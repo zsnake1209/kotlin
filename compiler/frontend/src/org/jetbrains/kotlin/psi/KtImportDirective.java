@@ -96,7 +96,7 @@ public class KtImportDirective extends KtElementImplStub<KotlinImportDirectiveSt
             alias = Name.identifier(aliasName);
         }
 
-        return new ImportPath(importFqn, isAllUnder(), alias);
+        return new ImportPath(importFqn, isAllUnder(), alias, this);
     }
 
     public boolean isValidImport() {

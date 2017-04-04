@@ -400,7 +400,7 @@ class TypeResolver(
                 }
 
                 val qualifierPart = qualifierParts.single()
-                type(resolveTypeForTypeParameter(c, annotations, descriptor, qualifierPart.expression, qualifierPart.typeArguments))
+                type(resolveTypeForTypeParameter(c, annotations, descriptor, qualifierPart.expression!!, qualifierPart.typeArguments))
             }
             is ClassDescriptor -> resolveTypeForClass(c, annotations, descriptor, element, qualifierResolutionResult)
             is TypeAliasDescriptor -> resolveTypeForTypeAlias(c, annotations, descriptor, element, qualifierResolutionResult)
@@ -699,7 +699,7 @@ class TypeResolver(
             if (currentArguments.size != currentParameters.size) {
                 c.trace.report(
                         WRONG_NUMBER_OF_TYPE_ARGUMENTS.on(
-                                qualifierPart.typeArguments ?: qualifierPart.expression,
+                                qualifierPart.typeArguments ?: qualifierPart.expression!!,
                                 currentParameters.size, classifierDescriptorChain[index]
                         )
                 )
@@ -740,7 +740,7 @@ class TypeResolver(
 
             if (restArguments == null && typeArgumentsCanBeSpecifiedCount > result.size) {
                 c.trace.report(
-                        OUTER_CLASS_ARGUMENTS_REQUIRED.on(qualifierParts.first().expression, nextParameterOwner))
+                        OUTER_CLASS_ARGUMENTS_REQUIRED.on(qualifierParts.first().expression!!, nextParameterOwner))
                 return null
             }
             else if (restArguments == null) {
