@@ -187,61 +187,6 @@ public class KtPsiUtil {
     }
 
     @Nullable
-    public static <T extends PsiElement> T getDirectParentOfTypeForBlock(@NotNull KtBlockExpression block, @NotNull Class<T> aClass) {
-        T parent = PsiTreeUtil.getParentOfType(block, aClass);
-        if (parent instanceof KtIfExpression) {
-            KtIfExpression ifExpression = (KtIfExpression) parent;
-            if (ifExpression.getElse() == block || ifExpression.getThen() == block) {
-                return parent;
-            }
-        }
-        if (parent instanceof KtWhenExpression) {
-            KtWhenExpression whenExpression = (KtWhenExpression) parent;
-            for (KtWhenEntry whenEntry : whenExpression.getEntries()) {
-                if (whenEntry.getExpression() == block) {
-                    return parent;
-                }
-            }
-        }
-        if (parent instanceof KtFunctionLiteral) {
-            KtFunctionLiteral functionLiteral = (KtFunctionLiteral) parent;
-            if (functionLiteral.getBodyExpression() == block) {
-                return parent;
-            }
-        }
-        if (parent instanceof KtTryExpression) {
-            KtTryExpression tryExpression = (KtTryExpression) parent;
-            if (tryExpression.getTryBlock() == block) {
-                return parent;
-            }
-            for (KtCatchClause clause : tryExpression.getCatchClauses()) {
-                if (clause.getCatchBody() == block) {
-                    return parent;
-                }
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    public static Name getAliasName(@NotNull KtImportDirective importDirective) {
-        if (importDirective.isAllUnder()) {
-            return null;
-        }
-        String aliasName = importDirective.getAliasName();
-        KtExpression importedReference = importDirective.getImportedReference();
-        if (importedReference == null) {
-            return null;
-        }
-        KtSimpleNameExpression referenceExpression = getLastReference(importedReference);
-        if (aliasName == null) {
-            aliasName = referenceExpression != null ? referenceExpression.getReferencedName() : null;
-        }
-
-        return aliasName != null && !aliasName.isEmpty() ? Name.identifier(aliasName) : null;
-    }
-
-    @Nullable
     public static KtSimpleNameExpression getLastReference(@NotNull KtExpression importedReference) {
         KtElement selector = KtPsiUtilKt.getQualifiedElementSelector(importedReference);
         return selector instanceof KtSimpleNameExpression ? (KtSimpleNameExpression) selector : null;
@@ -285,6 +230,7 @@ public class KtPsiUtil {
 
     @Nullable
     @Contract("null, _ -> null")
+    @SafeVarargs
     public static PsiElement getTopmostParentOfTypes(
             @Nullable PsiElement element,
             @NotNull Class<? extends PsiElement>... parentTypes) {
@@ -347,11 +293,12 @@ public class KtPsiUtil {
         return classOrObject instanceof KtClass && ((KtClass) classOrObject).isInterface();
     }
 
-    @Nullable
+    @NotNull
     public static KtClassOrObject getOutermostClassOrObject(@NotNull KtClassOrObject classOrObject) {
         KtClassOrObject current = classOrObject;
         while (true) {
             PsiElement parent = current.getParent();
+            //noinspection ConstantConditions
             assert classOrObject.getParent() != null : "Class with no parent: " + classOrObject.getText();
 
             if (parent instanceof PsiFile) {
@@ -580,7 +527,7 @@ public class KtPsiUtil {
     }
 
     @Nullable
-    public static PsiElement prevLeafIgnoringWhitespaceAndComments(@NotNull PsiElement element) {
+    private static PsiElement prevLeafIgnoringWhitespaceAndComments(@NotNull PsiElement element) {
         PsiElement prev = PsiTreeUtil.prevLeaf(element, true);
         while (prev != null && KtTokens.WHITE_SPACE_OR_COMMENT_BIT_SET.contains(prev.getNode().getElementType())) {
             prev = PsiTreeUtil.prevLeaf(prev, true);
@@ -601,11 +548,6 @@ public class KtPsiUtil {
     @NotNull
     public static String getText(@Nullable PsiElement element) {
         return element != null ? element.getText() : "";
-    }
-
-    @Nullable
-    public static String getNullableText(@Nullable PsiElement element) {
-        return element != null ? element.getText() : null;
     }
 
     /**
@@ -631,6 +573,7 @@ public class KtPsiUtil {
         return parent;
     }
 
+    @SafeVarargs
     public static <T extends PsiElement> T getLastChildByType(@NotNull PsiElement root, @NotNull Class<? extends T>... elementTypes) {
         PsiElement[] children = root.getChildren();
 
@@ -671,7 +614,7 @@ public class KtPsiUtil {
 
         if (results.isEmpty()) return null;
 
-        return first ? results.get(0) : results.get(results.size() - 1);
+        return results.get(first ? 0 : results.size() - 1);
     }
 
     @Nullable
@@ -798,11 +741,11 @@ public class KtPsiUtil {
         return getEnclosingElementForLocalDeclaration(declaration) != null;
     }
 
-    @Nullable
+    @NotNull
     public static KtToken getOperationToken(@NotNull KtOperationExpression expression) {
         KtSimpleNameExpression operationExpression = expression.getOperationReference();
         IElementType elementType = operationExpression.getReferencedNameElementType();
-        assert elementType == null || elementType instanceof KtToken :
+        assert elementType instanceof KtToken :
                 "JetOperationExpression should have operation token of type KtToken: " +
                 expression;
         return (KtToken) elementType;
@@ -832,13 +775,12 @@ public class KtPsiUtil {
                 //check that it's in inlineable call would be in resolve call of parent
                 return (KtExpression) parent;
             }
-            else if (parent instanceof KtParenthesizedExpression || parent instanceof KtBinaryExpressionWithTypeRHS) {
-                parent = parent.getParent();
-            }
-            else if (parent instanceof KtValueArgument || parent instanceof KtValueArgumentList) {
-                parent = parent.getParent();
-            }
-            else if (parent instanceof KtLambdaExpression || parent instanceof KtAnnotatedExpression) {
+            else if (parent instanceof KtParenthesizedExpression ||
+                     parent instanceof KtBinaryExpressionWithTypeRHS ||
+                     parent instanceof KtValueArgument ||
+                     parent instanceof KtValueArgumentList ||
+                     parent instanceof KtLambdaExpression ||
+                     parent instanceof KtAnnotatedExpression) {
                 parent = parent.getParent();
             }
             else {
