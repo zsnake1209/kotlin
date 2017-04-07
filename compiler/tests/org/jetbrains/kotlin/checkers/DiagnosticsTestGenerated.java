@@ -10006,6 +10006,12 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("flexibleTypesAsUpperBound.kt")
+            public void testFlexibleTypesAsUpperBound() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/flexibleTypesAsUpperBound.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("functionPlaceholderError.kt")
             public void testFunctionPlaceholderError() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/functionPlaceholderError.kt");
@@ -10117,6 +10123,12 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
             @TestMetadata("noInformationForParameter.kt")
             public void testNoInformationForParameter() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/noInformationForParameter.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("nullableTypeArgumentWithNotNullUpperBound.kt")
+            public void testNullableTypeArgumentWithNotNullUpperBound() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/nullableTypeArgumentWithNotNullUpperBound.kt");
                 doTest(fileName);
             }
 
