@@ -48,6 +48,7 @@ def groovyClassesDir = file("${buildDir}/mainGroovyClasses")
 compileGroovy.destinationDir = groovyClassesDir
 sourceSets.main.compileClasspath += files(groovyClassesDir)
 compileGroovy.classpath = sourceSets.main.compileClasspath - files(groovyClassesDir)
+sourceSets.main.java.srcDirs += sourceSets.main.kotlin.srcDirs
 
 processResources {
     expand(project.properties)

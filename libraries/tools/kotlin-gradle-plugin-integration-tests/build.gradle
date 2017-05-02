@@ -32,6 +32,8 @@ tasks.withType(Test) {
 
     exclude '**/KotlinAndroid*'
 
+    executable = "${JDK_18}/bin/java"
+
     testLogging {
         // set options for log level LIFECYCLE
         events "passed", "skipped", "failed", "standardOut"
