@@ -30,7 +30,9 @@ processResources {
 tasks.withType(Test) {
     onlyIf { !project.hasProperty("noTest") }
 
-    exclude '**/KotlinAndroid*'
+    if (!project.hasProperty("android")) {
+        exclude '**/KotlinAndroid*'
+    }
 
     executable = "${JDK_18}/bin/java"
 
