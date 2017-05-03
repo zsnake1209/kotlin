@@ -8,8 +8,6 @@ repositories {
     maven { url 'http://repository.jetbrains.com/utils/' }
 }
 
-def kotlinVersion = project.version
-
 dependencies {
     testCompile project(':kotlin-gradle-plugin')
     testCompile project(':kotlin-gradle-plugin').sourceSets.test.output
