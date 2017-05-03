@@ -33,7 +33,4 @@ internal class CandidateWithBoundDispatchReceiverImpl(
         override val dispatchReceiver: ReceiverValueWithSmartCastInfo?,
         override val descriptor: CallableDescriptor,
         override val diagnostics: List<ResolutionDiagnostic>
-) : CandidateWithBoundDispatchReceiver {
-    override fun copy(newDescriptor: CallableDescriptor) =
-            CandidateWithBoundDispatchReceiverImpl(dispatchReceiver, newDescriptor, diagnostics)
-}
+) : CandidateWithBoundDispatchReceiver
