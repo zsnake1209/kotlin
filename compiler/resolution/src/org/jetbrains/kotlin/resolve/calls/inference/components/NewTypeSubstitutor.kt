@@ -16,6 +16,10 @@
 
 package org.jetbrains.kotlin.resolve.calls.inference.components
 
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
+import org.jetbrains.kotlin.resolve.calls.inference.model.TypeVariableFromCallableDescriptor
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.NewCapturedType
 import org.jetbrains.kotlin.types.checker.NewCapturedTypeConstructor
@@ -120,4 +124,16 @@ interface NewTypeSubstitutor {
 class NewTypeSubstitutorByConstructorMap(val map: Map<TypeConstructor, UnwrappedType>) : NewTypeSubstitutor {
     override val isEmpty get() = map.isEmpty()
     override fun substituteNotNullTypeWithConstructor(constructor: TypeConstructor): UnwrappedType? = map[constructor]
+}
+
+class FreshVariableNewTypeSubstitutor(val freshVariables: List<TypeVariableFromCallableDescriptor>) : NewTypeSubstitutor {
+    override val isEmpty get() = freshVariables.isEmpty()
+
+    override fun substituteNotNullTypeWithConstructor(constructor: TypeConstructor): UnwrappedType? {
+        val indexPropozal = (constructor.declarationDescriptor as? TypeParameterDescriptor)?.index ?: return null
+        val typeVariable = freshVariables.getOrNull(indexPropozal) ?: return null
+        if (typeVariable.originalTypeParameter.typeConstructor != constructor) return null
+
+        return typeVariable.defaultType
+    }
 }
