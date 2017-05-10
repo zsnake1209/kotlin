@@ -21,11 +21,13 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
 import com.intellij.psi.impl.compiled.ClsClassImpl
 import com.intellij.psi.impl.compiled.ClsFileImpl
+import com.intellij.psi.impl.java.stubs.PsiJavaFileStub
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.asJava.LightClassBuilder
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.builder.ClsWrapperStubPsiFactory
+import org.jetbrains.kotlin.asJava.builder.KotlinLightClassBuilderFactory
 import org.jetbrains.kotlin.asJava.builder.InvalidLightClassDataHolder
 import org.jetbrains.kotlin.asJava.builder.LightClassDataHolder
 import org.jetbrains.kotlin.asJava.classes.*
@@ -341,6 +343,8 @@ class IDELightClassGenerationSupport(private val project: Project) : LightClassG
         javaFileStub.psi = fakeFile
         return fakeFile.classes.single() as ClsClassImpl
     }
+
+    override fun createLightClassBuilderFactory(javaFileStub: PsiJavaFileStub) = KotlinLightClassBuilderFactory(javaFileStub)
 }
 
 class KtFileClassProviderImpl(val lightClassGenerationSupport: LightClassGenerationSupport) : KtFileClassProvider {

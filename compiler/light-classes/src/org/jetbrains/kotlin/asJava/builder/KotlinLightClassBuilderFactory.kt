@@ -21,13 +21,16 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.java.stubs.PsiJavaFileStub
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.containers.Stack
+import org.jetbrains.kotlin.codegen.AbstractClassBuilder
 import org.jetbrains.kotlin.codegen.ClassBuilder
 import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.ClassBuilderMode
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
+import org.jetbrains.org.objectweb.asm.FieldVisitor
+import org.jetbrains.org.objectweb.asm.MethodVisitor
 
-class KotlinLightClassBuilderFactory(private val javaFileStub: PsiJavaFileStub) : ClassBuilderFactory {
-    private val stubStack = Stack<StubElement<PsiElement>>().apply {
+open class KotlinLightClassBuilderFactory(protected val javaFileStub: PsiJavaFileStub) : ClassBuilderFactory {
+    protected val stubStack = Stack<StubElement<PsiElement>>().apply {
         @Suppress("UNCHECKED_CAST")
         push(javaFileStub as StubElement<PsiElement>)
     }
@@ -45,6 +48,20 @@ class KotlinLightClassBuilderFactory(private val javaFileStub: PsiJavaFileStub) 
             LOG.error("Unbalanced stack operations: " + pop)
         }
         return javaFileStub
+    }
+}
+
+class CliLightClassBuilderFactory(javaFileStub: PsiJavaFileStub) : KotlinLightClassBuilderFactory(javaFileStub) {
+    override fun newClassBuilder(origin: JvmDeclarationOrigin): StubClassBuilder {
+        return object: StubClassBuilder(stubStack, javaFileStub) {
+            override fun newMethod(origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, exceptions: Array<out String>?): MethodVisitor {
+                return AbstractClassBuilder.EMPTY_METHOD_VISITOR
+            }
+
+            override fun newField(origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, value: Any?): FieldVisitor {
+                return AbstractClassBuilder.EMPTY_FIELD_VISITOR
+            }
+        }
     }
 }
 
