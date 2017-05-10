@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.cli.jvm.compiler
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiManager
+import com.intellij.psi.impl.java.stubs.PsiJavaFileStub
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.PsiSearchScopeUtil
 import com.intellij.util.Function
@@ -240,4 +241,6 @@ class CliLightClassGenerationSupport(project: Project) : LightClassGenerationSup
             JvmFileClassUtil.getFileClassInfoNoResolve(it).facadeClassFqName.shortName().asString()
         }
     }
+
+    override fun createLightClassBuilderFactory(javaFileStub: PsiJavaFileStub) = CliLightClassBuilderFactory(javaFileStub)
 }

@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.asJava
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
+import com.intellij.psi.impl.java.stubs.PsiJavaFileStub
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.asJava.builder.*
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
@@ -82,4 +83,6 @@ abstract class LightClassGenerationSupport {
             return ServiceManager.getService(project, LightClassGenerationSupport::class.java)
         }
     }
+
+    abstract fun createLightClassBuilderFactory(javaFileStub: PsiJavaFileStub): KotlinLightClassBuilderFactory
 }

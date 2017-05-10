@@ -27,6 +27,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.compiled.ClsFileImpl
 import com.intellij.psi.impl.java.stubs.PsiJavaFileStub
 import com.intellij.psi.impl.java.stubs.impl.PsiJavaFileStubImpl
+import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.name.FqName
@@ -46,7 +47,7 @@ fun buildLightClass(
     val project = files.first().project
 
     try {
-        val classBuilderFactory = KotlinLightClassBuilderFactory(createJavaFileStub(project, packageFqName, files))
+        val classBuilderFactory = LightClassGenerationSupport.getInstance(project).createLightClassBuilderFactory(createJavaFileStub(project, packageFqName, files))
         val state = GenerationState(
                 project,
                 classBuilderFactory,
