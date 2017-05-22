@@ -19,18 +19,18 @@ package org.jetbrains.kotlin.js.resolve
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.resolve.ImportPath
+import org.jetbrains.kotlin.resolve.ImportDirective
 import org.jetbrains.kotlin.resolve.MultiTargetPlatform
 import org.jetbrains.kotlin.resolve.PlatformConfigurator
 import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 
 object JsPlatform : TargetPlatform("JS") {
-    private val defaultImports = LockBasedStorageManager().createMemoizedFunction<Boolean, List<ImportPath>> { includeKotlinComparisons ->
-            Default.getDefaultImports(includeKotlinComparisons) + ImportPath.fromString("kotlin.js.*")
+    private val defaultImports = LockBasedStorageManager().createMemoizedFunction<Boolean, List<ImportDirective>> { includeKotlinComparisons ->
+        Default.getDefaultImports(includeKotlinComparisons) + ImportDirective.fromString("kotlin.js.*")
     }
 
-    override fun getDefaultImports(includeKotlinComparisons: Boolean): List<ImportPath> = defaultImports(includeKotlinComparisons)
+    override fun getDefaultImports(includeKotlinComparisons: Boolean): List<ImportDirective> = defaultImports(includeKotlinComparisons)
 
     override val platformConfigurator: PlatformConfigurator = JsPlatformConfigurator
 

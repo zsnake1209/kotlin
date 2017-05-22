@@ -40,7 +40,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.parents
-import org.jetbrains.kotlin.resolve.ImportPath
+import org.jetbrains.kotlin.resolve.ImportDirective
 
 abstract class RenameKotlinPsiProcessor : RenamePsiElementProcessor() {
     override fun canProcessElement(element: PsiElement): Boolean = element is KtNamedDeclaration
@@ -102,7 +102,7 @@ abstract class RenameKotlinPsiProcessor : RenamePsiElementProcessor() {
                         val newFqName = fqName.parent().child(Name.identifier(newName))
                         val importList = importDirective.parent as KtImportList
                         if (importList.imports.none { it.importedFqName == newFqName }) {
-                            val newImportDirective = KtPsiFactory(element).createImportDirective(ImportPath(newFqName, false))
+                            val newImportDirective = KtPsiFactory(element).createImportDirective(ImportDirective(newFqName, false))
                             importDirective.parent.addAfter(newImportDirective, importDirective)
                         }
                     }

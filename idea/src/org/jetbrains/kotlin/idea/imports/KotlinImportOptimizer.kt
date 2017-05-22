@@ -37,7 +37,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.Import
+import org.jetbrains.kotlin.resolve.ImportDirective
 import org.jetbrains.kotlin.resolve.descriptorUtil.getImportableDescriptor
 import org.jetbrains.kotlin.resolve.scopes.HierarchicalScope
 import org.jetbrains.kotlin.resolve.scopes.utils.*
@@ -172,7 +172,7 @@ class KotlinImportOptimizer : ImportOptimizer {
             return visitor.data
         }
 
-        fun prepareOptimizedImports(file: KtFile, data: OptimizedImportsBuilder.InputData): List<Import>? {
+        fun prepareOptimizedImports(file: KtFile, data: OptimizedImportsBuilder.InputData): List<ImportDirective>? {
             val settings = KotlinCodeStyleSettings.getInstance(file.project)
             val options = OptimizedImportsBuilder.Options(
                     settings.NAME_COUNT_TO_USE_STAR_IMPORT,
@@ -181,7 +181,7 @@ class KotlinImportOptimizer : ImportOptimizer {
             return OptimizedImportsBuilder(file, data, options).buildOptimizedImports()
         }
 
-        fun replaceImports(file: KtFile, imports: List<Import>) {
+        fun replaceImports(file: KtFile, imports: List<ImportDirective>) {
             val importList = file.importList!!
             val oldImports = importList.imports
             val psiFactory = KtPsiFactory(file.project)

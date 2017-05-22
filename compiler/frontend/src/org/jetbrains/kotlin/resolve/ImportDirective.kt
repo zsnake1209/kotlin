@@ -21,35 +21,27 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.renderer.render
 
-interface Import {
-    val isAllUnder: Boolean
-    val fqName: FqName
-    val alias: Name?
+val ImportDirective.hasAlias get() = alias != null
+val ImportDirective.importedName: Name? get() = if (isAllUnder) null else (alias ?: fqName.shortName())
 
-    val importDirective: KtImportDirective?
-}
-
-val Import.hasAlias get() = alias != null
-val Import.importedName: Name? get() = if (isAllUnder) null else (alias ?: fqName.shortName())
-
-fun Import.getText(): String {
+fun ImportDirective.getText(): String {
     val fqNameStr = fqName.toUnsafe().render()
     val pathStr = fqNameStr + if (isAllUnder) ".*" else ""
-    return pathStr + if (alias != null && !isAllUnder) (" as " + alias?.asString()) else ""
+    return pathStr + if (alias != null && !isAllUnder) (" as " + alias.asString()) else ""
 }
 
-class ImportPath @JvmOverloads constructor(
-        override val fqName: FqName,
-        override val isAllUnder: Boolean,
-        override val alias: Name? = null,
-        override val importDirective: KtImportDirective? = null): Import {
+class ImportDirective @JvmOverloads constructor(
+        val fqName: FqName,
+        val isAllUnder: Boolean,
+        val alias: Name? = null,
+        val psi: KtImportDirective? = null) {
     override fun toString(): String = getText()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
 
-        other as ImportPath
+        other as ImportDirective
 
         if (fqName != other.fqName) return false
         if (isAllUnder != other.isAllUnder) return false
@@ -66,12 +58,12 @@ class ImportPath @JvmOverloads constructor(
     }
 
     companion object {
-        @JvmStatic fun fromString(pathStr: String): ImportPath {
+        @JvmStatic fun fromString(pathStr: String): ImportDirective {
             if (pathStr.endsWith(".*")) {
-                return ImportPath(FqName(pathStr.substring(0, pathStr.length - 2)), isAllUnder = true)
+                return ImportDirective(FqName(pathStr.substring(0, pathStr.length - 2)), isAllUnder = true)
             }
             else {
-                return ImportPath(FqName(pathStr), isAllUnder = false)
+                return ImportDirective(FqName(pathStr), isAllUnder = false)
             }
         }
     }

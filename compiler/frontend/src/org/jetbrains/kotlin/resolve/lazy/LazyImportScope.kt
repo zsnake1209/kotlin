@@ -42,20 +42,20 @@ import org.jetbrains.kotlin.utils.Printer
 import java.util.*
 
 interface IndexedImports {
-    val imports: List<Import>
-    fun importsForName(name: Name): Collection<Import>
+    val imports: List<ImportDirective>
+    fun importsForName(name: Name): Collection<ImportDirective>
 }
 
-class AllUnderImportsIndexed(allImports: Collection<Import>) : IndexedImports {
+class AllUnderImportsIndexed(allImports: Collection<ImportDirective>) : IndexedImports {
     override val imports = allImports.filter { it.isAllUnder }
     override fun importsForName(name: Name) = imports
 }
 
-class ExplicitImportsIndexed(allImports: Collection<Import>) : IndexedImports {
+class ExplicitImportsIndexed(allImports: Collection<ImportDirective>) : IndexedImports {
     override val imports = allImports.filter { !it.isAllUnder }
 
-    private val nameToImports: ListMultimap<Name, Import> by lazy {
-        val builder = ImmutableListMultimap.builder<Name, Import>()
+    private val nameToImports: ListMultimap<Name, ImportDirective> by lazy {
+        val builder = ImmutableListMultimap.builder<Name, ImportDirective>()
 
         for (import in imports) {
             val importedName = import.importedName ?: continue // parse error
@@ -65,12 +65,12 @@ class ExplicitImportsIndexed(allImports: Collection<Import>) : IndexedImports {
         builder.build()
     }
 
-    override fun importsForName(name: Name): List<Import> = nameToImports.get(name)
+    override fun importsForName(name: Name): List<ImportDirective> = nameToImports.get(name)
 }
 
 interface ImportResolver {
     fun forceResolveAllImports()
-    fun forceResolveImport(import: Import)
+    fun forceResolveImport(import: ImportDirective)
 }
 
 class LazyImportResolver(
@@ -86,12 +86,12 @@ class LazyImportResolver(
 ) : ImportResolver {
 
     // Include directive into equals to write diagnostics to duplicate imports if necessary
-    private data class ImportWithDirective(val import: Import, val directive: KtImportDirective? = import.importDirective)
+    private data class ImportWithDirective(val import: ImportDirective, val directive: KtImportDirective? = import.psi)
 
     private val importedScopesProvider = storageManager.createMemoizedFunctionWithNullableValues { (import, _): ImportWithDirective ->
         qualifiedExpressionResolver.processImportReference(
                 import, moduleDescriptor, traceForImportResolve, excludedImportNames, packageFragment,
-                import.importDirective?.suppressDiagnosticsInDebugMode() ?: false
+                import.psi?.suppressDiagnosticsInDebugMode() ?: false
         )
     }
 
@@ -116,7 +116,7 @@ class LazyImportResolver(
             val importedName = import.importedName
             if (scope != null && importedName != null) {
                 // TODO: Is NoLookupLocation.FROM_SYNTHETIC_SCOPE will do?
-                val location = import.importDirective?.let { KotlinLookupLocation(it) } ?: NoLookupLocation.FROM_SYNTHETIC_SCOPE
+                val location = import.psi?.let { KotlinLookupLocation(it) } ?: NoLookupLocation.FROM_SYNTHETIC_SCOPE
                 if (scope.getContributedClassifier(importedName, location) != null) {
                     explicitClassImports.put(importedName, ImportWithDirective(import))
                 }
@@ -143,8 +143,8 @@ class LazyImportResolver(
         forceResolveAllImportsTask()
     }
 
-    private fun checkResolvedImportDirective(import: Import) {
-        val importDirective = import.importDirective ?: return
+    private fun checkResolvedImportDirective(import: ImportDirective) {
+        val importDirective = import.psi ?: return
 
         val importedReference = importDirective.importedReference ?: return
         val lastReference = KtPsiUtil.getLastReference(importedReference) ?: return
@@ -158,7 +158,7 @@ class LazyImportResolver(
         }
     }
 
-    override fun forceResolveImport(import: Import) {
+    override fun forceResolveImport(import: ImportDirective) {
         forceResolveImportDirective(ImportWithDirective(import))
     }
 
@@ -195,7 +195,7 @@ class LazyImportResolver(
         }
     }
 
-    fun getImportScope(import: Import): ImportingScope {
+    fun getImportScope(import: ImportDirective): ImportingScope {
         return importedScopesProvider(ImportWithDirective(import)) ?: ImportingScope.Empty
     }
 }

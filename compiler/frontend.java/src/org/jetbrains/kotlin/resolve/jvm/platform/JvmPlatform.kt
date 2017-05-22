@@ -24,16 +24,16 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import java.util.*
 
 object JvmPlatform : TargetPlatform("JVM") {
-    private val defaultImports = LockBasedStorageManager().createMemoizedFunction<Boolean, List<ImportPath>> { includeKotlinComparisons ->
-        ArrayList<ImportPath>().apply {
+    private val defaultImports = LockBasedStorageManager().createMemoizedFunction<Boolean, List<ImportDirective>> { includeKotlinComparisons ->
+        ArrayList<ImportDirective>().apply {
             addAll(Default.getDefaultImports(includeKotlinComparisons))
 
-            add(ImportPath.fromString("java.lang.*"))
-            add(ImportPath.fromString("kotlin.jvm.*"))
+            add(ImportDirective.fromString("java.lang.*"))
+            add(ImportDirective.fromString("kotlin.jvm.*"))
 
             fun addAllClassifiersFromScope(scope: MemberScope) {
                 for (descriptor in scope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS, MemberScope.ALL_NAME_FILTER)) {
-                    add(ImportPath(DescriptorUtils.getFqNameSafe(descriptor), false))
+                    add(ImportDirective(DescriptorUtils.getFqNameSafe(descriptor), false))
                 }
             }
 
@@ -44,7 +44,7 @@ object JvmPlatform : TargetPlatform("JVM") {
 
     }
 
-    override fun getDefaultImports(includeKotlinComparisons: Boolean): List<ImportPath> = defaultImports(includeKotlinComparisons)
+    override fun getDefaultImports(includeKotlinComparisons: Boolean): List<ImportDirective> = defaultImports(includeKotlinComparisons)
 
     override val platformConfigurator: PlatformConfigurator = JvmPlatformConfigurator
 

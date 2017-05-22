@@ -34,15 +34,15 @@ abstract class TargetPlatform(val platformName: String) {
     override fun toString() = platformName
 
     abstract val platformConfigurator: PlatformConfigurator
-    abstract fun getDefaultImports(includeKotlinComparisons: Boolean): List<ImportPath>
+    abstract fun getDefaultImports(includeKotlinComparisons: Boolean): List<ImportDirective>
     open val excludedImports: List<FqName> get() = emptyList()
 
     abstract val multiTargetPlatform: MultiTargetPlatform
 
     object Default : TargetPlatform("Default") {
-        private val defaultImports = LockBasedStorageManager().createMemoizedFunction<Boolean, List<ImportPath>> {
+        private val defaultImports = LockBasedStorageManager().createMemoizedFunction<Boolean, List<ImportDirective>> {
             includeKotlinComparisons ->
-            ArrayList<ImportPath>().apply {
+            ArrayList<ImportDirective>().apply {
                 listOf(
                         "kotlin.*",
                         "kotlin.annotation.*",
@@ -51,15 +51,15 @@ abstract class TargetPlatform(val platformName: String) {
                         "kotlin.sequences.*",
                         "kotlin.text.*",
                         "kotlin.io.*"
-                ).forEach { add(ImportPath.fromString(it)) }
+                ).forEach { add(ImportDirective.fromString(it)) }
 
                 if (includeKotlinComparisons) {
-                    add(ImportPath.fromString("kotlin.comparisons.*"))
+                    add(ImportDirective.fromString("kotlin.comparisons.*"))
                 }
             }
         }
 
-        override fun getDefaultImports(includeKotlinComparisons: Boolean): List<ImportPath> = defaultImports(includeKotlinComparisons)
+        override fun getDefaultImports(includeKotlinComparisons: Boolean): List<ImportDirective> = defaultImports(includeKotlinComparisons)
 
         override val platformConfigurator =
                 object : PlatformConfigurator(

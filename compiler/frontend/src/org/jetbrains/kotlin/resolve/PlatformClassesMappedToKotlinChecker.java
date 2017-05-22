@@ -32,10 +32,10 @@ public class PlatformClassesMappedToKotlinChecker {
     public static void checkPlatformClassesMappedToKotlin(
             @NotNull PlatformToKotlinClassMap platformToKotlinMap,
             @NotNull BindingTrace trace,
-            @NotNull Import anImport,
+            @NotNull ImportDirective anImport,
             @NotNull Collection<? extends DeclarationDescriptor> descriptors
     ) {
-        KtImportDirective importDirective = anImport.getImportDirective();
+        KtImportDirective importDirective = anImport.getPsi();
         if (importDirective == null) return;
 
         KtExpression importedReference = importDirective.getImportedReference();

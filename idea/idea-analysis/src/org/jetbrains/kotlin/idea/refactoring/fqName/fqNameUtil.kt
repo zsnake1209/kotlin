@@ -23,8 +23,7 @@ import com.intellij.psi.PsiPackage
 import org.jetbrains.kotlin.asJava.namedUnwrappedElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
-import org.jetbrains.kotlin.resolve.Import
-import org.jetbrains.kotlin.resolve.ImportPath
+import org.jetbrains.kotlin.resolve.ImportDirective
 import org.jetbrains.kotlin.resolve.hasAlias
 
 /**
@@ -44,7 +43,7 @@ fun PsiElement.getKotlinFqName(): FqName? {
     }
 }
 
-fun FqName.isImported(importPath: Import, skipAliasedImports: Boolean = true): Boolean {
+fun FqName.isImported(importPath: ImportDirective, skipAliasedImports: Boolean = true): Boolean {
     return when {
         skipAliasedImports && importPath.hasAlias -> false
         importPath.isAllUnder && !isRoot -> importPath.fqName == this.parent()
@@ -52,12 +51,12 @@ fun FqName.isImported(importPath: Import, skipAliasedImports: Boolean = true): B
     }
 }
 
-fun ImportPath.isImported(alreadyImported: ImportPath): Boolean {
+fun ImportDirective.isImported(alreadyImported: ImportDirective): Boolean {
     return if (isAllUnder || hasAlias) this == alreadyImported else fqName.isImported(alreadyImported)
 }
 
-private fun ImportPath.isImported(imports: Iterable<ImportPath>): Boolean = imports.any { isImported(it) }
+private fun ImportDirective.isImported(imports: Iterable<ImportDirective>): Boolean = imports.any { isImported(it) }
 
-fun ImportPath.isImported(imports: Iterable<ImportPath>, excludedFqNames: Iterable<FqName>): Boolean {
+fun ImportDirective.isImported(imports: Iterable<ImportDirective>, excludedFqNames: Iterable<FqName>): Boolean {
     return isImported(imports) && (isAllUnder || this.fqName !in excludedFqNames)
 }

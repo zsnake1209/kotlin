@@ -23,8 +23,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles;
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.Name;
-import org.jetbrains.kotlin.resolve.Import;
-import org.jetbrains.kotlin.resolve.ImportPath;
+import org.jetbrains.kotlin.resolve.ImportDirective;
 import org.jetbrains.kotlin.test.KotlinTestUtils;
 import org.jetbrains.kotlin.test.KotlinTestWithEnvironment;
 import org.junit.Assert;
@@ -65,21 +64,21 @@ public class KtPsiUtilTest extends KotlinTestWithEnvironment {
 
     public void testConvertToImportPath() {
         Assert.assertEquals(null, getImportPathFromParsed("import "));
-        Assert.assertEquals(new ImportPath(new FqName("some"), false), getImportPathFromParsed("import some."));
+        Assert.assertEquals(new ImportDirective(new FqName("some"), false), getImportPathFromParsed("import some."));
         Assert.assertEquals(null, getImportPathFromParsed("import *"));
-        Assert.assertEquals(new ImportPath(new FqName("some.test"), true), getImportPathFromParsed("import some.test.* as SomeTest"));
-        Assert.assertEquals(new ImportPath(new FqName("some"), false), getImportPathFromParsed("import some?.Test"));
+        Assert.assertEquals(new ImportDirective(new FqName("some.test"), true), getImportPathFromParsed("import some.test.* as SomeTest"));
+        Assert.assertEquals(new ImportDirective(new FqName("some"), false), getImportPathFromParsed("import some?.Test"));
 
-        Assert.assertEquals(new ImportPath(new FqName("some"), false), getImportPathFromParsed("import some"));
-        Assert.assertEquals(new ImportPath(new FqName("some"), true), getImportPathFromParsed("import some.*"));
-        Assert.assertEquals(new ImportPath(new FqName("some.Test"), false), getImportPathFromParsed("import some.Test"));
-        Assert.assertEquals(new ImportPath(new FqName("some.test"), true), getImportPathFromParsed("import some.test.*"));
-        Assert.assertEquals(new ImportPath(new FqName("some.test"), false, Name.identifier("SomeTest")), getImportPathFromParsed("import some.test as SomeTest"));
+        Assert.assertEquals(new ImportDirective(new FqName("some"), false), getImportPathFromParsed("import some"));
+        Assert.assertEquals(new ImportDirective(new FqName("some"), true), getImportPathFromParsed("import some.*"));
+        Assert.assertEquals(new ImportDirective(new FqName("some.Test"), false), getImportPathFromParsed("import some.Test"));
+        Assert.assertEquals(new ImportDirective(new FqName("some.test"), true), getImportPathFromParsed("import some.test.*"));
+        Assert.assertEquals(new ImportDirective(new FqName("some.test"), false, Name.identifier("SomeTest")), getImportPathFromParsed("import some.test as SomeTest"));
 
-        Assert.assertEquals(new ImportPath(new FqName("some.Test"), false), getImportPathFromParsed("import some./* hello world */Test"));
-        Assert.assertEquals(new ImportPath(new FqName("some.Test"), false), getImportPathFromParsed("import some.    Test"));
+        Assert.assertEquals(new ImportDirective(new FqName("some.Test"), false), getImportPathFromParsed("import some./* hello world */Test"));
+        Assert.assertEquals(new ImportDirective(new FqName("some.Test"), false), getImportPathFromParsed("import some.    Test"));
 
-        Assert.assertNotSame(new ImportPath(new FqName("some.test"), false), getImportPathFromParsed("import some.Test"));
+        Assert.assertNotSame(new ImportDirective(new FqName("some.test"), false), getImportPathFromParsed("import some.Test"));
     }
 
     public void testIsLocalClass() throws IOException {
@@ -115,7 +114,7 @@ public class KtPsiUtilTest extends KotlinTestWithEnvironment {
         );
     }
 
-    private Import getImportPathFromParsed(String text) {
+    private ImportDirective getImportPathFromParsed(String text) {
         KtImportDirective importDirective =
                 PsiTreeUtil.findChildOfType(KtPsiFactoryKt.KtPsiFactory(getProject()).createFile(text), KtImportDirective.class);
 

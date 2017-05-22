@@ -25,8 +25,7 @@ import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.psi.stubs.KotlinImportDirectiveStub;
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes;
-import org.jetbrains.kotlin.resolve.Import;
-import org.jetbrains.kotlin.resolve.ImportPath;
+import org.jetbrains.kotlin.resolve.ImportDirective;
 
 public class KtImportDirective extends KtElementImplStub<KotlinImportDirectiveStub> {
 
@@ -84,7 +83,7 @@ public class KtImportDirective extends KtElementImplStub<KotlinImportDirectiveSt
 
     @Nullable
     @IfNotParsed
-    public Import getImportPath() {
+    public ImportDirective getImportPath() {
         FqName importFqn = getImportedFqName();
         if (importFqn == null) {
             return null;
@@ -96,7 +95,7 @@ public class KtImportDirective extends KtElementImplStub<KotlinImportDirectiveSt
             alias = Name.identifier(aliasName);
         }
 
-        return new ImportPath(importFqn, isAllUnder(), alias, this);
+        return new ImportDirective(importFqn, isAllUnder(), alias, this);
     }
 
     public boolean isValidImport() {

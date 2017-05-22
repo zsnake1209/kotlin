@@ -20,17 +20,16 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.resolve.Import
-import org.jetbrains.kotlin.resolve.ImportPath
+import org.jetbrains.kotlin.resolve.ImportDirective
 import java.util.*
 
 abstract class ImportInsertHelper {
     /*TODO: implementation is not quite correct*/
-    abstract fun isImportedWithDefault(importPath: ImportPath, contextFile: KtFile): Boolean
+    abstract fun isImportedWithDefault(importPath: ImportDirective, contextFile: KtFile): Boolean
 
     abstract fun mayImportOnShortenReferences(descriptor: DeclarationDescriptor): Boolean
 
-    abstract val importSortComparator: Comparator<Import>
+    abstract val importSortComparator: Comparator<ImportDirective>
 
     abstract fun importDescriptor(file: KtFile, descriptor: DeclarationDescriptor, forceAllUnderImport: Boolean = false): ImportDescriptorResult
 

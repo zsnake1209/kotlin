@@ -86,7 +86,7 @@ class FileScopeFactory(
                 allUnderImportResolver.forceResolveAllImports()
             }
 
-            override fun forceResolveImport(import: Import) {
+            override fun forceResolveImport(import: ImportDirective) {
                 if (import.isAllUnder) {
                     allUnderImportResolver.forceResolveImport(import)
                 }
@@ -110,7 +110,7 @@ class FileScopeFactory(
 
             val extraImports = file.originalFile.virtualFile?.let { vFile ->
                 val scriptExternalDependencies = getScriptExternalDependencies(vFile, file.project)
-                scriptExternalDependencies?.imports?.map { ImportPath.fromString(it) }
+                scriptExternalDependencies?.imports?.map { ImportDirective.fromString(it) }
             }
 
             val allImplicitImports = defaultImportProvider.defaultImports concat extraImports

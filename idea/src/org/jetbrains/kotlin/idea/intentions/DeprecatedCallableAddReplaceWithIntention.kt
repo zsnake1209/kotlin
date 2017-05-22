@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getReceiverExpression
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.DescriptorUtils
-import org.jetbrains.kotlin.resolve.ImportPath
+import org.jetbrains.kotlin.resolve.ImportDirective
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedValueArgument
 import org.jetbrains.kotlin.resolve.calls.model.isReallySuccess
@@ -218,7 +218,7 @@ class DeprecatedCallableAddReplaceWithIntention : SelfTargetingRangeIntention<Kt
                              ?: return
                 if (target.isExtension || expression.getReceiverExpression() == null) {
                     val fqName = target.importableFqName ?: return
-                    if (!importHelper.isImportedWithDefault(ImportPath(fqName, false), file)
+                    if (!importHelper.isImportedWithDefault(ImportDirective(fqName, false), file)
                         && (target.containingDeclaration as? PackageFragmentDescriptor)?.fqName != currentPackageFqName) {
                         result.add(fqName.asString())
                     }

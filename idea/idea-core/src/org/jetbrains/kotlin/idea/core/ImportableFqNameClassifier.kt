@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.load.java.components.JavaAnnotationMapper
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.platform.JavaToKotlinClassMap
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.resolve.ImportPath
+import org.jetbrains.kotlin.resolve.ImportDirective
 import org.jetbrains.kotlin.resolve.hasAlias
 import java.util.*
 
@@ -60,7 +60,7 @@ class ImportableFqNameClassifier(private val file: KtFile) {
     }
 
     fun classify(fqName: FqName, isPackage: Boolean): Classification {
-        val importPath = ImportPath(fqName, false)
+        val importPath = ImportDirective(fqName, false)
 
         if (isPackage) {
             return when {

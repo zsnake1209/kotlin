@@ -172,8 +172,8 @@ class QualifiedExpressionResolver {
         return result.asReversed() to hasError
     }
 
-    fun Import.asQualifierPartList(): List<QualifierPart>? {
-        val directive = importDirective
+    fun ImportDirective.asQualifierPartList(): List<QualifierPart>? {
+        val directive = psi
         if (directive != null) {
             return directive.importedReference?.asQualifierPartList()
         }
@@ -182,7 +182,7 @@ class QualifiedExpressionResolver {
     }
 
     fun processImportReference(
-            import: Import,
+            import: ImportDirective,
             moduleDescriptor: ModuleDescriptor,
             trace: BindingTrace,
             excludedImportNames: Collection<FqName>,
@@ -195,7 +195,7 @@ class QualifiedExpressionResolver {
                 when {
                     suppressDiagnosticsInDebugMode -> null
                     packageFragmentForVisibilityCheck is DeclarationDescriptorWithSource && packageFragmentForVisibilityCheck.source == SourceElement.NO_SOURCE -> {
-                        val importDirective = import.importDirective
+                        val importDirective = import.psi
                         if (importDirective != null) {
                             PackageFragmentWithCustomSource(packageFragmentForVisibilityCheck, KotlinSourceElement(importDirective.containingKtFile))
                         }
@@ -227,7 +227,7 @@ class QualifiedExpressionResolver {
     private fun processSingleImport(
             moduleDescriptor: ModuleDescriptor,
             trace: BindingTrace,
-            import: Import,
+            import: ImportDirective,
             path: List<QualifierPart>,
             lastPart: QualifierPart,
             packageFragmentForVisibilityCheck: PackageFragmentDescriptor?
