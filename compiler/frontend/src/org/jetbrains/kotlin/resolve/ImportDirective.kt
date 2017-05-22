@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.resolve
 
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.renderer.render
 
@@ -34,7 +35,9 @@ class ImportDirective @JvmOverloads constructor(
         val fqName: FqName,
         val isAllUnder: Boolean,
         val alias: Name? = null,
-        val psi: KtImportDirective? = null) {
+
+        val psi: KtImportDirective? = null,
+        val reportOn: KtElement? = psi) {
     override fun toString(): String = getText()
 
     override fun equals(other: Any?): Boolean {

@@ -172,13 +172,9 @@ class QualifiedExpressionResolver {
         return result.asReversed() to hasError
     }
 
-    fun ImportDirective.asQualifierPartList(): List<QualifierPart>? {
-        val directive = psi
-        if (directive != null) {
-            return directive.importedReference?.asQualifierPartList()
-        }
-
-        return fqName.pathSegments().map { SyntheticQualifierPart(it) }
+    fun ImportDirective.asQualifierPartList(): List<QualifierPart>? = when {
+        psi != null -> psi.importedReference?.asQualifierPartList()
+        else -> fqName.pathSegments().map { SyntheticQualifierPart(it) }
     }
 
     fun processImportReference(
@@ -213,7 +209,7 @@ class QualifiedExpressionResolver {
 
             if (packageOrClassDescriptor is ClassDescriptor && packageOrClassDescriptor.kind.isSingleton) {
                 // todo report on star
-                lastPart.expression?.let { trace.report(Errors.CANNOT_ALL_UNDER_IMPORT_FROM_SINGLETON.on(it, packageOrClassDescriptor)) }
+                trace.report(Errors.CANNOT_ALL_UNDER_IMPORT_FROM_SINGLETON.on(lastPart.reportOn, packageOrClassDescriptor))
                 return null
             }
 
@@ -270,7 +266,7 @@ class QualifiedExpressionResolver {
             is PackageViewDescriptor -> {
                 val packageDescriptor = moduleDescriptor.getPackage(packageOrClassDescriptor.fqName.child(lastName))
                 if (!packageDescriptor.isEmpty()) {
-                    lastPart.expression?.let { trace.report(Errors.PACKAGE_CANNOT_BE_IMPORTED.on(it)) }
+                    trace.report(Errors.PACKAGE_CANNOT_BE_IMPORTED.on(lastPart.reportOn))
                     descriptors.add(packageOrClassDescriptor)
                 }
             }
@@ -280,7 +276,7 @@ class QualifiedExpressionResolver {
                 descriptors.addAll(memberScope.getContributedFunctions(lastName, lastPart.location))
                 descriptors.addAll(memberScope.getContributedVariables(lastName, lastPart.location))
                 if (descriptors.isNotEmpty()) {
-                    lastPart.expression?.let { trace.report(Errors.CANNOT_BE_IMPORTED.on(it, lastName)) }
+                    trace.report(Errors.CANNOT_BE_IMPORTED.on(lastPart.reportOn, lastName))
                 }
             }
 
@@ -322,9 +318,11 @@ class QualifiedExpressionResolver {
 
     interface QualifierPart {
         val name: Name
-        val expression: KtSimpleNameExpression?
         val typeArguments: KtTypeArgumentList?
         val location: LookupLocation
+
+        val expression: KtSimpleNameExpression?
+        val reportOn: KtSimpleNameExpression get() = expression!!
     }
 
     class SyntheticQualifierPart(override val name: Name) : QualifierPart {
@@ -605,12 +603,13 @@ class QualifiedExpressionResolver {
             isQualifier: Boolean = true
     ) {
         if (referenceExpression == null) return
+        val reportErrorsOn = referenceExpression
 
         if (descriptors.size > 1) {
             val visibleDescriptors = descriptors.filter { isVisible(it, shouldBeVisibleFrom, position) }
             if (visibleDescriptors.isEmpty()) {
                 val descriptor = descriptors.first() as DeclarationDescriptorWithVisibility
-                trace.report(Errors.INVISIBLE_REFERENCE.on(referenceExpression, descriptor, descriptor.visibility, descriptor))
+                trace.report(Errors.INVISIBLE_REFERENCE.on(reportErrorsOn, descriptor, descriptor.visibility, descriptor))
             }
             else if (visibleDescriptors.size > 1) {
                 trace.record(BindingContext.AMBIGUOUS_REFERENCE_TARGET, referenceExpression, visibleDescriptors)
@@ -633,26 +632,29 @@ class QualifiedExpressionResolver {
             isQualifier: Boolean = true
     ): Qualifier? {
         if (referenceExpression == null) return null
+        val reportErrorsOn = referenceExpression
 
         if (descriptor == null) {
-            trace.report(Errors.UNRESOLVED_REFERENCE.on(referenceExpression))
+            trace.report(Errors.UNRESOLVED_REFERENCE.on(reportErrorsOn))
             return null
         }
 
         trace.record(BindingContext.REFERENCE_TARGET, referenceExpression, descriptor)
 
-        UnderscoreUsageChecker.checkSimpleNameUsage(descriptor, referenceExpression, trace)
+        UnderscoreUsageChecker.checkSimpleNameUsage(descriptor, reportErrorsOn, trace)
 
         if (descriptor is DeclarationDescriptorWithVisibility) {
             val fromToCheck =
-                    if (shouldBeVisibleFrom is PackageFragmentDescriptor && shouldBeVisibleFrom.source == SourceElement.NO_SOURCE && referenceExpression.containingFile !is DummyHolder) {
+                    if (shouldBeVisibleFrom is PackageFragmentDescriptor &&
+                        shouldBeVisibleFrom.source == SourceElement.NO_SOURCE &&
+                        referenceExpression.containingFile !is DummyHolder) { // NOTE: No check for dummy files
                         PackageFragmentWithCustomSource(shouldBeVisibleFrom, KotlinSourceElement(referenceExpression.containingKtFile))
                     }
                     else {
                         shouldBeVisibleFrom
                     }
             if (!isVisible(descriptor, fromToCheck, position)) {
-                trace.report(Errors.INVISIBLE_REFERENCE.on(referenceExpression, descriptor, descriptor.visibility, descriptor))
+                trace.report(Errors.INVISIBLE_REFERENCE.on(reportErrorsOn, descriptor, descriptor.visibility, descriptor))
             }
         }
 

@@ -349,7 +349,7 @@ class TypeResolver(
     private fun resolveTypeForTypeParameter(
             c: TypeResolutionContext, annotations: Annotations,
             typeParameter: TypeParameterDescriptor,
-            referenceExpression: KtSimpleNameExpression,
+            reportErrorsOn: KtElement,
             typeArgumentList: KtTypeArgumentList?
     ): KotlinType {
         val scopeForTypeParameter = getScopeForTypeParameter(c, typeParameter)
@@ -361,7 +361,7 @@ class TypeResolver(
 
         val containing = typeParameter.containingDeclaration
         if (containing is ClassDescriptor) {
-            DescriptorResolver.checkHasOuterClassInstance(c.scope, c.trace, referenceExpression, containing)
+            DescriptorResolver.checkHasOuterClassInstance(c.scope, c.trace, reportErrorsOn, containing)
         }
 
         return if (scopeForTypeParameter is ErrorUtils.ErrorScope)
@@ -400,7 +400,7 @@ class TypeResolver(
                 }
 
                 val qualifierPart = qualifierParts.single()
-                type(resolveTypeForTypeParameter(c, annotations, descriptor, qualifierPart.expression!!, qualifierPart.typeArguments))
+                type(resolveTypeForTypeParameter(c, annotations, descriptor, qualifierPart.reportOn, qualifierPart.typeArguments))
             }
             is ClassDescriptor -> resolveTypeForClass(c, annotations, descriptor, element, qualifierResolutionResult)
             is TypeAliasDescriptor -> resolveTypeForTypeAlias(c, annotations, descriptor, element, qualifierResolutionResult)
@@ -528,7 +528,7 @@ class TypeResolver(
 
         val reportStrategy = TracingTypeAliasExpansionReportStrategy(
                 c.trace,
-                type, typeAliasQualifierPart.typeArguments ?: typeAliasQualifierPart.expression,
+                type, typeAliasQualifierPart.typeArguments ?: typeAliasQualifierPart.reportOn,
                 descriptor, descriptor.declaredTypeParameters,
                 argumentElementsFromUserType // TODO arguments from inner scope
         )
@@ -590,7 +590,7 @@ class TypeResolver(
     private class TracingTypeAliasExpansionReportStrategy(
             val trace: BindingTrace,
             val type: KtElement?,
-            val typeArgumentsOrTypeName: KtElement?,
+            val reportErrorsOn: KtElement?,
             val typeAliasDescriptor: TypeAliasDescriptor,
             typeParameters: List<TypeParameterDescriptor>,
             typeArguments: List<KtTypeProjection>
@@ -599,8 +599,8 @@ class TypeResolver(
         private val mappedArguments = typeParameters.zip(typeArguments).toMap()
 
         override fun wrongNumberOfTypeArguments(typeAlias: TypeAliasDescriptor, numberOfParameters: Int) {
-            if (typeArgumentsOrTypeName != null) {
-                trace.report(WRONG_NUMBER_OF_TYPE_ARGUMENTS.on(typeArgumentsOrTypeName, numberOfParameters, typeAliasDescriptor))
+            if (reportErrorsOn != null) {
+                trace.report(WRONG_NUMBER_OF_TYPE_ARGUMENTS.on(reportErrorsOn, numberOfParameters, typeAliasDescriptor))
             }
         }
 
@@ -699,7 +699,7 @@ class TypeResolver(
             if (currentArguments.size != currentParameters.size) {
                 c.trace.report(
                         WRONG_NUMBER_OF_TYPE_ARGUMENTS.on(
-                                qualifierPart.typeArguments ?: qualifierPart.expression!!,
+                                qualifierPart.typeArguments ?: qualifierPart.reportOn,
                                 currentParameters.size, classifierDescriptorChain[index]
                         )
                 )
@@ -740,7 +740,7 @@ class TypeResolver(
 
             if (restArguments == null && typeArgumentsCanBeSpecifiedCount > result.size) {
                 c.trace.report(
-                        OUTER_CLASS_ARGUMENTS_REQUIRED.on(qualifierParts.first().expression!!, nextParameterOwner))
+                        OUTER_CLASS_ARGUMENTS_REQUIRED.on(qualifierParts.first().reportOn, nextParameterOwner))
                 return null
             }
             else if (restArguments == null) {
