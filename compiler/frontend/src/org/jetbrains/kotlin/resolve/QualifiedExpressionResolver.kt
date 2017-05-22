@@ -376,6 +376,8 @@ class QualifiedExpressionResolver {
         val firstPartExpression = firstPart.expression
 
         if (position == QualifierPosition.EXPRESSION) {
+            // TODO: Assert expression != null
+
             // In expression position, value wins against classifier (and package).
             // If we see a function or variable (possibly ambiguous),
             // tell resolver we have no qualifier and let it perform the context-dependent resolution.
