@@ -295,7 +295,7 @@ class DeclarationsChecker(
         for (annotationEntry in modifierList.annotationEntries) {
             val calleeExpression = annotationEntry.calleeExpression
             if (calleeExpression != null) {
-                calleeExpression.constructorReferenceExpression?.let { trace.report(UNRESOLVED_REFERENCE.on(it, it)) }
+                calleeExpression.constructorReferenceExpression?.let { trace.report(UNRESOLVED_REFERENCE.on(it)) }
             }
         }
         annotationChecker.check(packageDirective, trace, null)

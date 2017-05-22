@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.diagnostics.rendering
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.diagnostics.*
 import java.text.MessageFormat
 
@@ -40,6 +41,16 @@ class DiagnosticWithParameters1Renderer<A : Any>(
     override fun renderParameters(diagnostic: DiagnosticWithParameters1<*, A>): Array<out Any> {
         val context = RenderingContext.of(diagnostic.a)
         return arrayOf(renderParameter(diagnostic.a, rendererForA, context))
+    }
+}
+
+class DiagnosticWithPositionRender<E : PsiElement>(
+        message: String,
+        private val rendererForE: DiagnosticParameterRenderer<E>?
+) : AbstractDiagnosticWithParametersRenderer<AbstractDiagnostic<E>>(message) {
+    override fun renderParameters(diagnostic: AbstractDiagnostic<E>): Array<out Any> {
+        val context = RenderingContext.of(diagnostic.psiElement)
+        return arrayOf(renderParameter(diagnostic.psiElement, rendererForE, context))
     }
 }
 

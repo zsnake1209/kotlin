@@ -80,7 +80,7 @@ class AddTestLibQuickFix(element: KtElement)
 
             if (PsiTreeUtil.getParentOfType(diagnostic.psiElement, KtImportDirective::class.java) != null) return null
 
-            val unresolvedText = unresolvedReference.a.text
+            val unresolvedText = unresolvedReference.psiElement.text
             if (unresolvedText in KOTLIN_TEST_UNRESOLVED) {
                 val ktFile = (diagnostic.psiElement.containingFile as? KtFile) ?: return null
 

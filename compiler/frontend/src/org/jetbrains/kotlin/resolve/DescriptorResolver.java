@@ -608,7 +608,7 @@ public class DescriptorResolver {
                 trace.record(BindingContext.REFERENCE_TARGET, nameExpression, classifier);
             }
             else {
-                trace.report(UNRESOLVED_REFERENCE.on(nameExpression, nameExpression));
+                trace.report(UNRESOLVED_REFERENCE.on(nameExpression));
             }
 
             KtTypeReference boundTypeReference = constraint.getBoundTypeReference();

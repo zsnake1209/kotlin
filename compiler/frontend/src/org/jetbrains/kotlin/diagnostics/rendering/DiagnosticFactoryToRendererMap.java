@@ -53,6 +53,11 @@ public final class DiagnosticFactoryToRendererMap {
         map.put(factory, new SimpleDiagnosticRenderer(message));
     }
 
+    public <E extends PsiElement> void put(@NotNull DiagnosticFactory0<E> factory, @NotNull String message, @Nullable DiagnosticParameterRenderer<? super E> rendererE) {
+        checkMutability();
+        map.put(factory, new DiagnosticWithPositionRender<>(message, rendererE));
+    }
+
     public <E extends PsiElement, A> void put(@NotNull DiagnosticFactory1<E, A> factory, @NotNull String message, @Nullable DiagnosticParameterRenderer<? super A> rendererA) {
         checkMutability();
         map.put(factory, new DiagnosticWithParameters1Renderer<A>(message, rendererA));

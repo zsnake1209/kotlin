@@ -88,8 +88,7 @@ public interface Errors {
     DiagnosticFactory2<KtDeclaration, PropertyDescriptor, FunctionDescriptor> EXTENSION_FUNCTION_SHADOWED_BY_MEMBER_PROPERTY_WITH_INVOKE =
             DiagnosticFactory2.create(WARNING, FOR_REDECLARATION);
 
-    DiagnosticFactory1<KtReferenceExpression, KtReferenceExpression> UNRESOLVED_REFERENCE =
-            DiagnosticFactory1.create(ERROR, FOR_UNRESOLVED_REFERENCE);
+    DiagnosticFactory0<KtReferenceExpression> UNRESOLVED_REFERENCE = DiagnosticFactory0.create(ERROR, FOR_UNRESOLVED_REFERENCE);
 
     DiagnosticFactory2<PsiElement, DeclarationDescriptor, String> DEPRECATION = DiagnosticFactory2.create(WARNING);
     DiagnosticFactory2<PsiElement, DeclarationDescriptor, String> DEPRECATION_ERROR = DiagnosticFactory2.create(ERROR);

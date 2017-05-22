@@ -107,7 +107,7 @@ object LabelResolver {
         if (labelElement == null || labelName == null) return null
 
         return resolveNamedLabel(labelName, labelElement, context.trace) ?: run {
-            context.trace.report(UNRESOLVED_REFERENCE.on(labelElement, labelElement))
+            context.trace.report(UNRESOLVED_REFERENCE.on(labelElement))
             null
         }
     }
@@ -170,7 +170,7 @@ object LabelResolver {
                 return LabeledReceiverResolutionResult.labelResolutionSuccess(thisReceiver)
             }
             else {
-                context.trace.report(UNRESOLVED_REFERENCE.on(targetLabel, targetLabel))
+                context.trace.report(UNRESOLVED_REFERENCE.on(targetLabel))
             }
         }
         else {

@@ -210,7 +210,7 @@ public class ExpressionTypingVisitorForStatements extends ExpressionTypingVisito
 
         if (leftType == null) {
             KotlinTypeInfo rightInfo = facade.getTypeInfo(right, context.replaceDataFlowInfo(leftInfo.getDataFlowInfo()));
-            context.trace.report(UNRESOLVED_REFERENCE.on(operationSign, operationSign));
+            context.trace.report(UNRESOLVED_REFERENCE.on(operationSign));
             temporary.commit();
             return rightInfo.clearType();
         }

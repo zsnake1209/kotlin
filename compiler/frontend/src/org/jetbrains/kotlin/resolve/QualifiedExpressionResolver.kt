@@ -635,7 +635,7 @@ class QualifiedExpressionResolver {
         if (referenceExpression == null) return null
 
         if (descriptor == null) {
-            trace.report(Errors.UNRESOLVED_REFERENCE.on(referenceExpression, referenceExpression))
+            trace.report(Errors.UNRESOLVED_REFERENCE.on(referenceExpression))
             return null
         }
 

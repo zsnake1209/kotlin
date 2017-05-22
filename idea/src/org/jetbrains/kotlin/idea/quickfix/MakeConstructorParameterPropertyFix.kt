@@ -60,7 +60,7 @@ class MakeConstructorParameterPropertyFix(
     companion object Factory : KotlinIntentionActionsFactory() {
 
         override fun doCreateActions(diagnostic: Diagnostic): List<IntentionAction> {
-            val ktReference = Errors.UNRESOLVED_REFERENCE.cast(diagnostic).a as? KtNameReferenceExpression ?: return emptyList()
+            val ktReference = Errors.UNRESOLVED_REFERENCE.cast(diagnostic).psiElement as? KtNameReferenceExpression ?: return emptyList()
 
             val valOrVar = if (ktReference.getAssignmentByLHS() != null) KotlinValVar.Var else KotlinValVar.Val
 
