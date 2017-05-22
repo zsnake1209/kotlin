@@ -110,7 +110,10 @@ class QualifiedExpressionResolver {
             is PackageViewDescriptor -> qualifier.memberScope.getContributedClassifier(lastPart.name, lastPart.location)
             is ClassDescriptor -> {
                 val descriptor = qualifier.unsubstitutedInnerClassesScope.getContributedClassifier(lastPart.name, lastPart.location)
-                checkNotEnumEntry(descriptor, trace, lastPart.expression)
+                val expression = lastPart.expression
+                if (expression != null) {
+                    checkNotEnumEntry(descriptor, trace, expression)
+                }
                 descriptor
             }
             else -> null
@@ -119,8 +122,8 @@ class QualifiedExpressionResolver {
         return TypeQualifierResolutionResult(qualifierPartList, classifier)
     }
 
-    private fun checkNotEnumEntry(descriptor: DeclarationDescriptor?, trace: BindingTrace, expression: KtSimpleNameExpression?) {
-        if (expression != null && descriptor != null && DescriptorUtils.isEnumEntry(descriptor)) {
+    private fun checkNotEnumEntry(descriptor: DeclarationDescriptor?, trace: BindingTrace, expression: KtSimpleNameExpression) {
+        if (descriptor != null && DescriptorUtils.isEnumEntry(descriptor)) {
             val qualifiedParent = expression.getTopmostParentQualifiedExpressionForSelector()
             if (qualifiedParent == null || qualifiedParent.parent !is KtDoubleColonExpression) {
                 trace.report(Errors.ENUM_ENTRY_AS_TYPE.on(expression))
