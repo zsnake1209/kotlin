@@ -1,3 +1,5 @@
+import kotlin.collections.AbstractMap
+
 val c = 3
 
 val g = listOf("a", "b", "c")

@@ -14,8 +14,13 @@ class TestDependenciesResolver : ScriptDependenciesResolver {
     ): Future<KotlinScriptExternalDependencies?> {
         return CompletableFuture.completedFuture(
                 object : KotlinScriptExternalDependencies {
-                    override val classpath: Iterable<File> = listOf(environment?.get("runtime-classes") as File)
-                    override val imports: Iterable<String> = listOf("kotlin.system.*")
+                    override val classpath: Iterable<File> = listOf(
+                            environment?.get("runtime-classes") as File)
+                    override val imports: Iterable<String> = listOf(
+                            "kotlin.system.*",
+                            "kotlin.collections.AbstractMap",
+                            "kotlin.collectins.TypoInImport",
+                            "java.lang.String")
                 })
 
     }

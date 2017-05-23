@@ -174,7 +174,7 @@ class QualifiedExpressionResolver {
 
     fun ImportDirective.asQualifierPartList(): List<QualifierPart>? = when {
         psi != null -> psi.importedReference?.asQualifierPartList()
-        else -> fqName.pathSegments().map { SyntheticQualifierPart(it) }
+        else -> fqName.pathSegments().map { SyntheticQualifierPart(it, reportOn!! ) }
     }
 
     fun processImportReference(
@@ -322,10 +322,10 @@ class QualifiedExpressionResolver {
         val location: LookupLocation
 
         val expression: KtSimpleNameExpression?
-        val reportOn: KtSimpleNameExpression get() = expression!!
+        val reportOn: KtElement
     }
 
-    class SyntheticQualifierPart(override val name: Name) : QualifierPart {
+    class SyntheticQualifierPart(override val name: Name, override val reportOn: KtElement) : QualifierPart {
         override val expression: KtSimpleNameExpression? get() = null
         override val typeArguments: KtTypeArgumentList? get() = null
         override val location: LookupLocation get() = NoLookupLocation.FROM_SYNTHETIC_SCOPE
@@ -339,8 +339,8 @@ class QualifiedExpressionResolver {
         constructor (expression: KtSimpleNameExpression) : this(expression.getReferencedNameAsName(), expression)
 
         override val location = KotlinLookupLocation(expression)
+        override val reportOn: KtSimpleNameExpression get() = expression
     }
-
 
     private fun resolveToPackageOrClass(
             path: List<QualifierPart>,

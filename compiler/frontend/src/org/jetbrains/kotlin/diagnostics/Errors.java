@@ -174,13 +174,14 @@ public interface Errors {
 
     // Imports
 
-    DiagnosticFactory1<KtSimpleNameExpression, ClassDescriptor> CANNOT_ALL_UNDER_IMPORT_FROM_SINGLETON = DiagnosticFactory1.create(ERROR);
-    DiagnosticFactory1<KtSimpleNameExpression, Name> CANNOT_BE_IMPORTED = DiagnosticFactory1.create(ERROR);
-    DiagnosticFactory0<KtSimpleNameExpression> PACKAGE_CANNOT_BE_IMPORTED = DiagnosticFactory0.create(ERROR);
+
+    DiagnosticFactory1<KtElement, ClassDescriptor> CANNOT_ALL_UNDER_IMPORT_FROM_SINGLETON = DiagnosticFactory1.create(ERROR);
+    DiagnosticFactory1<KtElement, Name> CANNOT_BE_IMPORTED = DiagnosticFactory1.create(ERROR);
+    DiagnosticFactory0<KtElement> PACKAGE_CANNOT_BE_IMPORTED = DiagnosticFactory0.create(ERROR);
 
     DiagnosticFactory1<KtImportDirective, String> CONFLICTING_IMPORT = DiagnosticFactory1.create(ERROR, PositioningStrategies.IMPORT_ALIAS);
 
-    DiagnosticFactory0<KtSimpleNameExpression> OPERATOR_RENAMED_ON_IMPORT = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<KtElement> OPERATOR_RENAMED_ON_IMPORT = DiagnosticFactory0.create(ERROR);
 
     // Modifiers
 

@@ -21,8 +21,6 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.platform.PlatformToKotlinClassMap;
 import org.jetbrains.kotlin.psi.KtElement;
-import org.jetbrains.kotlin.psi.KtExpression;
-import org.jetbrains.kotlin.psi.KtImportDirective;
 
 import java.util.Collection;
 
@@ -35,28 +33,25 @@ public class PlatformClassesMappedToKotlinChecker {
             @NotNull ImportDirective anImport,
             @NotNull Collection<? extends DeclarationDescriptor> descriptors
     ) {
-        KtImportDirective importDirective = anImport.getPsi();
-        if (importDirective == null) return;
-
-        KtExpression importedReference = importDirective.getImportedReference();
-        if (importedReference == null) return;
+        KtElement reportOn = anImport.getReportOn();
+        if (reportOn == null) return;
 
         for (DeclarationDescriptor descriptor : descriptors) {
-            reportPlatformClassMappedToKotlin(platformToKotlinMap, trace, importedReference, descriptor);
+            reportPlatformClassMappedToKotlin(platformToKotlinMap, trace, reportOn, descriptor);
         }
     }
 
     public static void reportPlatformClassMappedToKotlin(
             @NotNull PlatformToKotlinClassMap platformToKotlinMap,
             @NotNull BindingTrace trace,
-            @NotNull KtElement element,
+            @NotNull KtElement reportOn,
             @NotNull DeclarationDescriptor descriptor
     ) {
         if (!(descriptor instanceof ClassDescriptor)) return;
 
         Collection<ClassDescriptor> kotlinAnalogsForClass = platformToKotlinMap.mapPlatformClass((ClassDescriptor) descriptor);
         if (!kotlinAnalogsForClass.isEmpty()) {
-            trace.report(PLATFORM_CLASS_MAPPED_TO_KOTLIN.on(element, kotlinAnalogsForClass));
+            trace.report(PLATFORM_CLASS_MAPPED_TO_KOTLIN.on(reportOn, kotlinAnalogsForClass));
         }
     }
 }

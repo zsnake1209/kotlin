@@ -61,13 +61,12 @@ class ImportDirective @JvmOverloads constructor(
     }
 
     companion object {
-        @JvmStatic fun fromString(pathStr: String): ImportDirective {
-            if (pathStr.endsWith(".*")) {
-                return ImportDirective(FqName(pathStr.substring(0, pathStr.length - 2)), isAllUnder = true)
-            }
-            else {
-                return ImportDirective(FqName(pathStr), isAllUnder = false)
-            }
+        @JvmStatic @JvmOverloads
+        fun fromString(pathStr: String, reportOn: KtElement? = null): ImportDirective {
+            val isAllUnder = pathStr.endsWith(".*")
+            val fqName = if (isAllUnder) FqName(pathStr.substring(0, pathStr.length - 2)) else FqName(pathStr)
+
+            return ImportDirective(fqName, isAllUnder, reportOn = reportOn)
         }
     }
 }
