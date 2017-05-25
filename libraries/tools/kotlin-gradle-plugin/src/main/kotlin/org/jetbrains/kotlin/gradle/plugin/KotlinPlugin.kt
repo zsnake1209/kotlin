@@ -421,15 +421,15 @@ abstract class AbstractAndroidProjectHandler<V>(private val kotlinConfigurationT
 
         project.createKaptExtension()
 
-        project.afterEvaluate { actualProject ->
-            if (actualProject != null) {
-                val plugin = (actualProject.plugins.findPlugin("android")
-                              ?: actualProject.plugins.findPlugin("android-library")
-                              ?: actualProject.plugins.findPlugin("com.android.test")) as BasePlugin
-                val subpluginEnvironment = loadSubplugins(actualProject)
+        project.afterEvaluate { project ->
+            if (project != null) {
+                val plugin = (project.plugins.findPlugin("android")
+                              ?: project.plugins.findPlugin("android-library")
+                              ?: project.plugins.findPlugin("com.android.test")) as BasePlugin
+                val subpluginEnvironment = loadSubplugins(project)
 
-                forEachVariant(actualProject) {
-                    processVariant(it, actualProject, ext, plugin, aptConfigurations, kotlinOptions,
+                forEachVariant(project) {
+                    processVariant(it, project, ext, plugin, aptConfigurations, kotlinOptions,
                             kotlinConfigurationTools.kotlinTasksProvider, subpluginEnvironment)
                 }
             }
