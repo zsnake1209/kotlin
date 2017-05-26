@@ -66,9 +66,11 @@ class KotlinToResolvedCallTransformer(
             val result = transformAndReportCompletedCall<D>(baseResolvedCall.completedCall, context, trace)
             allResolvedCalls.add(result)
 
-            val callCheckerContext = CallCheckerContext(context, languageFeatureSettings)
-            for (resolvedCall in allResolvedCalls) {
-                runCallCheckers(resolvedCall, callCheckerContext)
+            if (trace != null) {
+                val callCheckerContext = CallCheckerContext(context.replaceBindingTrace(trace), languageFeatureSettings)
+                for (resolvedCall in allResolvedCalls) {
+                    runCallCheckers(resolvedCall, callCheckerContext)
+                }
             }
 
             return result
