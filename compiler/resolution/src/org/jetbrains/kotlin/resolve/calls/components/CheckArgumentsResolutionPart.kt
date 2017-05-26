@@ -19,10 +19,7 @@ package org.jetbrains.kotlin.resolve.calls.components
 import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
 import org.jetbrains.kotlin.builtins.isExtensionFunctionType
 import org.jetbrains.kotlin.builtins.isFunctionType
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
-import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.calls.inference.ConstraintSystemBuilder
 import org.jetbrains.kotlin.resolve.calls.inference.model.ArgumentConstraintPosition
 import org.jetbrains.kotlin.resolve.calls.inference.model.LambdaTypeVariable
@@ -34,6 +31,7 @@ import org.jetbrains.kotlin.types.checker.hasSupertypeWithGivenTypeConstructor
 import org.jetbrains.kotlin.types.checker.intersectWrappedTypes
 import org.jetbrains.kotlin.types.lowerIfFlexible
 import org.jetbrains.kotlin.types.typeUtil.builtIns
+import org.jetbrains.kotlin.types.typeUtil.immediateSupertypes
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 import org.jetbrains.kotlin.types.upperIfFlexible
 import org.jetbrains.kotlin.utils.SmartList
@@ -272,6 +270,7 @@ private fun captureFromTypeParameterUpperBoundIfNeeded(argumentType: UnwrappedTy
 
     if (argumentType.lowerIfFlexible().constructor.declarationDescriptor is TypeParameterDescriptor) {
         val chosenSupertype = argumentType.lowerIfFlexible().supertypes().singleOrNull {
+            it.constructor.declarationDescriptor is ClassifierDescriptorWithTypeParameters &&
             it.unwrap().hasSupertypeWithGivenTypeConstructor(expectedTypeConstructor)
         }
         if (chosenSupertype != null) {
