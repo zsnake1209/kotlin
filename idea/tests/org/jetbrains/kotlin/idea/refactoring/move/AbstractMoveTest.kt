@@ -207,11 +207,10 @@ enum class MoveAction : AbstractMultifileRefactoringTest.RefactoringAction {
             }
             val targetDirPath = config.getString("targetDirectory")
             val targetDir = rootDir.findFileByRelativePath(targetDirPath)!!.toPsiDirectory(project)!!
-            MoveFilesWithDeclarationsProcessor(
+            KotlinAwareMoveFilesOrDirectoriesProcessor(
                     project,
                     elementsToMove,
                     targetDir,
-                    (elementsToMove.singleOrNull() as? KtFile)?.name,
                     searchInComments = true,
                     searchInNonJavaFiles = true,
                     moveCallback = null
