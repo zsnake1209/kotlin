@@ -374,6 +374,7 @@ class FunctionDescriptorResolver(
                 }
             }
 
+
             val valueParameterDescriptor = descriptorResolver.resolveValueParameterDescriptor(parameterScope, functionDescriptor,
                                                                                               valueParameter, i, type, trace)
 
