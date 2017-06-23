@@ -101,6 +101,6 @@ fun ContextForNewModule(
         builtIns: KotlinBuiltIns,
         multiTargetPlatform: MultiTargetPlatform?
 ): MutableModuleContext {
-    val module = ModuleDescriptorImpl(moduleName, projectContext.storageManager, builtIns, multiTargetPlatform)
+    val module = ModuleDescriptorImpl(moduleName, projectContext.storageManager, builtIns, { multiTargetPlatform })
     return MutableModuleContextImpl(module, projectContext)
 }

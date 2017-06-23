@@ -175,7 +175,7 @@ abstract class AnalyzerFacade<in P : PlatformAnalysisParameters> {
             val storageManager = projectContext.storageManager
 
             val resolverForProject = ResolverForProjectImpl(debugName, modules.keysToMap { module ->
-                ModuleDescriptorImpl(module.name, storageManager, builtIns, modulePlatforms(module), module.capabilities)
+                ModuleDescriptorImpl(module.name, storageManager, builtIns, { modulePlatforms(module) }, module.capabilities)
             }, delegateResolver)
 
             for (module in modules) {

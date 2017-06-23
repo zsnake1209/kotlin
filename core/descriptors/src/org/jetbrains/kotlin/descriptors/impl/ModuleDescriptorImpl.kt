@@ -33,16 +33,14 @@ class ModuleDescriptorImpl @JvmOverloads constructor(
         private val storageManager: StorageManager,
         override val builtIns: KotlinBuiltIns,
         // May be null in compiler context, should be not-null in IDE context
-        multiTargetPlatform: MultiTargetPlatform? = null,
-        capabilities: Map<ModuleDescriptor.Capability<*>, Any?> = emptyMap()
+        private val multiTargetPlatform: () -> MultiTargetPlatform? = { null },
+        private val capabilities: Map<ModuleDescriptor.Capability<*>, Any?> = emptyMap()
 ) : DeclarationDescriptorImpl(Annotations.EMPTY, moduleName), ModuleDescriptor {
     init {
         if (!moduleName.isSpecial) {
             throw IllegalArgumentException("Module name must be special: $moduleName")
         }
     }
-
-    private val capabilities = capabilities + (multiTargetPlatform?.let { mapOf(MultiTargetPlatform.CAPABILITY to it) } ?: emptyMap())
 
     private var dependencies: ModuleDependencies? = null
     private var packageFragmentProviderForModuleContent: PackageFragmentProvider? = null
@@ -120,7 +118,12 @@ class ModuleDescriptorImpl @JvmOverloads constructor(
         get() = packageFragmentProviderForWholeModuleWithDependencies
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> getCapability(capability: ModuleDescriptor.Capability<T>) = capabilities[capability] as? T
+    override fun <T> getCapability(capability: ModuleDescriptor.Capability<T>): T? {
+        if (capability == MultiTargetPlatform.CAPABILITY) {
+            return multiTargetPlatform() as? T
+        }
+        return capabilities[capability] as? T
+    }
 }
 
 interface ModuleDependencies {

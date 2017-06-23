@@ -37,6 +37,7 @@ import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.FqNameUnsafe;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
+import org.jetbrains.kotlin.resolve.MultiTargetPlatform;
 import org.jetbrains.kotlin.resolve.scopes.ChainedMemberScope;
 import org.jetbrains.kotlin.resolve.scopes.MemberScope;
 import org.jetbrains.kotlin.storage.MemoizedFunctionToNotNull;
@@ -133,7 +134,12 @@ public abstract class KotlinBuiltIns {
     }
 
     protected void createBuiltInsModule() {
-        builtInsModule = new ModuleDescriptorImpl(BUILTINS_MODULE_NAME, storageManager, this, null);
+        builtInsModule = new ModuleDescriptorImpl(BUILTINS_MODULE_NAME, storageManager, this, new Function0<MultiTargetPlatform>() {
+            @Override
+            public MultiTargetPlatform invoke() {
+                return null;
+            }
+        });
         builtInsModule.initialize(BuiltInsLoader.Companion.getInstance().createPackageFragmentProvider(
                 storageManager, builtInsModule,
                 getClassDescriptorFactories(), getPlatformDependentDeclarationFilter(), getAdditionalClassPartsProvider()

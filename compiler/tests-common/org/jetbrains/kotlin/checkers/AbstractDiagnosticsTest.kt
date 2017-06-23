@@ -471,7 +471,7 @@ abstract class AbstractDiagnosticsTest : BaseDiagnosticsTest() {
         val platform =
                 if (nameSuffix.isEmpty()) null
                 else if (nameSuffix == "common") MultiTargetPlatform.Common else MultiTargetPlatform.Specific(nameSuffix.toUpperCase())
-        return ModuleDescriptorImpl(Name.special("<$moduleName>"), storageManager, JvmBuiltIns(storageManager), platform)
+        return ModuleDescriptorImpl(Name.special("<$moduleName>"), storageManager, JvmBuiltIns(storageManager), { platform })
     }
 
     protected open fun createSealedModule(storageManager: StorageManager): ModuleDescriptorImpl =
