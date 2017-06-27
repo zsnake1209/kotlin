@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,7 +199,7 @@ object JavaAnnotationTargetMapper {
         // Map argument: java.lang.annotation.Retention -> kotlin.annotation.annotation
         return (element as? JavaEnumValueAnnotationArgument)?.let {
             retentionNameList[it.resolve()?.name?.asString()]?.let {
-                (builtIns.getAnnotationRetentionEnumEntry(it) as? ClassDescriptor)?.let(::EnumValue)
+                (builtIns.getAnnotationRetentionEnumEntry(it) as? ClassDescriptor)?.let { EnumValue(it) }
             }
         }
     }

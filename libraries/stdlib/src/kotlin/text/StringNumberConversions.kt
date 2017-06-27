@@ -330,7 +330,7 @@ public fun String.toLongOrNull(radix: Int): Long? {
  */
 @SinceKotlin("1.1")
 @kotlin.jvm.JvmVersion
-public fun String.toFloatOrNull(): Float? = screenFloatValue(this, java.lang.Float::parseFloat)
+public fun String.toFloatOrNull(): Float? = screenFloatValue(this) { java.lang.Float.parseFloat(it) }
 
 /**
  * Parses the string as a [Double] number and returns the result
@@ -338,7 +338,7 @@ public fun String.toFloatOrNull(): Float? = screenFloatValue(this, java.lang.Flo
  */
 @SinceKotlin("1.1")
 @kotlin.jvm.JvmVersion
-public fun String.toDoubleOrNull(): Double? = screenFloatValue(this, java.lang.Double::parseDouble)
+public fun String.toDoubleOrNull(): Double? = screenFloatValue(this) { java.lang.Double.parseDouble(it) }
 
 /**
  * Recommended floating point number validation RegEx from the javadoc of `java.lang.Double.valueOf(String)`

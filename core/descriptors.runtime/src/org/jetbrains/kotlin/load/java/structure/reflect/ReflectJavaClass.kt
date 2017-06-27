@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class ReflectJavaClass(
                     // nested class constructor accessed from the outer class
                     it.simpleName.isEmpty()
                 }
-                .mapNotNull { it.simpleName.takeIf(Name::isValidIdentifier)?.let(Name::identifier) }.toList()
+                .mapNotNull { it.simpleName.takeIf(Name::isValidIdentifier)?.let { Name.identifier(it) } }.toList()
 
     override fun findInnerClass(name: Name) = klass.declaredClasses
             .asSequence()

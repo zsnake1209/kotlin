@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.serialization.deserialization.findClassAcrossModuleDependencies
 import kotlin.jvm.internal.TypeIntrinsics
 import kotlin.reflect.*
-import kotlin.reflect.jvm.internal.KotlinReflectionInternalError
 import kotlin.reflect.jvm.internal.KDeclarationContainerImpl.MemberBelonginess.DECLARED
 import kotlin.reflect.jvm.internal.KDeclarationContainerImpl.MemberBelonginess.INHERITED
 
@@ -111,7 +110,7 @@ internal class KClassImpl<T : Any>(override val jClass: Class<T>) : KDeclaration
         }
 
         val typeParameters: List<KTypeParameter> by ReflectProperties.lazySoft {
-            descriptor.declaredTypeParameters.map(::KTypeParameterImpl)
+            descriptor.declaredTypeParameters.map { KTypeParameterImpl(it) }
         }
 
         val supertypes: List<KType> by ReflectProperties.lazySoft {

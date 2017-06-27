@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class LazyJavaPackageFragment(
     private val scope = JvmPackageScope(c, jPackage, this)
 
     private val subPackages = c.storageManager.createRecursionTolerantLazyValue(
-            { jPackage.subPackages.map(JavaPackage::fqName) },
+            { jPackage.subPackages.map { it.fqName } },
             // This breaks infinite recursion between loading Java descriptors and building light classes
             onRecursiveCall = listOf()
     )

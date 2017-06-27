@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.load.java.descriptors.JavaCallableMemberDescriptor
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.reflect.*
-import kotlin.reflect.jvm.internal.KotlinReflectionInternalError
 import kotlin.reflect.jvm.javaType
 
 internal abstract class KCallableImpl<out R> : KCallable<R> {
@@ -81,7 +80,7 @@ internal abstract class KCallableImpl<out R> : KCallable<R> {
         get() = returnType_()
 
     private val typeParameters_ = ReflectProperties.lazySoft {
-        descriptor.typeParameters.map(::KTypeParameterImpl)
+        descriptor.typeParameters.map { KTypeParameterImpl(it) }
     }
 
     override val typeParameters: List<KTypeParameter>
