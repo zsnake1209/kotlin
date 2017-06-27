@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,7 +200,7 @@ private fun <T> Array<out T>.copyToArrayOfAny(isVarargs: Boolean): Array<Any?> =
             // if the array came from varargs and already is array of Any, copying isn't required
             @Suppress("UNCHECKED_CAST") (this as Array<Any?>)
         else
-            java.util.Arrays.copyOf(this, this.size, Array<Any?>::class.java)
+            java.util.Arrays.copyOf(this, this.size, Array<Any?>::class.java as Class<out Array<Any>>)
 
 /**
  * Searches this list or its range for the provided [element] using the binary search algorithm.

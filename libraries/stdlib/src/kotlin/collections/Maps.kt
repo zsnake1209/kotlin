@@ -709,4 +709,4 @@ internal inline fun <K, V> Map<K, V>.toSingletonMapOrSelf(): Map<K, V> = toSingl
 // creates a singleton copy of map
 @kotlin.jvm.JvmVersion
 internal fun <K, V> Map<out K, V>.toSingletonMap(): Map<K, V>
-    = with (entries.iterator().next()) { java.util.Collections.singletonMap(key, value) }
+        = with (entries.iterator().next()) { java.util.Collections.singletonMap(key, value) as Map<K, V> }
