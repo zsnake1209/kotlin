@@ -539,7 +539,7 @@ public fun <K, V, M : MutableMap<in K, in V>> Map<out K, V>.toMap(destination: M
  * The [pair] is iterated in the end if it has a unique key.
  */
 public operator fun <K, V> Map<out K, V>.plus(pair: Pair<K, V>): Map<K, V>
-        = if (this.isEmpty()) mapOf(pair) else LinkedHashMap(this).apply { put(pair.first, pair.second) }
+        = if (this.isEmpty()) mapOf(pair) else LinkedHashMap<K, V>(this).apply { put(pair.first, pair.second) }
 
 /**
  * Creates a new read-only map by replacing or adding entries to this map from a given collection of key-value [pairs].
@@ -548,7 +548,7 @@ public operator fun <K, V> Map<out K, V>.plus(pair: Pair<K, V>): Map<K, V>
  * Those [pairs] with unique keys are iterated in the end in the order of [pairs] collection.
  */
 public operator fun <K, V> Map<out K, V>.plus(pairs: Iterable<Pair<K, V>>): Map<K, V>
-        = if (this.isEmpty()) pairs.toMap() else LinkedHashMap(this).apply { putAll(pairs) }
+        = if (this.isEmpty()) pairs.toMap() else LinkedHashMap<K, V>(this).apply { putAll(pairs) }
 
 /**
  * Creates a new read-only map by replacing or adding entries to this map from a given array of key-value [pairs].
@@ -557,7 +557,7 @@ public operator fun <K, V> Map<out K, V>.plus(pairs: Iterable<Pair<K, V>>): Map<
  * Those [pairs] with unique keys are iterated in the end in the order of [pairs] array.
  */
 public operator fun <K, V> Map<out K, V>.plus(pairs: Array<out Pair<K, V>>): Map<K, V>
-        = if (this.isEmpty()) pairs.toMap() else LinkedHashMap(this).apply { putAll(pairs) }
+        = if (this.isEmpty()) pairs.toMap() else LinkedHashMap<K, V>(this).apply { putAll(pairs) }
 
 /**
  * Creates a new read-only map by replacing or adding entries to this map from a given sequence of key-value [pairs].
@@ -566,7 +566,7 @@ public operator fun <K, V> Map<out K, V>.plus(pairs: Array<out Pair<K, V>>): Map
  * Those [pairs] with unique keys are iterated in the end in the order of [pairs] sequence.
  */
 public operator fun <K, V> Map<out K, V>.plus(pairs: Sequence<Pair<K, V>>): Map<K, V>
-        = LinkedHashMap(this).apply { putAll(pairs) }.optimizeReadOnlyMap()
+        = LinkedHashMap<K, V>(this).apply { putAll(pairs) }.optimizeReadOnlyMap()
 
 /**
  * Creates a new read-only map by replacing or adding entries to this map from another [map].
@@ -575,7 +575,7 @@ public operator fun <K, V> Map<out K, V>.plus(pairs: Sequence<Pair<K, V>>): Map<
  * Those entries of another [map] that are missing in this map are iterated in the end in the order of that [map].
  */
 public operator fun <K, V> Map<out K, V>.plus(map: Map<out K, V>): Map<K, V>
-        = LinkedHashMap(this).apply { putAll(map) }
+        = LinkedHashMap<K, V>(this).apply { putAll(map) }
 
 
 /**
