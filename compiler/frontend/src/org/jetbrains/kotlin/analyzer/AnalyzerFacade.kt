@@ -48,7 +48,8 @@ import kotlin.coroutines.experimental.buildSequence
 
 class ResolverForModule(
         val packageFragmentProvider: PackageFragmentProvider,
-        val componentProvider: ComponentProvider
+        val componentProvider: ComponentProvider,
+        val debugInfo: String
 )
 
 abstract class ResolverForProject<M : ModuleInfo> {

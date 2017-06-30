@@ -112,7 +112,7 @@ object JvmAnalyzerFacade : AnalyzerFacade<JvmPlatformParameters>() {
         providersForModule += PackageFragmentProviderExtension.getInstances(project)
                 .mapNotNull { it.getPackageFragmentProvider(project, moduleDescriptor, moduleContext.storageManager, trace, moduleInfo) }
 
-        return ResolverForModule(CompositePackageFragmentProvider(providersForModule), container)
+        return ResolverForModule(CompositePackageFragmentProvider(providersForModule), container, moduleInfo.displayedName)
     }
 
     override val targetPlatform: TargetPlatform

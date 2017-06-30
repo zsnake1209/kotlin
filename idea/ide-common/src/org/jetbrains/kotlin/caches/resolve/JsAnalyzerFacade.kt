@@ -86,7 +86,7 @@ object JsAnalyzerFacade : AnalyzerFacade<PlatformAnalysisParameters>() {
             }
         }
 
-        return ResolverForModule(packageFragmentProvider, container)
+        return ResolverForModule(packageFragmentProvider, container, moduleInfo.displayedName)
     }
 
     override val targetPlatform: TargetPlatform

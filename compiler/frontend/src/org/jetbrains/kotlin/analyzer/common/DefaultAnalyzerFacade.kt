@@ -114,7 +114,7 @@ object DefaultAnalyzerFacade : AnalyzerFacade<PlatformAnalysisParameters>() {
                 container.get<MetadataPackageFragmentProvider>()
         )
 
-        return ResolverForModule(CompositePackageFragmentProvider(packageFragmentProviders), container)
+        return ResolverForModule(CompositePackageFragmentProvider(packageFragmentProviders), container, moduleInfo.displayedName)
     }
 
     private fun createContainerToResolveCommonCode(
