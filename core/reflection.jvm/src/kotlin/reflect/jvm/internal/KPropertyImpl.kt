@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,18 +53,22 @@ internal abstract class KPropertyImpl<out R> private constructor(
 
     override val isBound: Boolean get() = boundReceiver != CallableReference.NO_RECEIVER
 
-    private val javaField_ = ReflectProperties.lazySoft {
+    private val javaField_ = ReflectProperties.lazySoft<Field?> {
         val jvmSignature = RuntimeTypeMapper.mapPropertySignature(descriptor)
         when (jvmSignature) {
             is KotlinProperty -> {
                 val descriptor = jvmSignature.descriptor
                 JvmProtoBufUtil.getJvmFieldSignature(jvmSignature.proto, jvmSignature.nameResolver, jvmSignature.typeTable)?.let {
-                    val owner = if (JvmAbi.isCompanionObjectWithBackingFieldsInOuter(descriptor.containingDeclaration)) {
-                        container.jClass.enclosingClass
+                    var owner: Class<out Any>? = if (JvmAbi.isCompanionObjectWithBackingFieldsInOuter(descriptor.containingDeclaration)) {
+                        (container.jClass as Class<out Any>).enclosingClass as Class<out Any>
                     }
-                    else descriptor.containingDeclaration.let { containingDeclaration ->
-                        if (containingDeclaration is ClassDescriptor) containingDeclaration.toJavaClass()
-                        else container.jClass
+                    else null
+                    if (owner == null) {
+                        val containingDeclaration = descriptor.containingDeclaration
+                        val test = if (containingDeclaration is ClassDescriptor)
+                            containingDeclaration.toJavaClass() as? Class<out Any>
+                        else container.jClass as? Class<out Any>
+                        owner = test
                     }
 
                     try {
