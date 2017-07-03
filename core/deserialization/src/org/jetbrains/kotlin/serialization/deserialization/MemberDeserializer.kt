@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.serialization.Flags
 import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.*
+import org.jetbrains.kotlin.types.KotlinType
 
 class MemberDeserializer(private val c: DeserializationContext) {
     private val annotationDeserializer = AnnotationDeserializer(c.components.moduleDescriptor, c.components.notFoundClasses)
@@ -67,7 +68,7 @@ class MemberDeserializer(private val c: DeserializationContext) {
                 local.typeDeserializer.type(proto.returnType(c.typeTable)),
                 local.typeDeserializer.ownTypeParameters,
                 getDispatchReceiverParameter(),
-                proto.receiverType(c.typeTable)?.let { local.typeDeserializer.type(it, receiverAnnotations) }
+                proto.receiverType(c.typeTable)?.let<ProtoBuf.Type, KotlinType> { local.typeDeserializer.type(it, receiverAnnotations) }
         )
 
         val getter = if (hasGetter) {
