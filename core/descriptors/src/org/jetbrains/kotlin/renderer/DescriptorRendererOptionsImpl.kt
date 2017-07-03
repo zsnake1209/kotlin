@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ internal class DescriptorRendererOptionsImpl : DescriptorRendererOptions {
         }
     }
 
-    override var classifierNamePolicy: ClassifierNamePolicy by property(ClassifierNamePolicy.SOURCE_CODE_QUALIFIED)
+    override var classifierNamePolicy: ClassifierNamePolicy by property<ClassifierNamePolicy>(ClassifierNamePolicy.SOURCE_CODE_QUALIFIED)
     override var withDefinedIn by property(true)
     override var withSourceFileForTopLevel by property(true)
     override var modifiers: Set<DescriptorRendererModifier> by property(DescriptorRendererModifier.DEFAULTS)
@@ -86,7 +86,7 @@ internal class DescriptorRendererOptionsImpl : DescriptorRendererOptions {
     override var defaultParameterValueRenderer by property<((ValueParameterDescriptor) -> String)?>({ "..." })
     override var secondaryConstructorsAsPrimary by property(true)
     override var overrideRenderingPolicy by property(OverrideRenderingPolicy.RENDER_OPEN)
-    override var valueParametersHandler: DescriptorRenderer.ValueParametersHandler by property(DescriptorRenderer.ValueParametersHandler.DEFAULT)
+    override var valueParametersHandler: DescriptorRenderer.ValueParametersHandler by property <DescriptorRenderer.ValueParametersHandler>(DescriptorRenderer.ValueParametersHandler.DEFAULT)
     override var textFormat by property(RenderingFormat.PLAIN)
     override var parameterNameRenderingPolicy by property(ParameterNameRenderingPolicy.ALL)
     override var receiverAfterName by property(false)
