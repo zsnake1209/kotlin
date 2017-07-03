@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,12 +260,12 @@ class LazyJavaClassMemberScope(
 
         // add declarations
         addOverriddenBuiltinMethods(
-                name, result, mergedFunctionFromSuperTypes, result,
+                name, result, mergedFunctionFromSuperTypes as Collection<SimpleFunctionDescriptor>, result,
                 this::searchMethodsByNameWithoutBuiltinMagic)
 
         // add from super types
         addOverriddenBuiltinMethods(
-                name, result, mergedFunctionFromSuperTypes, specialBuiltinsFromSuperTypes,
+                name, result, mergedFunctionFromSuperTypes as Collection<SimpleFunctionDescriptor>, specialBuiltinsFromSuperTypes,
                 this::searchMethodsInSupertypesWithoutBuiltinMagic)
 
         val visibleFunctionsFromSupertypes =
