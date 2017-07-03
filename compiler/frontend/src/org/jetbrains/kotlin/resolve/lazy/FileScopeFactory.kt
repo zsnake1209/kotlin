@@ -110,11 +110,11 @@ class FileScopeFactory(
 
             val extraImports = file.originalFile.virtualFile?.let { vFile ->
                 val scriptExternalDependencies = getScriptExternalDependencies(vFile, file.project)
-                scriptExternalDependencies?.imports?.map { ImportDirective.fromString(it, file) }
+                scriptExternalDependencies?.imports?.map { FakeImportDirective.fromString(it, file) }
             }
 
             val allImplicitImports = defaultImportProvider.defaultImports.map {
-                ImportDirective(it.fqName, it.isAllUnder, it.alias, it.psi, file)
+                FakeImportDirective(it.fqName, it.isAllUnder, it.alias, file.project)
             } concat extraImports
 
             val defaultImportsFiltered = if (aliasImportNames.isEmpty()) { // optimization

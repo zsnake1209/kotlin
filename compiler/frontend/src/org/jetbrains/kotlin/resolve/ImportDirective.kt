@@ -16,57 +16,82 @@
 
 package org.jetbrains.kotlin.resolve
 
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtImportDirective
+import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.renderer.render
 
-val ImportDirective.hasAlias get() = alias != null
-val ImportDirective.importedName: Name? get() = if (isAllUnder) null else (alias ?: fqName.shortName())
+val Import.hasAlias get() = alias != null
+val Import.importedName: Name? get() = if (isAllUnder) null else (alias ?: fqName.shortName())
 
-fun ImportDirective.getText(): String {
+fun Import.getText(): String {
     val fqNameStr = fqName.toUnsafe().render()
     val pathStr = fqNameStr + if (isAllUnder) ".*" else ""
+    val alias = alias
     return pathStr + if (alias != null && !isAllUnder) (" as " + alias.asString()) else ""
 }
 
-class ImportDirective @JvmOverloads constructor(
-        val fqName: FqName,
-        val isAllUnder: Boolean,
-        val alias: Name? = null,
+interface Import {
+    val fqName: FqName
+    val isAllUnder: Boolean
+    val alias: Name?
+}
 
-        val psi: KtImportDirective? = null,
-        val reportOn: KtElement? = psi) {
-    override fun toString(): String = getText()
+interface ImportDirective : Import {
+    val psi: KtImportDirective
+}
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
+data class ImportDirectiveImpl(
+    override val fqName: FqName,
+    override val isAllUnder: Boolean,
+    override val alias: Name? = null,
+    override val psi: KtImportDirective
+) : ImportDirective
 
-        other as ImportDirective
-
-        if (fqName != other.fqName) return false
-        if (isAllUnder != other.isAllUnder) return false
-        if (alias != other.alias) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = fqName.hashCode()
-        result = 31 * result + isAllUnder.hashCode()
-        result = 31 * result + (alias?.hashCode() ?: 0)
-        return result
+data class FakeImportDirective @JvmOverloads constructor(
+        override val fqName: FqName,
+        override val isAllUnder: Boolean = false,
+        override val alias: Name? = null,
+        val project: Project
+): ImportDirective {
+    override val psi by lazy {
+        KtPsiFactory(project).createImportDirective(this)
     }
 
     companion object {
-        @JvmStatic @JvmOverloads
-        fun fromString(pathStr: String, reportOn: KtElement? = null): ImportDirective {
+        @JvmStatic
+        fun fromString(pathStr: String, reportOn: PsiElement): FakeImportDirective = fromString(pathStr, reportOn.project)
+
+        @JvmStatic
+        fun fromString(pathStr: String, project: Project): FakeImportDirective {
             val isAllUnder = pathStr.endsWith(".*")
             val fqName = if (isAllUnder) FqName(pathStr.substring(0, pathStr.length - 2)) else FqName(pathStr)
 
-            return ImportDirective(fqName, isAllUnder, reportOn = reportOn)
+            return FakeImportDirective(fqName, isAllUnder, project = project)
+        }
+    }
+}
+
+fun ImportDirective.toImportPath() = ImportPath(fqName, isAllUnder, alias)
+
+
+data class ImportPath @JvmOverloads constructor(
+        override val fqName: FqName,
+        override val isAllUnder: Boolean = false,
+        override val alias: Name? = null
+): Import {
+    override fun toString(): String = getText()
+
+    companion object {
+        @JvmStatic
+        fun fromString(pathStr: String): ImportPath {
+            val isAllUnder = pathStr.endsWith(".*")
+            val fqName = if (isAllUnder) FqName(pathStr.substring(0, pathStr.length - 2)) else FqName(pathStr)
+
+            return ImportPath(fqName, isAllUnder)
         }
     }
 }

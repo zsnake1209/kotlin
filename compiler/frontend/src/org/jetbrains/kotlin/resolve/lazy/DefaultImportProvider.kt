@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.isChildOf
 import org.jetbrains.kotlin.name.isSubpackageOf
 import org.jetbrains.kotlin.resolve.ImportDirective
+import org.jetbrains.kotlin.resolve.ImportPath
 import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.checkSinceKotlinVersionAccessibility
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -38,7 +39,7 @@ class DefaultImportProvider(
         private val targetPlatform: TargetPlatform,
         private val languageVersionSettings: LanguageVersionSettings
 ) {
-    val defaultImports: List<ImportDirective> by storageManager.createLazyValue {
+    val defaultImports: List<ImportPath> by storageManager.createLazyValue {
         targetPlatform.getDefaultImports(languageVersionSettings.supportsFeature(DefaultImportOfPackageKotlinComparisons))
     }
 

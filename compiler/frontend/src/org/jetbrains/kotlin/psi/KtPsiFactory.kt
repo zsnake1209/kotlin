@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.Import
 import org.jetbrains.kotlin.resolve.ImportDirective
 import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.getText
@@ -396,13 +397,13 @@ class KtPsiFactory @JvmOverloads constructor(private val project: Project, val m
         return if (fqName.isRoot) null else createPackageDirective(fqName)
     }
 
-    fun createImportDirective(importPath: ImportDirective): KtImportDirective {
-        if (importPath.fqName.isRoot) {
+    fun createImportDirective(import: Import): KtImportDirective {
+        if (import.fqName.isRoot) {
             throw IllegalArgumentException("import path must not be empty")
         }
 
         val importDirectiveBuilder = StringBuilder("import ")
-        importDirectiveBuilder.append(importPath.getText())
+        importDirectiveBuilder.append(import.getText())
 
         val file = createFile(importDirectiveBuilder.toString())
         return file.importDirectives.first()

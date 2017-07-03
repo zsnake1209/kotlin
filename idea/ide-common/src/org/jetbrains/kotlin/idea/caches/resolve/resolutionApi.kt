@@ -27,10 +27,8 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.BindingTraceContext
-import org.jetbrains.kotlin.resolve.ImportDirective
-import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
+import org.jetbrains.kotlin.psi.KtPsiFactory
+import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
 fun KtElement.getResolutionFacade(): ResolutionFacade {
@@ -92,7 +90,7 @@ fun ResolutionFacade.resolveImportReference(
 ): Collection<DeclarationDescriptor> {
     val qualifiedExpressionResolver = this.getFrontendService(moduleDescriptor, QualifiedExpressionResolver::class.java)
     return qualifiedExpressionResolver.processImportReference(
-            ImportDirective(fqName, false), moduleDescriptor, BindingTraceContext(), excludedImportNames = emptyList(),
+            FakeImportDirective(fqName, false, project = project), moduleDescriptor, BindingTraceContext(), excludedImportNames = emptyList(),
             packageFragmentForVisibilityCheck = null,
             suppressDiagnosticsInDebugMode = false
     )?.getContributedDescriptors() ?: emptyList()

@@ -28,8 +28,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.getImportableDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
 
-object ImportPathComparator : Comparator<ImportDirective> {
-    override fun compare(import1: ImportDirective, import2: ImportDirective): Int {
+object ImportPathComparator : Comparator<Import> {
+    override fun compare(import1: Import, import2: Import): Int {
         // alias imports placed last
         if (import1.hasAlias != import2.hasAlias) {
             return if (import1.hasAlias) +1 else -1
@@ -45,7 +45,7 @@ object ImportPathComparator : Comparator<ImportDirective> {
         return import1.toString().compareTo(import2.toString())
     }
 
-    private fun isJavaOrKotlinStdlibImport(path: ImportDirective): Boolean {
+    private fun isJavaOrKotlinStdlibImport(path: Import): Boolean {
         val s = path.getText()
         return s.startsWith("java.") || s.startsWith("javax.")|| s.startsWith("kotlin.")
     }

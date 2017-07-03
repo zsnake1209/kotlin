@@ -33,11 +33,8 @@ import org.jetbrains.kotlin.idea.util.getFileResolutionScope
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.resolve.DescriptorUtils
-import org.jetbrains.kotlin.resolve.ImportDirective
+import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.descriptorUtil.getImportableDescriptor
-import org.jetbrains.kotlin.resolve.hasAlias
-import org.jetbrains.kotlin.resolve.importedName
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.resolve.lazy.DefaultImportProvider
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
@@ -56,10 +53,10 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
     private val codeStyleSettings: KotlinCodeStyleSettings
         get() = KotlinCodeStyleSettings.getInstance(project)
 
-    override val importSortComparator: Comparator<ImportDirective>
+    override val importSortComparator: Comparator<Import>
         get() = ImportPathComparator
 
-    override fun isImportedWithDefault(importPath: ImportDirective, contextFile: KtFile): Boolean {
+    override fun isImportedWithDefault(importPath: Import, contextFile: KtFile): Boolean {
         val defaultImportProvider = contextFile.getResolutionFacade().frontendService<DefaultImportProvider>()
         return importPath.isImported(defaultImportProvider.defaultImports, defaultImportProvider.excludedImports)
     }
@@ -164,10 +161,10 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
 
             val fqName = target.importableFqName ?: return ImportDescriptorResult.FAIL
             val containerFqName = fqName.parent()
-            val imports = file.importDirectives
+            val imports = file.importDirectives.map { it.importPath?.toImportPath() }.filterNotNull()
 
-            val starImportPath = ImportDirective(containerFqName, true)
-            if (imports.any { it.importPath == starImportPath }) {
+            val starImportPath = ImportPath(containerFqName, true)
+            if (imports.any { it == starImportPath }) {
                 return if (isAlreadyImported(target, resolutionFacade.getFileResolutionScope(file), fqName))
                     ImportDescriptorResult.ALREADY_IMPORTED
                 else
@@ -182,8 +179,8 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
         private fun shouldTryStarImport(containerFqName: FqName, target: DeclarationDescriptor, imports: Collection<KtImportDirective>): Boolean {
             if (!canImportWithStar(containerFqName, target)) return false
 
-            val starImportPath = ImportDirective(containerFqName, true)
-            if (imports.any { it.importPath == starImportPath }) return false
+            val starImportPath = ImportPath(containerFqName, true)
+            if (imports.any { it.importPath?.toImportPath() == starImportPath }) return false
 
             if (containerFqName.asString() in codeStyleSettings.PACKAGES_TO_USE_STAR_IMPORTS) return true
 
@@ -250,7 +247,7 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
                             // check that class is really imported
                             && topLevelScope.findClassifier(importedClass.name, NoLookupLocation.FROM_IDE) == importedClass
                             // and not yet imported explicitly
-                            && imports.all { it.importPath != ImportDirective(importedClass.importableFqName!!, false)  }
+                            && imports.all { it.importPath?.toImportPath() != ImportPath(importedClass.importableFqName!!, false)  }
                     }
             val conflicts = detectNeededImports(conflictCandidates)
 
@@ -367,7 +364,7 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
                 = this.getImportableTargets(resolutionFacade.analyze(this, BodyResolveMode.PARTIAL))
 
         private fun addImport(fqName: FqName, allUnder: Boolean): KtImportDirective {
-            val importPath = ImportDirective(fqName, allUnder)
+            val importPath = ImportPath(fqName, allUnder)
 
             val psiFactory = KtPsiFactory(project)
             if (file is KtCodeFragment) {

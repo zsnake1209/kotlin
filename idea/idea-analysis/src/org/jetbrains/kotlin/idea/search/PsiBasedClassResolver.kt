@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.psi.KtUserType
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfTypeAndBranch
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.resolve.ImportDirective
+import org.jetbrains.kotlin.resolve.ImportPath
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -242,7 +243,7 @@ class PsiBasedClassResolver @TestOnly constructor(private val targetClassFqName:
     }
 }
 
-private fun KtFile.getDefaultImports(): List<ImportDirective> {
+private fun KtFile.getDefaultImports(): List<ImportPath> {
     val moduleInfo = getNullableModuleInfo() ?: return emptyList()
     val versionSettings = LanguageSettingsProvider.getInstance(project).getLanguageVersionSettings(moduleInfo, project)
     return TargetPlatformDetector.getPlatform(this).getDefaultImports(

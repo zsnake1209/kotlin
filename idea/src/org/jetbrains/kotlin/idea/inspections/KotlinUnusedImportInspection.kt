@@ -49,6 +49,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCodeFragment
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
+import org.jetbrains.kotlin.resolve.Import
 import org.jetbrains.kotlin.resolve.ImportDirective
 import org.jetbrains.kotlin.resolve.hasAlias
 import java.util.*
@@ -206,7 +207,7 @@ class KotlinUnusedImportInspection : AbstractKotlinInspection() {
         return DaemonListeners.canChangeFileSilently(file)
     }
 
-    private fun optimizeImportsOnTheFly(file: KtFile, optimizedImports: List<ImportDirective>, editor: Editor, project: Project) {
+    private fun optimizeImportsOnTheFly(file: KtFile, optimizedImports: List<Import>, editor: Editor, project: Project) {
         PsiDocumentManager.getInstance(file.project).commitAllDocuments()
         DocumentUtil.writeInRunUndoTransparentAction {
             KotlinImportOptimizer.replaceImports(file, optimizedImports)

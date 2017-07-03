@@ -33,8 +33,7 @@ public class PlatformClassesMappedToKotlinChecker {
             @NotNull ImportDirective anImport,
             @NotNull Collection<? extends DeclarationDescriptor> descriptors
     ) {
-        KtElement reportOn = anImport.getReportOn();
-        if (reportOn == null) return;
+        KtElement reportOn = anImport.getPsi();
 
         for (DeclarationDescriptor descriptor : descriptors) {
             reportPlatformClassMappedToKotlin(platformToKotlinMap, trace, reportOn, descriptor);

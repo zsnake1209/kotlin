@@ -172,10 +172,10 @@ class QualifiedExpressionResolver {
         return result.asReversed() to hasError
     }
 
-    fun ImportDirective.asQualifierPartList(): List<QualifierPart>? = when {
+    fun ImportDirective.asQualifierPartList(): List<QualifierPart>? = psi.importedReference?.asQualifierPartList() /*when {
         psi != null -> psi.importedReference?.asQualifierPartList()
         else -> fqName.pathSegments().map { SyntheticQualifierPart(it, reportOn!! ) }
-    }
+    }*/
 
     fun processImportReference(
             import: ImportDirective,
