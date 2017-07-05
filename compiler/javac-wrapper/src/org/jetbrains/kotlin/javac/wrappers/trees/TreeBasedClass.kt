@@ -94,7 +94,7 @@ class TreeBasedClass(
             }
 
             tree.implementing?.mapNotNull { it.mapToJavaClassifierType() }?.let(this::addAll)
-            tree.extending?.let { it.mapToJavaClassifierType()?.let(this::add) }
+            tree.extending?.let { it.mapToJavaClassifierType()?.let { this.add(it) } }
 
             if (isEmpty()) {
                 javac.JAVA_LANG_OBJECT?.let(this::add)

@@ -35,7 +35,6 @@ import com.sun.tools.javac.model.JavacElements
 import com.sun.tools.javac.model.JavacTypes
 import com.sun.tools.javac.tree.JCTree
 import com.sun.tools.javac.util.Context
-import com.sun.tools.javac.util.List as JavacList
 import com.sun.tools.javac.util.Names
 import com.sun.tools.javac.util.Options
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
@@ -46,18 +45,18 @@ import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.javac.wrappers.symbols.SymbolBasedClass
 import org.jetbrains.kotlin.javac.wrappers.symbols.SymbolBasedClassifierType
 import org.jetbrains.kotlin.javac.wrappers.symbols.SymbolBasedPackage
-import org.jetbrains.kotlin.load.java.structure.JavaClass
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.isSubpackageOf
-import org.jetbrains.kotlin.name.parentOrNull
-import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.javac.wrappers.trees.TreeBasedClass
 import org.jetbrains.kotlin.javac.wrappers.trees.TreeBasedPackage
 import org.jetbrains.kotlin.javac.wrappers.trees.TreePathResolverCache
 import org.jetbrains.kotlin.javac.wrappers.trees.computeClassId
+import org.jetbrains.kotlin.load.java.structure.JavaClass
 import org.jetbrains.kotlin.load.java.structure.JavaClassifier
 import org.jetbrains.kotlin.load.java.structure.JavaPackage
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.isSubpackageOf
+import org.jetbrains.kotlin.name.parentOrNull
+import org.jetbrains.kotlin.psi.KtFile
 import java.io.Closeable
 import java.io.File
 import javax.lang.model.element.Element
@@ -65,6 +64,7 @@ import javax.lang.model.type.TypeMirror
 import javax.tools.JavaFileManager
 import javax.tools.JavaFileObject
 import javax.tools.StandardLocation
+import com.sun.tools.javac.util.List as JavacList
 
 class JavacWrapper(javaFiles: Collection<File>,
                    kotlinFiles: Collection<KtFile>,
@@ -119,7 +119,7 @@ class JavacWrapper(javaFiles: Collection<File>,
     private val elements = JavacElements.instance(context)
     private val types = JavacTypes.instance(context)
     private val fileObjects = fileManager.getJavaFileObjectsFromFiles(javaFiles).toJavacList()
-    private val compilationUnits: JavacList<JCTree.JCCompilationUnit> = fileObjects.map(javac::parse).toJavacList()
+    private val compilationUnits: JavacList<JCTree.JCCompilationUnit> = fileObjects.map { javac.parse(it) }.toJavacList()
 
     private val javaClasses = compilationUnits
             .flatMap { unit ->
