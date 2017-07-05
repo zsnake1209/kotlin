@@ -156,7 +156,7 @@ class SymbolTable {
     private val typeParameterSymbolTable = ScopedSymbolTable<TypeParameterDescriptor, IrTypeParameter, IrTypeParameterSymbol>()
     private val valueParameterSymbolTable = ScopedSymbolTable<ParameterDescriptor, IrValueParameter, IrValueParameterSymbol>()
     private val variableSymbolTable = ScopedSymbolTable<VariableDescriptor, IrVariable, IrVariableSymbol>()
-    private val scopedSymbolTables = listOf(typeParameterSymbolTable, valueParameterSymbolTable, variableSymbolTable)
+    private val scopedSymbolTables = listOf<ScopedSymbolTable<out DeclarationDescriptorNonRoot, out IrSymbolDeclaration<IrBindableSymbol<DeclarationDescriptorNonRoot, out IrSymbolDeclaration<IrBindableSymbol<DeclarationDescriptorNonRoot, out IrSymbolDeclaration<*>>>>>, *>>(typeParameterSymbolTable, valueParameterSymbolTable, variableSymbolTable)
 
     fun declareFile(fileEntry: SourceManager.FileEntry, packageFragmentDescriptor: PackageFragmentDescriptor): IrFile =
             IrFileImpl(fileEntry, IrFileSymbolImpl(packageFragmentDescriptor))
