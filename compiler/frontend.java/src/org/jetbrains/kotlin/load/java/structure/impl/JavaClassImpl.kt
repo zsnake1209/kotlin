@@ -34,7 +34,7 @@ class JavaClassImpl(psiClass: PsiClass) : JavaClassifierImpl<PsiClass>(psiClass)
     }
 
     override val innerClassNames: Collection<Name>
-        get() = psi.innerClasses.mapNotNull { it.name?.takeIf(Name::isValidIdentifier)?.let(Name::identifier) }
+        get() = psi.innerClasses.mapNotNull { it.name?.takeIf { Name.isValidIdentifier(it) }?.let { Name.identifier(it) } }
 
     override fun findInnerClass(name: Name): JavaClass? {
         return psi.findInnerClassByName(name.asString(), false)?.let(::JavaClassImpl)
