@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,10 +112,14 @@ class FakeCallResolver(
         val call = CallMaker.makeCallWithExpressions(
                 callElement, receiver, /* callOperationNode = */ null, fakeCalleeExpression, valueArguments
         )
-        val results = callResolver.resolveCallWithGivenName(context, call, fakeCalleeExpression, name)
+        try {
+            val results = callResolver.resolveCallWithGivenName(context, call, fakeCalleeExpression, name)
+            onComplete(fakeCalleeExpression, results.isSuccess)
 
-        onComplete(fakeCalleeExpression, results.isSuccess)
+            return Pair(call, results)
+        } catch(e: RuntimeException) {
+            throw RuntimeException("problem in : ${callElement.parent.parent.text} \n original:\n\n $e")
+        }
 
-        return Pair(call, results)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,7 +200,7 @@ class KotlinToResolvedCallTransformer(
         }
 
         val functionDescriptor = trace.bindingContext.get(BindingContext.FUNCTION, ktFunction) as? FunctionDescriptorImpl ?:
-                                 throw AssertionError("No function descriptor for resolved lambda argument")
+                                 throw AssertionError("No function descriptor for resolved lambda argument: $ktFunction \n\n${ktFunction.parent.text}")
         functionDescriptor.setReturnType(returnType)
 
         val existingLambdaType = trace.getType(ktArgumentExpression) ?: throw AssertionError("No type for resolved lambda argument")
