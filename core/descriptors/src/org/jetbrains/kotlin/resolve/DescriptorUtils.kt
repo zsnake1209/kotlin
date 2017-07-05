@@ -43,6 +43,8 @@ import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.SmartList
 
+private val DEFAULT_VALUE_FQ_NAME = FqName("kotlin.internal.DefaultValue")
+
 fun ClassDescriptor.getClassObjectReferenceTarget(): ClassDescriptor = companionObjectDescriptor ?: this
 
 fun DeclarationDescriptor.getImportableDescriptor(): DeclarationDescriptor {
@@ -197,6 +199,33 @@ fun ValueParameterDescriptor.hasDefaultValue(): Boolean {
             },
             ValueParameterDescriptor::declaresDefaultValue
     )
+}
+
+fun ValueParameterDescriptor.getDefaultValueFromAnnotation(): String? {
+    val rootCandidates = mutableListOf<ValueParameterDescriptor>()
+
+    val overriddenAnnotationName = DFS.ifAny(listOf(this), { it.overriddenDescriptors }, {
+        val containingDeclaration = it.containingDeclaration
+        if (containingDeclaration is CallableMemberDescriptor && containingDeclaration.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
+            return@ifAny false
+        }
+
+        if (!it.annotations.hasAnnotation(DEFAULT_VALUE_FQ_NAME)) {
+            return@ifAny false
+        }
+        if (it.overriddenDescriptors.isEmpty()) {
+            rootCandidates.add(it)
+            return@ifAny false
+        }
+
+        true
+    })
+
+    if (overriddenAnnotationName || rootCandidates.size != 1) {
+        return null
+    }
+
+    return rootCandidates.first().annotations.findAnnotation(DEFAULT_VALUE_FQ_NAME)!!.firstArgumentValue() as? String
 }
 
 fun FunctionDescriptor.hasOrInheritsParametersWithDefaultValue(): Boolean = DFS.ifAny(
