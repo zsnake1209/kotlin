@@ -80,7 +80,7 @@ open class KotlinJvmReplService(
 
     private val scriptDef = makeScriptDefinition(templateClasspath, templateClassName)
 
-    private val replCompiler: ReplCompiler? by lazy {
+    private val replCompiler: ReplCompiler? by lazy<GenericReplCompiler?> {
         if (scriptDef == null) null
         else GenericReplCompiler(disposable, scriptDef, configuration, messageCollector)
     }
@@ -90,7 +90,7 @@ open class KotlinJvmReplService(
     protected val states = WeakHashMap<RemoteReplStateFacadeServer, Boolean>() // used as (missing) WeakHashSet
     protected val stateIdCounter = AtomicInteger()
     @Deprecated("remove after removal state-less check/compile/eval methods")
-    protected val defaultStateFacade: RemoteReplStateFacadeServer by lazy { createRemoteState() }
+    protected val defaultStateFacade: RemoteReplStateFacadeServer by lazy<RemoteReplStateFacadeServer> { createRemoteState() }
 
     override fun createState(lock: ReentrantReadWriteLock): IReplStageState<*> =
             replCompiler?.createState(lock) ?: throw IllegalStateException("repl compiler is not initialized properly")

@@ -258,7 +258,7 @@ class KotlinCoreEnvironment private constructor(
     val project: Project
         get() = projectEnvironment.project
 
-    val sourceLinesOfCode: Int by lazy { countLinesOfCode(sourceFiles) }
+    val sourceLinesOfCode: Int by lazy<Int> { countLinesOfCode(sourceFiles) }
 
     fun countLinesOfCode(sourceFiles: List<KtFile>): Int  =
             sourceFiles.sumBy { sourceFile ->

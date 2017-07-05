@@ -23,7 +23,7 @@ enum class JvmTarget(override val description: String) : TargetPlatformVersion {
     JVM_1_8("1.8"),
     ;
 
-    val bytecodeVersion: Int by lazy {
+    val bytecodeVersion: Int by lazy<Int> {
         when (this) {
             JVM_1_6 -> Opcodes.V1_6
             JVM_1_8 ->
