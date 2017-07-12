@@ -24,11 +24,11 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.completion.isAfterDot
+import org.jetbrains.kotlin.idea.core.ShortenReferences
 import org.jetbrains.kotlin.idea.completion.isArtificialImportAliasedDescriptor
 import org.jetbrains.kotlin.idea.core.completion.DeclarationLookupObject
 import org.jetbrains.kotlin.idea.util.CallTypeAndReceiver
 import org.jetbrains.kotlin.idea.util.IdeDescriptorRenderers
-import org.jetbrains.kotlin.idea.core.ShortenReferences
 import org.jetbrains.kotlin.name.FqNameUnsafe
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
@@ -53,7 +53,7 @@ object KotlinClassifierInsertHandler : BaseDeclarationInsertHandler() {
 
                 val lookupObject = item.`object` as DeclarationLookupObject
                 if (lookupObject.descriptor?.isArtificialImportAliasedDescriptor == true) return // never need to insert import or use qualified name for import-aliased class
-                
+
                 val qualifiedName = qualifiedName(lookupObject)
 
                 // first try to resolve short name for faster handling
