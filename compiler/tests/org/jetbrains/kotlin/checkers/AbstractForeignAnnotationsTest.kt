@@ -17,19 +17,28 @@
 package org.jetbrains.kotlin.checkers
 
 import org.jetbrains.kotlin.config.*
+import org.jetbrains.kotlin.test.InTextDirectivesUtils
 import org.jetbrains.kotlin.test.MockLibraryUtil
 import java.io.File
 
 val FOREIGN_ANNOTATIONS_SOURCES_PATH = "compiler/testData/foreignAnnotations/annotations"
 
 abstract class AbstractForeignAnnotationsTest : AbstractDiagnosticsWithFullJdkTest() {
+    private val WARNING_FOR_JSR305_ANNOTATIONS_DIRECTIVE = "WARNING_FOR_JSR305_ANNOTATIONS"
+
     override fun getExtraClasspath(): List<File> =
             listOf(MockLibraryUtil.compileJvmLibraryToJar(annotationsPath, "foreign-annotations"))
 
     open protected val annotationsPath: String
         get() = FOREIGN_ANNOTATIONS_SOURCES_PATH
 
-    override fun loadLanguageVersionSettings(module: List<TestFile>): LanguageVersionSettings =
-            LanguageVersionSettingsImpl(LanguageVersion.LATEST_STABLE, ApiVersion.LATEST_STABLE,
-                                        mapOf(AnalysisFlag.loadJsr305Annotations to Jsr305State.ENABLE))
+    override fun loadLanguageVersionSettings(module: List<TestFile>): LanguageVersionSettings {
+        val hasWarningDirective = module.none {
+            InTextDirectivesUtils.isDirectiveDefined(it.expectedText, WARNING_FOR_JSR305_ANNOTATIONS_DIRECTIVE)
+        }
+
+        val jsr305State = if (hasWarningDirective) Jsr305State.WARN else Jsr305State.ENABLE
+        return LanguageVersionSettingsImpl(LanguageVersion.LATEST_STABLE, ApiVersion.LATEST_STABLE,
+                                    mapOf(AnalysisFlag.loadJsr305Annotations to jsr305State))
+    }
 }

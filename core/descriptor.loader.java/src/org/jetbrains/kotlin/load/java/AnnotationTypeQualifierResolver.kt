@@ -19,8 +19,6 @@ package org.jetbrains.kotlin.load.java
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
-import org.jetbrains.kotlin.load.java.AnnotationTypeQualifierResolver.QualifierApplicabilityType
-import org.jetbrains.kotlin.load.java.AnnotationTypeQualifierResolver.TypeQualifierWithApplicability
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
@@ -33,11 +31,16 @@ private val TYPE_QUALIFIER_NICKNAME_FQNAME = FqName("javax.annotation.meta.TypeQ
 private val TYPE_QUALIFIER_FQNAME = FqName("javax.annotation.meta.TypeQualifier")
 private val TYPE_QUALIFIER_DEFAULT_FQNAME = FqName("javax.annotation.meta.TypeQualifierDefault")
 
-interface AnnotationTypeQualifierResolver {
-    fun resolveTypeQualifierAnnotation(annotationDescriptor: AnnotationDescriptor): AnnotationDescriptor?
+enum class NullabilityAnnotationsPolicy {
+    ERROR,
+    WARNING,
+    IGNORE;
 
-    fun resolveTypeQualifierDefaultAnnotation(annotationDescriptor: AnnotationDescriptor): TypeQualifierWithApplicability?
+    fun isIgnored(): Boolean = this == IGNORE
+    fun isWarning(): Boolean = this == WARNING
+}
 
+class AnnotationTypeQualifierResolver(storageManager: StorageManager, val policyForJsr305Annotations: NullabilityAnnotationsPolicy) {
     enum class QualifierApplicabilityType {
         METHOD_RETURN_TYPE, VALUE_PARAMETER, FIELD, TYPE_USE
     }
@@ -52,14 +55,6 @@ interface AnnotationTypeQualifierResolver {
         operator fun component2() = QualifierApplicabilityType.values().filter(this::isApplicableTo)
     }
 
-    object Empty : AnnotationTypeQualifierResolver {
-        override fun resolveTypeQualifierAnnotation(annotationDescriptor: AnnotationDescriptor): AnnotationDescriptor? = null
-
-        override fun resolveTypeQualifierDefaultAnnotation(annotationDescriptor: AnnotationDescriptor): TypeQualifierWithApplicability? = null
-    }
-}
-
-class AnnotationTypeQualifierResolverImpl(storageManager: StorageManager) : AnnotationTypeQualifierResolver {
     private val resolvedNicknames =
             storageManager.createMemoizedFunctionWithNullableValues(this::computeTypeQualifierNickname)
 
@@ -75,14 +70,22 @@ class AnnotationTypeQualifierResolverImpl(storageManager: StorageManager) : Anno
         return resolvedNicknames(classDescriptor)
     }
 
-    override fun resolveTypeQualifierAnnotation(annotationDescriptor: AnnotationDescriptor): AnnotationDescriptor? {
+    fun resolveTypeQualifierAnnotation(annotationDescriptor: AnnotationDescriptor): AnnotationDescriptor? {
+        if (policyForJsr305Annotations.isIgnored()) {
+            return null
+        }
+
         val annotationClass = annotationDescriptor.annotationClass ?: return null
         if (annotationClass.isAnnotatedWithTypeQualifier) return annotationDescriptor
 
         return resolveTypeQualifierNickname(annotationClass)
     }
 
-    override fun resolveTypeQualifierDefaultAnnotation(annotationDescriptor: AnnotationDescriptor): TypeQualifierWithApplicability? {
+    fun resolveTypeQualifierDefaultAnnotation(annotationDescriptor: AnnotationDescriptor): TypeQualifierWithApplicability? {
+        if (policyForJsr305Annotations.isIgnored()) {
+            return null
+        }
+
         val typeQualifierDefaultAnnotatedClass =
                 annotationDescriptor.annotationClass?.takeIf { it.annotations.hasAnnotation(TYPE_QUALIFIER_DEFAULT_FQNAME) }
                 ?: return null

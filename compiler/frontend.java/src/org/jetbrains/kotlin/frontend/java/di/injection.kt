@@ -103,12 +103,14 @@ fun createContainerForLazyResolveWithJava(
 
     useInstance(languageVersionSettings)
 
-    if (languageVersionSettings.getFlag(AnalysisFlag.loadJsr305Annotations).shouldReportError) {
-        useImpl<AnnotationTypeQualifierResolverImpl>()
+    val loadJsr305Annotations = languageVersionSettings.getFlag(AnalysisFlag.loadJsr305Annotations)
+    val nullabilityAnnotationsPolicy = when {
+        loadJsr305Annotations.shouldReportError -> NullabilityAnnotationsPolicy.ERROR
+        loadJsr305Annotations.shouldReportWarning -> NullabilityAnnotationsPolicy.WARNING
+        else -> NullabilityAnnotationsPolicy.IGNORE
     }
-    else {
-        useInstance(AnnotationTypeQualifierResolver.Empty)
-    }
+
+    useInstance(nullabilityAnnotationsPolicy)
 
     if (useBuiltInsProvider) {
         useInstance((moduleContext.module.builtIns as JvmBuiltIns).settings)
