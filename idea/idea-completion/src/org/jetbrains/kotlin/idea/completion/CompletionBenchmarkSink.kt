@@ -29,7 +29,7 @@ interface CompletionBenchmarkSink {
         fun enableAndGet(): Impl = Impl().also { _instance = it }
 
         fun disable() {
-            _instance.let { if (it is Impl) it.channel.close() }
+            _instance.let { (it as? Impl)?.channel?.close() }
             _instance = Empty
         }
 
@@ -46,8 +46,8 @@ interface CompletionBenchmarkSink {
     }
 
     class Impl : CompletionBenchmarkSink {
-        val pendingSessions = mutableListOf<CompletionSession>()
-        lateinit var results: CompletionBenchmarkResults
+        private val pendingSessions = mutableListOf<CompletionSession>()
+        private lateinit var results: CompletionBenchmarkResults
         val channel = ConflatedChannel<CompletionBenchmarkResults>()
 
         override fun onCompletionStarted(completionSession: CompletionSession) {
