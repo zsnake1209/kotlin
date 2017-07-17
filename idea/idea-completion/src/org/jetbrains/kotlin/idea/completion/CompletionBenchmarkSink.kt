@@ -50,13 +50,13 @@ interface CompletionBenchmarkSink {
         private lateinit var results: CompletionBenchmarkResults
         val channel = ConflatedChannel<CompletionBenchmarkResults>()
 
-        override fun onCompletionStarted(completionSession: CompletionSession) {
+        override fun onCompletionStarted(completionSession: CompletionSession) = synchronized(this) {
             if (pendingSessions.isEmpty())
                 results = CompletionBenchmarkResults()
             pendingSessions += completionSession
         }
 
-        override fun onCompletionEnded(completionSession: CompletionSession) {
+        override fun onCompletionEnded(completionSession: CompletionSession) = synchronized(this) {
             pendingSessions -= completionSession
             if (pendingSessions.isEmpty()) {
                 results.onEnd()
@@ -64,11 +64,11 @@ interface CompletionBenchmarkSink {
             }
         }
 
-        override fun onFirstFlush(completionSession: CompletionSession) {
+        override fun onFirstFlush(completionSession: CompletionSession) = synchronized(this) {
             results.onFirstFlush()
         }
 
-        fun reset() {
+        fun reset() = synchronized(this) {
             pendingSessions.clear()
         }
 
