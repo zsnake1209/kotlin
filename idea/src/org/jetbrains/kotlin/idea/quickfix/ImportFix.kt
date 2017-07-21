@@ -31,6 +31,7 @@ import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.util.PsiModificationTracker
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
@@ -51,10 +52,9 @@ import org.jetbrains.kotlin.idea.core.isVisible
 import org.jetbrains.kotlin.idea.imports.canBeReferencedViaImport
 import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.project.TargetPlatformDetector
+import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.idea.references.mainReference
-import org.jetbrains.kotlin.idea.util.CallTypeAndReceiver
-import org.jetbrains.kotlin.idea.util.getResolutionScope
-import org.jetbrains.kotlin.idea.util.receiverTypes
+import org.jetbrains.kotlin.idea.util.*
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.js.resolve.JsPlatform
 import org.jetbrains.kotlin.name.FqName
@@ -300,17 +300,19 @@ internal class ImportFix(expression: KtSimpleNameExpression) : OrdinaryImportFix
         indicesHelper.getKotlinEnumsByName(name).filterTo(result, filterByCallType)
 
         val resolutionFacade = element.getResolutionFacade()
-        val actualReceiverTypes =
-                callTypeAndReceiver.receiverTypes(bindingContext, element, resolutionFacade.moduleDescriptor, resolutionFacade, false).orEmpty()
+        var actualReceiverTypes = callTypeAndReceiver
+                .receiverTypesWithIndex(bindingContext, element,
+                                        resolutionFacade.moduleDescriptor, resolutionFacade,
+                                        false).orEmpty()
+
+        if (element.languageVersionSettings.supportsFeature(LanguageFeature.DslMarkersSupport)) {
+            actualReceiverTypes -= actualReceiverTypes.shadowedByDslMarkers()
+        }
 
         val processor = { descriptor: CallableDescriptor ->
-            if (descriptor.canBeReferencedViaImport() && filterByCallType(descriptor)) {
-                val extensionReceiverType = descriptor.extensionReceiverParameter?.type
-
-                if ((actualReceiverTypes.isEmpty() && extensionReceiverType == null) ||
-                    (extensionReceiverType != null && actualReceiverTypes.any { it.isSubtypeOf(extensionReceiverType) })) {
-                    result.add(descriptor)
-                }
+            if (descriptor.canBeReferencedViaImport() && filterByCallType(descriptor)
+                && descriptor.isValidByReceiversFor(actualReceiverTypes)) {
+                result.add(descriptor)
             }
         }
 
@@ -330,6 +332,11 @@ internal class ImportFix(expression: KtSimpleNameExpression) : OrdinaryImportFix
         return result
     }
 
+    private fun CallableDescriptor.isValidByReceiversFor(explicitReceiverTypes: Collection<ReceiverType>): Boolean {
+        val receiverParameterType = extensionReceiverParameter?.type ?: return true
+        if (explicitReceiverTypes.isEmpty()) return false
+        return explicitReceiverTypes.any { it.type.isSubtypeOf(receiverParameterType) }
+    }
 
     override fun fillCandidates(
             name: String,

@@ -1,7 +1,7 @@
 package some
 
 object AAA {
-    operator fun plus(i: Int): Int {
+    operator fun Int.plus(i: Int): Int {
         return 42
     }
 }
