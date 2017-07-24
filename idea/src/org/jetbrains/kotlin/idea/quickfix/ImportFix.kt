@@ -74,6 +74,7 @@ import org.jetbrains.kotlin.resolve.scopes.utils.addImportingScope
 import org.jetbrains.kotlin.resolve.scopes.utils.collectFunctions
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.util.OperatorNameConventions
+import org.jetbrains.kotlin.utils.ifEmpty
 import java.util.*
 
 /**
@@ -303,15 +304,23 @@ internal class ImportFix(expression: KtSimpleNameExpression) : OrdinaryImportFix
         var actualReceiverTypes = callTypeAndReceiver
                 .receiverTypesWithIndex(bindingContext, element,
                                         resolutionFacade.moduleDescriptor, resolutionFacade,
-                                        false).orEmpty()
+                                        stableSmartCastsOnly = false,
+                                        withImplicitReceiversWhenExplicitPresent = true).orEmpty()
 
         if (element.languageVersionSettings.supportsFeature(LanguageFeature.DslMarkersSupport)) {
             actualReceiverTypes -= actualReceiverTypes.shadowedByDslMarkers()
         }
 
+        val explicitReceiverTypes = actualReceiverTypes.filterNot { it.implicit }
+
+        val checkDispatchReceiver = when(callTypeAndReceiver) {
+            is CallTypeAndReceiver.OPERATOR, is CallTypeAndReceiver.INFIX -> true
+            else -> false
+        }
+
         val processor = { descriptor: CallableDescriptor ->
             if (descriptor.canBeReferencedViaImport() && filterByCallType(descriptor)
-                && descriptor.isValidByReceiversFor(actualReceiverTypes)) {
+                && descriptor.isValidByReceiversFor(explicitReceiverTypes, actualReceiverTypes, checkDispatchReceiver)) {
                 result.add(descriptor)
             }
         }
@@ -332,10 +341,17 @@ internal class ImportFix(expression: KtSimpleNameExpression) : OrdinaryImportFix
         return result
     }
 
-    private fun CallableDescriptor.isValidByReceiversFor(explicitReceiverTypes: Collection<ReceiverType>): Boolean {
-        val receiverParameterType = extensionReceiverParameter?.type ?: return true
-        if (explicitReceiverTypes.isEmpty()) return false
-        return explicitReceiverTypes.any { it.type.isSubtypeOf(receiverParameterType) }
+
+    private fun CallableDescriptor.isValidByReceiversFor(explicitReceiverTypes: Collection<ReceiverType>,
+                                                         allReceiverTypes: Collection<ReceiverType>,
+                                                         checkDispatchReceiver: Boolean): Boolean {
+        val bothReceivers = listOfNotNull(extensionReceiverParameter, dispatchReceiverParameter.takeIf { checkDispatchReceiver })
+
+        val receiverTypesPerReceiver = generateSequence(explicitReceiverTypes.ifEmpty { allReceiverTypes }) { allReceiverTypes }
+
+        return bothReceivers
+                .zip(receiverTypesPerReceiver.asIterable())
+                .all { (receiver, possibleTypes) -> possibleTypes.any { it.type.isSubtypeOf(receiver.type) } }
     }
 
     override fun fillCandidates(
