@@ -18,9 +18,10 @@ package org.jetbrains.kotlin.cli.common.arguments;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.config.AnalysisFlag;
-import org.jetbrains.kotlin.config.Jsr305State;
 import org.jetbrains.kotlin.config.JvmTarget;
+import org.jetbrains.kotlin.utils.Jsr305State;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
@@ -165,10 +166,26 @@ public class K2JVMCompilerArguments extends CommonCompilerArguments {
 
     @Argument(
             value = "-Xjsr305-annotations",
-            valueDescription = "{ignore|enable}",
-            description = "Specify global behavior for JSR-305 nullability annotations: ignore, or treat as other supported nullability annotations"
+            valueDescription = "{ignore|enable|warn}",
+            description = "Specify global behavior for JSR-305 nullability annotations: ignore, treat as other supported nullability annotations, or report "
     )
     public String jsr305GlobalReportLevel = Jsr305State.DEFAULT.getDescription();
+
+    @Argument(
+            value = "-Xjsr305-annotation-migration",
+            valueDescription = "{ignore|enable|warn}",
+            description = "Specify default behavior for JSR-305 migration nullability annotation: " +
+                          "ignore annotations marked with migration, warn on incorrect nullability usages, or treat as other supported nullability annotations"
+    )
+    public String jsr305MigrationReportLevel = Jsr305State.DEFAULT.getDescription();
+
+    @Argument(
+            value = "-Xjsr305-user-annotation",
+            valueDescription = "<fully qualified class name>:{ignore|enable|warn}",
+            description = "Specify behavior for JSR-305 user nullability annotation: " +
+                          "ignore them, warn on incorrect nullability usages, or treat as other supported nullability annotations"
+    )
+    public String[] jsr305AnnotationReportLevel = new String[]{};
 
     // Paths to output directories for friend modules.
     public String[] friendPaths;
@@ -177,12 +194,28 @@ public class K2JVMCompilerArguments extends CommonCompilerArguments {
     @NotNull
     public Map<AnalysisFlag<?>, Object> configureAnalysisFlags() {
         Map<AnalysisFlag<?>, Object> result = super.configureAnalysisFlags();
-        for (Jsr305State state : Jsr305State.values()) {
-            if (state.getDescription().equals(jsr305GlobalReportLevel)) {
-                result.put(AnalysisFlag.getLoadJsr305Annotations(), state);
-                break;
-            }
+
+        Jsr305State globalState = Jsr305State.Companion.fromDescription(jsr305GlobalReportLevel);
+        if (globalState != null) {
+            result.put(AnalysisFlag.getJsr305GlobalAnnotations(), globalState);
         }
+
+        Jsr305State migrationState = Jsr305State.Companion.fromDescription(jsr305MigrationReportLevel);
+        if (migrationState != null) {
+            result.put(AnalysisFlag.getJsr305MigrationAnnotation(), globalState);
+        }
+
+        Map<String, Jsr305State> userAnnotationsState = new HashMap<>();
+        for (String annotation : jsr305AnnotationReportLevel) {
+            String[] nameAndState = annotation.split(":");
+            if (nameAndState.length != 2) continue;
+
+            Jsr305State state = Jsr305State.Companion.fromDescription(nameAndState[1]);
+            if (state == null) continue;
+
+            userAnnotationsState.put(nameAndState[0], state);
+        }
+        result.put(AnalysisFlag.getJsr305SpecialAnnotations(), userAnnotationsState);
         return result;
     }
 }

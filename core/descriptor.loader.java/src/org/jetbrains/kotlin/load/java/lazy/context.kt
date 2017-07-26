@@ -119,12 +119,11 @@ fun LazyJavaResolverContext.computeNewDefaultTypeQualifiers(
             ?: QualifierByApplicabilityType(AnnotationTypeQualifierResolver.QualifierApplicabilityType::class.java)
 
     var wasUpdate = false
-    val forWarning = components.annotationTypeQualifierResolver.policyForJsr305Annotations.isWarning()
     for ((typeQualifier, applicableTo) in typeQualifierDefaults) {
         val nullability = components
                                   .signatureEnhancement
-                                  .extractNullability(typeQualifier)
-                                  ?.copy(isForWarningOnly = forWarning) ?: continue
+                                  .extractNullability(typeQualifier.descriptor)
+                                  ?.copy(isForWarningOnly = typeQualifier.policy.isWarning()) ?: continue
 
         for (applicabilityType in applicableTo) {
             nullabilityQualifiers[applicabilityType] = nullability

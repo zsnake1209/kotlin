@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.config
 
+import org.jetbrains.kotlin.utils.Jsr305State
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -41,6 +42,10 @@ class AnalysisFlag<out T> internal constructor(
         object Jsr305StateIgnoreByDefault {
             operator fun provideDelegate(instance: Any?, property: KProperty<*>) = Flag(property.name, Jsr305State.IGNORE)
         }
+
+        object Jsr305StateForUserAnnotations {
+            operator fun provideDelegate(instance: Any?, property: KProperty<*>) = Flag(property.name, mapOf<String, Jsr305State>())
+        }
     }
 
     companion object Flags {
@@ -51,22 +56,12 @@ class AnalysisFlag<out T> internal constructor(
         val multiPlatformDoNotCheckImpl by Flag.Boolean
 
         @JvmStatic
-        val loadJsr305Annotations by Flag.Jsr305StateIgnoreByDefault
-    }
-}
+        val jsr305GlobalAnnotations by Flag.Jsr305StateIgnoreByDefault
 
-enum class Jsr305State(
-        val description: String,
-        val shouldReportWarning: Boolean = false,
-        val shouldReportError: Boolean = false
-) {
-    IGNORE("ignore"),
-    WARN("warn", shouldReportWarning = true),
-    ENABLE("enable", shouldReportError = true),
-    ;
+        @JvmStatic
+        val jsr305MigrationAnnotation by Flag.Jsr305StateIgnoreByDefault
 
-    companion object {
-        @JvmField
-        val DEFAULT: Jsr305State = IGNORE
+        @JvmStatic
+        val jsr305SpecialAnnotations by Flag.Jsr305StateForUserAnnotations
     }
 }

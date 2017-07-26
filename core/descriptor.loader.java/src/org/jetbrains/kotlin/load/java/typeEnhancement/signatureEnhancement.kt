@@ -59,13 +59,15 @@ class SignatureEnhancement(private val annotationTypeQualifierResolver: Annotati
             in NOT_NULL_ANNOTATIONS -> NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NOT_NULL)
             JAVAX_NONNULL_ANNOTATION -> annotationDescriptor.extractNullabilityTypeFromArgument()
             else -> {
-                val forWarning = annotationTypeQualifierResolver.policyForJsr305Annotations.isWarning()
+                val typeQualifierWithPolicy = annotationTypeQualifierResolver
+                        .resolveTypeQualifierAnnotation(annotationDescriptor)
+                        ?.takeIf { it.descriptor.fqName == JAVAX_NONNULL_ANNOTATION }
+                        ?: return null
 
-                annotationTypeQualifierResolver
-                    .resolveTypeQualifierAnnotation(annotationDescriptor)
-                    ?.takeIf { it.fqName == JAVAX_NONNULL_ANNOTATION }
-                    ?.extractNullabilityTypeFromArgument()
-                    ?.copy(isForWarningOnly = forWarning)
+                typeQualifierWithPolicy
+                        .descriptor
+                        .extractNullabilityTypeFromArgument()
+                        ?.copy(isForWarningOnly = typeQualifierWithPolicy.policy.isWarning())
             }
         }
     }

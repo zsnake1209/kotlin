@@ -103,14 +103,12 @@ fun createContainerForLazyResolveWithJava(
 
     useInstance(languageVersionSettings)
 
-    val loadJsr305Annotations = languageVersionSettings.getFlag(AnalysisFlag.loadJsr305Annotations)
-    val nullabilityAnnotationsPolicy = when {
-        loadJsr305Annotations.shouldReportError -> NullabilityAnnotationsPolicy.ERROR
-        loadJsr305Annotations.shouldReportWarning -> NullabilityAnnotationsPolicy.WARNING
-        else -> NullabilityAnnotationsPolicy.IGNORE
-    }
 
-    useInstance(nullabilityAnnotationsPolicy)
+    useInstance(Jsr305AnnotationsPolicy(
+            languageVersionSettings.getFlag(AnalysisFlag.jsr305GlobalAnnotations),
+            languageVersionSettings.getFlag(AnalysisFlag.jsr305MigrationAnnotation),
+            languageVersionSettings.getFlag(AnalysisFlag.jsr305SpecialAnnotations)
+    ))
 
     if (useBuiltInsProvider) {
         useInstance((moduleContext.module.builtIns as JvmBuiltIns).settings)
