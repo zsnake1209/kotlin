@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jetbrains.kotlin.idea.quickfix.replaceWith
+package org.jetbrains.kotlin.idea.quickfix.replacement
 
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
@@ -40,13 +40,12 @@ import org.jetbrains.kotlin.resolve.scopes.utils.chainImportingScopes
 import org.jetbrains.kotlin.resolve.scopes.utils.memberScopeAsImportingScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingServices
-import java.util.*
 
-data class ReplaceWith(val pattern: String, val imports: List<String>)
+data class PatternAnnotation(val pattern: String, val imports: List<String>)
 
-object ReplaceWithAnnotationAnalyzer {
+object PatternAnnotationAnalyzer {
     fun analyzeCallableReplacement(
-        annotation: ReplaceWith,
+        annotation: PatternAnnotation,
         symbolDescriptor: CallableDescriptor,
         resolutionFacade: ResolutionFacade,
         reformat: Boolean
@@ -59,7 +58,7 @@ object ReplaceWithAnnotationAnalyzer {
     }
 
     private fun analyzeOriginal(
-        annotation: ReplaceWith,
+        annotation: PatternAnnotation,
         symbolDescriptor: CallableDescriptor,
         resolutionFacade: ResolutionFacade,
         reformat: Boolean
@@ -90,7 +89,7 @@ object ReplaceWithAnnotationAnalyzer {
     }
 
     fun analyzeClassifierReplacement(
-        annotation: ReplaceWith,
+        annotation: PatternAnnotation,
         symbolDescriptor: ClassifierDescriptorWithTypeParameters,
         resolutionFacade: ResolutionFacade
     ): KtUserType? {
@@ -151,7 +150,7 @@ object ReplaceWithAnnotationAnalyzer {
     }
 
     private fun buildExplicitImportsScope(
-        annotation: ReplaceWith,
+        annotation: PatternAnnotation,
         resolutionFacade: ResolutionFacade,
         module: ModuleDescriptor
     ): ExplicitImportsScope {
@@ -167,7 +166,7 @@ object ReplaceWithAnnotationAnalyzer {
         return ExplicitImportsScope(importedSymbols)
     }
 
-    private fun importFqNames(annotation: ReplaceWith): List<FqName> {
+    private fun importFqNames(annotation: PatternAnnotation): List<FqName> {
         return annotation.imports
             .asSequence()
             .filter { FqNameUnsafe.isValid(it) }

@@ -1,4 +1,4 @@
-// "class org.jetbrains.kotlin.idea.quickfix.replaceWith.DeprecatedSymbolUsageFix" "false"
+// "class org.jetbrains.kotlin.idea.quickfix.replacement.replaceWith.DeprecatedSymbolUsageFix" "false"
 // ERROR: The integer literal does not conform to the expected type String
 // ERROR: Assigning single elements to varargs in named form is forbidden
 

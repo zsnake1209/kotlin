@@ -17,8 +17,8 @@
 package org.jetbrains.kotlin.idea.quickfix
 
 import com.intellij.testFramework.TestDataPath
-import org.jetbrains.kotlin.idea.quickfix.replaceWith.DeprecatedSymbolUsageFix
-import org.jetbrains.kotlin.idea.quickfix.replaceWith.ReplaceWith
+import org.jetbrains.kotlin.idea.quickfix.replacement.replaceWith.DeprecatedSymbolUsageFix
+import org.jetbrains.kotlin.idea.quickfix.replacement.PatternAnnotation
 import org.jetbrains.kotlin.idea.test.KotlinLightCodeInsightFixtureTestCase
 import org.jetbrains.kotlin.idea.test.ProjectDescriptorWithStdlibSources
 import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
@@ -55,7 +55,7 @@ class DeprecatedSymbolUsageFixSpecialTest : KotlinLightCodeInsightFixtureTestCas
         val element = file.findElementAt(offset)
         val nameExpression = element!!.parents.firstIsInstance<KtSimpleNameExpression>()
         project.executeWriteCommand("") {
-            DeprecatedSymbolUsageFix(nameExpression, ReplaceWith(pattern, emptyList())).invoke(project, editor, file)
+            DeprecatedSymbolUsageFix(nameExpression, PatternAnnotation(pattern, emptyList())).invoke(project, editor, file)
         }
 
         myFixture.checkResultByFile("$testPath.after")
