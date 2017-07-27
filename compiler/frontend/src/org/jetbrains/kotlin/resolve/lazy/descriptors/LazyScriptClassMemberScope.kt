@@ -38,7 +38,7 @@ class LazyScriptClassMemberScope(
                 scriptDescriptor,
                 Annotations.EMPTY,
                 true,
-                SourceElement.NO_SOURCE
+                scriptDescriptor.source
         )
         constructor.initialize(
                 createScriptParameters(constructor),
