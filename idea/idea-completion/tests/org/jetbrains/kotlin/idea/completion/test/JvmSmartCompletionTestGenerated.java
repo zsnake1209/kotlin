@@ -1472,6 +1472,12 @@ public class JvmSmartCompletionTestGenerated extends AbstractJvmSmartCompletionT
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/idea-completion/testData/smart/lambdaSignature"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
         }
 
+        @TestMetadata("Destructuring.kt")
+        public void testDestructuring() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/smart/lambdaSignature/Destructuring.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("ExplicitParameterTypesRequired.kt")
         public void testExplicitParameterTypesRequired() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/smart/lambdaSignature/ExplicitParameterTypesRequired.kt");
@@ -1481,6 +1487,12 @@ public class JvmSmartCompletionTestGenerated extends AbstractJvmSmartCompletionT
         @TestMetadata("Map.kt")
         public void testMap() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/smart/lambdaSignature/Map.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("MapEntryDestructuring.kt")
+        public void testMapEntryDestructuring() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/smart/lambdaSignature/MapEntryDestructuring.kt");
             doTest(fileName);
         }
 

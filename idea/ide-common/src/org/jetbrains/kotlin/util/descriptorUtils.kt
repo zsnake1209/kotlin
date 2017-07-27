@@ -91,6 +91,13 @@ val ClassifierDescriptorWithTypeParameters.constructors: Collection<ConstructorD
         else -> emptyList()
     }
 
+fun ClassifierDescriptorWithTypeParameters.resolveToClassDescriptor(): ClassDescriptor? =
+        when (this) {
+            is TypeAliasDescriptor -> this.classDescriptor
+            is ClassDescriptor -> this
+            else -> null
+        }
+
 val ClassifierDescriptorWithTypeParameters.kind: ClassKind?
     get() = when (this) {
         is TypeAliasDescriptor -> classDescriptor?.kind

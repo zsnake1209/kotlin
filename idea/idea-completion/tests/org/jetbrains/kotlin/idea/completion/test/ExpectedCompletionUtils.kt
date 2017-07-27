@@ -118,6 +118,8 @@ object ExpectedCompletionUtils {
 
     private val COMPLETION_TYPE_PREFIX = "COMPLETION_TYPE:"
 
+    val WITH_RUNTIME = "WITH_RUNTIME"
+
     val KNOWN_PREFIXES: List<String> = ImmutableList.of(
             EXIST_LINE_PREFIX,
             ABSENT_LINE_PREFIX,
@@ -136,7 +138,8 @@ object ExpectedCompletionUtils {
             RUNTIME_TYPE,
             COMPLETION_TYPE_PREFIX,
             LightClassComputationControl.LIGHT_CLASS_DIRECTIVE,
-            AstAccessControl.ALLOW_AST_ACCESS_DIRECTIVE)
+            AstAccessControl.ALLOW_AST_ACCESS_DIRECTIVE,
+            WITH_RUNTIME)
 
     fun itemsShouldExist(fileText: String, platform: TargetPlatform?): Array<CompletionProposal> {
         return when (platform) {

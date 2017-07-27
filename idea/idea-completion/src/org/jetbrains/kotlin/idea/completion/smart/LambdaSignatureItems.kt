@@ -21,17 +21,23 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
 import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
 import org.jetbrains.kotlin.builtins.isFunctionType
+import org.jetbrains.kotlin.descriptors.ClassifierDescriptorWithTypeParameters
+import org.jetbrains.kotlin.idea.completion.LambdaDestructuringTemplates
 import org.jetbrains.kotlin.idea.completion.LambdaSignatureTemplates
 import org.jetbrains.kotlin.idea.completion.suppressAutoInsertion
 import org.jetbrains.kotlin.idea.core.ExpectedInfos
 import org.jetbrains.kotlin.idea.core.fuzzyType
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
+import org.jetbrains.kotlin.idea.util.destructuring
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
+import org.jetbrains.kotlin.util.resolveToClassDescriptor
 
 object LambdaSignatureItems {
     fun addToCollection(
@@ -60,6 +66,11 @@ object LambdaSignatureItems {
                 collection.add(createLookupElement(functionType, LambdaSignatureTemplates.SignaturePresentation.NAMES, explicitParameterTypes = false))
                 collection.add(createLookupElement(functionType, LambdaSignatureTemplates.SignaturePresentation.NAMES_AND_TYPES, explicitParameterTypes = true))
             }
+
+            val singleParameterType = functionType.getValueParameterTypesFromFunctionType().singleOrNull()?.type
+            if (singleParameterType != null) {
+                addDestructuringIfPossible(singleParameterType, collection)
+            }
         }
     }
 
@@ -74,13 +85,52 @@ object LambdaSignatureItems {
         else
             SmartCompletionItemPriority.LAMBDA_SIGNATURE
         return LookupElementBuilder.create(lookupString)
-                .withInsertHandler({ context, lookupElement ->
-                                       val offset = context.startOffset
-                                       val placeholder = "{}"
-                                       context.document.replaceString(offset, context.tailOffset, placeholder)
-                                       LambdaSignatureTemplates.insertTemplate(context, TextRange(offset, offset + placeholder.length), functionType, explicitParameterTypes, signatureOnly = true)
-                                   })
+                .withInsertHandler { context, _ ->
+                    val offset = context.startOffset
+                    val placeholder = "{}"
+                    context.document.replaceString(offset, context.tailOffset, placeholder)
+                    LambdaSignatureTemplates.insertTemplate(context, TextRange(offset, offset + placeholder.length), functionType, explicitParameterTypes, signatureOnly = true)
+                }
                 .suppressAutoInsertion()
                 .assignSmartCompletionPriority(priority)
+    }
+
+    private fun createLookupElementForDestructuring(destructuringInformation: List<Pair<Name, KotlinType>>,
+                                                    explicitTypes: Boolean): LookupElement {
+
+        val priority = if (explicitTypes)
+            SmartCompletionItemPriority.LAMBDA_SIGNATURE_DESTRUCTURING_EXPLICIT_PARAMETER_TYPES
+        else
+            SmartCompletionItemPriority.LAMBDA_SIGNATURE_DESTRUCTURING
+
+
+        val lookupString = LambdaDestructuringTemplates.presentation(destructuringInformation, explicitTypes)
+        return LookupElementBuilder.create(lookupString)
+                .withInsertHandler { context, _ ->
+                    val offset = context.startOffset
+                    val placeholder = "{}"
+                    context.document.replaceString(offset, context.tailOffset, placeholder)
+                    LambdaDestructuringTemplates.insertTemplate(context, TextRange(offset, offset + placeholder.length), destructuringInformation, explicitTypes)
+                }
+                .suppressAutoInsertion()
+                .assignSmartCompletionPriority(priority)
+    }
+
+    private fun addDestructuringIfPossible(
+            functionType: KotlinType,
+            collection: MutableCollection<LookupElement>) {
+
+        val parameterClassDescriptor =
+                (functionType.constructor.declarationDescriptor
+                        as? ClassifierDescriptorWithTypeParameters)
+                        ?.resolveToClassDescriptor() ?: return
+
+        val destructuring = parameterClassDescriptor.destructuring(functionType) ?: return
+
+        val unsubstitutedParametersPresent = destructuring.any { (_, type) -> type.isTypeParameter() }
+        if (!unsubstitutedParametersPresent) {
+            collection += createLookupElementForDestructuring(destructuring, false)
+            collection += createLookupElementForDestructuring(destructuring, true)
+        }
     }
 }
