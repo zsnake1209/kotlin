@@ -17,12 +17,13 @@
 package org.jetbrains.kotlin.idea.completion
 
 import com.intellij.codeInsight.completion.InsertionContext
-import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.template.*
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import org.jetbrains.kotlin.idea.completion.handlers.isCharAt
+import org.jetbrains.kotlin.idea.core.KotlinNameSuggester
 import org.jetbrains.kotlin.idea.util.IdeDescriptorRenderers
 import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
 import org.jetbrains.kotlin.name.Name
@@ -98,12 +99,20 @@ object LambdaDestructuringTemplates {
         template.isToShortenLongNames = true
         template.isToReformat = true
         template.addTextSegment("(")
+
+
+        val usedNames = mutableListOf<String>() // For name deduplication in completion
         destructuringInformation.forEachIndexed { i, (name, type) ->
+
             val nameResult = TextResult(name.render())
             val nameExpression = object : Expression() {
                 override fun calculateQuickResult(context: ExpressionContext?) = nameResult
 
-                override fun calculateLookupItems(context: ExpressionContext?) = emptyArray<LookupElement>()
+                override fun calculateLookupItems(context: ExpressionContext?) =
+                        (listOf(KotlinNameSuggester.suggestNameByName(nameResult.text, { it !in usedNames })) +
+                         KotlinNameSuggester.suggestNamesByType(type, { it !in usedNames }))
+                                .map { LookupElementBuilder.create(it).withInsertHandler { _, item -> usedNames += item.lookupString } }
+                                .toTypedArray()
 
                 override fun calculateResult(context: ExpressionContext?) = nameResult
             }
@@ -111,20 +120,9 @@ object LambdaDestructuringTemplates {
             template.addVariable(nameExpression, true)
             if (explicitTypes) {
                 template.addTextSegment(": ")
-                if (type.isTypeParameter()) {
-                    val typeParameterNameResult = TextResult(TYPE_RENDERER.renderType(type))
-                    val typeExpression = object : Expression() {
-                        override fun calculateQuickResult(context: ExpressionContext?) = typeParameterNameResult
-
-                        override fun calculateLookupItems(context: ExpressionContext?) = emptyArray<LookupElement>()
-
-                        override fun calculateResult(context: ExpressionContext?) = typeParameterNameResult
-                    }
-                    template.addVariable(typeExpression, false)
-                }
-                else {
-                    template.addTextSegment(TYPE_RENDERER.renderType(type))
-                }
+                // Type can't be inferred from destructuring
+                assert(!type.isTypeParameter())
+                template.addTextSegment(TYPE_RENDERER.renderType(type))
             }
             if (i < destructuringInformation.lastIndex) {
                 template.addTextSegment(", ")

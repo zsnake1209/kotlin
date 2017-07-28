@@ -20,11 +20,8 @@ import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.idea.caches.resolve.LibraryModificationTracker
-import org.jetbrains.kotlin.idea.completion.test.ExpectedCompletionUtils.WITH_RUNTIME
-import org.jetbrains.kotlin.idea.test.ConfigLibraryUtil
 import org.jetbrains.kotlin.idea.test.KotlinLightCodeInsightFixtureTestCase
 import org.jetbrains.kotlin.resolve.TargetPlatform
-import org.jetbrains.kotlin.test.InTextDirectivesUtils
 import java.io.File
 
 abstract class KotlinFixtureCompletionBaseTestCase : KotlinLightCodeInsightFixtureTestCase() {
@@ -58,12 +55,9 @@ abstract class KotlinFixtureCompletionBaseTestCase : KotlinLightCodeInsightFixtu
         //TODO: this is a hacky workaround for js second completion tests failing with PsiInvalidElementAccessException
         LibraryModificationTracker.getInstance(project).incModificationCount()
         myFixture.configureByFile(testPath)
-        if (InTextDirectivesUtils.isDirectiveDefined(myFixture.file.text,  WITH_RUNTIME)) {
-            ConfigLibraryUtil.configureKotlinRuntime(module)
-        }
     }
 
     protected open fun tearDownFixture() {
-        ConfigLibraryUtil.unConfigureKotlinRuntime(module)
+
     }
 }

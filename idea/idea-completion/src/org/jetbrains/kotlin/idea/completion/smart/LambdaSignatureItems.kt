@@ -35,9 +35,9 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.descriptorUtil.denotedClassDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
-import org.jetbrains.kotlin.util.resolveToClassDescriptor
 
 object LambdaSignatureItems {
     fun addToCollection(
@@ -123,10 +123,10 @@ object LambdaSignatureItems {
         val parameterClassDescriptor =
                 (functionType.constructor.declarationDescriptor
                         as? ClassifierDescriptorWithTypeParameters)
-                        ?.resolveToClassDescriptor() ?: return
+                        ?.denotedClassDescriptor ?: return
 
         val destructuring = parameterClassDescriptor.destructuring(functionType) ?: return
-
+        // TODO: Handle unsubstituted types correctly (Explicit type declaration for destructuring)
         val unsubstitutedParametersPresent = destructuring.any { (_, type) -> type.isTypeParameter() }
         if (!unsubstitutedParametersPresent) {
             collection += createLookupElementForDestructuring(destructuring, false)
