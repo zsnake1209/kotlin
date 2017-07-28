@@ -56,6 +56,10 @@ import org.jetbrains.kotlin.js.facade.K2JSTranslator;
 import org.jetbrains.kotlin.js.facade.MainCallParameters;
 import org.jetbrains.kotlin.js.facade.TranslationResult;
 import org.jetbrains.kotlin.js.sourceMap.SourceFilePathResolver;
+import org.jetbrains.kotlin.js.facade.TranslationUnit;
+import org.jetbrains.kotlin.js.facade.exceptions.TranslationException;
+import org.jetbrains.kotlin.incremental.js.IncrementalDataProvider;
+import org.jetbrains.kotlin.incremental.js.IncrementalResultsConsumer;
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus;
 import org.jetbrains.kotlin.psi.KtFile;
 import org.jetbrains.kotlin.serialization.js.ModuleKind;
@@ -100,6 +104,35 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
     }
 
     @NotNull
+    protected KotlinCoreEnvironment createJsEnvironment(@NotNull CompilerConfiguration configuration, @NotNull Disposable rootDisposable) {
+        return KotlinCoreEnvironment.createForProduction(rootDisposable, configuration, EnvironmentConfigFiles.JS_CONFIG_FILES);
+    }
+
+    @NotNull
+    protected TranslationResult translate(
+            @NotNull JsConfig.Reporter reporter,
+            @NotNull List<KtFile> allKotlinFiles,
+            @NotNull JsAnalysisResult jsAnalysisResult,
+            @NotNull MainCallParameters mainCallParameters,
+            @NotNull JsConfig config
+    ) throws TranslationException {
+        K2JSTranslator translator = new K2JSTranslator(config);
+        IncrementalDataProvider incrementalDataProvider = config.getConfiguration().get(JSConfigurationKeys.INCREMENTAL_DATA_PROVIDER);
+        if (incrementalDataProvider != null) {
+            List<TranslationUnit> translationUnits = new ArrayList<>();
+            for (KtFile ktFile : allKotlinFiles) {
+                translationUnits.add(new TranslationUnit.SourceFile(ktFile));
+            }
+            for (byte[] binaryTree : incrementalDataProvider.getBinaryTrees()) {
+                translationUnits.add(new TranslationUnit.BinaryAst(binaryTree));
+            }
+            return translator.translateUnits(reporter, translationUnits, mainCallParameters, jsAnalysisResult);
+        }
+
+        return translator.translate(reporter, allKotlinFiles, mainCallParameters, jsAnalysisResult);
+    }
+
+    @NotNull
     @Override
     protected ExitCode doExecute(
             @NotNull K2JSCompilerArguments arguments,
@@ -120,8 +153,7 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
         configuration.put(JSConfigurationKeys.LIBRARIES, configureLibraries(arguments, paths, messageCollector));
 
         ContentRootsKt.addKotlinSourceRoots(configuration, arguments.freeArgs);
-        KotlinCoreEnvironment environmentForJS =
-                KotlinCoreEnvironment.createForProduction(rootDisposable, configuration, EnvironmentConfigFiles.JS_CONFIG_FILES);
+        KotlinCoreEnvironment environmentForJS = createJsEnvironment(configuration, rootDisposable);
 
         Project project = environmentForJS.getProject();
         List<KtFile> sourcesFiles = environmentForJS.getSourceFiles();
@@ -205,10 +237,9 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
         MainCallParameters mainCallParameters = createMainCallParameters(arguments.main);
         TranslationResult translationResult;
 
-        K2JSTranslator translator = new K2JSTranslator(config);
         try {
             //noinspection unchecked
-            translationResult = translator.translate(reporter, sourcesFiles, mainCallParameters, jsAnalysisResult);
+            translationResult = translate(reporter, sourcesFiles, jsAnalysisResult, mainCallParameters, config);
         }
         catch (Exception e) {
             throw ExceptionUtilsKt.rethrow(e);
@@ -343,6 +374,16 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
             moduleKind = ModuleKind.PLAIN;
         }
         configuration.put(JSConfigurationKeys.MODULE_KIND, moduleKind);
+
+        IncrementalDataProvider incrementalDataProvider = services.get(IncrementalDataProvider.class);
+        if (incrementalDataProvider != null) {
+            configuration.put(JSConfigurationKeys.INCREMENTAL_DATA_PROVIDER, incrementalDataProvider);
+        }
+
+        IncrementalResultsConsumer incrementalResultsConsumer = services.get(IncrementalResultsConsumer.class);
+        if (incrementalResultsConsumer != null) {
+            configuration.put(JSConfigurationKeys.INCREMENTAL_RESULTS_CONSUMER, incrementalResultsConsumer);
+        }
 
         String sourceMapEmbedContentString = arguments.sourceMapEmbedSources;
         SourceMapSourceEmbedding sourceMapContentEmbedding = sourceMapEmbedContentString != null ?
