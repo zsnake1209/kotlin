@@ -68,6 +68,14 @@ public class KotlinConfidenceTest extends LightCompletionTestCase {
         doTest();
     }
 
+    public void testNoAutoPopupInStringTemplateAfterSpace() {
+        doTest();
+    }
+
+    public void testNoAutoPopupInRawStringTemplateAfterNewLine() {
+        doTest();
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -100,15 +108,15 @@ public class KotlinConfidenceTest extends LightCompletionTestCase {
 
             if (noLookup) {
                 assertNull("Expected no lookup", getLookup());
+                return;
             }
             else if (!expectedElements.isEmpty()) {
                 assertContainsItems(ArrayUtil.toStringArray(expectedElements));
+                return;
             }
-            if (typeText != null) {
-                assertNotNull("You must type something, use // TYPE:", typeText);
-                type(typeText);
-                checkResultByFile(getAfterFileName());
-            }
+            assertNotNull("You must type something, use // TYPE:", typeText);
+            type(typeText);
+            checkResultByFile(getAfterFileName());
         }
         finally {
             CodeInsightSettings.getInstance().SELECT_AUTOPOPUP_SUGGESTIONS_BY_CHARS = completeByChars;

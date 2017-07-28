@@ -17,16 +17,20 @@
 package org.jetbrains.kotlin.idea.completion.confidence
 
 import com.intellij.codeInsight.completion.CompletionConfidence
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.util.ThreeState
-import org.jetbrains.kotlin.psi.KtStringTemplateEntry
+import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
+import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.prevLeaf
 
 class EnableAutopopupInStringTemplate : CompletionConfidence() {
     override fun shouldSkipAutopopup(contextElement: PsiElement, psiFile: PsiFile, offset: Int): ThreeState {
-        val stringTemplate = contextElement.prevLeaf(true)?.getParentOfType<KtStringTemplateEntry>(strict = false)
-        return if (stringTemplate != null) ThreeState.NO else ThreeState.UNSURE
+        val stringTemplate = contextElement.prevLeaf()?.getParentOfType<KtSimpleNameStringTemplateEntry>(strict = false) ?: return ThreeState.UNSURE
+        val textRange = TextRange.create(stringTemplate.endOffset, offset)
+        val containsWhitespaces = textRange.substring(psiFile.text).any { it.isWhitespace() }
+        return if (containsWhitespaces) ThreeState.UNSURE else ThreeState.NO
     }
 }
