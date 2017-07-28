@@ -4,7 +4,8 @@ class Bar {
 
 fun foo() {
     val bar = Bar()
-    val y = "$bar. a<caret>"
+    val y = """$bar.
+a<caret>"""
 }
 
 // NO_LOOKUP
