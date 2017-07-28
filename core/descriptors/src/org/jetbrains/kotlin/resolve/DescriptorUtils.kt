@@ -202,26 +202,23 @@ fun ValueParameterDescriptor.hasDefaultValue(): Boolean {
 }
 
 fun ValueParameterDescriptor.getDefaultValueFromAnnotation(): String? {
-    val rootCandidates = mutableListOf<ValueParameterDescriptor>()
+    val handler = object : DFS.NodeHandlerWithListResult<ValueParameterDescriptor, ValueParameterDescriptor>() {
+        override fun beforeChildren(current: ValueParameterDescriptor): Boolean {
+            val containingDeclaration = current.containingDeclaration
+            if (containingDeclaration is CallableMemberDescriptor && containingDeclaration.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
+                return true
+            }
 
-    val overriddenAnnotationName = DFS.ifAny(listOf(this), { it.overriddenDescriptors }, {
-        val containingDeclaration = it.containingDeclaration
-        if (containingDeclaration is CallableMemberDescriptor && containingDeclaration.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
-            return@ifAny false
+            if (current.annotations.hasAnnotation(DEFAULT_VALUE_FQ_NAME) && current.overriddenDescriptors.isEmpty()) {
+                result.add(current)
+            }
+
+            return true
         }
+    }
 
-        if (!it.annotations.hasAnnotation(DEFAULT_VALUE_FQ_NAME)) {
-            return@ifAny false
-        }
-        if (it.overriddenDescriptors.isEmpty()) {
-            rootCandidates.add(it)
-            return@ifAny false
-        }
-
-        true
-    })
-
-    if (overriddenAnnotationName || rootCandidates.size != 1) {
+    val rootCandidates = DFS.dfs(listOf(this), { it.overriddenDescriptors }, handler)
+    if (rootCandidates.size != 1) {
         return null
     }
 

@@ -79,7 +79,7 @@ fun main() {
     val bd: B = D()
 
     a.first()
-    c.first(<!NO_VALUE_FOR_PARAMETER!>)<!>
+    c.first()
     ac.first()
 
     d.first(<!NO_VALUE_FOR_PARAMETER!>)<!>
