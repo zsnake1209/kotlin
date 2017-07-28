@@ -35,6 +35,7 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.asCoroutineDispatcher
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.annotations.TestOnly
+import org.jetbrains.kotlin.idea.core.util.EDT
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.psi.NotNullableUserDataProperty
 import org.jetbrains.kotlin.script.*
@@ -231,7 +232,9 @@ internal class ScriptDependenciesUpdater(
             rootsChangesRunnable.invoke()
         }
         else {
-            application.invokeLater(rootsChangesRunnable, ModalityState.defaultModalityState())
+            launch(EDT(project)) {
+                rootsChangesRunnable()
+            }
         }
     }
 
