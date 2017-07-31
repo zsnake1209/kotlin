@@ -59,10 +59,16 @@ class FSOperationsHelper(
         }
     }
 
-    fun markFiles(files: Iterable<File>, excludeFiles: Set<File> = setOf()) {
-        val filesToMark = files.filterTo(HashSet()) {
-            it !in excludeFiles && it.exists() && moduleBasedFilter.accept(it)
-        }
+    fun markFiles(files: Iterable<File>) {
+        markFilesImpl(files) { it.exists() }
+    }
+
+    fun markInChunkOrDependents(files: Iterable<File>, excludeFiles: Set<File>) {
+        markFilesImpl(files) { it !in excludeFiles && it.exists() && moduleBasedFilter.accept(it) }
+    }
+
+    private inline fun markFilesImpl(files: Iterable<File>, shouldMark: (File)->Boolean) {
+        val filesToMark = files.filterTo(HashSet(), shouldMark)
 
         if (filesToMark.isEmpty()) return
 
