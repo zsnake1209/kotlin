@@ -37,7 +37,10 @@ import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.resolve.calls.tasks.TracingStrategyImpl
 import org.jetbrains.kotlin.resolve.calls.util.CallMaker
-import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.IndexedParametersSubstitution
+import org.jetbrains.kotlin.types.TypeUtils
+import org.jetbrains.kotlin.types.UnwrappedType
+import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.expressions.DoubleColonExpressionResolver
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingServices
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
@@ -97,7 +100,8 @@ class ResolvedAtomCompleter(
                                 .replaceBindingTrace(trace)
 
                 val argumentExpression = resultValueArgument.valueArgument.getArgumentExpression() ?: continue
-                kotlinToResolvedCallTransformer.updateRecordedType(argumentExpression, newContext)
+                // type checking for lambda is performed in analyzeAndGetLambdaResultArguments via `expressionTypingServices.getTypeInfo`
+                kotlinToResolvedCallTransformer.updateRecordedType(argumentExpression, newContext, false)
             }
     }
 

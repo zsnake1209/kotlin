@@ -307,12 +307,34 @@ public class DataFlowAnalyzer {
 
         KotlinType result = checkTypeInternal(expressionType, expression, c, hasError);
         if (Boolean.FALSE.equals(hasError.get())) {
-            for (AdditionalTypeChecker checker : additionalTypeCheckers) {
-                checker.checkType(expression, expressionType, result, c);
-            }
+            performAdditionalTypeChecks(expression, expressionType, result, c);
         }
 
         return result;
+    }
+
+    public void performAdditionalTypeChecks(
+            @NotNull KtExpression expression,
+            @Nullable KotlinType expressionType,
+            @NotNull ResolutionContext c
+    ) {
+        if (expressionType == null) return;
+
+        SmartCastResult castResult = checkPossibleCast(expressionType, expression, c);
+        KotlinType expressionTypeWithSmartCast = castResult != null ? castResult.getResultType() : expressionType;
+
+        performAdditionalTypeChecks(expression, expressionType, expressionTypeWithSmartCast, c);
+    }
+
+    private void performAdditionalTypeChecks(
+            @NotNull KtExpression expression,
+            @NotNull KotlinType expressionType,
+            @NotNull KotlinType expressionTypeWithSmartCast,
+            @NotNull ResolutionContext c
+    ) {
+        for (AdditionalTypeChecker checker : additionalTypeCheckers) {
+            checker.checkType(expression, expressionType, expressionTypeWithSmartCast, c);
+        }
     }
 
     @Nullable

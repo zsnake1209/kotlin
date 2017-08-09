@@ -188,14 +188,15 @@ class KotlinToResolvedCallTransformer(
             // todo external argument
 
             val argumentExpression = valueArgument.getArgumentExpression() ?: continue
-            updateRecordedType(argumentExpression, newContext)
+            updateRecordedType(argumentExpression, newContext, resolvedCall.isReallySuccess())
         }
 
     }
 
     fun updateRecordedType(
             expression: KtExpression,
-            context: BasicCallResolutionContext
+            context: BasicCallResolutionContext,
+            performFullTypeChecking: Boolean
     ): KotlinType? {
         val deparenthesized = expression.let {
             KtPsiUtil.getLastElementDeparenthesized(it, context.statementFilter)
@@ -214,7 +215,10 @@ class KotlinToResolvedCallTransformer(
 
         updatedType = updateRecordedTypeForArgument(updatedType, recordedType, expression, context)
 
-        dataFlowAnalyzer.checkType(updatedType, deparenthesized, context)
+        if (performFullTypeChecking)
+            dataFlowAnalyzer.checkType(updatedType, deparenthesized, context)
+        else
+            dataFlowAnalyzer.performAdditionalTypeChecks(deparenthesized, updatedType, context)
 
         return updatedType
     }
