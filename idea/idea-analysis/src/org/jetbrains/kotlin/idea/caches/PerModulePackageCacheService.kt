@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.idea.caches
 
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileTypes.FileTypeRegistry
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.Ref
@@ -29,6 +30,8 @@ import com.intellij.psi.impl.PsiTreeChangePreprocessor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.idea.KotlinFileType
+import org.jetbrains.kotlin.idea.caches.PerModulePackageCacheService.Companion.FULL_DROP_THRESHOLD
 import org.jetbrains.kotlin.idea.caches.resolve.ModuleSourceInfo
 import org.jetbrains.kotlin.idea.caches.resolve.getModuleInfoByVirtualFile
 import org.jetbrains.kotlin.idea.caches.resolve.getNullableModuleInfo
@@ -48,18 +51,32 @@ class KotlinPackageContentModificationListener(
 
         val scope = GlobalSearchScope.projectScope(project)
 
-        connection.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener.Adapter() {
+
+        connection.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun before(events: MutableList<out VFileEvent>) = onEvents(events) { it is VFileDeleteEvent || it is VFileMoveEvent }
             override fun after(events: List<VFileEvent>) = onEvents(events) { it is VFileMoveEvent || it is VFileCreateEvent || it is VFileCopyEvent }
 
-            fun onEvents(events: List<VFileEvent>, filter: (VFileEvent) -> Boolean) = events.asSequence()
-                    .filter(filter)
-                    .map { it.file }
-                    .filterNotNull()
-                    .filter { it in scope }
-                    .forEach { file ->
-                        project.service<PerModulePackageCacheService>().notifyPackageChange(file)
-                    }
+            fun onEvents(events: List<VFileEvent>, filter: (VFileEvent) -> Boolean) {
+
+                val service = project.service<PerModulePackageCacheService>()
+                if (events.size >= FULL_DROP_THRESHOLD) {
+                    service.onTooComplexChange()
+                }
+                else {
+                    events
+                            .asSequence()
+                            .filter(filter)
+                            .map { it.file }
+                            .filterNotNull()
+                            .filter {
+                                FileTypeRegistry.getInstance().getFileTypeByFileName(it.name) == KotlinFileType.INSTANCE
+                            }
+                            .filter { it in scope }
+                            .forEach { file ->
+                                service.notifyPackageChange(file)
+                            }
+                }
+            }
         })
     }
 }
@@ -69,7 +86,10 @@ class KotlinPackageStatementPsiTreeChangePreprocessor(private val project: Proje
         val file = event.file as? KtFile ?: return
 
         when (event.code) {
-            PsiTreeChangeEventImpl.PsiEventType.CHILD_ADDED, PsiTreeChangeEventImpl.PsiEventType.CHILD_MOVED, PsiTreeChangeEventImpl.PsiEventType.CHILD_REPLACED, PsiTreeChangeEventImpl.PsiEventType.CHILD_REMOVED -> {
+            PsiTreeChangeEventImpl.PsiEventType.CHILD_ADDED,
+            PsiTreeChangeEventImpl.PsiEventType.CHILD_MOVED,
+            PsiTreeChangeEventImpl.PsiEventType.CHILD_REPLACED,
+            PsiTreeChangeEventImpl.PsiEventType.CHILD_REMOVED -> {
                 val child = event.child ?: return
                 if (child.getParentOfType<KtPackageDirective>(false) != null)
                     project.service<PerModulePackageCacheService>().notifyPackageChange(file)
@@ -89,20 +109,54 @@ class PerModulePackageCacheService(private val project: Project) {
 
     private val cache = ContainerUtil.createConcurrentWeakMap<ModuleInfo, Ref<ConcurrentMap<FqName, Boolean>>>()
 
-    internal fun notifyPackageChange(file: VirtualFile) {
-        (getModuleInfoByVirtualFile(project, file) as? ModuleSourceInfo)?.let { onChangeInModuleSource(it) }
+    private val pendingVFileChanges: MutableSet<VirtualFile> = mutableSetOf()
+    private val pendingKtFileChanges: MutableSet<KtFile> = mutableSetOf()
+
+    internal fun onTooComplexChange() {
+        cache.values.forEach { it.set(null) }
     }
 
-    internal fun notifyPackageChange(file: KtFile) {
-        (file.getNullableModuleInfo() as? ModuleSourceInfo)?.let { onChangeInModuleSource(it) }
+    internal fun notifyPackageChange(file: VirtualFile): Unit = synchronized(pendingVFileChanges) {
+        if (file.isDirectory) {
+            pendingVFileChanges += file
+        }
+        else if (file.parent != null && file.parent.isDirectory) {
+            notifyPackageChange(file.parent)
+        }
     }
 
-    internal fun onChangeInModuleSource(moduleSourceInfo: ModuleSourceInfo) {
+    internal fun notifyPackageChange(file: KtFile): Unit = synchronized(pendingKtFileChanges) {
+        pendingKtFileChanges += file
+    }
+
+    internal fun invalidateCacheForModule(moduleSourceInfo: ModuleSourceInfo) {
         cache[moduleSourceInfo]?.set(null)
     }
 
+    internal fun checkPendingChanges() {
+        if (pendingVFileChanges.size + pendingKtFileChanges.size >= FULL_DROP_THRESHOLD) {
+            onTooComplexChange()
+        }
+        else {
+            synchronized(pendingVFileChanges) {
+                pendingVFileChanges.forEach { vfile ->
+                    (getModuleInfoByVirtualFile(project, vfile) as? ModuleSourceInfo)?.let { invalidateCacheForModule(it) }
+                }
+                pendingVFileChanges.clear()
+            }
+            synchronized(pendingKtFileChanges) {
+                pendingKtFileChanges.forEach { file ->
+                    (file.getNullableModuleInfo() as? ModuleSourceInfo)?.let { invalidateCacheForModule(it) }
+                }
+                pendingKtFileChanges.clear()
+            }
+        }
+    }
+
+
     fun packageExists(packageFqName: FqName, moduleInfo: ModuleSourceInfo): Boolean {
         val module = moduleInfo.module
+        checkPendingChanges()
 
         // Module own cache is a view on global cache. Since global cache based on WeakReferences when module
         // gets disposed this soft map will be disposed too, leading to drop soft refs on ModuleInfo's, and then to
@@ -123,5 +177,6 @@ class PerModulePackageCacheService(private val project: Project) {
 
     companion object {
         private val PER_MODULE_PACKAGE_CACHE = Key.create<ConcurrentMap<ModuleInfo, Ref<ConcurrentMap<FqName, Boolean>>>>("per_module_package_cache")
+        val FULL_DROP_THRESHOLD = 1000
     }
 }
