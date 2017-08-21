@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtil.compareVersionNumbers
 import org.jetbrains.kotlin.com.intellij.util.ReflectionUtil
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptionsImpl
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.internal.*
 import org.jetbrains.kotlin.gradle.internal.Kapt3KotlinGradleSubplugin.Companion.getKaptClasssesDir
 import org.jetbrains.kotlin.gradle.tasks.*
@@ -43,6 +44,9 @@ val KOTLIN_DSL_NAME = "kotlin"
 val KOTLIN_JS_DSL_NAME = "kotlin2js"
 val KOTLIN_OPTIONS_DSL_NAME = "kotlinOptions"
 
+private val Project.kotlinExt: KotlinProjectExtension
+    get() = extensions.findByType(KotlinProjectExtension::class.java)!!
+
 internal abstract class KotlinSourceSetProcessor<T : AbstractKotlinCompile<*>>(
         val project: Project,
         val javaBasePlugin: JavaBasePlugin,
@@ -56,8 +60,10 @@ internal abstract class KotlinSourceSetProcessor<T : AbstractKotlinCompile<*>>(
     abstract protected fun doTargetSpecificProcessing()
     protected val logger = Logging.getLogger(this.javaClass)!!
 
-    protected val isSeparateClassesDirSupported: Boolean =
-            sourceSet.output.javaClass.methods.any { it.name == "getClassesDirs" }
+    protected val isSeparateClassesDirSupported: Boolean by lazy {
+        !project.kotlinExt.disableSeparateClassesDirs &&
+                sourceSet.output.javaClass.methods.any { it.name == "getClassesDirs" }
+    }
 
     protected val sourceSetName: String = sourceSet.name
     protected val sourceRootDir: String = "src/$sourceSetName/kotlin"
