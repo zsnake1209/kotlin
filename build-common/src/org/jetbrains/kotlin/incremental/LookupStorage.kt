@@ -29,7 +29,7 @@ import java.io.File
 import java.util.*
 
 
-open class LookupStorage(private val targetDataDir: File) : BasicMapsOwner(targetDataDir) {
+open class LookupStorage(targetDataDir: File) : BasicMapsOwner(targetDataDir) {
     companion object {
         private val DELETED_TO_SIZE_TRESHOLD = 0.5
         private val MINIMUM_GARBAGE_COLLECTIBLE_SIZE = 10000
