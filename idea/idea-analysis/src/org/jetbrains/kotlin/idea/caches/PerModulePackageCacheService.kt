@@ -49,14 +49,11 @@ class KotlinPackageContentModificationListener(
     init {
         val connection = project.messageBus.connect()
 
-        val scope = GlobalSearchScope.projectScope(project)
-
-
         connection.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun before(events: MutableList<out VFileEvent>) = onEvents(events) { it is VFileDeleteEvent || it is VFileMoveEvent }
             override fun after(events: List<VFileEvent>) = onEvents(events) { it is VFileMoveEvent || it is VFileCreateEvent || it is VFileCopyEvent }
 
-            fun onEvents(events: List<VFileEvent>, filter: (VFileEvent) -> Boolean) {
+            fun onEvents(events: List<VFileEvent>, eventPredicate: (VFileEvent) -> Boolean) {
 
                 val service = project.service<PerModulePackageCacheService>()
                 if (events.size >= FULL_DROP_THRESHOLD) {
@@ -65,16 +62,11 @@ class KotlinPackageContentModificationListener(
                 else {
                     events
                             .asSequence()
-                            .filter(filter)
+                            .filter(eventPredicate)
                             .map { it.file }
                             .filterNotNull()
-                            .filter {
-                                FileTypeRegistry.getInstance().getFileTypeByFileName(it.name) == KotlinFileType.INSTANCE
-                            }
-                            .filter { it in scope }
-                            .forEach { file ->
-                                service.notifyPackageChange(file)
-                            }
+                            .filter { FileTypeRegistry.getInstance().getFileTypeByFileName(it.name) == KotlinFileType.INSTANCE }
+                            .forEach { file -> service.notifyPackageChange(file) }
                 }
             }
         })
@@ -112,11 +104,15 @@ class PerModulePackageCacheService(private val project: Project) {
     private val pendingVFileChanges: MutableSet<VirtualFile> = mutableSetOf()
     private val pendingKtFileChanges: MutableSet<KtFile> = mutableSetOf()
 
-    internal fun onTooComplexChange() {
+    private val projectScope = GlobalSearchScope.projectScope(project)
+
+    internal fun onTooComplexChange() = synchronized(this) {
+        pendingVFileChanges.clear()
+        pendingKtFileChanges.clear()
         cache.values.forEach { it.set(null) }
     }
 
-    internal fun notifyPackageChange(file: VirtualFile): Unit = synchronized(pendingVFileChanges) {
+    internal fun notifyPackageChange(file: VirtualFile): Unit = synchronized(this) {
         if (file.isDirectory) {
             pendingVFileChanges += file
         }
@@ -125,7 +121,7 @@ class PerModulePackageCacheService(private val project: Project) {
         }
     }
 
-    internal fun notifyPackageChange(file: KtFile): Unit = synchronized(pendingKtFileChanges) {
+    internal fun notifyPackageChange(file: KtFile): Unit = synchronized(this) {
         pendingKtFileChanges += file
     }
 
@@ -133,23 +129,22 @@ class PerModulePackageCacheService(private val project: Project) {
         cache[moduleSourceInfo]?.set(null)
     }
 
-    internal fun checkPendingChanges() {
+    internal fun checkPendingChanges() = synchronized(this) {
         if (pendingVFileChanges.size + pendingKtFileChanges.size >= FULL_DROP_THRESHOLD) {
             onTooComplexChange()
         }
         else {
-            synchronized(pendingVFileChanges) {
-                pendingVFileChanges.forEach { vfile ->
-                    (getModuleInfoByVirtualFile(project, vfile) as? ModuleSourceInfo)?.let { invalidateCacheForModule(it) }
-                }
-                pendingVFileChanges.clear()
+            pendingVFileChanges.forEach { vfile ->
+                if (vfile !in projectScope) return@forEach
+                (getModuleInfoByVirtualFile(project, vfile) as? ModuleSourceInfo)?.let { invalidateCacheForModule(it) }
             }
-            synchronized(pendingKtFileChanges) {
-                pendingKtFileChanges.forEach { file ->
-                    (file.getNullableModuleInfo() as? ModuleSourceInfo)?.let { invalidateCacheForModule(it) }
-                }
-                pendingKtFileChanges.clear()
+            pendingVFileChanges.clear()
+
+            pendingKtFileChanges.forEach { file ->
+                if (file.virtualFile != null && file.virtualFile !in projectScope) return@forEach
+                (file.getNullableModuleInfo() as? ModuleSourceInfo)?.let { invalidateCacheForModule(it) }
             }
+            pendingKtFileChanges.clear()
         }
     }
 
