@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtil.compareVersionNumbers
 import org.jetbrains.kotlin.com.intellij.util.ReflectionUtil
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptionsImpl
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.internal.*
 import org.jetbrains.kotlin.gradle.internal.Kapt3KotlinGradleSubplugin.Companion.getKaptClasssesDir
 import org.jetbrains.kotlin.gradle.tasks.*
@@ -55,8 +56,10 @@ internal abstract class KotlinSourceSetProcessor<T : AbstractKotlinCompile<*>>(
     abstract protected fun doTargetSpecificProcessing()
     protected val logger = Logging.getLogger(this.javaClass)!!
 
-    protected val isSeparateClassesDirSupported: Boolean =
-            sourceSet.output.javaClass.methods.any { it.name == "getClassesDirs" }
+    protected val isSeparateClassesDirSupported: Boolean by lazy {
+        sourceSet.output.javaClass.methods.any { it.name == "getClassesDirs" } &&
+                !DisableSeparateClassesDirProvider.isSeparateClassesDirDisabledInProject(project)
+    }
 
     protected val sourceSetName: String = sourceSet.name
     protected val sourceRootDir: String = "src/$sourceSetName/kotlin"
@@ -764,6 +767,27 @@ internal class SubpluginEnvironment(
         }
 
         return appliedSubplugins
+    }
+}
+
+object DisableSeparateClassesDirProvider {
+    private val warningShownForProject = Collections.newSetFromMap<Project>(WeakHashMap())
+
+    const val message = "Separate classes directories were disabled for Kotlin. " +
+            "This build assumes single classes directory per source set, which has been deprecated in Gradle " +
+            "and should only be used for compatibility."
+
+    private val Project.kotlinExt: KotlinProjectExtension
+        get() = extensions.findByType(KotlinProjectExtension::class.java)!!
+
+    fun isSeparateClassesDirDisabledInProject(project: Project): Boolean {
+        if (project.kotlinExt.disableSeparateClassesDirs) {
+            if (warningShownForProject.add(project)) {
+                project.logger.kotlinWarn(message)
+            }
+            return true
+        }
+        return false
     }
 }
 

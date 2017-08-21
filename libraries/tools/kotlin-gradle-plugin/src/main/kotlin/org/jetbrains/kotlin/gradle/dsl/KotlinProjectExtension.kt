@@ -27,6 +27,14 @@ internal fun Project.createKotlinExtension() {
 open class KotlinProjectExtension {
     val experimental: ExperimentalExtension
             get() = DslObject(this).extensions.getByType(ExperimentalExtension::class.java)!!
+
+    /**
+     * With Gradle 4.0+, disables the separate output directory for Kotlin, falling back to sharing the deprecated
+     * single classes directory per source set. With Gradle < 4.0, has no effect.
+     * */
+    @set:Deprecated("To be used for compatibility with plugins that expect " +
+            "the deprecated single classes directory, as in Gradle < 4.0.")
+    var disableSeparateClassesDirs = false
 }
 
 open class ExperimentalExtension {
