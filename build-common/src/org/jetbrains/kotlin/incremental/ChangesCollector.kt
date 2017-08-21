@@ -73,7 +73,9 @@ class ChangesCollector {
     }
 
     fun collectProtoChanges(oldData: ProtoData?, newData: ProtoData?) {
-        if (oldData == null && newData == null) throw AssertionError("Assertion failed")
+        if (oldData == null && newData == null) {
+            throw IllegalStateException("Old and new value are null")
+        }
 
         if (oldData == null) {
             newData!!.collectAll(isRemoved = false)
@@ -163,7 +165,9 @@ class ChangesCollector {
     }
 
     fun collectMemberIfNeeded(scope: FqName, name: String, oldValue: Any?, newValue: Any?) {
-        if (oldValue == null && newValue == null) throw IllegalStateException("Old and new value are null for ${scope}#name")
+        if (oldValue == null && newValue == null) {
+            throw IllegalStateException("Old and new value are null for $scope#$name")
+        }
 
         if (oldValue != null && newValue == null) {
             collectRemovedMember(scope, name)
