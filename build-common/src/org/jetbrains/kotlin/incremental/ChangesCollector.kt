@@ -92,19 +92,19 @@ class ChangesCollector {
                         val fqName = oldData.nameResolver.getClassId(oldData.proto.fqName).asSingleFqName()
                         val diff = DifferenceCalculatorForClass(oldData, newData).difference()
                         if (diff.isClassAffected) {
-                            collectSinature(oldData, diff.areSubclassesAffected)
+                            collectSignature(oldData, diff.areSubclassesAffected)
                         }
                         collectChangedMembers(fqName, diff.changedMembersNames)
                     }
                     is PackagePartProtoData -> {
-                        collectSinature(oldData, areSubclassesAffected = true)
+                        collectSignature(oldData, areSubclassesAffected = true)
                     }
                 }
             }
             is PackagePartProtoData -> {
                 when (newData) {
                     is ClassProtoData -> {
-                        collectSinature(newData, areSubclassesAffected = false)
+                        collectSignature(newData, areSubclassesAffected = false)
                     }
                     is PackagePartProtoData -> {
                         val diff = DifferenceCalculatorForPackageFacade(oldData, newData).difference()
@@ -158,7 +158,7 @@ class ChangesCollector {
             memberNames.forEach { collectMember(classFqName, it) }
         }
         else {
-            collectSinature(classFqName, areSubclassesAffected = true)
+            collectSignature(classFqName, areSubclassesAffected = true)
         }
     }
 
@@ -173,12 +173,12 @@ class ChangesCollector {
         }
     }
 
-    fun collectSinature(classData: ClassProtoData, areSubclassesAffected: Boolean) {
+    fun collectSignature(classData: ClassProtoData, areSubclassesAffected: Boolean) {
         val fqName = classData.nameResolver.getClassId(classData.proto.fqName).asSingleFqName()
-        collectSinature(fqName, areSubclassesAffected)
+        collectSignature(fqName, areSubclassesAffected)
     }
 
-    fun collectSinature(fqName: FqName, areSubclassesAffected: Boolean) {
+    fun collectSignature(fqName: FqName, areSubclassesAffected: Boolean) {
         val prevValue = this.areSubclassesAffected[fqName] ?: false
         this.areSubclassesAffected[fqName] = prevValue || areSubclassesAffected
     }

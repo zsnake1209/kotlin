@@ -139,7 +139,7 @@ open class IncrementalCacheImpl(
                 // because we don't write proto for multifile facades.
                 // As a workaround we can remove proto values for multifile facades.
                 if (className in protoMap) {
-                    changesCollector.collectSinature(className.fqNameForClassNameWithoutDollars, areSubclassesAffected = true)
+                    changesCollector.collectSignature(className.fqNameForClassNameWithoutDollars, areSubclassesAffected = true)
                 }
                 protoMap.remove(className, changesCollector)
                 classFqNameToSourceMap.remove(className.fqNameForClassNameWithoutDollars)
