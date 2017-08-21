@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.js.translate.declaration
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor
+import org.jetbrains.kotlin.descriptors.impl.referencedProperty
 import org.jetbrains.kotlin.js.backend.ast.*
 import org.jetbrains.kotlin.js.translate.callTranslator.CallTranslator
 import org.jetbrains.kotlin.js.translate.context.Namer
@@ -94,6 +95,11 @@ class DefaultPropertyTranslator(
         assert(!descriptor.isExtension) { "Unexpected extension property $descriptor}" }
         assert(descriptor is PropertyDescriptor) { "Property descriptor expected: $descriptor" }
         val result = backingFieldReference(context(), descriptor as PropertyDescriptor)
+        if (getterDescriptor is PropertyAccessorDescriptor && getterDescriptor.correspondingProperty.isLateInit) {
+            function.body.statements += JsIf(JsBinaryOperation(JsBinaryOperator.EQ, result, JsNullLiteral()),
+                                             JsReturn(JsInvocation(Namer.throwUninitializedPropertyAccessExceptionFunRef(),
+                                                                   JsStringLiteral(getterDescriptor.correspondingProperty.name.asString()))))
+        }
         function.body.statements += JsReturn(result).apply { source = descriptor.source.getPsi() }
     }
 
