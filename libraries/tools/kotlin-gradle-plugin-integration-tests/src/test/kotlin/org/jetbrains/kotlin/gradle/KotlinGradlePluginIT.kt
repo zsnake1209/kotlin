@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.gradle
 
 import org.gradle.api.logging.LogLevel
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
+import org.jetbrains.kotlin.gradle.plugin.DisableSeparateClassesDirProvider
 import org.jetbrains.kotlin.gradle.tasks.USING_INCREMENTAL_COMPILATION_MESSAGE
 import org.jetbrains.kotlin.gradle.util.getFileByName
 import org.jetbrains.kotlin.gradle.util.getFilesByNames
@@ -556,6 +557,29 @@ class KotlinGradleIT: BaseGradleIT() {
             // Check that the sync output task is not used with Gradle 4.0+ and there's no old Kotlin output layout
             assertNotContains(":copyMainKotlinClasses")
             assertNoSuchFile("build/kotlin-classes")
+        }
+    }
+
+    @Test
+    fun testDisableSeparateClassesDirs() {
+        val project = Project("simpleProject", "4.0")
+        val separateDirPath = "build/classes/kotlin/main/demo/KotlinGreetingJoiner.class"
+        val singleDirPath = "build/classes/java/main/demo/KotlinGreetingJoiner.class"
+
+        project.build("build") {
+            assertSuccessful()
+            assertFileExists(separateDirPath)
+            assertNoSuchFile(singleDirPath)
+            assertNotContains(DisableSeparateClassesDirProvider.message)
+        }
+
+        File(project.projectDir, "build.gradle").appendText("\nkotlin.disableSeparateClassesDirs = true")
+
+        project.build("clean", "build") {
+            assertSuccessful()
+            assertFileExists(singleDirPath)
+            assertNoSuchFile(separateDirPath)
+            assertContains(DisableSeparateClassesDirProvider.message)
         }
     }
 }
