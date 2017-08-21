@@ -330,7 +330,7 @@ open class IncrementalCacheImpl(
             }
 
             for (const in oldMap.keys + newMap.keys) {
-                changesCollector.collectMemberIfNeeded(kotlinClass.scopeFqName(), const, oldMap[const], newMap[const])
+                changesCollector.collectMemberIfValueWasChanged(kotlinClass.scopeFqName(), const, oldMap[const], newMap[const])
             }
         }
 
@@ -488,7 +488,7 @@ open class IncrementalCacheImpl(
             }
 
             for (fn in oldMap.keys + newMap.keys) {
-                changesCollector.collectMemberIfNeeded(kotlinClass.scopeFqName(), functionNameBySignature(fn), oldMap[fn], newMap[fn])
+                changesCollector.collectMemberIfValueWasChanged(kotlinClass.scopeFqName(), functionNameBySignature(fn), oldMap[fn], newMap[fn])
             }
         }
 

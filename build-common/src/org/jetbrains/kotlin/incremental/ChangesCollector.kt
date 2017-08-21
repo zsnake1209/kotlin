@@ -164,7 +164,7 @@ class ChangesCollector {
         }
     }
 
-    fun collectMemberIfNeeded(scope: FqName, name: String, oldValue: Any?, newValue: Any?) {
+    fun collectMemberIfValueWasChanged(scope: FqName, name: String, oldValue: Any?, newValue: Any?) {
         if (oldValue == null && newValue == null) {
             throw IllegalStateException("Old and new value are null for $scope#$name")
         }
