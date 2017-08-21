@@ -212,12 +212,6 @@ public class IncrementalJsCompilerRunnerTestGenerated extends AbstractIncrementa
             doTest(fileName);
         }
 
-        @TestMetadata("defaultValueInConstructorAdded")
-        public void testDefaultValueInConstructorAdded() throws Exception {
-            String fileName = KotlinTestUtils.navigationMetadata("jps-plugin/testData/incremental/pureKotlin/defaultValueInConstructorAdded/");
-            doTest(fileName);
-        }
-
         @TestMetadata("defaultValueInConstructorChanged")
         public void testDefaultValueInConstructorChanged() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("jps-plugin/testData/incremental/pureKotlin/defaultValueInConstructorChanged/");
