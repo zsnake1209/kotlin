@@ -52,21 +52,21 @@ class ChangesCollector {
     private fun <T, R> MutableMap<T, MutableSet<R>>.getSet(key: T) =
             getOrPut(key) { HashSet() }
 
-    fun collectChangedMember(scope: FqName, name: String) {
+    private fun collectChangedMember(scope: FqName, name: String) {
         changedMembers.getSet(scope).add(name)
     }
 
-    fun collectRemovedMember(scope: FqName, name: String) {
+    private fun collectRemovedMember(scope: FqName, name: String) {
         removedMembers.getSet(scope).add(name)
     }
 
-    fun collectChangedMembers(scope: FqName, names: Collection<String>) {
+    private fun collectChangedMembers(scope: FqName, names: Collection<String>) {
         if (names.isNotEmpty()) {
             changedMembers.getSet(scope).addAll(names)
         }
     }
 
-    fun collectRemovedMembers(scope: FqName, names: Collection<String>) {
+    private fun collectRemovedMembers(scope: FqName, names: Collection<String>) {
         if (names.isNotEmpty()) {
             removedMembers.getSet(scope).addAll(names)
         }
@@ -173,7 +173,7 @@ class ChangesCollector {
         }
     }
 
-    fun collectSignature(classData: ClassProtoData, areSubclassesAffected: Boolean) {
+    private fun collectSignature(classData: ClassProtoData, areSubclassesAffected: Boolean) {
         val fqName = classData.nameResolver.getClassId(classData.proto.fqName).asSingleFqName()
         collectSignature(fqName, areSubclassesAffected)
     }
