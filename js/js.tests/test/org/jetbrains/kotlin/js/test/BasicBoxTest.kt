@@ -316,26 +316,23 @@ abstract class BasicBoxTest(
             mainCallParameters: MainCallParameters,
             incrementalData: IncrementalData
     ) {
-        val sourceToTranslationUnit = hashMapOf< File, TranslationUnit>()
-            for (testFile in kotlinFiles) {
-                if (testFile.recompile) {
-                    val sourceFile = File(testFile.fileName)
-                    incrementalData.translatedFiles.remove(sourceFile)
-                    sourceToTranslationUnit[sourceFile] =TranslationUnit.SourceFile(createPsiFile(testFile.fileName))
-                }
-                }
-                    for ((sourceFile, data) in incrementalData.translatedFiles){
-                    sourceToTranslationUnit[sourceFile] =
-                    TranslationUnit.BinaryAst(data.binaryAst)
+        val sourceToTranslationUnit = hashMapOf<File, TranslationUnit>()
+        for (testFile in kotlinFiles) {
+            if (testFile.recompile) {
+                val sourceFile = File(testFile.fileName)
+                incrementalData.translatedFiles.remove(sourceFile)
+                sourceToTranslationUnit[sourceFile] = TranslationUnit.SourceFile(createPsiFile(testFile.fileName))
             }
-            val  translationUnits = sourceToTranslationUnit.keys
+        }
+        for ((sourceFile, data) in incrementalData.translatedFiles) {
+            sourceToTranslationUnit[sourceFile] = TranslationUnit.BinaryAst(data.binaryAst)
+        }
+        val translationUnits = sourceToTranslationUnit.keys
                 .sortedBy { it.canonicalPath }
-                .map { sourceToTranslationUnit[it]!!
-            }
+                .map { sourceToTranslationUnit[it]!! }
 
-
-            val recompiledConfig = createConfig(sourceDirs,module, dependencies, friends, multiModule, incrementalData)
-            val recompiledOutputFile = File(outputFile.parentFile, outputFile.nameWithoutExtension + "-recompiled.js")
+        val recompiledConfig = createConfig(sourceDirs,module, dependencies, friends, multiModule, incrementalData)
+        val recompiledOutputFile = File(outputFile.parentFile, outputFile.nameWithoutExtension + "-recompiled.js")
 
         translateFiles(translationUnits, recompiledOutputFile, recompiledConfig, outputPrefixFile, outputPostfixFile,
                        mainCallParameters, incrementalData)
