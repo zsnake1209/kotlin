@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.contains
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.utils.SmartList
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 class NewConstraintSystemImpl(
         private val constraintInjector: ConstraintInjector,
@@ -218,7 +219,7 @@ class NewConstraintSystemImpl(
     override fun fixVariable(variable: NewTypeVariable, resultType: UnwrappedType) {
         checkState(State.BUILDING, State.COMPLETION)
 
-        val reifiedForSpecialType = eliminateSpecialIntersectionType(resultType) ?: resultType
+        val reifiedForSpecialType = eliminateSpecialIntersectionType(variable, resultType) ?: resultType
         constraintInjector.addInitialEqualityConstraint(this, variable.defaultType, reifiedForSpecialType, FixVariableConstraintPosition(variable))
         notFixedTypeVariables.remove(variable.freshTypeConstructor)
 
@@ -231,7 +232,11 @@ class NewConstraintSystemImpl(
         storage.fixedTypeVariables[variable.freshTypeConstructor] = reifiedForSpecialType
     }
 
-    private fun eliminateSpecialIntersectionType(type: UnwrappedType): UnwrappedType? {
+    private fun eliminateSpecialIntersectionType(variable: NewTypeVariable, type: UnwrappedType): UnwrappedType? {
+        if (variable.freshTypeConstructor.safeAs<TypeVariableTypeConstructor>()?.debugName == "<TYPE-PARAMETER-FOR-EXCLEXCL-RESOLVE>") {
+            return null
+        }
+
         val constructor = type.constructor
         if (constructor !is IntersectionTypeConstructor) return null
 
