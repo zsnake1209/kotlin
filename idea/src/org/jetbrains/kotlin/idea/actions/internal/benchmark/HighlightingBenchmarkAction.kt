@@ -28,7 +28,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTextField
 import com.intellij.uiDesigner.core.GridLayoutManager
-import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.channels.ConflatedChannel
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.kotlin.idea.actions.internal.KotlinInternalMode
 import org.jetbrains.kotlin.idea.actions.internal.benchmark.AbstractCompletionBenchmarkAction.Companion.addBoxWithLabel
@@ -65,19 +65,47 @@ class HighlightingBenchmarkAction : AnAction() {
         val ktFiles = collectFiles() ?: return
 
         val results = mutableListOf<Result>()
-        launch(EDT) {
-            ktFiles
-                    .shuffledSequence(random)
-                    .take(settings.files)
-                    .forEach { file ->
-                        results += openFileAndMeasureTimeToHighlight(file, project)
-                    }
 
-            saveResults(results, project)
+        val connection = project.messageBus.connect()
+
+        val finishListener = DaemonFinishListener()
+        connection.subscribe(DaemonCodeAnalyzer.DAEMON_EVENT_TOPIC, finishListener)
+
+        launch(EDT) {
+            try {
+                ktFiles
+                        .shuffledSequence(random)
+                        .take(settings.files)
+                        .forEach { file ->
+                            results += openFileAndMeasureTimeToHighlight(file, project, finishListener)
+                        }
+
+                saveResults(results, project)
+            }
+            finally {
+                connection.disconnect()
+                finishListener.channel.close()
+            }
         }
     }
 
     private data class Settings(val seed: Long, val files: Int, val lines: Int)
+
+    private inner class DaemonFinishListener : DaemonCodeAnalyzer.DaemonListener {
+        val channel = ConflatedChannel<String>()
+
+        override fun daemonFinished() {
+            channel.offer(SUCCESS)
+        }
+
+        override fun daemonCancelEventOccurred(reason: String) {
+            channel.offer(reason)
+        }
+    }
+
+    companion object {
+        private const val SUCCESS = "Success"
+    }
 
     private fun showSettingsDialog(): Settings? {
         var cSeed: JBTextField by Delegates.notNull()
@@ -101,56 +129,42 @@ class HighlightingBenchmarkAction : AnAction() {
     private sealed class Result(val location: String) {
         abstract fun toCSV(builder: StringBuilder)
 
-        class Success(location: String, val pendingTime: Long, val analysisTime: Long) : Result(location) {
+        class Success(location: String, val time: Long) : Result(location) {
             override fun toCSV(builder: StringBuilder): Unit = with(builder) {
                 append(location)
                 append(", ")
-                append(pendingTime)
-                append(", ")
-                append(analysisTime)
+                append(time)
             }
-
         }
 
-        class Error(location: String) : Result(location) {
+        class Error(location: String, val reason: String) : Result(location) {
             override fun toCSV(builder: StringBuilder): Unit = with(builder) {
+                append(location)
                 append(", ")
-                append(", ")
+                append(reason)
             }
         }
     }
 
-    private suspend fun openFileAndMeasureTimeToHighlight(file: KtFile, project: Project): Result {
+    private suspend fun openFileAndMeasureTimeToHighlight(file: KtFile, project: Project, finishListener: DaemonFinishListener): Result {
 
-        NavigationUtil.openFileWithPsiElement(file.navigationElement, false, true)
+        NavigationUtil.openFileWithPsiElement(file.navigationElement, true, true)
         val location = file.virtualFile.path
-
-        val document = PsiDocumentManager.getInstance(project).getDocument(file) ?: return Result.Error(location)
-
-        val editor = EditorFactory.getInstance().getEditors(document, project).firstOrNull() ?: return Result.Error(location)
 
         val daemon = DaemonCodeAnalyzer.getInstance(project) as DaemonCodeAnalyzerImpl
 
-        if (!daemon.isHighlightingAvailable(file)) return Result.Error(location)
+        if (!daemon.isHighlightingAvailable(file)) return Result.Error(location, "Highlighting not available")
 
-        if (!daemon.isRunningOrPending) return Result.Error(location)
-
-        fun DaemonCodeAnalyzerImpl.isPending() = !isRunning && isRunningOrPending
+        if (!daemon.isRunningOrPending) return Result.Error(location, "Analysis not running or pending")
 
         val start = System.currentTimeMillis()
-        while (daemon.isPending()) {
-            delay(1)
+        val outcome = finishListener.channel.receive()
+        if (outcome != SUCCESS) {
+            return Result.Error(location, outcome)
         }
 
-        val analysisStart = System.currentTimeMillis()
-
-        while (daemon.isRunning) {
-            delay(1)
-        }
-
-        val pendingTime = analysisStart - start
-        val analysisTime = System.currentTimeMillis() - analysisStart
-        return Result.Success(location, pendingTime, analysisTime)
+        val analysisTime = System.currentTimeMillis() - start
+        return Result.Success(location, analysisTime)
     }
 
 
@@ -160,7 +174,7 @@ class HighlightingBenchmarkAction : AnAction() {
         if (result == JFileChooser.APPROVE_OPTION) {
             val file = jfc.selectedFile
             file.writeText(buildString {
-                appendln("n, file, pending, full")
+                appendln("n, file, time")
                 var i = 0
                 allResults.forEach {
                     append(i++)
