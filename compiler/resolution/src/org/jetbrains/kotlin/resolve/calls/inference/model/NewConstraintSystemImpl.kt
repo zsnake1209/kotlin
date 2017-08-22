@@ -25,9 +25,12 @@ import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstituto
 import org.jetbrains.kotlin.resolve.calls.inference.components.ResultTypeResolver
 import org.jetbrains.kotlin.resolve.calls.model.KotlinCallDiagnostic
 import org.jetbrains.kotlin.resolve.calls.tower.isSuccess
+import org.jetbrains.kotlin.types.IntersectionTypeConstructor
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.UnwrappedType
+import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.contains
+import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.utils.SmartList
 
 class NewConstraintSystemImpl(
@@ -215,7 +218,8 @@ class NewConstraintSystemImpl(
     override fun fixVariable(variable: NewTypeVariable, resultType: UnwrappedType) {
         checkState(State.BUILDING, State.COMPLETION)
 
-        constraintInjector.addInitialEqualityConstraint(this, variable.defaultType, resultType, FixVariableConstraintPosition(variable))
+        val reifiedForSpecialType = eliminateSpecialIntersectionType(resultType) ?: resultType
+        constraintInjector.addInitialEqualityConstraint(this, variable.defaultType, reifiedForSpecialType, FixVariableConstraintPosition(variable))
         notFixedTypeVariables.remove(variable.freshTypeConstructor)
 
         for (variableWithConstraint in notFixedTypeVariables.values) {
@@ -224,7 +228,17 @@ class NewConstraintSystemImpl(
             }
         }
 
-        storage.fixedTypeVariables[variable.freshTypeConstructor] = resultType
+        storage.fixedTypeVariables[variable.freshTypeConstructor] = reifiedForSpecialType
+    }
+
+    private fun eliminateSpecialIntersectionType(type: UnwrappedType): UnwrappedType? {
+        val constructor = type.constructor
+        if (constructor !is IntersectionTypeConstructor) return null
+
+        if (constructor.supertypes.size != 2) return null
+        val typeParameter = constructor.supertypes.singleOrNull { it != type.builtIns.anyType } ?: return null
+
+        return if (typeParameter.isTypeParameter()) typeParameter.unwrap() else null
     }
 
     // KotlinConstraintSystemCompleter.Context, PostponedArgumentsAnalyzer.Context
