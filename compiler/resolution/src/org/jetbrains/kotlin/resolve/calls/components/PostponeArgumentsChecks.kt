@@ -45,11 +45,14 @@ fun resolveKtPrimitive(
 private fun preprocessLambdaArgument(
         csBuilder: ConstraintSystemBuilder,
         argument: LambdaKotlinCallArgument,
-        expectedType: UnwrappedType?
+        expectedType: UnwrappedType?,
+        processAnyway: Boolean = false
 ): ResolvedAtom {
-    val newExpectedType = expectedType?.let { csBuilder.getProperTypeBounds(expectedType).singleOrNull { it.isBuiltinFunctionalType } } ?: expectedType
+    if (expectedType != null && csBuilder.isTypeVariable(expectedType) && !processAnyway) {
+        return LambdaWithNotFixedExpectedType(argument, expectedType)
+    }
 
-    val resolvedArgument = extractLambdaInfoFromFunctionalType(newExpectedType, argument) ?: extraLambdaInfo(newExpectedType, argument, csBuilder)
+    val resolvedArgument = extractLambdaInfoFromFunctionalType(expectedType, argument) ?: extraLambdaInfo(expectedType, argument, csBuilder)
 
     if (expectedType != null) {
         val lambdaType = createFunctionType(csBuilder.builtIns, Annotations.EMPTY, resolvedArgument.receiver,
@@ -80,7 +83,6 @@ private fun extraLambdaInfo(
 
     val parameters = argument.parametersTypes?.map { it ?: builtIns.nothingType } ?: emptyList()
 
-
     val newTypeVariableUsed = returnType == typeVariable.defaultType
     if (newTypeVariableUsed) csBuilder.registerVariable(typeVariable)
 
@@ -108,6 +110,15 @@ private fun extractLambdaParameters(expectedType: UnwrappedType, argument: Lambd
     return parametersTypes.mapIndexed { index, type ->
         type ?: expectedParameters.getOrNull(index)?.type?.unwrap() ?: expectedType.builtIns.nullableAnyType
     }
+}
+
+fun LambdaWithNotFixedExpectedType.transformToResolvedLambda(csBuilder: ConstraintSystemBuilder): ResolvedLambdaAtom {
+    val fixedExpectedType = csBuilder.buildCurrentSubstitutor().safeSubstitute(expectedType)
+    val resolvedLambdaAtom = preprocessLambdaArgument(csBuilder, atom, fixedExpectedType, processAnyway = true) as ResolvedLambdaAtom
+
+    setAnalyzed(resolvedLambdaAtom)
+
+    return resolvedLambdaAtom
 }
 
 private fun preprocessCallableReference(

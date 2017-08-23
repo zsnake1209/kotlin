@@ -39,6 +39,8 @@ interface ConstraintSystemOperation {
     fun isProperType(type: UnwrappedType): Boolean
     fun isTypeVariable(type: UnwrappedType): Boolean
 
+    fun findTypeVariable(type: UnwrappedType): NewTypeVariable?
+
     fun getProperSuperTypeConstructors(type: UnwrappedType): List<TypeConstructor>
     fun getProperTypeBounds(type: UnwrappedType): List<UnwrappedType>
 }

@@ -185,6 +185,10 @@ class NewConstraintSystemImpl(
         return notFixedTypeVariables.containsKey(type.constructor)
     }
 
+    override fun findTypeVariable(type: UnwrappedType): NewTypeVariable? {
+        return allTypeVariables[type.constructor]
+    }
+
     // ConstraintInjector.Context
     override val allTypeVariables: Map<TypeConstructor, NewTypeVariable> get() {
         checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION)
