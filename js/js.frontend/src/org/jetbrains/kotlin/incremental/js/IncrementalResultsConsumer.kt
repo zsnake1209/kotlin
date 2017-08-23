@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.incremental.js
 
-import org.jetbrains.kotlin.js.backend.ast.JsExpression
 import java.io.File
 import java.security.MessageDigest
 
@@ -25,7 +24,11 @@ interface IncrementalResultsConsumer {
     fun processHeader(headerMetadata: ByteArray)
     /** processes new package part metadata and binary tree for compiled source file */
     fun processPackagePart(sourceFile: File, packagePartMetadata: ByteArray, binaryAst: ByteArray)
-    fun processInlineFunction(sourceFile: File, fqName: String, inlineFunction: JsExpression)
+    /** [inlineFunction] is expected to be a body of inline function (an instance of [JsNode]),
+     * but [Any] is used to avoid classloader conflicts in tests where the compiler is isolated
+     * (such as [JsProtoComparisonTestGenerated])
+     */
+    fun processInlineFunction(sourceFile: File, fqName: String, inlineFunction: Any)
 }
 
 class IncrementalResultsConsumerImpl : IncrementalResultsConsumer {
@@ -36,7 +39,7 @@ class IncrementalResultsConsumerImpl : IncrementalResultsConsumer {
     val packageParts: Map<File, TranslationResultValue>
         get() = _packageParts
 
-    private val _inlineFuncs = hashMapOf<File, MutableMap<String, JsExpression>>()
+    private val _inlineFuncs = hashMapOf<File, MutableMap<String, Any>>()
     val inlineFunctions: Map<File, Map<String, Long>>
         get() {
             val result = HashMap<File, Map<String, Long>>(_inlineFuncs.size)
@@ -62,7 +65,7 @@ class IncrementalResultsConsumerImpl : IncrementalResultsConsumer {
         _packageParts.put(sourceFile, TranslationResultValue(packagePartMetadata, binaryAst))
     }
 
-    override fun processInlineFunction(sourceFile: File, fqName: String, inlineFunction: JsExpression) {
+    override fun processInlineFunction(sourceFile: File, fqName: String, inlineFunction: Any) {
         val mapForSource = _inlineFuncs.getOrPut(sourceFile) { hashMapOf() }
         mapForSource[fqName] = inlineFunction
     }
