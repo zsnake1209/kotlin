@@ -64,7 +64,7 @@ Kotlin.arrayDeepToString = function (a, visited) {
     if (Kotlin.isCharArray(a)) {
         toString = String.fromCharCode;
     }
-    return "[" + a.map(function (e) {
+    return "[" + Array.prototype.map.call(a, function (e) {
             if (Kotlin.isArrayish(e) && visited.indexOf(e) < 0) {
                 visited.push(e);
                 var result = Kotlin.arrayDeepToString(e, visited);
