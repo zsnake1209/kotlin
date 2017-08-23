@@ -17084,6 +17084,12 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
             doTest(fileName);
         }
 
+        @TestMetadata("subclassWithStar.kt")
+        public void testSubclassWithStar() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/regressions/subclassWithStar.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("supertypeDepth.kt")
         public void testSupertypeDepth() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/regressions/supertypeDepth.kt");
