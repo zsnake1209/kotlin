@@ -53,10 +53,7 @@ internal class ScriptDependenciesUpdater(
     private val contentLoader = ScriptContentLoader(project)
     private val asyncUpdatesDispatcher = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
     private val legacyUpdatesDispatcher =
-            Executors.newFixedThreadPool(
-                    (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
-            ).asCoroutineDispatcher()
-
+            Executors.newFixedThreadPool(1).asCoroutineDispatcher()
     init {
         listenToVfsChanges()
     }
