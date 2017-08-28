@@ -79,9 +79,11 @@ fun checkHideNonConfiguredNotifications(project: Project) {
         if (getConfigurableModulesWithKotlinFiles(project).all(::isModuleConfigured)) {
             ApplicationManager.getApplication().invokeLater {
                 ConfigureKotlinNotificationManager.expireOldNotifications(project)
+                checkInProgress.set(false)
             }
         }
-
-        checkInProgress.set(false)
+        else {
+            checkInProgress.set(false)
+        }
     }
 }
