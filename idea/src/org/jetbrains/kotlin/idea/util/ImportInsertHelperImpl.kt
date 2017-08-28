@@ -223,25 +223,22 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
             val kindFilter = DescriptorKindFilter.ALL.withoutKinds(DescriptorKindFilter.PACKAGES_MASK)
             val allNamesToImport = scopeToImport.getDescriptorsFiltered(kindFilter, { true }).filter(::isVisible).map { it.name }.toSet()
 
-            fun targetFqNameAndType(ref: KtReferenceExpression): Pair<FqName, Class<out Any>>? {
-                val descriptors = ref.resolveTargets()
-                val fqName: FqName? = descriptors.filter(::isVisible). map { it.importableFqName }.toSet().singleOrNull()
-                if (fqName != null) {
-                    return Pair(fqName, descriptors.elementAt(0).javaClass)
-                } else return null
+            fun targetFqNameAndType(referenceExpression: KtReferenceExpression): Pair<FqName, Class<out DeclarationDescriptor>>? {
+                val descriptors = referenceExpression.resolveTargets()
+                val fqName: FqName? = descriptors.filter(::isVisible).map { it.importableFqName }.toSet().singleOrNull()
+                return fqName?.let { fqName to descriptors.elementAt(0).javaClass }
             }
 
-            val futureCheckMap = HashMap<KtSimpleNameExpression, Pair<FqName, Class<out Any>>>()
+            val futureCheckMap = HashMap<KtSimpleNameExpression, Pair<FqName, Class<out DeclarationDescriptor>>>()
             file.accept(object : KtVisitorVoid() {
-                override fun visitElement(element: PsiElement): Unit = element.acceptChildren(this)
+                override fun visitElement(element: PsiElement) = element.acceptChildren(this)
                 override fun visitImportList(importList: KtImportList) {}
                 override fun visitPackageDirective(directive: KtPackageDirective) {}
                 override fun visitSimpleNameExpression(expression: KtSimpleNameExpression) {
                     val refName = expression.getReferencedNameAsName()
                     if (allNamesToImport.contains(refName)) {
-                        val tgt = targetFqNameAndType(expression)
-                        if (tgt != null) {
-                            futureCheckMap += Pair(expression, tgt)
+                        targetFqNameAndType(expression)?.let {
+                            futureCheckMap[expression] = it
                         }
                     }
                 }
@@ -257,16 +254,16 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
 
             dropRedundantExplicitImports(parentFqName)
 
-            val conflicts = futureCheckMap.mapNotNull { (expr, fqNameAndType) ->
-                if (targetFqNameAndType(expr) != fqNameAndType) fqNameAndType else null
+            val conflicts = futureCheckMap.mapNotNull { (expression, fqNameAndType) ->
+                if (targetFqNameAndType(expression) != fqNameAndType) fqNameAndType else null
             }.map { it.first }.toSet()
 
-            fun isNotImported(fqName: FqName): Boolean {
-                return file.importDirectives.none { directive ->
-                    !directive.isAllUnder && directive.alias == null
-                    directive.importedFqName == fqName
-                }
-            }
+            fun isNotImported(fqName: FqName): Boolean =
+                    file.importDirectives.none { directive ->
+                        !directive.isAllUnder
+                        && directive.alias == null
+                        && directive.importedFqName == fqName
+                    }
 
             for (conflict in conflicts.filter(::isNotImported)) {
                 addImport(conflict, false)

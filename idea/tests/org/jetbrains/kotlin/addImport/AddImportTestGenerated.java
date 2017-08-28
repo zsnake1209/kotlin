@@ -162,6 +162,12 @@ public class AddImportTestGenerated extends AbstractAddImportTest {
         doTest(fileName);
     }
 
+    @TestMetadata("ConflictingNameWithAliasImport.kt")
+    public void testConflictingNameWithAliasImport() throws Exception {
+        String fileName = KotlinTestUtils.navigationMetadata("idea/testData/addImport/ConflictingNameWithAliasImport.kt");
+        doTest(fileName);
+    }
+
     @TestMetadata("ConflictsExtensions.kt")
     public void testConflictsExtensions() throws Exception {
         String fileName = KotlinTestUtils.navigationMetadata("idea/testData/addImport/ConflictsExtensions.kt");
