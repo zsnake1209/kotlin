@@ -118,7 +118,7 @@ interface ModuleSourceInfo : IdeaModuleInfo, TrackableModuleInfo {
             KotlinModuleModificationTracker(module)
 }
 
-data class ModuleProductionSourceInfo(override val module: Module) : ModuleSourceInfo {
+data class ModuleProductionSourceInfo internal constructor(override val module: Module) : ModuleSourceInfo {
     override val name = Name.special("<production sources for module ${module.name}>")
 
     override fun contentScope(): GlobalSearchScope = ModuleProductionSourceScope(module)
@@ -131,7 +131,7 @@ data class ModuleProductionSourceInfo(override val module: Module) : ModuleSourc
 }
 
 //TODO: (module refactoring) do not create ModuleTestSourceInfo when there are no test roots for module
-data class ModuleTestSourceInfo(override val module: Module) : ModuleSourceInfo {
+data class ModuleTestSourceInfo internal constructor(override val module: Module) : ModuleSourceInfo {
     override val name = Name.special("<test sources for module ${module.name}>")
 
     override val displayedName get() = module.name + " (test)"
@@ -279,7 +279,7 @@ data class SdkInfo(val project: Project, val sdk: Sdk) : IdeaModuleInfo {
     override fun dependencies(): List<IdeaModuleInfo> = listOf(this)
 }
 
-internal object NotUnderContentRootModuleInfo : IdeaModuleInfo {
+object NotUnderContentRootModuleInfo : IdeaModuleInfo {
     override val moduleOrigin: ModuleOrigin
         get() = ModuleOrigin.OTHER
 
