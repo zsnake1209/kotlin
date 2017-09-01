@@ -83,7 +83,10 @@ class MethodInliner(
         //substitute returns with "goto end" instruction to keep non local returns in lambdas
         val end = Label()
         transformedNode = doInline(transformedNode)
-        removeClosureAssertions(transformedNode)
+        if (nodeRemapper !is RegeneratedLambdaFieldRemapper) {
+            //don't remove assertion in transformed anonymous object
+            removeClosureAssertions(transformedNode)
+        }
         transformedNode.instructions.resetLabels()
 
         val resultNode = MethodNode(
