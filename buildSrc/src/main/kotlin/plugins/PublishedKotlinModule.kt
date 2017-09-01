@@ -3,6 +3,8 @@ package plugins
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.maven.MavenResolver
 
 import org.gradle.api.plugins.MavenRepositoryHandlerConvention
 import org.gradle.api.tasks.Upload
@@ -43,9 +45,54 @@ open class PublishedKotlinModule : Plugin<Project> {
                 }
             }
 
+            fun MavenResolver.configurePom() {
+                pom.project {
+                    withGroovyBuilder {
+                        "licenses" {
+                            "license" {
+                                "name"("The Apache Software License, Version 2.0")
+                                "url"("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                                "distribution"("repo")
+                            }
+                        }
+                        "name"("${project.group}:${project.name}")
+                        "packaging"("jar")
+                        // optionally artifactId can be defined here
+                        "description"(project.description)
+                        "url"("https://kotlinlang.org/")
+                        "licenses" {
+                            "license" {
+                                "name"("The Apache License, Version 2.0")
+                                "url"("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                            }
+                        }
+                        "scm" {
+                            "url"("https://github.com/JetBrains/kotlin")
+                            "connection"("scm:git:https://github.com/JetBrains/kotlin.git")
+                            "developerConnection"("scm:git:https://github.com/JetBrains/kotlin.git")
+                        }
+                        "developers" {
+                            "developer" {
+                                "name"("Kotlin Team")
+                                "organization" {
+                                    "name"("JetBrains")
+                                    "url"("https://www.jetbrains.com")
+                                }
+                            }
+                        }
+                    }
+                }
+                pom.whenConfigured {
+                    dependencies.removeIf {
+                        InvokerHelper.getMetaClass(it).getProperty(it, "scope") == "test"
+                    }
+                }
+            }
+
+            val preparePublication = project.rootProject.tasks.getByName("preparePublication")
+
             (tasks.getByName("uploadArchives") as Upload).apply {
 
-                val preparePublication = project.rootProject.tasks.getByName("preparePublication")
                 dependsOn(preparePublication)
 
                 val username: String? by preparePublication.extra
@@ -63,47 +110,21 @@ open class PublishedKotlinModule : Plugin<Project> {
                                 }
                             }
 
-                            pom.project {
-                                withGroovyBuilder {
-                                    "licenses" {
-                                        "license" {
-                                            "name"("The Apache Software License, Version 2.0")
-                                            "url"("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                                            "distribution"("repo")
-                                        }
-                                    }
-                                    "name"("${project.group}:${project.name}")
-                                    "packaging"("jar")
-                                    // optionally artifactId can be defined here
-                                    "description"(project.description)
-                                    "url"("https://kotlinlang.org/")
-                                    "licenses" {
-                                        "license" {
-                                            "name"("The Apache License, Version 2.0")
-                                            "url"("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                                        }
-                                    }
-                                    "scm" {
-                                        "url"("https://github.com/JetBrains/kotlin")
-                                        "connection"("scm:git:https://github.com/JetBrains/kotlin.git")
-                                        "developerConnection"("scm:git:https://github.com/JetBrains/kotlin.git")
-                                    }
-                                    "developers" {
-                                        "developer" {
-                                            "name"("Kotlin Team")
-                                            "organization" {
-                                                "name"("JetBrains")
-                                                "url"("https://www.jetbrains.com")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            pom.whenConfigured {
-                                dependencies.removeIf {
-                                    InvokerHelper.getMetaClass(it).getProperty(it, "scope") == "test"
-                                }
-                            }
+                            configurePom()
+                        }
+                    }
+                }
+            }
+
+            val install = if (tasks.names.contains("install")) tasks.getByName("uploadArchives") as Upload
+                          else tasks.create("install", Upload::class.java)
+            install.apply {
+                configuration = project.configurations.getByName(Dependency.ARCHIVES_CONFIGURATION)
+                description = "Installs the 'archives' artifacts into the local Maven repository."
+                repositories {
+                    withConvention(MavenRepositoryHandlerConvention::class) {
+                        mavenInstaller {
+                            configurePom()
                         }
                     }
                 }
