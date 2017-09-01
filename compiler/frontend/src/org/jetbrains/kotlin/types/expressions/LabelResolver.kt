@@ -47,21 +47,33 @@ object LabelResolver {
         return elements
     }
 
-    fun getLabelNameIfAny(element: PsiElement): Name? {
-        return when (element) {
-            is KtLabeledExpression -> element.getLabelNameAsName()
-            is KtFunctionLiteral -> getLabelNameIfAny(element.parent)
-            is KtLambdaExpression -> getLabelForFunctionalExpression(element)
-            is KtNamedFunction -> element.nameAsName ?: getLabelForFunctionalExpression(element)
-            else -> null
-        }
+    private fun getLabelNameIfAny(element: PsiElement): Name? = getExpressionToExtractLabel(element)?.labelName
+
+    fun getLabelAndLabeledExpression(element: PsiElement): Pair<Name, PsiElement>? = getExpressionToExtractLabel(element)?.let { it.labelName?.to(it) }
+
+    private fun getExpressionToExtractLabel(element: PsiElement): PsiElement?
+            = when (element) {
+        is KtLabeledExpression -> element
+        is KtFunctionLiteral -> getExpressionToExtractLabel(element.parent)
+        is KtLambdaExpression -> getLabelForFunctionalExpression(element)
+        is KtNamedFunction -> if (element.nameAsName != null) element else getLabelForFunctionalExpression(element)
+        else -> null
     }
 
-    private fun getLabelForFunctionalExpression(element: KtExpression): Name? {
+    private val PsiElement.labelName: Name?
+        get() = when (this) {
+            is KtLabeledExpression -> getLabelNameAsName()
+            is KtNamedFunction -> nameAsName!!
+            is KtBinaryExpression -> operationReference.getReferencedNameAsName()
+            is KtSimpleNameExpression -> getReferencedNameAsName()
+            else -> null
+        }
+
+    private fun getLabelForFunctionalExpression(element: KtExpression): KtExpression? {
         val parent = element.parent
         return when (parent) {
-            is KtLabeledExpression -> getLabelNameIfAny(parent)
-            is KtBinaryExpression -> parent.operationReference.getReferencedNameAsName()
+            is KtLabeledExpression -> parent
+            is KtBinaryExpression -> parent
             else -> getCallerName(element)
         }
     }
@@ -71,10 +83,9 @@ object LabelResolver {
         return if (expression is KtLambdaExpression) expression.functionLiteral else expression
     }
 
-    private fun getCallerName(expression: KtExpression): Name? {
+    private fun getCallerName(expression: KtExpression): KtSimpleNameExpression? {
         val callExpression = getContainingCallExpression(expression) ?: return null
-        val calleeExpression = callExpression.calleeExpression as? KtSimpleNameExpression
-        return calleeExpression?.getReferencedNameAsName()
+        return callExpression.calleeExpression as? KtSimpleNameExpression
 
     }
 

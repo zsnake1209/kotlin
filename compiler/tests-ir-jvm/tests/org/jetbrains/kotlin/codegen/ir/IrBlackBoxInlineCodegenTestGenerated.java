@@ -1769,6 +1769,18 @@ public class IrBlackBoxInlineCodegenTestGenerated extends AbstractIrBlackBoxInli
             doTest(fileName);
         }
 
+        @TestMetadata("kt9304.kt")
+        public void testKt9304() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/boxInline/nonLocalReturns/kt9304.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("kt9304_2.kt")
+        public void testKt9304_2() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/boxInline/nonLocalReturns/kt9304_2.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("nestedNonLocals.kt")
         public void testNestedNonLocals() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/boxInline/nonLocalReturns/nestedNonLocals.kt");

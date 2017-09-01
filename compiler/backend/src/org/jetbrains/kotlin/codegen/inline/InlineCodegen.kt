@@ -540,11 +540,14 @@ abstract class InlineCodegen<out T: BaseExpressionCodegen>(
         fun getDeclarationLabels(lambdaOrFun: PsiElement?, descriptor: DeclarationDescriptor): Set<String> {
             val result = HashSet<String>()
 
-            if (lambdaOrFun != null) {
-                val label = LabelResolver.getLabelNameIfAny(lambdaOrFun)
+            var processingExpression: PsiElement? = lambdaOrFun
+            while (processingExpression != null) {
+                val expressionAndLabel = LabelResolver.getLabelAndLabeledExpression(processingExpression)
+                val label = expressionAndLabel?.first
                 if (label != null) {
                     result.add(label.asString())
                 }
+                processingExpression = expressionAndLabel?.second?.parent
             }
 
             if (!isFunctionLiteral(descriptor)) {
