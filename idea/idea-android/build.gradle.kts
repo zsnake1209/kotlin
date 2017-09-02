@@ -22,6 +22,7 @@ dependencies {
     testCompile(project(":idea:idea-test-framework")) { isTransitive = false }
     testCompile(project(":plugins:lint")) { isTransitive = false }
     testCompile(projectTests(":idea"))
+    testCompile(projectTests(":idea:idea-gradle"))
     testCompile(ideaPluginDeps("properties", plugin = "properties"))
     testCompile(ideaSdkDeps("gson"))
     testCompile(commonDep("junit:junit"))

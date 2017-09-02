@@ -37,6 +37,7 @@ val projectsToShadow = listOf(
         ":idea:idea-android",
         ":idea:idea-android-output-parser",
         ":idea:idea-core",
+        ":idea:idea-jvm",
         ":idea:idea-jps-common",
         ":idea:idea-gradle",
         ":idea:idea-maven",

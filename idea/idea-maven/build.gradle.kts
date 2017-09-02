@@ -17,11 +17,28 @@ dependencies {
     compile(project(":idea"))
     compile(project(":idea:idea-jps-common"))
 
+    testCompile(projectTests(":idea"))
     testCompile(project(":compiler.tests-common"))
     testCompile(project(":idea:idea-test-framework"))
+    testCompileOnly(ideaSdkDeps("openapi", "idea", "gson"))
+    testCompileOnly(ideaPluginDeps("maven", "maven-server-api", plugin = "maven"))
+
+    testRuntime(ideaSdkDeps("*.jar"))
+    testRuntime(ideaPluginDeps("resources_en", plugin = "junit"))
+    testRuntime(ideaPluginDeps("jcommander", "resources_en", plugin = "testng"))
+    testRuntime(ideaPluginDeps("resources_en", plugin = "properties"))
+    testRuntime(ideaPluginDeps("*.jar", plugin = "gradle"))
+    testRuntime(ideaPluginDeps("*.jar", plugin = "Groovy"))
+    testRuntime(ideaPluginDeps("jacocoant", plugin = "coverage"))
+    testRuntime(ideaPluginDeps("*.jar", plugin = "maven"))
+    testRuntime(ideaPluginDeps("*.jar", plugin = "android"))
 }
 
 sourceSets {
     "main" { projectDefault() }
     "test" { projectDefault() }
+}
+
+projectTest {
+    workingDir = rootDir
 }

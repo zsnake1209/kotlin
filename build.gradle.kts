@@ -263,6 +263,8 @@ tasks {
     "idea-plugin-tests" {
         dependsOn("dist")
         dependsOn(":idea:test",
+                  ":idea:idea-gradle:test",
+                  ":idea:idea-maven:test",
                   ":j2k:test",
                   ":eval4j:test")
     }

@@ -16,9 +16,20 @@ dependencies {
 
     compile(project(":js:js.frontend"))
 
+    testCompile(projectTests(":idea"))
+    testCompile(project(":idea:idea-test-framework"))
+    testCompile(ideaSdkDeps("openapi", "idea", "groovy-all"))
+    testCompile(ideaPluginDeps("gradle-wrapper", "gradle-base-services", "gradle-tooling-extension-impl", "gradle-tooling-api", "gradle", plugin = "gradle"))
+    testCompile(ideaPluginDeps("Groovy", plugin = "Groovy"))
 }
 
 sourceSets {
     "main" { projectDefault() }
     "test" { projectDefault() }
+}
+
+testsJar()
+
+projectTest {
+    workingDir = rootDir
 }
