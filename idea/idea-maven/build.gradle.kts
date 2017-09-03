@@ -39,6 +39,8 @@ sourceSets {
     "test" { projectDefault() }
 }
 
+testsJar()
+
 projectTest {
     workingDir = rootDir
 }

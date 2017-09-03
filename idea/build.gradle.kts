@@ -1,4 +1,6 @@
 
+import org.gradle.jvm.tasks.Jar
+
 apply { plugin("kotlin") }
 
 dependencies {
@@ -41,7 +43,9 @@ dependencies {
     testCompile(project(":compiler:cli"))
     testCompile(project(":compiler.tests-common"))
     testCompile(project(":idea:idea-test-framework")) { isTransitive = false }
-    testCompile(project(":idea:idea-jvm"))
+    testCompile(project(":idea:idea-jvm")) { isTransitive = false }
+    testCompile(project(":idea:idea-gradle")) { isTransitive = false }
+    testCompile(project(":idea:idea-maven")) { isTransitive = false }
     testCompile(commonDep("junit:junit"))
 
     testCompileOnly(ideaPluginDeps("gradle-base-services", "gradle-tooling-extension-impl", "gradle-wrapper", plugin = "gradle"))
@@ -52,7 +56,7 @@ dependencies {
 
     testRuntime(ideaSdkDeps("*.jar"))
 
-    testRuntime(ideaPluginDeps("resources_en", plugin = "junit"))
+    testRuntime(ideaPluginDeps("*.jar", plugin = "junit"))
     testRuntime(ideaPluginDeps("jcommander", "resources_en", plugin = "testng"))
     testRuntime(ideaPluginDeps("resources_en", plugin = "properties"))
     testRuntime(ideaPluginDeps("*.jar", plugin = "gradle"))
