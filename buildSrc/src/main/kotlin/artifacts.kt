@@ -34,11 +34,13 @@ fun<T> Project.runtimeJarArtifactBy(task: Task, artifactRef: T, body: Configurab
 }
 
 fun Project.buildVersion(): Dependency {
+    evaluationDependsOn(":prepare")
     val cfg = configurations.create("build-version")
     return dependencies.add(cfg.name, dependencies.project(":prepare:build.version", configuration = "buildVersion"))
 }
 
 fun<T: Jar> Project.runtimeJar(task: T, body: T.() -> Unit = {}): T {
+    evaluationDependsOn(":prepare")
     val buildVersionCfg = configurations.create("buildVersion")
     dependencies.add(buildVersionCfg.name, dependencies.project(":prepare:build.version", configuration = "buildVersion"))
     extra["runtimeJarTask"] = task

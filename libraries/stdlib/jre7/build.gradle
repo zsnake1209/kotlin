@@ -65,7 +65,7 @@ test {
 }
 
 task testJre6Tests(type: Test) {
-    dependsOn project(':kotlin-stdlib').tasks.testClasses
+    dependsOn ':kotlin-stdlib:testClasses'
     group = "verification"
 
     executable = "$JDK_17/bin/java"

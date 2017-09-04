@@ -1,17 +1,19 @@
 
-import org.gradle.jvm.tasks.Jar
+
 
 apply { plugin("kotlin") }
 
 dependencies {
     compile(projectDist(":kotlin-stdlib"))
     compile(project(":core"))
+    evaluationDependsOn(":compiler")
     compile(project(":compiler:backend"))
     compile(project(":compiler:cli-common"))
     compile(projectDist(":kotlin-daemon-client"))
     compile(project(":compiler:frontend"))
     compile(project(":compiler:frontend.java"))
     compile(project(":compiler:frontend.script"))
+    evaluationDependsOn(":js")
     compile(project(":js:js.frontend"))
     compile(project(":js:js.serializer"))
     compile(project(":compiler:light-classes"))
@@ -25,6 +27,7 @@ dependencies {
     compile(project(":idea:ide-common"))
     compile(project(":idea:idea-jps-common"))
     compile(project(":idea:kotlin-gradle-tooling"))
+    evaluationDependsOn(":plugins")
     compile(project(":plugins:uast-kotlin"))
     compile(project(":plugins:uast-kotlin-idea"))
 
@@ -104,4 +107,4 @@ projectTest {
     workingDir = rootDir
 }
 
-testsJar {}
+//testsJar {}

@@ -10,6 +10,7 @@ javaHome = rootProject.extra["JDK_16"] as String
 dependencies {
     compile(projectDist(":kotlin-stdlib"))
     compile(project("util.runtime"))
+    evaluationDependsOn(":custom-dependencies")
     compile(protobufLite())
     compile(commonDep("javax.inject"))
 }
