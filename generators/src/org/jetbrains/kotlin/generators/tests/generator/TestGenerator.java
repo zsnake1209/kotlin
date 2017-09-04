@@ -142,19 +142,20 @@ public class TestGenerator {
             };
         }
 
-        generateTestClass(p, model, false);
+        generateTestClass(p, model, false, false);
 
         File testSourceFile = new File(testSourceFilePath);
         GeneratorsFileUtil.writeFileIfContentChanged(testSourceFile, out.toString(), false);
     }
 
-    private void generateTestClass(Printer p, TestClassModel testClassModel, boolean isStatic) {
+    private void generateTestClass(Printer p, TestClassModel testClassModel, boolean isStatic, boolean isInner) {
         String staticModifier = isStatic ? "static " : "";
 
         generateMetadata(p, testClassModel);
         generateTestDataPath(p, testClassModel);
-        p.println("@RunWith(", RUNNER.getSimpleName(), ".class)");
-
+        if(!isInner) {
+            p.println("@RunWith(", RUNNER.getSimpleName(), ".class)");
+        }
         p.println("public " + staticModifier + "class ", testClassModel.getName(), " extends ", baseTestClassName, " {");
         p.pushIndent();
 
@@ -188,7 +189,7 @@ public class TestGenerator {
                     p.println();
                 }
 
-                generateTestClass(p, innerTestClass, true);
+                generateTestClass(p, innerTestClass, true, true);
             }
         }
 
