@@ -339,6 +339,8 @@ fun Project.configureJvmProject(javaHome: String, javaVersion: String) {
 
     tasks.withType<JavaCompile> {
         options.forkOptions.javaHome = file(javaHome)
+        options.isIncremental = true
+        options.isFork = true
     }
 
     tasks.withType<KotlinCompile> {
