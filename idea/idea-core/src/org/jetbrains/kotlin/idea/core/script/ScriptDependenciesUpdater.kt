@@ -18,8 +18,8 @@ package org.jetbrains.kotlin.idea.core.script
 
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.isProjectOrWorkspaceFile
 import com.intellij.openapi.roots.ProjectRootManager
@@ -64,7 +64,7 @@ internal class ScriptDependenciesUpdater(
     }
 
     private class TimeStampedJob(val actualJob: Job, val timeStamp: TimeStamp) {
-        fun stampBy(virtualFile: VirtualFile) = ModStampedRequest(virtualFile.modificationStamp, this)
+        fun stampBy(virtualFile: VirtualFile, project: Project) = ModStampedRequest(modificationStamp(virtualFile, project), this)
     }
 
     private class ModStampedRequest(
@@ -129,14 +129,14 @@ internal class ScriptDependenciesUpdater(
 
         lastRequest?.cancel()
 
-        requests[path] = sendRequest(file, scriptDefinition).stampBy(file)
+        requests[path] = sendRequest(file, scriptDefinition).stampBy(file, project)
         return
     }
 
     private fun shouldSendNewRequest(file: VirtualFile, previousRequest: ModStampedRequest?): Boolean {
         if (previousRequest == null) return true
 
-        return file.modificationStamp != previousRequest.modificationStamp
+        return modificationStamp(file , project) != previousRequest.modificationStamp
     }
 
     private fun sendRequest(
@@ -277,6 +277,10 @@ private object TimeStamps {
     private var current: Long = 0
 
     fun next() = TimeStamp(current++)
+}
+
+private fun modificationStamp(virtualFile: VirtualFile, project: Project): Long {
+    return project.service<GradleProjectUpdateTracker>().modificationCount
 }
 
 @set: TestOnly

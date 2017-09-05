@@ -36,6 +36,8 @@
 
         <runConfigurationProducer implementation="org.jetbrains.kotlin.idea.run.KotlinTestClassGradleConfigurationProducer"/>
         <runConfigurationProducer implementation="org.jetbrains.kotlin.idea.run.KotlinTestMethodGradleConfigurationProducer"/>
+
+        <externalSystemTaskNotificationListener implementation="org.jetbrains.kotlin.idea.core.script.GradleProjectUpdateListener"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
