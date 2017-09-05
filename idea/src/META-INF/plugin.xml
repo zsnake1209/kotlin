@@ -256,6 +256,9 @@
     <projectService serviceInterface="org.jetbrains.kotlin.idea.util.ImportInsertHelper"
                     serviceImplementation="org.jetbrains.kotlin.util.ImportInsertHelperImpl"/>
 
+    <projectService serviceInterface="org.jetbrains.kotlin.idea.core.script.GradleProjectUpdateTracker"
+                    serviceImplementation="org.jetbrains.kotlin.idea.core.script.GradleProjectUpdateTracker"/>
+
     <applicationService serviceInterface="org.jetbrains.kotlin.psi.KotlinDeclarationNavigationPolicy"
                         serviceImplementation="org.jetbrains.kotlin.idea.decompiler.navigation.KotlinDeclarationNavigationPolicyImpl"/>
 
