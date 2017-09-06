@@ -18,6 +18,9 @@ apply { plugin("kotlin") }
 
 val ideaCommunityPlugin by configurations.creating
 
+val ideaProjectClasses =  project(":idea").the<JavaPluginConvention>().sourceSets["main"].output.classesDirs
+val ideaProjectResources =  project(":idea").the<JavaPluginConvention>().sourceSets["main"].output.resourcesDir
+
 dependencies {
     val compile by configurations
     val compileOnly by configurations
@@ -31,7 +34,7 @@ dependencies {
     compile(project(":compiler:light-classes")) { isTransitive = false }
     compile(project(":compiler:frontend")) { isTransitive = false }
     compile(project(":compiler:frontend.java")) { isTransitive = false }
-    compile(project(":idea")) { isTransitive = false }
+    compile(ideaProjectClasses)
     compile(project(":idea:idea-core")) { isTransitive = false }
     compile(project(":idea:ide-common")) { isTransitive = false }
     compile(project(":idea:idea-gradle")) { isTransitive = false }
@@ -93,13 +96,13 @@ dependencies {
     ideaCommunityPlugin(projectRuntimeJar(":prepare:kotlin-plugin"))
 }
 
-val ultimateMetaInf = File(buildDir, "gen", "META-INF")
+val preparedResources = File(buildDir, "prepResources")
 
 sourceSets {
     "main" { projectDefault() }
     "test" {
         projectDefault()
-        resources.srcDir(ultimateMetaInf.parentFile).apply { include("META-INF/**") }
+        resources.srcDir(preparedResources)
     }
 }
 
@@ -111,9 +114,16 @@ val ultimatePluginXmlContent: String by lazy {
             .joinToString("\n")
 }
 
+val prepareResources by task<Copy> {
+    dependsOn(":idea:assemble")
+    from(ideaProjectResources, { exclude("META-INF/plugin.xml") })
+    into(preparedResources)
+}
+
 val preparePluginXml by task<Copy> {
-    from(File(rootDir, "idea/src/META-INF/plugin.xml"))
-    into(ultimateMetaInf)
+    dependsOn(":idea:assemble")
+    from(ideaProjectResources, { include("META-INF/plugin.xml") })
+    into(preparedResources)
     filter {
         it?.replace("<!-- ULTIMATE-PLUGIN-PLACEHOLDER -->", ultimatePluginXmlContent)
     }
@@ -127,7 +137,7 @@ val jar = runtimeJar(task<ShadowJar>("shadowJar")) {
             from(zipTree(it), { exclude("META-INF/plugin.xml") })
         }
     }
-    from(ultimateMetaInf.parentFile, { include("META-INF/**") })
+    from(preparedResources, { include("META-INF/plugin.xml") })
     from(the<JavaPluginConvention>().sourceSets.getByName("main").output)
     archiveName = "kotlin-plugin.jar"
 }
@@ -143,6 +153,7 @@ task<Copy>("idea-ultimate-plugin") {
 }
 
 projectTest {
+    dependsOn(prepareResources)
     dependsOn(preparePluginXml)
     workingDir = rootDir
 }
