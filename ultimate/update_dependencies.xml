@@ -32,6 +32,13 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="get-karma-intellij-plugin">
+        <sequential>
+            <get src="http://plugins.jetbrains.com/plugin/download?updateId=38070" dest="${download}/karma_plugin.zip" usetimestamp="true"/>
+            <unzip src="${download}/karma_plugin.zip" dest="dependencies/karma_plugin" overwrite="true"/>
+        </sequential>
+    </macrodef>
+
     <target name="fetch-extras">
         <mkdir dir="${download}"/>
 
@@ -42,6 +49,7 @@
         <get-spring-library lib="spring-web" version="4.2.0.RELEASE"/>
 
         <get-nodejs-intellij-plugin/>
+        <get-karma-intellij-plugin/>
     </target>
 
     <!-- Override fetch-third-party from the main buildfile -->
