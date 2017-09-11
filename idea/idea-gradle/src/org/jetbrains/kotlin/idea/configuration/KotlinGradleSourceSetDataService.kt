@@ -20,7 +20,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.ProjectKeys
 import com.intellij.openapi.externalSystem.model.project.LibraryData
-import com.intellij.openapi.externalSystem.model.project.LibraryDependencyData
 import com.intellij.openapi.externalSystem.model.project.ModuleData
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
@@ -32,6 +31,7 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.roots.impl.libraries.LibraryImpl
 import com.intellij.openapi.roots.libraries.PersistentLibraryKind
+import com.intellij.openapi.util.Key
 import com.intellij.util.PathUtil
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.config.CoroutineSupport
@@ -39,6 +39,8 @@ import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.TargetPlatformKind
 import org.jetbrains.kotlin.extensions.ProjectExtensionDescriptor
+import org.jetbrains.kotlin.gradle.ArgsInfo
+import org.jetbrains.kotlin.gradle.CompilerArgumentsBySourceSet
 import org.jetbrains.kotlin.idea.facet.*
 import org.jetbrains.kotlin.idea.framework.CommonLibraryKind
 import org.jetbrains.kotlin.idea.framework.JSLibraryKind
@@ -46,10 +48,17 @@ import org.jetbrains.kotlin.idea.framework.detectLibraryKind
 import org.jetbrains.kotlin.idea.inspections.gradle.findAll
 import org.jetbrains.kotlin.idea.inspections.gradle.findKotlinPluginVersion
 import org.jetbrains.kotlin.idea.inspections.gradle.getResolvedKotlinStdlibVersionByModuleData
+import org.jetbrains.kotlin.psi.UserDataProperty
 import org.jetbrains.plugins.gradle.model.data.BuildScriptClasspathData
 import org.jetbrains.plugins.gradle.model.data.GradleSourceSetData
 import java.io.File
 import java.util.*
+
+var Module.compilerArgumentsBySourceSet
+        by UserDataProperty(Key.create<CompilerArgumentsBySourceSet>("CURRENT_COMPILER_ARGUMENTS"))
+
+var Module.sourceSetName
+        by UserDataProperty(Key.create<String>("SOURCE_SET_NAME"))
 
 interface GradleProjectImportHandler {
     companion object : ProjectExtensionDescriptor<GradleProjectImportHandler>(
@@ -75,7 +84,8 @@ class KotlinGradleSourceSetDataService : AbstractProjectDataService<GradleSource
             val ideModule = modelsProvider.findIdeModule(sourceSetData) ?: continue
 
             val moduleNode = ExternalSystemApiUtil.findParent(sourceSetNode, ProjectKeys.MODULE) ?: continue
-            val kotlinFacet = configureFacetByGradleModule(moduleNode, sourceSetNode, ideModule, modelsProvider) ?: continue
+            val sourceSetName = sourceSetNode.data.id.let { it.substring(it.lastIndexOf(':') + 1) }
+            val kotlinFacet = configureFacetByGradleModule(moduleNode, sourceSetName, ideModule, modelsProvider) ?: continue
             GradleProjectImportHandler.getInstances(project).forEach { it.importBySourceSet(kotlinFacet, sourceSetNode) }
         }
     }
@@ -167,7 +177,7 @@ private fun detectPlatformByLibrary(moduleNode: DataNode<ModuleData>): TargetPla
 
 fun configureFacetByGradleModule(
         moduleNode: DataNode<ModuleData>,
-        sourceSetNode: DataNode<GradleSourceSetData>?,
+        sourceSetName: String?,
         ideModule: Module,
         modelsProvider: IdeModifiableModelsProvider
 ): KotlinFacet? {
@@ -192,20 +202,25 @@ fun configureFacetByGradleModule(
     val kotlinFacet = ideModule.getOrCreateFacet(modelsProvider, false)
     kotlinFacet.configureFacet(compilerVersion, coroutinesProperty, platformKind, modelsProvider)
 
-    val sourceSetName = sourceSetNode?.data?.id?.let { it.substring(it.lastIndexOf(':') + 1) } ?: "main"
+    ideModule.compilerArgumentsBySourceSet = moduleNode.compilerArgumentsBySourceSet
+    ideModule.sourceSetName = sourceSetName
 
-    val argsInfo = moduleNode.compilerArgumentsBySourceSet?.get(sourceSetName)
+    val argsInfo = moduleNode.compilerArgumentsBySourceSet?.get(sourceSetName ?: "main")
     if (argsInfo != null) {
-        val currentCompilerArguments = argsInfo.currentArguments
-        val defaultCompilerArguments = argsInfo.defaultArguments
-        val dependencyClasspath = argsInfo.dependencyClasspath.map { PathUtil.toSystemIndependentName(it) }
-        if (currentCompilerArguments.isNotEmpty()) {
-            parseCompilerArgumentsToFacet(currentCompilerArguments, defaultCompilerArguments, kotlinFacet, modelsProvider)
-        }
-        adjustClasspath(kotlinFacet, dependencyClasspath)
+        configureFacetByCompilerArguments(kotlinFacet, argsInfo, modelsProvider)
     }
 
     return kotlinFacet
+}
+
+fun configureFacetByCompilerArguments(kotlinFacet: KotlinFacet, argsInfo: ArgsInfo, modelsProvider: IdeModifiableModelsProvider?) {
+    val currentCompilerArguments = argsInfo.currentArguments
+    val defaultCompilerArguments = argsInfo.defaultArguments
+    val dependencyClasspath = argsInfo.dependencyClasspath.map { PathUtil.toSystemIndependentName(it) }
+    if (currentCompilerArguments.isNotEmpty()) {
+        parseCompilerArgumentsToFacet(currentCompilerArguments, defaultCompilerArguments, kotlinFacet, modelsProvider)
+    }
+    adjustClasspath(kotlinFacet, dependencyClasspath)
 }
 
 private fun adjustClasspath(kotlinFacet: KotlinFacet, dependencyClasspath: List<String>) {
