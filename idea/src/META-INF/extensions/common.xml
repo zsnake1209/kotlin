@@ -2,6 +2,14 @@
     <id>org.jetbrains.kotlin</id>
 
     <extensionPoints>
+        <extensionPoint name="facetValidatorCreator"
+                        interface="org.jetbrains.kotlin.idea.facet.KotlinFacetValidatorCreator"/>
+        <extensionPoint name="clearBuildState"
+                        interface="org.jetbrains.kotlin.idea.compiler.configuration.ClearBuildStateExtension"/>
+        <extensionPoint name="newFileHook"
+                        interface="org.jetbrains.kotlin.idea.actions.NewKotlinFileHook"/>
+        <extensionPoint name="completionExtension"
+                        interface="org.jetbrains.kotlin.idea.completion.KotlinCompletionExtension"/>
         <extensionPoint name="defaultErrorMessages"
                         interface="org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages$Extension"/>
         <extensionPoint name="suppressStringProvider"

@@ -5,8 +5,11 @@ jvmTarget = "1.6"
 
 dependencies {
     compile(project(":core"))
-    compile(ideaSdkCoreDeps(*(rootProject.extra["ideaCoreSdkJars"] as Array<String>)))
-    compile(ideaSdkDeps("jps-model.jar", subdir = "jps"))
+    if (!isClionBuild()) {
+        compile(ideaSdkCoreDeps(*(rootProject.extra["ideaCoreSdkJars"] as Array<String>)))
+    } else {
+        compile(clionSdkDeps("openapi", "util", "annotations", "log4j", "trove4j", "guava"))
+    }
 }
 
 sourceSets {
