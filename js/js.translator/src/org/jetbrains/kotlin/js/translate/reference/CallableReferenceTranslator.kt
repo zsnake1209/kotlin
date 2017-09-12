@@ -27,14 +27,14 @@ import org.jetbrains.kotlin.js.translate.callTranslator.CallTranslator
 import org.jetbrains.kotlin.js.translate.context.Namer
 import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.general.Translation
-import org.jetbrains.kotlin.js.translate.utils.BindingUtils
+import org.jetbrains.kotlin.js.translate.utils.JsDescriptorUtils
 import org.jetbrains.kotlin.js.translate.utils.TranslationUtils
 import org.jetbrains.kotlin.js.translate.utils.finalElement
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.callUtil.getFunctionResolvedCallWithAssert
 import org.jetbrains.kotlin.resolve.calls.callUtil.getPropertyResolvedCallWithAssert
+import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCallWithAssert
 import org.jetbrains.kotlin.resolve.calls.model.DelegatingResolvedCall
 import org.jetbrains.kotlin.resolve.calls.model.ExpressionValueArgument
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
@@ -42,38 +42,29 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedValueArgument
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.resolve.calls.util.CallMaker
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
-import org.jetbrains.kotlin.types.expressions.DoubleColonLHS
+import org.jetbrains.kotlin.resolve.scopes.receivers.ExpressionReceiver
+import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver
+import org.jetbrains.kotlin.resolve.scopes.receivers.ImplicitClassReceiver
+import org.jetbrains.kotlin.resolve.scopes.receivers.TransientReceiver
 
 object CallableReferenceTranslator {
 
     fun translate(expression: KtCallableReferenceExpression, context: TranslationContext): JsExpression {
-        val descriptor = BindingUtils.getDescriptorForReferenceExpression(context.bindingContext(), expression.callableReference)
+        val referencedFunction = expression.callableReference.getResolvedCallWithAssert(context.bindingContext())
+        val descriptor = referencedFunction.getResultingDescriptor()
 
-        val receiverExpression = expression.receiverExpression
-        val receiver = when {
-            receiverExpression != null -> {
-                if (context.bindingContext().get(BindingContext.DOUBLE_COLON_LHS, receiverExpression) is DoubleColonLHS.Expression &&
-                    descriptor is CallableMemberDescriptor &&
-                    descriptor.dispatchReceiverParameter ?: descriptor.extensionReceiverParameter != null
-                        ) {
-                    val block = JsBlock()
-                    val e = Translation.translateAsExpression(receiverExpression, context, block)
-                    if (!block.isEmpty) {
-                        context.addStatementsToCurrentBlockFrom(block)
-                    }
-                    e
-                }
-                else {
-                    null
-                }
+        val extensionReceiver = referencedFunction.extensionReceiver
+        val dispatchReceiver = referencedFunction.dispatchReceiver
+        assert(dispatchReceiver == null || extensionReceiver == null) { "Cannot generate reference with both receivers: " + descriptor }
+
+        val receiver = (dispatchReceiver ?: extensionReceiver)?.let {
+            when (it) {
+                is TransientReceiver -> null
+                is ImplicitClassReceiver -> context.getDispatchReceiver(JsDescriptorUtils.getReceiverParameterForReceiver(it))
+                is ExtensionReceiver -> JsThisRef()
+                is ExpressionReceiver -> Translation.translateAsExpression(it.expression, context)
+                else -> throw UnsupportedOperationException("Unsupported receiver value: " + it)
             }
-            descriptor is CallableDescriptor -> {
-                val extensionReceiver = descriptor.extensionReceiverParameter
-                val dispatchReceiver = descriptor.dispatchReceiverParameter
-                assert(dispatchReceiver == null || extensionReceiver == null) { "Cannot generate reference with both receivers: " + descriptor }
-                (dispatchReceiver ?: extensionReceiver)?.let { context.getDispatchReceiver(it) }
-            }
-            else -> null
         }
 
         return when (descriptor) {
