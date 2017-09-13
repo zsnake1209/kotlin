@@ -278,7 +278,7 @@ class KotlinCompletionContributor : CompletionContributor() {
             return
         }
 
-        for (extension in KotlinCompletionExtension.EP_NAME.getExtensions(parameters.position.project)) {
+        for (extension in KotlinCompletionExtension.EP_NAME.getExtensions()) {
             if (extension.perform(parameters, result)) return
         }
 
