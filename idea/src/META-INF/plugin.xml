@@ -2605,6 +2605,7 @@
     <projectOpenProcessor implementation="org.jetbrains.kotlin.gradle.GradleKotlinDSLProjectOpenProcessor"/>
     <projectImportProvider implementation="org.jetbrains.kotlin.gradle.GradleKotlinDSLProjectImportProvider"/>
 
+    <additionalLibraryRootsProvider implementation="org.jetbrains.kotlin.idea.core.script.dependencies.ScriptDependenciesLibraryProvider"/>
     <codeInsight.intention.jvmCommonIntentionActionsFactory language="kotlin" implementationClass="org.jetbrains.kotlin.idea.intentions.KotlinCommonIntentionActionsFactory"/>
   </extensions>
 
