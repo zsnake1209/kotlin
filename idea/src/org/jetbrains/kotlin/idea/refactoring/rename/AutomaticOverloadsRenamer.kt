@@ -24,8 +24,6 @@ import com.intellij.refactoring.rename.naming.AutomaticRenamer
 import com.intellij.refactoring.rename.naming.AutomaticRenamerFactory
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.annotations.TestOnly
-import org.jetbrains.kotlin.descriptors.CallableDescriptor
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
@@ -34,7 +32,6 @@ import org.jetbrains.kotlin.idea.highlighter.markers.headerDescriptor
 import org.jetbrains.kotlin.idea.util.getAllAccessibleFunctions
 import org.jetbrains.kotlin.idea.util.getResolutionScope
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.UserDataProperty
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
@@ -71,7 +68,7 @@ private fun KtNamedFunction.getOverloads(): Collection<FunctionDescriptor> {
     val scope = getResolutionScope(context, resolutionFacade)
     val extensionReceiverClass = descriptor.extensionReceiverParameter?.type?.constructor?.declarationDescriptor as? ClassDescriptor
 
-    if (descriptor.isImpl && descriptor.headerDescriptor() != null) return emptyList()
+    if (descriptor.isActual && descriptor.headerDescriptor() != null) return emptyList()
 
     val result = LinkedHashSet<FunctionDescriptor>()
     result += scope.getAllAccessibleFunctions(name)
