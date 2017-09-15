@@ -20,10 +20,7 @@ import org.gradle.api.logging.LogLevel
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.gradle.plugin.CopyClassesToJavaOutputStatus
 import org.jetbrains.kotlin.gradle.tasks.USING_INCREMENTAL_COMPILATION_MESSAGE
-import org.jetbrains.kotlin.gradle.util.checkBytecodeContains
-import org.jetbrains.kotlin.gradle.util.getFileByName
-import org.jetbrains.kotlin.gradle.util.getFilesByNames
-import org.jetbrains.kotlin.gradle.util.modify
+import org.jetbrains.kotlin.gradle.util.*
 import org.junit.Test
 import java.io.File
 import java.util.zip.ZipFile
@@ -490,6 +487,27 @@ class KotlinGradleIT: BaseGradleIT() {
     }
 
     @Test
+    fun testIncrementalTestCompile() {
+        val project = Project("kotlinProject", GRADLE_VERSION)
+        val options = defaultBuildOptions().copy(incremental = true)
+
+        project.build("build", options = options) {
+            assertSuccessful()
+        }
+
+        val joinerKt = project.projectDir.getFileByName("KotlinGreetingJoiner.kt")
+        joinerKt.modify {
+            it.replace("class KotlinGreetingJoiner", "internal class KotlinGreetingJoiner")
+        }
+
+        project.build("build", options = options) {
+            assertSuccessful()
+            val testJoinerKt = project.projectDir.getFileByName("TestKotlinGreetingJoiner.kt")
+            assertCompiledKotlinSources(project.relativize(joinerKt, testJoinerKt))
+        }
+    }
+
+    @Test
     fun testLanguageVersionApiVersionExplicit() {
         val project = Project("kotlinProject", "3.3")
         project.setupWorkingDir()
@@ -540,7 +558,7 @@ class KotlinGradleIT: BaseGradleIT() {
 
     @Test
     fun testSeparateOutputGradle40() {
-        val project = Project("kotlinJavaProject", "4.0")
+        val project = Project("kotlinJavaProject", GRADLE_VERSION)
         project.build("compileDeployKotlin", "assemble") {
             assertSuccessful()
 
@@ -563,7 +581,7 @@ class KotlinGradleIT: BaseGradleIT() {
 
     @Test
     fun testArchiveBaseNameForModuleName() {
-        val project = Project("simpleProject", "4.0")
+        val project = Project("simpleProject", GRADLE_VERSION)
         project.setupWorkingDir()
 
         val archivesBaseName = "myArchivesBaseName"
@@ -587,7 +605,7 @@ class KotlinGradleIT: BaseGradleIT() {
 
     @Test
     fun testJavaPackagePrefix() {
-        val project = Project("javaPackagePrefix", "4.0")
+        val project = Project("javaPackagePrefix", GRADLE_VERSION)
         project.build("build") {
             assertSuccessful()
 
