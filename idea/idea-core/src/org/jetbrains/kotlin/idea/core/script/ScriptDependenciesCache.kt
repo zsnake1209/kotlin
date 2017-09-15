@@ -60,12 +60,6 @@ internal class ScriptDependenciesCache(private val project: Project) {
         allLibrarySourcesCache.clear()
         allLibrarySourcesScope.clear()
 
-        val kotlinScriptDependenciesClassFinder =
-                Extensions.getArea(project).getExtensionPoint(PsiElementFinder.EP_NAME).extensions
-                        .filterIsInstance<KotlinScriptDependenciesClassFinder>()
-                        .single()
-
-        kotlinScriptDependenciesClassFinder.clearCache()
         updateHighlighting(file)
     }
 
