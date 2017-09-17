@@ -178,7 +178,8 @@ public class JavaElementFinder extends PsiElementFinder implements KotlinFinderM
 
         Collection<FqName> subpackages = lightClassGenerationSupport.getSubPackages(packageFQN, scope);
 
-        Collection<PsiPackage> answer = Collections2.transform(subpackages, input -> new KtLightPackage(psiManager, input, scope));
+        Collection<PsiPackage> answer =
+                Collections2.<FqName, PsiPackage>transform(subpackages, input -> new KtLightPackage(psiManager, input, scope));
 
         return answer.toArray(new PsiPackage[answer.size()]);
     }
