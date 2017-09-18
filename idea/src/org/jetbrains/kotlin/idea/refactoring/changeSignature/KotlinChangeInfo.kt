@@ -531,7 +531,7 @@ fun ChangeInfo.toJetChangeInfo(
 ): KotlinChangeInfo {
     val method = method as PsiMethod
 
-    val functionDescriptor = method.getJavaOrKotlinMemberDescriptor(resolutionFacade) as CallableDescriptor
+    val functionDescriptor = (resolutionFacade?.let { method.getJavaOrKotlinMemberDescriptor(it) } ?: method.getJavaOrKotlinMemberDescriptor()) as CallableDescriptor
     val parameterDescriptors = functionDescriptor.valueParameters
 
     //noinspection ConstantConditions
