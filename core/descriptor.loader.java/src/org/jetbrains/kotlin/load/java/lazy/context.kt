@@ -81,14 +81,9 @@ class JavaTypeQualifiersByElementType(
         val nullabilityQualifierWithMigrationStatus =
                 nullabilityQualifiers[applicabilityType]
                 ?: nullabilityQualifiers[AnnotationTypeQualifierResolver.QualifierApplicabilityType.TYPE_USE]
-                ?: return null
+        ?: return null
 
-        return JavaTypeQualifiers(
-                nullabilityQualifierWithMigrationStatus.qualifier, null,
-                isNotNullTypeParameter = false,
-                isNullabilityQualifierForWarning = nullabilityQualifierWithMigrationStatus.isForWarningOnly
-        )
-    }
+        return JavaTypeQualifiers(nullabilityQualifierWithMigrationStatus.qualifier, null, isNotNullTypeParameter = false, isNullabilityQualifierForWarning = nullabilityQualifierWithMigrationStatus.isForWarningOnly) }
 }
 
 class LazyJavaResolverContext internal constructor(
@@ -151,7 +146,12 @@ private fun LazyJavaResolverContext.extractDefaultNullabilityQualifier(
             typeQualifierResolver.resolveTypeQualifierDefaultAnnotation(annotationDescriptor)
             ?: return null
 
-    val jsr305State = typeQualifierResolver.resolveJsr305AnnotationState(typeQualifier).takeIf { it != ReportLevel.IGNORE } ?: return null
+    val jsr305State = typeQualifierResolver.resolveJsr305CustomState(annotationDescriptor)
+                      ?: typeQualifierResolver.resolveJsr305AnnotationState(typeQualifier)
+
+    if (jsr305State.isIgnore) {
+        return null
+    }
 
     val nullabilityQualifier =
             components
