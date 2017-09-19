@@ -266,6 +266,12 @@ public class CliTestGenerated extends AbstractCliTest {
             doJvmTest(fileName);
         }
 
+        @TestMetadata("jsr305MigrationFqNameIgnore.args")
+        public void testJsr305MigrationFqNameIgnore() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/cli/jvm/jsr305MigrationFqNameIgnore.args");
+            doJvmTest(fileName);
+        }
+
         @TestMetadata("jsr305MigrationIgnore.args")
         public void testJsr305MigrationIgnore() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/cli/jvm/jsr305MigrationIgnore.args");
