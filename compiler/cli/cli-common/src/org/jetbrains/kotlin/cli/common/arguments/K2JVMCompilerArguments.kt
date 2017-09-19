@@ -171,7 +171,7 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
                                "|@<fully qualified class name>:{ignore|strict|warn}",
             description = "Specify behaviors for JSR-305 nullability annotations for: " +
                           "global, annotated with @UnderMigration or custom annotation " +
-                          "with specific value: ignore, treat as other supported nullability annotations, or report a warning." +
+                          "with specific value: ignore, treat as other supported nullability annotations, or report a warning. " +
                           "Note that strict value is experimental yet"
     )
     var jsr305: Array<String>? by FreezableVar(null)

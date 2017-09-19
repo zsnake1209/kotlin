@@ -34,8 +34,6 @@ import org.jetbrains.kotlin.load.kotlin.DeserializedDescriptorResolver
 import org.jetbrains.kotlin.load.kotlin.KotlinClassFinder
 import org.jetbrains.kotlin.serialization.deserialization.ErrorReporter
 import org.jetbrains.kotlin.storage.StorageManager
-import org.jetbrains.kotlin.utils.ReportLevel
-import sun.awt.event.IgnorePaintEvent
 import java.util.*
 
 class JavaResolverComponents(

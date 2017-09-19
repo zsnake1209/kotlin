@@ -100,10 +100,9 @@ class AnnotationTypeQualifierResolver(storageManager: StorageManager, private va
             return null
         }
 
-        return BUILT_IN_TYPE_QUALIFIER_DEFAULT_ANNOTATIONS[annotationDescriptor.fqName]?.let {
+        return BUILT_IN_TYPE_QUALIFIER_DEFAULT_ANNOTATIONS[annotationDescriptor.fqName]?.let { (qualifier, applicability) ->
             val state = resolveJsr305AnnotationState(annotationDescriptor).takeIf { it != ReportLevel.IGNORE } ?: return null
-            val qualifier = it.nullabilityQualifier.copy(isForWarningOnly = state.isWarning)
-            return NullabilityQualifierWithApplicability(qualifier, it.qualifierApplicabilityTypes)
+            return NullabilityQualifierWithApplicability(qualifier.copy(isForWarningOnly = state.isWarning), applicability)
         }
     }
 

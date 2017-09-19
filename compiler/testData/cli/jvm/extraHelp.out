@@ -10,7 +10,7 @@ where advanced options include:
   -Xmodule-path=<path>       Paths where to find Java 9+ modules
   -Xjavac-arguments=<option[,]> Java compiler arguments
   -Xjsr305={ignore|strict|warn}|under-migration:{ignore-strict-warn}|@<fully qualified class name>:{ignore|strict|warn}
-                             Specify behaviors for JSR-305 nullability annotations for: global, annotated with @UnderMigration or custom annotation with specific value: ignore, treat as other supported nullability annotations, or report a warning.Note that strict value is experimental yet
+                             Specify behaviors for JSR-305 nullability annotations for: global, annotated with @UnderMigration or custom annotation with specific value: ignore, treat as other supported nullability annotations, or report a warning. Note that strict value is experimental yet
   -Xload-builtins-from-dependencies
                              Load definitions of built-in declarations from module dependencies, instead of from the compiler
   -Xno-call-assertions       Don't generate not-null assertions for arguments of platform types
