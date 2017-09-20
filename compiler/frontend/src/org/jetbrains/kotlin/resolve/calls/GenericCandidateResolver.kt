@@ -59,6 +59,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.TypeUtils.DONT_CARE
 import org.jetbrains.kotlin.types.expressions.ControlStructureTypingUtils.ResolveConstruct
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingUtils
+import org.jetbrains.kotlin.types.typeUtil.contains
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -136,6 +137,21 @@ class GenericCandidateResolver(
                 typeVariableSubstitutors[call.toHandle()]?.substitute(it, Variance.INVARIANT)
             }
 
+    private fun FunctionDescriptor.isFunctionForExpectTypeFromCastFeature(): Boolean {
+        val typeParameter = typeParameters.singleOrNull() ?: return false
+
+        val returnType = returnType ?: return false
+        if (returnType is DeferredType && returnType.isComputing) return false
+
+        if (returnType.constructor != typeParameter.typeConstructor) return false
+
+        fun KotlinType.isBadType() = contains { it.constructor == typeParameter.typeConstructor }
+
+        if (valueParameters.any { it.type.isBadType() } || extensionReceiverParameter?.type?.isBadType() == true) return false
+
+        return true
+    }
+
     private fun addExpectedTypeForExplicitCast(
             context: CallCandidateResolutionContext<*>,
             builder: ConstraintSystem.Builder
@@ -154,15 +170,9 @@ class GenericCandidateResolver(
         val leftType = context.trace.get(BindingContext.TYPE, binaryParent.right ?: return) ?: return
         val expectedType = if (operationType == KtTokens.AS_SAFE) leftType.makeNullable() else leftType
 
-        val returnType = candidateDescriptor.returnType ?: return
-        val typeInSystem = builder.typeInSystem(context.call, returnType) ?: return
+        if (context.candidateCall.call.typeArgumentList != null || !candidateDescriptor.isFunctionForExpectTypeFromCastFeature()) return
 
-        val constraintSystem = builder.build()
-        val typeVariable = constraintSystem.typeVariables.firstOrNull {
-            it.freshTypeParameter.typeConstructor == typeInSystem.constructor
-        } ?: return
-        val typeBounds = constraintSystem.getTypeBounds(typeVariable)
-        if (typeBounds.bounds.any { it.position.isStrong() && it.isProper }) return
+        val typeInSystem = builder.typeInSystem(context.call, candidateDescriptor.returnType ?: return) ?: return
 
         context.trace.record(BindingContext.CAST_TYPE_USED_AS_EXPECTED_TYPE, binaryParent)
         builder.addSubtypeConstraint(typeInSystem, expectedType, ConstraintPositionKind.SPECIAL.position())

@@ -6,7 +6,7 @@ fun <V> id(value: V) = value
 
 val asString = foo() as String
 
-val viaId = id(foo()) as String
+val viaId = <!TYPE_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>id<!>(<!TYPE_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>foo<!>()) as String
 
 val insideId = id(foo() as String)
 
