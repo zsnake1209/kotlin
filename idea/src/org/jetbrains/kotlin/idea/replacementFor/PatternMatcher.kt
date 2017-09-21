@@ -44,15 +44,15 @@ data class ReplacementForPatternMatch(
 )
 
 class PatternMatcher(
-        private val callable: FunctionDescriptor,
+        private val callable: FunctionDescriptor?,
         private val pattern: KtExpression,
         analyzePattern: () -> BindingContext?
 ) {
-    private val parametersByName: Map<String, ValueParameterDescriptor> = callable.valueParameters.associateBy { it.name.asString() }
+    private val parametersByName: Map<String, ValueParameterDescriptor> = callable?.valueParameters?.associateBy { it.name.asString() } ?: emptyMap()
     private val patternBindingContext by lazy { analyzePattern() }
 
     //TODO: type arguments
-    private class Match(val arguments: Map<ParameterDescriptor, KtExpression>) {
+    class Match(val arguments: Map<ParameterDescriptor, KtExpression>) {
         fun isEmpty() = arguments.isEmpty()
 
         companion object {
@@ -60,15 +60,10 @@ class PatternMatcher(
         }
     }
 
-    fun matchExpression(expression: KtExpression, bindingContext: BindingContext, annotationData: PatternAnnotationData): ReplacementForPatternMatch? {
+    fun matchExpression(expression: KtExpression, bindingContext: BindingContext?): PatternMatcher.Match? {
         //TODO: which other "not really expressions" exist?
         if (expression.getQualifiedExpressionForSelector() != null) return null
 
-        val match = doMatchExpression(expression, bindingContext) ?: return null
-        return ReplacementForPatternMatch(callable, annotationData, match.arguments)
-    }
-
-    private fun doMatchExpression(expression: KtExpression, bindingContext: BindingContext?): Match? {
         return matchExpressionPart(expression, pattern, bindingContext)
     }
 
@@ -104,12 +99,14 @@ class PatternMatcher(
             }
 
             is KtThisExpression -> {
-                if (part !is KtExpression) return null
-                if (patternPart.labelQualifier != null) return null //TODO: can we support this at all?
-                val receiverParameter = callable.extensionReceiverParameter
-                                        ?: callable.dispatchReceiverParameter
-                                        ?: return null /*TODO?*/
-                return Match(mapOf(receiverParameter to part))
+                if (callable != null) {
+                    if (part !is KtExpression) return null
+                    if (patternPart.labelQualifier != null) return null //TODO: can we support this at all?
+                    val receiverParameter = callable.extensionReceiverParameter
+                                            ?: callable.dispatchReceiverParameter
+                                            ?: return null /*TODO?*/
+                    return Match(mapOf(receiverParameter to part))
+                }
             }
 
             is KtDotQualifiedExpression -> {
@@ -197,8 +194,8 @@ class PatternMatcher(
             }
             else {
                 //TODO: what if expressions have side effects?
-                val match = PatternMatcher(callable, currentValue, { bindingContext }).doMatchExpression(value, bindingContext) ?: return null
-                if (!match.isEmpty()) return null //TODO: can this happen?
+                val match = PatternMatcher(null, currentValue, { bindingContext }).matchExpression(value, bindingContext) ?: return null
+                assert(match.isEmpty()) // because no callable passed
             }
         }
         return Match(newArguments)

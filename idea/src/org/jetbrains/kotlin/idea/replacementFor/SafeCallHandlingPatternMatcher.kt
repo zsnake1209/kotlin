@@ -72,11 +72,13 @@ class SafeCallHandlingPatternMatcher(
         if (resolvablePattern == null) return null
         if (expression is KtSafeQualifiedExpression && resolvablePattern.expression !is KtSafeQualifiedExpression) {
             return safeMatcher
-                    ?.matchExpression(expression, bindingContext, annotationData)
-                    ?.copy(safeCallReceiver = expression.receiverExpression)
+                    ?.matchExpression(expression, bindingContext)
+                    ?.let { ReplacementForPatternMatch(callable, annotationData, it.arguments, safeCallReceiver = expression.receiverExpression) }
         }
         else {
-            return matcher!!.matchExpression(expression, bindingContext, annotationData)
+            return matcher!!
+                    .matchExpression(expression, bindingContext)
+                    ?.let { ReplacementForPatternMatch(callable, annotationData, it.arguments) }
         }
     }
 }
