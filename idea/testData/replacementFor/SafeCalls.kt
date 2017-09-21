@@ -27,6 +27,11 @@ fun B.new4(a: A?): Int? = a?.old4(this)
 @ReplacementFor("a.oldProperty")
 fun newProperty(a: A): Int = a.oldProperty
 
+fun Any?.old5(p: Any?){}
+
+@ReplacementFor("p.old5(this)")
+fun Any?.new5(p: Any?){}
+
 fun foo(a: A?, b: B) {
     val v1 = a?.old1(b)
     val v2 = a?.old2(b)
@@ -37,4 +42,8 @@ fun foo(a: A?, b: B) {
     if (a != null) a.old4(b)
 
     val v4 = a?.oldProperty
+
+    x()?.old5(x( ))
 }
+
+fun x(): Any? = null
