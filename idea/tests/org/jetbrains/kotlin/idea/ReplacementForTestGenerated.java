@@ -114,6 +114,12 @@ public class ReplacementForTestGenerated extends AbstractReplacementForTest {
         doTest(fileName);
     }
 
+    @TestMetadata("SafeCalls.kt")
+    public void testSafeCalls() throws Exception {
+        String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/SafeCalls.kt");
+        doTest(fileName);
+    }
+
     @TestMetadata("Simple.kt")
     public void testSimple() throws Exception {
         String fileName = KotlinTestUtils.navigationMetadata("idea/testData/replacementFor/Simple.kt");

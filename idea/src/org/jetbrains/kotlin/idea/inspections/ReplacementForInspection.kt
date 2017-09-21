@@ -65,7 +65,7 @@ class ReplacementForInspection : AbstractKotlinInspection() {
             val bindingContext = expression.analyze(BodyResolveMode.PARTIAL)
             val matches = matcher.match(expression, bindingContext)
             val sameMatch = matches.firstOrNull { id(it) == matchId } ?: return // something changed
-            sameMatch.replaceExpression(expression)
+            sameMatch.replaceExpression(expression, bindingContext)
         }
 
         companion object {

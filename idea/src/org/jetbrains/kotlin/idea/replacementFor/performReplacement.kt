@@ -31,14 +31,15 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.isAncestor
 import org.jetbrains.kotlin.renderer.render
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.bindingContextUtil.isUsedAsExpression
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasDefaultValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.scopes.ExplicitImportsScope
 import org.jetbrains.kotlin.resolve.scopes.utils.addImportingScope
 
-fun ReplacementForPatternMatch.replaceExpression(expression: KtExpression): KtExpression {
-    val (newExpression, addImport, shortenReceiver) = buildReplacement(this, expression)
+fun ReplacementForPatternMatch.replaceExpression(expression: KtExpression, bindingContext: BindingContext) {
+    val (newExpression, addImport, shortenReceiver) = buildReplacement(this, expression, bindingContext)
 
     val replaced = expression.replaced(newExpression)
 
@@ -47,24 +48,21 @@ fun ReplacementForPatternMatch.replaceExpression(expression: KtExpression): KtEx
     }
 
     if (shortenReceiver) {
-        val selector = (replaced as KtDotQualifiedExpression).selectorExpression
+        val selector = (extractCallFromReplacement(replaced) as KtDotQualifiedExpression).selectorExpression
         val shortenOptions = ShortenReferences.Options(removeThis = true)
-        return ShortenReferences { shortenOptions }.process(replaced, elementFilter = { element ->
+        ShortenReferences { shortenOptions }.process(replaced, elementFilter = { element ->
             if (element == selector)
                 ShortenReferences.FilterResult.SKIP
             else
                 ShortenReferences.FilterResult.PROCESS
-        }) as KtExpression
-    }
-    else {
-        return replaced
+        })
     }
 }
 
 fun ReplacementForPatternMatch.checkCorrectness(expressionToReplace: KtExpression, bindingContext: BindingContext): Boolean {
     if (callable.valueParameters.any { !arguments.containsKey(it) && !it.hasDefaultValue() }) return false // value for some parameter missing in the match
 
-    val (newExpression, addImport, _) = buildReplacement(this, expressionToReplace)
+    val (newExpression, addImport, _) = buildReplacement(this, expressionToReplace, bindingContext)
 
     var resolutionScope = expressionToReplace.getResolutionScope(bindingContext)!!
     if (addImport) {
@@ -77,7 +75,7 @@ fun ReplacementForPatternMatch.checkCorrectness(expressionToReplace: KtExpressio
         return false
     }
 
-    val resolvedCall = newExpression.getResolvedCall(newBindingContext) ?: return false
+    val resolvedCall = extractCallFromReplacement(newExpression).getResolvedCall(newBindingContext) ?: return false
     if (resolvedCall.resultingDescriptor.original != callable) return false
     
     return true
@@ -89,7 +87,7 @@ private data class Replacement(
         val shortenReceiver: Boolean
 )
 
-private fun buildReplacement(match: ReplacementForPatternMatch, expressionToBeReplaced: KtExpression): Replacement {
+private fun buildReplacement(match: ReplacementForPatternMatch, expressionToBeReplaced: KtExpression, bindingContext: BindingContext): Replacement {
     for (value in match.arguments.values) {
         assert(value.isValid)
     }
@@ -101,11 +99,31 @@ private fun buildReplacement(match: ReplacementForPatternMatch, expressionToBeRe
     var shortenReceiver = false
     val addImport = callable.isExtension
     val expression = KtPsiFactory(expressionToBeReplaced).buildExpression {
+        var generateSafeCall = false
+        var generateElseNull = false
+        val safeCallReceiver = match.safeCallReceiver
+        if (safeCallReceiver != null) {
+            if (receiverValue != null && safeCallReceiver.text == receiverValue.text) { //TODO: not by text
+                generateSafeCall = true
+            }
+            else {
+                appendFixedText("if (")
+                appendExpression(safeCallReceiver)
+                appendFixedText("!=null)")
+                generateElseNull = expressionToBeReplaced.isUsedAsExpression(bindingContext)
+            }
+        }
+
         if (receiverValue != null) {
             appendExpression(receiverValue)
-            appendFixedText(".")
-            if (receiverValue is KtThisExpression) {
-                shortenReceiver = true
+            if (generateSafeCall) {
+                appendFixedText("?.")
+            }
+            else {
+                appendFixedText(".")
+                if (receiverValue is KtThisExpression) {
+                    shortenReceiver = true
+                }
             }
         }
         else {
@@ -143,10 +161,21 @@ private fun buildReplacement(match: ReplacementForPatternMatch, expressionToBeRe
         }
 
         appendFixedText(")")
+
+        if (generateElseNull) {
+            appendFixedText(" else null")
+        }
     }
 
 
     return Replacement(expression, addImport, shortenReceiver)
+}
+
+private fun extractCallFromReplacement(replacement: KtExpression): KtExpression {
+    return when (replacement) {
+        is KtIfExpression -> replacement.then!!
+        else -> replacement
+    }
 }
 
 private fun qualifierFqName(callable: FunctionDescriptor): FqName? {

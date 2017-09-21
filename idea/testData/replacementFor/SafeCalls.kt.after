@@ -1,0 +1,40 @@
+// WITH_RUNTIME
+package x
+
+class A {
+    fun old1(b: B): Int = 0
+    fun old2(b: B): Int = 0
+    fun old3(b: B): Int = 0
+    fun old4(b: B): Int = 0
+
+    val oldProperty: Int = 0
+}
+
+class B
+
+@ReplacementFor("old1(b)")
+fun A.new1(b: B): Int = old1(b)
+
+@ReplacementFor("this.old2(b)")
+fun A.new2(b: B): Int = this.old2(b)
+
+@ReplacementFor("a.old3(this)")
+fun B.new3(a: A): Int = a.old3(this)
+
+@ReplacementFor("a?.old4(this)")
+fun B.new4(a: A?): Int? = a?.old4(this)
+
+@ReplacementFor("a.oldProperty")
+fun newProperty(a: A): Int = a.oldProperty
+
+fun foo(a: A?, b: B) {
+    val v1 = a?.new1(b)
+    val v2 = a?.new2(b)
+    val v3 = if (a != null) b.new3(a) else null
+    if (a != null) b.new3(a)
+
+    b.new4(a)
+    if (a != null) a.old4(b)
+
+    val v4 = if (a != null) newProperty(a) else null
+}
