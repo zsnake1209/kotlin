@@ -61,12 +61,9 @@ fun PatternAnnotationData.analyzeAsExpression(symbolDescriptor: CallableDescript
         return null
     }
 
-    val module = resolutionFacade.moduleDescriptor
-    val explicitImportsScope = buildExplicitImportsScope(this, resolutionFacade, module)
-    val defaultImportsScopes = buildDefaultImportsScopes(resolutionFacade, module)
-    val scope = getResolutionScope(originalDescriptor, originalDescriptor, listOf(explicitImportsScope) + defaultImportsScopes) ?: return null
+    val scope = buildResolutionScope(resolutionFacade, originalDescriptor) ?: return null
 
-    val expressionTypingServices = resolutionFacade.getFrontendService(module, ExpressionTypingServices::class.java)
+    val expressionTypingServices = resolutionFacade.getFrontendService(resolutionFacade.moduleDescriptor, ExpressionTypingServices::class.java)
 
     return ResolvablePattern(expression, { expression.analyzeInContext(scope, expressionTypingServices = expressionTypingServices) })
 }
@@ -84,11 +81,7 @@ fun PatternAnnotationData.analyzeAsUserType(
     }
     if (typeReference.typeElement !is KtUserType) return null
 
-    val module = resolutionFacade.moduleDescriptor
-
-    val explicitImportsScope = buildExplicitImportsScope(this, resolutionFacade, module)
-    val defaultImportScopes = buildDefaultImportsScopes(resolutionFacade, module)
-    val scope = getResolutionScope(symbolDescriptor, symbolDescriptor, listOf(explicitImportsScope) + defaultImportScopes) ?: return null
+    val scope = buildResolutionScope(resolutionFacade, symbolDescriptor) ?: return null
 
     val typeResolver = resolutionFacade.getFrontendService(TypeResolver::class.java)
     val bindingTrace = BindingTraceContext()
@@ -118,6 +111,13 @@ private fun CallableDescriptor.toOriginal(): CallableDescriptor {
         DescriptorUtils.unwrapFakeOverride(this)
     else
         this).original
+}
+
+private fun PatternAnnotationData.buildResolutionScope(resolutionFacade: ResolutionFacade, descriptor: DeclarationDescriptor): LexicalScope? {
+    val module = resolutionFacade.moduleDescriptor
+    val explicitImportsScope = buildExplicitImportsScope(this, resolutionFacade, module)
+    val defaultImportsScopes = buildDefaultImportsScopes(resolutionFacade, module)
+    return getResolutionScope(descriptor, descriptor, listOf(explicitImportsScope) + defaultImportsScopes)
 }
 
 private fun buildDefaultImportsScopes(resolutionFacade: ResolutionFacade, module: ModuleDescriptor): List<ImportingScope> {
