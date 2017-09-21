@@ -19,7 +19,10 @@ package org.jetbrains.kotlin.idea.replacementFor
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.ParameterDescriptor
+import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.quickfix.replacement.PatternAnnotationData
 import org.jetbrains.kotlin.idea.util.getImplicitReceiversWithInstanceToExpression
@@ -36,7 +39,8 @@ import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 data class ReplacementForPatternMatch(
         val callable: FunctionDescriptor,
         val annotationData: PatternAnnotationData,
-        val arguments: Map<ParameterDescriptor, KtExpression>
+        val arguments: Map<ParameterDescriptor, KtExpression>,
+        val safeCallReceiver: KtExpression? = null
 )
 
 class PatternMatcher(
@@ -56,15 +60,12 @@ class PatternMatcher(
         }
     }
 
-    //TODO: handle safe calls
-
     fun matchExpression(expression: KtExpression, bindingContext: BindingContext, annotationData: PatternAnnotationData): ReplacementForPatternMatch? {
         //TODO: which other "not really expressions" exist?
         if (expression.getQualifiedExpressionForSelector() != null) return null
 
         val match = doMatchExpression(expression, bindingContext) ?: return null
         return ReplacementForPatternMatch(callable, annotationData, match.arguments)
-                .takeIf { it.checkCorrectness(expression, bindingContext) }
     }
 
     private fun doMatchExpression(expression: KtExpression, bindingContext: BindingContext?): Match? {
@@ -204,7 +205,7 @@ class PatternMatcher(
     }
 }
 
-private fun expressionForImplicitReceiver(callElement: KtElement, bindingContext: BindingContext): KtExpression? {
+internal fun expressionForImplicitReceiver(callElement: KtElement, bindingContext: BindingContext): KtExpression? {
     if (callElement is KtNameReferenceExpression) {
         val classDescriptor = bindingContext[BindingContext.REFERENCE_TARGET, callElement] as? ClassDescriptor
         if (classDescriptor != null) {
@@ -241,3 +242,4 @@ private fun expressionForImplicitReceiver(callElement: KtElement, bindingContext
         return KtPsiFactory(callElement).createExpression(fqName.parent().render())
     }
 }
+

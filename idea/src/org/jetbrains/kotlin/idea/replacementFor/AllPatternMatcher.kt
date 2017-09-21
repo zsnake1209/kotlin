@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.core.KotlinIndicesHelper
 import org.jetbrains.kotlin.idea.quickfix.replacement.PatternAnnotationData
-import org.jetbrains.kotlin.idea.quickfix.replacement.analyzeAsExpression
 import org.jetbrains.kotlin.idea.stubindex.ReplacementForAnnotationIndex
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
@@ -33,8 +32,6 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.constants.StringValue
 import org.jetbrains.kotlin.utils.SmartList
-import org.jetbrains.kotlin.utils.addIfNotNull
-import org.jetbrains.kotlin.utils.getOrPutNullable
 
 //TODO: code duplication
 private fun KtExpression.callNameExpression(): KtNameReferenceExpression? {
@@ -54,8 +51,7 @@ class AllPatternMatcher(private val file: KtFile) {
 
     private data class MatcherKey(val descriptor: FunctionDescriptor, val patternData: PatternAnnotationData)
 
-    private val matchers = HashMap<MatcherKey, PatternMatcher?>()
-
+    private val matchers = HashMap<MatcherKey, SafeCallHandlingPatternMatcher>()
 
     fun match(expression: KtExpression, bindingContext: BindingContext): Collection<ReplacementForPatternMatch> {
         val name = expression.callNameExpression()?.getReferencedName() ?: return emptyList()
@@ -72,12 +68,15 @@ class AllPatternMatcher(private val file: KtFile) {
         for (descriptor in functionDescriptors) {
             val patterns = extractReplacementForPatterns(descriptor)
             for (pattern in patterns) {
-                val matcher = matchers.getOrPutNullable(MatcherKey(descriptor, pattern)) {
-                    val resolvablePattern = pattern.analyzeAsExpression(descriptor, resolutionFacade)
-                                            ?: return@getOrPutNullable null
-                    PatternMatcher(descriptor, resolvablePattern.expression, resolvablePattern.analyze)
-                } ?: continue
-                result.addIfNotNull(matcher.matchExpression(expression, bindingContext, pattern))
+                val matcher = matchers.getOrPut(MatcherKey(descriptor, pattern)) {
+                    SafeCallHandlingPatternMatcher(pattern, descriptor, resolutionFacade)
+                }
+
+                val match = matcher.matchExpression(expression, bindingContext, pattern) ?: continue
+
+                if (match.checkCorrectness(expression, bindingContext)) {
+                    result.add(match)
+                }
             }
         }
         return result
