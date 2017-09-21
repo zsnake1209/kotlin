@@ -103,7 +103,7 @@ private fun buildReplacement(match: ReplacementForPatternMatch, expressionToBeRe
         var generateElseNull = false
         val safeCallReceiver = match.safeCallReceiver
         if (safeCallReceiver != null) {
-            if (receiverValue != null && safeCallReceiver.text == receiverValue.text) { //TODO: not by text
+            if (receiverValue != null && matchExpressions(safeCallReceiver, receiverValue)) {
                 generateSafeCall = true
             }
             else {
@@ -169,6 +169,11 @@ private fun buildReplacement(match: ReplacementForPatternMatch, expressionToBeRe
 
 
     return Replacement(expression, addImport, shortenReceiver)
+}
+
+private fun matchExpressions(expression1: KtExpression, expression2: KtExpression): Boolean {
+    if (expression1 == expression2) return true
+    return PatternMatcher(null, expression1, { null }).matchExpression(expression2, null) != null
 }
 
 private fun extractCallFromReplacement(replacement: KtExpression): KtExpression {
