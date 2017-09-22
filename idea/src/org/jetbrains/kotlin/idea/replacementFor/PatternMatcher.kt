@@ -215,15 +215,11 @@ internal fun expressionForImplicitReceiver(callElement: KtElement, bindingContex
     val resolvedCall = callElement.getResolvedCall(bindingContext) ?: return null
     val dispatchReceiver = resolvedCall.dispatchReceiver
     val extensionReceiver = resolvedCall.extensionReceiver
-    val receiverValue = when {
-        dispatchReceiver != null -> {
-            if (extensionReceiver != null) return null // TODO: calls with both receivers?
-            dispatchReceiver
-        }
-        extensionReceiver != null -> extensionReceiver
-        else -> null
-    }
 
+    // TODO: calls with both receivers?
+    if (dispatchReceiver != null && extensionReceiver != null) return null
+
+    val receiverValue = dispatchReceiver ?: extensionReceiver
     if (receiverValue != null) {
         val resolutionScope = callElement.getResolutionScope(bindingContext)!!
         val receiverExpressionFactory = resolutionScope.getImplicitReceiversWithInstanceToExpression().entries
