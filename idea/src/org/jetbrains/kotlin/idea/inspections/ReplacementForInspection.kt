@@ -70,7 +70,7 @@ class ReplacementForInspection : AbstractKotlinInspection() {
 
         companion object {
             private fun id(match: ReplacementForPatternMatch) =
-                    DescriptorRenderer.FQ_NAMES_IN_TYPES.render(match.callable) + "#" + match.annotationData.pattern
+                    Pair(DescriptorRenderer.FQ_NAMES_IN_TYPES.render(match.callable), match.annotationData.pattern)
         }
     }
 }
