@@ -22,7 +22,7 @@ plugins {
 }
 
 // Set to false to disable proguard run on kotlin-compiler.jar. Speeds up the build
-val shrink = true
+val shrink = !isClionBuild()
 val compilerManifestClassPath =
         "kotlin-stdlib.jar kotlin-reflect.jar kotlin-script-runtime.jar"
 

@@ -39,8 +39,8 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 
 class AddReflectionQuickFix(element: KtElement)
-        : AddKotlinLibQuickFix(element, listOf(LibraryJarDescriptor.REFLECT_JAR,
-                                               LibraryJarDescriptor.REFLECT_SRC_JAR)) {
+    : AddKotlinLibQuickFix(element, listOf(LibraryJarDescriptor.REFLECT_JAR,
+                                           LibraryJarDescriptor.REFLECT_SRC_JAR)) {
     override fun getText() = KotlinBundle.message("add.reflection.to.classpath")
     override fun getFamilyName() = text
 
@@ -53,8 +53,8 @@ class AddReflectionQuickFix(element: KtElement)
 }
 
 class AddTestLibQuickFix(element: KtElement)
-        : AddKotlinLibQuickFix(element, listOf(LibraryJarDescriptor.TEST_JAR,
-                                               LibraryJarDescriptor.TEST_SRC_JAR)) {
+    : AddKotlinLibQuickFix(element, listOf(LibraryJarDescriptor.TEST_JAR,
+                                           LibraryJarDescriptor.TEST_SRC_JAR)) {
     override fun getText() = KotlinBundle.message("add.test.to.classpath")
     override fun getFamilyName() = text
 

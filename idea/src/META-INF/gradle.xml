@@ -43,6 +43,8 @@
 
         <projectTaskRunner implementation="org.jetbrains.kotlin.idea.run.MultiplatformGradleProjectTaskRunner" order="first"/>
         <orderEnumerationHandlerFactory implementation="org.jetbrains.kotlin.idea.run.MultiplatformGradleOrderEnumeratorHandler$FactoryImpl" order="first"/>
+
+        <moduleBuilder builderClass="org.jetbrains.kotlin.gradle.kdsl.GradleModuleBuilder"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">

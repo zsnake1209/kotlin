@@ -1,16 +1,19 @@
 @file:Suppress("unused") // usages in build scripts are not tracked properly
 
-import org.gradle.api.*
+import org.gradle.api.GradleException
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.embeddedKotlinVersion
+import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.project
+import org.gradle.kotlin.dsl.version
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 import java.io.File
-import java.util.*
 
 val bootstrapKotlinVersion: String = System.getProperty("bootstrap.kotlin.version") ?: embeddedKotlinVersion
 
@@ -40,8 +43,11 @@ fun Project.preloadedDeps(vararg artifactBaseNames: String, baseDir: File = File
 
 fun Project.ideaUltimatePreloadedDeps(vararg artifactBaseNames: String, subdir: String? = null): ConfigurableFileCollection {
     val ultimateDepsDir = File(rootDir, "ultimate", "dependencies")
-    return if (ultimateDepsDir.isDirectory) preloadedDeps(*artifactBaseNames, baseDir = ultimateDepsDir, subdir = subdir)
-    else files()
+    if (ultimateDepsDir.isDirectory) {
+        return preloadedDeps(*artifactBaseNames, baseDir = ultimateDepsDir, subdir = subdir)
+    } else {
+        return files()
+    }
 }
 
 fun Project.ideaSdkDeps(vararg artifactBaseNames: String, subdir: String = "lib"): ConfigurableFileCollection =
@@ -50,7 +56,7 @@ fun Project.ideaSdkDeps(vararg artifactBaseNames: String, subdir: String = "lib"
 fun Project.ideaUltimateSdkDeps(vararg artifactBaseNames: String, subdir: String = "lib"): ConfigurableFileCollection {
     val ultimateSdkDir = File(rootDir, "ultimate", "ideaSDK")
     return if (ultimateSdkDir.isDirectory) preloadedDeps(*artifactBaseNames, baseDir = ultimateSdkDir, subdir = subdir)
-           else files()
+    else files()
 }
 
 fun Project.ideaSdkCoreDeps(vararg artifactBaseNames: String): ConfigurableFileCollection = ideaSdkDeps(*artifactBaseNames, subdir = "core")
@@ -62,6 +68,18 @@ fun Project.ideaPluginDeps(vararg artifactBaseNames: String, plugin: String, sub
 
 fun Project.ideaUltimatePluginDeps(vararg artifactBaseNames: String, plugin: String, subdir: String = "lib"): ConfigurableFileCollection =
         ideaUltimateSdkDeps(*artifactBaseNames, subdir = "plugins/$plugin/$subdir")
+
+fun Project.sdkDeps(vararg artifactBaseNames: String, subdir: String, sdkName: String): ConfigurableFileCollection =
+        preloadedDeps(*artifactBaseNames, baseDir = File(rootDir, sdkName), subdir = subdir)
+
+fun Project.pluginDeps(vararg artifactBaseNames: String, plugin: String, subdir: String, sdkName: String): ConfigurableFileCollection =
+        preloadedDeps(*artifactBaseNames, baseDir = File(rootDir, sdkName), subdir = "plugins/$plugin/$subdir")
+
+fun Project.clionSdkDeps(vararg artifactBaseNames: String, subdir: String = "lib"): ConfigurableFileCollection =
+        sdkDeps(*artifactBaseNames, subdir = subdir, sdkName = "clionSDK")
+
+fun Project.clionPluginDeps(vararg artifactBaseNames: String, plugin: String, subdir: String = "lib"): ConfigurableFileCollection =
+        pluginDeps(*artifactBaseNames, plugin = plugin, subdir = subdir, sdkName = "clionSDK")
 
 fun Project.kotlinDep(artifactBaseName: String, version: String? = null): String = "org.jetbrains.kotlin:kotlin-$artifactBaseName:${version ?: bootstrapKotlinVersion}"
 

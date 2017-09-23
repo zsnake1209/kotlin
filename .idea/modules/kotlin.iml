@@ -5,13 +5,6 @@
     <content url="file://$MODULE_DIR$/../..">
       <excludeFolder url="file://$MODULE_DIR$/../../.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../build" />
-      <excludeFolder url="file://$MODULE_DIR$/../../dependencies" />
-      <excludeFolder url="file://$MODULE_DIR$/../../dist" />
-      <excludeFolder url="file://$MODULE_DIR$/../../ideaSDK/androidSDK" />
-      <excludeFolder url="file://$MODULE_DIR$/../../ideaSDK/config" />
-      <excludeFolder url="file://$MODULE_DIR$/../../ideaSDK/config-idea" />
-      <excludeFolder url="file://$MODULE_DIR$/../../ideaSDK/system" />
-      <excludeFolder url="file://$MODULE_DIR$/../../ideaSDK/system-idea" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

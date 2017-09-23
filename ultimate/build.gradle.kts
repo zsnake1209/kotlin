@@ -14,6 +14,10 @@ buildscript {
     }
 }
 
+if (System.getProperty("build.for.clion") == "true") {
+    println("This is CLion build!")
+}
+
 apply { plugin("kotlin") }
 
 val ideaCommunityPlugin by configurations.creating
