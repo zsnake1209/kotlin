@@ -121,11 +121,12 @@ noDefaultJar()
 
 cleanArtifacts()
 
-dist(targetName = compilerBaseName + ".jar",
-     fromTask = if (shrink) proguard
-                else packCompiler)
+fun packTask() = if (shrink) proguard else packCompiler
 
-runtimeJarArtifactBy(proguard, proguard.outputs.files.singleFile) {
+dist(targetName = compilerBaseName + ".jar",
+     fromTask = packTask())
+
+runtimeJarArtifactBy(packTask(), packTask().outputs.files.singleFile) {
     name = compilerBaseName
     classifier = ""
 }

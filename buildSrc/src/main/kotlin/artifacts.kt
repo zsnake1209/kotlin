@@ -151,10 +151,11 @@ fun Project.ideaPlugin(subdir: String = "lib"): Copy = ideaPlugin(subdir) {
 }
 
 fun Project.clionPlugin(subdir: String = "lib", body: AbstractCopyTask.() -> Unit) {
+    val thisProject = this
     task<Copy>("clionPlugin") {
         body()
         into(File(rootProject.extra["clionPluginDir"].toString(), subdir).path)
-        rename("-${java.util.regex.Pattern.quote(rootProject.extra["build.number"].toString())}", "")
+        rename("-${java.util.regex.Pattern.quote(thisProject.version.toString())}", "")
     }
 }
 

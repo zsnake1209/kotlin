@@ -282,16 +282,16 @@ val compilerCopyTask = task<Copy>("idea-plugin-copy-compiler") {
 }
 
 task<Copy>("ideaPlugin") {
-    if (!isClionBuild()) {
-        dependsOn(compilerCopyTask)
-        dependsOnTaskIfExistsRec("idea-plugin")
-        shouldRunAfter(":prepare:idea-plugin:idea-plugin")
-        into("$ideaPluginDir/lib")
-    } else {
-        dependsOnTaskIfExistsRec("clionPlugin")
-        shouldRunAfter(":prepare:clion-plugin:clionPlugin")
-        into("$clionPluginDir/lib")
-    }
+    dependsOn(compilerCopyTask)
+    dependsOnTaskIfExistsRec("idea-plugin")
+    shouldRunAfter(":prepare:idea-plugin:idea-plugin")
+    into("$ideaPluginDir/lib")
+}
+
+task<Copy>("clionPlugin") {
+    dependsOn(":prepare:clion-plugin:clionPlugin")
+    shouldRunAfter(":prepare:clion-plugin:clionPlugin")
+    into("$clionPluginDir/lib")
 }
 
 task("dist-plugin") {
