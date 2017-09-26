@@ -64,7 +64,35 @@ dependencies {
     sideJars(ideaSdkDeps("asm-all"))
 }
 
+val ideaProjectResources =  project(":idea").the<JavaPluginConvention>().sourceSets["main"].output.resourcesDir
+val preparedResources = File(buildDir, "prepResources")
+
+val clionPluginXmlContent: String by lazy {
+    val sectRex = Regex("""^\s*</?idea-plugin>\s*$""")
+    File(ideaProjectResources, "META-INF/clion.xml")
+            .readLines()
+            .filterNot { it.matches(sectRex) }
+            .joinToString("\n")
+}
+
+val prepareResources by task<Copy> {
+    from(ideaProjectResources, {
+        exclude("META-INF/plugin.xml")
+    })
+    into(preparedResources)
+}
+
+val preparePluginXml by task<Copy> {
+    from(ideaProjectResources, { include("META-INF/plugin.xml") })
+    into(preparedResources)
+    filter {
+        it?.replace("<!-- CLION-PLUGIN-PLACEHOLDER -->", clionPluginXmlContent)
+    }
+}
+
 val jar = runtimeJar(task<ShadowJar>("shadowJar")) {
+    dependsOn(preparePluginXml)
+    from(prepareResources)
     from(files("$rootDir/resources/kotlinManifest.properties"))
     from(packedJars)
     for (p in projectsToShadow) {

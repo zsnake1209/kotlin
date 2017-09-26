@@ -10,7 +10,6 @@
 
   <depends>com.intellij.modules.platform</depends>
   <depends optional="true" config-file="jvm.xml">com.intellij.modules.java</depends>
-  <depends optional="true" config-file="clion.xml">com.intellij.modules.clion</depends>
 
   <depends optional="true" config-file="junit.xml">JUnit</depends>
   <depends optional="true" config-file="gradle.xml">org.jetbrains.plugins.gradle</depends>
@@ -25,6 +24,8 @@
   <depends optional="true" config-file="decompiler.xml">org.jetbrains.java.decompiler</depends>
 
   <!-- ULTIMATE-PLUGIN-PLACEHOLDER -->
+
+  <!-- CLION-PLUGIN-PLACEHOLDER -->
 
   <project-components>
     <component>
