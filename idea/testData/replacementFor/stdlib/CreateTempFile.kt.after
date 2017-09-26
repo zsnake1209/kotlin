@@ -1,0 +1,10 @@
+// WITH_RUNTIME
+import java.io.File
+
+fun foo(dir: File) {
+    val file1 = createTempFile("prefix", "suffix", dir)
+    val file2 = createTempFile("prefix", "suffix", null)
+    val file3 = createTempFile("prefix", "suffix")
+    val file4 = createTempFile("prefix", null) //TODO: no last argument
+    val file5 = createTempFile("tmp", null) //TODO: no arguments
+}

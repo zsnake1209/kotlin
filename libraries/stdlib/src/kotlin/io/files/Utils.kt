@@ -3,9 +3,9 @@
 @file:JvmName("FilesKt")
 package kotlin.io
 
-import java.io.*
+import java.io.File
+import java.io.IOException
 import java.util.*
-import kotlin.comparisons.*
 
 /**
  * Creates an empty directory in the specified [directory], using the given [prefix] and [suffix] to generate its name.
