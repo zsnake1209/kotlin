@@ -26,7 +26,7 @@ public @interface Bar2 {
 
 actual typealias Foo1 = Bar1
 
-<!NO_ACTUAL_CLASS_MEMBER_FOR_EXPECTED_CLASS!>actual typealias Foo4 = Bar2<!>
+actual typealias Foo4 = Bar2
 
 actual annotation class Foo2(val p: String = "default")
 
