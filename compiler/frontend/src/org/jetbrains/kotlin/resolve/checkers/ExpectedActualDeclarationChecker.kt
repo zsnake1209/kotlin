@@ -127,14 +127,18 @@ object ExpectedActualDeclarationChecker : DeclarationChecker {
         // TODO: use common module here
         val compatibility = findExpectedForActual(descriptor, descriptor.module) ?: return
 
-        val hasExpectedModifier = descriptor.isActual && reportOn.hasActualModifier()
-        if (!hasExpectedModifier) {
-            if (Compatible !in compatibility) return
+        val hasActualModifier = descriptor.isActual && reportOn.hasActualModifier()
+        if (!hasActualModifier) {
+            if (compatibility.isEmpty()) return
 
-            // we suppress error, because annotation classes can only have one constructor and it's a 100% boilerplate
-            // to require every annotation constructor with additional parameters with default values be marked with the `actual` modifier
-            if (checkExpected && !descriptor.isAnnotationConstructor()) {
-                diagnosticHolder.report(Errors.ACTUAL_MISSING.on(reportOn))
+            if (Compatible in compatibility) {
+                // we suppress error, because annotation classes can only have one constructor and it's a 100% boilerplate
+                // to require every annotation constructor with additional parameters with default values be marked with the `actual` modifier
+                if (checkExpected && !descriptor.isAnnotationConstructor()) {
+                    diagnosticHolder.report(Errors.ACTUAL_MISSING.on(reportOn))
+                }
+
+                return
             }
         }
 
