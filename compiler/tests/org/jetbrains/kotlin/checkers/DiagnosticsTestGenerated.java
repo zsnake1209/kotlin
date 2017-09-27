@@ -13940,6 +13940,12 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                     doTest(fileName);
                 }
 
+                @TestMetadata("actualClassWithDifferentConstructors.kt")
+                public void testActualClassWithDifferentConstructors() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/multiplatform/headerClass/actualClassWithDifferentConstructors.kt");
+                    doTest(fileName);
+                }
+
                 @TestMetadata("actualMissing.kt")
                 public void testActualMissing() throws Exception {
                     String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/multiplatform/headerClass/actualMissing.kt");
