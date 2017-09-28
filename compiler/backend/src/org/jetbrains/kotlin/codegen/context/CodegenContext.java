@@ -111,7 +111,12 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
         @SuppressWarnings("ConstantConditions")
         public PropertyDescriptor getOrCreateAccessorIfNeeded(boolean getterAccessorRequired, boolean setterAccessorRequired) {
             if (getterAccessorRequired && setterAccessorRequired) {
-                return getOrCreateAccessorWithSyntheticGetterAndSetter();
+                if (withSyntheticGetterAndSetter == null) {
+                    withSyntheticGetterAndSetter = new AccessorForPropertyDescriptor(
+                            property, containingDeclaration, superCallTarget, nameSuffix,
+                            true, true);
+                }
+                return withSyntheticGetterAndSetter;
             }
             else if (getterAccessorRequired && !setterAccessorRequired) {
                 if (withSyntheticGetter == null) {
@@ -134,14 +139,9 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
             }
         }
 
-        @NotNull
-        public AccessorForPropertyDescriptor getOrCreateAccessorWithSyntheticGetterAndSetter() {
-            if (withSyntheticGetterAndSetter == null) {
-                withSyntheticGetterAndSetter = new AccessorForPropertyDescriptor(
-                        property, containingDeclaration, superCallTarget, nameSuffix,
-                        true, true);
-            }
-            return withSyntheticGetterAndSetter;
+        public AccessorForPropertyDescriptor getOrCreateWorstCaseAccessor(boolean setterAccessorCanBeGenerated) {
+            // Since we always require a getter, we know that it'd be AccessorForPropertyDescriptor
+            return (AccessorForPropertyDescriptor) getOrCreateAccessorIfNeeded(true, setterAccessorCanBeGenerated);
         }
     }
 
@@ -461,9 +461,13 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
                 propertyAccessorFactories.put(key, factory);
 
                 // Record worst case accessor for accessor methods generation.
-                accessors.put(key, factory.getOrCreateAccessorWithSyntheticGetterAndSetter());
+                PropertySetterDescriptor setterDescriptor = propertyDescriptor.getSetter();
+                Visibility setterVisibility = setterDescriptor != null ? setterDescriptor.getVisibility() : null;
+                boolean setterIsInvisible = setterVisibility != null && setterVisibility != Visibilities.LOCAL &&
+                                            !setterVisibility.isVisible(Visibilities.ALWAYS_SUITABLE_RECEIVER, setterDescriptor, contextDescriptor);
+                accessors.put(key, factory.getOrCreateWorstCaseAccessor(!setterIsInvisible));
 
-                return (D) factory.getOrCreateAccessorIfNeeded(getterAccessorRequired, setterAccessorRequired);
+                return (D) factory.getOrCreateAccessorIfNeeded(getterAccessorRequired, setterAccessorRequired && !setterIsInvisible);
             }
 
             accessor = new AccessorForPropertyBackingField(

@@ -1049,6 +1049,21 @@ public class WriteFlagsTestGenerated extends AbstractWriteFlagsTest {
             }
         }
 
+        @TestMetadata("compiler/testData/writeFlags/property/syntheticAccessors")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class SyntheticAccessors extends AbstractWriteFlagsTest {
+            public void testAllFilesPresentInSyntheticAccessors() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/writeFlags/property/syntheticAccessors"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+            }
+
+            @TestMetadata("syntheticAccessorsForProtectedPropertyWithPrivateSet.kt")
+            public void testSyntheticAccessorsForProtectedPropertyWithPrivateSet() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/writeFlags/property/syntheticAccessors/syntheticAccessorsForProtectedPropertyWithPrivateSet.kt");
+                doTest(fileName);
+            }
+        }
+
         @TestMetadata("compiler/testData/writeFlags/property/syntheticAnnotationsMethod")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
