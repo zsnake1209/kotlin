@@ -66,7 +66,7 @@ object ExpectedActualDeclarationChecker : DeclarationChecker {
         }
         else {
             val checkExpected = !languageVersionSettings.getFlag(AnalysisFlag.multiPlatformDoNotCheckActual)
-            checkActualDeclarationHasExpected(declaration, descriptor, diagnosticHolder, checkExpected)
+            checkActualDeclarationSatisfiesExpected(declaration, descriptor, diagnosticHolder, checkExpected)
         }
     }
 
@@ -119,7 +119,7 @@ object ExpectedActualDeclarationChecker : DeclarationChecker {
         }
     }
 
-    private fun checkActualDeclarationHasExpected(
+    private fun checkActualDeclarationSatisfiesExpected(
             reportOn: KtDeclaration, descriptor: MemberDescriptor, diagnosticHolder: DiagnosticSink, checkExpected: Boolean
     ) {
         // Using the platform module instead of the common module is sort of fine here because the former always depends on the latter.
