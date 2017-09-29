@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ import org.jetbrains.kotlin.idea.facet.implementingDescriptors
 import org.jetbrains.kotlin.idea.findUsages.KotlinFindUsagesHandlerFactory
 import org.jetbrains.kotlin.idea.findUsages.handlers.KotlinFindClassUsagesHandler
 import org.jetbrains.kotlin.idea.highlighter.markers.hasActualsFor
+import org.jetbrains.kotlin.idea.highlighter.markers.isExpectedOrExpectedClassMember
 import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.idea.references.resolveMainReferenceToDescriptors
@@ -167,6 +168,8 @@ class UnusedSymbolInspection : AbstractKotlinInspection() {
                 if (declaration is KtNamedFunction && declaration.isSerializationImplicitlyUsedMethod()) return
                 // properties can be referred by component1/component2, which is too expensive to search, don't mark them as unused
                 if (declaration is KtParameter && declaration.dataClassComponentFunction() != null) return
+
+                if (declaration is KtConstructor<*> && declaration.isExpectedOrExpectedClassMember()) return
 
                 // Main checks: finding reference usages && text usages
                 if (hasNonTrivialUsages(declaration, descriptor)) return

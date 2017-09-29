@@ -78,4 +78,13 @@
     <problem_class severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">Unused symbol</problem_class>
     <description>Constructor is never used</description>
   </problem>
+
+  <problem>
+    <file>expectClassWithSecondaryConstructor.kt</file>
+    <line>2</line>
+    <module>light_idea_test_case</module>
+    <entry_point TYPE="file" FQNAME="temp:///src/expectClassWithSecondaryConstructor.kt" />
+    <problem_class severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">Unused symbol</problem_class>
+    <description>Class ''Foo'' is never used</description>
+  </problem>
 </problems>
