@@ -2569,6 +2569,10 @@
     <quickFixContributor implementation="org.jetbrains.kotlin.idea.quickfix.QuickFixRegistrar"/>
 
     <versionInfoProvider implementation="org.jetbrains.kotlin.idea.facet.KotlinVersionInfoProviderByModuleDependencies"/>
+
+    <binaryExtension implementation="org.jetbrains.kotlin.idea.util.JavaClassBinary"/>
+    <binaryExtension implementation="org.jetbrains.kotlin.idea.util.KotlinBuiltInBinary"/>
+    <binaryExtension implementation="org.jetbrains.kotlin.idea.util.KotlinModuleBinary"/>
   </extensions>
 
 </idea-plugin>
