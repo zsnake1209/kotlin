@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,14 +129,9 @@ public abstract class KtUsefulTestCase extends TestCase {
         UIUtil.removeLeakingAppleListeners();
         super.tearDown();
 
-        resetApplicationToNull(application);
+        resetApplicationToNull();
 
         application = null;
-    }
-
-    public static void resetApplicationToNull(Application old) {
-        if (old != null) return;
-        resetApplicationToNull();
     }
 
     public static void resetApplicationToNull() {

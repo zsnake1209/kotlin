@@ -60,7 +60,7 @@ class CompilerApiTest : KotlinIntegrationTestBase() {
             return code to outputs
         }
         finally {
-            KtUsefulTestCase.resetApplicationToNull(application)
+            KtUsefulTestCase.resetApplicationToNull()
         }
     }
 
