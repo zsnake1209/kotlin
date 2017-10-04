@@ -83,10 +83,21 @@ val prepareResources by task<Copy> {
 }
 
 val preparePluginXml by task<Copy> {
+    var isInsideClionPlaceholder = false
+    val start = "<!-- CLION-PLUGIN-PLACEHOLDER-START -->"
+    val end = "<!-- CLION-PLUGIN-PLACEHOLDER-END -->"
     from(ideaProjectResources, { include("META-INF/plugin.xml") })
     into(preparedResources)
     filter {
-        it?.replace("<!-- CLION-PLUGIN-PLACEHOLDER -->", clionPluginXmlContent)
+        if (it.contains(start)) {
+            isInsideClionPlaceholder = true
+            clionPluginXmlContent
+        } else if (it.contains(end)) {
+            isInsideClionPlaceholder = false
+            ""
+        } else if (isInsideClionPlaceholder) {
+            ""
+        } else it
     }
 }
 

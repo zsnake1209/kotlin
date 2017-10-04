@@ -9,14 +9,12 @@
   <idea-version since-build="172.1" until-build="173.*"/>
 
   <depends>com.intellij.modules.platform</depends>
-  <depends optional="true" config-file="jvm.xml">com.intellij.modules.java</depends>
 
   <depends optional="true" config-file="junit.xml">JUnit</depends>
   <depends optional="true" config-file="gradle.xml">org.jetbrains.plugins.gradle</depends>
   <depends optional="true" config-file="maven.xml">org.jetbrains.idea.maven</depends>
   <depends optional="true" config-file="testng-j.xml">TestNG-J</depends>
   <depends optional="true" config-file="kotlin-copyright.xml">com.intellij.copyright</depends>
-  <depends optional="true" config-file="javaScriptDebug.xml">JavaScriptDebugger</depends>
   <depends optional="true" config-file="android.xml">org.jetbrains.android</depends>
   <depends optional="true" config-file="coverage.xml">Coverage</depends>
   <depends optional="true" config-file="i18n.xml">com.intellij.java-i18n</depends>
@@ -25,7 +23,10 @@
 
   <!-- ULTIMATE-PLUGIN-PLACEHOLDER -->
 
-  <!-- CLION-PLUGIN-PLACEHOLDER -->
+  <!-- CLION-PLUGIN-PLACEHOLDER-START -->
+  <depends optional="true" config-file="jvm.xml">com.intellij.modules.java</depends>
+  <depends optional="true" config-file="javaScriptDebug.xml">JavaScriptDebugger</depends>
+  <!-- CLION-PLUGIN-PLACEHOLDER-END -->
 
   <project-components>
     <component>
