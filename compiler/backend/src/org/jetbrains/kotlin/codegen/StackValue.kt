@@ -82,7 +82,7 @@ class FunctionCallStackValue(resultType: Type, lambda: (v: InstructionAdapter) -
 fun ValueParameterDescriptor.findJavaDefaultArgumentValue(targetType: Type, typeMapper: KotlinTypeMapper): StackValue {
     val descriptorWithDefaultValue = DFS.dfs(
             listOf(this),
-            { it.overriddenDescriptors.map(ValueParameterDescriptor::getOriginal) },
+            { it.original.overriddenDescriptors.map(ValueParameterDescriptor::getOriginal) },
             object : DFS.AbstractNodeHandler<ValueParameterDescriptor, ValueParameterDescriptor?>() {
                 var result: ValueParameterDescriptor? = null
 

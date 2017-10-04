@@ -117,9 +117,9 @@ abstract class ArgumentGenerator {
 
 private fun CallableDescriptor.defaultValueFromJava(index: Int): Boolean = DFS.ifAny(
         listOf(this),
-        { current -> current.overriddenDescriptors.map { it.original } },
+        { current -> current.original.overriddenDescriptors.map { it.original } },
         { descriptor ->
-            descriptor.overriddenDescriptors.isEmpty() &&
+            descriptor.original.overriddenDescriptors.isEmpty() &&
             descriptor is JavaCallableMemberDescriptor &&
             descriptor.valueParameters[index].declaresDefaultValue()
         }
