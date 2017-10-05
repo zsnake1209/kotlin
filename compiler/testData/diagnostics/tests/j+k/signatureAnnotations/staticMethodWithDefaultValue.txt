@@ -9,5 +9,5 @@ public/*package*/ open class A {
     public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
 
     // Static members
-    public open fun withDefault(): kotlin.String!
+    public open fun withDefault(/*0*/ @kotlin.annotations.jvm.internal.DefaultValue(value = "OK") arg: kotlin.String! = ...): kotlin.String!
 }
