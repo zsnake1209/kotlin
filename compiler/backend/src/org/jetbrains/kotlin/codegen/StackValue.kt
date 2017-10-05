@@ -81,7 +81,7 @@ class FunctionCallStackValue(resultType: Type, lambda: (v: InstructionAdapter) -
 
 fun ValueParameterDescriptor.findJavaDefaultArgumentValue(targetType: Type, typeMapper: KotlinTypeMapper): StackValue {
     val descriptorWithDefaultValue = DFS.dfs(
-            listOf(this),
+            listOf(this.original),
             { it.original.overriddenDescriptors.map(ValueParameterDescriptor::getOriginal) },
             object : DFS.AbstractNodeHandler<ValueParameterDescriptor, ValueParameterDescriptor?>() {
                 var result: ValueParameterDescriptor? = null
@@ -97,7 +97,7 @@ fun ValueParameterDescriptor.findJavaDefaultArgumentValue(targetType: Type, type
 
                 override fun result(): ValueParameterDescriptor? = result
             }
-    ) ?: error("Should be at least one descriptor with default value: " + this)
+    ) ?: error("Should be at least one descriptor with default value: $this")
 
     val defaultValue = descriptorWithDefaultValue.getDefaultValueFromAnnotation()
     if (defaultValue is NullDefaultValue) {

@@ -46,7 +46,7 @@ fun copyValueParameters(
     return newValueParametersTypes.zip(oldValueParameters).map { (newParameter, oldParameter) ->
         ValueParameterDescriptorImpl(
                 newOwner,
-                oldParameter,
+                null,
                 oldParameter.index,
                 oldParameter.annotations,
                 oldParameter.name,
