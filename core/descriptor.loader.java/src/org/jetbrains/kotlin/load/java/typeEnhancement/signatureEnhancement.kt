@@ -140,7 +140,9 @@ class SignatureEnhancement(private val annotationTypeQualifierResolver: Annotati
         val valueParameterEnhancements = annotationOwnerForMember.valueParameters.map {
             p ->
                 val enhancementResult =partsForValueParameter(p, memberContext) { it.valueParameters[p.index].type }
-                        .enhance(predefinedEnhancementInfo?.parametersInfo?.getOrNull(p.index))val actualType = if (enhancementResult.wereChanges) enhancementResult.type else p.type
+                        .enhance(predefinedEnhancementInfo?.parametersInfo?.getOrNull(p.index))
+
+            val actualType = if (enhancementResult.wereChanges) enhancementResult.type else p.type
             val hasDefaultValue = p.hasDefaultValueInAnnotation(actualType)
             val wereChanges = enhancementResult.wereChanges || (hasDefaultValue != p.declaresDefaultValue())
 
