@@ -2,6 +2,8 @@
 
 import kotlin.test.assertEquals
 
+
+
 fun box(): String {
 
     assertEquals(-2147483648, Float.NEGATIVE_INFINITY.toInt())
@@ -33,6 +35,25 @@ fun box(): String {
     assertEquals(2147483647, 2147483648.0.toInt())
     assertEquals(2147483647, Double.MAX_VALUE.toInt())
     assertEquals(2147483647, Double.POSITIVE_INFINITY.toInt())
+
+    for (d in doubleArrayOf(Double.NEGATIVE_INFINITY, -Double.MAX_VALUE,
+                            -2147483649.0, -2147483648.0, -2147483647.0,
+                            -65536.0, -65535.0, -65534.0,
+                            -1.5, -Double.MIN_VALUE,
+                            -0.0, 0.0,
+                            Double.MIN_VALUE, 1.5,
+                            65534.0, 65535.0, 65536.0,
+                            2147483647.0, 2147483648.0, 2147483649.0,
+                            Double.MAX_VALUE, Double.POSITIVE_INFINITY)) {
+        assertEquals(d.toInt().toByte(), d.toByte())
+        assertEquals(d.toInt().toShort(), d.toShort())
+        assertEquals(d.toInt().toChar(), d.toChar())
+
+        val f = d.toFloat()
+        assertEquals(f.toInt().toByte(), f.toByte())
+        assertEquals(f.toInt().toShort(), f.toShort())
+        assertEquals(f.toInt().toChar(), f.toChar())
+    }
 
     return "OK"
 }

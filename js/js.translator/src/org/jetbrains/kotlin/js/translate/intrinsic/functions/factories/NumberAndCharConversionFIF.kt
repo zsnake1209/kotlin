@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.js.patterns.PatternBuilder.pattern
 import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.intrinsic.functions.basic.FunctionIntrinsicWithReceiverComputed
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils.*
+import org.jetbrains.kotlin.types.expressions.OperatorConventions
 import org.jetbrains.kotlin.utils.identity
 import java.util.function.Predicate
 
@@ -35,9 +36,11 @@ object NumberAndCharConversionFIF : CompositeFIF() {
 
     private val convertOperations: Map<String, FunctionIntrinsicWithReceiverComputed> =
             mapOf(
-                    "Float|Double.toInt" to KotlinAliasedFunctionIntrinsic("doubleToInt"),
-                    "Int|Float|Double.toShort" to ConversionUnaryIntrinsic(::toShort),
-                    "Short|Int|Float|Double.toByte" to ConversionUnaryIntrinsic(::toByte),
+                    "Float|Double.toInt" to KotlinAliasedFunctionIntrinsic("numberToInt"),
+                    "Float|Double.toShort" to ConversionUnaryIntrinsic { toShort(invokeKotlinFunction ("numberToInt", it)) },
+                    "Int.toShort" to ConversionUnaryIntrinsic(::toShort),
+                    "Float|Double.toByte" to ConversionUnaryIntrinsic { toByte(invokeKotlinFunction ("numberToInt", it)) },
+                    "Short|Int.toByte" to ConversionUnaryIntrinsic(::toByte),
 
                     "Int|Short|Byte.toLong" to ConversionUnaryIntrinsic(::longFromInt),
                     "Float|Double.toLong" to ConversionUnaryIntrinsic(::longFromNumber),
@@ -54,7 +57,8 @@ object NumberAndCharConversionFIF : CompositeFIF() {
                     "Number.toFloat|toDouble" to ConversionUnaryIntrinsic { invokeKotlinFunction("numberToDouble", it) },
                     "Number.toLong" to ConversionUnaryIntrinsic { invokeKotlinFunction("numberToLong", it) },
 
-                    "Int|Short|Byte|Float|Double.toChar" to  ConversionUnaryIntrinsic(::toChar),
+                    "Float|Double.toChar" to  ConversionUnaryIntrinsic { toShort(invokeKotlinFunction ("numberToInt", it)) },
+                    "Int|Short|Byte.toChar" to  ConversionUnaryIntrinsic(::toChar),
 
                     "Long.toFloat|toDouble" to  ConversionUnaryIntrinsic { invokeMethod(it, "toNumber") },
                     "Long.toInt" to  ConversionUnaryIntrinsic { invokeMethod(it, "toInt") },
