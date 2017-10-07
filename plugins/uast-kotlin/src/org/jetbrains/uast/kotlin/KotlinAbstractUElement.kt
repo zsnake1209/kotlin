@@ -27,7 +27,12 @@ import org.jetbrains.uast.kotlin.psi.UastKotlinPsiVariable
 abstract class KotlinAbstractUElement(private val givenParent: UElement?) : UElement {
 
     override val uastParent: UElement? by lz {
-        givenParent ?: convertParent()
+        try {
+            givenParent ?: convertParent()
+        }
+        catch (e: Throwable) {
+            throw Exception("exception while getting uastParent for $this(${this.javaClass})", e)
+        }
     }
 
     protected open fun getPsiParentForLazyConversion(): PsiElement? = psi?.let { psi -> (psi.parent ?: psi.containingFile) }
