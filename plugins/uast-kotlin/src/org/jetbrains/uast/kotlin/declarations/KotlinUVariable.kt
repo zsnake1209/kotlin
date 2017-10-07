@@ -82,6 +82,13 @@ abstract class AbstractKotlinUVariable(givenParent: UElement?)
         get() = UIdentifier(nameIdentifier, this)
 
     override fun equals(other: Any?) = other is AbstractKotlinUVariable && psi == other.psi
+
+    override fun getPsiParentForLazyConversion(): PsiElement? = super.getPsiParentForLazyConversion()?.let { parent ->
+        if (psi is UastKotlinPsiVariable) {
+            parent.parent
+        }
+        else parent
+    }
 }
 
 class KotlinUVariable(

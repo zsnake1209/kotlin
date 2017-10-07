@@ -17,10 +17,6 @@
 package org.jetbrains.uast.kotlin
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.asJava.elements.KtLightAbstractAnnotation
-import org.jetbrains.kotlin.asJava.toLightGetter
-import org.jetbrains.kotlin.asJava.toLightSetter
-import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
@@ -34,45 +30,64 @@ abstract class KotlinAbstractUElement(private val givenParent: UElement?) : UEle
         givenParent ?: convertParent()
     }
 
+    protected open fun getPsiParentForLazyConversion(): PsiElement? = psi?.let { psi -> (psi.parent ?: psi.containingFile) }
+
     protected open fun convertParent(): UElement? {
-        val psi = psi
-        var parent = psi?.parent ?: psi?.containingFile
+        val element = this
+        val parent = getPsiParentForLazyConversion()
 
-        val annotationEntry = (this as? KotlinUAnnotation)?.ktAnnotationEntry
-        if (annotationEntry != null) {
-            parent = annotationEntry.parent ?: annotationEntry.containingFile
-            val parentUnwrapped = KotlinConverter.unwrapElements(parent) ?: return null
-            val target = annotationEntry.useSiteTarget?.getAnnotationUseSiteTarget()
-            when (target) {
-                AnnotationUseSiteTarget.PROPERTY_GETTER ->
-                    parent = (parentUnwrapped as? KtProperty)?.getter
-                             ?: (parentUnwrapped as? KtParameter)?.toLightGetter()
-                             ?: parent
-
-                AnnotationUseSiteTarget.PROPERTY_SETTER ->
-                    parent = (parentUnwrapped as? KtProperty)?.setter
-                             ?: (parentUnwrapped as? KtParameter)?.toLightSetter()
-                             ?: parent
+        fun UElement?.checkLoop(): UElement? = this.apply {
+            if (this == element) {
+                throw IllegalStateException("Loop in parent structure when converting a $psi")
             }
         }
-        if (psi is UastKotlinPsiVariable && parent != null) {
-            parent = parent.parent
+
+        val parentUnwrapped = KotlinConverter.unwrapElements(parent) ?: return null
+        if (parent is KtValueArgument && parentUnwrapped is KtAnnotationEntry) {
+            return (KotlinUastLanguagePlugin().convertElementWithParent(parentUnwrapped, null) as? KotlinUAnnotation)
+                    ?.findAttributeValueExpression(parent).checkLoop()
         }
 
-        if (parent is KtStringTemplateEntryWithExpression) {
-            parent = parent.parent
-        }
-        if ((parent is KtStringTemplateExpression && parent.entries.size == 1) ||
-            parent is KtWhenConditionWithExpression) {
-            parent = parent.parent
-        }
-
-        val result = doConvertParent(this, parent)
-        if (result == this) {
-            throw IllegalStateException("Loop in parent structure when converting a $psi")
+        if (parent is KtParameter) {
+            val annotationClass = findAnnotationClassFromConstructorParameter(parent)
+            if (annotationClass != null) {
+                return annotationClass.methods.find { it.name == parent.name }.checkLoop()
+            }
         }
 
-        return result
+        if (parent is KtClassInitializer) {
+            val containingClass = parent.containingClassOrObject
+            if (containingClass != null) {
+                val containingUClass = KotlinUastLanguagePlugin().convertElementWithParent(containingClass, null) as KotlinUClass?
+                containingUClass?.methods?.filterIsInstance<KotlinPrimaryConstructorUMethod>()?.firstOrNull()?.let {
+                    return it.uastBody.checkLoop()
+                }
+            }
+        }
+
+        val result = KotlinUastLanguagePlugin().convertElementWithParent(parentUnwrapped, null)
+
+        if (result is UEnumConstant && element is UDeclaration) {
+            return result.initializingClass.checkLoop()
+        }
+
+        if (result is USwitchClauseExpressionWithBody && element.psi !is KtWhenCondition) {
+            return result.body.checkLoop()
+        }
+
+        if (result is KotlinUDestructuringDeclarationExpression &&
+            element.psi == (parent as KtDestructuringDeclaration).initializer) {
+            return result.tempVarAssignment.checkLoop()
+        }
+
+        if (result is KotlinUElvisExpression && parent is KtBinaryExpression) {
+            when (element.psi) {
+                parent.left -> return result.lhsDeclaration.checkLoop()
+                parent.right -> return result.rhsIfExpression.checkLoop()
+            }
+        }
+
+        return result.checkLoop()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -84,55 +99,6 @@ abstract class KotlinAbstractUElement(private val givenParent: UElement?) : UEle
     }
 
     override fun hashCode() = psi?.hashCode() ?: 0
-}
-
-fun doConvertParent(element: UElement, parent: PsiElement?): UElement? {
-    val parentUnwrapped = KotlinConverter.unwrapElements(parent) ?: return null
-    if (parent is KtValueArgument && parentUnwrapped is KtAnnotationEntry) {
-        return (KotlinUastLanguagePlugin().convertElementWithParent(parentUnwrapped, null) as? KotlinUAnnotation)
-            ?.findAttributeValueExpression(parent)
-    }
-
-    if (parent is KtParameter) {
-        val annotationClass = findAnnotationClassFromConstructorParameter(parent)
-        if (annotationClass != null) {
-            return annotationClass.methods.find { it.name == parent.name }
-        }
-    }
-
-    if (parent is KtClassInitializer) {
-        val containingClass = parent.containingClassOrObject
-        if (containingClass != null) {
-            val containingUClass = KotlinUastLanguagePlugin().convertElementWithParent(containingClass, null) as KotlinUClass?
-            containingUClass?.methods?.filterIsInstance<KotlinPrimaryConstructorUMethod>()?.firstOrNull()?.let {
-                return it.uastBody
-            }
-        }
-    }
-
-    val result = KotlinUastLanguagePlugin().convertElementWithParent(parentUnwrapped, null)
-
-    if (result is UEnumConstant && element is UDeclaration) {
-        return result.initializingClass
-    }
-
-    if (result is USwitchClauseExpressionWithBody && element.psi !is KtWhenCondition) {
-        return result.body
-    }
-
-    if (result is KotlinUDestructuringDeclarationExpression &&
-        element.psi == (parent as KtDestructuringDeclaration).initializer) {
-        return result.tempVarAssignment
-    }
-
-    if (result is KotlinUElvisExpression && parent is KtBinaryExpression) {
-        when (element.psi) {
-            parent.left -> return result.lhsDeclaration
-            parent.right -> return result.rhsIfExpression
-        }
-    }
-
-    return result
 }
 
 private fun findAnnotationClassFromConstructorParameter(parameter: KtParameter): UClass? {
@@ -152,5 +118,17 @@ abstract class KotlinAbstractUExpression(givenParent: UElement?)
             val annotatedExpression = psi?.parent as? KtAnnotatedExpression ?: return emptyList()
             return annotatedExpression.annotationEntries.map { KotlinUAnnotation(it, this) }
         }
+
+    override fun getPsiParentForLazyConversion(): PsiElement? = super.getPsiParentForLazyConversion()?.let {
+        var parent = it
+        if (parent is KtStringTemplateEntryWithExpression) {
+            parent = parent.parent
+        }
+        if ((parent is KtStringTemplateExpression && parent.entries.size == 1) ||
+            parent is KtWhenConditionWithExpression) {
+            parent = parent.parent
+        }
+        parent
+    }
 }
 
