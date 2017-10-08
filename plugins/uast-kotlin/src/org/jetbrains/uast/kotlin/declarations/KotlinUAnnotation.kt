@@ -2,6 +2,7 @@ package org.jetbrains.uast.kotlin
 
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.asJava.toLightAnnotation
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
@@ -23,8 +24,8 @@ class KotlinUAnnotation(
 
     private val resolvedCall: ResolvedCall<*>? by lz { ktAnnotationEntry.getResolvedCall(ktAnnotationEntry.analyze()) }
 
-    override val psi: PsiAnnotation?
-        get() = ktAnnotationEntry.toLightAnnotation()
+    override val psi: PsiElement?
+        get() = ktAnnotationEntry.toLightAnnotation() ?: ktAnnotationEntry // there are still cases when there is no light annotation, but we need any kind of PSI
 
     override fun equals(other: Any?): Boolean {
         if (other !is KotlinUAnnotation) {
