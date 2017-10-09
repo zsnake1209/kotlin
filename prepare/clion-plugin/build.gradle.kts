@@ -56,7 +56,7 @@ dependencies {
     packedJars(preloadedDeps("protobuf-${rootProject.extra["versions.protobuf-java"]}"))
     packedJars(project(":kotlin-stdlib", configuration = "builtins"))
     sideJars(projectDist(":kotlin-script-runtime"))
-    sideJars(projectDist(":kotlin-stdlib"))
+//    sideJars(projectDist(":kotlin-stdlib"))
     sideJars(projectDist(":kotlin-reflect"))
     sideJars(commonDep("io.javaslang", "javaslang"))
     sideJars(commonDep("javax.inject"))
