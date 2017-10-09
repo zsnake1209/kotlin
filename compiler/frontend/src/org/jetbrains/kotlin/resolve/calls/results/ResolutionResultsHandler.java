@@ -53,9 +53,8 @@ public class ResolutionResultsHandler {
             @NotNull LanguageVersionSettings languageVersionSettings
     ) {
         Set<MutableResolvedCall<D>> successfulCandidates = Sets.newLinkedHashSet();
-        Set<MutableResolvedCall<D>> failedCandidates = Sets.newLinkedHashSet();
         Set<MutableResolvedCall<D>> incompleteCandidates = Sets.newLinkedHashSet();
-        Set<MutableResolvedCall<D>> candidatesWithWrongReceiver = Sets.newLinkedHashSet();
+
         for (MutableResolvedCall<D> candidateCall : candidates) {
             ResolutionStatus status = candidateCall.getStatus();
             assert status != UNKNOWN_STATUS : "No resolution for " + candidateCall.getCandidateDescriptor();
@@ -65,20 +64,32 @@ public class ResolutionResultsHandler {
             else if (status == INCOMPLETE_TYPE_INFERENCE) {
                 incompleteCandidates.add(candidateCall);
             }
-            else if (candidateCall.getStatus() == RECEIVER_TYPE_ERROR) {
+        }
+
+        // TODO : maybe it's better to filter overrides out first, and only then look for the maximally specific
+        if (!successfulCandidates.isEmpty() || !incompleteCandidates.isEmpty()) {
+            return computeSuccessfulResult(
+                    context, tracing, successfulCandidates, incompleteCandidates, context.checkArguments, languageVersionSettings);
+        }
+
+        candidates.forEach(MutableResolvedCall::performRemainingTasks);
+
+        Set<MutableResolvedCall<D>> failedCandidates = Sets.newLinkedHashSet();
+        Set<MutableResolvedCall<D>> candidatesWithWrongReceiver = Sets.newLinkedHashSet();
+        for (MutableResolvedCall<D> candidateCall : candidates) {
+            ResolutionStatus status = candidateCall.getStatus();
+            assert !status.isSuccess() && status != INCOMPLETE_TYPE_INFERENCE
+                    : "Successful candidates should be processed earlier for " + candidateCall.getCandidateDescriptor();
+
+            if (candidateCall.getStatus() == RECEIVER_TYPE_ERROR) {
                 candidatesWithWrongReceiver.add(candidateCall);
             }
             else if (candidateCall.getStatus() != RECEIVER_PRESENCE_ERROR) {
                 failedCandidates.add(candidateCall);
             }
         }
-        // TODO : maybe it's better to filter overrides out first, and only then look for the maximally specific
 
-        if (!successfulCandidates.isEmpty() || !incompleteCandidates.isEmpty()) {
-            return computeSuccessfulResult(
-                    context, tracing, successfulCandidates, incompleteCandidates, context.checkArguments, languageVersionSettings);
-        }
-        else if (!failedCandidates.isEmpty()) {
+        if (!failedCandidates.isEmpty()) {
             return computeFailedResult(tracing, context.trace, failedCandidates, context.checkArguments, languageVersionSettings);
         }
         if (!candidatesWithWrongReceiver.isEmpty()) {
@@ -105,6 +116,7 @@ public class ResolutionResultsHandler {
                 successfulAndIncomplete, true, context.isDebuggerContext, checkArgumentsMode, languageVersionSettings);
         if (results.isSingleResult()) {
             MutableResolvedCall<D> resultingCall = results.getResultingCall();
+            resultingCall.performRemainingTasks();
             resultingCall.getTrace().moveAllMyDataTo(context.trace);
             if (resultingCall.getStatus() == INCOMPLETE_TYPE_INFERENCE) {
                 return OverloadResolutionResultsImpl.incompleteTypeInference(resultingCall);
