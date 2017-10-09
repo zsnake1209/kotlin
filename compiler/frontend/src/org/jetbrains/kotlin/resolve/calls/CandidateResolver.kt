@@ -80,10 +80,6 @@ class CandidateResolver(
             return
         }
 
-        if (!context.isDebuggerContext) {
-            checkVisibilityWithoutReceiver()
-        }
-
         when (checkArguments) {
             CheckArgumentTypesMode.CHECK_VALUE_ARGUMENTS ->
                 mapArguments()
@@ -100,6 +96,10 @@ class CandidateResolver(
 
         checkAbstractAndSuper()
         checkConstructedExpandedType()
+
+        if (!context.isDebuggerContext) {
+            checkVisibilityWithoutReceiver()
+        }
     }
 
     private fun CallCandidateResolutionContext<*>.checkValueArguments() = checkAndReport {
