@@ -34,7 +34,7 @@ object NumberAndCharConversionFIF : CompositeFIF() {
             .or(pattern("Char.toChar"))
 
     private fun TranslationContext.narrowDoubleToInt(receiver: JsExpression): JsExpression {
-        val funName = if (config.isAtLeast(LanguageVersion.KOTLIN_1_2))"doubleToInt" else "numberToInt"
+        val funName = if (config.isAtLeast(LanguageVersion.KOTLIN_1_2)) "doubleToInt" else "numberToInt"
         return invokeKotlinFunction(funName, receiver)
     }
 
@@ -61,8 +61,8 @@ object NumberAndCharConversionFIF : CompositeFIF() {
                     "Number.toFloat|toDouble" to ConversionUnaryIntrinsic { invokeKotlinFunction("numberToDouble", it) },
                     "Number.toLong" to ConversionUnaryIntrinsic { invokeKotlinFunction("numberToLong", it) },
 
-                    "Float|Double.toChar" to  ConversionUnaryIntrinsic { toShort(invokeKotlinFunction ("numberToInt", it)) },
-                    "Int|Short|Byte.toChar" to  ConversionUnaryIntrinsic { toChar(it) },
+                    "Float|Double.toChar" to ConversionUnaryIntrinsic { toChar(invokeKotlinFunction ("numberToInt", it)) },
+                    "Int|Short|Byte.toChar" to ConversionUnaryIntrinsic { toChar(it) },
 
                     "Long.toFloat|toDouble" to  ConversionUnaryIntrinsic { invokeMethod(it, "toNumber") },
                     "Long.toInt" to  ConversionUnaryIntrinsic { invokeMethod(it, "toInt") },
