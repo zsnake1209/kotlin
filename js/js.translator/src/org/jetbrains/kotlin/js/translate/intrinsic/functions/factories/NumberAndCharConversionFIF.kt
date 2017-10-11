@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.js.translate.intrinsic.functions.factories
 
-import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.js.backend.ast.JsExpression
 import org.jetbrains.kotlin.js.patterns.PatternBuilder.pattern
@@ -33,14 +32,9 @@ object NumberAndCharConversionFIF : CompositeFIF() {
             .or(pattern("Long.toLong"))
             .or(pattern("Char.toChar"))
 
-    private fun TranslationContext.narrowDoubleToInt(receiver: JsExpression): JsExpression {
-        val funName = if (config.isAtLeast(LanguageVersion.KOTLIN_1_2)) "doubleToInt" else "numberToInt"
-        return invokeKotlinFunction(funName, receiver)
-    }
-
     private val convertOperations: Map<String, FunctionIntrinsicWithReceiverComputed> =
             mapOf(
-                    "Float|Double.toInt" to ConversionUnaryIntrinsic { narrowDoubleToInt(it) },
+                    "Float|Double.toInt" to ConversionUnaryIntrinsic { invokeKotlinFunction("numberToInt", it) },
                     "Float|Double.toShort" to ConversionUnaryIntrinsic { toShort(invokeKotlinFunction ("numberToInt", it)) },
                     "Int.toShort" to ConversionUnaryIntrinsic { toShort(it) },
                     "Float|Double.toByte" to ConversionUnaryIntrinsic { toByte(invokeKotlinFunction ("numberToInt", it)) },
