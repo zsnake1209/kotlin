@@ -35,9 +35,9 @@ object NumberAndCharConversionFIF : CompositeFIF() {
     private val convertOperations: Map<String, FunctionIntrinsicWithReceiverComputed> =
             mapOf(
                     "Float|Double.toInt" to ConversionUnaryIntrinsic { invokeKotlinFunction("numberToInt", it) },
-                    "Float|Double.toShort" to ConversionUnaryIntrinsic { toShort(invokeKotlinFunction ("numberToInt", it)) },
+                    "Float|Double.toShort" to ConversionUnaryIntrinsic { toShort(invokeKotlinFunction("numberToInt", it)) },
                     "Int.toShort" to ConversionUnaryIntrinsic { toShort(it) },
-                    "Float|Double.toByte" to ConversionUnaryIntrinsic { toByte(invokeKotlinFunction ("numberToInt", it)) },
+                    "Float|Double.toByte" to ConversionUnaryIntrinsic { toByte(invokeKotlinFunction("numberToInt", it)) },
                     "Short|Int.toByte" to ConversionUnaryIntrinsic { toByte(it) },
 
                     "Int|Short|Byte.toLong" to ConversionUnaryIntrinsic { longFromInt(it) },
@@ -55,7 +55,7 @@ object NumberAndCharConversionFIF : CompositeFIF() {
                     "Number.toFloat|toDouble" to ConversionUnaryIntrinsic { invokeKotlinFunction("numberToDouble", it) },
                     "Number.toLong" to ConversionUnaryIntrinsic { invokeKotlinFunction("numberToLong", it) },
 
-                    "Float|Double.toChar" to ConversionUnaryIntrinsic { toChar(invokeKotlinFunction ("numberToInt", it)) },
+                    "Float|Double.toChar" to ConversionUnaryIntrinsic { toChar(invokeKotlinFunction("numberToInt", it)) },
                     "Int|Short|Byte.toChar" to ConversionUnaryIntrinsic { toChar(it) },
 
                     "Long.toFloat|toDouble" to  ConversionUnaryIntrinsic { invokeMethod(it, "toNumber") },
