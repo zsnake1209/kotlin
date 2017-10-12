@@ -30,19 +30,18 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 
 object ArrayLiteralsInAnnotationItems {
 
-    private fun addForUsage(collection: MutableCollection<LookupElement>,
-                            expectedInfos: Collection<ExpectedInfo>,
-                            position: PsiElement) {
+    private fun MutableCollection<LookupElement>.addForUsage(expectedInfos: Collection<ExpectedInfo>,
+                                                             position: PsiElement) {
         if (position.getParentOfType<KtAnnotationEntry>(false) != null) {
-            expectedInfos
+            expectedInfos.asSequence()
                     .filter { it.fuzzyType?.type?.let { type -> KotlinBuiltIns.isArray(type) } == true }
-                    .mapTo(collection) { createLookupElement(it.itemOptions.starPrefix) }
+                    .filterNot { it.itemOptions.starPrefix }
+                    .mapTo(this) { createLookupElement() }
         }
     }
 
-    private fun addForDefaultArguments(collection: MutableCollection<LookupElement>,
-                                       expectedInfos: Collection<ExpectedInfo>,
-                                       position: PsiElement) {
+    private fun MutableCollection<LookupElement>.addForDefaultArguments(expectedInfos: Collection<ExpectedInfo>,
+                                                                        position: PsiElement) {
 
         // CLASS [MODIFIER_LIST, PRIMARY_CONSTRUCTOR [VALUE_PARAMETER_LIST [VALUE_PARAMETER [..., REFERENCE_EXPRESSION=position]]]]
         val valueParameter = position.parent as? KtParameter ?: return
@@ -53,14 +52,12 @@ object ArrayLiteralsInAnnotationItems {
         if (primaryConstructor.valueParameterList == valueParameter.parent) {
             expectedInfos
                     .filter { it.fuzzyType?.type?.let { type -> KotlinBuiltIns.isArray(type) } == true }
-                    .mapTo(collection) { createLookupElement(false) }
+                    .mapTo(this) { createLookupElement() }
         }
     }
 
-    private fun createLookupElement(spread: Boolean): LookupElement {
-        val literal = if (spread) "*[]" else "[]"
-
-        return LookupElementBuilder.create(literal)
+    private fun createLookupElement(): LookupElement {
+        return LookupElementBuilder.create("[]")
                 .withInsertHandler { context, _ ->
                     context.editor.caretModel.moveToOffset(context.tailOffset - 1)
                 }
@@ -68,9 +65,9 @@ object ArrayLiteralsInAnnotationItems {
     }
 
     fun collect(expectedInfos: Collection<ExpectedInfo>, position: PsiElement): Collection<LookupElement> {
-        return mutableListOf<LookupElement>().also {
-            addForUsage(it, expectedInfos, position)
-            addForDefaultArguments(it, expectedInfos, position)
+        return mutableListOf<LookupElement>().apply {
+            addForUsage(expectedInfos, position)
+            addForDefaultArguments(expectedInfos, position)
         }
     }
 }

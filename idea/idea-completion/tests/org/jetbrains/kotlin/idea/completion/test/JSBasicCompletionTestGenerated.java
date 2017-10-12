@@ -1585,12 +1585,6 @@ public class JSBasicCompletionTestGenerated extends AbstractJSBasicCompletionTes
                 doTest(fileName);
             }
 
-            @TestMetadata("ArrayLiteralAnnotationUseForVararg2.kt")
-            public void testArrayLiteralAnnotationUseForVararg2() throws Exception {
-                String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/basic/common/fromSmart/ArrayLiteralAnnotationUseForVararg2.kt");
-                doTest(fileName);
-            }
-
             @TestMetadata("EnumEntries.kt")
             public void testEnumEntries() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/basic/common/fromSmart/EnumEntries.kt");
