@@ -325,7 +325,15 @@ class DelegatedPropertyResolver(
         val functionName = if (isGet) OperatorNameConventions.GET_VALUE else OperatorNameConventions.SET_VALUE
         val receiver = ExpressionReceiver.create(delegateExpression, delegateType, trace.bindingContext)
 
-        val resolutionResult = fakeCallResolver.makeAndResolveFakeCallInContext(receiver, context, arguments, functionName, delegateExpression)
+        val fakeTrace = TemporaryBindingTrace.create(context.trace, "trace to resolve fake call for get/setValue method")
+        val fakeBindingTrace = context.replaceBindingTrace(fakeTrace)
+
+        val resolutionResult =
+                fakeCallResolver.makeAndResolveFakeCallInContext(
+                        receiver, fakeBindingTrace, arguments, functionName, delegateExpression
+                ) { fake ->
+                    fakeTrace.commit({ _, key -> key != fake }, true)
+                }
 
         trace.record(BindingContext.DELEGATED_PROPERTY_CALL, accessor, resolutionResult.first)
         return resolutionResult.second
