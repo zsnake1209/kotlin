@@ -20,14 +20,18 @@ import com.intellij.execution.configurations.CommandLineTokenizer
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
 import org.gradle.tooling.ProjectConnection
 import org.jetbrains.kotlin.lexer.KotlinLexer
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.script.ScriptTemplatesProvider
+import org.jetbrains.plugins.gradle.service.GradleBuildClasspathManager
 import org.jetbrains.plugins.gradle.service.execution.GradleExecutionHelper
 import org.jetbrains.plugins.gradle.settings.GradleExecutionSettings
 import java.io.File
 import java.util.*
+import kotlin.script.experimental.dependencies.ScriptDependencies
 
 abstract class AbstractGradleScriptTemplatesProvider(
         project: Project, override val id: String, private val templateClass: String, private val dependencySelector: Regex
@@ -165,3 +169,48 @@ fun topLevelSectionCodeTextTokens(script: CharSequence, sectionIdentifier: Strin
         TopLevelSectionTokensEnumerator(script, sectionIdentifier).asSequence()
                 .filter { it.tokenType !in KtTokens.WHITE_SPACE_OR_COMMENT_BIT_SET }
                 .map { it.tokenSequence }
+
+
+const val KOTLIN_BUILD_FILE_NAME = "build.gradle.kts"
+
+class GradleScriptDefaultDependenciesProvider(
+        private val scriptDependenciesCache: ScriptDependenciesCache,
+        private val buildClasspathManager: GradleBuildClasspathManager
+) : DefaultScriptDependenciesProvider {
+    override fun defaultDependenciesFor(scriptFile: VirtualFile): ScriptDependencies? {
+        if (scriptFile.name != KOTLIN_BUILD_FILE_NAME) return null
+
+        return previouslyAnalyzedScriptsCombinedDependencies().takeUnless { it.classpath.isEmpty() } ?: gradleJarsFromIdeaModel()
+    }
+
+    private fun previouslyAnalyzedScriptsCombinedDependencies(): ScriptDependencies {
+        val sources = mutableListOf<File>()
+        val binaries = mutableListOf<File>()
+        val imports = mutableListOf<String>()
+
+        scriptDependenciesCache.inspectCache { cache ->
+            cache.entries.filter { it.key.endsWith(KOTLIN_BUILD_FILE_NAME) }
+                    .map { it.value }.forEach {
+                sources += it.sources
+                binaries += it.classpath
+                imports += it.imports
+            }
+        }
+        return ScriptDependencies(
+                classpath = binaries.distinct(),
+                sources = sources.distinct(),
+                imports = imports.distinct()
+        )
+    }
+
+    private fun gradleJarsFromIdeaModel(): ScriptDependencies {
+        val (sourceJars, binaryJars) = buildClasspathManager.allClasspathEntries.partition {
+            it.name == "src" || it.parent?.name == "src" || it.name.contains("-sources")
+        }
+
+        return ScriptDependencies(
+                classpath = binaryJars.map { VfsUtilCore.virtualToIoFile(it) },
+                sources = sourceJars.map { VfsUtilCore.virtualToIoFile(it) }
+        )
+    }
+}
