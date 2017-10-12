@@ -127,6 +127,11 @@ class FakeCallResolver(
         }
     }
 
+    private val fakeCalleeExpression by lazy(LazyThreadSafetyMode.PUBLICATION) {
+
+        KtPsiFactory(project, markGenerated = false).createSimpleName("fakeName")
+    }
+
     @JvmOverloads
     fun makeAndResolveFakeCallInContext(
             receiver: ReceiverValue?,
@@ -137,7 +142,6 @@ class FakeCallResolver(
             realExpression: RealExpression? = null,
             onComplete: (KtSimpleNameExpression) -> Unit = { _ -> }
     ): Pair<Call, OverloadResolutionResults<FunctionDescriptor>> {
-        val fakeCalleeExpression = KtPsiFactory(project, markGenerated = false).createSimpleName(name.asString())
         val call = CallMaker.makeCallWithExpressions(callElement, receiver, null, fakeCalleeExpression, valueArguments)
 
         val tracingStrategy = when (realExpression?.callKind) {
