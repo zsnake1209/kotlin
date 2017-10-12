@@ -22,6 +22,10 @@ import org.jetbrains.kotlin.js.patterns.PatternBuilder.pattern
 import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.intrinsic.functions.basic.FunctionIntrinsicWithReceiverComputed
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils.*
+import org.jetbrains.kotlin.js.translate.utils.jsAstUtils.invokeKotlinFunction
+import org.jetbrains.kotlin.js.translate.utils.jsAstUtils.toByte
+import org.jetbrains.kotlin.js.translate.utils.jsAstUtils.toChar
+import org.jetbrains.kotlin.js.translate.utils.jsAstUtils.toShort
 import java.util.function.Predicate
 
 object NumberAndCharConversionFIF : CompositeFIF() {
