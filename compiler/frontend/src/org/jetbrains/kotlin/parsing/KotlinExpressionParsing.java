@@ -1137,22 +1137,15 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
             return;
         }
 
-        if (collapse) {
-            advanceLambdaBlock();
-            literal.done(FUNCTION_LITERAL);
-            literalExpression.collapse(LAMBDA_EXPRESSION);
-        }
-        else {
-            PsiBuilder.Marker body = mark();
-            parseStatements();
+        PsiBuilder.Marker body = mark();
+        parseStatements();
 
-            body.done(BLOCK);
-            body.setCustomEdgeTokenBinders(PRECEDING_ALL_COMMENTS_BINDER, TRAILING_ALL_COMMENTS_BINDER);
+        body.done(BLOCK);
+        body.setCustomEdgeTokenBinders(PRECEDING_ALL_COMMENTS_BINDER, TRAILING_ALL_COMMENTS_BINDER);
 
-            expect(RBRACE, "Expecting '}'");
-            literal.done(FUNCTION_LITERAL);
-            literalExpression.done(LAMBDA_EXPRESSION);
-        }
+        expect(RBRACE, "Expecting '}'");
+        literal.done(FUNCTION_LITERAL);
+        literalExpression.done(LAMBDA_EXPRESSION);
 
         myBuilder.restoreNewlinesState();
     }

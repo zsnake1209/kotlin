@@ -117,7 +117,7 @@ public interface KtNodeTypes {
     KtNodeType BODY                      = new KtNodeType("BODY", KtContainerNodeForControlStructureBody.class);
     KtNodeType BLOCK                     = new KtNodeType("BLOCK", KtBlockExpression.class);
 
-    IElementType LAMBDA_EXPRESSION       = new LambdaExpressionElementType();
+    KtNodeType LAMBDA_EXPRESSION       = new KtNodeType("LAMBDA_EXPRESSION", KtLambdaExpression.class);
 
     KtNodeType FUNCTION_LITERAL          = new KtNodeType("FUNCTION_LITERAL", KtFunctionLiteral.class);
     KtNodeType ANNOTATED_EXPRESSION      = new KtNodeType("ANNOTATED_EXPRESSION", KtAnnotatedExpression.class);
