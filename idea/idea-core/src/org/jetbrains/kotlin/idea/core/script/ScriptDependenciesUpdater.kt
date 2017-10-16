@@ -95,11 +95,9 @@ internal class ScriptDependenciesUpdater(
     }
 
     private fun tryLoadingFromDisk(file: VirtualFile): Boolean {
-        ScriptDependenciesFileAttribute.read(file)?.let { deserialized ->
-            saveToCache(deserialized, file)
-            return true
-        }
-        return false
+        val deserializedDependencies = ScriptDependenciesFileAttribute.read(file) ?: return false
+        saveToCache(deserializedDependencies, file)
+        return true
     }
 
     private fun saveToCache(deserialized: ScriptDependencies, file: VirtualFile) {

@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import org.gradle.tooling.ProjectConnection
+import org.jetbrains.kotlin.gradle.kdsl.DEFAULT_SCRIPT_NAME
 import org.jetbrains.kotlin.lexer.KotlinLexer
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.script.ScriptTemplatesProvider
@@ -171,7 +172,7 @@ fun topLevelSectionCodeTextTokens(script: CharSequence, sectionIdentifier: Strin
                 .map { it.tokenSequence }
 
 
-const val KOTLIN_BUILD_FILE_NAME = "build.gradle.kts"
+private const val KOTLIN_BUILD_FILE_NAME = DEFAULT_SCRIPT_NAME
 
 class GradleScriptDefaultDependenciesProvider(
         private val scriptDependenciesCache: ScriptDependenciesCache,
