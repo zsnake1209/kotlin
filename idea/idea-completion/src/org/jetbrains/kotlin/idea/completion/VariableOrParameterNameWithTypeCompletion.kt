@@ -47,7 +47,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.isError
 import java.util.*
 
-class ParameterNameAndTypeCompletion(
+class VariableOrParameterNameWithTypeCompletion(
         private val collector: LookupElementsCollector,
         private val lookupElementFactory: BasicLookupElementFactory,
         private val prefixMatcher: PrefixMatcher,

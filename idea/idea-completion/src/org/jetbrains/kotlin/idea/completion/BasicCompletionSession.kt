@@ -195,6 +195,10 @@ class BasicCompletionSession(
             if (declaration != null) {
                 completeDeclarationNameFromUnresolvedOrOverride(declaration)
 
+                if (declaration is KtProperty && !declaration.isLocal) {
+                    completeVariableNameAndType()
+                }
+
                 // no auto-popup on typing after "val", "var" and "fun" because it's likely the name of the declaration which is being typed by user
                 if (parameters.invocationCount == 0) {
                     val suppressOtherCompletion = when (declaration) {
@@ -475,6 +479,29 @@ class BasicCompletionSession(
                 else -> null
             }
         }
+
+        private fun completeVariableNameAndType() {
+            val variableNameAndTypeCompletion = VariableOrParameterNameWithTypeCompletion(collector, basicLookupElementFactory, prefixMatcher, resolutionFacade)
+
+            // if we are typing parameter name, restart completion each time we type an upper case letter because new suggestions will appear (previous words can be used as user prefix)
+            val prefixPattern = StandardPatterns.string().with(object : PatternCondition<String>("Prefix ends with uppercase letter") {
+                override fun accepts(prefix: String, context: ProcessingContext?) = prefix.isNotEmpty() && prefix.last().isUpperCase()
+            })
+            collector.restartCompletionOnPrefixChange(prefixPattern)
+
+            collector.addLookupElementPostProcessor { lookupElement ->
+                lookupElement.putUserData(KotlinCompletionCharFilter.HIDE_LOOKUP_ON_COLON, Unit)
+                lookupElement
+            }
+
+            variableNameAndTypeCompletion.addFromParametersInFile(position, resolutionFacade, isVisibleFilterCheckAlways)
+            flushToResultSet()
+
+            variableNameAndTypeCompletion.addFromImportedClasses(position, bindingContext, isVisibleFilterCheckAlways)
+            flushToResultSet()
+
+            variableNameAndTypeCompletion.addFromAllClasses(parameters, indicesHelper(false))
+        }
     }
 
     private val KEYWORDS_ONLY = object : CompletionKind {
@@ -641,13 +668,13 @@ class BasicCompletionSession(
 
         override fun addWeighers(sorter: CompletionSorter): CompletionSorter {
             if (shouldCompleteParameterNameAndType()) {
-                return sorter.weighBefore("prefix", ParameterNameAndTypeCompletion.Weigher)
+                return sorter.weighBefore("prefix", VariableOrParameterNameWithTypeCompletion.Weigher)
             }
             return sorter
         }
 
         private fun completeParameterNameAndType() {
-            val parameterNameAndTypeCompletion = ParameterNameAndTypeCompletion(collector, basicLookupElementFactory, prefixMatcher, resolutionFacade)
+            val parameterNameAndTypeCompletion = VariableOrParameterNameWithTypeCompletion(collector, basicLookupElementFactory, prefixMatcher, resolutionFacade)
 
             // if we are typing parameter name, restart completion each time we type an upper case letter because new suggestions will appear (previous words can be used as user prefix)
             val prefixPattern = StandardPatterns.string().with(object : PatternCondition<String>("Prefix ends with uppercase letter") {
