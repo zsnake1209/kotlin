@@ -20,14 +20,12 @@ import com.intellij.execution.configurations.CommandLineTokenizer
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import org.gradle.tooling.ProjectConnection
 import org.jetbrains.kotlin.gradle.kdsl.DEFAULT_SCRIPT_NAME
 import org.jetbrains.kotlin.lexer.KotlinLexer
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.script.ScriptTemplatesProvider
-import org.jetbrains.plugins.gradle.service.GradleBuildClasspathManager
 import org.jetbrains.plugins.gradle.service.execution.GradleExecutionHelper
 import org.jetbrains.plugins.gradle.settings.GradleExecutionSettings
 import java.io.File
@@ -175,13 +173,12 @@ fun topLevelSectionCodeTextTokens(script: CharSequence, sectionIdentifier: Strin
 private const val KOTLIN_BUILD_FILE_NAME = DEFAULT_SCRIPT_NAME
 
 class GradleScriptDefaultDependenciesProvider(
-        private val scriptDependenciesCache: ScriptDependenciesCache,
-        private val buildClasspathManager: GradleBuildClasspathManager
+        private val scriptDependenciesCache: ScriptDependenciesCache
 ) : DefaultScriptDependenciesProvider {
     override fun defaultDependenciesFor(scriptFile: VirtualFile): ScriptDependencies? {
         if (scriptFile.name != KOTLIN_BUILD_FILE_NAME) return null
 
-        return previouslyAnalyzedScriptsCombinedDependencies().takeUnless { it.classpath.isEmpty() } ?: gradleJarsFromIdeaModel()
+        return previouslyAnalyzedScriptsCombinedDependencies().takeUnless { it.classpath.isEmpty() }
     }
 
     private fun previouslyAnalyzedScriptsCombinedDependencies(): ScriptDependencies {
@@ -201,17 +198,6 @@ class GradleScriptDefaultDependenciesProvider(
                 classpath = binaries.distinct(),
                 sources = sources.distinct(),
                 imports = imports.distinct()
-        )
-    }
-
-    private fun gradleJarsFromIdeaModel(): ScriptDependencies {
-        val (sourceJars, binaryJars) = buildClasspathManager.allClasspathEntries.partition {
-            it.name == "src" || it.parent?.name == "src" || it.name.contains("-sources")
-        }
-
-        return ScriptDependencies(
-                classpath = binaryJars.map { VfsUtilCore.virtualToIoFile(it) },
-                sources = sourceJars.map { VfsUtilCore.virtualToIoFile(it) }
         )
     }
 }
