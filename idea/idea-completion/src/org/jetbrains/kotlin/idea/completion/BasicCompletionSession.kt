@@ -195,8 +195,8 @@ class BasicCompletionSession(
             if (declaration != null) {
                 completeDeclarationNameFromUnresolvedOrOverride(declaration)
 
-                if (declaration is KtProperty && !declaration.isLocal) {
-                    completeVariableNameAndType()
+                if (declaration is KtProperty) {
+                    completeVariableName(declaration.modifierList?.hasModifier(KtTokens.LATEINIT_KEYWORD) == true)
                 }
 
                 // no auto-popup on typing after "val", "var" and "fun" because it's likely the name of the declaration which is being typed by user
@@ -480,8 +480,8 @@ class BasicCompletionSession(
             }
         }
 
-        private fun completeVariableNameAndType() {
-            val variableNameAndTypeCompletion = VariableOrParameterNameWithTypeCompletion(collector, basicLookupElementFactory, prefixMatcher, resolutionFacade)
+        private fun completeVariableName(withType: Boolean) {
+            val variableNameAndTypeCompletion = VariableOrParameterNameWithTypeCompletion(collector, basicLookupElementFactory, prefixMatcher, resolutionFacade, withType)
 
             // if we are typing parameter name, restart completion each time we type an upper case letter because new suggestions will appear (previous words can be used as user prefix)
             val prefixPattern = StandardPatterns.string().with(object : PatternCondition<String>("Prefix ends with uppercase letter") {
@@ -674,7 +674,7 @@ class BasicCompletionSession(
         }
 
         private fun completeParameterNameAndType() {
-            val parameterNameAndTypeCompletion = VariableOrParameterNameWithTypeCompletion(collector, basicLookupElementFactory, prefixMatcher, resolutionFacade)
+            val parameterNameAndTypeCompletion = VariableOrParameterNameWithTypeCompletion(collector, basicLookupElementFactory, prefixMatcher, resolutionFacade, true)
 
             // if we are typing parameter name, restart completion each time we type an upper case letter because new suggestions will appear (previous words can be used as user prefix)
             val prefixPattern = StandardPatterns.string().with(object : PatternCondition<String>("Prefix ends with uppercase letter") {

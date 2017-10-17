@@ -1,6 +1,6 @@
 
 class Foo
 
-val f<caret>
+lateinit var f<caret>
 
 // EXIST: { itemText: "foo: Foo" }
