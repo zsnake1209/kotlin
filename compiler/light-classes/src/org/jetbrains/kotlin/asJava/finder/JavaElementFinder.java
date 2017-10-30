@@ -30,10 +30,14 @@ import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport;
+import org.jetbrains.kotlin.load.java.AbstractJavaClassFinder;
 import org.jetbrains.kotlin.load.java.JvmAbi;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.FqNamesUtilKt;
-import org.jetbrains.kotlin.psi.*;
+import org.jetbrains.kotlin.psi.KtClass;
+import org.jetbrains.kotlin.psi.KtClassOrObject;
+import org.jetbrains.kotlin.psi.KtEnumEntry;
+import org.jetbrains.kotlin.psi.KtFile;
 import org.jetbrains.kotlin.resolve.jvm.KotlinFinderMarker;
 
 import java.util.Collection;
@@ -182,6 +186,11 @@ public class JavaElementFinder extends PsiElementFinder implements KotlinFinderM
     @NotNull
     @Override
     public PsiClass[] getClasses(@NotNull PsiPackage psiPackage, @NotNull GlobalSearchScope scope) {
+
+        if (scope instanceof AbstractJavaClassFinder.FilterOutKotlinSourceFilesScope) {
+            return PsiClass.EMPTY_ARRAY;
+        }
+
         List<PsiClass> answer = new SmartList<>();
         FqName packageFQN = new FqName(psiPackage.getQualifiedName());
 
