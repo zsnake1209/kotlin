@@ -1,20 +1,20 @@
 <idea-plugin>
     <extensionPoints>
-        <extensionPoint name="updater" beanClass="com.intellij.openapi.fileTypes.FileTypeExtensionPoint"/>
-        <extensionPoint name="projectConfigurator" interface="org.jetbrains.kotlin.idea.configuration.KotlinProjectConfigurator"/>
+        <extensionPoint qualifiedName="org.jetbrains.kotlin.updater" beanClass="com.intellij.openapi.fileTypes.FileTypeExtensionPoint"/>
+        <extensionPoint qualifiedName="org.jetbrains.kotlin.projectConfigurator" interface="org.jetbrains.kotlin.idea.configuration.KotlinProjectConfigurator"/>
 
-        <extensionPoint name="declarationAttributeAltererExtension"
+        <extensionPoint qualifiedName="org.jetbrains.kotlin.declarationAttributeAltererExtension"
                         interface="org.jetbrains.kotlin.extensions.DeclarationAttributeAltererExtension"
                         area="IDEA_PROJECT"/>
 
-        <extensionPoint name="androidDexer"
+        <extensionPoint qualifiedName="org.jetbrains.kotlin.androidDexer"
                         interface="org.jetbrains.kotlin.idea.debugger.evaluate.classLoading.AndroidDexer"
                         area="IDEA_PROJECT"/>
 
-        <extensionPoint name="idePlatformSupport"
+        <extensionPoint qualifiedName="org.jetbrains.kotlin.idePlatformSupport"
                         interface="org.jetbrains.kotlin.caches.resolve.IdePlatformSupport"/>
 
-        <extensionPoint name="highlighterExtension"
+        <extensionPoint qualifiedName="org.jetbrains.kotlin.highlighterExtension"
                         interface="org.jetbrains.kotlin.idea.highlighter.HighlighterExtension"/>
     </extensionPoints>
 
