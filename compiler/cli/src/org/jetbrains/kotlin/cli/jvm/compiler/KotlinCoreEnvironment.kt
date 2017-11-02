@@ -459,7 +459,7 @@ class KotlinCoreEnvironment private constructor(
         ): JavaCoreApplicationEnvironment {
             Extensions.cleanRootArea(parentDisposable)
             registerAppExtensionPoints()
-            val applicationEnvironment = object : JavaCoreApplicationEnvironment(parentDisposable) {
+            val applicationEnvironment = object : JavaCoreApplicationEnvironment(parentDisposable, false) {
                 override fun createJrtFileSystem(): VirtualFileSystem? = CoreJrtFileSystem()
             }
 
