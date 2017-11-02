@@ -1,7 +1,8 @@
 package org.jetbrains.kotlin.gradle
 
-import org.gradle.api.logging.LogLevel
 import com.intellij.openapi.util.io.FileUtil
+import org.gradle.api.logging.LogLevel
+import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.util.*
 import org.junit.After
 import org.junit.AfterClass
@@ -150,7 +151,7 @@ abstract class BaseGradleIT {
 
     open inner class Project(
             val projectName: String,
-            val wrapperVersion: String,
+            val gradleVersionRequirement: GradleVersionRequirement,
             directoryPrefix: String? = null,
             val minLogLevel: LogLevel = LogLevel.DEBUG
     ) {
@@ -211,6 +212,8 @@ abstract class BaseGradleIT {
     }
 
     fun Project.build(vararg params: String, options: BuildOptions = defaultBuildOptions(), check: CompiledProject.() -> Unit) {
+        val wrapperVersion = chooseWrapperVersionOrFinishTest()
+
         val env = createEnvironmentVariablesMap(options)
         val wrapperDir = prepareWrapper(wrapperVersion, env)
         val cmd = createBuildCommand(wrapperDir, params, options)

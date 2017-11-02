@@ -14,7 +14,7 @@ import kotlin.test.assertTrue
 class Kotlin2JsGradlePluginIT : BaseGradleIT() {
     @Test
     fun testBuildAndClean() {
-        val project = Project("kotlin2JsProject", "2.10")
+        val project = Project("kotlin2JsProject", NoSpecificGradleVersion)
 
         project.build("build") {
             assertSuccessful()
@@ -35,10 +35,8 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
         project.build("build") {
             assertSuccessful()
-            assertContains(
-                    ":mainProject:compileKotlin2Js UP-TO-DATE",
-                    ":libraryProject:compileTestKotlin2Js UP-TO-DATE"
-            )
+            assertContains(":mainProject:compileKotlin2Js UP-TO-DATE")
+            assertContainsRegex(":libraryProject:compileTestKotlin2Js (UP-TO-DATE|NO-SOURCE)".toRegex())
         }
 
         project.build("clean") {
@@ -61,7 +59,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testJarIncludesJsDefaultOutput() {
-        val project = Project("kotlin2JsNoOutputFileProject", "2.10")
+        val project = Project("kotlin2JsNoOutputFileProject", NoSpecificGradleVersion)
 
         project.build("jar") {
             assertSuccessful()
@@ -77,7 +75,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testJarIncludesJsOutputSetExplicitly() {
-        val project = Project("kotlin2JsModuleKind", "2.10")
+        val project = Project("kotlin2JsModuleKind", NoSpecificGradleVersion)
 
         project.build(":jar") {
             assertSuccessful()
@@ -93,7 +91,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testModuleKind() {
-        val project = Project("kotlin2JsModuleKind", "2.10")
+        val project = Project("kotlin2JsModuleKind", NoSpecificGradleVersion)
 
         project.build("runRhino") {
             assertSuccessful()
@@ -102,7 +100,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testDefaultOutputFile() {
-        val project = Project("kotlin2JsNoOutputFileProject", "2.10")
+        val project = Project("kotlin2JsNoOutputFileProject", NoSpecificGradleVersion)
 
         project.build("build") {
             assertSuccessful()
@@ -113,7 +111,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testCompileTestCouldAccessProduction() {
-        val project = Project("kotlin2JsProjectWithTests", "2.10")
+        val project = Project("kotlin2JsProjectWithTests", NoSpecificGradleVersion)
 
         project.build("build") {
             assertSuccessful()
@@ -130,7 +128,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testCompilerTestAccessInternalProduction() {
-        val project = Project("kotlin2JsInternalTest", "2.10")
+        val project = Project("kotlin2JsInternalTest", SpecificGradleVersion("3.5"))
 
         project.build("runRhino") {
             assertSuccessful()
@@ -139,7 +137,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testJsCustomSourceSet() {
-        val project = Project("kotlin2JsProjectWithCustomSourceset", "2.10")
+        val project = Project("kotlin2JsProjectWithCustomSourceset", NoSpecificGradleVersion)
 
         project.build("build") {
             assertSuccessful()
@@ -162,7 +160,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testKotlinJsBuiltins() {
-        val project = Project("kotlinBuiltins", "4.0")
+        val project = Project("kotlinBuiltins", GradleVersionAtLeast("4.0"))
 
         project.setupWorkingDir()
         val buildGradle = File(project.projectDir, "app").getFileByName("build.gradle")
@@ -177,7 +175,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testKotlinJsSourceMap() {
-        val project = Project("kotlin2JsNoOutputFileProject", "2.10")
+        val project = Project("kotlin2JsNoOutputFileProject", NoSpecificGradleVersion)
 
         project.setupWorkingDir()
 
@@ -202,25 +200,25 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
 
     @Test
     fun testKotlinJsSourceMapInline() {
-        val project = Project("kotlin2JsProjectWithSourceMapInline", "2.10")
+        val project = Project("kotlin2JsProjectWithSourceMapInline", NoSpecificGradleVersion)
 
         project.build("build") {
             assertSuccessful()
 
-            val mapFilePath = "app/build/classes/main/app.js.map"
+            val mapFilePath = kotlinClassesDir(subproject = "app") + "app.js.map"
             assertFileExists(mapFilePath)
             val map = fileInWorkingDir(mapFilePath).readText()
 
             assertTrue("Source map should contain reference to main.kt") { map.contains("\"./src/main/kotlin/main.kt\"") }
             assertTrue("Source map should contain reference to foo.kt") { map.contains("\"./src/main/kotlin/foo.kt\"") }
-            assertTrue("Source map should contain source of main.kt") { map.contains("\"fun main(args: Array<String>) {\\n") }
-            assertTrue("Source map should contain source of foo.kt") { map.contains("\"inline fun foo(): String {\\n") }
+            assertTrue("Source map should contain source of main.kt") { map.contains("\"fun main(args: Array<String>) {") }
+            assertTrue("Source map should contain source of foo.kt") { map.contains("\"inline fun foo(): String {") }
         }
     }
 
     @Test
     fun testDce() {
-        val project = Project("kotlin2JsDceProject", "2.10", minLogLevel = LogLevel.INFO)
+        val project = Project("kotlin2JsDceProject", NoSpecificGradleVersion, minLogLevel = LogLevel.INFO)
 
         project.build("runRhino") {
             println(output)
@@ -234,7 +232,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
     /** Issue: KT-18495 */
     @Test
     fun testNoSeparateClassesDirWarning() {
-        val project = Project("kotlin2JsProject", "4.0")
+        val project = Project("kotlin2JsProject", GradleVersionAtLeast("4.0"))
         project.build("build") {
             assertSuccessful()
             assertNotContains("this build assumes a single directory for all classes from a source set")
@@ -242,7 +240,7 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
     }
 
     @Test
-    fun testIncrementalCompilation() = Project("kotlin2JsICProject", "4.0").run {
+    fun testIncrementalCompilation() = Project("kotlin2JsICProject", GradleVersionAtLeast("4.0")).run {
         build("build") {
             assertSuccessful()
             assertContains(USING_EXPERIMENTAL_JS_INCREMENTAL_COMPILATION_MESSAGE)

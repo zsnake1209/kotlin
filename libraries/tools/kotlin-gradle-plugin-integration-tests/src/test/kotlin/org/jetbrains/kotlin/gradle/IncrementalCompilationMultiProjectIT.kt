@@ -9,7 +9,7 @@ import java.io.File
 
 class IncrementalCompilationMultiProjectIT : BaseGradleIT() {
     companion object {
-        private val GRADLE_VERSION = "2.10"
+        private val GRADLE_VERSION = NoSpecificGradleVersion
         private val ANDROID_GRADLE_PLUGIN_VERSION = "1.5.+"
     }
 
@@ -195,7 +195,7 @@ open class A {
 
     @Test
     fun testAndroid() {
-        val project = Project("AndroidProject", GRADLE_VERSION)
+        val project = Project("AndroidProject", SpecificGradleVersion("2.10"))
         val options = androidBuildOptions()
 
         project.build("assembleDebug", options = options) {
