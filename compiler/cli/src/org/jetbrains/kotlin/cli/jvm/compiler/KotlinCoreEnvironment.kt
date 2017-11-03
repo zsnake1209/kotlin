@@ -110,6 +110,8 @@ import org.jetbrains.kotlin.script.ScriptReportSink
 import org.jetbrains.kotlin.utils.PathUtil
 import java.io.File
 import java.util.zip.ZipFile
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.isAccessible
 
 class KotlinCoreEnvironment private constructor(
         parentDisposable: Disposable,
@@ -155,7 +157,9 @@ class KotlinCoreEnvironment private constructor(
     val configuration: CompilerConfiguration = initialConfiguration.apply { setupJdkClasspathRoots(configFiles) }.copy()
 
     init {
-        PersistentFSConstants.setMaxIntellisenseFileSize(FileUtilRt.LARGE_FOR_CONTENT_LOADING)
+        PersistentFSConstants::class.java.getDeclaredField("ourMaxIntellisenseFileSize")
+                .apply { isAccessible = true }
+                .setInt(null, FileUtilRt.LARGE_FOR_CONTENT_LOADING)
 
         val project = projectEnvironment.project
 
