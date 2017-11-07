@@ -422,7 +422,12 @@ class KotlinCoreEnvironment private constructor(
         ): KotlinCoreEnvironment {
             // Tests are supposed to create a single project and dispose it right after use
             return KotlinCoreEnvironment(parentDisposable,
-                                         createApplicationEnvironment(parentDisposable, configuration, extensionConfigs.files),
+                                         createApplicationEnvironment(
+                                                 parentDisposable,
+                                                 configuration,
+                                                 extensionConfigs.files,
+                                                 unitTestMode = true
+                                         ),
                                          configuration,
                                          extensionConfigs)
         }
@@ -438,7 +443,7 @@ class KotlinCoreEnvironment private constructor(
                     return ourApplicationEnvironment!!
 
                 val parentDisposable = Disposer.newDisposable()
-                ourApplicationEnvironment = createApplicationEnvironment(parentDisposable, configuration, configFilePaths)
+                ourApplicationEnvironment = createApplicationEnvironment(parentDisposable, configuration, configFilePaths, unitTestMode = false)
                 ourProjectCount = 0
                 Disposer.register(parentDisposable, Disposable {
                     synchronized (APPLICATION_LOCK) {
@@ -459,11 +464,14 @@ class KotlinCoreEnvironment private constructor(
         }
 
         private fun createApplicationEnvironment(
-                parentDisposable: Disposable, configuration: CompilerConfiguration, configFilePaths: List<String>
+                parentDisposable: Disposable,
+                configuration: CompilerConfiguration,
+                configFilePaths: List<String>,
+                unitTestMode: Boolean = true
         ): JavaCoreApplicationEnvironment {
             Extensions.cleanRootArea(parentDisposable)
             registerAppExtensionPoints()
-            val applicationEnvironment = object : JavaCoreApplicationEnvironment(parentDisposable, false) {
+            val applicationEnvironment = object : JavaCoreApplicationEnvironment(parentDisposable, unitTestMode) {
                 override fun createJrtFileSystem(): VirtualFileSystem? = CoreJrtFileSystem()
             }
 
