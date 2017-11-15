@@ -54,7 +54,7 @@ const val KOTLIN_BUILD_DIR_NAME = "kotlin"
 const val USING_INCREMENTAL_COMPILATION_MESSAGE = "Using Kotlin incremental compilation"
 const val USING_EXPERIMENTAL_JS_INCREMENTAL_COMPILATION_MESSAGE = "Using experimental Kotlin/JS incremental compilation"
 
-abstract class AbstractKotlinCompileTool<T : CommonToolArguments>() : AbstractCompile() {
+abstract class AbstractKotlinCompileTool<T : CommonToolArguments>() : AbstractCompile(), CompilerArgumentAware {
     // TODO: deprecate and remove
     @get:Internal
     var compilerJarFile: File? = null
@@ -72,10 +72,24 @@ abstract class AbstractKotlinCompileTool<T : CommonToolArguments>() : AbstractCo
                 ?: findKotlinCompilerClasspath(project).takeIf { it.isNotEmpty() }
                 ?: throw IllegalStateException("Could not find Kotlin Compiler classpath. Please specify $name.compilerClasspath")
 
+    override val serializedCompilerArguments: List<String>
+        get() = ArgumentUtils.convertArgumentsToStringList(prepareCompilerArguments())
+
+    override val defaultSerializedCompilerArguments: List<String>
+        get() = createCompilerArgs()
+                .also { setupCompilerArgs(it, defaultsOnly = true) }
+                .let(ArgumentUtils::convertArgumentsToStringList)
+
+    protected fun prepareCompilerArguments(): T = createCompilerArgs().also { setupCompilerArgs(it) }
+
+    abstract fun createCompilerArgs(): T
+
+    abstract fun setupCompilerArgs(args: T, defaultsOnly: Boolean = false)
+
     protected abstract fun findKotlinCompilerClasspath(project: Project): List<File>
 }
 
-abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKotlinCompileTool<T>(), CompilerArgumentAware {
+abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKotlinCompileTool<T>() {
     @get:LocalState
     internal val taskBuildDirectory: File
         get() = File(File(project.buildDir, KOTLIN_BUILD_DIR_NAME), name).apply { mkdirs() }
@@ -105,8 +119,6 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
             return cacheVersions.all { it.checkVersion() == CacheVersion.Action.DO_NOTHING }
         }
 
-    abstract protected fun createCompilerArgs(): T
-
     @get:Internal
     internal val pluginOptions = CompilerPluginOptions()
 
@@ -117,22 +129,6 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
     protected val compileClasspath: Iterable<File>
         get() = (classpath + additionalClasspath)
                 .filterTo(LinkedHashSet(), File::exists)
-
-    @get:Input
-    override val serializedCompilerArguments: List<String>
-        get() {
-            val arguments = createCompilerArgs()
-            setupCompilerArgs(arguments)
-            return ArgumentUtils.convertArgumentsToStringList(arguments)
-        }
-
-    @get:Internal
-    override val defaultSerializedCompilerArguments: List<String>
-        get() {
-            val arguments = createCompilerArgs()
-            setupCompilerArgs(arguments, true)
-            return ArgumentUtils.convertArgumentsToStringList(arguments)
-        }
 
     @get:Internal
     private val kotlinExt: KotlinProjectExtension
@@ -233,8 +229,7 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
         }
 
         sourceRoots.log(this.name, logger)
-        val args = createCompilerArgs()
-        setupCompilerArgs(args)
+        val args = prepareCompilerArguments()
 
         compilerCalled = true
         callCompiler(args, sourceRoots, ChangedFiles(inputs))
@@ -245,7 +240,7 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
 
     internal abstract fun callCompiler(args: T, sourceRoots: SourceRoots, changedFiles: ChangedFiles)
 
-    open fun setupCompilerArgs(args: T, defaultsOnly: Boolean = false) {
+    override fun setupCompilerArgs(args: T, defaultsOnly: Boolean) {
         args.coroutinesState = when (coroutines) {
             Coroutines.ENABLE -> CommonCompilerArguments.ENABLE
             Coroutines.WARN -> CommonCompilerArguments.WARN

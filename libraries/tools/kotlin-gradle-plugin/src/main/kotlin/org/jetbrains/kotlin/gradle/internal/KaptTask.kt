@@ -2,17 +2,18 @@ package org.jetbrains.kotlin.gradle.internal
 
 import com.intellij.openapi.util.io.FileUtil
 import org.gradle.api.GradleException
+import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
-import org.gradle.api.internal.ConventionTask
 import org.gradle.api.tasks.*
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.compilerRunner.GradleCompilerEnvironment
 import org.jetbrains.kotlin.compilerRunner.GradleCompilerRunner
 import org.jetbrains.kotlin.compilerRunner.OutputItemsCollectorImpl
+import org.jetbrains.kotlin.gradle.dsl.CompilerArgumentAware
 import org.jetbrains.kotlin.gradle.tasks.*
 import java.io.File
 
-open class KaptTask : ConventionTask() {
+open class KaptTask : AbstractKotlinCompileTool<K2JVMCompilerArguments>(), CompilerArgumentAware {
     @get:Internal
     internal val pluginOptions = CompilerPluginOptions()
 
@@ -30,12 +31,19 @@ open class KaptTask : ConventionTask() {
     @get:OutputDirectory
     internal lateinit var classesDir: File
 
-    @get:OutputDirectory
-    lateinit var destinationDir: File
+    override fun createCompilerArgs(): K2JVMCompilerArguments = K2JVMCompilerArguments()
 
-    @get:Classpath @get:InputFiles
-    val classpath: FileCollection
-        get() = kotlinCompileTask.classpath
+    override fun setupCompilerArgs(args: K2JVMCompilerArguments, defaultsOnly: Boolean) {
+        kotlinCompileTask.setupCompilerArgs(args)
+
+        args.pluginClasspaths = (pluginOptions.classpath + args.pluginClasspaths!!).toSet().toTypedArray()
+        args.pluginOptions = (pluginOptions.arguments + args.pluginOptions!!).toTypedArray()
+        args.verbose = project.hasProperty("kapt.verbose") && project.property("kapt.verbose").toString().toBoolean() == true
+    }
+
+    override fun findKotlinCompilerClasspath(project: Project): List<File> = findKotlinJvmCompilerClasspath(project)
+
+    override fun getClasspath(): FileCollection = kotlinCompileTask.classpath
 
     val source: FileCollection
         @InputFiles get() {
@@ -47,7 +55,7 @@ open class KaptTask : ConventionTask() {
         }
 
     @TaskAction
-    fun compile() {
+    override fun compile() {
         /** Delete everything inside generated sources and classes output directory
          * (annotation processing is not incremental) */
         destinationDir.clearDirectory()
@@ -57,17 +65,11 @@ open class KaptTask : ConventionTask() {
         val rawSourceRoots = FilteringSourceRootsContainer(sourceRootsFromKotlin, { !isInsideDestinationDirs(it) })
         val sourceRoots = SourceRoots.ForJvm.create(kotlinCompileTask.source, rawSourceRoots)
 
-        // todo handle the args like those of the compile tasks
-        val args = K2JVMCompilerArguments()
-        kotlinCompileTask.setupCompilerArgs(args)
-
-        args.pluginClasspaths = (pluginOptions.classpath + args.pluginClasspaths!!).toSet().toTypedArray()
-        args.pluginOptions = (pluginOptions.arguments + args.pluginOptions!!).toTypedArray()
-        args.verbose = project.hasProperty("kapt.verbose") && project.property("kapt.verbose").toString().toBoolean() == true
+        val args = prepareCompilerArguments()
 
         val messageCollector = GradleMessageCollector(logger)
         val outputItemCollector = OutputItemsCollectorImpl()
-        val environment = GradleCompilerEnvironment(kotlinCompileTask.computedCompilerClasspath, messageCollector, outputItemCollector, args)
+        val environment = GradleCompilerEnvironment(computedCompilerClasspath, messageCollector, outputItemCollector, args)
         if (environment.toolsJar == null) {
             throw GradleException("Could not find tools.jar in system classpath, which is required for kapt to work")
         }
