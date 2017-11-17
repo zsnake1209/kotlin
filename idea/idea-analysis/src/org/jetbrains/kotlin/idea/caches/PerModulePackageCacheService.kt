@@ -19,8 +19,10 @@ package org.jetbrains.kotlin.idea.caches
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.FileTypeRegistry
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
@@ -50,8 +52,11 @@ class KotlinPackageContentModificationListener(
         val connection = project.messageBus.connect()
 
         connection.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
-            override fun before(events: MutableList<out VFileEvent>) = onEvents(events) { it is VFileDeleteEvent || it is VFileMoveEvent }
-            override fun after(events: List<VFileEvent>) = onEvents(events) { it is VFileMoveEvent || it is VFileCreateEvent || it is VFileCopyEvent }
+            override fun before(events: MutableList<out VFileEvent>) = onEvents(events, ::isRelevant)
+            override fun after(events: List<VFileEvent>) = onEvents(events, ::isRelevant)
+
+            private fun isRelevant(it: VFileEvent): Boolean =
+                    it is VFileMoveEvent || it is VFileCreateEvent || it is VFileCopyEvent || it is VFileDeleteEvent
 
             fun onEvents(events: List<VFileEvent>, eventPredicate: (VFileEvent) -> Boolean) {
 
@@ -63,8 +68,9 @@ class KotlinPackageContentModificationListener(
                     events
                             .asSequence()
                             .filter(eventPredicate)
+                            .filter { it.file != null }
                             .mapNotNull { it.file }
-                            .filter { FileTypeRegistry.getInstance().getFileTypeByFileName(it.name) == KotlinFileType.INSTANCE }
+                            .filter { it.isDirectory || FileTypeRegistry.getInstance().getFileTypeByFileName(it.name) == KotlinFileType.INSTANCE }
                             .forEach { file -> service.notifyPackageChange(file) }
                 }
             }
@@ -100,24 +106,19 @@ class PerModulePackageCacheService(private val project: Project) {
 
     private val cache = ContainerUtil.createConcurrentWeakMap<ModuleInfo, Ref<ConcurrentMap<FqName, Boolean>>>()
 
-    private val pendingDirectoryChanges: MutableSet<VirtualFile> = mutableSetOf()
+    private val pendingVFileChanges: MutableSet<VirtualFile> = mutableSetOf()
     private val pendingKtFileChanges: MutableSet<KtFile> = mutableSetOf()
 
     private val projectScope = GlobalSearchScope.projectScope(project)
 
     internal fun onTooComplexChange() = synchronized(this) {
-        pendingDirectoryChanges.clear()
+        pendingVFileChanges.clear()
         pendingKtFileChanges.clear()
         cache.values.forEach { it.set(null) }
     }
 
     internal fun notifyPackageChange(file: VirtualFile): Unit = synchronized(this) {
-        if (file.isDirectory) {
-            pendingDirectoryChanges += file
-        }
-        else if (file.parent != null && file.parent.isDirectory) {
-            notifyPackageChange(file.parent)
-        }
+        pendingVFileChanges += file
     }
 
     internal fun notifyPackageChange(file: KtFile): Unit = synchronized(this) {
@@ -129,18 +130,39 @@ class PerModulePackageCacheService(private val project: Project) {
     }
 
     internal fun checkPendingChanges() = synchronized(this) {
-        if (pendingDirectoryChanges.size + pendingKtFileChanges.size >= FULL_DROP_THRESHOLD) {
+        if (pendingVFileChanges.size + pendingKtFileChanges.size >= FULL_DROP_THRESHOLD) {
             onTooComplexChange()
         }
         else {
-            pendingDirectoryChanges.forEach { vfile ->
-                if (vfile !in projectScope) return@forEach
-                (getModuleInfoByVirtualFile(project, vfile) as? ModuleSourceInfo)?.let { invalidateCacheForModule(it) }
+
+            pendingVFileChanges.forEach { vfile ->
+                if (vfile.isDirectory) {
+                    cache.keys
+                            .filterIsInstance<ModuleSourceInfo>()
+                            .forEach { sourceInfo ->
+                                val module = sourceInfo.module
+                                val sourceRoots = module.rootManager.sourceRootUrls
+
+                                if (sourceRoots.any {
+                                    VfsUtilCore.isEqualOrAncestor(vfile.url, it)
+                                    || VfsUtilCore.isEqualOrAncestor(it, vfile.url)
+                                }) {
+                                    invalidateCacheForModule(sourceInfo)
+                                }
+                            }
+                }
+                else {
+                    (getModuleInfoByVirtualFile(project, vfile) as? ModuleSourceInfo)?.let {
+                        invalidateCacheForModule(it)
+                    }
+                }
             }
-            pendingDirectoryChanges.clear()
+            pendingVFileChanges.clear()
 
             pendingKtFileChanges.forEach { file ->
-                if (file.virtualFile != null && file.virtualFile !in projectScope) return@forEach
+                if (file.virtualFile != null && file.virtualFile !in projectScope) {
+                    return@forEach
+                }
                 (file.getNullableModuleInfo() as? ModuleSourceInfo)?.let { invalidateCacheForModule(it) }
             }
             pendingKtFileChanges.clear()
