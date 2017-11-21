@@ -328,6 +328,27 @@ public class SingleAbstractMethodUtils {
         List<ValueParameterDescriptor> valueParameters = new ArrayList<>(originalValueParameters.size());
         for (ValueParameterDescriptor originalParam : originalValueParameters) {
             KotlinType originalType = originalParam.getType();
+            KotlinType originalOriginalType = original.getOriginal().getValueParameters().get(originalParam.getIndex()).getType();
+            TypeProjection projection = substitutor.getSubstitution().get(originalOriginalType);
+            // When we create SAM adapter for calls like
+            // foo(K k, Predicate<V> p) and `K` is substituted as functional type, we do not want to create SAM adapter for parameter k
+            // so, we just leave it unchanged
+            if (TypeUtils.isTypeParameter(originalOriginalType) && projection == null) {
+                KotlinType type = substitutor.substitute(originalType, Variance.IN_VARIANCE);
+                if (type != null) {
+                    valueParameters.add(
+                            new ValueParameterDescriptorImpl(
+                                    samAdapter, null, originalParam.getIndex(), originalParam.getAnnotations(),
+                                    originalParam.getName(), type,
+                                    /* declaresDefaultValue = */ false,
+                                    /* isCrossinline = */ false,
+                                    /* isNoinline = */ false,
+                                    null, SourceElement.NO_SOURCE
+                            )
+                    );
+                    continue;
+                }
+            }
             KotlinType functionType = getFunctionTypeForSamType(originalType, samResolver);
             KotlinType newTypeUnsubstituted = functionType != null ? functionType : originalType;
             KotlinType newType = substitutor.substitute(newTypeUnsubstituted, Variance.IN_VARIANCE);

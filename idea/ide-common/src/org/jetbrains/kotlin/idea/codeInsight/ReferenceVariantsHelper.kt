@@ -23,6 +23,8 @@ import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.idea.resolve.frontendService
 import org.jetbrains.kotlin.idea.util.*
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
+import org.jetbrains.kotlin.load.java.sam.SamAdapterDescriptor
+import org.jetbrains.kotlin.load.java.sam.SamConstructorDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.FqNameUnsafe
 import org.jetbrains.kotlin.name.Name
@@ -41,10 +43,12 @@ import org.jetbrains.kotlin.resolve.scopes.receivers.ClassQualifier
 import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
 import org.jetbrains.kotlin.resolve.scopes.utils.collectDescriptorsFiltered
 import org.jetbrains.kotlin.resolve.scopes.utils.memberScopeAsImportingScope
+import org.jetbrains.kotlin.synthetic.SamAdapterExtensionFunctionDescriptor
 import org.jetbrains.kotlin.synthetic.SyntheticJavaPropertyDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.expressions.DoubleColonLHS
 import org.jetbrains.kotlin.types.typeUtil.isUnit
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 import java.util.*
 
 class ReferenceVariantsHelper(
@@ -408,13 +412,20 @@ class ReferenceVariantsHelper(
 
         val syntheticScopes = resolutionFacade.getFrontendService(SyntheticScopes::class.java)
         if (kindFilter.acceptsKinds(DescriptorKindFilter.VARIABLES_MASK)) {
-            for (extension in syntheticScopes.collectSyntheticExtensionProperties(receiverTypes)) {
+            for (extension in receiverTypes.flatMap {
+                val synthetic = syntheticScopes.provideSyntheticScope(it.memberScope, SyntheticScopesRequirements(needExtensionProperties = true))
+                synthetic.getContributedDescriptors().filterIsInstance<SyntheticJavaPropertyDescriptor>()
+            }) {
                 process(extension)
             }
         }
 
         if (kindFilter.acceptsKinds(DescriptorKindFilter.FUNCTIONS_MASK)) {
-            for (syntheticMember in syntheticScopes.collectSyntheticMemberFunctions(receiverTypes)) {
+            val synthetics = receiverTypes.flatMap { type ->
+                syntheticScopes.provideSyntheticScope(type.memberScope, SyntheticScopesRequirements(needMemberFunctions = true))
+                        .getContributedDescriptors(kindFilter).filterIsInstance<SamAdapterExtensionFunctionDescriptor>()
+            }
+            for (syntheticMember in synthetics) {
                 process(syntheticMember)
             }
         }
@@ -435,6 +446,8 @@ fun ResolutionScope.collectSyntheticStaticMembersAndConstructors(
         nameFilter: (Name) -> Boolean
 ): List<FunctionDescriptor> {
     val syntheticScopes = resolutionFacade.getFrontendService(SyntheticScopes::class.java)
-    return (syntheticScopes.collectSyntheticStaticFunctions(this) + syntheticScopes.collectSyntheticConstructors(this))
-            .filter { kindFilter.accepts(it) && nameFilter(it.name) }
+    val scope = syntheticScopes.provideSyntheticScope(this, SyntheticScopesRequirements(needStaticFunctions = true, needConstructors = true))
+    return scope.getContributedDescriptors(kindFilter, nameFilter)
+            .filter { it is SamAdapterDescriptor<*> || it is SamConstructorDescriptor }
+            .filterIsInstance<FunctionDescriptor>()
 }
