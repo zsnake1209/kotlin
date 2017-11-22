@@ -106,6 +106,7 @@ class KotlinPackageStatementPsiTreeChangePreprocessor(private val project: Proje
 class PerModulePackageCacheService(private val project: Project) {
 
     /*
+     * Disposal of entries handled by Module child Disposable registered in packageExists
      * Actually an StrongMap<Module, SoftMap<ModuleSourceInfo, SoftMap<FqName, Boolean>>>
      */
     private val cache = ConcurrentHashMap<Module, ConcurrentMap<ModuleSourceInfo, ConcurrentMap<FqName, Boolean>>>()
@@ -148,8 +149,7 @@ class PerModulePackageCacheService(private val project: Project) {
                     for ((module, data) in cache) {
                         val sourceRootUrls = module.rootManager.sourceRootUrls
                         if (sourceRootUrls.any { url ->
-                            VfsUtilCore.isEqualOrAncestor(vfile.url, url)
-                            || vfile.isDirectory && VfsUtilCore.isEqualOrAncestor(url, vfile.url)
+                            vfile.containedInOrContains(url)
                         }) {
                             data.clear()
                         }
@@ -172,6 +172,10 @@ class PerModulePackageCacheService(private val project: Project) {
             pendingKtFileChanges.clear()
         }
     }
+
+    private fun VirtualFile.containedInOrContains(root: String) =
+            (VfsUtilCore.isEqualOrAncestor(url, root)
+             || isDirectory && VfsUtilCore.isEqualOrAncestor(root, url))
 
 
     fun packageExists(packageFqName: FqName, moduleInfo: ModuleSourceInfo): Boolean {
