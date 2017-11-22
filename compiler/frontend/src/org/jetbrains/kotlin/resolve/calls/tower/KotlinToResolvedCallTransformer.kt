@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.resolve.calls.tower
 
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.*
@@ -530,25 +531,38 @@ class NewResolvedCallImpl<D : CallableDescriptor>(
             isCompleted = true
         }
 
-        resultingDescriptor = run {
-            val candidateDescriptor = resolvedCallAtom.candidateDescriptor
-            val containsCapturedTypes = resolvedCallAtom.candidateDescriptor.returnType?.contains { it is NewCapturedType } ?: false
-
-            when {
-                candidateDescriptor is FunctionDescriptor ||
-                (candidateDescriptor is PropertyDescriptor && (candidateDescriptor.typeParameters.isNotEmpty() || containsCapturedTypes)) ->
-                    // this code is very suspicious. Now it is very useful for BE, because they cannot do nothing with captured types,
-                    // but it seems like temporary solution.
-                    candidateDescriptor.substitute(resolvedCallAtom.substitutor).substituteAndApproximateCapturedTypes(
-                            substitutor ?: FreshVariableNewTypeSubstitutor.Empty)
-                else ->
-                    candidateDescriptor
-            }
-        } as D
+        resultingDescriptor = substituteAndApproximate(substitutor) as D
 
         typeArguments = resolvedCallAtom.substitutor.freshVariables.map {
             val substituted = (substitutor ?: FreshVariableNewTypeSubstitutor.Empty).safeSubstitute(it.defaultType)
             TypeApproximator().approximateToSuperType(substituted, TypeApproximatorConfiguration.CapturedTypesApproximation) ?: substituted
+        }
+    }
+
+    private fun substituteAndApproximate(substitutor: NewTypeSubstitutor?): CallableDescriptor {
+        val candidateDescriptor = resolvedCallAtom.candidateDescriptor
+        val containsCapturedTypes = resolvedCallAtom.candidateDescriptor.returnType?.contains { it is NewCapturedType } ?: false
+
+        fun substitute(): CallableDescriptor {
+            return candidateDescriptor
+                    .substitute(resolvedCallAtom.substitutor)
+                    .substituteAndApproximateCapturedTypes(substitutor ?: FreshVariableNewTypeSubstitutor.Empty)
+        }
+
+        return when {
+            candidateDescriptor is FunctionDescriptor -> substitute()
+
+            candidateDescriptor is PropertyDescriptor && (candidateDescriptor.typeParameters.isNotEmpty() || containsCapturedTypes) -> {
+                if (candidateDescriptor.setter != null) {
+                    candidateDescriptor.safeAs<PropertyDescriptorImpl>()?.setSetterProjectedOut(containsCapturedTypes)
+                }
+
+                // this code is very suspicious. Now it is very useful for BE, because they cannot do nothing with captured types,
+                // but it seems like temporary solution.
+                substitute()
+            }
+
+            else -> candidateDescriptor
         }
     }
 
