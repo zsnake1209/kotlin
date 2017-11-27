@@ -20,10 +20,13 @@ import java.lang.annotation.*;
 
 /**
  * Annotate anything of type descendant from Iterable or Iterator with @Mutable if the corresponding collection/iterator
- * is allowed to be mutated
+ * is allowed to be mutated.
+ *
+ * @deprecated Use kotlin.annotations.jvm.Mutable instead
  */
 @Documented
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
+@Deprecated
 public @interface Mutable {
 }
