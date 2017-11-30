@@ -114,8 +114,8 @@ class AndroidComponentRegistrar : ComponentRegistrar {
             registerParcelExtensions(project)
         }
 
-        if (variants.isNotEmpty() && !applicationPackage.isNullOrBlank()) {
-            val layoutXmlFileManager = CliAndroidLayoutXmlFileManager(project, applicationPackage!!, variants)
+        if (variants.isNotEmpty() && !applicationPackage.isBlank()) {
+            val layoutXmlFileManager = CliAndroidLayoutXmlFileManager(project, applicationPackage, variants)
             project.registerService(AndroidLayoutXmlFileManager::class.java, layoutXmlFileManager)
 
             ExpressionCodegenExtension.registerExtension(project, CliAndroidExtensionsExpressionCodegenExtension(isExperimental, globalCacheImpl))

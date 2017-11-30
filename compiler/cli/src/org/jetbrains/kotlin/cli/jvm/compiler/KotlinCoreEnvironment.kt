@@ -107,6 +107,7 @@ import org.jetbrains.kotlin.script.ScriptDefinitionProvider
 import org.jetbrains.kotlin.script.ScriptDependenciesProvider
 import org.jetbrains.kotlin.script.ScriptReportSink
 import org.jetbrains.kotlin.script.StandardScriptDefinition
+import org.jetbrains.kotlin.synthetic.extensions.SyntheticScopeProviderExtension
 import org.jetbrains.kotlin.utils.PathUtil
 import java.io.File
 import java.util.zip.ZipFile
@@ -170,6 +171,7 @@ class KotlinCoreEnvironment private constructor(
         DeclarationAttributeAltererExtension.registerExtensionPoint(project)
         PreprocessedVirtualFileFactoryExtension.registerExtensionPoint(project)
         JsSyntheticTranslateExtension.registerExtensionPoint(project)
+        SyntheticScopeProviderExtension.registerExtensionPoint(project)
 
         for (registrar in configuration.getList(ComponentRegistrar.PLUGIN_COMPONENT_REGISTRARS)) {
             try {

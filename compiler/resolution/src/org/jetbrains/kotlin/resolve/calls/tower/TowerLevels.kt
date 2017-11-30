@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.resolve.calls.tower
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.DescriptorEquivalenceForOverrides
 import org.jetbrains.kotlin.resolve.calls.smartcasts.getReceiverValueWithSmartCast
 import org.jetbrains.kotlin.resolve.calls.util.FakeCallableDescriptorForObject
 import org.jetbrains.kotlin.resolve.calls.util.FakeCallableDescriptorForTypeAliasObject
@@ -182,10 +183,12 @@ internal class MemberScopeTowerLevel(
 }
 
 internal class QualifierScopeTowerLevel(scopeTower: ImplicitScopeTower, val qualifier: QualifierReceiver) : AbstractScopeTowerLevel(scopeTower) {
-    override fun getVariables(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?) = qualifier.staticScope
-            .getContributedVariables(name, location).map {
-                createCandidateDescriptor(it, dispatchReceiver = null)
-            }
+    private val syntheticScopes = scopeTower.syntheticScopes
+    override fun getVariables(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?) =
+            syntheticScopes
+                    .provideSyntheticScope(qualifier.staticScope, SyntheticScopesMetadata(needStaticFields = true))
+                    .getContributedVariables(name, location)
+                    .map { createCandidateDescriptor(it, dispatchReceiver = null) }
 
     override fun getObjects(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?) = qualifier.staticScope
             .getContributedObjectVariables(name, location).map {
@@ -207,11 +210,13 @@ internal open class ScopeBasedTowerLevel protected constructor(
         scopeTower: ImplicitScopeTower,
         private val resolutionScope: ResolutionScope
 ) : AbstractScopeTowerLevel(scopeTower) {
+    private val syntheticScopes = scopeTower.syntheticScopes
 
     internal constructor(scopeTower: ImplicitScopeTower, lexicalScope: LexicalScope) : this(scopeTower, lexicalScope as ResolutionScope)
 
     override fun getVariables(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?): Collection<CandidateWithBoundDispatchReceiver>
-            = resolutionScope.getContributedVariables(name, location).map {
+            = syntheticScopes.provideSyntheticScope(resolutionScope, SyntheticScopesMetadata(needStaticFields = true))
+            .getContributedVariables(name, location).map {
                 createCandidateDescriptor(it, dispatchReceiver = null)
             }
 
