@@ -109,6 +109,11 @@ tasks.withType(Test) {
             }
         }
     }
+
+    if (project.hasProperty("teamcity")) {
+        doFirst { println "##teamcity[testSuiteStarted name='$name']" }
+        doLast { println "##teamcity[testSuiteFinished name='$name']" }
+    }
 }
 
 def jpsIncrementalTestsClass = '**/KotlinGradlePluginJpsParametrizedIT.class'
