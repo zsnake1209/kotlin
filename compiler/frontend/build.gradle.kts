@@ -7,6 +7,7 @@ jvmTarget = "1.6"
 val jflexPath by configurations.creating
 
 dependencies {
+    compile(project(":kotlin-annotations-jvm"))
     compile(project(":core:descriptors"))
     compile(project(":core:deserialization"))
     compile(project(":compiler:util"))

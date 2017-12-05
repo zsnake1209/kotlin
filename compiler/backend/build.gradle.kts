@@ -5,6 +5,7 @@ apply { plugin("jps-compatible") }
 jvmTarget = "1.6"
 
 dependencies {
+    compile(project(":kotlin-annotations-jvm"))
     compile(project(":compiler:util"))
     compile(project(":compiler:backend-common"))
     compile(project(":compiler:frontend"))
