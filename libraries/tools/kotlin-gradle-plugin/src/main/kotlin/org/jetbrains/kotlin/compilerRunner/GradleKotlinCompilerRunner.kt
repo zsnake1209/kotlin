@@ -97,9 +97,8 @@ internal class GradleCompilerRunner(private val project: Project) : KotlinCompil
                 friendDirs = args.friendPaths?.map(::File) ?: emptyList())
         args.buildFile = buildFile.absolutePath
 
-        if (environment !is GradleIncrementalCompilerEnvironment) {
-            args.destination = null
-        }
+        val destination = args.destination
+        args.destination = null
 
         var deleteBuildFile = true
 
@@ -109,6 +108,7 @@ internal class GradleCompilerRunner(private val project: Project) : KotlinCompil
             return res
         }
         finally {
+            args.destination = destination
             if (deleteBuildFile) {
                 buildFile.delete()
             }
