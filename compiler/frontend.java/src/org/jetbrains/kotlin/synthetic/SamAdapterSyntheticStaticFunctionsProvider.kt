@@ -19,7 +19,7 @@ package org.jetbrains.kotlin.synthetic
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.incremental.components.LookupLocation
-import org.jetbrains.kotlin.incremental.components.NoLookupLocation
+import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.load.java.components.SamConversionResolver
 import org.jetbrains.kotlin.load.java.descriptors.JavaMethodDescriptor
 import org.jetbrains.kotlin.load.java.sam.SingleAbstractMethodUtils
@@ -27,54 +27,59 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.*
 import org.jetbrains.kotlin.storage.StorageManager
 
-private class SamAdapterSyntheticStaticFunctionsScope(
+private class SamAdapterSyntheticStaticFunctionsCache(
         storageManager: StorageManager,
-        private val samResolver: SamConversionResolver,
-        override val wrappedScope: ResolutionScope
-) : SyntheticResolutionScope() {
-    val functions = storageManager.createMemoizedFunction<Name, List<FunctionDescriptor>> {
-        super.getContributedFunctions(it, NoLookupLocation.FROM_SYNTHETIC_SCOPE) + doGetFunctions(it)
-    }
+        private val samResolver: SamConversionResolver
+) {
+    val functions = storageManager.createMemoizedFunctionWithNullableValues<FunctionDescriptor, FunctionDescriptor> { wrapFunction(it) }
 
-    val descriptors = storageManager.createLazyValue {
-        doGetDescriptors()
-    }
-
-    private fun doGetFunctions(name: Name) =
-            super.getContributedFunctions(name, NoLookupLocation.FROM_SYNTHETIC_SCOPE)
-                    .mapNotNull { wrapFunction(it) }
-
-    private fun wrapFunction(function: DeclarationDescriptor): FunctionDescriptor? {
+    private fun wrapFunction(function: FunctionDescriptor): FunctionDescriptor? {
         if (function !is JavaMethodDescriptor) return null
         if (function.dispatchReceiverParameter != null) return null // consider only statics
         if (!SingleAbstractMethodUtils.isSamAdapterNecessary(function)) return null
 
         return SingleAbstractMethodUtils.createSamAdapterFunction(function, samResolver)
     }
+}
 
-    private fun doGetDescriptors(): List<FunctionDescriptor> =
-            super.getContributedDescriptors(DescriptorKindFilter.FUNCTIONS, MemberScope.ALL_NAME_FILTER)
-                    .mapNotNull { wrapFunction(it) }
+private class SamAdapterSyntheticStaticFunctionsScope(
+        private val cache: SamAdapterSyntheticStaticFunctionsCache,
+        private val lookupTracker: LookupTracker,
+        override val workerScope: ResolutionScope
+) : AbstractResolutionScopeAdapter() {
+    override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<FunctionDescriptor> {
+        val original = super.getContributedFunctions(name, location)
+        val synthetics = original.mapNotNull { cache.functions(it) }
+        if (synthetics.isEmpty()) return original
+        recordLookups(synthetics, location)
+        return synthetics + original
+    }
 
-    override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<FunctionDescriptor> = functions(name)
+    private fun recordLookups(functions: Collection<FunctionDescriptor>, location: LookupLocation) {
+        functions.forEach { recordSamLookupsForParameters(it.original, location) }
+    }
+
+    private fun recordSamLookupsForParameters(function: FunctionDescriptor, location: LookupLocation) {
+        for (valueParameter in function.valueParameters) {
+            recordSamLookupsToClassifier(lookupTracker, valueParameter.type.constructor.declarationDescriptor ?: continue, location)
+        }
+    }
 
     override fun getContributedDescriptors(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> {
-        return super.getContributedDescriptors(kindFilter, nameFilter) +
-               if (kindFilter.acceptsKinds(DescriptorKindFilter.FUNCTIONS_MASK)) descriptors()
-               else emptyList()
+        val original = super.getContributedDescriptors(kindFilter, nameFilter)
+        if (!kindFilter.acceptsKinds(DescriptorKindFilter.FUNCTIONS_MASK)) return original
+        return original.filterIsInstance<FunctionDescriptor>().mapNotNull { cache.functions(it) } + original
     }
 }
 
 class SamAdapterSyntheticStaticFunctionsProvider(
-        private val storageManager: StorageManager,
-        private val samResolver: SamConversionResolver
+        storageManager: StorageManager,
+        samResolver: SamConversionResolver,
+        private val lookupTracker: LookupTracker
 ) : SyntheticScopeProvider {
-    private val makeSynthetic = storageManager.createMemoizedFunction<ResolutionScope, ResolutionScope> {
-        SamAdapterSyntheticStaticFunctionsScope(storageManager, samResolver, it)
-    }
-
-    override fun provideSyntheticScope(scope: ResolutionScope, metadata: SyntheticScopesMetadata): ResolutionScope {
-        if (!metadata.needStaticFunctions) return scope
-        return makeSynthetic(scope)
+    private val cache = SamAdapterSyntheticStaticFunctionsCache(storageManager, samResolver)
+    override fun provideSyntheticScope(scope: ResolutionScope, requirements: SyntheticScopesRequirements): ResolutionScope {
+        if (!requirements.needStaticFunctions) return scope
+        return SamAdapterSyntheticStaticFunctionsScope(cache, lookupTracker, scope)
     }
 }
