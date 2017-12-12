@@ -1,0 +1,8 @@
+description = 'Common module for kotlin-test integration tests for JS'
+
+apply plugin: 'kotlin-platform-common'
+
+dependencies {
+    compile project(':kotlin-stdlib-common')
+    testCompile project(':kotlin-test:kotlin-test-common')
+}

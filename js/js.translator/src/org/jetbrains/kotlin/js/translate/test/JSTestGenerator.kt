@@ -130,18 +130,21 @@ class JSTestGenerator(val context: TranslationContext) {
     }
 
     private val FunctionDescriptor.isTest
-        get() = annotationFinder("Test", "kotlin.test")
+        get() = simple && annotationFinder("Test", "kotlin.test")
 
     private val DeclarationDescriptor.isIgnored
         get() = annotationFinder("Ignore", "kotlin.test")
 
     private val FunctionDescriptor.isBefore
-        get() = annotationFinder("BeforeTest", "kotlin.test")
+        get() = simple && annotationFinder("BeforeTest", "kotlin.test")
 
     private val FunctionDescriptor.isAfter
-        get() = annotationFinder("AfterTest", "kotlin.test")
+        get() = simple && annotationFinder("AfterTest", "kotlin.test")
 
     private fun DeclarationDescriptor.annotationFinder(shortName: String, vararg packages: String) = packages.any { packageName ->
         annotations.hasAnnotation(FqName("$packageName.$shortName"))
     }
+
+    private val FunctionDescriptor.simple
+            get() = !isExpect && modality != Modality.ABSTRACT
 }

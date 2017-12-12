@@ -8,6 +8,7 @@ apply plugin: 'kotlin-platform-js'
 
 dependencies {
     compile project(':kotlin-test:kotlin-test-js')
+    expectedBy project(':kotlin-test:kotlin-test-js:kotlin-test-js-it:kotlin-test-js-it-common')
 }
 
 // package.json contains direct links to the builddir
