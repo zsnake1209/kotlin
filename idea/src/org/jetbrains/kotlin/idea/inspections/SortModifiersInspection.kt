@@ -52,17 +52,25 @@ class SortModifiersInspection : AbstractKotlinInspection(), CleanupLocalInspecti
     }
 }
 
-private class SortModifiersFix(private val modifiers: List<KtModifierKeywordToken>) : LocalQuickFix {
+class SortModifiersFix(private val modifiers: List<KtModifierKeywordToken>) : LocalQuickFix {
+    companion object {
+        fun sortModifiers(
+                modifierList: KtModifierList,
+                modifiers: List<KtModifierKeywordToken> = modifierList.allChildren.mapNotNull { it.node.elementType as? KtModifierKeywordToken }.toList()
+        ) {
+            val owner = modifierList.parent as? KtModifierListOwner ?: return
+            modifiers.forEach { owner.removeModifier(it) }
+            modifiers.forEach { owner.addModifier(it) }
+        }
+    }
+
     override fun getName() = "Sort modifiers"
 
     override fun getFamilyName() = name
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val list = descriptor.psiElement as? KtModifierList ?: return
-        val owner = list.parent as? KtModifierListOwner ?: return
-
-        modifiers.forEach { owner.removeModifier(it) }
-        modifiers.forEach { owner.addModifier(it) }
+        sortModifiers(list, modifiers)
     }
 }
 

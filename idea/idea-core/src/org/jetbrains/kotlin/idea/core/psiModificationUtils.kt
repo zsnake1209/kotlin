@@ -406,3 +406,7 @@ fun KtParameter.setDefaultValue(newDefaultValue: KtExpression): PsiElement? {
     val eq = equalsToken ?: add(psiFactory.createEQ())
     return addAfter(newDefaultValue, eq) as KtExpression
 }
+
+fun KtModifierList.appendModifier(modifier: KtModifierKeywordToken) {
+    add(KtPsiFactory(this).createModifier(modifier))
+}
