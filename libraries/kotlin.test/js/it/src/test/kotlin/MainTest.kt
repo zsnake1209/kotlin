@@ -32,8 +32,11 @@ class TestTest {
     }
 }
 
+var platformTestConter = 0
+
 actual class PlatformTest {
     @Test actual fun platformTest() {
+        assertEquals(0, platformTestConter++)
         assertEquals("common", commonFun())
         assertEquals("js", platformFun())
     }
