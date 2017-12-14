@@ -186,7 +186,7 @@ internal class QualifierScopeTowerLevel(scopeTower: ImplicitScopeTower, val qual
     private val syntheticScopes = scopeTower.syntheticScopes
     override fun getVariables(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?) =
             syntheticScopes
-                    .provideSyntheticScope(qualifier.staticScope, SyntheticScopesMetadata(needStaticFields = true))
+                    .provideSyntheticScope(qualifier.staticScope, SyntheticScopesRequirements(needStaticFields = true))
                     .getContributedVariables(name, location)
                     .map { createCandidateDescriptor(it, dispatchReceiver = null) }
 
@@ -215,7 +215,7 @@ internal open class ScopeBasedTowerLevel protected constructor(
     internal constructor(scopeTower: ImplicitScopeTower, lexicalScope: LexicalScope) : this(scopeTower, lexicalScope as ResolutionScope)
 
     override fun getVariables(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?): Collection<CandidateWithBoundDispatchReceiver>
-            = syntheticScopes.provideSyntheticScope(resolutionScope, SyntheticScopesMetadata(needStaticFields = true))
+            = syntheticScopes.provideSyntheticScope(resolutionScope, SyntheticScopesRequirements(needStaticFields = true))
             .getContributedVariables(name, location).map {
                 createCandidateDescriptor(it, dispatchReceiver = null)
             }

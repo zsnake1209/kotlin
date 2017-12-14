@@ -28,10 +28,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
-import org.jetbrains.kotlin.resolve.scopes.ResolutionScope
-import org.jetbrains.kotlin.resolve.scopes.SyntheticResolutionScope
-import org.jetbrains.kotlin.resolve.scopes.SyntheticScopeProvider
-import org.jetbrains.kotlin.resolve.scopes.SyntheticScopesMetadata
+import org.jetbrains.kotlin.resolve.scopes.*
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.extensions.SyntheticScopeProviderExtension
 import org.jetbrains.kotlin.types.KotlinType
@@ -42,14 +39,14 @@ import kotlin.properties.Delegates
 interface CompatSyntheticFunctionDescriptor : FunctionDescriptor, SyntheticMemberDescriptor<FunctionDescriptor>
 
 private abstract class CompatSyntheticResolutionScope(
-        storageManager: StorageManager
-) : SyntheticResolutionScope() {
+        storageManager: StorageManager,
+        protected val ownerClass: ClassDescriptor,
+        protected val type: KotlinType
+) : AbstractResolutionScopeAdapter() {
     private val annotationFqName = FqName("kotlin.annotations.jvm.internal.Compat")
     protected val compats = storageManager.createLazyValue {
         doGetCompats()
     }
-
-    protected abstract val type: KotlinType
 
     private fun doGetCompats(): Collection<ClassDescriptor> {
         return (type.constructor.supertypes + type)
@@ -78,12 +75,12 @@ private abstract class CompatSyntheticResolutionScope(
     }
 }
 
-private class CompatSyntheticMemberScope(
+private class CompatSyntheticMemberFunctionsScope(
         storageManager: StorageManager,
-        override val type: KotlinType,
-        override val wrappedScope: ResolutionScope
-) : CompatSyntheticResolutionScope(storageManager) {
-    private val ownerClass = type.constructor.declarationDescriptor as ClassDescriptor
+        override val workerScope: ResolutionScope,
+        ownerClass: ClassDescriptor,
+        type: KotlinType
+) : CompatSyntheticResolutionScope(storageManager, ownerClass, type) {
     private val functions = storageManager.createMemoizedFunction<Name, Collection<FunctionDescriptor>> {
         shadowOriginalFunctions(super.getContributedFunctions(it, NoLookupLocation.FROM_SYNTHETIC_SCOPE), doGetFunctions(it))
     }
@@ -160,8 +157,10 @@ private class CompatSyntheticMemberScope(
 
 private class CompatSyntheticStaticScope(
         storageManager: StorageManager,
-        override val wrappedScope: ResolutionScope
-) : CompatSyntheticResolutionScope(storageManager) {
+        override val workerScope: ResolutionScope,
+        ownerClass: ClassDescriptor,
+        type: KotlinType
+) : CompatSyntheticResolutionScope(storageManager, ownerClass, type) {
     private val functions = storageManager.createMemoizedFunction<Name, Collection<FunctionDescriptor>> {
         shadowOriginalFunctions(super.getContributedFunctions(it, NoLookupLocation.FROM_SYNTHETIC_SCOPE), doGetFunctions(it))
     }
@@ -170,18 +169,7 @@ private class CompatSyntheticStaticScope(
         shadowOriginalFields(super.getContributedVariables(it, NoLookupLocation.FROM_SYNTHETIC_SCOPE), doGetFields(it))
     }
 
-    private lateinit var ownerClass: ClassDescriptor
-
-    override lateinit var type: KotlinType
-        private set
-
     private fun doGetFields(name: Name): Collection<VariableDescriptor> {
-        if (!this::ownerClass.isInitialized) {
-            assert(!this::type.isInitialized) { "type is initialized, while ownerClass is not" }
-            val originalField = super.getContributedVariables(name, NoLookupLocation.FROM_SYNTHETIC_SCOPE).firstOrNull() ?: return emptyList()
-            ownerClass = originalField.containingDeclaration as? ClassDescriptor ?: return emptyList()
-            type = ownerClass.defaultType
-        }
         return compats().flatMap { compat ->
             compat.staticScope.getContributedVariables(name, NoLookupLocation.FROM_SYNTHETIC_SCOPE)
                     .filter { it.visibility == Visibilities.PUBLIC }
@@ -210,12 +198,6 @@ private class CompatSyntheticStaticScope(
     }
 
     private fun doGetFunctions(name: Name): Collection<FunctionDescriptor> {
-        if (!this::ownerClass.isInitialized) {
-            assert(!this::type.isInitialized) { "type is initialized, while ownerClass is not" }
-            val originalFunction = super.getContributedFunctions(name, NoLookupLocation.FROM_SYNTHETIC_SCOPE).firstOrNull() ?: return emptyList()
-            ownerClass = originalFunction.containingDeclaration as? ClassDescriptor ?: return emptyList()
-            type = ownerClass.defaultType
-        }
         return compats().flatMap { compat ->
             val compatFunctions = compat.staticScope.getContributedFunctions(name, NoLookupLocation.FROM_SYNTHETIC_SCOPE)
                     .filter { it.visibility == Visibilities.PUBLIC }
@@ -274,29 +256,23 @@ private class CompatSyntheticStaticScope(
     }
 }
 
-class CompatSyntheticsProvider(storageManager: StorageManager) : SyntheticScopeProvider {
-    private val makeSyntheticMemberScope = storageManager.createMemoizedFunction<Pair<KotlinType, ResolutionScope>, ResolutionScope> { (type, scope) ->
-        CompatSyntheticMemberScope(storageManager, type, scope)
-    }
-    private val makeSyntheticStaticScope = storageManager.createMemoizedFunction<ResolutionScope, ResolutionScope> {
-        CompatSyntheticStaticScope(storageManager, it)
-    }
-
-    override fun provideSyntheticScope(scope: ResolutionScope, metadata: SyntheticScopesMetadata): ResolutionScope {
+class CompatSyntheticsProvider(private val storageManager: StorageManager) : SyntheticScopeProvider {
+    override fun provideSyntheticScope(scope: ResolutionScope, requirements: SyntheticScopesRequirements): ResolutionScope {
+        val descriptor = scope.getContributedDescriptors().firstOrNull() ?: return scope
+        val ownerClass = descriptor.containingDeclaration as? ClassDescriptor ?: return scope
+        val type = ownerClass.defaultType as? KotlinType ?: return scope
         return when {
         // The property can be generated from getters, thus, we should provide a scope for them
-            metadata.needMemberFunctions || metadata.needExtensionProperties -> {
-                val type = metadata.type
-                if (type == null || type.constructor.declarationDescriptor !is ClassDescriptor) return scope
-                makeSyntheticMemberScope(Pair(type, scope))
-            }
-            metadata.needStaticFunctions || metadata.needStaticFields -> makeSyntheticStaticScope(scope)
+            requirements.needMemberFunctions || requirements.needExtensionProperties ->
+                CompatSyntheticMemberFunctionsScope(storageManager, scope, ownerClass, type)
+            requirements.needStaticFunctions || requirements.needStaticFields ->
+                CompatSyntheticStaticScope(storageManager, scope, ownerClass, type)
             else -> scope
         }
     }
 }
 
-object CompatSyntheticsProviderExtension: SyntheticScopeProviderExtension {
+object CompatSyntheticsProviderExtension : SyntheticScopeProviderExtension {
     override fun getProvider(storageManager: StorageManager): SyntheticScopeProvider = CompatSyntheticsProvider(storageManager)
 }
 

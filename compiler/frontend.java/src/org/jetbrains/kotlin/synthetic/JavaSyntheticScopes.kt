@@ -34,9 +34,9 @@ class JavaSyntheticScopes(
     override val scopeProviders =
             SyntheticScopeProviderExtension.getInstances(project).map { it.getProvider(storageManager) } +
             listOf(
-                    JavaSyntheticPropertiesProvider(storageManager),
+                    JavaSyntheticPropertiesProvider(storageManager, lookupTracker),
                     SamAdapterSyntheticMembersProvider(storageManager, samConventionResolver, deprecationResolver),
-                    SamAdapterSyntheticStaticFunctionsProvider(storageManager, samConventionResolver),
-                    SamAdapterSyntheticConstructorsProvider(storageManager, samConventionResolver)
+                    SamAdapterSyntheticStaticFunctionsProvider(storageManager, samConventionResolver, lookupTracker),
+                    SamAdapterSyntheticConstructorsProvider(storageManager, samConventionResolver, lookupTracker)
             )
 }
