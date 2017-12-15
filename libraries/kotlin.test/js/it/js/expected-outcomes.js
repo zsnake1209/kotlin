@@ -1,5 +1,4 @@
 module.exports = {
-    'SimpleTest testFoo': 'fail',
     'SimpleTest testBar': 'pass',
     'SimpleTest testFooWrong': 'pending',
     'TestTest emptyTest': 'pending',
