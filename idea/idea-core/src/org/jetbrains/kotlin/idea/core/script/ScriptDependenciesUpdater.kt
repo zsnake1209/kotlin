@@ -279,6 +279,10 @@ class ScriptDependenciesUpdater(
         })
     }
 
+    fun highlightingNotYetAvailable(file: VirtualFile): Boolean {
+        return requests[file] != null && cache[file] == null
+    }
+
     fun clear() {
         cache.clear()
         requests.clear()

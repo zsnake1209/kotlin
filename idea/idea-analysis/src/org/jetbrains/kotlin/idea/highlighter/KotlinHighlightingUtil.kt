@@ -16,9 +16,11 @@
 
 package org.jetbrains.kotlin.idea.highlighter
 
+import com.intellij.openapi.components.service
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.idea.caches.resolve.NotUnderContentRootModuleInfo
 import org.jetbrains.kotlin.idea.caches.resolve.getModuleInfo
+import org.jetbrains.kotlin.idea.core.script.ScriptDependenciesUpdater
 import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.psi.KtCodeFragment
 import org.jetbrains.kotlin.psi.KtFile
@@ -36,6 +38,13 @@ object KotlinHighlightingUtil {
         if (ktFile.isCompiled) {
             return false
         }
+
+        val scriptDependenciesUpdater = ktFile.project.service<ScriptDependenciesUpdater>()
+        val virtualFile = ktFile.virtualFile
+        if (virtualFile != null && scriptDependenciesUpdater.highlightingNotYetAvailable(virtualFile)) {
+            return false
+        }
+
         return (ktFile is KtCodeFragment && ktFile.context != null) || ktFile.isScript() || ProjectRootsUtil.isInProjectSource(ktFile)
     }
 }
