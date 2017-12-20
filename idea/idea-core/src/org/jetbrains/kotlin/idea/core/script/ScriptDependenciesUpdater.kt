@@ -52,7 +52,7 @@ class ScriptDependenciesUpdater(
         private val cache: ScriptDependenciesCache,
         private val scriptDefinitionProvider: ScriptDefinitionProvider
 ) {
-    private val requests = ConcurrentHashMap<String, ModStampedRequest>()
+    private val requests = ConcurrentHashMap<VirtualFile, ModStampedRequest>()
     private val contentLoader = ScriptContentLoader(project)
     private val asyncUpdatesDispatcher = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
     private val legacyUpdatesDispatcher =
@@ -137,8 +137,7 @@ class ScriptDependenciesUpdater(
             file: VirtualFile,
             scriptDefinition: KotlinScriptDefinition
     ) {
-        val path = file.path
-        val lastRequest = requests[path]
+        val lastRequest = requests[file]
 
         if (!shouldSendNewRequest(file, lastRequest)) {
             return
@@ -146,7 +145,7 @@ class ScriptDependenciesUpdater(
 
         lastRequest?.cancel()
 
-        requests[path] = sendRequest(file, scriptDefinition).stampBy(file)
+        requests[file] = sendRequest(file, scriptDefinition).stampBy(file)
         return
     }
 
@@ -202,13 +201,13 @@ class ScriptDependenciesUpdater(
             result: DependenciesResolver.ResolveResult,
             scriptDef: KotlinScriptDefinition
     ) {
-        val lastRequest = requests[file.path]
+        val lastRequest = requests[file]
         val lastTimeStamp = lastRequest?.job?.timeStamp
         val isLastSentRequest = lastTimeStamp == null || lastTimeStamp == currentTimeStamp
         if (isLastSentRequest) {
             if (lastRequest != null) {
                 // no job running atm unless there is a job started while we process this result
-                requests.replace(file.path, lastRequest, ModStampedRequest(lastRequest.modificationStamp, job = null))
+                requests.replace(file, lastRequest, ModStampedRequest(lastRequest.modificationStamp, job = null))
             }
             ServiceManager.getService(project, ScriptReportSink::class.java)?.attachReports(file, result.reports)
             val resultingDependencies = (result.dependencies ?: ScriptDependencies.Empty).adjustByDefinition(scriptDef)
