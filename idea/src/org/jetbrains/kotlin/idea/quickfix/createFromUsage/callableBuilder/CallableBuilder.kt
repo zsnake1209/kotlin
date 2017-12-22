@@ -468,14 +468,6 @@ class CallableBuilder(val config: CallableBuilderConfiguration) {
                         append(defaultVisibility)
                     }
 
-                    // TODO: Get rid of isAbstract
-                    if (callableInfo.isAbstract
-                        && containingElement is KtClass
-                        && !containingElement.isInterface()
-                        && !modifierList.hasModifier(KtTokens.ABSTRACT_KEYWORD)) {
-                        modifierList.appendModifier(KtTokens.ABSTRACT_KEYWORD)
-                    }
-
                     SortModifiersFix.sortModifiers(modifierList)
                     modifierList.text.let {
                         if (it.isNotEmpty()) {
@@ -504,9 +496,7 @@ class CallableBuilder(val config: CallableBuilderConfiguration) {
                         }
                         @Suppress("USELESS_CAST") // KT-10755
                         if (callableInfo is FunctionInfo) {
-                            val operatorModifier = if (callableInfo.isOperator) "operator " else ""
-                            val infixModifier = if (callableInfo.isInfix) "infix " else ""
-                            psiFactory.createFunction("$modifiers$infixModifier${operatorModifier}fun<> $header $body") as KtNamedDeclaration
+                            psiFactory.createFunction("${modifiers}fun<> $header $body") as KtNamedDeclaration
                         }
                         else if ((callableInfo as ConstructorInfo).isPrimary) {
                             val constructorText = if (modifiers.isNotEmpty()) "${modifiers}constructor$paramList" else paramList
@@ -648,6 +638,13 @@ class CallableBuilder(val config: CallableBuilderConfiguration) {
                 val returnType = propertyDescriptor.returnType ?: return
                 if (TypeUtils.isNullableType(returnType) || KotlinBuiltIns.isPrimitiveType(returnType)) return
                 declaration.addModifier(KtTokens.LATEINIT_KEYWORD)
+            }
+
+            if (callableInfo.isAbstract) {
+                val containingClass = declaration.containingClassOrObject
+                if (containingClass is KtClass && containingClass.isInterface()) {
+                    declaration.removeModifier(KtTokens.ABSTRACT_KEYWORD)
+                }
             }
         }
 
