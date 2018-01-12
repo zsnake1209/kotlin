@@ -34,14 +34,9 @@ class K2JSDce : CLITool<K2JSDceArguments>() {
     override fun execImpl(messageCollector: MessageCollector, services: Services, arguments: K2JSDceArguments): ExitCode {
         val baseDir = File(arguments.outputDirectory ?: "min")
         var hasErrors = false
-        val files = arguments.freeArgs.flatMap { arg ->
-            val files = collectInputFiles(baseDir, arg, messageCollector)
-            if (files != null) {
-                files
-            } else {
-                hasErrors = true
-                emptyList()
-            }
+        val files = arguments.freeArgs.fold(mutableListOf<InputFile>()) { inputFiles, arg ->
+            hasErrors = hasErrors or collectInputFiles(baseDir, arg, inputFiles, messageCollector)
+            inputFiles
         }
 
         if (hasErrors) return ExitCode.COMPILATION_ERROR
@@ -163,32 +158,38 @@ class K2JSDce : CLITool<K2JSDceArguments>() {
         return true
     }
 
-    private fun collectInputFiles(baseDir: File, fileName: String, messageCollector: MessageCollector): List<InputFile>? {
+    private fun collectInputFiles(
+        baseDir: File,
+        fileName: String,
+        files: MutableList<InputFile>,
+        messageCollector: MessageCollector
+    ): Boolean {
         val file = File(fileName)
-        return when {
+        when {
             file.isDirectory -> {
-                collectInputFilesFromDirectory(baseDir, fileName)
+                files += collectInputFilesFromDirectory(baseDir, fileName)
+                return false
             }
             file.isFile -> {
                 when {
                     fileName.endsWith(".js") -> {
-                        listOf(singleInputFile(baseDir, fileName))
+                        files += singleInputFile(baseDir, fileName)
                     }
                     fileName.endsWith(".zip") || fileName.endsWith(".jar") -> {
-                        collectInputFilesFromZip(baseDir, fileName)
+                        files += collectInputFilesFromZip(baseDir, fileName)
                     }
                     else -> {
                         messageCollector.report(
-                            CompilerMessageSeverity.ERROR,
-                            "invalid file name '$fileName'; must end either with '.js', '.zip' or '.jar'"
+                            CompilerMessageSeverity.WARNING,
+                            "invalid file name '${file.absolutePath}'; must end either with '.js', '.zip' or '.jar'"
                         )
-                        null
                     }
                 }
+                return false
             }
             else -> {
                 messageCollector.report(CompilerMessageSeverity.ERROR, "source file or directory not found: $fileName")
-                null
+                return true
             }
         }
     }
