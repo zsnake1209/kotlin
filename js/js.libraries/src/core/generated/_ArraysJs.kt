@@ -2670,7 +2670,7 @@ public fun CharArray.dropLast(n: Int): List<Char> {
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun <T> Array<out T>.dropLastWhile(predicate: (T) -> Boolean): List<T> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -2682,7 +2682,7 @@ public inline fun <T> Array<out T>.dropLastWhile(predicate: (T) -> Boolean): Lis
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun ByteArray.dropLastWhile(predicate: (Byte) -> Boolean): List<Byte> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -2694,7 +2694,7 @@ public inline fun ByteArray.dropLastWhile(predicate: (Byte) -> Boolean): List<By
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun ShortArray.dropLastWhile(predicate: (Short) -> Boolean): List<Short> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -2706,7 +2706,7 @@ public inline fun ShortArray.dropLastWhile(predicate: (Short) -> Boolean): List<
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun IntArray.dropLastWhile(predicate: (Int) -> Boolean): List<Int> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -2718,7 +2718,7 @@ public inline fun IntArray.dropLastWhile(predicate: (Int) -> Boolean): List<Int>
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun LongArray.dropLastWhile(predicate: (Long) -> Boolean): List<Long> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -2730,7 +2730,7 @@ public inline fun LongArray.dropLastWhile(predicate: (Long) -> Boolean): List<Lo
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun FloatArray.dropLastWhile(predicate: (Float) -> Boolean): List<Float> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -2742,7 +2742,7 @@ public inline fun FloatArray.dropLastWhile(predicate: (Float) -> Boolean): List<
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun DoubleArray.dropLastWhile(predicate: (Double) -> Boolean): List<Double> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -2754,7 +2754,7 @@ public inline fun DoubleArray.dropLastWhile(predicate: (Double) -> Boolean): Lis
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun BooleanArray.dropLastWhile(predicate: (Boolean) -> Boolean): List<Boolean> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -2766,7 +2766,7 @@ public inline fun BooleanArray.dropLastWhile(predicate: (Boolean) -> Boolean): L
  * Returns a list containing all elements except last elements that satisfy the given [predicate].
  */
 public inline fun CharArray.dropLastWhile(predicate: (Char) -> Boolean): List<Char> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return take(index + 1)
         }
@@ -4077,7 +4077,7 @@ public fun CharArray.takeLast(n: Int): List<Char> {
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun <T> Array<out T>.takeLastWhile(predicate: (T) -> Boolean): List<T> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }
@@ -4089,7 +4089,7 @@ public inline fun <T> Array<out T>.takeLastWhile(predicate: (T) -> Boolean): Lis
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun ByteArray.takeLastWhile(predicate: (Byte) -> Boolean): List<Byte> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }
@@ -4101,7 +4101,7 @@ public inline fun ByteArray.takeLastWhile(predicate: (Byte) -> Boolean): List<By
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun ShortArray.takeLastWhile(predicate: (Short) -> Boolean): List<Short> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }
@@ -4113,7 +4113,7 @@ public inline fun ShortArray.takeLastWhile(predicate: (Short) -> Boolean): List<
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun IntArray.takeLastWhile(predicate: (Int) -> Boolean): List<Int> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }
@@ -4125,7 +4125,7 @@ public inline fun IntArray.takeLastWhile(predicate: (Int) -> Boolean): List<Int>
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun LongArray.takeLastWhile(predicate: (Long) -> Boolean): List<Long> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }
@@ -4137,7 +4137,7 @@ public inline fun LongArray.takeLastWhile(predicate: (Long) -> Boolean): List<Lo
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun FloatArray.takeLastWhile(predicate: (Float) -> Boolean): List<Float> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }
@@ -4149,7 +4149,7 @@ public inline fun FloatArray.takeLastWhile(predicate: (Float) -> Boolean): List<
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun DoubleArray.takeLastWhile(predicate: (Double) -> Boolean): List<Double> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }
@@ -4161,7 +4161,7 @@ public inline fun DoubleArray.takeLastWhile(predicate: (Double) -> Boolean): Lis
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun BooleanArray.takeLastWhile(predicate: (Boolean) -> Boolean): List<Boolean> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }
@@ -4173,7 +4173,7 @@ public inline fun BooleanArray.takeLastWhile(predicate: (Boolean) -> Boolean): L
  * Returns a list containing last elements satisfying the given [predicate].
  */
 public inline fun CharArray.takeLastWhile(predicate: (Char) -> Boolean): List<Char> {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return drop(index + 1)
         }

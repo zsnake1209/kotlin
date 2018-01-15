@@ -389,7 +389,7 @@ object Filtering : TemplateGroupBase() {
 
         body {
             """
-            for (index in lastIndex downTo 0) {
+            for (index in indices.reversed()) {
                 if (!predicate(this[index])) {
                     return take(index + 1)
                 }
@@ -422,7 +422,7 @@ object Filtering : TemplateGroupBase() {
         }
         body(CharSequences, Strings) {
             """
-            for (index in lastIndex downTo 0)
+            for (index in indices.reversed())
                 if (!predicate(this[index]))
                     return ${subsequence(f, "0", "index + 1")}
 
@@ -440,7 +440,7 @@ object Filtering : TemplateGroupBase() {
 
         body {
             """
-            for (index in lastIndex downTo 0) {
+            for (index in indices.reversed()) {
                 if (!predicate(this[index])) {
                     return drop(index + 1)
                 }
@@ -481,7 +481,7 @@ object Filtering : TemplateGroupBase() {
         }
         body(Strings, CharSequences) {
             """
-            for (index in lastIndex downTo 0) {
+            for (index in indices.reversed()) {
                 if (!predicate(this[index])) {
                     return ${subsequence(f, "index + 1")}
                 }

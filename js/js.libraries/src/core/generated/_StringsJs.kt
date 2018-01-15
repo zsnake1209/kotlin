@@ -253,7 +253,7 @@ public fun String.dropLast(n: Int): String {
  * Returns a subsequence of this char sequence containing all characters except last characters that satisfy the given [predicate].
  */
 public inline fun CharSequence.dropLastWhile(predicate: (Char) -> Boolean): CharSequence {
-    for (index in lastIndex downTo 0)
+    for (index in indices.reversed())
         if (!predicate(this[index]))
             return subSequence(0, index + 1)
     return ""
@@ -263,7 +263,7 @@ public inline fun CharSequence.dropLastWhile(predicate: (Char) -> Boolean): Char
  * Returns a string containing all characters except last characters that satisfy the given [predicate].
  */
 public inline fun String.dropLastWhile(predicate: (Char) -> Boolean): String {
-    for (index in lastIndex downTo 0)
+    for (index in indices.reversed())
         if (!predicate(this[index]))
             return substring(0, index + 1)
     return ""
@@ -441,7 +441,7 @@ public fun String.takeLast(n: Int): String {
  * Returns a subsequence of this char sequence containing last characters that satisfy the given [predicate].
  */
 public inline fun CharSequence.takeLastWhile(predicate: (Char) -> Boolean): CharSequence {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return subSequence(index + 1, length)
         }
@@ -453,7 +453,7 @@ public inline fun CharSequence.takeLastWhile(predicate: (Char) -> Boolean): Char
  * Returns a string containing last characters that satisfy the given [predicate].
  */
 public inline fun String.takeLastWhile(predicate: (Char) -> Boolean): String {
-    for (index in lastIndex downTo 0) {
+    for (index in indices.reversed()) {
         if (!predicate(this[index])) {
             return substring(index + 1)
         }
