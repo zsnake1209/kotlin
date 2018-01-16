@@ -43,32 +43,32 @@ internal fun recordSamLookupsToClassifier(lookupTracker: LookupTracker, classifi
 }
 
 private class SamAdapterSyntheticConstructorsCache(
-        storageManager: StorageManager,
-        samResolver: SamConversionResolver
+    storageManager: StorageManager,
+    samResolver: SamConversionResolver
 ) {
     val samConstructorForClassifier =
-            storageManager.createMemoizedFunction<JavaClassDescriptor, SamConstructorDescriptor> { classifier ->
-                SingleAbstractMethodUtils.createSamConstructorFunction(classifier.containingDeclaration, classifier, samResolver)
-            }
+        storageManager.createMemoizedFunction<JavaClassDescriptor, SamConstructorDescriptor> { classifier ->
+            SingleAbstractMethodUtils.createSamConstructorFunction(classifier.containingDeclaration, classifier, samResolver)
+        }
 
     val samConstructorForJavaConstructor =
-            storageManager.createMemoizedFunction<JavaClassConstructorDescriptor, ClassConstructorDescriptor> { constructor ->
-                SingleAbstractMethodUtils.createSamAdapterConstructor(constructor, samResolver) as ClassConstructorDescriptor
-            }
+        storageManager.createMemoizedFunction<JavaClassConstructorDescriptor, ClassConstructorDescriptor> { constructor ->
+            SingleAbstractMethodUtils.createSamAdapterConstructor(constructor, samResolver) as ClassConstructorDescriptor
+        }
 
     val samConstructorForTypeAliasConstructor =
-            storageManager.createMemoizedFunctionWithNullableValues<
-                    Pair<ClassConstructorDescriptor, TypeAliasDescriptor>,
-                    TypeAliasConstructorDescriptor> { (constructor, typeAliasDescriptor) ->
-                TypeAliasConstructorDescriptorImpl.createIfAvailable(storageManager, typeAliasDescriptor, constructor)
-            }
+        storageManager.createMemoizedFunctionWithNullableValues<
+                Pair<ClassConstructorDescriptor, TypeAliasDescriptor>,
+                TypeAliasConstructorDescriptor> { (constructor, typeAliasDescriptor) ->
+            TypeAliasConstructorDescriptorImpl.createIfAvailable(storageManager, typeAliasDescriptor, constructor)
+        }
 }
 
 private class SamAdapterSyntheticConstructorsScope(
-        private val cache: SamAdapterSyntheticConstructorsCache,
-        private val samResolver: SamConversionResolver,
-        private val lookupTracker: LookupTracker,
-        override val workerScope: ResolutionScope
+    private val cache: SamAdapterSyntheticConstructorsCache,
+    private val samResolver: SamConversionResolver,
+    private val lookupTracker: LookupTracker,
+    override val workerScope: ResolutionScope
 ) : AbstractResolutionScopeAdapter() {
     override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<FunctionDescriptor> {
         val classifier = getContributedClassifier(name, location) ?: return super.getContributedFunctions(name, location)
@@ -80,7 +80,10 @@ private class SamAdapterSyntheticConstructorsScope(
         recordSamLookupsToClassifier(lookupTracker, classifier, location)
     }
 
-    override fun getContributedDescriptors(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> {
+    override fun getContributedDescriptors(
+        kindFilter: DescriptorKindFilter,
+        nameFilter: (Name) -> Boolean
+    ): Collection<DeclarationDescriptor> {
         val original = super.getContributedDescriptors(kindFilter, nameFilter)
         if (kindFilter.acceptsKinds(DescriptorKindFilter.FUNCTIONS_MASK)) {
             val classifiers = workerScope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
@@ -89,16 +92,15 @@ private class SamAdapterSyntheticConstructorsScope(
                 return original + listOfNotNull(getSyntheticConstructor(constructor))
             else
                 return original + processClassifierDescriptors(classifiers)
-        }
-        else return original
+        } else return original
     }
 
     private fun processClassifierDescriptors(
-            contributedDescriptors: Collection<DeclarationDescriptor>
+        contributedDescriptors: Collection<DeclarationDescriptor>
     ): List<DeclarationDescriptor> {
         return contributedDescriptors
-                .filterIsInstance<ClassifierDescriptor>()
-                .flatMap { getAllSamConstructors(it) }
+            .filterIsInstance<ClassifierDescriptor>()
+            .flatMap { getAllSamConstructors(it) }
     }
 
     private fun getSyntheticConstructor(constructor: ConstructorDescriptor): ConstructorDescriptor? {
@@ -120,7 +122,7 @@ private class SamAdapterSyntheticConstructorsScope(
     }
 
     private fun getAllSamConstructors(classifier: ClassifierDescriptor): List<FunctionDescriptor> =
-            getSamAdaptersFromConstructors(classifier) + listOfNotNull(getSamConstructor(classifier))
+        getSamAdaptersFromConstructors(classifier) + listOfNotNull(getSamConstructor(classifier))
 
     private fun getSamAdaptersFromConstructors(classifier: ClassifierDescriptor): List<FunctionDescriptor> {
         if (classifier !is JavaClassDescriptor) return emptyList()
@@ -147,14 +149,15 @@ private class SamAdapterSyntheticConstructorsScope(
         if (classDescriptor !is LazyJavaClassDescriptor || classDescriptor.defaultFunctionTypeForSamInterface == null) return null
 
         return SingleAbstractMethodUtils.createTypeAliasSamConstructorFunction(
-                classifier, cache.samConstructorForClassifier(classDescriptor), samResolver)
+            classifier, cache.samConstructorForClassifier(classDescriptor), samResolver
+        )
     }
 }
 
 class SamAdapterSyntheticConstructorsProvider(
-        storageManager: StorageManager,
-        private val samResolver: SamConversionResolver,
-        private val lookupTracker: LookupTracker
+    storageManager: StorageManager,
+    private val samResolver: SamConversionResolver,
+    private val lookupTracker: LookupTracker
 ) : SyntheticScopeProvider {
     private val cache = SamAdapterSyntheticConstructorsCache(storageManager, samResolver)
 

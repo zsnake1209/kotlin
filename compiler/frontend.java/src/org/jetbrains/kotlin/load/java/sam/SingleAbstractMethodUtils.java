@@ -225,7 +225,8 @@ public class SingleAbstractMethodUtils {
             @NotNull SamConstructorDescriptor underlyingSamConstructor,
             @NotNull SamConversionResolver samResolver
     ) {
-        SamTypeAliasConstructorDescriptorImpl result = new SamTypeAliasConstructorDescriptorImpl(typeAliasDescriptor, underlyingSamConstructor);
+        SamTypeAliasConstructorDescriptorImpl result =
+                new SamTypeAliasConstructorDescriptorImpl(typeAliasDescriptor, underlyingSamConstructor);
 
         JavaClassDescriptor samInterface = underlyingSamConstructor.getBaseDescriptorForSynthetic();
         List<TypeParameterDescriptor> samTypeParameters = typeAliasDescriptor.getTypeConstructor().getParameters();
@@ -308,7 +309,7 @@ public class SingleAbstractMethodUtils {
         TypeSubstitutor substitutor = typeParameters.substitutor;
         KotlinType returnType = substitutor.substitute(returnTypeUnsubstituted, Variance.INVARIANT);
         assert returnType != null : "couldn't substitute type: " + returnTypeUnsubstituted +
-                                        ", substitutor = " + substitutor;
+                                    ", substitutor = " + substitutor;
 
 
         List<ValueParameterDescriptor> valueParameters = createValueParametersForSamAdapter(original, adapter, substitutor, samResolver);
@@ -385,7 +386,10 @@ public class SingleAbstractMethodUtils {
 
             for (KotlinType upperBound : traitTypeParameter.getUpperBounds()) {
                 KotlinType upperBoundSubstituted = typeParametersSubstitutor.substitute(upperBound, Variance.INVARIANT);
-                assert upperBoundSubstituted != null : "couldn't substitute type: " + upperBound + ", substitutor = " + typeParametersSubstitutor;
+                assert upperBoundSubstituted != null : "couldn't substitute type: " +
+                                                       upperBound +
+                                                       ", substitutor = " +
+                                                       typeParametersSubstitutor;
                 funTypeParameter.addUpperBound(upperBoundSubstituted);
             }
 
@@ -413,6 +417,4 @@ public class SingleAbstractMethodUtils {
                 @NotNull KotlinType returnType
         );
     }
-
-
 }

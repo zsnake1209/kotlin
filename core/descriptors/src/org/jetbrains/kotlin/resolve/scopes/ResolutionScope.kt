@@ -36,8 +36,8 @@ interface ResolutionScope {
      * (that means that the implementation is not obliged to use the filters but may do so when it gives any performance advantage).
      */
     fun getContributedDescriptors(
-            kindFilter: DescriptorKindFilter = DescriptorKindFilter.ALL,
-            nameFilter: (Name) -> Boolean = MemberScope.ALL_NAME_FILTER
+        kindFilter: DescriptorKindFilter = DescriptorKindFilter.ALL,
+        nameFilter: (Name) -> Boolean = MemberScope.ALL_NAME_FILTER
     ): Collection<DeclarationDescriptor>
 
     fun definitelyDoesNotContainName(name: Name): Boolean = false
@@ -50,7 +50,10 @@ interface ResolutionScope {
         override fun getContributedClassifier(name: Name, location: LookupLocation): ClassifierDescriptor? = null
         override fun getContributedVariables(name: Name, location: LookupLocation): Collection<VariableDescriptor> = emptyList()
         override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<FunctionDescriptor> = emptyList()
-        override fun getContributedDescriptors(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> =
-                emptyList()
+        override fun getContributedDescriptors(
+            kindFilter: DescriptorKindFilter,
+            nameFilter: (Name) -> Boolean
+        ): Collection<DeclarationDescriptor> =
+            emptyList()
     }
 }

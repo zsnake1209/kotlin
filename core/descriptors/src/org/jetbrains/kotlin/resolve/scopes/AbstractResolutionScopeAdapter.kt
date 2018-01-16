@@ -23,20 +23,23 @@ import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.name.Name
 
-abstract class AbstractResolutionScopeAdapter: ResolutionScope {
+abstract class AbstractResolutionScopeAdapter : ResolutionScope {
     abstract val workerScope: ResolutionScope
 
     override fun getContributedClassifier(name: Name, location: LookupLocation): ClassifierDescriptor? =
-            workerScope.getContributedClassifier(name, location)
+        workerScope.getContributedClassifier(name, location)
 
     override fun getContributedVariables(name: Name, location: LookupLocation): Collection<VariableDescriptor> =
-            workerScope.getContributedVariables(name, location)
+        workerScope.getContributedVariables(name, location)
 
     override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
-            workerScope.getContributedFunctions(name, location)
+        workerScope.getContributedFunctions(name, location)
 
-    override fun getContributedDescriptors(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> =
-            workerScope.getContributedDescriptors(kindFilter, nameFilter)
+    override fun getContributedDescriptors(
+        kindFilter: DescriptorKindFilter,
+        nameFilter: (Name) -> Boolean
+    ): Collection<DeclarationDescriptor> =
+        workerScope.getContributedDescriptors(kindFilter, nameFilter)
 
     override fun definitelyDoesNotContainName(name: Name): Boolean = workerScope.definitelyDoesNotContainName(name)
 

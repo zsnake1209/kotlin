@@ -16,17 +16,16 @@
 
 package org.jetbrains.kotlin.resolve.scopes
 
-import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.incremental.components.LookupLocation
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 data class SyntheticScopesRequirements(
-        val needExtensionProperties: Boolean = false,
-        val needMemberFunctions: Boolean = false,
-        val needStaticFunctions: Boolean = false,
-        val needConstructors: Boolean = false
+    val needExtensionProperties: Boolean = false,
+    val needMemberFunctions: Boolean = false,
+    val needStaticFunctions: Boolean = false,
+    val needConstructors: Boolean = false
 )
 
 interface SyntheticScopeProvider {
@@ -37,9 +36,9 @@ interface SyntheticScopes {
     val scopeProviders: Collection<SyntheticScopeProvider>
 
     fun provideSyntheticScope(scope: ResolutionScope, requirements: SyntheticScopesRequirements): ResolutionScope =
-            scopeProviders.fold(scope) { prevScope, provider->
-                provider.provideSyntheticScope(prevScope, requirements)
-            }
+        scopeProviders.fold(scope) { prevScope, provider ->
+            provider.provideSyntheticScope(prevScope, requirements)
+        }
 
     object Empty : SyntheticScopes {
         override val scopeProviders: Collection<SyntheticScopeProvider> = emptyList()
@@ -49,11 +48,14 @@ interface SyntheticScopes {
 // TODO: Find a way to remove it
 fun SyntheticScopes.collectSyntheticConstructors(constructor: ConstructorDescriptor): Collection<ConstructorDescriptor> {
     val scope = object : ResolutionScope.Empty() {
-        override fun getContributedDescriptors(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> =
-                listOf(constructor)
+        override fun getContributedDescriptors(
+            kindFilter: DescriptorKindFilter,
+            nameFilter: (Name) -> Boolean
+        ): Collection<DeclarationDescriptor> =
+            listOf(constructor)
     }
     val syntheticScope = provideSyntheticScope(scope, SyntheticScopesRequirements(needConstructors = true))
     return syntheticScope.getContributedDescriptors().filterIsInstance<ConstructorDescriptor>()
 }
 
-interface SyntheticPropertyDescriptor: PropertyDescriptor
+interface SyntheticPropertyDescriptor : PropertyDescriptor

@@ -46,7 +46,7 @@ class SubstitutingScope(override val workerScope: MemberScope, val givenSubstitu
             when (descriptor) {
                 is Substitutable<*> -> descriptor.substitute(substitutor).sure {
                     "We expect that no conflict should happen while substitution is guaranteed to generate invariant projection, " +
-                    "but $descriptor substitution fails"
+                            "but $descriptor substitution fails"
                 }
                 else -> error("Unknown descriptor in scope: $descriptor")
             }
@@ -61,23 +61,24 @@ class SubstitutingScope(override val workerScope: MemberScope, val givenSubstitu
         if (descriptors.isEmpty()) return descriptors
 
         val result = newLinkedHashSetWithExpectedSize<D>(descriptors.size)
-        for (descriptor in descriptors) {
-            val substitute = substitute(descriptor)
-            result.add(substitute)
-        }
+        descriptors.mapTo(result) { substitute(it) }
 
         return result
     }
 
-    override fun getContributedVariables(name: Name, location: LookupLocation) = substitute(workerScope.getContributedVariables(name, location))
+    override fun getContributedVariables(name: Name, location: LookupLocation) =
+        substitute(workerScope.getContributedVariables(name, location))
 
     override fun getContributedClassifier(name: Name, location: LookupLocation) =
-            workerScope.getContributedClassifier(name, location)?.let { substitute(it) }
+        workerScope.getContributedClassifier(name, location)?.let { substitute(it) }
 
-    override fun getContributedFunctions(name: Name, location: LookupLocation) = substitute(workerScope.getContributedFunctions(name, location))
+    override fun getContributedFunctions(name: Name, location: LookupLocation) =
+        substitute(workerScope.getContributedFunctions(name, location))
 
-    override fun getContributedDescriptors(kindFilter: DescriptorKindFilter,
-                                           nameFilter: (Name) -> Boolean) = _allDescriptors
+    override fun getContributedDescriptors(
+        kindFilter: DescriptorKindFilter,
+        nameFilter: (Name) -> Boolean
+    ) = _allDescriptors
 
     override fun definitelyDoesNotContainName(name: Name) = workerScope.definitelyDoesNotContainName(name)
 

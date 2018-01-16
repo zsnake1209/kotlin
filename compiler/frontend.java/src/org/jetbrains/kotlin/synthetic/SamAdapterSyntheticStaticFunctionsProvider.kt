@@ -28,8 +28,8 @@ import org.jetbrains.kotlin.resolve.scopes.*
 import org.jetbrains.kotlin.storage.StorageManager
 
 private class SamAdapterSyntheticStaticFunctionsCache(
-        storageManager: StorageManager,
-        private val samResolver: SamConversionResolver
+    storageManager: StorageManager,
+    private val samResolver: SamConversionResolver
 ) {
     val functions = storageManager.createMemoizedFunctionWithNullableValues<FunctionDescriptor, FunctionDescriptor> { wrapFunction(it) }
 
@@ -43,9 +43,9 @@ private class SamAdapterSyntheticStaticFunctionsCache(
 }
 
 private class SamAdapterSyntheticStaticFunctionsScope(
-        private val cache: SamAdapterSyntheticStaticFunctionsCache,
-        private val lookupTracker: LookupTracker,
-        override val workerScope: ResolutionScope
+    private val cache: SamAdapterSyntheticStaticFunctionsCache,
+    private val lookupTracker: LookupTracker,
+    override val workerScope: ResolutionScope
 ) : AbstractResolutionScopeAdapter() {
     override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<FunctionDescriptor> {
         val original = super.getContributedFunctions(name, location)
@@ -65,7 +65,10 @@ private class SamAdapterSyntheticStaticFunctionsScope(
         }
     }
 
-    override fun getContributedDescriptors(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> {
+    override fun getContributedDescriptors(
+        kindFilter: DescriptorKindFilter,
+        nameFilter: (Name) -> Boolean
+    ): Collection<DeclarationDescriptor> {
         val original = super.getContributedDescriptors(kindFilter, nameFilter)
         if (!kindFilter.acceptsKinds(DescriptorKindFilter.FUNCTIONS_MASK)) return original
         return original.filterIsInstance<FunctionDescriptor>().mapNotNull { cache.functions(it) } + original
@@ -73,9 +76,9 @@ private class SamAdapterSyntheticStaticFunctionsScope(
 }
 
 class SamAdapterSyntheticStaticFunctionsProvider(
-        storageManager: StorageManager,
-        samResolver: SamConversionResolver,
-        private val lookupTracker: LookupTracker
+    storageManager: StorageManager,
+    samResolver: SamConversionResolver,
+    private val lookupTracker: LookupTracker
 ) : SyntheticScopeProvider {
     private val cache = SamAdapterSyntheticStaticFunctionsCache(storageManager, samResolver)
     override fun provideSyntheticScope(scope: ResolutionScope, requirements: SyntheticScopesRequirements): ResolutionScope {

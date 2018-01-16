@@ -36,16 +36,16 @@ interface SamAdapterExtensionFunctionDescriptor : FunctionDescriptor, SyntheticM
 }
 
 private class SamAdapterFunctionsCache(
-        storageManager: StorageManager,
-        private val samResolver: SamConversionResolver,
-        private val deprecationResolver: DeprecationResolver
+    storageManager: StorageManager,
+    private val samResolver: SamConversionResolver,
+    private val deprecationResolver: DeprecationResolver
 ) {
     val functions = storageManager.createMemoizedFunctionWithNullableValues<FunctionDescriptor, FunctionDescriptor> {
         wrapFunction(it)
     }
 
     private fun wrapFunction(
-            function: FunctionDescriptor
+        function: FunctionDescriptor
     ): FunctionDescriptor? {
         if (!function.visibility.isVisibleOutside()) return null
         if (!function.hasJavaOriginInHierarchy()) return null //TODO: should we go into base at all?
@@ -57,12 +57,12 @@ private class SamAdapterFunctionsCache(
 }
 
 private class MyFunctionDescriptor(
-        containingDeclaration: DeclarationDescriptor,
-        original: SimpleFunctionDescriptor?,
-        annotations: Annotations,
-        name: Name,
-        kind: CallableMemberDescriptor.Kind,
-        source: SourceElement
+    containingDeclaration: DeclarationDescriptor,
+    original: SimpleFunctionDescriptor?,
+    annotations: Annotations,
+    name: Name,
+    kind: CallableMemberDescriptor.Kind,
+    source: SourceElement
 ) : SamAdapterExtensionFunctionDescriptor, SimpleFunctionDescriptorImpl(containingDeclaration, original, annotations, name, kind, source) {
 
     override var baseDescriptorForSynthetic: FunctionDescriptor by Delegates.notNull()
@@ -74,27 +74,33 @@ private class MyFunctionDescriptor(
 
     companion object {
         fun create(sourceFunction: FunctionDescriptor, samResolver: SamConversionResolver): MyFunctionDescriptor {
-            val descriptor = MyFunctionDescriptor(sourceFunction.containingDeclaration,
-                                                  if (sourceFunction === sourceFunction.original) null else create(sourceFunction.original, samResolver),
-                                                  sourceFunction.annotations,
-                                                  sourceFunction.name,
-                                                  CallableMemberDescriptor.Kind.SYNTHESIZED,
-                                                  sourceFunction.original.source)
+            val descriptor = MyFunctionDescriptor(
+                sourceFunction.containingDeclaration,
+                if (sourceFunction === sourceFunction.original) null else create(sourceFunction.original, samResolver),
+                sourceFunction.annotations,
+                sourceFunction.name,
+                CallableMemberDescriptor.Kind.SYNTHESIZED,
+                sourceFunction.original.source
+            )
             descriptor.baseDescriptorForSynthetic = sourceFunction
 
             val sourceTypeParams = sourceFunction.typeParameters.toMutableList()
 
             val typeParameters = ArrayList<TypeParameterDescriptor>(sourceTypeParams.size)
-            val typeSubstitutor = DescriptorSubstitutor.substituteTypeParameters(sourceTypeParams, TypeSubstitution.EMPTY, descriptor, typeParameters)
+            val typeSubstitutor =
+                DescriptorSubstitutor.substituteTypeParameters(sourceTypeParams, TypeSubstitution.EMPTY, descriptor, typeParameters)
 
             val returnType = typeSubstitutor.safeSubstitute(sourceFunction.returnType!!, Variance.INVARIANT)
             val valueParameters = SingleAbstractMethodUtils.createValueParametersForSamAdapter(
-                    sourceFunction, descriptor, typeSubstitutor, samResolver)
+                sourceFunction, descriptor, typeSubstitutor, samResolver
+            )
 
             val visibility = syntheticVisibility(sourceFunction, isUsedForExtension = false)
 
-            descriptor.initialize(null, sourceFunction.dispatchReceiverParameter, typeParameters, valueParameters, returnType,
-                                  Modality.FINAL, visibility)
+            descriptor.initialize(
+                null, sourceFunction.dispatchReceiverParameter, typeParameters, valueParameters, returnType,
+                Modality.FINAL, visibility
+            )
 
             descriptor.isOperator = sourceFunction.isOperator
             descriptor.isInfix = sourceFunction.isInfix
@@ -107,33 +113,33 @@ private class MyFunctionDescriptor(
     override fun hasSynthesizedParameterNames() = baseDescriptorForSynthetic.hasSynthesizedParameterNames()
 
     override fun createSubstitutedCopy(
-            newOwner: DeclarationDescriptor,
-            original: FunctionDescriptor?,
-            kind: CallableMemberDescriptor.Kind,
-            newName: Name?,
-            annotations: Annotations,
-            source: SourceElement
+        newOwner: DeclarationDescriptor,
+        original: FunctionDescriptor?,
+        kind: CallableMemberDescriptor.Kind,
+        newName: Name?,
+        annotations: Annotations,
+        source: SourceElement
     ): MyFunctionDescriptor {
         return MyFunctionDescriptor(
-                containingDeclaration, original as SimpleFunctionDescriptor?, annotations, newName ?: name, kind, source
+            containingDeclaration, original as SimpleFunctionDescriptor?, annotations, newName ?: name, kind, source
         ).apply {
             baseDescriptorForSynthetic = this@MyFunctionDescriptor.baseDescriptorForSynthetic
         }
     }
 
     override fun newCopyBuilder(substitutor: TypeSubstitutor): CopyConfiguration =
-            super.newCopyBuilder(substitutor).setOriginal(this.original)
+        super.newCopyBuilder(substitutor).setOriginal(this.original)
 
     override fun doSubstitute(configuration: CopyConfiguration): FunctionDescriptor? {
         val descriptor = super.doSubstitute(configuration) as MyFunctionDescriptor? ?: return null
         val original = configuration.original
-                       ?: throw UnsupportedOperationException("doSubstitute with no original should not be called for synthetic extension $this")
+                ?: throw UnsupportedOperationException("doSubstitute with no original should not be called for synthetic extension $this")
 
         original as MyFunctionDescriptor
         assert(original.original == original) { "original in doSubstitute should have no other original" }
 
         val sourceFunctionSubstitutor =
-                CompositionTypeSubstitution(configuration.substitution, fromSourceFunctionTypeParameters).buildSubstitutor()
+            CompositionTypeSubstitution(configuration.substitution, fromSourceFunctionTypeParameters).buildSubstitutor()
 
         descriptor.baseDescriptorForSynthetic = original.baseDescriptorForSynthetic.substitute(sourceFunctionSubstitutor) ?: return null
         return descriptor
@@ -141,8 +147,8 @@ private class MyFunctionDescriptor(
 }
 
 private class SamAdapterFunctionsScope(
-        private val cache: SamAdapterFunctionsCache,
-        override val workerScope: ResolutionScope
+    private val cache: SamAdapterFunctionsCache,
+    override val workerScope: ResolutionScope
 ) : AbstractResolutionScopeAdapter() {
     override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<FunctionDescriptor> {
         val original = super.getContributedFunctions(name, location)
@@ -151,19 +157,22 @@ private class SamAdapterFunctionsScope(
         else return synthetic + original
     }
 
-    override fun getContributedDescriptors(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> {
+    override fun getContributedDescriptors(
+        kindFilter: DescriptorKindFilter,
+        nameFilter: (Name) -> Boolean
+    ): Collection<DeclarationDescriptor> {
         val original = super.getContributedDescriptors(kindFilter, nameFilter)
         if (!kindFilter.acceptsKinds(DescriptorKindFilter.FUNCTIONS_MASK)) return original
         else return original + original.filterIsInstance<FunctionDescriptor>()
-                    .flatMap { getContributedFunctions(it.name, NoLookupLocation.FROM_SYNTHETIC_SCOPE) }.filter { nameFilter(it.name) }
+            .flatMap { getContributedFunctions(it.name, NoLookupLocation.FROM_SYNTHETIC_SCOPE) }.filter { nameFilter(it.name) }
     }
 
 }
 
 class SamAdapterSyntheticMembersProvider(
-        storageManager: StorageManager,
-        samResolver: SamConversionResolver,
-        deprecationResolver: DeprecationResolver
+    storageManager: StorageManager,
+    samResolver: SamConversionResolver,
+    deprecationResolver: DeprecationResolver
 ) : SyntheticScopeProvider {
     private val cache = SamAdapterFunctionsCache(storageManager, samResolver, deprecationResolver)
 

@@ -34,8 +34,8 @@ interface ContextVariablesProvider {
 }
 
 class RealContextVariablesProvider(
-        private val referenceVariantsHelper: ReferenceVariantsHelper,
-        private val contextElement: PsiElement
+    private val referenceVariantsHelper: ReferenceVariantsHelper,
+    private val contextElement: PsiElement
 ) : ContextVariablesProvider {
 
     val allFunctionTypeVariables by lazy {
@@ -43,9 +43,14 @@ class RealContextVariablesProvider(
     }
 
     private fun collectVariables(): Collection<VariableDescriptor> {
-        val descriptorFilter = DescriptorKindFilter.VARIABLES exclude DescriptorKindExclude.Extensions // we exclude extensions by performance reasons
-        return referenceVariantsHelper.getReferenceVariants(contextElement, CallTypeAndReceiver.DEFAULT, descriptorFilter, nameFilter = { true })
-                .mapNotNull { it as? VariableDescriptor }
+        val descriptorFilter =
+            DescriptorKindFilter.VARIABLES exclude DescriptorKindExclude.Extensions // we exclude extensions by performance reasons
+        return referenceVariantsHelper.getReferenceVariants(
+            contextElement,
+            CallTypeAndReceiver.DEFAULT,
+            descriptorFilter,
+            nameFilter = { true })
+            .mapNotNull { it as? VariableDescriptor }
     }
 
     override fun functionTypeVariables(requiredType: FuzzyType): Collection<Pair<VariableDescriptor, TypeSubstitutor>> {

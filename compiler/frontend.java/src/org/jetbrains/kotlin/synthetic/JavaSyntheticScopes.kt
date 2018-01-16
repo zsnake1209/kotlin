@@ -23,15 +23,15 @@ import org.jetbrains.kotlin.resolve.scopes.SyntheticScopes
 import org.jetbrains.kotlin.storage.StorageManager
 
 class JavaSyntheticScopes(
-        storageManager: StorageManager,
-        lookupTracker: LookupTracker,
-        samConventionResolver: SamConversionResolver,
-        deprecationResolver: DeprecationResolver
-): SyntheticScopes {
+    storageManager: StorageManager,
+    lookupTracker: LookupTracker,
+    samConventionResolver: SamConversionResolver,
+    deprecationResolver: DeprecationResolver
+) : SyntheticScopes {
     override val scopeProviders = listOf(
-            JavaSyntheticPropertiesProvider(storageManager, lookupTracker),
-            SamAdapterSyntheticMembersProvider(storageManager, samConventionResolver, deprecationResolver),
-            SamAdapterSyntheticStaticFunctionsProvider(storageManager, samConventionResolver, lookupTracker),
-            SamAdapterSyntheticConstructorsProvider(storageManager, samConventionResolver, lookupTracker)
+        JavaSyntheticPropertiesProvider(storageManager, lookupTracker),
+        SamAdapterSyntheticMembersProvider(storageManager, samConventionResolver, deprecationResolver),
+        SamAdapterSyntheticStaticFunctionsProvider(storageManager, samConventionResolver, lookupTracker),
+        SamAdapterSyntheticConstructorsProvider(storageManager, samConventionResolver, lookupTracker)
     )
 }

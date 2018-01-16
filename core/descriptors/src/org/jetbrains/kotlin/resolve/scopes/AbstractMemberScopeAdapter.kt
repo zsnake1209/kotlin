@@ -31,10 +31,10 @@ abstract class AbstractMemberScopeAdapter : AbstractResolutionScopeAdapter(), Me
     abstract override val workerScope: MemberScope
 
     fun getActualScope(): MemberScope =
-            if (workerScope is AbstractMemberScopeAdapter)
-                (workerScope as AbstractMemberScopeAdapter).getActualScope()
-            else
-                workerScope
+        if (workerScope is AbstractMemberScopeAdapter)
+            (workerScope as AbstractMemberScopeAdapter).getActualScope()
+        else
+            workerScope
 
     override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<SimpleFunctionDescriptor> {
         return workerScope.getContributedFunctions(name, location)
@@ -48,8 +48,10 @@ abstract class AbstractMemberScopeAdapter : AbstractResolutionScopeAdapter(), Me
         return workerScope.getContributedVariables(name, location)
     }
 
-    override fun getContributedDescriptors(kindFilter: DescriptorKindFilter,
-                                           nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> {
+    override fun getContributedDescriptors(
+        kindFilter: DescriptorKindFilter,
+        nameFilter: (Name) -> Boolean
+    ): Collection<DeclarationDescriptor> {
         return workerScope.getContributedDescriptors(kindFilter, nameFilter)
     }
 
