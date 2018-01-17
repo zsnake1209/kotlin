@@ -364,7 +364,7 @@ object Filtering : TemplateGroupBase() {
         }
         body(Strings, CharSequences) {
             """
-            for (index in 0 until length)
+            for (index in indices)
                 if (!predicate(get(index))) {
                     return ${subsequence(f, "0", "index")}
                 }
@@ -537,7 +537,7 @@ object Filtering : TemplateGroupBase() {
 
         body(CharSequences) {
             """
-            for (index in 0 until length) {
+            for (index in indices) {
                 val element = get(index)
                 if (predicate(element)) destination.append(element)
             }

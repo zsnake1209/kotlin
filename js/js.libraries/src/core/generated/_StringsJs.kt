@@ -359,7 +359,7 @@ public inline fun <C : Appendable> CharSequence.filterNotTo(destination: C, pred
  * Appends all characters matching the given [predicate] to the given [destination].
  */
 public inline fun <C : Appendable> CharSequence.filterTo(destination: C, predicate: (Char) -> Boolean): C {
-    for (index in 0 until length) {
+    for (index in indices) {
         val element = get(index)
         if (predicate(element)) destination.append(element)
     }
@@ -465,7 +465,7 @@ public inline fun String.takeLastWhile(predicate: (Char) -> Boolean): String {
  * Returns a subsequence of this char sequence containing the first characters that satisfy the given [predicate].
  */
 public inline fun CharSequence.takeWhile(predicate: (Char) -> Boolean): CharSequence {
-    for (index in 0 until length)
+    for (index in indices)
         if (!predicate(get(index))) {
             return subSequence(0, index)
         }
@@ -476,7 +476,7 @@ public inline fun CharSequence.takeWhile(predicate: (Char) -> Boolean): CharSequ
  * Returns a string containing the first characters that satisfy the given [predicate].
  */
 public inline fun String.takeWhile(predicate: (Char) -> Boolean): String {
-    for (index in 0 until length)
+    for (index in indices)
         if (!predicate(get(index))) {
             return substring(0, index)
         }
