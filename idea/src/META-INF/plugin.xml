@@ -2713,6 +2713,7 @@
     <binaryExtension implementation="org.jetbrains.kotlin.idea.util.KotlinJsMetaBinary"/>
 
     <highlighterExtension implementation="org.jetbrains.kotlin.idea.highlighter.dsl.KotlinXHtmlCustomHighlighter"/>
+    <highlighterExtension implementation="org.jetbrains.kotlin.idea.highlighter.dsl.KtorRoutingCustomHighlighter"/>
   </extensions>
 
 </idea-plugin>

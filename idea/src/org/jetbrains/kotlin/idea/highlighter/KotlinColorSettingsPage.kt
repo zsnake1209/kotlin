@@ -26,6 +26,7 @@ import com.intellij.openapi.options.colors.RainbowColorSettingsPage
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.KotlinIcons
 import org.jetbrains.kotlin.idea.KotlinLanguage
+import org.jetbrains.kotlin.idea.highlighter.dsl.KtorRoutingCustomHighlighter
 import java.lang.reflect.Modifier
 import java.util.*
 
@@ -109,7 +110,8 @@ var <PACKAGE_PROPERTY><MUTABLE_VARIABLE>globalCounter</MUTABLE_VARIABLE></PACKAG
 
             }
         }
-        return map
+
+        return map + KtorRoutingCustomHighlighter.descriptionsToKeys
     }
 
     override fun getAttributeDescriptors(): Array<AttributesDescriptor> {
@@ -172,7 +174,8 @@ var <PACKAGE_PROPERTY><MUTABLE_VARIABLE>globalCounter</MUTABLE_VARIABLE></PACKAG
                        KotlinBundle.message("options.kotlin.attribute.descriptor.smart.constant") to KotlinHighlightingColors.SMART_CONSTANT,
                        KotlinBundle.message("options.kotlin.attribute.descriptor.smart.cast.receiver") to KotlinHighlightingColors.SMART_CAST_RECEIVER,
                        KotlinBundle.message("options.kotlin.attribute.descriptor.label") to KotlinHighlightingColors.LABEL,
-                       "Named argument" to KotlinHighlightingColors.NAMED_ARGUMENT)
+                       "Named argument" to KotlinHighlightingColors.NAMED_ARGUMENT) +
+                KtorRoutingCustomHighlighter.descriptionsToKeys.map { (description, key) -> description to key }.toTypedArray()
     }
 
     override fun getColorDescriptors(): Array<ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
