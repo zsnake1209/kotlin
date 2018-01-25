@@ -40,13 +40,12 @@ open class KotlinScriptDefinitionFromAnnotatedTemplate(
 ) : KotlinScriptDefinition(template) {
 
     val scriptFilePattern by lazy {
-        val pattern =
-            takeUnlessError {
-                template.annotations.firstIsInstanceOrNull<kotlin.script.templates.ScriptTemplateDefinition>()?.scriptFilePattern
-            }
-                    ?: takeUnlessError { template.annotations.firstIsInstanceOrNull<ScriptTemplateDefinition>()?.scriptFilePattern }
-                    ?: DEFAULT_SCRIPT_FILE_PATTERN
-        Regex(pattern)
+        takeUnlessError {
+            val regexString =
+                    template.annotations.firstIsInstanceOrNull<kotlin.script.templates.ScriptTemplateDefinition>()?.scriptFilePattern ?:
+                            template.annotations.firstIsInstanceOrNull<ScriptTemplateDefinition>()?.scriptFilePattern
+            regexString?.let { Regex(regexString) }
+        } ?: defaultRegex
     }
 
     override val dependencyResolver: DependenciesResolver by lazy {
@@ -160,6 +159,8 @@ open class KotlinScriptDefinitionFromAnnotatedTemplate(
 
     companion object {
         internal val log = Logger.getInstance(KotlinScriptDefinitionFromAnnotatedTemplate::class.java)
+
+        private val defaultRegex = Regex(DEFAULT_SCRIPT_FILE_PATTERN)
     }
 }
 
