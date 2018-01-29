@@ -329,6 +329,9 @@
     <projectService serviceInterface="org.jetbrains.kotlin.idea.core.util.ProjectJob"
                     serviceImplementation="org.jetbrains.kotlin.idea.core.util.ProjectJob"/>
 
+    <projectService serviceInterface="org.jetbrains.kotlin.idea.highlighter.dsl.HighlightingScriptsCache"
+                    serviceImplementation="org.jetbrains.kotlin.idea.highlighter.dsl.HighlightingScriptsCache"/>
+
     <errorHandler implementation="org.jetbrains.kotlin.idea.reporter.KotlinReportSubmitter"/>
 
     <internalFileTemplate name="Kotlin File"/>
@@ -2715,6 +2718,7 @@
     <highlighterExtension implementation="org.jetbrains.kotlin.idea.highlighter.dsl.KotlinXHtmlCustomHighlighter"/>
     <highlighterExtension implementation="org.jetbrains.kotlin.idea.highlighter.dsl.KtorRoutingCustomHighlighter"/>
     <highlighterExtension implementation="org.jetbrains.kotlin.idea.highlighter.dsl.SpekAnnotationCustomHighlighter"/>
+    <highlighterExtension implementation="org.jetbrains.kotlin.idea.highlighter.dsl.ScriptBasedHighlighter"/>
   </extensions>
 
 </idea-plugin>

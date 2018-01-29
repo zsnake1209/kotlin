@@ -1,0 +1,1 @@
+C:\Dev\kotlin\dist\kotlinc\bin\kotlinc-jvm -cp C:\Dev\Misc\ColorScheme\out\artifacts\ColorScheme_jar\ColorScheme.jar -script-templates kotlinx.colorScheme.ColorSchemeDefinition -d C:\Dev\Misc\ColorExample\lib\htmlColor.jar C:\Dev\Misc\ColorScheme\examples\src\html.color.kts

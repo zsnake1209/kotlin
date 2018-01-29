@@ -46,7 +46,7 @@ class SpekAnnotationCustomHighlighter : HighlighterExtension() {
     companion object {
         private val STYLES = 16
 
-        private val keys = (0 until STYLES).map { styleNum -> TextAttributesKey.createTextAttributesKey("KOTLIN::DSL::CUSTOM$styleNum") }
+        val keys = (0 until STYLES).map { styleNum -> TextAttributesKey.createTextAttributesKey("KOTLIN::DSL::CUSTOM$styleNum") }
 
         val descriptionsToKeys: Map<String, TextAttributesKey> = keys.withIndex().associate { (styleNum, style) ->
             "Dsl//Custom//Style$styleNum" to style
