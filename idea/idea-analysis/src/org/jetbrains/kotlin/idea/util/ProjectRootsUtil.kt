@@ -104,7 +104,7 @@ object ProjectRootsUtil {
         return runReadAction {
             val virtualFile = when (element) {
                                   is PsiDirectory -> element.virtualFile
-                                  else -> element.containingFile?.virtualFile
+                                  else -> element.containingFile?.originalFile?.virtualFile
                               } ?: return@runReadAction false
 
             val project = element.project
