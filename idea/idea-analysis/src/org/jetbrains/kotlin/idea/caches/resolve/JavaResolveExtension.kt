@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.idea.caches.resolve.lightClasses.KtLightClassForDecompiledDeclaration
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
-import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.load.java.sources.JavaSourceElement
 import org.jetbrains.kotlin.load.java.structure.*
@@ -40,7 +39,7 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 
 @JvmOverloads
 fun PsiMethod.getJavaMethodDescriptor(resolutionFacade: ResolutionFacade = javaResolutionFacade()): FunctionDescriptor? {
-    val method = originalElement as? PsiMethod ?: return null
+    val method = original() ?: return null
     if (method.containingClass == null || !Name.isValidIdentifier(method.name)) return null
     val resolver = method.getJavaDescriptorResolver(resolutionFacade)
     return when {
@@ -51,13 +50,13 @@ fun PsiMethod.getJavaMethodDescriptor(resolutionFacade: ResolutionFacade = javaR
 
 @JvmOverloads
 fun PsiClass.getJavaClassDescriptor(resolutionFacade: ResolutionFacade = javaResolutionFacade()): ClassDescriptor? {
-    val psiClass = originalElement as? PsiClass ?: return null
+    val psiClass = original() ?: return null
     return psiClass.getJavaDescriptorResolver(resolutionFacade)?.resolveClass(JavaClassImpl(psiClass))
 }
 
 @JvmOverloads
 fun PsiField.getJavaFieldDescriptor(resolutionFacade: ResolutionFacade = javaResolutionFacade()): PropertyDescriptor? {
-    val field = originalElement as? PsiField ?: return null
+    val field = original() ?: return null
     return field.getJavaDescriptorResolver(resolutionFacade)?.resolveField(JavaFieldImpl(field))
 }
 
@@ -144,3 +143,7 @@ private fun <T : DeclarationDescriptorWithSource> Collection<T>.findByJavaElemen
 
 fun PsiElement.javaResolutionFacade() =
         KotlinCacheService.getInstance(project).getResolutionFacadeByFile(this.containingFile, JvmPlatform)
+
+private inline fun <reified T : PsiElement> T.original(): T? {
+    return originalElement as? T
+}
