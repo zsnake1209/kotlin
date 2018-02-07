@@ -292,6 +292,9 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
     @get:LocalState @get:Optional
     internal var buildServicesWorkingDir: Callable<File>? = null
 
+    @get:Internal
+    var icLogFile: Any? = null
+
     init {
         incremental = true
     }
@@ -352,7 +355,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
         val messageCollector = GradleMessageCollector(logger)
         val outputItemCollector = OutputItemsCollectorImpl()
         val compilerRunner = GradleCompilerRunner(project)
-        val reporter = GradleICReporter(project.rootProject.projectDir)
+        val reporter = GradleICReporter(project.rootProject.projectDir, project.file(icLogFile))
 
         val environment = when {
             !incremental ->
@@ -518,7 +521,7 @@ open class Kotlin2JsCompile() : AbstractKotlinCompile<K2JSCompilerArguments>(), 
         val messageCollector = GradleMessageCollector(logger)
         val outputItemCollector = OutputItemsCollectorImpl()
         val compilerRunner = GradleCompilerRunner(project)
-        val reporter = GradleICReporter(project.rootProject.projectDir)
+        val reporter = GradleICReporter(project.rootProject.projectDir, logFile = null)
 
         val environment = when {
             incremental -> {
