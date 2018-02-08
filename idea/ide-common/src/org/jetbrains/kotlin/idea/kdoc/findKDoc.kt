@@ -17,56 +17,70 @@
 package org.jetbrains.kotlin.idea.kdoc
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithSource
+import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptorIfAny
 import org.jetbrains.kotlin.kdoc.parser.KDocKnownTag
 import org.jetbrains.kotlin.kdoc.psi.api.KDoc
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
-import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.psi.KtPrimaryConstructor
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
+import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.psiUtil.containingClass
+import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
+import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
+import org.jetbrains.kotlin.psi.psiUtil.isPropertyParameter
 import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils
 
 fun DeclarationDescriptor.findKDoc(
-        descriptorToPsi: (DeclarationDescriptorWithSource) -> PsiElement? = { DescriptorToSourceUtils.descriptorToDeclaration(it) }
+    descriptorToPsi: (DeclarationDescriptorWithSource) -> PsiElement? = { DescriptorToSourceUtils.descriptorToDeclaration(it) }
 ): KDocTag? {
     if (this is DeclarationDescriptorWithSource) {
-        var psiDeclaration = descriptorToPsi(this)?.navigationElement
-        // KDoc for primary constructor is located inside of its class KDoc
-        if (psiDeclaration is KtPrimaryConstructor) {
-            psiDeclaration = psiDeclaration.getContainingClassOrObject()
-        }
+        val psiDeclaration = descriptorToPsi(this)?.navigationElement
+        return (psiDeclaration as? KtElement)?.findKDoc(descriptorToPsi)
+    }
+    return null
+}
 
-        if (psiDeclaration is KtDeclaration) {
-            val kdoc = psiDeclaration.docComment
-            if (kdoc != null) {
-                if (this is ConstructorDescriptor) {
-                    // ConstructorDescriptor resolves to the same JetDeclaration
-                    val constructorSection = kdoc.findSectionByTag(KDocKnownTag.CONSTRUCTOR)
-                    if (constructorSection != null) {
-                        return constructorSection
-                    }
+
+fun KtElement.findKDoc(descriptorToPsi: (DeclarationDescriptorWithSource) -> PsiElement?): KDocTag? {
+    var psiDeclaration = this
+
+    // KDoc for primary constructor is located inside of its class KDoc
+    if (psiDeclaration is KtPrimaryConstructor) {
+        psiDeclaration = psiDeclaration.getContainingClassOrObject()
+    }
+
+    if (psiDeclaration is KtDeclaration) {
+        val kdoc = psiDeclaration.docComment
+        if (kdoc != null) {
+            if (this is KtConstructor<*>) {
+                // ConstructorDescriptor resolves to the same JetDeclaration
+                val constructorSection = kdoc.findSectionByTag(KDocKnownTag.CONSTRUCTOR)
+                if (constructorSection != null) {
+                    return constructorSection
                 }
-                return kdoc.getDefaultSection()
+            }
+            return kdoc.getDefaultSection()
+        }
+    }
+
+    if (this is KtProperty || (this is KtParameter && this.isPropertyParameter())) {
+        val classKDoc = containingClass()?.getChildOfType<KDoc>()
+        val subjectName = name
+        if (classKDoc != null && subjectName != null) {
+            val propertySection =
+                classKDoc.findSectionByTag(KDocKnownTag.PROPERTY, subjectName)
+                        ?: classKDoc.findDescendantOfType<KDocTag> { it.knownTag == KDocKnownTag.PARAM && it.getSubjectName() == subjectName }
+            if (propertySection != null) {
+                return propertySection
             }
         }
     }
 
-    if (this is PropertyDescriptor) {
-        val containingClassDescriptor = this.containingDeclaration as? ClassDescriptor
-        if (containingClassDescriptor != null) {
-            val classKDoc = containingClassDescriptor.findKDoc(descriptorToPsi)?.getParentOfType<KDoc>(false)
-            if (classKDoc != null) {
-                val propertySection = classKDoc.findSectionByTag(KDocKnownTag.PROPERTY,
-                                                                 getName().asString())
-                if (propertySection != null) {
-                    return propertySection
-                }
-            }
-        }
-    }
+    if (this is KtCallableDeclaration) {
+        val descriptor = this.resolveToDescriptorIfAny() as? CallableDescriptor ?: return null
 
-    if (this is CallableDescriptor) {
-        for (baseDescriptor in this.overriddenDescriptors) {
+        for (baseDescriptor in descriptor.overriddenDescriptors) {
             val baseKDoc = baseDescriptor.original.findKDoc(descriptorToPsi)
             if (baseKDoc != null) {
                 return baseKDoc
@@ -76,4 +90,3 @@ fun DeclarationDescriptor.findKDoc(
 
     return null
 }
-
