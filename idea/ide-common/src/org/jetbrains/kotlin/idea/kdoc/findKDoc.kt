@@ -25,10 +25,7 @@ import org.jetbrains.kotlin.kdoc.parser.KDocKnownTag
 import org.jetbrains.kotlin.kdoc.psi.api.KDoc
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.psi.psiUtil.containingClass
-import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
-import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
-import org.jetbrains.kotlin.psi.psiUtil.isPropertyParameter
+import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils
 
 fun DeclarationDescriptor.findKDoc(
@@ -64,13 +61,25 @@ fun KtElement.findKDoc(descriptorToPsi: (DeclarationDescriptorWithSource) -> Psi
         }
     }
 
-    if (this is KtProperty || (this is KtParameter && this.isPropertyParameter())) {
-        val classKDoc = containingClass()?.getChildOfType<KDoc>()
+
+    if (this is KtParameter) {
+        val classKDoc = containingClassOrObject?.getChildOfType<KDoc>()
         val subjectName = name
         if (classKDoc != null && subjectName != null) {
             val propertySection =
-                classKDoc.findSectionByTag(KDocKnownTag.PROPERTY, subjectName)
+                classKDoc.findSectionByTag(KDocKnownTag.PROPERTY, subjectName)?.takeIf { this.isPropertyParameter() }
                         ?: classKDoc.findDescendantOfType<KDocTag> { it.knownTag == KDocKnownTag.PARAM && it.getSubjectName() == subjectName }
+            if (propertySection != null) {
+                return propertySection
+            }
+        }
+    }
+
+    if (this is KtProperty) {
+        val classKDoc = containingClass()?.getChildOfType<KDoc>()
+        val subjectName = name
+        if (classKDoc != null && subjectName != null) {
+            val propertySection = classKDoc.findSectionByTag(KDocKnownTag.PROPERTY, subjectName)
             if (propertySection != null) {
                 return propertySection
             }
