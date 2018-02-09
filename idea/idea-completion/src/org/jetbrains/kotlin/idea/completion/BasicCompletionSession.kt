@@ -70,7 +70,6 @@ import org.jetbrains.kotlin.util.kind
 import org.jetbrains.kotlin.util.supertypesWithAny
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
-import java.util.*
 
 class BasicCompletionSession(
         configuration: CompletionSessionConfiguration,
@@ -224,6 +223,26 @@ class BasicCompletionSession(
                 }
             }
 
+
+            withCollectRequiredContextVariableTypes { lookupFactory ->
+                val dslMembersCompletion = DslMembersCompletion(
+                    project, prefixMatcher, lookupFactory,
+                    receiverTypes, collector, indicesHelper(true), callTypeAndReceiver
+                )
+                if (dslMembersCompletion.completeDslFunctions()) {
+                    val position = parameters.position
+                    if (dslMembersCompletion.areMostlyDslsExpected()
+                        && parameters.completionType == CompletionType.BASIC
+                        && parameters.invocationCount < 2
+                        && position.parent is KtNameReferenceExpression
+                        && position.parent.parent is KtBlockExpression
+                    ) {
+                        return
+                    }
+                }
+
+            }
+
             val contextVariableTypesForSmartCompletion = withCollectRequiredContextVariableTypes(::completeWithSmartCompletion)
 
             val contextVariableTypesForReferenceVariants = withCollectRequiredContextVariableTypes { lookupElementFactory ->
@@ -273,6 +292,7 @@ class BasicCompletionSession(
 
             NamedArgumentCompletion.complete(collector, expectedInfos, callTypeAndReceiver.callType)
             flushToResultSet()
+
 
             val contextVariablesProvider = RealContextVariablesProvider(referenceVariantsHelper, position)
             withContextVariablesProvider(contextVariablesProvider) { lookupElementFactory ->

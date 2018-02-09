@@ -105,7 +105,11 @@ class KotlinIndicesHelper(
                 .distinct()
     }
 
-    fun processTopLevelCallables(nameFilter: (String) -> Boolean, processor: (CallableDescriptor) -> Unit) {
+    fun processTopLevelCallables(
+        nameFilter: (String) -> Boolean,
+        processor: (CallableDescriptor) -> Unit,
+        declarationFilter: (KtDeclaration) -> Boolean = { true }
+    ) {
         fun processIndex(index: StringStubIndexExtension<out KtCallableDeclaration>) {
             for (key in index.getAllKeys(project)) {
                 ProgressManager.checkCanceled()
@@ -114,6 +118,7 @@ class KotlinIndicesHelper(
                 for (declaration in index.get(key, project, scope)) {
                     if (declaration.receiverTypeReference != null) continue
                     if (filterOutPrivate && declaration.hasModifier(KtTokens.PRIVATE_KEYWORD)) continue
+                    if (!declarationFilter(declaration)) continue
 
                     for (descriptor in declaration.resolveToDescriptors<CallableDescriptor>()) {
                         if (descriptorFilter(descriptor)) {
@@ -141,7 +146,8 @@ class KotlinIndicesHelper(
     fun getCallableTopLevelExtensions(
             callTypeAndReceiver: CallTypeAndReceiver<*, *>,
             receiverTypes: Collection<KotlinType>,
-            nameFilter: (String) -> Boolean
+            nameFilter: (String) -> Boolean,
+            declarationFilter: (KtDeclaration) -> Boolean = { true }
     ): Collection<CallableDescriptor> {
         if (receiverTypes.isEmpty()) return emptyList()
 
@@ -157,7 +163,7 @@ class KotlinIndicesHelper(
                     KotlinTopLevelExtensionsByReceiverTypeIndex.receiverTypeNameFromKey(it) in receiverTypeNames
                     && nameFilter(KotlinTopLevelExtensionsByReceiverTypeIndex.callableNameFromKey(it))
                 }
-                .flatMap { index.get(it, project, scope).asSequence() }
+                .flatMap { index.get(it, project, scope).asSequence() }.filter(declarationFilter)
 
         val suitableExtensions = findSuitableExtensions(declarations, receiverTypes, callTypeAndReceiver.callType)
 

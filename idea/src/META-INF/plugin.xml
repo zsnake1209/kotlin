@@ -335,6 +335,9 @@
     <projectService serviceInterface="org.jetbrains.kotlin.idea.core.util.ProjectJob"
                     serviceImplementation="org.jetbrains.kotlin.idea.core.util.ProjectJob"/>
 
+    <projectService serviceInterface="org.jetbrains.kotlin.idea.completion.DslMarkerAnnotationsCache"
+                    serviceImplementation="org.jetbrains.kotlin.idea.completion.DslMarkerAnnotationsCache"/>
+
     <errorHandler implementation="org.jetbrains.kotlin.idea.reporter.KotlinReportSubmitter"/>
 
     <internalFileTemplate name="Kotlin File"/>

@@ -41,7 +41,6 @@ import org.jetbrains.kotlin.idea.project.TargetPlatformDetector
 import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.idea.util.*
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
@@ -52,7 +51,6 @@ import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
 import java.util.*
-import kotlin.collections.LinkedHashMap
 
 class CompletionSessionConfiguration(
         val useBetterPrefixMatcherForNonImportedClasses: Boolean,
@@ -362,17 +360,18 @@ abstract class CompletionSession(
     protected fun processTopLevelCallables(processor: (CallableDescriptor) -> Unit) {
         val shadowedFilter = ShadowedDeclarationsFilter.create(bindingContext, resolutionFacade, nameExpression!!, callTypeAndReceiver)
                 ?.createNonImportedDeclarationsFilter<CallableDescriptor>(referenceVariantsCollector!!.allCollected.imported)
-        indicesHelper(true).processTopLevelCallables({ prefixMatcher.prefixMatches(it) }) {
-            if (shadowedFilter != null) {
-                shadowedFilter(listOf(it)).singleOrNull()?.let(processor)
-            }
-            else {
-                processor(it)
-            }
-        }
+        indicesHelper(true).processTopLevelCallables(
+            nameFilter = { prefixMatcher.prefixMatches(it) },
+            processor = {
+                if (shadowedFilter != null) {
+                    shadowedFilter(listOf(it)).singleOrNull()?.let(processor)
+                } else {
+                    processor(it)
+                }
+            })
     }
 
-    protected fun withCollectRequiredContextVariableTypes(action: (LookupElementFactory) -> Unit): Collection<FuzzyType> {
+    protected inline fun withCollectRequiredContextVariableTypes(action: (LookupElementFactory) -> Unit): Collection<FuzzyType> {
         val provider = CollectRequiredTypesContextVariablesProvider()
         val lookupElementFactory = createLookupElementFactory(provider)
         action(lookupElementFactory)
