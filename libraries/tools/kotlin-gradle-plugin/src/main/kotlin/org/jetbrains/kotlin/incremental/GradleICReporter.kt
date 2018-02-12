@@ -27,7 +27,7 @@ internal class GradleICReporter(private val projectRootFile: File, private val l
     override fun report(message: () -> String) {
         if (logFile != null) {
             val msgText = message()
-            logFile.appendText(msgText)
+            logFile.appendText(msgText + "\n")
             if (log.isDebugEnabled) {
                 log.kotlinDebug(msgText)
             }
