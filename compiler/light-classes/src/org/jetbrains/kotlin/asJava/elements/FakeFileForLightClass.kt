@@ -16,12 +16,15 @@
 
 package org.jetbrains.kotlin.asJava.elements
 
+import com.intellij.openapi.util.TextRange
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.ClassFileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.impl.compiled.ClsFileImpl
 import com.intellij.psi.stubs.PsiClassHolderFileStub
+import com.intellij.util.IncorrectOperationException
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForFacade
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForSourceDeclaration
@@ -29,16 +32,12 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 
 open class FakeFileForLightClass(
-        val ktFile: KtFile,
-        private val lightClass: () -> KtLightClass,
-        private val stub: () -> PsiClassHolderFileStub<*>,
-        private val packageFqName: FqName = ktFile.packageFqName
-) : ClsFileImpl(ClassFileViewProvider(ktFile.manager, ktFile.virtualFile ?:
-                                                      ktFile.originalFile.virtualFile ?:
-                                                      ktFile.viewProvider.virtualFile)) {
+    val ktFile: KtFile,
+    private val lightClass: () -> KtLightClass,
+    private val stub: () -> PsiClassHolderFileStub<*>,
+    private val packageFqName: FqName = ktFile.packageFqName
+) : PsiJavaFile by ClsFileFromStubs(ktFile, stub) {
     override fun getPackageName() = packageFqName.asString()
-
-    override fun getStub() = stub()
 
     override fun getClasses() = arrayOf(lightClass())
 
@@ -77,10 +76,23 @@ open class FakeFileForLightClass(
         if (lightClass() is KtLightClassForFacade) {
             ktFile.packageDirective?.fqName = FqName(packageName)
         }
-        else {
-            super.setPackageName(packageName)
-        }
+        throw IncorrectOperationException("Cannot set package")
     }
 
+    override fun getText() = ""
+    override fun getTextRange(): TextRange = TextRange.EMPTY_RANGE
+    override fun findElementAt(offset: Int): PsiElement? = null
+    override fun getTextOffset(): Int = 0
+}
+
+private class ClsFileFromStubs(
+    ktFile: KtFile,
+    private val stub: () -> PsiClassHolderFileStub<*>
+) : ClsFileImpl(
+    ClassFileViewProvider(
+        ktFile.manager, ktFile.virtualFile ?: ktFile.originalFile.virtualFile ?: ktFile.viewProvider.virtualFile
+    )
+) {
+    override fun getStub() = stub()
     override fun isPhysical() = false
 }

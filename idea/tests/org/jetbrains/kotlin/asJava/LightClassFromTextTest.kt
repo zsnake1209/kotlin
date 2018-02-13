@@ -16,9 +16,11 @@
 
 package org.jetbrains.kotlin.asJava
 
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiType
+import com.intellij.psi.SmartPointerManager
 import com.intellij.testFramework.LightProjectDescriptor
 import org.jetbrains.kotlin.idea.test.KotlinLightCodeInsightFixtureTestCase
 import org.jetbrains.kotlin.idea.test.KotlinWithJdkAndRuntimeLightProjectDescriptor
@@ -102,6 +104,15 @@ class LightClassFromTextTest : KotlinLightCodeInsightFixtureTestCase() {
         assertEquals(0, headerClass.toLightElements().size)
         val headerFunction = contextFile.declarations.single { it is KtNamedFunction }
         assertEquals(0, headerFunction.toLightElements().size)
+    }
+
+    fun testSmartPointerFromContainingFile() {
+        val foo = (myFixture.configureByText("Foo.kt", "class Foo") as KtFile).declarations.single() as KtClassOrObject
+        val lightFoo = foo.toLightClass()!!
+        val fooFile = lightFoo.containingFile
+        SmartPointerManager.createPointer(fooFile)
+        SmartPointerManager.getInstance(project).createSmartPsiElementPointer(fooFile)
+        SmartPointerManager.getInstance(project).createSmartPsiFileRangePointer(fooFile, TextRange(0, 1))
     }
 
     private fun classesFromText(text: String, fileName: String = "A.kt"): Array<out PsiClass> {
