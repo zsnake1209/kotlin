@@ -140,11 +140,11 @@ val copyJpsBuildTest by tasks.creating { configureExtractFromConfigurationTask(`
 
 val unzipNodeJSPlugin by tasks.creating { configureExtractFromConfigurationTask(`plugins-NodeJS`) { zipTree(it.singleFile) } }
 
-fun writeIvyXml(moduleName: String, fileName: String, jarFiles: FileCollection, baseDir: File, sourcesJar: File?) {
+fun writeIvyXml(moduleName: String, fileName: String, jarFileTree: FileTree, baseDir: File, sourcesJar: File?) {
     with(IvyDescriptorFileGenerator(DefaultIvyPublicationIdentity(customDepsOrg, moduleName, intellijVersion))) {
         addConfiguration(DefaultIvyConfiguration("default"))
         addConfiguration(DefaultIvyConfiguration("sources"))
-        jarFiles.asFileTree.files.forEach {
+        jarFileTree.files.forEach {
             if (it.isFile && it.extension == "jar") {
                 val relativeName = it.toRelativeString(baseDir).removeSuffix(".jar")
                 addArtifact(DefaultIvyArtifact(it, relativeName, "jar", "jar", null).also { it.conf = "default" })
@@ -194,33 +194,39 @@ val prepareIvyXmls by tasks.creating {
 
         if (installIntellijCommunity) {
             writeIvyXml(intellij.name, intellij.name,
-                        files("$intellijSdkDir/lib/").filter { !it.name.startsWith("kotlin-") },
+                        fileTree("$intellijSdkDir/lib/").matching {
+                            include("*.jar")
+                            exclude("kotlin-*")
+                        },
                         File(intellijSdkDir, "lib"),
                         sourcesFile)
 
             File(intellijSdkDir, "plugins").listFiles { it: File -> it.isDirectory }.forEach {
-                writeIvyXml(it.name, "intellij.plugin.${it.name}", files("$it/lib/"), File(it, "lib"), sourcesFile)
+                writeIvyXml(it.name, "intellij.plugin.${it.name}", fileTree("$it/lib/"), File(it, "lib"), sourcesFile)
             }
         }
 
         if (installIntellijUltimate) {
             writeIvyXml(intellij.name /* important! the module name should be "intellij" */ , intellijUltimate.name,
-                        files("$intellijUltimateSdkDir/lib/").filter { !it.name.startsWith("kotlin-") },
+                        fileTree("$intellijUltimateSdkDir/lib/").matching {
+                            include("*.jar")
+                            exclude("kotlin-*")
+                        },
                         File(intellijUltimateSdkDir, "lib"),
                         sourcesFile)
 
             File(intellijUltimateSdkDir, "plugins").listFiles { it: File -> it.isDirectory }.forEach {
-                writeIvyXml(it.name, "intellijUltimate.plugin.${it.name}", files("$it/lib/"), File(it, "lib"), sourcesFile)
+                writeIvyXml(it.name, "intellijUltimate.plugin.${it.name}", fileTree("$it/lib/"), File(it, "lib"), sourcesFile)
             }
         }
 
         flatDeps.forEach {
-            writeIvyXml(it.name, it.name, files("$repoDir/${it.name}"), File(repoDir, it.name), sourcesFile)
+            writeIvyXml(it.name, it.name, fileTree("$repoDir/${it.name}"), File(repoDir, it.name), sourcesFile)
         }
 
         if (intellijUltimateEnabled) {
             val nodeJsBaseDir = "${`plugins-NodeJS`.name}/NodeJS/lib"
-            writeIvyXml("NodeJS", `plugins-NodeJS`.name, files("$repoDir/$nodeJsBaseDir"), File(repoDir, nodeJsBaseDir), sourcesFile)
+            writeIvyXml("NodeJS", `plugins-NodeJS`.name, fileTree("$repoDir/$nodeJsBaseDir"), File(repoDir, nodeJsBaseDir), sourcesFile)
         }
     }
 }
