@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.idea.completion
 
 import com.intellij.codeInsight.completion.PrefixMatcher
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -17,7 +18,6 @@ import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.psiUtil.collectAnnotationEntriesFromStubOrPsi
 import org.jetbrains.kotlin.resolve.calls.DslMarkerUtils
 
-// TODO: suppress completion when start of expression only, not inside context, provide completion variants with {}
 class DslMembersCompletion(
     private val project: Project,
     private val prefixMatcher: PrefixMatcher,
@@ -27,22 +27,42 @@ class DslMembersCompletion(
     private val indicesHelper: KotlinIndicesHelper,
     private val callTypeAndReceiver: CallTypeAndReceiver<*, *>
 ) {
-    private val dslReceiver = receiverTypes?.last()?.takeIf { DslMarkerUtils.extractDslMarkerFqNames(it.type).isNotEmpty() && it.implicit }
-
-    fun areMostlyDslsExpected() =
-        callTypeAndReceiver.callType == CallType.DEFAULT
-
-    fun completeDslFunctions(): Boolean {
-        dslReceiver ?: return false
-
-        var hasResults = false
-        val processor = { descriptor: DeclarationDescriptor ->
-            collector.addElements(baseFactory.createStandardLookupElementsForDescriptor(descriptor, false))
-            hasResults = true
+    private val dslReceiver = receiverTypes?.lastOrNull()?.takeIf {
+        DslMarkerUtils.extractDslMarkerFqNames(it.type).isNotEmpty() && it.implicit
+    }
+    private val factory = object : AbstractLookupElementFactory {
+        override fun createLookupElement(
+            descriptor: DeclarationDescriptor,
+            useReceiverTypes: Boolean,
+            qualifyNestedClasses: Boolean,
+            includeClassTypeArguments: Boolean,
+            parametersAndTypeGrayed: Boolean
+        ): LookupElement? {
+            error("Should not be called")
         }
+
+        override fun createStandardLookupElementsForDescriptor(
+            descriptor: DeclarationDescriptor,
+            useReceiverTypes: Boolean
+        ): Collection<LookupElement> {
+            return baseFactory.createStandardLookupElementsForDescriptor(descriptor, useReceiverTypes).also {
+                it.forEach { element ->
+                    element.isDslMember = true
+                }
+            }
+        }
+    }
+
+
+    // TODO: only concrete dsl
+    fun completeDslFunctions() {
+        dslReceiver ?: return
+
         val annotationShortNames = project.service<DslMarkerAnnotationsCache>().dslMarkerAnnotationFqNames.mapTo(HashSet()) {
             it.shortName()
         }
+        if (annotationShortNames.isEmpty()) return
+
         indicesHelper.getCallableTopLevelExtensions(
             nameFilter = { prefixMatcher.prefixMatches(it) },
             declarationFilter = {
@@ -51,10 +71,11 @@ class DslMembersCompletion(
             },
             callTypeAndReceiver = callTypeAndReceiver,
             receiverTypes = listOf(dslReceiver.type)
-        ).forEach(processor)
+        ).forEach { descriptor: DeclarationDescriptor ->
+            collector.addDescriptorElements(descriptor, factory, notImported = true, withReceiverCast = false)
+        }
 
         collector.flushToResultSet()
-        return hasResults
     }
 
 }

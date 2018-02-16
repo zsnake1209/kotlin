@@ -223,24 +223,11 @@ class BasicCompletionSession(
                 }
             }
 
-
             withCollectRequiredContextVariableTypes { lookupFactory ->
-                val dslMembersCompletion = DslMembersCompletion(
+                DslMembersCompletion(
                     project, prefixMatcher, lookupFactory,
                     receiverTypes, collector, indicesHelper(true), callTypeAndReceiver
-                )
-                if (dslMembersCompletion.completeDslFunctions()) {
-                    val position = parameters.position
-                    if (dslMembersCompletion.areMostlyDslsExpected()
-                        && parameters.completionType == CompletionType.BASIC
-                        && parameters.invocationCount < 2
-                        && position.parent is KtNameReferenceExpression
-                        && position.parent.parent is KtBlockExpression
-                    ) {
-                        return
-                    }
-                }
-
+                ).completeDslFunctions()
             }
 
             val contextVariableTypesForSmartCompletion = withCollectRequiredContextVariableTypes(::completeWithSmartCompletion)

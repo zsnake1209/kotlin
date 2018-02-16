@@ -269,6 +269,9 @@ abstract class CompletionSession(
 
         sorter = sorter.weighAfter("kotlin.proximity", ByNameAlphabeticalWeigher, PreferLessParametersWeigher)
 
+        // TODO: force dsl members only if no expected type
+        sorter = sorter.weighBefore("prefix", PreferDslMembers)
+
         return sorter
     }
 
