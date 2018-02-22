@@ -68,23 +68,26 @@ class LookupElementsCollector(
         postProcessors.add(processor)
     }
 
-    fun addDescriptorElements(descriptors: Iterable<DeclarationDescriptor>,
-                                     lookupElementFactory: AbstractLookupElementFactory,
-                                     notImported: Boolean = false,
-                                     withReceiverCast: Boolean = false
+    fun addDescriptorElements(
+        descriptors: Iterable<DeclarationDescriptor>,
+        lookupElementFactory: AbstractLookupElementFactory,
+        notImported: Boolean = false,
+        withReceiverCast: Boolean = false,
+        allowDuplicateDescriptors: Boolean = false
     ) {
         for (descriptor in descriptors) {
-            addDescriptorElements(descriptor, lookupElementFactory, notImported, withReceiverCast)
+            addDescriptorElements(descriptor, lookupElementFactory, notImported, withReceiverCast, allowDuplicateDescriptors)
         }
     }
 
     fun addDescriptorElements(
-            descriptor: DeclarationDescriptor,
-            lookupElementFactory: AbstractLookupElementFactory,
-            notImported: Boolean = false,
-            withReceiverCast: Boolean = false
+        descriptor: DeclarationDescriptor,
+        lookupElementFactory: AbstractLookupElementFactory,
+        notImported: Boolean = false,
+        withReceiverCast: Boolean = false,
+        allowDuplicateDescriptors: Boolean = false
     ) {
-        if (descriptor is CallableDescriptor && descriptor in processedCallables) return
+        if (!allowDuplicateDescriptors && descriptor is CallableDescriptor && descriptor in processedCallables) return
 
         var lookupElements = lookupElementFactory.createStandardLookupElementsForDescriptor(descriptor, useReceiverTypes = true)
 

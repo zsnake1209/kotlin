@@ -297,8 +297,8 @@ class BasicCompletionSession(
 
                 if (contextVariableTypesForReferenceVariants.any { contextVariablesProvider.functionTypeVariables(it).isNotEmpty() }) {
                     val (imported, notImported) = referenceVariantsWithSingleFunctionTypeParameter()!!
-                    collector.addDescriptorElements(imported, lookupElementFactory)
-                    collector.addDescriptorElements(notImported, lookupElementFactory, notImported = true)
+                    collector.addDescriptorElements(imported, lookupElementFactory, allowDuplicateDescriptors = true)
+                    collector.addDescriptorElements(notImported, lookupElementFactory, notImported = true, allowDuplicateDescriptors = true)
                 }
 
                 val staticMembersCompletion = StaticMembersCompletion(
