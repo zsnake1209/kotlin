@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package kotlin;
+package kotlin.jvm
 
-public class NoWhenBranchMatchedException extends RuntimeException {
-    public NoWhenBranchMatchedException() {
-    }
+import java.lang.Error
 
-    public NoWhenBranchMatchedException(String message) {
-        super(message);
-    }
+public class KotlinReflectionNotSupportedError : Error {
+    constructor() : super("Kotlin reflection implementation is not found at runtime. Make sure you have kotlin-reflect.jar in the classpath")
 
-    public NoWhenBranchMatchedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    constructor(message: String?) : super(message)
 
-    public NoWhenBranchMatchedException(Throwable cause) {
-        super(cause);
-    }
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
+
+    constructor(cause: Throwable?) : super(cause)
 }

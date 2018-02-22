@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package kotlin.jvm.internal.markers;
+package kotlin
 
-public interface KMutableListIterator extends KMutableIterator {
+public class TypeCastException : ClassCastException {
+    constructor()
+
+    constructor(message: String?) : super(message)
 }
