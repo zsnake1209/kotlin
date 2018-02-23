@@ -17,7 +17,6 @@
 package org.jetbrains.kotlin.asJava.builder
 
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.java.stubs.PsiJavaFileStub
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.containers.Stack
@@ -27,9 +26,9 @@ import org.jetbrains.kotlin.codegen.ClassBuilderMode
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 
 class KotlinLightClassBuilderFactory(private val javaFileStub: PsiJavaFileStub) : ClassBuilderFactory {
-    private val stubStack = Stack<StubElement<PsiElement>>().apply {
+    private val stubStack = Stack<StubElement<*>>().apply {
         @Suppress("UNCHECKED_CAST")
-        push(javaFileStub as StubElement<PsiElement>)
+        push(javaFileStub as StubElement<*>)
     }
 
     override fun getClassBuilderMode(): ClassBuilderMode = ClassBuilderMode.LIGHT_CLASSES
