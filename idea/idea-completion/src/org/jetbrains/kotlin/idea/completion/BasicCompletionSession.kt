@@ -208,6 +208,8 @@ class BasicCompletionSession(
                 }
             }
 
+            KEYWORDS_ONLY.doComplete()
+
             fun completeWithSmartCompletion(lookupElementFactory: LookupElementFactory) {
                 if (smartCompletion != null) {
                     val (additionalItems, @Suppress("UNUSED_VARIABLE") inheritanceSearcher) = smartCompletion.additionalItems(lookupElementFactory)
@@ -254,8 +256,6 @@ class BasicCompletionSession(
                 }
                 referenceVariantsCollector!!.collectingFinished()
             }
-
-            KEYWORDS_ONLY.doComplete()
 
             // getting root packages from scope is very slow so we do this in alternative way
             if (callTypeAndReceiver.receiver == null && callTypeAndReceiver.callType.descriptorKindFilter.kindMask.and(DescriptorKindFilter.PACKAGES_MASK) != 0) {
