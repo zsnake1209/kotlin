@@ -22,7 +22,9 @@ class KtLambdaArgument(node: ASTNode) : KtValueArgument(node), LambdaArgument {
 
     override fun getArgumentExpression() = super.getArgumentExpression()!!
 
-    override fun getLambdaExpression(): KtLambdaExpression = getArgumentExpression().unpackFunctionLiteral()!!
+    override fun getLambdaExpression(): KtLambdaExpression = getArgumentExpression().let {
+        it.unpackFunctionLiteral() ?: throw IllegalStateException("cant unpack function for $it of ${it.javaClass}")
+    }
 }
 
 fun KtExpression.unpackFunctionLiteral(allowParentheses: Boolean = false): KtLambdaExpression? {
