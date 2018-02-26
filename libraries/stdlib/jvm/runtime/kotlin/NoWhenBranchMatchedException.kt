@@ -16,7 +16,7 @@
 
 package kotlin
 
-public class NoWhenBranchMatchedException : RuntimeException {
+public open class NoWhenBranchMatchedException : RuntimeException {
     constructor()
 
     constructor(message: String?) : super(message)

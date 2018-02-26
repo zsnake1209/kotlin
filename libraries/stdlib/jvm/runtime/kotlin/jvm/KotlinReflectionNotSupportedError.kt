@@ -18,7 +18,7 @@ package kotlin.jvm
 
 import java.lang.Error
 
-public class KotlinReflectionNotSupportedError : Error {
+public open class KotlinReflectionNotSupportedError : Error {
     constructor() : super("Kotlin reflection implementation is not found at runtime. Make sure you have kotlin-reflect.jar in the classpath")
 
     constructor(message: String?) : super(message)

@@ -16,7 +16,7 @@
 
 package kotlin
 
-public class TypeCastException : ClassCastException {
+public open class TypeCastException : ClassCastException {
     constructor()
 
     constructor(message: String?) : super(message)
