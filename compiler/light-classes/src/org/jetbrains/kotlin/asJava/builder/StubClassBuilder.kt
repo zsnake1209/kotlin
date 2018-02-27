@@ -23,7 +23,10 @@ import org.jetbrains.org.objectweb.asm.FieldVisitor
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 import kotlin.properties.Delegates
 
-class StubClassBuilder(private val parentStack: Stack<StubElement<*>>, private val fileStub: PsiJavaFileStub) : AbstractClassBuilder() {
+class StubClassBuilder(
+    private val parentStack: Stack<StubElement<*>>,
+    private val fileStub: PsiJavaFileStub
+) : AbstractClassBuilder() {
     private val parent: StubElement<*> = parentStack.peek()
     private var v: StubBuildingVisitor<*> by Delegates.notNull()
     private var isPackageClass = false
@@ -63,7 +66,7 @@ class StubClassBuilder(private val parentStack: Stack<StubElement<*>>, private v
             val packageName = origin.packageFqName
             val packageClassName = OldPackageFacadeClassUtils.getPackageClassName(packageName)
 
-            if (name == packageClassName || name.endsWith("/" + packageClassName)) {
+            if (name == packageClassName || name.endsWith("/$packageClassName")) {
                 isPackageClass = true
             }
         }
@@ -79,13 +82,13 @@ class StubClassBuilder(private val parentStack: Stack<StubElement<*>>, private v
         if (parent is PsiJavaFileStub) {
             assert(parent === fileStub)
             val packagePrefix = packageInternalNamePrefix
-            assert(internalName.startsWith(packagePrefix)) { internalName + " : " + packagePrefix }
+            assert(internalName.startsWith(packagePrefix)) { "$internalName : $packagePrefix" }
             return internalName.substring(packagePrefix.length)
         }
         if (parent is PsiClassStub<*>) {
             val parentPrefix = getClassInternalNamePrefix(parent) ?: return null
 
-            assert(internalName.startsWith(parentPrefix)) { internalName + " : " + parentPrefix }
+            assert(internalName.startsWith(parentPrefix)) { "$internalName : $parentPrefix" }
             return internalName.substring(parentPrefix.length)
         }
         return null
@@ -147,8 +150,7 @@ class StubClassBuilder(private val parentStack: Stack<StubElement<*>>, private v
         if (oldOrigin != null) {
             val originalElement = oldOrigin.originalElement
             throw IllegalStateException(
-                "Rewriting origin element: " +
-                        originalElement?.text + " for stub " + last.toString()
+                "Rewriting origin element: ${originalElement?.text} for stub $last"
             )
         }
 
@@ -159,20 +161,18 @@ class StubClassBuilder(private val parentStack: Stack<StubElement<*>>, private v
     override fun done() {
         if (!isPackageClass) {
             val pop = parentStack.pop()
-            assert(pop === v.result) { "parentStack: got " + pop + ", expected " + v.result }
+            assert(pop === v.result) { "parentStack: got $pop, expected ${v.result}" }
         }
         super.done()
     }
+}
 
-    companion object {
-        private val EMPTY_STRATEGY = object : InnerClassSourceStrategy<Any> {
-            override fun findInnerClass(s: String, o: Any): Any? {
-                return null
-            }
+private val EMPTY_STRATEGY = object : InnerClassSourceStrategy<Any> {
+    override fun findInnerClass(s: String?, o: Any?): Any? {
+        return null
+    }
 
-            override fun accept(innerClass: Any, visitor: StubBuildingVisitor<Any>) {
-                throw UnsupportedOperationException("Shall not be called!")
-            }
-        }
+    override fun accept(innerClass: Any, visitor: StubBuildingVisitor<Any>) {
+        throw UnsupportedOperationException("Shall not be called!")
     }
 }
