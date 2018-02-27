@@ -25,7 +25,9 @@ import kotlin.properties.Delegates
 
 class StubClassBuilder(
     private val parentStack: Stack<StubElement<*>>,
-    private val fileStub: PsiJavaFileStub
+    private val fileStub: PsiJavaFileStub,
+    // NOTE: passing debug location through the call chain to catch pesky EA-107235, may be redundant after it is fixed
+    private val onError: (String) -> Nothing
 ) : AbstractClassBuilder() {
     private val parent: StubElement<*> = parentStack.peek()
     private var v: StubBuildingVisitor<*> by Delegates.notNull()
@@ -80,18 +82,28 @@ class StubClassBuilder(
 
     private fun calculateShortName(internalName: String): String? {
         if (parent is PsiJavaFileStub) {
-            assert(parent === fileStub)
+            assertWithLocation(parent === fileStub) {
+                "Parent should file stub but was ${parent.javaClass}"
+            }
             val packagePrefix = packageInternalNamePrefix
-            assert(internalName.startsWith(packagePrefix)) { "$internalName : $packagePrefix" }
+            assertWithLocation(internalName.startsWith(packagePrefix)) {
+                "Internal name must start with package name (internal name: '$internalName', package name: '$packagePrefix')"
+            }
             return internalName.substring(packagePrefix.length)
         }
         if (parent is PsiClassStub<*>) {
             val parentPrefix = getClassInternalNamePrefix(parent) ?: return null
 
-            assert(internalName.startsWith(parentPrefix)) { "$internalName : $parentPrefix" }
+            assertWithLocation(internalName.startsWith(parentPrefix)) {
+                "Internal name must start with parent class name (internal name: '$internalName', parent name: '$parentPrefix')"
+            }
             return internalName.substring(parentPrefix.length)
         }
         return null
+    }
+
+    private fun assertWithLocation(condition: Boolean, message: () -> String) {
+        assert(condition) { onError(message()) }
     }
 
     private fun getClassInternalNamePrefix(classStub: PsiClassStub<*>): String? {
@@ -161,7 +173,7 @@ class StubClassBuilder(
     override fun done() {
         if (!isPackageClass) {
             val pop = parentStack.pop()
-            assert(pop === v.result) { "parentStack: got $pop, expected ${v.result}" }
+            assertWithLocation(pop === v.result) { "parentStack: got $pop, expected ${v.result}" }
         }
         super.done()
     }

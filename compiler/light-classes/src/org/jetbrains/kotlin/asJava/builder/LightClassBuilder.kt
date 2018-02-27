@@ -37,16 +37,17 @@ import org.jetbrains.kotlin.resolve.diagnostics.Diagnostics
 data class LightClassBuilderResult(val stub: PsiJavaFileStub, val bindingContext: BindingContext, val diagnostics: Diagnostics)
 
 fun buildLightClass(
-        packageFqName: FqName,
-        files: Collection<KtFile>,
-        generateClassFilter: GenerationState.GenerateClassFilter,
-        context: LightClassConstructionContext,
-        generate: (state: GenerationState, files: Collection<KtFile>) -> Unit
+    packageFqName: FqName,
+    files: Collection<KtFile>,
+    generateClassFilter: GenerationState.GenerateClassFilter,
+    context: LightClassConstructionContext,
+    onError: (String) -> Nothing,
+    generate: (state: GenerationState, files: Collection<KtFile>) -> Unit
 ): LightClassBuilderResult {
     val project = files.first().project
 
     try {
-        val classBuilderFactory = KotlinLightClassBuilderFactory(createJavaFileStub(project, packageFqName, files))
+        val classBuilderFactory = KotlinLightClassBuilderFactory(createJavaFileStub(project, packageFqName, files), onError)
         val state = GenerationState.Builder(
                 project,
                 classBuilderFactory,

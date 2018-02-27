@@ -33,7 +33,10 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtScript
+import org.jetbrains.kotlin.psi.psiUtil.attachElement
+import org.jetbrains.kotlin.psi.psiUtil.attachFiles
 import org.jetbrains.kotlin.psi.psiUtil.isAncestor
+import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments
 import org.jetbrains.org.objectweb.asm.Type
 
 class LightClassDataProviderForClassOrObject(
@@ -43,17 +46,19 @@ class LightClassDataProviderForClassOrObject(
     private fun computeLightClassData(): LightClassDataHolder.ForClass {
         val file = classOrObject.containingKtFile
         val packageFqName = file.packageFqName
-        return LightClassGenerationSupport.getInstance(classOrObject.project).createDataHolderForClass(classOrObject) {
-            constructionContext ->
-            buildLightClass(packageFqName, listOf(file), ClassFilterForClassOrObject(classOrObject), constructionContext) {
-                state, files ->
-                val packageCodegen = state.factory.forPackage(packageFqName, files)
-                val packagePartType = Type.getObjectType(JvmFileClassUtil.getFileClassInternalName(file))
-                val context = state.rootContext.intoPackagePart(packageCodegen.packageFragment, packagePartType, file)
-                packageCodegen.generateClassOrObject(getOutermostClassOrObject(classOrObject), context)
-                state.factory.done()
+        return LightClassGenerationSupport.getInstance(classOrObject.project)
+            .createDataHolderForClass(classOrObject) { constructionContext ->
+                buildLightClass(
+                    packageFqName, listOf(file), ClassFilterForClassOrObject(classOrObject), constructionContext,
+                    { throw KotlinExceptionWithAttachments("Building light class for class or object\n$it").attachElement(classOrObject) }
+                ) { state, files ->
+                    val packageCodegen = state.factory.forPackage(packageFqName, files)
+                    val packagePartType = Type.getObjectType(JvmFileClassUtil.getFileClassInternalName(file))
+                    val context = state.rootContext.intoPackagePart(packageCodegen.packageFragment, packagePartType, file)
+                    packageCodegen.generateClassOrObject(getOutermostClassOrObject(classOrObject), context)
+                    state.factory.done()
+                }
             }
-        }
     }
 
     override fun compute(): CachedValueProvider.Result<LightClassDataHolder.ForClass>? {
@@ -74,10 +79,11 @@ sealed class LightClassDataProviderForFileFacade constructor(
     abstract fun findFiles(): Collection<KtFile>
 
     private fun computeLightClassData(files: Collection<KtFile>): LightClassDataHolder.ForFacade {
-        return LightClassGenerationSupport.getInstance(project).createDataHolderForFacade(files) {
-            constructionContext ->
-            buildLightClass(facadeFqName.parent(), files, ClassFilterForFacade, constructionContext) generate@ {
-                state, files ->
+        return LightClassGenerationSupport.getInstance(project).createDataHolderForFacade(files) { constructionContext ->
+            buildLightClass(
+                facadeFqName.parent(), files, ClassFilterForFacade, constructionContext,
+                { throw KotlinExceptionWithAttachments("Building light class for facade: $facadeFqName\n$it").attachFiles(findFiles()) }
+            ) generate@{ state, files ->
                 val representativeFile = files.first()
                 val fileClassInfo = JvmFileClassUtil.getFileClassInfoNoResolve(representativeFile)
                 if (!fileClassInfo.withJvmMultifileClass) {
@@ -130,15 +136,11 @@ sealed class LightClassDataProviderForFileFacade constructor(
 
 class LightClassDataProviderForScript(private val script: KtScript) : CachedValueProvider<LightClassDataHolder.ForScript> {
     private fun computeLightClassData(): LightClassDataHolder.ForScript {
-        return LightClassGenerationSupport.getInstance(script.project).createDataHolderForScript(script) {
-            constructionContext ->
+        return LightClassGenerationSupport.getInstance(script.project).createDataHolderForScript(script) { constructionContext ->
             buildLightClass(
-                    script.fqName.parent(),
-                    listOf(script.containingKtFile),
-                    ClassFilterForScript(script),
-                    constructionContext
-            ) generate@ {
-                state, files ->
+                script.fqName.parent(), listOf(script.containingKtFile), ClassFilterForScript(script), constructionContext,
+                { throw KotlinExceptionWithAttachments("Building light class for script\n$it").attachElement(script) }
+            ) generate@{ state, files ->
                 val scriptFile = files.first()
                 val codegen = state.factory.forPackage(scriptFile.packageFqName, files)
                 codegen.generate(CompilationErrorHandler.THROW_EXCEPTION)

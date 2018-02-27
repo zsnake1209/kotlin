@@ -25,14 +25,17 @@ import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.ClassBuilderMode
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 
-class KotlinLightClassBuilderFactory(private val javaFileStub: PsiJavaFileStub) : ClassBuilderFactory {
+class KotlinLightClassBuilderFactory(
+    private val javaFileStub: PsiJavaFileStub,
+    private val onError: (String) -> Nothing
+) : ClassBuilderFactory {
     private val stubStack = Stack<StubElement<*>>().apply {
         @Suppress("UNCHECKED_CAST")
         push(javaFileStub as StubElement<*>)
     }
 
     override fun getClassBuilderMode(): ClassBuilderMode = ClassBuilderMode.LIGHT_CLASSES
-    override fun newClassBuilder(origin: JvmDeclarationOrigin) = StubClassBuilder(stubStack, javaFileStub)
+    override fun newClassBuilder(origin: JvmDeclarationOrigin) = StubClassBuilder(stubStack, javaFileStub, onError)
 
     override fun asText(builder: ClassBuilder) = throw UnsupportedOperationException("asText is not implemented")
     override fun asBytes(builder: ClassBuilder) = throw UnsupportedOperationException("asBytes is not implemented")
