@@ -202,13 +202,7 @@ public final class PatternTranslator extends AbstractTranslator {
         }
 
         if (isArray(type)) {
-            if (ArrayFIF.typedArraysEnabled(context().getConfig())) {
-                return namer().isArray();
-            }
-            else {
-                return Namer.IS_ARRAY_FUN_REF;
-            }
-
+            return namer().isArray();
         }
 
         if (TypePredicatesKt.getCHAR_SEQUENCE().test(type)) return namer().isCharSequence();
@@ -246,12 +240,10 @@ public final class PatternTranslator extends AbstractTranslator {
             return namer().isTypeOf(new JsStringLiteral("number"));
         }
 
-        if (ArrayFIF.typedArraysEnabled(context().getConfig())) {
-            if (KotlinBuiltIns.isPrimitiveArray(type)) {
-                PrimitiveType arrayType = KotlinBuiltIns.getPrimitiveArrayElementType(type);
-                assert arrayType != null;
-                return namer().isPrimitiveArray(arrayType);
-            }
+        if (KotlinBuiltIns.isPrimitiveArray(type)) {
+            PrimitiveType arrayType = KotlinBuiltIns.getPrimitiveArrayElementType(type);
+            assert arrayType != null;
+            return namer().isPrimitiveArray(arrayType);
         }
 
         return null;
