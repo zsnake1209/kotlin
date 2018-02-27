@@ -328,8 +328,7 @@ internal object KotlinConverter {
                 }
 
             is KtExpression -> KotlinConverter.convertExpression(element, givenParent, requiredType)
-            is KtLambdaArgument -> element.getArgumentExpression().unpackFunctionLiteral()
-                ?.let { KotlinConverter.convertExpression(it, givenParent, requiredType) }
+            is KtLambdaArgument -> element.getLambdaExpression()?.let { KotlinConverter.convertExpression(it, givenParent, requiredType) }
             is KtLightAnnotationForSourceEntry.LightExpressionValue<*> -> {
                 val expression = element.originalExpression
                 when (expression) {

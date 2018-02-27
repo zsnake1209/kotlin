@@ -38,8 +38,6 @@ interface ValueArgument {
 
 interface LambdaArgument : ValueArgument {
     fun getLambdaExpression(): KtLambdaExpression?
-
-    override fun getArgumentExpression(): KtExpression
 }
 
 interface ValueArgumentName {
