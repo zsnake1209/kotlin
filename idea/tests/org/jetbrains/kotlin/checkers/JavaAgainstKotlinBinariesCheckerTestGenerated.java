@@ -127,6 +127,12 @@ public class JavaAgainstKotlinBinariesCheckerTestGenerated extends AbstractJavaA
         doTest(fileName);
     }
 
+    @TestMetadata("JvmPackageNameFileFacade.kt")
+    public void testJvmPackageNameFileFacade() throws Exception {
+        String fileName = KotlinTestUtils.navigationMetadata("idea/testData/kotlinAndJavaChecker/javaAgainstKotlin/JvmPackageNameFileFacade.kt");
+        doTest(fileName);
+    }
+
     @TestMetadata("KotlinAnnotations.kt")
     public void testKotlinAnnotations() throws Exception {
         String fileName = KotlinTestUtils.navigationMetadata("idea/testData/kotlinAndJavaChecker/javaAgainstKotlin/KotlinAnnotations.kt");
