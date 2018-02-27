@@ -72,9 +72,9 @@ private fun getCounterpart(expression: KtCallExpression): String? {
     val callee = expression.calleeExpression as? KtNameReferenceExpression ?: return null
     val calleeName = callee.getReferencedName()
     val counterpartName = counterpartNames[calleeName]
-    val lambdaArgument = expression.lambdaArguments.singleOrNull()?.getLambdaExpression()
-    if (counterpartName != null && lambdaArgument != null) {
-        if (lambdaArgument.valueParameters.isNotEmpty()) {
+    val lambdaExpression = expression.lambdaArguments.singleOrNull()?.getLambdaExpression()
+    if (counterpartName != null && lambdaExpression != null) {
+        if (lambdaExpression.valueParameters.isNotEmpty()) {
             return null
         }
         val bindingContext = callee.analyze(BodyResolveMode.PARTIAL)
