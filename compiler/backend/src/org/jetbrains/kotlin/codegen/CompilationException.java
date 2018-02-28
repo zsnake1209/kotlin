@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.diagnostics.DiagnosticUtils;
+import org.jetbrains.kotlin.psi.psiUtil.AttachmentUtil;
 import org.jetbrains.kotlin.util.ExceptionUtilKt;
 import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments;
 
@@ -22,7 +23,7 @@ public class CompilationException extends KotlinExceptionWithAttachments {
         this.element = element;
 
         if (element != null) {
-            withAttachment("element.kt", element.getText());
+            AttachmentUtil.attachElement(this, element);
         }
     }
 

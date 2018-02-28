@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.asJava.elements.KtLightMethod
 import org.jetbrains.kotlin.asJava.elements.KtLightMethodImpl
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.NotNullableUserDataProperty
-import org.jetbrains.kotlin.psi.debugText.getDebugText
+import org.jetbrains.kotlin.psi.psiUtil.attachElement
 import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments
 
 typealias ExactLightClassContextProvider = () -> LightClassConstructionContext
@@ -147,7 +147,7 @@ private sealed class LazyLightClassMemberMatchingError(message: String, containi
 
     init {
         containingClass.kotlinOrigin?.hasLightClassMatchingErrors = true
-        withAttachment("class.kt", (containingClass.kotlinOrigin)?.getDebugText())
+        attachElement(containingClass.kotlinOrigin)
     }
 
     class NoMatch(dummyMember: PsiMember, containingClass: KtLightClass) : LazyLightClassMemberMatchingError(

@@ -59,7 +59,7 @@ fun <T : PsiElement> T.copied(): T = copy() as T
 fun KtLambdaArgument.moveInsideParentheses(bindingContext: BindingContext): KtCallExpression {
     val ktExpression = this.getArgumentExpression()
             ?: throw KotlinExceptionWithAttachments("no argument expression for $this")
-                .withAttachment("lambdaExpression", this.text)
+                .attachElement(this)
     return moveInsideParenthesesAndReplaceWith(ktExpression, bindingContext)
 }
 

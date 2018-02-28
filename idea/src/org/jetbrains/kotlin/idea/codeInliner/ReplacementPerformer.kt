@@ -25,10 +25,7 @@ import org.jetbrains.kotlin.idea.core.replaced
 import org.jetbrains.kotlin.idea.intentions.ConvertToBlockBodyIntention
 import org.jetbrains.kotlin.idea.intentions.RemoveCurlyBracesFromTemplateIntention
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.psi.psiUtil.PsiChildRange
-import org.jetbrains.kotlin.psi.psiUtil.canPlaceAfterSimpleNameEntry
-import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
-import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
+import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.resolve.bindingContextUtil.isUsedAsExpression
 import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments
 import java.util.*
@@ -215,7 +212,7 @@ internal class ExpressionReplacementPerformer(
         val ktLambdaArgument = runAfterReplacement.lambdaArguments[0]
         val block = ktLambdaArgument.getLambdaExpression()?.bodyExpression
                 ?: throw KotlinExceptionWithAttachments("cant get body expression for $ktLambdaArgument")
-                    .withAttachment("ktLambdaArgument", ktLambdaArgument.text)
+                    .attachElement(ktLambdaArgument)
         elementToBeReplaced = block.statements.single()
         return elementToBeReplaced
 

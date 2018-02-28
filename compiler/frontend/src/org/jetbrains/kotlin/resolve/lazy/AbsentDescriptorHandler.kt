@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.resolve.lazy
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.psi.psiUtil.getElementTextWithContext
+import org.jetbrains.kotlin.psi.psiUtil.attachElement
 import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments
 
 interface AbsentDescriptorHandler {
@@ -24,6 +24,6 @@ class NoDescriptorForDeclarationException @JvmOverloads constructor(declaration:
                 + (additionalDetails?.let { "\n---------------------------------------------------\n$it" } ?: "")
     ) {
     init {
-        withAttachment("declaration.kt", declaration.getElementTextWithContext())
+        attachElement(declaration)
     }
 }

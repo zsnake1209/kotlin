@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.asJava.elements.KtLightMethodImpl
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtClassOrObject
-import org.jetbrains.kotlin.psi.debugText.getDebugText
+import org.jetbrains.kotlin.psi.psiUtil.attachElement
 import org.jetbrains.kotlin.resolve.diagnostics.Diagnostics
 import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments
 
@@ -98,7 +98,7 @@ fun PsiJavaFileStub.findDelegate(classOrObject: KtClassOrObject): PsiClass {
 
     val stubFileText = DebugUtil.stubTreeToString(this)
     throw KotlinExceptionWithAttachments("Couldn't get delegate for class")
-            .withAttachment(classOrObject.name ?: "unnamed class or object", classOrObject.getDebugText())
+            .attachElement(classOrObject)
             .withAttachment("file.kt", ktFileText)
             .withAttachment("stub text", stubFileText)
 }

@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.codegen.when.WhenByEnumsMapping;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.psi.*;
-import org.jetbrains.kotlin.psi.psiUtil.PsiUtilsKt;
 import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.BindingTrace;
 import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils;
@@ -27,6 +26,7 @@ import org.jetbrains.org.objectweb.asm.Type;
 
 import java.util.*;
 
+import static org.jetbrains.kotlin.psi.psiUtil.AttachmentUtil.attachElement;
 import static org.jetbrains.kotlin.resolve.BindingContext.*;
 
 public class CodegenBinding {
@@ -124,8 +124,7 @@ public class CodegenBinding {
             return asmTypeForAnonymousClassOrNull(bindingContext, variableDescriptor);
         }
 
-        throw new KotlinExceptionWithAttachments("Couldn't compute ASM type for expression")
-              .withAttachment("expression.kt", PsiUtilsKt.getElementTextWithContext(expression));
+        throw attachElement(new KotlinExceptionWithAttachments("Couldn't compute ASM type for expression"), expression);
     }
 
     @NotNull

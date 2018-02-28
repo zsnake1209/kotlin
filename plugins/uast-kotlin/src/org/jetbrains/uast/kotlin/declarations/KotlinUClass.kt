@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.asJava.classes.KtLightClassForScript
 import org.jetbrains.kotlin.asJava.elements.KtLightMethod
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.psiUtil.attachFiles
 import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
@@ -284,7 +285,7 @@ private fun reportConvertFailure(psiMethod: PsiMethod): Nothing {
     if (isValid) {
         report.withAttachment("method", psiMethod.text)
         psiMethod.containingFile?.let {
-            report.withAttachment("file", it.text)
+            report.attachFiles(it)
         }
     }
 

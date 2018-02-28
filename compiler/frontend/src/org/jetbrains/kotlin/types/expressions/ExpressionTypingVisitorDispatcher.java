@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.util.ReenteringLazyValueComputationException;
 import org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments;
 
 import static org.jetbrains.kotlin.diagnostics.Errors.TYPECHECKER_HAS_RUN_INTO_RECURSIVE_PROBLEM;
+import static org.jetbrains.kotlin.psi.psiUtil.AttachmentUtil.attachElement;
 
 public abstract class ExpressionTypingVisitorDispatcher extends KtVisitor<KotlinTypeInfo, ExpressionTypingContext>
         implements ExpressionTypingInternals {
@@ -230,8 +231,10 @@ public abstract class ExpressionTypingVisitorDispatcher extends KtVisitor<Kotlin
         try {
             // This trows AssertionError in CLI and reports the error in the IDE
             LOG.error(
-                    new KotlinExceptionWithAttachments("Exception while analyzing expression at " + DiagnosticUtils.atLocation(expression), e)
-                        .withAttachment("expression.kt", expression.getText())
+                    attachElement(
+                            new KotlinExceptionWithAttachments("Exception while analyzing expression at "
+                                                               + DiagnosticUtils.atLocation(expression), e), expression
+                    )
             );
         }
         catch (AssertionError errorFromLogger) {
