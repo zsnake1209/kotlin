@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.*
+import org.jetbrains.kotlin.resolve.jvm.JvmBindingContextSlices
 import org.jetbrains.kotlin.resolve.lazy.KotlinCodeAnalyzer
 import org.jetbrains.kotlin.resolve.lazy.ResolveSessionUtils
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
@@ -190,9 +191,11 @@ class CliLightClassGenerationSupport(project: Project) : LightClassGenerationSup
     override fun findFilesForFacade(facadeFqName: FqName, scope: GlobalSearchScope): Collection<KtFile> {
         if (facadeFqName.isRoot) return emptyList()
 
-        return PackagePartClassUtils.getFilesWithCallables(findFilesForPackage(facadeFqName.parent(), scope)).filter {
-            JvmFileClassUtil.getFileClassInfoNoResolve(it).facadeClassFqName == facadeFqName
-        }
+        val facadeFiles = bindingContext.get(JvmBindingContextSlices.FACADE_FQ_NAME_TO_FILES, facadeFqName)?.filter {
+            PsiSearchScopeUtil.isInScope(scope, it)
+        } ?: emptyList()
+
+        return PackagePartClassUtils.getFilesWithCallables(facadeFiles)
     }
 
     override fun createTrace(): BindingTraceContext {
