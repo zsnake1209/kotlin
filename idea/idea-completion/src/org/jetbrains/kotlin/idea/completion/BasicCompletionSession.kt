@@ -694,11 +694,6 @@ class BasicCompletionSession(
             })
             collector.restartCompletionOnPrefixChange(prefixPattern)
 
-            collector.addLookupElementPostProcessor { lookupElement ->
-                lookupElement.putUserData(KotlinCompletionCharFilter.HIDE_LOOKUP_ON_COLON, Unit)
-                lookupElement
-            }
-
             parameterNameAndTypeCompletion.addFromParametersInFile(position, resolutionFacade, isVisibleFilterCheckAlways)
             flushToResultSet()
 
