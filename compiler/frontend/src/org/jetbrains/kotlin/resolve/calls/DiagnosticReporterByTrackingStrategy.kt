@@ -244,13 +244,13 @@ class DiagnosticReporterByTrackingStrategy(
                 if (specialTypeVariableKind != null)
                     trace.report(
                         CONTRADICTION_FOR_SPECIAL_CALL.on(
-                            elementToReport, constraintError.sortedConstraints, specialTypeVariableKind
+                            elementToReport, constraintError, specialTypeVariableKind
                         )
                     )
                 else
                     trace.report(
                         CONTRADICTION_IN_CONSTRAINT_SYSTEM.on(
-                            elementToReport, constraintError.typeVariable, constraintError.sortedConstraints
+                            elementToReport, constraintError.typeVariable, constraintError
                         )
                     )
             }

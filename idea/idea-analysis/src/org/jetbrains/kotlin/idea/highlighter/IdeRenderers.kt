@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.idea.highlighter.renderersUtil.renderResolvedCall
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.resolve.MemberComparator
 import org.jetbrains.kotlin.resolve.calls.inference.InferenceErrorData
-import org.jetbrains.kotlin.resolve.calls.inference.components.SortedConstraints
+import org.jetbrains.kotlin.resolve.calls.inference.model.ContradictoryTypeVariableError
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.ConflictingJvmDeclarationsData
 
@@ -54,13 +54,13 @@ object IdeRenderers {
     }
 
     @JvmField
-    val HTML_SORTED_CONSTRAINTS_RENDERER = Renderer<SortedConstraints> {
-        Renderers.renderSortedConstraints(it, isHtml = true)
+    val HTML_CONSTRAINT_ERROR_RENDERER = Renderer<ContradictoryTypeVariableError> {
+        Renderers.renderConstraintError(it, HtmlTabledDescriptorRenderer.create()).toString()
     }
 
     @JvmField
-    val HTML_SORTED_CONSTRAINTS_FOR_SPECIAL_CALL_RENDERER = Renderer<SortedConstraints> {
-        Renderers.renderSortedConstraintsForSpecialCall(it, isHtml = true)
+    val HTML_CONSTRAINT_ERROR_FOR_SPECIAL_CALL_RENDERER = Renderer<ContradictoryTypeVariableError> {
+        Renderers.renderConstraintErrorForSpecialCall(it, HtmlTabledDescriptorRenderer.create()).toString()
     }
 
     @JvmField val HTML_RENDER_RETURN_TYPE = ContextDependentRenderer<CallableMemberDescriptor> {

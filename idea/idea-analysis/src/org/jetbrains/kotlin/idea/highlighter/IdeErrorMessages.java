@@ -83,11 +83,11 @@ public class IdeErrorMessages {
 
         MAP.put(CONTRADICTION_IN_CONSTRAINT_SYSTEM,
                 "<html>Contradictory requirements for type variable ''{0}'':<br>{1}</html>",
-                NEW_TYPE_VARIABLE_RENDERER, HTML_SORTED_CONSTRAINTS_RENDERER);
+                NEW_TYPE_VARIABLE_RENDERER, HTML_CONSTRAINT_ERROR_RENDERER);
 
         MAP.put(CONTRADICTION_FOR_SPECIAL_CALL,
                 "<html>Result type for ''{1}'' expression cannot be inferred:<br>{0}</html>",
-                HTML_SORTED_CONSTRAINTS_FOR_SPECIAL_CALL_RENDERER, SPECIAL_VARIABLE_KIND_RENDERER);
+                HTML_CONSTRAINT_ERROR_FOR_SPECIAL_CALL_RENDERER, SPECIAL_VARIABLE_KIND_RENDERER);
 
         MAP.put(WRONG_SETTER_PARAMETER_TYPE, "<html>Setter parameter type must be equal to the type of the property." +
                                              "<table><tr><td>Expected:</td><td>{0}</td></tr>" +

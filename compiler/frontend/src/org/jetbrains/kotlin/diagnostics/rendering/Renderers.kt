@@ -16,8 +16,7 @@ import org.jetbrains.kotlin.cfg.WhenMissingCase
 import org.jetbrains.kotlin.cfg.hasUnknown
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.TypeAliasConstructorDescriptor
-import org.jetbrains.kotlin.diagnostics.rendering.TabledDescriptorRenderer.newTable
-import org.jetbrains.kotlin.diagnostics.rendering.TabledDescriptorRenderer.newText
+import org.jetbrains.kotlin.diagnostics.rendering.TabledDescriptorRenderer.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
@@ -35,9 +34,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.components.SpecialTypeVariab
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPosition
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPositionKind.*
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.getValidityConstraintForConstituentType
-import org.jetbrains.kotlin.resolve.calls.inference.model.Constraint
-import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
-import org.jetbrains.kotlin.resolve.calls.inference.model.TypeVariableTypeConstructor
+import org.jetbrains.kotlin.resolve.calls.inference.model.*
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.getMultiTargetPlatform
 import org.jetbrains.kotlin.types.*
@@ -224,41 +221,56 @@ object Renderers {
     }
 
     @JvmField
-    val SORTED_CONSTRAINTS_RENDERER = Renderer<SortedConstraints> {
-        renderSortedConstraints(it, isHtml = false)
+    val CONSTRAINT_ERROR_RENDERER = Renderer<ContradictoryTypeVariableError> {
+        renderConstraintError(it, create()).toString()
     }
 
     @JvmField
-    val SORTED_CONSTRAINTS_FOR_SPECIAL_CALL_RENDERER = Renderer<SortedConstraints> {
-        renderSortedConstraintsForSpecialCall(it, isHtml = false)
+    val CONSTRAINT_ERROR_FOR_SPECIAL_CALL_RENDERER = Renderer<ContradictoryTypeVariableError> {
+        renderConstraintErrorForSpecialCall(it, create()).toString()
     }
 
-    fun renderSortedConstraints(constraints: SortedConstraints, isHtml: Boolean): String =
-        buildString {
-            appendIfNotEmpty(
-                constraints.upper, "should be a subtype of: ", constraints.equality.isNotEmpty() || constraints.lower.isNotEmpty(), isHtml
-            )
-            appendIfNotEmpty(constraints.equality, "should be equal to: ", constraints.lower.isNotEmpty(), isHtml)
-            appendIfNotEmpty(constraints.lower, "should be a supertype of: ", false, isHtml)
+    fun renderConstraintError(constraintError: ContradictoryTypeVariableError, result: TabledDescriptorRenderer): TabledDescriptorRenderer {
+        val typeVariable = constraintError.typeVariable
+        if (typeVariable is TypeVariableFromCallableDescriptor) {
+            val containingDeclaration = typeVariable.originalTypeParameter.containingDeclaration
+            if (containingDeclaration is CallableDescriptor) {
+                result.table(newTable().apply { descriptor(containingDeclaration) })
+            }
         }
 
-    fun renderSortedConstraintsForSpecialCall(constraints: SortedConstraints, isHtml: Boolean): String =
-        buildString {
-            appendIfNotEmpty(
-                constraints.upper, "should be conformed to: ", constraints.equality.isNotEmpty() || constraints.lower.isNotEmpty(), isHtml
-            )
-            appendIfNotEmpty(constraints.equality, "should be equal to: ", constraints.lower.isNotEmpty(), isHtml)
-            appendIfNotEmpty(constraints.lower, "should be a supertype of: ", false, isHtml)
+        result.renderSortedConstraints(constraintError.sortedConstraints, false)
+
+        return result
+    }
+
+    fun renderConstraintErrorForSpecialCall(
+        constraintError: ContradictoryTypeVariableError,
+        result: TabledDescriptorRenderer
+    ): TabledDescriptorRenderer =
+        result.also { it.renderSortedConstraints(constraintError.sortedConstraints, true) }
+
+    private fun TabledDescriptorRenderer.renderSortedConstraints(constraints: SortedConstraints, isSpecialCall: Boolean) {
+        val constraintsTable = newTable().apply {
+            appendIfNotEmpty(constraints.upper, if (isSpecialCall) "should be conformed to: " else "should be a subtype of: ")
+            appendIfNotEmpty(constraints.equality, "should be equal to: ")
+            appendIfNotEmpty(constraints.lower, "should be a supertype of: ")
         }
 
-    private fun StringBuilder.appendIfNotEmpty(constraints: List<Constraint>, prefix: String, newLine: Boolean, isHtml: Boolean) {
+        table(constraintsTable)
+    }
+
+    private fun TabledDescriptorRenderer.TableRenderer.appendIfNotEmpty(constraints: List<Constraint>, prefix: String) {
         if (constraints.isEmpty()) return
-        append(prefix)
-        append(constraints.joinToString {
-            val from = it.position.from.message?.let { " ($it)" } ?: ""
-            "${renderConstrainedType(it.type)}$from"
-        }) // Render properly
-        if (newLine) append(if (isHtml) "<br>" else "\n")
+        text(
+            buildString {
+                append(prefix)
+                append(constraints.joinToString {
+                    val from = it.position.from.message?.let { " ($it)" } ?: ""
+                    "${renderConstrainedType(it.type)}$from"
+                })
+            }
+        )
     }
 
     private fun renderConstrainedType(type: UnwrappedType): String =
