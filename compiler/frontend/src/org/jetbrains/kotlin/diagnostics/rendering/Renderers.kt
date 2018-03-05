@@ -225,30 +225,40 @@ object Renderers {
 
     @JvmField
     val SORTED_CONSTRAINTS_RENDERER = Renderer<SortedConstraints> {
-        buildString {
-            appendIfNotEmpty(it.upper, "should be a subtype of: ", it.equality.isNotEmpty() || it.lower.isNotEmpty())
-            appendIfNotEmpty(it.equality, "should be equal to: ", it.lower.isNotEmpty())
-            appendIfNotEmpty(it.lower, "should be a supertype of: ", false)
-        }
+        renderSortedConstraints(it, isHtml = false)
     }
 
     @JvmField
     val SORTED_CONSTRAINTS_FOR_SPECIAL_CALL_RENDERER = Renderer<SortedConstraints> {
-        buildString {
-            appendIfNotEmpty(it.upper, "should be conformed to: ", it.equality.isNotEmpty() || it.lower.isNotEmpty())
-            appendIfNotEmpty(it.equality, "should be equal to: ", it.lower.isNotEmpty())
-            appendIfNotEmpty(it.lower, "should be a supertype of: ", false)
-        }
+        renderSortedConstraintsForSpecialCall(it, isHtml = false)
     }
 
-    private fun StringBuilder.appendIfNotEmpty(constraints: List<Constraint>, prefix: String, newLine: Boolean) {
+    fun renderSortedConstraints(constraints: SortedConstraints, isHtml: Boolean): String =
+        buildString {
+            appendIfNotEmpty(
+                constraints.upper, "should be a subtype of: ", constraints.equality.isNotEmpty() || constraints.lower.isNotEmpty(), isHtml
+            )
+            appendIfNotEmpty(constraints.equality, "should be equal to: ", constraints.lower.isNotEmpty(), isHtml)
+            appendIfNotEmpty(constraints.lower, "should be a supertype of: ", false, isHtml)
+        }
+
+    fun renderSortedConstraintsForSpecialCall(constraints: SortedConstraints, isHtml: Boolean): String =
+        buildString {
+            appendIfNotEmpty(
+                constraints.upper, "should be conformed to: ", constraints.equality.isNotEmpty() || constraints.lower.isNotEmpty(), isHtml
+            )
+            appendIfNotEmpty(constraints.equality, "should be equal to: ", constraints.lower.isNotEmpty(), isHtml)
+            appendIfNotEmpty(constraints.lower, "should be a supertype of: ", false, isHtml)
+        }
+
+    private fun StringBuilder.appendIfNotEmpty(constraints: List<Constraint>, prefix: String, newLine: Boolean, isHtml: Boolean) {
         if (constraints.isEmpty()) return
         append(prefix)
         append(constraints.joinToString {
             val from = it.position.from.message?.let { " ($it)" } ?: ""
             "${renderConstrainedType(it.type)}$from"
         }) // Render properly
-        if (newLine) append("\n")
+        if (newLine) append(if (isHtml) "<br>" else "\n")
     }
 
     private fun renderConstrainedType(type: UnwrappedType): String =
