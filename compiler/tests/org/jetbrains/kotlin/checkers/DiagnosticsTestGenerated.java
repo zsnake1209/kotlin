@@ -11406,6 +11406,63 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                     String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/wrongArgumentPassedToLocalExtensionFunction.kt");
                     doTest(fileName);
                 }
+
+                @TestMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem")
+                @TestDataPath("$PROJECT_ROOT")
+                @RunWith(JUnit3RunnerWithInners.class)
+                public static class ContradictionInConstraintSystem extends AbstractDiagnosticsTest {
+                    public void testAllFilesPresentInContradictionInConstraintSystem() throws Exception {
+                        KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+                    }
+
+                    @TestMetadata("capturedTypesAsSimpleTypes.kt")
+                    public void testCapturedTypesAsSimpleTypes() throws Exception {
+                        String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem/capturedTypesAsSimpleTypes.kt");
+                        doTest(fileName);
+                    }
+
+                    @TestMetadata("contradictorySpecialCallDiagnostic.kt")
+                    public void testContradictorySpecialCallDiagnostic() throws Exception {
+                        String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem/contradictorySpecialCallDiagnostic.kt");
+                        doTest(fileName);
+                    }
+
+                    @TestMetadata("dependentTypeVariableDiagnostic.kt")
+                    public void testDependentTypeVariableDiagnostic() throws Exception {
+                        String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem/dependentTypeVariableDiagnostic.kt");
+                        doTest(fileName);
+                    }
+
+                    @TestMetadata("wrongBoundsFromLambda.kt")
+                    public void testWrongBoundsFromLambda() throws Exception {
+                        String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem/wrongBoundsFromLambda.kt");
+                        doTest(fileName);
+                    }
+
+                    @TestMetadata("wrongExtraBounds.kt")
+                    public void testWrongExtraBounds() throws Exception {
+                        String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem/wrongExtraBounds.kt");
+                        doTest(fileName);
+                    }
+
+                    @TestMetadata("wrongLambdaWithExpectedType.kt")
+                    public void testWrongLambdaWithExpectedType() throws Exception {
+                        String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem/wrongLambdaWithExpectedType.kt");
+                        doTest(fileName);
+                    }
+
+                    @TestMetadata("wrongTypeArgument.kt")
+                    public void testWrongTypeArgument() throws Exception {
+                        String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem/wrongTypeArgument.kt");
+                        doTest(fileName);
+                    }
+
+                    @TestMetadata("wrongUpperBoundValue.kt")
+                    public void testWrongUpperBoundValue() throws Exception {
+                        String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/inference/reportingImprovements/contradictionInConstraintSystem/wrongUpperBoundValue.kt");
+                        doTest(fileName);
+                    }
+                }
             }
 
             @TestMetadata("compiler/testData/diagnostics/tests/inference/substitutions")

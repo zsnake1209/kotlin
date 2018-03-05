@@ -1,0 +1,7 @@
+package
+
+public fun </*0*/ T> foo(/*0*/ l: () -> T): T
+public fun </*0*/ T> subCall(/*0*/ x: T): T
+public fun testSimple(): kotlin.Int
+public fun testSpecialCall(): kotlin.Int
+public fun testSubCall(): kotlin.Int

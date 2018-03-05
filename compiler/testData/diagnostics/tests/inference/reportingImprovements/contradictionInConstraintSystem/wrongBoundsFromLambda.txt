@@ -1,0 +1,10 @@
+package
+
+public fun </*0*/ T> foo(/*0*/ x: T, /*1*/ l: (T) -> kotlin.Unit): kotlin.Unit
+public fun </*0*/ T : kotlin.Number> fooReturn(/*0*/ x: T, /*1*/ l: () -> T): kotlin.Unit
+public fun myTest(): kotlin.Unit
+public fun </*0*/ T : kotlin.Number> onlyLambda(/*0*/ x: () -> T): kotlin.Unit
+public fun testLambdaLastExpression(): kotlin.Unit
+public fun testLambdaWithReturnIfExpression(): kotlin.Int
+public fun testOnlyLambda(): kotlin.Unit
+public fun testWrongParameterTypeOfLambda(): kotlin.Unit

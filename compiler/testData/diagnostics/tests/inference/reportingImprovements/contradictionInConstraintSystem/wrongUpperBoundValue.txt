@@ -1,0 +1,23 @@
+package
+
+public fun </*0*/ T : kotlin.Any> foo1(/*0*/ receiver: Inv1<T>): kotlin.Unit
+public fun </*0*/ T : kotlin.Any, /*1*/ K : kotlin.Any> foo2(/*0*/ a: Inv2<T, K>): kotlin.Unit
+public fun </*0*/ K : kotlin.Any> subCallNullable(): Inv1<K?>
+public fun </*0*/ K> subCallNullableUpperBound(): Inv1<K>
+public fun </*0*/ S> test(): kotlin.Unit
+public fun </*0*/ K> test(/*0*/ c: Inv1<K>): kotlin.Unit
+public fun </*0*/ S, /*1*/ V> test(/*0*/ c: Inv2<S, V>): kotlin.Unit
+
+public final class Inv1</*0*/ K> {
+    public constructor Inv1</*0*/ K>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class Inv2</*0*/ T, /*1*/ K> {
+    public constructor Inv2</*0*/ T, /*1*/ K>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}

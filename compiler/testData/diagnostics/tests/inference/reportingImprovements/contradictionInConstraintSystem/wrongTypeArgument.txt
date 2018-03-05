@@ -1,0 +1,25 @@
+package
+
+public fun </*0*/ T> foo1(/*0*/ a: Inv1<T>, /*1*/ b: T): kotlin.Unit
+public fun </*0*/ T> foo2(/*0*/ a: T, /*1*/ b: Inv1<T>): kotlin.Unit
+public fun </*0*/ K, /*1*/ V> foo3(/*0*/ a: Inv2<K, V>, /*1*/ key: K): kotlin.Unit
+public fun </*0*/ S> subCall(): S
+public fun </*0*/ T, /*1*/ S> test(/*0*/ a: Inv2<T, S>, /*1*/ v: S): kotlin.Unit
+public fun </*0*/ S, /*1*/ P> test1(/*0*/ a: Inv1<S>, /*1*/ b: P): kotlin.Unit
+public fun </*0*/ S> test2(/*0*/ a: Inv1<S>, /*1*/ b: S?): kotlin.Unit
+public fun </*0*/ S, /*1*/ P> test3(/*0*/ a: S, /*1*/ b: Inv1<P>): kotlin.Unit
+public fun </*0*/ K, /*1*/ S> test4(): kotlin.Unit
+
+public final class Inv1</*0*/ K> {
+    public constructor Inv1</*0*/ K>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class Inv2</*0*/ K, /*1*/ V> {
+    public constructor Inv2</*0*/ K, /*1*/ V>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
