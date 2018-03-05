@@ -30,6 +30,7 @@ fun contradictoryTypeVariableError(
 
     // for this case we separately report upper bound violated error
     if (constraintPosition is ExplicitTypeParameterConstraintPosition) return null
+    if (constraintPosition is ReceiverConstraintPosition) return null
 
     val variableWithConstraints = c.notFixedTypeVariables[typeVariable.freshTypeConstructor] ?: return null
     val properConstraints = variableWithConstraints.constraints.filter { c.canBeProper(it.type) }
