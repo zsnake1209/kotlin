@@ -29,7 +29,7 @@ class ConstraintIncorporator(val typeApproximator: TypeApproximator) {
 
         fun getConstraintsForVariable(typeVariable: NewTypeVariable): Collection<Constraint>
 
-        fun addNewIncorporatedConstraint(lowerType: UnwrappedType, upperType: UnwrappedType)
+        fun addNewIncorporatedConstraint(lowerType: UnwrappedType, upperType: UnwrappedType, typeVariable: NewTypeVariable)
     }
 
     // \alpha is typeVariable, \beta -- other type variable registered in ConstraintStorage
@@ -48,7 +48,7 @@ class ConstraintIncorporator(val typeApproximator: TypeApproximator) {
         if (constraint.kind != ConstraintKind.LOWER) {
             c.getConstraintsForVariable(typeVariable).forEach {
                 if (it.kind != ConstraintKind.UPPER) {
-                    c.addNewIncorporatedConstraint(it.type, constraint.type)
+                    c.addNewIncorporatedConstraint(it.type, constraint.type, typeVariable)
                 }
             }
         }
@@ -57,7 +57,7 @@ class ConstraintIncorporator(val typeApproximator: TypeApproximator) {
         if (constraint.kind != ConstraintKind.UPPER) {
             c.getConstraintsForVariable(typeVariable).forEach {
                 if (it.kind != ConstraintKind.LOWER) {
-                    c.addNewIncorporatedConstraint(constraint.type, it.type)
+                    c.addNewIncorporatedConstraint(constraint.type, it.type, typeVariable)
                 }
             }
         }
@@ -130,10 +130,14 @@ class ConstraintIncorporator(val typeApproximator: TypeApproximator) {
         }
 
         if (baseConstraint.kind != ConstraintKind.UPPER) {
-            c.addNewIncorporatedConstraint(approximateCapturedTypes(typeForApproximation, toSuper = false), targetVariable.defaultType)
+            c.addNewIncorporatedConstraint(
+                approximateCapturedTypes(typeForApproximation, toSuper = false), targetVariable.defaultType, targetVariable
+            )
         }
         if (baseConstraint.kind != ConstraintKind.LOWER) {
-            c.addNewIncorporatedConstraint(targetVariable.defaultType, approximateCapturedTypes(typeForApproximation, toSuper = true))
+            c.addNewIncorporatedConstraint(
+                targetVariable.defaultType, approximateCapturedTypes(typeForApproximation, toSuper = true), targetVariable
+            )
         }
     }
 

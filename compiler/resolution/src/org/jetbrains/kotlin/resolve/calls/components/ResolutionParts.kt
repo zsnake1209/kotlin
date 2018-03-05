@@ -221,7 +221,7 @@ private fun KotlinResolutionCandidate.resolveKotlinArgument(
         val resultType = knownTypeParametersResultingSubstitutor?.substitute(argumentType) ?: argumentType
         resolvedCall.substitutor.substituteKeepAnnotations(resultType)
     }
-    addResolvedKtPrimitive(resolveKtPrimitive(csBuilder, argument, expectedType, this, isReceiver))
+    addResolvedKtPrimitive(resolveKtPrimitive(csBuilder, argument, expectedType, this, isReceiver, candidateParameter?.name))
 }
 
 internal object CheckReceivers : ResolutionPart() {

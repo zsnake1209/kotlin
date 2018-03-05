@@ -1,17 +1,6 @@
 /*
- * Copyright 2010-2017 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.diagnostics.rendering
@@ -41,9 +30,14 @@ import org.jetbrains.kotlin.resolve.calls.inference.*
 import org.jetbrains.kotlin.resolve.calls.inference.TypeBounds.Bound
 import org.jetbrains.kotlin.resolve.calls.inference.TypeBounds.BoundKind.LOWER_BOUND
 import org.jetbrains.kotlin.resolve.calls.inference.TypeBounds.BoundKind.UPPER_BOUND
+import org.jetbrains.kotlin.resolve.calls.inference.components.SortedConstraints
+import org.jetbrains.kotlin.resolve.calls.inference.components.SpecialTypeVariableKind
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPosition
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPositionKind.*
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.getValidityConstraintForConstituentType
+import org.jetbrains.kotlin.resolve.calls.inference.model.Constraint
+import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
+import org.jetbrains.kotlin.resolve.calls.inference.model.TypeVariableTypeConstructor
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.getMultiTargetPlatform
 import org.jetbrains.kotlin.types.*
@@ -215,6 +209,45 @@ object Renderers {
     @JvmField
     val TYPE_INFERENCE_CANNOT_CAPTURE_TYPES_RENDERER = Renderer<InferenceErrorData> {
         renderCannotCaptureTypeParameterError(it, TabledDescriptorRenderer.create()).toString()
+    }
+
+    @JvmField
+    val NEW_TYPE_VARIABLE_RENDERER = Renderer<NewTypeVariable> {
+        val typeConstructor = it.freshTypeConstructor
+        if (typeConstructor is TypeVariableTypeConstructor) typeConstructor.debugName else typeConstructor.toString()
+    }
+
+    @JvmField
+    val SPECIAL_VARIABLE_KIND_RENDERER = Renderer<SpecialTypeVariableKind> {
+        it.expressionName
+    }
+
+    @JvmField
+    val SORTED_CONSTRAINTS_RENDERER = Renderer<SortedConstraints> {
+        buildString {
+            appendIfNotEmpty(it.upper, "should be a subtype of: ", it.equality.isNotEmpty() || it.lower.isNotEmpty())
+            appendIfNotEmpty(it.equality, "should be equal to: ", it.lower.isNotEmpty())
+            appendIfNotEmpty(it.lower, "should be a supertype of: ", false)
+        }
+    }
+
+    @JvmField
+    val SORTED_CONSTRAINTS_FOR_SPECIAL_CALL_RENDERER = Renderer<SortedConstraints> {
+        buildString {
+            appendIfNotEmpty(it.upper, "should be conformed to: ", it.equality.isNotEmpty() || it.lower.isNotEmpty())
+            appendIfNotEmpty(it.equality, "should be equal to: ", it.lower.isNotEmpty())
+            appendIfNotEmpty(it.lower, "should be a supertype of: ", false)
+        }
+    }
+
+    private fun StringBuilder.appendIfNotEmpty(constraints: List<Constraint>, prefix: String, newLine: Boolean) {
+        if (constraints.isEmpty()) return
+        append(prefix)
+        append(constraints.joinToString {
+            val from = it.position.from.message?.let { " ($it)" } ?: ""
+            "${it.type}$from"
+        }) // Render properly
+        if (newLine) append("\n")
     }
 
     @JvmStatic

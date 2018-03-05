@@ -236,6 +236,32 @@ class DiagnosticReporterByTrackingStrategy(
                     )
                 }
             }
+            ContradictoryTypeVariableError::class.java -> {
+                val constraintError = diagnostic as ContradictoryTypeVariableError
+                val elementToReport = extractTargetElement(constraintError.constraintPosition) ?: return
+
+                val specialTypeVariableKind = constraintError.specialTypeVariableKind
+                if (specialTypeVariableKind != null)
+                    trace.report(
+                        CONTRADICTION_FOR_SPECIAL_CALL.on(
+                            elementToReport, constraintError.sortedConstraints, specialTypeVariableKind
+                        )
+                    )
+                else
+                    trace.report(
+                        CONTRADICTION_IN_CONSTRAINT_SYSTEM.on(
+                            elementToReport, constraintError.typeVariable, constraintError.sortedConstraints
+                        )
+                    )
+            }
+        }
+    }
+
+    private fun extractTargetElement(position: ConstraintPosition): KtElement? {
+        return when (position) {
+            is ArgumentConstraintPosition -> position.argument.psiExpression
+            is ExpectedTypeConstraintPosition -> position.topLevelCall.psiKotlinCall.psiCall.callElement
+            else -> null
         }
     }
 

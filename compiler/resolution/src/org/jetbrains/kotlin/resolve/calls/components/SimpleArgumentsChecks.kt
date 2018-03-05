@@ -1,23 +1,13 @@
 /*
- * Copyright 2010-2017 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.resolve.calls.components
 
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptorWithTypeParameters
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.inference.ConstraintSystemBuilder
 import org.jetbrains.kotlin.resolve.calls.inference.addSubtypeConstraintIfCompatible
 import org.jetbrains.kotlin.resolve.calls.inference.model.ArgumentConstraintPosition
@@ -37,11 +27,17 @@ fun checkSimpleArgument(
     argument: SimpleKotlinCallArgument,
     expectedType: UnwrappedType?,
     diagnosticsHolder: KotlinDiagnosticsHolder,
-    isReceiver: Boolean
+    isReceiver: Boolean,
+    parameterName: Name?
 ): ResolvedAtom = when (argument) {
-    is ExpressionKotlinCallArgument -> checkExpressionArgument(csBuilder, argument, expectedType, diagnosticsHolder, isReceiver)
-    is SubKotlinCallArgument -> checkSubCallArgument(csBuilder, argument, expectedType, diagnosticsHolder, isReceiver)
-    else -> unexpectedArgument(argument)
+    is ExpressionKotlinCallArgument ->
+        checkExpressionArgument(csBuilder, argument, expectedType, diagnosticsHolder, isReceiver, parameterName)
+
+    is SubKotlinCallArgument ->
+        checkSubCallArgument(csBuilder, argument, expectedType, diagnosticsHolder, isReceiver, parameterName)
+
+    else ->
+        unexpectedArgument(argument)
 }
 
 private fun checkExpressionArgument(
@@ -49,7 +45,8 @@ private fun checkExpressionArgument(
     expressionArgument: ExpressionKotlinCallArgument,
     expectedType: UnwrappedType?,
     diagnosticsHolder: KotlinDiagnosticsHolder,
-    isReceiver: Boolean
+    isReceiver: Boolean,
+    parameterName: Name?
 ): ResolvedAtom {
     val resolvedKtExpression = ResolvedExpressionAtom(expressionArgument)
     if (expectedType == null) return resolvedKtExpression
@@ -70,7 +67,10 @@ private fun checkExpressionArgument(
     }
 
     val expectedNullableType = expectedType.makeNullableAsSpecified(true)
-    val position = if (isReceiver) ReceiverConstraintPosition(expressionArgument) else ArgumentConstraintPosition(expressionArgument)
+    val position = if (isReceiver)
+        ReceiverConstraintPosition(expressionArgument)
+    else
+        ArgumentConstraintPosition(expressionArgument, parameterName?.asString())
     if (expressionArgument.isSafeCall) {
         if (!csBuilder.addSubtypeConstraintIfCompatible(argumentType, expectedNullableType, position)) {
             diagnosticsHolder.addDiagnosticIfNotNull(
@@ -142,14 +142,18 @@ private fun checkSubCallArgument(
     subCallArgument: SubKotlinCallArgument,
     expectedType: UnwrappedType?,
     diagnosticsHolder: KotlinDiagnosticsHolder,
-    isReceiver: Boolean
+    isReceiver: Boolean,
+    parameterName: Name?
 ): ResolvedAtom {
     val subCallResult = subCallArgument.callResult
 
     if (expectedType == null) return subCallResult
 
     val expectedNullableType = expectedType.makeNullableAsSpecified(true)
-    val position = if (isReceiver) ReceiverConstraintPosition(subCallArgument) else ArgumentConstraintPosition(subCallArgument)
+    val position = if (isReceiver)
+        ReceiverConstraintPosition(subCallArgument)
+    else
+        ArgumentConstraintPosition(subCallArgument, parameterName?.asString())
 
     // subArgument cannot has stable smartcast
     // return type can contains fixed type variables

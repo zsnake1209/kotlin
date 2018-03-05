@@ -24,6 +24,9 @@ import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.resolve.VarianceConflictDiagnosticData;
 import org.jetbrains.kotlin.resolve.calls.inference.InferenceErrorData;
+import org.jetbrains.kotlin.resolve.calls.inference.components.SortedConstraints;
+import org.jetbrains.kotlin.resolve.calls.inference.components.SpecialTypeVariableKind;
+import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable;
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
 import org.jetbrains.kotlin.resolve.calls.tower.WrongResolutionToClassifier;
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectedActualResolver.Compatibility.Incompatible;
@@ -55,6 +58,9 @@ public interface Errors {
 
     DiagnosticFactory1<PsiElement, String> NEW_INFERENCE_ERROR = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory1<PsiElement, String> NEW_INFERENCE_DIAGNOSTIC = DiagnosticFactory1.create(WARNING);
+
+    DiagnosticFactory2<PsiElement, NewTypeVariable, SortedConstraints> CONTRADICTION_IN_CONSTRAINT_SYSTEM = DiagnosticFactory2.create(ERROR);
+    DiagnosticFactory2<PsiElement, SortedConstraints, SpecialTypeVariableKind> CONTRADICTION_FOR_SPECIAL_CALL = DiagnosticFactory2.create(ERROR);
 
     DiagnosticFactory1<PsiElement, Pair<LanguageFeature, LanguageVersionSettings>> UNSUPPORTED_FEATURE = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory1<PsiElement, Throwable> EXCEPTION_FROM_ANALYZER = DiagnosticFactory1.create(ERROR);
