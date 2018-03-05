@@ -129,12 +129,6 @@ public class JavaAgainstKotlinSourceCheckerTestGenerated extends AbstractJavaAga
             doTest(fileName);
         }
 
-        @TestMetadata("JvmPackageNameFileFacade.kt")
-        public void testJvmPackageNameFileFacade() throws Exception {
-            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/kotlinAndJavaChecker/javaAgainstKotlin/JvmPackageNameFileFacade.kt");
-            doTest(fileName);
-        }
-
         @TestMetadata("KotlinAnnotations.kt")
         public void testKotlinAnnotations() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/kotlinAndJavaChecker/javaAgainstKotlin/KotlinAnnotations.kt");
@@ -213,6 +207,12 @@ public class JavaAgainstKotlinSourceCheckerTestGenerated extends AbstractJavaAga
         @TestMetadata("InnerClassWithoutName.kt")
         public void testInnerClassWithoutName() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/kotlinAndJavaChecker/javaWithKotlin/InnerClassWithoutName.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("JvmPackageNameFileFacade.kt")
+        public void testJvmPackageNameFileFacade() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/kotlinAndJavaChecker/javaWithKotlin/JvmPackageNameFileFacade.kt");
             doTest(fileName);
         }
 
