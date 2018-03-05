@@ -28,7 +28,7 @@ should be a supertype of: String? \(for parameter 'entry0'\), Int \(for paramete
 }
 
 val test: Int = <!CONTRADICTION_FOR_SPECIAL_CALL(should be conformed to: Int \(expected type for '<given candidates>'\)
-should be a supertype of: Nothing? \(for parameter 'thenBranch'\), {Int & Byte & Short & Long} \(for parameter 'thenBranch'\); if), TYPE_MISMATCH, TYPE_MISMATCH!>if (true) {
+should be a supertype of: Nothing? \(for parameter 'thenBranch'\), Int \(for parameter 'thenBranch'\); if), TYPE_MISMATCH, TYPE_MISMATCH!>if (true) {
     when (2) {
         1 -> 1
         else -> null

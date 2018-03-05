@@ -42,6 +42,7 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.getMultiTargetPlatform
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
+import org.jetbrains.kotlin.types.typeUtil.foldNumberTypes
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -245,10 +246,13 @@ object Renderers {
         append(prefix)
         append(constraints.joinToString {
             val from = it.position.from.message?.let { " ($it)" } ?: ""
-            "${it.type}$from"
+            "${renderConstrainedType(it.type)}$from"
         }) // Render properly
         if (newLine) append("\n")
     }
+
+    private fun renderConstrainedType(type: UnwrappedType): String =
+        DescriptorRenderer.ONLY_NAMES_WITH_SHORT_TYPES.renderType(type.foldNumberTypes())
 
     @JvmStatic
     fun renderConflictingSubstitutionsInferenceError(
