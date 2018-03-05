@@ -39,9 +39,6 @@ object JvmBindingContextSlices {
     @JvmField
     val LOAD_FROM_JAVA_SIGNATURE_ERRORS: WritableSlice<DeclarationDescriptor, List<String>> = Slices.createCollectiveSlice()
 
-    @JvmField
-    val FACADE_FQ_NAME_TO_FILES: WritableSlice<FqName, MutableCollection<KtFile>> = Slices.createSimpleSlice()
-
     init {
         BasicWritableSlice.initSliceDebugNames(JvmBindingContextSlices::class.java)
     }
