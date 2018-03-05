@@ -1,17 +1,6 @@
 /*
- * Copyright 2010-2017 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.types.typeUtil
@@ -21,11 +10,14 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.calls.inference.isCaptured
+import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.checker.NewCapturedType
 import org.jetbrains.kotlin.types.checker.NewTypeVariableConstructor
+import org.jetbrains.kotlin.types.checker.intersectTypes
+import org.jetbrains.kotlin.utils.addIfNotNull
 import java.util.*
 
 enum class TypeNullability {
@@ -224,3 +216,28 @@ fun UnwrappedType.canHaveUndefinedNullability(): Boolean =
     constructor is NewTypeVariableConstructor ||
             constructor.declarationDescriptor is TypeParameterDescriptor ||
             this is NewCapturedType
+
+fun UnwrappedType.foldNumberTypes(): UnwrappedType {
+    val constructor = this.constructor
+
+    if (constructor is IntegerValueTypeConstructor)
+        return TypeUtils.getDefaultPrimitiveNumberType(constructor).unwrap()
+
+    if (constructor !is IntersectionTypeConstructor)
+        return this
+
+    val resultTypes = arrayListOf<UnwrappedType>()
+    val numberTypes = arrayListOf<KotlinType>()
+    for (supertype in constructor.supertypes) {
+        if (supertype.isPrimitiveNumberType())
+            numberTypes.add(supertype)
+        else
+            resultTypes.add(supertype.unwrap())
+    }
+
+    resultTypes.addIfNotNull(
+        TypeUtils.getDefaultPrimitiveNumberType(numberTypes)?.unwrap()
+    )
+
+    return intersectTypes(resultTypes).makeNullableAsSpecified(this.isMarkedNullable)
+}

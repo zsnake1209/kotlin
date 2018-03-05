@@ -1,17 +1,6 @@
 /*
- * Copyright 2010-2017 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.resolve.calls.inference.components
@@ -21,10 +10,12 @@ import org.jetbrains.kotlin.resolve.calls.inference.components.TypeVariableDirec
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintKind
 import org.jetbrains.kotlin.resolve.calls.inference.model.VariableWithConstraints
 import org.jetbrains.kotlin.resolve.calls.inference.model.checkConstraint
-import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
-import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.TypeApproximator
+import org.jetbrains.kotlin.types.TypeApproximatorConfiguration
+import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.checker.intersectTypes
-import org.jetbrains.kotlin.types.typeUtil.isPrimitiveNumberType
+import org.jetbrains.kotlin.types.singleBestRepresentative
+import org.jetbrains.kotlin.types.typeUtil.foldNumberTypes
 
 class ResultTypeResolver(
     val typeApproximator: TypeApproximator
@@ -84,7 +75,7 @@ class ResultTypeResolver(
         val lowerConstraints = variableWithConstraints.constraints.filter { it.kind == ConstraintKind.LOWER && c.isProperType(it.type) }
         if (lowerConstraints.isNotEmpty()) {
             val commonSuperType = NewCommonSuperTypeCalculator.commonSuperType(lowerConstraints.map { it.type })
-            val adjustedCommonSuperType = adjustCommonSupertypeWithKnowledgeOfNumberTypes(commonSuperType)
+            val adjustedCommonSuperType = commonSuperType.foldNumberTypes()
             /**
              *
              * fun <T> Array<out T>.intersect(other: Iterable<T>) {
@@ -111,33 +102,6 @@ class ResultTypeResolver(
         }
 
         return null
-    }
-
-    private fun adjustCommonSupertypeWithKnowledgeOfNumberTypes(commonSuperType: UnwrappedType): UnwrappedType {
-        val constructor = commonSuperType.constructor
-
-        return when (constructor) {
-            is IntegerValueTypeConstructor,
-            is IntersectionTypeConstructor -> {
-                val newSupertypes = arrayListOf<UnwrappedType>()
-                val numberSupertypes = arrayListOf<KotlinType>()
-                for (supertype in constructor.supertypes.map { it.unwrap() }) {
-                    if (supertype.isPrimitiveNumberType())
-                        numberSupertypes.add(supertype)
-                    else
-                        newSupertypes.add(supertype)
-                }
-
-                TypeUtils.getDefaultPrimitiveNumberType(numberSupertypes)?.let {
-                    newSupertypes.add(it.unwrap())
-                }
-
-                intersectTypes(newSupertypes).makeNullableAsSpecified(commonSuperType.isMarkedNullable)
-            }
-
-            else ->
-                commonSuperType
-        }
     }
 
     private fun findSuperType(c: Context, variableWithConstraints: VariableWithConstraints): UnwrappedType? {
