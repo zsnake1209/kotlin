@@ -6,6 +6,7 @@ apply { plugin("kotlin") }
 dependencies {
     compileOnly(ideaSdkCoreDeps("intellij-core"))
     compileOnly(ideaPluginDeps("maven", plugin = "maven"))
+
     compileOnly(project(":jps-plugin"))
     compileOnly(project(":compiler:plugin-api"))
     compileOnly(project(":compiler:frontend"))
