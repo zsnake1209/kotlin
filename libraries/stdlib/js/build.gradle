@@ -28,6 +28,7 @@ def kotlinTestJsOutputFile = "${project(':kotlin-test:kotlin-test-js').buildDir}
 // TODO: take from sourcesets' outputs
 def jsTestOutputFile = "${buildDir}/classes/kotlin/test/kotlin-stdlib-js_test.js"
 def kotlinTestJsTestOutputFile = "${project(':kotlin-test:kotlin-test-js').buildDir}/classes/kotlin/test/kotlin-test-js_test.js"
+def kotlinTestJsTestOutputFileCopy = "${buildDir}/classes/${file(kotlinTestJsTestOutputFile).name}"
 
 
 sourceSets {
@@ -304,8 +305,15 @@ dist {
 task populateNodeModules(type: Copy, dependsOn: [compileJs, compileTestKotlin2Js]) {
     from jsOutputFile
     from kotlinTestJsOutputFile
+    from kotlinTestJsTestOutputFile
 
     into "${buildDir}/node_modules"
+}
+
+task copyKotlinTestTests(type: Copy, dependsOn: [':kotlin-test:kotlin-test-js:testClasses']) {
+    from kotlinTestJsTestOutputFile
+
+    into file(kotlinTestJsTestOutputFileCopy).parent
 }
 
 node {
@@ -322,9 +330,9 @@ task installTeamcityReporter(type: NpmTask, dependsOn: [populateNodeModules]) {
     args = ['install', 'mocha-teamcity-reporter']
 }
 
-task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, populateNodeModules, installMocha]) {
+task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, populateNodeModules, copyKotlinTestTests, installMocha]) {
     script = file("${buildDir}/node_modules/mocha/bin/mocha")
-    args = [jsTestOutputFile]
+    args = [jsTestOutputFile, kotlinTestJsTestOutputFileCopy]
 
     if (project.hasProperty("teamcity")) {
         dependsOn installTeamcityReporter
