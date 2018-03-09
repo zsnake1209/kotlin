@@ -40,7 +40,8 @@ class CliKotlinAsJavaSupport(
         return findFacadeFilesInPackage(packageFqName, scope)
             .groupBy { it.javaFileFacadeFqName }
             .mapNotNull {
-                KtStubLightClass(
+                KtStubLightClass.ForFacade(
+                    it.key,
                     psiManager
                 )
             }
@@ -62,8 +63,9 @@ class CliKotlinAsJavaSupport(
         val filesForFacade = findFilesForFacade(facadeFqName, scope)
         if (filesForFacade.isEmpty()) return emptyList()
 
-        return listOfNotNull<PsiClass>(
-            KtStubLightClass(
+        return listOf(
+            KtStubLightClass.ForFacade(
+                facadeFqName,
                 psiManager
             )
         )
@@ -131,10 +133,10 @@ class CliKotlinAsJavaSupport(
     }
 
     override fun getLightClass(classOrObject: KtClassOrObject): KtLightClass? =
-        KtStubLightClass(psiManager)
+        KtStubLightClass.ForClassOrObject(classOrObject, psiManager)
 
     override fun getLightClassForScript(script: KtScript): KtLightClass? =
-        KtStubLightClass(psiManager)
+        KtStubLightClass.ForScript(script, psiManager)
 
 
     override fun findClassOrObjectDeclarations(fqName: FqName, searchScope: GlobalSearchScope): Collection<KtClassOrObject> {

@@ -9,14 +9,20 @@ import com.intellij.openapi.util.Pair
 import com.intellij.psi.*
 import com.intellij.psi.impl.light.LightElement
 import com.intellij.psi.javadoc.PsiDocComment
+import org.jetbrains.kotlin.asJava.hasInterfaceDefaultImpls
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.load.java.structure.LightClassOriginKind
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtScript
+import java.util.*
 
-class KtStubLightClass(manager: PsiManager) : LightElement(manager, KotlinLanguage.INSTANCE), KtLightClass, PsiClass {
+abstract class KtStubLightClass(manager: PsiManager) : LightElement(manager, KotlinLanguage.INSTANCE), KtLightClass, PsiClass {
     override fun toString(): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    abstract override fun getName(): String?
 
     override fun hasModifierProperty(name: String) = false // TODO:
 
@@ -39,8 +45,6 @@ class KtStubLightClass(manager: PsiManager) : LightElement(manager, KotlinLangua
     override fun getSuperClass(): PsiClass? = null
 
     override fun getSupers(): Array<PsiClass> = emptyArray()
-
-    override fun getQualifiedName(): String? = null // TODO:
 
     override fun findMethodsAndTheirSubstitutorsByName(name: String?, checkBases: Boolean) = emptyList<Pair<PsiMethod, PsiSubstitutor>>()
 
@@ -110,4 +114,35 @@ class KtStubLightClass(manager: PsiManager) : LightElement(manager, KotlinLangua
         get() = error("Should not be called")
     override val originKind: LightClassOriginKind
         get() = error("Should not be called")
+
+
+    class ForFacade(private val facadeFqName: FqName, manager: PsiManager) : KtStubLightClass(manager) {
+        override fun getQualifiedName(): String? = facadeFqName.asString()
+        override fun getName(): String? = facadeFqName.shortName().asString()
+    }
+
+    class ForClassOrObject(private val classOrObject: KtClassOrObject, manager: PsiManager) : KtStubLightClass(manager) {
+        override fun getQualifiedName() = classOrObject.fqName?.asString()
+        override fun getName() = classOrObject.fqName?.shortName()?.asString()
+        override fun getInnerClasses(): Array<PsiClass> {
+            val result = ArrayList<PsiClass>()
+            classOrObject.declarations.filterIsInstance<KtClassOrObject>()
+                .mapTo(result) { KtStubLightClass.ForClassOrObject(it, manager) }
+
+            if (classOrObject.hasInterfaceDefaultImpls) {
+                // TODO:
+            }
+            return result.toTypedArray()
+        }
+
+        override fun findInnerClassByName(name: String?, checkBases: Boolean): PsiClass? {
+            return classOrObject.declarations.filterIsInstance<KtClassOrObject>().find { it.name == name }
+                ?.let { KtStubLightClass.ForClassOrObject(it, manager) }
+        }
+    }
+
+    class ForScript(private val script: KtScript, manager: PsiManager) : KtStubLightClass(manager) {
+        override fun getName() = script.fqName.shortName().asString()
+        override fun getQualifiedName() = script.fqName.asString()
+    }
 }
