@@ -23,7 +23,6 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.containers.ContainerUtil
-import org.jetbrains.kotlin.asJava.getJvmSignatureDiagnostics
 import org.jetbrains.kotlin.checkers.BaseDiagnosticsTest.TestFile
 import org.jetbrains.kotlin.checkers.BaseDiagnosticsTest.TestModule
 import org.jetbrains.kotlin.checkers.CheckerTestUtil.ActualDiagnostic
@@ -39,6 +38,7 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.MultiTargetPlatform
+import org.jetbrains.kotlin.resolve.diagnostics.Diagnostics
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.junit.Assert
@@ -309,6 +309,15 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
         }
 
         override fun toString(): String = ktFile?.name ?: "Java file"
+    }
+
+    private fun getJvmSignatureDiagnostics(
+        declaration: KtDeclaration?,
+        diagnostics: Diagnostics,
+        allScope: GlobalSearchScope
+    ): Diagnostics? {
+        // TODO: use IDE light classes directly
+        return null
     }
 
     companion object {
