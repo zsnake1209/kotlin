@@ -18,9 +18,7 @@ import org.jetbrains.kotlin.psi.KtScript
 import java.util.*
 
 abstract class KtStubLightClass(manager: PsiManager) : LightElement(manager, KotlinLanguage.INSTANCE), KtLightClass, PsiClass {
-    override fun toString(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun toString(): String = "${javaClass.name}:$name"
 
     abstract override fun getName(): String?
 
@@ -114,7 +112,6 @@ abstract class KtStubLightClass(manager: PsiManager) : LightElement(manager, Kot
         get() = error("Should not be called")
     override val originKind: LightClassOriginKind
         get() = error("Should not be called")
-
 
     class ForFacade(private val facadeFqName: FqName, manager: PsiManager) : KtStubLightClass(manager) {
         override fun getQualifiedName(): String? = facadeFqName.asString()
