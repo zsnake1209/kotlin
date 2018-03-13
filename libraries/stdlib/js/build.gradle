@@ -28,7 +28,6 @@ def kotlinTestJsOutputFile = "${project(':kotlin-test:kotlin-test-js').buildDir}
 // TODO: take from sourcesets' outputs
 def jsTestOutputFile = "${buildDir}/classes/kotlin/test/kotlin-stdlib-js_test.js"
 def kotlinTestJsTestOutputFile = "${project(':kotlin-test:kotlin-test-js').buildDir}/classes/kotlin/test/kotlin-test-js_test.js"
-def kotlinTestJsTestOutputFileCopy = "${buildDir}/classes/${file(kotlinTestJsTestOutputFile).name}"
 
 
 sourceSets {
@@ -302,45 +301,33 @@ dist {
     }
 }
 
-task populateNodeModules(type: Copy, dependsOn: [compileJs, compileTestKotlin2Js]) {
-    from jsOutputFile
-    from kotlinTestJsOutputFile
-    from kotlinTestJsTestOutputFile
-
-    into "${buildDir}/node_modules"
-}
-
-task copyKotlinTestTests(type: Copy, dependsOn: [':kotlin-test:kotlin-test-js:testClasses']) {
-    from kotlinTestJsTestOutputFile
-
-    into file(kotlinTestJsTestOutputFileCopy).parent
-}
-
 node {
     download = true
     version = '8.9.4' // The default 6.9.1 has buggy hyperbolic functions implementation
     nodeModulesDir = buildDir
 }
 
-task installMocha(type: NpmTask, dependsOn: [populateNodeModules]) {
+task installMocha(type: NpmTask) {
     args = ['install', 'mocha']
 }
 
-task installTeamcityReporter(type: NpmTask, dependsOn: [populateNodeModules]) {
+task installTeamcityReporter(type: NpmTask) {
     args = ['install', 'mocha-teamcity-reporter']
 }
 
-task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, populateNodeModules, copyKotlinTestTests, installMocha]) {
+task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, installMocha, ':kotlin-test:kotlin-test-js:testClasses']) {
     script = file("${buildDir}/node_modules/mocha/bin/mocha")
-    args = [jsTestOutputFile, kotlinTestJsTestOutputFileCopy]
+    args = [jsTestOutputFile, kotlinTestJsTestOutputFile]
 
     if (project.hasProperty("teamcity")) {
         dependsOn installTeamcityReporter
         args = ['--reporter', 'mocha-teamcity-reporter'] + args
+    }
 
-        execOverrides {
-            it.ignoreExitValue = true
-        }
+    execOverrides {
+        it.ignoreExitValue = rootProject.ignoreTestFailures
+        it.environment = [NODE_PATH: [file(jsOutputFile).parent, file(kotlinTestJsOutputFile).parent].join(File.pathSeparator)]
+        it.workingDir = buildDir
     }
 }
 
