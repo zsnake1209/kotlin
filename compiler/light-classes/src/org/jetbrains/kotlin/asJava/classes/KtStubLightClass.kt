@@ -9,14 +9,17 @@ import com.intellij.openapi.util.Pair
 import com.intellij.psi.*
 import com.intellij.psi.impl.light.LightElement
 import com.intellij.psi.javadoc.PsiDocComment
+import org.jetbrains.kotlin.asJava.elements.FakeFileForLightClass
 import org.jetbrains.kotlin.asJava.hasInterfaceDefaultImpls
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.load.java.structure.LightClassOriginKind
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtScript
 import java.util.*
 
+// TODO: const and jvmfield properties
 abstract class KtStubLightClass(manager: PsiManager) : LightElement(manager, KotlinLanguage.INSTANCE), KtLightClass, PsiClass {
     override fun toString(): String = "${javaClass.name}:$name"
 
@@ -25,6 +28,8 @@ abstract class KtStubLightClass(manager: PsiManager) : LightElement(manager, Kot
     override fun hasModifierProperty(name: String) = false // TODO:
 
     override fun getInnerClasses(): Array<PsiClass> = emptyArray() // TODO
+
+    abstract override fun getContainingFile(): PsiFile
 
     override fun findMethodBySignature(patternMethod: PsiMethod?, checkBases: Boolean) = null
 
@@ -111,14 +116,21 @@ abstract class KtStubLightClass(manager: PsiManager) : LightElement(manager, Kot
     override val clsDelegate: PsiClass
         get() = error("Should not be called")
     override val originKind: LightClassOriginKind
-        get() = error("Should not be called")
+        get() = LightClassOriginKind.SOURCE
 
-    class ForFacade(private val facadeFqName: FqName, manager: PsiManager) : KtStubLightClass(manager) {
+    class ForFacade(
+        private val facadeFqName: FqName,
+        private val files: Collection<KtFile>,
+        psiManager: PsiManager
+    ) : KtStubLightClass(psiManager) {
+        override fun getContainingFile() = files.first()
+
         override fun getQualifiedName(): String? = facadeFqName.asString()
         override fun getName(): String? = facadeFqName.shortName().asString()
     }
 
     class ForClassOrObject(private val classOrObject: KtClassOrObject, manager: PsiManager) : KtStubLightClass(manager) {
+        override fun getContainingFile() = classOrObject.containingFile
         override fun getQualifiedName() = classOrObject.fqName?.asString()
         override fun getName() = classOrObject.fqName?.shortName()?.asString()
         override fun getInnerClasses(): Array<PsiClass> {
@@ -139,6 +151,7 @@ abstract class KtStubLightClass(manager: PsiManager) : LightElement(manager, Kot
     }
 
     class ForScript(private val script: KtScript, manager: PsiManager) : KtStubLightClass(manager) {
+        override fun getContainingFile() = script.containingFile
         override fun getName() = script.fqName.shortName().asString()
         override fun getQualifiedName() = script.fqName.asString()
     }

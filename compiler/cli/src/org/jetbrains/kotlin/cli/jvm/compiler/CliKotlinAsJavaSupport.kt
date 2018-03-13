@@ -39,9 +39,10 @@ class CliKotlinAsJavaSupport(
     override fun getFacadeClassesInPackage(packageFqName: FqName, scope: GlobalSearchScope): Collection<PsiClass> {
         return findFacadeFilesInPackage(packageFqName, scope)
             .groupBy { it.javaFileFacadeFqName }
-            .mapNotNull {
+            .mapNotNull { (fqName, files) ->
                 KtStubLightClass.ForFacade(
-                    it.key,
+                    fqName,
+                    files,
                     psiManager
                 )
             }
@@ -66,6 +67,7 @@ class CliKotlinAsJavaSupport(
         return listOf(
             KtStubLightClass.ForFacade(
                 facadeFqName,
+                filesForFacade,
                 psiManager
             )
         )
