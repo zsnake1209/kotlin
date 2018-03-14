@@ -779,6 +779,9 @@ class CollectionTest {
         assertEquals(listOf(3, 7, 11), data.sorted())
         assertEquals(listOf(11, 7, 3), data.sortedDescending())
 
+        assertEquals(listOf(-0.0, 0.0), listOf(0.0, -0.0).sorted())
+        assertNotEquals(listOf(0.0, -0.0), listOf(0.0, -0.0).sorted())
+
         val dataDouble = listOf(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.MIN_VALUE, -Double.MIN_VALUE,
                                 1.0, -1.0, Double.MAX_VALUE, -Double.MAX_VALUE, Double.NaN, 0.0, -0.0)
         assertEquals(listOf(Double.NEGATIVE_INFINITY, -Double.MAX_VALUE, -1.0, -Double.MIN_VALUE, -0.0,
