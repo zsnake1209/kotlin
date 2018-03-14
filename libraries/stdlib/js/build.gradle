@@ -28,6 +28,7 @@ def kotlinTestJsOutputFile = "${project(':kotlin-test:kotlin-test-js').buildDir}
 // TODO: take from sourcesets' outputs
 def jsTestOutputFile = "${buildDir}/classes/kotlin/test/kotlin-stdlib-js_test.js"
 def kotlinTestJsTestOutputFile = "${project(':kotlin-test:kotlin-test-js').buildDir}/classes/kotlin/test/kotlin-test-js_test.js"
+def kotlinTestJsTestOutputFileCopy = "${buildDir}/classes/${file(kotlinTestJsTestOutputFile).name}"
 
 
 sourceSets {
@@ -315,8 +316,22 @@ task installTeamcityReporter(type: NpmTask, dependsOn: [deleteLegacyNodeModules]
     args = ['install', 'mocha-teamcity-reporter']
 }
 
-task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, installMocha, ':kotlin-test:kotlin-test-js:testClasses']) {
-    script = file("${buildDir}/node_modules/mocha/index.js")
+task populateNodeModules(type: Copy, dependsOn: [compileJs, compileTestKotlin2Js]) {
+    from jsOutputFile
+    from kotlinTestJsOutputFile
+    from kotlinTestJsTestOutputFile
+
+    into "${buildDir}/node_modules"
+}
+
+task copyKotlinTestTests(type: Copy, dependsOn: [':kotlin-test:kotlin-test-js:testClasses']) {
+    from kotlinTestJsTestOutputFile
+
+    into file(kotlinTestJsTestOutputFileCopy).parent
+}
+
+task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, installMocha, populateNodeModules, copyKotlinTestTests]) {
+    script = file("${buildDir}/node_modules/mocha/bin/mocha")
 
     if (project.hasProperty("teamcity")) {
         dependsOn installTeamcityReporter
@@ -325,12 +340,10 @@ task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, installMocha, ':
         args = ['--reporter', 'min']
     }
 
-    args += [jsTestOutputFile, kotlinTestJsTestOutputFile]
+    args += [jsTestOutputFile, kotlinTestJsTestOutputFileCopy]
 
     execOverrides {
         it.ignoreExitValue = rootProject.ignoreTestFailures
-        it.environment = [NODE_PATH: [file(jsOutputFile).parent, file(kotlinTestJsOutputFile).parent].join(File.pathSeparator)]
-        it.workingDir = buildDir
     }
 }
 
