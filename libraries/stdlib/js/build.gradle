@@ -316,7 +316,7 @@ task installTeamcityReporter(type: NpmTask, dependsOn: [deleteLegacyNodeModules]
 }
 
 task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, installMocha, ':kotlin-test:kotlin-test-js:testClasses']) {
-    script = file("${buildDir}/node_modules/mocha/bin/mocha")
+    script = file("${buildDir}/node_modules/mocha/index.js")
 
     if (project.hasProperty("teamcity")) {
         dependsOn installTeamcityReporter
