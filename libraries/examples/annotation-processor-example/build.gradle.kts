@@ -6,7 +6,7 @@ apply {
 }
 
 dependencies {
-    compile(projectDist(":kotlin-stdlib"))
+    compile(project(":kotlin-stdlib"))
 }
 
 sourceSets {

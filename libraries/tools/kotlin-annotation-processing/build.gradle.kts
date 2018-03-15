@@ -9,7 +9,7 @@ apply { plugin("kotlin") }
 val packedJars by configurations.creating
 
 dependencies {
-    compile(projectDist(":kotlin-stdlib"))
+    compile(project(":kotlin-stdlib"))
     compileOnly(project(":kotlin-annotation-processing"))
     compileOnly(gradleApi())
     testCompile(gradleApi())

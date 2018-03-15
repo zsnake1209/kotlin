@@ -22,11 +22,11 @@ dependencies {
     testCompile(project(":compiler:daemon-common"))
     testCompile(project(":kotlin-daemon-client"))
     testCompile(commonDep("junit:junit"))
-    testCompile(projectDist(":kotlin-test:kotlin-test-jvm"))
-    testCompile(projectDist(":kotlin-test:kotlin-test-junit"))
+    testCompile(project(":kotlin-test:kotlin-test-jvm"))
+    testCompile(project(":kotlin-test:kotlin-test-junit"))
     testRuntimeCompilerJar(projectDist(":kotlin-compiler"))
-    testStdlibJar(projectDist(":kotlin-stdlib"))
-    testScriptRuntimeJar(projectDist(":kotlin-script-runtime"))
+    testStdlibJar(project(":kotlin-stdlib"))
+    testScriptRuntimeJar(project(":kotlin-script-runtime"))
 }
 
 sourceSets {

@@ -5,7 +5,7 @@ apply { plugin("jps-compatible") }
 dependencies {
     testRuntime(intellijDep())
 
-    compile(projectDist(":kotlin-stdlib"))
+    compile(project(":kotlin-stdlib"))
     compile(project(":compiler:frontend"))
     compile(project(":compiler:frontend.java"))
     compile(project(":compiler:light-classes"))
@@ -15,7 +15,7 @@ dependencies {
     testCompile(project(":idea"))
     testCompile(projectTests(":idea:idea-test-framework"))
     testCompile(project(":compiler:light-classes"))
-    testCompile(projectDist(":kotlin-test:kotlin-test-junit"))
+    testCompile(project(":kotlin-test:kotlin-test-junit"))
     testCompile(commonDep("junit:junit"))
 
     testRuntime(project(":plugins:kapt3-idea")) { isTransitive = false }

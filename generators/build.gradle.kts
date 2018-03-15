@@ -20,7 +20,7 @@ dependencies {
     testCompileOnly(project(":kotlin-reflect-api"))
     testCompile(intellijDep("jps-build-test"))
     testRuntime(intellijDep()) { includeJars("idea_rt") }
-    testRuntime(projectDist(":kotlin-reflect"))
+    testRuntime(project(":kotlin-reflect"))
 }
 
 sourceSets {

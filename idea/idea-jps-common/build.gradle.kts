@@ -3,7 +3,7 @@ apply { plugin("kotlin") }
 apply { plugin("jps-compatible") }
 
 dependencies {
-    compile(projectDist(":kotlin-stdlib"))
+    compile(project(":kotlin-stdlib"))
     compileOnly(project(":kotlin-reflect-api"))
     compile(project(":compiler:util"))
     compile(project(":compiler:cli-common"))

@@ -4,9 +4,9 @@ apply { plugin("jps-compatible") }
 dependencies {
     testRuntime(intellijDep())
     testCompile(projectTests(":compiler:tests-common"))
-    testCompile(projectDist(":kotlin-script-runtime"))
-    testCompile(projectDist(":kotlin-stdlib"))
-    testCompile(projectDist(":kotlin-test:kotlin-test-jvm"))
+    testCompile(project(":kotlin-script-runtime"))
+    testCompile(project(":kotlin-stdlib"))
+    testCompile(project(":kotlin-test:kotlin-test-jvm"))
 }
 
 sourceSets {

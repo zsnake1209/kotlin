@@ -7,7 +7,7 @@ apply { plugin("jps-compatible") }
 jvmTarget = "1.6"
 
 dependencies {
-    compile(projectDist(":kotlin-stdlib"))
+    compile(project(":kotlin-stdlib"))
 }
 
 sourceSets {

@@ -29,9 +29,9 @@ dependencies {
     testCompile(projectTests(":compiler:tests-common"))
     testCompile(projectTests(":idea"))
     testCompile(projectTests(":idea:idea-android"))
-    testCompile(projectDist(":kotlin-test:kotlin-test-jvm"))
+    testCompile(project(":kotlin-test:kotlin-test-jvm"))
     testCompile(commonDep("junit:junit"))
-    testRuntime(projectDist(":kotlin-reflect"))
+    testRuntime(project(":kotlin-reflect"))
     testCompile(intellijPluginDep("android")) { includeJars("android", "android-common", "sdk-common", "sdk-tools") }
     testCompile(intellijPluginDep("Groovy")) { includeJars("Groovy") }
     testCompile(intellijDep()) { includeJars("extensions") }

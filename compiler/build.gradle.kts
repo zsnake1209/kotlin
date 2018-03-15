@@ -23,7 +23,7 @@ if (effectSystemEnabled) {
 }
 
 
-val depDistProjects = listOf(
+val depProjects = listOf(
         ":kotlin-script-runtime",
         ":kotlin-stdlib",
         ":kotlin-test:kotlin-test-jvm"
@@ -56,12 +56,13 @@ val antLauncherJar by configurations.creating
 dependencies {
     testRuntime(intellijDep()) // Should come before compiler, because of "progarded" stuff needed for tests
 
-    depDistProjects.forEach {
-        testCompile(projectDist(it))
+    depProjects.forEach {
+        testCompile(project(it))
     }
+
     testCompile(commonDep("junit:junit"))
-    testCompileOnly(projectDist(":kotlin-test:kotlin-test-jvm"))
-    testCompileOnly(projectDist(":kotlin-test:kotlin-test-junit"))
+    testCompileOnly(project(":kotlin-test:kotlin-test-jvm"))
+    testCompileOnly(project(":kotlin-test:kotlin-test-junit"))
     testCompile(projectTests(":compiler:tests-common"))
     testCompile(projectTests(":generators:test-generator"))
     testCompile(project(":compiler:ir.ir2cfg"))
@@ -74,7 +75,7 @@ dependencies {
     testCompileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     testCompileOnly(intellijDep()) { includeJars("openapi", "idea", "idea_rt", "util", "asm-all") }
 
-    testRuntime(projectDist(":kotlin-reflect"))
+    testRuntime(project(":kotlin-reflect"))
     testRuntime(projectDist(":kotlin-daemon-client"))
     testRuntime(androidDxJar())
     testRuntime(files(toolsJar()))
