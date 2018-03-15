@@ -16,6 +16,12 @@ dependencies {
     compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     compileOnly("org.jetbrains:annotations:13.0")
     compileOnly(intellijDep()) { includeIntellijCoreJarDependencies(project) }
+    runtime(project(":kotlin-reflect"))
+    compileOnly(project(":kotlin-reflect-api"))
+    compile(commonDep("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")) { isTransitive = false }
+    compile(commonDep("io.ktor", "ktor-network")) {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
+    }
 }
 
 sourceSets {
