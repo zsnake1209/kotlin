@@ -96,6 +96,10 @@ open class KotlinPlatformImplementationPluginBase(platformName: String) : Kotlin
 
     private var implementConfigurationIsUsed = false
 
+    private fun platformImplementationConfigName(platform: String) = "platform${platform.capitalize()}Implementations"
+
+    private fun automaticPlatformDependenciesConfigName(sourceSetName: String) = "autoconfigured${sourceSetName.capitalize()}Dependencies"
+
     private fun addCommonProject(commonProject: Project, platformProject: Project) {
         commonProjects.add(commonProject)
 
@@ -117,60 +121,102 @@ open class KotlinPlatformImplementationPluginBase(platformName: String) : Kotlin
             commonProject.dependencies.add(platformImplementationConfigName, platformProject)
         }
 
+        // Single variable for all source sets below,
+        // lazy to prevent it from traversing the modules before they are evaluated
+        val commonModuleDependencies = lazy {
+            getCommonModuleDependencies(commonProject)
+        }
+
         platformProject.afterEvaluate {
-            platformProject.sourceSets.all { sourceSet ->
-                val compileClasspath =
-                    sourceSet.compileClasspath as? Configuration
-                            ?: platformProject.configurations.findByName(sourceSet.compileClasspathConfigurationName)
-                            ?: return@all
+            val mainSourceSet = platformProject.sourceSets.getByName("main")
+            val configurationToAddDeps = platformProject.configurations.getAt("implementation")
+            val configurationToCheckDeps =
+                mainSourceSet.compileClasspath as? Configuration
+                        ?: platformProject.configurations.findByName(mainSourceSet.compileClasspathConfigurationName)
+                        ?: configurationToAddDeps
 
-                compileClasspath.withDependencies {
-                    val commonModulesSequence = traverseCommonModuleDependencies(commonProject)
-                    commonModulesSequence.forEach { commonModule ->
-                        val platformImplDeps =
-                            commonModule.configurations.findByName(platformImplementationConfigName(platformName)) ?: return@forEach
-
-                        val platformImplProjectDeps =
-                            platformImplDeps.dependencies.filterIsInstance<ProjectDependency>()
-
-                        val platformImplProjectPaths = platformImplProjectDeps.map { it.dependencyProject.path }
-
-                        val thisProjectDependsOnImpl = compileClasspath.allDependencies.any { dep ->
-                            dep is ProjectDependency && dep.dependencyProject.path in platformImplProjectPaths
-                        }
-
-                        if (!thisProjectDependsOnImpl) {
-                            if (platformImplProjectDeps.size > 1) {
-                                platformProject.logger.kotlinWarn(
-                                    "A platform module ${platformProject.path} does not depend on a platform implementation " +
-                                            "of its common dependency ${commonModule.path}. " +
-                                            "Add a dependency for source set ${sourceSet.name} to one of the following modules: \n" +
-                                            platformImplProjectPaths.joinToString("\n") { " * $it" }
-                                )
-                            } else {
-                                val singlePlatformImpl = platformImplProjectDeps.single().dependencyProject
-                                platformProject.dependencies.add(compileClasspath.name, singlePlatformImpl)
-                            }
-                        }
-                    }
-                }
-            }
+            setUpPlatformModuleDependencies(
+                platformProject,
+                mainSourceSet,
+                configurationToCheckDeps,
+                configurationToAddDeps,
+                commonModuleDependencies
+            )
         }
     }
 
-    private fun platformImplementationConfigName(platformName: String) = "platform${platformName.capitalize()}Implementations"
+    private fun getCommonModuleDependencies(from: Project): List<Project> {
 
-    private fun traverseCommonModuleDependencies(startFrom: Project): Sequence<Project> {
-        fun getCompileDependencies(project: Project) =
+        fun getCompileProjectDependencies(project: Project) =
             project.configurations.findByName("compileClasspath")?.allDependencies
                 .orEmpty()
                 .filterIsInstance<ProjectDependency>()
                 .map { it.dependencyProject }
 
-        return generateSequence(listOf(startFrom)) { prev -> prev.flatMap { getCompileDependencies(it) } }
+        return generateSequence(listOf(from)) { prev -> prev.flatMap { getCompileProjectDependencies(it) } }
             .drop(1)
             .takeWhile { it.isNotEmpty() }
             .flatten()
+            .toList()
+    }
+
+    //TODO adapt for Native
+    private val platformDisplayName = platformName.toUpperCase()
+
+    private fun setUpPlatformModuleDependencies(
+        platformProject: Project,
+        sourceSet: SourceSet,
+        configurationToCheck: Configuration,
+        defaultConfigurationToAdd: Configuration,
+        commonModuleDependencies: Lazy<List<Project>>
+    ) {
+        // Workaround: with configure-on-demand, we still need to evaluate all projects. This forces them to evaluate:
+        platformProject.rootProject.allprojects { project ->
+            platformProject.rootProject.evaluationDependsOn(project.path)
+        }
+
+        defaultConfigurationToAdd.withDependencies {
+            commonModuleDependencies.value.forEach { commonModule ->
+                val platformImplDeps =
+                    commonModule.configurations.findByName(platformImplementationConfigName(platformName))
+
+                val platformImplProjectDeps =
+                    platformImplDeps?.dependencies.orEmpty().filterIsInstance<ProjectDependency>()
+
+                val platformImplProjectPaths = platformImplProjectDeps.map { it.dependencyProject.path }
+
+                val thisProjectDependsOnImpl = configurationToCheck.allDependencies.any { dep ->
+                    dep is ProjectDependency && dep.dependencyProject.path in platformImplProjectPaths
+                }
+
+                when {
+                    thisProjectDependsOnImpl -> Unit
+                    platformImplProjectDeps.isEmpty() -> {
+                        println(
+                            "No $platformDisplayName platform module found for the common dependency ${commonModule.path} of " +
+                                    "platform module ${platformProject.path}. Please make sure there is a ${platformDisplayName} " +
+                                    "platform implementation and " +
+                                    "the project containing it is evaluated at the moment of the dependency resolution."
+                        )
+                    }
+                    platformImplProjectDeps.size == 1 -> {
+                        val singlePlatformImpl = platformImplProjectDeps.single().dependencyProject
+                        platformProject.logger.kotlinInfo("Found a single ${platformDisplayName} platform implementation ${singlePlatformImpl.path} " +
+                                                                  "for common dependency ${commonModule.path}. " +
+                                                                  "Adding it to ${defaultConfigurationToAdd}.")
+                        platformProject.dependencies.add(defaultConfigurationToAdd.name, singlePlatformImpl)
+                    }
+                    else -> { // platformImplProjectDeps.size > 1
+                        platformProject.logger.kotlinWarn(
+                            "A platform module ${platformProject.path} does not explicitly depend on a ${platformDisplayName} platform implementation " +
+                                    "of its common dependency ${commonModule.path}. " +
+                                    "Please manually choose one of the platform modules and specify the dependency for ${sourceSet.name}:" +
+                                    platformImplProjectPaths.joinToString("\n") { " * $it" }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     protected open fun addCommonSourceSetToPlatformSourceSet(commonSourceSet: SourceSet, platformProject: Project) {
