@@ -20,12 +20,12 @@ import com.android.build.gradle.BaseExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile
 
 abstract class KotlinPlatformPluginBase(protected val platformName: String) : Plugin<Project> {
@@ -111,7 +111,66 @@ open class KotlinPlatformImplementationPluginBase(platformName: String) : Kotlin
                 // todo: warn if not found
                 addCommonSourceSetToPlatformSourceSet(commonSourceSet, platformProject)
             }
+
+            val platformImplementationConfigName = platformImplementationConfigName(platformName)
+            commonProject.configurations.maybeCreate(platformImplementationConfigName)
+            commonProject.dependencies.add(platformImplementationConfigName, platformProject)
         }
+
+        platformProject.afterEvaluate {
+            platformProject.sourceSets.all { sourceSet ->
+                val compileClasspath =
+                    sourceSet.compileClasspath as? Configuration
+                            ?: platformProject.configurations.findByName(sourceSet.compileClasspathConfigurationName)
+                            ?: return@all
+
+                compileClasspath.withDependencies {
+                    val commonModulesSequence = traverseCommonModuleDependencies(commonProject)
+                    commonModulesSequence.forEach { commonModule ->
+                        val platformImplDeps =
+                            commonModule.configurations.findByName(platformImplementationConfigName(platformName)) ?: return@forEach
+
+                        val platformImplProjectDeps =
+                            platformImplDeps.dependencies.filterIsInstance<ProjectDependency>()
+
+                        val platformImplProjectPaths = platformImplProjectDeps.map { it.dependencyProject.path }
+
+                        val thisProjectDependsOnImpl = compileClasspath.allDependencies.any { dep ->
+                            dep is ProjectDependency && dep.dependencyProject.path in platformImplProjectPaths
+                        }
+
+                        if (!thisProjectDependsOnImpl) {
+                            if (platformImplProjectDeps.size > 1) {
+                                platformProject.logger.kotlinWarn(
+                                    "A platform module ${platformProject.path} does not depend on a platform implementation " +
+                                            "of its common dependency ${commonModule.path}. " +
+                                            "Add a dependency for source set ${sourceSet.name} to one of the following modules: \n" +
+                                            platformImplProjectPaths.joinToString("\n") { " * $it" }
+                                )
+                            } else {
+                                val singlePlatformImpl = platformImplProjectDeps.single().dependencyProject
+                                platformProject.dependencies.add(compileClasspath.name, singlePlatformImpl)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun platformImplementationConfigName(platformName: String) = "platform${platformName.capitalize()}Implementations"
+
+    private fun traverseCommonModuleDependencies(startFrom: Project): Sequence<Project> {
+        fun getCompileDependencies(project: Project) =
+            project.configurations.findByName("compileClasspath")?.allDependencies
+                .orEmpty()
+                .filterIsInstance<ProjectDependency>()
+                .map { it.dependencyProject }
+
+        return generateSequence(listOf(startFrom)) { prev -> prev.flatMap { getCompileDependencies(it) } }
+            .drop(1)
+            .takeWhile { it.isNotEmpty() }
+            .flatten()
     }
 
     protected open fun addCommonSourceSetToPlatformSourceSet(commonSourceSet: SourceSet, platformProject: Project) {
