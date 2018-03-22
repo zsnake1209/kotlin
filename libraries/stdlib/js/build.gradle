@@ -22,6 +22,7 @@ def jsSrcDir = "src"
 def jsTestSrcDir = "test"
 def jsSrcJsDir = "${jsSrcDir}/js"
 def jsOutputFile = "${buildDir}/classes/kotlin.js"
+def jsOutputMetaFile = "${buildDir}/classes/kotlin.meta.js"
 
 def kotlinTestJsOutputFile = "${project(':kotlin-test:kotlin-test-js').buildDir}/classes/main/kotlin-test.js"
 
@@ -215,7 +216,7 @@ task compileJs(type: JavaExec) {
             if (prefixToRemove != null) sourcePath.substring(prefixToRemove.length()) else sourcePath
         }
 
-        def sourceMapSourcesBaseDirs = [jsSrcDir, jsSrcJsDir, jsSrcGeneratedDir, builtinsSrcDir, commonSrcDir, projectDir]
+        def sourceMapSourcesBaseDirs = [jsSrcDir, jsSrcJsDir, jsSrcGeneratedDir, builtinsSrcDir, commonSrcDir, projectDir, experimentalSrcDir]
 
         sourceMap.sourcesContent = sourceMap.sources.collect { sourceName ->
             def text = sourceMapSourcesBaseDirs.collect { file("$it/$sourceName") }.find { it.exists() }?.text
@@ -224,6 +225,15 @@ task compileJs(type: JavaExec) {
         }
 
         sourceMapFile.text = groovy.json.JsonOutput.toJson(sourceMap)
+
+        def metaJsFile = file(jsOutputMetaFile)
+        metaJsFile.text = ''
+
+        (compileKotlin2Js.outputs.files.collect { it.path } + compileExperimentalKotlin2Js.outputs.files.collect { it.path }).forEach {
+            if (it.endsWith('.js') && !it.endsWith('.meta.js')) {
+                metaJsFile.text += file(it.substring(0, it.length() - 3) + '.meta.js').text
+            }
+        }
     }
 }
 
@@ -248,6 +258,7 @@ task mergedJar(type: Jar, dependsOn: classes) {
     includeEmptyDirs false
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     from jsOutputFile
+    from jsOutputMetaFile
     from "${jsOutputFile}.map"
     from sourceSets.main.output
 }
