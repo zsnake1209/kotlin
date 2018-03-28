@@ -44,8 +44,10 @@ dependencies {
 
     compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     compileOnly(intellijDep()) {
-        includeJars("annotations", "openapi", "idea", "velocity", "boot", "gson", "log4j", "asm-all",
-                    "swingx-core", "forms_rt", "util", "jdom", "trove4j", "guava", rootProject = rootProject)
+        includeJars(
+            "annotations", "openapi", "idea", "velocity", "boot", "gson", "log4j", "asm-all",
+            "swingx-core", "forms_rt", "util", "jdom", "trove4j", "guava", rootProject = rootProject
+        )
     }
     compileOnly(commonDep("com.google.code.findbugs", "jsr305"))
     compileOnly(intellijPluginDep("IntelliLang"))
@@ -89,7 +91,14 @@ dependencies {
     testCompile(intellijPluginDep("java-i18n"))
     testCompileOnly(intellijDep()) { includeJars("groovy-all", "velocity", "gson", "idea_rt", "util", "log4j", rootProject = rootProject) }
     testCompileOnly(commonDep("com.google.code.findbugs", "jsr305"))
-    testCompileOnly(intellijPluginDep("gradle")) { includeJars("gradle-base-services", "gradle-tooling-extension-impl", "gradle-wrapper", rootProject = rootProject) }
+    testCompileOnly(intellijPluginDep("gradle")) {
+        includeJars(
+            "gradle-base-services",
+            "gradle-tooling-extension-impl",
+            "gradle-wrapper",
+            rootProject = rootProject
+        )
+    }
     testCompileOnly(intellijPluginDep("Groovy")) { includeJars("Groovy") }
     testCompileOnly(intellijPluginDep("maven")) { includeJars("maven", "maven-server-api") }
 
@@ -105,22 +114,59 @@ dependencies {
 sourceSets {
     "main" {
         projectDefault()
-        java.srcDirs("idea-completion/src",
-                     "idea-live-templates/src",
-                     "idea-repl/src")
+        java.srcDirs(
+            "idea-completion/src",
+            "idea-live-templates/src",
+            "idea-repl/src"
+        )
         resources.srcDirs("idea-repl/src").apply { include("META-INF/**") }
     }
     "test" {
         projectDefault()
         java.srcDirs(
-                     "idea-completion/tests",
-                     "idea-live-templates/tests")
+            "idea-completion/tests",
+            "idea-live-templates/tests"
+        )
+    }
+
+}
+
+val performanceTestCompile by configurations.creating {
+    extendsFrom(configurations["testCompile"])
+}
+
+val performanceTestRuntime by configurations.creating {
+    extendsFrom(configurations["testRuntime"])
+}
+
+val performanceTest by run {
+    val sourceSets = the<JavaPluginConvention>().sourceSets
+    sourceSets.creating {
+        compileClasspath += sourceSets["test"].output
+        compileClasspath += sourceSets["main"].output
+        runtimeClasspath += sourceSets["test"].output
+        runtimeClasspath += sourceSets["main"].output
+        java.srcDirs("performanceTests")
     }
 }
 
 projectTest {
     dependsOn(":dist")
+    dependsOn("performanceTest")
     workingDir = rootDir
+}
+
+
+projectTest(taskName = "performanceTest") {
+    dependsOn(":dist")
+    dependsOn(performanceTest.output)
+    testClassesDirs = performanceTest.output.classesDirs
+    classpath = performanceTest.runtimeClasspath
+    workingDir = rootDir
+
+    doFirst {
+        systemProperty("idea.home.path", intellijRootDir().canonicalPath)
+    }
 }
 
 testsJar {}
