@@ -89,6 +89,7 @@ private val keywords = setOf("interface", "is", "as")
 private fun String.parse() = if (this.startsWith("0x")) BigInteger(this.substring(2), 16) else BigInteger(this)
 private fun String.replaceWrongConstants(type: Type) = when {
     this == "null" && type.nullable -> "null"
+    this == "undefined" -> "undefined"
     this == "definedExternally" || type is SimpleType && type.type == "Int" && parse() > BigInteger.valueOf(Int.MAX_VALUE.toLong()) -> "definedExternally"
     type is SimpleType && type.type == "Double" && this.matches("[0-9]+".toRegex()) -> "${this}.0"
     else -> this
@@ -291,7 +292,7 @@ fun Appendable.renderBuilderFunction(dictionary: GenerateTraitOrClass, allSuperT
             .distinctBy { it.signature }
             .map { it.copy(kind = AttributeKind.ARGUMENT) }
             .dynamicIfUnknownType(allTypes)
-            .map { if (it.initializer == null && (it.type.nullable || it.type == DynamicType) && !it.required) it.copy(initializer = "null") else it }
+            .map { if (it.initializer == null && (it.type.nullable || it.type == DynamicType) && !it.required) it.copy(initializer = "undefined") else it }
 
     appendln("@kotlin.internal.InlineOnly")
     append("public inline fun ${dictionary.name}")
