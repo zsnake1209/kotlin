@@ -168,7 +168,8 @@ projectTest(taskName = "performanceTest") {
     workingDir = rootDir
 
     jvmArgs.removeAll { it.startsWith("-Xmx") }
-    maxHeapSize = "2g"
+
+    maxHeapSize = "3g"
 
     doFirst {
         systemProperty("idea.home.path", intellijRootDir().canonicalPath)
