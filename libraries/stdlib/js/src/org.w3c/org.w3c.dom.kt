@@ -1358,6 +1358,9 @@ public external abstract class ValidityState {
     open val valid: Boolean
 }
 
+/**
+ * Exposes the JavaScript [HTMLDetailsElement](https://developer.mozilla.org/en/docs/Web/API/HTMLDetailsElement) to Kotlin
+ */
 public external abstract class HTMLDetailsElement : HTMLElement {
     open var open: Boolean
 }
@@ -1771,7 +1774,7 @@ public external interface ElementDefinitionOptions {
 }
 
 @kotlin.internal.InlineOnly
-public inline fun ElementDefinitionOptions(extends: String? = null): ElementDefinitionOptions {
+public inline fun ElementDefinitionOptions(extends: String? = undefined): ElementDefinitionOptions {
     val o = js("({})")
 
     o["extends"] = extends
@@ -2087,7 +2090,7 @@ public external interface PromiseRejectionEventInit : EventInit {
 }
 
 @kotlin.internal.InlineOnly
-public inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any? = null, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PromiseRejectionEventInit {
+public inline fun PromiseRejectionEventInit(promise: Promise<Any?>?, reason: Any? = undefined, bubbles: Boolean? = false, cancelable: Boolean? = false, composed: Boolean? = false): PromiseRejectionEventInit {
     val o = js("({})")
 
     o["promise"] = promise
@@ -2277,6 +2280,9 @@ public external abstract class PluginArray : ItemArrayLike<Plugin> {
 @kotlin.internal.InlineOnly inline operator fun PluginArray.get(index: Int): Plugin? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun PluginArray.get(name: String): Plugin? = asDynamic()[name]
 
+/**
+ * Exposes the JavaScript [MimeTypeArray](https://developer.mozilla.org/en/docs/Web/API/MimeTypeArray) to Kotlin
+ */
 public external abstract class MimeTypeArray : ItemArrayLike<MimeType> {
     override val length: Int
     override fun item(index: Int): MimeType?
@@ -2299,6 +2305,9 @@ public external abstract class Plugin : ItemArrayLike<MimeType> {
 @kotlin.internal.InlineOnly inline operator fun Plugin.get(index: Int): MimeType? = asDynamic()[index]
 @kotlin.internal.InlineOnly inline operator fun Plugin.get(name: String): MimeType? = asDynamic()[name]
 
+/**
+ * Exposes the JavaScript [MimeType](https://developer.mozilla.org/en/docs/Web/API/MimeType) to Kotlin
+ */
 public external abstract class MimeType {
     open val type: String
     open val description: String
@@ -2337,7 +2346,7 @@ public external interface ImageBitmapOptions {
 }
 
 @kotlin.internal.InlineOnly
-public inline fun ImageBitmapOptions(imageOrientation: ImageOrientation? = ImageOrientation.NONE, premultiplyAlpha: PremultiplyAlpha? = PremultiplyAlpha.DEFAULT, colorSpaceConversion: ColorSpaceConversion? = ColorSpaceConversion.DEFAULT, resizeWidth: Int? = null, resizeHeight: Int? = null, resizeQuality: ResizeQuality? = ResizeQuality.LOW): ImageBitmapOptions {
+public inline fun ImageBitmapOptions(imageOrientation: ImageOrientation? = ImageOrientation.NONE, premultiplyAlpha: PremultiplyAlpha? = PremultiplyAlpha.DEFAULT, colorSpaceConversion: ColorSpaceConversion? = ColorSpaceConversion.DEFAULT, resizeWidth: Int? = undefined, resizeHeight: Int? = undefined, resizeQuality: ResizeQuality? = ResizeQuality.LOW): ImageBitmapOptions {
     val o = js("({})")
 
     o["imageOrientation"] = imageOrientation
@@ -2901,6 +2910,9 @@ public external interface ChildNode {
     fun remove(): Unit
 }
 
+/**
+ * Exposes the JavaScript [Slotable](https://developer.mozilla.org/en/docs/Web/API/Slotable) to Kotlin
+ */
 public external interface Slotable {
     val assignedSlot: HTMLSlotElement?
 }
@@ -2959,7 +2971,7 @@ public external interface MutationObserverInit {
 }
 
 @kotlin.internal.InlineOnly
-public inline fun MutationObserverInit(childList: Boolean? = false, attributes: Boolean? = null, characterData: Boolean? = null, subtree: Boolean? = false, attributeOldValue: Boolean? = null, characterDataOldValue: Boolean? = null, attributeFilter: Array<String>? = null): MutationObserverInit {
+public inline fun MutationObserverInit(childList: Boolean? = false, attributes: Boolean? = undefined, characterData: Boolean? = undefined, subtree: Boolean? = false, attributeOldValue: Boolean? = undefined, characterDataOldValue: Boolean? = undefined, attributeFilter: Array<String>? = undefined): MutationObserverInit {
     val o = js("({})")
 
     o["childList"] = childList
@@ -3081,7 +3093,7 @@ public external interface ElementCreationOptions {
 }
 
 @kotlin.internal.InlineOnly
-public inline fun ElementCreationOptions(is_: String? = null): ElementCreationOptions {
+public inline fun ElementCreationOptions(is_: String? = undefined): ElementCreationOptions {
     val o = js("({})")
 
     o["is"] = is_
@@ -3529,6 +3541,9 @@ public external interface DOMRectList : ItemArrayLike<DOMRect> {
 }
 @kotlin.internal.InlineOnly inline operator fun DOMRectList.get(index: Int): DOMRect? = asDynamic()[index]
 
+/**
+ * Exposes the JavaScript [DOMQuad](https://developer.mozilla.org/en/docs/Web/API/DOMQuad) to Kotlin
+ */
 public external open class DOMQuad {
     constructor(p1: DOMPointInit = definedExternally, p2: DOMPointInit = definedExternally, p3: DOMPointInit = definedExternally, p4: DOMPointInit = definedExternally)
     constructor(rect: DOMRectInit)
@@ -3656,7 +3671,7 @@ public external interface ScrollToOptions : ScrollOptions {
 }
 
 @kotlin.internal.InlineOnly
-public inline fun ScrollToOptions(left: Double? = null, top: Double? = null, behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollToOptions {
+public inline fun ScrollToOptions(left: Double? = undefined, top: Double? = undefined, behavior: ScrollBehavior? = ScrollBehavior.AUTO): ScrollToOptions {
     val o = js("({})")
 
     o["left"] = left
@@ -3679,6 +3694,9 @@ public external abstract class MediaQueryList : EventTarget {
     fun removeListener(listener: ((Event) -> Unit)?): Unit
 }
 
+/**
+ * Exposes the JavaScript [MediaQueryListEvent](https://developer.mozilla.org/en/docs/Web/API/MediaQueryListEvent) to Kotlin
+ */
 public external open class MediaQueryListEvent(type: String, eventInitDict: MediaQueryListEventInit = definedExternally) : Event {
     open val media: String
     open val matches: Boolean
@@ -3757,7 +3775,7 @@ public external interface BoxQuadOptions {
 }
 
 @kotlin.internal.InlineOnly
-public inline fun BoxQuadOptions(box: CSSBoxType? = CSSBoxType.BORDER, relativeTo: dynamic = null): BoxQuadOptions {
+public inline fun BoxQuadOptions(box: CSSBoxType? = CSSBoxType.BORDER, relativeTo: dynamic = undefined): BoxQuadOptions {
     val o = js("({})")
 
     o["box"] = box
@@ -3785,6 +3803,9 @@ public inline fun ConvertCoordinateOptions(fromBox: CSSBoxType? = CSSBoxType.BOR
     return o
 }
 
+/**
+ * Exposes the JavaScript [GeometryUtils](https://developer.mozilla.org/en/docs/Web/API/GeometryUtils) to Kotlin
+ */
 public external interface GeometryUtils {
     fun getBoxQuads(options: BoxQuadOptions = definedExternally): Array<DOMQuad>
     fun convertQuadFromNode(quad: dynamic, from: dynamic, options: ConvertCoordinateOptions = definedExternally): DOMQuad
