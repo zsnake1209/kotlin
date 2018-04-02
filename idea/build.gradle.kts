@@ -152,7 +152,6 @@ val performanceTest by run {
 
 projectTest {
     dependsOn(":dist")
-    dependsOn("performanceTest")
     workingDir = rootDir
     doFirst {
         systemProperty("idea.home.path", intellijRootDir().canonicalPath)
