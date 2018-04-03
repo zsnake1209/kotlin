@@ -21,7 +21,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import org.apache.commons.lang.StringEscapeUtils
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -146,19 +145,13 @@ class AllKotlinInspectionTest : DaemonAnalyzerTestCase() {
     }
 
     fun String.tcEscape(): String {
-
-        val escaped = StringEscapeUtils.escapeJava(this)
-        return escaped
+        return this
             .replace("|", "||")
             .replace("[", "|[")
             .replace("]", "|]")
-            .replace("\\r", "|r")
-            .replace("\\n", "|n")
-            .replace("\\t", "\t")
-            .replace("\\b", "\b")
-            .replace("\\\"", "\"")
-            .replace("\\\\", "\\")
-            .replace("\\\\u([0-F]{1,4})".toRegex()) { "|0x" + it.groups[0]!!.value }
+            .replace("\r", "|r")
+            .replace("\n", "|n")
+            .replace("'", "|'")
     }
 
 
