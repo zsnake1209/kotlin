@@ -11,6 +11,8 @@ import groovy.lang.Closure
 import org.gradle.api.*
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ExternalDependency
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.Usage
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.SourceDirectorySet
@@ -24,6 +26,7 @@ import org.gradle.api.tasks.*
 import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptionsImpl
 import org.jetbrains.kotlin.gradle.internal.*
 import org.jetbrains.kotlin.gradle.internal.Kapt3GradleSubplugin.Companion.getKaptGeneratedClassesDir
@@ -31,6 +34,7 @@ import org.jetbrains.kotlin.gradle.tasks.*
 import org.jetbrains.kotlin.gradle.utils.*
 import org.jetbrains.kotlin.incremental.configureMultiProjectIncrementalCompilation
 import java.io.File
+import java.io.Serializable
 import java.net.URL
 import java.util.*
 import java.util.concurrent.Callable
@@ -357,7 +361,6 @@ internal class KotlinCommonSourceSetProcessor(
             // can be missing (e.g. in case of tests)
             project.tasks.findByName(sourceSet.jarTaskName)?.dependsOn(kotlinTask)
             val javaTask = project.tasks.findByName(sourceSet.compileJavaTaskName)
-            project.tasks.remove(javaTask)
 
             appliedPlugins
                     .flatMap { it.getSubpluginKotlinTasks(project, kotlinTask) }
@@ -440,7 +443,177 @@ internal open class KotlinCommonPlugin(
 ) : AbstractKotlinPlugin(tasksProvider, kotlinSourceSetProvider, kotlinPluginVersion) {
     override fun buildSourceSetProcessor(project: Project, javaBasePlugin: JavaBasePlugin, sourceSet: SourceSet, kotlinPluginVersion: String) =
             KotlinCommonSourceSetProcessor(project, javaBasePlugin, sourceSet, tasksProvider, kotlinSourceSetProvider)
+
+    override fun apply(project: Project) {
+        super.apply(project)
+
+        val projectExtension = project.extensions.getByType(KotlinCommonProjectExtension::class.java)
+
+        projectExtension.platformModuleHandler = { platformModuleName ->
+            addPlatformProject(project, project.project(platformModuleName))
+        }
+
+        listOf(
+            "apiElements",
+            "runtimeElements",
+            "compileClasspath",
+            "testCompileClasspath",
+            "runtimeClasspath",
+            "testRuntimeClasspath"
+        ).forEach { configurationName ->
+            project.configurations.getByName(configurationName).setPlatform(KotlinPlatform.Common)
+        }
+    }
+
+    fun Configuration.setPlatform(platform: KotlinPlatform) {
+        attributes.attribute(kotlinPlatformAttribute, platform)
+    }
+
+    private fun platformApiElementsConfigurationName(moduleName: String) =
+        "apiElementsOf${moduleName.capitalize()}"
+
+    private fun platformRuntimeElementsConfigurationName(moduleName: String) =
+        "runtimeElementsOf${moduleName.capitalize()}"
+
+    private fun createPlatformModuleElementsConfigurations(commonProject: Project, platformProjectName: String) {
+        // Use the same org.gradle.usage attribute as that provided by Gradle in apiElements and runtimeElements:
+        val javaApiUsage = commonProject.configurations.getByName("apiElements").attributes.getAttribute(Usage.USAGE_ATTRIBUTE)!!
+        val javaRuntimeUsage = commonProject.configurations.getByName("runtimeElements").attributes.getAttribute(Usage.USAGE_ATTRIBUTE)!!
+
+        commonProject.configurations.create(platformApiElementsConfigurationName(platformProjectName)).apply {
+            attributes.attribute(Usage.USAGE_ATTRIBUTE, javaApiUsage)
+        }
+        commonProject.configurations.create(platformRuntimeElementsConfigurationName(platformProjectName)).apply {
+            attributes.attribute(Usage.USAGE_ATTRIBUTE, javaRuntimeUsage)
+        }
+    }
+
+    private val consumableImplementationConfigurationName
+        get() = "commonImplementationDependencies"
+
+    private fun ensureConsumableConfigurationsInCommonProject(commonProject: Project) {
+        // Since the `implementation` configuration is not consumable, create another consumable one for usage in
+        // the platform modules
+        val consumableImplementation = commonProject.configurations.maybeCreate(consumableImplementationConfigurationName)
+        val implementation = commonProject.configurations.getByName("implementation")
+        consumableImplementation.extendsFrom(implementation)
+        // TODO the same for API?
+    }
+
+    private fun SourceSet.setPlatform(platform: KotlinPlatform, configurations: NamedDomainObjectContainer<Configuration>) {
+        val sourceSetPlatformConfigurationNames =
+            listOf(
+                apiConfigurationName,
+                apiElementsConfigurationName,
+                compileClasspathConfigurationName,
+                compileConfigurationName,
+                compileOnlyConfigurationName,
+                implementationConfigurationName,
+                runtimeClasspathConfigurationName,
+                runtimeElementsConfigurationName,
+                runtimeConfigurationName,
+                runtimeOnlyConfigurationName
+            )
+        sourceSetPlatformConfigurationNames.forEach {
+            configurations.findByName(it)?.setPlatform(platform)
+        }
+    }
+
+    fun addPlatformProject(commonProject: Project, platformProject: Project) {
+        val platformModuleName = platformProject.name
+        createPlatformModuleElementsConfigurations(commonProject, platformModuleName)
+        val platformApiElementsInCommon =
+            commonProject.configurations.getByName(platformApiElementsConfigurationName(platformModuleName))
+        val platformRuntimeElementsInCommon =
+            commonProject.configurations.getByName(platformRuntimeElementsConfigurationName(platformModuleName))
+
+        ensureConsumableConfigurationsInCommonProject(commonProject)
+
+        platformProject.whenEvaluated {
+            val platformPlugin = (platformProject.plugins.firstOrNull { it is KotlinPlatformImplementationPluginBase }
+                    ?: throw GradleException("The platform module $platformProject should have one of the Kotlin platform plugins applied."))
+                    as KotlinPlatformImplementationPluginBase
+
+            val platformName = platformPlugin.platformName
+            val platform = KotlinPlatform.values().find { it.platformName == platformName }!!
+
+            commonProject.sourceSets.all { commonSourceSet ->
+                // todo: warn if not found
+                platformPlugin.addCommonSourceSetToPlatformSourceSet(commonSourceSet, platformProject)
+            }
+
+            val configurationsWithPlatformAttribute =
+                listOf(platformApiElementsInCommon, platformRuntimeElementsInCommon)
+
+            configurationsWithPlatformAttribute.forEach { it.setPlatform(platform) }
+
+            platformProject.sourceSets.all { it.setPlatform(platform, platformProject.configurations) }
+
+            platformProject.configurations.getByName("expectedBy").setPlatform(KotlinPlatform.Common)
+
+            fun Project.addProjectDependency(toConfiguration: String, onProject: Project, onConfiguration: String) {
+                dependencies.run {
+                    val dependency = project(mapOf("path" to onProject.path, "configuration" to onConfiguration))
+                    add(toConfiguration, dependency)
+                }
+            }
+
+            // Setup the configurations needed for propagating the dependencies on the platform module to the
+            // dependent modules of the common module:
+            listOf(
+                platformApiElementsInCommon.name to "apiElements",
+                platformRuntimeElementsInCommon.name to "runtimeElements"
+            ).forEach { (commonModuleConfig, platformModuleConfig) ->
+                commonProject.addProjectDependency(
+                    toConfiguration = commonModuleConfig,
+                    onProject = platformProject,
+                    onConfiguration = platformModuleConfig
+                )
+            }
+
+            val platformProjectDependency = commonProject.dependencies.project(mapOf("path" to platformProject.path))
+            platformApiElementsInCommon.dependencies.add(platformProjectDependency)
+            platformRuntimeElementsInCommon.dependencies.add(platformProjectDependency)
+
+            // Propagate the dependencies of the common module to the platform module:
+            listOf(
+                "implementation" to consumableImplementationConfigurationName,
+                // TODO the same for API?
+                "compile" to "compile",
+                "runtime" to "runtime",
+                "compile" to "default"
+            ).forEach { (platformModuleConfig, commonModuleConfig) ->
+                platformProject.addProjectDependency(
+                    toConfiguration = platformModuleConfig,
+                    onProject = commonProject,
+                    onConfiguration = commonModuleConfig
+                )
+            }
+        }
+    }
+
+    private val Project.sourceSets: SourceSetContainer
+        get() = convention.getPlugin(JavaPluginConvention::class.java).sourceSets
+
 }
+
+fun <T> Project.whenEvaluated(fn: Project.() -> T) {
+    if (state.executed) {
+        fn()
+    } else {
+        afterEvaluate { it.fn() }
+    }
+}
+
+enum class KotlinPlatform(val platformName: String) : Serializable, Named {
+    Jvm("jvm"), Js("js"), Android("android"),
+    // While this is not actually a platform, we use it to mark configurations with common artifacts and dependencies
+    Common("common");
+
+    override fun getName(): String = platformName
+}
+
+internal val kotlinPlatformAttribute = Attribute.of("org.jetbrains.kotlin.platform", KotlinPlatform::class.java)
 
 internal open class Kotlin2JsPlugin(
         tasksProvider: KotlinTasksProvider,

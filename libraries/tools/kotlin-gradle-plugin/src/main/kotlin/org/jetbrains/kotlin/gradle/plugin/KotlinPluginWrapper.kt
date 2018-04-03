@@ -21,6 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.createKotlinExtension
@@ -65,6 +66,9 @@ open class KotlinPluginWrapper @Inject constructor(fileResolver: FileResolver): 
 open class KotlinCommonPluginWrapper @Inject constructor(fileResolver: FileResolver): KotlinBasePluginWrapper(fileResolver) {
     override fun getPlugin(kotlinGradleBuildServices: KotlinGradleBuildServices) =
             KotlinCommonPlugin(KotlinCommonTasksProvider(), KotlinSourceSetProviderImpl(fileResolver), kotlinPluginVersion)
+
+    override val projectExtensionClass: KClass<out KotlinCommonProjectExtension>
+        get() = KotlinCommonProjectExtension::class
 }
 
 open class KotlinAndroidPluginWrapper @Inject constructor(fileResolver: FileResolver): KotlinBasePluginWrapper(fileResolver) {

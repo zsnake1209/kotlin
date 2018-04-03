@@ -38,6 +38,13 @@ open class KotlinJvmProjectExtension : KotlinProjectExtension() {
     var copyClassesToJavaOutput = false
 }
 
+open class KotlinCommonProjectExtension : KotlinProjectExtension() {
+    lateinit internal var platformModuleHandler: (platformModuleName: String) -> Unit
+
+    fun addPlatformModule(platformModuleName: String) =
+        platformModuleHandler(platformModuleName)
+}
+
 open class ExperimentalExtension {
     var coroutines: Coroutines? = null
 }
