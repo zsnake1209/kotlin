@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.types.checker.TypeCheckerContext.LowerCapturedTypePo
 import org.jetbrains.kotlin.types.checker.TypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy.*
 import org.jetbrains.kotlin.types.checker.TypeCheckerContext.SupertypesPolicy
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
+import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import org.jetbrains.kotlin.utils.SmartList
@@ -148,8 +149,13 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
             }
 
             is IntegerValueTypeConstructor -> {
-                val newConstructor = IntersectionTypeConstructor(constructor.supertypes.map { TypeUtils.makeNullableAsSpecified(it, type.isMarkedNullable) })
-                return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(type.annotations, newConstructor, listOf(), false, type.memberScope)
+                return IntegerValueType(
+                    type.memberScope,
+                    type.builtIns,
+                    constructor.supertypes.map { TypeUtils.makeNullableAsSpecified(it, type.isMarkedNullable) }
+                )
+//                val newConstructor = IntersectionTypeConstructor(constructor.supertypes.map { TypeUtils.makeNullableAsSpecified(it, type.isMarkedNullable) })
+//                return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(type.annotations, newConstructor, listOf(), false, type.memberScope)
             }
 
             is IntersectionTypeConstructor -> if (type.isMarkedNullable) {
@@ -221,6 +227,14 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
         }
 
         if (!NullabilityChecker.isPossibleSubtype(this, subType, superType)) return false
+
+        if (superType is IntegerValueType) {
+            if (subType in superType.supertypes) return true
+        }
+
+        if (subType is IntegerValueType) {
+            if (superType in subType.supertypes) return true
+        }
 
         val superConstructor = superType.constructor
 
@@ -479,7 +493,8 @@ val SimpleType.isClassType: Boolean get() = constructor.declarationDescriptor is
 val SimpleType.isSingleClassifierType: Boolean
     get() = !isError &&
             constructor.declarationDescriptor !is TypeAliasDescriptor &&
-            (constructor.declarationDescriptor != null || this is CapturedType || this is NewCapturedType || this is DefinitelyNotNullType)
+            (constructor.declarationDescriptor != null ||
+                    this is CapturedType || this is NewCapturedType || this is DefinitelyNotNullType || this is IntegerValueType)
 
 val SimpleType.isIntersectionType: Boolean
     get() = constructor is IntersectionTypeConstructor

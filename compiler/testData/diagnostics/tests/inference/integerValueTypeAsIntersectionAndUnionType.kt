@@ -1,3 +1,4 @@
+// !LANGUAGE: +NewInference
 // !DIAGNOSTICS: -UNUSED_PARAMETER
 
 fun test() {

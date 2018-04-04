@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
@@ -23,6 +24,7 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.checker.NewTypeVariableConstructor
 import org.jetbrains.kotlin.types.checker.NullabilityChecker
 import org.jetbrains.kotlin.types.typeUtil.canHaveUndefinedNullability
+import java.util.ArrayList
 
 abstract class DelegatingSimpleType : SimpleType() {
     protected abstract val delegate: SimpleType
@@ -115,3 +117,56 @@ fun SimpleType.makeSimpleTypeDefinitelyNotNullOrNotNull(): SimpleType =
 
 fun UnwrappedType.makeDefinitelyNotNullOrNotNull(): UnwrappedType =
         DefinitelyNotNullType.makeDefinitelyNotNull(this) ?: makeNullableAsSpecified(false)
+
+class IntegerValueType(
+    override val memberScope: MemberScope,
+    val builtIns: KotlinBuiltIns,
+    val supertypes: List<KotlinType>
+) : SimpleType() {
+    override val constructor: TypeConstructor
+        get() = NewIntegerValueTypeConstructor(builtIns, this)
+
+    override val arguments: List<TypeProjection> =
+        emptyList()
+
+    override val isMarkedNullable: Boolean
+        get() = false
+
+    override fun replaceAnnotations(newAnnotations: Annotations): SimpleType {
+        TODO()
+    }
+
+    override fun makeNullableAsSpecified(newNullability: Boolean): SimpleType {
+        TODO()
+    }
+
+    override val annotations: Annotations
+        get() = Annotations.EMPTY
+
+    override fun toString(): String {
+        return "IntegerValueType($supertypes)"
+    }
+}
+
+class NewIntegerValueTypeConstructor(
+    private val builtIns: KotlinBuiltIns,
+    val integerValueType: IntegerValueType
+) : TypeConstructor {
+    val comparableSupertype = builtIns.comparable.defaultType.replace(listOf(TypeProjectionImpl(integerValueType)))
+
+    override fun getSupertypes(): Collection<KotlinType> = listOf(comparableSupertype)
+
+    override fun getParameters(): List<TypeParameterDescriptor> = emptyList()
+
+    override fun isFinal() = false
+
+    override fun isDenotable() = false
+
+    override fun getDeclarationDescriptor() = null
+
+    override fun getBuiltIns(): KotlinBuiltIns {
+        return builtIns
+    }
+
+    override fun toString() = "NewIntegerValueType($supertypes)"
+}
