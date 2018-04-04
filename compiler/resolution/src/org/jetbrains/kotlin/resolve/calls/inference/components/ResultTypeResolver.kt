@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.intersectTypes
 import org.jetbrains.kotlin.types.typeUtil.isPrimitiveNumberType
+import org.jetbrains.kotlin.utils.addIfNotNull
 
 class ResultTypeResolver(
     val typeApproximator: TypeApproximator
@@ -116,28 +117,26 @@ class ResultTypeResolver(
     private fun adjustCommonSupertypeWithKnowledgeOfNumberTypes(commonSuperType: UnwrappedType): UnwrappedType {
         val constructor = commonSuperType.constructor
 
-        return when (constructor) {
-            is IntegerValueTypeConstructor,
-            is IntersectionTypeConstructor -> {
-                val newSupertypes = arrayListOf<UnwrappedType>()
-                val numberSupertypes = arrayListOf<KotlinType>()
-                for (supertype in constructor.supertypes.map { it.unwrap() }) {
-                    if (supertype.isPrimitiveNumberType())
-                        numberSupertypes.add(supertype)
-                    else
-                        newSupertypes.add(supertype)
-                }
+        if (constructor is IntegerValueTypeConstructor)
+            return TypeUtils.getDefaultPrimitiveNumberType(constructor).unwrap()
 
-                TypeUtils.getDefaultPrimitiveNumberType(numberSupertypes)?.let {
-                    newSupertypes.add(it.unwrap())
-                }
+        if (constructor !is IntersectionTypeConstructor)
+            return commonSuperType
 
-                intersectTypes(newSupertypes).makeNullableAsSpecified(commonSuperType.isMarkedNullable)
-            }
-
-            else ->
-                commonSuperType
+        val resultTypes = arrayListOf<UnwrappedType>()
+        val numberTypes = arrayListOf<KotlinType>()
+        for (supertype in constructor.supertypes) {
+            if (supertype.isPrimitiveNumberType())
+                numberTypes.add(supertype)
+            else
+                resultTypes.add(supertype.unwrap())
         }
+
+        resultTypes.addIfNotNull(
+            TypeUtils.getDefaultPrimitiveNumberType(numberTypes)?.unwrap()
+        )
+
+        return intersectTypes(resultTypes).makeNullableAsSpecified(commonSuperType.isMarkedNullable)
     }
 
     private fun findSuperType(c: Context, variableWithConstraints: VariableWithConstraints): UnwrappedType? {
