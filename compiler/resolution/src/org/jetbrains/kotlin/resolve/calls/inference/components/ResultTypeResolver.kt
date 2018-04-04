@@ -116,32 +116,28 @@ class ResultTypeResolver(
     private fun adjustCommonSupertypeWithKnowledgeOfNumberTypes(commonSuperType: UnwrappedType): UnwrappedType {
         val constructor = commonSuperType.constructor
 
-        val numberSupertypes = when {
-            constructor is IntegerValueTypeConstructor || constructor is IntersectionTypeConstructor -> {
+        return when (constructor) {
+            is IntegerValueTypeConstructor,
+            is IntersectionTypeConstructor -> {
                 val newSupertypes = arrayListOf<UnwrappedType>()
-                val result = arrayListOf<KotlinType>()
+                val numberSupertypes = arrayListOf<KotlinType>()
                 for (supertype in constructor.supertypes.map { it.unwrap() }) {
                     if (supertype.isPrimitiveNumberType())
-                        result.add(supertype)
+                        numberSupertypes.add(supertype)
                     else
                         newSupertypes.add(supertype)
                 }
 
-                result as List<SimpleType>
+                TypeUtils.getDefaultPrimitiveNumberType(numberSupertypes)?.let {
+                    newSupertypes.add(it.unwrap())
+                }
+
+                intersectTypes(newSupertypes).makeNullableAsSpecified(commonSuperType.isMarkedNullable)
             }
 
-            commonSuperType is IntegerValueType -> {
-                commonSuperType.supertypes as List<SimpleType>
-            }
-
-            else -> emptyList<SimpleType>()
+            else ->
+                commonSuperType
         }
-
-        if (numberSupertypes.isNotEmpty()) {
-            return intersectTypes(numberSupertypes).makeNullableAsSpecified(commonSuperType.isMarkedNullable)
-        }
-
-        return commonSuperType
     }
 
     private fun findSuperType(c: Context, variableWithConstraints: VariableWithConstraints): UnwrappedType? {
