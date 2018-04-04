@@ -168,6 +168,11 @@ projectTest(taskName = "performanceTest") {
     maxHeapSize = "3g"
     jvmArgs("-XX:SoftRefLRUPolicyMSPerMB=50")
 
+    val isTeamcityBuild = project.hasProperty("teamcity") || System.getenv("TEAMCITY_VERSION") != null
+    if (isTeamcityBuild) {
+        jvmArgs("-agentpath:/tmp/yourkit/bin/linux-x86-64/libyjpagent.so=port=10001,listen=all")
+    }
+
     doFirst {
         systemProperty("idea.home.path", intellijRootDir().canonicalPath)
     }
