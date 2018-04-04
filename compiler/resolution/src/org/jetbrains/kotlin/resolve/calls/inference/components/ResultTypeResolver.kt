@@ -115,6 +115,9 @@ class ResultTypeResolver(
     }
 
     private fun adjustCommonSupertypeWithKnowledgeOfNumberTypes(commonSuperType: UnwrappedType): UnwrappedType {
+        if (commonSuperType is IntegerValueType)
+            return TypeUtils.getDefaultPrimitiveNumberType(commonSuperType.supertypes)!!.unwrap()
+
         val constructor = commonSuperType.constructor
 
         if (constructor is IntegerValueTypeConstructor)
