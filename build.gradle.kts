@@ -184,6 +184,7 @@ extra["compilerModules"] = arrayOf(
         ":compiler:resolution",
         ":compiler:serialization",
         ":compiler:psi",
+        ":compiler:modules",
         ":compiler:frontend",
         ":compiler:frontend.java",
         ":compiler:frontend.script",
