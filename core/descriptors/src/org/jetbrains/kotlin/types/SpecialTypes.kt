@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.types
 
-import com.sun.jdi.IntegerValue
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
