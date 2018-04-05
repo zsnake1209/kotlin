@@ -183,6 +183,7 @@ extra["compilerModules"] = arrayOf(
         ":compiler:resolution",
         ":compiler:serialization",
         ":compiler:psi",
+        ":compiler:modules",
         *if (project.findProperty("fir.enabled") == "true") {
             arrayOf(
                 ":compiler:fir:cones",
