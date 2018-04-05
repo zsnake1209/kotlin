@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.*
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.canHaveUndefinedNullability
+import org.jetbrains.kotlin.types.typeUtil.contains
 
 object NewCommonSuperTypeCalculator {
 
@@ -87,6 +88,12 @@ object NewCommonSuperTypeCalculator {
     }
 
     private fun commonSuperTypeForNotNullTypes(types: List<SimpleType>, depth: Int): SimpleType {
+        val types = types.sortedWith(Comparator { s1, s2 ->
+            val s1WithIntegerValueType = s1.contains { it is IntegerValueType }
+            val s2WithIntegerValueType = s2.contains { it is IntegerValueType }
+            s1WithIntegerValueType.compareTo(s2WithIntegerValueType)
+        })
+
         val uniqueTypes = types.uniquify()
         val filteredType = uniqueTypes.filterNot { type ->
             uniqueTypes.any { other -> type != other && NewKotlinTypeChecker.isSubtypeOf(type, other) }

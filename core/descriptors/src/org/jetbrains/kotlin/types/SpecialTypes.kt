@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.types
 
+import com.sun.jdi.IntegerValue
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
@@ -24,7 +25,7 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.checker.NewTypeVariableConstructor
 import org.jetbrains.kotlin.types.checker.NullabilityChecker
 import org.jetbrains.kotlin.types.typeUtil.canHaveUndefinedNullability
-import java.util.ArrayList
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 abstract class DelegatingSimpleType : SimpleType() {
     protected abstract val delegate: SimpleType
@@ -119,9 +120,11 @@ fun UnwrappedType.makeDefinitelyNotNullOrNotNull(): UnwrappedType =
         DefinitelyNotNullType.makeDefinitelyNotNull(this) ?: makeNullableAsSpecified(false)
 
 class IntegerValueType(
-    override val memberScope: MemberScope,
     val builtIns: KotlinBuiltIns,
-    val supertypes: List<KotlinType>
+    val supertypes: List<KotlinType>,
+    override val memberScope: MemberScope,
+    override val isMarkedNullable: Boolean = false,
+    override val annotations: Annotations = Annotations.EMPTY
 ) : SimpleType() {
     override val constructor: TypeConstructor
         get() = NewIntegerValueTypeConstructor(builtIns, this)
@@ -129,22 +132,24 @@ class IntegerValueType(
     override val arguments: List<TypeProjection> =
         emptyList()
 
-    override val isMarkedNullable: Boolean
-        get() = false
-
     override fun replaceAnnotations(newAnnotations: Annotations): SimpleType {
-        TODO()
+        return IntegerValueType(builtIns, supertypes, memberScope, isMarkedNullable, newAnnotations)
     }
 
     override fun makeNullableAsSpecified(newNullability: Boolean): SimpleType {
-        TODO()
+        return if (isMarkedNullable == newNullability)
+            this
+        else
+            IntegerValueType(builtIns, supertypes, memberScope, newNullability, annotations)
     }
-
-    override val annotations: Annotations
-        get() = Annotations.EMPTY
 
     override fun toString(): String {
         return "IntegerValueType($supertypes)"
+    }
+
+    private fun createSimpleType(newNullability: Boolean, annotations: Annotations): SimpleType {
+        val newConstructor = IntersectionTypeConstructor(supertypes.map { TypeUtils.makeNullableAsSpecified(it, false) })
+        return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(annotations, newConstructor, listOf(), newNullability, memberScope)
     }
 }
 
@@ -153,8 +158,9 @@ class NewIntegerValueTypeConstructor(
     val integerValueType: IntegerValueType
 ) : TypeConstructor {
     val comparableSupertype = builtIns.comparable.defaultType.replace(listOf(TypeProjectionImpl(integerValueType)))
+    private val hashCode = integerValueType.supertypes.hashCode()
 
-    override fun getSupertypes(): Collection<KotlinType> = listOf(comparableSupertype)
+    override fun getSupertypes(): Collection<KotlinType> = listOf(builtIns.number.defaultType, comparableSupertype)
 
     override fun getParameters(): List<TypeParameterDescriptor> = emptyList()
 
@@ -169,4 +175,13 @@ class NewIntegerValueTypeConstructor(
     }
 
     override fun toString() = "NewIntegerValueType($supertypes)"
+
+    override fun hashCode(): Int {
+        return hashCode
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        return integerValueType.supertypes == other.safeAs<NewIntegerValueTypeConstructor>()?.integerValueType?.supertypes
+    }
 }

@@ -28,10 +28,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.TypeCheckerContext.LowerCapturedTypePolicy.*
 import org.jetbrains.kotlin.types.checker.TypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy.*
 import org.jetbrains.kotlin.types.checker.TypeCheckerContext.SupertypesPolicy
-import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
-import org.jetbrains.kotlin.types.typeUtil.builtIns
-import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
-import org.jetbrains.kotlin.types.typeUtil.makeNullable
+import org.jetbrains.kotlin.types.typeUtil.*
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -150,9 +147,9 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
 
             is IntegerValueTypeConstructor -> {
                 return IntegerValueType(
-                    type.memberScope,
                     type.builtIns,
-                    constructor.supertypes.map { TypeUtils.makeNullableAsSpecified(it, type.isMarkedNullable) }
+                    constructor.supertypes.map { TypeUtils.makeNullableAsSpecified(it, type.isMarkedNullable) },
+                    type.memberScope
                 )
 //                val newConstructor = IntersectionTypeConstructor(constructor.supertypes.map { TypeUtils.makeNullableAsSpecified(it, type.isMarkedNullable) })
 //                return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(type.annotations, newConstructor, listOf(), false, type.memberScope)
@@ -233,7 +230,7 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
         }
 
         if (subType is IntegerValueType) {
-            if (superType in subType.supertypes) return true
+            if (superType.makeNotNullable() in subType.supertypes) return true
         }
 
         val superConstructor = superType.constructor
