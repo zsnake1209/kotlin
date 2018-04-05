@@ -162,6 +162,8 @@ class AllKotlinInspectionTest : DaemonAnalyzerTestCase() {
         statsOutput.appendln("File, InspectionID, Time")
 
         fun appendInspectionResult(file: String, id: String, nanoTime: Long) {
+            totals.merge(id, nanoTime) { a, b -> a + b }
+
             statsOutput.appendln(buildString {
                 append(file)
                 append(", ")
