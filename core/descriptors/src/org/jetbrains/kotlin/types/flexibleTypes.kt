@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.renderer.DescriptorRendererOptions
 import org.jetbrains.kotlin.types.checker.ErrorTypesAreEqualToAnything
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.builtIns
+import org.jetbrains.kotlin.types.typeUtil.contains
 
 
 fun KotlinType.isFlexible(): Boolean = unwrap() is FlexibleType
@@ -44,15 +45,15 @@ fun KotlinType.isNullabilityFlexible(): Boolean {
 fun Collection<KotlinType>.singleBestRepresentative(): KotlinType? {
     if (this.size == 1) return this.first()
 
-    return this.firstOrNull {
-        candidate ->
-        this.all {
-            other ->
-            // We consider error types equal to anything here, so that intersections like
-            // {Array<String>, Array<[ERROR]>} work correctly
-            candidate == other || ErrorTypesAreEqualToAnything.equalTypes(candidate, other)
+    return this
+        .filter { type -> !type.contains { it.constructor is NewIntegerValueTypeConstructor } }
+        .firstOrNull { candidate ->
+            this.all { other ->
+                // We consider error types equal to anything here, so that intersections like
+                // {Array<String>, Array<[ERROR]>} work correctly
+                candidate == other || ErrorTypesAreEqualToAnything.equalTypes(candidate, other)
+            }
         }
-    }
 }
 
 fun Collection<TypeProjection>.singleBestRepresentative(): TypeProjection? {

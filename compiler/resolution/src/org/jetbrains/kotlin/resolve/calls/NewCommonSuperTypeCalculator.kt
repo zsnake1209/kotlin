@@ -89,8 +89,8 @@ object NewCommonSuperTypeCalculator {
 
     private fun commonSuperTypeForNotNullTypes(types: List<SimpleType>, depth: Int): SimpleType {
         val types = types.sortedWith(Comparator { s1, s2 ->
-            val s1WithIntegerValueType = s1.contains { it is IntegerValueType }
-            val s2WithIntegerValueType = s2.contains { it is IntegerValueType }
+            val s1WithIntegerValueType = s1.contains { it.constructor is NewIntegerValueTypeConstructor }
+            val s2WithIntegerValueType = s2.contains { it.constructor is NewIntegerValueTypeConstructor }
             s1WithIntegerValueType.compareTo(s2WithIntegerValueType)
         })
 

@@ -126,7 +126,7 @@ class IntegerValueType(
     override val annotations: Annotations = Annotations.EMPTY
 ) : SimpleType() {
     override val constructor: TypeConstructor
-        get() = NewIntegerValueTypeConstructor(builtIns, this)
+        get() = NewIntegerValueTypeConstructor(builtIns, this, supertypes)
 
     override val arguments: List<TypeProjection> =
         emptyList()
@@ -145,16 +145,12 @@ class IntegerValueType(
     override fun toString(): String {
         return "IntegerValueType($supertypes)"
     }
-
-    private fun createSimpleType(newNullability: Boolean, annotations: Annotations): SimpleType {
-        val newConstructor = IntersectionTypeConstructor(supertypes.map { TypeUtils.makeNullableAsSpecified(it, false) })
-        return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(annotations, newConstructor, listOf(), newNullability, memberScope)
-    }
 }
 
 class NewIntegerValueTypeConstructor(
     private val builtIns: KotlinBuiltIns,
-    val integerValueType: IntegerValueType
+    val integerValueType: IntegerValueType,
+    val integerSupertypes: List<KotlinType>
 ) : TypeConstructor {
     val comparableSupertype = builtIns.comparable.defaultType.replace(listOf(TypeProjectionImpl(integerValueType)))
     private val hashCode = integerValueType.supertypes.hashCode()
@@ -173,7 +169,7 @@ class NewIntegerValueTypeConstructor(
         return builtIns
     }
 
-    override fun toString() = "NewIntegerValueType($supertypes)"
+    override fun toString() = "NewIntegerValueType($supertypes ; $integerSupertypes)"
 
     override fun hashCode(): Int {
         return hashCode

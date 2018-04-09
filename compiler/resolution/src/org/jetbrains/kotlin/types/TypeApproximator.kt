@@ -42,6 +42,7 @@ open class TypeApproximatorConfiguration {
     open val errorType get() = false
     open val definitelyNotNullType get() = true
     open val intersection: IntersectionStrategy = TO_COMMON_SUPERTYPE
+    open val integerValueType get() = false
 
     open val typeVariable: (TypeVariableTypeConstructor) -> Boolean = { false }
     open val capturedType: (NewCapturedType) -> Boolean = { false } // true means that this type we can leave as is
@@ -74,12 +75,16 @@ open class TypeApproximatorConfiguration {
         // i.e. will be approximated only approximatedCapturedStatus captured types
         override val capturedType get() = { it: NewCapturedType -> it.captureStatus != approximatedCapturedStatus }
         override val intersection get() = IntersectionStrategy.ALLOWED
+        override val integerValueType: Boolean get() = true
         override val typeVariable: (TypeVariableTypeConstructor) -> Boolean get() = { true }
     }
 
     object IncorporationConfiguration : TypeApproximatorConfiguration.AbstractCapturedTypesApproximation(FOR_INCORPORATION)
     object SubtypeCapturedTypesApproximation : TypeApproximatorConfiguration.AbstractCapturedTypesApproximation(FOR_SUBTYPING)
     object CapturedTypesApproximation : TypeApproximatorConfiguration.AbstractCapturedTypesApproximation(FROM_EXPRESSION)
+    object CapturedTypesAndNumberTypesApproximation : TypeApproximatorConfiguration.AbstractCapturedTypesApproximation(FROM_EXPRESSION) {
+        override val integerValueType get() = false
+    }
 }
 
 class TypeApproximator {
@@ -305,6 +310,15 @@ class TypeApproximator {
 
         if (typeConstructor is IntersectionTypeConstructor) {
             return approximateIntersectionType(type, conf, toSuper, depth)
+        }
+
+        if (typeConstructor is NewIntegerValueTypeConstructor) {
+            return if (conf.integerValueType)
+                null
+            else
+                TypeUtils.getDefaultPrimitiveNumberType(typeConstructor.integerSupertypes)
+                    ?.unwrap()
+                    ?.makeNullableAsSpecified(type.isMarkedNullable)
         }
 
         if (typeConstructor is TypeVariableTypeConstructor) {

@@ -114,11 +114,22 @@ class ResultTypeResolver(
         return null
     }
 
-    private fun adjustCommonSupertypeWithKnowledgeOfNumberTypes(commonSuperType: UnwrappedType): UnwrappedType {
-        if (commonSuperType is IntegerValueType)
-            return TypeUtils.getDefaultPrimitiveNumberType(commonSuperType.supertypes)!!.unwrap().makeNullableAsSpecified(commonSuperType.isNullable())
+    private fun adjustWithKnowledgeOfNumberTypes(type: UnwrappedType): UnwrappedType? {
+        val constructor = type.constructor
+        if (constructor is NewIntegerValueTypeConstructor)
+            return TypeUtils.getDefaultPrimitiveNumberType(constructor.integerSupertypes)!!
+                .unwrap()
+                .makeNullableAsSpecified(type.isMarkedNullable)
 
+        return null
+    }
+
+    private fun adjustCommonSupertypeWithKnowledgeOfNumberTypes(commonSuperType: UnwrappedType): UnwrappedType {
         val constructor = commonSuperType.constructor
+
+        if (constructor is NewIntegerValueTypeConstructor)
+            return TypeUtils.getDefaultPrimitiveNumberType(constructor.integerSupertypes)!!.unwrap()
+                .makeNullableAsSpecified(commonSuperType.isMarkedNullable)
 
         if (constructor is IntegerValueTypeConstructor)
             return TypeUtils.getDefaultPrimitiveNumberType(constructor).unwrap()

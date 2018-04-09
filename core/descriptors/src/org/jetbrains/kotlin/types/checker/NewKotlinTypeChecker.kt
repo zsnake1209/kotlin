@@ -225,13 +225,7 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
 
         if (!NullabilityChecker.isPossibleSubtype(this, subType, superType)) return false
 
-        if (superType is IntegerValueType) {
-            if (subType in superType.supertypes) return true
-        }
-
-        if (subType is IntegerValueType) {
-            if (superType.makeNotNullable() in subType.supertypes) return true
-        }
+        checkSubtypeForIntegralTypes(subType, superType)?.let { return it }
 
         val superConstructor = superType.constructor
 
@@ -268,6 +262,24 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
                 return isSubtypeForSameConstructor(newArguments, superType)
             }
         }
+    }
+
+    private fun TypeCheckerContext.checkSubtypeForIntegralTypes(subType: SimpleType, superType: SimpleType): Boolean? {
+        val subTypeConstructor = subType.constructor
+        val superTypeConstructor = superType.constructor
+        if (subTypeConstructor is NewIntegerValueTypeConstructor && superTypeConstructor is NewIntegerValueTypeConstructor) {
+            return subTypeConstructor.integerSupertypes.size <= superTypeConstructor.integerSupertypes.size
+        }
+
+        if (superTypeConstructor is NewIntegerValueTypeConstructor) {
+            if (subType in superTypeConstructor.integerSupertypes) return true
+        }
+
+        if (subTypeConstructor is NewIntegerValueTypeConstructor) {
+            if (superType.makeNotNullable() in subTypeConstructor.integerSupertypes) return true
+        }
+
+        return null
     }
 
     private fun TypeCheckerContext.collectAndFilter(classType: SimpleType, constructor: TypeConstructor) =
