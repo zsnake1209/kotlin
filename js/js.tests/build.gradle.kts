@@ -81,16 +81,26 @@ projectTest("quickTest") {
 
 val generateTests by generator("org.jetbrains.kotlin.generators.tests.GenerateJsTestsKt")
 val testDataDir = project(":js:js.translator").projectDir.resolve("testData")
+val isTC = project.hasProperty("teamcity")
 
 val install by task<NpmTask> {
     setWorkingDir(testDataDir)
     setArgs(listOf("install"))
 }
 
+val cleanTestOut by task<Delete> {
+    delete("$testDataDir/out", "$testDataDir/out-min")
+
+    if (isTC) {
+        val test by tasks
+        test.dependsOn(this)
+    }
+}
+
 val runMocha by task<NpmTask> {
     setWorkingDir(testDataDir)
 
-    val target = if (project.hasProperty("teamcity")) "runOnTeamcity" else "test"
+    val target = if (isTC) "runOnTeamcity" else "test"
     setArgs(listOf("run", target))
 
     dependsOn(install, "test")
