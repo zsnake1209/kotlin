@@ -36,6 +36,8 @@ import kotlin.coroutines.experimental.buildSequence
 
 var PsiFile.moduleInfo: ModuleInfo? by UserDataProperty(Key.create("MODULE_INFO"))
 
+var PsiFile.copyableModuleInfo: ModuleInfo? by CopyablePsiUserDataProperty(Key.create("MODULE_INFO"))
+
 fun PsiElement.getModuleInfo(): IdeaModuleInfo = this.collectInfos(ModuleInfoCollector.NotNullTakeFirst)
 
 fun PsiElement.getNullableModuleInfo(): IdeaModuleInfo? = this.collectInfos(ModuleInfoCollector.NullableTakeFirst)
@@ -172,6 +174,10 @@ private sealed class ModuleInfoCollector<out T>(
 
 private fun <T> PsiElement.collectInfos(c: ModuleInfoCollector<T>): T {
     (containingFile?.moduleInfo as? IdeaModuleInfo)?.let {
+        return c.onResult(it)
+    }
+
+    (containingFile?.copyableModuleInfo as? IdeaModuleInfo)?.let {
         return c.onResult(it)
     }
 

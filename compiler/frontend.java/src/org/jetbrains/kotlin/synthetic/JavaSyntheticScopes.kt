@@ -16,25 +16,40 @@
 
 package org.jetbrains.kotlin.synthetic
 
+import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.extensions.ProjectExtensionDescriptor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.load.java.components.SamConversionResolver
 import org.jetbrains.kotlin.resolve.DeprecationResolver
+import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScopes
 import org.jetbrains.kotlin.storage.StorageManager
 
 class JavaSyntheticScopes(
-        storageManager: StorageManager,
-        lookupTracker: LookupTracker,
-        languageVersionSettings: LanguageVersionSettings,
-        samConventionResolver: SamConversionResolver,
-        deprecationResolver: DeprecationResolver
-): SyntheticScopes {
-    override val scopes = listOf(
+    private val project: Project,
+    private val moduleDescriptor: ModuleDescriptor,
+    private val storageManager: StorageManager,
+    private val lookupTracker: LookupTracker,
+    private val samConventionResolver: SamConversionResolver,
+    private val deprecationResolver: DeprecationResolver
+) : SyntheticScopes {
+    override val scopes = run {
+        val scopesFromExtensions = SyntheticScopeProviderExtension
+            .getInstances(project)
+            .flatMap { it.getScopes(moduleDescriptor) }
+
+        listOf(
             JavaSyntheticPropertiesScope(storageManager, lookupTracker),
-            SamAdapterFunctionsScope(
-                    storageManager, languageVersionSettings, samConventionResolver, deprecationResolver,
-                    lookupTracker
-            )
-    )
+            SamAdapterFunctionsScope(storageManager, samConventionResolver, deprecationResolver, lookupTracker)
+        ) + scopesFromExtensions
+    }
+}
+
+interface SyntheticScopeProviderExtension {
+    companion object : ProjectExtensionDescriptor<SyntheticScopeProviderExtension>(
+        "org.jetbrains.kotlin.syntheticScopeProviderExtension", SyntheticScopeProviderExtension::class.java)
+
+    fun getScopes(moduleDescriptor: ModuleDescriptor): List<SyntheticScope>
 }

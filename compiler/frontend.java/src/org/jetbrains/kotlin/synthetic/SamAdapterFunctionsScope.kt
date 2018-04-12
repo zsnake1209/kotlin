@@ -54,11 +54,10 @@ val SAM_LOOKUP_NAME = Name.special("<SAM-CONSTRUCTOR>")
 
 class SamAdapterFunctionsScope(
         storageManager: StorageManager,
-        private val languageVersionSettings: LanguageVersionSettings,
         private val samResolver: SamConversionResolver,
         private val deprecationResolver: DeprecationResolver,
         private val lookupTracker: LookupTracker
-) : SyntheticScope {
+) : SyntheticScope.Default() {
     private val extensionForFunction =
             storageManager.createMemoizedFunctionWithNullableValues<FunctionDescriptor, FunctionDescriptor> { function ->
                 extensionForFunctionNotCached(function)
@@ -142,10 +141,6 @@ class SamAdapterFunctionsScope(
                     }
         }
     }
-
-    override fun getSyntheticExtensionProperties(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<PropertyDescriptor> = emptyList()
-
-    override fun getSyntheticExtensionProperties(receiverTypes: Collection<KotlinType>): Collection<PropertyDescriptor> = emptyList()
 
     override fun getSyntheticStaticFunctions(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> {
         return getSamFunctions(scope.getContributedFunctions(name, location), location)

@@ -138,5 +138,9 @@
         <gradleFrameworkSupport implementation="org.jetbrains.kotlin.gradle.kdsl.frameworkSupport.GradleKotlinDSLKotlinJavaFrameworkSupportProvider" />
         <gradleFrameworkSupport implementation="org.jetbrains.kotlin.gradle.kdsl.frameworkSupport.GradleKotlinDSLKotlinJSFrameworkSupportProvider" />
         <gradleFrameworkSupport implementation="org.jetbrains.kotlin.gradle.kdsl.frameworkSupport.GradleGroovyFrameworkSupportProvider" />
+
+        <syntheticScopeProviderExtension implementation="org.jetbrains.kotlin.idea.debugger.evaluate.DebuggerFieldSyntheticScopeProvider"/>
+
+        <expressionCodegenExtension implementation="org.jetbrains.kotlin.idea.debugger.evaluate.DebuggerFieldExpressionCodegenExtension"/>
     </extensions>
 </idea-plugin>
