@@ -9682,6 +9682,12 @@ public class DiagnosticsUsingJavacTestGenerated extends AbstractDiagnosticsUsing
                     doTest(fileName);
                 }
 
+                @TestMetadata("IntersectionTypeAsReified.kt")
+                public void testIntersectionTypeAsReified() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/generics/tpAsReified/IntersectionTypeAsReified.kt");
+                    doTest(fileName);
+                }
+
                 @TestMetadata("LocalFun.kt")
                 public void testLocalFun() throws Exception {
                     String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/generics/tpAsReified/LocalFun.kt");

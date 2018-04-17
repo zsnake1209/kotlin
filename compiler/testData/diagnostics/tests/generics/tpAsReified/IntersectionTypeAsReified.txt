@@ -1,0 +1,12 @@
+package
+
+public fun </*0*/ T> foo(/*0*/ a: kotlin.Array<In<T>>, /*1*/ b: kotlin.Array<In<kotlin.String>>): kotlin.Boolean
+public fun </*0*/ S> select(/*0*/ x: S, /*1*/ y: S): S
+public inline fun </*0*/ reified K> In<K>.ofType(/*0*/ y: kotlin.Any?): kotlin.Boolean
+
+public final class In</*0*/ in I> {
+    public constructor In</*0*/ in I>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
