@@ -413,3 +413,18 @@ interface SourceForBinaryModuleInfo : IdeaModuleInfo {
     override val moduleOrigin: ModuleOrigin
         get() = ModuleOrigin.OTHER
 }
+
+class CodeFragmentInfo(private val contextModule: ModuleSourceInfo): IdeaModuleInfo {
+    override fun contentScope() = GlobalSearchScope.EMPTY_SCOPE
+
+    override val moduleOrigin: ModuleOrigin
+        get() = ModuleOrigin.OTHER
+
+    override fun dependencies(): List<IdeaModuleInfo> {
+        return listOf(this) + contextModule.dependencies()
+    }
+
+    override val name: Name
+        get() = Name.special("<code fragment in context of $contextModule>")
+
+}

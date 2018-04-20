@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PropertyGetterDescriptorImpl
+import org.jetbrains.kotlin.idea.caches.project.CodeFragmentInfo
 import org.jetbrains.kotlin.idea.caches.project.ModuleOrigin
 import org.jetbrains.kotlin.idea.caches.project.ModuleProductionSourceInfo
 import org.jetbrains.kotlin.idea.caches.project.OriginCapability
@@ -35,7 +36,7 @@ class DebuggerFieldSyntheticScopeProvider : SyntheticScopeProviderExtension {
     private val scopes = listOf(DebuggerFieldSyntheticScope())
 
     override fun getScopes(moduleDescriptor: ModuleDescriptor): List<SyntheticScope> {
-        val isOurModuleDescriptor = moduleDescriptor.getCapability(ModuleInfo.Capability) is EvaluatorCodeFragmentModuleInfo
+        val isOurModuleDescriptor = moduleDescriptor.getCapability(ModuleInfo.Capability) is CodeFragmentInfo
         return if (isOurModuleDescriptor) scopes else emptyList()
     }
 }

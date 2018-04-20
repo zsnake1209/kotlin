@@ -26,7 +26,6 @@ import com.intellij.debugger.ui.impl.watch.NodeDescriptorImpl
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -42,10 +41,7 @@ import com.intellij.xdebugger.impl.ui.tree.ValueMarkup
 import com.sun.jdi.*
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.eval4j.jdi.asValue
-import org.jetbrains.kotlin.analyzer.EphemeralModuleInfo
-import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
-import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.caches.project.*
 import org.jetbrains.kotlin.idea.codeInsight.CodeInsightUtils
@@ -57,27 +53,12 @@ import org.jetbrains.kotlin.idea.util.IdeDescriptorRenderers
 import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
 import org.jetbrains.kotlin.idea.versions.getKotlinJvmRuntimeMarkerClass
 import org.jetbrains.kotlin.j2k.AfterConversionPass
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getElementTextWithContext
 import org.jetbrains.kotlin.psi.psiUtil.quoteIfNeeded
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import java.util.concurrent.atomic.AtomicReference
-
-class EvaluatorCodeFragmentModuleInfo(private val file: KtFile, private val origin: IdeaModuleInfo) : IdeaModuleInfo, EphemeralModuleInfo {
-    override fun contentScope() = GlobalSearchScope.fileScope(file)
-
-    override val moduleOrigin: ModuleOrigin
-        get() = ModuleOrigin.OTHER
-
-    override val expectedBy: List<ModuleSourceInfo>
-        get() = emptyList()
-
-    override val name = Name.special("<EvaluatorCodeFragmentModuleInfo>")
-
-    override fun dependencies() = origin.dependencies() + this
-}
 
 class KotlinCodeFragmentFactory : CodeFragmentFactory() {
     override fun createCodeFragment(item: TextWithImports, context: PsiElement?, project: Project): JavaCodeFragment {
@@ -103,8 +84,10 @@ class KotlinCodeFragmentFactory : CodeFragmentFactory() {
             )
         }
 
-        codeFragment.copyableModuleInfo = EvaluatorCodeFragmentModuleInfo(
-            codeFragment, context?.getModuleInfo() ?: NotUnderContentRootModuleInfo)
+        val contextInfo = context?.getModuleInfo()
+        if (contextInfo is ModuleSourceInfo) {
+            codeFragment.copyableModuleInfo = CodeFragmentInfo(contextInfo)
+        }
 
         codeFragment.putCopyableUserData(KtCodeFragment.RUNTIME_TYPE_EVALUATOR, { expression: KtExpression ->
             val debuggerContext = DebuggerManagerEx.getInstanceEx(project).context

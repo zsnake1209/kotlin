@@ -154,7 +154,7 @@ class ResolverForProjectImpl<M : ModuleInfo>(
     override val name: String
         get() = "Resolver for '$debugName'"
 
-    private fun isCorrectModuleInfo(moduleInfo: M) = moduleInfo in allModules || moduleInfo is EphemeralModuleInfo
+    private fun isCorrectModuleInfo(moduleInfo: M) = moduleInfo in allModules
 
     override fun resolverForModuleDescriptor(descriptor: ModuleDescriptor): ResolverForModule {
         return projectContext.storageManager.compute {
@@ -224,11 +224,6 @@ class ResolverForProjectImpl<M : ModuleInfo>(
             }
         }
 
-        // Emphemeral module infos are not cached
-        if (module is EphemeralModuleInfo) {
-            return createModuleDescriptor(module).moduleDescriptor
-        }
-
         return delegateResolver.descriptorForModule(module) as ModuleDescriptorImpl
     }
 
@@ -294,8 +289,6 @@ interface ModuleInfo {
         val Capability = ModuleDescriptor.Capability<ModuleInfo>("ModuleInfo")
     }
 }
-
-interface EphemeralModuleInfo
 
 interface TrackableModuleInfo : ModuleInfo {
     fun createModificationTracker(): ModificationTracker

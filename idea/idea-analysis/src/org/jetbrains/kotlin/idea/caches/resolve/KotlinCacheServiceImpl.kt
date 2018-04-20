@@ -307,6 +307,19 @@ class KotlinCacheServiceImpl(val project: Project) : KotlinCacheService {
                 )
             }
 
+            specialModuleInfo is CodeFragmentInfo -> {
+                val moduleFacade = globalFacade(settings)
+                val globalContext = moduleFacade.globalContext.contextWithNewLockAndCompositeExceptionTracker()
+                makeProjectResolutionFacade(
+                    "facade for $specialModuleInfo",
+                    globalContext,
+                    reuseDataFrom = moduleFacade,
+                    moduleFilter = { it is CodeFragmentInfo },
+                    // TODO: collecting infos may be expensive, investigate how often this is called, also API (moduleFilter + allModules) is quite terrible
+                    allModules = listOf(specialModuleInfo) + collectAllModuleInfosFromIdeaModel(project)
+                )
+            }
+
             else -> throw IllegalStateException("Unknown IdeaModuleInfo ${specialModuleInfo::class.java}")
         }
     }
@@ -417,21 +430,12 @@ class KotlinCacheServiceImpl(val project: Project) : KotlinCacheService {
         (moduleInfo as? IdeaModuleInfo)?.let { getResolutionFacadeByModuleInfo(it, platform) }
 
     private fun Collection<KtFile>.filterNotInProjectSourceOrScript(moduleInfo: IdeaModuleInfo): Set<KtFile> {
-        return mapNotNull {
-            if (it is KtCodeFragment) it.getContextFile() else it
-        }.filter {
-            !ProjectRootsUtil.isInProjectSource(it) || !moduleInfo.contentScope().contains(it) || it.isScript()
+        return filter {
+            !ProjectRootsUtil.isInProjectSource(it) || !moduleInfo.contentScope().contains(it) || it.isScript() || it is KtCodeFragment
         }.toSet()
     }
 
-    private fun KtCodeFragment.getContextFile(): KtFile? {
-        val contextElement = context ?: return null
-        val contextFile = (contextElement as? KtElement)?.containingKtFile
-                ?: throw AssertionError("Analyzing kotlin code fragment of type ${this::class.java} with java context of type ${contextElement::class.java}")
-        return if (contextFile is KtCodeFragment) contextFile.getContextFile() else contextFile
-    }
-
-    private companion object {
+     private companion object {
         private val SUPPRESS_ANNOTATION_SHORT_NAME = KotlinBuiltIns.FQ_NAMES.suppress.shortName().identifier
     }
 }
