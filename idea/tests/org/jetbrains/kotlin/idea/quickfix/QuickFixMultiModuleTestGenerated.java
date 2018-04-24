@@ -189,6 +189,11 @@ public class QuickFixMultiModuleTestGenerated extends AbstractQuickFixMultiModul
         runTest("idea/testData/multiModuleQuickFix/importClassInCommon/");
     }
 
+    @TestMetadata("importClassInFromProductionInCommonTests")
+    public void testImportClassInFromProductionInCommonTests() throws Exception {
+        runTest("idea/testData/multiModuleQuickFix/importClassInFromProductionInCommonTests/");
+    }
+
     @TestMetadata("importCommonClassInJs")
     public void testImportCommonClassInJs() throws Exception {
         runTest("idea/testData/multiModuleQuickFix/importCommonClassInJs/");
