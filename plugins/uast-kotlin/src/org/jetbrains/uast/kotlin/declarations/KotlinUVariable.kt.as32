@@ -99,7 +99,7 @@ abstract class AbstractKotlinUVariable(givenParent: UElement?)
 
     override fun equals(other: Any?) = other is AbstractKotlinUVariable && psi == other.psi
 
-    class WrappedUAnnotation(psiAnnotation: PsiAnnotation, override val uastParent: UElement) : UAnnotation, JvmDeclarationUElement {
+    class WrappedUAnnotation(psiAnnotation: PsiAnnotation, override val uastParent: UElement) : UAnnotation {
 
         override val javaPsi: PsiAnnotation = psiAnnotation
         override val psi: PsiAnnotation = javaPsi
@@ -216,7 +216,7 @@ class KotlinReceiverUParameter(
 
 }
 
-class KotlinNullabilityUAnnotation(val annotatedElement: PsiElement, override val uastParent: UElement) : UAnnotation, JvmDeclarationUElement {
+class KotlinNullabilityUAnnotation(val annotatedElement: PsiElement, override val uastParent: UElement) : UAnnotation {
 
     private fun getTargetType(annotatedElement: PsiElement): KotlinType? {
         if (annotatedElement is KtTypeReference) {

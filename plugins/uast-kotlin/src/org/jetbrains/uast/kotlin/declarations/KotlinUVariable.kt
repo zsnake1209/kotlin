@@ -34,7 +34,6 @@ import org.jetbrains.uast.*
 import org.jetbrains.uast.internal.acceptList
 import org.jetbrains.uast.kotlin.declarations.KotlinUIdentifier
 import org.jetbrains.uast.kotlin.declarations.UastLightIdentifier
-import org.jetbrains.uast.kotlin.internal.KotlinUElementWithComments
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiParameter
 import org.jetbrains.uast.kotlin.psi.UastKotlinPsiVariable
 import org.jetbrains.uast.visitor.UastVisitor
@@ -112,8 +111,7 @@ abstract class AbstractKotlinUVariable(givenParent: UElement?) : KotlinAbstractU
 
     override fun equals(other: Any?) = other is AbstractKotlinUVariable && psi == other.psi
 
-    class WrappedUAnnotation(psiAnnotation: PsiAnnotation, override val uastParent: UElement) : UAnnotation, UAnchorOwner,
-        JvmDeclarationUElement {
+    class WrappedUAnnotation(psiAnnotation: PsiAnnotation, override val uastParent: UElement) : UAnnotation, UAnchorOwner {
 
         override val javaPsi: PsiAnnotation = psiAnnotation
         override val psi: PsiAnnotation = javaPsi
@@ -232,8 +230,7 @@ class KotlinReceiverUParameter(
 
 }
 
-class KotlinNullabilityUAnnotation(val annotatedElement: PsiElement, override val uastParent: UElement) : UAnnotationEx, UAnchorOwner,
-    JvmDeclarationUElement {
+class KotlinNullabilityUAnnotation(val annotatedElement: PsiElement, override val uastParent: UElement) : UAnnotationEx, UAnchorOwner {
 
     private fun getTargetType(annotatedElement: PsiElement): KotlinType? {
         if (annotatedElement is KtTypeReference) {

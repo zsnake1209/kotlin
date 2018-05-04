@@ -7,7 +7,6 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.utils.addToStdlib.assertedCast
-import org.jetbrains.uast.JvmDeclarationUElement
 import org.jetbrains.uast.UAnchorOwner
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UFile
@@ -108,16 +107,16 @@ abstract class AbstractKotlinRenderLogTest : AbstractKotlinUastTest(), RenderLog
                     node.uastAnchor?.let { visitElement(it) }
                 }
 
-                val jvmDeclaration = node as? JvmDeclarationUElement
-                                     ?: throw AssertionError("${node.javaClass} should implement 'JvmDeclarationUElement'")
-
-                jvmDeclaration.sourcePsi?.let {
+                node.sourcePsi?.let {
                     assertTrue("sourcePsi should be physical but ${it.javaClass} found for [${it.text}] " +
-                               "for ${jvmDeclaration.javaClass}->${jvmDeclaration.uastParent?.javaClass}",it is LeafPsiElement || it is KtElement|| it is LeafPsiElement)
+                                       "for ${node.javaClass}->${node.uastParent?.javaClass}",
+                               it is LeafPsiElement || it is KtElement || it is LeafPsiElement
+                    )
                 }
-                jvmDeclaration.javaPsi?.let {
+                node.javaPsi?.let {
                     assertTrue("javaPsi should be light but ${it.javaClass} found for [${it.text}] " +
-                               "for ${jvmDeclaration.javaClass}->${jvmDeclaration.uastParent?.javaClass}", it !is KtElement)
+                                       "for ${node.javaClass}->${node.uastParent?.javaClass}", it !is KtElement
+                    )
                 }
 
                 return false
