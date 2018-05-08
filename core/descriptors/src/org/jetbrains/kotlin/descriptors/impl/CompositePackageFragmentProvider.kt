@@ -21,12 +21,13 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.name.FqName
 import java.util.*
 import org.jetbrains.kotlin.name.Name
+import kotlin.collections.LinkedHashSet
 
 class CompositePackageFragmentProvider(// can be modified from outside
         private val providers: List<PackageFragmentProvider>) : PackageFragmentProvider {
 
     override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> {
-        val result = ArrayList<PackageFragmentDescriptor>()
+        val result = LinkedHashSet<PackageFragmentDescriptor>()
         for (provider in providers) {
             result.addAll(provider.getPackageFragments(fqName))
         }
