@@ -102,7 +102,11 @@ private fun OrderEntry.acceptAsDependency(forProduction: Boolean): Boolean {
             || scope.isForProductionCompile
 }
 
-private fun ideaModelDependencies(module: Module, forProduction: Boolean): List<IdeaModuleInfo> {
+private fun ideaModelDependencies(
+    module: Module,
+    forProduction: Boolean,
+    platform: TargetPlatform
+): List<IdeaModuleInfo> {
     //NOTE: lib dependencies can be processed several times during recursive traversal
     val result = LinkedHashSet<IdeaModuleInfo>()
     val dependencyEnumerator = ModuleRootManager.getInstance(module).orderEntries().compileOnly().recursively().exportedOnly()
@@ -115,7 +119,7 @@ private fun ideaModelDependencies(module: Module, forProduction: Boolean): List<
         }
         true
     }
-    return result.toList()
+    return result.filterNot { it is LibraryInfo && it.platform != platform }
 }
 
 fun Module.findImplementedModuleNames(modelsProvider: IdeModifiableModelsProvider): List<String> {
@@ -157,7 +161,7 @@ sealed class ModuleSourceInfoWithExpectedBy(private val forProduction: Boolean) 
 
     override fun dependencies(): List<IdeaModuleInfo> = module.cached(createCachedValueProvider {
         CachedValueProvider.Result(
-            ideaModelDependencies(module, forProduction),
+            ideaModelDependencies(module, forProduction, platform),
             ProjectRootModificationTracker.getInstance(module.project)
         )
     })
