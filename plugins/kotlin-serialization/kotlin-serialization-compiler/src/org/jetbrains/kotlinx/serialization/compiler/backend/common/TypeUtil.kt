@@ -143,10 +143,3 @@ fun KtPureClassOrObject.anonymousInitializers() = declarations
     .filterIsInstance<KtAnonymousInitializer>()
     .mapNotNull { it.body }
     .toList()
-
-fun SerializableProperty.annotationVarsAndDesc(annotationClass: ClassDescriptor): Pair<List<ValueArgument>, List<ValueParameterDescriptor>> {
-    val args: List<ValueArgument> = (this.descriptor.annotations.findAnnotation(annotationClass.fqNameSafe) as? LazyAnnotationDescriptor)?.annotationEntry?.valueArguments.orEmpty()
-    val consParams = annotationClass.unsubstitutedPrimaryConstructor?.valueParameters.orEmpty()
-    if (args.size != consParams.size) throw IllegalArgumentException("Can't use arguments with defaults for serializable annotations yet")
-    return args to consParams
-}
