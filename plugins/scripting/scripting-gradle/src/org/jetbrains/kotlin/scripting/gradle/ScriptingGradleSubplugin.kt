@@ -7,10 +7,10 @@ package org.jetbrains.kotlin.scripting.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.compile.AbstractCompile
 import org.jetbrains.kotlin.gradle.plugin.KotlinGradleSubplugin
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.plugin.source.KotlinSourceSet
 
 class ScriptingGradleSubplugin : Plugin<Project>
 {
@@ -40,7 +40,7 @@ class ScriptingKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
         javaCompile: AbstractCompile,
         variantData: Any?,
         androidProjectHandler: Any?,
-        javaSourceSet: SourceSet?
+        kotlinSourceSet: KotlinSourceSet?
     ): List<SubpluginOption> {
         if (!ScriptingGradleSubplugin.isEnabled(project)) return emptyList()
 
