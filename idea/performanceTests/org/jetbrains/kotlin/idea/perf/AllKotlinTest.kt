@@ -25,7 +25,7 @@ import java.io.StringWriter
 
 abstract class AllKotlinTest : DaemonAnalyzerTestCase() {
 
-    private val rootProjectFile: File = File("../prefTestProject").absoluteFile
+    private val rootProjectFile: File = File("../perfTestProject").absoluteFile
     private val statsFile: File = File("build/stats.csv").absoluteFile
     private val tmp = rootProjectFile
 
