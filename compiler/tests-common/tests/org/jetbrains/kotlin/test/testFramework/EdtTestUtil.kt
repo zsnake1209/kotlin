@@ -25,8 +25,9 @@ import javax.swing.SwingUtilities
 class EdtTestUtil {
     companion object {
         @TestOnly @JvmStatic fun runInEdtAndWait(runnable: Runnable) {
-            runInEdtAndWait { runnable.run() }
+            org.jetbrains.kotlin.test.testFramework.runInEdtAndWait { runnable.run() }
         }
+
     }
 }
 
