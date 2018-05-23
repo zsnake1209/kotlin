@@ -27,7 +27,6 @@ fun <T : JsNode> transformCoroutineMetadataToSpecialFunctions(node: T): T {
     val visitor = object : JsVisitorWithContextImpl() {
         override fun endVisit(x: JsNameRef, ctx: JsContext<in JsExpression>) {
             val specialFunction = when {
-                x.coroutineController -> SpecialFunction.COROUTINE_CONTROLLER
                 x.coroutineReceiver -> SpecialFunction.COROUTINE_RECEIVER
                 x.coroutineResult -> SpecialFunction.COROUTINE_RESULT
                 else -> null
@@ -76,11 +75,6 @@ fun <T : JsNode> transformSpecialFunctionsToCoroutineMetadata(node: T): T {
         override fun endVisit(x: JsInvocation, ctx: JsContext<in JsExpression>) {
             x.qualifier.name?.specialFunction?.let { specialFunction ->
                 val replacement = when (specialFunction) {
-                    SpecialFunction.COROUTINE_CONTROLLER -> {
-                        JsNameRef("\$\$controller\$\$", x.arguments.getOrNull(0)).apply {
-                            coroutineController = true
-                        }
-                    }
                     SpecialFunction.COROUTINE_RECEIVER -> {
                         JsNameRef("\$this\$", x.arguments.getOrNull(0)).apply {
                             coroutineReceiver = true

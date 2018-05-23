@@ -85,7 +85,7 @@ fun generateDelegateCall(
     val functionObject = simpleReturnFunction(context.scope(), invocation)
     functionObject.source = source?.finalElement
     functionObject.parameters.addAll(parameters)
-    functionObject.onlyIf(JsFunction::isSuspend) { it.fillCoroutineMetadata(context, fromDescriptor, false) }
+    functionObject.onlyIf(JsFunction::isSuspend) { it.fillCoroutineMetadata(context, fromDescriptor) }
 
     val fromFunctionName = fromDescriptor.getNameForFunctionWithPossibleDefaultParam()
 
@@ -158,8 +158,7 @@ fun TranslationContext.addAccessorsToPrototype(
 
 fun JsFunction.fillCoroutineMetadata(
     context: TranslationContext,
-    descriptor: FunctionDescriptor,
-    hasController: Boolean
+    descriptor: FunctionDescriptor
 ) {
     val suspendPropertyDescriptor = context.currentModule.getPackage(context.languageVersionSettings.coroutinesIntrinsicsPackageFqName())
         .memberScope
@@ -179,7 +178,6 @@ fun JsFunction.fillCoroutineMetadata(
         finallyPathName = getCoroutinePropertyName("finallyPath"),
         resultName = getCoroutinePropertyName("result"),
         exceptionName = getCoroutinePropertyName("exception"),
-        hasController = hasController,
         hasReceiver = descriptor.dispatchReceiverParameter != null,
         psiElement = descriptor.source.getPsi()
     )

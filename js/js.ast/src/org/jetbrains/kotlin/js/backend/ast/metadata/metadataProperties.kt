@@ -132,7 +132,6 @@ data class CoroutineMetadata(
         val exceptionName: JsName,
         val baseClassRef: JsExpression,
         val suspendObjectRef: JsExpression,
-        val hasController: Boolean,
         val hasReceiver: Boolean,
         val psiElement: PsiElement?
 )

@@ -222,13 +222,6 @@ fun JsBlock.replaceSpecialReferences(context: CoroutineTransformationContext) {
                     ctx.replaceMe(JsThisRef())
                 }
 
-                x.coroutineController -> {
-                    ctx.replaceMe(JsNameRef(context.controllerFieldName, x.qualifier).apply {
-                        source = x.source
-                        sideEffects = SideEffectKind.PURE
-                    })
-                }
-
                 x.coroutineResult -> {
                     ctx.replaceMe(JsNameRef(context.metadata.resultName, x.qualifier).apply {
                         source = x.source
@@ -249,12 +242,6 @@ fun JsBlock.replaceSpecialReferencesInSimpleFunction(continuationParam: JsParame
             when {
                 x.coroutineReceiver -> {
                     ctx.replaceMe(pureFqn(continuationParam.name, null).source(x.source))
-                }
-
-                x.coroutineController -> {
-                    ctx.replaceMe(JsThisRef().apply {
-                        source = x.source
-                    })
                 }
 
                 x.coroutineResult && x.qualifier.let { it is JsNameRef && it.name == continuationParam.name } -> {

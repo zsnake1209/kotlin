@@ -16,7 +16,10 @@
 
 package org.jetbrains.kotlin.js.translate.expression
 
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.js.backend.ast.*
 import org.jetbrains.kotlin.js.backend.ast.metadata.*
@@ -76,7 +79,7 @@ class LiteralFunctionTranslator(context: TranslationContext) : AbstractTranslato
                 lambda.name = tracker.getNameForCapturedDescriptor(descriptor)
             }
             name.staticRef = lambdaCreator
-            lambdaCreator.fillCoroutineMetadata(invokingContext, descriptor)
+            lambdaCreator.maybeFillCoroutineMetadata(invokingContext, descriptor)
             lambdaCreator.source = declaration
             return lambdaCreator.withCapturedParameters(functionContext, name, invokingContext, declaration)
         }
@@ -91,15 +94,15 @@ class LiteralFunctionTranslator(context: TranslationContext) : AbstractTranslato
         lambda.isLocal = true
 
         invokingContext.addFunctionDeclaration(name, lambda, declaration)
-        lambda.fillCoroutineMetadata(invokingContext, descriptor)
+        lambda.maybeFillCoroutineMetadata(invokingContext, descriptor)
         name.staticRef = lambda
         return JsAstUtils.pureFqn(name, null)
     }
 
-    fun JsFunction.fillCoroutineMetadata(context: TranslationContext, descriptor: FunctionDescriptor) {
+    private fun JsFunction.maybeFillCoroutineMetadata(context: TranslationContext, descriptor: FunctionDescriptor) {
         if (!descriptor.isSuspend) return
 
-        fillCoroutineMetadata(context, descriptor, hasController = descriptor.extensionReceiverParameter != null)
+        fillCoroutineMetadata(context, descriptor)
         forceStateMachine = true
     }
 

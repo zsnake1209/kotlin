@@ -141,24 +141,12 @@ class CoroutineFunctionTransformer(private val function: JsFunction, name: Strin
         constructor.parameters += parameters.map { JsParameter(it.name) }
         val lastParameter = parameters.lastOrNull()?.name
 
-        val controllerName = if (context.metadata.hasController) {
-            JsScope.declareTemporaryName("controller").apply {
-                constructor.parameters.add(constructor.parameters.lastIndex, JsParameter(this))
-            }
-        }
-        else {
-            null
-        }
-
         val interceptorRef = lastParameter!!.makeRef()
         val parameterNames = (function.parameters.map { it.name } + innerFunction?.parameters?.map { it.name }.orEmpty()).toSet()
 
         constructor.body.statements.run {
             val baseClass = context.metadata.baseClassRef.deepCopy()
             this += JsInvocation(Namer.getFunctionCallRef(baseClass), JsThisRef(), interceptorRef).source(psiElement).makeStmt()
-            if (controllerName != null) {
-                assignToField(context.controllerFieldName, controllerName.makeRef(), psiElement)
-            }
             assignToField(context.metadata.exceptionStateName, JsIntLiteral(globalCatchBlockIndex), psiElement)
             if (context.metadata.hasReceiver) {
                 assignToField(context.receiverFieldName, context.receiverFieldName.makeRef(), psiElement)
@@ -227,10 +215,6 @@ class CoroutineFunctionTransformer(private val function: JsFunction, name: Strin
         }
         val parameters = function.parameters + innerFunction?.parameters.orEmpty()
         instantiation.arguments += parameters.dropLast(1).map { it.name.makeRef() }
-
-        if (function.coroutineMetadata!!.hasController) {
-            instantiation.arguments += JsThisRef()
-        }
 
         instantiation.arguments += parameters.last().name.makeRef()
 

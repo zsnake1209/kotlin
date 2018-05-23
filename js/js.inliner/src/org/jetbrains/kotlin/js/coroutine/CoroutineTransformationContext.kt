@@ -28,7 +28,6 @@ class CoroutineTransformationContext(private val scope: JsScope, function: JsFun
     val entryBlock = CoroutineBlock()
     val globalCatchBlock = CoroutineBlock()
     val metadata = function.coroutineMetadata!!
-    val controllerFieldName by lazy { scope.declareName("\$controller") }
     val returnValueFieldName by lazy { scope.declareName("\$returnValue") }
     val receiverFieldName by lazy { scope.declareName("\$this") }
 

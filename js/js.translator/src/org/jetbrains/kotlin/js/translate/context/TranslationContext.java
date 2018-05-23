@@ -550,12 +550,6 @@ public class TranslationContext {
         if (alias != null) {
             return alias;
         }
-        if (isCoroutineLambda(descriptor.getContainingDeclaration())) {
-            JsNameRef result = new JsNameRef("$$controller$$", JsAstUtils.stateMachineReceiver());
-            MetadataProperties.setCoroutineController(result, true);
-            return result;
-        }
-
         if (DescriptorUtils.isObject(descriptor.getContainingDeclaration())) {
             if (isConstructorOrDirectScope(descriptor.getContainingDeclaration())) {
                 return new JsThisRef();
