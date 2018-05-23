@@ -394,7 +394,7 @@ internal abstract class AbstractKotlinPlugin(
     override fun apply(project: Project) {
         val kotlinPlatformExtension = project.extensions.getByType(KotlinPlatformExtension::class.java)
 
-        registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer, project)
+        registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer, kotlinPlatformExtension)
 
         configureSourceSetDefaults(project, kotlinPlatformExtension)
         configureDefaultVersionsResolutionStrategy(project)
@@ -431,10 +431,13 @@ internal abstract class AbstractKotlinPlugin(
     }
 }
 
-internal fun registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer: KotlinSourceSetContainer<*>, project: Project) {
-    DslObject(project.kotlinExtension).extensions.run {
+internal fun registerKotlinSourceSetsIfAbsent(
+    kotlinSourceSetContainer: KotlinSourceSetContainer<*>,
+    kotlinPlatformExtension: KotlinPlatformExtension
+) {
+    DslObject(kotlinPlatformExtension).extensions.run {
         if (findByName("sourceSets") == null) {
-            kotlinSourceSetContainer.kotlinPlatformExtension = project.kotlinExtension
+            kotlinSourceSetContainer.kotlinPlatformExtension = kotlinPlatformExtension
             // No type-safe way to do this providing actual runtime class of the extension, which is required for Gradle Kotlin DSL
             // (the class of extension differs from plugin to plugin)
             @Suppress("UNCHECKED_CAST")
@@ -454,7 +457,7 @@ internal open class KotlinPlugin(
                                          kotlinJavaSourceSetProvider, kotlinPluginVersion, kotlinGradleBuildServices)
 
     override fun apply(project: Project) {
-        registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer, project)
+        registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer, project.kotlinExtension)
 
         project.createKaptExtension()
         project.plugins.apply(JavaPlugin::class.java)
@@ -477,8 +480,9 @@ internal open class KotlinCommonPlugin(
             KotlinCommonSourceSetProcessor(project, sourceSet as KotlinBaseSourceSet, tasksProvider, kotlinSourceSetContainer)
 
     override fun apply(project: Project) {
-        (project.kotlinExtension as KotlinOnlyPlatformExtension).platformName = "kotlinCommon"
-        registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer, project)
+        val kotlinOnlyPlatformExtension = project.kotlinExtension as KotlinOnlyPlatformExtension
+        kotlinOnlyPlatformExtension.platformName = "kotlinCommon"
+        registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer, kotlinOnlyPlatformExtension)
 
         project.plugins.apply(KotlinOnlyPlugin::class.java)
         super.apply(project)
@@ -494,8 +498,9 @@ internal open class Kotlin2JsPlugin(
         Kotlin2JsSourceSetProcessor(project, sourceSet as KotlinBaseSourceSet, tasksProvider, kotlinSourceSetContainer)
 
     override fun apply(project: Project) {
-        (project.kotlinExtension as KotlinOnlyPlatformExtension).platformName = "kotlin2Js"
-        registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer, project)
+        val kotlinOnlyPlatformExtension = project.kotlinExtension as KotlinOnlyPlatformExtension
+        kotlinOnlyPlatformExtension.platformName = "kotlin2Js"
+        registerKotlinSourceSetsIfAbsent(kotlinSourceSetContainer, kotlinOnlyPlatformExtension)
 
         project.plugins.apply(KotlinOnlyPlugin::class.java)
         super.apply(project)
@@ -510,7 +515,8 @@ internal open class KotlinAndroidPlugin(
 ) : Plugin<Project> {
 
     override fun apply(project: Project) {
-        registerKotlinSourceSetsIfAbsent(kotlinSourceSetProvider, project)
+        val kotlinPlatformExtension = project.kotlinExtension as KotlinAndroidPlatformExtension
+        registerKotlinSourceSetsIfAbsent(kotlinSourceSetProvider, kotlinPlatformExtension)
 
         val version = loadAndroidPluginVersion()
         if (version != null) {
