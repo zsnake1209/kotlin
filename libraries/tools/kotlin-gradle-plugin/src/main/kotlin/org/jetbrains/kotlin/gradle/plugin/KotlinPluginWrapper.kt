@@ -65,8 +65,8 @@ open class KotlinPluginWrapper @Inject constructor(fileResolver: FileResolver, p
     override fun getPlugin(project: Project, kotlinGradleBuildServices: KotlinGradleBuildServices): Plugin<Project> =
             KotlinPlugin(KotlinTasksProvider(), KotlinJavaSourceSetContainer(instantiator, project, fileResolver), kotlinPluginVersion, kotlinGradleBuildServices)
 
-    override val projectExtensionClass: KClass<out KotlinJvmPlatformExtension>
-        get() = KotlinJvmPlatformExtension::class
+    override val projectExtensionClass: KClass<out KotlinWithJavaPlatformExtension>
+        get() = KotlinWithJavaPlatformExtension::class
 }
 
 open class KotlinCommonPluginWrapper @Inject constructor(fileResolver: FileResolver, private val instantiator: Instantiator): KotlinBasePluginWrapper(fileResolver) {
@@ -84,7 +84,10 @@ open class KotlinMultiplatformPluginWrapper @Inject constructor(
     private val objectFactory: ObjectFactory
 ): KotlinBasePluginWrapper(fileResolver) {
     override fun getPlugin(project: Project, kotlinGradleBuildServices: KotlinGradleBuildServices): Plugin<Project> =
-        KotlinMultiplatformPlugin(buildOutputCleanupRegistry, project.objects, fileResolver, instantiator)
+        KotlinMultiplatformPlugin(
+            buildOutputCleanupRegistry, project.objects, fileResolver,
+            instantiator, kotlinGradleBuildServices, kotlinPluginVersion
+        )
 
     override val projectExtensionClass: KClass<out KotlinMultiplatformExtension>
         get() = KotlinMultiplatformExtension::class

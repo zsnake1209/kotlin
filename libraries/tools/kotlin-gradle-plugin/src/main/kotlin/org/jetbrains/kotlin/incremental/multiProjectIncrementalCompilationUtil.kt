@@ -30,7 +30,7 @@ import java.io.File
 internal fun configureMultiProjectIncrementalCompilation(
         project: Project,
         kotlinTask: KotlinCompile,
-        javaTask: AbstractCompile,
+        javaTask: AbstractCompile?,
         kotlinAfterJavaTask: KotlinCompile?,
         artifactDifferenceRegistryProvider: ArtifactDifferenceRegistryProvider,
         artifactFile: File?
@@ -50,7 +50,8 @@ internal fun configureMultiProjectIncrementalCompilation(
     }
 
     fun isUnknownTaskOutputtingToJavaDestination(task: Task): Boolean {
-        return task !is JavaCompile &&
+        return javaTask != null &&
+                task !is JavaCompile &&
                 task !is KotlinCompile &&
                 task is AbstractCompile &&
                 FileUtil.isAncestor(javaTask.destinationDir, task.destinationDir, /* strict = */ false)
