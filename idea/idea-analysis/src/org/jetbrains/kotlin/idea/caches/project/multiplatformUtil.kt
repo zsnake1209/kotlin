@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.idea.caches.project
 
+import com.intellij.facet.FacetTypeRegistry
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProviderImpl
 import com.intellij.openapi.module.Module
@@ -13,6 +14,7 @@ import com.intellij.psi.util.CachedValueProvider
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.idea.facet.KotlinFacetType
 
 fun Module.findImplementingModules(modelsProvider: IdeModifiableModelsProvider) =
     modelsProvider.modules.filter { name in it.findImplementedModuleNames(modelsProvider) }
@@ -71,3 +73,22 @@ val ModuleDescriptor.implementedDescriptors: List<ModuleDescriptor>
                 .getResolutionFacadeByModuleInfo(it, it.platform)?.moduleDescriptor
         }
     }
+
+fun Module.findImplementedModuleNames(modelsProvider: IdeModifiableModelsProvider): List<String> {
+    val facetModel = modelsProvider.getModifiableFacetModel(this)
+    val facet = facetModel.findFacet(
+        KotlinFacetType.TYPE_ID,
+        FacetTypeRegistry.getInstance().findFacetType(KotlinFacetType.ID)!!.defaultFacetName
+    )
+    return facet?.configuration?.settings?.implementedModuleNames ?: emptyList()
+}
+
+fun Module.findImplementedModules() = this.cached<List<Module>>(
+    CachedValueProvider {
+        val modelsProvider = IdeModifiableModelsProviderImpl(project)
+        CachedValueProvider.Result(
+            findImplementedModuleNames(modelsProvider).mapNotNull { modelsProvider.findIdeModule(it) },
+            ProjectRootModificationTracker.getInstance(project)
+        )
+    }
+)

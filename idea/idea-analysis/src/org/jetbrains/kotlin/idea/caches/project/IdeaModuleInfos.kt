@@ -5,10 +5,7 @@
 
 package org.jetbrains.kotlin.idea.caches.project
 
-import com.intellij.facet.FacetTypeRegistry
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
-import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProviderImpl
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.impl.scopes.LibraryScopeBase
 import com.intellij.openapi.project.Project
@@ -34,8 +31,6 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.idea.configuration.BuildSystemType
 import org.jetbrains.kotlin.idea.configuration.getBuildSystemType
 import org.jetbrains.kotlin.idea.core.isInTestSourceContentKotlinAware
-import org.jetbrains.kotlin.idea.facet.KotlinFacetType
-import org.jetbrains.kotlin.idea.facet.KotlinFacetType.Companion.ID
 import org.jetbrains.kotlin.idea.framework.getLibraryPlatform
 import org.jetbrains.kotlin.idea.project.KotlinModuleModificationTracker
 import org.jetbrains.kotlin.idea.project.TargetPlatformDetector
@@ -121,25 +116,6 @@ private fun ideaModelDependencies(
     return result.filterNot { it is LibraryInfo && it.platform != platform }
 }
 
-fun Module.findImplementedModuleNames(modelsProvider: IdeModifiableModelsProvider): List<String> {
-    val facetModel = modelsProvider.getModifiableFacetModel(this)
-    val facet = facetModel.findFacet(
-        KotlinFacetType.TYPE_ID,
-        FacetTypeRegistry.getInstance().findFacetType(ID)!!.defaultFacetName
-    )
-    return facet?.configuration?.settings?.implementedModuleNames ?: emptyList()
-}
-
-fun Module.findImplementedModules() = this.cached<List<Module>>(
-    CachedValueProvider {
-        val modelsProvider = IdeModifiableModelsProviderImpl(project)
-        CachedValueProvider.Result(
-            findImplementedModuleNames(modelsProvider).mapNotNull { modelsProvider.findIdeModule(it) },
-            ProjectRootModificationTracker.getInstance(project)
-        )
-    }
-)
-
 interface ModuleSourceInfo : IdeaModuleInfo, TrackableModuleInfo {
     val module: Module
 
@@ -160,7 +136,7 @@ interface ModuleSourceInfo : IdeaModuleInfo, TrackableModuleInfo {
 sealed class ModuleSourceInfoWithExpectedBy(private val forProduction: Boolean) : ModuleSourceInfo {
     override val expectedBy: List<ModuleSourceInfo>
         get() {
-            val expectedByModules = module.findImplementedModules()
+            val expectedByModules = module.implementedModules
             return expectedByModules.mapNotNull { if (forProduction) it.productionSourceInfo() else it.testSourceInfo() }
         }
 
