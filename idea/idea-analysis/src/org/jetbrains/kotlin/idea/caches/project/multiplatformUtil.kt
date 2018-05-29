@@ -35,10 +35,10 @@ val Module.implementedModules: List<Module>
         }
     )
 
-fun Module.findImplementingModules(modelsProvider: IdeModifiableModelsProvider) =
+private fun Module.findImplementingModules(modelsProvider: IdeModifiableModelsProvider) =
     modelsProvider.modules.filter { name in it.findImplementedModuleNames(modelsProvider) }
 
-fun Module.findImplementedModuleNames(modelsProvider: IdeModifiableModelsProvider): List<String> {
+private fun Module.findImplementedModuleNames(modelsProvider: IdeModifiableModelsProvider): List<String> {
     val facetModel = modelsProvider.getModifiableFacetModel(this)
     val facet = facetModel.findFacet(
         KotlinFacetType.TYPE_ID,
@@ -60,7 +60,7 @@ val ModuleDescriptor.implementingDescriptors: List<ModuleDescriptor>
         val moduleSourceInfo = moduleInfo as? ModuleSourceInfo ?: return emptyList()
         val module = moduleSourceInfo.module
         return module.cached(CachedValueProvider {
-            val implementingModuleInfos = module.findImplementingModuleInfos(moduleSourceInfo.isTests())
+            val implementingModuleInfos = module.implementingModules.mapNotNull { it.toInfo(moduleSourceInfo.isTests()) }
             val implementingModuleDescriptors = implementingModuleInfos.mapNotNull {
                 KotlinCacheService.getInstance(module.project).getResolutionFacadeByModuleInfo(it, it.platform)?.moduleDescriptor
             }
@@ -71,12 +71,6 @@ val ModuleDescriptor.implementingDescriptors: List<ModuleDescriptor>
             )
         })
     }
-
-private fun Module.findImplementingModuleInfos(isTests: Boolean): List<ModuleSourceInfo> {
-    val modelsProvider = IdeModifiableModelsProviderImpl(project)
-    val implementingModules = findImplementingModules(modelsProvider)
-    return implementingModules.mapNotNull { it.toInfo(isTests) }
-}
 
 val ModuleDescriptor.implementedDescriptors: List<ModuleDescriptor>
     get() {
