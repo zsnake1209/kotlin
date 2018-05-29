@@ -48,9 +48,6 @@ private fun Module.findImplementedModuleNames(modelsProvider: IdeModifiableModel
 }
 
 
-private fun Module.toInfo(isTests: Boolean): ModuleSourceInfo? =
-    if (isTests) productionSourceInfo() else testSourceInfo()
-
 val ModuleDescriptor.implementingDescriptors: List<ModuleDescriptor>
     get() {
         val moduleInfo = getCapability(ModuleInfo.Capability)
@@ -58,19 +55,12 @@ val ModuleDescriptor.implementingDescriptors: List<ModuleDescriptor>
             return listOf(this)
         }
         val moduleSourceInfo = moduleInfo as? ModuleSourceInfo ?: return emptyList()
-        val module = moduleSourceInfo.module
-        return module.cached(CachedValueProvider {
-            val implementingModuleInfos = module.implementingModules.mapNotNull { it.toInfo(moduleSourceInfo.isTests()) }
-            val implementingModuleDescriptors = implementingModuleInfos.mapNotNull {
-                KotlinCacheService.getInstance(module.project).getResolutionFacadeByModuleInfo(it, it.platform)?.moduleDescriptor
-            }
-            CachedValueProvider.Result(
-                implementingModuleDescriptors,
-                *(implementingModuleInfos.map { it.createModificationTracker() } +
-                        ProjectRootModificationTracker.getInstance(module.project)).toTypedArray()
-            )
-        })
+        val implementingModuleInfos = moduleSourceInfo.module.implementingModules.mapNotNull { it.toInfo(moduleSourceInfo.isTests()) }
+        return implementingModuleInfos.mapNotNull { it.toDescriptor() }
     }
+
+private fun Module.toInfo(isTests: Boolean): ModuleSourceInfo? =
+    if (isTests) productionSourceInfo() else testSourceInfo()
 
 val ModuleDescriptor.implementedDescriptors: List<ModuleDescriptor>
     get() {
@@ -79,8 +69,8 @@ val ModuleDescriptor.implementedDescriptors: List<ModuleDescriptor>
 
         val moduleSourceInfo = moduleInfo as? ModuleSourceInfo ?: return emptyList()
 
-        return moduleSourceInfo.expectedBy.mapNotNull {
-            KotlinCacheService.getInstance(moduleSourceInfo.module.project)
-                .getResolutionFacadeByModuleInfo(it, it.platform)?.moduleDescriptor
-        }
+        return moduleSourceInfo.expectedBy.mapNotNull { it.toDescriptor() }
     }
+
+private fun ModuleSourceInfo.toDescriptor() = KotlinCacheService.getInstance(module.project)
+    .getResolutionFacadeByModuleInfo(this, platform)?.moduleDescriptor
