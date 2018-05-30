@@ -19,9 +19,8 @@ import org.jetbrains.kotlin.fileClasses.javaFileFacadeFqName
 import org.jetbrains.kotlin.idea.caches.lightClasses.ClsJavaStubByVirtualFileCache
 import org.jetbrains.kotlin.idea.caches.lightClasses.KtLightClassForDecompiledDeclaration
 import org.jetbrains.kotlin.idea.caches.lightClasses.platformMutabilityWrapper
+import org.jetbrains.kotlin.idea.caches.project.*
 import org.jetbrains.kotlin.idea.caches.project.IdeaModuleInfo
-import org.jetbrains.kotlin.idea.caches.project.ModuleSourceInfo
-import org.jetbrains.kotlin.idea.caches.project.getModuleInfo
 import org.jetbrains.kotlin.idea.decompiler.classFile.KtClsFile
 import org.jetbrains.kotlin.idea.decompiler.navigation.SourceNavigationHelper
 import org.jetbrains.kotlin.idea.stubindex.*
@@ -29,6 +28,7 @@ import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.idea.util.application.runReadAction
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.utils.sure
 import java.util.*
@@ -50,7 +50,7 @@ class IDEKotlinAsJavaSupport(private val project: Project): KotlinAsJavaSupport(
                 .get(packageFqName.asString(), project, scope)
         }
         val groupedByFqNameAndModuleInfo = facadeFilesInPackage.groupBy {
-            Pair(it.javaFileFacadeFqName, it.getModuleInfo())
+            Pair(it.javaFileFacadeFqName, it.getModuleInfoPreferringJvmPlatform())
         }
 
         return groupedByFqNameAndModuleInfo.flatMap {
@@ -141,11 +141,9 @@ class IDEKotlinAsJavaSupport(private val project: Project): KotlinAsJavaSupport(
         KtLightClassForScript.create(script)
 
     private fun withFakeLightClasses(
-        lightClassForFacade: KtLightClassForFacade?,
+        lightClassForFacade: KtLightClassForFacade,
         facadeFiles: List<KtFile>
     ): List<PsiClass> {
-        if (lightClassForFacade == null) return emptyList()
-
         val lightClasses = ArrayList<PsiClass>()
         lightClasses.add(lightClassForFacade)
         if (facadeFiles.size > 1) {
@@ -157,7 +155,7 @@ class IDEKotlinAsJavaSupport(private val project: Project): KotlinAsJavaSupport(
     }
 
     override fun getFacadeClasses(facadeFqName: FqName, scope: GlobalSearchScope): Collection<PsiClass> {
-        val filesByModule = findFilesForFacade(facadeFqName, scope).groupBy(KtFile::getModuleInfo)
+        val filesByModule = findFilesForFacade(facadeFqName, scope).groupBy(PsiElement::getModuleInfoPreferringJvmPlatform)
 
         return filesByModule.flatMap {
             createLightClassForFileFacade(facadeFqName, it.value, it.key)
@@ -209,15 +207,32 @@ class IDEKotlinAsJavaSupport(private val project: Project): KotlinAsJavaSupport(
         moduleInfo: IdeaModuleInfo
     ): List<PsiClass> {
         val (clsFiles, sourceFiles) = facadeFiles.partition { it is KtClsFile }
-        val lightClassesForClsFacades = clsFiles.mapNotNull { createLightClassForDecompiledKotlinFile(it as KtClsFile) }
-        if (moduleInfo is ModuleSourceInfo && sourceFiles.isNotEmpty()) {
-            val lightClassForFacade = KtLightClassForFacade.createForFacade(
-                psiManager, facadeFqName, moduleInfo.contentScope(), sourceFiles
-            )
-            return withFakeLightClasses(lightClassForFacade, sourceFiles) + lightClassesForClsFacades
-        } else {
-            return lightClassesForClsFacades
-        }
+        val facadesFromCls = clsFiles.mapNotNull { createLightClassForDecompiledKotlinFile(it as KtClsFile) }
+        val facadesFromSources = createFacadesForSourceFiles(moduleInfo, sourceFiles, facadeFqName)
+        return facadesFromSources + facadesFromCls
+    }
+
+    private fun createFacadesForSourceFiles(
+        moduleInfo: IdeaModuleInfo,
+        sourceFiles: List<KtFile>,
+        facadeFqName: FqName
+    ): List<PsiClass> {
+        if (sourceFiles.isEmpty()) return listOf()
+        if (moduleInfo !is ModuleSourceInfo && moduleInfo !is PlatformModuleInfo) return listOf()
+
+        // NOTE: this is a hacky solution to the following problem:
+        // when building this light class resolver will be built by the first file in the list
+        // (we could assume that files are in the same module before)
+        // thus we need to ensure that resolver will be built by the file from platform part of the module
+        // (resolver build by a file from the common part will have no knowledge of the platform part)
+        val platformModuleSourcesFirst = sourceFiles
+            .sortedByDescending {
+                (moduleInfo as? PlatformModuleInfo)?.platformModule?.contentScope()?.contains(it.virtualFile) ?: false
+            }
+        val lightClassForFacade = KtLightClassForFacade.createForFacade(
+            psiManager, facadeFqName, moduleInfo.contentScope(), platformModuleSourcesFirst
+        )
+        return withFakeLightClasses(lightClassForFacade, sourceFiles)
     }
 
     override fun findFilesForFacade(facadeFqName: FqName, scope: GlobalSearchScope): Collection<KtFile> {
@@ -307,4 +322,8 @@ class IDEKotlinAsJavaSupport(private val project: Project): KotlinAsJavaSupport(
         javaFileStub.psi = fakeFile
         return fakeFile.classes.single() as ClsClassImpl
     }
+}
+
+internal fun PsiElement.getModuleInfoPreferringJvmPlatform(): IdeaModuleInfo {
+    return getPlatformModuleInfo(JvmPlatform) ?: getModuleInfo()
 }
