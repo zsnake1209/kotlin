@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.idea.decompiler.navigation.SourceNavigationHelper
 import org.jetbrains.kotlin.idea.stubindex.*
 import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.idea.util.application.runReadAction
+import org.jetbrains.kotlin.js.resolve.JsPlatform
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.TargetPlatform
@@ -122,7 +123,7 @@ class IDEKotlinAsJavaSupport(private val project: Project): KotlinAsJavaSupport(
         val virtualFile = classOrObject.containingFile.virtualFile
         if (virtualFile != null) {
             when {
-                ProjectRootsUtil.isProjectSourceFile(project, virtualFile) ->
+                ProjectRootsUtil.isProjectSourceFile(project, virtualFile) && (classOrObject.getModuleInfo().platform != JsPlatform) ->
                     return KtLightClassForSourceDeclaration.create(classOrObject)
                 ProjectRootsUtil.isLibraryClassFile(project, virtualFile) ->
                     return getLightClassForDecompiledClassOrObject(classOrObject)
