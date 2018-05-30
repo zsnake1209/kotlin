@@ -29,6 +29,8 @@ import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.idea.util.application.runReadAction
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.resolve.TargetPlatform
+import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.utils.sure
 import java.util.*
@@ -210,14 +212,25 @@ class IDEKotlinAsJavaSupport(private val project: Project): KotlinAsJavaSupport(
     ): List<PsiClass> {
         val (clsFiles, sourceFiles) = facadeFiles.partition { it is KtClsFile }
         val lightClassesForClsFacades = clsFiles.mapNotNull { createLightClassForDecompiledKotlinFile(it as KtClsFile) }
-        if (moduleInfo is ModuleSourceInfo && sourceFiles.isNotEmpty()) {
-            val lightClassForFacade = KtLightClassForFacade.createForFacade(
-                psiManager, facadeFqName, moduleInfo.contentScope(), sourceFiles
-            )
-            return withFakeLightClasses(lightClassForFacade, sourceFiles) + lightClassesForClsFacades
-        } else {
-            return lightClassesForClsFacades
+        val fileFacadeForSourceFiles = createLightClassesForFileFacadeFromSourceFiles(moduleInfo, sourceFiles, facadeFqName)
+        return fileFacadeForSourceFiles + lightClassesForClsFacades
+    }
+
+    private fun createLightClassesForFileFacadeFromSourceFiles(
+        moduleInfo: IdeaModuleInfo,
+        sourceFiles: List<KtFile>,
+        facadeFqName: FqName
+    ): List<PsiClass> {
+        if (moduleInfo !is ModuleSourceInfo || sourceFiles.isEmpty()) {
+            return listOf()
         }
+        val platform = moduleInfo.platform
+        if (platform != JvmPlatform || platform != TargetPlatform.Common) return listOf()
+
+        val lightClassForFacade = KtLightClassForFacade.createForFacade(
+            psiManager, facadeFqName, moduleInfo.contentScope(), sourceFiles
+        )
+        return withFakeLightClasses(lightClassForFacade, sourceFiles)
     }
 
     override fun findFilesForFacade(facadeFqName: FqName, scope: GlobalSearchScope): Collection<KtFile> {
