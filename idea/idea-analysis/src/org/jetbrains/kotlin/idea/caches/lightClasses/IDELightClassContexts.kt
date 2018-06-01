@@ -34,10 +34,10 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.CompositePackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.frontend.di.configureModule
-import org.jetbrains.kotlin.idea.caches.project.getModuleInfo
-import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.caches.lightClasses.IDELightClassConstructionContext.Mode.EXACT
 import org.jetbrains.kotlin.idea.caches.lightClasses.IDELightClassConstructionContext.Mode.LIGHT
+import org.jetbrains.kotlin.idea.caches.project.getModuleInfo
+import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.compiler.IDELanguageSettingsProvider
 import org.jetbrains.kotlin.idea.project.IdeaEnvironment
 import org.jetbrains.kotlin.idea.project.ResolveElementCache
@@ -102,7 +102,7 @@ internal object IDELightClassContexts {
         val classDescriptor = bindingContext.get(BindingContext.CLASS, classOrObject).sure {
             "Class descriptor was not found for ${classOrObject.getElementTextWithContext()}"
         }
-        ForceResolveUtil.forceResolveAllContents(classDescriptor)
+        ForceResolveUtil.forceResolveAllContents(classDescriptor, false)
         return IDELightClassConstructionContext(bindingContext, resolutionFacade.moduleDescriptor, EXACT)
     }
 
@@ -117,7 +117,7 @@ internal object IDELightClassContexts {
             return IDELightClassConstructionContext(bindingContext, resolutionFacade.moduleDescriptor, EXACT)
         }
 
-        ForceResolveUtil.forceResolveAllContents(descriptor)
+        ForceResolveUtil.forceResolveAllContents(descriptor, false)
 
         return IDELightClassConstructionContext(bindingContext, resolutionFacade.moduleDescriptor, EXACT)
     }
@@ -255,14 +255,14 @@ internal object IDELightClassContexts {
                         val name = declaration.nameAsSafeName
                         val functions = packageDescriptor.memberScope.getContributedFunctions(name, NoLookupLocation.FROM_IDE)
                         for (descriptor in functions) {
-                            ForceResolveUtil.forceResolveAllContents(descriptor)
+                            ForceResolveUtil.forceResolveAllContents(descriptor, true)
                         }
                     }
                     is KtProperty -> {
                         val name = declaration.nameAsSafeName
                         val properties = packageDescriptor.memberScope.getContributedVariables(name, NoLookupLocation.FROM_IDE)
                         for (descriptor in properties) {
-                            ForceResolveUtil.forceResolveAllContents(descriptor)
+                            ForceResolveUtil.forceResolveAllContents(descriptor, true)
                         }
                     }
                     is KtClassOrObject, is KtTypeAlias, is KtDestructuringDeclaration -> {
@@ -273,7 +273,7 @@ internal object IDELightClassContexts {
                 }
             }
 
-            ForceResolveUtil.forceResolveAllContents(session.getFileAnnotations(file))
+            ForceResolveUtil.forceResolveAllContents(session.getFileAnnotations(file), false)
         }
     }
 

@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.types.FlexibleType;
 import org.jetbrains.kotlin.types.FlexibleTypesKt;
 import org.jetbrains.kotlin.types.KotlinType;
 import org.jetbrains.kotlin.types.TypeUtils;
+import org.jetbrains.kotlin.types.typeUtil.TypeUtilsKt;
 import org.jetbrains.org.objectweb.asm.*;
 
 import java.lang.annotation.*;
@@ -194,6 +195,12 @@ public abstract class AnnotationCodegen {
     @Nullable
     public static Class<?> getNullabilityAnnotationFromType(@Nullable KotlinType type) {
         if (type == null) return null;
+
+        if (TypeUtilsKt.isWrappedNotComputedType(type)) {
+            // If type hasn't been yet computed return any annotation as a base clsDelegate that will be corrected
+            // when one requests a nullability annotation (see org.jetbrains.kotlin.asJava.elements.KtLightNullabilityAnnotation)
+            return null;
+        }
 
         if (isBareTypeParameterWithNullableUpperBound(type)) {
             // This is to account for the case of, say
