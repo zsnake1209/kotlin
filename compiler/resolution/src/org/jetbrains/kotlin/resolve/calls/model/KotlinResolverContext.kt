@@ -43,7 +43,7 @@ class KotlinCallComponents(
     val reflectionTypes: ReflectionTypes,
     val builtIns: KotlinBuiltIns,
     val languageVersionSettings: LanguageVersionSettings,
-    val samTypeTransformer: SamTypeTransformer
+    val samConversionTransformer: SamConversionTransformer
 )
 
 class SimpleCandidateFactory(

@@ -526,7 +526,7 @@ class NewResolvedCallImpl<D : CallableDescriptor>(
     private var extensionReceiver = resolvedCallAtom.extensionReceiverArgument?.receiver?.receiverValue
     private var dispatchReceiver = resolvedCallAtom.dispatchReceiverArgument?.receiver?.receiverValue
     private var smartCastDispatchReceiverType: KotlinType? = null
-    private var argumentToSamConvertedType: MutableMap<ValueArgument, UnwrappedType>? = null
+    private var expedtedTypeForSamConvertedArgumentMap: MutableMap<ValueArgument, UnwrappedType>? = null
 
 
     override val kotlinCall: KotlinCall get() = resolvedCallAtom.atom
@@ -617,20 +617,20 @@ class NewResolvedCallImpl<D : CallableDescriptor>(
             TypeApproximator().approximateToSuperType(substituted, TypeApproximatorConfiguration.CapturedTypesApproximation) ?: substituted
         }
 
-        calculateArgumentToSamConvertedType(substitutor)
+        calculateEexpedtedTypeForSamConvertedArgumentMap(substitutor)
     }
 
     fun getExpectedTypeForSamConvertedArgument(valueArgument: ValueArgument): UnwrappedType? =
-        argumentToSamConvertedType?.get(valueArgument)
+        expedtedTypeForSamConvertedArgumentMap?.get(valueArgument)
 
-    private fun calculateArgumentToSamConvertedType(substitutor: NewTypeSubstitutor?) {
+    private fun calculateEexpedtedTypeForSamConvertedArgumentMap(substitutor: NewTypeSubstitutor?) {
         if (resolvedCallAtom.argumentsWithConversion.isEmpty()) return
 
-        argumentToSamConvertedType = hashMapOf()
+        expedtedTypeForSamConvertedArgumentMap = hashMapOf()
         for ((argument, description) in resolvedCallAtom.argumentsWithConversion) {
             val typeWithFreshVariables = resolvedCallAtom.substitutor.safeSubstitute(description.convertedTypeByCandidateParameter)
             val expectedType = substitutor?.safeSubstitute(typeWithFreshVariables) ?: typeWithFreshVariables
-            argumentToSamConvertedType!![argument.psiCallArgument.valueArgument] = expectedType
+            expedtedTypeForSamConvertedArgumentMap!![argument.psiCallArgument.valueArgument] = expectedType
         }
     }
 
