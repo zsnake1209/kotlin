@@ -10,6 +10,23 @@ package kotlin.collections
 
 import kotlin.*
 
+internal actual object EmptySet : Set<Nothing>, Serializable {
+    private const val serialVersionUID: Long = 3406603774387020532
+
+    actual override fun equals(other: Any?): Boolean = other is Set<*> && other.isEmpty()
+    actual override fun hashCode(): Int = 0
+    actual override fun toString(): String = "[]"
+
+    actual override val size: Int get() = 0
+    actual override fun isEmpty(): Boolean = true
+    actual override fun contains(element: Nothing): Boolean = false
+    actual override fun containsAll(elements: Collection<Nothing>): Boolean = elements.isEmpty()
+
+    actual override fun iterator(): Iterator<Nothing> = EmptyIterator
+
+    private fun readResolve(): Any = EmptySet
+}
+
 /**
  * Returns an immutable list containing only the specified object [element].
  * The returned list is serializable.

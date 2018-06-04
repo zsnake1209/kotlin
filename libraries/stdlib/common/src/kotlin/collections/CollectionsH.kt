@@ -7,6 +7,20 @@ package kotlin.collections
 
 expect interface RandomAccess
 
+internal expect object EmptySet : Set<Nothing> {
+
+    override fun equals(other: Any?): Boolean
+    override fun hashCode(): Int
+    override fun toString(): String
+
+    override val size: Int
+    override fun isEmpty(): Boolean
+    override fun contains(element: Nothing): Boolean
+    override fun containsAll(elements: Collection<Nothing>): Boolean
+
+    override fun iterator(): Iterator<Nothing>
+}
+
 /** Returns the array if it's not `null`, or an empty array otherwise. */
 expect inline fun <reified T> Array<out T>?.orEmpty(): Array<out T>
 

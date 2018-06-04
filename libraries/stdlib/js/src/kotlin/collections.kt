@@ -8,6 +8,20 @@ package kotlin.collections
 import kotlin.comparisons.naturalOrder
 import kotlin.math.floor
 
+internal actual object EmptySet : Set<Nothing> {
+
+    actual override fun equals(other: Any?): Boolean = other is Set<*> && other.isEmpty()
+    actual override fun hashCode(): Int = 0
+    actual override fun toString(): String = "[]"
+
+    actual override val size: Int get() = 0
+    actual override fun isEmpty(): Boolean = true
+    actual override fun contains(element: Nothing): Boolean = false
+    actual override fun containsAll(elements: Collection<Nothing>): Boolean = elements.isEmpty()
+
+    actual override fun iterator(): Iterator<Nothing> = EmptyIterator
+}
+
 /** Returns the array if it's not `null`, or an empty array otherwise. */
 @kotlin.internal.InlineOnly
 public actual inline fun <T> Array<out T>?.orEmpty(): Array<out T> = this ?: emptyArray<T>()
