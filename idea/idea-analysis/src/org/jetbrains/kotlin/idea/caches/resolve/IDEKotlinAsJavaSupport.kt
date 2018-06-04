@@ -21,14 +21,18 @@ import org.jetbrains.kotlin.idea.caches.lightClasses.KtLightClassForDecompiledDe
 import org.jetbrains.kotlin.idea.caches.lightClasses.platformMutabilityWrapper
 import org.jetbrains.kotlin.idea.caches.project.IdeaModuleInfo
 import org.jetbrains.kotlin.idea.caches.project.ModuleSourceInfo
+import org.jetbrains.kotlin.idea.caches.project.findImplementingModuleInfos
 import org.jetbrains.kotlin.idea.caches.project.getModuleInfo
 import org.jetbrains.kotlin.idea.decompiler.classFile.KtClsFile
 import org.jetbrains.kotlin.idea.decompiler.navigation.SourceNavigationHelper
+import org.jetbrains.kotlin.idea.project.platform
 import org.jetbrains.kotlin.idea.stubindex.*
 import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.idea.util.application.runReadAction
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.resolve.TargetPlatform
+import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.utils.sure
 import java.util.*
@@ -157,10 +161,18 @@ class IDEKotlinAsJavaSupport(private val project: Project): KotlinAsJavaSupport(
     }
 
     override fun getFacadeClasses(facadeFqName: FqName, scope: GlobalSearchScope): Collection<PsiClass> {
-        val filesByModule = findFilesForFacade(facadeFqName, scope).groupBy(KtFile::getModuleInfo)
-
+        val filesByModule = findFilesForFacade(facadeFqName, scope).flatMap {
+            val file = it
+            val moduleInfo = file.getModuleInfo()
+            if (moduleInfo.platform == TargetPlatform.Common &&
+                moduleInfo is ModuleSourceInfo
+            ) {
+                moduleInfo.module.findImplementingModuleInfos(moduleInfo).filter { it.platform == JvmPlatform }
+                    .map { Pair(it, file) }
+            } else listOf(Pair(moduleInfo, file))
+        }.groupBy { it.first }
         return filesByModule.flatMap {
-            createLightClassForFileFacade(facadeFqName, it.value, it.key)
+            createLightClassForFileFacade(facadeFqName, it.value.map { it.second }, it.key)
         }
     }
 

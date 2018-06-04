@@ -31,7 +31,7 @@ private fun Module.getModuleInfo(baseModuleSourceInfo: ModuleSourceInfo): Module
         else -> null
     }
 
-private fun Module.findImplementingModuleInfos(moduleSourceInfo: ModuleSourceInfo) =
+fun Module.findImplementingModuleInfos(moduleSourceInfo: ModuleSourceInfo) =
     findImplementingModules().mapNotNull { it.getModuleInfo(moduleSourceInfo) }
 
 val ModuleDescriptor.implementingDescriptors: List<ModuleDescriptor>
