@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.asJava.KotlinAsJavaSupport
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.classes.getOutermostClassOrObject
 import org.jetbrains.kotlin.codegen.CompilationErrorHandler
+import org.jetbrains.kotlin.codegen.state.DeferredTypesTrackerImpl
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil
 import org.jetbrains.kotlin.name.FqName
@@ -155,7 +156,11 @@ class LightClassDataProviderForScript(private val script: KtScript) : CachedValu
 }
 
 interface StubComputationTracker {
-    fun onStubComputed(javaFileStub: PsiJavaFileStub, context: LightClassConstructionContext)
+    fun onStubComputed(
+        javaFileStub: PsiJavaFileStub,
+        context: LightClassConstructionContext,
+        deferredTypesTracker: DeferredTypesTrackerImpl
+    )
 }
 
 

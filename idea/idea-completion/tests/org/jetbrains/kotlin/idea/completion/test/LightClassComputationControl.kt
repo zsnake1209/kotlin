@@ -22,6 +22,7 @@ import com.intellij.psi.impl.java.stubs.PsiClassStub
 import com.intellij.psi.impl.java.stubs.PsiJavaFileStub
 import org.jetbrains.kotlin.asJava.builder.LightClassConstructionContext
 import org.jetbrains.kotlin.asJava.builder.StubComputationTracker
+import org.jetbrains.kotlin.codegen.state.DeferredTypesTrackerImpl
 import org.jetbrains.kotlin.test.InTextDirectivesUtils
 import org.junit.Assert
 import org.picocontainer.MutablePicoContainer
@@ -36,7 +37,11 @@ object LightClassComputationControl {
 
         val actualFqNames = synchronizedList(ArrayList<String>())
         val stubComputationTracker = object : StubComputationTracker {
-            override fun onStubComputed(javaFileStub: PsiJavaFileStub, context: LightClassConstructionContext) {
+            override fun onStubComputed(
+                javaFileStub: PsiJavaFileStub,
+                context: LightClassConstructionContext,
+                deferredTypesTracker: DeferredTypesTrackerImpl
+            ) {
                 val qualifiedName = (javaFileStub.childrenStubs.single() as PsiClassStub<*>).qualifiedName!!
                 actualFqNames.add(qualifiedName)
             }
