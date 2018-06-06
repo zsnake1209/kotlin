@@ -49,7 +49,6 @@ public final class Wrapper {
         @org.jetbrains.annotations.NotNull
         private final p.G code;
 
-        @org.jetbrains.annotations.NotNull
         public java.lang.String toString() { /* compiled code */ }
 
         @org.jetbrains.annotations.NotNull
