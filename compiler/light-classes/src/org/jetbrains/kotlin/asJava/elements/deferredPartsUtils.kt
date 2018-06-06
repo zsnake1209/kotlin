@@ -29,15 +29,15 @@ internal fun KtLightElement<*, *>.computeChildTypeElement(
 ): PsiTypeElement? {
     val delegateTypeElement = clsDelegateTypeElement as? ClsTypeElementImpl
     val canonicalText =
-        getDeferredTypeInfoIfExists()?.jvmDescriptorOrGenericSignature?.let(::parseJvmDescriptorOrGenericSignature)
+        getDeferredTypeInfoIfExists()?.parseTypeString()
                 ?: delegateTypeElement?.canonicalText
                 ?: return null
 
     return ClsTypeElementImpl(this, canonicalText, /*ClsTypeElementImpl.VARIANCE_NONE */ 0.toChar())
 }
 
-private fun parseJvmDescriptorOrGenericSignature(value: String) =
-    SignatureParsing.parseTypeString(StringCharacterIterator(value), StubBuildingVisitor.GUESSING_MAPPER)
+fun DeferredTypesTracker.TypeInfo.parseTypeString() =
+    SignatureParsing.parseTypeString(StringCharacterIterator(jvmDescriptorOrGenericSignature), StubBuildingVisitor.GUESSING_MAPPER)
 
 internal fun KtLightElement<*, *>.getDeferredTypeInfoIfExists(): DeferredTypesTracker.TypeInfo? =
     clsDelegate.getUserDataFromStub(DEFERRED_TYPE_INFO)?.invoke()
