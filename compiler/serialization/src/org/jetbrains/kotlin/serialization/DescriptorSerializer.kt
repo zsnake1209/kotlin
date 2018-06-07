@@ -628,7 +628,7 @@ class DescriptorSerializer private constructor(
                 it is CallableMemberDescriptor && it.hasJvmDefaultAnnotation()
             }
         ) {
-            builder.versionRequirement = writeVersionRequirement(1, 2, 40, ProtoBuf.VersionRequirement.VersionKind.COMPILER_VERSION)
+            builder.versionRequirement = writeVersionRequirement(1, 2, 50, ProtoBuf.VersionRequirement.VersionKind.COMPILER_VERSION)
         }
     }
 

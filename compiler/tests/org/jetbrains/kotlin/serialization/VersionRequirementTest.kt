@@ -163,7 +163,7 @@ class VersionRequirementTest : TestCaseWithTmpdir() {
 
     fun testJvmDefault() {
         doTest(
-            VersionRequirement.Version(1, 2, 40), DeprecationLevel.ERROR, null, COMPILER_VERSION, null,
+            VersionRequirement.Version(1, 2, 50), DeprecationLevel.ERROR, null, COMPILER_VERSION, null,
             "test.Base",
             "test.Derived"
         )
