@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.codegen.context.CodegenContextUtil;
 import org.jetbrains.kotlin.codegen.context.FieldOwnerContext;
 import org.jetbrains.kotlin.codegen.context.MultifileClassFacadeContext;
 import org.jetbrains.kotlin.codegen.context.MultifileClassPartContext;
+import org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings;
 import org.jetbrains.kotlin.codegen.state.GenerationState;
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
 import org.jetbrains.kotlin.descriptors.*;
@@ -60,6 +61,7 @@ import static org.jetbrains.kotlin.codegen.binding.CodegenBinding.DELEGATED_PROP
 import static org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings.FIELD_FOR_PROPERTY;
 import static org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings.SYNTHETIC_METHOD_FOR_PROPERTY;
 import static org.jetbrains.kotlin.diagnostics.Errors.EXPECTED_FUNCTION_SOURCE_WITH_DEFAULT_ARGUMENTS_NOT_FOUND;
+import static org.jetbrains.kotlin.metadata.jvm.deserialization.JvmProtoBufUtil.JVM_DEFAULT_FLAG;
 import static org.jetbrains.kotlin.resolve.DescriptorUtils.isCompanionObject;
 import static org.jetbrains.kotlin.resolve.DescriptorUtils.isInterface;
 import static org.jetbrains.kotlin.resolve.jvm.AsmTypes.K_PROPERTY_TYPE;
@@ -191,6 +193,10 @@ public class PropertyCodegen {
         if (!propertyAnnotations.getAllAnnotations().isEmpty() && kind != OwnerKind.DEFAULT_IMPLS &&
             CodegenContextUtil.isImplClassOwner(context)) {
             v.getSerializationBindings().put(SYNTHETIC_METHOD_FOR_PROPERTY, descriptor, getSyntheticMethodSignature(descriptor));
+        }
+
+        if (AnnotationUtilKt.hasJvmDefaultAnnotation(descriptor)) {
+            v.getSerializationBindings().put(JvmSerializationBindings.JVM_DEFAULT, descriptor, JVM_DEFAULT_FLAG);
         }
     }
 

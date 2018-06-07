@@ -520,6 +520,11 @@ open class ProtoCompareGenerated(val oldNameResolver: NameResolver, val newNameR
             if (!checkEquals(old.getExtension(JvmProtoBuf.propertySignature), new.getExtension(JvmProtoBuf.propertySignature))) return false
         }
 
+        if (old.hasExtension(JvmProtoBuf.isJvmDefault) != new.hasExtension(JvmProtoBuf.isJvmDefault)) return false
+        if (old.hasExtension(JvmProtoBuf.isJvmDefault)) {
+            if (old.getExtension(JvmProtoBuf.isJvmDefault) != new.getExtension(JvmProtoBuf.isJvmDefault)) return false
+        }
+
         if (old.getExtensionCount(JsProtoBuf.propertyAnnotation) != new.getExtensionCount(JsProtoBuf.propertyAnnotation)) {
             return false
         }
@@ -1722,6 +1727,10 @@ fun ProtoBuf.Property.hashCode(stringIndexes: (Int) -> Int, fqNameIndexes: (Int)
 
     if (hasExtension(JvmProtoBuf.propertySignature)) {
         hashCode = 31 * hashCode + getExtension(JvmProtoBuf.propertySignature).hashCode(stringIndexes, fqNameIndexes)
+    }
+
+    if (hasExtension(JvmProtoBuf.isJvmDefault)) {
+        hashCode = 31 * hashCode + getExtension(JvmProtoBuf.isJvmDefault)
     }
 
     for(i in 0..getExtensionCount(JsProtoBuf.propertyAnnotation) - 1) {

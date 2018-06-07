@@ -19,6 +19,7 @@ object JvmProtoBufUtil {
     val EXTENSION_REGISTRY: ExtensionRegistryLite = ExtensionRegistryLite.newInstance().apply(JvmProtoBuf::registerAllExtensions)
 
     const val PLATFORM_TYPE_ID = "kotlin.jvm.PlatformType"
+    const val JVM_DEFAULT_FLAG = 1
 
     @JvmStatic
     fun readClassDataFrom(data: Array<String>, strings: Array<String>): Pair<JvmNameResolver, ProtoBuf.Class> =
@@ -115,6 +116,11 @@ object JvmProtoBufUtil {
         return JvmMemberSignature.Field(nameResolver.getString(name), desc)
     }
 
+    fun isJvmDefaultProperty(
+        proto: ProtoBuf.Property
+    ): Boolean {
+        return proto.getExtensionOrNull(JvmProtoBuf.isJvmDefault)?.let { it.and(JVM_DEFAULT_FLAG) == JVM_DEFAULT_FLAG } ?: false
+    }
 
     private fun mapTypeDefault(type: ProtoBuf.Type, nameResolver: NameResolver): String? {
         return if (type.hasClassName()) ClassMapperLite.mapClass(nameResolver.getQualifiedClassName(type.className)) else null

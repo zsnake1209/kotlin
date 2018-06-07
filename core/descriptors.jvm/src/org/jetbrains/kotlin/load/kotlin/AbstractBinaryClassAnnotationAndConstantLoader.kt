@@ -97,8 +97,10 @@ abstract class AbstractBinaryClassAnnotationAndConstantLoader<A : Any, C : Any, 
 
             val isConst = Flags.IS_CONST.get(proto.flags)
 
+            val isJvmDefault = org.jetbrains.kotlin.metadata.jvm.deserialization.JvmProtoBufUtil.isJvmDefaultProperty(proto)
+
             val propertyAnnotations = syntheticFunctionSignature?.let { sig ->
-                findClassAndLoadMemberAnnotations(container, sig, property = true, isConst = isConst)
+                findClassAndLoadMemberAnnotations(container, sig, property = true, isConst = isConst, isJvmDefault = isJvmDefault)
             }.orEmpty()
 
             val fieldAnnotations = fieldSignature?.let { sig ->
@@ -134,10 +136,13 @@ abstract class AbstractBinaryClassAnnotationAndConstantLoader<A : Any, C : Any, 
 
     private fun findClassAndLoadMemberAnnotations(
             container: ProtoContainer, signature: MemberSignature,
-            property: Boolean = false, field: Boolean = false, isConst: Boolean? = null
+            property: Boolean = false, field: Boolean = false, isConst: Boolean? = null, isJvmDefault: Boolean = false
     ): List<A> {
         val kotlinClass =
-                findClassWithAnnotationsAndInitializers(container, getSpecialCaseContainerClass(container, property, field, isConst))
+            findClassWithAnnotationsAndInitializers(
+                container,
+                getSpecialCaseContainerClass(container, property, field, isConst, isJvmDefault)
+            )
                 ?: return listOf()
 
         return storage(kotlinClass).memberAnnotations[signature] ?: listOf()
@@ -199,7 +204,7 @@ abstract class AbstractBinaryClassAnnotationAndConstantLoader<A : Any, C : Any, 
         val signature = getCallableSignature(proto, container.nameResolver, container.typeTable, AnnotatedCallableKind.PROPERTY)
                         ?: return null
 
-        val specialCase = getSpecialCaseContainerClass(container, property = true, field = true, isConst = Flags.IS_CONST.get(proto.flags))
+        val specialCase = getSpecialCaseContainerClass(container, property = true, field = true, isConst = Flags.IS_CONST.get(proto.flags), isJvmDefault = false)
         val kotlinClass = findClassWithAnnotationsAndInitializers(container, specialCase) ?: return null
 
         return storage(kotlinClass).propertyConstants[signature]
@@ -218,11 +223,11 @@ abstract class AbstractBinaryClassAnnotationAndConstantLoader<A : Any, C : Any, 
     // TODO: do not use KotlinClassFinder#findKotlinClass here because it traverses the file system in the compiler
     // Introduce an API in KotlinJvmBinaryClass to find a class nearby instead
     private fun getSpecialCaseContainerClass(
-            container: ProtoContainer, property: Boolean, field: Boolean, isConst: Boolean?
+            container: ProtoContainer, property: Boolean, field: Boolean, isConst: Boolean?, isJvmDefault: Boolean
     ): KotlinJvmBinaryClass? {
         if (property) {
             checkNotNull(isConst) { "isConst should not be null for property (container=$container)" }
-            if (container is ProtoContainer.Class && container.kind == ProtoBuf.Class.Kind.INTERFACE) {
+            if (container is ProtoContainer.Class && container.kind == ProtoBuf.Class.Kind.INTERFACE && !isJvmDefault) {
                 return kotlinClassFinder.findKotlinClass(
                         container.classId.createNestedClassId(Name.identifier(JvmAbi.DEFAULT_IMPLS_CLASS_NAME))
                 )

@@ -192,6 +192,10 @@ public class JvmSerializerExtension extends SerializerExtension {
         );
 
         proto.setExtension(JvmProtoBuf.propertySignature, signature);
+        Integer jvmDefault = bindings.get(JVM_DEFAULT, descriptor);
+        if (jvmDefault != null) {
+            proto.setExtension(JvmProtoBuf.isJvmDefault, jvmDefault);
+        }
     }
 
     @Override

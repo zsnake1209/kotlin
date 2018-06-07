@@ -11,6 +11,7 @@ public final class DebugJvmProtoBuf {
     registry.add(org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.methodSignature);
     registry.add(org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.lambdaClassOriginName);
     registry.add(org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.propertySignature);
+    registry.add(org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.isJvmDefault);
     registry.add(org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.typeAnnotation);
     registry.add(org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.isRaw);
     registry.add(org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.typeParameterAnnotation);
@@ -4558,6 +4559,17 @@ public final class DebugJvmProtoBuf {
           .newFileScopedGeneratedExtension(
         org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.JvmPropertySignature.class,
         org.jetbrains.kotlin.metadata.jvm.DebugJvmProtoBuf.JvmPropertySignature.getDefaultInstance());
+  public static final int IS_JVM_DEFAULT_FIELD_NUMBER = 101;
+  /**
+   * <code>extend .org.jetbrains.kotlin.metadata.Property { ... }</code>
+   */
+  public static final
+    org.jetbrains.kotlin.protobuf.GeneratedMessage.GeneratedExtension<
+      org.jetbrains.kotlin.metadata.DebugProtoBuf.Property,
+      java.lang.Integer> isJvmDefault = org.jetbrains.kotlin.protobuf.GeneratedMessage
+          .newFileScopedGeneratedExtension(
+        java.lang.Integer.class,
+        null);
   public static final int TYPE_ANNOTATION_FIELD_NUMBER = 100;
   /**
    * <code>extend .org.jetbrains.kotlin.metadata.Type { ... }</code>
@@ -4726,25 +4738,27 @@ public final class DebugJvmProtoBuf {
       "perty_signature\022\'.org.jetbrains.kotlin.m" +
       "etadata.Property\030d \001(\01327.org.jetbrains.k" +
       "otlin.metadata.jvm.JvmPropertySignature:" +
-      "g\n\017type_annotation\022#.org.jetbrains.kotli" +
-      "n.metadata.Type\030d \003(\0132).org.jetbrains.ko" +
-      "tlin.metadata.Annotation:3\n\006is_raw\022#.org",
-      ".jetbrains.kotlin.metadata.Type\030e \001(\010:z\n" +
-      "\031type_parameter_annotation\022,.org.jetbrai" +
-      "ns.kotlin.metadata.TypeParameter\030d \003(\0132)" +
-      ".org.jetbrains.kotlin.metadata.Annotatio" +
-      "n:E\n\021class_module_name\022$.org.jetbrains.k" +
-      "otlin.metadata.Class\030e \001(\005B\004\230\265\030\001:k\n\024clas" +
-      "s_local_variable\022$.org.jetbrains.kotlin." +
-      "metadata.Class\030f \003(\0132\'.org.jetbrains.kot" +
-      "lin.metadata.Property:P\n\034anonymous_objec" +
-      "t_origin_name\022$.org.jetbrains.kotlin.met",
-      "adata.Class\030g \001(\005B\004\230\265\030\001:I\n\023package_modul" +
-      "e_name\022&.org.jetbrains.kotlin.metadata.P" +
-      "ackage\030e \001(\005B\004\230\265\030\001:o\n\026package_local_vari" +
-      "able\022&.org.jetbrains.kotlin.metadata.Pac" +
-      "kage\030f \003(\0132\'.org.jetbrains.kotlin.metada" +
-      "ta.PropertyB\022B\020DebugJvmProtoBuf"
+      "?\n\016is_jvm_default\022\'.org.jetbrains.kotlin" +
+      ".metadata.Property\030e \001(\005:g\n\017type_annotat" +
+      "ion\022#.org.jetbrains.kotlin.metadata.Type",
+      "\030d \003(\0132).org.jetbrains.kotlin.metadata.A" +
+      "nnotation:3\n\006is_raw\022#.org.jetbrains.kotl" +
+      "in.metadata.Type\030e \001(\010:z\n\031type_parameter" +
+      "_annotation\022,.org.jetbrains.kotlin.metad" +
+      "ata.TypeParameter\030d \003(\0132).org.jetbrains." +
+      "kotlin.metadata.Annotation:E\n\021class_modu" +
+      "le_name\022$.org.jetbrains.kotlin.metadata." +
+      "Class\030e \001(\005B\004\230\265\030\001:k\n\024class_local_variabl" +
+      "e\022$.org.jetbrains.kotlin.metadata.Class\030" +
+      "f \003(\0132\'.org.jetbrains.kotlin.metadata.Pr",
+      "operty:P\n\034anonymous_object_origin_name\022$" +
+      ".org.jetbrains.kotlin.metadata.Class\030g \001" +
+      "(\005B\004\230\265\030\001:I\n\023package_module_name\022&.org.je" +
+      "tbrains.kotlin.metadata.Package\030e \001(\005B\004\230" +
+      "\265\030\001:o\n\026package_local_variable\022&.org.jetb" +
+      "rains.kotlin.metadata.Package\030f \003(\0132\'.or" +
+      "g.jetbrains.kotlin.metadata.PropertyB\022B\020" +
+      "DebugJvmProtoBuf"
     };
     org.jetbrains.kotlin.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new org.jetbrains.kotlin.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4794,14 +4808,15 @@ public final class DebugJvmProtoBuf {
     methodSignature.internalInit(descriptor.getExtensions().get(1));
     lambdaClassOriginName.internalInit(descriptor.getExtensions().get(2));
     propertySignature.internalInit(descriptor.getExtensions().get(3));
-    typeAnnotation.internalInit(descriptor.getExtensions().get(4));
-    isRaw.internalInit(descriptor.getExtensions().get(5));
-    typeParameterAnnotation.internalInit(descriptor.getExtensions().get(6));
-    classModuleName.internalInit(descriptor.getExtensions().get(7));
-    classLocalVariable.internalInit(descriptor.getExtensions().get(8));
-    anonymousObjectOriginName.internalInit(descriptor.getExtensions().get(9));
-    packageModuleName.internalInit(descriptor.getExtensions().get(10));
-    packageLocalVariable.internalInit(descriptor.getExtensions().get(11));
+    isJvmDefault.internalInit(descriptor.getExtensions().get(4));
+    typeAnnotation.internalInit(descriptor.getExtensions().get(5));
+    isRaw.internalInit(descriptor.getExtensions().get(6));
+    typeParameterAnnotation.internalInit(descriptor.getExtensions().get(7));
+    classModuleName.internalInit(descriptor.getExtensions().get(8));
+    classLocalVariable.internalInit(descriptor.getExtensions().get(9));
+    anonymousObjectOriginName.internalInit(descriptor.getExtensions().get(10));
+    packageModuleName.internalInit(descriptor.getExtensions().get(11));
+    packageLocalVariable.internalInit(descriptor.getExtensions().get(12));
     org.jetbrains.kotlin.protobuf.ExtensionRegistry registry =
         org.jetbrains.kotlin.protobuf.ExtensionRegistry.newInstance();
     registry.add(org.jetbrains.kotlin.metadata.DebugExtOptionsProtoBuf.stringIdInTable);
