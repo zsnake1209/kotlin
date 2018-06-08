@@ -977,7 +977,7 @@ private fun Project.createAptConfiguration(sourceSetName: String, kotlinPluginVe
     return aptConfiguration
 }
 
-private fun Project.createKaptExtension() {
+internal fun Project.createKaptExtension() {
     extensions.create("kapt", KaptExtension::class.java)
 }
 
