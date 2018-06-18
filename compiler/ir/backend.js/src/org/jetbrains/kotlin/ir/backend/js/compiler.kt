@@ -29,9 +29,9 @@ fun compile(
     export: FqName
 ): String {
     val analysisResult = TopDownAnalyzerFacadeForJS.analyzeFiles(files, project, configuration, emptyList(), emptyList())
+    TopDownAnalyzerFacadeForJS.checkForErrors(files, analysisResult.bindingContext)
     ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
 
-    TopDownAnalyzerFacadeForJS.checkForErrors(files, analysisResult.bindingContext)
 
     val psi2IrTranslator = Psi2IrTranslator()
     val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext)
@@ -50,9 +50,7 @@ fun compile(
 
     context.performInlining(moduleFragment)
 
-    moduleFragment.files.forEach { context.lower(it) }
-    val transformer = SecondaryCtorLowering.CallsiteRedirectionTransformer(context)
-    moduleFragment.files.forEach { it.accept(transformer, null) }
+    context.lower(moduleFragment)
 
     val program = moduleFragment.accept(IrModuleToJsTransformer(context), null)
 
@@ -77,23 +75,26 @@ fun JsIrBackendContext.performInlining(moduleFragment: IrModuleFragment) {
     }
 }
 
-fun JsIrBackendContext.lower(file: IrFile) {
-    LateinitLowering(this, true).lower(file)
-    DefaultArgumentStubGenerator(this).runOnFilePostfix(file)
-    DefaultParameterInjector(this).runOnFilePostfix(file)
-    SharedVariablesLowering(this).runOnFilePostfix(file)
-    ReturnableBlockLowering(this).lower(file)
-    LocalDeclarationsLowering(this).runOnFilePostfix(file)
-    InnerClassesLowering(this).runOnFilePostfix(file)
-    InnerClassConstructorCallsLowering(this).runOnFilePostfix(file)
-    PropertiesLowering().lower(file)
-    InitializersLowering(this, JsLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, false).runOnFilePostfix(file)
-    MultipleCatchesLowering(this).lower(file)
-    TypeOperatorLowering(this).lower(file)
-    BlockDecomposerLowering(this).runOnFilePostfix(file)
-    SecondaryCtorLowering(this).runOnFilePostfix(file)
-    CallableReferenceLowering(this).lower(file)
-    IntrinsicifyCallsLowering(this).lower(file)
+fun JsIrBackendContext.lower(moduleFragment: IrModuleFragment) {
+    moduleFragment.files.forEach(LateinitLowering(this, true)::lower)
+    moduleFragment.files.forEach(DefaultArgumentStubGenerator(this)::runOnFilePostfix)
+    moduleFragment.files.forEach(DefaultParameterInjector(this)::runOnFilePostfix)
+    moduleFragment.files.forEach(SharedVariablesLowering(this)::runOnFilePostfix)
+    moduleFragment.files.forEach(ReturnableBlockLowering(this)::lower)
+    moduleFragment.files.forEach(LocalDeclarationsLowering(this)::runOnFilePostfix)
+    moduleFragment.files.forEach(InnerClassesLowering(this)::runOnFilePostfix)
+    moduleFragment.files.forEach(InnerClassConstructorCallsLowering(this)::runOnFilePostfix)
+    moduleFragment.files.forEach(SuspendFunctionsLowering(this)::runOnFilePostfix)
+    moduleFragment.files.forEach(PropertiesLowering()::lower)
+    moduleFragment.files.forEach(InitializersLowering(this, JsLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, false)::runOnFilePostfix)
+    moduleFragment.files.forEach(MultipleCatchesLowering(this)::lower)
+    moduleFragment.files.forEach(TypeOperatorLowering(this)::lower)
+    moduleFragment.files.forEach(BlockDecomposerLowering(this)::runOnFilePostfix)
+    val sctor = SecondaryCtorLowering(this)
+    moduleFragment.files.forEach(sctor.getConstructorProcessorLowering())
+    moduleFragment.files.forEach(sctor.getConstructorRedirectorLowering())
+    moduleFragment.files.forEach(CallableReferenceLowering(this)::lower)
+    moduleFragment.files.forEach(IntrinsicifyCallsLowering(this)::lower)
 }
 
 // TODO find out why duplicates occur
