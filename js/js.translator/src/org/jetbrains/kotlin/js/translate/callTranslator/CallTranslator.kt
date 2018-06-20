@@ -150,8 +150,7 @@ private fun translateFunctionCall(
 
     if (CallExpressionTranslator.shouldBeInlined(inlineResolvedCall.resultingDescriptor, context)) {
         val callElement = resolvedCall.call.callElement
-        val ktExpression = (callElement as? KtWhenConditionInRange)?.rangeExpression ?: callElement as KtExpression
-        setInlineCallMetadata(callExpression, ktExpression, inlineResolvedCall.resultingDescriptor, context)
+        setInlineCallMetadata(callExpression, callElement, inlineResolvedCall.resultingDescriptor, context)
     }
 
     if (resolvedCall.resultingDescriptor.isSuspend) {
