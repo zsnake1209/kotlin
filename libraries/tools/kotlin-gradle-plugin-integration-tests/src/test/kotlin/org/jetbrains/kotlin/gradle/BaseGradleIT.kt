@@ -1,12 +1,20 @@
 package org.jetbrains.kotlin.gradle
 
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.tasks.TaskExecutionException
+import org.gradle.internal.exceptions.LocationAwareException
+import org.gradle.tooling.BuildException
+import org.gradle.tooling.GradleConnector
+import org.gradle.tooling.ProjectConnection
+import org.gradle.tooling.exceptions.UnsupportedBuildArgumentException
+import org.gradle.tooling.exceptions.UnsupportedOperationConfigurationException
 import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.util.*
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.Assert
 import org.junit.Before
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.regex.Pattern
 import kotlin.test.*
@@ -256,7 +264,9 @@ abstract class BaseGradleIT {
             setupWorkingDir()
         }
 
-        val result = runProcess(cmd, projectDir, env, options)
+        val result = withGradleConnection(projectDir, wrapperVersion) {
+            runWithTapi(projectDir, createGradleTailParameters(options, params), env)
+        }
         try {
             CompiledProject(this, result.output, result.exitCode).check()
         } catch (t: Throwable) {
@@ -267,6 +277,46 @@ abstract class BaseGradleIT {
             throw t
         }
     }
+
+    private fun <T> withGradleConnection(projectDir: File, version: String, fn: ProjectConnection.() -> T): T {
+        val connection = GradleConnector
+            .newConnector()
+            .useGradleVersion(version)
+            .forProjectDirectory(projectDir)
+            .connect()
+
+        return try {
+            connection.fn()
+        } finally {
+            connection.close()
+        }
+    }
+
+    private fun ProjectConnection.runWithTapi(projectDir: File, args: List<String>, environmentVariables: Map<String, String>, vararg tasks: String): ProcessRunResult {
+        val stdout = ByteArrayOutputStream()
+        val launcher = newBuild()
+            .setStandardOutput(stdout)
+            .setStandardError(stdout)
+            .setColorOutput(false)
+            .setEnvironmentVariables(environmentVariables)
+            .withArguments(args)
+            .forTasks(*tasks)
+
+
+        val failure: Exception? = try {
+            launcher.run()
+            null
+        } catch (e: UnsupportedOperationConfigurationException) {
+            throw e
+        } catch (e: UnsupportedBuildArgumentException) {
+            throw e
+        } catch (e: BuildException) {
+            e
+        }
+
+        return ProcessRunResult(args, projectDir, if (failure != null) 1 else 0, stdout.toString())
+    }
+
 
     fun CompiledProject.assertSuccessful() {
         if (resultCode == 0) return
@@ -501,7 +551,7 @@ abstract class BaseGradleIT {
                 else -> add("--${minLogLevel.name.toLowerCase()}")
             }
             if (options.daemonOptionSupported) {
-                add(if (options.withDaemon) "--daemon" else "--no-daemon")
+                //add(if (options.withDaemon) "--daemon" else "--no-daemon")
             }
 
             add("-Pkotlin_version=" + options.kotlinVersion)
