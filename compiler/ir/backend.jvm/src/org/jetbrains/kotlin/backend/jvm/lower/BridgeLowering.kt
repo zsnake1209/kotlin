@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.irBlockBody
 import org.jetbrains.kotlin.backend.common.lower.irNot
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
-import org.jetbrains.kotlin.backend.jvm.JvmLoweredStatementOrigin
 import org.jetbrains.kotlin.backend.jvm.descriptors.DefaultImplsClassDescriptor
 import org.jetbrains.kotlin.backend.jvm.descriptors.JvmFunctionDescriptorImpl
 import org.jetbrains.kotlin.codegen.AsmUtil.isAbstractMethod
@@ -37,6 +36,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
@@ -111,7 +111,6 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
             }
         }
     }
-
 
     private fun generateBridges(descriptor: FunctionDescriptor, irClass: IrClass) {
         // equals(Any?), hashCode(), toString() never need bridges
@@ -219,7 +218,7 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
                 implementation.returnType!!.toIrType()!!,
                 implementation,
                 implementation.typeParametersCount,
-                JvmLoweredStatementOrigin.BRIDGE_DELEGATION,
+                IrStatementOrigin.BRIDGE_DELEGATION,
                 if (isStubDeclarationWithDelegationToSuper) getSuperClassDescriptor(
                     descriptor.containingDeclaration as ClassDescriptor
                 ) else null
@@ -228,14 +227,14 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
                 irFunction.dispatchReceiverParameter!!.symbol,
-                JvmLoweredStatementOrigin.BRIDGE_DELEGATION
+                IrStatementOrigin.BRIDGE_DELEGATION
             )
             irFunction.extensionReceiverParameter?.let {
                 call.extensionReceiver = IrGetValueImpl(
                     UNDEFINED_OFFSET,
                     UNDEFINED_OFFSET,
                     it.symbol,
-                    JvmLoweredStatementOrigin.BRIDGE_DELEGATION
+                    IrStatementOrigin.BRIDGE_DELEGATION
                 )
             }
             irFunction.valueParameters.mapIndexed { i, valueParameter ->
@@ -245,7 +244,7 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
                         UNDEFINED_OFFSET,
                         UNDEFINED_OFFSET,
                         valueParameter.symbol,
-                        JvmLoweredStatementOrigin.BRIDGE_DELEGATION
+                        IrStatementOrigin.BRIDGE_DELEGATION
                     )
                 )
             }
@@ -279,7 +278,7 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
                     UNDEFINED_OFFSET,
                     UNDEFINED_OFFSET,
                     bridgeFunction.valueParameters[i].symbol,
-                    JvmLoweredStatementOrigin.BRIDGE_DELEGATION
+                    IrStatementOrigin.BRIDGE_DELEGATION
                 )
             if (delegateParameterTypes == null || OBJECT_TYPE == delegateParameterTypes[i]) {
                 irNotEquals(checkValue, irNull())
