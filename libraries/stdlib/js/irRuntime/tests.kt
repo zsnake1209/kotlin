@@ -3,6 +3,9 @@
  * that can be found in the license/LICENSE.txt file.
  */
 
-package kotlin.js
+package kotlin.test
 
-class DefaultConstructorMarker {}
+fun <T> assertEquals(a: T, b: T) {
+    if (a != b) throw Exception("")
+}
+
