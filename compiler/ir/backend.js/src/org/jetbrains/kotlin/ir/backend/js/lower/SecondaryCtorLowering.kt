@@ -99,7 +99,11 @@ class SecondaryCtorLowering(val context: JsIrBackendContext) {
         return newConstructors
     }
 
-    private class ThisUsageReplaceTransformer(val function: IrFunctionSymbol, val newThisSymbol: IrValueSymbol, val oldThisSymbol: IrValueSymbol?) :
+    private class ThisUsageReplaceTransformer(
+        val function: IrFunctionSymbol,
+        val newThisSymbol: IrValueSymbol,
+        val oldThisSymbol: IrValueSymbol?
+    ) :
         IrElementTransformerVoid() {
 
         override fun visitReturn(expression: IrReturn): IrExpression = IrReturnImpl(
@@ -124,6 +128,7 @@ class SecondaryCtorLowering(val context: JsIrBackendContext) {
 
     private fun createInitConstructor(
         declaration: IrConstructor,
+        klass: IrClass,
         name: String,
         type: IrType
     ): IrSimpleFunction =
@@ -206,7 +211,7 @@ class SecondaryCtorLowering(val context: JsIrBackendContext) {
         }
 
 
-    class CallsiteRedirectionTransformer : IrElementTransformer<IrFunction?> {
+    inner class CallsiteRedirectionTransformer : IrElementTransformer<IrFunction?> {
 
         override fun visitFunction(declaration: IrFunction, data: IrFunction?): IrStatement = super.visitFunction(declaration, declaration)
 

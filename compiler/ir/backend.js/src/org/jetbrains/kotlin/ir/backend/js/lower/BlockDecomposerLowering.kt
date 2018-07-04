@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 class BlockDecomposerLowering(context: JsIrBackendContext) : DeclarationContainerLoweringPass {
 
     private val decomposerTransformer = BlockDecomposerTransformer(context)
+    private val nothingType = context.irBuiltIns.nothingType
 
     override fun lower(irDeclarationContainer: IrDeclarationContainer) {
         irDeclarationContainer.declarations.transformFlat { declaration ->
@@ -52,7 +53,7 @@ class BlockDecomposerLowering(context: JsIrBackendContext) : DeclarationContaine
             ).initialize(returnType = expression.type)
 
 
-            val returnStatement = JsIrBuilder.buildReturn(initFnSymbol, expression, context.irBuiltIns.nothingNType)
+            val returnStatement = JsIrBuilder.buildReturn(initFnSymbol, expression, nothingType)
             val newBody = IrBlockBodyImpl(expression.startOffset, expression.endOffset).apply {
                 statements += returnStatement
             }

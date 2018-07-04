@@ -77,10 +77,10 @@ class MultipleCatchesLowering(val context: JsIrBackendContext) : FileLoweringPas
                     assert(!catch.catchParameter.isVar) { "caught exception parameter has to be immutable" }
                     val type = catch.catchParameter.type
                     val typeSymbol = type.classifierOrNull
-                    val castedPendingException = buildImplicitCast(pendingException, type, typeSymbol)
+                    val castedPendingException = buildImplicitCast(pendingException, type, typeSymbol!!)
                     val catchBody = catch.result.transform(object : IrElementTransformer<VariableDescriptor> {
                         override fun visitGetValue(expression: IrGetValue, data: VariableDescriptor) =
-                            if (typeSymbol != null && expression.descriptor == data)
+                            if (expression.descriptor == data)
                                 castedPendingException
                             else
                                 expression
@@ -90,7 +90,7 @@ class MultipleCatchesLowering(val context: JsIrBackendContext) : FileLoweringPas
                         branches += IrElseBranchImpl(catch.startOffset, catch.endOffset, litTrue, catchBody)
                         break
                     } else {
-                        val typeCheck = buildIsCheck(pendingException, type, typeSymbol!!)
+                        val typeCheck = buildIsCheck(pendingException, type, typeSymbol)
                         branches += IrBranchImpl(catch.startOffset, catch.endOffset, typeCheck, catchBody)
                     }
                 }

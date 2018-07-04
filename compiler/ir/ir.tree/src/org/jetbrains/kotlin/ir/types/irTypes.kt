@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.ir.types
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrClassSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
@@ -74,6 +76,17 @@ fun IrType.toKotlinType(): KotlinType {
         else -> TODO(toString())
     }
 }
+
+fun IrType.getClass(): IrClass? =
+    (this.classifierOrNull as? IrClassSymbol)?.owner
+
+fun IrClassSymbol.createType(hasQuestionMark: Boolean, arguments: List<IrTypeArgument>): IrSimpleType =
+    IrSimpleTypeImpl(
+        this,
+        hasQuestionMark,
+        arguments,
+        emptyList()
+    )
 
 private fun makeKotlinType(
     classifier: IrClassifierSymbol,
