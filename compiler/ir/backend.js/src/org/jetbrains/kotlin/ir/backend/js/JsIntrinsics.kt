@@ -128,6 +128,8 @@ class JsIntrinsics(
         )
     )
 
+    val charConstructor = context.symbolTable.referenceConstructor(context.getClass(FqName("kotlin.Char")).constructors.single())
+
     // Helpers:
 
     private fun getInternalFunction(name: String) =
