@@ -172,7 +172,7 @@ class IntrinsicifyCallsLowering(private val context: JsIrBackendContext) : FileL
                 }
             }
 
-            op(irBuiltIns.charType, ConversionNames.TO_CHAR) { irCall(it, intrinsics.jsAsIs, dispatchReceiverAsFirstArgument = true) }
+            op(irBuiltIns.charType, ConversionNames.TO_CHAR) { it.dispatchReceiver!! }
         }
 
         nameToTransformer.run {
