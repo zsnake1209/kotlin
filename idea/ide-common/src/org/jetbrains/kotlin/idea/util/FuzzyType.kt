@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.Constrain
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.StrictEqualityTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.*
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.util.*
 
 fun CallableDescriptor.fuzzyReturnType() = returnType?.toFuzzyType(typeParameters)
@@ -89,8 +90,18 @@ class FuzzyType(
     }
 
     private fun TypeParameterDescriptor.toOriginal(): TypeParameterDescriptor {
-        val callableDescriptor = containingDeclaration as? CallableMemberDescriptor ?: return this
-        return callableDescriptor.original.typeParameters[index]
+        try {
+            val callableDescriptor = containingDeclaration as? CallableMemberDescriptor ?: return this
+            return callableDescriptor.original.typeParameters[index]
+        } catch (e: NullPointerException) {
+            val message = """
+                containingDeclaration = $containingDeclaration,
+                original = ${containingDeclaration?.original},
+                typeParameters = ${containingDeclaration?.original?.safeAs<CallableMemberDescriptor>()?.typeParameters}
+                index = $index
+            """.trimIndent()
+            throw IllegalStateException(message, e)
+        }
     }
 
     override fun equals(other: Any?) = other is FuzzyType && other.type == type && other.freeParameters == freeParameters
