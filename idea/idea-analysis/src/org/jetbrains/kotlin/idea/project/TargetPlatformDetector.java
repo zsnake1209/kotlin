@@ -62,7 +62,7 @@ public class TargetPlatformDetector {
             }
         }
 
-        LOG.info("Using default platform for file: " + file.getName());
+        LOG.debug("Using default platform for file: " + file.getName());
         return JvmPlatform.INSTANCE;
     }
 
