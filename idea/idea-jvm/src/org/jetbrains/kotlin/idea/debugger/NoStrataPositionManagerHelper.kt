@@ -26,8 +26,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.containers.ConcurrentWeakFactoryMap
-import com.intellij.util.containers.ContainerUtil
+import com.intellij.util.containers.ConcurrentFactoryMap
 import com.sun.jdi.Location
 import com.sun.jdi.ReferenceType
 import org.jetbrains.kotlin.codegen.inline.API
@@ -110,18 +109,13 @@ fun getLastLineNumberForLocation(location: Location, project: Project, searchSco
     return lineMapping.values.firstOrNull { it.contains(lineNumber) }?.last()
 }
 
-class WeakBytecodeDebugInfoStorage : ConcurrentWeakFactoryMap<BinaryCacheKey, BytecodeDebugInfo?>() {
-    override fun create(key: BinaryCacheKey): BytecodeDebugInfo? {
-        val bytes = readClassFileImpl(key.project, key.jvmName, key.file) ?: return null
+fun createWeakBytecodeDebugInfoStorage(): ConcurrentMap<BinaryCacheKey, BytecodeDebugInfo?> = ConcurrentFactoryMap.createWeakMap<BinaryCacheKey, BytecodeDebugInfo?> {
+    val bytes = readClassFileImpl(it.project, it.jvmName, it.file) ?: return@createWeakMap null
 
-        val smapData = readDebugInfo(bytes)
-        val lineNumberMapping = readLineNumberTableMapping(bytes)
+    val smapData = readDebugInfo(bytes)
+    val lineNumberMapping = readLineNumberTableMapping(bytes)
 
-        return BytecodeDebugInfo(smapData, lineNumberMapping)
-    }
-    override fun createMap(): ConcurrentMap<BinaryCacheKey, BytecodeDebugInfo?> {
-        return ContainerUtil.createConcurrentWeakKeyWeakValueMap()
-    }
+    BytecodeDebugInfo(smapData, lineNumberMapping)
 }
 
 class BytecodeDebugInfo(val smapData: SmapData?, val lineTableMapping: Map<BytecodeMethodKey, Map<String, Set<Int>>>)

@@ -22,9 +22,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.SingleRootFileViewProvider;
 import com.intellij.psi.impl.PsiManagerEx;
 import com.intellij.psi.impl.file.impl.FileManager;
-import com.intellij.util.containers.ConcurrentWeakFactoryMap;
-import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.containers.FactoryMap;
+import com.intellij.util.containers.ConcurrentFactoryMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,17 +34,7 @@ public class MockFileManager implements FileManager {
   private final PsiManagerEx myManager;
   // in mock tests it's LightVirtualFile, they're only alive when they're referenced,
   // and there can not be several instances representing the same file
-  private final ConcurrentMap<VirtualFile, FileViewProvider> myViewProviders = new ConcurrentWeakFactoryMap<VirtualFile, FileViewProvider>() {
-    @Override
-    protected ConcurrentMap<VirtualFile, FileViewProvider> createMap() {
-      return ContainerUtil.createConcurrentWeakKeyWeakValueMap();
-    }
-
-    @Override
-    protected FileViewProvider create(VirtualFile key) {
-      return new SingleRootFileViewProvider(myManager, key);
-    }
-  };
+  private final ConcurrentMap<VirtualFile, FileViewProvider> myViewProviders;
 
   @Override
   @NotNull
@@ -56,6 +44,7 @@ public class MockFileManager implements FileManager {
 
   public MockFileManager(PsiManagerEx manager) {
     myManager = manager;
+    myViewProviders = ConcurrentFactoryMap.createWeakMap(file -> new SingleRootFileViewProvider(myManager, file));
   }
 
   @Override
