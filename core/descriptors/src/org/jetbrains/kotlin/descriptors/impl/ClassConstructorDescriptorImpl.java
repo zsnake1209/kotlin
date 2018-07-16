@@ -162,7 +162,7 @@ public class ClassConstructorDescriptorImpl extends FunctionDescriptorImpl imple
         assert newName == null : "Attempt to rename constructor: " + this;
         return new ClassConstructorDescriptorImpl(
                 (ClassDescriptor) newOwner,
-                this,
+                (ConstructorDescriptor) original,
                 annotations,
                 isPrimary,
                 Kind.DECLARATION,
