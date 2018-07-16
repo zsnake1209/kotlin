@@ -137,6 +137,8 @@ private class CompanionObjectJvmStaticLowering(val context: JvmBackendContext) :
             proxyIrFunction.body = this
         }
 
+        target.annotations.mapTo(proxyIrFunction.annotations) { it.deepCopyWithSymbols() }
+
         return proxyIrFunction
     }
 }

@@ -252,7 +252,12 @@ class ExpressionCodegen(
         callGenerator.beforeValueParametersStart()
         val defaultMask = DefaultCallArgs(callable.valueParameterTypes.size)
         val enumConstructorDefaultArgsShift =
-            if (expression.descriptor is ConstructorDescriptor && isEnumClass(expression.descriptor.containingDeclaration)) 2 else 0
+            when {
+                expression.descriptor is ConstructorDescriptor && isEnumClass(expression.descriptor.containingDeclaration) -> 2
+                expression.descriptor is ConstructorDescriptor &&
+                        (expression.descriptor.containingDeclaration as ClassDescriptor).isInner -> 1 // ignore the `$outer` parameter
+                else -> 0
+            }
         expression.descriptor.valueParameters.forEachIndexed { i, parameterDescriptor ->
             val arg = expression.getValueArgument(i)
             val parameterType = callable.valueParameterTypes[i]
