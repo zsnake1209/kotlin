@@ -1,5 +1,6 @@
 // !LANGUAGE: +JvmStaticInInterface
 // JVM_TARGET: 1.8
+// JAVAC_OPTIONS: -source 1.8 -target 1.8
 // IGNORE_BACKEND: JS_IR
 // TODO: muted automatically, investigate should it be ran for JS or not
 // IGNORE_BACKEND: JS, NATIVE
