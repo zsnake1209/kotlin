@@ -44,13 +44,13 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
     private fun generateWrappers(target: IrFunction, irClass: IrClass) {
         val numDefaultParameters = target.symbol.descriptor.valueParameters.count { it.hasDefaultValue() }
         for (i in 0 until numDefaultParameters) {
-            val wrapper = generateWrapper(target, irClass, i)
+            val wrapper = generateWrapper(target, i)
             irClass.addMember(wrapper)
         }
     }
 
-    private fun generateWrapper(target: IrFunction, irClass: IrClass, numDefaultParametersToExpect: Int): IrFunction {
-        val wrapperSymbol = generateWrapperSymbol(target.symbol, irClass, numDefaultParametersToExpect)
+    private fun generateWrapper(target: IrFunction, numDefaultParametersToExpect: Int): IrFunction {
+        val wrapperSymbol = generateWrapperSymbol(target.symbol, numDefaultParametersToExpect)
         val wrapperIrFunction = when (wrapperSymbol) {
             is IrConstructorSymbol -> IrConstructorImpl(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,
@@ -86,11 +86,11 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
         }
 
         var parametersCopied = 0
-        var defaultParametersAlreadyCopied = 0
-        target.valueParameters.mapIndexed { i, valueParameter ->
+        var defaultParametersCopied = 0
+        for ((i, valueParameter) in target.valueParameters.withIndex()) {
             if ((valueParameter.descriptor as ValueParameterDescriptor).hasDefaultValue()) {
-                if (defaultParametersAlreadyCopied < numDefaultParametersToExpect) {
-                    defaultParametersAlreadyCopied++
+                if (defaultParametersCopied < numDefaultParametersToExpect) {
+                    defaultParametersCopied++
                     call.putValueArgument(
                         i,
                         IrGetValueImpl(
@@ -110,6 +110,7 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
                     )
                 )
             }
+
         }
 
         wrapperIrFunction.body = IrExpressionBodyImpl(
@@ -121,28 +122,10 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
         return wrapperIrFunction
     }
 
-    private fun generateWrapperSymbol(oldSymbol: IrFunctionSymbol, irClass: IrClass, numDefaultParametersToExpect: Int): IrFunctionSymbol {
+    private fun generateWrapperSymbol(oldSymbol: IrFunctionSymbol, numDefaultParametersToExpect: Int): IrFunctionSymbol {
         val oldDescriptor = oldSymbol.descriptor
-        val newDescriptor = if (oldSymbol.descriptor is ClassConstructorDescriptor) {
-            ClassConstructorDescriptorImpl.createSynthesized(
-                irClass.descriptor,
-                oldDescriptor.annotations,
-                /* isPrimary = */ false,
-                oldDescriptor.source
-            ).apply {
-                // Call the long version of `initialize()`, because otherwise default implementation inserts
-                // an unwanted `dispatchReceiverParameter`
-                initialize(
-                    oldDescriptor.extensionReceiverParameter?.type,
-                    oldDescriptor.dispatchReceiverParameter,
-                    oldDescriptor.typeParameters,
-                    generateNewValueParameters(oldDescriptor, numDefaultParametersToExpect),
-                    oldDescriptor.returnType,
-                    oldDescriptor.modality,
-                    oldDescriptor.visibility
-                )
-                returnType = oldDescriptor.returnType!!
-            }
+        val newDescriptor = if (oldDescriptor is ClassConstructorDescriptor) {
+            oldDescriptor.copyWithModifiedParameters(numDefaultParametersToExpect)
         } else {
             val newParameters = generateNewValueParameters(oldDescriptor, numDefaultParametersToExpect)
             oldDescriptor.newCopyBuilder()
@@ -155,16 +138,40 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
         return createFunctionSymbol(newDescriptor)
     }
 
+    private fun ClassConstructorDescriptor.copyWithModifiedParameters(numDefaultParametersToExpect: Int): ClassConstructorDescriptor {
+        val result = ClassConstructorDescriptorImpl.createSynthesized(
+            this.containingDeclaration,
+            annotations,
+            /* isPrimary = */ false,
+            source
+        )
+        // Call the long version of `initialize()`, because otherwise default implementation inserts
+        // an unwanted `dispatchReceiverParameter`.
+        result.initialize(
+            extensionReceiverParameter?.type,
+            dispatchReceiverParameter,
+            typeParameters,
+            generateNewValueParameters(this, numDefaultParametersToExpect),
+            returnType,
+            modality,
+            visibility
+        )
+        return result
+    }
+
     private fun generateNewValueParameters(
         oldDescriptor: FunctionDescriptor,
         numDefaultParametersToExpect: Int
     ): List<ValueParameterDescriptor> {
         var parametersCopied = 0
-        var defaultParametersAlreadyCopied = 0
-        return oldDescriptor.valueParameters.mapNotNull { oldValueParameter ->
-            if (oldValueParameter.hasDefaultValue()) {
-                if (defaultParametersAlreadyCopied < numDefaultParametersToExpect) {
-                    defaultParametersAlreadyCopied++
+        var defaultParametersCopied = 0
+        val result = mutableListOf<ValueParameterDescriptor>()
+        for (oldValueParameter in oldDescriptor.valueParameters) {
+            if (oldValueParameter.hasDefaultValue() &&
+                defaultParametersCopied < numDefaultParametersToExpect
+            ) {
+                defaultParametersCopied++
+                result.add(
                     ValueParameterDescriptorImpl(
                         oldDescriptor,      // to be substituted with newDescriptor
                         null,
@@ -178,10 +185,12 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
                         varargElementType = oldValueParameter.varargElementType,
                         source = oldValueParameter.source
                     )
-                } else null
-            } else {
-                oldValueParameter.copy(oldDescriptor, oldValueParameter.name, parametersCopied++)
+                )
+            } else if (!oldValueParameter.hasDefaultValue()) {
+                result.add(oldValueParameter.copy(oldDescriptor, oldValueParameter.name, parametersCopied++))
+
             }
         }
+        return result
     }
 }
