@@ -103,7 +103,7 @@ class PartialBodyResolveFilter(
                 val level = statementMarks.statementMark(statement)
                 when (level) {
                     MarkLevel.NEED_REFERENCE_RESOLVE -> nameFilter.addUsedNames(statement)
-                    MarkLevel.NEED_COMPLETION -> nameFilter.addAllNames()
+                    MarkLevel.NEED_COMPLETION -> nameFilter.addUsedNames(statement)
                 }
             }
 
