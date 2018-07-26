@@ -11,12 +11,18 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.roots.libraries.Library
+import com.intellij.util.CommonProcessors
+import com.intellij.util.text.VersionComparatorUtil
 import org.jetbrains.kotlin.config.ApiVersion
 import org.jetbrains.kotlin.config.LanguageVersion
+import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.idea.framework.GRADLE_SYSTEM_ID
 import org.jetbrains.kotlin.idea.framework.MAVEN_SYSTEM_ID
 import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.idea.util.application.runReadAction
+import org.jetbrains.kotlin.idea.versions.LibInfo
 
 class KotlinMigrationProjectComponent(val project: Project) {
     private var old: MigrationState? = null
@@ -38,121 +44,125 @@ class KotlinMigrationProjectComponent(val project: Project) {
     fun onImportFinished() {
         new = MigrationState.build(project)
 
-        checkForUpdates(project, old, new)
+        val migrationInfo = prepareMigrationInfo(old, new) ?: return
+
+        if (ApplicationManager.getApplication().isUnitTestMode) {
+            return
+        }
+
+        ApplicationManager.getApplication().invokeLater {
+            // Notify
+        }
     }
 
     companion object {
-        fun getInstance(project: Project): KotlinMigrationProjectComponent = project.getComponent(KotlinMigrationProjectComponent::class.java)!!
+        fun getInstance(project: Project): KotlinMigrationProjectComponent =
+            project.getComponent(KotlinMigrationProjectComponent::class.java)!!
 
-        private fun checkForUpdates(project: Project, old: MigrationState?, new: MigrationState?) {
+        private fun prepareMigrationInfo(old: MigrationState?, new: MigrationState?): MigrationInfo? {
             if (old == null || new == null) {
-                return
+                return null
             }
 
-            val oldLibrary = old.libraries.firstOrNull()
-            val newLibrary = new.libraries.firstOrNull()
+            val oldLibraryVersion = old.stdlibInfo?.version
+            val newLibraryVersion = new.stdlibInfo?.version
 
-            val oldApiVersion = old.apiVersions.firstOrNull()
-            val newApiVersion = new.apiVersions.firstOrNull { newApi -> newApi !in old.apiVersions }
-
-            val oldLanguageVersion = old.languageVersions.firstOrNull()
-            val newLanguageVersion = new.languageVersions.firstOrNull { languageVersion -> languageVersion !in old.languageVersions }
-
-            if (oldLibrary == null || newLibrary == null) {
-                return
+            if (oldLibraryVersion == null || newLibraryVersion == null) {
+                return null
             }
 
-            if (oldLibrary.version != newLibrary.version ||
-                (oldApiVersion != newApiVersion && newApiVersion != null) ||
-                (oldLanguageVersion != newLanguageVersion && newLanguageVersion != null)
+            if (VersionComparatorUtil.COMPARATOR.compare(newLibraryVersion, oldLibraryVersion) > 0 ||
+                old.apiVersion < new.apiVersion || old.languageVersion < new.languageVersion
             ) {
-                notifyUpdate(
-                    project,
-                    MigrationInfo(
-                        oldLibrary.version, newLibrary.version,
-                        oldApiVersion, newApiVersion,
-                        oldLanguageVersion, newLanguageVersion
-                    )
+                return MigrationInfo(
+                    oldLibraryVersion, newLibraryVersion,
+                    old.apiVersion, new.apiVersion,
+                    old.languageVersion, new.languageVersion
                 )
             }
+
+            return null
         }
     }
 }
 
 private class MigrationState(
-    var libraries: Collection<LibraryInfo>,
-    var apiVersions: Collection<ApiVersion>,
-    var languageVersions: Collection<LanguageVersion>
+    var stdlibInfo: LibInfo?,
+    var apiVersion: ApiVersion,
+    var languageVersion: LanguageVersion
 ) {
     companion object {
         fun build(project: Project): MigrationState {
-            val libraries = collectKotlinLibraries(project)
-            val (apiVersions, languageVersions) = org.jetbrains.kotlin.idea.configuration.collectCompilerSettings(project)
-            return MigrationState(libraries, apiVersions, languageVersions)
+            val libraries = maxKotlinLibVersion(project)
+            val languageVersionSettings = collectMaxCompilerSettings(project)
+            return MigrationState(libraries, languageVersionSettings.apiVersion, languageVersionSettings.languageVersion)
         }
     }
 }
 
-internal class MigrationInfo(
+internal data class MigrationInfo(
     val oldStdlibVersion: String,
-    val newVersion: String,
-    val oldApiVersion: ApiVersion?,
-    val newApiVersion: ApiVersion?,
-    val oldLanguageVersion: LanguageVersion?,
-    val newLanguageVersion: LanguageVersion?
+    val newStdlibVersion: String,
+    val oldApiVersion: ApiVersion,
+    val newApiVersion: ApiVersion,
+    val oldLanguageVersion: LanguageVersion,
+    val newLanguageVersion: LanguageVersion
 )
-
-private fun notifyUpdate(project: Project, migrationInfo: MigrationInfo) {
-    if (ApplicationManager.getApplication().isUnitTestMode) {
-        return
-    }
-
-    ApplicationManager.getApplication().invokeLater {
-        // Notify
-    }
-}
-
-data class LibraryInfo(val groupId: String, val artifactId: String, val version: String)
 
 private const val KOTLIN_GROUP_ID = "org.jetbrains.kotlin"
 
-private fun collectKotlinLibraries(project: Project): HashSet<LibraryInfo> {
-    val oldKotlinLibraries = HashSet<LibraryInfo>()
-    runReadAction {
-        ProjectRootManager.getInstance(project).orderEntries().forEachLibrary { library ->
-            if (ExternalSystemApiUtil.isExternalSystemLibrary(library, GRADLE_SYSTEM_ID) ||
-                ExternalSystemApiUtil.isExternalSystemLibrary(library, MAVEN_SYSTEM_ID)
+private fun maxKotlinLibVersion(project: Project): LibInfo? {
+    return runReadAction {
+        var maxStdlibInfo: LibInfo? = null
+
+        val allLibProcessor = CommonProcessors.CollectUniquesProcessor<Library>()
+        ProjectRootManager.getInstance(project).orderEntries().forEachLibrary(allLibProcessor)
+
+        for (library in allLibProcessor.results) {
+            if (!ExternalSystemApiUtil.isExternalSystemLibrary(library, GRADLE_SYSTEM_ID) &&
+                !ExternalSystemApiUtil.isExternalSystemLibrary(library, MAVEN_SYSTEM_ID)
             ) {
-                if (library.name?.contains(" $KOTLIN_GROUP_ID:kotlin-stdlib") == true) {
-                    val libName = library.name ?: return@forEachLibrary true
-                    val version = libName.substringAfterLastNullable(":") ?: return@forEachLibrary true
-
-                    val nameWithoutVersion = libName.substringBeforeLastNullable(":") ?: return@forEachLibrary true
-                    val artifactId = nameWithoutVersion.substringAfterLastNullable(":") ?: return@forEachLibrary true
-
-                    oldKotlinLibraries.add(LibraryInfo(KOTLIN_GROUP_ID, artifactId, version))
-                }
+                continue
             }
 
-            true
-        }
-    }
+            if (library.name?.contains(" $KOTLIN_GROUP_ID:kotlin-stdlib") != true) {
+                continue
+            }
 
-    return oldKotlinLibraries
+            val libName = library.name ?: continue
+
+            val version = libName.substringAfterLastNullable(":") ?: continue
+            val artifactId = libName.substringBeforeLastNullable(":")?.substringAfterLastNullable(":") ?: continue
+
+            if (version.isBlank() || artifactId.isBlank()) continue
+
+            if (maxStdlibInfo == null || VersionComparatorUtil.COMPARATOR.compare(version, maxStdlibInfo.version) > 0) {
+                maxStdlibInfo = LibInfo(KOTLIN_GROUP_ID, artifactId, version)
+            }
+        }
+
+        maxStdlibInfo
+    }
 }
 
-private fun collectCompilerSettings(project: Project): Pair<Set<ApiVersion>, Set<LanguageVersion>> {
+private fun collectMaxCompilerSettings(project: Project): LanguageVersionSettings {
     return runReadAction {
-        val apiVersions = HashSet<ApiVersion>()
-        val languageVersion = HashSet<LanguageVersion>()
-        val modules = ModuleManager.getInstance(project).modules
-        for (module in modules) {
+        var maxApiVersion: ApiVersion? = null
+        var maxLanguageVersion: LanguageVersion? = null
+
+        for (module in ModuleManager.getInstance(project).modules) {
             val languageVersionSettings = module.languageVersionSettings
-            apiVersions.add(languageVersionSettings.apiVersion)
-            languageVersion.add(languageVersionSettings.languageVersion)
+
+            if (maxApiVersion == null || languageVersionSettings.apiVersion > maxApiVersion) {
+                maxApiVersion = languageVersionSettings.apiVersion
+            }
+
+            if (maxLanguageVersion == null || languageVersionSettings.languageVersion > maxLanguageVersion) {
+                maxLanguageVersion = languageVersionSettings.languageVersion
+            }
         }
 
-        apiVersions to languageVersion
+        LanguageVersionSettingsImpl(maxLanguageVersion ?: LanguageVersion.LATEST_STABLE, maxApiVersion ?: ApiVersion.LATEST_STABLE)
     }
 }
 
