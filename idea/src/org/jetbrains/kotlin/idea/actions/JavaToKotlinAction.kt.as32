@@ -37,8 +37,6 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiManager
-import com.intellij.psi.search.FileTypeIndex
-import com.intellij.psi.search.GlobalSearchScopesCore
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.j2k.IdeaJavaToKotlinServices
@@ -193,11 +191,15 @@ class JavaToKotlinAction : AnAction() {
     }
 
     private fun isAnyJavaFileSelected(project: Project, files: Array<VirtualFile>): Boolean {
-
-        val filesScope = GlobalSearchScopesCore.directoriesScope(project, true, *files)
-        val potentialJavaFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, filesScope)
-
-        if (potentialJavaFiles.isEmpty()) return false
+        val javaFileType = JavaFileType.INSTANCE
+        val potentialJavaFiles = files.filter {
+            if (it.isDirectory) {
+                if (isAnyJavaFileSelected(project, it.children)) return true
+                false
+            } else {
+                it.extension == javaFileType.defaultExtension
+            }
+        }
 
         val manager = PsiManager.getInstance(project)
         return potentialJavaFiles.any { manager.findFile(it) is PsiJavaFile && it.isWritable }
