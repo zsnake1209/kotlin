@@ -155,6 +155,8 @@ class JavaToKotlinAction : AnAction() {
         val javaFiles = selectedJavaFiles(e).filter { it.isWritable }.toList()
         val project = CommonDataKeys.PROJECT.getData(e.dataContext)!!
 
+        if (javaFiles.isEmpty()) Messages.showErrorDialog("No writable Java files found", "Nothing to convert")
+
         val firstSyntaxError = javaFiles.asSequence().map { PsiTreeUtil.findChildOfType(it, PsiErrorElement::class.java) }.firstOrNull()
 
         if (firstSyntaxError != null) {
@@ -189,14 +191,9 @@ class JavaToKotlinAction : AnAction() {
     }
 
     private fun isAnyJavaFileSelected(project: Project, files: Array<VirtualFile>): Boolean {
-        val javaFileType = JavaFileType.INSTANCE
+        if (files.any { it.isDirectory }) return true // Giving up on directories
         val potentialJavaFiles = files.filter {
-            if (it.isDirectory) {
-                if (isAnyJavaFileSelected(project, it.children)) return true
-                false
-            } else {
-                it.extension == javaFileType.defaultExtension
-            }
+            it.extension == JavaFileType.DEFAULT_EXTENSION
         }
 
         val manager = PsiManager.getInstance(project)
