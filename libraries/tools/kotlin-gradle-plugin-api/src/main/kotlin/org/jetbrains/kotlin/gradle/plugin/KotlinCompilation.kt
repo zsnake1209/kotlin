@@ -38,12 +38,18 @@ interface KotlinCompilation: Named, HasAttributes, HasKotlinDependencies {
     fun source(sourceSet: KotlinSourceSet)
 
     override fun getName(): String = compilationName
+
+    override val relatedConfigurationNames: List<String>
+        get() = super.relatedConfigurationNames + compileDependencyConfigurationName
 }
 
 interface KotlinCompilationToRunnableFiles : KotlinCompilation {
     val runtimeDependencyConfigurationName: String
 
     var runtimeDependencyFiles: FileCollection
+
+    override val relatedConfigurationNames: List<String>
+        get() = super.relatedConfigurationNames + runtimeDependencyConfigurationName
 }
 
 interface KotlinCompilationWithResources : KotlinCompilation {

@@ -128,7 +128,7 @@ internal class KotlinMultiplatformPlugin(
 
         project.afterEvaluate {
             targets.all { target ->
-                val compilationAttributes = target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)?.attributes
+                val mainCompilationAttributes = target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)?.attributes
                     ?: return@all
 
                 fun <T> copyAttribute(key: Attribute<T>, from: AttributeContainer, to: AttributeContainer) {
@@ -142,12 +142,14 @@ internal class KotlinMultiplatformPlugin(
                 )
                     .mapNotNull { configurationName -> target.project.configurations.findByName(configurationName) }
                     .forEach { configuration ->
-                        compilationAttributes.keySet().forEach { key ->
-                            copyAttribute(key, compilationAttributes, configuration.attributes)
+                        mainCompilationAttributes.keySet().forEach { key ->
+                            copyAttribute(key, mainCompilationAttributes, configuration.attributes)
                         }
                     }
 
                 target.compilations.all { compilation ->
+                    val compilationAttributes = compilation.attributes
+
                     compilation.relatedConfigurationNames
                         .mapNotNull { configurationName -> target.project.configurations.findByName(configurationName) }
                         .forEach { configuration ->
