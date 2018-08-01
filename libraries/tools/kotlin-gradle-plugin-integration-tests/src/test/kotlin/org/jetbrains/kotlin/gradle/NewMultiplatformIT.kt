@@ -11,15 +11,15 @@ import org.junit.Test
 import java.util.zip.ZipFile
 
 class NewMultiplatformIT : BaseGradleIT() {
-
+    val gradleVersion = GradleVersionRequired.AtLeast("4.8")
 
     private fun Project.targetClassesDir(targetName: String, sourceSetName: String = "main") =
         classesDir(sourceSet = "$targetName/$sourceSetName")
 
     @Test
     fun testLibAndApp() {
-        val libProject = Project("sample-lib", GradleVersionRequired.AtLeast("4.8"), "new-mpp-lib-and-app")
-        val appProject = Project("sample-app", GradleVersionRequired.AtLeast("4.8"), "new-mpp-lib-and-app")
+        val libProject = Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")
+        val appProject = Project("sample-app", gradleVersion, "new-mpp-lib-and-app")
 
         with(libProject) {
             build("publish") {
@@ -89,7 +89,25 @@ class NewMultiplatformIT : BaseGradleIT() {
     }
 
     @Test
-    fun testJvmWithJavaEquivalence() = with(Project("sample-lib", GradleVersionRequired.AtLeast("4.8"), "new-mpp-lib-and-app")) {
+    fun testSourceSetCyclicDependencyDetection() = with(Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")) {
+        setupWorkingDir()
+        gradleBuildScript().appendText("\n" + """
+            kotlin.sourceSets {
+                a
+                b { dependsOn a }
+                c { dependsOn b }
+                a.dependsOn(c)
+            }
+        """.trimIndent())
+
+        build("assemble") {
+            assertFailed()
+            assertContains("a -> c -> b -> a")
+        }
+    }
+
+    @Test
+    fun testJvmWithJavaEquivalence() = with(Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")) {
         lateinit var classesWithoutJava: Set<String>
 
         fun getFilePathsSet(inDirectory: String): Set<String> {
@@ -134,6 +152,60 @@ class NewMultiplatformIT : BaseGradleIT() {
         }
     }
 
-//    @Test
-//    fun testLibWithTests() = with(Project("new-mpp-lib-with-tests", ))
+    @Test
+    fun testLibWithTests() = with(Project("new-mpp-lib-with-tests", gradleVersion)) {
+        build("check") {
+            assertSuccessful()
+            assertTasksExecuted(
+                // compilation tasks:
+                ":compileKotlinJs",
+                ":compileTestKotlinJs",
+                ":compileKotlinJvmWithoutJava",
+                ":compileTestKotlinJvmWithoutJava",
+                ":compileKotlinJvmWithJava",
+                ":compileJava",
+                ":compileTestKotlinJvmWithJava",
+                ":compileTestJava",
+                // test tasks:
+                ":jsTest", // does not run any actual tests for now
+                ":jvmWithoutJavaTest",
+                ":test"
+            )
+
+            val expectedKotlinOutputFiles = listOf(
+                kotlinClassesDir(sourceSet = "js/main") + "new-mpp-lib-with-tests.js",
+                kotlinClassesDir(sourceSet = "js/test") + "new-mpp-lib-with-tests_test.js",
+                *kotlinClassesDir(sourceSet = "jvmWithJava/main").let {
+                    arrayOf(
+                        it + "com/example/lib/JavaClassUsageKt.class",
+                        it + "com/example/lib/CommonKt.class",
+                        it + "META-INF/new-mpp-lib-with-tests.kotlin_module"
+                    )
+                },
+                *kotlinClassesDir(sourceSet = "jvmWithJava/test").let {
+                    arrayOf(
+                        it + "com/example/lib/TestCommonCode.class",
+                        it + "com/example/lib/TestWithJava.class",
+                        it + "META-INF/new-mpp-lib-with-tests.kotlin_module" // Note: same name as in main
+                    )
+                },
+                *kotlinClassesDir(sourceSet = "jvmWithoutJava/main").let {
+                    arrayOf(
+                        it + "com/example/lib/CommonKt.class",
+                        it + "com/example/lib/MainKt.class",
+                        it + "META-INF/new-mpp-lib-with-tests.kotlin_module"
+                    )
+                },
+                *kotlinClassesDir(sourceSet = "jvmWithoutJava/test").let {
+                    arrayOf(
+                        it + "com/example/lib/TestCommonCode.class",
+                        it + "com/example/lib/TestWithoutJava.class",
+                        it + "META-INF/new-mpp-lib-with-tests.kotlin_module" // Note: same name as in main
+                    )
+                }
+            )
+
+            expectedKotlinOutputFiles.forEach { assertFileExists(it) }
+        }
+    }
 }
