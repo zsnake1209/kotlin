@@ -123,10 +123,14 @@ abstract class Symbols<out T : CommonBackendContext>(val context: T, private val
     val doubleArray = primitiveArrayClass(PrimitiveType.DOUBLE)
     val booleanArray = primitiveArrayClass(PrimitiveType.BOOLEAN)
 
-    val unsignedArrays = UnsignedType.values().associate { it to unsignedArrayClass(it) }
+    val unsignedArrays = UnsignedType.values().mapNotNull { unsignedType ->
+        unsignedArrayClass(unsignedType)?.let { unsignedType to it }
+    }.toMap()
+
+
     val primitiveArrays = PrimitiveType.values().associate { it to primitiveArrayClass(it) }
 
-    val arrays = primitiveArrays.values + unsignedArrays.values.filterNotNull() + array
+    val arrays = primitiveArrays.values + unsignedArrays.values + array
 
     protected fun arrayExtensionFun(type: KotlinType, name: String): IrSimpleFunctionSymbol {
         val descriptor = builtInsPackage("kotlin")
