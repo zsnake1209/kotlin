@@ -6,13 +6,22 @@
 package org.jetbrains.kotlin.backend.common
 
 import org.jetbrains.kotlin.backend.common.ir.Ir
+import org.jetbrains.kotlin.builtins.ReflectionTypes
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.utils.addIfNotNull
+import java.util.*
+import kotlin.reflect.KProperty
 
-interface CommonBackendContext : BackendContext {
+interface WithLogger {
+    fun log(message: () -> String)
+}
+
+interface CommonBackendContext : BackendContext, WithLogger {
+
     override val ir: Ir<CommonBackendContext>
 
     //TODO move to builtins
@@ -23,7 +32,7 @@ interface CommonBackendContext : BackendContext {
     //TODO move to builtins
     fun getInternalFunctions(name: String): List<FunctionDescriptor>
 
-    fun log(message: () -> String)
+    //val reflectionTypes: ReflectionTypes
 
     fun report(element: IrElement?, irFile: IrFile?, message: String, isError: Boolean)
 }

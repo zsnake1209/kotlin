@@ -654,7 +654,7 @@ open class LocalDeclarationsLowering(
             parent: IrClass,
             fieldType: IrType
         ): IrField {
-            val descriptor = WrappedPropertyDescriptor()
+            val descriptor = WrappedFieldDescriptor()
             val symbol = IrFieldSymbolImpl(descriptor)
             return IrFieldImpl(
                 startOffset,

@@ -210,6 +210,9 @@ open class DeepCopyIrTreeWithSymbols(
             declaration.setter?.transform()
         ).apply {
             transformAnnotations(declaration)
+            this.backingField?.let {
+                it.correspondingProperty = this
+            }
         }
 
     override fun visitField(declaration: IrField): IrField =

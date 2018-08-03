@@ -31,6 +31,10 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 
+interface IrDeserializer {
+    fun findDeserializedDeclaration(descriptor: DeclarationDescriptor): IrDeclaration?
+}
+
 interface ReferenceSymbolTable {
     fun referenceClass(descriptor: ClassDescriptor): IrClassSymbol
 
@@ -221,7 +225,10 @@ open class SymbolTable : ReferenceSymbolTable {
     ): IrClass {
         return classSymbolTable.declare(
             descriptor,
-            { IrClassSymbolImpl(descriptor) },
+            { //println("new symbol: ${descriptor.name}")
+                //try {error("")} catch (e: Throwable) {e.printStackTrace()}
+                IrClassSymbolImpl(descriptor)
+            },
             classFactory
         )
     }
@@ -237,12 +244,13 @@ open class SymbolTable : ReferenceSymbolTable {
         origin: IrDeclarationOrigin,
         descriptor: ClassConstructorDescriptor,
         constructorFactory: (IrConstructorSymbol) -> IrConstructor = { IrConstructorImpl(startOffset, endOffset, origin, it, IrUninitializedType) }
-    ): IrConstructor =
-        constructorSymbolTable.declare(
+    ): IrConstructor {
+        return constructorSymbolTable.declare(
             descriptor,
             { IrConstructorSymbolImpl(descriptor) },
             constructorFactory
         )
+    }
 
     override fun referenceConstructor(descriptor: ClassConstructorDescriptor) =
         constructorSymbolTable.referenced(descriptor) { IrConstructorSymbolImpl(descriptor) }
@@ -271,12 +279,16 @@ open class SymbolTable : ReferenceSymbolTable {
         descriptor: PropertyDescriptor,
         type: IrType,
         fieldFactory: (IrFieldSymbol) -> IrField = { IrFieldImpl(startOffset, endOffset, origin, it, type) }
-    ): IrField =
-        fieldSymbolTable.declare(
-            descriptor,
-            { IrFieldSymbolImpl(descriptor) },
-            fieldFactory
+    ): IrField {
+
+        //println("declareField descriptor = $descriptor /*name = ${descriptor.name}*/")
+
+        return fieldSymbolTable.declare(
+                descriptor,
+                { IrFieldSymbolImpl(descriptor) },
+                fieldFactory
         )
+    }
 
     fun declareField(
         startOffset: Int,
@@ -403,6 +415,10 @@ open class SymbolTable : ReferenceSymbolTable {
 
     override fun referenceVariable(descriptor: VariableDescriptor) =
         variableSymbolTable.referenced(descriptor) { throw AssertionError("Undefined variable referenced: $descriptor") }
+
+    fun introduceVariable(irVariable: IrVariable) {
+        variableSymbolTable.introduceLocal(irVariable.descriptor, irVariable.symbol)
+    }
 
     val unboundVariables: Set<IrVariableSymbol> get() = variableSymbolTable.unboundSymbols
 

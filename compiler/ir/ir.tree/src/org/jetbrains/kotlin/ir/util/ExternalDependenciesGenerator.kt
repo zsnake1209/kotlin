@@ -25,10 +25,11 @@ import org.jetbrains.kotlin.resolve.BindingContext
 class ExternalDependenciesGenerator(
     moduleDescriptor: ModuleDescriptor,
     val symbolTable: SymbolTable,
-    val irBuiltIns: IrBuiltIns
+    val irBuiltIns: IrBuiltIns,
+    val deserializer: IrDeserializer? = null
 ) {
     private val stubGenerator = DeclarationStubGenerator(
-        moduleDescriptor, symbolTable, IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB, irBuiltIns.languageVersionSettings
+        moduleDescriptor, symbolTable, IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB, irBuiltIns.languageVersionSettings, deserializer
     )
 
     fun generateUnboundSymbolsAsDependencies(irModule: IrModuleFragment, bindingContext: BindingContext? = null) {
@@ -40,7 +41,7 @@ class ExternalDependenciesGenerator(
         fun run() {
             stubGenerator.unboundSymbolGeneration = true
             ArrayList(symbolTable.unboundClasses).forEach {
-                stubGenerator.generateClassStub(it.descriptor)
+                val cls = stubGenerator.generateClassStub(it.descriptor)
             }
             ArrayList(symbolTable.unboundConstructors).forEach {
                 stubGenerator.generateConstructorStub(it.descriptor)
@@ -58,7 +59,12 @@ class ExternalDependenciesGenerator(
                 stubGenerator.generateOrGetTypeParameterStub(it.descriptor)
             }
 
-            assert(symbolTable.unboundClasses.isEmpty())
+            assert(symbolTable.unboundClasses.isEmpty()) {
+                ArrayList(symbolTable.unboundClasses).forEach {
+                    println("unbound: ${it} ${it.descriptor} @${it.descriptor.hashCode()}")
+                }
+                error("that's all")
+            }
             assert(symbolTable.unboundConstructors.isEmpty())
             assert(symbolTable.unboundEnumEntries.isEmpty())
             assert(symbolTable.unboundFields.isEmpty())

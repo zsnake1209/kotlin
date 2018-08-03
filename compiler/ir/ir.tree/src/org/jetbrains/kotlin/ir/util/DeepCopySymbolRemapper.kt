@@ -81,7 +81,10 @@ open class DeepCopySymbolRemapper(
 
     override fun visitField(declaration: IrField) {
         remapSymbol(fields, declaration) {
+            if (declaration.correspondingProperty == null)
             IrFieldSymbolImpl(descriptorsRemapper.remapDeclaredField(it.descriptor))
+            else
+                IrFieldSymbolImpl(descriptorsRemapper.remapDeclaredProperty(it.descriptor))
         }
         declaration.acceptChildrenVoid(this)
     }

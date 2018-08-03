@@ -53,10 +53,10 @@ class IrCallImpl(
         type: IrType,
         symbol: IrFunctionSymbol,
         descriptor: FunctionDescriptor,
+        typeArgumentsCount: Int,
         origin: IrStatementOrigin? = null,
         superQualifierSymbol: IrClassSymbol? = null
-    ) : this(startOffset, endOffset, type, symbol, descriptor, descriptor.typeParametersCount,
-             descriptor.valueParameters.size, origin, superQualifierSymbol)
+    ) : this(startOffset, endOffset, type, symbol, descriptor, typeArgumentsCount, symbol.descriptor.valueParameters.size, origin, superQualifierSymbol)
 
     constructor(
         startOffset: Int,
@@ -64,10 +64,9 @@ class IrCallImpl(
         type: IrType,
         symbol: IrFunctionSymbol,
         descriptor: FunctionDescriptor,
-        typeArgumentsCount: Int,
         origin: IrStatementOrigin? = null,
         superQualifierSymbol: IrClassSymbol? = null
-    ) : this(startOffset, endOffset, type, symbol, descriptor, typeArgumentsCount,
+    ) : this(startOffset, endOffset, type, symbol, descriptor, descriptor.typeParametersCount,
              descriptor.valueParameters.size, origin, superQualifierSymbol)
 
     @Deprecated("Creates unbound symbols")

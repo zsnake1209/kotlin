@@ -20,16 +20,20 @@ import org.jetbrains.kotlin.backend.common.DumpIrTreeWithDescriptorsVisitor
 import org.jetbrains.kotlin.backend.common.deepCopyWithVariables
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedTypeParameterDescriptor
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedValueParameterDescriptor
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedVariableDescriptor
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.builders.IrStatementsBuilder
+import org.jetbrains.kotlin.ir.builders.Scope
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrTypeParameterImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionReference
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
@@ -333,3 +337,23 @@ val IrFunction.isStatic: Boolean
 
 val IrDeclaration.isTopLevel: Boolean
     get() = parent is IrPackageFragment
+
+fun <T : IrElement> IrStatementsBuilder<T>.irTemporaryWithWrappedDescriptor(
+    value: IrExpression,
+    nameHint: String? = null): IrVariable {
+    val temporary = scope.createTemporaryVariableWithWrappedDescriptor(value, nameHint)
+    +temporary
+    return temporary
+}
+
+
+fun Scope.createTemporaryVariableWithWrappedDescriptor(
+    irExpression: IrExpression,
+    nameHint: String? = null,
+    isMutable: Boolean = false,
+    origin: IrDeclarationOrigin = IrDeclarationOrigin.IR_TEMPORARY_VARIABLE): IrVariable {
+
+    return createTemporaryVariableWithGivenDescriptor(
+        irExpression, nameHint, isMutable, origin, WrappedVariableDescriptor()
+    ).apply { (this.descriptor as WrappedVariableDescriptor).bind(this) }
+}
