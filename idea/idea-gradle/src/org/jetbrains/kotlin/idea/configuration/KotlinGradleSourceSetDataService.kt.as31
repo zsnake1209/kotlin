@@ -191,6 +191,7 @@ fun configureFacetByGradleModule(
     ideModule: Module,
     modelsProvider: IdeModifiableModelsProvider
 ): KotlinFacet? {
+    if (moduleNode.kotlinSourceSet != null) return null // Suppress in the presence of new MPP model
     if (!moduleNode.isResolved) return null
 
     if (!moduleNode.hasKotlinPlugin) {

@@ -180,6 +180,7 @@ fun configureFacetByGradleModule(
     sourceSetNode: DataNode<GradleSourceSetData>?,
     sourceSetName: String? = sourceSetNode?.data?.id?.let { it.substring(it.lastIndexOf(':') + 1) }
 ): KotlinFacet? {
+    if (moduleNode.kotlinSourceSet != null) return null // Suppress in the presence of new MPP model
     if (!moduleNode.isResolved) return null
 
     if (!moduleNode.hasKotlinPlugin) {
