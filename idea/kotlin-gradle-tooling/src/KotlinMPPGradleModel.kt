@@ -22,6 +22,7 @@ interface KotlinModule : Serializable {
 interface KotlinSourceSet : KotlinModule {
     val sourceDirs: Set<File>
     val resourceDirs: Set<File>
+    val dependsOnSourceSets: Set<String>
 }
 
 interface KotlinCompilationOutput : Serializable {
@@ -76,7 +77,7 @@ interface ExtraFeatures : Serializable {
 }
 
 interface KotlinMPPGradleModel : Serializable {
-    val sourceSets: Collection<KotlinSourceSet>
+    val sourceSets: Map<String, KotlinSourceSet>
     val targets: Collection<KotlinTarget>
     val extraFeatures: ExtraFeatures
 }

@@ -229,7 +229,7 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtension() {
                 targetData.moduleIds = compilationIds
             }
 
-            for (sourceSet in mppModel.sourceSets) {
+            for (sourceSet in mppModel.sourceSets.values) {
                 if (sourceSet.isAndroid) continue
                 val moduleId = getKotlinModuleId(gradleModule, sourceSet, resolverCtx)
                 val existingSourceSetDataNode = sourceSetMap[moduleId]?.first
@@ -330,9 +330,7 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtension() {
                     )
                     for (sourceSet in compilation.sourceSets) {
                         if (sourceSet.fullName() == compilation.fullName()) continue
-                        val usedModuleId = getKotlinModuleId(gradleModule, sourceSet, resolverCtx)
-                        val usedModuleDataNode = ideModule.findChildModuleById(usedModuleId) ?: continue
-                        addDependency(dataNode, usedModuleDataNode)
+                        addDependency(dataNode, sourceSet, gradleModule, ideModule, resolverCtx)
                     }
                 }
             }
@@ -352,6 +350,10 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtension() {
                         preprocessDependencies(sourceSet, ideProject),
                         ideProject
                     )
+                    for (targetSourceSetName in sourceSet.dependsOnSourceSets) {
+                        val targetSourceSet = mppModel.sourceSets[targetSourceSetName] ?: continue
+                        addDependency(dataNode, targetSourceSet, gradleModule, ideModule, resolverCtx)
+                    }
                 }
             }
         }
@@ -401,6 +403,18 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtension() {
             fromModule.createChild(ProjectKeys.MODULE_DEPENDENCY, moduleDependencyData)
         }
 
+        private fun addDependency(
+            fromModule: DataNode<*>,
+            toModule: KotlinModule,
+            gradleModule: IdeaModule,
+            ideModule: DataNode<ModuleData>,
+            resolverCtx: ProjectResolverContext
+        ) {
+            val usedModuleId = getKotlinModuleId(gradleModule, toModule, resolverCtx)
+            val usedModuleDataNode = ideModule.findChildModuleById(usedModuleId) ?: return
+            addDependency(fromModule, usedModuleDataNode)
+        }
+
         private fun createContentRootData(sourceDirs: Set<File>, sourceType: ExternalSystemSourceType, parentNode: DataNode<*>) {
             for (sourceDir in sourceDirs) {
                 val contentRootData = ContentRootData(GradleConstants.SYSTEM_ID, sourceDir.absolutePath)
@@ -422,7 +436,7 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtension() {
                     sourceSetsMap[dataNode.data.id] = dataNode
                 }
             }
-            for (sourceSet in mppModel.sourceSets) {
+            for (sourceSet in mppModel.sourceSets.values) {
                 if (sourceSet.isAndroid) continue
                 val moduleId = getKotlinModuleId(gradleModule, sourceSet, resolverCtx)
                 val moduleDataNode = sourceSetsMap[moduleId] ?: continue

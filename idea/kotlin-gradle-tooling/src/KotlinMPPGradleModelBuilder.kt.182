@@ -49,7 +49,7 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         val targets = buildTargets(sourceSetMap, dependencyResolver, project)
         computeSourceSetsDeferredInfo(sourceSets, targets)
         val coroutinesState = getCoroutinesState(project)
-        return KotlinMPPGradleModelImpl(sourceSets, targets, ExtraFeaturesImpl(coroutinesState))
+        return KotlinMPPGradleModelImpl(sourceSetMap, targets, ExtraFeaturesImpl(coroutinesState))
     }
 
     private fun getCoroutinesState(project: Project): String? {
@@ -73,9 +73,12 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         val sourceSetClass = gradleSourceSet.javaClass
         val getSourceDirSet = sourceSetClass.getMethodOrNull("getKotlin") ?: return null
         val getResourceDirSet = sourceSetClass.getMethodOrNull("getResources") ?: return null
+        val getDependsOn = sourceSetClass.getMethodOrNull("getDependsOn") ?: return null
         val sourceDirs = (getSourceDirSet(gradleSourceSet) as? SourceDirectorySet)?.srcDirs ?: emptySet()
         val resourceDirs = (getResourceDirSet(gradleSourceSet) as? SourceDirectorySet)?.srcDirs ?: emptySet()
-        return KotlinSourceSetImpl(gradleSourceSet.name, sourceDirs, resourceDirs)
+        @Suppress("UNCHECKED_CAST")
+        val dependsOnSourceSets = (getDependsOn(gradleSourceSet) as? Set<Named>)?.mapTo(LinkedHashSet()) { it.name } ?: emptySet<String>()
+        return KotlinSourceSetImpl(gradleSourceSet.name, sourceDirs, resourceDirs, dependsOnSourceSets)
     }
 
     private fun buildDependencies(

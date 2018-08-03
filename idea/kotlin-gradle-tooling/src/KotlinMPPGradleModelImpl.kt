@@ -10,7 +10,8 @@ import java.io.File
 class KotlinSourceSetImpl(
     override val name: String,
     override val sourceDirs: Set<File>,
-    override val resourceDirs: Set<File>
+    override val resourceDirs: Set<File>,
+    override val dependsOnSourceSets: Set<String>
 ) : KotlinSourceSet {
     override var isAndroid: Boolean = false
         internal set
@@ -79,7 +80,7 @@ class ExtraFeaturesImpl(
 ) : ExtraFeatures
 
 class KotlinMPPGradleModelImpl(
-    override val sourceSets: Collection<KotlinSourceSet>,
+    override val sourceSets: Map<String, KotlinSourceSet>,
     override val targets: Collection<KotlinTarget>,
     override val extraFeatures: ExtraFeatures
 ) : KotlinMPPGradleModel
