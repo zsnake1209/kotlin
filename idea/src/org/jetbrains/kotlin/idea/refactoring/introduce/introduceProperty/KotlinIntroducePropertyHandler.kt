@@ -23,9 +23,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.codeStyle.JavaCodeStyleManager
+import com.intellij.psi.codeStyle.VariableKind
 import com.intellij.refactoring.RefactoringActionHandler
 import org.jetbrains.kotlin.idea.codeInsight.CodeInsightUtils
-import org.jetbrains.kotlin.idea.refactoring.KotlinRefactoringBundle
 import org.jetbrains.kotlin.idea.refactoring.getExtractionContainers
 import org.jetbrains.kotlin.idea.refactoring.introduce.extractionEngine.*
 import org.jetbrains.kotlin.idea.refactoring.introduce.selectElementsWithTargetSibling
@@ -40,11 +41,14 @@ import org.jetbrains.kotlin.psi.KtProperty
 import java.util.*
 
 class KotlinIntroducePropertyHandler(
-        val helper: ExtractionEngineHelper = KotlinIntroducePropertyHandler.InteractiveExtractionHelper
+        private val forConstant: Boolean = false,
+        val helper: ExtractionEngineHelper = KotlinIntroducePropertyHandler.InteractiveExtractionHelper(forConstant)
 ): RefactoringActionHandler {
-    object InteractiveExtractionHelper : ExtractionEngineHelper(INTRODUCE_PROPERTY) {
+    class InteractiveExtractionHelper(private val forConstant: Boolean) : ExtractionEngineHelper(
+        getIntroducePropertyOperationName(forConstant)
+    ) {
         private fun getExtractionTarget(descriptor: ExtractableCodeDescriptor) =
-                propertyTargets.firstOrNull { it.isAvailable(descriptor) }
+                getPropertyTargets(forConstant).firstOrNull { it.isAvailable(descriptor) }
 
         override fun validate(descriptor: ExtractableCodeDescriptor) =
                 descriptor.validate(getExtractionTarget(descriptor) ?: ExtractionTarget.FUNCTION)
@@ -55,21 +59,35 @@ class KotlinIntroducePropertyHandler(
                 descriptorWithConflicts: ExtractableCodeDescriptorWithConflicts,
                 onFinish: (ExtractionResult) -> Unit
         ) {
-            val descriptor = descriptorWithConflicts.descriptor
+            val descriptor = descriptorWithConflicts.descriptor.let {
+                if (forConstant) {
+                    val codeStyleManager = JavaCodeStyleManager.getInstance(project)
+                    it.copy(
+                        suggestedNames = it.suggestedNames.map {
+                            codeStyleManager.propertyNameToVariableName(it, VariableKind.STATIC_FINAL_FIELD)
+                        },
+                        visibility = null
+                    )
+                } else it
+            }
             val target = getExtractionTarget(descriptor)
             if (target != null) {
                 val options = ExtractionGeneratorOptions.DEFAULT.copy(target = target, delayInitialOccurrenceReplacement = true)
                 doRefactor(ExtractionGeneratorConfiguration(descriptor, options), onFinish)
-            }
-            else {
-                showErrorHint(project, editor, "Can't introduce property for this expression", INTRODUCE_PROPERTY)
+            } else {
+                showErrorHint(
+                    project,
+                    editor,
+                    "Can't introduce property for this expression",
+                    getIntroducePropertyOperationName(forConstant)
+                )
             }
         }
     }
 
     fun selectElements(editor: Editor, file: KtFile, continuation: (elements: List<PsiElement>, targetSibling: PsiElement) -> Unit) {
         selectElementsWithTargetSibling(
-                INTRODUCE_PROPERTY,
+            getIntroducePropertyOperationName(forConstant),
                 editor,
                 file,
                 "Select target code block",
@@ -100,14 +118,15 @@ class KotlinIntroducePropertyHandler(
                     }
 
                     val introducer = KotlinInplacePropertyIntroducer(
-                            property = property,
-                            editor = editor,
-                            project = project,
-                            title = INTRODUCE_PROPERTY,
-                            doNotChangeVar = false,
-                            exprType = descriptor.returnType,
-                            extractionResult = it,
-                            availableTargets = propertyTargets.filter { it.isAvailable(descriptor) }
+                        property = property,
+                        editor = editor,
+                        project = project,
+                        title = getIntroducePropertyOperationName(forConstant),
+                        doNotChangeVar = false,
+                        exprType = descriptor.returnType,
+                        extractionResult = it,
+                        availableTargets = getPropertyTargets(forConstant).filter { it.isAvailable(descriptor) },
+                        forConstant = forConstant
                     )
                     introducer.performInplaceRefactoring(LinkedHashSet(descriptor.suggestedNames))
                 }
@@ -115,9 +134,13 @@ class KotlinIntroducePropertyHandler(
                     processDuplicatesSilently(it.duplicateReplacers, project)
                 }
             }
-        }
-        else {
-            showErrorHintByKey(project, editor, "cannot.refactor.no.expression", INTRODUCE_PROPERTY)
+        } else {
+            showErrorHintByKey(
+                project,
+                editor,
+                "cannot.refactor.no.expression",
+                getIntroducePropertyOperationName(forConstant)
+            )
         }
     }
 
@@ -127,8 +150,8 @@ class KotlinIntroducePropertyHandler(
     }
 
     override fun invoke(project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) {
-        throw AssertionError("$INTRODUCE_PROPERTY can only be invoked from editor")
+        throw AssertionError("${getIntroducePropertyOperationName(forConstant)} can only be invoked from editor")
     }
 }
 
-val INTRODUCE_PROPERTY: String = KotlinRefactoringBundle.message("introduce.property")
+fun getIntroducePropertyOperationName(forConstant: Boolean) = if (forConstant) "Introduce Constant" else "Introduce Property"

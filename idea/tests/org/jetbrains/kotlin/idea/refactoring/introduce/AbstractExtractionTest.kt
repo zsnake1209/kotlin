@@ -50,8 +50,8 @@ import org.jetbrains.kotlin.idea.refactoring.introduce.extractFunction.EXTRACT_F
 import org.jetbrains.kotlin.idea.refactoring.introduce.extractFunction.ExtractKotlinFunctionHandler
 import org.jetbrains.kotlin.idea.refactoring.introduce.extractionEngine.*
 import org.jetbrains.kotlin.idea.refactoring.introduce.introduceParameter.*
-import org.jetbrains.kotlin.idea.refactoring.introduce.introduceProperty.INTRODUCE_PROPERTY
 import org.jetbrains.kotlin.idea.refactoring.introduce.introduceProperty.KotlinIntroducePropertyHandler
+import org.jetbrains.kotlin.idea.refactoring.introduce.introduceProperty.getIntroducePropertyOperationName
 import org.jetbrains.kotlin.idea.refactoring.introduce.introduceTypeAlias.IntroduceTypeAliasDescriptor
 import org.jetbrains.kotlin.idea.refactoring.introduce.introduceTypeAlias.KotlinIntroduceTypeAliasHandler
 import org.jetbrains.kotlin.idea.refactoring.introduce.introduceTypeParameter.KotlinIntroduceTypeParameterHandler
@@ -223,11 +223,12 @@ abstract class AbstractExtractionTest : KotlinLightCodeInsightFixtureTestCase() 
         doTest(path) { file ->
             file as KtFile
 
-            val extractionTarget = propertyTargets.single {
+            val forConstant = InTextDirectivesUtils.isDirectiveDefined(file.text, "// INTRODUCE_CONSTANT")
+            val extractionTarget = getPropertyTargets(forConstant).single {
                 it.targetName == InTextDirectivesUtils.findStringWithPrefixes(file.getText(), "// EXTRACTION_TARGET: ")
             }
             val explicitPreviousSibling = file.findElementByCommentPrefix("// SIBLING:")
-            val helper = object : ExtractionEngineHelper(INTRODUCE_PROPERTY) {
+            val helper = object : ExtractionEngineHelper(getIntroducePropertyOperationName(forConstant)) {
                 override fun validate(descriptor: ExtractableCodeDescriptor) = descriptor.validate(extractionTarget)
 
                 override fun configureAndRun(
@@ -245,7 +246,7 @@ abstract class AbstractExtractionTest : KotlinLightCodeInsightFixtureTestCase() 
                     )
                 }
             }
-            val handler = KotlinIntroducePropertyHandler(helper)
+            val handler = KotlinIntroducePropertyHandler(forConstant, helper)
             val editor = fixture.editor
             handler.selectElements(editor, file) { elements, previousSibling ->
                 handler.doInvoke(project, editor, file, elements, explicitPreviousSibling ?: previousSibling)

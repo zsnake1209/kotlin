@@ -40,6 +40,8 @@ class KotlinRefactoringSupportProvider : RefactoringSupportProvider() {
 
     override fun getIntroduceVariableHandler() = KotlinIntroduceVariableHandler
 
+    override fun getIntroduceConstantHandler() = KotlinIntroducePropertyHandler(true)
+
     override fun getIntroduceParameterHandler() = KotlinIntroduceParameterHandler()
 
     override fun getIntroduceFunctionalParameterHandler() = KotlinIntroduceLambdaParameterHandler()

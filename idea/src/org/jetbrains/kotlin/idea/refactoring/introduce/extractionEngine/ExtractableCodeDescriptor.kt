@@ -461,9 +461,17 @@ enum class ExtractionTarget(val targetName: String) {
     }
 }
 
-val propertyTargets: List<ExtractionTarget> = listOf(ExtractionTarget.PROPERTY_WITH_INITIALIZER,
-                                                     ExtractionTarget.PROPERTY_WITH_GETTER,
-                                                     ExtractionTarget.LAZY_PROPERTY)
+fun getPropertyTargets(forConstant: Boolean): List<ExtractionTarget> {
+    return if (forConstant) {
+        listOf(ExtractionTarget.PROPERTY_WITH_INITIALIZER)
+    } else {
+        listOf(
+            ExtractionTarget.PROPERTY_WITH_INITIALIZER,
+            ExtractionTarget.PROPERTY_WITH_GETTER,
+            ExtractionTarget.LAZY_PROPERTY
+        )
+    }
+}
 
 data class ExtractionGeneratorOptions(
         val inTempFile: Boolean = false,

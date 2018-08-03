@@ -47,7 +47,8 @@ class KotlinInplacePropertyIntroducer(
         doNotChangeVar: Boolean,
         exprType: KotlinType?,
         private var extractionResult: ExtractionResult,
-        private val availableTargets: List<ExtractionTarget>
+        private val availableTargets: List<ExtractionTarget>,
+        private val forConstant: Boolean
 ): KotlinInplaceVariableIntroducer<KtProperty>(
         property, editor, project, title, KtExpression.EMPTY_ARRAY, null, false, property, false, doNotChangeVar, exprType, false
 ) {
@@ -81,7 +82,7 @@ class KotlinInplacePropertyIntroducer(
     private fun isInitializer(): Boolean = currentTarget == ExtractionTarget.PROPERTY_WITH_INITIALIZER
 
     override fun initPanelControls() {
-        if (availableTargets.size > 1) {
+        if (availableTargets.size > 1 && !forConstant) {
             addPanelControl(
                     ControlWrapper {
                         val propertyKindComboBox = with(JComboBox(availableTargets.map { it.targetName.capitalize() }.toTypedArray())) {
@@ -116,14 +117,17 @@ class KotlinInplacePropertyIntroducer(
         if (ExtractionTarget.PROPERTY_WITH_INITIALIZER in availableTargets) {
             val condition = { isInitializer() }
 
-            createVarCheckBox?.let {
-                val initializer = object: Pass<JComponent>() {
-                    override fun pass(t: JComponent) {
-                        (t as JCheckBox).isSelected = property.isVar
+            if (!forConstant) {
+                createVarCheckBox?.let {
+                    val initializer = object: Pass<JComponent>() {
+                        override fun pass(t: JComponent) {
+                            (t as JCheckBox).isSelected = property.isVar
+                        }
                     }
+                    addPanelControl(ControlWrapper(it, condition, initializer))
                 }
-                addPanelControl(ControlWrapper(it, condition, initializer))
             }
+
             createExplicitTypeCheckBox?.let {
                 val initializer = object: Pass<JComponent>() {
                     override fun pass(t: JComponent) {
