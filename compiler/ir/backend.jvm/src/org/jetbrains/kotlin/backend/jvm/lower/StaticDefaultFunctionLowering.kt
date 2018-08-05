@@ -34,7 +34,7 @@ class StaticDefaultFunctionLowering(val state: GenerationState) : IrElementTrans
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
         return if (declaration.origin == DECLARATION_ORIGIN_FUNCTION_FOR_DEFAULT_PARAMETER && declaration.dispatchReceiverParameter != null) {
-            val newFunction = createStaticFunctionWithReceivers(
+            val newFunction = createStaticFunctionDescriptorWithReceivers(
                 declaration.descriptor.containingDeclaration as ClassDescriptor,
                 declaration.descriptor.name,
                 declaration.descriptor,

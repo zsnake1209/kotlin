@@ -7,12 +7,12 @@ package org.jetbrains.kotlin.backend.jvm.lower
 
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.CodegenUtil
+import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredStatementOrigin
 import org.jetbrains.kotlin.backend.jvm.codegen.isJvmInterface
 import org.jetbrains.kotlin.backend.jvm.descriptors.DefaultImplsClassDescriptor
 import org.jetbrains.kotlin.backend.jvm.descriptors.DefaultImplsClassDescriptorImpl
 import org.jetbrains.kotlin.codegen.isDefinitelyNotDefaultImplsMethod
-import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -23,14 +23,12 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
-import org.jetbrains.kotlin.ir.expressions.typeParametersCount
-import org.jetbrains.kotlin.ir.types.toIrType
 import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 
-class InterfaceDelegationLowering(val state: GenerationState) : IrElementTransformerVoid(), ClassLoweringPass {
+class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTransformerVoid(), ClassLoweringPass {
 
     override fun lower(irClass: IrClass) {
         if (irClass.isJvmInterface) return
@@ -45,18 +43,18 @@ class InterfaceDelegationLowering(val state: GenerationState) : IrElementTransfo
         for ((interfaceFun, value) in CodegenUtil.getNonPrivateTraitMethods(classDescriptor)) {
             //skip java 8 default methods
             if (!interfaceFun.isDefinitelyNotDefaultImplsMethod()) {
-                val inheritedFun =
+                val inheritedFunDescriptor =
                     if (classDescriptor !== descriptor) {
-                        InterfaceLowering.createDefaultImplFunDescriptor(
+                        InterfaceLowering.getDefaultImplFunction(
                             descriptor as DefaultImplsClassDescriptorImpl,
                             interfaceFun,
                             classDescriptor,
-                            state.typeMapper
-                        )
+                            context
+                        ).descriptor
                     } else {
                         value
                     }
-                generateDelegationToDefaultImpl(irClass, interfaceFun, inheritedFun)
+                generateDelegationToDefaultImpl(irClass, interfaceFun, inheritedFunDescriptor)
             }
         }
     }
@@ -68,17 +66,17 @@ class InterfaceDelegationLowering(val state: GenerationState) : IrElementTransfo
         irClass.declarations.add(irFunction)
 
         val interfaceDescriptor = interfaceFun.containingDeclaration as ClassDescriptor
-        val defaultImpls = InterfaceLowering.createDefaultImplsClassDescriptor(interfaceDescriptor)
+        val defaultImpls = InterfaceLowering.getDefaultImplsClass(interfaceDescriptor, context)
         val defaultImplFun =
-            InterfaceLowering.createDefaultImplFunDescriptor(defaultImpls, interfaceFun.original, interfaceDescriptor, state.typeMapper)
-        irFunction.returnType = defaultImplFun.returnType!!.toIrType()!!
+            InterfaceLowering.getDefaultImplFunction(defaultImpls.descriptor, interfaceFun.original, interfaceDescriptor, context)
+        irFunction.returnType = defaultImplFun.returnType
         val irCallImpl =
             IrCallImpl(
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
-                defaultImplFun.returnType!!.toIrType()!!,
-                defaultImplFun,
-                defaultImplFun.typeParametersCount,
+                defaultImplFun.returnType,
+                defaultImplFun.symbol, defaultImplFun.descriptor,
+                defaultImplFun.typeParameters.size,
                 JvmLoweredStatementOrigin.DEFAULT_IMPLS_DELEGATION
             )
         irBody.statements.add(

@@ -32,6 +32,8 @@ interface JvmLoweredDeclarationOrigin : IrDeclarationOrigin {
     object TO_ARRAY : IrDeclarationOriginImpl("TO_ARRAY")
     object JVM_STATIC_WRAPPER : IrDeclarationOriginImpl("JVM_STATIC_WRAPPER")
     object JVM_OVERLOADS_WRAPPER : IrDeclarationOriginImpl("JVM_OVERLOADS_WRAPPER")
+    object JVM_MODIFIED_BY_LOWERING : IrDeclarationOriginImpl("JVM_MODIFIED_BY_LOWERING")
+
 }
 
 interface JvmLoweredStatementOrigin : IrStatementOrigin {
