@@ -234,6 +234,7 @@ class BasicLookupElementFactory(
             }
         }
 
+        var isMarkedAsDsl = false
         if (descriptor is CallableDescriptor) {
             appendContainerAndReceiverInformation(descriptor) { element = element.appendTailText(it, true) }
 
@@ -241,6 +242,7 @@ class BasicLookupElementFactory(
                 EditorColorsManager.getInstance().globalScheme.getAttributes(it)
             }
             if (dslTextAttributes != null) {
+                isMarkedAsDsl = true
                 element = element.withBoldness(dslTextAttributes.fontType == Font.BOLD)
                 dslTextAttributes.foregroundColor?.let { element = element.withItemTextForeground(it) }
             }
@@ -264,7 +266,9 @@ class BasicLookupElementFactory(
             element.putUserData(KotlinCompletionCharFilter.ACCEPT_OPENING_BRACE, Unit)
         }
 
-        return element.withIconFromLookupObject()
+        val result = element.withIconFromLookupObject()
+        result.isDslMember = isMarkedAsDsl
+        return result
     }
 
     fun appendContainerAndReceiverInformation(descriptor: CallableDescriptor, appendTailText: (String) -> Unit) {
