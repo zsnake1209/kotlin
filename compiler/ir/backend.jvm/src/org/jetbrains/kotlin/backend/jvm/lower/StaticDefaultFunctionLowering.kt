@@ -18,12 +18,16 @@ package org.jetbrains.kotlin.backend.jvm.lower
 
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.lower.DECLARATION_ORIGIN_FUNCTION_FOR_DEFAULT_PARAMETER
+import org.jetbrains.kotlin.backend.common.lower.VariableRemapper
 import org.jetbrains.kotlin.codegen.state.GenerationState
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrValueParameter
+import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
+import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
 class StaticDefaultFunctionLowering(val state: GenerationState) : IrElementTransformerVoid(), ClassLoweringPass {
@@ -46,3 +50,23 @@ class StaticDefaultFunctionLowering(val state: GenerationState) : IrElementTrans
         }
     }
 }
+
+
+private fun FunctionDescriptor.createFunctionAndMapVariables(
+    oldFunction: IrFunction,
+    visibility: Visibility
+) =
+    IrFunctionImpl(
+        oldFunction.startOffset, oldFunction.endOffset, oldFunction.origin, IrSimpleFunctionSymbolImpl(this),
+        visibility = visibility
+    ).apply {
+        body = oldFunction.body
+        createParameterDeclarations()
+        val mapping: Map<ValueDescriptor, IrValueParameter> =
+            (
+                    listOfNotNull(oldFunction.descriptor.dispatchReceiverParameter!!, oldFunction.descriptor.extensionReceiverParameter) +
+                            oldFunction.descriptor.valueParameters
+                    ).zip(valueParameters).toMap()
+
+        body?.transform(VariableRemapper(mapping), null)
+    }

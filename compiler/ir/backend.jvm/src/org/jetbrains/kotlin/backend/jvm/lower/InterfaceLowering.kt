@@ -169,22 +169,3 @@ internal fun IrFunction.transferBody(oldFunction: IrFunction) {
 
     body?.transform(VariableRemapper(mapping), null)
 }
-
-internal fun FunctionDescriptor.createFunctionAndMapVariables(
-    oldFunction: IrFunction,
-    visibility: Visibility
-) =
-    IrFunctionImpl(
-        oldFunction.startOffset, oldFunction.endOffset, oldFunction.origin, IrSimpleFunctionSymbolImpl(this),
-        visibility = visibility
-    ).apply {
-        body = oldFunction.body
-        createParameterDeclarations()
-        val mapping: Map<ValueDescriptor, IrValueParameter> =
-            (
-                    listOfNotNull(oldFunction.descriptor.dispatchReceiverParameter!!, oldFunction.descriptor.extensionReceiverParameter) +
-                            oldFunction.descriptor.valueParameters
-                    ).zip(valueParameters).toMap()
-
-        body?.transform(VariableRemapper(mapping), null)
-    }
