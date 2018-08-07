@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.idea.util
 
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
@@ -231,8 +232,7 @@ fun CallTypeAndReceiver<*, *>.receiverTypesWithIndex(
         moduleDescriptor: ModuleDescriptor,
         resolutionFacade: ResolutionFacade,
         stableSmartCastsOnly: Boolean,
-        withImplicitReceiversWhenExplicitPresent: Boolean = false,
-        excludeShadowedByDslMarker: Boolean = false
+        withImplicitReceiversWhenExplicitPresent: Boolean = false
 ): Collection<ReceiverType>? {
     val languageVersionSettings = resolutionFacade.frontendService<LanguageVersionSettings>()
 
@@ -297,7 +297,9 @@ fun CallTypeAndReceiver<*, *>.receiverTypesWithIndex(
         ExpressionReceiver.create(receiverExpression, receiverType, bindingContext)
     }
 
-    val implicitReceiverValues = resolutionScope.getImplicitReceiversWithInstance(excludeShadowedByDslMarker).map { it.value }
+    val implicitReceiverValues = resolutionScope.getImplicitReceiversWithInstance(
+        excludeShadowedByDslMarkers = languageVersionSettings.supportsFeature(LanguageFeature.DslMarkersSupport)
+    ).map { it.value }
 
     val dataFlowInfo = bindingContext.getDataFlowInfoBefore(contextElement)
 

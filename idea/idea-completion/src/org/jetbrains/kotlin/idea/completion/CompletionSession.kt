@@ -406,10 +406,9 @@ abstract class CompletionSession(
                                       nameExpression: KtSimpleNameExpression,
                                       callTypeAndReceiver: CallTypeAndReceiver<*, *>): Collection<ReceiverType>? {
         var receiverTypes = callTypeAndReceiver.receiverTypesWithIndex(
-                bindingContext, nameExpression, moduleDescriptor, resolutionFacade,
-                stableSmartCastsOnly = true, /* we don't include smart cast receiver types for "unstable" receiver value to mark members grayed */
-                withImplicitReceiversWhenExplicitPresent = true,
-                excludeShadowedByDslMarker = nameExpression.languageVersionSettings.supportsFeature(LanguageFeature.DslMarkersSupport)
+            bindingContext, nameExpression, moduleDescriptor, resolutionFacade,
+            stableSmartCastsOnly = true, /* we don't include smart cast receiver types for "unstable" receiver value to mark members grayed */
+            withImplicitReceiversWhenExplicitPresent = true
         )
 
         if (callTypeAndReceiver is CallTypeAndReceiver.SAFE || isDebuggerContext) {

@@ -306,8 +306,7 @@ internal class ImportFix(expression: KtSimpleNameExpression) : OrdinaryImportFix
                 bindingContext, element,
                 resolutionFacade.moduleDescriptor, resolutionFacade,
                 stableSmartCastsOnly = false,
-                withImplicitReceiversWhenExplicitPresent = true,
-                excludeShadowedByDslMarker = element.languageVersionSettings.supportsFeature(LanguageFeature.DslMarkersSupport)
+                withImplicitReceiversWhenExplicitPresent = true
             ).orEmpty()
 
 
