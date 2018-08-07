@@ -538,6 +538,7 @@ abstract class BaseGradleIT {
 
             // Workaround: override a console type set in the user machine gradle.properties (since Gradle 4.3):
             add("--console=plain")
+            add("--init-script=${resourcesRootFile.resolve("init-script.gradle").absolutePath}")
 
             addAll(options.freeCommandLineArgs)
         }
