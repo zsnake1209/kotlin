@@ -40,7 +40,7 @@ fun compile(
     dependencies: List<Result> = listOf()
 ): Result {
     val analysisResult =
-        TopDownAnalyzerFacadeForJS.analyzeFiles(files, project, configuration, dependencies.filterIsInstance(), emptyList())
+        TopDownAnalyzerFacadeForJS.analyzeFiles(files, project, configuration, dependencies.map { it.moduleDescriptor }.filterIsInstance(), emptyList())
 
     ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
 

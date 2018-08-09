@@ -18,10 +18,7 @@ import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ModuleIndex
 import org.jetbrains.kotlin.ir.backend.js.utils.OperatorNames
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrEnumEntrySymbol
@@ -84,7 +81,8 @@ class JsIrBackendContext(
                     NoLookupLocation.FROM_BACKEND
                 ) as ClassDescriptor
             )
-            val contextGetter = continuation.owner.declarations.single { it.descriptor.name == CONTINUATION_CONTEXT_GETTER_NAME } as IrFunction
+            val contextGetter = (continuation.owner.declarations.singleOrNull { it.descriptor.name.asString() == "context" } as? IrProperty)?.getter ?:
+                continuation.owner.declarations.single { it.descriptor.name == CONTINUATION_CONTEXT_GETTER_NAME } as IrFunction
             return contextGetter.symbol
         }
 

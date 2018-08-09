@@ -406,7 +406,11 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
 
             coroutineClass.addChild(doResumeMethodBuilder.ir)
 
-            coroutineClass.setSuperSymbolsAndAddFakeOverrides(superTypes)
+            try {
+                coroutineClass.setSuperSymbolsAndAddFakeOverrides(superTypes)
+            } catch (t: Throwable) {
+                coroutineClass.setSuperSymbolsAndAddFakeOverrides(superTypes)
+            }
 
             setupExceptionState()
 

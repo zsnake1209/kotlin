@@ -90,7 +90,8 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
         val functionDescriptor = irCall.descriptor
         val originalDescriptor = functionDescriptor.resolveFakeOverride().original
         val functionDeclaration =
-            context.originalModuleIndex.functions[originalDescriptor] // ?:                 // If function is declared in the current module.
+            context.originalModuleIndex.functions[originalDescriptor] ?: context.symbolTable.referenceDeclaredFunction(originalDescriptor).owner
+        // ?:                 // If function is declared in the current module.
        // TODO     deserializer.deserializeInlineBody(originalDescriptor)                      // Function is declared in another module.
         return functionDeclaration as IrFunction?
     }
