@@ -69,7 +69,7 @@ fun compile(
 
     context.performInlining(moduleFragment)
 
-    context.lower(moduleFragment)
+    context.lower(moduleFragment, dependencies.map { it.irModule })
 
     val program = moduleFragment.accept(IrModuleToJsTransformer(context), null)
 
@@ -87,7 +87,7 @@ private fun JsIrBackendContext.performInlining(moduleFragment: IrModuleFragment)
     }
 }
 
-private fun JsIrBackendContext.lower(moduleFragment: IrModuleFragment) {
+private fun JsIrBackendContext.lower(moduleFragment: IrModuleFragment, dependencies: List<IrModuleFragment>) {
     moduleFragment.files.forEach(LateinitLowering(this, true)::lower)
     moduleFragment.files.forEach(DefaultArgumentStubGenerator(this)::runOnFilePostfix)
     moduleFragment.files.forEach(DefaultParameterInjector(this)::runOnFilePostfix)
@@ -106,7 +106,7 @@ private fun JsIrBackendContext.lower(moduleFragment: IrModuleFragment) {
     moduleFragment.files.forEach(TypeOperatorLowering(this)::lower)
     moduleFragment.files.forEach(BlockDecomposerLowering(this)::runOnFilePostfix)
     val sctor = SecondaryCtorLowering(this)
-    moduleFragment.files.forEach(sctor.getConstructorProcessorLowering())
+    (moduleFragment.files + dependencies.flatMap { it.files }).forEach(sctor.getConstructorProcessorLowering())
     moduleFragment.files.forEach(sctor.getConstructorRedirectorLowering())
     val clble = CallableReferenceLowering(this)
     moduleFragment.files.forEach(clble.getReferenceCollector())
