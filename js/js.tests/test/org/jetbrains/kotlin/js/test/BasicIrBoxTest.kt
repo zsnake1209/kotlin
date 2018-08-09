@@ -95,22 +95,13 @@ abstract class BasicIrBoxTest(
             runtimeFile.write(runtimeResult!!.generatedCode)
         }
 
-        val result = if (doNotCache) {
-            val runtimeFiles = runtimeSources.map(::createPsiFile)
-            val allFiles = runtimeFiles + filesToCompile
-            compile(
-                config.project,
-                allFiles,
-                config.configuration,
-                FqName((testPackage?.let { "$it." } ?: "") + testFunction))
-        } else {
-            compile(
-                config.project,
-                filesToCompile,
-                config.configuration,
-                FqName((testPackage?.let { "$it." } ?: "") + testFunction),
-                listOf(runtimeResult!!.moduleDescriptor))
-        }
+
+        val result = compile(
+            config.project,
+            filesToCompile,
+            config.configuration,
+            FqName((testPackage?.let { "$it." } ?: "") + testFunction),
+            listOf(runtimeResult!!))
 
         outputFile.write(result.generatedCode)
     }

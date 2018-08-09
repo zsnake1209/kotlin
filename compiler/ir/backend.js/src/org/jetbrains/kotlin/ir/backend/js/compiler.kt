@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransf
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
+import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
 import org.jetbrains.kotlin.name.FqName
@@ -29,14 +30,14 @@ import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStat
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
 
-data class Result(val moduleDescriptor: ModuleDescriptor, val generatedCode: String)
+data class Result(val moduleDescriptor: ModuleDescriptor, val generatedCode: String, val irModule: IrModuleFragment)
 
 fun compile(
     project: Project,
     files: List<KtFile>,
     configuration: CompilerConfiguration,
     export: FqName? = null,
-    dependencies: List<ModuleDescriptor> = listOf()
+    dependencies: List<Result> = listOf()
 ): Result {
     val analysisResult =
         TopDownAnalyzerFacadeForJS.analyzeFiles(files, project, configuration, dependencies.filterIsInstance(), emptyList())
@@ -47,6 +48,8 @@ fun compile(
 
     val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
     val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext)
+
+    dependencies.forEach { psi2IrContext.symbolTable.loadModule(it.irModule)}
 
     val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files)
 
@@ -60,6 +63,8 @@ fun compile(
     ExternalDependenciesGenerator(psi2IrContext.moduleDescriptor, psi2IrContext.symbolTable, psi2IrContext.irBuiltIns)
         .generateUnboundSymbolsAsDependencies(moduleFragment)
 
+    val moduleFragmentCopy = moduleFragment.deepCopyWithSymbols()
+
     MoveExternalDeclarationsToSeparatePlace().lower(moduleFragment.files)
 
     context.performInlining(moduleFragment)
@@ -68,12 +73,11 @@ fun compile(
 
     val program = moduleFragment.accept(IrModuleToJsTransformer(context), null)
 
-    return Result(analysisResult.moduleDescriptor, program.toString())
+    return Result(analysisResult.moduleDescriptor, program.toString(), moduleFragmentCopy)
 }
 
 private fun JsIrBackendContext.performInlining(moduleFragment: IrModuleFragment) {
     FunctionInlining(this).inline(moduleFragment)
-
 
     moduleFragment.replaceUnboundSymbols(this)
     moduleFragment.patchDeclarationParents()
