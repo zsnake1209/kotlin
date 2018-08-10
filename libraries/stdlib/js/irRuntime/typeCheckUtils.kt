@@ -74,6 +74,9 @@ public fun isInterface(ctor: dynamic, IType: dynamic): Boolean {
 
 fun typeOf(obj: dynamic) = js("typeof obj").unsafeCast<String>()
 
+// TODO switch to libraries/stdlib/js/src/kotlin/jsTypeOf.kt
+fun jsTypeOf(a: Any?): String = js("typeof a")
+
 fun isObject(obj: dynamic): Boolean {
     val objTypeOf = typeOf(obj)
 

@@ -49,7 +49,9 @@ fun compile(
     val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
     val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext)
 
-    dependencies.forEach { psi2IrContext.symbolTable.loadModule(it.irModule)}
+    val irDependencyModules = dependencies.map { it.irModule.deepCopyWithSymbols() }
+
+    irDependencyModules.forEach { psi2IrContext.symbolTable.loadModule(it)}
 
     val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files)
 
@@ -63,13 +65,13 @@ fun compile(
     ExternalDependenciesGenerator(psi2IrContext.moduleDescriptor, psi2IrContext.symbolTable, psi2IrContext.irBuiltIns)
         .generateUnboundSymbolsAsDependencies(moduleFragment)
 
-    val moduleFragmentCopy = moduleFragment.deepCopyWithSymbols()
-
     MoveExternalDeclarationsToSeparatePlace().lower(moduleFragment.files)
+
+    val moduleFragmentCopy = moduleFragment.deepCopyWithSymbols()
 
     context.performInlining(moduleFragment)
 
-    context.lower(moduleFragment, dependencies.map { it.irModule })
+    context.lower(moduleFragment, irDependencyModules)
 
     val program = moduleFragment.accept(IrModuleToJsTransformer(context), null)
 

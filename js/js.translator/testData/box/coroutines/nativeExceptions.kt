@@ -1,4 +1,3 @@
-// IGNORE_BACKEND: JS_IR
 // EXPECTED_REACHABLE_NODES: 1250
 import kotlin.coroutines.experimental.*
 import kotlin.coroutines.experimental.intrinsics.*

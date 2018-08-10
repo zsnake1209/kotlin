@@ -173,9 +173,9 @@ class IrElementToJsExpressionTransformer : BaseIrElementToJsNodeTransformer<JsEx
         }
 
         return if (symbol is IrConstructorSymbol) {
-//            if (!symbol.owner.isPrimary) {
-//                println("AAAA")
-//            }
+            if (!symbol.owner.isPrimary) {
+                println("AAAA")
+            }
 //            assert(symbol.owner.isPrimary)
             JsNew(context.getNameForSymbol(symbol).makeRef(), arguments)
         } else {

@@ -21,7 +21,6 @@ import java.io.File
 private val runtimeSources = listOfKtFilesFrom(
     "libraries/stdlib/js/src/kotlin/core.kt",
     "libraries/stdlib/js/src/kotlin/js.core.kt",
-    "libraries/stdlib/js/src/kotlin/jsTypeOf.kt",
     "libraries/stdlib/js/src/kotlin/dynamic.kt",
     "libraries/stdlib/js/src/kotlin/annotations.kt",
 
