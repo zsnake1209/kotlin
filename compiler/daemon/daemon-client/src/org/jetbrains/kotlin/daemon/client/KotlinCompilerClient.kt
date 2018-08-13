@@ -34,6 +34,8 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
+const val COMPILER_DAEMON_RUNNER_PROPERTY = "kotlin.compiler.daemon.runner"
+
 class CompilationServices(
         val incrementalCompilationComponents: IncrementalCompilationComponents? = null,
         val lookupTracker: LookupTracker? = null,
@@ -366,16 +368,20 @@ object KotlinCompilerClient {
         val javaExecutable = File(File(System.getProperty("java.home"), "bin"), "java")
         val serverHostname = System.getProperty(JAVA_RMI_SERVER_HOSTNAME) ?: error("$JAVA_RMI_SERVER_HOSTNAME is not set!")
         val platformSpecificOptions = listOf(
-                // hide daemon window
-                "-Djava.awt.headless=true",
-                "-D$JAVA_RMI_SERVER_HOSTNAME=$serverHostname")
-        val args = listOf(
-                   javaExecutable.absolutePath, "-cp", compilerId.compilerClasspath.joinToString(File.pathSeparator)) +
-                   platformSpecificOptions +
-                   daemonJVMOptions.mappers.flatMap { it.toArgs("-") } +
-                   COMPILER_DAEMON_CLASS_FQN +
-                   daemonOptions.mappers.flatMap { it.toArgs(COMPILE_DAEMON_CMDLINE_OPTIONS_PREFIX) } +
-                   compilerId.mappers.flatMap { it.toArgs(COMPILE_DAEMON_CMDLINE_OPTIONS_PREFIX) }
+            // hide daemon window
+            "-Djava.awt.headless=true",
+            "-D$JAVA_RMI_SERVER_HOSTNAME=$serverHostname"
+        )
+
+        val daemonRunnerArgs = System.getProperty(COMPILER_DAEMON_RUNNER_PROPERTY)?.let { listOf(it) }
+            ?: listOf(javaExecutable.absolutePath, "-cp", compilerId.compilerClasspath.joinToString(File.pathSeparator))
+
+        val args = daemonRunnerArgs +
+                platformSpecificOptions +
+                daemonJVMOptions.mappers.flatMap { it.toArgs("-") } +
+                COMPILER_DAEMON_CLASS_FQN +
+                daemonOptions.mappers.flatMap { it.toArgs(COMPILE_DAEMON_CMDLINE_OPTIONS_PREFIX) } +
+                compilerId.mappers.flatMap { it.toArgs(COMPILE_DAEMON_CMDLINE_OPTIONS_PREFIX) }
         reportingTargets.report(DaemonReportCategory.DEBUG, "starting the daemon as: " + args.joinToString(" "))
         val processBuilder = ProcessBuilder(args)
         processBuilder.redirectErrorStream(true)
