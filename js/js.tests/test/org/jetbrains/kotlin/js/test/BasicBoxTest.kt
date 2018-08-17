@@ -700,6 +700,10 @@ abstract class BasicBoxTest(
                 }
             }
 
+            if (InTextDirectivesUtils.isDirectiveDefined(text, "WITH_UNSIGNED")) {
+                LanguageVersion.KOTLIN_1_3.toSettings().trySet()
+            }
+
             parseLanguageVersionSettings(directives)?.trySet()
 
             // Relies on the order of module creation
