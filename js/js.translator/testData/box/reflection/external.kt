@@ -1,5 +1,5 @@
 // IGNORE_BACKEND: JS_IR
-// EXPECTED_REACHABLE_NODES: 1099
+// EXPECTED_REACHABLE_NODES: 1212
 external class A
 
 external object O
