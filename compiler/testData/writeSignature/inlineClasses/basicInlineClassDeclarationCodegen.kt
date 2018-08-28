@@ -25,6 +25,6 @@ inline class Foo(val x: Int) {
 // jvm signature: (ILjava/lang/Object;D)V
 // generic signature: null
 
-// method: Foo$Erased::withInlineClassType-1e4ch6lh
+// method: Foo$Erased::withInlineClassType-BuT-CB1
 // jvm signature: (II)V
 // generic signature: null

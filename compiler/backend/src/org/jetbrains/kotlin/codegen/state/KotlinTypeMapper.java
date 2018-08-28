@@ -42,7 +42,10 @@ import org.jetbrains.kotlin.load.java.lazy.descriptors.LazyJavaPackageFragment;
 import org.jetbrains.kotlin.load.kotlin.*;
 import org.jetbrains.kotlin.load.kotlin.incremental.IncrementalPackageFragmentProvider.IncrementalMultifileClassPackageFragment;
 import org.jetbrains.kotlin.metadata.jvm.deserialization.JvmBytecodeBinaryVersion;
+import org.jetbrains.kotlin.metadata.jvm.deserialization.JvmMemberSignature;
+import org.jetbrains.kotlin.metadata.jvm.deserialization.JvmProtoBufUtil;
 import org.jetbrains.kotlin.name.*;
+import org.jetbrains.kotlin.protobuf.MessageLite;
 import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.psi.KtFile;
 import org.jetbrains.kotlin.psi.KtFunctionLiteral;
@@ -58,6 +61,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterKind;
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterSignature;
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature;
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor;
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedSimpleFunctionDescriptor;
 import org.jetbrains.kotlin.types.*;
 import org.jetbrains.kotlin.util.OperatorNameConventions;
 import org.jetbrains.org.objectweb.asm.Type;
@@ -1084,6 +1088,19 @@ public class KotlinTypeMapper {
 
         String manglingSuffix = InlineClassManglingUtilsKt.getInlineClassValueParametersManglingSuffix(descriptor);
         if (manglingSuffix != null) {
+            // If we have a mangled function from binaries, see if there is a JVM method signature stored in metadata.
+            // TODO use this code for all functions, not just for ones with inline class types in parameters
+            if (descriptor instanceof DeserializedSimpleFunctionDescriptor) {
+                DeserializedSimpleFunctionDescriptor deserializedDescriptor = (DeserializedSimpleFunctionDescriptor) descriptor;
+                JvmMemberSignature.Method jvmMethodSignature = JvmProtoBufUtil.getJvmMethodSignature(
+                        deserializedDescriptor.getProto(), deserializedDescriptor.getNameResolver(), deserializedDescriptor.getTypeTable()
+                );
+                if (jvmMethodSignature != null) {
+                    return jvmMethodSignature.getName();
+                }
+            }
+
+            // Fall-through: mangle as usual
             name += "-" + manglingSuffix;
         }
 

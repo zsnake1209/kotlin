@@ -65,11 +65,21 @@ private fun getSignatureElementForMangling(type: KotlinType): String = buildStri
     }
 }
 
+private const val CUSTOM_ENCODING = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
+private const val CUSTOM_RADIX = CUSTOM_ENCODING.length.toLong()
+
 private fun md5radix36string(signatureForMangling: String): String {
     val d = MessageDigest.getInstance("MD5").digest(signatureForMangling.toByteArray())
     var acc = 0L
     for (i in 0..4) {
         acc = (acc shl 8) + (d[i].toLong() and 0xFFL)
     }
-    return acc.toString(36)
+
+    return buildString {
+        while (acc > 0) {
+            val digit = (acc % CUSTOM_RADIX).toInt()
+            append(CUSTOM_ENCODING[digit])
+            acc /= CUSTOM_RADIX
+        }
+    }
 }

@@ -60,6 +60,7 @@ object JvmProtoBufUtil {
         }.toByteArray())
 
     // returns JVM signature in the format: "equals(Ljava/lang/Object;)Z"
+    @JvmStatic
     fun getJvmMethodSignature(
         proto: ProtoBuf.Function,
         nameResolver: NameResolver,

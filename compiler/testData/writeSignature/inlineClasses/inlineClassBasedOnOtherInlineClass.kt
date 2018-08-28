@@ -8,7 +8,7 @@ object Test {
     fun listOfFoo(f: List<Foo>) {}
 }
 
-// method: Test::simple-1e4ch6lh
+// method: Test::simple-BuT-CB1
 // jvm signature: (I)V
 // generic signature: null
 
