@@ -266,6 +266,16 @@ val IrClass.defaultType: IrType
 
 val IrSimpleFunction.isReal: Boolean get() = descriptor.kind.isReal
 
+fun IrClass.isImmediateSubClassOf(ancestor: IrClass) = ancestor.symbol in superTypes.mapNotNull {
+    (it as? IrSimpleType)?.classifier
+}
+
+fun IrClass.isSubclassOf(ancestor: IrClass): Boolean =
+    (this == ancestor) ||
+            superTypes.mapNotNull { ((it as? IrSimpleType)?.classifier as IrClassSymbol).owner }.any {
+                it.isSubclassOf(ancestor)
+            }
+
 // This implementation is from kotlin-native
 // TODO: use this implementation instead of any other
 fun IrSimpleFunction.resolveFakeOverride(): IrSimpleFunction? {

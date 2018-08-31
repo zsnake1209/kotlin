@@ -49,6 +49,7 @@ class IrVarargImpl(
     }
 
     override fun putElement(i: Int, element: IrVarargElement) {
+
         elements[i] = element
     }
 

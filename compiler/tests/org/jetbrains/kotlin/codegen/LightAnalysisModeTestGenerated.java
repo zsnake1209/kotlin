@@ -10709,6 +10709,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
                 runTest("compiler/testData/codegen/box/functions/bigArity/callFromJava.kt");
             }
 
+            @TestMetadata("callFunViaVararg.kt")
+            public void testCallFunViaVararg() throws Exception {
+                runTest("compiler/testData/codegen/box/functions/bigArity/callFunViaVararg.kt");
+            }
+
             @TestMetadata("callWithIncorrectNumberOfArguments.kt")
             public void testCallWithIncorrectNumberOfArguments() throws Exception {
                 runTest("compiler/testData/codegen/box/functions/bigArity/callWithIncorrectNumberOfArguments.kt");
@@ -10732,6 +10737,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
             @TestMetadata("invokeLambda.kt")
             public void testInvokeLambda() throws Exception {
                 runTest("compiler/testData/codegen/box/functions/bigArity/invokeLambda.kt");
+            }
+
+            @TestMetadata("invokeMemberCallableReference.kt")
+            public void testInvokeMemberCallableReference() throws Exception {
+                runTest("compiler/testData/codegen/box/functions/bigArity/invokeMemberCallableReference.kt");
             }
 
             @TestMetadata("javaLambda.kt")

@@ -1,0 +1,140 @@
+/*
+ * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the license/LICENSE.txt file.
+ */
+
+package org.jetbrains.kotlin.backend.jvm.lower
+
+import org.jetbrains.kotlin.backend.common.ClassLoweringPass
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedValueParameterDescriptor
+import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.jetbrains.kotlin.ir.builders.*
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
+import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
+import org.jetbrains.kotlin.ir.expressions.impl.IrTypeOperatorCallImpl
+import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
+import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
+import org.jetbrains.kotlin.ir.types.classifierOrFail
+import org.jetbrains.kotlin.ir.types.typeWith
+import org.jetbrains.kotlin.ir.util.isSubclassOf
+import org.jetbrains.kotlin.name.Name
+
+class FunctionNVarargInvokeLowering(var context: JvmBackendContext) : ClassLoweringPass {
+
+    override fun lower(irClass: IrClass) {
+        val invokeFunctions =
+            irClass.declarations.filter { it is IrSimpleFunction && it.name.toString() == "invoke" } as List<IrSimpleFunction>
+        if (invokeFunctions.isEmpty() ||
+            invokeFunctions.any { it.valueParameters.size > 0 && it.valueParameters.last().varargElementType != null } ||
+            invokeFunctions.all { it.valueParameters.size + (if (it.extensionReceiverParameter != null) 1 else 0) <= CallableReferenceLowering.MAX_ARGCOUNT_WITHOUT_VARARG }
+        ) {
+            // No need to add a new vararg invoke method
+            return
+        }
+        val functionInvokes = invokeFunctions.filter { irClass.isSubclassOf(context.ir.symbols.getFunction(it.valueParameters.size).owner) }
+        if (functionInvokes.isEmpty()) return
+
+        irClass.declarations.add(generateVarargInvoke(irClass, functionInvokes))
+    }
+
+    private fun generateVarargInvoke(irClass: IrClass, invokesToDelegateTo: List<IrSimpleFunction>): IrFunction {
+        val backendContext = context
+        val descriptor = WrappedSimpleFunctionDescriptor()
+        return IrFunctionImpl(
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+            origin = CallableReferenceLowering.DECLARATION_ORIGIN_FUNCTION_REFERENCE_IMPL,
+            symbol = IrSimpleFunctionSymbolImpl(descriptor),
+            name = Name.identifier("invoke"),
+            visibility = Visibilities.PUBLIC,
+            modality = Modality.OPEN,
+            isInline = false,
+            isExternal = false,
+            isTailrec = false,
+            isSuspend = false
+        ).apply {
+            descriptor.bind(this)
+            returnType = context.irBuiltIns.anyNType
+            dispatchReceiverParameter = irClass.thisReceiver
+            val varargParameterDescriptor = WrappedValueParameterDescriptor()
+            val varargParam = IrValueParameterImpl(
+                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                origin = CallableReferenceLowering.DECLARATION_ORIGIN_FUNCTION_REFERENCE_IMPL,
+                symbol = IrValueParameterSymbolImpl(varargParameterDescriptor),
+                name = Name.identifier("args"),
+                index = 0,
+                type = context.irBuiltIns.arrayClass.typeWith(),
+                varargElementType = context.irBuiltIns.anyClass.typeWith(),
+                isCrossinline = false,
+                isNoinline = false
+            ).apply {
+                varargParameterDescriptor.bind(this)
+            }
+            valueParameters.add(varargParam)
+            val irBuilder = context.createIrBuilder(symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET)
+            body = irBuilder.irBlockBody(UNDEFINED_OFFSET, UNDEFINED_OFFSET) {
+                val arrayGetFun = backendContext.irBuiltIns.arrayClass.owner
+                    .declarations.find {
+                    (it as? IrSimpleFunction)?.name?.toString() == "get"
+                }!! as IrSimpleFunction
+                val arraySizeProperty = context.irBuiltIns.arrayClass.owner.declarations.find {
+                    (it as? IrProperty)?.name?.toString() == "size"
+                } as IrProperty
+                val numberOfArguments = irTemporary(irCall(arraySizeProperty.getter!!).apply {
+                    dispatchReceiver = irGet(varargParam)
+                })
+
+                for (target in invokesToDelegateTo) {
+                    +irIfThen(
+                        backendContext.irBuiltIns.unitType,
+                        irEquals(irGet(numberOfArguments), irInt(target.valueParameters.size)),
+                        irReturn(
+                            IrTypeOperatorCallImpl(
+                                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                                backendContext.irBuiltIns.anyNType,
+                                IrTypeOperator.CAST,
+                                target.returnType,
+                                target.returnType.classifierOrFail,
+                                irCall(target).apply {
+                                    dispatchReceiver = irGet(irClass.thisReceiver!!)
+                                    target.valueParameters.forEachIndexed { i, irValueParameter ->
+                                        putValueArgument(
+                                            i, IrTypeOperatorCallImpl(
+                                                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                                                irValueParameter.type,
+                                                IrTypeOperator.CAST,
+                                                context.irBuiltIns.anyNType,
+                                                context.irBuiltIns.anyNType.classifierOrFail,
+                                                irCallOp(
+                                                    arrayGetFun.symbol,
+                                                    context.irBuiltIns.anyNType,
+                                                    irGet(varargParam),
+                                                    irInt(i)
+                                                )
+                                            )
+                                        )
+                                    }
+                                }
+                            )
+                        )
+                    )
+                }
+
+                val throwMessage = invokesToDelegateTo.map { it.valueParameters.size.toString() }.joinToString(
+                    prefix = "Expected ",
+                    separator = " or ",
+                    postfix = " arguments to invoke call"
+                )
+                +irCall(context.irBuiltIns.illegalArgumentExceptionFun.symbol).apply {
+                    putValueArgument(0, irString(throwMessage))
+                }
+            }
+        }
+    }
+}
