@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import static org.jetbrains.kotlin.backend.common.bridges.ImplKt.findImplementationFromInterface;
 import static org.jetbrains.kotlin.codegen.AsmUtil.calculateInnerClassAccessFlags;
 import static org.jetbrains.kotlin.codegen.AsmUtil.isPrimitive;
 import static org.jetbrains.kotlin.codegen.JvmCodegenUtil.isNonDefaultInterfaceMember;
@@ -694,12 +695,13 @@ public abstract class MemberCodegen<T extends KtPureElement/* TODO: & KtDeclarat
 
     protected final void generateSyntheticAccessors() {
         for (AccessorForCallableDescriptor<?> accessor : ((CodegenContext<?>) context).getAccessors()) {
-            boolean hasJvmDefaultAnnotation = hasJvmDefaultAnnotation(accessor.getCalleeDescriptor());
+            boolean isInterfaceMemberNotDefaultImpls = hasJvmDefaultAnnotation(accessor.getCalleeDescriptor()) ||
+                                              accessor.getAccessorKind() == AccessorKind.JVM_DEFAULT_COMPATIBILITY;
             OwnerKind kind = context.getContextKind();
 
             if (!isInterface(context.getContextDescriptor()) ||
-                (hasJvmDefaultAnnotation && kind == OwnerKind.IMPLEMENTATION) ||
-                (!hasJvmDefaultAnnotation && kind == OwnerKind.DEFAULT_IMPLS)) {
+                (isInterfaceMemberNotDefaultImpls && kind == OwnerKind.IMPLEMENTATION) ||
+                (!isInterfaceMemberNotDefaultImpls && kind == OwnerKind.DEFAULT_IMPLS)) {
                 generateSyntheticAccessor(accessor);
             }
         }
@@ -745,7 +747,7 @@ public abstract class MemberCodegen<T extends KtPureElement/* TODO: & KtDeclarat
                         public void doGenerateBody(@NotNull ExpressionCodegen codegen, @NotNull JvmMethodSignature signature) {
                             markLineNumberForElement(element.getPsiOrParent(), codegen.v);
                             if (accessorForCallableDescriptor.getAccessorKind() == AccessorKind.JVM_DEFAULT_COMPATIBILITY) {
-                                FunctionDescriptor descriptor = unwrapFakeOverrideToAnyDeclaration(original).getOriginal();
+                                FunctionDescriptor descriptor = ((FunctionDescriptor) findImplementationFromInterface(original)).getOriginal();
                                 if (descriptor != original) {
                                     descriptor = descriptor
                                             .copy(original.getContainingDeclaration(), descriptor.getModality(), descriptor.getVisibility(),
@@ -778,7 +780,7 @@ public abstract class MemberCodegen<T extends KtPureElement/* TODO: & KtDeclarat
                 public void doGenerateBody(@NotNull ExpressionCodegen codegen, @NotNull JvmMethodSignature signature) {
                     if (accessorForCallableDescriptor.getAccessorKind() == AccessorKind.JVM_DEFAULT_COMPATIBILITY) {
                         markLineNumberForElement(element.getPsiOrParent(), codegen.v);
-                        PropertyDescriptor descriptor = unwrapFakeOverrideToAnyDeclaration(original).getOriginal();
+                        PropertyDescriptor descriptor = ((PropertyDescriptor) findImplementationFromInterface(original)).getOriginal();
                         if (descriptor != original) {
                             descriptor = (PropertyDescriptor) descriptor
                                     .copy(original.getContainingDeclaration(), descriptor.getModality(), descriptor.getVisibility(),

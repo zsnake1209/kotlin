@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.jetbrains.kotlin.backend.common.bridges.ImplKt.findImplementationFromInterface;
 import static org.jetbrains.kotlin.codegen.AsmUtil.isStaticMethod;
 import static org.jetbrains.kotlin.codegen.JvmCodegenUtil.*;
 import static org.jetbrains.kotlin.codegen.binding.CodegenBinding.*;
@@ -863,8 +864,9 @@ public class KotlinTypeMapper {
                     FunctionDescriptor originalDescriptor = descriptor.getOriginal();
                     signature = mapSignatureSkipGeneric(originalDescriptor, OwnerKind.DEFAULT_IMPLS);
                     returnKotlinType = originalDescriptor.getReturnType();
-                    if (descriptor instanceof AccessorForCallableDescriptor &&
-                        hasJvmDefaultAnnotation(((AccessorForCallableDescriptor) descriptor).getCalleeDescriptor())) {
+                    CallableMemberDescriptor implementationForAccessor = descriptor instanceof AccessorForCallableDescriptor ?
+                            findImplementationFromInterface(((AccessorForCallableDescriptor) descriptor).getCalleeDescriptor()) : null;
+                    if (implementationForAccessor != null && hasJvmDefaultAnnotation(implementationForAccessor)) {
                         owner = mapClass(currentOwner);
                         isInterfaceMember = true;
                     }

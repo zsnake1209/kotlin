@@ -68,10 +68,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
 
+import static org.jetbrains.kotlin.backend.common.bridges.ImplKt.findImplementationFromInterface;
 import static org.jetbrains.kotlin.builtins.KotlinBuiltIns.isNullableAny;
 import static org.jetbrains.kotlin.codegen.AsmUtil.*;
 import static org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings.METHOD_FOR_FUNCTION;
 import static org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.DECLARATION;
+import static org.jetbrains.kotlin.descriptors.CallableMemberDescriptor.Kind.FAKE_OVERRIDE;
 import static org.jetbrains.kotlin.descriptors.ModalityKt.isOverridable;
 import static org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget.*;
 import static org.jetbrains.kotlin.descriptors.annotations.AnnotationUtilKt.isEffectivelyInlineOnly;
@@ -747,9 +749,11 @@ public class FunctionCodegen {
             @NotNull MethodContext context,
             @NotNull JvmDefaultMode jvmDefaultMode
     ) {
-        return OwnerKind.DEFAULT_IMPLS == context.getContextKind() &&
-               hasJvmDefaultAnnotation(functionDescriptor) &&
-               jvmDefaultMode.isCompatibility();
+        if (OwnerKind.DEFAULT_IMPLS == context.getContextKind() && jvmDefaultMode.isCompatibility()) {
+            CallableMemberDescriptor realMember = findImplementationFromInterface(functionDescriptor) ;
+            return realMember != null && hasJvmDefaultAnnotation(realMember);
+        }
+        return false;
     }
 
     private static void generateLocalVariableTable(

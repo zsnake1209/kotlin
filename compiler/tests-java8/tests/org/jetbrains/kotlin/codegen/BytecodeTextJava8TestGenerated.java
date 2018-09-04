@@ -81,6 +81,16 @@ public class BytecodeTextJava8TestGenerated extends AbstractBytecodeTextTest {
                 runTest("compiler/testData/codegen/java8/bytecodeText/jvmDefault/compatibility/defaultArgs.kt");
             }
 
+            @TestMetadata("diamondFun.kt")
+            public void testDiamondFun() throws Exception {
+                runTest("compiler/testData/codegen/java8/bytecodeText/jvmDefault/compatibility/diamondFun.kt");
+            }
+
+            @TestMetadata("diamondProperty.kt")
+            public void testDiamondProperty() throws Exception {
+                runTest("compiler/testData/codegen/java8/bytecodeText/jvmDefault/compatibility/diamondProperty.kt");
+            }
+
             @TestMetadata("simpleFunction.kt")
             public void testSimpleFunction() throws Exception {
                 runTest("compiler/testData/codegen/java8/bytecodeText/jvmDefault/compatibility/simpleFunction.kt");
