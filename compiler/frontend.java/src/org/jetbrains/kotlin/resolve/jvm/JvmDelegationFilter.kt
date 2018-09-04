@@ -23,7 +23,7 @@ import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.deserialization.PLATFORM_DEPENDENT_ANNOTATION_FQ_NAME
 import org.jetbrains.kotlin.load.java.descriptors.JavaMethodDescriptor
-import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.OverridingUtil
 import org.jetbrains.kotlin.resolve.jvm.annotations.hasJvmDefaultAnnotation
 import org.jetbrains.kotlin.resolve.lazy.DelegationFilter
 
@@ -32,8 +32,7 @@ object JvmDelegationFilter : DelegationFilter {
     override fun filter(interfaceMember: CallableMemberDescriptor, languageVersionSettings: LanguageVersionSettings): Boolean {
         if (!languageVersionSettings.supportsFeature(LanguageFeature.NoDelegationToJavaDefaultInterfaceMembers)) return true
 
-        //We always have only one implementation otherwise it's an error in kotlin and java
-        val realMember = DescriptorUtils.unwrapFakeOverride(interfaceMember)
+        val realMember = findMostSpecificOverride(interfaceMember) ?: interfaceMember
         return !isJavaDefaultMethod(realMember) &&
                 !realMember.hasJvmDefaultAnnotation() &&
                 !isBuiltInMemberMappedToJavaDefault(realMember)
@@ -47,5 +46,12 @@ object JvmDelegationFilter : DelegationFilter {
         return interfaceMember.modality != Modality.ABSTRACT &&
                KotlinBuiltIns.isBuiltIn(interfaceMember) &&
                interfaceMember.annotations.hasAnnotation(PLATFORM_DEPENDENT_ANNOTATION_FQ_NAME)
+    }
+
+    fun findMostSpecificOverride(descriptor: CallableMemberDescriptor): CallableMemberDescriptor? {
+        val overridden = OverridingUtil.getOverriddenDeclarations(descriptor)
+        val filtered = OverridingUtil.filterOutOverridden(overridden)
+
+        return filtered.singleOrNull()
     }
 }
