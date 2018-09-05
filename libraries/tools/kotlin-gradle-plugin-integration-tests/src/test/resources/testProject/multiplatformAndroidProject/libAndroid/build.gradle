@@ -3,6 +3,10 @@ apply plugin: 'kotlin-platform-android'
 
 dependencies {
     expectedBy project(":lib")
+    if (VersionNumber.parse(android_tools_version) < VersionNumber.parse("3.0.0-alpha1"))
+        compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    else
+        implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 android {
