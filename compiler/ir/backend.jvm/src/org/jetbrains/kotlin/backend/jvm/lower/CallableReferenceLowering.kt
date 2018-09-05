@@ -419,7 +419,6 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 }
 
                 override fun buildIr(): IrSimpleFunction {
-                    val backendContext = context
                     val startOffset = irFunctionReference.startOffset
                     val endOffset = irFunctionReference.endOffset
                     val ourSymbol = symbol
@@ -436,9 +435,14 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                         createParameterDeclarations()
 
                         body = irBuilder.irBlockBody(startOffset, endOffset) {
+                            val arrayGetFun = context.irBuiltIns.arrayClass.owner
+                                .declarations.find {
+                                (it as? IrSimpleFunction)?.name?.toString() == "get"
+                            }!! as IrSimpleFunction
+
                             if (useVararg) {
                                 val varargParam = valueParameters.single()
-                                val arraySizeProperty = backendContext.irBuiltIns.arrayClass.owner.declarations.find {
+                                val arraySizeProperty = context.irBuiltIns.arrayClass.owner.declarations.find {
                                     (it as? IrProperty)?.name?.toString() == "size"
                                 } as IrProperty
                                 +irIfThen(
@@ -448,7 +452,7 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                                         },
                                         irInt(unboundFunctionParameters.size)
                                     ),
-                                    irCall(backendContext.irBuiltIns.illegalArgumentExceptionFun).apply {
+                                    irCall(context.irBuiltIns.illegalArgumentExceptionFun).apply {
                                         putValueArgument(0, irString("Expected ${unboundFunctionParameters.size} arguments"))
                                     }
                                 )
@@ -458,35 +462,43 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                                     var unboundIndex = 0
                                     val unboundArgsSet = unboundFunctionParameters.toSet()
 
-                                    functionParameters.forEach {
+                                    functionParameters.forEach { parameter ->
                                         val argument = when {
-                                            !unboundArgsSet.contains(it) ->
+                                            !unboundArgsSet.contains(parameter) ->
                                                 // Bound parameter - read from field.
-                                                irGetField(irGet(functionReferenceThis.owner), argumentToPropertiesMap[it]!!.owner)
+                                                irGetField(irGet(functionReferenceThis.owner), argumentToPropertiesMap[parameter]!!.owner)
                                             ourSymbol.descriptor.isSuspend && unboundIndex == valueParameters.size ->
                                                 // For suspend functions the last argument is continuation and it is implicit.
                                                 TODO()
 //                                                        irCall(getContinuationSymbol,
 //                                                               listOf(ourSymbol.descriptor.returnType!!))
                                             useVararg -> {
+                                                val type = parameter.type.toIrType()!!
                                                 val varargParam = valueParameters.single()
-                                                val getFun = backendContext.irBuiltIns.arrayClass.owner
-                                                    .declarations.find {
-                                                    (it as? IrSimpleFunction)?.name?.toString() == "get"
-                                                }!! as IrSimpleFunction
-                                                irCall(getFun).apply {
-                                                    dispatchReceiver = irGet(varargParam)
-                                                    putValueArgument(0, irInt(unboundIndex++))
+                                                irBlock(resultType = type) {
+                                                    val argValue = irTemporary(
+                                                        irCall(arrayGetFun).apply {
+                                                            dispatchReceiver = irGet(varargParam)
+                                                            putValueArgument(0, irInt(unboundIndex++))
+                                                        }
+                                                    )
+                                                    +irIfThen(
+                                                        irNotIs(irGet(argValue), type),
+                                                        irCall(context.irBuiltIns.illegalArgumentExceptionFun).apply {
+                                                            putValueArgument(0, irString("Wrong type, expected $type"))
+                                                        }
+                                                    )
+                                                    +irGet(argValue)
                                                 }
                                             }
                                             else -> {
                                                 irGet(valueParameters[unboundIndex++])
                                             }
                                         }
-                                        when (it) {
+                                        when (parameter) {
                                             functionDescriptor.dispatchReceiverParameter -> dispatchReceiver = argument
                                             functionDescriptor.extensionReceiverParameter -> extensionReceiver = argument
-                                            else -> putValueArgument((it as ValueParameterDescriptor).index, argument)
+                                            else -> putValueArgument((parameter as ValueParameterDescriptor).index, argument)
                                         }
                                     }
 

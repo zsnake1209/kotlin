@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedValueParameterDescriptor
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.backend.common.lower.irIfThen
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
@@ -104,20 +105,26 @@ class FunctionNVarargInvokeLowering(var context: JvmBackendContext) : ClassLower
                                 irCall(target).apply {
                                     dispatchReceiver = irGet(irClass.thisReceiver!!)
                                     target.valueParameters.forEachIndexed { i, irValueParameter ->
+                                        val type = irValueParameter.type
                                         putValueArgument(
-                                            i, IrTypeOperatorCallImpl(
-                                                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                                                irValueParameter.type,
-                                                IrTypeOperator.CAST,
-                                                context.irBuiltIns.anyNType,
-                                                context.irBuiltIns.anyNType.classifierOrFail,
-                                                irCallOp(
-                                                    arrayGetFun.symbol,
-                                                    context.irBuiltIns.anyNType,
-                                                    irGet(varargParam),
-                                                    irInt(i)
+                                            i,
+                                            irBlock(resultType = type) {
+                                                val argValue = irTemporary(
+                                                    irCallOp(
+                                                        arrayGetFun.symbol,
+                                                        context.irBuiltIns.anyNType,
+                                                        irGet(varargParam),
+                                                        irInt(i)
+                                                    )
                                                 )
-                                            )
+                                                +irIfThen(
+                                                    irNotIs(irGet(argValue), type),
+                                                    irCall(context.irBuiltIns.illegalArgumentExceptionFun).apply {
+                                                        putValueArgument(0, irString("Wrong type, expected $type"))
+                                                    }
+                                                )
+                                                +irGet(argValue)
+                                            }
                                         )
                                     }
                                 }
