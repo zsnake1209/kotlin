@@ -168,8 +168,6 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
         val irFunctionReference: IrFunctionReference
     ) {
 
-        // !!!!!! FROM HERE !!!!!! Replace by IR ops
-
         private val functionDescriptor = irFunctionReference.descriptor
         private val functionParameters = functionDescriptor.explicitParameters
         private val boundFunctionParameters = irFunctionReference.getArguments().map { it.first }
