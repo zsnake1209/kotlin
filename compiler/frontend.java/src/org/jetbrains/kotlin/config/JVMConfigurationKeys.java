@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.script.ScriptDefinitionsSource;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 public class JVMConfigurationKeys {
     private JVMConfigurationKeys() {
@@ -122,6 +123,9 @@ public class JVMConfigurationKeys {
 
     public static final CompilerConfigurationKey<Boolean> IR =
             CompilerConfigurationKey.create("IR");
+
+    public static final CompilerConfigurationKey<Set<String>> DUMP_IR_AT =
+            CompilerConfigurationKey.create("dump IR at these stages");
 
     public static final CompilerConfigurationKey<Boolean> USE_FAST_CLASS_FILES_READING =
             CompilerConfigurationKey.create("use fast class files reading implementation [experimental]");

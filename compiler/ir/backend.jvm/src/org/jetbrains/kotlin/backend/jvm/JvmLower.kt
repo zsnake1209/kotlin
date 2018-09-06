@@ -16,67 +16,93 @@
 
 package org.jetbrains.kotlin.backend.jvm
 
+import org.jetbrains.kotlin.backend.common.asFileLoweringPass
 import org.jetbrains.kotlin.backend.common.lower.*
 import org.jetbrains.kotlin.backend.common.runOnFilePostfix
 import org.jetbrains.kotlin.backend.jvm.lower.*
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.util.PatchDeclarationParentsVisitor
+import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.NameUtils
+import java.io.File
 
 class JvmLower(val context: JvmBackendContext) {
     fun lower(irFile: IrFile) {
+        val fileName = File(irFile.name).name
+        val stagesToDump = context.state.configuration[JVMConfigurationKeys.DUMP_IR_AT] ?: emptySet()
+        val outputDirectory = context.state.configuration[JVMConfigurationKeys.OUTPUT_DIRECTORY] ?: File("").absoluteFile
+
+        if ("start" in stagesToDump) {
+            outputDirectory.resolve("$fileName.ir.start").writeText(irFile.dump())
+        }
+
         // TODO run lowering passes as callbacks in bottom-up visitor
-        FileClassLowering(context).lower(irFile)
-        KCallableNamePropertyLowering(context).lower(irFile)
+        listOf(
+            FileClassLowering(context),
+            KCallableNamePropertyLowering(context),
 
-        LateinitLowering(context, true).lower(irFile)
+            LateinitLowering(context, true),
 
-        ConstAndJvmFieldPropertiesLowering(context).lower(irFile)
-        PropertiesLowering().lower(irFile)
-        AnnotationLowering().runOnFilePostfix(irFile) //should be run before defaults lowering
+            ConstAndJvmFieldPropertiesLowering(context),
+            PropertiesLowering(),
+            AnnotationLowering(), //should be run before defaults lowering
 
-        //Should be before interface lowering
-        DefaultArgumentStubGenerator(context, false).runOnFilePostfix(irFile)
+            //Should be before interface lowering
+            DefaultArgumentStubGenerator(context, false),
 
-        InterfaceLowering(context).runOnFilePostfix(irFile)
-        InterfaceDelegationLowering(context).runOnFilePostfix(irFile)
-        SharedVariablesLowering(context).runOnFilePostfix(irFile)
+            InterfaceLowering(context),
+            InterfaceDelegationLowering(context),
+            SharedVariablesLowering(context),
 
-        irFile.acceptVoid(PatchDeclarationParentsVisitor())
+            PatchDeclarationParentsVisitor().asFileLoweringPass(),
 
-        LocalDeclarationsLowering(
-            context,
-            object : LocalNameProvider {
-                override fun localName(descriptor: DeclarationDescriptor): String =
-                    NameUtils.sanitizeAsJavaIdentifier(super.localName(descriptor))
-            },
-            Visibilities.PUBLIC, //TODO properly figure out visibility
-            true
-        ).runOnFilePostfix(irFile)
-        CallableReferenceLowering(context).lower(irFile)
+            LocalDeclarationsLowering(
+                context,
+                object : LocalNameProvider {
+                    override fun localName(descriptor: DeclarationDescriptor): String =
+                        NameUtils.sanitizeAsJavaIdentifier(super.localName(descriptor))
+                },
+                Visibilities.PUBLIC, //TODO properly figure out visibility
+                true
+            ),
+            CallableReferenceLowering(context),
 
-        InnerClassesLowering(context).runOnFilePostfix(irFile)
-        InnerClassConstructorCallsLowering(context).runOnFilePostfix(irFile)
+            InnerClassesLowering(context),
+            InnerClassConstructorCallsLowering(context),
 
-        irFile.acceptVoid(PatchDeclarationParentsVisitor())
+            PatchDeclarationParentsVisitor().asFileLoweringPass(),
 
-        EnumClassLowering(context).runOnFilePostfix(irFile)
-        //Should be before SyntheticAccessorLowering cause of synthetic accessor for companion constructor
-        ObjectClassLowering(context).lower(irFile)
-        InitializersLowering(context, JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, true).runOnFilePostfix(irFile)
-        SingletonReferencesLowering(context).runOnFilePostfix(irFile)
-        SyntheticAccessorLowering(context).lower(irFile)
-        BridgeLowering(context).runOnFilePostfix(irFile)
-        JvmOverloadsAnnotationLowering(context).runOnFilePostfix(irFile)
-        JvmStaticAnnotationLowering(context).lower(irFile)
-        StaticDefaultFunctionLowering(context.state).runOnFilePostfix(irFile)
+            EnumClassLowering(context),
+            //Should be before SyntheticAccessorLowering cause of synthetic accessor for companion constructor
+            ObjectClassLowering(context),
+            InitializersLowering(context, JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, true),
+            SingletonReferencesLowering(context),
+            SyntheticAccessorLowering(context),
+            BridgeLowering(context),
+            JvmOverloadsAnnotationLowering(context),
+            JvmStaticAnnotationLowering(context),
+            StaticDefaultFunctionLowering(context.state),
 
-        TailrecLowering(context).runOnFilePostfix(irFile)
-        ToArrayLowering(context).runOnFilePostfix(irFile)
+            TailrecLowering(context),
+            ToArrayLowering(context),
 
-        irFile.acceptVoid(PatchDeclarationParentsVisitor())
+            PatchDeclarationParentsVisitor().asFileLoweringPass()
+        ).forEach { lowering ->
+            lowering.lower(irFile)
+            val loweringName = lowering::class.simpleName
+            if (loweringName in stagesToDump) {
+                outputDirectory.resolve("$fileName.ir.$loweringName").writeText(irFile.dump())
+            }
+        }
+
+        if ("end" in stagesToDump) {
+            outputDirectory.resolve("$fileName.ir.end").writeText(irFile.dump())
+        }
+
     }
 }
