@@ -1,0 +1,9 @@
+package
+
+public final inline class A {
+    public constructor A(/*0*/ unbox: kotlin.Int)
+    public final val unbox: kotlin.Int
+    public open override /*1*/ /*synthesized*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*synthesized*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*synthesized*/ fun toString(): kotlin.String
+}

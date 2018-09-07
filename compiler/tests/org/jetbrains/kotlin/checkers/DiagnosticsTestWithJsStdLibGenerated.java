@@ -491,6 +491,11 @@ public class DiagnosticsTestWithJsStdLibGenerated extends AbstractDiagnosticsTes
             runTest("compiler/testData/diagnostics/testsWithJsStdLib/name/illegalPackageName.kt");
         }
 
+        @TestMetadata("inlineClassReservedProperies.kt")
+        public void testInlineClassReservedProperies() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithJsStdLib/name/inlineClassReservedProperies.kt");
+        }
+
         @TestMetadata("jsNameAndOverridden.kt")
         public void testJsNameAndOverridden() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithJsStdLib/name/jsNameAndOverridden.kt");
