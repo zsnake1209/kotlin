@@ -270,11 +270,21 @@ fun IrClass.isImmediateSubClassOf(ancestor: IrClass) = ancestor.symbol in superT
     (it as? IrSimpleType)?.classifier
 }
 
-fun IrClass.isSubclassOf(ancestor: IrClass): Boolean =
-    (this == ancestor) ||
-            superTypes.mapNotNull { ((it as? IrSimpleType)?.classifier as IrClassSymbol).owner }.any {
-                it.isSubclassOf(ancestor)
-            }
+fun IrClass.isSubclassOf(ancestor: IrClass): Boolean {
+
+    val alreadyVisited = mutableSetOf<IrClass>()
+
+    fun IrClass.hasAncestorInSuperTypes(): Boolean = when {
+        this === ancestor -> true
+        this in alreadyVisited -> false
+        else -> {
+            alreadyVisited.add(this)
+            superTypes.mapNotNull { ((it as? IrSimpleType)?.classifier as? IrClassSymbol)?.owner }.any { it.hasAncestorInSuperTypes() }
+        }
+    }
+
+    return this.hasAncestorInSuperTypes()
+}
 
 // This implementation is from kotlin-native
 // TODO: use this implementation instead of any other

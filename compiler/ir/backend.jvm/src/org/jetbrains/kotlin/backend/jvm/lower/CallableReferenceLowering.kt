@@ -249,8 +249,6 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 SimpleMemberScope(contributedDescriptors), setOf(constructorBuilder.symbol.descriptor), null
             )
 
-            functionReferenceClass.createParameterDeclarations()
-
             functionReferenceThis = functionReferenceClass.thisReceiver!!.symbol
 
             val invokeFunctionDescriptor = functionClassDescriptor.getFunction("invoke", functionClassTypeParameters)
