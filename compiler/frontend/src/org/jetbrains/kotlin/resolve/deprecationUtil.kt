@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.config.MavenComparableVersion
+import org.jetbrains.kotlin.container.DefaultImplementation
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.impl.DescriptorDerivedFromTypeAlias
@@ -46,6 +47,7 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
+import org.jetbrains.kotlin.types.expressions.FunctionWithBigAritySupport
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -196,9 +198,21 @@ enum class DeprecationLevelValue {
     WARNING, ERROR, HIDDEN
 }
 
+@DefaultImplementation(CoroutineCompatibilitySupport::class)
+class CoroutineCompatibilitySupport private constructor(val enabled: Boolean) {
+    constructor() : this(true)
+
+    companion object {
+        val ENABLED = CoroutineCompatibilitySupport(true)
+
+        val DISABLED = CoroutineCompatibilitySupport(false)
+    }
+}
+
 class DeprecationResolver(
     storageManager: StorageManager,
-    private val languageVersionSettings: LanguageVersionSettings
+    private val languageVersionSettings: LanguageVersionSettings,
+    private val coroutineCompatibilitySupport: CoroutineCompatibilitySupport
 ) {
     private val deprecations = storageManager.createMemoizedFunction { descriptor: DeclarationDescriptor ->
         val deprecations = descriptor.getOwnDeprecations()
@@ -338,10 +352,13 @@ class DeprecationResolver(
 
     private fun getDeprecationByCoroutinesVersion(target: DeclarationDescriptor): DeprecatedExperimentalCoroutine? {
         if (target !is DeserializedMemberDescriptor) return null
-        return when (target.coroutinesExperimentalCompatibilityMode) {
-            COMPATIBLE -> null
-            NEEDS_WRAPPER -> DeprecatedExperimentalCoroutine(target, WARNING)
-            INCOMPATIBLE -> DeprecatedExperimentalCoroutine(target, ERROR)
+
+        target.coroutinesExperimentalCompatibilityMode.let { mode ->
+            return when {
+                mode == COMPATIBLE -> null
+                mode == NEEDS_WRAPPER && coroutineCompatibilitySupport.enabled -> DeprecatedExperimentalCoroutine(target, WARNING)
+                else -> DeprecatedExperimentalCoroutine(target, ERROR)
+            }
         }
     }
 
