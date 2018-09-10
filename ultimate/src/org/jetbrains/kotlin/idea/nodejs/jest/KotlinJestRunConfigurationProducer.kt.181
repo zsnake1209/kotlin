@@ -17,6 +17,7 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.idea.js.KotlinJSRunConfigurationData
 import org.jetbrains.kotlin.idea.js.jsTestOutputFilePath
 import org.jetbrains.kotlin.idea.js.KotlinJSRunConfigurationDataProvider
+import org.jetbrains.kotlin.idea.js.jsOrJsImpl
 import org.jetbrains.kotlin.idea.nodejs.TestElementInfo
 import org.jetbrains.kotlin.idea.nodejs.TestElementPath
 import org.jetbrains.kotlin.idea.nodejs.getNodeJsEnvironmentVars
@@ -77,7 +78,7 @@ class KotlinJestRunConfigurationProducer :
         context: ConfigurationContext
     ): JestConfigData? {
         val element = context.psiLocation ?: return null
-        val module = context.module ?: return null
+        val module = context.module.jsOrJsImpl() ?: return null
         if (!module.platform.isJavaScript) return null
 
         val file = module.moduleFile
