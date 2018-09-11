@@ -27,7 +27,7 @@ import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 
 class IrIllegalArgumentException : IntrinsicMethod() {
-    val exceptionTypeDescriptor = "java/lang/IllegalArgumentException"
+    val exceptionTypeDescriptor = Type.getInternalName(IllegalArgumentException::class.java)
 
     override fun toCallable(
         expression: IrMemberAccessExpression,
