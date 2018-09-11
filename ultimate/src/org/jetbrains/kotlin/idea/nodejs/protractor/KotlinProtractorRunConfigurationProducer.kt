@@ -24,12 +24,11 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.idea.js.KotlinJSRunConfigurationData
 import org.jetbrains.kotlin.idea.js.KotlinJSRunConfigurationDataProvider
+import org.jetbrains.kotlin.idea.js.asJsModule
 import org.jetbrains.kotlin.idea.js.jsTestOutputFilePath
 import org.jetbrains.kotlin.idea.nodejs.TestElementPath
 import org.jetbrains.kotlin.idea.nodejs.getNodeJsEnvironmentVars
-import org.jetbrains.kotlin.idea.project.platform
 import org.jetbrains.kotlin.idea.run.addBuildTask
-import org.jetbrains.kotlin.platform.impl.isJavaScript
 
 class ProtractorConfigData(
     override val element: PsiElement,
@@ -46,8 +45,7 @@ class KotlinProtractorRunConfigurationProducer :
     override fun getConfigurationData(
         context: ConfigurationContext
     ): ProtractorConfigData? {
-        val module = context.module ?: return null
-        if (!module.platform.isJavaScript) return null
+        val module = context.module?.asJsModule() ?: return null
         val element = context.psiLocation ?: return null
         if (!TestElementPath.isModuleAssociatedDir(element, module)) return null
         val testFilePath = module.jsTestOutputFilePath ?: return null

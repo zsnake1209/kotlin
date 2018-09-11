@@ -32,13 +32,12 @@ import com.jetbrains.nodejs.mocha.MochaUtil
 import com.jetbrains.nodejs.mocha.execution.*
 import org.jetbrains.kotlin.idea.js.KotlinJSRunConfigurationData
 import org.jetbrains.kotlin.idea.js.KotlinJSRunConfigurationDataProvider
+import org.jetbrains.kotlin.idea.js.asJsModule
 import org.jetbrains.kotlin.idea.js.jsTestOutputFilePath
 import org.jetbrains.kotlin.idea.nodejs.TestElementInfo
 import org.jetbrains.kotlin.idea.nodejs.TestElementPath
 import org.jetbrains.kotlin.idea.nodejs.getNodeJsEnvironmentVars
-import org.jetbrains.kotlin.idea.project.platform
 import org.jetbrains.kotlin.idea.run.addBuildTask
-import org.jetbrains.kotlin.platform.impl.isJavaScript
 
 private typealias MochaTestElementInfo = TestElementInfo<MochaRunSettings>
 
@@ -104,8 +103,7 @@ class KotlinMochaRunConfigurationProducer : MochaRunConfigurationProducer(), Kot
     }
 
     override fun getConfigurationData(context: ConfigurationContext): MochaConfigData? {
-        val module = context.module ?: return null
-        if (!module.platform.isJavaScript) return null
+        val module = context.module?.asJsModule() ?: return null
         val element = context.psiLocation ?: return null
         val file = module.moduleFile ?: return null
         val project = module.project

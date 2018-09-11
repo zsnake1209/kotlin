@@ -17,12 +17,11 @@ import org.jetbrains.kotlin.idea.MainFunctionDetector
 import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptorIfAny
 import org.jetbrains.kotlin.idea.js.KotlinJSRunConfigurationData
 import org.jetbrains.kotlin.idea.js.KotlinJSRunConfigurationDataProvider
+import org.jetbrains.kotlin.idea.js.asJsModule
 import org.jetbrains.kotlin.idea.js.jsProductionOutputFilePath
 import org.jetbrains.kotlin.idea.nodejs.TestElementPath
 import org.jetbrains.kotlin.idea.nodejs.getNodeJsEnvironmentVars
-import org.jetbrains.kotlin.idea.project.platform
 import org.jetbrains.kotlin.idea.run.addBuildTask
-import org.jetbrains.kotlin.platform.impl.isJavaScript
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
@@ -48,8 +47,7 @@ private class KotlinNodeJsRunConfigurationProducer :
     override fun getConfigurationData(context: ConfigurationContext): NodeJsConfigData? {
         if (!context.isAcceptable) return null
         val element = context.psiLocation ?: return null
-        val module = context.module ?: return null
-        if (!module.platform.isJavaScript) return null
+        val module = context.module?.asJsModule() ?: return null
 
         val jsFilePath = module.jsProductionOutputFilePath ?: return null
         val declaration = element.getNonStrictParentOfType<KtNamedDeclaration>()
