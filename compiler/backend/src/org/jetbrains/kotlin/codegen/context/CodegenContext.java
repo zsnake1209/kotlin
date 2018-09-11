@@ -501,14 +501,16 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
 
         // NB should check for property accessor factory first (or change property accessor tracking under propertyAccessorFactory creation)
         if (propertyAccessorFactories.containsKey(key)) {
-            return (D) propertyAccessorFactories.get(key).getOrCreateAccessorIfNeeded(getterAccessorRequired, setterAccessorRequired);
+            PropertyDescriptor accessor =
+                    propertyAccessorFactories.get(key).getOrCreateAccessorIfNeeded(getterAccessorRequired, setterAccessorRequired);
+            return updateAccessShouldBePublic((D) accessor, accessorShouldBePublic);
         }
 
         if (accessors.containsKey(key)) {
             AccessorForCallableDescriptor<?> accessor = accessors.get(key);
             assert accessorKind == AccessorKind.NORMAL ||
                    accessor instanceof AccessorForPropertyBackingField : "There is already exists accessor with isForBackingField = false in this context";
-            return (D) accessor;
+            return updateAccessShouldBePublic((D) accessor, accessorShouldBePublic);
         }
 
         String nameSuffix = SyntheticAccessorUtilKt.getAccessorNameSuffix(descriptor, key.superCallLabelTarget, accessorKind);
@@ -554,6 +556,28 @@ public abstract class CodegenContext<T extends DeclarationDescriptor> {
         accessors.put(key, accessor);
 
         return (D) accessor;
+    }
+
+    private static <D extends CallableMemberDescriptor> D updateAccessShouldBePublic(
+            @Nullable D descriptor,
+            boolean accessorShouldBePublic
+    ) {
+        if (!(descriptor instanceof AccessorForCallableDescriptor<?>)) {
+            // may be in case when property doesn't need any accessor
+            // (see org.jetbrains.kotlin.codegen.context.CodegenContext.AccessorForPropertyDescriptorFactory.getOrCreateAccessorIfNeeded)
+            return descriptor;
+        }
+
+        if (accessorShouldBePublic) {
+            ((AccessorForCallableDescriptor) descriptor).setAccessorShouldBePublic(true);
+            if (descriptor instanceof PropertyDescriptor) {
+                // These calls don't do anything if accessor is not synthetic
+                updateAccessShouldBePublic(((PropertyDescriptor) descriptor).getSetter(), true);
+                updateAccessShouldBePublic(((PropertyDescriptor) descriptor).getGetter(), true);
+            }
+        }
+
+        return descriptor;
     }
 
     @Nullable

@@ -26,5 +26,5 @@ interface AccessorForCallableDescriptor<T : CallableMemberDescriptor> {
 
     val accessorKind: AccessorKind
 
-    val accessorShouldBePublic: Boolean
+    var accessorShouldBePublic: Boolean
 }

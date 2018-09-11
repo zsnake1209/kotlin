@@ -38,7 +38,7 @@ open class AccessorForPropertyDescriptor private constructor(
     val isWithSyntheticGetterAccessor: Boolean,
     val isWithSyntheticSetterAccessor: Boolean,
     final override val accessorKind: AccessorKind,
-    override val accessorShouldBePublic: Boolean
+    override var accessorShouldBePublic: Boolean
 ) : PropertyDescriptorImpl(
     containingDeclaration,
     null,
@@ -119,7 +119,7 @@ open class AccessorForPropertyDescriptor private constructor(
     class Getter(
         property: AccessorForPropertyDescriptor,
         override val accessorKind: AccessorKind,
-        override val accessorShouldBePublic: Boolean
+        override var accessorShouldBePublic: Boolean
     ) : PropertyGetterDescriptorImpl(
         property,
         Annotations.EMPTY,
@@ -148,7 +148,7 @@ open class AccessorForPropertyDescriptor private constructor(
     class Setter(
         property: AccessorForPropertyDescriptor,
         override val accessorKind: AccessorKind,
-        override val accessorShouldBePublic: Boolean
+        override var accessorShouldBePublic: Boolean
     ) : PropertySetterDescriptorImpl(
         property,
         Annotations.EMPTY,

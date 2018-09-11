@@ -29,6 +29,39 @@ public class IrBlackBoxInlineCodegenTestGenerated extends AbstractIrBlackBoxInli
         KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/boxInline"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JVM_IR, true);
     }
 
+    @TestMetadata("compiler/testData/codegen/boxInline/accessors")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class Accessors extends AbstractIrBlackBoxInlineCodegenTest {
+        private void runTest(String testDataFilePath) throws Exception {
+            KotlinTestUtils.runTest(this::doTest, TargetBackend.JVM_IR, testDataFilePath);
+        }
+
+        public void testAllFilesPresentInAccessors() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/boxInline/accessors"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JVM_IR, true);
+        }
+
+        @TestMetadata("privateFieldUsedInInlineAndNoInlineContext.kt")
+        public void testPrivateFieldUsedInInlineAndNoInlineContext() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/accessors/privateFieldUsedInInlineAndNoInlineContext.kt");
+        }
+
+        @TestMetadata("privateFunUsedInInlineAndNoInlineContext.kt")
+        public void testPrivateFunUsedInInlineAndNoInlineContext() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/accessors/privateFunUsedInInlineAndNoInlineContext.kt");
+        }
+
+        @TestMetadata("privateGetterUsedInInlineAndNoInlineContext.kt")
+        public void testPrivateGetterUsedInInlineAndNoInlineContext() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/accessors/privateGetterUsedInInlineAndNoInlineContext.kt");
+        }
+
+        @TestMetadata("privateSetterUsedInInlineAndNoInlineContext.kt")
+        public void testPrivateSetterUsedInInlineAndNoInlineContext() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/accessors/privateSetterUsedInInlineAndNoInlineContext.kt");
+        }
+    }
+
     @TestMetadata("compiler/testData/codegen/boxInline/anonymousObject")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

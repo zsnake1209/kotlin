@@ -29,7 +29,7 @@ class AccessorForFunctionDescriptor(
     override val superCallTarget: ClassDescriptor?,
     private val nameSuffix: String,
     override val accessorKind: AccessorKind,
-    override val accessorShouldBePublic: Boolean
+    override var accessorShouldBePublic: Boolean
 ) : AbstractAccessorForFunctionDescriptor(containingDeclaration, Name.identifier("access$$nameSuffix")),
     AccessorForCallableDescriptor<FunctionDescriptor> {
 
