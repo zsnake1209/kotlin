@@ -1,9 +1,4 @@
-<<<<<<< ed89b51be63b1723371a8a64e0b9053d286cd40e
-// IGNORE_BACKEND: JS_IR
 // EXPECTED_REACHABLE_NODES: 1285
-=======
-// EXPECTED_REACHABLE_NODES: 1113
->>>>>>> unmute
 /*
  * Copy of JVM-backend test
  * Found at: compiler/testData/codegen/boxInline/complex/closureChain.1.kt
