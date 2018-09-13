@@ -93,12 +93,12 @@ class IrSimpleBuiltinOperatorDescriptorImpl(
         return this === other ||
                 other is IrSimpleBuiltinOperatorDescriptorImpl &&
                 name == other.name &&
-                valueParameters == other.valueParameters &&
-                containingDeclaration.fqNameOrNull() == other.containingDeclaration.fqNameOrNull()
+                valueParameters.map { it.type } == other.valueParameters.map { it.type } &&
+                containingDeclaration == other.containingDeclaration
     }
 
     override fun hashCode(): Int {
-        return ((containingDeclaration.fqNameOrNull()?.hashCode() ?: 0) * 31 + name.hashCode()) * 31 + valueParameters.hashCode()
+        return (containingDeclaration.hashCode() * 31 + name.hashCode()) * 31 + valueParameters.map { it.type }.hashCode()
     }
 }
 
@@ -138,10 +138,10 @@ class IrBuiltinValueParameterDescriptorImpl(
                 name == other.name &&
                 index == other.index &&
                 type == other.type &&
-                containingDeclaration.fqNameOrNull() == other.containingDeclaration.fqNameOrNull()
+                containingDeclaration == other.containingDeclaration
     }
 
     override fun hashCode(): Int {
-        return (((containingDeclaration.fqNameOrNull()?.hashCode() ?: 0) * 31 + name.hashCode()) * 31 + index) * 31 + type.hashCode()
+        return (name.hashCode() * 31 + index) * 31 + type.hashCode()
     }
 }
