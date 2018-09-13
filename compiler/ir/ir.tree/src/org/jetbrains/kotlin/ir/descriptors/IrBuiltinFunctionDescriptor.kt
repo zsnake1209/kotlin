@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorNonRootImpl
 import org.jetbrains.kotlin.descriptors.impl.VariableDescriptorImpl
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import java.util.*
@@ -72,14 +73,6 @@ abstract class IrBuiltinOperatorDescriptorBase(containingDeclaration: Declaratio
     override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>, data: D): R {
         return visitor.visitFunctionDescriptor(this, data)
     }
-
-    override fun equals(other: Any?): Boolean {
-        return other is IrBuiltinOperatorDescriptorBase && containingDeclaration == other.containingDeclaration && name == other.name
-    }
-
-    override fun hashCode(): Int {
-        return containingDeclaration.hashCode() * 31 + name.hashCode()
-    }
 }
 
 class IrSimpleBuiltinOperatorDescriptorImpl(
@@ -97,11 +90,15 @@ class IrSimpleBuiltinOperatorDescriptorImpl(
     override fun getValueParameters(): List<ValueParameterDescriptor> = valueParameters
 
     override fun equals(other: Any?): Boolean {
-        return other is IrSimpleBuiltinOperatorDescriptorImpl && containingDeclaration == other.containingDeclaration && name == other.name
+        return this === other ||
+                other is IrSimpleBuiltinOperatorDescriptorImpl &&
+                name == other.name &&
+                valueParameters == other.valueParameters &&
+                containingDeclaration.fqNameOrNull() == other.containingDeclaration.fqNameOrNull()
     }
 
     override fun hashCode(): Int {
-        return containingDeclaration.hashCode() * 31 + name.hashCode()
+        return ((containingDeclaration.fqNameOrNull()?.hashCode() ?: 0) * 31 + name.hashCode()) * 31 + valueParameters.hashCode()
     }
 }
 
@@ -136,11 +133,15 @@ class IrBuiltinValueParameterDescriptorImpl(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is IrBuiltinValueParameterDescriptorImpl && containingDeclaration == other.containingDeclaration &&
-                name == other.name && index == other.index && type == other.type
+        return this === other ||
+                other is IrBuiltinValueParameterDescriptorImpl &&
+                name == other.name &&
+                index == other.index &&
+                type == other.type &&
+                containingDeclaration.fqNameOrNull() == other.containingDeclaration.fqNameOrNull()
     }
 
     override fun hashCode(): Int {
-        return ((containingDeclaration.hashCode() * 31 + name.hashCode()) * 31 + index) * 31 + type.hashCode()
+        return (((containingDeclaration.fqNameOrNull()?.hashCode() ?: 0) * 31 + name.hashCode()) * 31 + index) * 31 + type.hashCode()
     }
 }
