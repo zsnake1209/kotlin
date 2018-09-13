@@ -5,9 +5,9 @@
 
 package kotlin.js
 
-external fun <T> Array(size: Int): Array<T>
+import withType
 
-internal fun <T> newArray(size: Int, initValue: T) = fillArrayVal(Array<T>(size), initValue)
+external fun <T> Array(size: Int): Array<T>
 
 internal fun <T> fillArrayVal(array: Array<T>, initValue: T): Array<T> {
     for (i in 0..array.size - 1) {
@@ -26,11 +26,6 @@ internal inline fun <T> fillArrayFun(array: dynamic, init: (Int) -> T): Array<T>
         ++i
     }
     return result
-}
-
-internal inline fun withType(type: String, array: dynamic): dynamic {
-    array.`$type$` = type
-    return array
 }
 
 internal fun booleanArray(size: Int): BooleanArray = withType("BooleanArray", fillArrayVal(Array<Boolean>(size), false)).unsafeCast<BooleanArray>()

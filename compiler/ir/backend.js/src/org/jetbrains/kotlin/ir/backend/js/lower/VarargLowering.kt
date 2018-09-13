@@ -69,7 +69,7 @@ private class VarargTransformer(
 
         // empty vararg => empty array literal
         if (segments.isEmpty()) {
-            return listOf().toArrayLiteral(expression.type, expression.varargElementType)
+            return emptyList().toArrayLiteral(expression.type, expression.varargElementType)
         }
 
         // vararg with a single segment => no need to concatenate
@@ -89,7 +89,7 @@ private class VarargTransformer(
             }
         }
 
-        val arrayLiteral = segments.toArrayLiteral(IrSimpleTypeImpl(context.intrinsics.array, false, listOf(), listOf()), context.irBuiltIns.anyType)
+        val arrayLiteral = segments.toArrayLiteral(IrSimpleTypeImpl(context.intrinsics.array, false, emptyList(), emptyList()), context.irBuiltIns.anyType)
 
         val concatFun = if (expression.type.classifierOrNull in context.intrinsics.primitiveArrays.keys) {
             context.intrinsics.primitiveArrayConcat
@@ -115,7 +115,7 @@ private class VarargTransformer(
             val argument = expression.getValueArgument(i)
             val parameter = expression.symbol.owner.valueParameters[i]
             if (argument == null && parameter.varargElementType != null) {
-                expression.putValueArgument(i, listOf().toArrayLiteral(parameter.type, parameter.varargElementType!!))
+                expression.putValueArgument(i, emptyList().toArrayLiteral(parameter.type, parameter.varargElementType!!))
             }
         }
 

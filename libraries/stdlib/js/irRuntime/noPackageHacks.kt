@@ -12,7 +12,7 @@ import kotlin.js.*
 internal fun <T> arrayConcat(vararg args: T): T {
     val len = args.size
     val typed = js("Array(len)").unsafeCast<Array<T>>()
-    for (i in 0..args.size - 1) {
+    for (i in 0 until len) {
         val arr = args[i]
         if (arr !is Array<*>) {
             typed[i] = js("[]").slice.call(arr)
@@ -28,16 +28,17 @@ internal fun <T> arrayConcat(vararg args: T): T {
 @PublishedApi
 internal fun <T> primitiveArrayConcat(vararg args: T): T {
     var size = 0
-    for (i in 0..args.size - 1) {
+    for (i in 0 until args.size) {
         size += args[i].unsafeCast<Array<Any?>>().size
     }
     val a = args[0]
     val result = js("new a.constructor(size)").unsafeCast<Array<Any?>>()
     if (a.asDynamic().`$type$` != null) {
-        result.asDynamic().`$type$` = a.asDynamic().`$type$`
+        withType(a.asDynamic().`$type$`, result)
     }
+
     size = 0
-    for (i in 0..args.size - 1) {
+    for (i in 0 until args.size) {
         val arr = args[i].unsafeCast<Array<Any?>>()
         for (j in 0 until arr.size) {
             result[size++] = arr[j]

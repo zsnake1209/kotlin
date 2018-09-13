@@ -175,7 +175,6 @@ class JsIntrinsics(private val irBuiltIns: IrBuiltIns, val context: JsIrBackendC
 
     val jsArray = getInternalFunction("arrayWithFun")
     val jsFillArray = getInternalFunction("fillArrayFun")
-    val jsNewArray = getInternalFunction("newArray")
 
     val jsArrayLength = unOp("jsArrayLength")
     val jsArrayGet = binOp("jsArrayGet")

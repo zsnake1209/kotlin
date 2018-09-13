@@ -43,6 +43,7 @@ open class DeepCopyIrTreeWithSymbols(
 ) : IrElementTransformerVoid() {
 
     init {
+        // TODO refactor
         (typeRemapper as? DeepCopyTypeRemapper)?.let {
             it.deepCopy = this
         }

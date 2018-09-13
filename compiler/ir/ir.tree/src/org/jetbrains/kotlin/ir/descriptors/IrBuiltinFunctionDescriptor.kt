@@ -82,7 +82,7 @@ abstract class IrBuiltinOperatorDescriptorBase(containingDeclaration: Declaratio
     }
 }
 
-open class IrSimpleBuiltinOperatorDescriptorImpl(
+class IrSimpleBuiltinOperatorDescriptorImpl(
     containingDeclaration: DeclarationDescriptor,
     name: Name,
     private val returnType: KotlinType
