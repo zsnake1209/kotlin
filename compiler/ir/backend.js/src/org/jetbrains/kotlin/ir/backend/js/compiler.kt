@@ -41,7 +41,7 @@ import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStat
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
 
-data class Result(val moduleDescriptor: ModuleDescriptor, val generatedCode: String, val moduleFragment: IrModuleFragment, val symbolTable: SymbolTable, val irBuiltIns: IrBuiltIns, val jsIntrinsics: JsIntrinsics)
+data class Result(val moduleDescriptor: ModuleDescriptor, val generatedCode: String, val moduleFragment: IrModuleFragment)
 
 fun compile(
     project: Project,
@@ -93,7 +93,7 @@ fun compile(
 
     val program = moduleFragment.accept(IrModuleToJsTransformer(context), null)
 
-    return Result(analysisResult.moduleDescriptor, program.toString(), moduleFragmentCopy, context.symbolTable, context.irBuiltIns, context.intrinsics)
+    return Result(analysisResult.moduleDescriptor, program.toString(), moduleFragmentCopy)
 }
 
 private fun JsIrBackendContext.performInlining(moduleFragment: IrModuleFragment) {

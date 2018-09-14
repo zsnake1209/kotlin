@@ -36,11 +36,11 @@ private class VarargTransformer(
         val startOffset = firstOrNull()?.startOffset ?: UNDEFINED_OFFSET
         val endOffset = lastOrNull()?.endOffset ?: UNDEFINED_OFFSET
 
-        val vararg = IrVarargImpl(startOffset, endOffset, type, varargElementType, this)
+        val irVararg = IrVarargImpl(startOffset, endOffset, type, varargElementType, this)
 
         return IrCallImpl(startOffset, endOffset, type, intrinsic).apply {
             if (intrinsic.owner.typeParameters.isNotEmpty()) putTypeArgument(0, varargElementType)
-            putValueArgument(0, vararg)
+            putValueArgument(0, irVararg)
         }
     }
 

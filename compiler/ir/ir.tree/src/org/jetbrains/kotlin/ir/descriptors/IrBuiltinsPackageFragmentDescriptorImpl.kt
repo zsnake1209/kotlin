@@ -47,7 +47,10 @@ class IrBuiltinsPackageFragmentDescriptorImpl(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is IrBuiltinsPackageFragmentDescriptorImpl && containingModule == other.containingModule && fqName == other.fqName
+        return this === other ||
+                other is IrBuiltinsPackageFragmentDescriptorImpl &&
+                fqName == other.fqName &&
+                containingModule == other.containingModule
     }
 
     override fun hashCode(): Int {
