@@ -28,14 +28,26 @@ class DeepCopyTypeRemapper(
         // TODO
     }
 
-    // TODODO
-    override fun remapType(type: IrType): IrType
-            = if (type !is IrSimpleType) type else {
-        IrSimpleTypeImpl(type.originalKotlinType, symbolRemapper.getReferencedClassifier(type.classifier), type.hasQuestionMark, type.arguments.map {
-            if (it !is IrTypeProjection) it else {
+    // TODO This is a hack
+    override fun remapType(type: IrType): IrType {
+        if (type !is IrSimpleType) return type
+
+        val arguments = type.arguments.map {
+            if (it is IrTypeProjection) {
                 IrTypeProjectionImpl(this.remapType(it.type), it.variance)
+            } else {
+                it
             }
-        }, type.annotations.map { it.transform(deepCopy, null) as IrCall })
+        }
+
+        val annotations = type.annotations.map { it.transform(deepCopy, null) as IrCall }
+
+        return IrSimpleTypeImpl(
+            type.originalKotlinType,
+            symbolRemapper.getReferencedClassifier(type.classifier),
+            type.hasQuestionMark,
+            arguments,
+            annotations)
     }
 
 }
