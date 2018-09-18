@@ -6,13 +6,17 @@
 package org.jetbrains.kotlin.gradle.plugin.mpp
 
 import org.gradle.api.Project
+import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.internal.cleanup.BuildOutputCleanupRegistry
 import org.gradle.internal.reflect.Instantiator
-import org.jetbrains.kotlin.compilerRunner.*
+import org.jetbrains.kotlin.compilerRunner.KotlinNativeProjectProperty
+import org.jetbrains.kotlin.compilerRunner.hasProperty
+import org.jetbrains.kotlin.compilerRunner.konanHome
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.sources.applyLanguageSettingsToKotlinTask
@@ -106,6 +110,17 @@ class KotlinMetadataTargetPreset(
                 // Since there's no default source set, apply language settings from commonMain:
                 val compileKotlinMetadata = project.tasks.getByName(mainCompilation.compileKotlinTaskName) as KotlinCompile<*>
                 applyLanguageSettingsToKotlinTask(commonMainSourceSet.languageSettings, compileKotlinMetadata)
+
+                // If our published platform-specific variant modules depend on the Kotlin metadata module rather than reference it as a
+                // variant, ensure that pure Java consumers who read Gradle metadata are able to consume the transitive dependency on the
+                // metadata module in both their compile and runtime input configurations
+                // (in contrast with java-api, which cannot be consumed for runtime):
+                if (!(project.kotlinExtension as KotlinMultiplatformExtension).publishGradleMetadata) {
+                    project.configurations.getByName(apiElementsConfigurationName).attributes.attribute(
+                        Usage.USAGE_ATTRIBUTE,
+                        project.usageByName(Usage.JAVA_RUNTIME_JARS)
+                    )
+                }
             }
         }
 }

@@ -481,7 +481,7 @@ class NewMultiplatformIT : BaseGradleIT() {
 
     @Test
     fun testDependenciesOnMppLibraryPartsWithNoMetadata() {
-        val repoDir = with (Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")) {
+        val repoDir = with(Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")) {
             setupWorkingDir()
             gradleBuildScript().modify { it.replace("publishGradleMetadata = true", "publishGradleMetadata = false") }
             build("publish") { assertSuccessful() }
@@ -530,6 +530,58 @@ class NewMultiplatformIT : BaseGradleIT() {
             assertTrue(""""name": "linux64-api"""" in gradleModuleMetadata)
             assertTrue(""""name": "mingw64-api"""" in gradleModuleMetadata)
             assertTrue(""""name": "macos64-api"""" in gradleModuleMetadata)
+        }
+    }
+
+    @Test
+    fun testNonMppConsumersOfLibraryPublishedWithNoMetadataOptIn() {
+        val repoDir = with(Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")) {
+            setupWorkingDir()
+            gradleBuildScript().modify { it.replace("publishGradleMetadata = true", "publishGradleMetadata = false") }
+            build("publish") { assertSuccessful() }
+            projectDir.resolve("repo")
+        }
+
+        with(Project("sample-old-style-app", gradleVersion, "new-mpp-lib-and-app")) {
+            setupWorkingDir()
+            gradleBuildScript().appendText("\nallprojects { repositories { maven { url '${repoDir.toURI()}' } } }")
+            gradleBuildScript("app-common").modify { it.replace("com.example:sample-lib:", "com.example:sample-lib-metadata:") }
+            gradleBuildScript("app-jvm").modify { it.replace("com.example:sample-lib:", "com.example:sample-lib-jvm6:") }
+            gradleBuildScript("app-js").modify { it.replace("com.example:sample-lib:", "com.example:sample-lib-nodejs:") }
+
+            build("assemble", "run") {
+                assertSuccessful()
+                assertTasksExecuted(":app-common:compileKotlinCommon", ":app-jvm:compileKotlin", ":app-jvm:run", ":app-js:compileKotlin2Js")
+            }
+
+            // Then run again without even reading the metadata from the repo:
+            projectDir.resolve("settings.gradle").modify { it.replace("enableFeaturePreview('GRADLE_METADATA')", "") }
+
+            build("assemble", "run", "--rerun-tasks") {
+                assertSuccessful()
+                assertTasksExecuted(":app-common:compileKotlinCommon", ":app-jvm:compileKotlin", ":app-jvm:run", ":app-js:compileKotlin2Js")
+            }
+        }
+
+        with(Project("sample-app-without-kotlin", gradleVersion, "new-mpp-lib-and-app")) {
+            setupWorkingDir()
+            gradleBuildScript().modify {
+                it.replace("com.example:sample-lib:1.0", "com.example:sample-lib-jvm6:1.0") + "\n" + """
+                    repositories { maven { url '${repoDir.toURI()}' } }
+                """.trimIndent()
+            }
+
+            build("run") {
+                assertSuccessful()
+                assertTasksExecuted(":compileJava", ":run")
+            }
+
+            // Then run again without even reading the metadata from the repo:
+            projectDir.resolve("settings.gradle").modify { it.replace("enableFeaturePreview('GRADLE_METADATA')", "") }
+            build("run", "--rerun-tasks") {
+                assertSuccessful()
+                assertTasksExecuted(":compileJava", ":run")
+            }
         }
     }
 
