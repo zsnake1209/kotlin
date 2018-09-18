@@ -6,15 +6,16 @@
 package org.jetbrains.kotlin.gradle.plugin.mpp
 
 import org.gradle.api.Project
-import org.gradle.api.artifacts.*
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.DependencyConstraint
+import org.gradle.api.artifacts.ModuleDependency
+import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.attributes.AttributeContainer
 import org.gradle.api.attributes.Usage
 import org.gradle.api.capabilities.Capability
-import org.gradle.api.component.ComponentWithCoordinates
 import org.gradle.api.component.ComponentWithVariants
 import org.gradle.api.internal.component.SoftwareComponentInternal
 import org.gradle.api.internal.component.UsageContext
-import org.gradle.api.publish.maven.MavenPublication
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetComponent
 import org.jetbrains.kotlin.gradle.plugin.usageByName
@@ -39,12 +40,14 @@ object NativeUsage {
     const val KOTLIN_KLIB = "kotlin-klib"
 }
 
-internal class KotlinPlatformUsageContext(
-    val project: Project,
+internal open class KotlinPlatformUsageContext(
     val kotlinTarget: KotlinTarget,
     private val usage: Usage,
-    val dependencyConfigurationName: String
+    val dependencyConfigurationName: String,
+    private val publishWithKotlinMetadata: Boolean
 ) : UsageContext {
+    private val project: Project get() = kotlinTarget.project
+
     override fun getUsage(): Usage = usage
 
     override fun getName(): String = kotlinTarget.targetName + when (dependencyConfigurationName) {
