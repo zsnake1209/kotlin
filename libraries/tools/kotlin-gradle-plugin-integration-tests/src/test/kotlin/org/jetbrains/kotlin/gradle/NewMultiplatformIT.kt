@@ -440,6 +440,77 @@ class NewMultiplatformIT : BaseGradleIT() {
     }
 
     @Test
+    fun testPublishWithoutGradleMetadata() {
+        val libProject = Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")
+
+        with (libProject) {
+            setupWorkingDir()
+            gradleBuildScript().modify { it.replace("publishGradleMetadata = true", "publishGradleMetadata = false") }
+
+            build("publish") {
+                assertSuccessful()
+                val groupRepoDir = "repo/com/example"
+
+                // No root publication:
+                assertNoSuchFile("$groupRepoDir/sample-lib")
+
+                // Check that the platform publications have the metadata dependency
+                listOf("jvm6", "nodejs", "wasm32", nativeHostTargetName.toLowerCase()).forEach { targetAppendix ->
+                    val targetPomPath = "$groupRepoDir/sample-lib-$targetAppendix/1.0/sample-lib-$targetAppendix-1.0.pom"
+                    assertFileContains(
+                        targetPomPath,
+                        "<groupId>com.example</groupId>",
+                        "<artifactId>sample-lib-metadata</artifactId>",
+                        "<version>1.0</version>"
+                    )
+                }
+
+                // Check that Kotlin usages and platform types are not written to the Gradle metadata:
+                listOf("jvm6", "nodejs", "metadata", nativeHostTargetName.toLowerCase()).forEach { targetAppendix ->
+                    val gradleMetadata = projectDir.resolve(
+                        "$groupRepoDir/sample-lib-$targetAppendix/1.0/sample-lib-$targetAppendix-1.0.module"
+                    ).readText()
+
+                    listOf("org.jetbrains.kotlin.platform", "kotlin-api", "kotlin-runtime").forEach {
+                        Assert.assertFalse("Gradle metadata for target $targetAppendix should not contain '$it'", it in gradleMetadata)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testDependenciesOnMppLibraryPartsWithNoMetadata() {
+        val repoDir = with (Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")) {
+            setupWorkingDir()
+            gradleBuildScript().modify { it.replace("publishGradleMetadata = true", "publishGradleMetadata = false") }
+            build("publish") { assertSuccessful() }
+            projectDir.resolve("repo")
+        }
+
+        with(Project("sample-app", gradleVersion, "new-mpp-lib-and-app")) {
+            setupWorkingDir()
+            gradleBuildScript().modify {
+                it.replace("implementation 'com.example:sample-lib:1.0'", "implementation 'com.example:sample-lib-metadata:1.0'") + "\n" + """
+                    repositories { maven { url '${repoDir.toURI()}' } }
+
+                    dependencies {
+                        allJvmImplementation 'com.example:sample-lib-jvm6:1.0'
+                        nodeJsMainImplementation 'com.example:sample-lib-nodejs:1.0'
+                        wasm32MainImplementation 'com.example:sample-lib-wasm32:1.0'
+                        ${nativeHostTargetName}MainImplementation 'com.example:sample-lib-${nativeHostTargetName.toLowerCase()}:1.0'
+                    }
+                """.trimIndent()
+            }
+
+            build("assemble") {
+                assertSuccessful()
+                assertTasksExecuted(listOf("Jvm6", "NodeJs", "Wasm32", nativeHostTargetName.capitalize()).map { ":compileKotlin$it" })
+            }
+        }
+    }
+
+    @Test
     fun testPublishingOnlySupportedNativeTargets() = with(Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")) {
         val (publishedVariant, nonPublishedVariant) = when {
             HostManager.hostIsMac -> "macos64" to "linux64"

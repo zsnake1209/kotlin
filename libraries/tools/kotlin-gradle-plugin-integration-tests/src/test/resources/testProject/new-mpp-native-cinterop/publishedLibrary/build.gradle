@@ -11,6 +11,8 @@ repositories {
 }
 
 kotlin {
+	publishGradleMetadata = true
+
     sourceSets {
         allNative
         nativeTest

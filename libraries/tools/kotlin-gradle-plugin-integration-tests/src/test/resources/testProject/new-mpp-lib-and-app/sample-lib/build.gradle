@@ -20,6 +20,8 @@ repositories {
 }
 
 kotlin {
+    publishGradleMetadata = true
+
     targets {
         fromPreset(presets.jvm, 'jvm6')
         fromPreset(presets.js, 'nodeJs')
