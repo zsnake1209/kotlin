@@ -52,14 +52,18 @@ class EffectsExtractingVisitor(
     private val trace: BindingTrace,
     private val moduleDescriptor: ModuleDescriptor,
     private val dataFlowValueFactory: DataFlowValueFactory
-) : KtVisitor<Computation, Unit>() {
-    fun extractOrGetCached(element: KtElement): Computation {
+) : KtVisitor<Computation, Any?>() {
+    fun extractOrGetCached(element: KtElement, resolvedCall: ResolvedCall<*>? = null): Computation {
         trace[BindingContext.EXPRESSION_EFFECTS, element]?.let { return it }
-        return element.accept(this, Unit).also { trace.record(BindingContext.EXPRESSION_EFFECTS, element, it) }
+        return element.accept(this, resolvedCall).also { trace.record(BindingContext.EXPRESSION_EFFECTS, element, it) }
     }
 
-    override fun visitKtElement(element: KtElement, data: Unit): Computation {
-        val resolvedCall = element.getResolvedCall(trace.bindingContext) ?: return UNKNOWN_COMPUTATION
+    override fun visitKtElement(element: KtElement, data: Any?): Computation {
+        val resolvedCall =
+            data as? ResolvedCall<*>
+                ?: element.getResolvedCall(trace.bindingContext)
+                ?: return UNKNOWN_COMPUTATION
+
         if (resolvedCall.isCallWithUnsupportedReceiver()) return UNKNOWN_COMPUTATION
 
         val arguments = resolvedCall.getCallArgumentsAsComputations() ?: return UNKNOWN_COMPUTATION
@@ -84,12 +88,12 @@ class EffectsExtractingVisitor(
 
     // We need lambdas only as arguments currently, and it is processed in 'visitElement' while parsing arguments of call.
     // For all other cases we don't need lambdas.
-    override fun visitLambdaExpression(expression: KtLambdaExpression, data: Unit?): Computation = UNKNOWN_COMPUTATION
+    override fun visitLambdaExpression(expression: KtLambdaExpression, data: Any??): Computation = UNKNOWN_COMPUTATION
 
-    override fun visitParenthesizedExpression(expression: KtParenthesizedExpression, data: Unit): Computation =
+    override fun visitParenthesizedExpression(expression: KtParenthesizedExpression, data: Any?): Computation =
         KtPsiUtil.deparenthesize(expression)?.accept(this, data) ?: UNKNOWN_COMPUTATION
 
-    override fun visitConstantExpression(expression: KtConstantExpression, data: Unit): Computation {
+    override fun visitConstantExpression(expression: KtConstantExpression, data: Any?): Computation {
         val bindingContext = trace.bindingContext
 
         val type: KotlinType = bindingContext.getType(expression) ?: return UNKNOWN_COMPUTATION
@@ -107,7 +111,7 @@ class EffectsExtractingVisitor(
         }
     }
 
-    override fun visitIsExpression(expression: KtIsExpression, data: Unit): Computation {
+    override fun visitIsExpression(expression: KtIsExpression, data: Any?): Computation {
         val rightType: KotlinType = trace[BindingContext.TYPE, expression.typeReference] ?: return UNKNOWN_COMPUTATION
         val arg = extractOrGetCached(expression.leftHandSide)
         return CallComputation(
@@ -116,7 +120,7 @@ class EffectsExtractingVisitor(
         )
     }
 
-    override fun visitSafeQualifiedExpression(expression: KtSafeQualifiedExpression, data: Unit?): Computation {
+    override fun visitSafeQualifiedExpression(expression: KtSafeQualifiedExpression, data: Any??): Computation {
         val computation = super.visitSafeQualifiedExpression(expression, data)
         if (computation === UNKNOWN_COMPUTATION) return computation
 
@@ -130,7 +134,7 @@ class EffectsExtractingVisitor(
         return CallComputation(computation.type, effectsWithoutReturnsNull)
     }
 
-    override fun visitBinaryExpression(expression: KtBinaryExpression, data: Unit): Computation {
+    override fun visitBinaryExpression(expression: KtBinaryExpression, data: Any?): Computation {
         val left = extractOrGetCached(expression.left ?: return UNKNOWN_COMPUTATION)
         val right = extractOrGetCached(expression.right ?: return UNKNOWN_COMPUTATION)
 
@@ -145,7 +149,7 @@ class EffectsExtractingVisitor(
         }
     }
 
-    override fun visitUnaryExpression(expression: KtUnaryExpression, data: Unit): Computation {
+    override fun visitUnaryExpression(expression: KtUnaryExpression, data: Any?): Computation {
         val arg = extractOrGetCached(expression.baseExpression ?: return UNKNOWN_COMPUTATION)
         return when (expression.operationToken) {
             KtTokens.EXCL -> CallComputation(DefaultBuiltIns.Instance.booleanType, NotFunctor().invokeWithArguments(arg))

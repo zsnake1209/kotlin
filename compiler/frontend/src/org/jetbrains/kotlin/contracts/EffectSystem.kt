@@ -52,7 +52,8 @@ class EffectSystem(val languageVersionSettings: LanguageVersionSettings, val dat
         val callExpression = resolvedCall.call.callElement as? KtCallExpression ?: return DataFlowInfo.EMPTY
         if (callExpression is KtDeclaration) return DataFlowInfo.EMPTY
 
-        val resultContextInfo = getContextInfoWhen(ESReturns(ESConstant.WILDCARD), callExpression, bindingTrace, moduleDescriptor)
+        val resultContextInfo =
+            getContextInfoWhen(ESReturns(ESConstant.WILDCARD), callExpression, bindingTrace, moduleDescriptor, resolvedCall)
 
         return resultContextInfo.toDataFlowInfo(languageVersionSettings)
     }
@@ -89,7 +90,8 @@ class EffectSystem(val languageVersionSettings: LanguageVersionSettings, val dat
         val callExpression = resolvedCall.call.callElement as? KtCallExpression ?: return
         if (callExpression is KtDeclaration) return
 
-        val resultingContextInfo = getContextInfoWhen(ESReturns(ESConstant.WILDCARD), callExpression, bindingTrace, moduleDescriptor)
+        val resultingContextInfo =
+            getContextInfoWhen(ESReturns(ESConstant.WILDCARD), callExpression, bindingTrace, moduleDescriptor, resolvedCall)
         for (effect in resultingContextInfo.firedEffects) {
             val callsEffect = effect as? ESCalls ?: continue
             val lambdaExpression = (callsEffect.callable as? ESLambda)?.lambda ?: continue
@@ -114,13 +116,19 @@ class EffectSystem(val languageVersionSettings: LanguageVersionSettings, val dat
         observedEffect: ESEffect,
         expression: KtExpression,
         bindingTrace: BindingTrace,
-        moduleDescriptor: ModuleDescriptor
+        moduleDescriptor: ModuleDescriptor,
+        resolvedCall: ResolvedCall<*>? = null
     ): MutableContextInfo {
         val computation = getNonTrivialComputation(expression, bindingTrace, moduleDescriptor) ?: return MutableContextInfo.EMPTY
         return InfoCollector(observedEffect).collectFromSchema(computation.effects)
     }
 
-    private fun getNonTrivialComputation(expression: KtExpression, trace: BindingTrace, moduleDescriptor: ModuleDescriptor): Computation? {
+    private fun getNonTrivialComputation(
+        expression: KtExpression,
+        trace: BindingTrace,
+        moduleDescriptor: ModuleDescriptor,
+        resolvedCall: ResolvedCall<*>? = null
+    ): Computation? {
         val computation = EffectsExtractingVisitor(trace, moduleDescriptor, dataFlowValueFactory).extractOrGetCached(expression)
         return if (computation == UNKNOWN_COMPUTATION) null else computation
     }
