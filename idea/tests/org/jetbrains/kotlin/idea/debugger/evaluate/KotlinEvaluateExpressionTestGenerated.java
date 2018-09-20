@@ -425,6 +425,11 @@ public class KotlinEvaluateExpressionTestGenerated extends AbstractKotlinEvaluat
             public void testPrimitivesCoertion() throws Exception {
                 runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/coroutines/primitivesCoertion.kt");
             }
+
+            @TestMetadata("stringUpdate.kt")
+            public void testStringUpdate() throws Exception {
+                runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/coroutines/stringUpdate.kt");
+            }
         }
 
         @TestMetadata("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/createExpression")

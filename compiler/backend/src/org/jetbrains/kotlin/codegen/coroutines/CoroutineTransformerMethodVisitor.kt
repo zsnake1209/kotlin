@@ -598,7 +598,7 @@ class CoroutineTransformerMethodVisitor(
         val continuationLabel = LabelNode()
         val continuationLabelAfterLoadedResult = LabelNode()
         val suspendElementLineNumber = lineNumber
-        val nextLineNumberNode = suspension.suspensionCallEnd.findNextOrNull { it is LineNumberNode } as? LineNumberNode
+        var nextLineNumberNode = suspension.suspensionCallEnd.findNextOrNull { it is LineNumberNode } as? LineNumberNode
         with(methodNode.instructions) {
             // Save state
             insertBefore(
@@ -648,33 +648,13 @@ class CoroutineTransformerMethodVisitor(
 
                 // Extend next instruction linenumber. Can't use line number of suspension point here because both non-suspended execution
                 // and re-entering after suspension passes this label.
-
-                // However, for primitives we generate it separately
-                if (possibleTryCatchBlockStart.next?.isUnboxingSequence() != true) {
+                if (possibleTryCatchBlockStart.next?.opcode != Opcodes.ASTORE && possibleTryCatchBlockStart.next?.opcode != Opcodes.CHECKCAST) {
                     visitLineNumber(afterSuspensionPointLineNumber, continuationLabelAfterLoadedResult.label)
+                } else {
+                    // But keep the linenumber if the result of the call is is used afterwards
+                    nextLineNumberNode = null
                 }
             })
-
-            // In code like val a = suspendReturnsInt()
-            // `a` is coerced from Object to int, and coercion happens before scopeStart's mark:
-            //  LL
-            //   CHECKCAST java/lang/Number
-            //   INVOKEVIRTUAL java/lang/Number.intValue ()I
-            //   ISTORE N
-            //  LM
-            //   /* put lineNumber here */
-            //   ...
-            //  LOCALVARIABLE name LM LK N
-            if (continuationLabelAfterLoadedResult.label.info.safeAs<AbstractInsnNode>()?.next?.isUnboxingSequence() == true) {
-                // Find next label after unboxing and put linenumber there
-                var current = (continuationLabelAfterLoadedResult.label.info as AbstractInsnNode).next
-                while (current != null && current !is LabelNode) {
-                    current = current.next
-                }
-                if (current != null) {
-                    insert(current, LineNumberNode(afterSuspensionPointLineNumber, current.cast()))
-                }
-            }
 
             if (nextLineNumberNode != null) {
                 // Remove the line number instruction as it now covered with line number on continuation label.
@@ -684,10 +664,6 @@ class CoroutineTransformerMethodVisitor(
         }
 
         return continuationLabel
-    }
-
-    private fun AbstractInsnNode.isUnboxingSequence(): Boolean {
-        return opcode == Opcodes.CHECKCAST && next?.isPrimitiveUnboxing() == true
     }
 
     // It's necessary to preserve some sensible invariants like there should be no jump in the middle of try-catch-block
