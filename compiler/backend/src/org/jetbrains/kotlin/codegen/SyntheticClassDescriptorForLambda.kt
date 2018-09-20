@@ -19,12 +19,15 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.KotlinType
 
 class SyntheticClassDescriptorForLambda(
-        containingDeclaration: DeclarationDescriptor,
-        name: Name,
-        supertypes: Collection<KotlinType>,
-        element: KtElement
-) : ClassDescriptorImpl(containingDeclaration, name, Modality.FINAL, ClassKind.CLASS, supertypes, element.toSourceElement(),
-                        /* isExternal = */ false, LockBasedStorageManager.NO_LOCKS) {
+    containingDeclaration: DeclarationDescriptor,
+    name: Name,
+    val originalSimpleName: String?,
+    supertypes: Collection<KotlinType>,
+    element: KtElement
+) : ClassDescriptorImpl(
+    containingDeclaration, name, Modality.FINAL, ClassKind.CLASS, supertypes, element.toSourceElement(),
+    /* isExternal = */ false, LockBasedStorageManager.NO_LOCKS
+) {
     init {
         initialize(MemberScope.Empty, emptySet(), null)
     }

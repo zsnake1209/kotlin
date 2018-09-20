@@ -11,6 +11,7 @@ import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.backend.common.CodegenUtil;
+import org.jetbrains.kotlin.codegen.binding.CalculatedClosure;
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding;
 import org.jetbrains.kotlin.codegen.context.*;
 import org.jetbrains.kotlin.codegen.inline.DefaultSourceMapper;
@@ -358,11 +359,14 @@ public abstract class MemberCodegen<T extends KtPureElement/* TODO: & KtDeclarat
 
     private void writeInnerClass(@NotNull ClassDescriptor innerClass) {
         if (!ErrorUtils.isError(innerClass)) {
-            writeInnerClass(innerClass, typeMapper, v);
+            writeInnerClass(innerClass, typeMapper, v, state.getBindingContext().get(CodegenBinding.CLOSURE, innerClass));
         }
     }
 
-    public static void writeInnerClass(@NotNull ClassDescriptor innerClass, @NotNull KotlinTypeMapper typeMapper, @NotNull ClassBuilder v) {
+    public static void writeInnerClass(
+            @NotNull ClassDescriptor innerClass, @NotNull KotlinTypeMapper typeMapper, @NotNull ClassBuilder v,
+            @Nullable CalculatedClosure closure
+    ) {
         DeclarationDescriptor containing = innerClass.getContainingDeclaration();
         String outerClassInternalName = null;
         if (containing instanceof ClassDescriptor) {
@@ -370,6 +374,14 @@ public abstract class MemberCodegen<T extends KtPureElement/* TODO: & KtDeclarat
         }
         String innerName = innerClass.getName().isSpecial() ? null : innerClass.getName().asString();
         String innerClassInternalName = typeMapper.classInternalName(innerClass);
+        if (innerName == null && innerClass instanceof SyntheticClassDescriptorForLambda) {
+            String originalSimpleName = ((SyntheticClassDescriptorForLambda) innerClass).getOriginalSimpleName();
+            if (originalSimpleName != null) {
+                innerName = originalSimpleName;
+            } else if (closure != null && JvmCodegenUtil.isConst(closure)) {
+                innerName = innerClassInternalName;
+            }
+        }
         v.visitInnerClass(innerClassInternalName, outerClassInternalName, innerName, calculateInnerClassAccessFlags(innerClass));
     }
 

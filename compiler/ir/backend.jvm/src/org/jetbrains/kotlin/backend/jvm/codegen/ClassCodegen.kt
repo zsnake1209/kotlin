@@ -189,7 +189,7 @@ open class ClassCodegen protected constructor(
         }
 
         for (innerClass in innerClasses) {
-            MemberCodegen.writeInnerClass(innerClass, typeMapper, visitor)
+            MemberCodegen.writeInnerClass(innerClass, typeMapper, visitor, state.bindingContext[CodegenBinding.CLOSURE, innerClass])
         }
     }
 

@@ -106,7 +106,8 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
             @NotNull Collection<KotlinType> supertypes,
             @NotNull String name
     ) {
-        return recordClassForCallable(element, callableDescriptor, supertypes, name, null);
+        boolean isSuspend = callableDescriptor instanceof FunctionDescriptor && ((FunctionDescriptor) callableDescriptor).isSuspend();
+        return recordClassForCallable(element, callableDescriptor, supertypes, name, isSuspend ? name : null, null);
     }
 
     @NotNull
@@ -114,12 +115,13 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
             @NotNull KtElement element,
             @NotNull FunctionDescriptor functionDescriptor,
             @NotNull String name,
+            @Nullable String originalSimpleName,
             @Nullable DeclarationDescriptor customContainer
     ) {
         return recordClassForCallable(
                 element, functionDescriptor,
                 runtimeTypes.getSupertypesForClosure(functionDescriptor),
-                name, customContainer
+                name, originalSimpleName, customContainer
         );
     }
 
@@ -129,12 +131,14 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
             @NotNull CallableDescriptor callableDescriptor,
             @NotNull Collection<KotlinType> supertypes,
             @NotNull String name,
+            @Nullable String originalSimpleName,
             @Nullable DeclarationDescriptor customContainer
     ) {
         String simpleName = name.substring(name.lastIndexOf('/') + 1);
         ClassDescriptor classDescriptor = new SyntheticClassDescriptorForLambda(
                 customContainer != null ? customContainer : correctContainerForLambda(callableDescriptor),
                 Name.special("<closure-" + simpleName + ">"),
+                originalSimpleName,
                 supertypes,
                 element
         );
@@ -566,7 +570,9 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
             }
 
             String name = inventAnonymousClassName();
-            ClassDescriptor classDescriptor = recordClassForFunction(function, functionDescriptor, name, functionDescriptor);
+            String originalSimpleName = functionDescriptor.getName().asString() + "$Continuation";
+            ClassDescriptor classDescriptor =
+                    recordClassForFunction(function, functionDescriptor, name, originalSimpleName, functionDescriptor);
             MutableClosure closure = recordClosure(classDescriptor, name);
 
             SimpleFunctionDescriptor jvmSuspendFunctionView =
@@ -607,7 +613,8 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
         }
         else {
             String name = inventAnonymousClassName();
-            ClassDescriptor classDescriptor = recordClassForFunction(function, functionDescriptor, name, null);
+            ClassDescriptor classDescriptor =
+                    recordClassForFunction(function, functionDescriptor, name, functionDescriptor.getName().asString(), null);
             MutableClosure closure = recordClosure(classDescriptor, name);
 
             classStack.push(classDescriptor);

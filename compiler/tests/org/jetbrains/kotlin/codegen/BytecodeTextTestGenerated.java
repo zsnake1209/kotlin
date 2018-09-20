@@ -139,6 +139,11 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
         runTest("compiler/testData/codegen/bytecodeText/inlineProtectedJavaConstantFromOtherPackage.kt");
     }
 
+    @TestMetadata("innerClassAttribute.kt")
+    public void testInnerClassAttribute() throws Exception {
+        runTest("compiler/testData/codegen/bytecodeText/innerClassAttribute.kt");
+    }
+
     @TestMetadata("intConstantNotNull.kt")
     public void testIntConstantNotNull() throws Exception {
         runTest("compiler/testData/codegen/bytecodeText/intConstantNotNull.kt");
