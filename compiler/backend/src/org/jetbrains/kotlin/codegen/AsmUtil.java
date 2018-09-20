@@ -366,8 +366,7 @@ public class AsmUtil {
         int flags = getVisibilityAccessFlag(functionDescriptor, kind);
         flags |= getVarargsFlag(functionDescriptor);
         flags |= getDeprecatedAccessFlag(functionDescriptor);
-        if (state.getDeprecationProvider().isDeprecatedHidden(functionDescriptor) ||
-            (functionDescriptor.isSuspend()) && functionDescriptor.getVisibility().equals(Visibilities.PRIVATE)) {
+        if (state.getDeprecationProvider().isDeprecatedHidden(functionDescriptor)) {
             flags |= ACC_SYNTHETIC;
         }
         return flags;
