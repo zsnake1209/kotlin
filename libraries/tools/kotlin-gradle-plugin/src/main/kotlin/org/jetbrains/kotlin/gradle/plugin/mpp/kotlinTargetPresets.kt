@@ -11,7 +11,9 @@ import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.internal.cleanup.BuildOutputCleanupRegistry
 import org.gradle.internal.reflect.Instantiator
-import org.jetbrains.kotlin.compilerRunner.*
+import org.jetbrains.kotlin.compilerRunner.KotlinNativeProjectProperty
+import org.jetbrains.kotlin.compilerRunner.hasProperty
+import org.jetbrains.kotlin.compilerRunner.konanHome
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.*
@@ -283,6 +285,21 @@ class KotlinNativeTargetPreset(
                 platformLibs(target).files.forEach { platformLib -> implementation(project.files(platformLib)) }
             }
         }
+
+        if (!konanTarget.enabledOnCurrentHost) {
+            with(HostManager()) {
+                val supportedHosts = enabledTargetsByHost.filterValues { konanTarget in it }.keys
+                val supportedHostsString =
+                    if (supportedHosts.size == 1)
+                        "a ${supportedHosts.single()} host" else
+                        "one of the host platforms: ${supportedHosts.joinToString(", ")}"
+                project.logger.warn(
+                    "Target '$name' for platform ${konanTarget} is ignored during build on this ${HostManager.host} machine. " +
+                            "You can build it with $supportedHostsString."
+                )
+            }
+        }
+
         return result
     }
 }
