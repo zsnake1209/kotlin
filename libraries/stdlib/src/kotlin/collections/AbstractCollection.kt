@@ -4,13 +4,18 @@
  */
 package kotlin.collections
 
+
+internal interface SupportsToArray {
+    fun toArray(): Array<Any?>
+    fun <T> toArray(array: Array<T>): Array<T>
+}
 /**
  * Provides a skeletal implementation of the read-only [Collection] interface.
  *
  * @param E the type of elements contained in the collection. The collection is covariant on its element type.
  */
 @SinceKotlin("1.1")
-public abstract class AbstractCollection<out E> protected constructor() : Collection<E> {
+public abstract class AbstractCollection<out E> protected constructor() : Collection<E>, SupportsToArray {
     abstract override val size: Int
     abstract override fun iterator(): Iterator<E>
 
@@ -28,11 +33,13 @@ public abstract class AbstractCollection<out E> protected constructor() : Collec
     /**
      * Returns new array of type `Array<Any?>` with the elements of this collection.
      */
-    protected open fun toArray(): Array<Any?> = copyToArrayImpl(this)
+    @Suppress("CANNOT_WEAKEN_ACCESS_PRIVILEGE")
+    protected override fun toArray(): Array<Any?> = copyToArrayImpl(this)
 
     /**
      * Fills the provided [array] or creates new array of the same type
      * and fills it with the elements of this collection.
      */
-    protected open fun <T> toArray(array: Array<T>): Array<T> = copyToArrayImpl(this, array)
+    @Suppress("CANNOT_WEAKEN_ACCESS_PRIVILEGE")
+    protected override fun <T> toArray(array: Array<T>): Array<T> = copyToArrayImpl(this, array)
 }
