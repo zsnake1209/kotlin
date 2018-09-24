@@ -67,9 +67,11 @@ internal class PsiContractParserDispatcher(
             return null
         }
 
-        val effectsWithExpression = lambda.bodyExpression?.statements?.map { parseEffect(it) to it } ?: return null
+        val effectsWithExpression = lambda.bodyExpression?.statements?.flatMap { expression ->
+            parseEffect(expression).map { it to expression }
+        } ?: return null
         checkDuplicatedCallsEffectsAndReport(effectsWithExpression)
-        val effects = effectsWithExpression.mapNotNull { it.first }
+        val effects = effectsWithExpression.map { it.first }
         if (effects.isEmpty()) return null
 
         return ContractDescription(effects, callContext.functionDescriptor, storageManager)
@@ -77,15 +79,15 @@ internal class PsiContractParserDispatcher(
 
     fun parseCondition(expression: KtExpression?): BooleanExpression? = expression?.accept(conditionParser, Unit)
 
-    fun parseEffect(expression: KtExpression?): EffectDeclaration? {
-        if (expression == null) return null
-        if (!isValidEffectDeclaration(expression)) return null
+    fun parseEffect(expression: KtExpression?): Collection<EffectDeclaration> {
+        if (expression == null) return emptyList()
+        if (!isValidEffectDeclaration(expression)) return emptyList()
 
-        val returnType = expression.getType(callContext.bindingContext) ?: return null
+        val returnType = expression.getType(callContext.bindingContext) ?: return emptyList()
         val parser = effectsParsers[returnType.constructor.declarationDescriptor?.name]
         if (parser == null) {
             collector.badDescription("unrecognized effect", expression)
-            return null
+            return emptyList()
         }
 
         return parser.tryParseEffect(expression)
