@@ -80,7 +80,12 @@ open class SuspendFunctionGenerationStrategy(
 
     override fun doGenerateBody(codegen: ExpressionCodegen, signature: JvmMethodSignature) {
         this.codegen = codegen
-        codegen.returnExpression(declaration.bodyExpression ?: error("Function has no body: " + declaration.getElementTextWithContext()))
+        state.globalCoroutinesContext.enterScope(false)
+        try {
+            codegen.returnExpression(declaration.bodyExpression ?: error("Function has no body: " + declaration.getElementTextWithContext()))
+        } finally {
+            state.globalCoroutinesContext.exitScope()
+        }
     }
 
     // When we generate named suspend function for the use as inline site, we do not generate state machine.

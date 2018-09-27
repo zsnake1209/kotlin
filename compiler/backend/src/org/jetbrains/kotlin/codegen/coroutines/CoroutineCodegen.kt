@@ -438,31 +438,36 @@ class CoroutineCodegenForLambda private constructor(
         )
 
     private fun generateResumeImpl() {
-        functionCodegen.generateMethod(
-            OtherOrigin(element),
-            methodToImplement,
-            object : FunctionGenerationStrategy.FunctionDefault(state, element as KtDeclarationWithBody) {
+        state.globalCoroutinesContext.enterScope(false)
+        try {
+            functionCodegen.generateMethod(
+                OtherOrigin(element),
+                methodToImplement,
+                object : FunctionGenerationStrategy.FunctionDefault(state, element as KtDeclarationWithBody) {
 
-                override fun wrapMethodVisitor(mv: MethodVisitor, access: Int, name: String, desc: String): MethodVisitor {
-                    if (forInline) return super.wrapMethodVisitor(mv, access, name, desc)
-                    return CoroutineTransformerMethodVisitor(
-                        mv, access, name, desc, null, null,
-                        obtainClassBuilderForCoroutineState = { v },
-                        lineNumber = CodegenUtil.getLineNumberForElement(element, false) ?: 0,
-                        shouldPreserveClassInitialization = constructorCallNormalizationMode.shouldPreserveClassInitialization,
-                        containingClassInternalName = v.thisName,
-                        isForNamedFunction = false,
-                        languageVersionSettings = languageVersionSettings,
-                        sourceFile = element.containingFile.name
-                    )
-                }
+                    override fun wrapMethodVisitor(mv: MethodVisitor, access: Int, name: String, desc: String): MethodVisitor {
+                        if (forInline) return super.wrapMethodVisitor(mv, access, name, desc)
+                        return CoroutineTransformerMethodVisitor(
+                            mv, access, name, desc, null, null,
+                            obtainClassBuilderForCoroutineState = { v },
+                            lineNumber = CodegenUtil.getLineNumberForElement(element, false) ?: 0,
+                            shouldPreserveClassInitialization = constructorCallNormalizationMode.shouldPreserveClassInitialization,
+                            containingClassInternalName = v.thisName,
+                            isForNamedFunction = false,
+                            languageVersionSettings = languageVersionSettings,
+                            sourceFile = element.containingFile.name
+                        )
+                    }
 
-                override fun doGenerateBody(codegen: ExpressionCodegen, signature: JvmMethodSignature) {
-                    codegen.initializeCoroutineParameters()
-                    super.doGenerateBody(codegen, signature)
+                    override fun doGenerateBody(codegen: ExpressionCodegen, signature: JvmMethodSignature) {
+                        codegen.initializeCoroutineParameters()
+                        super.doGenerateBody(codegen, signature)
+                    }
                 }
-            }
-        )
+            )
+        } finally {
+            state.globalCoroutinesContext.exitScope()
+        }
     }
 
     companion object {
@@ -544,67 +549,72 @@ class CoroutineCodegenForNamedFunction private constructor(
     }
 
     private fun generateResumeImpl() {
-        functionCodegen.generateMethod(
-            OtherOrigin(element),
-            methodToImplement,
-            object : FunctionGenerationStrategy.CodegenBased(state) {
-                override fun doGenerateBody(codegen: ExpressionCodegen, signature: JvmMethodSignature) {
-                    StackValue.field(
-                        AsmTypes.OBJECT_TYPE, Type.getObjectType(v.thisName), languageVersionSettings.dataFieldName(), false,
-                        StackValue.LOCAL_0
-                    ).store(StackValue.local(1, AsmTypes.OBJECT_TYPE), codegen.v)
-
-                    if (!languageVersionSettings.isReleaseCoroutines()) {
+        state.globalCoroutinesContext.enterScope(false)
+        try {
+            functionCodegen.generateMethod(
+                OtherOrigin(element),
+                methodToImplement,
+                object : FunctionGenerationStrategy.CodegenBased(state) {
+                    override fun doGenerateBody(codegen: ExpressionCodegen, signature: JvmMethodSignature) {
                         StackValue.field(
-                            AsmTypes.JAVA_THROWABLE_TYPE, Type.getObjectType(v.thisName), EXCEPTION_FIELD_NAME, false,
+                            AsmTypes.OBJECT_TYPE, Type.getObjectType(v.thisName), languageVersionSettings.dataFieldName(), false,
                             StackValue.LOCAL_0
-                        ).store(StackValue.local(2, AsmTypes.JAVA_THROWABLE_TYPE), codegen.v)
-                    }
+                        ).store(StackValue.local(1, AsmTypes.OBJECT_TYPE), codegen.v)
 
-                    labelFieldStackValue.store(
-                        StackValue.operation(Type.INT_TYPE) {
-                            labelFieldStackValue.put(Type.INT_TYPE, it)
-                            it.iconst(1 shl 31)
-                            it.or(Type.INT_TYPE)
-                        },
-                        codegen.v
-                    )
+                        if (!languageVersionSettings.isReleaseCoroutines()) {
+                            StackValue.field(
+                                AsmTypes.JAVA_THROWABLE_TYPE, Type.getObjectType(v.thisName), EXCEPTION_FIELD_NAME, false,
+                                StackValue.LOCAL_0
+                            ).store(StackValue.local(2, AsmTypes.JAVA_THROWABLE_TYPE), codegen.v)
+                        }
 
-                    val captureThis = closure.capturedOuterClassDescriptor
-                    val captureThisType = captureThis?.let(typeMapper::mapType)
-                    if (captureThisType != null) {
-                        StackValue.field(
-                            captureThisType, Type.getObjectType(v.thisName), AsmUtil.CAPTURED_THIS_FIELD,
-                            false, StackValue.LOCAL_0
-                        ).put(captureThisType, codegen.v)
-                    }
-
-                    val isInterfaceMethod = DescriptorUtils.isInterface(suspendFunctionJvmView.containingDeclaration)
-                    val callableMethod =
-                        typeMapper.mapToCallableMethod(
-                            suspendFunctionJvmView,
-                            // Obtain default impls method for interfaces
-                            isInterfaceMethod
+                        labelFieldStackValue.store(
+                            StackValue.operation(Type.INT_TYPE) {
+                                labelFieldStackValue.put(Type.INT_TYPE, it)
+                                it.iconst(1 shl 31)
+                                it.or(Type.INT_TYPE)
+                            },
+                            codegen.v
                         )
 
-                    for (argumentType in callableMethod.getAsmMethod().argumentTypes.dropLast(1)) {
-                        AsmUtil.pushDefaultValueOnStack(argumentType, codegen.v)
+                        val captureThis = closure.capturedOuterClassDescriptor
+                        val captureThisType = captureThis?.let(typeMapper::mapType)
+                        if (captureThisType != null) {
+                            StackValue.field(
+                                captureThisType, Type.getObjectType(v.thisName), AsmUtil.CAPTURED_THIS_FIELD,
+                                false, StackValue.LOCAL_0
+                            ).put(captureThisType, codegen.v)
+                        }
+
+                        val isInterfaceMethod = DescriptorUtils.isInterface(suspendFunctionJvmView.containingDeclaration)
+                        val callableMethod =
+                            typeMapper.mapToCallableMethod(
+                                suspendFunctionJvmView,
+                                // Obtain default impls method for interfaces
+                                isInterfaceMethod
+                            )
+
+                        for (argumentType in callableMethod.getAsmMethod().argumentTypes.dropLast(1)) {
+                            AsmUtil.pushDefaultValueOnStack(argumentType, codegen.v)
+                        }
+
+                        codegen.v.load(0, AsmTypes.OBJECT_TYPE)
+
+                        if (suspendFunctionJvmView.isOverridable && !isInterfaceMethod && captureThisType != null) {
+                            val owner = captureThisType.internalName
+                            val impl = callableMethod.getAsmMethod().getImplForOpenMethod(owner)
+                            codegen.v.invokestatic(owner, impl.name, impl.descriptor, false)
+                        } else {
+                            callableMethod.genInvokeInstruction(codegen.v)
+                        }
+
+                        codegen.v.visitInsn(Opcodes.ARETURN)
                     }
-
-                    codegen.v.load(0, AsmTypes.OBJECT_TYPE)
-
-                    if (suspendFunctionJvmView.isOverridable && !isInterfaceMethod && captureThisType != null) {
-                        val owner = captureThisType.internalName
-                        val impl = callableMethod.getAsmMethod().getImplForOpenMethod(owner)
-                        codegen.v.invokestatic(owner, impl.name, impl.descriptor, false)
-                    } else {
-                        callableMethod.genInvokeInstruction(codegen.v)
-                    }
-
-                    codegen.v.visitInsn(Opcodes.ARETURN)
                 }
-            }
-        )
+            )
+        } finally {
+            state.globalCoroutinesContext.exitScope()
+        }
     }
 
     private fun generateGetLabelMethod() {

@@ -7,14 +7,14 @@ package org.jetbrains.kotlin.codegen.coroutines
 
 import org.jetbrains.kotlin.backend.common.peek
 import org.jetbrains.kotlin.backend.common.pop
+import org.jetbrains.kotlin.backend.common.push
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.ErrorsJvm.SUSPENSION_POINT_INSIDE_MONITOR
 
 class GlobalCoroutinesContext(private val diagnostics: DiagnosticSink) {
-    private var monitorsDepth = 0
-
     private val inlineLambdaInsideMonitorSourceArgumentIndexes = arrayListOf<Set<Int>>()
+    private val monitorStates = arrayListOf<Boolean>()
 
     fun pushArgumentIndexes(indexes: Set<Int>) {
         inlineLambdaInsideMonitorSourceArgumentIndexes.add(indexes)
@@ -24,31 +24,31 @@ class GlobalCoroutinesContext(private val diagnostics: DiagnosticSink) {
         inlineLambdaInsideMonitorSourceArgumentIndexes.pop()
     }
 
-    private fun enterMonitor() {
-        monitorsDepth++
+    fun enterScope(monitorEnabled: Boolean) {
+        monitorStates.push(monitorEnabled)
     }
 
     fun enterMonitorIfNeeded(index: Int?) {
         if (index == null) return
         if (inlineLambdaInsideMonitorSourceArgumentIndexes.peek()?.contains(index) != true) return
-        enterMonitor()
+        enterScope(true)
     }
 
-    private fun exitMonitor() {
-        assert(monitorsDepth > 0) {
-            "exitMonitor without corresponding enterMonitor"
+    fun exitScope() {
+        assert(monitorStates.isNotEmpty()) {
+            "exitScope without corresponding enterScope"
         }
-        monitorsDepth--
+        monitorStates.pop()
     }
 
     fun exitMonitorIfNeeded(index: Int?) {
         if (index == null) return
         if (inlineLambdaInsideMonitorSourceArgumentIndexes.peek()?.contains(index) != true) return
-        exitMonitor()
+        exitScope()
     }
 
     fun checkSuspendCall(call: ResolvedCall<*>) {
-        if (monitorsDepth != 0) {
+        if (monitorStates.peek() == true) {
             diagnostics.report(SUSPENSION_POINT_INSIDE_MONITOR.on(call.call.callElement, call.resultingDescriptor))
         }
     }

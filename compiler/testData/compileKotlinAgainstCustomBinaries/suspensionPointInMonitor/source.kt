@@ -19,4 +19,22 @@ fun test() {
             { suspensionPoint() }
         )
     }
+
+    synchronized(lock) {
+        builder {
+            suspensionPoint()
+        }
+    }
+
+    synchronized(lock) {
+        object : SuspendRunnable {
+            override suspend fun run() {
+                suspensionPoint()
+            }
+        }
+    }
+}
+
+interface SuspendRunnable {
+    suspend fun run() {}
 }
