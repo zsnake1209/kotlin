@@ -140,6 +140,10 @@ class KotlinFacetSettings {
         // Increment this when making serialization-incompatible changes to configuration data
         val CURRENT_VERSION = 3
         val DEFAULT_VERSION = 0
+
+        private val newInferenceManualLanguageFeatureSetting = ManualLanguageFeatureSetting(
+            LanguageFeature.NewInference, LanguageFeature.State.ENABLED, "-XXLanguage:+InlineClasses"
+        )
     }
 
     var version = CURRENT_VERSION
@@ -212,10 +216,21 @@ class KotlinFacetSettings {
     var newInferenceEnabled: Boolean?
         get() {
             val arguments = compilerArguments ?: return LanguageFeature.NewInference.defaultState == LanguageFeature.State.ENABLED
-            return arguments.newInference
+            return arguments.internalArguments.any {
+                it is ManualLanguageFeatureSetting &&
+                        it.languageFeature == LanguageFeature.NewInference &&
+                        it.state == LanguageFeature.State.ENABLED
+            }
         }
         set(value) {
-            compilerArguments!!.newInference = value == true
+            val argumentsWithoutNewInference = compilerArguments!!.internalArguments.filterNot {
+                it is ManualLanguageFeatureSetting && it.languageFeature == LanguageFeature.NewInference
+            }
+            if (value == true) {
+                compilerArguments!!.internalArguments += argumentsWithoutNewInference + newInferenceManualLanguageFeatureSetting
+            } else {
+                compilerArguments!!.internalArguments = argumentsWithoutNewInference
+            }
         }
 
     var implementedModuleNames: List<String> = emptyList()

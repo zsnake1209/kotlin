@@ -2530,7 +2530,10 @@ compileTestKotlin {
         )
         importProject()
 
-        Assert.assertEquals(true, facetSettings.mergedCompilerArguments?.newInference)
+        Assert.assertEquals(
+            true,
+            facetSettings.mergedCompilerArguments?.internalArguments?.any { it.stringRepresentation == "-XXLanguage:+NewInference" }
+        )
     }
 
     private fun checkStableModuleName(projectName: String, expectedName: String, platform: TargetPlatform, isProduction: Boolean) {
