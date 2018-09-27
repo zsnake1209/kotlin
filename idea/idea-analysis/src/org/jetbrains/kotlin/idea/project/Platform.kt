@@ -143,6 +143,7 @@ fun Project.getLanguageVersionSettings(
                 if (isReleaseCoroutines) LanguageFeature.State.ENABLED else LanguageFeature.State.DISABLED
             )
         }
+        configureNewInferenceSupport(compilerSettings.enableNewInference)
     }
 
     val extraAnalysisFlags = additionalArguments.configureAnalysisFlags(MessageCollector.NONE).apply {
@@ -193,6 +194,7 @@ private fun Module.computeLanguageVersionSettings(): LanguageVersionSettings {
     val languageFeatures = facetSettings.mergedCompilerArguments?.configureLanguageFeatures(MessageCollector.NONE)?.apply {
         configureCoroutinesSupport(facetSettings.coroutineSupport, languageVersion)
         configureMultiplatformSupport(facetSettings.platform?.kind, this@computeLanguageVersionSettings)
+        configureNewInferenceSupport(facetSettings.newInferenceEnabled == true)
     }.orEmpty()
 
     val analysisFlags = facetSettings.mergedCompilerArguments?.configureAnalysisFlags(MessageCollector.NONE).orEmpty()
@@ -236,6 +238,13 @@ fun MutableMap<LanguageFeature, LanguageFeature.State>.configureCoroutinesSuppor
         coroutineSupport ?: LanguageFeature.Coroutines.defaultState
     }
     put(LanguageFeature.Coroutines, state)
+}
+
+fun MutableMap<LanguageFeature, LanguageFeature.State>.configureNewInferenceSupport(enableNewInference: Boolean) {
+    if (enableNewInference) {
+        put(LanguageFeature.NewInference, LanguageFeature.State.ENABLED)
+        put(LanguageFeature.SamConversionForKotlinFunctions, LanguageFeature.State.ENABLED)
+    }
 }
 
 fun MutableMap<LanguageFeature, LanguageFeature.State>.configureMultiplatformSupport(

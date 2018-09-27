@@ -267,6 +267,7 @@ class KotlinFacetEditorGeneralTab(
             }
             apiVersionComboBox.validateOnChange()
             coroutineSupportComboBox.validateOnChange()
+            enableNewInferenceCheckBox.validateOnChange()
         }
         editor.targetPlatformComboBox.validateOnChange()
 
