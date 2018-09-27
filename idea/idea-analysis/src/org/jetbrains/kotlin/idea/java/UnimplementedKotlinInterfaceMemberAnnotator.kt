@@ -48,7 +48,9 @@ class UnimplementedKotlinInterfaceMemberAnnotator : Annotator {
 
     private fun findUnimplementedMethod(psiClass: PsiClass): KtLightMethod? {
         val signaturesFromKotlinInterfaces = psiClass.visibleSignatures.filter { signature ->
-            signature.method.let { it is KtLightMethod && it.hasModifierProperty(PsiModifier.DEFAULT) }
+            signature.method.let {
+                it is KtLightMethod && it.hasModifierProperty(PsiModifier.DEFAULT) && !it.hasModifierProperty(PsiModifier.STATIC)
+            }
         }.ifEmpty { return null }
 
         val kotlinSuperClass = generateSequence(psiClass) { it.superClass }.firstOrNull { it is KtLightClassForSourceDeclaration }
