@@ -6,12 +6,6 @@ suspend fun suspensionPoint() {}
 
 fun test() {
     builder {
-        synchronized(lock) {
-            suspensionPoint()
-        }
-    }
-
-    builder {
         inlineMe {
             suspensionPoint()
         }
@@ -33,14 +27,6 @@ fun test() {
     synchronized(lock) {
         object : SuspendRunnable {
             override suspend fun run() {
-                suspensionPoint()
-            }
-        }
-    }
-
-    object : SuspendRunnable {
-        override suspend fun run() {
-            synchronized(lock) {
                 suspensionPoint()
             }
         }
