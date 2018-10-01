@@ -11,7 +11,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.analyzer.ModuleInfo;
 import org.jetbrains.kotlin.cfg.WhenMissingCase;
 import org.jetbrains.kotlin.config.LanguageFeature;
 import org.jetbrains.kotlin.config.LanguageVersion;
@@ -1088,6 +1087,9 @@ public interface Errors {
     // Function contracts
     DiagnosticFactory1<KtElement, String> ERROR_IN_CONTRACT_DESCRIPTION = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory1<KtElement, String> CONTRACT_NOT_ALLOWED = DiagnosticFactory1.create(ERROR);
+
+    // Contextual effects
+    DiagnosticFactory1<PsiElement, String> CONTEXTUAL_EFFECT_WARNING = DiagnosticFactory1.create(WARNING, DECLARATION_SIGNATURE_OR_DEFAULT);
 
     // Error sets
     ImmutableSet<? extends DiagnosticFactory<?>> UNRESOLVED_REFERENCE_DIAGNOSTICS = ImmutableSet.of(
