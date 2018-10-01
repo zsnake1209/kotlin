@@ -53,6 +53,7 @@ class EffectsExtractingVisitor private constructor(
     private val moduleDescriptor: ModuleDescriptor,
     private val dataFlowValueFactory: DataFlowValueFactory
 ) : KtVisitor<Computation, Unit>() {
+
     private fun extractOrGetCached(element: KtElement): Computation {
         trace[BindingContext.EXPRESSION_EFFECTS, element]?.let { return it }
         return element.accept(this, Unit).also { trace.record(BindingContext.EXPRESSION_EFFECTS, element, it) }
@@ -63,21 +64,30 @@ class EffectsExtractingVisitor private constructor(
         if (resolvedCall.isCallWithUnsupportedReceiver()) return UNKNOWN_COMPUTATION
 
         val arguments = resolvedCall.getCallArgumentsAsComputations() ?: return UNKNOWN_COMPUTATION
+        val hasNonTrivialCallsInArguments = arguments.any { it.hasNonTrivialCalls }
 
         val descriptor = resolvedCall.resultingDescriptor
         return when {
             descriptor.isEqualsDescriptor() -> CallComputation(
                 DefaultBuiltIns.Instance.booleanType,
-                EqualsFunctor(false).invokeWithArguments(arguments)
+                EqualsFunctor(false).invokeWithArguments(arguments),
+                hasNonTrivialCalls = hasNonTrivialCallsInArguments
             )
+
             descriptor is ValueDescriptor -> ESDataFlowValue(
                 descriptor,
                 (element as KtExpression).createDataFlowValue() ?: return UNKNOWN_COMPUTATION
             )
-            descriptor is FunctionDescriptor -> CallComputation(
-                descriptor.returnType,
-                descriptor.getFunctor()?.invokeWithArguments(arguments) ?: emptyList()
-            )
+
+            descriptor is FunctionDescriptor -> {
+                val functorIfAny = descriptor.getFunctor()
+                CallComputation(
+                    descriptor.returnType,
+                    functorIfAny?.invokeWithArguments(arguments) ?: emptyList(),
+                    hasNonTrivialCallsInArguments || functorIfAny != null
+                )
+            }
+
             else -> UNKNOWN_COMPUTATION
         }
     }
@@ -112,7 +122,8 @@ class EffectsExtractingVisitor private constructor(
         val arg = extractOrGetCached(expression.leftHandSide)
         return CallComputation(
             DefaultBuiltIns.Instance.booleanType,
-            IsFunctor(rightType, expression.isNegated).invokeWithArguments(listOf(arg))
+            IsFunctor(rightType, expression.isNegated).invokeWithArguments(listOf(arg)),
+            arg.hasNonTrivialCalls
         )
     }
 
@@ -127,7 +138,7 @@ class EffectsExtractingVisitor private constructor(
             this == ESReturns(ESConstant.NULL) || this is ConditionalEffect && this.simpleEffect.containsReturnsNull()
 
         val effectsWithoutReturnsNull = computation.effects.filter { !it.containsReturnsNull() }
-        return CallComputation(computation.type, effectsWithoutReturnsNull)
+        return CallComputation(computation.type, effectsWithoutReturnsNull, computation.hasNonTrivialCalls)
     }
 
     override fun visitBinaryExpression(expression: KtBinaryExpression, data: Unit): Computation {
@@ -135,12 +146,13 @@ class EffectsExtractingVisitor private constructor(
         val right = extractOrGetCached(expression.right ?: return UNKNOWN_COMPUTATION)
 
         val args = listOf(left, right)
+        val hasNonTrivialCallsInArgs = args.any { it.hasNonTrivialCalls }
 
         return when (expression.operationToken) {
-            KtTokens.EXCLEQ -> CallComputation(DefaultBuiltIns.Instance.booleanType, EqualsFunctor(true).invokeWithArguments(args))
-            KtTokens.EQEQ -> CallComputation(DefaultBuiltIns.Instance.booleanType, EqualsFunctor(false).invokeWithArguments(args))
-            KtTokens.ANDAND -> CallComputation(DefaultBuiltIns.Instance.booleanType, AndFunctor().invokeWithArguments(args))
-            KtTokens.OROR -> CallComputation(DefaultBuiltIns.Instance.booleanType, OrFunctor().invokeWithArguments(args))
+            KtTokens.EXCLEQ -> CallComputation(DefaultBuiltIns.Instance.booleanType, EqualsFunctor(true).invokeWithArguments(args), hasNonTrivialCallsInArgs)
+            KtTokens.EQEQ -> CallComputation(DefaultBuiltIns.Instance.booleanType, EqualsFunctor(false).invokeWithArguments(args), hasNonTrivialCallsInArgs)
+            KtTokens.ANDAND -> CallComputation(DefaultBuiltIns.Instance.booleanType, AndFunctor().invokeWithArguments(args), hasNonTrivialCallsInArgs)
+            KtTokens.OROR -> CallComputation(DefaultBuiltIns.Instance.booleanType, OrFunctor().invokeWithArguments(args), hasNonTrivialCallsInArgs)
             else -> UNKNOWN_COMPUTATION
         }
     }
@@ -148,7 +160,7 @@ class EffectsExtractingVisitor private constructor(
     override fun visitUnaryExpression(expression: KtUnaryExpression, data: Unit): Computation {
         val arg = extractOrGetCached(expression.baseExpression ?: return UNKNOWN_COMPUTATION)
         return when (expression.operationToken) {
-            KtTokens.EXCL -> CallComputation(DefaultBuiltIns.Instance.booleanType, NotFunctor().invokeWithArguments(arg))
+            KtTokens.EXCL -> CallComputation(DefaultBuiltIns.Instance.booleanType, NotFunctor().invokeWithArguments(arg), arg.hasNonTrivialCalls)
             else -> UNKNOWN_COMPUTATION
         }
     }
@@ -225,8 +237,17 @@ class EffectsExtractingVisitor private constructor(
             moduleDescriptor: ModuleDescriptor,
             dataFlowValueFactory: DataFlowValueFactory
         ): Computation? {
-            val computation = EffectsExtractingVisitor(trace, moduleDescriptor, dataFlowValueFactory).extractOrGetCached(expression)
-            return if (computation == UNKNOWN_COMPUTATION) null else computation
+            return getComputation(expression, trace, moduleDescriptor, dataFlowValueFactory)?.takeIf { it.hasNonTrivialCalls }
+        }
+
+        fun getComputation(
+            expression: KtExpression,
+            trace: BindingTrace,
+            moduleDescriptor: ModuleDescriptor,
+            dataFlowValueFactory: DataFlowValueFactory
+        ): Computation? {
+            val visitor = EffectsExtractingVisitor(trace, moduleDescriptor, dataFlowValueFactory)
+            return visitor.extractOrGetCached(expression).takeIf { it != UNKNOWN_COMPUTATION }
         }
     }
 }

@@ -36,4 +36,6 @@ interface Computation {
      * as the absence of information about that effect.
      */
     val effects: List<ESEffect>
+
+    val hasNonTrivialCalls: Boolean
 }

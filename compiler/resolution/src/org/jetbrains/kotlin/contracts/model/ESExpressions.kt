@@ -28,4 +28,5 @@ interface ESOperator : ESExpression {
 
 abstract class ESValue(override val type: KotlinType?) : Computation, ESExpression {
     override val effects: List<ESEffect> = listOf()
+    override val hasNonTrivialCalls: Boolean = false
 }

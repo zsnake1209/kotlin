@@ -20,9 +20,10 @@ import org.jetbrains.kotlin.contracts.model.Computation
 import org.jetbrains.kotlin.contracts.model.ESEffect
 import org.jetbrains.kotlin.types.KotlinType
 
-class CallComputation(override val type: KotlinType?, override val effects: List<ESEffect>) : Computation
+class CallComputation(override val type: KotlinType?, override val effects: List<ESEffect>, override val hasNonTrivialCalls: Boolean) : Computation
 
 object UNKNOWN_COMPUTATION : Computation {
     override val type: KotlinType? = null
     override val effects: List<ESEffect> = emptyList()
+    override val hasNonTrivialCalls: Boolean = false
 }

@@ -28,30 +28,33 @@ import org.jetbrains.kotlin.contracts.model.structure.*
 class Substitutor(private val substitutions: Map<ESVariable, Computation>) : ESExpressionVisitor<Computation?> {
     override fun visitIs(isOperator: ESIs): Computation? {
         val arg = isOperator.left.accept(this) ?: return null
-        return CallComputation(DefaultBuiltIns.Instance.booleanType, isOperator.functor.invokeWithArguments(arg))
+        return CallComputation(DefaultBuiltIns.Instance.booleanType, isOperator.functor.invokeWithArguments(arg), arg.hasNonTrivialCalls)
     }
 
     override fun visitNot(not: ESNot): Computation? {
         val arg = not.arg.accept(this) ?: return null
-        return CallComputation(DefaultBuiltIns.Instance.booleanType, not.functor.invokeWithArguments(arg))
+        return CallComputation(DefaultBuiltIns.Instance.booleanType, not.functor.invokeWithArguments(arg), arg.hasNonTrivialCalls)
     }
 
     override fun visitEqual(equal: ESEqual): Computation? {
         val left = equal.left.accept(this) ?: return null
         val right = equal.right.accept(this) ?: return null
-        return CallComputation(DefaultBuiltIns.Instance.booleanType, equal.functor.invokeWithArguments(listOf(left, right)))
+        val hasNonTrivialCallsInArgs = left.hasNonTrivialCalls || right.hasNonTrivialCalls
+        return CallComputation(DefaultBuiltIns.Instance.booleanType, equal.functor.invokeWithArguments(listOf(left, right)), hasNonTrivialCallsInArgs)
     }
 
     override fun visitAnd(and: ESAnd): Computation? {
         val left = and.left.accept(this) ?: return null
         val right = and.right.accept(this) ?: return null
-        return CallComputation(DefaultBuiltIns.Instance.booleanType, and.functor.invokeWithArguments(left, right))
+        val hasNonTrivialCallsInArgs = left.hasNonTrivialCalls || right.hasNonTrivialCalls
+        return CallComputation(DefaultBuiltIns.Instance.booleanType, and.functor.invokeWithArguments(left, right), hasNonTrivialCallsInArgs)
     }
 
     override fun visitOr(or: ESOr): Computation? {
         val left = or.left.accept(this) ?: return null
         val right = or.right.accept(this) ?: return null
-        return CallComputation(DefaultBuiltIns.Instance.booleanType, or.functor.invokeWithArguments(left, right))
+        val hasNonTrivialCallsInArgs = left.hasNonTrivialCalls || right.hasNonTrivialCalls
+        return CallComputation(DefaultBuiltIns.Instance.booleanType, or.functor.invokeWithArguments(left, right), hasNonTrivialCallsInArgs)
     }
 
     override fun visitVariable(esVariable: ESVariable): Computation? = substitutions[esVariable] ?: esVariable

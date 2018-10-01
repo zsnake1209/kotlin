@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.contracts
 
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.contracts.EffectsExtractingVisitor.Companion.getComputation
 import org.jetbrains.kotlin.contracts.EffectsExtractingVisitor.Companion.getNonTrivialComputation
 import org.jetbrains.kotlin.contracts.model.structure.ESCalls
 import org.jetbrains.kotlin.contracts.model.structure.ESReturns
@@ -65,10 +66,12 @@ class EffectSystem(val languageVersionSettings: LanguageVersionSettings, val dat
         if (!languageVersionSettings.supportsFeature(LanguageFeature.UseReturnsEffect)) return ConditionalDataFlowInfo.EMPTY
         if (leftExpression == null || rightExpression == null) return ConditionalDataFlowInfo.EMPTY
 
-        val leftComputation = getNonTrivialComputation(leftExpression, bindingTrace, moduleDescriptor, dataFlowValueFactory)
+        val leftComputation = getComputation(leftExpression, bindingTrace, moduleDescriptor, dataFlowValueFactory)
             ?: return ConditionalDataFlowInfo.EMPTY
-        val rightComputation = getNonTrivialComputation(rightExpression, bindingTrace, moduleDescriptor, dataFlowValueFactory)
+        val rightComputation = getComputation(rightExpression, bindingTrace, moduleDescriptor, dataFlowValueFactory)
             ?: return ConditionalDataFlowInfo.EMPTY
+
+        if (!leftComputation.hasNonTrivialCalls && !rightComputation.hasNonTrivialCalls) return ConditionalDataFlowInfo.EMPTY
 
         val effects = EqualsFunctor(false).invokeWithArguments(leftComputation, rightComputation)
 
