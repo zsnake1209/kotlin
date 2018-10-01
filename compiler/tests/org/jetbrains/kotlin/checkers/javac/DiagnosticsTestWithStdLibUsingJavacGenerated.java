@@ -1668,6 +1668,11 @@ public class DiagnosticsTestWithStdLibUsingJavacGenerated extends AbstractDiagno
             runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/suspesionInDefaultValue.kt");
         }
 
+        @TestMetadata("synchronizedSuspendFunction.kt")
+        public void testSynchronizedSuspendFunction() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/synchronizedSuspendFunction.kt");
+        }
+
         @TestMetadata("tryCatchLambda.kt")
         public void testTryCatchLambda() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/tryCatchLambda.kt");
