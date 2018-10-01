@@ -48,12 +48,12 @@ import org.jetbrains.kotlin.utils.addIfNotNull
  * Visits a given PSI-tree of call (and nested calls, if any) and extracts information
  * about effects of that call.
  */
-class EffectsExtractingVisitor(
+class EffectsExtractingVisitor private constructor(
     private val trace: BindingTrace,
     private val moduleDescriptor: ModuleDescriptor,
     private val dataFlowValueFactory: DataFlowValueFactory
 ) : KtVisitor<Computation, Unit>() {
-    fun extractOrGetCached(element: KtElement): Computation {
+    private fun extractOrGetCached(element: KtElement): Computation {
         trace[BindingContext.EXPRESSION_EFFECTS, element]?.let { return it }
         return element.accept(this, Unit).also { trace.record(BindingContext.EXPRESSION_EFFECTS, element, it) }
     }
@@ -215,6 +215,18 @@ class EffectsExtractingVisitor(
             is KtLambdaArgument -> getLambdaExpression()?.let { ESLambda(it) }
             is KtValueArgument -> getArgumentExpression()?.let { extractOrGetCached(it) }
             else -> null
+        }
+    }
+
+    companion object {
+        fun getNonTrivialComputation(
+            expression: KtExpression,
+            trace: BindingTrace,
+            moduleDescriptor: ModuleDescriptor,
+            dataFlowValueFactory: DataFlowValueFactory
+        ): Computation? {
+            val computation = EffectsExtractingVisitor(trace, moduleDescriptor, dataFlowValueFactory).extractOrGetCached(expression)
+            return if (computation == UNKNOWN_COMPUTATION) null else computation
         }
     }
 }

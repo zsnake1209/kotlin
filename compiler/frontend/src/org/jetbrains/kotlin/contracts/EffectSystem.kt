@@ -18,14 +18,13 @@ package org.jetbrains.kotlin.contracts
 
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.contracts.EffectsExtractingVisitor.Companion.getNonTrivialComputation
 import org.jetbrains.kotlin.contracts.model.structure.ESCalls
 import org.jetbrains.kotlin.contracts.model.structure.ESReturns
 import org.jetbrains.kotlin.contracts.model.functors.EqualsFunctor
 import org.jetbrains.kotlin.contracts.model.structure.ESConstant
-import org.jetbrains.kotlin.contracts.model.structure.UNKNOWN_COMPUTATION
 import org.jetbrains.kotlin.contracts.model.structure.lift
 import org.jetbrains.kotlin.contracts.model.ESEffect
-import org.jetbrains.kotlin.contracts.model.Computation
 import org.jetbrains.kotlin.contracts.model.MutableContextInfo
 import org.jetbrains.kotlin.contracts.model.visitors.InfoCollector
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -66,10 +65,10 @@ class EffectSystem(val languageVersionSettings: LanguageVersionSettings, val dat
         if (!languageVersionSettings.supportsFeature(LanguageFeature.UseReturnsEffect)) return ConditionalDataFlowInfo.EMPTY
         if (leftExpression == null || rightExpression == null) return ConditionalDataFlowInfo.EMPTY
 
-        val leftComputation =
-            getNonTrivialComputation(leftExpression, bindingTrace, moduleDescriptor) ?: return ConditionalDataFlowInfo.EMPTY
-        val rightComputation =
-            getNonTrivialComputation(rightExpression, bindingTrace, moduleDescriptor) ?: return ConditionalDataFlowInfo.EMPTY
+        val leftComputation = getNonTrivialComputation(leftExpression, bindingTrace, moduleDescriptor, dataFlowValueFactory)
+            ?: return ConditionalDataFlowInfo.EMPTY
+        val rightComputation = getNonTrivialComputation(rightExpression, bindingTrace, moduleDescriptor, dataFlowValueFactory)
+            ?: return ConditionalDataFlowInfo.EMPTY
 
         val effects = EqualsFunctor(false).invokeWithArguments(leftComputation, rightComputation)
 
@@ -116,12 +115,8 @@ class EffectSystem(val languageVersionSettings: LanguageVersionSettings, val dat
         bindingTrace: BindingTrace,
         moduleDescriptor: ModuleDescriptor
     ): MutableContextInfo {
-        val computation = getNonTrivialComputation(expression, bindingTrace, moduleDescriptor) ?: return MutableContextInfo.EMPTY
+        val computation = getNonTrivialComputation(expression, bindingTrace, moduleDescriptor, dataFlowValueFactory)
+            ?: return MutableContextInfo.EMPTY
         return InfoCollector(observedEffect).collectFromSchema(computation.effects)
-    }
-
-    private fun getNonTrivialComputation(expression: KtExpression, trace: BindingTrace, moduleDescriptor: ModuleDescriptor): Computation? {
-        val computation = EffectsExtractingVisitor(trace, moduleDescriptor, dataFlowValueFactory).extractOrGetCached(expression)
-        return if (computation == UNKNOWN_COMPUTATION) null else computation
     }
 }
