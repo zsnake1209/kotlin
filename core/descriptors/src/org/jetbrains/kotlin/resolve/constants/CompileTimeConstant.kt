@@ -100,23 +100,6 @@ fun hasUnsignedTypesInModuleDependencies(module: ModuleDescriptor): Boolean {
     return module.findClassAcrossModuleDependencies(KotlinBuiltIns.FQ_NAMES.uInt) != null
 }
 
-class UnsignedErrorValueTypeConstant(
-    private val value: Number,
-    override val parameters: CompileTimeConstant.Parameters
-) : CompileTimeConstant<Unit> {
-    val errorValue = ErrorValue.ErrorValueWithMessage(
-        "Type cannot be resolved. Please make sure you have the required dependencies for unsigned types in the classpath"
-    )
-
-    override fun toConstantValue(expectedType: KotlinType): ConstantValue<Unit> {
-        return errorValue
-    }
-
-    override fun equals(other: Any?) = other is UnsignedErrorValueTypeConstant && value == other.value
-
-    override fun hashCode() = value.hashCode()
-}
-
 class IntegerValueTypeConstant(
     private val value: Number,
     module: ModuleDescriptor,
