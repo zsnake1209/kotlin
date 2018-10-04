@@ -84,8 +84,7 @@ class CharValue(value: Char) : IntegerValueConstant<Char>(value) {
         '\b' -> "\\b"
         '\t' -> "\\t"
         '\n' -> "\\n"
-        //TODO: KT-8507
-        12.toChar() -> "\\f"
+        '\u000c' -> "\\f"
         '\r' -> "\\r"
         else -> if (isPrintableUnicode(c)) Character.toString(c) else "?"
     }
