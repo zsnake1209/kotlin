@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.resolve.InlineClassesUtilsKt;
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
 import org.jetbrains.kotlin.resolve.calls.util.UnderscoreUtilKt;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
+import org.jetbrains.kotlin.resolve.constants.PureConstant;
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOriginKt;
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodGenericSignature;
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature;
@@ -324,8 +325,8 @@ public class PropertyCodegen {
         }
         else if (Boolean.TRUE.equals(bindingContext.get(BindingContext.BACKING_FIELD_REQUIRED, descriptor))) {
             if (shouldWriteFieldInitializer(descriptor)) {
-                ConstantValue<?> initializer = descriptor.getCompileTimeInitializer();
-                defaultValue = initializer == null ? null : initializer.getValue();
+                PureConstant initializer = descriptor.getCompileTimeInitializer();
+                defaultValue = initializer instanceof ConstantValue<?> ? ((ConstantValue) initializer).getValue() : null;
             }
             else {
                 defaultValue = null;

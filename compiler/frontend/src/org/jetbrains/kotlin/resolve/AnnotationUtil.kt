@@ -32,7 +32,7 @@ fun DeclarationDescriptor.hasJvmStaticAnnotation(): Boolean {
 }
 
 fun AnnotationDescriptor.argumentValue(parameterName: String): ConstantValue<*>? {
-    return allValueArguments[Name.identifier(parameterName)].takeUnless { it is ErrorValue }
+    return allValueArguments[Name.identifier(parameterName)] as? ConstantValue<*>
 }
 
 @Deprecated(

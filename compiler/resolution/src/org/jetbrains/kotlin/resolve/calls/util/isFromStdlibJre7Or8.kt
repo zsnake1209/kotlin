@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.SINCE_KOTLIN_FQ_NAME
+import org.jetbrains.kotlin.resolve.constants.safeValue
 
 private val kotlin: FqName = KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME
 private val kotlinText: FqName = KotlinBuiltIns.TEXT_PACKAGE_FQ_NAME
@@ -54,7 +55,7 @@ fun CallableDescriptor.isLowPriorityFromStdlibJre7Or8(): Boolean {
     if (!isFromStdlibJre7Or8) return false
 
     val sinceKotlin = annotations.findAnnotation(SINCE_KOTLIN_FQ_NAME) ?: return false
-    val version = sinceKotlin.allValueArguments.values.singleOrNull()?.value as? String ?: return false
+    val version = sinceKotlin.allValueArguments.values.singleOrNull()?.safeValue as? String ?: return false
 
     return version == LanguageVersion.KOTLIN_1_1.versionString
 }

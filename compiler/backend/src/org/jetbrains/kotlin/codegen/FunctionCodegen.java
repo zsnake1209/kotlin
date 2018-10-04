@@ -45,6 +45,7 @@ import org.jetbrains.kotlin.resolve.calls.util.UnderscoreUtilKt;
 import org.jetbrains.kotlin.resolve.constants.ArrayValue;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
 import org.jetbrains.kotlin.resolve.constants.KClassValue;
+import org.jetbrains.kotlin.resolve.constants.PureConstant;
 import org.jetbrains.kotlin.resolve.inline.InlineUtil;
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes;
 import org.jetbrains.kotlin.resolve.jvm.RuntimeAssertionInfo;
@@ -1116,7 +1117,7 @@ public class FunctionCodegen {
 
         if (annotation == null) return ArrayUtil.EMPTY_STRING_ARRAY;
 
-        Collection<ConstantValue<?>> values = annotation.getAllValueArguments().values();
+        Collection<PureConstant> values = annotation.getAllValueArguments().values();
         if (values.isEmpty()) return ArrayUtil.EMPTY_STRING_ARRAY;
 
         Object value = values.iterator().next();
@@ -1125,7 +1126,7 @@ public class FunctionCodegen {
 
         List<String> strings = CollectionsKt.mapNotNull(
                 arrayValue.getValue(),
-                (ConstantValue<?> constant) -> {
+                (PureConstant constant) -> {
                     if (constant instanceof KClassValue) {
                         KClassValue classValue = (KClassValue) constant;
                         ClassDescriptor classDescriptor = DescriptorUtils.getClassDescriptorForType(classValue.getValue());

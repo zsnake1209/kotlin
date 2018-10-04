@@ -123,7 +123,7 @@ private fun AnnotationDescriptor.toAnnotationInstance(): Annotation? {
 }
 
 // TODO: consider throwing exceptions such as AnnotationFormatError/AnnotationTypeMismatchException if a value of unexpected type is found
-private fun ConstantValue<*>.toRuntimeValue(classLoader: ClassLoader): Any? = when (this) {
+private fun PureConstant.toRuntimeValue(classLoader: ClassLoader): Any? = when (this) {
     is AnnotationValue -> value.toAnnotationInstance()
     is ArrayValue -> value.map { it.toRuntimeValue(classLoader) }.toTypedArray()
     is EnumValue -> {
@@ -135,7 +135,7 @@ private fun ConstantValue<*>.toRuntimeValue(classLoader: ClassLoader): Any? = wh
     }
     is KClassValue -> (value.constructor.declarationDescriptor as? ClassDescriptor)?.toJavaClass()
     is ErrorValue, is NullValue -> null
-    else -> value  // Primitives and strings
+    else -> safeValue  // Primitives and strings
 }
 
 // TODO: wrap other exceptions

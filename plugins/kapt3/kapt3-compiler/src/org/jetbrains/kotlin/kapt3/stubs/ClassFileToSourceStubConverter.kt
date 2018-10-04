@@ -1004,9 +1004,9 @@ class ClassFileToSourceStubConverter(
         }
     }
 
-    private fun checkIfAnnotationValueMatches(asm: Any?, desc: ConstantValue<*>): Boolean {
+    private fun checkIfAnnotationValueMatches(asm: Any?, desc: PureConstant): Boolean {
         return when (asm) {
-            null -> desc.value == null
+            null -> desc is NullValue
             is Char -> desc is CharValue && desc.value == asm
             is Byte -> desc is ByteValue && desc.value == asm
             is Short -> desc is ShortValue && desc.value == asm

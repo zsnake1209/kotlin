@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.ValueArgument
+import org.jetbrains.kotlin.resolve.constants.safeValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyAnnotationDescriptor
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
@@ -167,7 +168,7 @@ fun ClassDescriptor.checkLoadMethodResult(type: KotlinType): Boolean = getSerial
 
 inline fun <reified R> Annotations.findAnnotationValue(annotationFqName: FqName, property: String): R? =
         findAnnotation(annotationFqName)?.let { annotation ->
-            annotation.allValueArguments.entries.singleOrNull { it.key.asString() == property }?.value?.value
+            annotation.allValueArguments.entries.singleOrNull { it.key.asString() == property }?.value?.safeValue
         } as? R
 
 // Search utils

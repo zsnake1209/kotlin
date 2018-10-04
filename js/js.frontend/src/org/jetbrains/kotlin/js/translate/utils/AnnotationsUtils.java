@@ -28,7 +28,8 @@ import org.jetbrains.kotlin.psi.KtAnnotationEntry;
 import org.jetbrains.kotlin.psi.KtFile;
 import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
-import org.jetbrains.kotlin.resolve.constants.ConstantValue;
+import org.jetbrains.kotlin.resolve.constants.PureConstant;
+import org.jetbrains.kotlin.resolve.constants.StringValue;
 import org.jetbrains.kotlin.resolve.source.PsiSourceFile;
 import org.jetbrains.kotlin.serialization.js.KotlinJavascriptPackageFragment;
 
@@ -63,14 +64,14 @@ public final class AnnotationsUtils {
         if (annotationDescriptor.getAllValueArguments().isEmpty()) {
             return null;
         }
-        ConstantValue<?> constant = annotationDescriptor.getAllValueArguments().values().iterator().next();
+        PureConstant constant = annotationDescriptor.getAllValueArguments().values().iterator().next();
         //TODO: this is a quick fix for unsupported default args problem
         if (constant == null) {
             return null;
         }
-        Object value = constant.getValue();
-        assert value instanceof String : "Native function annotation should have one String parameter";
-        return (String) value;
+
+        assert constant instanceof StringValue : "Native function annotation should have one String parameter but have " + constant;
+        return ((StringValue) constant).getValue();
     }
 
     @Nullable
@@ -140,13 +141,10 @@ public final class AnnotationsUtils {
         AnnotationDescriptor annotation = getJsNameAnnotation(descriptor);
         if (annotation == null || annotation.getAllValueArguments().isEmpty()) return null;
 
-        ConstantValue<?> value = annotation.getAllValueArguments().values().iterator().next();
+        PureConstant value = annotation.getAllValueArguments().values().iterator().next();
         if (value == null) return null;
 
-        Object result = value.getValue();
-        if (!(result instanceof String)) return null;
-
-        return (String) result;
+        return value instanceof StringValue ? ((StringValue) value).getValue() : null;
     }
 
     @Nullable
@@ -232,11 +230,10 @@ public final class AnnotationsUtils {
     private static String extractSingleStringArgument(@NotNull AnnotationDescriptor annotation) {
         if (annotation.getAllValueArguments().isEmpty()) return null;
 
-        ConstantValue<?> importValue = annotation.getAllValueArguments().values().iterator().next();
+        PureConstant importValue = annotation.getAllValueArguments().values().iterator().next();
         if (importValue == null) return null;
 
-        if (!(importValue.getValue() instanceof String)) return null;
-        return (String) importValue.getValue();
+        return importValue instanceof StringValue ? ((StringValue) importValue).getValue() : null;
     }
 
     @NotNull

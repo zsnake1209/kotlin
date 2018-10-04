@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.resolve.calls.util.FakeCallableDescriptorForTypeAlia
 import org.jetbrains.kotlin.resolve.checkers.ExperimentalUsageChecker
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.KClassValue
+import org.jetbrains.kotlin.resolve.constants.safeValue
 
 sealed class SinceKotlinAccessibility {
     object Accessible : SinceKotlinAccessibility()
@@ -72,7 +73,7 @@ private fun DeclarationDescriptor.getOwnSinceKotlinVersion(): SinceKotlinValue? 
 
     // TODO: use-site targeted annotations
     fun DeclarationDescriptor.consider() {
-        val apiVersion = (annotations.findAnnotation(SINCE_KOTLIN_FQ_NAME)?.allValueArguments?.values?.singleOrNull()?.value as? String)
+        val apiVersion = (annotations.findAnnotation(SINCE_KOTLIN_FQ_NAME)?.allValueArguments?.values?.singleOrNull()?.safeValue as? String)
             ?.let(ApiVersion.Companion::parse)
         if (apiVersion != null) {
             // TODO: combine wasExperimentalMarkerClasses in case of several associated declarations with the same maximal API version

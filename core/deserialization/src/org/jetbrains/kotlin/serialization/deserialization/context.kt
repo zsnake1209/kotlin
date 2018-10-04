@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.metadata.deserialization.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.protobuf.ExtensionRegistryLite
-import org.jetbrains.kotlin.resolve.constants.ConstantValue
+import org.jetbrains.kotlin.resolve.constants.PureConstant
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 import org.jetbrains.kotlin.storage.StorageManager
 
@@ -35,7 +35,7 @@ class DeserializationComponents(
     val moduleDescriptor: ModuleDescriptor,
     val configuration: DeserializationConfiguration,
     val classDataFinder: ClassDataFinder,
-    val annotationAndConstantLoader: AnnotationAndConstantLoader<AnnotationDescriptor, ConstantValue<*>>,
+    val annotationAndConstantLoader: AnnotationAndConstantLoader<AnnotationDescriptor, PureConstant>,
     val packageFragmentProvider: PackageFragmentProvider,
     val localClassifierTypeSettings: LocalClassifierTypeSettings,
     val errorReporter: ErrorReporter,

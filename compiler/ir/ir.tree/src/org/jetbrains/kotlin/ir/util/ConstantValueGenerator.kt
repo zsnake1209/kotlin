@@ -34,7 +34,7 @@ class ConstantValueGenerator(
     fun generateConstantValueAsExpression(
         startOffset: Int,
         endOffset: Int,
-        constantValue: ConstantValue<*>,
+        constantValue: PureConstant,
         varargElementType: KotlinType? = null
     ): IrExpression {
         val constantKtType = constantValue.getType(moduleDescriptor)

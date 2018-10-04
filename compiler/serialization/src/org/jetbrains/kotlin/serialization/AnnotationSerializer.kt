@@ -45,7 +45,7 @@ class AnnotationSerializer(private val stringTable: DescriptorAwareStringTable) 
         }
     }.build()
 
-    fun valueProto(constant: ConstantValue<*>): Value.Builder = Value.newBuilder().apply {
+    fun valueProto(constant: PureConstant): Value.Builder = Value.newBuilder().apply {
         constant.accept(object : AnnotationArgumentVisitor<Unit, Unit> {
             override fun visitAnnotationValue(value: AnnotationValue, data: Unit) {
                 type = Type.ANNOTATION

@@ -15,8 +15,8 @@ import org.jetbrains.kotlin.resolve.AnnotationChecker
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
-import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.constants.KClassValue
+import org.jetbrains.kotlin.resolve.constants.PureConstant
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 object ExperimentalMarkerDeclarationAnnotationChecker : AdditionalAnnotationChecker {
@@ -44,7 +44,7 @@ object ExperimentalMarkerDeclarationAnnotationChecker : AdditionalAnnotationChec
         }
     }
 
-    private fun checkUseExperimentalUsage(annotationClasses: List<ConstantValue<*>>, trace: BindingTrace, entry: KtAnnotationEntry) {
+    private fun checkUseExperimentalUsage(annotationClasses: List<PureConstant>, trace: BindingTrace, entry: KtAnnotationEntry) {
         if (annotationClasses.isEmpty()) {
             trace.report(Errors.USE_EXPERIMENTAL_WITHOUT_ARGUMENTS.on(entry))
             return

@@ -341,7 +341,7 @@ public abstract class AnnotationCodegen {
 
     private void genAnnotationArguments(AnnotationDescriptor annotationDescriptor, AnnotationVisitor annotationVisitor) {
         ClassDescriptor annotationClass = DescriptorUtilsKt.getAnnotationClass(annotationDescriptor);
-        for (Map.Entry<Name, ConstantValue<?>> entry : annotationDescriptor.getAllValueArguments().entrySet()) {
+        for (Map.Entry<Name, PureConstant> entry : annotationDescriptor.getAllValueArguments().entrySet()) {
             genCompileTimeValue(getAnnotationArgumentJvmName(annotationClass, entry.getKey()), entry.getValue(), annotationVisitor);
         }
     }
@@ -358,7 +358,7 @@ public abstract class AnnotationCodegen {
 
     private void genCompileTimeValue(
             @Nullable String name,
-            @NotNull ConstantValue<?> value,
+            @NotNull PureConstant value,
             @NotNull AnnotationVisitor annotationVisitor
     ) {
         AnnotationArgumentVisitor argumentVisitor = new AnnotationArgumentVisitor<Void, Void>() {
@@ -418,7 +418,7 @@ public abstract class AnnotationCodegen {
             @Override
             public Void visitArrayValue(ArrayValue value, Void data) {
                 AnnotationVisitor visitor = annotationVisitor.visitArray(name);
-                for (ConstantValue<?> argument : value.getValue()) {
+                for (PureConstant argument : value.getValue()) {
                     genCompileTimeValue(null, argument, visitor);
                 }
                 visitor.visitEnd();
@@ -475,7 +475,7 @@ public abstract class AnnotationCodegen {
                 return visitUnsupportedValue(value);
             }
 
-            private Void visitUnsupportedValue(ConstantValue<?> value) {
+            private Void visitUnsupportedValue(PureConstant value) {
                 ClassBuilderMode mode = typeMapper.getClassBuilderMode();
                 if (mode.generateBodies) {
                     throw new IllegalStateException("Don't know how to compile annotation value " + value);
@@ -500,13 +500,13 @@ public abstract class AnnotationCodegen {
     private static Set<ElementType> getJavaTargetList(ClassDescriptor descriptor) {
         AnnotationDescriptor targetAnnotation = descriptor.getAnnotations().findAnnotation(new FqName(Target.class.getName()));
         if (targetAnnotation != null) {
-            Collection<ConstantValue<?>> valueArguments = targetAnnotation.getAllValueArguments().values();
+            Collection<PureConstant> valueArguments = targetAnnotation.getAllValueArguments().values();
             if (!valueArguments.isEmpty()) {
-                ConstantValue<?> compileTimeConstant = valueArguments.iterator().next();
+                PureConstant compileTimeConstant = valueArguments.iterator().next();
                 if (compileTimeConstant instanceof ArrayValue) {
-                    List<? extends ConstantValue<?>> values = ((ArrayValue) compileTimeConstant).getValue();
+                    List<? extends PureConstant> values = ((ArrayValue) compileTimeConstant).getValue();
                     Set<ElementType> result = EnumSet.noneOf(ElementType.class);
-                    for (ConstantValue<?> value : values) {
+                    for (PureConstant value : values) {
                         if (value instanceof EnumValue) {
                             FqName enumClassFqName = ((EnumValue) value).getEnumClassId().asSingleFqName();
                             if (ElementType.class.getName().equals(enumClassFqName.asString())) {
@@ -529,7 +529,7 @@ public abstract class AnnotationCodegen {
         }
         AnnotationDescriptor retentionAnnotation = descriptor.getAnnotations().findAnnotation(new FqName(Retention.class.getName()));
         if (retentionAnnotation != null) {
-            ConstantValue<?> value = CollectionsKt.firstOrNull(retentionAnnotation.getAllValueArguments().values());
+            PureConstant value = CollectionsKt.firstOrNull(retentionAnnotation.getAllValueArguments().values());
             if (value instanceof EnumValue) {
                 FqName enumClassFqName = ((EnumValue) value).getEnumClassId().asSingleFqName();
                 if (RetentionPolicy.class.getName().equals(enumClassFqName.asString())) {

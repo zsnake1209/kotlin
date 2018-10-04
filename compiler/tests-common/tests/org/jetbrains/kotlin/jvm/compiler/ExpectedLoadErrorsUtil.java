@@ -24,7 +24,8 @@ import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBo
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
-import org.jetbrains.kotlin.resolve.constants.ConstantValue;
+import org.jetbrains.kotlin.resolve.constants.PureConstant;
+import org.jetbrains.kotlin.resolve.constants.StringValue;
 import org.jetbrains.kotlin.resolve.jvm.JvmBindingContextSlices;
 import org.jetbrains.kotlin.resolve.scopes.MemberScope;
 
@@ -83,9 +84,9 @@ public class ExpectedLoadErrorsUtil {
                 if (annotation == null) return null;
 
                 // we expect exactly one annotation argument
-                ConstantValue<?> argument = annotation.getAllValueArguments().values().iterator().next();
+                PureConstant argument = annotation.getAllValueArguments().values().iterator().next();
 
-                String error = (String) argument.getValue();
+                String error = ((StringValue) argument).getValue();
                 //noinspection ConstantConditions
                 List<String> errors = Arrays.asList(error.split("\\|"));
 

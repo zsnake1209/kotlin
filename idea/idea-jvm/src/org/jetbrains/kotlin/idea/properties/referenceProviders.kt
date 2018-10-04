@@ -45,6 +45,7 @@ import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.calls.model.ArgumentMatch
 import org.jetbrains.kotlin.resolve.calls.model.ExpressionValueArgument
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.resolve.constants.safeValue
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExpressionReceiver
 
@@ -52,7 +53,7 @@ private val PROPERTY_KEY = FqName(AnnotationUtil.PROPERTY_KEY)
 private val PROPERTY_KEY_RESOURCE_BUNDLE = Name.identifier(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER)
 
 private fun AnnotationDescriptor.getBundleName(): String? {
-    return allValueArguments[PROPERTY_KEY_RESOURCE_BUNDLE]?.value as? String
+    return allValueArguments[PROPERTY_KEY_RESOURCE_BUNDLE]?.safeValue as? String
 }
 
 private fun DeclarationDescriptor.getBundleNameByAnnotation(): String? {

@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.resolve.calls.model.DefaultValueArgument;
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedValueArgument;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
+import org.jetbrains.kotlin.resolve.constants.PureConstant;
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes;
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterKind;
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterSignature;
@@ -1655,10 +1656,10 @@ public abstract class StackValue {
                     "Const property should have primitive or string type: " + descriptor;
             assert isStaticPut : "Const property should be static" + descriptor;
 
-            ConstantValue<?> constantValue = descriptor.getCompileTimeInitializer();
-            if (constantValue == null) return false;
+            PureConstant constantValue = descriptor.getCompileTimeInitializer();
+            if (!(constantValue instanceof ConstantValue<?>)) return false;
 
-            Object value = constantValue.getValue();
+            Object value = ((ConstantValue) constantValue).getValue();
             if (this.type == Type.FLOAT_TYPE && value instanceof Double) {
                 value = ((Double) value).floatValue();
             }

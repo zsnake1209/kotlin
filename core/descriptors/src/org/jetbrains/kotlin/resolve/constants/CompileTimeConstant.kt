@@ -66,7 +66,7 @@ class TypedCompileTimeConstant<out T>(
         override val parameters: CompileTimeConstant.Parameters
 ) : CompileTimeConstant<T> {
     override val isError: Boolean
-        get() = constantValue is ErrorValue
+        get() = false // incompatible types, TODO: remove isError
 
     val type: KotlinType = constantValue.getType(module)
 

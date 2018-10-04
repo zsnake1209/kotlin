@@ -42,7 +42,7 @@ class AnnotationDeserializer(private val module: ModuleDescriptor, private val n
     fun deserializeAnnotation(proto: Annotation, nameResolver: NameResolver): AnnotationDescriptor {
         val annotationClass = resolveClass(nameResolver.getClassId(proto.id))
 
-        var arguments = emptyMap<Name, ConstantValue<*>>()
+        var arguments = emptyMap<Name, PureConstant>()
         if (proto.argumentCount != 0 && !ErrorUtils.isError(annotationClass) && DescriptorUtils.isAnnotationClass(annotationClass)) {
             val constructor = annotationClass.constructors.singleOrNull()
             if (constructor != null) {
@@ -58,15 +58,15 @@ class AnnotationDeserializer(private val module: ModuleDescriptor, private val n
         proto: Argument,
         parameterByName: Map<Name, ValueParameterDescriptor>,
         nameResolver: NameResolver
-    ): Pair<Name, ConstantValue<*>>? {
+    ): Pair<Name, PureConstant>? {
         val parameter = parameterByName[nameResolver.getName(proto.nameId)] ?: return null
         return Pair(nameResolver.getName(proto.nameId), resolveValue(parameter.type, proto.value, nameResolver))
     }
 
-    fun resolveValue(expectedType: KotlinType, value: Value, nameResolver: NameResolver): ConstantValue<*> {
+    fun resolveValue(expectedType: KotlinType, value: Value, nameResolver: NameResolver): PureConstant {
         val isUnsigned = Flags.IS_UNSIGNED.get(value.flags)
 
-        val result: ConstantValue<*> = when (value.type) {
+        val result: PureConstant = when (value.type) {
             Type.BYTE -> value.intValue.toByte().letIf(isUnsigned, ::UByteValue, ::ByteValue)
             Type.CHAR -> CharValue(value.intValue.toChar())
             Type.SHORT -> value.intValue.toShort().letIf(isUnsigned, ::UShortValue, ::ShortValue)

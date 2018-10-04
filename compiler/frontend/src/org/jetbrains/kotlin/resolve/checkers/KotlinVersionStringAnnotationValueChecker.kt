@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.RequireKotlinNames
 import org.jetbrains.kotlin.resolve.SINCE_KOTLIN_FQ_NAME
+import org.jetbrains.kotlin.resolve.constants.safeValue
 import org.jetbrains.kotlin.resolve.source.getPsi
 
 abstract class KotlinVersionStringAnnotationValueChecker(
@@ -33,7 +34,7 @@ abstract class KotlinVersionStringAnnotationValueChecker(
 ) : DeclarationChecker {
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
         val annotation = descriptor.annotations.findAnnotation(annotationFqName) ?: return
-        val version = annotation.allValueArguments.values.singleOrNull()?.value as? String ?: return
+        val version = annotation.allValueArguments.values.singleOrNull()?.safeValue as? String ?: return
         if (!version.matches(VERSION_REGEX)) {
             context.trace.report(Errors.ILLEGAL_KOTLIN_VERSION_STRING_VALUE.on(annotation.source.getPsi() ?: declaration, annotationFqName))
             return

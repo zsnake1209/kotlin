@@ -83,7 +83,7 @@ class MayBeConstantInspection : AbstractKotlinInspection() {
                     ) ?: return NONE
                     val erroneousConstant = compileTimeConstant.usesNonConstValAsConstant
                     compileTimeConstant.toConstantValue(propertyDescriptor.type).takeIf {
-                        !it.isStandaloneOnlyConstant() && it !is NullValue && it !is ErrorValue
+                        !it.isStandaloneOnlyConstant() && it !is NullValue
                     } ?: return NONE
                     when {
                         withJvmField ->

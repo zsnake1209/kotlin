@@ -26,15 +26,17 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.DelegatingBindingTrace
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
+import org.jetbrains.kotlin.resolve.constants.PureConstant
+import org.jetbrains.kotlin.resolve.constants.safeValue
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator as FrontendConstantExpressionEvaluator
 
 class KotlinLightConstantExpressionEvaluator : ConstantExpressionEvaluator {
-    private fun evalConstantValue(constantValue: ConstantValue<*>): Any? {
+    private fun evalConstantValue(constantValue: PureConstant): Any? {
         return if (constantValue is ArrayValue) {
             val items = constantValue.value.map { evalConstantValue(it) }
             items.singleOrNull() ?: items
-        } else constantValue.value
+        } else constantValue.safeValue
     }
 
     override fun computeConstantExpression(expression: PsiElement, throwExceptionOnOverflow: Boolean): Any? {

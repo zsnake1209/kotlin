@@ -363,10 +363,10 @@ private class ConstantExpressionEvaluatorVisitor(
                 return null
             }
             return when (constantValue) {
-                is ErrorValue, is EnumValue -> return null
+                is EnumValue -> null
                 is NullValue -> StringValue("null")
                 else -> StringValue(constantValue.stringTemplateValue())
-            }.wrap(compileTimeConstant.parameters)
+            }?.wrap(compileTimeConstant.parameters)
         }
 
         fun evaluate(entry: KtStringTemplateEntry): TypedCompileTimeConstant<String>? {
@@ -618,11 +618,11 @@ private class ConstantExpressionEvaluatorVisitor(
 
             if (isDivisionByZero(resultingDescriptorName.asString(), argumentForParameter.value)) {
                 val parentExpression: KtExpression = PsiTreeUtil.getParentOfType(receiverExpression, KtExpression::class.java)!!
-                trace.report(Errors.DIVISION_BY_ZERO.on(parentExpression))
+                trace.reportDiagnosticOnce(Errors.DIVISION_BY_ZERO.on(parentExpression))
 
                 if ((isIntegerType(argumentForReceiver.value) && isIntegerType(argumentForParameter.value)) ||
                     !constantExpressionEvaluator.languageVersionSettings.supportsFeature(LanguageFeature.DivisionByZeroInConstantExpressions)) {
-                    return ErrorValue.create("Division by zero").wrap()
+                    return null
                 }
             }
 
@@ -751,12 +751,16 @@ private class ConstantExpressionEvaluatorVisitor(
                 // TODO: FIXME: see KT-10425
                 if (callableDescriptor is PropertyDescriptor && callableDescriptor.modality != Modality.FINAL) return null
 
+                val compileTimeInitializer = callableDescriptor.compileTimeInitializer
+                if (compileTimeInitializer !is ConstantValue<*>) return null
+
                 val isConvertableConstVal =
                     callableDescriptor.isConst &&
                             ImplicitIntegerCoercion.isEnabledForConstVal(callableDescriptor) &&
-                            callableDescriptor.compileTimeInitializer is IntValue
+                            compileTimeInitializer is IntValue
 
-                return callableDescriptor.compileTimeInitializer?.wrap(
+
+                return compileTimeInitializer.wrap(
                     CompileTimeConstant.Parameters(
                         canBeUsedInAnnotation = isPropertyCompileTimeConstant(callableDescriptor),
                         isPure = false,
@@ -874,7 +878,7 @@ private class ConstantExpressionEvaluatorVisitor(
 
     private fun createConstantValueForArrayFunctionCall(
         call: ResolvedCall<*>
-    ): TypedCompileTimeConstant<List<ConstantValue<*>>>? {
+    ): TypedCompileTimeConstant<List<PureConstant>>? {
         val returnType = call.resultingDescriptor.returnType ?: return null
         val componentType = builtIns.getArrayElementType(returnType)
 

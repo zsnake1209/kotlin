@@ -24,8 +24,8 @@ import org.jetbrains.kotlin.load.java.typeEnhancement.NullabilityQualifier
 import org.jetbrains.kotlin.load.java.typeEnhancement.NullabilityQualifierWithMigrationStatus
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
-import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.constants.EnumValue
+import org.jetbrains.kotlin.resolve.constants.PureConstant
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import org.jetbrains.kotlin.resolve.descriptorUtil.firstArgument
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -160,7 +160,7 @@ class AnnotationTypeQualifierResolver(storageManager: StorageManager, private va
         }
     }
 
-    private fun ConstantValue<*>.mapConstantToQualifierApplicabilityTypes(): List<QualifierApplicabilityType> =
+    private fun PureConstant.mapConstantToQualifierApplicabilityTypes(): List<QualifierApplicabilityType> =
         when (this) {
             is ArrayValue -> value.flatMap { it.mapConstantToQualifierApplicabilityTypes() }
             is EnumValue -> listOfNotNull(

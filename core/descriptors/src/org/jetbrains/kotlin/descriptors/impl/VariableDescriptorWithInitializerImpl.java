@@ -23,13 +23,14 @@ import org.jetbrains.kotlin.descriptors.SourceElement;
 import org.jetbrains.kotlin.descriptors.annotations.Annotations;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
+import org.jetbrains.kotlin.resolve.constants.PureConstant;
 import org.jetbrains.kotlin.storage.NullableLazyValue;
 import org.jetbrains.kotlin.types.KotlinType;
 
 public abstract class VariableDescriptorWithInitializerImpl extends VariableDescriptorImpl {
     private final boolean isVar;
 
-    protected NullableLazyValue<ConstantValue<?>> compileTimeInitializer;
+    protected NullableLazyValue<PureConstant> compileTimeInitializer;
 
     public VariableDescriptorWithInitializerImpl(
             @NotNull DeclarationDescriptor containingDeclaration,
@@ -51,14 +52,14 @@ public abstract class VariableDescriptorWithInitializerImpl extends VariableDesc
 
     @Nullable
     @Override
-    public ConstantValue<?> getCompileTimeInitializer() {
+    public PureConstant getCompileTimeInitializer() {
         if (compileTimeInitializer != null) {
             return compileTimeInitializer.invoke();
         }
         return null;
     }
 
-    public void setCompileTimeInitializer(@NotNull NullableLazyValue<ConstantValue<?>> compileTimeInitializer) {
+    public void setCompileTimeInitializer(@NotNull NullableLazyValue<PureConstant> compileTimeInitializer) {
         assert !isVar() : "Constant value for variable initializer should be recorded only for final variables: " + getName();
         this.compileTimeInitializer = compileTimeInitializer;
     }

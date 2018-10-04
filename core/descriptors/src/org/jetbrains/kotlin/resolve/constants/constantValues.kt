@@ -27,11 +27,13 @@ import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.types.ErrorUtils
 import org.jetbrains.kotlin.types.KotlinType
 
-abstract class ConstantValue<out T>(open val value: T) {
+sealed class PureConstant {
     abstract fun getType(module: ModuleDescriptor): KotlinType
 
     abstract fun <R, D> accept(visitor: AnnotationArgumentVisitor<R, D>, data: D): R
+}
 
+abstract class ConstantValue<out T>(open val value: T) : PureConstant() {
     override fun equals(other: Any?): Boolean = this === other || value == (other as? ConstantValue<*>)?.value
 
     override fun hashCode(): Int = value?.hashCode() ?: 0
@@ -40,6 +42,26 @@ abstract class ConstantValue<out T>(open val value: T) {
 
     open fun stringTemplateValue(): String = value.toString()
 }
+
+class ErrorValue private constructor(val message: String) : PureConstant() {
+    override fun <R, D> accept(visitor: AnnotationArgumentVisitor<R, D>, data: D) = visitor.visitErrorValue(this, data)
+
+    override fun getType(module: ModuleDescriptor) = ErrorUtils.createErrorType(message)
+
+    override fun toString() = message
+
+    companion object {
+        fun create(message: String): ErrorValue {
+            return ErrorValue(message)
+        }
+    }
+}
+
+val PureConstant.safeValue
+    get() = when (this) {
+        is ConstantValue<*> -> value
+        is ErrorValue -> null
+    }
 
 abstract class IntegerValueConstant<out T> protected constructor(value: T) : ConstantValue<T>(value)
 abstract class UnsignedValueConstant<out T> protected constructor(value: T) : ConstantValue<T>(value)
@@ -51,9 +73,9 @@ class AnnotationValue(value: AnnotationDescriptor) : ConstantValue<AnnotationDes
 }
 
 class ArrayValue(
-        value: List<ConstantValue<*>>,
+        value: List<PureConstant>,
         private val computeType: (ModuleDescriptor) -> KotlinType
-) : ConstantValue<List<ConstantValue<*>>>(value) {
+) : ConstantValue<List<PureConstant>>(value) {
     override fun getType(module: ModuleDescriptor): KotlinType = computeType(module).also { type ->
         assert(KotlinBuiltIns.isArray(type) || KotlinBuiltIns.isPrimitiveArray(type)) { "Type should be an array, but was $type: $value" }
     }
@@ -117,26 +139,6 @@ class EnumValue(val enumClassId: ClassId, val enumEntryName: Name) : ConstantVal
     override fun <R, D> accept(visitor: AnnotationArgumentVisitor<R, D>, data: D) = visitor.visitEnumValue(this, data)
 
     override fun toString() = "${enumClassId.shortClassName}.$enumEntryName"
-}
-
-abstract class ErrorValue : ConstantValue<Unit>(Unit) {
-    @Deprecated("Should not be called, for this is not a real value, but a indication of an error")
-    override val value: Unit
-        get() = throw UnsupportedOperationException()
-
-    override fun <R, D> accept(visitor: AnnotationArgumentVisitor<R, D>, data: D) = visitor.visitErrorValue(this, data)
-
-    class ErrorValueWithMessage(val message: String) : ErrorValue() {
-        override fun getType(module: ModuleDescriptor) = ErrorUtils.createErrorType(message)
-
-        override fun toString() = message
-    }
-
-    companion object {
-        fun create(message: String): ErrorValue {
-            return ErrorValueWithMessage(message)
-        }
-    }
 }
 
 class FloatValue(value: Float) : ConstantValue<Float>(value) {

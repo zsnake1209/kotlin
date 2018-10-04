@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.load.kotlin.TypeMappingMode
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.constants.safeValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.firstOverridden
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.parentsWithSelf
@@ -111,7 +112,7 @@ private fun KotlinType.suppressWildcardsMode(): Boolean? =
         annotations.findAnnotation(JVM_SUPPRESS_WILDCARDS_ANNOTATION_FQ_NAME).suppressWildcardsMode()
 
 private fun AnnotationDescriptor?.suppressWildcardsMode(): Boolean? {
-    return (this ?: return null).allValueArguments.values.firstOrNull()?.value as? Boolean ?: true
+    return (this ?: return null).allValueArguments.values.firstOrNull()?.safeValue as? Boolean ?: true
 }
 
 private val JVM_SUPPRESS_WILDCARDS_ANNOTATION_FQ_NAME = FqName("kotlin.jvm.JvmSuppressWildcards")

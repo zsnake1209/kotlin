@@ -19,7 +19,7 @@ package org.jetbrains.kotlin.descriptors.annotations
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.constants.ConstantValue
+import org.jetbrains.kotlin.resolve.constants.PureConstant
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.types.ErrorUtils
@@ -32,7 +32,7 @@ interface AnnotationDescriptor {
     val fqName: FqName?
         get() = annotationClass?.takeUnless(ErrorUtils::isError)?.fqNameOrNull()
 
-    val allValueArguments: Map<Name, ConstantValue<*>>
+    val allValueArguments: Map<Name, PureConstant>
 
     val source: SourceElement
 }

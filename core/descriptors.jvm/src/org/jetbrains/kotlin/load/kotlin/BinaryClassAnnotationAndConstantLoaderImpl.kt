@@ -85,7 +85,7 @@ class BinaryClassAnnotationAndConstantLoaderImpl(
         val annotationClass = resolveClass(annotationClassId)
 
         return object : KotlinJvmBinaryClass.AnnotationArgumentVisitor {
-            private val arguments = HashMap<Name, ConstantValue<*>>()
+            private val arguments = HashMap<Name, PureConstant>()
 
             override fun visit(name: Name?, value: Any?) {
                 if (name != null) {
@@ -104,7 +104,7 @@ class BinaryClassAnnotationAndConstantLoaderImpl(
 
             override fun visitArray(name: Name): AnnotationArrayArgumentVisitor? {
                 return object : KotlinJvmBinaryClass.AnnotationArrayArgumentVisitor {
-                    private val elements = ArrayList<ConstantValue<*>>()
+                    private val elements = ArrayList<PureConstant>()
 
                     override fun visit(value: Any?) {
                         elements.add(createConstant(name, value))
@@ -145,9 +145,8 @@ class BinaryClassAnnotationAndConstantLoaderImpl(
                 result.add(AnnotationDescriptorImpl(annotationClass.defaultType, arguments, source))
             }
 
-            private fun createConstant(name: Name?, value: Any?): ConstantValue<*> {
-                return ConstantValueFactory.createConstantValue(value)
-                       ?: ErrorValue.create("Unsupported annotation argument: $name")
+            private fun createConstant(name: Name?, value: Any?): PureConstant {
+                return ConstantValueFactory.createConstantValue(value) ?: ErrorValue.create("Unsupported annotation argument: $name")
             }
         }
     }

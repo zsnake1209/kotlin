@@ -22,19 +22,19 @@ import org.jetbrains.kotlin.descriptors.SourceElement;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.renderer.DescriptorRenderer;
-import org.jetbrains.kotlin.resolve.constants.ConstantValue;
+import org.jetbrains.kotlin.resolve.constants.PureConstant;
 import org.jetbrains.kotlin.types.KotlinType;
 
 import java.util.Map;
 
 public class AnnotationDescriptorImpl implements AnnotationDescriptor {
     private final KotlinType annotationType;
-    private final Map<Name, ConstantValue<?>> valueArguments;
+    private final Map<Name, PureConstant> valueArguments;
     private final SourceElement source;
 
     public AnnotationDescriptorImpl(
             @NotNull KotlinType annotationType,
-            @NotNull Map<Name, ConstantValue<?>> valueArguments,
+            @NotNull Map<Name, PureConstant> valueArguments,
             @NotNull SourceElement source
     ) {
         this.annotationType = annotationType;
@@ -56,7 +56,7 @@ public class AnnotationDescriptorImpl implements AnnotationDescriptor {
 
     @NotNull
     @Override
-    public Map<Name, ConstantValue<?>> getAllValueArguments() {
+    public Map<Name, PureConstant> getAllValueArguments() {
         return valueArguments;
     }
 

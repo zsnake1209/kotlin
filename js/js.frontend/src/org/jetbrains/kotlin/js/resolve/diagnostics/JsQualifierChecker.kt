@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.resolve.AdditionalAnnotationChecker
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.constants.safeValue
 
 object JsQualifierChecker : AdditionalAnnotationChecker {
     override fun checkEntries(entries: List<KtAnnotationEntry>, actualTargets: List<KotlinTarget>, trace: BindingTrace) {
@@ -29,7 +30,7 @@ object JsQualifierChecker : AdditionalAnnotationChecker {
         for (entry in entries) {
             val annotation = bindingContext[BindingContext.ANNOTATION, entry] ?: continue
             if (annotation.fqName != AnnotationsUtils.JS_QUALIFIER_ANNOTATION) continue
-            val argument = annotation.allValueArguments.values.singleOrNull()?.value as? String ?: continue
+            val argument = annotation.allValueArguments.values.singleOrNull()?.safeValue as? String ?: continue
             if (!validateQualifier(argument)) {
                 val argumentPsi = entry.valueArgumentList!!.arguments[0]
                 trace.report(ErrorsJs.WRONG_JS_QUALIFIER.on(argumentPsi))

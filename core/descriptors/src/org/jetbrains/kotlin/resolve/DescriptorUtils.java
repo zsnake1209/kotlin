@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.name.FqNameUnsafe;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.name.SpecialNames;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
+import org.jetbrains.kotlin.resolve.constants.PureConstant;
 import org.jetbrains.kotlin.resolve.constants.StringValue;
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter;
 import org.jetbrains.kotlin.resolve.scopes.MemberScope;
@@ -542,10 +543,10 @@ public class DescriptorUtils {
     private static String getJvmName(@Nullable AnnotationDescriptor jvmNameAnnotation) {
         if (jvmNameAnnotation == null) return null;
 
-        Map<Name, ConstantValue<?>> arguments = jvmNameAnnotation.getAllValueArguments();
+        Map<Name, PureConstant> arguments = jvmNameAnnotation.getAllValueArguments();
         if (arguments.isEmpty()) return null;
 
-        ConstantValue<?> name = arguments.values().iterator().next();
+        PureConstant name = arguments.values().iterator().next();
         if (!(name instanceof StringValue)) return null;
 
         return ((StringValue) name).getValue();

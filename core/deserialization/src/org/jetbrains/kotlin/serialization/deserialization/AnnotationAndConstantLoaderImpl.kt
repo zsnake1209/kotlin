@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.metadata.deserialization.NameResolver
 import org.jetbrains.kotlin.metadata.deserialization.getExtensionOrNull
 import org.jetbrains.kotlin.protobuf.MessageLite
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
+import org.jetbrains.kotlin.resolve.constants.PureConstant
 import org.jetbrains.kotlin.serialization.SerializerExtensionProtocol
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -31,7 +32,7 @@ class AnnotationAndConstantLoaderImpl(
     module: ModuleDescriptor,
     notFoundClasses: NotFoundClasses,
     private val protocol: SerializerExtensionProtocol
-) : AnnotationAndConstantLoader<AnnotationDescriptor, ConstantValue<*>> {
+) : AnnotationAndConstantLoader<AnnotationDescriptor, PureConstant> {
     private val deserializer = AnnotationDeserializer(module, notFoundClasses)
 
     override fun loadClassAnnotations(container: ProtoContainer.Class): List<AnnotationDescriptor> {
@@ -95,7 +96,7 @@ class AnnotationAndConstantLoaderImpl(
         return proto.getExtension(protocol.typeParameterAnnotation).orEmpty().map { deserializer.deserializeAnnotation(it, nameResolver) }
     }
 
-    override fun loadPropertyConstant(container: ProtoContainer, proto: ProtoBuf.Property, expectedType: KotlinType): ConstantValue<*>? {
+    override fun loadPropertyConstant(container: ProtoContainer, proto: ProtoBuf.Property, expectedType: KotlinType): PureConstant? {
         val value = proto.getExtensionOrNull(protocol.compileTimeValue) ?: return null
         return deserializer.resolveValue(expectedType, value, container.nameResolver)
     }
