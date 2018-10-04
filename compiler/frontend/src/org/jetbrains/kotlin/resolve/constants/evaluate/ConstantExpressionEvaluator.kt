@@ -271,11 +271,9 @@ class ConstantExpressionEvaluator(
         expectedType: KotlinType? = TypeUtils.NO_EXPECTED_TYPE
     ): CompileTimeConstant<*>? {
         val visitor = ConstantExpressionEvaluatorVisitor(this, trace)
-        val constant = visitor.evaluate(expression, expectedType) ?: return null
-
-        checkExperimentalityOfConstantLiteral(expression, constant, expectedType, trace)
-
-        return if (!constant.isError) constant else null
+        return visitor.evaluate(expression, expectedType)?.also {
+            checkExperimentalityOfConstantLiteral(expression, it, expectedType, trace)
+        }
     }
 
     fun evaluateToConstantValue(
@@ -292,7 +290,6 @@ class ConstantExpressionEvaluator(
         expectedType: KotlinType?,
         trace: BindingTrace
     ) {
-        if (constant.isError) return
         if (!constant.parameters.isUnsignedNumberLiteral && !constant.parameters.isUnsignedLongNumberLiteral) return
 
         val constantType = when {
@@ -320,12 +317,6 @@ class ConstantExpressionEvaluator(
 
         @JvmStatic
         fun getConstant(expression: KtExpression, bindingContext: BindingContext): CompileTimeConstant<*>? {
-            val constant = getPossiblyErrorConstant(expression, bindingContext) ?: return null
-            return if (!constant.isError) constant else null
-        }
-
-        @JvmStatic
-        fun getPossiblyErrorConstant(expression: KtExpression, bindingContext: BindingContext): CompileTimeConstant<*>? {
             return bindingContext.get(BindingContext.COMPILE_TIME_VALUE, expression)
         }
     }
@@ -343,7 +334,7 @@ private class ConstantExpressionEvaluatorVisitor(
     private val builtIns = constantExpressionEvaluator.module.builtIns
 
     fun evaluate(expression: KtExpression, expectedType: KotlinType?): CompileTimeConstant<*>? {
-        val recordedCompileTimeConstant = ConstantExpressionEvaluator.getPossiblyErrorConstant(expression, trace.bindingContext)
+        val recordedCompileTimeConstant = ConstantExpressionEvaluator.getConstant(expression, trace.bindingContext)
         if (recordedCompileTimeConstant != null) {
             return recordedCompileTimeConstant
         }

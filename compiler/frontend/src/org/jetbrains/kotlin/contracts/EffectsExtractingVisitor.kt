@@ -95,7 +95,6 @@ class EffectsExtractingVisitor(
 
         val compileTimeConstant: CompileTimeConstant<*> =
             bindingContext.get(BindingContext.COMPILE_TIME_VALUE, expression) ?: return UNKNOWN_COMPUTATION
-        if (compileTimeConstant.isError) return UNKNOWN_COMPUTATION
 
         val value: Any? = compileTimeConstant.getValue(type)
 

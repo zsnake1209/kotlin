@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.DelegatingBindingTrace
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
-import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.constants.PureConstant
 import org.jetbrains.kotlin.resolve.constants.safeValue
 import org.jetbrains.kotlin.types.TypeUtils
@@ -60,7 +59,6 @@ class KotlinLightConstantExpressionEvaluator : ConstantExpressionEvaluator {
         val evaluatorTrace = DelegatingBindingTrace(resolutionFacade.analyze(expressionToCompute), "Evaluating annotation argument")
 
         val constant = evaluator.evaluateExpression(expressionToCompute, evaluatorTrace) ?: return null
-        if (constant.isError) return null
         return evalConstantValue(constant.toConstantValue(TypeUtils.NO_EXPECTED_TYPE))
     }
 }

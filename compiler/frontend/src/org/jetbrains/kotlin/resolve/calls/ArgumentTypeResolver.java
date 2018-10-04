@@ -245,8 +245,8 @@ public class ArgumentTypeResolver {
         );
     }
 
-    public static boolean constantCanBeConvertedToUnsigned(@NotNull CompileTimeConstant<?> constant) {
-        return !constant.isError() && constant.getParameters().isPure();
+    private static boolean constantCanBeConvertedToUnsigned(@NotNull CompileTimeConstant<?> constant) {
+        return constant.getParameters().isPure();
     }
 
     @NotNull

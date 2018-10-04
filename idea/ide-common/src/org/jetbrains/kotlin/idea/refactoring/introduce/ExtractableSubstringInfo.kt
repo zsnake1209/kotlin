@@ -57,7 +57,7 @@ class ExtractableSubstringInfo(
         val trace = DelegatingBindingTrace(tempContext, "Evaluate '$literal'")
         val languageVersionSettings = facade.getFrontendService(LanguageVersionSettings::class.java)
         val value = ConstantExpressionEvaluator(module, languageVersionSettings, facade.project).evaluateExpression(expr, trace)
-        if (value == null || value.isError) return stringType
+        if (value == null) return stringType
 
         return value.toConstantValue(TypeUtils.NO_EXPECTED_TYPE).getType(module)
     }

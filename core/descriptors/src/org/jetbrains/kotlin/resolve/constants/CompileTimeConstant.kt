@@ -23,8 +23,6 @@ import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.types.*
 
 interface CompileTimeConstant<out T> {
-    val isError: Boolean
-        get() = false
 
     val parameters: CompileTimeConstant.Parameters
 
@@ -65,9 +63,6 @@ class TypedCompileTimeConstant<out T>(
         module: ModuleDescriptor,
         override val parameters: CompileTimeConstant.Parameters
 ) : CompileTimeConstant<T> {
-    override val isError: Boolean
-        get() = false // incompatible types, TODO: remove isError
-
     val type: KotlinType = constantValue.getType(module)
 
     override fun toConstantValue(expectedType: KotlinType): ConstantValue<T> = constantValue
@@ -75,13 +70,10 @@ class TypedCompileTimeConstant<out T>(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TypedCompileTimeConstant<*>) return false
-        if (isError) return other.isError
-        if (other.isError) return false
         return constantValue.value == other.constantValue.value && type == other.type
     }
 
     override fun hashCode(): Int {
-        if (isError) return 13
         var result = constantValue.value?.hashCode() ?: 0
         result = 31 * result + type.hashCode()
         return result
