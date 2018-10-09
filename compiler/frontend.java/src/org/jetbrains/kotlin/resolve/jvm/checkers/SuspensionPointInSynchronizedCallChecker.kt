@@ -25,8 +25,7 @@ class SuspensionPointInSynchronizedCallChecker : CallChecker {
         val descriptor = resolvedCall.candidateDescriptor
         if (descriptor !is FunctionDescriptor || !descriptor.isSuspend) return
 
-        val enclosingSuspendFunction = findEnclosingSuspendFunction(context) ?: return
-        val enclosingSuspendFunctionSource = enclosingSuspendFunction.source.getPsi() ?: return
+        val enclosingSuspendFunctionSource = findEnclosingSuspendFunction(context)?.source?.getPsi() ?: return
 
         // Search for `synchronized` call
         var parent = reportOn
@@ -39,6 +38,7 @@ class SuspensionPointInSynchronizedCallChecker : CallChecker {
             if (parent is KtLambdaExpression) {
                 insideLambda = true
             }
+            // The lambda is inside parentheses -> keep the child the same to check whether it is the second argument
             if (parent !is KtValueArgumentList) {
                 child = parent
             }
