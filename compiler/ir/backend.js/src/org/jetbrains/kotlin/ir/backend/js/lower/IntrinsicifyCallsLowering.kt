@@ -260,7 +260,7 @@ class IntrinsicifyCallsLowering(private val context: JsIrBackendContext) : FileL
             put(Name.identifier("equals"), ::transformEqualsMethodCall)
         }
 
-        dynamicCallOriginToIrFunction.run {
+        dynamicCallOriginToIrFunction.apply {
             put(IrStatementOrigin.EXCL, context.intrinsics.jsNot)
 
             put(IrStatementOrigin.LT, context.intrinsics.jsLt)
@@ -296,6 +296,7 @@ class IntrinsicifyCallsLowering(private val context: JsIrBackendContext) : FileL
             put(IrStatementOrigin.POSTFIX_INCR, context.intrinsics.jsPostfixInc)
             put(IrStatementOrigin.POSTFIX_DECR, context.intrinsics.jsPostfixDec)
             put(IrStatementOrigin.GET_ARRAY_ELEMENT, context.intrinsics.jsArrayGet)
+            put(IrStatementOrigin.EQ, context.intrinsics.jsArraySet)
         }
     }
 
