@@ -315,6 +315,8 @@ class NewMultiplatformIT : BaseGradleIT() {
                     languageVersion = '1.3'
                     apiVersion = '1.3'
                     enableLanguageFeature('InlineClasses')
+                    useExperimentalAnnotation('kotlin.ExperimentalUnsignedTypes')
+                    useExperimentalAnnotation('kotlin.contracts.ExperimentalContracts')
                     progressiveMode = true
                 }
             """.trimIndent()
@@ -322,7 +324,11 @@ class NewMultiplatformIT : BaseGradleIT() {
 
         build("compileKotlinJvm6") {
             assertSuccessful()
-            assertContains("-language-version 1.3", "-api-version 1.3", "-XXLanguage:+InlineClasses", " -progressive")
+            assertContains(
+                "-language-version 1.3", "-api-version 1.3", "-XXLanguage:+InlineClasses",
+                " -progressive", "-Xuse-experimental=kotlin.ExperimentalUnsignedTypes",
+                "-Xuse-experimental=kotlin.contracts.ExperimentalContracts"
+            )
         }
     }
 
@@ -351,8 +357,20 @@ class NewMultiplatformIT : BaseGradleIT() {
             }
         }
 
-        testMonotonousCheck("languageSettings.languageVersion = '1.4'", SourceSetConsistencyChecks.languageVersionCheckHint)
-        testMonotonousCheck("languageSettings.enableLanguageFeature('InlineClasses')", SourceSetConsistencyChecks.unstableFeaturesHint)
+        testMonotonousCheck(
+            "languageSettings.languageVersion = '1.4'",
+            SourceSetConsistencyChecks.languageVersionCheckHint
+        )
+
+        testMonotonousCheck(
+            "languageSettings.enableLanguageFeature('InlineClasses')",
+            SourceSetConsistencyChecks.unstableFeaturesHint
+        )
+
+        testMonotonousCheck(
+            "languageSettings.useExperimentalAnnotation('kotlin.ExperimentalUnsignedTypes')",
+            SourceSetConsistencyChecks.experimentalAnnotationsInUseHint
+        )
 
         // check that enabling a bugfix feature and progressive mode or advancing API level
         // don't require doing the same for dependent source sets:
