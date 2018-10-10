@@ -81,31 +81,13 @@ public abstract class AssignmentTranslator extends AbstractTranslator {
             @NotNull KtExpression expression,
             @NotNull TranslationContext context
     ) {
-        if (expression instanceof KtSimpleNameExpression) {
-            KtSimpleNameExpression nameExpression = (KtSimpleNameExpression) expression;
-            DeclarationDescriptor descriptor = getDescriptorForReferenceExpression(context.bindingContext(), nameExpression);
-            return isValProperty(descriptor);
+        KtSimpleNameExpression simpleNameExpression = getSimpleName(expression);
+
+        if (simpleNameExpression != null) {
+            DeclarationDescriptor descriptor = getDescriptorForReferenceExpression(context.bindingContext(), simpleNameExpression);
+            return descriptor instanceof PropertyDescriptor && !((PropertyDescriptor) descriptor).isVar();
         }
-        else if (expression instanceof KtDotQualifiedExpression) {
-            KtDotQualifiedExpression qualifiedExpression = (KtDotQualifiedExpression) expression;
-            if (qualifiedExpression.getReceiverExpression() instanceof KtThisExpression &&
-                qualifiedExpression.getSelectorExpression() instanceof KtSimpleNameExpression
-            ) {
-                KtSimpleNameExpression nameExpression = (KtSimpleNameExpression) qualifiedExpression.getSelectorExpression();
-                DeclarationDescriptor descriptor = getDescriptorForReferenceExpression(context.bindingContext(), nameExpression);
-                return isValProperty(descriptor);
-            }
-        }
+
         return false;
-    }
-
-    private static boolean isValProperty(
-            @Nullable DeclarationDescriptor descriptor
-    ) {
-        if (!(descriptor instanceof PropertyDescriptor)) return false;
-
-        PropertyDescriptor propertyDescriptor = (PropertyDescriptor) descriptor;
-
-        return !propertyDescriptor.isVar();
     }
 }
