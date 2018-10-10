@@ -97,6 +97,7 @@ class CoroutineTransformerMethodVisitor(
 
         val suspensionPoints = collectSuspensionPoints(methodNode)
 
+        moveAreturnsToTheirValues(suspensionPoints, containingClassInternalName, methodNode)
         checkForSuspensionPointInsideMonitor(methodNode, suspensionPoints)
 
         // First instruction in the method node may change in case of named function
@@ -194,6 +195,24 @@ class CoroutineTransformerMethodVisitor(
 
         if (languageVersionSettings.isReleaseCoroutines() && !isCrossinlineLambda) {
             writeDebugMetadata(methodNode, suspensionPointLineNumbers, spilledToVariableMapping)
+        }
+    }
+
+    /* If there are multiple passes to ARETURN we can move ARETURN to the branches thus simplifying tail-call analysis.
+     *
+     * After this transformation ARETURNs are immediately preceded by instructions, placing the value on top of stack or suspension point.
+     * However, since the tail-call analysis views suspension points as a whole, we cannot move ARETURN inside it.
+     * These multiinstruction suspension points are the result of use of intrinsics.
+     */
+    private fun moveAreturnsToTheirValues(suspensionPoints: List<SuspensionPoint>, internalClassName: String, methodNode: MethodNode) {
+        val areturns = methodNode.instructions.asSequence().filter { it.opcode == Opcodes.ARETURN }.toList()
+        val sources = findSourceInstructions(internalClassName, methodNode, areturns, ignoreCopy = false)
+            // Find sources of ARETURN
+            .filter { it.value.size > 1 }.values.flatten().toSet()
+            // But not when they are inside a suspension point
+            .filter { insn -> suspensionPoints.none { insn in it } }
+        for (source in sources) {
+            methodNode.instructions.insert(source, InsnNode(Opcodes.ARETURN))
         }
     }
 
@@ -888,6 +907,15 @@ private class SuspensionPoint(
     fun removeAfterSuspendMarker(methodNode: MethodNode) {
         methodNode.instructions.remove(suspensionCallEnd.previous)
         methodNode.instructions.remove(suspensionCallEnd)
+    }
+
+    operator fun contains(insn: AbstractInsnNode): Boolean {
+        var current = suspensionCallBegin
+        while (current != suspensionCallEnd) {
+            if (current == insn) return true
+            current = current.next
+        }
+        return false
     }
 }
 
