@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.TransformationMethodVisitor
 import org.jetbrains.kotlin.codegen.inline.*
 import org.jetbrains.kotlin.codegen.optimization.DeadCodeEliminationMethodTransformer
+import org.jetbrains.kotlin.codegen.optimization.boxing.isPrimitiveBoxing
 import org.jetbrains.kotlin.codegen.optimization.boxing.isPrimitiveUnboxing
 import org.jetbrains.kotlin.codegen.optimization.common.*
 import org.jetbrains.kotlin.codegen.optimization.fixStack.FixStackMethodTransformer
@@ -90,6 +91,7 @@ class CoroutineTransformerMethodVisitor(
 
         FixStackMethodTransformer().transform(containingClassInternalName, methodNode)
         RedundantLocalsEliminationMethodTransformer(languageVersionSettings).transform(containingClassInternalName, methodNode)
+        removeRedundantUnboxings(containingClassInternalName, methodNode)
         if (languageVersionSettings.isReleaseCoroutines()) {
             ChangeBoxingMethodTransformer.transform(containingClassInternalName, methodNode)
         }
@@ -196,6 +198,41 @@ class CoroutineTransformerMethodVisitor(
         if (languageVersionSettings.isReleaseCoroutines() && !isCrossinlineLambda) {
             writeDebugMetadata(methodNode, suspensionPointLineNumbers, spilledToVariableMapping)
         }
+    }
+
+    /* Remove sequences like
+     *
+     *  CHECKCAST Number
+     *  INVOKEVIRTUAL Number.intValue
+     *  INVOKESTATIC Integer.valueOf
+     *
+     * If boxing is not immediately preceded by unboxing, we move it to the unboxing, thus simplifying its removal.
+     */
+    private fun removeRedundantUnboxings(internalClassName: String, methodNode: MethodNode) {
+        // move boxings closer to the primitives or unboxings
+        val unboxings = methodNode.instructions.asSequence().filter { it.isPrimitiveUnboxing() }.toList()
+        if (unboxings.isEmpty()) return
+        val boxings = ReturnUnitMethodTransformer.findSuccessors(methodNode, unboxings)
+            .filter { (_, succs) -> succs.all { it.isPrimitiveBoxing() } }
+            .values.flatten().toSet()
+        val boxingSources = findSourceInstructions(internalClassName, methodNode, boxings, ignoreCopy = false)
+
+        // Filter out boxings immediately preceded by unboxing
+        val movableBoxings = boxings.filter { boxing -> boxingSources[boxing]?.all { it != boxing.previous } ?: false }
+        for (boxing in movableBoxings) {
+            val sources = boxingSources[boxing] ?: continue
+            for (source in sources) {
+                methodNode.instructions.insert(source, boxing.clone())
+            }
+            methodNode.instructions.remove(boxing)
+        }
+
+        // remove unboxings immediately followed by boxings
+        val toRemove = methodNode.instructions.asSequence()
+            .filter { it.isPrimitiveUnboxing() && it.previous.opcode == Opcodes.CHECKCAST && it.next.isPrimitiveBoxing() }
+            .flatMap { sequenceOf(it.previous, it, it.next) }.toList()
+
+        methodNode.instructions.removeAll(toRemove)
     }
 
     /* If there are multiple passes to ARETURN we can move ARETURN to the branches thus simplifying tail-call analysis.

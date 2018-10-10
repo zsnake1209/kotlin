@@ -82,7 +82,7 @@ object ReturnUnitMethodTransformer : MethodTransformer() {
 
     // Find instructions which do something on stack, ignoring markers
     // Return map {insn => list of found instructions}
-    private fun findSuccessors(
+    internal fun findSuccessors(
         methodNode: MethodNode,
         insns: Collection<AbstractInsnNode>
     ): Map<AbstractInsnNode, Collection<AbstractInsnNode>> {
