@@ -229,10 +229,30 @@ class CoroutineTransformerMethodVisitor(
 
         // remove unboxings immediately followed by boxings
         val toRemove = methodNode.instructions.asSequence()
-            .filter { it.isPrimitiveUnboxing() && it.previous.opcode == Opcodes.CHECKCAST && it.next.isPrimitiveBoxing() }
+            .filter { canBeRemoved(it) }
             .flatMap { sequenceOf(it.previous, it, it.next) }.toList()
 
         methodNode.instructions.removeAll(toRemove)
+    }
+
+    // We can remove unboxing-boxing sequence, iff incoming and resulting type are the same
+    private fun canBeRemoved(insn: AbstractInsnNode): Boolean {
+        if (!insn.isPrimitiveUnboxing() || insn.previous.opcode != Opcodes.CHECKCAST || !insn.next.isPrimitiveBoxing()) return false
+        insn as MethodInsnNode
+        val next = insn.next as MethodInsnNode
+        return when (insn.owner) {
+            "java/lang/Number" -> when (insn.name) {
+                "byteValue" -> next.owner == "java/lang/Byte"
+                "shortValue" -> next.owner == "java/lang/Short"
+                "intValue" -> next.owner == "java/lang/Int"
+                "floatValue" -> next.owner == "java/lang/Float"
+                "longValue" -> next.owner == "java/lang/Long"
+                "doubleValue" -> next.owner == "java/lang/Double"
+                else -> false
+            }
+            next.owner -> true
+            else -> false
+        }
     }
 
     /* If there are multiple passes to ARETURN we can move ARETURN to the branches thus simplifying tail-call analysis.
@@ -1009,13 +1029,7 @@ private fun allSuspensionPointsAreTailCalls(
         }
         if (insideTryBlock) return@all false
 
-        safelyReachableReturns[endIndex + 1]?.all { returnIndex ->
-            sourceFrames[returnIndex].top().sure {
-                "There must be some value on stack to return"
-            }.insns.all { sourceInsn ->
-                sourceInsn?.let(instructions::indexOf) in beginIndex..endIndex
-            }
-        } ?: false
+        safelyReachableReturns[endIndex + 1] != null
     }
 }
 
