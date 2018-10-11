@@ -13,6 +13,7 @@ import com.intellij.openapi.roots.*
 import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType
 import org.jetbrains.jps.util.JpsPathUtil
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.idea.facet.KotlinFacet
 import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.idea.project.platform
@@ -122,6 +123,24 @@ class ModuleInfo(
         if (actualArguments != arguments) {
             projectInfo.messageCollector.report(
                 "Module '${module.name}': expected additional arguments '$arguments' but found '$actualArguments'"
+            )
+        }
+    }
+
+    fun supportsFeature(feature: LanguageFeature, expected: Boolean = true) {
+        val supportsFeature = module.languageVersionSettings.getFeatureSupport(feature) == LanguageFeature.State.ENABLED
+        if (supportsFeature != expected) {
+            projectInfo.messageCollector.report(
+                "Module '${module.name}': ${"un".takeIf { !expected }.orEmpty()}expected to support language feature $feature"
+            )
+        }
+    }
+
+    fun usesExperimental(annotation: String, expected: Boolean = true) {
+        val usesExperimental = KotlinFacet.get(module)?.configuration?.settings?.compilerArguments?.useExperimental?.contains(annotation)
+        if (usesExperimental != expected) {
+            projectInfo.messageCollector.report(
+                "Module '${module.name}': ${"un".takeIf { !expected }.orEmpty()}expected to use experimental $annotation"
             )
         }
     }

@@ -5,12 +5,13 @@
 
 package org.jetbrains.kotlin.gradle
 
-import com.intellij.openapi.roots.*
+import com.intellij.openapi.roots.DependencyScope
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.jps.model.java.JavaSourceRootType
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.KotlinResourceRootType
 import org.jetbrains.kotlin.config.KotlinSourceRootType
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.idea.codeInsight.gradle.GradleImportingTestCase
 import org.jetbrains.kotlin.platform.impl.CommonIdePlatformKind
 import org.jetbrains.kotlin.platform.impl.JsIdePlatformKind
@@ -392,6 +393,91 @@ class NewMultiplatformProjectImportingTest : GradleImportingTestCase() {
             module("project_jvmTest")
             module("project_main")
             module("project_test")
+        }
+    }
+
+    @Test
+    fun testLanguageSettings() {
+        val experimentalFeature = LanguageFeature.values().first { it.defaultState != LanguageFeature.State.DISABLED }
+
+        createProjectSubFile(
+            "build.gradle",
+            """
+                buildscript {
+                    repositories {
+                        mavenLocal()
+                        jcenter()
+                        maven { url 'https://dl.bintray.com/kotlin/kotlin-dev' }
+                    }
+                    dependencies {
+                        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+                    }
+                }
+
+                allprojects {
+                    repositories {
+                        mavenLocal()
+                        jcenter()
+                        maven { url 'https://dl.bintray.com/kotlin/kotlin-dev' }
+                    }
+                }
+
+                apply plugin: 'kotlin-multiplatform'
+
+                kotlin {
+                    sourceSets {
+                        commonMain {
+                            dependencies {
+                                api 'org.jetbrains.kotlin:kotlin-stdlib-common'
+                            }
+
+                            languageSettings {
+                                languageVersion = '1.4'
+                                apiVersion = '1.2'
+                                progressiveMode = true
+                            }
+                        }
+                        jvmMain {
+                            dependencies {
+                                api 'org.jetbrains.kotlin:kotlin-stdlib'
+                            }
+
+                            languageSettings {
+                                languageVersion = '1.4'
+                                apiVersion = '1.1'
+                                enableLanguageFeature('${experimentalFeature.name}')
+                                useExperimentalAnnotation('kotlin.ExperimentalUnsignedTypes')
+                                useExperimentalAnnotation('kotlin.contracts.ExperimentalContracts')
+                            }
+                        }
+                    }
+                    targets {
+                        fromPreset(presets.jvmWithJava, 'jvm')
+                    }
+                }
+            """.trimIndent()
+        )
+
+        importProject()
+
+        checkProjectStructure(
+            exhaustiveSourceSourceRootList = false,
+            exhaustiveDependencyList = false
+        ) {
+            module("project")
+            module("project_commonMain") {
+                languageVersion("1.4")
+                apiVersion("1.2")
+            }
+            module("project_commonTest")
+            module("project_jvmMain") {
+                languageVersion("1.4")
+                apiVersion("1.1")
+                supportsFeature(experimentalFeature)
+                usesExperimental("kotlin.ExperimentalUnsignedTypes")
+                usesExperimental("kotlin.contracts.ExperimentalContracts")
+            }
+            module("project_jvmTest")
         }
     }
 
