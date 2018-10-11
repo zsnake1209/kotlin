@@ -5245,11 +5245,6 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/createCoroutineSafe.kt", "kotlin.coroutines");
         }
 
-        @TestMetadata("createCoroutinesOnManualInstances.kt")
-        public void testCreateCoroutinesOnManualInstances() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/createCoroutinesOnManualInstances.kt");
-        }
-
         @TestMetadata("createCoroutinesOnManualInstances_1_2.kt")
         public void testCreateCoroutinesOnManualInstances_1_2() throws Exception {
             runTest("compiler/testData/codegen/box/coroutines/createCoroutinesOnManualInstances_1_2.kt");
