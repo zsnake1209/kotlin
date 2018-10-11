@@ -116,6 +116,11 @@ internal abstract class KotlinJsOptionsBase : org.jetbrains.kotlin.gradle.dsl.Ko
             typedArraysField = value
         }
 
+    private var typedArraysField: kotlin.Boolean? = null
+    override var typedArrays: kotlin.Boolean
+        get() = typedArraysField ?: true
+        set(value) { typedArraysField = value }
+
     internal open fun updateArguments(args: org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments) {
         allWarningsAsErrorsField?.let { args.allWarningsAsErrors = it }
         suppressWarningsField?.let { args.suppressWarnings = it }
