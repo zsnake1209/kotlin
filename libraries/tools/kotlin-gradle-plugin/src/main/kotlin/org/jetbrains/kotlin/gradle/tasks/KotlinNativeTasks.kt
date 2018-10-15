@@ -230,7 +230,8 @@ open class KotlinNativeCompile : AbstractCompile() {
                 add("-Xplugin=$path")
             }
             compilerPluginOptions.arguments.forEach {
-                add("-P$it")
+                add("-P")
+                add(it)
             }
         }
 
