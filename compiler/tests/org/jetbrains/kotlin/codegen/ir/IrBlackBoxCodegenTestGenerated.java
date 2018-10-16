@@ -11909,6 +11909,11 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
             runTest("compiler/testData/codegen/box/inlineClasses/kt27140.kt");
         }
 
+        @TestMetadata("kt27615.kt")
+        public void testKt27615() throws Exception {
+            runTest("compiler/testData/codegen/box/inlineClasses/kt27615.kt");
+        }
+
         @TestMetadata("noAssertionsOnInlineClassBasedOnNullableType.kt")
         public void testNoAssertionsOnInlineClassBasedOnNullableType() throws Exception {
             runTest("compiler/testData/codegen/box/inlineClasses/noAssertionsOnInlineClassBasedOnNullableType.kt");
