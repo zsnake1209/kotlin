@@ -170,6 +170,7 @@ fun IrValueParameter.copyTo(
     ).also {
         descriptor.bind(it)
         it.parent = irFunction
+        it.defaultValue = defaultValue
     }
 }
 
