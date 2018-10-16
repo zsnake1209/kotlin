@@ -150,6 +150,9 @@ open class KotlinNativeCompile : AbstractCompile() {
 
     val enabledLanguageFeatures: Set<String>
         @Input get() = languageSettings?.enabledLanguageFeatures ?: emptySet()
+
+    val experimentalAnnotationsInUse: Set<String>
+        @Input get() = languageSettings?.experimentalAnnotationsInUse.orEmpty()
     // endregion.
 
     // region DSL for compiler options
@@ -222,6 +225,9 @@ open class KotlinNativeCompile : AbstractCompile() {
         addKey("-progressive", progressiveMode)
         enabledLanguageFeatures.forEach { featureName ->
             add("-XXLanguage:+$featureName")
+        }
+        experimentalAnnotationsInUse.forEach { annotationName ->
+            add("-Xuse-experimental=$annotationName")
         }
 
         // Compiler plugins.
