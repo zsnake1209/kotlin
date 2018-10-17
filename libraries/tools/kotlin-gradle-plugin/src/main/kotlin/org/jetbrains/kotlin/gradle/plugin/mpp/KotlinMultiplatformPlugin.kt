@@ -94,6 +94,8 @@ class KotlinMultiplatformPlugin(
 
         // propagate compiler plugin options to the source set language settings
         setupCompilerPluginOptions(project)
+
+        UnusedSourceSetsChecker.checkSourceSets(project)
     }
 
     private fun setupCompilerPluginOptions(project: Project) {
@@ -104,14 +106,7 @@ class KotlinMultiplatformPlugin(
                 .compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME)
 
         val primaryCompilationsBySourceSet by lazy { // don't evaluate eagerly: Android targets are not created at this point
-            val allCompilationsForSourceSets =
-                project.multiplatformExtension!!.targets
-                    .flatMap { target ->
-                        target.compilations.flatMap { compilation ->
-                            compilation.allKotlinSourceSets.map { it to compilation }
-                        }
-                    }
-                    .groupBy(keySelector = { (sourceSet, _) -> sourceSet }, valueTransform = { (_, compilation) -> compilation })
+            val allCompilationsForSourceSets = compilationsBySourceSet(project)
 
             allCompilationsForSourceSets.mapValues { (_, compilations) -> // choose one primary compilation
                 when (compilations.size) {
@@ -306,3 +301,15 @@ class KotlinMultiplatformPlugin(
 }
 
 internal val KotlinTarget.defaultArtifactId get() = "${project.name}-${name.toLowerCase()}"
+
+internal fun compilationsBySourceSet(project: Project): Map<KotlinSourceSet, Set<KotlinCompilation>> {
+    return project.multiplatformExtension!!.targets
+        .flatMap { target ->
+            target.compilations.flatMap { compilation ->
+                compilation.allKotlinSourceSets.map { it to compilation }
+            }
+        }
+        .groupBy(keySelector = { (sourceSet, _) -> sourceSet }, valueTransform = { (_, compilation) -> compilation })
+        .mapValues { it.value.toSet() }
+}
+
