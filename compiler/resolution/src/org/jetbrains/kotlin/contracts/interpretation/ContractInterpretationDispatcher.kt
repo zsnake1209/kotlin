@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.contracts.model.structure.ESVariable
 import org.jetbrains.kotlin.contracts.model.ESEffect
 import org.jetbrains.kotlin.contracts.model.ESExpression
 import org.jetbrains.kotlin.contracts.model.Functor
+import org.jetbrains.kotlin.contracts.model.functors.MergingFunctor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
 /**
@@ -51,9 +52,9 @@ class ContractInterpretationDispatcher {
             } else {
                 effectsInterpreters.mapNotNull { it.tryInterpret(effect) }.singleOrNull() ?: return null
             }
-        }
+        }.map { SubstitutingFunctor(it, contractDescription.ownerFunction) }
 
-        return SubstitutingFunctor(resultingClauses, contractDescription.ownerFunction)
+        return MergingFunctor(resultingClauses)
     }
 
     internal fun interpretEffect(effectDeclaration: EffectDeclaration): ESEffect? {
