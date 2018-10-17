@@ -34,10 +34,10 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 class ContractInterpretationDispatcher {
     private val constantsInterpreter = ConstantValuesInterpreter()
     private val conditionInterpreter = ConditionInterpreter(this)
-    private val conditionalEffectInterpreter = ConditionalEffectInterpreter(this)
     private val effectsInterpreters: List<EffectDeclarationInterpreter> = listOf(
         ReturnsEffectInterpreter(this),
-        CallsEffectInterpreter(this)
+        CallsEffectInterpreter(this),
+        ConditionalEffectInterpreter(this)
     )
 
     fun resolveFunctor(functionDescriptor: FunctionDescriptor): Functor? {
@@ -47,11 +47,7 @@ class ContractInterpretationDispatcher {
 
     private fun convertContractDescriptorToFunctor(contractDescription: ContractDescription): Functor? {
         val resultingClauses = contractDescription.effects.map { effect ->
-            if (effect is ConditionalEffectDeclaration) {
-                conditionalEffectInterpreter.interpret(effect) ?: return null
-            } else {
-                effectsInterpreters.mapNotNull { it.tryInterpret(effect) }.singleOrNull() ?: return null
-            }
+            effectsInterpreters.mapNotNull { it.tryInterpret(effect) }.singleOrNull() ?: return null
         }.map { SubstitutingFunctor(it, contractDescription.ownerFunction) }
 
         return MergingFunctor(resultingClauses)
