@@ -40,15 +40,15 @@ internal class ConditionalEffectInterpreter(private val dispatcher: ContractInte
     override fun tryInterpret(effectDeclaration: EffectDeclaration): ConditionalEffect? {
         if (effectDeclaration !is ConditionalEffectDeclaration) return null
 
-        val effect = dispatcher.interpretEffect(effectDeclaration.effect) as? SimpleEffect ?: return null
+        val effect = dispatcher.interpretOutcome(effectDeclaration.effect) ?: return null
         val condition = dispatcher.interpretCondition(effectDeclaration.condition) ?: return null
 
         return ConditionalEffect(condition, effect)
     }
 }
 
-internal class ReturnsEffectInterpreter(private val dispatcher: ContractInterpretationDispatcher) : EffectDeclarationInterpreter {
-    override fun tryInterpret(effectDeclaration: EffectDeclaration): ESEffect? {
+internal class ReturnsEffectInterpreter(private val dispatcher: ContractInterpretationDispatcher) : OutcomeInterpreter {
+    override fun tryInterpret(effectDeclaration: EffectDeclaration): SimpleEffect? {
         if (effectDeclaration !is ReturnsEffectDeclaration) return null
         val returnedValue = dispatcher.interpretConstant(effectDeclaration.value) ?: return null
         return ESReturns(returnedValue)

@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.contracts.model.structure.ESVariable
 import org.jetbrains.kotlin.contracts.model.ESEffect
 import org.jetbrains.kotlin.contracts.model.ESExpression
 import org.jetbrains.kotlin.contracts.model.Functor
+import org.jetbrains.kotlin.contracts.model.SimpleEffect
 import org.jetbrains.kotlin.contracts.model.functors.MergingFunctor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
@@ -35,9 +36,12 @@ class ContractInterpretationDispatcher {
     private val constantsInterpreter = ConstantValuesInterpreter()
     private val conditionInterpreter = ConditionInterpreter(this)
     private val effectsInterpreters: List<EffectDeclarationInterpreter> = listOf(
-        ReturnsEffectInterpreter(this),
         CallsEffectInterpreter(this),
         ConditionalEffectInterpreter(this)
+    )
+
+    private val outcomeInterpreters: List<OutcomeInterpreter> = listOf(
+        ReturnsEffectInterpreter(this)
     )
 
     fun resolveFunctor(functionDescriptor: FunctionDescriptor): Functor? {
@@ -53,9 +57,8 @@ class ContractInterpretationDispatcher {
         return MergingFunctor(resultingClauses)
     }
 
-    internal fun interpretEffect(effectDeclaration: EffectDeclaration): ESEffect? {
-        val convertedFunctors = effectsInterpreters.mapNotNull { it.tryInterpret(effectDeclaration) }
-        return convertedFunctors.singleOrNull()
+    internal fun interpretOutcome(effectDeclaration: EffectDeclaration): SimpleEffect? {
+        return outcomeInterpreters.mapNotNull { it.tryInterpret(effectDeclaration) }.singleOrNull()
     }
 
     internal fun interpretConstant(constantReference: ConstantReference): ESConstant? =
