@@ -17,7 +17,8 @@
 package org.jetbrains.kotlin.contracts.interpretation
 
 import org.jetbrains.kotlin.contracts.description.EffectDeclaration
-import org.jetbrains.kotlin.contracts.model.ESEffect
+import org.jetbrains.kotlin.contracts.model.Functor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
 /**
  * Interpreter of some effects. For most cases, each particular
@@ -26,5 +27,5 @@ import org.jetbrains.kotlin.contracts.model.ESEffect
  * about other implementations.
  */
 internal interface EffectDeclarationInterpreter {
-    fun tryInterpret(effectDeclaration: EffectDeclaration): ESEffect?
+    fun tryInterpret(effectDeclaration: EffectDeclaration, ownerFunction: FunctionDescriptor): Functor?
 }

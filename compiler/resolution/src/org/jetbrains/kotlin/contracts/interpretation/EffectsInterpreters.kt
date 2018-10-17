@@ -21,29 +21,31 @@ import org.jetbrains.kotlin.contracts.description.ConditionalEffectDeclaration
 import org.jetbrains.kotlin.contracts.description.EffectDeclaration
 import org.jetbrains.kotlin.contracts.description.ReturnsEffectDeclaration
 import org.jetbrains.kotlin.contracts.model.ConditionalEffect
-import org.jetbrains.kotlin.contracts.model.ESEffect
+import org.jetbrains.kotlin.contracts.model.Functor
 import org.jetbrains.kotlin.contracts.model.SimpleEffect
+import org.jetbrains.kotlin.contracts.model.functors.SubstitutingFunctor
 import org.jetbrains.kotlin.contracts.model.structure.ESCalls
 import org.jetbrains.kotlin.contracts.model.structure.ESReturns
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 
 internal class CallsEffectInterpreter(private val dispatcher: ContractInterpretationDispatcher) : EffectDeclarationInterpreter {
-    override fun tryInterpret(effectDeclaration: EffectDeclaration): ESEffect? {
+    override fun tryInterpret(effectDeclaration: EffectDeclaration, ownerFunction: FunctionDescriptor): Functor? {
         if (effectDeclaration !is CallsEffectDeclaration) return null
 
         val variable = dispatcher.interpretVariable(effectDeclaration.variableReference) ?: return null
         val kind = effectDeclaration.kind
-        return ESCalls(variable, kind)
+        return SubstitutingFunctor(ESCalls(variable, kind), ownerFunction)
     }
 }
 
 internal class ConditionalEffectInterpreter(private val dispatcher: ContractInterpretationDispatcher) : EffectDeclarationInterpreter {
-    override fun tryInterpret(effectDeclaration: EffectDeclaration): ConditionalEffect? {
+    override fun tryInterpret(effectDeclaration: EffectDeclaration, ownerFunction: FunctionDescriptor): Functor? {
         if (effectDeclaration !is ConditionalEffectDeclaration) return null
 
         val effect = dispatcher.interpretOutcome(effectDeclaration.effect) ?: return null
         val condition = dispatcher.interpretCondition(effectDeclaration.condition) ?: return null
 
-        return ConditionalEffect(condition, effect)
+        return SubstitutingFunctor(ConditionalEffect(condition, effect), ownerFunction)
     }
 }
 

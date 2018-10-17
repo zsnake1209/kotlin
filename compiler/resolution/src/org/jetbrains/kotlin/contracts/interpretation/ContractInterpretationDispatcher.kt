@@ -19,10 +19,8 @@ package org.jetbrains.kotlin.contracts.interpretation
 import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.contracts.description.expressions.ConstantReference
 import org.jetbrains.kotlin.contracts.description.expressions.VariableReference
-import org.jetbrains.kotlin.contracts.model.functors.SubstitutingFunctor
 import org.jetbrains.kotlin.contracts.model.structure.ESConstant
 import org.jetbrains.kotlin.contracts.model.structure.ESVariable
-import org.jetbrains.kotlin.contracts.model.ESEffect
 import org.jetbrains.kotlin.contracts.model.ESExpression
 import org.jetbrains.kotlin.contracts.model.Functor
 import org.jetbrains.kotlin.contracts.model.SimpleEffect
@@ -50,11 +48,11 @@ class ContractInterpretationDispatcher {
     }
 
     private fun convertContractDescriptorToFunctor(contractDescription: ContractDescription): Functor? {
-        val resultingClauses = contractDescription.effects.map { effect ->
-            effectsInterpreters.mapNotNull { it.tryInterpret(effect) }.singleOrNull() ?: return null
-        }.map { SubstitutingFunctor(it, contractDescription.ownerFunction) }
+        val resultingFunctors = contractDescription.effects.map { effect ->
+            effectsInterpreters.mapNotNull { it.tryInterpret(effect, contractDescription.ownerFunction) }.singleOrNull() ?: return null
+        }
 
-        return MergingFunctor(resultingClauses)
+        return MergingFunctor(resultingFunctors)
     }
 
     internal fun interpretOutcome(effectDeclaration: EffectDeclaration): SimpleEffect? {
