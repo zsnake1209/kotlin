@@ -32,14 +32,9 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
  */
 class ContractInterpretationDispatcher {
     private val constantsInterpreter = ConstantValuesInterpreter()
-    private val conditionInterpreter = ConditionInterpreter(this)
     private val effectsInterpreters: List<EffectDeclarationInterpreter> = listOf(
         CallsEffectInterpreter(this),
         ConditionalEffectInterpreter(this)
-    )
-
-    private val outcomeInterpreters: List<OutcomeInterpreter> = listOf(
-        ReturnsEffectInterpreter(this)
     )
 
     fun resolveFunctor(functionDescriptor: FunctionDescriptor): Functor? {
@@ -55,15 +50,8 @@ class ContractInterpretationDispatcher {
         return MergingFunctor(resultingFunctors)
     }
 
-    internal fun interpretOutcome(effectDeclaration: EffectDeclaration): SimpleEffect? {
-        return outcomeInterpreters.mapNotNull { it.tryInterpret(effectDeclaration) }.singleOrNull()
-    }
-
     internal fun interpretConstant(constantReference: ConstantReference): ESConstant? =
         constantsInterpreter.interpretConstant(constantReference)
-
-    internal fun interpretCondition(booleanExpression: BooleanExpression): ESExpression? =
-        booleanExpression.accept(conditionInterpreter, Unit)
 
     internal fun interpretVariable(variableReference: VariableReference): ESVariable? = ESVariable(variableReference.descriptor)
 }
