@@ -135,6 +135,11 @@ tasks.withType(Test) {
 
 def jpsIncrementalTestsClass = '**/KotlinGradlePluginJpsParametrizedIT.class'
 
+tasks.withType(Test).all {
+    systemProperty("sun.net.client.defaultReadTimeout", "30000")
+    systemProperty("sun.net.client.defaultConnectTimeout", "5000")
+}
+
 test {
     dependsOn(":kotlin-gradle-plugin:validateTaskProperties")
     exclude jpsIncrementalTestsClass
