@@ -34,8 +34,14 @@ import java.util.*
 class EnumUsageLowering(val context: JsIrBackendContext) : FileLoweringPass {
     override fun lower(irFile: IrFile) {
         irFile.transformChildrenVoid(object : IrElementTransformerVoid() {
-            override fun visitGetEnumValue(expression: IrGetEnumValue) =
-                JsIrBuilder.buildCall(context.enumEntryToGetInstanceFunction[expression.symbol]!!)
+            override fun visitGetEnumValue(expression: IrGetEnumValue): IrExpression {
+                val enumClass = expression.symbol.owner.parent as IrClass
+                if (enumClass.isExternal) {
+                    TODO("EXTERNAL ENUMS") // PUT BREAK POINT HERE
+                } else {
+                    return JsIrBuilder.buildCall(context.enumEntryToGetInstanceFunction[expression.symbol]!!)
+                }
+            }
         })
     }
 }
@@ -49,7 +55,7 @@ class EnumClassLowering(val context: JsIrBackendContext) : DeclarationContainerL
                 } else {
                     EnumClassTransformer(context, declaration).transform()
                 }
-        } else
+            } else
                 listOf(declaration)
         }
     }
