@@ -72,8 +72,7 @@ class FileClassLowering(val context: JvmBackendContext) : FileLoweringPass {
             isInner = false,
             isData = false,
             isExternal = false,
-            isInline = false,
-            isFileClass = true
+            isInline = false
         ).apply {
             descriptor.bind(this)
             superTypes.add(context.irBuiltIns.anyType)
