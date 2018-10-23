@@ -179,7 +179,8 @@ abstract class BaseGradleIT {
         val usePreciseJavaTracking: Boolean? = null,
         val withBuildCache: Boolean = false,
         val kaptOptions: KaptOptions? = null,
-        val parallelTasksInProject: Boolean? = null
+        val parallelTasksInProject: Boolean? = null,
+        val disallowDependencyResolutionAtConfigurationTime: Boolean = true
     )
 
     data class KaptOptions(val verbose: Boolean, val useWorkers: Boolean)
@@ -586,6 +587,11 @@ abstract class BaseGradleIT {
 
             // Workaround: override a console type set in the user machine gradle.properties (since Gradle 4.3):
             add("--console=plain")
+
+            add("--init-script")
+            add(resourcesRootFile.resolve("init.gradle").absolutePath)
+
+            add("-PdisallowDependencyResolutionAtConfigurationTime=${options.disallowDependencyResolutionAtConfigurationTime}")
 
             addAll(options.freeCommandLineArgs)
         }

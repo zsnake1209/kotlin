@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.gradle.tasks.findToolsJar
 import java.io.File
 
 internal class GradleCompilerEnvironment(
-    val compilerClasspath: List<File>,
+    val compilerClasspath: Iterable<File>,
     messageCollector: GradleMessageCollector,
     outputItemsCollector: OutputItemsCollector,
     val localStateDirectories: List<File>,

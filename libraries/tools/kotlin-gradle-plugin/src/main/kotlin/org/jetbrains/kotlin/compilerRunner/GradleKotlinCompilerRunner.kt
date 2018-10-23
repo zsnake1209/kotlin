@@ -122,7 +122,7 @@ internal open class GradleCompilerRunner(protected val task: Task) {
     ) {
         if (compilerArgs.version) {
             project.logger.lifecycle(
-                "Kotlin version " + loadCompilerVersion(environment.compilerClasspath) +
+                "Kotlin version " + loadCompilerVersion(environment.compilerClasspath.toList()) +
                         " (JRE " + System.getProperty("java.runtime.version") + ")"
             )
             compilerArgs.version = false
