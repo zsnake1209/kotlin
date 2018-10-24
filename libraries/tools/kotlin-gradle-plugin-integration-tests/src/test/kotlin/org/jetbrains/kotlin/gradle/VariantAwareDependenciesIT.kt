@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.gradle.util.testResolveAllConfigurations
 import org.junit.Test
 
 class VariantAwareDependenciesIT : BaseGradleIT() {
-    private val gradleVersion = GradleVersionRequired.AtLeast("4.8")
+    private val gradleVersion = GradleVersionRequired.AtLeast("5.0-milestone-1")
 
     @Test
     fun testJvmKtAppResolvesMppLib() {
