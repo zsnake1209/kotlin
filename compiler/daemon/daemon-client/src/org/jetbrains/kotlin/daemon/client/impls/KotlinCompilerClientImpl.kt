@@ -5,12 +5,10 @@
 
 package org.jetbrains.kotlin.daemon.client.impls
 
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.daemon.client.BasicCompilerServicesWithResultsFacadeServer
-import org.jetbrains.kotlin.daemon.client.CompilerCallbackServicesFacadeServer
-import org.jetbrains.kotlin.daemon.client.RemoteOutputStreamServer
-import org.jetbrains.kotlin.daemon.client.launchProcessWithFallback
+import org.jetbrains.kotlin.daemon.client.*
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.impls.*
 import org.jetbrains.kotlin.daemon.common.impls.DummyProfiler
@@ -20,7 +18,6 @@ import org.jetbrains.kotlin.load.kotlin.incremental.components.IncrementalCompil
 import org.jetbrains.kotlin.progress.CompilationCanceledStatus
 import java.io.File
 import java.io.OutputStream
-import java.io.PrintStream
 import java.net.SocketException
 import java.rmi.ConnectException
 import java.rmi.ConnectIOException
@@ -52,7 +49,7 @@ object KotlinCompilerClientImpl {
             ?.takeUnless(String::isBlank)
             ?.let(::File)
             ?.takeIf(File::exists)
-                ?: makeAutodeletingFlagFile(baseDir = File(daemonOptions.runFilesPathOrDefault))
+            ?: makeAutodeletingFlagFile(baseDir = File(daemonOptions.runFilesPathOrDefault))
 
     fun connectToCompileService(
         compilerId: CompilerId,
@@ -440,7 +437,7 @@ object KotlinCompilerClientImpl {
             Pair(it.daemon, optsCopy.updateMemoryUpperBounds(it.jvmOptions))
         }
         // else combine all options from running daemon to get fattest option for a new daemon to runServer
-                ?: Pair(null, aliveWithMetadata.fold(optsCopy, { opts, d -> opts.updateMemoryUpperBounds(d.jvmOptions) }))
+            ?: Pair(null, aliveWithMetadata.fold(optsCopy, { opts, d -> opts.updateMemoryUpperBounds(d.jvmOptions) }))
     }
 
 
@@ -542,10 +539,7 @@ object KotlinCompilerClientImpl {
     }
 }
 
-
-data class DaemonReportMessage(val category: DaemonReportCategory, val message: String)
-
-internal fun DaemonReportingTargets.report(category: DaemonReportCategory, message: String, source: String? = null) {
+fun DaemonReportingTargets.report(category: DaemonReportCategory, message: String, source: String? = null) {
     val sourceMessage: String by lazy { source?.let { "[$it] $message" } ?: message }
     out?.println("${category.name}: $sourceMessage")
     messages?.add(DaemonReportMessage(category, sourceMessage))
@@ -558,9 +552,9 @@ internal fun DaemonReportingTargets.report(category: DaemonReportCategory, messa
     }
     compilerServices?.let {
         when (category) {
-            DaemonReportCategory.DEBUG -> it.report(ReportCategory.DAEMON_MESSAGE, ReportSeverity.DEBUG, message, source)
-            DaemonReportCategory.INFO -> it.report(ReportCategory.DAEMON_MESSAGE, ReportSeverity.INFO, message, source)
-            DaemonReportCategory.EXCEPTION -> it.report(ReportCategory.EXCEPTION, ReportSeverity.ERROR, message, source)
+            DaemonReportCategory.DEBUG -> runBlocking { it.report(ReportCategory.DAEMON_MESSAGE, ReportSeverity.DEBUG, message, source) }
+            DaemonReportCategory.INFO -> runBlocking { it.report(ReportCategory.DAEMON_MESSAGE, ReportSeverity.INFO, message, source) }
+            DaemonReportCategory.EXCEPTION -> runBlocking { it.report(ReportCategory.EXCEPTION, ReportSeverity.ERROR, message, source) }
         }
     }
 }
@@ -572,10 +566,3 @@ internal fun isProcessAlive(process: Process) =
     } catch (e: IllegalThreadStateException) {
         true
     }
-
-class DaemonReportingTargets(
-    val out: PrintStream? = null,
-    val messages: MutableCollection<DaemonReportMessage>? = null,
-    val messageCollector: MessageCollector? = null,
-    val compilerServices: CompilerServicesFacadeBase? = null
-)
