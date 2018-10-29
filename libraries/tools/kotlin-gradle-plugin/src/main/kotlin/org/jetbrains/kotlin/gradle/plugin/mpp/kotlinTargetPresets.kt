@@ -233,6 +233,7 @@ class KotlinJvmWithJavaTargetPreset(
 
     companion object {
         const val PRESET_NAME = "jvmWithJava"
+        const val DEFAULT_TARGET_NAME = "jvm"
     }
 }
 

@@ -95,7 +95,33 @@ class KotlinMultiplatformPlugin(
         // propagate compiler plugin options to the source set language settings
         setupCompilerPluginOptions(project)
 
+        createJvmWithJavaTargetIfJavaIsApplied(project)
+
         UnusedSourceSetsChecker.checkSourceSets(project)
+    }
+
+    private fun createJvmWithJavaTargetIfJavaIsApplied(project: Project) {
+        project.pluginManager.withPlugin("java") {
+            project.multiplatformExtension!!.apply {
+                val defaultTargetName = KotlinJvmWithJavaTargetPreset.DEFAULT_TARGET_NAME
+                if (targets.findByName(defaultTargetName) != null) {
+                    project.logger.warn(
+                        "The 'java' plugin was applied, but a Kotlin target named '$defaultTargetName' already exists. No new target " +
+                                "was created for Kotlin with Java. To keep both targets, rename the '$defaultTargetName' " +
+                                "target created from a preset. To keep only the target for Kotlin with Java, don't create " +
+                                "the target from preset and instead configure '$defaultTargetName' after the 'java' plugin is " +
+                                "applied."
+                        // TODO: add a docs link
+                    )
+                } else {
+                    targets.add(
+                        presets
+                            .getByName(KotlinJvmWithJavaTargetPreset.PRESET_NAME)
+                            .createTarget(defaultTargetName)
+                    )
+                }
+            }
+        }
     }
 
     private fun setupCompilerPluginOptions(project: Project) {

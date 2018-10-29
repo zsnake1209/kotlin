@@ -186,12 +186,12 @@ class KotlinNativeTarget(
         attributes.attribute(konanTargetAttribute, konanTarget.name)
     }
 
+    override val publishable: Boolean
+        get() = konanTarget.enabledOnCurrentHost
+
     // TODO: Should binary files be output of a target or a compilation?
     override val artifactsTaskName: String
         get() = disambiguateName("link")
-
-    override val publishable: Boolean
-        get() = konanTarget.enabledOnCurrentHost
 
     companion object {
         val konanTargetAttribute = Attribute.of(
