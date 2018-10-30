@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.backend.common.ir.copyParameterDeclarationsFrom
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.irBlockBody
 import org.jetbrains.kotlin.backend.common.lower.irIfThen
+import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
@@ -20,6 +21,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrInstanceInitializerCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueParameterSymbol
@@ -64,6 +66,9 @@ class EnumClassTransformer(val context: JsIrBackendContext, private val irClass:
 
     fun transform(): List<IrDeclaration> {
         // Add `name` and `ordinal` parameters to enum class constructors
+
+        insertInstanceInitializer()
+
         lowerEnumConstructorsSignature()
 
         // Pass these parameters to delegating constructor calls
@@ -78,6 +83,7 @@ class EnumClassTransformer(val context: JsIrBackendContext, private val irClass:
         // Lower `IrEnumConstructorCall`s inside of enum entry class constructors to corresponding `IrDelegatingConstructorCall`s.
         // Add `name` and `ordinal` parameters.
         lowerEnumEntryClassConstructors(entryInstances)
+
 
         // Lower `IrEnumConstructorCall`s to corresponding `IrCall`s.
         // Add `name` and `ordinal` constant parameters only for calls to the "enum class" constructors ("enum entry class" constructors
@@ -103,6 +109,33 @@ class EnumClassTransformer(val context: JsIrBackendContext, private val irClass:
         return listOf(irClass) + entryInstances + listOf(entryInstancesInitializedVar, initEntryInstancesFun) + entryGetInstanceFuns
     }
 
+    private fun insertInstanceInitializer() {
+        irClass.transformChildrenVoid(object : IrElementTransformerVoid() {
+            override fun visitClass(declaration: IrClass) = declaration
+
+            override fun visitConstructor(declaration: IrConstructor): IrStatement {
+                declaration.transformChildrenVoid(this)
+
+                val blockBody = declaration.body as IrBlockBody
+
+                if (!blockBody.statements.any { it is IrInstanceInitializerCall }) {
+                    blockBody.statements.transformFlat {
+                        if (it is IrEnumConstructorCall)
+                            listOf(
+                                it, IrInstanceInitializerCallImpl(
+                                    declaration.startOffset, declaration.startOffset,
+                                    irClass.symbol, context.irBuiltIns.unitType
+                                )
+                            )
+                        else null
+                    }
+                }
+
+                return declaration
+            }
+        })
+    }
+
     private fun fixReferencesToConstructorParameters() {
         val fromOldToNewParameter = mutableMapOf<IrValueParameterSymbol, IrValueParameter>()
 
@@ -115,7 +148,7 @@ class EnumClassTransformer(val context: JsIrBackendContext, private val irClass:
             }
         }
 
-        irClass.transformChildrenVoid(object: IrElementTransformerVoid() {
+        irClass.transformChildrenVoid(object : IrElementTransformerVoid() {
             override fun visitGetValue(expression: IrGetValue): IrExpression {
                 fromOldToNewParameter[expression.symbol]?.let {
                     return builder.irGet(it)
@@ -281,13 +314,13 @@ class EnumClassTransformer(val context: JsIrBackendContext, private val irClass:
             }
 
         override fun visitDelegatingConstructorCall(expression: IrDelegatingConstructorCall): IrExpression {
-            var constructor = expression.symbol.owner
-            val constructorWasTransformed = constructor.symbol in loweredEnumConstructors
+            var delegatingConstructor = expression.symbol.owner
+            val constructorWasTransformed = delegatingConstructor.symbol in loweredEnumConstructors
 
             if (constructorWasTransformed)
-                constructor = loweredEnumConstructors[constructor.symbol]!!
+                delegatingConstructor = loweredEnumConstructors[delegatingConstructor.symbol]!!
 
-            return builder.irDelegatingConstructorCall(constructor).apply {
+            return builder.irDelegatingConstructorCall(delegatingConstructor).apply {
                 var valueArgIdx = 0
                 for (i in 0..1) {
                     putValueArgument(valueArgIdx++, builder.irGet(constructor.valueParameters[i]))
