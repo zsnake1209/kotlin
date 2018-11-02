@@ -22,7 +22,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
-import com.intellij.util.containers.SLRUCache
 import org.jetbrains.kotlin.analyzer.*
 import org.jetbrains.kotlin.analyzer.common.CommonAnalysisParameters
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -75,7 +74,7 @@ internal class ProjectResolutionFacade(
     private val analysisResults = CachedValuesManager.getManager(project).createCachedValue(
         {
             val resolverForProject = cachedResolverForProject
-            val results = object : SLRUCache<KtFile, PerFileAnalysisCache>(2, 3) {
+            val results = object : FailingSLRUCache<KtFile, PerFileAnalysisCache>(2, 3) {
                 override fun createValue(file: KtFile): PerFileAnalysisCache {
                     return PerFileAnalysisCache(
                         file,

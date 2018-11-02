@@ -84,7 +84,7 @@ class KotlinCacheServiceImpl(val project: Project) : KotlinCacheService {
     override fun getSuppressionCache(): KotlinSuppressCache = kotlinSuppressCache.value
 
     private val globalFacadesPerPlatformAndSdk: SLRUCache<PlatformAnalysisSettings, GlobalFacade> =
-        object : SLRUCache<PlatformAnalysisSettings, GlobalFacade>(2 * 3 * 2, 2 * 3 * 2) {
+        object : FailingSLRUCache<PlatformAnalysisSettings, GlobalFacade>(2 * 3 * 2, 2 * 3 * 2) {
             override fun createValue(settings: PlatformAnalysisSettings): GlobalFacade {
                 return GlobalFacade(settings)
             }
@@ -372,7 +372,7 @@ class KotlinCacheServiceImpl(val project: Project) : KotlinCacheService {
         // NOTE: computations inside createFacadeForFilesWithSpecialModuleInfo depend on project root structure
         // so we additionally drop the whole slru cache on change
         CachedValueProvider.Result(
-            object : SLRUCache<Set<KtFile>, ProjectResolutionFacade>(2, 3) {
+            object : FailingSLRUCache<Set<KtFile>, ProjectResolutionFacade>(2, 3) {
                 override fun createValue(files: Set<KtFile>) = createFacadeForFilesWithSpecialModuleInfo(files)
             },
             LibraryModificationTracker.getInstance(project),
@@ -394,7 +394,7 @@ class KotlinCacheServiceImpl(val project: Project) : KotlinCacheService {
 
     private val scriptsCacheProvider = CachedValueProvider {
         CachedValueProvider.Result(
-            object : SLRUCache<Set<KtFile>, ProjectResolutionFacade>(2, 3) {
+            object : FailingSLRUCache<Set<KtFile>, ProjectResolutionFacade>(2, 3) {
                 override fun createValue(files: Set<KtFile>) = createFacadeForFilesWithSpecialModuleInfo(files)
             },
             LibraryModificationTracker.getInstance(project),
