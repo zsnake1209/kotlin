@@ -101,6 +101,7 @@ open class DiscoverScriptExtensionsTask : DefaultTask() {
         } else if (extensions.isNotEmpty()) {
             project.logger.info("kotlin scripting plugin: Add new extensions to the sourceset $project.$sourceSet: $extensions")
             kotlinSourceSet.kotlin.filter.include(extensions.map { "**/*.$it" })
+            kotlinCompile.kotlinScriptExtensions = extensions.toTypedArray()
         }
     }
 }

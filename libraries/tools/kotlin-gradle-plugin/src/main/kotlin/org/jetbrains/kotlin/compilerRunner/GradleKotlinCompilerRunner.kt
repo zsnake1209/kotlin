@@ -63,23 +63,16 @@ internal open class GradleCompilerRunner(protected val project: Project) {
         args: K2JVMCompilerArguments,
         environment: GradleCompilerEnvironment
     ) {
-        val buildFile = makeModuleFile(
-            args.moduleName!!,
-            isTest = false,
-            outputDir = args.destinationAsFile,
-            sourcesToCompile = sourcesToCompile,
-            commonSources = commonSources,
-            javaSourceRoots = javaSourceRoots.map { JvmSourceRoot(it, javaPackagePrefix) },
-            classpath = args.classpathAsList,
-            friendDirs = args.friendPaths?.map(::File).orEmpty()
-        )
-        args.buildFile = buildFile.absolutePath
+        args.freeArgs += sourcesToCompile.map { it.absolutePath }
+        args.commonSources = commonSources.map { it.absolutePath }.toTypedArray()
+        args.javaSourceRoots = javaSourceRoots.map { it.absolutePath }.toTypedArray()
+        args.javaPackagePrefix = javaPackagePrefix
 
         if (environment.incrementalCompilationEnvironment == null || kotlinCompilerExecutionStrategy() != DAEMON_EXECUTION_STRATEGY) {
             args.destination = null
         }
 
-        runCompilerAsync(KotlinCompilerClass.JVM, args, environment, buildFile = buildFile)
+        runCompilerAsync(KotlinCompilerClass.JVM, args, environment)
     }
 
     /**
@@ -113,8 +106,7 @@ internal open class GradleCompilerRunner(protected val project: Project) {
     private fun runCompilerAsync(
         compilerClassName: String,
         compilerArgs: CommonCompilerArguments,
-        environment: GradleCompilerEnvironment,
-        buildFile: File? = null
+        environment: GradleCompilerEnvironment
     ) {
         if (compilerArgs.version) {
             project.logger.lifecycle(
@@ -134,8 +126,8 @@ internal open class GradleCompilerRunner(protected val project: Project) {
             isVerbose = compilerArgs.verbose,
             incrementalCompilationEnvironment = incrementalCompilationEnvironment,
             incrementalModuleInfo = modulesInfo,
-            buildFile = buildFile,
-            localStateDirectories = environment.localStateDirectories
+            localStateDirectories = environment.localStateDirectories,
+            kotlinScriptExtensions = environment.kotlinScriptExtensions
         )
         runCompilerAsync(workArgs)
     }

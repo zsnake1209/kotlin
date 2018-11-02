@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.gradle.tasks.GradleMessageCollector
 import org.jetbrains.kotlin.gradle.tasks.clearLocalStateDirectories
 import org.jetbrains.kotlin.gradle.tasks.throwGradleExceptionIfError
 import org.jetbrains.kotlin.incremental.ChangedFiles
-import org.jetbrains.kotlin.incremental.DELETE_MODULE_FILE_PROPERTY
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -52,8 +51,8 @@ internal class GradleKotlinCompilerWorkArguments(
     val isVerbose: Boolean,
     val incrementalCompilationEnvironment: IncrementalCompilationEnvironment?,
     val incrementalModuleInfo: IncrementalModuleInfo?,
-    val buildFile: File?,
-    val localStateDirectories: List<File>
+    val localStateDirectories: List<File>,
+    val kotlinScriptExtensions: Array<String>
 ) : Serializable {
     companion object {
         const val serialVersionUID: Long = 0
@@ -79,8 +78,8 @@ internal class GradleKotlinCompilerWork @Inject constructor(
     private val isVerbose = config.isVerbose
     private val incrementalCompilationEnvironment = config.incrementalCompilationEnvironment
     private val incrementalModuleInfo = config.incrementalModuleInfo
-    private val buildFile = config.buildFile
     private val localStateDirectories = config.localStateDirectories
+    private val kotlinScriptExtensions = config.kotlinScriptExtensions
 
     private val log: KotlinLogger =
         SL4JKotlinLogger(LoggerFactory.getLogger("GradleKotlinCompilerWork"))
@@ -99,10 +98,6 @@ internal class GradleKotlinCompilerWork @Inject constructor(
         } catch (e: Throwable) {
             clearLocalStateDirectories(log, localStateDirectories, "exception when running compiler")
             throw e
-        } finally {
-            if (buildFile != null && System.getProperty(DELETE_MODULE_FILE_PROPERTY) != "false") {
-                buildFile.delete()
-            }
         }
 
         if (incrementalCompilationEnvironment != null) {
@@ -209,7 +204,8 @@ internal class GradleKotlinCompilerWork @Inject constructor(
             targetPlatform = targetPlatform,
             reportCategories = reportCategories(isVerbose),
             reportSeverity = reportSeverity(isVerbose),
-            requestedCompilationResults = emptyArray()
+            requestedCompilationResults = emptyArray(),
+            kotlinScriptExtensions = kotlinScriptExtensions
         )
         val servicesFacade = GradleCompilerServicesFacadeImpl(log, messageCollector)
         return daemon.compile(sessionId, compilerArgs, compilationOptions, servicesFacade, compilationResults = null)
@@ -236,7 +232,8 @@ internal class GradleKotlinCompilerWork @Inject constructor(
             usePreciseJavaTracking = icEnv.usePreciseJavaTracking,
             localStateDirs = localStateDirectories,
             multiModuleICSettings = icEnv.multiModuleICSettings,
-            modulesInfo = incrementalModuleInfo!!
+            modulesInfo = incrementalModuleInfo!!,
+            kotlinScriptExtensions = kotlinScriptExtensions
         )
 
         log.info("Options for KOTLIN DAEMON: $compilationOptions")
