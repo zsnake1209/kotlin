@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil;
 import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.test.InTextDirectivesUtils;
+import org.jetbrains.kotlin.test.TargetBackend;
 import org.jetbrains.kotlin.utils.ExceptionUtilsKt;
 
 import java.io.File;
@@ -27,22 +28,28 @@ import static org.jetbrains.kotlin.test.clientserver.TestProcessServerKt.getGene
 
 public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
 
+    public static final boolean IGNORE_EXPECTED_FAILURES =
+            Boolean.getBoolean("org.jetbrains.kotlin.expected.failures.no.logging");
+
     @Override
     protected void doMultiFileTest(
         @NotNull File wholeFile,
         @NotNull List<TestFile> files,
         @Nullable File javaFilesDir
     ) throws Exception {
+        boolean isIgnored = InTextDirectivesUtils.isIgnoredTarget(getBackend(), wholeFile) && IGNORE_EXPECTED_FAILURES;
         try {
-            compile(files, javaFilesDir);
-            blackBox();
+            compile(files, javaFilesDir, !isIgnored);
+            blackBox(!isIgnored);
         }
         catch (Throwable t) {
-            try {
-                // To create .txt file in case of failure
-                doBytecodeListingTest(wholeFile);
-            }
-            catch (Throwable ignored) {
+            if (!isIgnored) {
+                try {
+                    // To create .txt file in case of failure
+                    doBytecodeListingTest(wholeFile);
+                }
+                catch (Throwable ignored) {
+                }
             }
 
             throw t;
@@ -89,7 +96,7 @@ public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
         assertEqualsToFile(expectedFile, text, s -> s.replace("COROUTINES_PACKAGE", coroutinesPackage));
     }
 
-    protected void blackBox() {
+    protected void blackBox(boolean reportProblems) {
         // If there are many files, the first 'box(): String' function will be executed.
         GeneratedClassLoader generatedClassLoader = generateAndCreateClassLoader();
         for (KtFile firstFile : myFiles.getPsiFiles()) {
@@ -104,8 +111,10 @@ public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
                 }
             }
             catch (Throwable e) {
-                System.out.println(generateToText());
-                throw ExceptionUtilsKt.rethrow(e);
+                if (reportProblems) {
+                    System.out.println(generateToText());
+                    throw ExceptionUtilsKt.rethrow(e);
+                }
             }
             finally {
                 clearReflectionCache(generatedClassLoader);
@@ -122,5 +131,9 @@ public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
             }
         }
         return null;
+    }
+
+    protected TargetBackend getBackend() {
+        return TargetBackend.JVM;
     }
 }
