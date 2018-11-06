@@ -518,6 +518,11 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
 
     @NotNull
     protected ClassFileFactory generateClassesInFile() {
+        return generateClassesInFile(true);
+    }
+
+    @NotNull
+    protected ClassFileFactory generateClassesInFile(boolean reportFailures) {
         if (classFileFactory == null) {
             try {
                 GenerationState generationState = GenerationUtils.compileFiles(
@@ -531,22 +536,26 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
                 }
             }
             catch (Throwable e) {
-                e.printStackTrace();
-                System.err.println("Generating instructions as text...");
-                try {
-                    if (classFileFactory == null) {
-                        System.err.println("Cannot generate text: exception was thrown during generation");
+                if (reportFailures) {
+                    e.printStackTrace();
+                    System.err.println("Generating instructions as text...");
+                    try {
+                        if (classFileFactory == null) {
+                            System.err.println("Cannot generate text: exception was thrown during generation");
+                        }
+                        else {
+                            System.err.println(classFileFactory.createText());
+                        }
                     }
-                    else {
-                        System.err.println(classFileFactory.createText());
+                    catch (Throwable e1) {
+                        System.err.println("Exception thrown while trying to generate text, the actual exception follows:");
+                        e1.printStackTrace();
+                        System.err.println("-----------------------------------------------------------------------------");
                     }
+                    fail("See exceptions above");
+                } else {
+                    fail("Compilation failure");
                 }
-                catch (Throwable e1) {
-                    System.err.println("Exception thrown while trying to generate text, the actual exception follows:");
-                    e1.printStackTrace();
-                    System.err.println("-----------------------------------------------------------------------------");
-                }
-                fail("See exceptions above");
             }
         }
         return classFileFactory;
@@ -650,6 +659,14 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
             @NotNull List<TestFile> files,
             @Nullable File javaSourceDir
     ) {
+        compile(files, javaSourceDir, true);
+    }
+
+    protected void compile(
+            @NotNull List<TestFile> files,
+            @Nullable File javaSourceDir,
+            boolean reportFailures
+    ) {
         configurationKind = extractConfigurationKind(files);
         boolean loadAndroidAnnotations = files.stream().anyMatch(it ->
                 InTextDirectivesUtils.isDirectiveDefined(it.content, "ANDROID_ANNOTATIONS")
@@ -677,7 +694,7 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
 
         loadMultiFiles(files);
 
-        generateClassesInFile();
+        generateClassesInFile(reportFailures);
 
         if (javaSourceDir != null) {
             // If there are Java files, they should be compiled against the class files produced by Kotlin, so we dump them to the disk
