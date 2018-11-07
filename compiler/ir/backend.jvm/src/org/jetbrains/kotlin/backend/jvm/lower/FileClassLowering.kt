@@ -78,7 +78,8 @@ class FileClassLowering(val context: JvmBackendContext) : FileLoweringPass {
             superTypes.add(context.irBuiltIns.anyType)
             parent = irFile
             declarations.addAll(fileClassMembers)
-//            fileClassMembers.forEach { it.parent = this }
+            // TODO: figure out why reparenting leads to failing tests.
+            // fileClassMembers.forEach { it.parent = this }
         }
         // TODO file annotations
     }

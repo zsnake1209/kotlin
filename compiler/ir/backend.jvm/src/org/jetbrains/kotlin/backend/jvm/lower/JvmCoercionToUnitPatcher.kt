@@ -20,7 +20,8 @@ class JvmCoercionToUnitPatcher(val context: JvmBackendContext) :
     InsertImplicitCasts(
         context.builtIns, context.irBuiltIns,
         TypeTranslator(context.ir.symbols.externalSymbolTable, context.state.languageVersionSettings)
-    ), FileLoweringPass {
+    ),
+    FileLoweringPass {
 
     override fun lower(irFile: IrFile) {
         irFile.transformChildrenVoid(this)
