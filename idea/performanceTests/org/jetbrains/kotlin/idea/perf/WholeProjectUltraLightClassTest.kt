@@ -6,14 +6,16 @@
 package org.jetbrains.kotlin.idea.perf
 
 import com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.refactoring.toPsiFile
 import org.jetbrains.kotlin.psi.KtFile
 import kotlin.system.measureNanoTime
 
 // abstract so that it doesn't run in CI until known issues (JDK absence in the test project, different module names in mangled methods) are addressed
-abstract class WholeProjectUltraLightClassTest : WholeProjectPerformanceTest(), WholeProjectKotlinFileProvider {
+class WholeProjectUltraLightClassTest : WholeProjectPerformanceTest(), WholeProjectKotlinFileProvider {
 
     override fun doTest(file: VirtualFile): PerFileTestResult {
+        if (file.extension != KotlinFileType.EXTENSION) return PerFileTestResult(emptyMap(), 0, emptyList())
         val psiFile = file.toPsiFile(project) as? KtFile ?: run {
             return WholeProjectPerformanceTest.PerFileTestResult(mapOf(), 0, listOf(AssertionError("PsiFile not found for $file")))
         }

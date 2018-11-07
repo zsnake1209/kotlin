@@ -9,6 +9,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import com.intellij.psi.*
 import com.intellij.testFramework.UsefulTestCase
+import junit.framework.ComparisonFailure
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForSourceDeclaration
@@ -47,10 +48,7 @@ object UltraLightChecker {
         val ultraText = ultraLightClass.renderClass()
 
         if (goldText != ultraText) {
-            Assert.assertEquals(
-                "// Classic implementation:\n$goldText",
-                "// Ultra-light implementation:\n$ultraText"
-            )
+            throw ComparisonFailure("${ktClass.fqName}", goldText, ultraText)
         }
         return ultraLightClass
     }
