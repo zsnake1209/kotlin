@@ -37,7 +37,7 @@ public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
         @NotNull List<TestFile> files,
         @Nullable File javaFilesDir
     ) throws Exception {
-        boolean isIgnored = InTextDirectivesUtils.isIgnoredTarget(getBackend(), wholeFile) && IGNORE_EXPECTED_FAILURES;
+        boolean isIgnored = IGNORE_EXPECTED_FAILURES && InTextDirectivesUtils.isIgnoredTarget(getBackend(), wholeFile);
         try {
             compile(files, javaFilesDir, !isIgnored);
             blackBox(!isIgnored);
@@ -113,8 +113,8 @@ public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
             catch (Throwable e) {
                 if (reportProblems) {
                     System.out.println(generateToText());
-                    throw ExceptionUtilsKt.rethrow(e);
                 }
+                throw ExceptionUtilsKt.rethrow(e);
             }
             finally {
                 clearReflectionCache(generatedClassLoader);
