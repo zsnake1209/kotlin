@@ -86,7 +86,7 @@ projectTest {
     dependsOn(*testDistProjects.map { "$it:dist" }.toTypedArray())
     workingDir = rootDir
     systemProperty("kotlin.test.script.classpath", testSourceSet.output.classesDirs.joinToString(File.pathSeparator))
-    systemProperty("org.jetbrains.kotlin.expected.failures.no.logging", findProperty("org.jetbrains.kotlin.expected.failures.no.logging") ?: false)
+    systemProperty("org.jetbrains.kotlin.expected.failures.no.logging", project.findProperty("org.jetbrains.kotlin.expected.failures.no.logging") ?: false)
     doFirst {
         systemProperty("kotlin.ant.classpath", antLauncherJar.asPath)
         systemProperty("kotlin.ant.launcher.class", "org.apache.tools.ant.Main")
