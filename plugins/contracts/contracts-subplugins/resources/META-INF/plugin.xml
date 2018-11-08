@@ -10,5 +10,6 @@
   <extensions defaultExtensionNs="org.jetbrains.kotlin.contracts">
     <specificContractExtension implementation="org.jetbrains.kotlin.contracts.contextual.exceptions.ExceptionContractExtension"/>
     <specificContractExtension implementation="org.jetbrains.kotlin.contracts.contextual.safebuilders.CallContractExtension"/>
+    <specificContractExtension implementation="org.jetbrains.kotlin.contracts.contextual.dslmarker.DslMarkerContractExtension"/>
   </extensions>
 </idea-plugin>
