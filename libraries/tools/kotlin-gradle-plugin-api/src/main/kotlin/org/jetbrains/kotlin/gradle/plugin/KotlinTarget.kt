@@ -45,5 +45,7 @@ interface KotlinTarget: Named, HasAttributes {
     fun mavenPublication(action: Closure<Unit>)
     fun mavenPublication(action: Action<MavenPublication>)
 
+    val originatingPreset: KotlinTargetPreset<out KotlinTarget>?
+
     override fun getName(): String = targetName
 }
