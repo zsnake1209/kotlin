@@ -5,10 +5,7 @@
 
 package org.jetbrains.kotlin.ir.backend.js.ir
 
-import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
-import org.jetbrains.kotlin.backend.common.descriptors.WrappedTypeParameterDescriptor
-import org.jetbrains.kotlin.backend.common.descriptors.WrappedValueParameterDescriptor
-import org.jetbrains.kotlin.backend.common.descriptors.WrappedVariableDescriptor
+import org.jetbrains.kotlin.backend.common.descriptors.*
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
@@ -16,17 +13,11 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrTypeParameterImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrVariableImpl
+import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.*
-import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrVariableSymbolImpl
+import org.jetbrains.kotlin.ir.symbols.impl.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classifierOrFail
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
@@ -117,6 +108,10 @@ object JsIrBuilder {
         origin: IrDeclarationOrigin = SYNTHESIZED_DECLARATION
     ): IrSimpleFunction {
         val descriptor = WrappedSimpleFunctionDescriptor()
+        if (name.asString()== "functionClasses\$init\$") {
+            fun foo(){}
+            foo()
+        }
         return IrFunctionImpl(
             UNDEFINED_OFFSET,
             UNDEFINED_OFFSET,
@@ -177,7 +172,7 @@ object JsIrBuilder {
 
     fun buildVar(
         type: IrType,
-        parent: IrDeclarationParent?,
+        parent: IrDeclarationParent,
         name: String = "tmp",
         isVar: Boolean = false,
         isConst: Boolean = false,
@@ -198,7 +193,34 @@ object JsIrBuilder {
         ).also {
             descriptor.bind(it)
             it.initializer = initializer
-            if (parent != null) it.parent = parent
+            it.parent = parent
+        }
+    }
+
+    fun buildField(
+        type: IrType,
+        parent: IrDeclarationParent,
+        name: String = "tmp",
+        isVar: Boolean = false,
+        isStatic: Boolean = false,
+        initializer: IrExpression? = null
+    ): IrField {
+        val descriptor = WrappedPropertyDescriptor()
+        return IrFieldImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            SYNTHESIZED_DECLARATION,
+            IrFieldSymbolImpl(descriptor),
+            Name.identifier(name),
+            type,
+            Visibilities.DEFAULT_VISIBILITY,
+            !isVar,
+            false,
+            isStatic
+        ).also {
+            descriptor.bind(it)
+            it.parent = parent
+            it.initializer = initializer?.let { i -> IrExpressionBodyImpl(i) }
         }
     }
 

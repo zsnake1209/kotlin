@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
 import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
 import org.jetbrains.kotlin.ir.util.transformFlat
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
@@ -47,7 +48,7 @@ class BlockDecomposerLowering(context: JsIrBackendContext) : DeclarationContaine
     }
 
     private fun IrExpressionBody.toBlockBody(containingFunction: IrFunction): IrBlockBody {
-        val returnStatement = JsIrBuilder.buildReturn(containingFunction.symbol, expression, nothingType)
+        val returnStatement = JsIrBuilder.buildReturn(containingFunction.symbol, expression.deepCopyWithSymbols(containingFunction), nothingType)
         return IrBlockBodyImpl(expression.startOffset, expression.endOffset).apply {
             statements += returnStatement
         }

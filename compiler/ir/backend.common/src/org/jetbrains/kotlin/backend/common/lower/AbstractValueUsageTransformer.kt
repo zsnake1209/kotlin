@@ -36,6 +36,8 @@ abstract class AbstractValueUsageTransformer(
     protected val irBuiltIns: IrBuiltIns
 ) : IrElementTransformerVoid() {
 
+    protected var currentFunction: IrFunction? = null
+
     protected open fun IrExpression.useAs(type: IrType): IrExpression = this
 
     protected open fun IrExpression.useAsStatement(): IrExpression = this
@@ -250,6 +252,9 @@ abstract class AbstractValueUsageTransformer(
     }
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
+        val oldFunction = currentFunction
+        currentFunction = declaration
+
         declaration.transformChildrenVoid(this)
 
         declaration.valueParameters.forEach { parameter ->
@@ -265,6 +270,7 @@ abstract class AbstractValueUsageTransformer(
             }
         }
 
+        currentFunction = oldFunction
         return declaration
     }
 

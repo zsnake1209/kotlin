@@ -35,7 +35,6 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
-import org.jetbrains.kotlin.ir.util.transformFlat
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
@@ -134,7 +133,7 @@ open class DefaultArgumentStubGenerator constructor(val context: CommonBackendCo
                     irGet(parameter)
                 }
 
-                val temporaryVariable = irTemporary(argument, nameHint = parameter.name.asString())
+                val temporaryVariable = irTemporary(argument, nameHint = parameter.name.asString()).also { it.parent = newIrFunction }
 
                 params.add(temporaryVariable)
                 variables[valueParameter] = temporaryVariable
