@@ -22,6 +22,7 @@ dependencies {
     compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     compileOnly("org.jetbrains:annotations:13.0")
     runtimeOnly(projectRuntimeJar(":kotlin-compiler-embeddable"))
+    compile(commonDep("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")) { isTransitive = false }
 }
 
 sourceSets {
