@@ -328,15 +328,15 @@ class CallableReferenceLowering(val context: JsIrBackendContext) : FileLoweringP
             val cacheName = "${factoryFunction.name}_${Namer.KCALLABLE_CACHE_SUFFIX}"
             val type = factoryFunction.returnType
             val irNull = JsIrBuilder.buildNull(context.irBuiltIns.nothingNType)
-            val cacheVar = JsIrBuilder.buildVar(type, factoryFunction.parent, cacheName, true, initializer = irNull)
+            val cacheField = JsIrBuilder.buildField(type, factoryFunction.parent, cacheName, true, initializer = irNull)
 
-            val irCacheValue = JsIrBuilder.buildGetValue(cacheVar.symbol)
+            val irCacheValue = JsIrBuilder.buildGetField(cacheField.symbol, null)
             val irIfCondition = JsIrBuilder.buildCall(context.irBuiltIns.eqeqSymbol).apply {
                 putValueArgument(0, irCacheValue)
                 putValueArgument(1, irNull)
             }
             val irSetCache =
-                JsIrBuilder.buildSetVariable(cacheVar.symbol, JsIrBuilder.buildGetValue(varSymbol), context.irBuiltIns.unitType)
+                JsIrBuilder.buildSetField(cacheField.symbol, null, JsIrBuilder.buildGetValue(varSymbol), context.irBuiltIns.unitType)
             val thenStatements = mutableListOf<IrStatement>().apply {
                 addAll(bodyStatements)
                 add(irSetCache)
@@ -345,7 +345,7 @@ class CallableReferenceLowering(val context: JsIrBackendContext) : FileLoweringP
             val irIfNode = JsIrBuilder.buildIfElse(context.irBuiltIns.unitType, irIfCondition, irThenBranch)
             statements += irIfNode
             returnValue = irCacheValue
-            returnStatements = listOf(cacheVar)
+            returnStatements = listOf(cacheField)
         } else {
             statements += bodyStatements
             returnValue = JsIrBuilder.buildGetValue(varSymbol)

@@ -73,7 +73,7 @@ class InlineClassLowering(val context: BackendContext) {
                                     expression,
                                     typeHint = irClass.defaultType.toKotlinType(),
                                     irType = irClass.defaultType
-                                )
+                                ).also { it.parent = result }
                             }
                         }
 
@@ -122,7 +122,7 @@ class InlineClassLowering(val context: BackendContext) {
                     declaration.transformChildrenVoid(this)
 
                     // TODO: Variable parents might not be initialized
-                    if (declaration !is IrVariable && declaration.parent == function)
+//                    if (declaration !is IrVariable && declaration.parent == function)
                         declaration.parent = staticMethod
 
                     return declaration

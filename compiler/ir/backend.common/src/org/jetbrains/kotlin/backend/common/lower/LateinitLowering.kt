@@ -99,7 +99,7 @@ class LateinitLowering(
                     val body = IrBlockBodyImpl(startOffset, endOffset)
                     val resultVar = scope.createTemporaryVariable(
                         irGetField(getter.dispatchReceiverParameter?.let { irGet(it) }, backingField)
-                    )
+                    ).also { it.parent = getter }
                     body.statements.add(resultVar)
                     val throwIfNull = irIfThenElse(
                         context.irBuiltIns.nothingType,

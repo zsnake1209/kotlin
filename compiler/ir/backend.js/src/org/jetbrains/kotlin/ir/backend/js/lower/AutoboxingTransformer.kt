@@ -101,6 +101,7 @@ class AutoboxingTransformer(val context: JsIrBackendContext) : AbstractValueUsag
         if (!actualType.isNullable())
             return call(arg)
         return JsIrBuilder.run {
+            // TODO: Fix `parent = null`
             val tmp = buildVar(actualType, parent = null, initializer = arg)
             val nullCheck = buildIfElse(
                 type = resultType,
