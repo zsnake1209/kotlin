@@ -98,7 +98,7 @@ public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
 
     protected void blackBox(boolean reportProblems) {
         // If there are many files, the first 'box(): String' function will be executed.
-        GeneratedClassLoader generatedClassLoader = generateAndCreateClassLoader();
+        GeneratedClassLoader generatedClassLoader = generateAndCreateClassLoader(reportProblems);
         for (KtFile firstFile : myFiles.getPsiFiles()) {
             String className = getFacadeFqName(firstFile, classFileFactory.getGenerationState().getBindingContext());
             if (className == null) continue;
