@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.compilerRunner.konanHome
 import org.jetbrains.kotlin.compilerRunner.konanVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompileTask
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.LanguageSettingsBuilder
 import org.jetbrains.kotlin.gradle.plugin.mpp.DefaultCInteropSettings
@@ -82,7 +83,7 @@ private fun FileCollection.filterOutPublishableInteropLibs(project: Project): Fi
 
 // endregion
 
-open class KotlinNativeCompile : AbstractCompile(), KotlinCompile<KotlinCommonToolOptions> {
+open class KotlinNativeCompile : AbstractCompile(), KotlinCompileTask<KotlinCommonToolOptions> {
 
     init {
         sourceCompatibility = "1.6"
