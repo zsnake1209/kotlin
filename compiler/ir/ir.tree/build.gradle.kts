@@ -11,7 +11,6 @@ dependencies {
     compile(project(":compiler:util"))
     compile(project(":compiler:frontend"))
     compile(project(":compiler:frontend.java"))
-
     compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
 }
 
