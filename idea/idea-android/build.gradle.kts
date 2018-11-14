@@ -25,6 +25,7 @@ dependencies {
     compileOnly(project(":kotlin-android-extensions-runtime"))
     compileOnly(intellijDep())
     compileOnly(intellijPluginDep("android"))
+    compileOnly(intellijPluginDep("junit"))
 
     testCompile(project(":kotlin-test:kotlin-test-jvm"))
     testCompile(projectTests(":idea:idea-test-framework")) { isTransitive = false }
