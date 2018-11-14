@@ -73,6 +73,8 @@
 
         <externalProjectDataService implementation="org.jetbrains.kotlin.android.configure.KotlinAndroidGradleLibraryDataService"/>
         <externalProjectDataService implementation="org.jetbrains.kotlin.android.configure.KotlinAndroidGradleMPPModuleDataService"/>
+
+        <runConfigurationProducer implementation="org.jetbrains.kotlin.android.run.KotlinAndroidJUnitRunConfigurationProducer"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">

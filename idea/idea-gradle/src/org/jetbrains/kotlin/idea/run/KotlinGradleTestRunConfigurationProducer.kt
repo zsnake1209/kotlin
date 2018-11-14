@@ -42,7 +42,7 @@ private fun isPluginEnabled(id: String): Boolean {
 
 private fun getTestClass(leaf: PsiElement): PsiClass? {
     if (IS_JUNIT_ENABLED) {
-        KotlinJUnitRunConfigurationProducer.getTestClass(leaf)?.let { return it }
+        AbstractKotlinJUnitRunConfigurationProducer.getTestClass(leaf)?.let { return it }
     }
     if (IS_TESTNG_ENABLED) {
         KotlinTestNgConfigurationProducer.getTestClassAndMethod(leaf)?.let { (testClass, testMethod) ->
@@ -54,7 +54,7 @@ private fun getTestClass(leaf: PsiElement): PsiClass? {
 
 private fun getTestMethod(leaf: PsiElement): PsiMethod? {
     if (IS_JUNIT_ENABLED) {
-        KotlinJUnitRunConfigurationProducer.getTestMethod(leaf)?.let { return it }
+        AbstractKotlinJUnitRunConfigurationProducer.getTestMethod(leaf)?.let { return it }
     }
     if (IS_TESTNG_ENABLED) {
         KotlinTestNgConfigurationProducer.getTestClassAndMethod(leaf)?.second?.let { return it }
