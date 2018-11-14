@@ -16,8 +16,10 @@
 
 package org.jetbrains.kotlin.backend.common.ir
 
+import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.DumpIrTreeWithDescriptorsVisitor
 import org.jetbrains.kotlin.backend.common.deepCopyWithVariables
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedReceiverParameterDescriptor
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedTypeParameterDescriptor
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.*
@@ -37,10 +39,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrInstanceInitializerCallImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.IrTypeProjection
-import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.DumpIrTreeVisitor
@@ -332,3 +331,24 @@ val IrFunction.isStatic: Boolean
 
 val IrDeclaration.isTopLevel: Boolean
     get() = parent is IrPackageFragment
+
+fun IrClass.createParameterDeclarationsWithWrappedDescriptor() {
+    val thisReceiverDescriptor = WrappedReceiverParameterDescriptor()
+    thisReceiver = IrValueParameterImpl(
+        startOffset, endOffset,
+        IrDeclarationOrigin.INSTANCE_RECEIVER,
+        IrValueParameterSymbolImpl(thisReceiverDescriptor),
+        Name.identifier("<this>"),
+        index = -1,
+        type = this.symbol.typeWith(this.typeParameters.map { it.defaultType }),
+        varargElementType = null,
+        isCrossinline = false,
+        isNoinline = false
+    ).also { valueParameter ->
+        thisReceiverDescriptor.bind(valueParameter)
+        valueParameter.parent = this
+    }
+
+    assert(typeParameters.isEmpty())
+    assert(descriptor.declaredTypeParameters.isEmpty())
+}
