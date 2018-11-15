@@ -29,7 +29,7 @@ import static org.jetbrains.kotlin.test.clientserver.TestProcessServerKt.getGene
 public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
 
     public static final boolean IGNORE_EXPECTED_FAILURES =
-            Boolean.getBoolean("org.jetbrains.kotlin.expected.failures.no.logging");
+            Boolean.getBoolean("kotlin.suppress.expected.test.failures");
 
     @Override
     protected void doMultiFileTest(
