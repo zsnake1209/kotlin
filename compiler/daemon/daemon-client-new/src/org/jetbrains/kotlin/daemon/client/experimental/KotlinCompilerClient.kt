@@ -1,15 +1,12 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.daemon.client.experimental
 
 import io.ktor.network.sockets.Socket
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Unconfined
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.daemon.client.CompileServiceSession
@@ -33,6 +30,7 @@ import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 import kotlin.concurrent.thread
+import org.jetbrains.kotlin.daemon.client.launchProcessWithFallback
 
 
 class KotlinCompilerClient : KotlinCompilerDaemonClient {
@@ -49,14 +47,14 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
     private val log = Logger.getLogger("KotlinCompilerClient")
     private fun String.info(msg: String) = {}()//log.info("[$this] : $msg")
 
-    fun getOrCreateClientFlagFile(daemonOptions: DaemonOptions): File =
+    override fun getOrCreateClientFlagFile(daemonOptions: DaemonOptions): File =
     // for jps property is passed from IDEA to JPS in KotlinBuildProcessParametersProvider
         System.getProperty(COMPILE_DAEMON_CLIENT_ALIVE_PATH_PROPERTY)
             ?.let(String::trimQuotes)
             ?.takeUnless(String::isBlank)
             ?.let(::File)
             ?.takeIf(File::exists)
-                ?: makeAutodeletingFlagFile(baseDir = File(daemonOptions.runFilesPathOrDefault))
+            ?: makeAutodeletingFlagFile(baseDir = File(daemonOptions.runFilesPathOrDefault))
 
     override suspend fun connectToCompileService(
         compilerId: CompilerId,
@@ -118,7 +116,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
             log.info("connectAndLease")
 
             fun CompileServiceAsync.leaseImpl(): Deferred<CompileServiceSession?> =
-                async {
+                GlobalScope.async {
                     // the newJVMOptions could be checked here for additional parameters, if needed
                     log.info("trying registerClient")
                     println("trying registerClient")
@@ -148,7 +146,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
                         File(daemonOptions.runFilesPath),
                         compilerId,
                         daemonJVMOptions,
-                        { cat, msg -> async { reportingTargets.report(cat, msg) } }).await()
+                        { cat, msg -> GlobalScope.async { reportingTargets.report(cat, msg) } }).await()
             if (service != null) {
 //                service.connectToServer()
                 service.leaseImpl().await()
@@ -253,7 +251,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
         configureClientOptions(ClientOptions())
 
     override fun main(vararg args: String) {
-        runBlocking(Unconfined) {
+        runBlocking {
             val compilerId = CompilerId()
             val daemonOptions = configureDaemonOptions()
             val daemonLaunchingOptions = configureDaemonJVMOptions(
@@ -418,7 +416,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
                 if (res != null) return res
 
                 if (err != null) {
-                    async {
+                    GlobalScope.async {
                         reportingTargets.report(
                             DaemonReportCategory.INFO,
                             (if (attempts >= DAEMON_CONNECT_CYCLE_ATTEMPTS || !autostart) "no more retries on: " else "retrying($attempts) on: ")
@@ -432,7 +430,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
                 }
             }
         } catch (e: Throwable) {
-            async { reportingTargets.report(DaemonReportCategory.EXCEPTION, e.toString()) }
+            GlobalScope.async { reportingTargets.report(DaemonReportCategory.EXCEPTION, e.toString()) }
         }
         return null
     }
@@ -442,7 +440,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
         compilerId: CompilerId,
         daemonJVMOptions: DaemonJVMOptions,
         report: (DaemonReportCategory, String) -> Unit
-    ): Deferred<Pair<CompileServiceAsync?, DaemonJVMOptions>> = async {
+    ): Deferred<Pair<CompileServiceAsync?, DaemonJVMOptions>> = GlobalScope.async {
         log.info("tryFindSuitableDaemonOrNewOpts")
 
         registryDir.mkdirs()
@@ -477,7 +475,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
                 Pair(it.daemon, optsCopy.updateMemoryUpperBounds(it.jvmOptions))
             }
         // else combine all options from running daemon to get fattest option for a new daemon to runServer
-                ?: Pair(null, aliveWithMetadata.fold(optsCopy, { opts, d -> opts.updateMemoryUpperBounds(d.jvmOptions) }))
+            ?: Pair(null, aliveWithMetadata.fold(optsCopy, { opts, d -> opts.updateMemoryUpperBounds(d.jvmOptions) }))
     }
 
 
@@ -527,7 +525,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
                         .forEachLine {
                             log.info("daemon_process_report : $it")
                             if (it == COMPILE_DAEMON_IS_READY_MESSAGE) {
-                                async {
+                                GlobalScope.async {
                                     reportingTargets.report(
                                         DaemonReportCategory.DEBUG,
                                         "Received the message signalling that the daemon is ready"
@@ -536,7 +534,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
                                 isEchoRead.release()
                                 //TODO return@forEachLine
                             } else {
-                                async { reportingTargets.report(DaemonReportCategory.INFO, it, "daemon") }
+                                GlobalScope.async { reportingTargets.report(DaemonReportCategory.INFO, it, "daemon") }
                             }
                         }
                 } finally {

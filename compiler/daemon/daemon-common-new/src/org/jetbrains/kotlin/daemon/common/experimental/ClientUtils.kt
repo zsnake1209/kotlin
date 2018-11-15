@@ -1,13 +1,12 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.daemon.common.experimental
 
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.runWithTimeout
 import org.jetbrains.kotlin.daemon.common.impls.DaemonReportCategory
@@ -33,7 +32,7 @@ internal fun String.info(msg: String) = {}()//log.info("[$this] : $msg")
 
 private suspend fun <T, R : Any> List<T>.mapNotNullAsync(transform: suspend (T) -> R?): List<R> =
     this
-        .map { async { transform(it) } }
+        .map { GlobalScope.async { transform(it) } }
         .mapNotNull { it.await() } // await for completion of the last action
 
 

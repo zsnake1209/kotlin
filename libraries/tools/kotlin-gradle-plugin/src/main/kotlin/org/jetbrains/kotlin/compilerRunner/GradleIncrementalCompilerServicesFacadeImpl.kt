@@ -9,6 +9,8 @@ import org.jetbrains.kotlin.daemon.client.reportFromDaemon
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.gradle.logging.GradleBufferingMessageCollector
 import org.jetbrains.kotlin.gradle.logging.kotlinDebug
+import org.jetbrains.kotlin.daemon.common.impls.*
+import org.jetbrains.kotlin.gradle.plugin.kotlinDebug
 import java.io.Serializable
 import java.rmi.Remote
 import java.rmi.server.UnicastRemoteObject
