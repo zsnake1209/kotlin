@@ -100,7 +100,7 @@ public actual fun CharArray.asList(): List<Char> {
  */
 @SinceKotlin("1.1")
 public actual infix fun <T> Array<out T>.contentDeepEquals(other: Array<out T>): Boolean {
-    return contentDeepEqualsInternal(other)
+    return contentDeepEqualsImpl(other)
 }
 
 /**
@@ -125,7 +125,7 @@ public actual fun <T> Array<out T>.contentDeepHashCode(): Int {
  */
 @SinceKotlin("1.1")
 public actual fun <T> Array<out T>.contentDeepToString(): String {
-    return contentDeepToStringInternal()
+    return contentDeepToStringImpl()
 }
 
 /**
@@ -288,7 +288,7 @@ public actual fun CharArray.contentHashCode(): Int {
  */
 @SinceKotlin("1.1")
 public actual fun <T> Array<out T>.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -298,7 +298,7 @@ public actual fun <T> Array<out T>.contentToString(): String {
  */
 @SinceKotlin("1.1")
 public actual fun ByteArray.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -308,7 +308,7 @@ public actual fun ByteArray.contentToString(): String {
  */
 @SinceKotlin("1.1")
 public actual fun ShortArray.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -318,7 +318,7 @@ public actual fun ShortArray.contentToString(): String {
  */
 @SinceKotlin("1.1")
 public actual fun IntArray.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -328,7 +328,7 @@ public actual fun IntArray.contentToString(): String {
  */
 @SinceKotlin("1.1")
 public actual fun LongArray.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -338,7 +338,7 @@ public actual fun LongArray.contentToString(): String {
  */
 @SinceKotlin("1.1")
 public actual fun FloatArray.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -348,7 +348,7 @@ public actual fun FloatArray.contentToString(): String {
  */
 @SinceKotlin("1.1")
 public actual fun DoubleArray.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -358,7 +358,7 @@ public actual fun DoubleArray.contentToString(): String {
  */
 @SinceKotlin("1.1")
 public actual fun BooleanArray.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -368,7 +368,7 @@ public actual fun BooleanArray.contentToString(): String {
  */
 @SinceKotlin("1.1")
 public actual fun CharArray.contentToString(): String {
-    return contentToStringInternal()
+    return arrayToString(this as Array<*>)
 }
 
 /**
@@ -1121,7 +1121,7 @@ public actual inline fun <T> Array<out T>.plusElement(element: T): Array<T> {
  * Sorts the array in-place.
  */
 public actual fun IntArray.sort(): Unit {
-    primitiveArraySortInternal()
+    this.asDynamic().sort()
 }
 
 /**
@@ -1136,35 +1136,35 @@ public actual fun LongArray.sort(): Unit {
  * Sorts the array in-place.
  */
 public actual fun ByteArray.sort(): Unit {
-    primitiveArraySortInternal()
+    this.asDynamic().sort()
 }
 
 /**
  * Sorts the array in-place.
  */
 public actual fun ShortArray.sort(): Unit {
-    primitiveArraySortInternal()
+    this.asDynamic().sort()
 }
 
 /**
  * Sorts the array in-place.
  */
 public actual fun DoubleArray.sort(): Unit {
-    primitiveArraySortInternal()
+    this.asDynamic().sort()
 }
 
 /**
  * Sorts the array in-place.
  */
 public actual fun FloatArray.sort(): Unit {
-    primitiveArraySortInternal()
+    this.asDynamic().sort()
 }
 
 /**
  * Sorts the array in-place.
  */
 public actual fun CharArray.sort(): Unit {
-    primitiveArraySortInternal()
+    this.asDynamic().sort()
 }
 
 /**

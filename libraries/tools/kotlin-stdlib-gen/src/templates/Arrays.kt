@@ -128,7 +128,7 @@ object ArrayOps : TemplateGroupBase() {
             }
 
             on(Backend.IR) {
-                body { "return contentDeepEqualsInternal(other)" }
+                body { "return contentDeepEqualsImpl(other)" }
             }
         }
     }
@@ -158,7 +158,7 @@ object ArrayOps : TemplateGroupBase() {
                 body { "definedExternally" }
             }
             on(Backend.IR) {
-                body { "return contentToStringInternal()" }
+                body { "return arrayToString(this as Array<*>)" }
             }
         }
     }
@@ -196,7 +196,7 @@ object ArrayOps : TemplateGroupBase() {
                 body { "definedExternally" }
             }
             on(Backend.IR) {
-                body { "return contentDeepToStringInternal()" }
+                body { "return contentDeepToStringImpl()" }
             }
         }
     }
@@ -793,7 +793,7 @@ object ArrayOps : TemplateGroupBase() {
                         body { "definedExternally" }
                     }
                     on(Backend.IR) {
-                        body { "primitiveArraySortInternal()" }
+                        body { "this.asDynamic().sort()" }
                     }
                 }
             }
