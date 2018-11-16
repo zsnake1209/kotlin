@@ -16,11 +16,25 @@ internal fun deleteProperty(obj: Any, property: Any) {
 
 internal fun arrayToString(array: Array<*>) = array.map { toString(it) }.joinToString(", ", "[", "]")
 
-internal infix fun <T> Array<out T>.contentDeepEqualsInternal(other: Array<out T>) = contentDeepEqualsImpl(other)
+internal fun <T> Array<out T>.contentDeepHashCodeInternal(): Int {
+    var result = 1
+    for (element in this) {
+        val elementHash = when {
+            element == null -> 0
+            isArrayish(element) -> (element.unsafeCast<Array<*>>()).contentDeepHashCodeInternal()
 
-internal fun <T> Array<out T>.contentDeepHashCodeInternal() = contentDeepHashCodeImpl()
+            element is UByteArray   -> element.contentHashCode()
+            element is UShortArray  -> element.contentHashCode()
+            element is UIntArray    -> element.contentHashCode()
+            element is ULongArray   -> element.contentHashCode()
 
-internal fun <T> Array<out T>.contentDeepToStringInternal() = contentDeepToStringImpl()
+            else                    -> element.hashCode()
+        }
+
+        result = 31 * result + elementHash
+    }
+    return result
+}
 
 internal fun <T> T.contentEqualsInternal(other: T): Boolean {
     val a = this.asDynamic()
@@ -49,10 +63,4 @@ internal fun <T> T.contentHashCodeInternal(): Int {
     }
 
     return result
-}
-
-internal fun <T> T.contentToStringInternal() = arrayToString(this as Array<*>)
-
-internal fun <T> T.primitiveArraySortInternal(): Unit {
-    this.asDynamic().sort()
 }
