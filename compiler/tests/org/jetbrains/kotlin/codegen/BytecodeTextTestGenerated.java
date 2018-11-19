@@ -364,6 +364,16 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
         runTest("compiler/testData/codegen/bytecodeText/topLevelFunWithDefaultArgs.kt");
     }
 
+    @TestMetadata("typeParametersWithFinalUpperBound_after.kt")
+    public void testTypeParametersWithFinalUpperBound_after() throws Exception {
+        runTest("compiler/testData/codegen/bytecodeText/typeParametersWithFinalUpperBound_after.kt");
+    }
+
+    @TestMetadata("typeParametersWithFinalUpperBound_before.kt")
+    public void testTypeParametersWithFinalUpperBound_before() throws Exception {
+        runTest("compiler/testData/codegen/bytecodeText/typeParametersWithFinalUpperBound_before.kt");
+    }
+
     @TestMetadata("compiler/testData/codegen/bytecodeText/argumentOrder")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

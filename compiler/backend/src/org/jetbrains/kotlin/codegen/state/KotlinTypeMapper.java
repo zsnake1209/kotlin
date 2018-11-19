@@ -25,6 +25,9 @@ import org.jetbrains.kotlin.codegen.signature.AsmTypeFactory;
 import org.jetbrains.kotlin.codegen.signature.BothSignatureWriter;
 import org.jetbrains.kotlin.codegen.signature.JvmSignatureWriter;
 import org.jetbrains.kotlin.config.JvmTarget;
+import org.jetbrains.kotlin.config.LanguageFeature;
+import org.jetbrains.kotlin.config.LanguageVersionSettings;
+import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableAccessorDescriptor;
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor;
@@ -86,6 +89,7 @@ public class KotlinTypeMapper {
     private final JvmTarget jvmTarget;
     private final boolean isReleaseCoroutines;
     private final boolean isIrBackend;
+    private final LanguageVersionSettings languageVersionSettings;
 
     private final TypeMappingConfiguration<Type> typeMappingConfiguration = new TypeMappingConfiguration<Type>() {
         @NotNull
@@ -156,6 +160,7 @@ public class KotlinTypeMapper {
             @NotNull IncompatibleClassTracker incompatibleClassTracker,
             @NotNull String moduleName,
             @NotNull JvmTarget jvmTarget,
+            @NotNull LanguageVersionSettings languageVersionSettings,
             boolean isReleaseCoroutines,
             boolean isIrBackend
     ) {
@@ -164,11 +169,13 @@ public class KotlinTypeMapper {
         this.incompatibleClassTracker = incompatibleClassTracker;
         this.moduleName = moduleName;
         this.jvmTarget = jvmTarget;
-        this.isReleaseCoroutines = isReleaseCoroutines;
+        this.languageVersionSettings = languageVersionSettings;
+        this.isReleaseCoroutines = isReleaseCoroutines; // TODO delegate to languageVersionSettings?
         this.isIrBackend = isIrBackend;
     }
 
     public static final boolean RELEASE_COROUTINES_DEFAULT = false;
+    public static final LanguageVersionSettings LANGUAGE_VERSION_SETTINGS_DEFAULT = LanguageVersionSettingsImpl.DEFAULT;
 
     @NotNull
     public BindingContext getBindingContext() {
@@ -402,6 +409,11 @@ public class KotlinTypeMapper {
                     sw);
         }
 
+        KotlinType upperBoundMappedToPrimitive = getUpperBoundMappedToJvmPrimitiveOrNull(returnType);
+        if (upperBoundMappedToPrimitive != null) {
+            returnType = upperBoundMappedToPrimitive;
+        }
+
         if (TypeSignatureMappingKt.hasVoidReturnType(descriptor)) {
             if (sw != null) {
                 sw.writeAsmType(Type.VOID_TYPE);
@@ -410,7 +422,7 @@ public class KotlinTypeMapper {
         }
         else if (descriptor instanceof FunctionDescriptor && forceBoxedReturnType((FunctionDescriptor) descriptor)) {
             //noinspection ConstantConditions
-            return mapType(descriptor.getReturnType(), sw, TypeMappingMode.RETURN_TYPE_BOXED);
+            return mapType(returnType, sw, TypeMappingMode.RETURN_TYPE_BOXED);
         }
 
         return mapReturnType(descriptor, sw, returnType);
@@ -1489,6 +1501,38 @@ public class KotlinTypeMapper {
         }
     }
 
+    private KotlinType getUpperBoundMappedToJvmPrimitiveOrNull(KotlinType kotlinType) {
+        TypeParameterDescriptor typeParameterDescriptor = TypeUtils.getTypeParameterDescriptorOrNull(kotlinType);
+        if (typeParameterDescriptor == null) {
+            return null;
+        }
+        else {
+            return getUpperBoundMappedToJvmPrimitiveOrNull(typeParameterDescriptor);
+        }
+    }
+
+    private KotlinType getUpperBoundMappedToJvmPrimitiveOrNull(TypeParameterDescriptor typeParameterDescriptor) {
+        KotlinType upperBound = TypeSignatureMappingKt.getRepresentativeUpperBound(typeParameterDescriptor);
+
+        if (!shouldUseUpperBoundInsteadOfTypeParameter(upperBound)) {
+            return null;
+        }
+
+        DeclarationDescriptor upperBoundTypeDescriptor = upperBound.getConstructor().getDeclarationDescriptor();
+        if (upperBoundTypeDescriptor instanceof TypeParameterDescriptor) {
+            return getUpperBoundMappedToJvmPrimitiveOrNull((TypeParameterDescriptor) upperBoundTypeDescriptor);
+        }
+        else {
+            return upperBound;
+        }
+    }
+
+    private boolean shouldUseUpperBoundInsteadOfTypeParameter(KotlinType upperBound) {
+        return AsmUtil.isPrimitive(mapType(upperBound)) &&
+               (languageVersionSettings.supportsFeature(LanguageFeature.ProperGenericSignatureWithPrimitiveUpperBounds) ||
+                InlineClassesUtilsKt.isInlineClassType(upperBound));
+    }
+
     private void writeFormalTypeParameter(@NotNull TypeParameterDescriptor typeParameterDescriptor, @NotNull JvmSignatureWriter sw) {
         if (!classBuilderMode.generateBodies && typeParameterDescriptor.getName().isSpecial()) {
             // If a type parameter has no name, the code below fails, but it should recover in case of light classes
@@ -1563,6 +1607,12 @@ public class KotlinTypeMapper {
             @NotNull KotlinType type,
             @Nullable CallableDescriptor callableDescriptor
     ) {
+        KotlinType upperBoundMappedToPrimitive = getUpperBoundMappedToJvmPrimitiveOrNull(type);
+        if (upperBoundMappedToPrimitive != null) {
+            writeParameterType(sw, upperBoundMappedToPrimitive, callableDescriptor);
+            return;
+        }
+
         if (sw.skipGenericSignature()) {
             mapType(type, sw, TypeMappingMode.DEFAULT);
             return;

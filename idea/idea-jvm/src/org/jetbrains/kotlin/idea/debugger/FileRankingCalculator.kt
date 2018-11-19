@@ -345,7 +345,7 @@ abstract class FileRankingCalculator(private val checkClassFqName: Boolean = tru
     private fun makeTypeMapper(bindingContext: BindingContext): KotlinTypeMapper {
         return KotlinTypeMapper(
             bindingContext, ClassBuilderMode.LIGHT_CLASSES, IncompatibleClassTracker.DoNothing, "debugger", JvmTarget.DEFAULT,
-            KotlinTypeMapper.RELEASE_COROUTINES_DEFAULT, false
+            KotlinTypeMapper.LANGUAGE_VERSION_SETTINGS_DEFAULT, KotlinTypeMapper.RELEASE_COROUTINES_DEFAULT, false
         )
     }
 

@@ -12794,6 +12794,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             public void testInvariantArgumentsNoWildcard() throws Exception {
                 runTest("compiler/testData/codegen/box/javaInterop/generics/invariantArgumentsNoWildcard.kt");
             }
+
+            @TestMetadata("typeParametersWithFinalUpperBound_after.kt")
+            public void testTypeParametersWithFinalUpperBound_after() throws Exception {
+                runTest("compiler/testData/codegen/box/javaInterop/generics/typeParametersWithFinalUpperBound_after.kt");
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/javaInterop/notNullAssertions")

@@ -192,6 +192,7 @@ class GenerationState private constructor(
         IncompatibleClassTrackerImpl(extraJvmDiagnosticsTrace),
         this.moduleName,
         target,
+        languageVersionSettings,
         configuration.languageVersionSettings.supportsFeature(LanguageFeature.ReleaseCoroutines),
         isIrBackend
     )
@@ -261,6 +262,7 @@ class GenerationState private constructor(
                 {
                     BuilderFactoryForDuplicateSignatureDiagnostics(
                         it, this.bindingContext, diagnostics, this.moduleName,
+                        languageVersionSettings,
                         isReleaseCoroutines = languageVersionSettings.supportsFeature(LanguageFeature.ReleaseCoroutines),
                         shouldGenerate = { !shouldOnlyCollectSignatures(it) },
                         isIrBackend = isIrBackend

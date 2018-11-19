@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.codegen.signature.JvmSignatureWriter
 import org.jetbrains.kotlin.codegen.state.IncompatibleClassTracker
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
 import org.jetbrains.kotlin.config.JvmTarget
+import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueDescriptor
@@ -104,5 +105,6 @@ internal fun typeMapper(support: UltraLightSupport): KotlinTypeMapper = KotlinTy
     BindingContext.EMPTY, ClassBuilderMode.LIGHT_CLASSES,
     IncompatibleClassTracker.DoNothing, support.moduleName,
     JvmTarget.JVM_1_8,
+    KotlinTypeMapper.LANGUAGE_VERSION_SETTINGS_DEFAULT,
     true, false
 )
