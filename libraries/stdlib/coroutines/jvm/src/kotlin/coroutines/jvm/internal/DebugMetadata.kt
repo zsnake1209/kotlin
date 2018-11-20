@@ -3,7 +3,10 @@
  * that can be found in the license/LICENSE.txt file.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 package kotlin.coroutines.jvm.internal
+
+import java.lang.reflect.Method
 
 @Target(AnnotationTarget.CLASS)
 @SinceKotlin("1.3")
@@ -41,7 +44,41 @@ internal fun BaseContinuationImpl.getStackTraceElementImpl(): StackTraceElement?
     checkDebugMetadataVersion(COROUTINES_DEBUG_METADATA_VERSION, debugMetadata.version)
     val label = getLabel()
     val lineNumber = if (label < 0) -1 else debugMetadata.lineNumbers[label]
-    return StackTraceElement(debugMetadata.className, debugMetadata.methodName, debugMetadata.sourceFile, lineNumber)
+    val moduleName = ModuleNameRetriever.getModuleName(this)
+    val moduleAndClass = if (moduleName == null) debugMetadata.className else "$moduleName/${debugMetadata.className}"
+    return StackTraceElement(moduleAndClass, debugMetadata.methodName, debugMetadata.sourceFile, lineNumber)
+}
+
+private object ModuleNameRetriever {
+    private class Cache(val getModuleMethod: Method?, val getDescriptorMethod: Method?, val nameMethod: Method?)
+
+    private val notOnJava9 = Cache(null, null, null)
+
+    var cache: Cache? = null
+
+    fun getModuleName(continuation: BaseContinuationImpl): String? {
+        val cache = this.cache ?: buildCache(continuation)
+        if (cache === notOnJava9) {
+            return null
+        }
+        val module = cache.getModuleMethod?.invoke(continuation.javaClass) ?: return null
+        val descriptor = cache.getDescriptorMethod?.invoke(module) ?: return null
+        return cache.nameMethod?.invoke(descriptor) as? String
+    }
+
+    private fun buildCache(continuation: BaseContinuationImpl): Cache {
+        val getModuleMethod: Method
+        try {
+            getModuleMethod = Class::class.java.getDeclaredMethod("getModule")
+        } catch (ignored: NoSuchMethodException) {
+            return notOnJava9.also { cache = it }
+        }
+        val methodClass = continuation.javaClass.classLoader.loadClass("java.lang.Module")
+        val getDescriptorMethod = methodClass.getDeclaredMethod("getDescriptor")
+        val moduleDescriptorClass = continuation.javaClass.classLoader.loadClass("java.lang.module.ModuleDescriptor")
+        val nameMethod = moduleDescriptorClass.getDeclaredMethod("name")
+        return Cache(getModuleMethod, getDescriptorMethod, nameMethod).also { cache = it }
+    }
 }
 
 private fun BaseContinuationImpl.getDebugMetadataAnnotation(): DebugMetadata? =
