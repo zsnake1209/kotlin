@@ -24,7 +24,7 @@ import org.jetbrains.org.objectweb.asm.tree.TypeInsnNode
 class CoroutineTransformer(
     private val inliningContext: InliningContext,
     private val classBuilder: ClassBuilder,
-    private val sourceFile: String,
+    private val sourceFile: String?,
     private val methods: List<MethodNode>,
     private val superClassName: String
 ) {
@@ -104,7 +104,7 @@ class CoroutineTransformer(
                 shouldPreserveClassInitialization = state.constructorCallNormalizationMode.shouldPreserveClassInitialization,
                 containingClassInternalName = classBuilder.thisName,
                 isForNamedFunction = false,
-                sourceFile = sourceFile,
+                sourceFile = sourceFile ?: "",
                 isCrossinlineLambda = inliningContext.isContinuation
             )
         }
@@ -124,7 +124,7 @@ class CoroutineTransformer(
                     JvmDeclarationOrigin.NO_ORIGIN, node.access, node.name, node.desc, node.signature,
                     ArrayUtil.toStringArray(node.exceptions)
                 ), node.access, node.name, node.desc, null, null,
-                obtainClassBuilderForCoroutineState = { continuationBuilders[continuationClassName]!! },
+                obtainClassBuilderForCoroutineState = { (inliningContext as RegeneratedClassContext).continuationBuilders[continuationClassName]!! },
                 element = element,
                 diagnostics = state.diagnostics,
                 languageVersionSettings = state.languageVersionSettings,
@@ -133,26 +133,27 @@ class CoroutineTransformer(
                 isForNamedFunction = true,
                 needDispatchReceiver = true,
                 internalNameForDispatchReceiver = classBuilder.thisName,
-                sourceFile = sourceFile
+                sourceFile = sourceFile ?: ""
             )
         }
     }
 
     fun replaceFakesWithReals(node: MethodNode) {
-        val continuationClassName = findFakeContinuationConstructorClassName(node)
-        if (continuationClassName != null) {
-            continuationBuilders
-                .remove(continuationClassName)
-                ?.let(ClassBuilder::done)
-        }
+        findFakeContinuationConstructorClassName(node)?.let(::unregisterClassBuilder)?.let(ClassBuilder::done)
         replaceFakeContinuationsWithRealOnes(
             node, if (!inliningContext.isContinuation) getLastParameterIndex(node.desc, node.access) else 0
         )
     }
 
-    companion object {
-        val continuationBuilders: MutableMap<String, ClassBuilder> = hashMapOf()
+    fun registerClassBuilder(continuationClassName: String) {
+        assert(inliningContext.parent?.parent is RegeneratedClassContext)
+        (inliningContext.parent?.parent as RegeneratedClassContext).continuationBuilders[continuationClassName] = classBuilder
+    }
 
+    fun unregisterClassBuilder(continuationClassName: String) =
+        (inliningContext as RegeneratedClassContext).continuationBuilders.remove(continuationClassName)
+
+    companion object {
         fun findFakeContinuationConstructorClassName(node: MethodNode): String? {
             val marker = node.instructions.asSequence().firstOrNull(::isBeforeFakeContinuationConstructorCallMarker) ?: return null
             val new = marker.next

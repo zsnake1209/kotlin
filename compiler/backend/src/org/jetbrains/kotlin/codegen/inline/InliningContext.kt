@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.codegen.inline
 
+import org.jetbrains.kotlin.codegen.ClassBuilder
 import org.jetbrains.kotlin.codegen.state.GenerationState
 
 class RootInliningContext(
@@ -29,7 +30,9 @@ class RegeneratedClassContext(
         override val callSiteInfo: InlineCallSiteInfo
 ) : InliningContext(
         parent, expressionMap, state, nameGenerator, typeRemapper, lambdaInfo, true
-)
+) {
+    val continuationBuilders: MutableMap<String, ClassBuilder> = hashMapOf()
+}
 
 open class InliningContext(
         val parent: InliningContext?,

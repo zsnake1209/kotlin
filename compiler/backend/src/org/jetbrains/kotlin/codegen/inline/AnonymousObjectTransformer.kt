@@ -21,10 +21,8 @@ import org.jetbrains.kotlin.metadata.jvm.JvmProtoBuf
 import org.jetbrains.kotlin.metadata.jvm.deserialization.JvmProtoBufUtil
 import org.jetbrains.kotlin.metadata.jvm.serialization.JvmStringTable
 import org.jetbrains.kotlin.protobuf.MessageLite
-import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin.Companion.NO_ORIGIN
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.org.objectweb.asm.*
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 import org.jetbrains.org.objectweb.asm.tree.*
@@ -52,7 +50,7 @@ class AnonymousObjectTransformer(
         val classBuilder = createRemappingClassBuilderViaFactory(inliningContext)
         val methodsToTransform = ArrayList<MethodNode>()
         val metadataReader = ReadKotlinClassHeaderAnnotationVisitor()
-        var superClassName = ""
+        lateinit var superClassName: String
 
         createClassReader().accept(object : ClassVisitor(API, classBuilder.visitor) {
             override fun visit(version: Int, access: Int, name: String, signature: String?, superName: String, interfaces: Array<String>) {
@@ -142,7 +140,7 @@ class AnonymousObjectTransformer(
         val coroutineTransformer = CoroutineTransformer(
             inliningContext,
             classBuilder,
-            sourceInfo ?: "",
+            sourceInfo,
             methodsToTransform,
             superClassName
         )
@@ -187,7 +185,7 @@ class AnonymousObjectTransformer(
         writeOuterInfo(visitor)
 
         if (continuationClassName == transformationInfo.oldClassName) {
-            CoroutineTransformer.continuationBuilders[continuationClassName] = classBuilder
+            coroutineTransformer.registerClassBuilder(continuationClassName)
         } else {
             classBuilder.done()
         }
