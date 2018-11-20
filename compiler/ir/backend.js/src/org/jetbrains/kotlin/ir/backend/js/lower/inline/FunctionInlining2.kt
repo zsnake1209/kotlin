@@ -315,6 +315,11 @@ private class Inliner(val globalSubstituteMap: MutableMap<DeclarationDescriptor,
 
         //-----------------------------------------------------------------//
 
+        private val IrFunctionReference.isLambda: Boolean
+            get() {
+                return symbol.owner.visibility == Visibilities.LOCAL && origin == IrStatementOrigin.LAMBDA
+            }
+
         override fun visitCall(expression: IrCall): IrExpression {
             if (!isLambdaCall(expression))
                 return super.visitCall(expression)
@@ -324,10 +329,11 @@ private class Inliner(val globalSubstituteMap: MutableMap<DeclarationDescriptor,
             if (functionArgument == null)
                 return super.visitCall(expression)
             val dispatchDescriptor = dispatchReceiver.descriptor
-            if (dispatchDescriptor is ValueParameterDescriptor &&
-                    dispatchDescriptor.isNoinline) return super.visitCall(expression)
+            if (dispatchDescriptor is ValueParameterDescriptor && dispatchDescriptor.isNoinline) return super.visitCall(expression)
 
             if (functionArgument is IrFunctionReference) {
+                if (!functionArgument.isLambda) return super.visitCall(expression)
+
                 val functionDescriptor = functionArgument.descriptor
                 val functionParameters = functionDescriptor.explicitParameters
                 val boundFunctionParameters = functionArgument.getArguments()
@@ -373,7 +379,7 @@ private class Inliner(val globalSubstituteMap: MutableMap<DeclarationDescriptor,
         override fun visitElement(element: IrElement) = element.accept(this, null)
     }
 
-    private fun isLambdaCall(irCall: IrCall)  = irCall.descriptor.isFunctionInvoke && irCall.dispatchReceiver is IrGetValue
+    private fun isLambdaCall(irCall: IrCall) = irCall.descriptor.isFunctionInvoke && irCall.dispatchReceiver is IrGetValue
 
     private fun createTypeSubstitutor(irCall: IrCall): TypeSubstitutor? {
         if (irCall.typeArgumentsCount == 0) return null
