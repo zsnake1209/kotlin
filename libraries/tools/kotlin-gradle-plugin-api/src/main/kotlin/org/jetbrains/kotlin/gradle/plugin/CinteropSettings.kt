@@ -9,7 +9,7 @@ import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.file.FileCollection
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 
 interface CInteropSettings : Named {
 
@@ -22,7 +22,7 @@ interface CInteropSettings : Named {
     }
 
     // TODO: Provide an interface for native compilations.
-    val compilation: KotlinCompilation<KotlinCommonToolOptions>
+    val compilation: KotlinCompilation<KotlinCommonOptions>
 
     val dependencyConfigurationName: String
     var dependencyFiles: FileCollection

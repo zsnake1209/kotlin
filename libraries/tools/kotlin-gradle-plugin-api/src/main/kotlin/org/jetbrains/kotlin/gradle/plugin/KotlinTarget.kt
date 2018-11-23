@@ -16,7 +16,7 @@ import org.gradle.api.component.SoftwareComponent
 import org.gradle.api.internal.component.UsageContext
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.util.ConfigureUtil
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 
 interface KotlinTargetComponent : SoftwareComponent {
     val target: KotlinTarget
@@ -29,7 +29,7 @@ interface KotlinTarget : Named, HasAttributes {
 
     val platformType: KotlinPlatformType
 
-    val compilations: NamedDomainObjectContainer<out KotlinCompilation<KotlinCommonToolOptions>>
+    val compilations: NamedDomainObjectContainer<out KotlinCompilation<KotlinCommonOptions>>
 
     val project: Project
 

@@ -38,7 +38,7 @@ internal fun KotlinCompilation<*>.composeName(prefix: String? = null, suffix: St
 internal val KotlinCompilation<*>.defaultSourceSetName: String
     get() = lowerCamelCaseName(target.disambiguationClassifier, compilationName)
 
-abstract class AbstractKotlinCompilation<T : KotlinCommonToolOptions>(
+abstract class AbstractKotlinCompilation<T : KotlinCommonOptions>(
     target: KotlinTarget,
     override val compilationName: String
 ) : KotlinCompilation<T>, HasKotlinDependencies {
@@ -50,8 +50,8 @@ abstract class AbstractKotlinCompilation<T : KotlinCommonToolOptions>(
         configure(kotlinOptions)
 
     @Suppress("UNCHECKED_CAST")
-    override val compileKotlinTask: KotlinCompileTask<T>
-        get() = (target.project.tasks.getByName(compileKotlinTaskName) as KotlinCompileTask<T>)
+    override val compileKotlinTask: KotlinCompile<T>
+        get() = (target.project.tasks.getByName(compileKotlinTaskName) as KotlinCompile<T>)
 
     // Don't declare this property in the constructor to avoid NPE
     // when an overriding property of a subclass is accessed instead.
@@ -166,7 +166,7 @@ abstract class AbstractKotlinCompilation<T : KotlinCommonToolOptions>(
 val KotlinCompilation<*>.allKotlinSourceSets: Set<KotlinSourceSet>
     get() = kotlinSourceSets.flatMapTo(mutableSetOf()) { it.getSourceSetHierarchy() }
 
-abstract class AbstractKotlinCompilationToRunnableFiles<T : KotlinCommonToolOptions>(
+abstract class AbstractKotlinCompilationToRunnableFiles<T : KotlinCommonOptions>(
     target: KotlinTarget,
     name: String
 ) : AbstractKotlinCompilation<T>(target, name), KotlinCompilationToRunnableFiles<T> {
@@ -293,10 +293,10 @@ class KotlinCommonCompilation(
 class KotlinNativeCompilation(
     override val target: KotlinNativeTarget,
     name: String
-) : AbstractKotlinCompilation<KotlinCommonToolOptions>(target, name), KotlinCompilationWithResources<KotlinCommonToolOptions> {
+) : AbstractKotlinCompilation<KotlinCommonOptions>(target, name), KotlinCompilationWithResources<KotlinCommonOptions> {
 
-    override val kotlinOptions: KotlinCommonToolOptions
-        get() = (project.tasks.getByName(compileKotlinTaskName) as KotlinNativeCompile).kotlinOptions
+    override val kotlinOptions: KotlinCommonOptions
+        get() = compileKotlinTask.kotlinOptions
 
     override val compileKotlinTask: KotlinNativeCompile
         get() = super.compileKotlinTask as KotlinNativeCompile

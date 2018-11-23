@@ -18,7 +18,7 @@ package org.jetbrains.kotlin.gradle.plugin
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.AbstractCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import java.io.File
 
 open class SubpluginOption(val key: String, val value: String)
@@ -57,7 +57,7 @@ interface KotlinGradleSubplugin<in KotlinCompile : AbstractCompile> {
         javaCompile: AbstractCompile?,
         variantData: Any?,
         androidProjectHandler: Any?,
-        kotlinCompilation: KotlinCompilation<KotlinCommonToolOptions>?
+        kotlinCompilation: KotlinCompilation<KotlinCommonOptions>?
     ): List<SubpluginOption>
 
     fun getSubpluginKotlinTasks(
