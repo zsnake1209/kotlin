@@ -12,9 +12,8 @@ import org.jetbrains.kotlin.compilerRunner.KonanCompilerRunner
 import org.jetbrains.kotlin.compilerRunner.KonanInteropRunner
 import org.jetbrains.kotlin.compilerRunner.konanHome
 import org.jetbrains.kotlin.compilerRunner.konanVersion
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompileTask
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.LanguageSettingsBuilder
 import org.jetbrains.kotlin.gradle.plugin.mpp.DefaultCInteropSettings
@@ -83,7 +82,7 @@ private fun FileCollection.filterOutPublishableInteropLibs(project: Project): Fi
 
 // endregion
 
-open class KotlinNativeCompile : AbstractCompile(), KotlinCompileTask<KotlinCommonToolOptions> {
+open class KotlinNativeCompile : AbstractCompile(), KotlinCompile<KotlinCommonOptions> {
 
     init {
         sourceCompatibility = "1.6"
@@ -158,7 +157,15 @@ open class KotlinNativeCompile : AbstractCompile(), KotlinCompileTask<KotlinComm
     // endregion.
 
     // region DSL for compiler options
-    private inner class NativeCompilerOpts : KotlinCommonToolOptions {
+    private inner class NativeCompilerOpts : KotlinCommonOptions {
+        override var apiVersion: String?
+            get() = languageSettings?.apiVersion
+            set(value) { languageSettings!!.apiVersion = value }
+
+        override var languageVersion: String?
+            get() = this@KotlinNativeCompile.languageVersion
+            set(value) { languageSettings!!.languageVersion = value }
+
         override var allWarningsAsErrors: Boolean = false
         override var suppressWarnings: Boolean = false
         override var verbose: Boolean = false
@@ -172,9 +179,9 @@ open class KotlinNativeCompile : AbstractCompile(), KotlinCompileTask<KotlinComm
     }
 
     @Internal
-    override val kotlinOptions: KotlinCommonToolOptions = NativeCompilerOpts()
+    override val kotlinOptions: KotlinCommonOptions = NativeCompilerOpts()
 
-    override fun kotlinOptions(fn: KotlinCommonToolOptions.() -> Unit) {
+    override fun kotlinOptions(fn: KotlinCommonOptions.() -> Unit) {
         kotlinOptions.fn()
     }
 
