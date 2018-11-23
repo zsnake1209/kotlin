@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.metadata.serialization.MutableVersionRequirementTabl
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.source.PsiSourceFile
+import org.jetbrains.kotlin.serialization.DescriptorSerializer
 import org.jetbrains.kotlin.serialization.KotlinSerializerExtensionBase
 import org.jetbrains.kotlin.types.FlexibleType
 
@@ -41,35 +42,38 @@ class KotlinJavascriptSerializerExtension(
     }
 
     override fun serializeClass(
-        descriptor: ClassDescriptor,
-        proto: ProtoBuf.Class.Builder,
-        versionRequirementTable: MutableVersionRequirementTable
+            descriptor: ClassDescriptor,
+            proto: ProtoBuf.Class.Builder,
+            versionRequirementTable: MutableVersionRequirementTable,
+            serializer: DescriptorSerializer
     ) {
         val id = getFileId(descriptor)
         if (id != null) {
             proto.setExtension(JsProtoBuf.classContainingFileId, id)
         }
-        super.serializeClass(descriptor, proto, versionRequirementTable)
+        super.serializeClass(descriptor, proto, versionRequirementTable, serializer)
     }
 
     override fun serializeProperty(
-        descriptor: PropertyDescriptor,
-        proto: ProtoBuf.Property.Builder,
-        versionRequirementTable: MutableVersionRequirementTable
+            descriptor: PropertyDescriptor,
+            proto: ProtoBuf.Property.Builder,
+            versionRequirementTable: MutableVersionRequirementTable,
+            serializer: DescriptorSerializer
     ) {
         val id = getFileId(descriptor)
         if (id != null) {
             proto.setExtension(JsProtoBuf.propertyContainingFileId, id)
         }
-        super.serializeProperty(descriptor, proto, versionRequirementTable)
+        super.serializeProperty(descriptor, proto, versionRequirementTable, serializer)
     }
 
-    override fun serializeFunction(descriptor: FunctionDescriptor, proto: ProtoBuf.Function.Builder) {
+    override fun serializeFunction(descriptor: FunctionDescriptor, proto: ProtoBuf.Function.Builder,
+                                   serializer: DescriptorSerializer) {
         val id = getFileId(descriptor)
         if (id != null) {
             proto.setExtension(JsProtoBuf.functionContainingFileId, id)
         }
-        super.serializeFunction(descriptor, proto)
+        super.serializeFunction(descriptor, proto, serializer)
     }
 
     private fun getFileId(descriptor: DeclarationDescriptor): Int? {
