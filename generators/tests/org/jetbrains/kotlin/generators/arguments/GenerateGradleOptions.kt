@@ -54,7 +54,7 @@ fun generateKotlinGradleOptions(withPrinterToFile: (targetFile: File, Printer.()
 
     val commonCompilerInterfaceFqName = FqName("org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions")
     val commonCompilerOptions = gradleOptions<CommonCompilerArguments>()
-    withPrinterToFile(File(srcDir, commonCompilerInterfaceFqName)) {
+    withPrinterToFile(File(apiSrcDir, commonCompilerInterfaceFqName)) {
         generateInterface(commonCompilerInterfaceFqName,
                           commonCompilerOptions,
                           parentType = commonInterfaceFqName)
