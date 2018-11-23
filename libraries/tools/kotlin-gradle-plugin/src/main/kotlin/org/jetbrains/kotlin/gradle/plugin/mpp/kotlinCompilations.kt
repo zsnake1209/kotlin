@@ -282,8 +282,7 @@ class KotlinCommonCompilation(
     // which are transformed to metadata
     private val commonSourceSetName = when (compilationName) {
         KotlinCompilation.MAIN_COMPILATION_NAME -> KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
-        KotlinCompilation.TEST_COMPILATION_NAME -> KotlinSourceSet.COMMON_TEST_SOURCE_SET_NAME
-        else -> defaultSourceSetName
+        else -> error("Custom metadata compilations are not supported yet")
     }
 
     override val defaultSourceSet: KotlinSourceSet
