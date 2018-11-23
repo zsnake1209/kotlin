@@ -48,7 +48,7 @@ abstract class AbstractBlackBoxCodegenTestSpec : AbstractBlackBoxCodegenTest() {
         }
     }
 
-    override fun doMultiFileTest(wholeFile: File, files: MutableList<TestFile>, javaFilesDir: File?) {
+    override fun doMultiFileTest(wholeFile: File, files: MutableList<TestFile>, javaFilesDir: File?, reportFailures: Boolean) {
         val testValidator = AbstractSpecTestValidator.getInstanceByType(wholeFile)
 
         try {
@@ -61,6 +61,6 @@ abstract class AbstractBlackBoxCodegenTestSpec : AbstractBlackBoxCodegenTest() {
 
         includeHelpers(wholeFile, files)
 
-        super.doMultiFileTest(wholeFile, files, javaFilesDir)
+        super.doMultiFileTest(wholeFile, files, javaFilesDir, reportFailures)
     }
 }

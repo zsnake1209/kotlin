@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil;
 import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.test.InTextDirectivesUtils;
-import org.jetbrains.kotlin.test.TargetBackend;
 import org.jetbrains.kotlin.utils.ExceptionUtilsKt;
 
 import java.io.File;
@@ -28,22 +27,19 @@ import static org.jetbrains.kotlin.test.clientserver.TestProcessServerKt.getGene
 
 public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
 
-    public static final boolean IGNORE_EXPECTED_FAILURES =
-            Boolean.getBoolean("kotlin.suppress.expected.test.failures");
-
     @Override
     protected void doMultiFileTest(
         @NotNull File wholeFile,
         @NotNull List<TestFile> files,
-        @Nullable File javaFilesDir
+        @Nullable File javaFilesDir,
+        boolean reportFailures
     ) throws Exception {
-        boolean isIgnored = IGNORE_EXPECTED_FAILURES && InTextDirectivesUtils.isIgnoredTarget(getBackend(), wholeFile);
         try {
-            compile(files, javaFilesDir, !isIgnored);
-            blackBox(!isIgnored);
+            compile(files, javaFilesDir, reportFailures);
+            blackBox(reportFailures);
         }
         catch (Throwable t) {
-            if (!isIgnored) {
+            if (reportFailures) {
                 try {
                     // To create .txt file in case of failure
                     doBytecodeListingTest(wholeFile);
@@ -131,9 +127,5 @@ public abstract class AbstractBlackBoxCodegenTest extends CodegenTestCase {
             }
         }
         return null;
-    }
-
-    protected TargetBackend getBackend() {
-        return TargetBackend.JVM;
     }
 }

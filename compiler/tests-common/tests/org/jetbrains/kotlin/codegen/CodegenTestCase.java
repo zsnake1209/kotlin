@@ -34,10 +34,7 @@ import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.psi.KtFile;
 import org.jetbrains.kotlin.script.ScriptDependenciesProvider;
-import org.jetbrains.kotlin.test.ConfigurationKind;
-import org.jetbrains.kotlin.test.InTextDirectivesUtils;
-import org.jetbrains.kotlin.test.KotlinTestUtils;
-import org.jetbrains.kotlin.test.TestJdkKind;
+import org.jetbrains.kotlin.test.*;
 import org.jetbrains.kotlin.test.clientserver.TestProxy;
 import org.jetbrains.kotlin.test.testFramework.KtUsefulTestCase;
 import org.jetbrains.kotlin.utils.ExceptionUtilsKt;
@@ -820,14 +817,14 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
         }
     }
 
-    protected void doTest(String filePath) throws Exception {
+    protected void doTest(String filePath, TargetBackend targetBackend, boolean reportFailures) throws Exception {
         File file = new File(filePath);
         String expectedText = KotlinTestUtils.doLoadFile(file);
         Ref<File> javaFilesDir = Ref.create();
 
         List<TestFile> testFiles = createTestFiles(file, expectedText, javaFilesDir, "");
 
-        doMultiFileTest(file, testFiles, javaFilesDir.get());
+        doMultiFileTest(file, testFiles, javaFilesDir.get(), reportFailures);
     }
 
     protected void doTestWithCoroutinesPackageReplacement(String filePath, String packageName) throws Exception {
@@ -839,7 +836,7 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
 
         List<TestFile> testFiles = createTestFiles(file, expectedText, javaFilesDir, coroutinesPackage);
 
-        doMultiFileTest(file, testFiles, javaFilesDir.get());
+        doMultiFileTest(file, testFiles, javaFilesDir.get(), true);
     }
 
     @NotNull
@@ -874,7 +871,8 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
     protected void doMultiFileTest(
         @NotNull File wholeFile,
         @NotNull List<TestFile> files,
-        @Nullable File javaFilesDir
+        @Nullable File javaFilesDir,
+        boolean reportFailures
     ) throws Exception {
         throw new UnsupportedOperationException("Multi-file test cases are not supported in this test");
     }
