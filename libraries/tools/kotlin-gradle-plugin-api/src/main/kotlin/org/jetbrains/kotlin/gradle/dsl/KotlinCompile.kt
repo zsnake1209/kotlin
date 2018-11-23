@@ -9,7 +9,7 @@ import groovy.lang.Closure
 import org.gradle.api.Task
 import org.gradle.api.tasks.Internal
 
-interface KotlinCompileTask<out T : KotlinCommonToolOptions> : Task {
+interface KotlinCompile<out T : KotlinCommonOptions> : Task {
     @get:Internal
     val kotlinOptions: T
 

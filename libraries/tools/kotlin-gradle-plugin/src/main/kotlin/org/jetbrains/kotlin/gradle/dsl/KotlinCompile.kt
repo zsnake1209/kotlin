@@ -19,8 +19,6 @@ package org.jetbrains.kotlin.gradle.dsl
 import groovy.lang.Closure
 import org.gradle.api.Task
 
-interface KotlinCompile<out T : KotlinCommonOptions> : KotlinCompileTask<T>
-
 interface KotlinJsCompile : KotlinCompile<KotlinJsOptions>
 
 interface KotlinJvmCompile : KotlinCompile<KotlinJvmOptions>
