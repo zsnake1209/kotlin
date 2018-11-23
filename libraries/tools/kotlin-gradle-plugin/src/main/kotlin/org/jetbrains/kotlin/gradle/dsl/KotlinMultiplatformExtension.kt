@@ -30,6 +30,8 @@ open class KotlinMultiplatformExtension : KotlinProjectExtension(), KotlinTarget
         @Suppress("UNCHECKED_CAST")
         (targets.getByName(KotlinMultiplatformPlugin.METADATA_TARGET_NAME) as KotlinOnlyTarget<KotlinCommonCompilation>).also(configure)
 
+    fun metadata(configure: Closure<*>) = metadata { ConfigureUtil.configure(configure, this) }
+
     fun <T : KotlinTarget> targetFromPreset(
         preset: KotlinTargetPreset<T>,
         name: String = preset.name,
