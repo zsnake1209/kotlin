@@ -16,12 +16,10 @@ val generateMppTargetContainerWithPresets by generator(
 )
 
 generateMppTargetContainerWithPresets.run {
-    afterEvaluate {
-        systemProperty(
-            "org.jetbrains.kotlin.generators.gradle.dsl.outputSourceRoot",
-            project(":kotlin-gradle-plugin").kotlin.sourceSets["main"].kotlin.srcDirs.single { it.name == "kotlin" }.absolutePath
-        )
-    }
+    systemProperty(
+        "org.jetbrains.kotlin.generators.gradle.dsl.outputSourceRoot",
+        project(":kotlin-gradle-plugin").projectDir.resolve("src/main/kotlin").absolutePath
+    )
 }
 
 // Workaround: 'java -jar' refuses to read the original dotted filename on Windows, 'Unable to access jarFile org.jetbrains.kotlin....jar'
