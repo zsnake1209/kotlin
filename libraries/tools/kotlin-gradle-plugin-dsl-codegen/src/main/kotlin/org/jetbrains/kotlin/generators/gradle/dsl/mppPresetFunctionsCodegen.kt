@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.generators.gradle.dsl
 
+import groovy.lang.Closure
+import org.gradle.util.ConfigureUtil
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetsContainerWithPresets
 import java.io.File
 
@@ -31,8 +33,8 @@ private fun generateKotlinTargetContainerWithPresetFunctionsInterface() {
     val imports = allPresetEntries
         .flatMap { it.typeNames() }
         .plus(parentInterfaceName)
-        .plus(typeName("org.gradle.util.ConfigureUtil"))
-        .plus(typeName("groovy.lang.Closure"))
+        .plus(typeName(ConfigureUtil::class.java.canonicalName))
+        .plus(typeName(Closure::class.java.canonicalName))
         .filter { it.packageName() != className.packageName() }
         .flatMap { it.collectFqNames() }
         .toSortedSet()
