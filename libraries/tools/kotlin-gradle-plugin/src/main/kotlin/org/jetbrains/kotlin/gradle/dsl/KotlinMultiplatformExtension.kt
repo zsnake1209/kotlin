@@ -47,7 +47,7 @@ open class KotlinMultiplatformExtension : KotlinProjectExtension(), KotlinTarget
 }
 
 internal fun KotlinTarget.isProducedFromPreset(kotlinTargetPreset: KotlinTargetPreset<*>): Boolean =
-    originatingPreset == kotlinTargetPreset
+    preset == kotlinTargetPreset
 
 internal fun <T : KotlinTarget> KotlinTargetsContainerWithPresets.configureOrCreate(
     targetName: String,
@@ -71,8 +71,8 @@ internal fun <T : KotlinTarget> KotlinTargetsContainerWithPresets.configureOrCre
             throw InvalidUserCodeException(
                 "The target '$targetName' already exists, but it was not created with the '${targetPreset.name}' preset. " +
                         "To configure it, access it by name in `kotlin.targets`" +
-                        " or use the preset function '${existingTarget.originatingPreset?.name}'"
-                            .takeIf { existingTarget.originatingPreset != null }
+                        " or use the preset function '${existingTarget.preset?.name}'"
+                            .takeIf { existingTarget.preset != null }
             )
         }
     }

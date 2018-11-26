@@ -51,7 +51,7 @@ interface KotlinTarget : Named, HasAttributes {
     fun attributes(configure: AttributeContainer.() -> Unit) = configure(attributes)
     fun attributes(configure: Closure<*>) = attributes { ConfigureUtil.configure(configure, this) }
 
-    val originatingPreset: KotlinTargetPreset<out KotlinTarget>?
+    val preset: KotlinTargetPreset<out KotlinTarget>?
 
     override fun getName(): String = targetName
 }
