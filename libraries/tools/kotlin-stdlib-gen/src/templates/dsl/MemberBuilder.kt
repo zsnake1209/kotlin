@@ -151,6 +151,7 @@ class MemberBuilder(
     }
 
     fun on(backend: Backend, action: () -> Unit) {
+        require(target.platform == Platform.JS)
         if (target.backend == backend) action()
     }
 

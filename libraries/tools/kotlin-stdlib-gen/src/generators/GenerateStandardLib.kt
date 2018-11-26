@@ -52,7 +52,7 @@ fun main(args: Array<String>) {
         //        File("build/out/$platform/$source.kt")
         when (target) {
             KotlinTarget.Common -> commonDir.resolve("_${source.name.capitalize()}.kt")
-            KotlinTarget.JVM, KotlinTarget.JVM_IR -> jvmDir.resolve("_${source.name.capitalize()}Jvm.kt")
+            KotlinTarget.JVM -> jvmDir.resolve("_${source.name.capitalize()}Jvm.kt")
             KotlinTarget.JS -> jsDir.resolve("_${source.name.capitalize()}Js.kt")
             KotlinTarget.JS_IR -> jsIrDir.resolve("_${source.name.capitalize()}Js.kt")
             KotlinTarget.Native -> error("Native is unsupported yet")
