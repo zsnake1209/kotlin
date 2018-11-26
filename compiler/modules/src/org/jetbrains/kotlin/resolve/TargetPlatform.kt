@@ -36,7 +36,7 @@ abstract class TargetPlatform(val platformName: String) {
                 computePlatformSpecificDefaultImports(storageManager, this)
 
                 if (includeLowPriorityImports) {
-                    addAll(Common.defaultLowPriorityImports)
+                    addAll(defaultLowPriorityImports)
                 }
             }
         }
