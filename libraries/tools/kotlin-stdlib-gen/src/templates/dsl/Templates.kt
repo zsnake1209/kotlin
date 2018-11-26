@@ -78,9 +78,9 @@ abstract class MemberTemplateDefinition<TParam> : MemberTemplate {
 
     private val buildActions = mutableListOf<BuildAction>()
 
-    private var targetPlatforms = setOf(*Platform.values())
+    private var allowedPlatforms = setOf(*Platform.values())
     override fun platforms(vararg platforms: Platform) {
-        targetPlatforms = setOf(*platforms)
+        allowedPlatforms = setOf(*platforms)
     }
 
 
@@ -106,17 +106,17 @@ abstract class MemberTemplateDefinition<TParam> : MemberTemplate {
 
 
     override fun instantiate(targets: List<KotlinTarget>): Sequence<MemberBuilder> {
-        val resultingTargets = targets.filter { it.platform in targetPlatforms }
+        val resultingTargets = targets.filter { it.platform in allowedPlatforms }
         val resultingPlatforms = resultingTargets.map { it.platform }.distinct()
-        val specificPlatforms by lazy { resultingTargets - KotlinTarget.Common }
+        val specificTargets by lazy { resultingTargets - KotlinTarget.Common }
 
         fun platformMemberBuilders(family: Family, p: TParam) =
-                if (Platform.Common in targetPlatforms) {
+                if (Platform.Common in allowedPlatforms) {
                     val commonMemberBuilder = createMemberBuilder(KotlinTarget.Common, family, p)
                     mutableListOf<MemberBuilder>().also { builders ->
                         if (Platform.Common in resultingPlatforms) builders.add(commonMemberBuilder)
                         if (commonMemberBuilder.hasPlatformSpecializations) {
-                            specificPlatforms.mapTo(builders) {
+                            specificTargets.mapTo(builders) {
                                 createMemberBuilder(it, family, p)
                             }
                         }
@@ -132,7 +132,7 @@ abstract class MemberTemplateDefinition<TParam> : MemberTemplate {
     }
 
     private fun createMemberBuilder(target: KotlinTarget, family: Family, p: TParam): MemberBuilder {
-        return MemberBuilder(targetPlatforms, target, family).also { builder ->
+        return MemberBuilder(allowedPlatforms, target, family).also { builder ->
             for (action in buildActions) {
                 when (action) {
                     is BuildAction.Generic -> action(builder)

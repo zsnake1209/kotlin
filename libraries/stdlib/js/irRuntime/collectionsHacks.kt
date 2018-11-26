@@ -14,7 +14,7 @@ internal fun deleteProperty(obj: Any, property: Any) {
     js("delete obj[property]")
 }
 
-internal fun arrayToString(array: Array<*>) = array.map { toString(it) }.joinToString(", ", "[", "]")
+internal fun arrayToString(array: Array<*>) = array.joinToString(", ", "[", "]") { toString(it) }
 
 internal fun <T> Array<out T>.contentDeepHashCodeInternal(): Int {
     var result = 1
@@ -51,8 +51,6 @@ internal fun <T> T.contentEqualsInternal(other: T): Boolean {
     }
     return true
 }
-
-internal fun <T> Array<out T>.contentHashCodeInternal(): Int = fold(1) { a, v -> a * 31 + hashCode(v) }
 
 internal fun <T> T.contentHashCodeInternal(): Int {
     val a = this.asDynamic()

@@ -29,7 +29,7 @@ fun readCopyrightNoticeFromProfile(copyrightProfile: File): String {
 }
 
 
-data class TargetSourceFile(
+data class TargetedSourceFile(
     val target: KotlinTarget,
     val sourceFile: SourceFile
 )
@@ -38,7 +38,7 @@ private val targetsToGenerate = KotlinTarget.values - KotlinTarget.Native
 
 @JvmName("groupByFileAndWriteGroups")
 fun Sequence<TemplateGroup>.groupByFileAndWrite(
-        fileNameBuilder: (TargetSourceFile) -> File
+        fileNameBuilder: (TargetedSourceFile) -> File
 ) {
     flatMap { group ->
         group.invoke()
@@ -49,7 +49,7 @@ fun Sequence<TemplateGroup>.groupByFileAndWrite(
 
 @JvmName("groupByFileAndWriteTemplates")
 fun Sequence<MemberTemplate>.groupByFileAndWrite(
-        fileNameBuilder: (TargetSourceFile) -> File
+        fileNameBuilder: (TargetedSourceFile) -> File
 ) {
     flatMap { it.instantiate(targetsToGenerate) }
         .groupByFileAndWrite(fileNameBuilder)
@@ -57,9 +57,9 @@ fun Sequence<MemberTemplate>.groupByFileAndWrite(
 
 @JvmName("groupByFileAndWriteMembers")
 fun Sequence<MemberBuilder>.groupByFileAndWrite(
-        fileNameBuilder: (TargetSourceFile) -> File
+        fileNameBuilder: (TargetedSourceFile) -> File
 ) {
-    val groupedMembers = groupBy { TargetSourceFile(it.target, it.sourceFile) }
+    val groupedMembers = groupBy { TargetedSourceFile(it.target, it.sourceFile) }
 
     for ((psf, members) in groupedMembers) {
         val file = fileNameBuilder(psf)
@@ -67,8 +67,8 @@ fun Sequence<MemberBuilder>.groupByFileAndWrite(
     }
 }
 
-fun List<MemberBuilder>.writeTo(file: File, targetSource: TargetSourceFile) {
-    val (target, sourceFile) = targetSource
+fun List<MemberBuilder>.writeTo(file: File, targetedSource: TargetedSourceFile) {
+    val (target, sourceFile) = targetedSource
     println("Generating file: $file")
     file.parentFile.mkdirs()
     FileWriter(file).use { writer ->
