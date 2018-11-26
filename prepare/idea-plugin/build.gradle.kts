@@ -29,6 +29,7 @@ val projectsToShadow by extra(listOf(
         ":eval4j",
         ":idea:formatter",
         ":compiler:psi",
+        ":compiler:modules",
         *if (project.findProperty("fir.enabled") == "true") {
             arrayOf(
                 ":compiler:fir:cones",
