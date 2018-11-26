@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
@@ -49,11 +50,14 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTra
         } else {
             Pair(irClass, false)
         }
-        for (function in actualClass.declarations.filterIsInstance<IrSimpleFunction>()) {
+
+        val newDeclarations = mutableListOf<IrFunction>()
+        for (function in actualClass.declarations) {
+            if (function !is IrSimpleFunction) continue
             if (function.origin !== IrDeclarationOrigin.FAKE_OVERRIDE) continue
 
             val implementation = function.resolveFakeOverride() ?: continue
-            if ((implementation.parent as? IrClass)?.isInterface != true ||
+            if (!implementation.hasInterfaceParent() ||
                 Visibilities.isPrivate(implementation.visibility) ||
                 implementation.visibility === Visibilities.INVISIBLE_FAKE ||
                 implementation.isDefinitelyNotDefaultImplsMethod() || implementation.isMethodOfAny()
@@ -61,16 +65,17 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTra
                 continue
             }
 
-            generateDelegationToDefaultImpl(irClass, implementation, function, isDefaultImplsGeneration)
+            newDeclarations.add(generateDelegationToDefaultImpl(implementation, function, isDefaultImplsGeneration))
         }
+
+        irClass.declarations.addAll(newDeclarations)
     }
 
     private fun generateDelegationToDefaultImpl(
-        irClass: IrClass,
         interfaceFun: IrSimpleFunction,
         inheritedFun: IrSimpleFunction,
         isDefaultImplsGeneration: Boolean
-    ) {
+    ): IrFunction {
         val defaultImplFun = context.declarationFactory.getDefaultImplsFunction(interfaceFun)
 
         val irFunction =
@@ -103,8 +108,6 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTra
                 }
             } else context.declarationFactory.getDefaultImplsFunction(inheritedFun)
 
-        irClass.declarations.add(irFunction)
-
         context.createIrBuilder(irFunction.symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET).apply {
             irFunction.body = irBlockBody {
                 +irReturn(
@@ -117,11 +120,16 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTra
                 )
             }
         }
+
+        return irFunction
     }
 
     private fun IrSimpleFunction.isMethodOfAny() =
         ((valueParameters.size == 0 && name.asString() in setOf("hashCode", "toString")) ||
                 (valueParameters.size == 1 && name.asString() == "equals" && valueParameters[0].type == context.irBuiltIns.anyType))
+
+    private fun IrSimpleFunction.hasInterfaceParent() =
+        (parent as? IrClass)?.isInterface == true
 
     private fun IrSimpleFunction.isDefinitelyNotDefaultImplsMethod() =
         resolveFakeOverride()?.let { origin == IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB } == true ||
