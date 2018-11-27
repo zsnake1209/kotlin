@@ -2,11 +2,12 @@
 package foo
 
 fun test(actual: DoubleArray, expect: DoubleArray): String {
-    for (index in 0..(expect.size)) {
+    for (index in 0 until expect.size) {
         val expectedElem = expect[index]
         val actualElem = actual[index]
-        if (expectedElem != actualElem) {
-            return "Content do not match: ${expect} vs. ${actual}"
+        if (expectedElem !== actualElem) {
+            if (expectedElem.isNaN() && actualElem.isNaN()) continue
+            return "Content at index $index does not match: $expectedElem != $actualElem"
         }
     }
     return "OK"
