@@ -6,7 +6,12 @@
 package org.jetbrains.kotlin.analyzer.common
 
 import org.jetbrains.kotlin.resolve.*
+import org.jetbrains.kotlin.storage.StorageManager
 
-object CommonPlatform : TargetPlatform.Common() {
+object CommonPlatform : TargetPlatform("Default") {
     override val platformConfigurator: PlatformConfigurator = CommonPlatformConfiguratorImpl()
+    override val multiTargetPlatform: MultiTargetPlatform
+        get() = MultiTargetPlatform.Common
+    override val isCommon get() = true
+    override fun computePlatformSpecificDefaultImports(storageManager: StorageManager, result: MutableList<ImportPath>) {}
 }

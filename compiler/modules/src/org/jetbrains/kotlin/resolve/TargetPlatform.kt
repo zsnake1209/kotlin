@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.resolve
 
-import com.intellij.openapi.components.ServiceManager
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.name.FqName
@@ -44,6 +43,10 @@ abstract class TargetPlatform(val platformName: String) {
 
     override fun toString() = platformName
 
+    @Deprecated("Please, do not use", ReplaceWith("is CommonPlatform"))
+    open val isCommon
+        get() = false
+
     abstract val platformConfigurator: PlatformConfigurator
 
     open val defaultLowPriorityImports: List<ImportPath> get() = emptyList()
@@ -73,12 +76,6 @@ abstract class TargetPlatform(val platformName: String) {
         )
     }
 
-    abstract class Common : TargetPlatform("Default") {
-        override fun computePlatformSpecificDefaultImports(storageManager: StorageManager, result: MutableList<ImportPath>) {}
-
-        override val multiTargetPlatform: MultiTargetPlatform
-            get() = MultiTargetPlatform.Common
-    }
 }
 
 interface PlatformConfigurator {

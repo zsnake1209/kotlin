@@ -28,10 +28,10 @@ interface ModuleInfo {
     // but if they are present, they should come after JVM built-ins in the dependencies list, because JVM built-ins contain
     // additional members dependent on the JDK
     fun dependencyOnBuiltIns(): ModuleInfo.DependencyOnBuiltIns =
-        if (platform is TargetPlatform.Common)
-            ModuleInfo.DependencyOnBuiltIns.AFTER_SDK
-        else
-            ModuleInfo.DependencyOnBuiltIns.LAST
+            if (@Suppress("DEPRECATION") platform?.isCommon == true)
+                ModuleInfo.DependencyOnBuiltIns.AFTER_SDK
+            else
+                ModuleInfo.DependencyOnBuiltIns.LAST
 
     //TODO: (module refactoring) provide dependency on builtins after runtime in IDEA
     enum class DependencyOnBuiltIns { NONE, AFTER_SDK, LAST }
