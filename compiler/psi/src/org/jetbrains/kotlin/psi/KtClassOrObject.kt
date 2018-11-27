@@ -26,6 +26,7 @@ import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jetbrains.kotlin.psi.stubs.KotlinClassOrObjectStub
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
@@ -60,8 +61,14 @@ abstract class KtClassOrObject :
 
         if (specifierList.entries.size > 1) {
             EditCommaSeparatedListHelper.removeItem<KtElement>(superTypeListEntry)
-        } else {
-            deleteChildRange(findChildByType<PsiElement>(KtTokens.COLON) ?: specifierList, specifierList)
+        }
+        else {
+            val colon = findChildByType<PsiElement>(KtTokens.COLON)
+            val start =
+                    colon?.run { siblings(false, false).takeWhile { it is PsiWhiteSpace }.lastOrNull() }
+                    ?: colon
+                    ?: specifierList
+            deleteChildRange(start, specifierList)
         }
     }
 
