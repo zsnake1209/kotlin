@@ -575,7 +575,7 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                     // TODO: getDefaultType() here is wrong and won't work for arrays
                     state.typeMapper.mapType(irContainer.defaultType.toKotlinType())
 
-//                    // !!!!!! Never invoked, at least in tests !!!!!!
+//                    // TODO: this code is only needed for property references, which are not yet supported.
 //                    descriptor is VariableDescriptorWithAccessors -> {
 //                        assert(false) { "VariableDescriptorWithAccessors" }
 //                        globalContext.state.bindingContext.get(
