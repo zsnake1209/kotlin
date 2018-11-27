@@ -24,6 +24,7 @@ import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.PersistentLibraryKind
 import com.intellij.openapi.util.io.JarUtil
 import com.intellij.openapi.vfs.*
+import org.jetbrains.kotlin.analyzer.common.CommonPlatform
 import org.jetbrains.kotlin.caches.resolve.IdePlatformKindResolution
 import org.jetbrains.kotlin.idea.vfilefinder.KnownLibraryKindForIndex
 import org.jetbrains.kotlin.idea.vfilefinder.getLibraryKindForJar
@@ -47,7 +48,7 @@ object JSLibraryKind : PersistentLibraryKind<DummyLibraryProperties>("kotlin.js"
 
 object CommonLibraryKind : PersistentLibraryKind<DummyLibraryProperties>("kotlin.common"), KotlinLibraryKind {
     override val compilerPlatform: TargetPlatform
-        get() = TargetPlatform.Common
+        get() = CommonPlatform
 
     override fun createDefaultProperties() = DummyLibraryProperties.INSTANCE!!
 }

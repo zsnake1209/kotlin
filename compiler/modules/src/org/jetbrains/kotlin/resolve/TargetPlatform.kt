@@ -73,11 +73,8 @@ abstract class TargetPlatform(val platformName: String) {
         )
     }
 
-    object Common : TargetPlatform("Default") {
+    abstract class Common : TargetPlatform("Default") {
         override fun computePlatformSpecificDefaultImports(storageManager: StorageManager, result: MutableList<ImportPath>) {}
-
-        override val platformConfigurator: PlatformConfigurator
-            get() = ServiceManager.getService(CommonPlatformConfigurator::class.java)
 
         override val multiTargetPlatform: MultiTargetPlatform
             get() = MultiTargetPlatform.Common

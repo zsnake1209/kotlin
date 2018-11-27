@@ -176,5 +176,5 @@ object CommonAnalyzerFacade : ResolverForModuleFactory() {
     }
 
     override val targetPlatform: TargetPlatform
-        get() = TargetPlatform.Common
+        get() = CommonPlatform
 }
