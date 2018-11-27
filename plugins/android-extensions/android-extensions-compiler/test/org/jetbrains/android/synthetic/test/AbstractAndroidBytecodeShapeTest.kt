@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.codegen.AbstractBytecodeTextTest
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
+import org.jetbrains.kotlin.test.TargetBackend
 import org.jetbrains.kotlin.test.TestJdkKind
 
 abstract class AbstractAndroidBytecodeShapeTest : AbstractBytecodeTextTest() {
@@ -33,7 +34,7 @@ abstract class AbstractAndroidBytecodeShapeTest : AbstractBytecodeTextTest() {
         addAndroidExtensionsRuntimeLibrary(myEnvironment)
     }
 
-    override fun doTest(path: String) {
+    override fun doTest(path: String, targetBackend: TargetBackend, reportFailures: Boolean) {
         val fileName = path + getTestName(true) + ".kt"
         createAndroidAPIEnvironment(path)
         loadFileByFullPath(fileName)

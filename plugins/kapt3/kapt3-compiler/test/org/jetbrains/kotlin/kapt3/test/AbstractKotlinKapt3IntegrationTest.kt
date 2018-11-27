@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.kapt3.util.MessageCollectorBackedKaptLogger
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
+import org.jetbrains.kotlin.test.TargetBackend
 import org.jetbrains.kotlin.test.util.trimTrailingWhitespacesAndAddNewlineAtEOF
 import org.jetbrains.kotlin.utils.PathUtil
 import java.io.File
@@ -115,14 +116,14 @@ abstract class AbstractKotlinKapt3IntegrationTest : CodegenTestCase() {
         }
 
         _processors = listOf(processor)
-        doTest(ktFileName.canonicalPath)
+        doTest(ktFileName.canonicalPath, TargetBackend.JVM, true)
 
         if (started != shouldRun) {
             fail("Annotation processor " + (if (shouldRun) "was not started" else "was started"))
         }
     }
 
-    override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?) {
+    override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?, reportFailures: Boolean) {
         val javaSources = javaFilesDir?.let { arrayOf(it) } ?: emptyArray()
 
         val txtFile = File(wholeFile.parentFile, wholeFile.nameWithoutExtension + ".it.txt")

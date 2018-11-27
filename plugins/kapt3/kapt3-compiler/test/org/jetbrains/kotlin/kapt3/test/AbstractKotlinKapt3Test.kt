@@ -49,6 +49,7 @@ import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PartialAnalysisHandlerExtension
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
+import org.jetbrains.kotlin.test.TargetBackend
 import org.jetbrains.kotlin.test.util.trimTrailingWhitespacesAndAddNewlineAtEOF
 import org.jetbrains.kotlin.utils.PathUtil
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
@@ -111,7 +112,7 @@ abstract class AbstractKotlinKapt3Test : CodegenTestCase() {
         myFiles = CodegenTestFiles.create(ktFiles)
     }
 
-    override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?) {
+    override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?, reportFailures: Boolean) {
         val javaSources = javaFilesDir?.let { arrayOf(it) } ?: emptyArray()
 
         createEnvironmentWithMockJdkAndIdeaAnnotations(ConfigurationKind.ALL, *javaSources)
@@ -246,7 +247,7 @@ open class AbstractClassFileToSourceStubConverterTest : AbstractKotlinKapt3Test(
             val test = AbstractClassFileToSourceStubConverterTest()
             try {
                 test.setUp()
-                test.doTest(args[0])
+                test.doTest(args[0], TargetBackend.JVM, true)
             } finally {
                 test.tearDown()
             }
@@ -256,7 +257,7 @@ open class AbstractClassFileToSourceStubConverterTest : AbstractKotlinKapt3Test(
     // This is to suppress "AssertionFailedError: No tests found"
     fun testSuppressWarning() {}
 
-    override fun doTest(filePath: String) {
+    override fun doTest(filePath: String, targetBackend: TargetBackend, reportFailures: Boolean) {
         val wholeFile = File(filePath)
 
         kaptFlags.add(KaptFlag.MAP_DIAGNOSTIC_LOCATIONS)
@@ -269,7 +270,7 @@ open class AbstractClassFileToSourceStubConverterTest : AbstractKotlinKapt3Test(
             kaptFlags.add(KaptFlag.STRICT)
         }
 
-        super.doTest(filePath)
+        super.doTest(filePath, targetBackend, reportFailures)
         doTestWithJdk9(AbstractClassFileToSourceStubConverterTest::class.java, filePath)
     }
 
@@ -331,11 +332,11 @@ open class AbstractClassFileToSourceStubConverterTest : AbstractKotlinKapt3Test(
 }
 
 abstract class AbstractKotlinKaptContextTest : AbstractKotlinKapt3Test() {
-    override fun doTest(filePath: String?) {
+    override fun doTest(filePath: String?, targetBackend: TargetBackend, reportFailures: Boolean) {
         kaptFlags.add(KaptFlag.CORRECT_ERROR_TYPES)
         kaptFlags.add(KaptFlag.STRICT)
         kaptFlags.add(KaptFlag.MAP_DIAGNOSTIC_LOCATIONS)
-        super.doTest(filePath)
+        super.doTest(filePath, targetBackend, reportFailures)
     }
 
     override fun check(kaptContext: KaptContextForStubGeneration, javaFiles: List<File>, txtFile: File, wholeFile: File) {

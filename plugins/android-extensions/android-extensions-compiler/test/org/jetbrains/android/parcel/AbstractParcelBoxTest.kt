@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.config.JvmClasspathRoot
 import org.jetbrains.kotlin.codegen.CodegenTestCase
 import org.jetbrains.kotlin.codegen.getClassFiles
+import org.jetbrains.kotlin.test.TargetBackend
 import org.jetbrains.kotlin.utils.PathUtil
 import org.jetbrains.org.objectweb.asm.ClassWriter
 import org.jetbrains.org.objectweb.asm.ClassWriter.COMPUTE_FRAMES
@@ -103,8 +104,10 @@ abstract class AbstractParcelBoxTest : CodegenTestCase() {
         }
     }
 
-    override fun doTest(filePath: String) {
-        super.doTest(File(BASE_DIR, filePath + ".kt").absolutePath)
+    protected fun doTest(filePath: String) = doTest(filePath, TargetBackend.JVM, true)
+
+    override fun doTest(filePath: String, targetBackend: TargetBackend, reportFailures: Boolean) {
+        super.doTest(File(BASE_DIR, filePath + ".kt").absolutePath, targetBackend, reportFailures)
     }
 
     private val androidPluginPath: String by lazy {
@@ -133,7 +136,7 @@ abstract class AbstractParcelBoxTest : CodegenTestCase() {
         return listOf(kotlinRuntimeJar) + layoutLibJars + robolectricJars + junitJar + androidExtensionsRuntimeCP
     }
 
-    override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?) {
+    override fun doMultiFileTest(wholeFile: File, files: List<TestFile>, javaFilesDir: File?, reportFailures: Boolean) {
         compile(files + TestFile(LIBRARY_KT.name, LIBRARY_KT.readText()), javaFilesDir)
 
         val javaBin = File(System.getProperty("java.home").takeIf { it.isNotEmpty() } ?: error("JAVA_HOME is not set"), "bin")
