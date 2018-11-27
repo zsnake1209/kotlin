@@ -1121,8 +1121,7 @@ public actual inline fun <T> Array<out T>.plusElement(element: T): Array<T> {
  * Sorts the array in-place.
  */
 public actual fun IntArray.sort(): Unit {
-    val f = js("Array.prototype.sort.call")
-    f(this)
+    this.asDynamic().sort()
 }
 
 /**
@@ -1137,40 +1136,35 @@ public actual fun LongArray.sort(): Unit {
  * Sorts the array in-place.
  */
 public actual fun ByteArray.sort(): Unit {
-    val f = js("Array.prototype.sort.call")
-    f(this)
+    this.asDynamic().sort()
 }
 
 /**
  * Sorts the array in-place.
  */
 public actual fun ShortArray.sort(): Unit {
-    val f = js("Array.prototype.sort.call")
-    f(this)
+    this.asDynamic().sort()
 }
 
 /**
  * Sorts the array in-place.
  */
 public actual fun DoubleArray.sort(): Unit {
-    val f = js("Array.prototype.sort.call")
-    f(this)
+    this.asDynamic().sort()
 }
 
 /**
  * Sorts the array in-place.
  */
 public actual fun FloatArray.sort(): Unit {
-    val f = js("Array.prototype.sort.call")
-    f(this)
+    this.asDynamic().sort()
 }
 
 /**
  * Sorts the array in-place.
  */
 public actual fun CharArray.sort(): Unit {
-    val f = js("Array.prototype.sort.call")
-    f(this)
+    this.asDynamic().sort()
 }
 
 /**
