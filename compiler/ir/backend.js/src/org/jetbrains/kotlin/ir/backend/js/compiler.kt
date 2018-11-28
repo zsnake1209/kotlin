@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.inline.replaceUnboundSymbols
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
@@ -149,10 +150,22 @@ private fun JsIrBackendContext.lower(moduleFragment: IrModuleFragment, dependenc
 private fun FileLoweringPass.lower(moduleFragment: IrModuleFragment) = moduleFragment.files.forEach { lower(it) }
 
 private fun DeclarationContainerLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) =
-    moduleFragment.files.forEach { runOnFilePostfix(it) }
+    moduleFragment.files.forEach {
+        if (it.name.endsWith("CoroutineImpl.kt")) {
+            fun foo() {}
+            foo()
+        }
+        runOnFilePostfix(it)
+    }
 
 private fun DeclarationContainerLoweringPass.runOnFilesPostfix(files: Iterable<IrFile>) =
-    files.forEach { runOnFilePostfix(it) }
+    files.forEach {
+        if (it.name.endsWith("kotlin/string.kt")) {
+            fun foo() {}
+            foo()
+        }
+        runOnFilePostfix(it)
+    }
 
 private fun BodyLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) =
     moduleFragment.files.forEach { runOnFilePostfix(it) }

@@ -28,12 +28,9 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrFieldSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
-import org.jetbrains.kotlin.ir.util.transformFlat
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
-import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
 import java.util.*
@@ -70,19 +67,19 @@ class LocalDeclarationsLowering(
         IrStatementOriginImpl("INITIALIZER_OF_FIELD_FOR_CAPTURED_VALUE")
 
     override fun lower(irDeclarationContainer: IrDeclarationContainer) {
-        if (irDeclarationContainer is IrDeclaration) {
-
-            // TODO: in case of `crossinline` lambda the @containingDeclaration and @parent points to completely different locations
-//            val parentsDecl = irDeclarationContainer.parents
-            val parentsDesc = irDeclarationContainer.descriptor.parents
-
-            if (parentsDesc.any { it is CallableDescriptor }) {
-
-                // Lowering of non-local declarations handles all local declarations inside.
-                // This declaration is local and shouldn't be considered.
-                return
-            }
-        }
+//        if (irDeclarationContainer is IrDeclaration) {
+//
+//            // TODO: in case of `crossinline` lambda the @containingDeclaration and @parent points to completely different locations
+////            val parentsDecl = irDeclarationContainer.parents
+//            val parentsDesc = irDeclarationContainer.descriptor.parents
+//
+//            if (parentsDesc.any { it is CallableDescriptor }) {
+//
+//                // Lowering of non-local declarations handles all local declarations inside.
+//                // This declaration is local and shouldn't be considered.
+//                return
+//            }
+//        }
 
         // Continuous numbering across all declarations in the container.
         lambdasCount = 0
@@ -90,10 +87,23 @@ class LocalDeclarationsLowering(
         irDeclarationContainer.transformDeclarationsFlat { memberDeclaration ->
             // TODO: may be do the opposite - specify the list of IR elements which need not to be transformed
             when (memberDeclaration) {
-                is IrFunction -> LocalDeclarationsTransformer(memberDeclaration).lowerLocalDeclarations()
-                is IrProperty -> LocalDeclarationsTransformer(memberDeclaration).lowerLocalDeclarations()
-                is IrField -> LocalDeclarationsTransformer(memberDeclaration).lowerLocalDeclarations()
-                is IrAnonymousInitializer -> LocalDeclarationsTransformer(memberDeclaration).lowerLocalDeclarations()
+                is IrFunction -> LocalDeclarationsTransformer(memberDeclaration).lowerLocalDeclarations(irDeclarationContainer)
+                is IrProperty -> memberDeclaration.run {
+                    //                    LocalDeclarationsTransformer(memberDeclaration).lowerLocalDeclarations(irDeclarationContainer)
+                    val fieldDeclarations =
+                        backingField?.let { LocalDeclarationsTransformer(it).lowerLocalDeclarations(irDeclarationContainer) }
+                    val getterDeclarations = getter?.let { LocalDeclarationsTransformer(it).lowerLocalDeclarations(irDeclarationContainer) }
+                    val setterDeclarations = setter?.let { LocalDeclarationsTransformer(it).lowerLocalDeclarations(irDeclarationContainer) }
+
+                    backingField = fieldDeclarations?.last() as IrField?
+                    getter = getterDeclarations?.last() as IrSimpleFunction?
+                    setter = setterDeclarations?.last() as IrSimpleFunction?
+
+
+                    listOfNotNull(fieldDeclarations?.dropLast(1), getterDeclarations?.dropLast(1), setterDeclarations?.dropLast(1)).flatten() + this
+                }
+                is IrField -> LocalDeclarationsTransformer(memberDeclaration).lowerLocalDeclarations(irDeclarationContainer)
+                is IrAnonymousInitializer -> LocalDeclarationsTransformer(memberDeclaration).lowerLocalDeclarations(irDeclarationContainer)
                 // TODO: visit children as well
                 else -> null
             }
@@ -178,9 +188,9 @@ class LocalDeclarationsLowering(
         val oldParameterToNew: MutableMap<IrValueParameter, IrValueParameter> = mutableMapOf()
         val newParameterToCaptured: MutableMap<IrValueParameter, IrValueSymbol> = mutableMapOf()
 
-        fun lowerLocalDeclarations(): List<IrDeclaration>? {
-            collectLocalDeclarations()
-            if (localFunctions.isEmpty() && localClasses.isEmpty()) return null
+        fun lowerLocalDeclarations(irDeclarationContainer: IrDeclarationContainer): List<IrDeclaration> {
+            collectLocalDeclarations2(irDeclarationContainer)
+            if (localFunctions.isEmpty() && localClasses.isEmpty()) return listOf(memberDeclaration)
 
             collectClosures()
 
@@ -213,16 +223,16 @@ class LocalDeclarationsLowering(
                 add(memberDeclaration)
             }
 
-        private inner class FunctionBodiesRewriter(val localContext: LocalContext?) : IrElementTransformerVoid() {
+        private inner class FunctionBodiesRewriter(val localContext: LocalContext?) : IrElementTransformer<IrDeclaration> {
 
-            override fun visitClass(declaration: IrClass) = if (declaration in localClasses) {
-                // Replace local class definition with an empty composite.
-                IrCompositeImpl(declaration.startOffset, declaration.endOffset, context.irBuiltIns.unitType)
-            } else {
-                super.visitClass(declaration)
-            }
+            override fun visitClass(declaration: IrClass, data: IrDeclaration) = if ((declaration in localClasses)) {
+                    // Replace local class definition with an empty composite.
+                    IrCompositeImpl(declaration.startOffset, declaration.endOffset, context.irBuiltIns.unitType)
+                } else {
+                    super.visitClass(declaration, declaration)
+                }
 
-            override fun visitFunction(declaration: IrFunction): IrStatement {
+            override fun visitFunction(declaration: IrFunction, data: IrDeclaration): IrStatement {
                 return if (declaration in localFunctions) {
                     // Replace local function definition with an empty composite.
                     IrCompositeImpl(declaration.startOffset, declaration.endOffset, context.irBuiltIns.unitType)
@@ -230,15 +240,17 @@ class LocalDeclarationsLowering(
                     if (localContext is LocalClassContext && declaration.parent == localContext.declaration) {
                         declaration.apply {
                             val classMemberLocalContext = LocalClassMemberContext(declaration, localContext)
-                            transformChildrenVoid(FunctionBodiesRewriter(classMemberLocalContext))
+                            transformChildren(FunctionBodiesRewriter(classMemberLocalContext), declaration)
                         }
                     } else {
-                        super.visitFunction(declaration)
+                        super.visitFunction(declaration, declaration)
                     }
                 }
             }
 
-            override fun visitConstructor(declaration: IrConstructor): IrStatement {
+            override fun visitField(declaration: IrField, data: IrDeclaration) = super.visitField(declaration, declaration)
+
+            override fun visitConstructor(declaration: IrConstructor, data: IrDeclaration): IrStatement {
                 // Body is transformed separately. See loop over constructors in rewriteDeclarations().
 
                 val constructorContext = localClassConstructors[declaration]
@@ -248,10 +260,10 @@ class LocalDeclarationsLowering(
                     declaration.valueParameters.filter { it.defaultValue != null }.forEach { argument ->
                         oldParameterToNew[argument]!!.defaultValue = argument.defaultValue
                     }
-                } ?: super.visitConstructor(declaration)
+                } ?: super.visitConstructor(declaration, declaration)
             }
 
-            override fun visitGetValue(expression: IrGetValue): IrExpression {
+            override fun visitGetValue(expression: IrGetValue, data: IrDeclaration): IrExpression {
                 val declaration = expression.symbol.owner
 
                 localContext?.irGet(expression.startOffset, expression.endOffset, declaration)?.let {
@@ -265,8 +277,8 @@ class LocalDeclarationsLowering(
                 return expression
             }
 
-            override fun visitCall(expression: IrCall): IrExpression {
-                expression.transformChildrenVoid(this)
+            override fun visitCall(expression: IrCall, data: IrDeclaration): IrExpression {
+                expression.transformChildren(this, data)
 
                 val oldCallee = expression.symbol.owner
                 val newCallee = oldCallee.transformed ?: return expression
@@ -274,8 +286,8 @@ class LocalDeclarationsLowering(
                 return createNewCall(expression, newCallee).fillArguments2(expression, newCallee)
             }
 
-            override fun visitDelegatingConstructorCall(expression: IrDelegatingConstructorCall): IrExpression {
-                expression.transformChildrenVoid(this)
+            override fun visitDelegatingConstructorCall(expression: IrDelegatingConstructorCall, data: IrDeclaration): IrExpression {
+                expression.transformChildren(this, data)
 
                 val oldCallee = expression.symbol.owner
                 val newCallee = transformedDeclarations[oldCallee] as IrConstructor? ?: return expression
@@ -332,8 +344,8 @@ class LocalDeclarationsLowering(
                 return this
             }
 
-            override fun visitFunctionReference(expression: IrFunctionReference): IrExpression {
-                expression.transformChildrenVoid(this)
+            override fun visitFunctionReference(expression: IrFunctionReference, data: IrDeclaration): IrExpression {
+                expression.transformChildren(this, data)
 
                 val oldCallee = expression.symbol.owner
                 val newCallee = oldCallee.transformed ?: return expression
@@ -351,8 +363,8 @@ class LocalDeclarationsLowering(
                 }
             }
 
-            override fun visitReturn(expression: IrReturn): IrExpression {
-                expression.transformChildrenVoid(this)
+            override fun visitReturn(expression: IrReturn, data: IrDeclaration): IrExpression {
+                expression.transformChildren(this, data)
 
                 val oldReturnTarget = expression.returnTargetSymbol.owner as? IrFunction ?: return expression
                 val newReturnTarget = oldReturnTarget.transformed ?: return expression
@@ -364,29 +376,29 @@ class LocalDeclarationsLowering(
                 )
             }
 
-            override fun visitDeclarationReference(expression: IrDeclarationReference): IrExpression {
+            override fun visitDeclarationReference(expression: IrDeclarationReference, data: IrDeclaration): IrExpression {
                 if (expression.symbol.owner in transformedDeclarations) {
                     TODO()
                 }
-                return super.visitDeclarationReference(expression)
+                return super.visitDeclarationReference(expression, data)
             }
 
-            override fun visitDeclaration(declaration: IrDeclaration): IrStatement {
+            override fun visitDeclaration(declaration: IrDeclaration, data: IrDeclaration): IrStatement {
                 if (declaration in transformedDeclarations) {
                     TODO()
                 }
-                return super.visitDeclaration(declaration)
+                return super.visitDeclaration(declaration, declaration)
             }
         }
 
         private fun rewriteFunctionBody(irDeclaration: IrDeclaration, localContext: LocalContext?) {
-            irDeclaration.transformChildrenVoid(FunctionBodiesRewriter(localContext))
+            irDeclaration.transformChildren(FunctionBodiesRewriter(localContext), irDeclaration)
         }
 
         private fun rewriteClassMembers(irClass: IrClass, localClassContext: LocalClassContext) {
             val constructors = irClass.declarations.filterIsInstance<IrConstructor>()
 
-            irClass.transformChildrenVoid(FunctionBodiesRewriter(localClassContext))
+            irClass.transformChildren(FunctionBodiesRewriter(localClassContext), irClass)
 
             val constructorsCallingSuper = constructors
                 .asSequence()
@@ -770,6 +782,47 @@ class LocalDeclarationsLowering(
                     localClasses[declaration] = localClassContext
                 }
             })
+        }
+
+        private fun collectLocalDeclarations2(irDeclarationContainer: IrDeclarationContainer) {
+            memberDeclaration.acceptChildren(object : IrElementVisitor<Unit, IrDeclaration> {
+
+                override fun visitElement(element: IrElement, data: IrDeclaration) {
+                    element.acceptChildren(this, data)
+                }
+
+                override fun visitFunction(declaration: IrFunction, data: IrDeclaration) {
+
+                    if (data != irDeclarationContainer) {
+                        val localFunctionContext = LocalFunctionContext(declaration)
+
+                        localFunctions[declaration] = localFunctionContext
+
+                        if (declaration.name.isSpecial) {
+                            localFunctionContext.index = lambdasCount++
+                        }
+                    }
+
+
+                    return super.visitFunction(declaration, declaration)
+                }
+
+                override fun visitField(declaration: IrField, data: IrDeclaration) = super.visitField(declaration, declaration)
+
+                override fun visitClass(declaration: IrClass, data: IrDeclaration) {
+
+                    if (data != irDeclarationContainer) {
+                        val localClassContext = LocalClassContext(declaration)
+                        localClasses[declaration] = localClassContext
+
+                        for (it in declaration.constructors) {
+                            localClassConstructors[it] = LocalClassConstructorContext(it)
+                        }
+                    }
+
+
+                }
+            }, memberDeclaration)
         }
     }
 
