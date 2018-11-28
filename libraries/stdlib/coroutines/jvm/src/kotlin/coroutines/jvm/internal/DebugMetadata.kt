@@ -49,10 +49,18 @@ internal fun BaseContinuationImpl.getStackTraceElementImpl(): StackTraceElement?
 }
 
 private object ModuleNameRetriever {
-    private class Cache(val getModuleMethod: Method?, val getDescriptorMethod: Method?, val nameMethod: Method?)
+    private class Cache(
+        @JvmField
+        val getModuleMethod: Method?,
+        @JvmField
+        val getDescriptorMethod: Method?,
+        @JvmField
+        val nameMethod: Method?
+    )
 
     private val notOnJava9 = Cache(null, null, null)
 
+    @JvmField
     var cache: Cache? = null
 
     fun getModuleName(continuation: BaseContinuationImpl): String? {
@@ -66,17 +74,16 @@ private object ModuleNameRetriever {
     }
 
     private fun buildCache(continuation: BaseContinuationImpl): Cache {
-        val getModuleMethod: Method
         try {
-            getModuleMethod = Class::class.java.getDeclaredMethod("getModule")
-        } catch (ignored: NoSuchMethodException) {
+            val getModuleMethod = Class::class.java.getDeclaredMethod("getModule")
+            val methodClass = continuation.javaClass.classLoader.loadClass("java.lang.Module")
+            val getDescriptorMethod = methodClass.getDeclaredMethod("getDescriptor")
+            val moduleDescriptorClass = continuation.javaClass.classLoader.loadClass("java.lang.module.ModuleDescriptor")
+            val nameMethod = moduleDescriptorClass.getDeclaredMethod("name")
+            return Cache(getModuleMethod, getDescriptorMethod, nameMethod).also { cache = it }
+        } catch (ignored: Exception) {
             return notOnJava9.also { cache = it }
         }
-        val methodClass = continuation.javaClass.classLoader.loadClass("java.lang.Module")
-        val getDescriptorMethod = methodClass.getDeclaredMethod("getDescriptor")
-        val moduleDescriptorClass = continuation.javaClass.classLoader.loadClass("java.lang.module.ModuleDescriptor")
-        val nameMethod = moduleDescriptorClass.getDeclaredMethod("name")
-        return Cache(getModuleMethod, getDescriptorMethod, nameMethod).also { cache = it }
     }
 }
 
