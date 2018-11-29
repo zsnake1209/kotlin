@@ -3,10 +3,9 @@ package foo
 
 fun test(actual: DoubleArray, expect: DoubleArray): String {
     for (index in 0 until expect.size) {
-        val expectedElem = expect[index]
-        val actualElem = actual[index]
-        if (expectedElem !== actualElem) {
-            if (expectedElem.isNaN() && actualElem.isNaN()) continue
+        val expectedElem: Any = expect[index]
+        val actualElem: Any = actual[index]
+        if (expectedElem != actualElem) {
             return "Content at index $index does not match: $expectedElem != $actualElem"
         }
     }
