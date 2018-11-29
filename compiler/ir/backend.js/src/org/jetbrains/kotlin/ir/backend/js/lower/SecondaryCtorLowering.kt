@@ -46,6 +46,9 @@ class SecondaryCtorLowering(val context: JsIrBackendContext) {
     }
 
     val constructorRedirectorLowering = object : DeclarationContainerLoweringPass {
+        override fun preLower(irFile: IrFile) {
+
+        }
         override fun lower(irDeclarationContainer: IrDeclarationContainer) {
             if (irDeclarationContainer is IrClass) {
                 if (!irDeclarationContainer.isInline)   // Inline classes are lowered separately

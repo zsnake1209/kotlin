@@ -151,7 +151,10 @@ private fun FileLoweringPass.lower(moduleFragment: IrModuleFragment) = moduleFra
 
 private fun DeclarationContainerLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) =
     moduleFragment.files.forEach {
-        if (it.name.endsWith("CoroutineImpl.kt")) {
+
+        preLower(it)
+
+        if (it.name.endsWith("regex.kt")) {
             fun foo() {}
             foo()
         }
