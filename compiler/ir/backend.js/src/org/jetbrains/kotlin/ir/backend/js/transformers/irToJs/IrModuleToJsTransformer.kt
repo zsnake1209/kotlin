@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -13,10 +13,11 @@ import org.jetbrains.kotlin.ir.backend.js.export.ExportModelToJsStatements
 import org.jetbrains.kotlin.ir.backend.js.lower.StaticMembersLowering
 import org.jetbrains.kotlin.ir.backend.js.export.toTypeScript
 import org.jetbrains.kotlin.ir.backend.js.utils.*
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.declarations.path
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.backend.js.webWorkers.WorkerFileWithIndex
+import org.jetbrains.kotlin.ir.backend.js.webWorkers.prepareFilePrefixForWorkers
+import org.jetbrains.kotlin.ir.backend.js.webWorkers.prepareFileSuffixForWorkers
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.js.backend.ast.*
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
@@ -25,7 +26,8 @@ import org.jetbrains.kotlin.utils.DFS
 class IrModuleToJsTransformer(
     private val backendContext: JsIrBackendContext,
     private val mainFunction: IrSimpleFunction?,
-    private val mainArguments: List<String>?
+    private val mainArguments: List<String>?,
+    private val workerFilesWithIndices: List<WorkerFileWithIndex>
 ) {
     val moduleName = backendContext.configuration[CommonConfigurationKeys.MODULE_NAME]!!
     private val moduleKind = backendContext.configuration[JSConfigurationKeys.MODULE_KIND]!!
@@ -98,7 +100,10 @@ class IrModuleToJsTransformer(
 
         val moduleBody = generateModuleBody(module, rootContext)
         val exportStatements = ExportModelToJsStatements(internalModuleName, namer)
-            .generateModuleExport(exportedModule)
+            .generateModuleExport(exportedModule) +
+                workerFilesWithIndices.map {
+                    jsAssignment(JsNameRef(it.functionName, "_"), JsNameRef(it.functionName)).makeStmt()
+                } + listOf(jsAssignment(JsNameRef("terminateWorkers", "_"), JsNameRef("terminateWorkers")).makeStmt())
 
         with(rootFunction) {
             parameters += JsParameter(internalModuleName)
@@ -120,7 +125,13 @@ class IrModuleToJsTransformer(
             kind = moduleKind
         )
 
-        return CompilerResult(program.toString(), dts)
+        val resultProgram =
+            if (workerFilesWithIndices.isNotEmpty())
+                prepareFilePrefixForWorkers() + program.toString() + prepareFileSuffixForWorkers(moduleName, workerFilesWithIndices)
+            else
+                program.toString()
+
+        return CompilerResult(resultProgram, dts)
     }
 
     private fun generateMainArguments(mainFunction: IrSimpleFunction, rootContext: JsGenerationContext): List<JsExpression> {

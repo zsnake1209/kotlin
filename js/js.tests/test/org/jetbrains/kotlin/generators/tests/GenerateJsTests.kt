@@ -56,6 +56,10 @@ fun main(args: Array<String>) {
         testClass<AbstractIrWasmBoxJsTest> {
             model("wasmBox", pattern = "^([^_](.+))\\.kt$", targetBackend = TargetBackend.JS_IR)
         }
+        
+        testClass<AbstractIrJsWebWorkersTests> {
+            model("webworkers/", pattern = "^([^_](.+))\\.kt$", targetBackend = TargetBackend.JS_IR)
+        }
     }
 
     testGroup("js/js.tests/test", "compiler/testData", testRunnerMethodName = "runTest0") {

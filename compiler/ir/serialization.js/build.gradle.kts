@@ -129,6 +129,7 @@ val reducedRuntimeSources by task<Sync> {
                 "libraries/stdlib/js/src/kotlin/reflect/KTypeHelpers.kt",
                 "libraries/stdlib/js/src/kotlin/reflect/KTypeParameterImpl.kt",
                 "libraries/stdlib/js/src/kotlin/reflect/KTypeImpl.kt",
+                "libraries/stdlib/js/src/kotlin/worker/**",
                 "libraries/stdlib/src/kotlin/collections/**",
                 "libraries/stdlib/src/kotlin/experimental/bitwiseOperations.kt",
                 "libraries/stdlib/src/kotlin/properties/Delegates.kt",
