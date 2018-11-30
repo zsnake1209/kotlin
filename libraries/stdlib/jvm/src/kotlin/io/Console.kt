@@ -150,7 +150,10 @@ private val decoder: CharsetDecoder by lazy { Charset.defaultCharset().newDecode
  *
  * @return the line read or `null` if the input stream is redirected to a file and the end of file has been reached.
  */
-fun readLine(): String? = readLine(System.`in`, decoder)
+fun readLine(): String? {
+    val console = System.console() ?: return readLine(System.`in`, decoder)
+    return console.readLine()
+}
 
 internal fun readLine(inputStream: InputStream, decoder: CharsetDecoder): String? {
     require(decoder.maxCharsPerByte() <= 1) { "Encodings with multiple chars per byte are not supported" }
