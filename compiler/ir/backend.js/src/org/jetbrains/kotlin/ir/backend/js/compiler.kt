@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.backend.common.*
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.lower.*
 import org.jetbrains.kotlin.backend.common.lower.InlineClassLowering
+import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -34,6 +35,41 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
+
+
+object JvmPhaseRunner : PhaseRunner<JsIrBackendContext, IrModuleFragment> {
+    override fun reportBefore(phase: CompilerPhase<JsIrBackendContext, IrModuleFragment>, depth: Int, context: JsIrBackendContext, data: IrModuleFragment) {
+//        if (phase in context.phases.toDumpStateBefore) {
+//            dumpFile(data, phase, BeforeOrAfter.BEFORE)
+//        }
+    }
+
+    override fun runBody(phase: CompilerPhase<JsIrBackendContext, IrModuleFragment>, context: JsIrBackendContext, source: IrModuleFragment): IrModuleFragment {
+//        val runner = when {
+//            phase === IrFileStartPhase -> ::justRun
+//            phase === IrFileEndPhase -> ::justRun
+//            (context.state.configuration.get(CommonConfigurationKeys.PROFILE_PHASES) == true) -> ::runAndProfile
+//            else -> ::justRun
+//        }
+//
+//        context.inVerbosePhase = (phase in context.phases.verbose)
+//
+//        val result = runner(phase, context, source)
+//
+//        context.inVerbosePhase = false
+//
+//        return result
+
+        return phase.invoke(context, source)
+    }
+
+    override fun reportAfter(phase: CompilerPhase<JsIrBackendContext, IrModuleFragment>, depth: Int, context: JsIrBackendContext, data: IrModuleFragment) {
+//        if (phase in context.phases.toDumpStateAfter) {
+//            dumpFile(data, phase, BeforeOrAfter.AFTER)
+//        }
+    }
+}
+
 
 data class Result(val moduleDescriptor: ModuleDescriptor, val generatedCode: String, val moduleFragment: IrModuleFragment)
 

@@ -118,32 +118,18 @@ class CompilerPhaseManager<Context : BackendContext, Data>(
     }
 }
 
-fun <Context : BackendContext> makePhase(
-    loweringConstructor: (Context) -> FileLoweringPass,
+fun <Context : BackendContext, Data> makePhase(
+    lowering: (Context, Data) -> Unit,
     description: String,
     name: String,
     prerequisite: Set<CompilerPhase<*, *>> = emptySet()
-) = object : CompilerPhase<Context, IrFile> {
+) = object : CompilerPhase<Context, Data> {
     override val name = name
     override val description = description
     override val prerequisite = prerequisite
 
-    override fun invoke(context: Context, input: IrFile): IrFile {
-        loweringConstructor(context).lower(input)
+    override fun invoke(context: Context, input: Data): Data {
+        lowering(context, input)
         return input
     }
-}
-
-object IrFileStartPhase : CompilerPhase<BackendContext, IrFile> {
-    override val name = "IrFileStart"
-    override val description = "State at start of IrFile lowering"
-    override val prerequisite = emptySet()
-    override fun invoke(context: BackendContext, input: IrFile) = input
-}
-
-object IrFileEndPhase : CompilerPhase<BackendContext, IrFile> {
-    override val name = "IrFileEnd"
-    override val description = "State at end of IrFile lowering"
-    override val prerequisite = emptySet()
-    override fun invoke(context: BackendContext, input: IrFile) = input
 }

@@ -26,55 +26,6 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.util.PatchDeclarationParentsVisitor
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 
-val jvmPhases = listOf(
-    IrFileStartPhase,
-
-    JvmCoercionToUnitPhase,
-    FileClassPhase,
-    KCallableNamePropertyPhase,
-
-    makeLateinitPhase(true),
-
-    MoveCompanionObjectFieldsPhase,
-    ConstAndJvmFieldPropertiesPhase,
-    PropertiesPhase,
-    AnnotationPhase,
-
-    makeDefaultArgumentStubPhase(false),
-
-    InterfacePhase,
-    InterfaceDelegationPhase,
-    SharedVariablesPhase,
-
-    makePatchParentsPhase(1),
-
-    JvmLocalDeclarationsPhase,
-    CallableReferencePhase,
-    FunctionNVarargInvokePhase,
-
-    InnerClassesPhase,
-    InnerClassConstructorCallsPhase,
-
-    makePatchParentsPhase(2),
-
-    EnumClassPhase,
-    ObjectClassPhase,
-    makeInitializersPhase(JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, true),
-    SingletonReferencesPhase,
-    SyntheticAccessorPhase,
-    BridgePhase,
-    JvmOverloadsAnnotationPhase,
-    JvmStaticAnnotationPhase,
-    StaticDefaultFunctionPhase,
-
-    TailrecPhase,
-    ToArrayPhase,
-
-    makePatchParentsPhase(3),
-
-    IrFileEndPhase
-)
-
 fun makePatchParentsPhase(number: Int) = object : CompilerPhase<BackendContext, IrFile> {
     override val name: String = "PatchParents$number"
     override val description: String = "Patch parent references in IrFile, pass $number"
