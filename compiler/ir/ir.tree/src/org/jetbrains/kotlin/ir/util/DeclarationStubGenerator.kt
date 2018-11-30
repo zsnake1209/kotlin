@@ -81,7 +81,7 @@ class DeclarationStubGenerator(
     internal fun generatePropertyStub(
         descriptor: PropertyDescriptor,
         bindingContext: BindingContext? = null
-    ): IrProperty =
+    ): IrProperty = symbolTable.referenceProperty(descriptor) {
         IrLazyProperty(
             UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor,
             this, typeTranslator
@@ -97,6 +97,7 @@ class DeclarationStubGenerator(
                 correspondingProperty = irProperty
             }
         }
+    }
 
     private fun generateFieldStub(descriptor: PropertyDescriptor): IrField {
         val referenced = symbolTable.referenceField(descriptor)
