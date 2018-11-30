@@ -114,6 +114,7 @@ class JsIrBackendContext(
         private val COROUTINE_PACKAGE_FQNAME_12 = FqName.fromSegments(listOf("kotlin", "coroutines", "experimental"))
         private val COROUTINE_PACKAGE_FQNAME_13 = FqName.fromSegments(listOf("kotlin", "coroutines"))
         private val COROUTINE_PACKAGE_FQNAME = COROUTINE_PACKAGE_FQNAME_13
+        private val WORKER_PACKAGE_FQNAME = FqName.fromSegments(listOf("kotlin", "worker"))
         private val COROUTINE_INTRINSICS_PACKAGE_FQNAME = COROUTINE_PACKAGE_FQNAME.child(INTRINSICS_PACKAGE_NAME)
 
         // TODO: due to name clash those weird suffix is required, remove it once `NameGenerator` is implemented
@@ -126,6 +127,7 @@ class JsIrBackendContext(
     private val internalPackage = module.getPackage(JS_PACKAGE_FQNAME)
 
     private val coroutinePackage = module.getPackage(COROUTINE_PACKAGE_FQNAME)
+    private val workerPackage = module.getPackage(WORKER_PACKAGE_FQNAME)
     private val coroutineIntrinsicsPackage = module.getPackage(COROUTINE_INTRINSICS_PACKAGE_FQNAME)
 
     val enumEntryToGetInstanceFunction = mutableMapOf<IrEnumEntrySymbol, IrSimpleFunction>()
@@ -177,6 +179,7 @@ class JsIrBackendContext(
                 get() = TODO("not implemented")
             override val coroutineImpl =
                 symbolTable.referenceClass(findClass(coroutinePackage.memberScope, COROUTINE_IMPL_NAME))
+            override val workerInterface = symbolTable.referenceClass(findClass(workerPackage.memberScope, "Worker"))
             override val coroutineSuspendedGetter =
                 symbolTable.referenceSimpleFunction(
                     coroutineIntrinsicsPackage.memberScope.getContributedVariables(
