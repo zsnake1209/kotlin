@@ -382,3 +382,7 @@ fun IrClass.createImplicitParameterDeclarationWithWrappedDescriptor() {
     assert(typeParameters.isEmpty())
     assert(descriptor.declaredTypeParameters.isEmpty())
 }
+
+fun IrSimpleFunction.isMethodOfAny() =
+    ((valueParameters.size == 0 && name.asString() in setOf("hashCode", "toString")) ||
+            (valueParameters.size == 1 && name.asString() == "equals" && valueParameters[0].type.isNullableAny()))
