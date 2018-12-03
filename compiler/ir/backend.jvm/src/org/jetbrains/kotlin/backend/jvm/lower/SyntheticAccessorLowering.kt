@@ -35,7 +35,6 @@ import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElementTransformerVoidWithContext(), FileLoweringPass {
     private val pendingTransformations = mutableListOf<Function0<Unit>>()
@@ -151,7 +150,7 @@ class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElementTrans
             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             JvmLoweredDeclarationOrigin.SYNTHETIC_ACCESSOR,
             IrSimpleFunctionSymbolImpl(accessorDescriptor),
-            source.descriptor.accessorName(),
+            source.accessorName(),
             Visibilities.PUBLIC,
             Modality.FINAL,
             IrUninitializedType,
@@ -191,7 +190,7 @@ class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElementTrans
             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             JvmLoweredDeclarationOrigin.SYNTHETIC_ACCESSOR,
             IrSimpleFunctionSymbolImpl(accessorDescriptor),
-            fieldSymbol.descriptor.accessorNameForGetter(),
+            fieldSymbol.owner.accessorNameForGetter(),
             Visibilities.PUBLIC,
             Modality.FINAL,
             fieldSymbol.owner.type,
@@ -250,7 +249,7 @@ class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElementTrans
             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             JvmLoweredDeclarationOrigin.SYNTHETIC_ACCESSOR,
             IrSimpleFunctionSymbolImpl(accessorDescriptor),
-            fieldSymbol.descriptor.accessorNameForSetter(),
+            fieldSymbol.owner.accessorNameForSetter(),
             Visibilities.PUBLIC,
             Modality.FINAL,
             returnType = context.irBuiltIns.unitType,
@@ -430,21 +429,20 @@ class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElementTrans
         }
     }
 
-    // !!!!!! Should I use syntheticAccesssorUtils here ???
-    private fun FunctionDescriptor.accessorName(): Name {
-        val jvmName = DescriptorUtils.getJvmName(this) ?: context.state.typeMapper.mapFunctionName(
-            this,
-            OwnerKind.getMemberOwnerKind(containingDeclaration)
+    private fun IrFunction.accessorName(): Name {
+        val jvmName = context.state.typeMapper.mapFunctionName(
+            descriptor,
+            OwnerKind.getMemberOwnerKind(parentAsClass.descriptor)
         )
         return Name.identifier("access\$$jvmName")
     }
 
-    private fun PropertyDescriptor.accessorNameForGetter(): Name {
+    private fun IrField.accessorNameForGetter(): Name {
         val getterName = JvmAbi.getterName(name.asString())
         return Name.identifier("access\$prop\$$getterName")
     }
 
-    private fun PropertyDescriptor.accessorNameForSetter(): Name {
+    private fun IrField.accessorNameForSetter(): Name {
         val setterName = JvmAbi.setterName(name.asString())
         return Name.identifier("access\$prop\$$setterName")
     }
