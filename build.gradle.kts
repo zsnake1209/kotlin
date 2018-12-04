@@ -37,7 +37,7 @@ buildscript {
 
 plugins {
     `build-scan` version "1.15"
-    //idea
+    idea
     id("jps-compatible")
 }
 
