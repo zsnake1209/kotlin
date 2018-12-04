@@ -89,13 +89,6 @@ class DeclarationStubGenerator(
             if (descriptor.hasBackingField(bindingContext)) {
                 irProperty.backingField = generateFieldStub(descriptor)
             }
-
-            irProperty.getter = descriptor.getter?.let { generateFunctionStub(it, createPropertyIfNeeded = false) }?.apply {
-                correspondingProperty = irProperty
-            }
-            irProperty.setter = descriptor.setter?.let { generateFunctionStub(it, createPropertyIfNeeded = false) }?.apply {
-                correspondingProperty = irProperty
-            }
         }
     }
 
