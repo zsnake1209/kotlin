@@ -52,7 +52,7 @@ fun compile(
     )
 
     CompilerPhaseManager(context, context.phases, moduleFragment, JsPhaseRunner).run {
-        jsPhases.fold(moduleFragment) { m, p -> phase(p, context, m) }
+        jsPhases.fold(data) { m, p -> phase(p, context, m) }
     }
 
     return Result(analysisResult.moduleDescriptor, context.jsProgram.toString(), context.moduleFragmentCopy)

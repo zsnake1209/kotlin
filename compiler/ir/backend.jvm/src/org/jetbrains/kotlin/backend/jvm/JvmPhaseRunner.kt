@@ -5,11 +5,11 @@
 
 package org.jetbrains.kotlin.backend.jvm
 
-import org.jetbrains.kotlin.backend.common.PhaseRunnerDefault
+import org.jetbrains.kotlin.backend.common.DefaultIrPhaseRunner
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.name
 
-object JvmPhaseRunner : PhaseRunnerDefault<JvmBackendContext, IrFile>() {
+object JvmPhaseRunner : DefaultIrPhaseRunner<JvmBackendContext, IrFile>() {
     override val startPhaseMarker = IrFileStartPhase
     override val endPhaseMarker = IrFileEndPhase
 

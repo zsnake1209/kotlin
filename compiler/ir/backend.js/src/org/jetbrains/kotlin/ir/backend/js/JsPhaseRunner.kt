@@ -5,10 +5,10 @@
 
 package org.jetbrains.kotlin.ir.backend.js
 
-import org.jetbrains.kotlin.backend.common.PhaseRunnerDefault
+import org.jetbrains.kotlin.backend.common.DefaultIrPhaseRunner
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
-object JsPhaseRunner : PhaseRunnerDefault<JsIrBackendContext, IrModuleFragment>() {
+object JsPhaseRunner : DefaultIrPhaseRunner<JsIrBackendContext, IrModuleFragment>() {
     override val startPhaseMarker = IrModuleStartPhase
     override val endPhaseMarker = IrModuleEndPhase
 

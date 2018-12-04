@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.util.dump
 import kotlin.system.measureTimeMillis
 
-interface CompilerPhase<in Context : BackendContext, Data: IrElement> {
+interface CompilerPhase<in Context : BackendContext, Data> {
     val name: String
     val description: String
     val prerequisite: Set<CompilerPhase<*, *>>
@@ -73,13 +73,13 @@ class CompilerPhases(private val phaseList: List<AnyPhase>, config: CompilerConf
 }
 
 
-interface PhaseRunner<Context : BackendContext, Data : IrElement> {
+interface PhaseRunner<Context : BackendContext, Data> {
     fun reportBefore(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data)
     fun runBody(phase: CompilerPhase<Context, Data>, context: Context, source: Data): Data
     fun reportAfter(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data)
 }
 
-abstract class PhaseRunnerDefault<Context : BackendContext, Data : IrElement> : PhaseRunner<Context, Data> {
+abstract class DefaultIrPhaseRunner<Context : BackendContext, Data : IrElement> : PhaseRunner<Context, Data> {
 
     enum class BeforeOrAfter { BEFORE, AFTER }
 
@@ -159,7 +159,7 @@ abstract class PhaseRunnerDefault<Context : BackendContext, Data : IrElement> : 
 }
 
 /* We assume that `element` is being modified by each phase, retaining its identity in the process. */
-class CompilerPhaseManager<Context : BackendContext, Data : IrElement>(
+class CompilerPhaseManager<Context : BackendContext, Data>(
     val context: Context,
     val phases: CompilerPhases,
     val data: Data,
@@ -170,7 +170,7 @@ class CompilerPhaseManager<Context : BackendContext, Data : IrElement>(
 
     private val previousPhases = mutableSetOf<CompilerPhase<Context, Data>>()
 
-    fun <NewData: IrElement> createChild(
+    fun <NewData> createChild(
         newData: NewData,
         newPhaseRunner: PhaseRunner<Context, NewData>
     ) = CompilerPhaseManager(
@@ -200,7 +200,7 @@ class CompilerPhaseManager<Context : BackendContext, Data : IrElement>(
     }
 }
 
-fun <Context : BackendContext, Data: IrElement> makePhase(
+fun <Context : BackendContext, Data> makePhase(
     lowering: (Context, Data) -> Unit,
     description: String,
     name: String,
