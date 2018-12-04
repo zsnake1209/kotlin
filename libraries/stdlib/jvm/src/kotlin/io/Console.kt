@@ -170,7 +170,7 @@ internal fun readLine(inputStream: InputStream, decoder: CharsetDecoder): String
             if (charBuffer.endsWithLineSeparator()) {
                 break
             }
-            if (charBuffer.limit() - charBuffer.position() < 2) {
+            if (charBuffer.remaining() < 2) {
                 charBuffer.offloadPrefixTo(stringBuilder)
             }
         }
