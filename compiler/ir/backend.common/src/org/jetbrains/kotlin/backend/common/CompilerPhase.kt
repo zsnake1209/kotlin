@@ -33,13 +33,21 @@ class CompilerPhases(private val phaseList: List<AnyPhase>, config: CompilerConf
     val toDumpStateBefore: Set<AnyPhase>
     val toDumpStateAfter: Set<AnyPhase>
 
+    val toValidateStateBefore: Set<AnyPhase>
+    val toValidateStateAfter: Set<AnyPhase>
+
     init {
         with(CommonConfigurationKeys) {
-            val beforeSet = phaseSetFromConfiguration(config, PHASES_TO_DUMP_STATE_BEFORE)
-            val afterSet = phaseSetFromConfiguration(config, PHASES_TO_DUMP_STATE_AFTER)
-            val bothSet = phaseSetFromConfiguration(config, PHASES_TO_DUMP_STATE)
-            toDumpStateBefore = beforeSet + bothSet
-            toDumpStateAfter = afterSet + bothSet
+            val beforeDumpSet = phaseSetFromConfiguration(config, PHASES_TO_DUMP_STATE_BEFORE)
+            val afterDumpSet = phaseSetFromConfiguration(config, PHASES_TO_DUMP_STATE_AFTER)
+            val bothDumpSet = phaseSetFromConfiguration(config, PHASES_TO_DUMP_STATE)
+            toDumpStateBefore = beforeDumpSet + bothDumpSet
+            toDumpStateAfter = afterDumpSet + bothDumpSet
+            val beforeValidateSet = phaseSetFromConfiguration(config, PHASES_TO_VALIDATE_BEFORE)
+            val afterValidateSet = phaseSetFromConfiguration(config, PHASES_TO_VALIDATE_AFTER)
+            val bothValidateSet = phaseSetFromConfiguration(config, PHASES_TO_VALIDATE)
+            toValidateStateBefore = beforeValidateSet + bothValidateSet
+            toValidateStateAfter = afterValidateSet + bothValidateSet
         }
     }
 
@@ -74,12 +82,13 @@ class CompilerPhases(private val phaseList: List<AnyPhase>, config: CompilerConf
 
 
 interface PhaseRunner<Context : BackendContext, Data> {
-    fun reportBefore(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data)
+    fun runBefore(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data)
     fun runBody(phase: CompilerPhase<Context, Data>, context: Context, source: Data): Data
-    fun reportAfter(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data)
+    fun runAfter(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data)
 }
 
-abstract class DefaultIrPhaseRunner<Context : BackendContext, Data : IrElement> : PhaseRunner<Context, Data> {
+abstract class DefaultIrPhaseRunner<Context : CommonBackendContext, Data : IrElement>(private val validator: (data: Data, context: Context) -> Unit = { _, _ -> }) :
+    PhaseRunner<Context, Data> {
 
     enum class BeforeOrAfter { BEFORE, AFTER }
 
@@ -88,10 +97,9 @@ abstract class DefaultIrPhaseRunner<Context : BackendContext, Data : IrElement> 
 
     private var inVerbosePhase = false
 
-    final override fun reportBefore(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data) {
-        if (phase in phases(context).toDumpStateBefore) {
-            dumpElement(data, phase, context, BeforeOrAfter.BEFORE)
-        }
+    final override fun runBefore(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data) {
+        checkAndRun(phase, phases(context).toDumpStateBefore) { dumpElement(data, phase, context, BeforeOrAfter.BEFORE) }
+        checkAndRun(phase, phases(context).toValidateStateBefore) { validator(data, context) }
     }
 
     final override fun runBody(phase: CompilerPhase<Context, Data>, context: Context, source: Data): Data {
@@ -111,10 +119,9 @@ abstract class DefaultIrPhaseRunner<Context : BackendContext, Data : IrElement> 
         return result
     }
 
-    final override fun reportAfter(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data) {
-        if (phase in phases(context).toDumpStateAfter) {
-            dumpElement(data, phase, context, BeforeOrAfter.AFTER)
-        }
+    final override fun runAfter(phase: CompilerPhase<Context, Data>, depth: Int, context: Context, data: Data) {
+        checkAndRun(phase, phases(context).toDumpStateAfter) { dumpElement(data, phase, context, BeforeOrAfter.AFTER) }
+        checkAndRun(phase, phases(context).toValidateStateAfter) { validator(data, context) }
     }
 
     open fun separator(title: String) = println("\n\n--- $title ----------------------\n")
@@ -127,6 +134,10 @@ abstract class DefaultIrPhaseRunner<Context : BackendContext, Data : IrElement> 
 
     private fun shouldBeDumped(context: Context, input: Data) =
         elementName(input) !in configuration(context).get(CommonConfigurationKeys.EXCLUDED_ELEMENTS_FROM_DUMPING, emptySet())
+
+    private fun checkAndRun(phase: CompilerPhase<Context, Data>, set: Set<AnyPhase>, block: () -> Unit) {
+        if (phase in set) block()
+    }
 
     private fun dumpElement(input: Data, phase: CompilerPhase<Context, Data>, context: Context, beforeOrAfter: BeforeOrAfter) {
         // Exclude nonsensical combinations
@@ -158,7 +169,6 @@ abstract class DefaultIrPhaseRunner<Context : BackendContext, Data : IrElement> 
         phase.invoke(context, source)
 }
 
-/* We assume that `element` is being modified by each phase, retaining its identity in the process. */
 class CompilerPhaseManager<Context : BackendContext, Data>(
     val context: Context,
     val phases: CompilerPhases,
@@ -193,9 +203,9 @@ class CompilerPhaseManager<Context : BackendContext, Data>(
 
         previousPhases.add(phase)
 
-        phaseRunner.reportBefore(phase, depth, context, source)
+        phaseRunner.runBefore(phase, depth, context, source)
         val result = phaseRunner.runBody(phase, context, source)
-        phaseRunner.reportAfter(phase, depth, context, result)
+        phaseRunner.runAfter(phase, depth, context, result)
         return result
     }
 }

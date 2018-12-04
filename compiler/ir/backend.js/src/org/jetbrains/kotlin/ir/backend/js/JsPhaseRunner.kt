@@ -5,10 +5,24 @@
 
 package org.jetbrains.kotlin.ir.backend.js
 
+import org.jetbrains.kotlin.backend.common.CheckDeclarationParentsVisitor
 import org.jetbrains.kotlin.backend.common.DefaultIrPhaseRunner
+import org.jetbrains.kotlin.backend.common.IrValidator
+import org.jetbrains.kotlin.backend.common.IrValidatorConfig
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
-object JsPhaseRunner : DefaultIrPhaseRunner<JsIrBackendContext, IrModuleFragment>() {
+private fun validationCallback(module: IrModuleFragment, context: JsIrBackendContext) {
+    val validatorConfig = IrValidatorConfig(
+        abortOnError = true,
+        ensureAllNodesAreDifferent = true,
+        checkTypes = false,
+        checkDescriptors = false
+    )
+    module.accept(IrValidator(context, validatorConfig), null)
+    module.accept(CheckDeclarationParentsVisitor, null)
+}
+
+object JsPhaseRunner : DefaultIrPhaseRunner<JsIrBackendContext, IrModuleFragment>(::validationCallback) {
     override val startPhaseMarker = IrModuleStartPhase
     override val endPhaseMarker = IrModuleEndPhase
 
