@@ -359,6 +359,11 @@ open class WrappedClassConstructorDescriptor(
     annotations: Annotations = Annotations.EMPTY,
     sourceElement: SourceElement = SourceElement.NO_SOURCE
 ) : ClassConstructorDescriptor, WrappedCallableDescriptor<IrConstructor>(annotations, sourceElement) {
+
+    //init {
+    //    try { error("creating wrapped class constructor descriptor") } catch (e: Throwable) { e.printStackTrace() ; println(e)}
+    //}
+
     override fun getContainingDeclaration() = (owner.parent as IrClass).descriptor
 
     override fun getDispatchReceiverParameter() = owner.dispatchReceiverParameter?.run {

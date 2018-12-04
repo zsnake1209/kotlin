@@ -41,22 +41,32 @@ class ExternalDependenciesGenerator(
         fun run() {
             stubGenerator.unboundSymbolGeneration = true
             ArrayList(symbolTable.unboundClasses).forEach {
-                val cls = stubGenerator.generateClassStub(it.descriptor)
+                //deserializer?.findDeserializedDeclaration(it) ?:
+                stubGenerator.generateClassStub(it.descriptor)
             }
             ArrayList(symbolTable.unboundConstructors).forEach {
+                //deserializer?.findDeserializedDeclaration(it) ?:
                 stubGenerator.generateConstructorStub(it.descriptor)
             }
             ArrayList(symbolTable.unboundEnumEntries).forEach {
+                //deserializer?.findDeserializedDeclaration(it) ?:
                 stubGenerator.generateEnumEntryStub(it.descriptor)
+
             }
             ArrayList(symbolTable.unboundFields).forEach {
+                //deserializer?.findDeserializedDeclaration(it) ?:
                 stubGenerator.generatePropertyStub(it.descriptor, bindingContext)
+
             }
             ArrayList(symbolTable.unboundSimpleFunctions).forEach {
+                //deserializer?.findDeserializedDeclaration(it) ?:
                 stubGenerator.generateFunctionStub(it.descriptor)
+
             }
             ArrayList(symbolTable.unboundTypeParameters).forEach {
+                //deserializer?.findDeserializedDeclaration(it) ?:
                 stubGenerator.generateOrGetTypeParameterStub(it.descriptor)
+
             }
 
             assert(symbolTable.unboundClasses.isEmpty()) {

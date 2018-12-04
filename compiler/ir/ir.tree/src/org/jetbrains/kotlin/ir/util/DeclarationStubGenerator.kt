@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrFieldImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrPropertyImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.declarations.lazy.*
@@ -84,7 +85,7 @@ class DeclarationStubGenerator(
         descriptor: PropertyDescriptor,
         bindingContext: BindingContext? = null
     ): IrProperty =
-        deserializer?.findDeserializedDeclaration(descriptor) as IrProperty? ?:
+        //deserializer?.findDeserializedDeclaration(descriptor) as IrProperty? ?:
         IrPropertyImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor).also { irProperty ->
             if (descriptor.hasBackingField(bindingContext)) {
                 irProperty.backingField = generateFieldStub(descriptor)
@@ -109,13 +110,16 @@ class DeclarationStubGenerator(
                 IrDeclarationOrigin.FAKE_OVERRIDE
             else origin
 
-        return symbolTable.declareField(
+        return /*deserializer?.findDeserializedDeclaration(referenced) as IrField? ?:*/        symbolTable.declareField(
             UNDEFINED_OFFSET,
             UNDEFINED_OFFSET,
             origin,
             descriptor.original,
             descriptor.type.toIrType()
-        ).apply {
+        ) {
+            deserializer?.findDeserializedDeclaration(referenced)  as IrField? ?:
+            IrFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, it, descriptor.type.toIrType())
+        }.apply {
             initializer = descriptor.compileTimeInitializer?.let {
                 IrExpressionBodyImpl(
                     constantValueGenerator.generateConstantValueAsExpression(
@@ -151,7 +155,7 @@ class DeclarationStubGenerator(
             origin,
             descriptor.original
         ) {
-            deserializer?.findDeserializedDeclaration(descriptor)  as IrSimpleFunction? ?:
+            deserializer?.findDeserializedDeclaration(referenced)  as IrSimpleFunction? ?:
             IrLazyFunction(UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, it, this, typeTranslator)
         }
     }
@@ -165,7 +169,7 @@ class DeclarationStubGenerator(
         return symbolTable.declareConstructor(
             UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor.original
         ) {
-            deserializer?.findDeserializedDeclaration(descriptor)  as IrConstructor? ?:
+            deserializer?.findDeserializedDeclaration(referenced)  as IrConstructor? ?:
             IrLazyConstructor(UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, it, this, typeTranslator)
         }
     }
@@ -200,7 +204,7 @@ class DeclarationStubGenerator(
         return symbolTable.declareClass(
             UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor
         ) {
-            deserializer?.findDeserializedDeclaration(descriptor)  as IrClass? ?:
+            deserializer?.findDeserializedDeclaration(referenceClass)  as IrClass? ?:
             IrLazyClass(UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, it, this, typeTranslator)
         }
     }
@@ -211,7 +215,7 @@ class DeclarationStubGenerator(
             return referenced.owner
         }
         return symbolTable.declareEnumEntry(UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor) {
-            deserializer?.findDeserializedDeclaration(descriptor)  as IrEnumEntry? ?:
+            deserializer?.findDeserializedDeclaration(referenced)  as IrEnumEntry? ?:
             IrLazyEnumEntryImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, it, this, typeTranslator)
         }
     }
@@ -222,7 +226,7 @@ class DeclarationStubGenerator(
             return referenced.owner
         }
         return symbolTable.declareGlobalTypeParameter(UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor) {
-            deserializer?.findDeserializedDeclaration(descriptor)  as IrTypeParameter? ?:
+            deserializer?.findDeserializedDeclaration(referenced)  as IrTypeParameter? ?:
             IrLazyTypeParameter(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin,
                 it, this, typeTranslator

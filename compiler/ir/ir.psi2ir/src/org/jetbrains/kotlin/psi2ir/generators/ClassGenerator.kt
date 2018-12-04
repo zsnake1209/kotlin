@@ -83,6 +83,7 @@ class ClassGenerator(
 
             generateMembersDeclaredInClassBody(irClass, ktClassOrObject)
 
+            println("generateClass: ${irClass.descriptor}")
             generateFakeOverrideMemberDeclarations(irClass, ktClassOrObject)
 
             if (irClass.isInline && ktClassOrObject is KtClassOrObject) {

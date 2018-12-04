@@ -30,9 +30,10 @@ import org.jetbrains.kotlin.ir.types.impl.IrUninitializedType
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedPropertyDescriptor
 
 interface IrDeserializer {
-    fun findDeserializedDeclaration(descriptor: DeclarationDescriptor): IrDeclaration?
+    fun findDeserializedDeclaration(symbol: IrSymbol): IrDeclaration?
 }
 
 interface ReferenceSymbolTable {
@@ -302,8 +303,11 @@ open class SymbolTable : ReferenceSymbolTable {
             initializer = irInitializer
         }
 
-    override fun referenceField(descriptor: PropertyDescriptor) =
-        fieldSymbolTable.referenced(descriptor) { IrFieldSymbolImpl(descriptor) }
+    override fun referenceField(descriptor: PropertyDescriptor): IrFieldSymbol {
+        if (descriptor is DeserializedPropertyDescriptor && descriptor.name.asString().startsWith("stackTraceStrings") == true) try { error("descriptor = $descriptor") } catch (e: Throwable) {println(e); e.printStackTrace()}
+
+        return fieldSymbolTable.referenced(descriptor) { IrFieldSymbolImpl(descriptor) }
+    }
 
     val unboundFields: Set<IrFieldSymbol> get() = fieldSymbolTable.unboundSymbols
 
