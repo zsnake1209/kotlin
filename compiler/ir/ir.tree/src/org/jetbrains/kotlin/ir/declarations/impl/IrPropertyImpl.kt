@@ -63,7 +63,9 @@ class IrPropertyImpl(
         startOffset, endOffset, origin,
         IrPropertySymbolImpl(descriptor),
         name, visibility, modality, isVar, isConst, isLateinit, isDelegated, isExternal
-    )
+    ) {
+        symbol.bind(this)
+    }
 
     constructor(
         startOffset: Int,
@@ -90,7 +92,9 @@ class IrPropertyImpl(
     ) : this(
         startOffset, endOffset, origin, isDelegated,
         IrPropertySymbolImpl(descriptor)
-    )
+    ) {
+        symbol.bind(this)
+    }
 
     constructor(
         startOffset: Int,
