@@ -23,6 +23,8 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
+import org.jetbrains.kotlin.ir.symbols.impl.IrPropertySymbolImpl
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
@@ -32,7 +34,7 @@ class IrPropertyImpl(
     startOffset: Int,
     endOffset: Int,
     origin: IrDeclarationOrigin,
-    override val descriptor: PropertyDescriptor,
+    override val symbol: IrPropertySymbol,
     override val name: Name,
     override val visibility: Visibility,
     override val modality: Modality,
@@ -48,16 +50,55 @@ class IrPropertyImpl(
         startOffset: Int,
         endOffset: Int,
         origin: IrDeclarationOrigin,
+        descriptor: PropertyDescriptor,
+        name: Name,
+        visibility: Visibility,
+        modality: Modality,
+        isVar: Boolean,
+        isConst: Boolean,
+        isLateinit: Boolean,
+        isDelegated: Boolean,
+        isExternal: Boolean
+    ) : this(
+        startOffset, endOffset, origin,
+        IrPropertySymbolImpl(descriptor),
+        name, visibility, modality, isVar, isConst, isLateinit, isDelegated, isExternal
+    )
+
+    constructor(
+        startOffset: Int,
+        endOffset: Int,
+        origin: IrDeclarationOrigin,
+        isDelegated: Boolean,
+        symbol: IrPropertySymbol
+    ) : this(
+        startOffset, endOffset, origin, symbol,
+        symbol.descriptor.name, symbol.descriptor.visibility, symbol.descriptor.modality,
+        isVar = symbol.descriptor.isVar,
+        isConst = symbol.descriptor.isConst,
+        isLateinit = symbol.descriptor.isLateInit,
+        isDelegated = isDelegated,
+        isExternal = symbol.descriptor.isEffectivelyExternal()
+    )
+
+    constructor(
+        startOffset: Int,
+        endOffset: Int,
+        origin: IrDeclarationOrigin,
         isDelegated: Boolean,
         descriptor: PropertyDescriptor
     ) : this(
-        startOffset, endOffset, origin, descriptor,
-        descriptor.name, descriptor.visibility, descriptor.modality,
-        isVar = descriptor.isVar,
-        isConst = descriptor.isConst,
-        isLateinit = descriptor.isLateInit,
-        isDelegated = isDelegated,
-        isExternal = descriptor.isEffectivelyExternal()
+        startOffset, endOffset, origin, isDelegated,
+        IrPropertySymbolImpl(descriptor)
+    )
+
+    constructor(
+        startOffset: Int,
+        endOffset: Int,
+        origin: IrDeclarationOrigin,
+        symbol: IrPropertySymbol
+    ) : this(
+        startOffset, endOffset, origin, symbol.descriptor.isDelegated, symbol
     )
 
     constructor(
@@ -91,6 +132,8 @@ class IrPropertyImpl(
         this.getter = getter
         this.setter = setter
     }
+
+    override val descriptor = symbol.descriptor
 
     override var backingField: IrField? = null
     override var getter: IrSimpleFunction? = null

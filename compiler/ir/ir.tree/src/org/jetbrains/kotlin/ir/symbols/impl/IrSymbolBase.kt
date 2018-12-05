@@ -75,6 +75,10 @@ class IrEnumEntrySymbolImpl(descriptor: ClassDescriptor) :
     IrBindableSymbolBase<ClassDescriptor, IrEnumEntry>(descriptor),
     IrEnumEntrySymbol
 
+class IrPropertySymbolImpl(descriptor: PropertyDescriptor) :
+    IrBindableSymbolBase<PropertyDescriptor, IrProperty>(descriptor),
+    IrPropertySymbol
+
 class IrFieldSymbolImpl(descriptor: PropertyDescriptor) :
     IrBindableSymbolBase<PropertyDescriptor, IrField>(descriptor),
     IrFieldSymbol

@@ -43,6 +43,7 @@ interface IrExternalPackageFragmentSymbol : IrPackageFragmentSymbol, IrBindableS
 interface IrAnonymousInitializerSymbol : IrBindableSymbol<ClassDescriptor, IrAnonymousInitializer>
 interface IrEnumEntrySymbol : IrBindableSymbol<ClassDescriptor, IrEnumEntry>
 
+interface IrPropertySymbol : IrBindableSymbol<PropertyDescriptor, IrProperty>
 interface IrFieldSymbol : IrBindableSymbol<PropertyDescriptor, IrField>
 
 interface IrClassifierSymbol : IrSymbol {

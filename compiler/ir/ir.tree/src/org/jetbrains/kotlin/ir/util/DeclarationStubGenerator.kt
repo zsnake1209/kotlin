@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrErrorExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.DescriptorUtils
-import org.jetbrains.kotlin.resolve.hasBackingField
 import org.jetbrains.kotlin.types.KotlinType
 
 class DeclarationStubGenerator(
@@ -78,15 +77,24 @@ class DeclarationStubGenerator(
                 throw AssertionError("Unexpected member descriptor: $descriptor")
         }
 
-    internal fun generatePropertyStub(
+    private fun generatePropertyStub(
         descriptor: PropertyDescriptor,
         bindingContext: BindingContext? = null
-    ): IrProperty = symbolTable.referenceProperty(descriptor) {
-        IrLazyProperty(
-            UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor,
-            this, typeTranslator, bindingContext
-        )
+    ): IrProperty {
+        val referenced = symbolTable.referenceProperty(descriptor)
+        if (referenced.isBound) {
+            return referenced.owner
+        }
+        return symbolTable.declareProperty(
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor
+        ) {
+            IrLazyProperty(
+                UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, referenced,
+                this, typeTranslator, bindingContext
+            )
+        }
     }
+
 
     fun generateFieldStub(descriptor: PropertyDescriptor, bindingContext: BindingContext? = null): IrField {
         val referenced = symbolTable.referenceField(descriptor)
