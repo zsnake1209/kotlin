@@ -146,7 +146,7 @@ class PropertyGenerator(declarationGenerator: DeclarationGenerator) : Declaratio
         return IrPropertyImpl(
             startOffset, endOffset,
             IrDeclarationOrigin.FAKE_OVERRIDE,
-            false,
+            propertyDescriptor.isDelegated,
             propertyDescriptor,
             backingField,
             propertyDescriptor.getter?.let { FunctionGenerator(declarationGenerator).generateFakeOverrideFunction(it, ktElement) },

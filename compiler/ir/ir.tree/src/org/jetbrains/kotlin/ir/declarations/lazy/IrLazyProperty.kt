@@ -26,41 +26,20 @@ class IrLazyProperty(
     endOffset: Int,
     origin: IrDeclarationOrigin,
     override val descriptor: PropertyDescriptor,
-    override val name: Name,
-    override val visibility: Visibility,
-    override val modality: Modality,
-    override val isVar: Boolean,
-    override val isConst: Boolean,
-    override val isLateinit: Boolean,
-    override val isDelegated: Boolean,
-    override val isExternal: Boolean,
     private val stubGenerator: DeclarationStubGenerator,
     typeTranslator: TypeTranslator,
+    override val name: Name = descriptor.name,
+    override val visibility: Visibility = descriptor.visibility,
+    override val modality: Modality = descriptor.modality,
+    override val isVar: Boolean = descriptor.isVar,
+    override val isConst: Boolean = descriptor.isConst,
+    override val isLateinit: Boolean = descriptor.isLateInit,
+    override val isDelegated: Boolean = descriptor.isDelegated,
+    override val isExternal: Boolean = descriptor.isEffectivelyExternal(),
     private val bindingContext: BindingContext? = null
 ) :
     IrLazyDeclarationBase(startOffset, endOffset, origin, stubGenerator, typeTranslator),
     IrProperty {
-
-    constructor(
-        startOffset: Int,
-        endOffset: Int,
-        origin: IrDeclarationOrigin,
-        descriptor: PropertyDescriptor,
-        stubGenerator: DeclarationStubGenerator,
-        typeTranslator: TypeTranslator,
-        bindingContext: BindingContext?
-    ) : this(
-        startOffset, endOffset, origin, descriptor,
-        descriptor.name, descriptor.visibility, descriptor.modality,
-        isVar = descriptor.isVar,
-        isConst = descriptor.isConst,
-        isLateinit = descriptor.isLateInit,
-        isDelegated = descriptor.isDelegated,
-        isExternal = descriptor.isEffectivelyExternal(),
-        stubGenerator = stubGenerator,
-        typeTranslator = typeTranslator,
-        bindingContext = bindingContext
-    )
 
     override var backingField: IrField? by lazyVar {
         if (descriptor.hasBackingField(bindingContext)) {

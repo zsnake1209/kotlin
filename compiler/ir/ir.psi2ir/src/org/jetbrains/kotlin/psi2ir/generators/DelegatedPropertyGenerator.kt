@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.psi2ir.generators
 
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irReturn
@@ -34,10 +35,12 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
+import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.declareSimpleFunctionWithOverrides
-import org.jetbrains.kotlin.psi.KtElement
-import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.psi.KtPropertyDelegate
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.ir.visitors.acceptVoid
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffsetSkippingComments
 import org.jetbrains.kotlin.psi2ir.intermediate.*
@@ -133,6 +136,62 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
                 irDelegate.symbol
             )
         }
+    }
+
+    fun generateFakeOverridesForPropertyFields(irElement: IrElement) {
+        irElement.acceptVoid(object : IrElementVisitorVoid {
+            override fun visitElement(element: IrElement) {
+                element.acceptChildrenVoid(this)
+            }
+
+            override fun visitProperty(declaration: IrProperty) {
+                if (declaration.isDelegated &&
+                    declaration.origin == IrDeclarationOrigin.FAKE_OVERRIDE &&
+                    declaration.backingField == null
+                ) {
+                    generateOverriddenDelegateFieldForProperty(declaration)
+                }
+                super.visitProperty(declaration)
+            }
+        })
+    }
+
+    private fun generateOverriddenDelegateFieldForProperty(
+        irProperty: IrProperty
+    ) {
+        /*
+            Descriptors for delegate fields are created by psi2ir, and are only accessible through IR structures.
+            Therefore we have to build their overrides in a postprocessing step of psi2ir.
+         */
+        if (irProperty.backingField != null) return
+
+        val propertyType = irProperty.getter?.returnType ?: irProperty.setter?.valueParameters!![0].type
+        val overriddenProperty = irProperty.getOverriddenDelegated()
+        generateOverriddenDelegateFieldForProperty(overriddenProperty)
+        val overriddenField = overriddenProperty.backingField!!
+
+        val delegateDescriptor = createPropertyDelegateDescriptor(
+            irProperty.descriptor,
+            overriddenField.type.toKotlinType(),
+            propertyType.toKotlinType()
+        ).apply {
+            overriddenDescriptors = listOf(overriddenField.descriptor)
+        }
+
+        irProperty.backingField = context.symbolTable.declareField(
+            irProperty.startOffset, irProperty.endOffset, IrDeclarationOrigin.FAKE_OVERRIDE,
+            delegateDescriptor, overriddenField.type
+        ).apply {
+            parent = irProperty.parent
+            correspondingProperty = irProperty
+            overriddenSymbols.add(overriddenProperty.backingField!!.symbol)
+        }
+    }
+
+    private fun IrProperty.getOverriddenDelegated(): IrProperty {
+        val symbol = getter?.overriddenSymbols?.find { it.owner.correspondingProperty?.isDelegated == true }
+            ?: setter?.overriddenSymbols?.find { it.owner.correspondingProperty?.isDelegated == true }
+        return symbol!!.owner.correspondingProperty!!
     }
 
     private fun generateInitializerBodyForPropertyDelegate(

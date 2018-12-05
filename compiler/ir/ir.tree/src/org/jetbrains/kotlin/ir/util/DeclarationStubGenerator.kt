@@ -85,7 +85,9 @@ class DeclarationStubGenerator(
     ): IrProperty = symbolTable.referenceProperty(descriptor) {
         IrLazyProperty(
             UNDEFINED_OFFSET, UNDEFINED_OFFSET, origin, descriptor,
-            this, typeTranslator, bindingContext
+            this, typeTranslator,
+            bindingContext = bindingContext,
+            isDelegated = false // external property's delegated field never plays any role
         )
     }
 

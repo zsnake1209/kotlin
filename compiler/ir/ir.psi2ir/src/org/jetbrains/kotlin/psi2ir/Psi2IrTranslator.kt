@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.generators.AnnotationGenerator
+import org.jetbrains.kotlin.psi2ir.generators.DelegatedPropertyGenerator
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.ModuleGenerator
 import org.jetbrains.kotlin.psi2ir.transformations.insertImplicitCasts
@@ -68,10 +69,12 @@ class Psi2IrTranslator(
         postprocessingSteps.forEach { it.postprocess(context, irElement) }
 
         irElement.patchDeclarationParents()
+        DelegatedPropertyGenerator(context).generateFakeOverridesForPropertyFields(irElement)
     }
 
     private fun generateAnnotationsForDeclarations(context: GeneratorContext, irElement: IrElement) {
         val annotationGenerator = AnnotationGenerator(context)
         irElement.acceptVoid(annotationGenerator)
     }
+
 }
