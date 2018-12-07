@@ -10,10 +10,7 @@ import org.jetbrains.kotlin.backend.common.descriptors.WrappedClassConstructorDe
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedValueParameterDescriptor
 import org.jetbrains.kotlin.backend.common.descriptors.synthesizedName
-import org.jetbrains.kotlin.backend.common.ir.copyTo
-import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
-import org.jetbrains.kotlin.backend.common.ir.ir2string
-import org.jetbrains.kotlin.backend.common.ir.irTemporaryWithWrappedDescriptor
+import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -221,8 +218,9 @@ open class DefaultParameterInjector constructor(
                 super.visitCall(expression)
                 val functionDeclaration = expression.symbol.owner
 
-                if (!functionDeclaration.needsDefaultArgumentsLowering(skipInline))
+                if (!functionDeclaration.needsDefaultArgumentsLowering(skipInline)) {
                     return expression
+                }
 
                 val argumentsCount = argumentCount(expression)
                 if (argumentsCount == functionDeclaration.valueParameters.size)

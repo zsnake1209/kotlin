@@ -70,7 +70,11 @@ class IrAnonymousInitializerSymbolImpl(descriptor: ClassDescriptor) :
 
 class IrClassSymbolImpl(descriptor: ClassDescriptor) :
     IrBindableSymbolBase<ClassDescriptor, IrClass>(descriptor),
-    IrClassSymbol
+    IrClassSymbol {
+    init {
+        if (descriptor.name.asString() == "__sFILEX") try { error("__sFILEX") } catch(e: Throwable) {println(e); e.printStackTrace()}
+    }
+}
 
 fun createClassSymbolOrNull(descriptor: ClassDescriptor?) =
     descriptor?.let { IrClassSymbolImpl(it) }

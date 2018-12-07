@@ -196,7 +196,7 @@ class DeclarationStubGenerator(
     internal fun generateClassStub(descriptor: ClassDescriptor): IrClass {
         val referenceClass = symbolTable.referenceClass(descriptor)
 
-        println("referenceClass symbol = $referenceClass name = ${descriptor.name}")
+        println("referenceClass symbol = $referenceClass name = ${descriptor.name} @${descriptor.hashCode()}")
         if (referenceClass.isBound) {
             return referenceClass.owner
         }
