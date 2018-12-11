@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.backend.common.descriptors.synthesizedName
 import org.jetbrains.kotlin.backend.common.ir.copyTo
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
 import org.jetbrains.kotlin.backend.common.ir.ir2string
+import org.jetbrains.kotlin.backend.common.ir.isOverridableOrOverrides
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -124,8 +125,8 @@ open class DefaultArgumentStubGenerator constructor(val context: CommonBackendCo
                 variables[valueParameter] = temporaryVariable
             }
 
-            if (irFunction is IrConstructor) {
-                +IrDelegatingConstructorCallImpl(
+            when (irFunction) {
+                is IrConstructor -> +IrDelegatingConstructorCallImpl(
                     startOffset = irFunction.startOffset,
                     endOffset = irFunction.endOffset,
                     type = context.irBuiltIns.unitType,
@@ -139,16 +140,8 @@ open class DefaultArgumentStubGenerator constructor(val context: CommonBackendCo
 
                     params.forEachIndexed { i, variable -> putValueArgument(i, irGet(variable)) }
                 }
-            } else {
-                +irReturn(irCall(irFunction).apply {
-                    newIrFunction.typeParameters.forEachIndexed { i, param ->
-                        putTypeArgument(i, param.defaultType)
-                    }
-                    dispatchReceiver = newIrFunction.dispatchReceiverParameter?.let { irGet(it) }
-                    extensionReceiver = newIrFunction.extensionReceiverParameter?.let { irGet(it) }
-
-                    params.forEachIndexed { i, variable -> putValueArgument(i, irGet(variable)) }
-                })
+                is IrSimpleFunction -> +irReturn(dispatchToImplementation(irFunction, newIrFunction, params))
+                else -> error("Unknown function declaration")
             }
         }
         // Remove default argument initializers.
@@ -156,6 +149,27 @@ open class DefaultArgumentStubGenerator constructor(val context: CommonBackendCo
             it.defaultValue = IrExpressionBodyImpl(IrErrorExpressionImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, it.type, "Default Stub"))
         }
         return listOf(irFunction, newIrFunction)
+    }
+
+    private fun IrBlockBodyBuilder.dispatchToImplementation(
+        irFunction: IrSimpleFunction,
+        newIrFunction: IrFunction,
+        params: MutableList<IrVariable>
+    ): IrCall {
+        return if (irFunction.isOverridableOrOverrides) {
+            // if $handler != null $handler(a, b, c) else foo(a, b, c)
+            TODO("Implement proper dispatch")
+        } else {
+            irCall(irFunction).apply {
+                newIrFunction.typeParameters.forEachIndexed { i, param ->
+                    putTypeArgument(i, param.defaultType)
+                }
+                dispatchReceiver = newIrFunction.dispatchReceiverParameter?.let { irGet(it) }
+                extensionReceiver = newIrFunction.extensionReceiverParameter?.let { irGet(it) }
+
+                params.forEachIndexed { i, variable -> putValueArgument(i, irGet(variable)) }
+            }
+        }
     }
 
 
@@ -192,12 +206,11 @@ open class DefaultParameterInjector constructor(
                     return expression
 
                 val (symbolForCall, params) = parametersForCall(expression)
-                symbolForCall as IrConstructorSymbol
                 return IrDelegatingConstructorCallImpl(
                     startOffset = expression.startOffset,
                     endOffset = expression.endOffset,
                     type = context.irBuiltIns.unitType,
-                    symbol = symbolForCall,
+                    symbol = symbolForCall as IrConstructorSymbol,
                     descriptor = symbolForCall.descriptor,
                     typeArgumentsCount = symbolForCall.owner.typeParameters.size
                 )
@@ -310,8 +323,14 @@ open class DefaultParameterInjector constructor(
                         symbol = defaultArgumentMarker
                     )
                 } else if (context.ir.shouldGenerateHandlerParameterForDefaultBodyFun()) {
-                    params += realFunction.valueParameters.last() to
-                            IrConstImpl.constNull(irBody.startOffset, irBody.endOffset, context.irBuiltIns.nothingNType)
+                    // TODO: Put lambda creation here
+                    val irCall = expression as IrCall
+                    params += if (irCall.superQualifierSymbol != null) {
+                        TODO("Build Lambda here")
+                    } else{
+                        realFunction.valueParameters.last() to
+                                IrConstImpl.constNull(irBody.startOffset, irBody.endOffset, context.irBuiltIns.nothingNType)
+                    }
                 }
                 params.forEach {
                     log { "descriptor::${realFunction.name.asString()}#${it.first.index}: ${it.first.name.asString()}" }
