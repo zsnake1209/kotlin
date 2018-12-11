@@ -155,21 +155,35 @@ open class DefaultArgumentStubGenerator constructor(val context: CommonBackendCo
         irFunction: IrSimpleFunction,
         newIrFunction: IrFunction,
         params: MutableList<IrVariable>
-    ): IrCall {
-        return if (irFunction.isOverridableOrOverrides) {
-            // if $handler != null $handler(a, b, c) else foo(a, b, c)
-            TODO("Implement proper dispatch")
-        } else {
-            irCall(irFunction).apply {
-                newIrFunction.typeParameters.forEachIndexed { i, param ->
-                    putTypeArgument(i, param.defaultType)
-                }
-                dispatchReceiver = newIrFunction.dispatchReceiverParameter?.let { irGet(it) }
-                extensionReceiver = newIrFunction.extensionReceiverParameter?.let { irGet(it) }
-
-                params.forEachIndexed { i, variable -> putValueArgument(i, irGet(variable)) }
+    ): IrExpression {
+        val dispatchCall = irCall(irFunction).apply {
+            newIrFunction.typeParameters.forEachIndexed { i, param ->
+                putTypeArgument(i, param.defaultType)
             }
+            dispatchReceiver = newIrFunction.dispatchReceiverParameter?.let { irGet(it) }
+            extensionReceiver = newIrFunction.extensionReceiverParameter?.let { irGet(it) }
+
+            params.forEachIndexed { i, variable -> putValueArgument(i, irGet(variable)) }
         }
+        return if (irFunction.isOverridableOrOverrides) {
+            val handlerDeclaration = newIrFunction.valueParameters.last()
+            val paramCount = irFunction.valueParameters.size
+            val invokeFunctionN = resolveInvoke(paramCount)
+            // if $handler != null $handler(a, b, c) else foo(a, b, c)
+            irIfThenElse(
+                irFunction.returnType,
+                irEqualsNull(irGet(handlerDeclaration)),
+                dispatchCall,
+                irCall(invokeFunctionN, IrStatementOrigin.INVOKE).apply {
+                    dispatchReceiver = irImplicitCast(irGet(handlerDeclaration), invokeFunctionN.dispatchReceiverParameter!!.type)
+                    extensionReceiver = newIrFunction.extensionReceiverParameter?.let { irGet(it) }
+                    params.forEachIndexed { i, variable -> putValueArgument(i, irGet(variable)) }
+                })
+        } else dispatchCall
+    }
+
+    private fun resolveInvoke(paramCount: Int): IrSimpleFunction {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 
@@ -325,17 +339,19 @@ open class DefaultParameterInjector constructor(
                 } else if (context.ir.shouldGenerateHandlerParameterForDefaultBodyFun()) {
                     // TODO: Put lambda creation here
                     val irCall = expression as IrCall
-                    params += if (irCall.superQualifierSymbol != null) {
-                        TODO("Build Lambda here")
-                    } else{
-                        realFunction.valueParameters.last() to
-                                IrConstImpl.constNull(irBody.startOffset, irBody.endOffset, context.irBuiltIns.nothingNType)
-                    }
+                    params += realFunction.valueParameters.last() to
+                            if (irCall.superQualifierSymbol != null) buildBoundSuperCall(irCall)
+                            else IrConstImpl.constNull(irBody.startOffset, irBody.endOffset, context.irBuiltIns.nothingNType)
+
                 }
                 params.forEach {
                     log { "descriptor::${realFunction.name.asString()}#${it.first.index}: ${it.first.name.asString()}" }
                 }
                 return Pair(realFunction.symbol, params)
+            }
+
+            private fun buildBoundSuperCall(irCall: IrCall): IrExpression {
+                TODO("Implement bound function")
             }
 
             private fun argumentCount(expression: IrMemberAccessExpression): Int {
