@@ -15,7 +15,7 @@ package kotlin.native
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.BINARY)
 @OptionalExpectation
-public expect annotation class ThreadLocal
+public expect annotation class ThreadLocal()
 
 /**
  * Top level variable is immutable and so could be shared.
@@ -25,5 +25,5 @@ public expect annotation class ThreadLocal
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.BINARY)
 @OptionalExpectation
-public expect annotation class SharedImmutable
+public expect annotation class SharedImmutable()
 
