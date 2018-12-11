@@ -198,7 +198,7 @@ private fun <T : PsiElement> deleteChildlessElement(element: PsiElement, childCl
 
 // Delete given element and all the elements separating it from the neighboring elements of the same class
 private fun deleteElementWithDelimiters(element: PsiElement) {
-    val paramBefore = PsiTreeUtil.getPrevSiblingOfType<PsiElement>(element, element.javaClass)
+    val paramBefore = PsiTreeUtil.getPrevSiblingOfType<PsiElement>(element, element.javaClass as Class<PsiElement>)
 
     val from: PsiElement
     val to: PsiElement
@@ -206,7 +206,7 @@ private fun deleteElementWithDelimiters(element: PsiElement) {
         from = paramBefore.nextSibling
         to = element
     } else {
-        val paramAfter = PsiTreeUtil.getNextSiblingOfType<PsiElement>(element, element.javaClass)
+        val paramAfter = PsiTreeUtil.getNextSiblingOfType<PsiElement>(element, element.javaClass as Class<PsiElement>)
 
         from = element
         to = if (paramAfter != null) paramAfter.prevSibling else element

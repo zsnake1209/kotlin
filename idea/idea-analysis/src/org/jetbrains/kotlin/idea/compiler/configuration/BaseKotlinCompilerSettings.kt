@@ -50,7 +50,7 @@ abstract class BaseKotlinCompilerSettings<T : Freezable> protected constructor(p
             }
 
             val beanClass = bean.javaClass
-            val defaultBean = defaultBeans.getOrPut(beanClass) { createDefaultBean(beanClass) }
+            val defaultBean = defaultBeans.getOrPut(beanClass) { createDefaultBean(beanClass as Class<Any>) }
             return accessor.read(defaultBean)
         }
 

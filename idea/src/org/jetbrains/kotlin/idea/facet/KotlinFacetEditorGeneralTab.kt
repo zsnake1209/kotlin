@@ -162,7 +162,7 @@ class KotlinFacetEditorGeneralTab(
                         CompilerSettings()
                 )
             }
-            val argumentClass = primaryArguments.javaClass
+            val argumentClass = primaryArguments.javaClass as Class<CommonCompilerArguments>
             val additionalArguments = argumentClass.newInstance().apply {
                 parseCommandLineArguments(splitArgumentString(editor.compilerConfigurable.additionalArgsOptionsField.text), this)
                 validateArguments(errors)?.let { message -> return ValidationResult(message) }
