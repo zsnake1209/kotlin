@@ -63,9 +63,7 @@ open class DefaultArgumentStubGenerator constructor(val context: CommonBackendCo
 
         if (bodies.isEmpty()) {
             // Fake override
-            val newIrFunction = irFunction.generateDefaultsFunction(context, IrDeclarationOrigin.FAKE_OVERRIDE, skipInlineMethods)
-
-            return listOf(irFunction, newIrFunction)
+            return listOf(irFunction)
         }
 
         val newIrFunction =
@@ -447,7 +445,7 @@ private fun buildFunctionDeclaration(irFunction: IrFunction, origin: IrDeclarati
                 IrSimpleFunctionSymbolImpl(descriptor),
                 name,
                 irFunction.visibility,
-                if (irFunction.modality === Modality.ABSTRACT) Modality.OPEN else irFunction.modality,
+                Modality.FINAL,
                 irFunction.returnType,
                 irFunction.isInline,
                 false,
