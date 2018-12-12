@@ -35,8 +35,11 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
+import org.jetbrains.kotlin.ir.types.IrSimpleType
+import org.jetbrains.kotlin.ir.types.makeTypeSubstitution
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.declareSimpleFunctionWithOverrides
+import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
@@ -46,6 +49,8 @@ import org.jetbrains.kotlin.psi.psiUtil.startOffsetSkippingComments
 import org.jetbrains.kotlin.psi2ir.intermediate.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeSubstitutor
+import org.jetbrains.kotlin.types.Variance
 
 class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : DeclarationGeneratorExtension(declarationGenerator) {
     constructor(context: GeneratorContext) : this(DeclarationGenerator(context))
@@ -139,6 +144,10 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
     }
 
     fun generateFakeOverridesForPropertyFields(irElement: IrElement) {
+        /*
+            Descriptors for delegate fields are created by psi2ir, and are only accessible through IR structures.
+            Therefore we have to build their overrides in a postprocessing step of psi2ir.
+         */
         irElement.acceptVoid(object : IrElementVisitorVoid {
             override fun visitElement(element: IrElement) {
                 element.acceptChildrenVoid(this)
@@ -159,10 +168,6 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
     private fun generateOverriddenDelegateFieldForProperty(
         irProperty: IrProperty
     ) {
-        /*
-            Descriptors for delegate fields are created by psi2ir, and are only accessible through IR structures.
-            Therefore we have to build their overrides in a postprocessing step of psi2ir.
-         */
         if (irProperty.backingField != null) return
 
         val propertyType = irProperty.getter?.returnType ?: irProperty.setter?.valueParameters!![0].type
@@ -170,9 +175,15 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
         generateOverriddenDelegateFieldForProperty(overriddenProperty)
         val overriddenField = overriddenProperty.backingField!!
 
+        val propertyClass = irProperty.parentAsClass
+        val overriddenClass = overriddenProperty.parentAsClass
+        val substitution = makeTypeSubstitution(propertyClass, overriddenClass)
+        val substitutedDelegateType =
+            TypeSubstitutor.create(substitution).substitute(overriddenField.type.toKotlinType(), Variance.INVARIANT)!!
+
         val delegateDescriptor = createPropertyDelegateDescriptor(
             irProperty.descriptor,
-            overriddenField.type.toKotlinType(),
+            substitutedDelegateType,
             propertyType.toKotlinType()
         ).apply {
             overriddenDescriptors = listOf(overriddenField.descriptor)
@@ -180,7 +191,7 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
 
         irProperty.backingField = context.symbolTable.declareField(
             irProperty.startOffset, irProperty.endOffset, IrDeclarationOrigin.FAKE_OVERRIDE,
-            delegateDescriptor, overriddenField.type
+            delegateDescriptor, substitutedDelegateType.toIrType()
         ).apply {
             parent = irProperty.parent
             correspondingProperty = irProperty

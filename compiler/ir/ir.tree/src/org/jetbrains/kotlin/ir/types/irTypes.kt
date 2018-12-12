@@ -95,14 +95,23 @@ private fun makeKotlinType(
     arguments: List<IrTypeArgument>,
     hasQuestionMark: Boolean
 ): SimpleType {
-    val kotlinTypeArguments = arguments.mapIndexed { index, it ->
-        when (it) {
-            is IrTypeProjection -> TypeProjectionImpl(it.variance, it.type.toKotlinType())
-            is IrStarProjection -> StarProjectionImpl((classifier.descriptor as ClassDescriptor).typeConstructor.parameters[index])
-            else -> error(it)
-        }
-    }
+    val kotlinTypeArguments = makeTypeProjectionList(classifier, arguments)
     return classifier.descriptor.defaultType.replace(newArguments = kotlinTypeArguments).makeNullableAsSpecified(hasQuestionMark)
+}
+
+private fun makeTypeProjectionList(classifier: IrClassifierSymbol, arguments: List<IrTypeArgument>) = arguments.mapIndexed { index, it ->
+    when (it) {
+        is IrTypeProjection -> TypeProjectionImpl(it.variance, it.type.toKotlinType())
+        is IrStarProjection -> StarProjectionImpl((classifier.descriptor as ClassDescriptor).typeConstructor.parameters[index])
+        else -> error(it)
+    }
+}
+
+fun makeTypeSubstitution(subClass: IrClass, superClass: IrClass): TypeSubstitution {
+    val typeParameters = superClass.descriptor.declaredTypeParameters
+    val superType = subClass.superTypes.find { it is IrSimpleType && it.classifier == superClass.symbol } as IrSimpleType
+    val projectionList = makeTypeProjectionList(superClass.symbol, superType.arguments)
+    return IndexedParametersSubstitution(typeParameters, projectionList)
 }
 
 fun ClassifierDescriptor.toIrType(hasQuestionMark: Boolean = false, symbolTable: SymbolTable? = null): IrType {

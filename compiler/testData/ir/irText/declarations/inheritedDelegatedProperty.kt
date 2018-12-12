@@ -1,11 +1,11 @@
 import kotlin.reflect.KProperty
 
-class Delegate {
-    operator fun getValue(t: Any?, p: KProperty<*>): Int = 1
+class Delegate<T>(val v: T) {
+    operator fun getValue(t: Any?, p: KProperty<*>): T = v
 }
 
-class B: A() {}
+class B: A<Int>(1) {}
 
-open class A {
-    val prop: Int by Delegate()
+open class A<T>(vv: T) {
+    val prop: T by Delegate(vv)
 }
