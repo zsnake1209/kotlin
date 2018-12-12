@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.IrSimpleBuiltinOperatorDescriptorImpl
 import org.jetbrains.kotlin.ir.expressions.IrReturnableBlock
 import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 
 abstract class IrSymbolBase<out D : DeclarationDescriptor>(override val descriptor: D) : IrSymbol
 
@@ -70,11 +71,7 @@ class IrAnonymousInitializerSymbolImpl(descriptor: ClassDescriptor) :
 
 class IrClassSymbolImpl(descriptor: ClassDescriptor) :
     IrBindableSymbolBase<ClassDescriptor, IrClass>(descriptor),
-    IrClassSymbol {
-    init {
-        if (descriptor.name.asString() == "__sFILEX") try { error("__sFILEX") } catch(e: Throwable) {println(e); e.printStackTrace()}
-    }
-}
+    IrClassSymbol
 
 fun createClassSymbolOrNull(descriptor: ClassDescriptor?) =
     descriptor?.let { IrClassSymbolImpl(it) }

@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 
 interface IrDeserializer {
     fun findDeserializedDeclaration(symbol: IrSymbol): IrDeclaration?
+    fun declareForwardDeclarations()
 }
 
 interface ReferenceSymbolTable {

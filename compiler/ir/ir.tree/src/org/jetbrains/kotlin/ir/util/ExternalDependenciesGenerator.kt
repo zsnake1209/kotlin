@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 
 class ExternalDependenciesGenerator(
     moduleDescriptor: ModuleDescriptor,
@@ -69,9 +70,11 @@ class ExternalDependenciesGenerator(
 
             }
 
+            deserializer?.declareForwardDeclarations()
+
             assert(symbolTable.unboundClasses.isEmpty()) {
                 ArrayList(symbolTable.unboundClasses).forEach {
-                    println("unbound: ${it} ${it.descriptor} @${it.descriptor.hashCode()}")
+                    println("unbound: ${it} ${it.descriptor} @${it.descriptor.hashCode()} ${it.descriptor.containingDeclaration} ${it.descriptor.module}")
                 }
                 error("that's all")
             }

@@ -49,10 +49,8 @@ fun generateOverriddenFieldSymbols(
     symbolTable: SymbolTable,
     hasBackingField: (PropertyDescriptor) -> Boolean
 ) {
-    println("overriddenDescriptors = ${declaration.descriptor.overriddenDescriptors}")
     declaration.descriptor.overriddenDescriptors.mapNotNullTo(declaration.overriddenSymbols) {
         if (hasBackingField(it)) {
-            println("it.original = ${it.original}")
             symbolTable.referenceField(it.original)
         } else null
     }
