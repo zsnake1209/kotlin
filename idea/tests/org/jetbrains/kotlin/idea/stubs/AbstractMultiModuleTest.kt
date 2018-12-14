@@ -59,7 +59,9 @@ abstract class AbstractMultiModuleTest : DaemonAnalyzerTestCase() {
         srcRootPath: String? = null,
         testRootPath: String? = null
     ): Module {
-        val module = createModuleFromTestData(moduleRootPath, name, StdModuleTypes.JAVA, true)!!
+        val module = createModuleFromTestData(moduleRootPath, name, StdModuleTypes.JAVA, false)!!
+        ModuleRootModificationUtil.updateModel(module) { model -> model.clear() }
+
         if (srcRootPath != null) {
             addRoot(module, File(srcRootPath), isTestRoot = false)
         }
