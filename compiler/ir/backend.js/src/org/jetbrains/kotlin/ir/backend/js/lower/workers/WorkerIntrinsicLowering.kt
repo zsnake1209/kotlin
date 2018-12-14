@@ -131,15 +131,9 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
         workerClass.thisReceiver = workerClassThis
         workerClassThis.parent = workerClass
         val innerField = createInnerField(workerClass)
-        val constructorBuilder = createConstructorBuilder(workerClass, workerClassThis, innerField)
-        constructorBuilder.initialize()
-        workerClass.addChild(constructorBuilder.ir)
-        val postMessageBuilder = createPostMessageBuilder(workerClass, workerClassThis)
-        postMessageBuilder.initialize()
-        workerClass.addChild(postMessageBuilder.ir)
-        val onmessageBuilder = createOnmessageBuilder(workerClass, workerClassThis)
-        onmessageBuilder.initialize()
-        workerClass.addChild(onmessageBuilder.ir)
+        createConstructorBuilder(workerClass, workerClassThis, innerField).also { it.initialize(); workerClass.addChild(it.ir) }
+        createPostMessageBuilder(workerClass, workerClassThis).also { it.initialize(); workerClass.addChild(it.ir) }
+        createOnmessageBuilder(workerClass, workerClassThis).also { it.initialize(); workerClass.addChild(it.ir) }
         return workerClass
     }
 
@@ -167,13 +161,13 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
                 descriptor.bind(declaration)
                 declaration.parent = workerClass
                 declaration.dispatchReceiverParameter = workerClassThis.copyTo(declaration)
+                val superDeclaration = workerInterface.owner.simpleFunctions().single { it.name.asString() == "onmessage" }
                 declaration.valueParameters += JsIrBuilder.buildValueParameter(
                     name = "c",
                     index = 0,
-                    type = context.irBuiltIns.anyType // <- TODO: Change to function type
+                    type = superDeclaration.valueParameters.first().type
                 ).also { it.parent = declaration }
 
-                val superDeclaration = workerInterface.owner.simpleFunctions().single { it.name.asString() == "postMessage" }
                 declaration.overriddenSymbols += superDeclaration.overriddenSymbols
                 declaration.overriddenSymbols += superDeclaration.symbol
 
@@ -190,7 +184,7 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
                             0,
                             JsIrBuilder.buildString(
                                 context.irBuiltIns.stringType,
-                                "this.inner_${workerClass.name}.onmessage(c)"
+                                "this.inner_${workerClass.name}.onmessage = c"
                             )
                         )
                     }

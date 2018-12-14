@@ -6,11 +6,11 @@
 package kotlin.worker
 
 // TODO: make this interface generic
-interface Worker {
+interface WebWorker {
     fun postMessage(message: Any)
     fun onmessage(c: (Any) -> Unit)
 }
 
-fun worker(c: Worker.() -> Unit): Worker {
+fun worker(c: WebWorker.() -> Unit): WebWorker {
     throw UnsupportedOperationException("Implemented as intrinsic")
 }
