@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.backend.common.lower.SymbolWithIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.SourceManager
+import org.jetbrains.kotlin.ir.SourceRangeInfo
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
@@ -21,10 +23,7 @@ import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irSetField
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.IrClassImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrFieldImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -37,6 +36,7 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrFieldSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
@@ -44,6 +44,8 @@ import org.jetbrains.kotlin.name.Name
 
 class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPass {
     private object WORKER_IMPL_ORIGIN : IrDeclarationOriginImpl("WORKER_IMPL")
+
+    val additionalFiles = arrayListOf<IrFile>()
 
     private val workerInterface = context.ir.symbols.workerInterface
     private val jsCodeSymbol = context.symbolTable.referenceSimpleFunction(context.getInternalFunctions("js").single())
@@ -58,26 +60,10 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
                 val call = super.visitCall(expression)
                 if (call is IrCall && expression.descriptor.isWorker()) {
                     val param = call.getValueArgument(0) as? IrBlock ?: error("worker intrinsic accepts only block, but got $call")
-                    // TODO: Move param to separate file
                     val wrapper = createWorkerWrapper(param)
+                    moveToSeparateFile(param, wrapper.name, wrapper)
                     context.implicitDeclarationFile.declarations.add(wrapper)
-                    val worker = IrCallImpl(
-                        startOffset = UNDEFINED_OFFSET,
-                        endOffset = UNDEFINED_OFFSET,
-                        type = context.irBuiltIns.anyType,
-                        symbol = jsCodeSymbol
-                    ).apply {
-                        putValueArgument(0, JsIrBuilder.buildString(context.irBuiltIns.stringType, "new Worker(\"${wrapper.name}\")"))
-                    }
-                    val constructor = wrapper.constructors.first()
-                    return IrCallImpl(
-                        startOffset = call.startOffset,
-                        endOffset = call.endOffset,
-                        type = wrapper.defaultType,
-                        symbol = constructor.symbol
-                    ).apply {
-                        putValueArgument(0, worker)
-                    }
+                    return callWrapperConstructor(wrapper, call, createNewWorker(wrapper))
                 } else {
                     return call
                 }
@@ -88,6 +74,94 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
                 return super.visitFunction(declaration)
             }
         })
+    }
+
+    private fun moveToSeparateFile(param: IrBlock, name: Name, worker: IrClass) {
+        val file = newFile(name.asString())
+        createWorkerContentBuilder(param, file, worker).also { it.initialize(); file.declarations.add(it.ir) }
+    }
+
+    private fun newFile(name: String): IrFile {
+        val file = IrFileImpl(object : SourceManager.FileEntry {
+            override val name = name
+            override val maxOffset = UNDEFINED_OFFSET
+
+            override fun getSourceRangeInfo(beginOffset: Int, endOffset: Int) =
+                SourceRangeInfo(
+                    "",
+                    UNDEFINED_OFFSET,
+                    UNDEFINED_OFFSET,
+                    UNDEFINED_OFFSET,
+                    UNDEFINED_OFFSET,
+                    UNDEFINED_OFFSET,
+                    UNDEFINED_OFFSET
+                )
+
+            override fun getLineNumber(offset: Int) = UNDEFINED_OFFSET
+            override fun getColumnNumber(offset: Int) = UNDEFINED_OFFSET
+        }, context.internalPackageFragmentDescriptor)
+        additionalFiles.add(file)
+        return file
+    }
+
+    private fun createWorkerContentBuilder(param: IrBlock, file: IrFile, worker: IrClass) =
+        object : SymbolWithIrBuilder<IrSimpleFunctionSymbol, IrSimpleFunction>() {
+            private val descriptor = WrappedSimpleFunctionDescriptor()
+
+            override fun buildSymbol() = IrSimpleFunctionSymbolImpl(descriptor)
+
+            override fun buildIr(): IrSimpleFunction {
+                val declaration = IrFunctionImpl(
+                    startOffset = UNDEFINED_OFFSET,
+                    endOffset = UNDEFINED_OFFSET,
+                    origin = WORKER_IMPL_ORIGIN,
+                    symbol = symbol,
+                    name = Name.identifier("imTooOldForThisStuff"),
+                    visibility = Visibilities.PUBLIC,
+                    modality = Modality.FINAL,
+                    returnType = context.irBuiltIns.unitType,
+                    isInline = false,
+                    isExternal = false,
+                    isTailrec = false,
+                    isSuspend = false
+                )
+                descriptor.bind(declaration)
+                declaration.parent = worker.parent // TODO: find correct parent
+
+                declaration.body = context.createIrBuilder(symbol, declaration.startOffset, declaration.endOffset).irBlockBody(
+                    startOffset = UNDEFINED_OFFSET, endOffset = UNDEFINED_OFFSET
+                ) {
+                    param.statements.forEach {
+                        +it.deepCopyWithSymbols()
+                    }
+                }
+                return declaration
+            }
+        }
+
+    private fun callWrapperConstructor(
+        wrapper: IrClass,
+        call: IrExpression,
+        worker: IrCallImpl
+    ): IrCallImpl {
+        val constructor = wrapper.constructors.first()
+        return IrCallImpl(
+            startOffset = call.startOffset,
+            endOffset = call.endOffset,
+            type = wrapper.defaultType,
+            symbol = constructor.symbol
+        ).apply {
+            putValueArgument(0, worker)
+        }
+    }
+
+    private fun createNewWorker(wrapper: IrClass) = IrCallImpl(
+        startOffset = UNDEFINED_OFFSET,
+        endOffset = UNDEFINED_OFFSET,
+        type = context.irBuiltIns.anyType,
+        symbol = jsCodeSymbol
+    ).apply {
+        putValueArgument(0, JsIrBuilder.buildString(context.irBuiltIns.stringType, "new Worker(\"${wrapper.name}\")"))
     }
 
     /* Create the following class
