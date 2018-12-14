@@ -106,7 +106,9 @@ abstract class AbstractContextRunConfigurationTest : AbstractMultiModuleTest() {
     ) {
         val module = module(
             getTestName(true),
-            moduleRootPath = modulePath
+            moduleRootPath = modulePath,
+            srcRootPath = "${modulePath}src".takeIf { File(it).isDirectory },
+            testRootPath = "${modulePath}test".takeIf { File(it).isDirectory }
         )
         module.configureLibraries()
 
