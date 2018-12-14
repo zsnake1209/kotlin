@@ -82,7 +82,7 @@ abstract class AbstractContextRunConfigurationTest : AbstractMultiModuleTest() {
     }
 
     private fun RunConfiguration.extractDataTo(result: MutableMap<String, String>) {
-        val getter = this::class.declaredMemberFunctions.first { it.name == "getPersistantData" } as KFunction<*>
+        val getter = this::class.declaredMemberFunctions.first { it.name.startsWith("getPersist") } as KFunction<*>
         val persistentData = getter.call(this)!!
         persistentData::class.declaredMemberProperties.forEach {
             if (it.visibility == KVisibility.PUBLIC) {
