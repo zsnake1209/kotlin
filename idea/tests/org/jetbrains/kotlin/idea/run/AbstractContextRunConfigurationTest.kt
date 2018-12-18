@@ -146,8 +146,8 @@ private fun VirtualFile.createOrFindChildDir(requestor: Any, name: String): Virt
 }
 
 object ForTestLibraries {
-    val junitJar = findPlatformJarContaining("org.junit.Test")
-    val testNGJar = findPlatformJarContaining("org.testng.annotations.Test")
+    val junitJar by lazy { findPlatformJarContaining("org.junit.Test") }
+    val testNGJar by lazy { findPlatformJarContaining("org.testng.annotations.Test") }
 
     private fun String.assertExists(): File {
         val file = File(this)
@@ -160,7 +160,7 @@ object ForTestLibraries {
     private fun findPlatformJarContaining(classFqName: String): File {
         val classLoader = this@ForTestLibraries::class.java.classLoader
         val pathToClassFile = classLoader.getResource("${classFqName.replace('.', '/')}.class").path
-        val pathToJar =  pathToClassFile.substringAfter("file:/").substringBeforeLast(".jar") + ".jar"
+        val pathToJar = pathToClassFile.substringAfter("file:/").substringBeforeLast(".jar") + ".jar"
         return pathToJar.assertExists()
     }
 }
