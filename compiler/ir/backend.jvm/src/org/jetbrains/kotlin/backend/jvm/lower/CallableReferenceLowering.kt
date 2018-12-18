@@ -278,6 +278,7 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 IrConstructorSymbolImpl(descriptor),
                 name = Name.special("<init>"),
                 visibility = Visibilities.PUBLIC,
+                returnType = functionReferenceClass.defaultType,
                 isInline = false,
                 isExternal = false,
                 isPrimary = true
@@ -285,7 +286,6 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 val constructor = this
                 descriptor.bind(this)
                 parent = functionReferenceClass
-                returnType = functionReferenceClass.defaultType
 
                 val boundArgsSet = boundCalleeParameters.toSet()
                 for (param in callee.explicitParameters) {
@@ -346,6 +346,7 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 Name.identifier("invoke"),
                 Visibilities.PUBLIC,
                 Modality.FINAL,
+                returnType = callee.returnType,
                 isInline = false,   // not sure
                 isExternal = false,
                 isTailrec = false,
@@ -355,7 +356,6 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 descriptor.bind(this)
                 parent = functionReferenceClass
                 overriddenSymbols.add(superFunction.symbol)
-                returnType = callee.returnType
                 dispatchReceiverParameter = functionReferenceClass.thisReceiver?.copyTo(function)
 
                 val unboundArgsSet = unboundCalleeParameters.toSet()
@@ -475,6 +475,7 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 Name.identifier("getSignature"),
                 superFunction.visibility,
                 superFunction.modality,
+                returnType = superFunction.returnType,
                 isInline = false,
                 isExternal = false,
                 isTailrec = false,
@@ -484,7 +485,6 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 descriptor.bind(this)
                 parent = functionReferenceClass
                 overriddenSymbols.add(superFunction.symbol)
-                returnType = superFunction.returnType
                 dispatchReceiverParameter = functionReferenceClass.thisReceiver!!.copyTo(function)
 
                 val irBuilder = context.createIrBuilder(function.symbol, startOffset, endOffset)
@@ -511,6 +511,7 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 Name.identifier("getName"),
                 superGetter.visibility,
                 superGetter.modality,
+                returnType = superGetter.returnType,
                 isInline = false,
                 isExternal = false,
                 isTailrec = false,
@@ -520,7 +521,6 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 descriptor.bind(this)
                 parent = functionReferenceClass
                 overriddenSymbols.add(superGetter.symbol)
-                returnType = superGetter.returnType
                 dispatchReceiverParameter = functionReferenceClass.thisReceiver?.copyTo(function)
 
                 val irBuilder = context.createIrBuilder(function.symbol, startOffset, endOffset)
@@ -541,6 +541,7 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 Name.identifier("getOwner"),
                 superFunction.visibility,
                 superFunction.modality,
+                returnType = superFunction.returnType,
                 isInline = false,
                 isExternal = false,
                 isTailrec = false,
@@ -550,7 +551,6 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 descriptor.bind(this)
                 parent = functionReferenceClass
                 overriddenSymbols.add(superFunction.symbol)
-                returnType = superFunction.returnType
                 dispatchReceiverParameter = functionReferenceClass.thisReceiver?.copyTo(function)
 
                 val irBuilder = context.createIrBuilder(function.symbol, startOffset, endOffset)

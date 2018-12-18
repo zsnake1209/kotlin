@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.backend.jvm.lower
 
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedClassDescriptor
+import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarationsWithWrappedDescriptor
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
