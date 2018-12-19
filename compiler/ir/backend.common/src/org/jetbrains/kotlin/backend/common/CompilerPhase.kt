@@ -137,11 +137,8 @@ abstract class DefaultPhaseRunner<Context : CommonBackendContext, Data>(private 
         }
 
         context.inVerbosePhase = (phase in phases(context).verbose)
-        val result = try {
-            runner(manager, phase, depth, source)
-        } finally {
-            context.inVerbosePhase = false
-        }
+        val result = runner(manager, phase, depth, source)
+        context.inVerbosePhase = false
 
         return result
     }
