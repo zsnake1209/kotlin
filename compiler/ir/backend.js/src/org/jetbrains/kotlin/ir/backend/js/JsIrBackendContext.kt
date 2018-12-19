@@ -269,9 +269,10 @@ class JsIrBackendContext(
 
     fun getFunctions(fqName: FqName) = findFunctions(module.getPackage(fqName.parent()).memberScope, fqName.shortName())
 
+    override var inVerbosePhase = false
     override fun log(message: () -> String) {
         /*TODO*/
-        print(message())
+        if (inVerbosePhase)  print(message())
     }
 
     override fun report(element: IrElement?, irFile: IrFile?, message: String, isError: Boolean) {

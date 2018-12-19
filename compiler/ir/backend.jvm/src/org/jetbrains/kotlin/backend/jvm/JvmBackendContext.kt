@@ -55,10 +55,7 @@ class JvmBackendContext(
         }
     }
 
-    var inVerbosePhase = false
-
     fun rootPhaseManager(irFile: IrFile) = CompilerPhaseManager(this, phases, irFile, JvmPhaseRunner)
-
 
     private fun find(memberScope: MemberScope, className: String): ClassDescriptor {
         return find(memberScope, Name.identifier(className))
@@ -87,6 +84,7 @@ class JvmBackendContext(
         }
     }
 
+    override var inVerbosePhase = false
     override fun log(message: () -> String) {
         /*TODO*/
         if (inVerbosePhase) {

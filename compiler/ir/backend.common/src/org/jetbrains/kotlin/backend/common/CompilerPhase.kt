@@ -110,8 +110,6 @@ abstract class DefaultPhaseRunner<Context : CommonBackendContext, Data>(private 
 
     enum class BeforeOrAfter { BEFORE, AFTER }
 
-    private var inVerbosePhase = false
-
     final override fun runBefore(
         manager: CompilerPhaseManager<Context, Data>,
         phase: CompilerPhase<Context, Data>,
@@ -138,11 +136,12 @@ abstract class DefaultPhaseRunner<Context : CommonBackendContext, Data>(private 
             else -> ::justRun
         }
 
-        inVerbosePhase = phase in phases(context).verbose
-
-        val result = runner(manager, phase, depth, source)
-
-        inVerbosePhase = false
+        context.inVerbosePhase = (phase in phases(context).verbose)
+        val result = try {
+            runner(manager, phase, depth, source)
+        } finally {
+            context.inVerbosePhase = false
+        }
 
         return result
     }

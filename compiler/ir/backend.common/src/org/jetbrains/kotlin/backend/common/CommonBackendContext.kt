@@ -23,6 +23,7 @@ interface CommonBackendContext : BackendContext {
     //TODO move to builtins
     fun getInternalFunctions(name: String): List<FunctionDescriptor>
 
+    var inVerbosePhase: Boolean
     fun log(message: () -> String)
 
     fun report(element: IrElement?, irFile: IrFile?, message: String, isError: Boolean)
