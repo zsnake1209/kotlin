@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementContainer
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
@@ -83,7 +84,7 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
 
     private fun newFile(name: String): IrFile {
         val file = IrFileImpl(object : SourceManager.FileEntry {
-            override val name = name
+            override val name = "<${name}_blob>"
             override val maxOffset = UNDEFINED_OFFSET
 
             override fun getSourceRangeInfo(beginOffset: Int, endOffset: Int) =
@@ -116,7 +117,7 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
                     endOffset = UNDEFINED_OFFSET,
                     origin = WORKER_IMPL_ORIGIN,
                     symbol = symbol,
-                    name = Name.identifier("imTooOldForThisStuff"),
+                    name = Name.identifier("onmessageImpl"),
                     visibility = Visibilities.PUBLIC,
                     modality = Modality.FINAL,
                     returnType = context.irBuiltIns.unitType,
@@ -126,15 +127,16 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
                     isSuspend = false
                 )
                 descriptor.bind(declaration)
-                declaration.parent = worker.parent // TODO: find correct parent
+                declaration.parent = worker
+                declaration.valueParameters += JsIrBuilder.buildValueParameter(
+                    name = "it",
+                    index = 0,
+                    type = context.irBuiltIns.anyType
+                ).also { it.parent = declaration }
 
-                declaration.body = context.createIrBuilder(symbol, declaration.startOffset, declaration.endOffset).irBlockBody(
-                    startOffset = UNDEFINED_OFFSET, endOffset = UNDEFINED_OFFSET
-                ) {
-                    param.statements.forEach {
-                        +it.deepCopyWithSymbols()
-                    }
-                }
+                declaration.body = JsIrBuilder.buildBlockBody(
+                    (param.statements.filterIsInstance<IrFunction>().single().body!!.deepCopyWithSymbols(declaration) as IrStatementContainer).statements
+                )
                 return declaration
             }
         }
@@ -161,7 +163,7 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
         type = context.irBuiltIns.anyType,
         symbol = jsCodeSymbol
     ).apply {
-        putValueArgument(0, JsIrBuilder.buildString(context.irBuiltIns.stringType, "new Worker(\"${wrapper.name}\")"))
+        putValueArgument(0, JsIrBuilder.buildString(context.irBuiltIns.stringType, "new Worker(${wrapper.name}_blob)"))
     }
 
     /* Create the following class
@@ -258,7 +260,7 @@ class WorkerIntrinsicLowering(val context: JsIrBackendContext) : FileLoweringPas
                             0,
                             JsIrBuilder.buildString(
                                 context.irBuiltIns.stringType,
-                                "this.inner_${workerClass.name}.onmessage = c"
+                                "this.inner_${workerClass.name}.onmessage = function(it) { c(it) }"
                             )
                         )
                     }
