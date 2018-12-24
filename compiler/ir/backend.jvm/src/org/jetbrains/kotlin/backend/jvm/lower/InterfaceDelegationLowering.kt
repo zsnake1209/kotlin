@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.backend.jvm.lower
 
-import org.jetbrains.kotlin.backend.common.ClassLoweringPass
+import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
 import org.jetbrains.kotlin.backend.common.ir.copyParameterDeclarationsFrom
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
@@ -14,37 +14,46 @@ import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.codegen.isJvmInterface
 import org.jetbrains.kotlin.codegen.OwnerKind
 import org.jetbrains.kotlin.codegen.state.GenerationState
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.deserialization.PLATFORM_DEPENDENT_ANNOTATION_FQ_NAME
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.irBlockBody
-import org.jetbrains.kotlin.ir.builders.irCall
-import org.jetbrains.kotlin.ir.builders.irGet
-import org.jetbrains.kotlin.ir.builders.irReturn
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.builders.*
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.isInterface
+import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.resolveFakeOverride
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
+import java.util.function.UnaryOperator
 
-class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTransformerVoid(), ClassLoweringPass {
+class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementVisitorVoid, FileLoweringPass {
 
     val state: GenerationState = context.state
 
-    override fun lower(irClass: IrClass) {
-        if (irClass.isJvmInterface) return
+    val replacementMap = mutableMapOf<IrSimpleFunctionSymbol, IrSimpleFunctionSymbol>()
 
-        irClass.transformChildrenVoid(this)
-        generateInterfaceMethods(irClass)
+    override fun lower(irFile: IrFile) {
+        irFile.acceptChildrenVoid(this)
+        // TODO: Replacer should be run on whole module, not on a single file.
+        irFile.acceptVoid(OverriddenSymbolsReplacer(replacementMap))
     }
 
+    override fun visitElement(element: IrElement) {
+        element.acceptChildrenVoid(this)
+    }
+
+    override fun visitClass(declaration: IrClass) {
+        super.visitClass(declaration)
+        if (declaration.isJvmInterface) return
+
+        generateInterfaceMethods(declaration)
+    }
 
     private fun generateInterfaceMethods(irClass: IrClass) {
         val (actualClass, isDefaultImplsGeneration) = if (irClass.origin == JvmLoweredDeclarationOrigin.DEFAULT_IMPLS) {
@@ -53,10 +62,19 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTra
             Pair(irClass, false)
         }
 
-        val newDeclarations = mutableListOf<IrFunction>()
-        for (function in actualClass.declarations) {
-            if (function !is IrSimpleFunction) continue
+        val toRemove = mutableListOf<IrSimpleFunction>()
+        for (function in actualClass.declarations.filterIsInstance<IrSimpleFunction>()) {
             if (function.origin !== IrDeclarationOrigin.FAKE_OVERRIDE) continue
+
+            // In classes, only generate interface delegation for functions immediately inherited from am interface.
+            // (Otherwise, delegation will be present in the parent class)
+            if (!isDefaultImplsGeneration &&
+                function.overriddenSymbols.any {
+                    !it.owner.parentAsClass.isInterface &&
+                            it.owner.resolveFakeOverride()?.modality != Modality.ABSTRACT
+                }) {
+                continue
+            }
 
             val implementation = function.resolveFakeOverride() ?: continue
             if (!implementation.hasInterfaceParent() ||
@@ -67,17 +85,19 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTra
                 continue
             }
 
-            newDeclarations.add(generateDelegationToDefaultImpl(implementation, function, isDefaultImplsGeneration))
+            val delegation = generateDelegationToDefaultImpl(irClass, implementation, function, isDefaultImplsGeneration)
+            toRemove.add(function)
+            replacementMap[function.symbol] = delegation.symbol
         }
-
-        irClass.declarations.addAll(newDeclarations)
+        irClass.declarations.removeAll(toRemove)
     }
 
     private fun generateDelegationToDefaultImpl(
+        irClass: IrClass,
         interfaceFun: IrSimpleFunction,
         inheritedFun: IrSimpleFunction,
         isDefaultImplsGeneration: Boolean
-    ): IrFunction {
+    ): IrSimpleFunction {
         val defaultImplFun = context.declarationFactory.getDefaultImplsFunction(interfaceFun)
 
         val irFunction =
@@ -110,6 +130,8 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTra
                 }
             } else context.declarationFactory.getDefaultImplsFunction(inheritedFun)
 
+        irClass.declarations.add(irFunction)
+
         context.createIrBuilder(irFunction.symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET).apply {
             irFunction.body = irBlockBody {
                 +irReturn(
@@ -124,6 +146,17 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementTra
         }
 
         return irFunction
+    }
+
+    private class OverriddenSymbolsReplacer(val replacementMap: Map<IrSimpleFunctionSymbol, IrSimpleFunctionSymbol>): IrElementVisitorVoid {
+        override fun visitElement(element: IrElement) {
+            element.acceptChildrenVoid(this)
+        }
+
+        override fun visitSimpleFunction(declaration: IrSimpleFunction) {
+            declaration.overriddenSymbols.replaceAll(UnaryOperator { symbol -> replacementMap[symbol] ?: symbol })
+            super.visitSimpleFunction(declaration)
+        }
     }
 
     private fun IrSimpleFunction.isMethodOfAny() =
