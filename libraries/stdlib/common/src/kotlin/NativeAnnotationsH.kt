@@ -3,7 +3,7 @@
  * that can be found in the license/LICENSE.txt file.
  */
 
-package kotlin.native
+package kotlin.native.concurrent
 
 /**
  * Top level variable or object is thread local, and so could be mutable.
