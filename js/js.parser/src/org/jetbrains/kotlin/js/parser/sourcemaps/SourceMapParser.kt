@@ -113,6 +113,7 @@ object SourceMapParser {
                 currentGroup.addSegment(SourceMapSegment(jsColumn, sourceRoot + sources[sourceIndex], sourceLine, sourceColumn))
             }
             else {
+                // todo: optimize
                 currentGroup.addSegment(SourceMapSegment(jsColumn, null, -1, -1))
             }
 
