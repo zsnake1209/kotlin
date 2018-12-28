@@ -36,9 +36,12 @@ import org.jetbrains.kotlin.js.translate.utils.JsDescriptorUtils.getModuleName
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.inline.InlineStrategy
 import org.jetbrains.kotlin.utils.JsLibraryUtils
-import org.jetbrains.kotlin.utils.sure
 import java.io.File
 import java.io.StringReader
+import java.lang.ref.ReferenceQueue
+import java.lang.ref.SoftReference
+import java.security.MessageDigest
+import java.util.*
 
 // TODO: add hash checksum to defineModule?
 /**
@@ -61,6 +64,59 @@ class FunctionReader(
         private val currentModuleName: JsName,
         fragments: List<JsProgramFragment>
 ) {
+    private object ModuleInfoCache {
+        private data class FileSnapshot(val file: File, val size: Long, val lastModified: Long, val md5: Long)
+
+        private val cleanUpQueue = ReferenceQueue<Collection<ModuleInfo>>()
+
+        private class ModulesReference(
+            val snapshot: FileSnapshot,
+            modules: Collection<ModuleInfo>
+        ) : SoftReference<Collection<ModuleInfo>>(modules, cleanUpQueue)
+
+        private val jarToModuleInfo = HashMap<FileSnapshot, SoftReference<Collection<ModuleInfo>>>()
+
+        fun getOrPut(file: File, fn: (File) -> Collection<ModuleInfo>): Collection<ModuleInfo> {
+            if (!file.isFile || !"jar".equals(file.extension, ignoreCase = true)) {
+                return fn(file)
+            }
+
+            val md5 = file.readBytes().md5()
+            val lastModified = file.lastModified()
+            val size = file.length()
+            val snapshot = FileSnapshot(file, lastModified = lastModified, size = size, md5 = md5)
+
+            return synchronized(jarToModuleInfo) {
+                var referenceToClean = cleanUpQueue.poll()
+                while (referenceToClean != null) {
+                    jarToModuleInfo.remove((referenceToClean as ModulesReference).snapshot)
+                    referenceToClean = cleanUpQueue.poll()
+                }
+
+                val value = jarToModuleInfo[snapshot]?.get()
+                if (value != null) {
+                    value
+                } else {
+                    val modules = fn(file)
+                    jarToModuleInfo[snapshot] = ModulesReference(snapshot, modules)
+                    modules
+                }
+            }
+        }
+
+        private fun ByteArray.md5(): Long {
+            val d = MessageDigest.getInstance("MD5").digest(this)!!
+            return ((d[0].toLong() and 0xFFL)
+                    or ((d[1].toLong() and 0xFFL) shl 8)
+                    or ((d[2].toLong() and 0xFFL) shl 16)
+                    or ((d[3].toLong() and 0xFFL) shl 24)
+                    or ((d[4].toLong() and 0xFFL) shl 32)
+                    or ((d[5].toLong() and 0xFFL) shl 40)
+                    or ((d[6].toLong() and 0xFFL) shl 48)
+                    or ((d[7].toLong() and 0xFFL) shl 56))
+        }
+    }
+
     /**
      * fileContent: .js file content, that contains this module definition.
      *     One file can contain more than one module definition.
@@ -72,6 +128,7 @@ class FunctionReader(
      *     The default variable is Kotlin, but it can be renamed by minifier.
      */
     class ModuleInfo(
+            val name: String,
             val filePath: String,
             val fileContent: String,
             val moduleVariable: String,
@@ -88,10 +145,10 @@ class FunctionReader(
                 ?.let { Regex("\\s*$it\\s*\\(\\s*").toPattern() }
     }
 
-    private val moduleNameToInfo by lazy {
-        val result = HashMultimap.create<String, ModuleInfo>()
+    private fun readModuleInfos(file: File): Collection<ModuleInfo> {
+        val result = arrayListOf<ModuleInfo>()
 
-        JsLibraryUtils.traverseJsLibraries(config.libraries.map(::File)) { (content, path, sourceMapContent, file) ->
+        JsLibraryUtils.traverseJsLibrary(file) { (content, path, sourceMapContent, file) ->
             var current = 0
 
             while (true) {
@@ -127,18 +184,30 @@ class FunctionReader(
                 }
 
                 val moduleInfo = ModuleInfo(
-                        filePath = path,
-                        fileContent = content,
-                        moduleVariable = moduleVariable,
-                        kotlinVariable = kotlinVariable,
-                        specialFunctions = specialFunctions,
-                        offsetToSourceMappingProvider = { OffsetToSourceMapping(content) },
-                        sourceMap = sourceMap,
-                        outputDir = file?.parentFile
+                    name = moduleName,
+                    filePath = path,
+                    fileContent = content,
+                    moduleVariable = moduleVariable,
+                    kotlinVariable = kotlinVariable,
+                    specialFunctions = specialFunctions,
+                    offsetToSourceMappingProvider = { OffsetToSourceMapping(content) },
+                    sourceMap = sourceMap,
+                    outputDir = file?.parentFile
                 )
 
-                result.put(moduleName, moduleInfo)
+                result.add(moduleInfo)
             }
+        }
+
+        return result
+    }
+
+    private val moduleNameToInfo by lazy {
+        val result = HashMultimap.create<String, ModuleInfo>()
+
+        for (file in config.libraries.map(::File)) {
+            val modules = ModuleInfoCache.getOrPut(file) { readModuleInfos(file) }
+            modules.forEach { result.put(it.name, it) }
         }
 
         result
