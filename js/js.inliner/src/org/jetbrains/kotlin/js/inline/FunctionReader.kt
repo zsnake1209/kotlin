@@ -81,6 +81,7 @@ class FunctionReader(
                 return fn(file)
             }
 
+            // todo: optimize
             val md5 = file.readBytes().md5()
             val lastModified = file.lastModified()
             val size = file.length()
