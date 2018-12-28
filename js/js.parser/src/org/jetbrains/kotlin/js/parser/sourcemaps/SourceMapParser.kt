@@ -110,10 +110,10 @@ object SourceMapParser {
                 if (sourceIndex !in sources.indices) {
                     return stream.createError("Source index $sourceIndex is out of bounds ${sources.indices}")
                 }
-                currentGroup.segments += SourceMapSegment(jsColumn, sourceRoot + sources[sourceIndex], sourceLine, sourceColumn)
+                currentGroup.addSegment(SourceMapSegment(jsColumn, sourceRoot + sources[sourceIndex], sourceLine, sourceColumn))
             }
             else {
-                currentGroup.segments += SourceMapSegment(jsColumn, null, -1, -1)
+                currentGroup.addSegment(SourceMapSegment(jsColumn, null, -1, -1))
             }
 
             when {

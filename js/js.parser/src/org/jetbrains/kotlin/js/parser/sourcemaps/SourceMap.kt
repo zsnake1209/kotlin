@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.js.parser.sourcemaps
 
+import org.jetbrains.kotlin.utils.SmartList
 import java.io.File
 import java.io.PrintStream
 import java.io.Reader
@@ -59,7 +60,13 @@ data class SourceMapSegment(
 )
 
 class SourceMapGroup {
-    val segments = mutableListOf<SourceMapSegment>()
+    private val mySegments = SmartList<SourceMapSegment>()
+    val segments: List<SourceMapSegment>
+        get() = mySegments
+
+    fun addSegment(segment: SourceMapSegment) {
+        mySegments.add(segment)
+    }
 }
 
 sealed class SourceMapParseResult
