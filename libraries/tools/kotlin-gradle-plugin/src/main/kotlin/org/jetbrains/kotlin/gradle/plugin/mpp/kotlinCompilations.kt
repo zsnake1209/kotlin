@@ -74,13 +74,17 @@ abstract class AbstractKotlinCompilation<T : KotlinCommonOptions>(
     }
 
     open fun addSourcesToCompileTask(sourceSet: KotlinSourceSet, addAsCommonSources: Boolean) {
-        (target.project.tasks.getByName(compileKotlinTaskName) as AbstractKotlinCompile<*>).apply {
-            source(sourceSet.kotlin)
-            sourceFilesExtensions(sourceSet.customSourceFilesExtensions)
-            if (addAsCommonSources) {
-                commonSourceSet += sourceSet.kotlin
+        target.project.tasks
+            // To configure a task that may have not yet been created at this point, use 'withType-matching-all`:
+            .withType(AbstractKotlinCompile::class.java)
+            .matching { it.name == compileKotlinTaskName }
+            .all { compileKotlinTask ->
+                compileKotlinTask.source(sourceSet.kotlin)
+                compileKotlinTask.sourceFilesExtensions(sourceSet.customSourceFilesExtensions)
+                if (addAsCommonSources) {
+                    compileKotlinTask.commonSourceSet += sourceSet.kotlin
+                }
             }
-        }
     }
 
     override fun source(sourceSet: KotlinSourceSet) {
