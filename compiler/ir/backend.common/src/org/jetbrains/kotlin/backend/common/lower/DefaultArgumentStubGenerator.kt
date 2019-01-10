@@ -142,7 +142,9 @@ open class DefaultArgumentStubGenerator constructor(open val context: CommonBack
         }
         // Remove default argument initializers.
         irFunction.valueParameters.forEach {
-            it.defaultValue = IrExpressionBodyImpl(IrErrorExpressionImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, it.type, "Default Stub"))
+            if (it.defaultValue != null) {
+                it.defaultValue = IrExpressionBodyImpl(IrErrorExpressionImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, it.type, "Default Stub"))
+            }
         }
         return listOf(irFunction, newIrFunction)
     }

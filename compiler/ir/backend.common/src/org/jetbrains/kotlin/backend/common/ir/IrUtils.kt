@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.expressions.IrFunctionReference
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
@@ -162,7 +163,10 @@ fun IrValueParameter.copyTo(
             (parent as IrTypeParametersContainer).classIfConstructor,
             irFunction.classIfConstructor
     ),
-    varargElementType: IrType? = this.varargElementType
+    varargElementType: IrType? = this.varargElementType,
+    defaultValue: IrExpressionBody? = this.defaultValue,
+    isCrossinline: Boolean = this.isCrossinline,
+    isNoinline: Boolean = this.isNoinline
 ): IrValueParameter {
     val descriptor = WrappedValueParameterDescriptor(symbol.descriptor.annotations, symbol.descriptor.source)
     val symbol = IrValueParameterSymbolImpl(descriptor)
