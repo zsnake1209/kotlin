@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.descriptors.impl.ReceiverParameterDescriptorImpl
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.parentAsClass
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
@@ -838,4 +839,45 @@ open class WrappedFieldDescriptor(
     }
 
     override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? = null
+}
+
+class WrappedPackageFragmentDescriptor(var moduleDescriptor: ModuleDescriptor) : PackageFragmentDescriptor {
+    lateinit var owner: IrPackageFragment
+    private var bound = false
+    fun bind(packageFragment: IrPackageFragment) {
+        assert(!bound)
+        bound = true
+        owner = packageFragment
+    }
+
+    override val fqName: FqName get() = owner.fqName
+
+    override fun getContainingDeclaration() = moduleDescriptor
+
+    override fun getMemberScope(): MemberScope {
+        TODO("not implemented")
+    }
+
+    override fun getOriginal(): DeclarationDescriptorWithSource {
+        TODO("not implemented")
+    }
+
+    override fun getSource(): SourceElement {
+        TODO("not implemented")
+    }
+
+    override fun getName(): Name {
+        TODO("not implemented")
+    }
+
+    override fun <R : Any?, D : Any?> accept(visitor: DeclarationDescriptorVisitor<R, D>?, data: D): R {
+        TODO("not implemented")
+    }
+
+    override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
+        TODO("not implemented")
+    }
+
+    override val annotations: Annotations
+        get() = TODO("not implemented")
 }
