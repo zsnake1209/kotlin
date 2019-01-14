@@ -18,7 +18,7 @@ package org.jetbrains.kotlin.backend.jvm.lower
 
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedClassDescriptor
-import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarationsWithWrappedDescriptor
+import org.jetbrains.kotlin.backend.common.ir.createImplicitParameterDeclarationWithWrappedDescriptor
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
@@ -79,7 +79,7 @@ class FileClassLowering(val context: JvmBackendContext) : FileLoweringPass {
             superTypes.add(context.irBuiltIns.anyType)
             parent = irFile
             declarations.addAll(fileClassMembers)
-            createParameterDeclarationsWithWrappedDescriptor()
+            createImplicitParameterDeclarationWithWrappedDescriptor()
             // TODO: figure out why reparenting leads to failing tests.
             // fileClassMembers.forEach { it.parent = this }
         }

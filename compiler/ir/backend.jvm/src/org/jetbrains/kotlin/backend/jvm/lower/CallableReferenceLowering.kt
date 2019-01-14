@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.descriptors.*
 import org.jetbrains.kotlin.backend.common.ir.copyTo
-import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarationsWithWrappedDescriptor
+import org.jetbrains.kotlin.backend.common.ir.createImplicitParameterDeclarationWithWrappedDescriptor
 import org.jetbrains.kotlin.backend.common.lower.*
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
@@ -232,7 +232,7 @@ class CallableReferenceLowering(val context: JvmBackendContext) : FileLoweringPa
                 functionReferenceClassDescriptor.bind(this)
                 parent = referenceParent
                 superTypes.addAll(functionReferenceClassSuperTypes)
-                createParameterDeclarationsWithWrappedDescriptor()
+                createImplicitParameterDeclarationWithWrappedDescriptor()
             }
 
             functionReferenceThis = functionReferenceClass.thisReceiver!!.symbol

@@ -332,7 +332,7 @@ val IrFunction.isStatic: Boolean
 val IrDeclaration.isTopLevel: Boolean
     get() = parent is IrPackageFragment
 
-fun IrClass.createParameterDeclarationsWithWrappedDescriptor() {
+fun IrClass.createImplicitParameterDeclarationWithWrappedDescriptor() {
     val thisReceiverDescriptor = WrappedReceiverParameterDescriptor()
     thisReceiver = IrValueParameterImpl(
         startOffset, endOffset,

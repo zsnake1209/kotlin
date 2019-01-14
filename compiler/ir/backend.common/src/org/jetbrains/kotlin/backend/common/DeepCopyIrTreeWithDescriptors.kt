@@ -26,7 +26,7 @@ inline fun <reified T : IrElement> T.deepCopyWithWrappedDescriptors(initialParen
         it.acceptVoid(WrappedDescriptorPatcher)
     }
 
-val DescriptorsToIrRemapper = object : DescriptorsRemapper {
+object DescriptorsToIrRemapper : DescriptorsRemapper {
     override fun remapDeclaredClass(descriptor: ClassDescriptor) =
         WrappedClassDescriptor(descriptor.annotations, descriptor.source)
 
@@ -55,7 +55,7 @@ val DescriptorsToIrRemapper = object : DescriptorsRemapper {
             WrappedValueParameterDescriptor(descriptor.annotations, descriptor.source)
 }
 
-val WrappedDescriptorPatcher = object : IrElementVisitorVoid {
+object WrappedDescriptorPatcher : IrElementVisitorVoid {
     override fun visitElement(element: IrElement) {
         element.acceptChildrenVoid(this)
     }
