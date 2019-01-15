@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.containers.Stack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.KtNodeType;
@@ -145,50 +146,21 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         POSTFIX(PLUSPLUS, MINUSMINUS, EXCLEXCL,
                 DOT, SAFE_ACCESS), // typeArguments? valueArguments : typeArguments : arrayAccess
 
-        PREFIX(MINUS, PLUS, MINUSMINUS, PLUSPLUS, EXCL) { // annotations
+        PREFIX(MINUS, PLUS, MINUSMINUS, PLUSPLUS, EXCL),
 
-            @Override
-            public void parseHigherPrecedence(KotlinExpressionParsing parser) {
-                throw new IllegalStateException("Don't call this method");
-            }
-        },
-
-        AS(AS_KEYWORD, AS_SAFE) {
-            @Override
-            public KtNodeType parseRightHandSide(IElementType operation, KotlinExpressionParsing parser) {
-                parser.myKotlinParsing.parseTypeRef();
-                return BINARY_WITH_TYPE;
-            }
-
-            @Override
-            public void parseHigherPrecedence(KotlinExpressionParsing parser) {
-                parser.parsePrefixExpression();
-            }
-        },
+        AS(AS_KEYWORD, AS_SAFE),
 
         MULTIPLICATIVE(MUL, DIV, PERC),
         ADDITIVE(PLUS, MINUS),
         RANGE(KtTokens.RANGE),
         SIMPLE_NAME(IDENTIFIER),
         ELVIS(KtTokens.ELVIS),
-        IN_OR_IS(IN_KEYWORD, NOT_IN, IS_KEYWORD, NOT_IS) {
-            @Override
-            public KtNodeType parseRightHandSide(IElementType operation, KotlinExpressionParsing parser) {
-                if (operation == IS_KEYWORD || operation == NOT_IS) {
-                    parser.myKotlinParsing.parseTypeRef();
-                    return IS_EXPRESSION;
-                }
-
-                return super.parseRightHandSide(operation, parser);
-            }
-        },
+        IN_OR_IS(IN_KEYWORD, NOT_IN, IS_KEYWORD, NOT_IS),
         COMPARISON(LT, GT, LTEQ, GTEQ),
         EQUALITY(EQEQ, EXCLEQ, EQEQEQ, EXCLEQEQEQ),
         CONJUNCTION(ANDAND),
         DISJUNCTION(OROR),
-        //        ARROW(KtTokens.ARROW),
-        ASSIGNMENT(EQ, PLUSEQ, MINUSEQ, MULTEQ, DIVEQ, PERCEQ),
-        ;
+        ASSIGNMENT(EQ, PLUSEQ, MINUSEQ, MULTEQ, DIVEQ, PERCEQ);
 
         static {
             Precedence[] values = Precedence.values();
@@ -205,29 +177,13 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
             this.operations = TokenSet.create(operations);
         }
 
-        public void parseHigherPrecedence(KotlinExpressionParsing parser) {
-            assert higher != null;
-            parser.parseBinaryExpression(higher);
-        }
-
-        /**
-         *
-         * @param operation the operation sign (e.g. PLUS or IS)
-         * @param parser the parser object
-         * @return node type of the result
-         */
-        public KtNodeType parseRightHandSide(IElementType operation, KotlinExpressionParsing parser) {
-            parseHigherPrecedence(parser);
-            return BINARY_EXPRESSION;
-        }
-
         @NotNull
         public final TokenSet getOperations() {
             return operations;
         }
     }
 
-    public static final TokenSet ALLOW_NEWLINE_OPERATIONS = TokenSet.create(
+    private static final TokenSet ALLOW_NEWLINE_OPERATIONS = TokenSet.create(
             DOT, SAFE_ACCESS,
             COLON, AS_KEYWORD, AS_SAFE,
             ELVIS,
@@ -244,7 +200,7 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         for (Precedence precedence : values) {
             operations.addAll(Arrays.asList(precedence.getOperations().getTypes()));
         }
-        ALL_OPERATIONS = TokenSet.create(operations.toArray(new IElementType[operations.size()]));
+        ALL_OPERATIONS = TokenSet.create(operations.toArray(new IElementType[0]));
     }
 
     static {
@@ -301,27 +257,85 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
         parseBinaryExpression(Precedence.ASSIGNMENT);
     }
 
+
+    private static class BinaryExpressionParsingState {
+        private final Precedence precedence;
+        private final PsiBuilder.Marker expression;
+        private final boolean closeBinary;
+
+        public BinaryExpressionParsingState(Precedence precedence, PsiBuilder.Marker expression, boolean closeBinary) {
+            this.precedence = precedence;
+            this.expression = expression;
+            this.closeBinary = closeBinary;
+        }
+    }
+
     /*
      * element (operation element)*
      *
      * see the precedence table
      */
-    private void parseBinaryExpression(Precedence precedence) {
-        PsiBuilder.Marker expression = mark();
+    private void parseBinaryExpression(Precedence p) {
+        Stack<BinaryExpressionParsingState> states = new Stack<>();
+        states.push(new BinaryExpressionParsingState(p, null, false));
 
-        precedence.parseHigherPrecedence(this);
+        parseBinaryExpression:
+        while (!states.empty()) {
+            BinaryExpressionParsingState state = states.pop();
+            Precedence precedence = state.precedence;
+            PsiBuilder.Marker expression = state.expression;
+            boolean closeBinary = state.closeBinary;
 
-        while (!interruptedWithNewLine() && atSet(precedence.getOperations())) {
-            IElementType operation = tt();
+            if (expression == null) {
+                expression = mark();
 
-            parseOperationReference();
+                if (precedence.equals(Precedence.PREFIX)) {
+                    throw new IllegalStateException("Don't call this method");
+                }
+                else if (precedence.equals(Precedence.AS)) {
+                    parsePrefixExpression();
+                }
+                else {
+                    assert precedence.higher != null;
+                    states.push(new BinaryExpressionParsingState(precedence, expression, false));
+                    states.push(new BinaryExpressionParsingState(precedence.higher, null, false));
+                    continue;
+                }
+            }
 
-            KtNodeType resultType = precedence.parseRightHandSide(operation, this);
-            expression.done(resultType);
-            expression = expression.precede();
+            if (closeBinary) {
+                expression.done(BINARY_EXPRESSION);
+                expression = expression.precede();
+            }
+
+            while (!interruptedWithNewLine() && atSet(precedence.getOperations())) {
+                IElementType operation = tt();
+
+                parseOperationReference();
+
+                KtNodeType resultType;
+
+                if (precedence.equals(Precedence.AS)) {
+                    myKotlinParsing.parseTypeRef();
+                    resultType = BINARY_WITH_TYPE;
+                }
+                else if (precedence.equals(Precedence.IN_OR_IS) && (operation == IS_KEYWORD || operation == NOT_IS)) {
+                    myKotlinParsing.parseTypeRef();
+                    resultType = IS_EXPRESSION;
+                }
+                else {
+                    assert precedence.higher != null;
+                    states.push(new BinaryExpressionParsingState(precedence, expression, true));
+                    states.push(new BinaryExpressionParsingState(precedence.higher, null, false));
+                    continue parseBinaryExpression;
+                }
+
+                expression.done(resultType);
+                expression = expression.precede();
+            }
+
+            expression.drop();
         }
-
-        expression.drop();
     }
 
     /*
