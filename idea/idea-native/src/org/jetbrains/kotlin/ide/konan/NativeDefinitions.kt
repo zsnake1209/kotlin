@@ -64,25 +64,16 @@ class NativeDefinitionsParserDefinition : ParserDefinition {
 
     override fun getFileNodeType(): IFileElementType = FILE
 
-    override fun createLexer(project: Project): Lexer {
-        return NativeDefinitionsLexerAdapter()
-    }
+    override fun createLexer(project: Project): Lexer = NativeDefinitionsLexerAdapter()
 
-    override fun createParser(project: Project): PsiParser {
-        return NativeDefinitionsParser()
-    }
+    override fun createParser(project: Project): PsiParser = NativeDefinitionsParser()
 
-    override fun createFile(viewProvider: FileViewProvider): PsiFile {
-        return NativeDefinitionsFile(viewProvider)
-    }
+    override fun createFile(viewProvider: FileViewProvider): PsiFile = NativeDefinitionsFile(viewProvider)
 
-    override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements {
-        return ParserDefinition.SpaceRequirements.MAY
-    }
+    override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements =
+        ParserDefinition.SpaceRequirements.MAY
 
-    override fun createElement(node: ASTNode): PsiElement {
-        return NativeDefinitionsTypes.Factory.createElement(node)
-    }
+    override fun createElement(node: ASTNode): PsiElement = NativeDefinitionsTypes.Factory.createElement(node)
 }
 
 val SET_OF_OPERATORS = hashSetOf(
@@ -141,9 +132,7 @@ class NativeDefinitionsSyntaxHighlighter : SyntaxHighlighterBase() {
             else -> EMPTY_KEYS
         }
 
-    override fun getHighlightingLexer(): Lexer {
-        return NativeDefinitionsLexerAdapter()
-    }
+    override fun getHighlightingLexer(): Lexer = NativeDefinitionsLexerAdapter()
 
     companion object {
         private fun createKeys(externalName: String, key: TextAttributesKey): Array<TextAttributesKey> {

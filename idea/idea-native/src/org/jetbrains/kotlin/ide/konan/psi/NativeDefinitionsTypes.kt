@@ -16,9 +16,7 @@ import javax.swing.Icon
 class NativeDefinitionsElementType(debugName: String) : IElementType(debugName, NativeDefinitionsLanguage.INSTANCE)
 
 class NativeDefinitionsTokenType(debugName: String) : IElementType(debugName, NativeDefinitionsLanguage.INSTANCE) {
-    override fun toString(): String {
-        return "NativeDefinitionsTokenType." + super.toString()
-    }
+    override fun toString(): String = "NativeDefinitionsTokenType." + super.toString()
 }
 
 class NativeDefinitionsFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, NativeDefinitionsLanguage.INSTANCE) {
