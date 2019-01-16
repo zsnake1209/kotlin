@@ -34,6 +34,7 @@ public class SemanticWhitespaceAwarePsiBuilderImpl extends PsiBuilderAdapter imp
     private final Stack<Boolean> joinComplexTokens = new Stack<>();
 
     private final Stack<Boolean> newlinesEnabled = new Stack<>();
+    private Boolean cachedNewLineBeforeNextToken = null;
 
     private final PsiBuilderImpl delegateImpl;
 
@@ -69,9 +70,18 @@ public class SemanticWhitespaceAwarePsiBuilderImpl extends PsiBuilderAdapter imp
 
     @Override
     public boolean newlineBeforeCurrentToken() {
-        if (!newlinesEnabled.peek()) return false;
+        if (cachedNewLineBeforeNextToken != null) return cachedNewLineBeforeNextToken;
 
-        if (eof()) return true;
+        if (!newlinesEnabled.peek()) {
+            cachedNewLineBeforeNextToken = false;
+            return false;
+        }
+
+        if (eof()) {
+            cachedNewLineBeforeNextToken = true;
+            return true;
+        }
+
 
         // TODO: maybe, memoize this somehow?
         for (int i = 1; i <= getCurrentOffset(); i++) {
@@ -96,11 +106,13 @@ public class SemanticWhitespaceAwarePsiBuilderImpl extends PsiBuilderAdapter imp
 
             for (int j = previousTokenStart; j < previousTokenEnd; j++) {
                 if (getOriginalText().charAt(j) == '\n') {
+                    cachedNewLineBeforeNextToken = true;
                     return true;
                 }
             }
         }
 
+        cachedNewLineBeforeNextToken = false;
         return false;
     }
 
@@ -160,6 +172,8 @@ public class SemanticWhitespaceAwarePsiBuilderImpl extends PsiBuilderAdapter imp
 
     @Override
     public void advanceLexer() {
+        cachedNewLineBeforeNextToken = null;
+
         if (!joinComplexTokens()) {
             super.advanceLexer();
             return;

@@ -292,15 +292,15 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
                 if (precedence.equals(Precedence.PREFIX)) {
                     throw new IllegalStateException("Don't call this method");
                 }
-                else if (precedence.equals(Precedence.AS)) {
-                    parsePrefixExpression();
-                }
-                else {
+
+                while (!precedence.equals(Precedence.AS)) {
                     assert precedence.higher != null;
                     states.push(new BinaryExpressionParsingState(precedence, expression, false));
-                    states.push(new BinaryExpressionParsingState(precedence.higher, null, false));
-                    continue;
+                    precedence = precedence.higher;
+                    expression = mark();
                 }
+
+                parsePrefixExpression();
             }
 
             if (closeBinary) {
@@ -313,15 +313,13 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
                 parseOperationReference();
 
-                KtNodeType resultType;
-
                 if (precedence.equals(Precedence.AS)) {
                     myKotlinParsing.parseTypeRef();
-                    resultType = BINARY_WITH_TYPE;
+                    expression.done(BINARY_WITH_TYPE);
                 }
                 else if (precedence.equals(Precedence.IN_OR_IS) && (operation == IS_KEYWORD || operation == NOT_IS)) {
                     myKotlinParsing.parseTypeRef();
-                    resultType = IS_EXPRESSION;
+                    expression.done(IS_EXPRESSION);
                 }
                 else {
                     assert precedence.higher != null;
@@ -330,7 +328,6 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
                     continue parseBinaryExpression;
                 }
 
-                expression.done(resultType);
                 expression = expression.precede();
             }
 
