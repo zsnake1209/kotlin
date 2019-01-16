@@ -13,16 +13,15 @@ import org.jetbrains.annotations.*
 import org.jetbrains.kotlin.ide.konan.*
 import javax.swing.Icon
 
-class NativeDefinitionsElementType(@NonNls debugName: String) : IElementType(debugName, NativeDefinitionsLanguage.INSTANCE)
+class NativeDefinitionsElementType(debugName: String) : IElementType(debugName, NativeDefinitionsLanguage.INSTANCE)
 
-class NativeDefinitionsTokenType(@NonNls debugName: String) : IElementType(debugName, NativeDefinitionsLanguage.INSTANCE) {
-
+class NativeDefinitionsTokenType(debugName: String) : IElementType(debugName, NativeDefinitionsLanguage.INSTANCE) {
     override fun toString(): String {
         return "NativeDefinitionsTokenType." + super.toString()
     }
 }
 
-class NativeDefinitionsFile(@NotNull viewProvider: FileViewProvider) : PsiFileBase(viewProvider, NativeDefinitionsLanguage.INSTANCE) {
+class NativeDefinitionsFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, NativeDefinitionsLanguage.INSTANCE) {
 
     override fun getFileType(): FileType = NativeDefinitionsFileType.INSTANCE
 
