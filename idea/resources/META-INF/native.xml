@@ -16,6 +16,7 @@
         <fileTypeFactory implementation="org.jetbrains.kotlin.ide.konan.KotlinNativeFileTypeFactory"/>
         <fileBasedIndex implementation="org.jetbrains.kotlin.ide.konan.index.KotlinNativeMetaFileIndex"/>
         <library.type implementation="org.jetbrains.kotlin.ide.konan.NativeLibraryType"/>
+        <lang.parserDefinition language="Kotlin/Native Definitions" implementationClass="org.jetbrains.kotlin.ide.konan.NativeDefinitionsParserDefinition"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">

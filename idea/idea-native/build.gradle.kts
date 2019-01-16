@@ -13,8 +13,12 @@ dependencies {
 }
 
 sourceSets {
-    "main" { projectDefault() }
+    "main" {
+        projectDefault()
+        java.srcDir("gen")
+    }
     "test" { none() }
+
 }
 
 configureFormInstrumentation()
