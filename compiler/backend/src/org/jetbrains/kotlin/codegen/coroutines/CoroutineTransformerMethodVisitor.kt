@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
@@ -497,12 +497,6 @@ class CoroutineTransformerMethodVisitor(
         val frames = performRefinedTypeAnalysis(methodNode, containingClassInternalName)
         fun AbstractInsnNode.index() = instructions.indexOf(this)
 
-        fun Int.isInlinerFakeVariable(index: Int) = methodNode.localVariables.any {
-            (it.name.startsWith(JvmAbi.LOCAL_VARIABLE_NAME_PREFIX_INLINE_ARGUMENT) || it.name.startsWith(JvmAbi.LOCAL_VARIABLE_NAME_PREFIX_INLINE_FUNCTION))
-                    && it.index == this
-                    && it.start.index() <= index && index <= it.end.index()
-        }
-
         // We postpone these actions because they change instruction indices that we use when obtaining frames
         val postponedActions = mutableListOf<() -> Unit>()
         val maxVarsCountByType = mutableMapOf<Type, Int>()
@@ -544,9 +538,8 @@ class CoroutineTransformerMethodVisitor(
             // k + 2 - exception
             val variablesToSpill =
                 (0 until localsCount)
-                    .filterNot {
-                        it in setOf(continuationIndex, dataIndex, exceptionIndex) || it.isInlinerFakeVariable(suspensionCallBegin.index())
-                    }.map { Pair(it, frame.getLocal(it)) }
+                    .filterNot { it in setOf(continuationIndex, dataIndex, exceptionIndex) }
+                    .map { Pair(it, frame.getLocal(it)) }
                     .filter { (index, value) ->
                         (index == 0 && needDispatchReceiver && isForNamedFunction) ||
                                 (value != StrictBasicValue.UNINITIALIZED_VALUE && livenessFrame.isAlive(index))
