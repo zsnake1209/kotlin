@@ -69,7 +69,7 @@ fun StorageComponentContainer.configureModule(
         extension.registerModuleComponents(this, platform, moduleContext.module)
     }
 
-    if (languageVersionSettings.supportsFeature(LanguageFeature.ContextualEffects)) {
+    if (!languageVersionSettings.supportsFeature(LanguageFeature.ContextualEffects)) {
         useInstance(ExtensionContractComponents.DEFAULT)
     } else {
         useInstance(ExtensionContractComponents(ContractsExtension.getInstances(moduleContext.project)))
