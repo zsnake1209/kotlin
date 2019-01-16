@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.ide.konan
 import com.intellij.lang.*
 import com.intellij.lexer.FlexAdapter
 import com.intellij.lexer.Lexer
+import com.intellij.openapi.options.colors.*
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.HighlighterColors
@@ -28,9 +29,6 @@ const val NATIVE_DEFINITIONS_NAME = "KND"
 const val NATIVE_DEFINITIONS_DESCRIPTION = "Definitions file for Kotlin/Native C interop"
 
 class NativeDefinitionsFileType : LanguageFileType(NativeDefinitionsLanguage.INSTANCE) {
-    companion object {
-        val INSTANCE = NativeDefinitionsFileType()
-    }
 
     override fun getName(): String = NATIVE_DEFINITIONS_NAME
 
@@ -39,6 +37,10 @@ class NativeDefinitionsFileType : LanguageFileType(NativeDefinitionsLanguage.INS
     override fun getDefaultExtension(): String = KDEFINITIONS_FILE_EXTENSION
 
     override fun getIcon(): Icon = KotlinIcons.NATIVE
+
+    companion object {
+        val INSTANCE = NativeDefinitionsFileType()
+    }
 }
 
 class NativeDefinitionsLanguage private constructor() : Language(NATIVE_DEFINITIONS_NAME) {
@@ -50,8 +52,11 @@ class NativeDefinitionsLanguage private constructor() : Language(NATIVE_DEFINITI
 class NativeDefinitionsLexerAdapter : FlexAdapter(NativeDefinitionsLexer(null as Reader?))
 
 class NativeDefinitionsParserDefinition : ParserDefinition {
+    private val COMMENTS = TokenSet.create(NativeDefinitionsTypes.COMMENT)
+    private val STRING_LITERALS = TokenSet.create(NativeDefinitionsTypes.C_STRING_LITERAL)
+    private val FILE = IFileElementType(NativeDefinitionsLanguage.INSTANCE)
 
-    override fun getWhitespaceTokens(): TokenSet = WHITE_SPACES
+    override fun getWhitespaceTokens(): TokenSet = TokenSet.WHITE_SPACE
 
     override fun getCommentTokens(): TokenSet = COMMENTS
 
@@ -78,29 +83,22 @@ class NativeDefinitionsParserDefinition : ParserDefinition {
     override fun createElement(node: ASTNode): PsiElement {
         return NativeDefinitionsTypes.Factory.createElement(node)
     }
-
-    companion object {
-        val COMMENTS = TokenSet.create(NativeDefinitionsTypes.COMMENT)
-        val STRING_LITERALS = TokenSet.create(NativeDefinitionsTypes.C_STRING_LITERAL)
-        val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
-
-        val FILE = IFileElementType(NativeDefinitionsLanguage.INSTANCE)
-    }
 }
 
 val SET_OF_OPERATORS = hashSetOf(
     NativeDefinitionsTypes.C_ADD_ASSIGN, NativeDefinitionsTypes.C_AND, NativeDefinitionsTypes.C_AND_ASSIGN,
-    NativeDefinitionsTypes.C_AND_OP, NativeDefinitionsTypes.C_CARET, NativeDefinitionsTypes.C_DEC_OP,
-    NativeDefinitionsTypes.C_DIV_ASSIGN, NativeDefinitionsTypes.C_EQ_OP, NativeDefinitionsTypes.C_EQ_SIGN,
-    NativeDefinitionsTypes.C_EX_MARK, NativeDefinitionsTypes.C_GE_OP, NativeDefinitionsTypes.C_GREATER,
-    NativeDefinitionsTypes.C_INC_OP, NativeDefinitionsTypes.C_LE_OP, NativeDefinitionsTypes.C_LEFT_ASSIGN,
-    NativeDefinitionsTypes.C_LEFT_OP, NativeDefinitionsTypes.C_LESS, NativeDefinitionsTypes.C_MINUS,
-    NativeDefinitionsTypes.C_MOD_ASSIGN, NativeDefinitionsTypes.C_MUL_ASSIGN, NativeDefinitionsTypes.C_MULT,
-    NativeDefinitionsTypes.C_NE_OP, NativeDefinitionsTypes.C_OR_ASSIGN, NativeDefinitionsTypes.C_OR_OP,
-    NativeDefinitionsTypes.C_PERCENT, NativeDefinitionsTypes.C_PLUS, NativeDefinitionsTypes.C_PTR_OP,
-    NativeDefinitionsTypes.C_QU_MARK, NativeDefinitionsTypes.C_RIGHT_ASSIGN, NativeDefinitionsTypes.C_RIGHT_OP,
-    NativeDefinitionsTypes.C_SLASH, NativeDefinitionsTypes.C_SUB_ASSIGN, NativeDefinitionsTypes.C_TILDE,
-    NativeDefinitionsTypes.C_VBAR, NativeDefinitionsTypes.C_XOR_ASSIGN, NativeDefinitionsTypes.DEF_SEPARATOR
+    NativeDefinitionsTypes.C_AND_OP, NativeDefinitionsTypes.C_CARET, NativeDefinitionsTypes.C_COLON,
+    NativeDefinitionsTypes.C_DEC_OP, NativeDefinitionsTypes.C_DIV_ASSIGN, NativeDefinitionsTypes.C_EQ_OP,
+    NativeDefinitionsTypes.C_EQ_SIGN, NativeDefinitionsTypes.C_EX_MARK, NativeDefinitionsTypes.C_GE_OP,
+    NativeDefinitionsTypes.C_GREATER, NativeDefinitionsTypes.C_INC_OP, NativeDefinitionsTypes.C_LE_OP,
+    NativeDefinitionsTypes.C_LEFT_ASSIGN, NativeDefinitionsTypes.C_LEFT_OP, NativeDefinitionsTypes.C_LESS,
+    NativeDefinitionsTypes.C_MINUS, NativeDefinitionsTypes.C_MOD_ASSIGN, NativeDefinitionsTypes.C_MUL_ASSIGN,
+    NativeDefinitionsTypes.C_MULT, NativeDefinitionsTypes.C_NE_OP, NativeDefinitionsTypes.C_OR_ASSIGN,
+    NativeDefinitionsTypes.C_OR_OP, NativeDefinitionsTypes.C_PERCENT, NativeDefinitionsTypes.C_PLUS,
+    NativeDefinitionsTypes.C_PTR_OP, NativeDefinitionsTypes.C_QU_MARK, NativeDefinitionsTypes.C_RIGHT_ASSIGN,
+    NativeDefinitionsTypes.C_RIGHT_OP, NativeDefinitionsTypes.C_SLASH, NativeDefinitionsTypes.C_SUB_ASSIGN,
+    NativeDefinitionsTypes.C_TILDE, NativeDefinitionsTypes.C_VBAR, NativeDefinitionsTypes.C_XOR_ASSIGN,
+    NativeDefinitionsTypes.DEF_SEPARATOR
 )
 
 val SET_OF_C_KEYWORDS = hashSetOf(
@@ -172,5 +170,67 @@ class NativeDefinitionsSyntaxHighlighter : SyntaxHighlighterBase() {
 }
 
 class NativeDefinitionsSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
-    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter = NativeDefinitionsSyntaxHighlighter()
+    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter =
+        NativeDefinitionsSyntaxHighlighter()
+}
+
+class NativeDefinitionsColorSettingsPage : ColorSettingsPage {
+
+    override fun getIcon(): Icon? = KotlinIcons.NATIVE
+
+    override fun getHighlighter(): SyntaxHighlighter = NativeDefinitionsSyntaxHighlighter()
+
+    override fun getDemoText(): String {
+        return """headers = curl/curl.h
+# Unspecified options.
+linkerOpts = -DBAR=bar
+! Specified options.
+compilerOpts.linux = -I/usr/include -I/usr/include/x86_64-linux-gnu
+
+---
+
+struct Hash { // Line comment.
+    int data[2];
+};
+
+/**********************
+ * Multiline comment. *
+ **********************/
+inline static int strangeSum(const int* buffer, int bufferSize) {
+    int result = 20;
+    const char * stringLiteral = "This is a string";
+    for (int i = 0; i < bufferSize; ++i) {
+        result += stringLiteral[i % 10] & 1 == 0 ? (i << 1) : buffer[i / 2];
+    }
+    return result;
+}
+"""
+    }
+
+    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? = null
+
+    override fun getAttributeDescriptors(): Array<AttributesDescriptor> {
+        infix fun String.to(keys: Array<TextAttributesKey>) = AttributesDescriptor(this, keys[0])
+
+        return arrayOf(
+            "Braces and Operators//Braces" to NativeDefinitionsSyntaxHighlighter.BRACE_KEYS,
+            "Braces and Operators//Brackets" to NativeDefinitionsSyntaxHighlighter.BRACKET_KEYS,
+            "Braces and Operators//Comma" to NativeDefinitionsSyntaxHighlighter.COMMA_KEYS,
+            "Braces and Operators//Dot" to NativeDefinitionsSyntaxHighlighter.DOT_KEYS,
+            "Braces and Operators//Operator sign" to NativeDefinitionsSyntaxHighlighter.OPERATOR_KEYS,
+            "Braces and Operators//Parentheses" to NativeDefinitionsSyntaxHighlighter.PAREN_KEYS,
+            "Braces and Operators//Semicolon" to NativeDefinitionsSyntaxHighlighter.SEMICOLON_KEYS,
+            "C keyword" to NativeDefinitionsSyntaxHighlighter.C_KEYWORD_KEYS,
+            "Constant" to NativeDefinitionsSyntaxHighlighter.CONSTANT_KEYS,
+            "Comment" to NativeDefinitionsSyntaxHighlighter.COMMENT_KEYS,
+            "Def keywords" to NativeDefinitionsSyntaxHighlighter.DEF_KEYWORD_KEYS,
+            "Def values" to NativeDefinitionsSyntaxHighlighter.DEF_VALUE_KEYS,
+            "Identifier" to NativeDefinitionsSyntaxHighlighter.IDENTIFIER_KEYS,
+            "String text" to NativeDefinitionsSyntaxHighlighter.STRING_KEYS
+        )
+    }
+
+    override fun getColorDescriptors(): Array<ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
+
+    override fun getDisplayName(): String = NATIVE_DEFINITIONS_NAME
 }
