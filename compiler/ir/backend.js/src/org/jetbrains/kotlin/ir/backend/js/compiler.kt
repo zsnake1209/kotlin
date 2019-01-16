@@ -26,6 +26,7 @@ fun compile(
     files: List<KtFile>,
     configuration: CompilerConfiguration,
     export: FqName? = null,
+    isKlibCompilation: Boolean = false,
     dependencies: List<ModuleDescriptor> = listOf(),
     irDependencyModules: List<IrModuleFragment> = listOf()
 ): Result {
@@ -43,7 +44,7 @@ fun compile(
     TopDownAnalyzerFacadeForJS.checkForErrors(files, analysisResult.bindingContext)
 
     val symbolTable = SymbolTable()
-    irDependencyModules.forEach { symbolTable.loadModule(it)}
+    irDependencyModules.forEach { symbolTable.loadModule(it) }
 
     val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
     val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext, symbolTable)
@@ -58,6 +59,16 @@ fun compile(
         configuration,
         irDependencyModules
     )
+
+    if (isKlibCompilation) {
+//        val declarationTable = DeclarationTable(moduleFragment.irBuiltins, DescriptorTable())
+//        val serializedIr = IrModuleSerializer(context, declarationTable/*, onlyForInlines = false*/).serializedIrModule(moduleFragment)
+//        val serializer = KonanSerializationUtil(context, configuration.get(CommonConfigurationKeys.METADATA_VERSION)!!, declarationTable)
+//        val serializedData = serializer.serializeModule(analysisResult.moduleDescriptor, serializedIr)
+//        buildLibrary(serializedData)
+//
+        TODO("Implemenet IrSerialization")
+    }
 
     CompilerPhaseManager(context, context.phases, moduleFragment, JsPhaseRunner).run {
         jsPhases.fold(data) { m, p -> phase(p, context, m) }

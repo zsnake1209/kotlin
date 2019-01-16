@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.test.TargetBackend
 import java.io.File
 
-private val runtimeSources = listOfKtFilesFrom(
+val runtimeSources = listOfKtFilesFrom(
     "core/builtins/src/kotlin",
     "libraries/stdlib/common/src",
     "libraries/stdlib/src/kotlin/",
@@ -181,6 +181,7 @@ abstract class BasicIrBoxTest(
             filesToCompile,
             config.configuration,
             FqName((testPackage?.let { "$it." } ?: "") + testFunction),
+            false,
             dependencies,
             irDependencies)
 
