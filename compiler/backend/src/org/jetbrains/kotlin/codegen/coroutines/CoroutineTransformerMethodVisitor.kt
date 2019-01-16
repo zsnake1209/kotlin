@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
@@ -980,8 +980,7 @@ private fun findSafelyReachableReturns(methodNode: MethodNode, sourceFrames: Arr
             return@init setOf(index)
         }
 
-        if (!insn.isMeaningful || insn.opcode in SAFE_OPCODES || insn.isInvisibleInDebugVarInsn(methodNode) ||
-            isInlineMarker(insn)) {
+        if (!insn.isMeaningful || insn.opcode in SAFE_OPCODES || isInlineMarker(insn)) {
             setOf()
         } else null
     }
@@ -1013,14 +1012,6 @@ private fun findSafelyReachableReturns(methodNode: MethodNode, sourceFrames: Arr
 
 // Check whether this instruction is unreachable, i.e. there is no path leading to this instruction
 internal fun isUnreachable(index: Int, sourceFrames: Array<Frame<SourceValue?>?>) = sourceFrames[index] == null
-
-private fun AbstractInsnNode?.isInvisibleInDebugVarInsn(methodNode: MethodNode): Boolean {
-    val insns = methodNode.instructions
-    val index = insns.indexOf(this)
-    return (this is VarInsnNode && methodNode.localVariables.none {
-        it.index == `var` && index in it.start.let(insns::indexOf)..it.end.let(insns::indexOf)
-    })
-}
 
 private val SAFE_OPCODES =
     ((Opcodes.DUP..Opcodes.DUP2_X2) + Opcodes.NOP + Opcodes.POP + Opcodes.POP2 + (Opcodes.IFEQ..Opcodes.GOTO)).toSet()
