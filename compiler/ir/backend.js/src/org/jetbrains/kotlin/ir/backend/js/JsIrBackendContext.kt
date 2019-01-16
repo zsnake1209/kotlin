@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.ir.backend.js
 
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
-import org.jetbrains.kotlin.backend.common.CompilerPhases
+import org.jetbrains.kotlin.backend.common.PhaseConfig
 import org.jetbrains.kotlin.backend.common.atMostOne
 import org.jetbrains.kotlin.backend.common.descriptors.KnownPackageFragmentDescriptor
 import org.jetbrains.kotlin.backend.common.ir.Ir
@@ -55,7 +55,8 @@ class JsIrBackendContext(
 
     override val builtIns = module.builtIns
 
-    val phases = CompilerPhases(jsPhases, configuration, IrModuleStartPhase, IrModuleEndPhase)
+    val phaseConfig = PhaseConfig(jsPhases, configuration)
+    override var inVerbosePhase: Boolean = false
 
     val internalPackageFragmentDescriptor = KnownPackageFragmentDescriptor(builtIns.builtInsModule, FqName("kotlin.js.internal"))
     val implicitDeclarationFile by lazy {
@@ -269,10 +270,9 @@ class JsIrBackendContext(
 
     fun getFunctions(fqName: FqName) = findFunctions(module.getPackage(fqName.parent()).memberScope, fqName.shortName())
 
-    override var inVerbosePhase = false
     override fun log(message: () -> String) {
         /*TODO*/
-        if (inVerbosePhase)  print(message())
+        if (inVerbosePhase) print(message())
     }
 
     override fun report(element: IrElement?, irFile: IrFile?, message: String, isError: Boolean) {

@@ -16,28 +16,26 @@
 
 package org.jetbrains.kotlin.backend.jvm
 
-import org.jetbrains.kotlin.backend.common.BackendContext
-import org.jetbrains.kotlin.backend.common.CompilerPhase
-import org.jetbrains.kotlin.backend.common.CompilerPhaseManager
-import org.jetbrains.kotlin.backend.common.runPhases
+import org.jetbrains.kotlin.backend.common.*
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.util.PatchDeclarationParentsVisitor
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 
-fun <Context : BackendContext> makePatchParentsPhase(number: Int) = object : CompilerPhase<Context, IrFile> {
-    override val name: String = "PatchParents$number"
-    override val description: String = "Patch parent references in IrFile, pass $number"
-    override val prerequisite: Set<CompilerPhase<Context, *>> = emptySet()
+fun makePatchParentsPhase(number: Int) =
+    object : AbstractIrFileCompilerPhase<JvmBackendContext>() {
+        override val name: String = "PatchParents$number"
+        override val description: String = "Patch parent references in IrFile, pass $number"
+        override val prerequisite: Set<CompilerPhase<*, *, *>> = emptySet()
 
-    override fun invoke(manager: CompilerPhaseManager<Context, IrFile>, input: IrFile): IrFile {
-        input.acceptVoid(PatchDeclarationParentsVisitor())
-        return input
+        override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: JvmBackendContext, input: IrFile): IrFile {
+            input.acceptVoid(PatchDeclarationParentsVisitor())
+            return input
+        }
     }
-}
 
 class JvmLower(val context: JvmBackendContext) {
     fun lower(irFile: IrFile) {
         // TODO run lowering passes as callbacks in bottom-up visitor
-        context.rootPhaseManager(irFile).runPhases(jvmPhases)
+        jvmPhases.invokeToplevel(context.phaseConfig, context, irFile)
     }
 }
