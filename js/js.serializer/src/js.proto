@@ -51,6 +51,11 @@ message Files {
   repeated File file = 1;
 }
 
+message DescriptorUniqId {
+  required int64 index = 1;
+}
+
+
 extend Package {
   optional int32 package_fq_name = 131;
 }
@@ -58,15 +63,18 @@ extend Package {
 extend Class {
   repeated Annotation class_annotation = 130;
   optional int32 class_containing_file_id = 135;
+  optional DescriptorUniqId class_uniq_id = 136;
 }
 
 extend Constructor {
   repeated Annotation constructor_annotation = 130;
+  optional DescriptorUniqId constructor_uniq_id = 131;
 }
 
 extend Function {
   repeated Annotation function_annotation = 130;
   optional int32 function_containing_file_id = 135;
+  optional DescriptorUniqId function_uniq_id = 136;
 }
 
 extend Property {
@@ -75,14 +83,18 @@ extend Property {
   repeated Annotation property_setter_annotation = 133;
   optional Annotation.Argument.Value compile_time_value = 131;
   optional int32 property_containing_file_id = 135;
+  optional DescriptorUniqId property_uniq_id = 136;
+
 }
 
 extend EnumEntry {
   repeated Annotation enum_entry_annotation = 130;
+  optional DescriptorUniqId enum_entry_uniq_id = 131;
 }
 
 extend ValueParameter {
   repeated Annotation parameter_annotation = 130;
+  optional DescriptorUniqId value_param_uniq_id = 131;
 }
 
 extend Type {
@@ -91,6 +103,7 @@ extend Type {
 
 extend TypeParameter {
   repeated Annotation type_parameter_annotation = 130;
+  optional DescriptorUniqId type_param_uniq_id = 131;
 }
 
 extend PackageFragment {

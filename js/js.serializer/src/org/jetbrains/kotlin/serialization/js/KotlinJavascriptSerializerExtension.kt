@@ -33,12 +33,40 @@ import org.jetbrains.kotlin.types.FlexibleType
 class KotlinJavascriptSerializerExtension(
     private val fileRegistry: KotlinFileRegistry,
     private val languageVersionSettings: LanguageVersionSettings,
-    override val metadataVersion: BinaryVersion
+    override val metadataVersion: BinaryVersion,
+    val declarationTableHandler: ((DeclarationDescriptor) -> JsProtoBuf.DescriptorUniqId?)?
 ) : KotlinSerializerExtensionBase(JsSerializerProtocol) {
     override val stringTable = JavaScriptStringTable()
 
     override fun serializeFlexibleType(flexibleType: FlexibleType, lowerProto: ProtoBuf.Type.Builder, upperProto: ProtoBuf.Type.Builder) {
         lowerProto.flexibleTypeCapabilitiesId = stringTable.getStringIndex(DynamicTypeDeserializer.id)
+    }
+
+    private fun uniqId(descriptor: DeclarationDescriptor): JsProtoBuf.DescriptorUniqId? {
+//        val index = declarationTable.descriptorTable.get(descriptor)
+//        return index?.let { newDescriptorUniqId(it) }
+        return declarationTableHandler?.let { it(descriptor) }
+    }
+
+    override fun serializeTypeParameter(typeParameter: TypeParameterDescriptor, proto: ProtoBuf.TypeParameter.Builder) {
+        uniqId(typeParameter)?.let { proto.setExtension(JsProtoBuf.typeParamUniqId, it) }
+        super.serializeTypeParameter(typeParameter, proto)
+    }
+
+    override fun serializeValueParameter(descriptor: ValueParameterDescriptor, proto: ProtoBuf.ValueParameter.Builder) {
+        uniqId(descriptor)?.let { proto.setExtension(JsProtoBuf.valueParamUniqId, it) }
+        super.serializeValueParameter(descriptor, proto)
+    }
+
+    override fun serializeEnumEntry(descriptor: ClassDescriptor, proto: ProtoBuf.EnumEntry.Builder) {
+        uniqId(descriptor)?.let { proto.setExtension(JsProtoBuf.enumEntryUniqId, it) }
+        super.serializeEnumEntry(descriptor, proto)
+    }
+
+    override fun serializeConstructor(descriptor: ConstructorDescriptor, proto: ProtoBuf.Constructor.Builder,
+                                      childSerializer: DescriptorSerializer) {
+        uniqId(descriptor)?.let { proto.setExtension(JsProtoBuf.constructorUniqId, it) }
+        super.serializeConstructor(descriptor, proto, childSerializer)
     }
 
     override fun serializeClass(
@@ -47,6 +75,7 @@ class KotlinJavascriptSerializerExtension(
             versionRequirementTable: MutableVersionRequirementTable,
             childSerializer: DescriptorSerializer
     ) {
+        uniqId(descriptor)?.let { proto.setExtension(JsProtoBuf.classUniqId, it) }
         val id = getFileId(descriptor)
         if (id != null) {
             proto.setExtension(JsProtoBuf.classContainingFileId, id)
@@ -60,6 +89,7 @@ class KotlinJavascriptSerializerExtension(
             versionRequirementTable: MutableVersionRequirementTable,
             childSerializer: DescriptorSerializer
     ) {
+        uniqId(descriptor)?.let { proto.setExtension(JsProtoBuf.propertyUniqId, it) }
         val id = getFileId(descriptor)
         if (id != null) {
             proto.setExtension(JsProtoBuf.propertyContainingFileId, id)
@@ -70,6 +100,7 @@ class KotlinJavascriptSerializerExtension(
     override fun serializeFunction(descriptor: FunctionDescriptor,
                                    proto: ProtoBuf.Function.Builder,
                                    childSerializer: DescriptorSerializer) {
+        uniqId(descriptor)?.let { proto.setExtension(JsProtoBuf.functionUniqId, it) }
         val id = getFileId(descriptor)
         if (id != null) {
             proto.setExtension(JsProtoBuf.functionContainingFileId, id)

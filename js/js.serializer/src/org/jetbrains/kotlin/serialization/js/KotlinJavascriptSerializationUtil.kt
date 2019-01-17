@@ -72,7 +72,8 @@ object KotlinJavascriptSerializationUtil {
         bindingContext: BindingContext,
         jsDescriptor: JsModuleDescriptor<ModuleDescriptor>,
         languageVersionSettings: LanguageVersionSettings,
-        metadataVersion: JsMetadataVersion
+        metadataVersion: JsMetadataVersion,
+        declarationTableHandler: ((DeclarationDescriptor) -> JsProtoBuf.DescriptorUniqId?)? = null
     ): SerializedMetadata {
         val serializedFragments = HashMap<FqName, ProtoBuf.PackageFragment>()
         val module = jsDescriptor.data
@@ -81,7 +82,7 @@ object KotlinJavascriptSerializationUtil {
             val fragment = serializeDescriptors(
                 bindingContext, module,
                 module.getPackage(fqName).memberScope.getContributedDescriptors(),
-                fqName, languageVersionSettings, metadataVersion
+                fqName, languageVersionSettings, metadataVersion, declarationTableHandler
             )
 
             if (!fragment.isEmpty()) {
@@ -166,7 +167,8 @@ object KotlinJavascriptSerializationUtil {
         scope: Collection<DeclarationDescriptor>,
         fqName: FqName,
         languageVersionSettings: LanguageVersionSettings,
-        metadataVersion: BinaryVersion
+        metadataVersion: BinaryVersion,
+        declarationTableHandler: ((DeclarationDescriptor) -> JsProtoBuf.DescriptorUniqId?)? = null
     ): ProtoBuf.PackageFragment {
         val builder = ProtoBuf.PackageFragment.newBuilder()
 
@@ -182,7 +184,7 @@ object KotlinJavascriptSerializationUtil {
         }
 
         val fileRegistry = KotlinFileRegistry()
-        val extension = KotlinJavascriptSerializerExtension(fileRegistry, languageVersionSettings, metadataVersion)
+        val extension = KotlinJavascriptSerializerExtension(fileRegistry, languageVersionSettings, metadataVersion, declarationTableHandler)
 
         val classDescriptors = scope.filterIsInstance<ClassDescriptor>().sortedBy { it.fqNameSafe.asString() }
 

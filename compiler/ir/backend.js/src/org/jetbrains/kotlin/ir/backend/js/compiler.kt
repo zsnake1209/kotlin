@@ -7,17 +7,29 @@ package org.jetbrains.kotlin.ir.backend.js
 
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.common.CompilerPhaseManager
+import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.DeclarationTable
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.DescriptorTable
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.IrModuleSerializer
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.newDescriptorUniqId
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
+import org.jetbrains.kotlin.serialization.js.JsModuleDescriptor
+import org.jetbrains.kotlin.serialization.js.KotlinJavascriptSerializationUtil
+import org.jetbrains.kotlin.serialization.js.KotlinJavascriptSerializerExtension
+import org.jetbrains.kotlin.serialization.js.ModuleKind
+import org.jetbrains.kotlin.utils.JsMetadataVersion
+import java.io.File
 
 data class Result(val moduleDescriptor: ModuleDescriptor, val generatedCode: String, val moduleFragment: IrModuleFragment)
 
@@ -60,13 +72,59 @@ fun compile(
         irDependencyModules
     )
 
+    moduleFragment.patchDeclarationParents() // why do we need it?
+
     if (isKlibCompilation) {
-//        val declarationTable = DeclarationTable(moduleFragment.irBuiltins, DescriptorTable())
-//        val serializedIr = IrModuleSerializer(context, declarationTable/*, onlyForInlines = false*/).serializedIrModule(moduleFragment)
-//        val serializer = KonanSerializationUtil(context, configuration.get(CommonConfigurationKeys.METADATA_VERSION)!!, declarationTable)
+        val declarationTable = DeclarationTable(moduleFragment.irBuiltins, DescriptorTable())
+        val serializedIr = IrModuleSerializer(context, declarationTable/*, onlyForInlines = false*/).serializedIrModule(moduleFragment)
+        val serializer = KotlinJavascriptSerializationUtil
 //        val serializedData = serializer.serializeModule(analysisResult.moduleDescriptor, serializedIr)
+        val moduleDescription = JsModuleDescriptor(
+            name = "AAAAA",
+            data = moduleFragment.descriptor,
+            kind = ModuleKind.UMD,
+            imported = dependencies.map { it.name.asString() }
+        )
+        val serializedData = serializer.serializeMetadata(
+            psi2IrContext.bindingContext,
+            moduleDescription,
+            configuration.get(CommonConfigurationKeys.LANGUAGE_VERSION_SETTINGS)!!,
+            configuration.get(CommonConfigurationKeys.METADATA_VERSION)  as? JsMetadataVersion
+                ?: JsMetadataVersion.INSTANCE
+        ) {
+            val index = declarationTable.descriptorTable.get(it)
+            index?.let { newDescriptorUniqId(it) }
+        }
 //        buildLibrary(serializedData)
 //
+
+        val stdKlibDir = File("js/js.translator/testData/out/klibs/runtime/").also {
+            it.deleteRecursively()
+            it.mkdirs()
+        }
+
+        val moduleFile = File(stdKlibDir, "module.kji")
+        moduleFile.writeBytes(serializedIr.module)
+
+        for ((id, data) in serializedIr.declarations) {
+            val file = File(stdKlibDir, "${id.index}${if (id.isLocal) "L" else "G"}.kjd")
+            file.writeBytes(data)
+        }
+
+
+        val debugFile = File(stdKlibDir, "debug.txt")
+
+        for ((id, data) in serializedIr.debugIndex) {
+            debugFile.appendText(id.toString())
+            debugFile.appendText(" --- ")
+            debugFile.appendText(data)
+            debugFile.appendText("\n")
+        }
+
+        File(stdKlibDir, "meta.kjm").also { it.writeText(serializedData.asString()) }
+
+
+//        return
         TODO("Implemenet IrSerialization")
     }
 

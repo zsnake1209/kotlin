@@ -39,7 +39,6 @@ fun buildConfiguration(environment: KotlinCoreEnvironment): CompilerConfiguratio
 private val stdKlibFile = File("js/js.translator/testData/out/klibs/stdlib.klib")
 
 fun main() {
-
     val environment = KotlinCoreEnvironment.createForTests(Disposable { }, CompilerConfiguration(), EnvironmentConfigFiles.JS_CONFIG_FILES)
 
     fun createPsiFile(fileName: String): KtFile {

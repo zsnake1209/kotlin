@@ -183,7 +183,7 @@ public final class K2JSTranslator {
                 ProtoBuf.PackageFragment packagePart = serializationUtil.serializeDescriptors(
                         bindingTrace.getBindingContext(), moduleDescriptor, scope, file.getPackageFqName(),
                         CommonConfigurationKeysKt.getLanguageVersionSettings(config.getConfiguration()),
-                        metadataVersion != null ? metadataVersion : JsMetadataVersion.INSTANCE
+                        metadataVersion != null ? metadataVersion : JsMetadataVersion.INSTANCE, null
                 );
 
                 File ioFile = VfsUtilCore.virtualToIoFile(file.getVirtualFile());
