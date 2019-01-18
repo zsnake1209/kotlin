@@ -16,8 +16,8 @@
 
 package org.jetbrains.kotlin.idea.completion
 
-import com.intellij.codeInsight.completion.AllClassesGetter
 import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.codeInsight.completion.JavaClassNameCompletionContributor
 import com.intellij.codeInsight.completion.PrefixMatcher
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiLiteral
@@ -86,21 +86,26 @@ class AllClassesCompletion(private val parameters: CompletionParameters,
     }
 
     private fun addAdaptedJavaCompletion(collector: (PsiClass) -> Unit) {
-        AllClassesGetter.processJavaClasses(parameters, prefixMatcher, true, { psiClass ->
-            if (psiClass!! !is KtLightClass) { // Kotlin class should have already been added as kotlin element before
-                if (psiClass.isSyntheticKotlinClass()) return@processJavaClasses // filter out synthetic classes produced by Kotlin compiler
+        JavaClassNameCompletionContributor.addAllClasses(parameters, true, prefixMatcher) {
+            val psiClass = it.psiElement
+            when (psiClass) {
+                is PsiClass -> {
+                    if (psiClass !is KtLightClass) {
+                        if (psiClass.isSyntheticKotlinClass()) return@addAllClasses
 
-                val kind = when {
-                    psiClass.isAnnotationType -> ClassKind.ANNOTATION_CLASS
-                    psiClass.isInterface -> ClassKind.INTERFACE
-                    psiClass.isEnum -> ClassKind.ENUM_CLASS
-                    else -> ClassKind.CLASS
-                }
-                if (kindFilter(kind) && !isNotToBeUsed(psiClass)) {
-                    collector(psiClass)
+                        val kind = when {
+                            psiClass.isAnnotationType -> ClassKind.ANNOTATION_CLASS
+                            psiClass.isInterface -> ClassKind.INTERFACE
+                            psiClass.isEnum -> ClassKind.ENUM_CLASS
+                            else -> ClassKind.CLASS
+                        }
+                        if (kindFilter(kind) && !isNotToBeUsed(psiClass)) {
+                            collector(psiClass)
+                        }
+                    }
                 }
             }
-        })
+        }
     }
 
     private fun PsiClass.isSyntheticKotlinClass(): Boolean {
