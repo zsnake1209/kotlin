@@ -18,12 +18,11 @@ package org.jetbrains.kotlin.ir.backend.js.lower.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.ir.ir2string
-//import org.jetbrains.kotlin.backend.konan.descriptors.findTopLevelDeclaration
-//import org.jetbrains.kotlin.backend.konan.descriptors.isExpectMember
-//import org.jetbrains.kotlin.backend.konan.descriptors.isSerializableExpectClass
-import org.jetbrains.kotlin.descriptors.*
-//import org.jetbrains.kotlin.backend.konan.library.SerializedIr
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.ClassKind.*
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.SourceManager
 import org.jetbrains.kotlin.ir.declarations.*
@@ -36,7 +35,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrUnaryPrimitiveImpl
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrTypeBase
-import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
 import org.jetbrains.kotlin.types.Variance
 
 internal class IrModuleSerializer(
@@ -991,29 +989,3 @@ internal class IrModuleSerializer(
 
     }
 }
-class SerializedIr (
-    val module: ByteArray,
-    val declarations: Map<UniqId, ByteArray>,
-    val debugIndex: Map<UniqId, String>
-)
-
-internal val DeclarationDescriptor.isExpectMember: Boolean
-    get() = this is MemberDescriptor && this.isExpect
-
-internal val DeclarationDescriptor.isSerializableExpectClass: Boolean
-    get() = this is ClassDescriptor && ExpectedActualDeclarationChecker.shouldGenerateExpectClass(this)
-
-val IrDeclaration.isPropertyAccessor get() =
-    this is IrSimpleFunction && this.correspondingProperty != null
-
-val IrDeclaration.isPropertyField get() =
-    this is IrField && this.correspondingProperty != null
-
-val IrDeclaration.isTopLevelDeclaration get() =
-    parent !is IrDeclaration && !this.isPropertyAccessor && !this.isPropertyField
-
-fun IrDeclaration.findTopLevelDeclaration(): IrDeclaration =
-    if (this.isTopLevelDeclaration) this
-    else if (this.isPropertyAccessor) (this as IrSimpleFunction).correspondingProperty!!.findTopLevelDeclaration()
-    else if (this.isPropertyField) (this as IrField).correspondingProperty!!.findTopLevelDeclaration()
-    else (this.parent as IrDeclaration).findTopLevelDeclaration()

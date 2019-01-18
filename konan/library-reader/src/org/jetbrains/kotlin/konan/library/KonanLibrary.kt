@@ -46,6 +46,8 @@ interface KonanLibrary {
     val moduleHeaderData: KonanProtoBuf.LinkDataLibrary
     fun packageMetadataParts(fqName: String): Set<String>
     fun packageMetadata(packageFqName: String, partName: String): KonanProtoBuf.LinkDataPackageFragment
+
+    fun irDeclaration(index: Long, isLocal: Boolean): ByteArray
 }
 
 val KonanLibrary.uniqueName

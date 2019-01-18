@@ -7,15 +7,13 @@ package org.jetbrains.kotlin.ir.backend.js
 
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.common.CompilerPhaseManager
+import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.DeclarationTable
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.DescriptorTable
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.IrModuleSerializer
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.newDescriptorUniqId
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.*
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
@@ -28,7 +26,9 @@ import org.jetbrains.kotlin.serialization.js.JsModuleDescriptor
 import org.jetbrains.kotlin.serialization.js.KotlinJavascriptSerializationUtil
 import org.jetbrains.kotlin.serialization.js.KotlinJavascriptSerializerExtension
 import org.jetbrains.kotlin.serialization.js.ModuleKind
+import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.utils.JsMetadataVersion
+import org.jetbrains.kotlin.utils.KotlinJavascriptMetadataUtils
 import java.io.File
 
 data class Result(val moduleDescriptor: ModuleDescriptor, val generatedCode: String, val moduleFragment: IrModuleFragment)
@@ -56,12 +56,33 @@ fun compile(
     TopDownAnalyzerFacadeForJS.checkForErrors(files, analysisResult.bindingContext)
 
     val symbolTable = SymbolTable()
-    irDependencyModules.forEach { symbolTable.loadModule(it) }
+//    irDependencyModules.forEach { symbolTable.loadModule(it) }
 
     val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
     val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext, symbolTable)
 
-    val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files)
+    val moduleDescriptor = analysisResult.moduleDescriptor
+
+//    val deserializer = KonanIrModuleDeserializer(
+//        moduleDescriptor,
+//        object : LoggingContext {
+//            override fun log(message: () -> String) {
+//
+//            }
+//        },
+//        psi2IrContext.irBuiltIns,
+//        psi2IrContext.symbolTable,
+//        null
+//    )
+
+//    val irModules = moduleDescriptor.allDependencyModules.map {
+//        moduleToLibrary[it].let { l ->
+//            deserializer.deserializeIrModule(l, library.wholeIr, true)
+//        }
+//    }.filterNotNull()
+
+//    val symbols = KonanSymbols(context, generatorContext.symbolTable, generatorContext.symbolTable.lazyWrapper)
+    val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files/*, deserializer*/)
 
     val context = JsIrBackendContext(
         analysisResult.moduleDescriptor,
@@ -78,9 +99,10 @@ fun compile(
         val declarationTable = DeclarationTable(moduleFragment.irBuiltins, DescriptorTable())
         val serializedIr = IrModuleSerializer(context, declarationTable/*, onlyForInlines = false*/).serializedIrModule(moduleFragment)
         val serializer = KotlinJavascriptSerializationUtil
+//        val ddeserializer = KotlinJavascriptSerializationUtil
 //        val serializedData = serializer.serializeModule(analysisResult.moduleDescriptor, serializedIr)
         val moduleDescription = JsModuleDescriptor(
-            name = "AAAAA",
+            name = configuration.get(CommonConfigurationKeys.MODULE_NAME) as String,
             data = moduleFragment.descriptor,
             kind = ModuleKind.UMD,
             imported = dependencies.map { it.name.asString() }
@@ -121,7 +143,26 @@ fun compile(
             debugFile.appendText("\n")
         }
 
-        File(stdKlibDir, "meta.kjm").also { it.writeText(serializedData.asString()) }
+        val metadata = File(stdKlibDir, "meta.kjm").also { it.writeText(serializedData.asString()) }
+
+        val deserializer = KonanIrModuleDeserializer(
+            moduleDescriptor,
+            context,
+            context.irBuiltIns,
+            SymbolTable(),
+            stdKlibDir,
+            null
+        )
+
+        val storageManager = LockBasedStorageManager("JsConfig")
+        // CREATE NEW MODULE DESCRIPTOR HERE AND DESERIALIZE IT
+
+        val metadatas = KotlinJavascriptMetadataUtils.loadMetadata(metadata)
+        val mt = metadatas.single()
+        val desc = serializer.readModuleAsProto(mt.body, mt.version)
+
+
+        val deserializedModuleFragment = deserializer.deserializeIrModule(moduleDescriptor, moduleFile.readBytes(), true)
 
 
 //        return
