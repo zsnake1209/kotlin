@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrSetFieldImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
+import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
 
@@ -38,6 +39,7 @@ class InitializersLowering(
         val staticInitializerStatements = handleStatics(irClass)
         if (clinitNeeded && staticInitializerStatements.isNotEmpty())
             createStaticInitializationMethod(irClass, staticInitializerStatements)
+        irClass.patchDeclarationParents(irClass.parent)
     }
 
     fun handleNonStatics(irClass: IrClass) =
