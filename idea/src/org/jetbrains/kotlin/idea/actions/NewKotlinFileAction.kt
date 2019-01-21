@@ -47,8 +47,8 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
-import org.jetbrains.kotlin.statistics.KotlinStatisticsTrigger
-import org.jetbrains.kotlin.statistics.KotlinIdeNewFileTemplateTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinStatisticsTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinIdeNewFileTemplateTrigger
 import java.util.*
 
 class NewKotlinFileAction : CreateFileFromTemplateAction(

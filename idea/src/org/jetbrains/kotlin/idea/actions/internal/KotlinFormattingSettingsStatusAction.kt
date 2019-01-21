@@ -8,13 +8,13 @@ package org.jetbrains.kotlin.idea.actions.internal
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
-import org.jetbrains.kotlin.idea.formatter.KotlinFormatterUsageCollector
+import org.jetbrains.kotlin.idea.formatter.KotlinFormatterUtils
 
 class KotlinFormattingSettingsStatusAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        val formatterKind = KotlinFormatterUsageCollector.getKotlinFormatterKind(project)
+        val formatterKind = KotlinFormatterUtils.getKotlinFormatterKind(project)
 
         Messages.showInfoMessage(
             project,

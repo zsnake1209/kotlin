@@ -3,23 +3,12 @@
  * that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.statistics
+package org.jetbrains.kotlin.idea.statistics
 
-import com.intellij.ide.plugins.PluginManager
-import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsageTriggerCollector
-import com.intellij.internal.statistic.service.fus.collectors.FUSApplicationUsageTrigger
-import com.intellij.internal.statistic.service.fus.collectors.FUSUsageContext
-import com.intellij.openapi.extensions.PluginId
-
-open class KotlinStatisticsTrigger(private val groupIdSufix: String) : ApplicationUsageTriggerCollector() {
-    override fun getGroupId() = "statistics.kotlin.$groupIdSufix"
-
+open class KotlinStatisticsTrigger(private val groupIdSufix: String) {
     companion object {
         public fun trigger(clazz: Class<out KotlinStatisticsTrigger>, event: String) {
-            val plugin = PluginManager.getPlugin(PluginId.getId("org.jetbrains.kotlin"))
-            val version = plugin?.version ?: "undefined"
-
-            FUSApplicationUsageTrigger.getInstance().trigger(clazz, event, FUSUsageContext.create(version))
+            // FUS is not working for 182
         }
     }
 }

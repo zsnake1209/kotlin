@@ -9,8 +9,8 @@ import com.intellij.ide.scratch.ScratchFileCreationHelper
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.parsing.KotlinParserDefinition
-import org.jetbrains.kotlin.statistics.KotlinIdeNewFileTemplateTrigger
-import org.jetbrains.kotlin.statistics.KotlinStatisticsTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinIdeNewFileTemplateTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinStatisticsTrigger
 
 class KtScratchFileCreationHelper: ScratchFileCreationHelper() {
 

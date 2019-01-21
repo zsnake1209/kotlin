@@ -3234,11 +3234,13 @@
     <postStartupActivity implementation="org.jetbrains.kotlin.idea.framework.TargetRetrieveActivity"/>
 
     <!--FUS triggers-->
-    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.statistics.KotlinTargetTrigger"/>
-    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.statistics.KotlinMavenTargetTrigger"/>
-    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.statistics.KotlinJPSTargetTrigger"/>
-    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.statistics.KotlinIdeRefactoringTrigger"/>
-    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.statistics.KotlinIdeNewFileTemplateTrigger"/>
+    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.idea.statistics.KotlinTargetTrigger"/>
+    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.idea.statistics.KotlinIdeRefactoringTrigger"/>
+    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.idea.statistics.KotlinIdeNewFileTemplateTrigger"/>
+    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.idea.statistics.KotlinMavenTargetTrigger"/>
+    <statistics.applicationUsagesCollector implementation="org.jetbrains.kotlin.idea.statistics.KotlinJPSTargetTrigger"/>
+    <statistics.projectUsagesCollector implementation="org.jetbrains.kotlin.idea.statistics.KotlinFormatterUsageCollector"/>
+    <statistics.projectUsagesCollector implementation="org.jetbrains.kotlin.idea.statistics.KotlinInlayParameterHintsUsageCollector"/>
 
   </extensions>
 </idea-plugin>

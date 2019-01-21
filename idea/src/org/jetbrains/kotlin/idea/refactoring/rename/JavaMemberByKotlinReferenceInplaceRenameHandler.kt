@@ -16,7 +16,7 @@
 
 package org.jetbrains.kotlin.idea.refactoring.rename
 
-import org.jetbrains.kotlin.statistics.KotlinStatisticsTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinStatisticsTrigger
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.command.impl.StartMarkAction
 import com.intellij.openapi.editor.Editor
@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
-import org.jetbrains.kotlin.statistics.KotlinIdeRefactoringTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinIdeRefactoringTrigger
 
 class JavaMemberByKotlinReferenceInplaceRenameHandler : MemberInplaceRenameHandler() {
     class Renamer(

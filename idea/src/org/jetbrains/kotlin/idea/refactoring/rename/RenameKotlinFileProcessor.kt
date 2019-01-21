@@ -16,7 +16,7 @@
 
 package org.jetbrains.kotlin.idea.refactoring.rename
 
-import org.jetbrains.kotlin.statistics.KotlinStatisticsTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinStatisticsTrigger
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.JavaPsiFacade
@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.statistics.KotlinIdeRefactoringTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinIdeRefactoringTrigger
 
 class RenameKotlinFileProcessor : RenamePsiFileProcessor() {
     class FileRenamingPsiClassWrapper(

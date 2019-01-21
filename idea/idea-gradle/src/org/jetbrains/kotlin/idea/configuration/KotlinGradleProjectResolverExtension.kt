@@ -36,8 +36,8 @@ import org.jetbrains.kotlin.idea.inspections.gradle.getDependencyModules
 import org.jetbrains.kotlin.idea.util.CopyableDataNodeUserDataProperty
 import org.jetbrains.kotlin.idea.util.DataNodeUserDataProperty
 import org.jetbrains.kotlin.idea.util.NotNullableCopyableDataNodeUserDataProperty
-import org.jetbrains.kotlin.statistics.KotlinStatisticsTrigger
-import org.jetbrains.kotlin.statistics.KotlinTargetTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinStatisticsTrigger
+import org.jetbrains.kotlin.idea.statistics.KotlinTargetTrigger
 import org.jetbrains.plugins.gradle.model.ExternalProjectDependency
 import org.jetbrains.plugins.gradle.model.ExternalSourceSet
 import org.jetbrains.plugins.gradle.model.FileCollectionDependency
