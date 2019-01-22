@@ -132,26 +132,26 @@ fun <Context : CommonBackendContext, Data: IrElement> dumpIrElement(
 
 // Mixins for dumping and verifying
 interface PhaseWithIrInput<in Context: CommonBackendContext, Input: IrElement, Output>: NamedCompilerPhase<Context, Input, Output> {
-    val verifyInput: (Context, Input) -> Unit
+    val inputVerifier: (Context, Input) -> Unit
     val getNameForInput: Input.() -> String
     fun dumpInput(context: Context, input: Input) = dumpIrElement(this, input, getNameForInput, BeforeOrAfter.BEFORE)
-    fun verifyInput(context: Context, input: Input): Unit = verifyInput(context, input)
+    fun verifyInput(context: Context, input: Input): Unit = inputVerifier(context, input)
 }
 
 interface PhaseWithIrOutput<in Context: CommonBackendContext, Input, Output: IrElement>: NamedCompilerPhase<Context, Input, Output> {
-    val verifyOutput: (Context, Output) -> Unit
+    val outputVerifier: (Context, Output) -> Unit
     val getNameForOutput: Output.() -> String
     fun dumpOutput(context: Context, output: Output) = dumpIrElement(this, output, getNameForOutput, BeforeOrAfter.BEFORE)
-    fun verifyOutput(context: Context, output: Output): Unit = verifyOutput(context, output)
+    fun verifyOutput(context: Context, output: Output): Unit = outputVerifier(context, output)
 }
 
-interface SameTypeIrPhase<in Context: CommonBackendContext, Data: IrElement>:
+interface SameTypeIrPhase<in Context: CommonBackendContext, Data: IrElement> :
     SameTypeCompilerPhase<Context, Data>, PhaseWithIrInput<Context, Data, Data>, PhaseWithIrOutput<Context, Data, Data> {
     val verify: (Context, Data) -> Unit
     val getName: Data.() -> String
 
-    override val verifyInput get() = verify
-    override val verifyOutput get() = verify
+    override val inputVerifier get() = verify
+    override val outputVerifier get() = verify
     override val getNameForInput get() = getName
     override val getNameForOutput get() = getName
 }
@@ -217,72 +217,72 @@ abstract class NamedPhase<in Context : CommonBackendContext, Input, Output>(
 // that dumping functions are implemented by mixins.
 
 abstract class AbstractIrModuleNamedPhase<in Context : CommonBackendContext>(
-        lower: CompilerPhase<Context, IrModuleFragment, IrModuleFragment>,
-        override val name: String,
-        override val description: String,
-        override val prerequisite: Set<AnyPhase>,
-        override val verify: (Context, IrModuleFragment)-> Unit
+    lower: CompilerPhase<Context, IrModuleFragment, IrModuleFragment>,
+    override val name: String,
+    override val description: String,
+    override val prerequisite: Set<AnyPhase>,
+    override val verify: (Context, IrModuleFragment) -> Unit
 ) : NamedPhase<Context, IrModuleFragment, IrModuleFragment>(lower, name, description, prerequisite),
-        SameTypeIrPhase<Context, IrModuleFragment>
+    SameTypeIrPhase<Context, IrModuleFragment>
 
 fun <Context : CommonBackendContext> namedIrModulePhase(
-        lower: CompilerPhase<Context, IrModuleFragment, IrModuleFragment>,
-        name: String,
-        description: String,
-        prerequisite: Set<AnyPhase> = emptySet(),
-        verify: (Context, IrModuleFragment)-> Unit = { _, _ -> }
+    lower: CompilerPhase<Context, IrModuleFragment, IrModuleFragment>,
+    name: String,
+    description: String,
+    prerequisite: Set<AnyPhase> = emptySet(),
+    verify: (Context, IrModuleFragment) -> Unit = { _, _ -> }
 ) = object : AbstractIrModuleNamedPhase<Context>(lower, name, description, prerequisite, verify) {
     override val getName get(): IrModuleFragment.() -> String = { this.name.asString() }
 }
 
 abstract class AbstractIrFileNamedPhase<in Context : CommonBackendContext>(
-        lower: CompilerPhase<Context, IrFile, IrFile>,
-        override val name: String,
-        override val description: String,
-        override val prerequisite: Set<AnyPhase>,
-        override val verify: (Context, IrFile)-> Unit = { _, _ -> }
+    lower: CompilerPhase<Context, IrFile, IrFile>,
+    override val name: String,
+    override val description: String,
+    override val prerequisite: Set<AnyPhase>,
+    override val verify: (Context, IrFile) -> Unit = { _, _ -> }
 ) : NamedPhase<Context, IrFile, IrFile>(lower, name, description, prerequisite),
-        SameTypeIrPhase<Context, IrFile>
+    SameTypeIrPhase<Context, IrFile>
 
 fun <Context : CommonBackendContext> namedIrFilePhase(
-        lower: CompilerPhase<Context, IrFile, IrFile>,
-        name: String,
-        description: String,
-        prerequisite: Set<AnyPhase> = emptySet(),
-        verify: (Context, IrFile)-> Unit = { _, _ -> }
+    lower: CompilerPhase<Context, IrFile, IrFile>,
+    name: String,
+    description: String,
+    prerequisite: Set<AnyPhase> = emptySet(),
+    verify: (Context, IrFile) -> Unit = { _, _ -> }
 ) = object : AbstractIrFileNamedPhase<Context>(lower, name, description, prerequisite, verify) {
     override val getName get(): IrFile.() -> String = { this.name }
 }
 
-abstract class AbstractUnitNamedPhase<in Context: CommonBackendContext>(
-        lower: CompilerPhase<Context, Unit, Unit>,
-        override val name: String,
-        override val description: String,
-        override val prerequisite: Set<AnyPhase> = emptySet()
+abstract class AbstractUnitNamedPhase<in Context : CommonBackendContext>(
+    lower: CompilerPhase<Context, Unit, Unit>,
+    override val name: String,
+    override val description: String,
+    override val prerequisite: Set<AnyPhase> = emptySet()
 ) : NamedPhase<Context, Unit, Unit>(lower, name, description, prerequisite),
-       SameTypeUnitPhase<Context>
+    SameTypeUnitPhase<Context>
 
-fun <Context: CommonBackendContext> namedUnitPhase(
-        lower: CompilerPhase<Context, Unit, Unit>,
-        name: String,
-        description: String,
-        prerequisite: Set<AnyPhase> = emptySet()
+fun <Context : CommonBackendContext> namedUnitPhase(
+    lower: CompilerPhase<Context, Unit, Unit>,
+    name: String,
+    description: String,
+    prerequisite: Set<AnyPhase> = emptySet()
 ) = object : AbstractUnitNamedPhase<Context>(lower, name, description, prerequisite) {}
 
-fun <Context: CommonBackendContext> namedOpUnitPhase(
-        op: Context.() -> Unit,
-        name: String,
-        description: String,
-        prerequisite: Set<AnyPhase>
+fun <Context : CommonBackendContext> namedOpUnitPhase(
+    op: Context.() -> Unit,
+    name: String,
+    description: String,
+    prerequisite: Set<AnyPhase>
 ) = object : AbstractUnitNamedPhase<Context>(
-        object : CompilerPhase<Context, Unit, Unit> {
-            override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: Unit) {
-                context.op()
-            }
-        },
-        name,
-        description,
-        prerequisite
+    object : CompilerPhase<Context, Unit, Unit> {
+        override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: Unit) {
+            context.op()
+        }
+    },
+    name,
+    description,
+    prerequisite
 ) {}
 
 abstract class AbstractPerformByIrFile<Context : CommonBackendContext>(
