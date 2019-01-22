@@ -17,10 +17,7 @@
 package org.jetbrains.kotlin.types.checker
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
-import org.jetbrains.kotlin.descriptors.isFinalClass
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedTypeConstructorImpl
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
@@ -35,45 +32,19 @@ import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 object StrictEqualityTypeChecker {
+
+    private val context = ClassicTypeSystemContext()
     /**
      * String! != String & A<String!> != A<String>, also A<in Nothing> != A<out Any?>
      * also A<*> != A<out Any?>
      * different error types non-equals even errorTypeEqualToAnything
      */
     fun strictEqualTypes(a: UnwrappedType, b: UnwrappedType): Boolean {
-        if (a === b) return true
-
-        if (a is SimpleType && b is SimpleType) return strictEqualTypes(a, b)
-        if (a is FlexibleType && b is FlexibleType) {
-            return strictEqualTypes(a.lowerBound, b.lowerBound) &&
-                   strictEqualTypes(a.upperBound, b.upperBound)
-        }
-        return false
+        return AbstractStrictEqualityTypeChecker.strictEqualTypes(context, a, b)
     }
 
     fun strictEqualTypes(a: SimpleType, b: SimpleType): Boolean {
-        if (a.isMarkedNullable != b.isMarkedNullable
-            || a.isDefinitelyNotNullType != b.isDefinitelyNotNullType
-            || a.constructor != b.constructor
-            || a.arguments.size != b.arguments.size
-        ) {
-            return false
-        }
-
-        if (a.arguments === b.arguments) return true
-
-        for (i in a.arguments.indices) {
-            val aArg = a.arguments[i]
-            val bArg = b.arguments[i]
-            if (aArg.isStarProjection != bArg.isStarProjection) return false
-
-            // both non-star
-            if (!aArg.isStarProjection) {
-                if (aArg.projectionKind != bArg.projectionKind) return false
-                if (!strictEqualTypes(aArg.type.unwrap(), bArg.type.unwrap())) return false
-            }
-        }
-        return true
+        return AbstractStrictEqualityTypeChecker.strictEqualTypes(context, a, b)
     }
 
 }
