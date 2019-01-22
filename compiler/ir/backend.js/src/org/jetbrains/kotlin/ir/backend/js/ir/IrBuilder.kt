@@ -38,7 +38,7 @@ object JsIrBuilder {
     object SYNTHESIZED_STATEMENT : IrStatementOriginImpl("SYNTHESIZED_STATEMENT")
     object SYNTHESIZED_DECLARATION : IrDeclarationOriginImpl("SYNTHESIZED_DECLARATION")
 
-    fun buildCall(target: IrFunctionSymbol, type: IrType? = null, typeArguments: List<IrType>? = null): IrCall =
+    fun buildCall(target: IrFunctionSymbol, type: IrType? = null, typeArguments: List<IrType>? = null, valueParameterCount: Int? = null): IrCall =
         IrCallImpl(
             UNDEFINED_OFFSET,
             UNDEFINED_OFFSET,
@@ -46,6 +46,7 @@ object JsIrBuilder {
             target,
             target.descriptor,
             target.descriptor.typeParametersCount,
+            if (valueParameterCount == null) target.descriptor.valueParameters.size else valueParameterCount,
             SYNTHESIZED_STATEMENT
         ).apply {
             typeArguments?.let {

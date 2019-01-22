@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
 import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
@@ -28,6 +29,7 @@ import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.types.isNothing
 import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
 import org.jetbrains.kotlin.ir.visitors.*
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 class SuspendState(type: IrType) {
     val entryBlock: IrContainerExpression = JsIrBuilder.buildComposite(type)
@@ -289,12 +291,22 @@ class StateMachineBuilder(
         super.visitCall(expression)
 
         if (expression.isSuspend) {
-            val result = lastExpression()
             val continueState = SuspendState(unit)
             val dispatch = IrDispatchPoint(continueState)
 
             currentState.successors += continueState
 
+            val view = expression.symbol.owner.cast<IrSimpleFunction>().getOrCreateView(context)
+            transformLastExpression {
+                JsIrBuilder.buildCall(view.symbol, expression.type, valueParameterCount = expression.valueArgumentsCount + 1).apply {
+                    for (i in 0 until expression.valueArgumentsCount) {
+                        putValueArgument(0, expression.getValueArgument(i))
+                    }
+                    dispatchReceiver = expression.dispatchReceiver
+                    putValueArgument(expression.valueArgumentsCount, thisReceiver)
+                }
+            }
+            val result = lastExpression()
             transformLastExpression {
                 JsIrBuilder.buildCall(stateSymbol.setter!!.symbol, unit).apply {
                     dispatchReceiver = thisReceiver

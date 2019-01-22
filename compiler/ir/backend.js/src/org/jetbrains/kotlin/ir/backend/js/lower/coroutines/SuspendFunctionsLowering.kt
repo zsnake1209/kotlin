@@ -54,8 +54,29 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
 
     override fun lower(irFile: IrFile) {
         markSuspendLambdas(irFile)
+        addContinuationParameter(irFile)
         buildCoroutines(irFile)
         transformCallableReferencesToSuspendLambdas(irFile)
+    }
+
+    private fun addContinuationParameter(irFile: IrFile) {
+        irFile.transformDeclarationsFlat(::tryAddContinuationParameter)
+        irFile.acceptVoid(object : IrElementVisitorVoid {
+            override fun visitElement(element: IrElement) {
+                element.acceptChildrenVoid(this)
+            }
+
+            override fun visitClass(declaration: IrClass) {
+                declaration.acceptChildrenVoid(this)
+                declaration.transformDeclarationsFlat(::tryAddContinuationParameter)
+            }
+        })
+    }
+
+    private fun tryAddContinuationParameter(element: IrElement): List<IrDeclaration>? {
+        return if (element is IrSimpleFunction && element.isSuspend && suspendLambdas[element] == null) {
+            listOf(element.getOrCreateView(context))
+        } else null
     }
 
     private fun buildCoroutines(irFile: IrFile) {
@@ -238,10 +259,6 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                     functionParameters.forEachIndexed { index, argument ->
                         putValueArgument(index, irGet(argument))
                     }
-                    putValueArgument(
-                        functionParameters.size,
-                        irCall(getContinuationSymbol, getContinuationSymbol.owner.returnType, listOf(irFunction.returnType))
-                    )
                 }
                 val dispatchReceiverVar = JsIrBuilder.buildVar(dispatchReceiverCall.type, irFunction, initializer = dispatchReceiverCall)
                 +dispatchReceiverVar

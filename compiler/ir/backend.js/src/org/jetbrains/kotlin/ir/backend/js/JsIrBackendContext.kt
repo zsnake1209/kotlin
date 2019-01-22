@@ -119,6 +119,7 @@ class JsIrBackendContext(
     val enumEntryExternalToInstanceField = mutableMapOf<IrEnumEntrySymbol, IrField>()
     val callableReferencesCache = mutableMapOf<CallableReferenceKey, IrSimpleFunction>()
     val secondaryConstructorToFactoryCache = mutableMapOf<IrConstructor, ConstructorPair>()
+    val transformedSuspendFunctionsCache = mutableMapOf<IrFunction, IrFunction>()
 
     val coroutineGetContext: IrFunctionSymbol
         get() {

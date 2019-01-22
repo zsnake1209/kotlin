@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.ir.backend.js.lower.coroutines
 
+import org.jetbrains.kotlin.backend.common.ir.copyTo
+import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
 import org.jetbrains.kotlin.backend.common.ir.isSuspend
 import org.jetbrains.kotlin.backend.common.lower.FinallyBlocksLowering
 import org.jetbrains.kotlin.backend.common.pop
@@ -14,16 +16,20 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetFieldImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrSetFieldImpl
-import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
-import org.jetbrains.kotlin.ir.symbols.IrReturnableBlockSymbol
-import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
+import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classifierOrFail
+import org.jetbrains.kotlin.ir.types.createType
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.visitors.*
+import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 
 object COROUTINE_ROOT_LOOP : IrStatementOriginImpl("COROUTINE_ROOT_LOOP")
@@ -171,5 +177,33 @@ class LiveLocalsTransformer(
         } else {
             JsIrBuilder.buildComposite(declaration.type)
         }
+    }
+}
+
+fun IrSimpleFunction.getOrCreateView(context: JsIrBackendContext) = context.transformedSuspendFunctionsCache.getOrPut(this) {
+    JsIrBuilder.buildFunction(
+        name,
+        context.irBuiltIns.anyNType,
+        parent,
+        visibility,
+        modality,
+        isInline,
+        isExternal,
+        isSuspend
+    ).also {
+        it.copyTypeParametersFrom(this)
+        it.dispatchReceiverParameter = dispatchReceiverParameter
+
+        valueParameters.mapTo(it.valueParameters) { p -> p.copyTo(it) }
+        val continuationType = context.intrinsics.getContinuation.owner.returnType.classifierOrFail.cast<IrClassSymbol>().createType(
+            hasQuestionMark = false,
+            arguments = listOf(
+                makeTypeProjection(
+                    type = returnType,
+                    variance = Variance.INVARIANT
+                )
+            )
+        )
+        it.valueParameters += JsIrBuilder.buildValueParameter("continuation", valueParameters.size, continuationType).apply { parent = it }
     }
 }
