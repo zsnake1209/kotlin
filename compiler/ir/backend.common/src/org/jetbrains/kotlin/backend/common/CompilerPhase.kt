@@ -220,7 +220,8 @@ abstract class AbstractIrModuleNamedPhase<in Context : CommonBackendContext>(
         lower: CompilerPhase<Context, IrModuleFragment, IrModuleFragment>,
         override val name: String,
         override val description: String,
-        override val prerequisite: Set<AnyPhase>
+        override val prerequisite: Set<AnyPhase>,
+        override val verify: (Context, IrModuleFragment)-> Unit
 ) : NamedPhase<Context, IrModuleFragment, IrModuleFragment>(lower, name, description, prerequisite),
         SameTypeIrPhase<Context, IrModuleFragment>
 
@@ -230,8 +231,7 @@ fun <Context : CommonBackendContext> namedIrModulePhase(
         description: String,
         prerequisite: Set<AnyPhase> = emptySet(),
         verify: (Context, IrModuleFragment)-> Unit = { _, _ -> }
-) = object : AbstractIrModuleNamedPhase<Context>(lower, name, description, prerequisite) {
-    override val verify = verify
+) = object : AbstractIrModuleNamedPhase<Context>(lower, name, description, prerequisite, verify) {
     override val getName get(): IrModuleFragment.() -> String = { this.name.asString() }
 }
 
@@ -239,7 +239,8 @@ abstract class AbstractIrFileNamedPhase<in Context : CommonBackendContext>(
         lower: CompilerPhase<Context, IrFile, IrFile>,
         override val name: String,
         override val description: String,
-        override val prerequisite: Set<AnyPhase>
+        override val prerequisite: Set<AnyPhase>,
+        override val verify: (Context, IrFile)-> Unit = { _, _ -> }
 ) : NamedPhase<Context, IrFile, IrFile>(lower, name, description, prerequisite),
         SameTypeIrPhase<Context, IrFile>
 
@@ -249,8 +250,7 @@ fun <Context : CommonBackendContext> namedIrFilePhase(
         description: String,
         prerequisite: Set<AnyPhase> = emptySet(),
         verify: (Context, IrFile)-> Unit = { _, _ -> }
-) = object : AbstractIrFileNamedPhase<Context>(lower, name, description, prerequisite) {
-    override val verify = verify
+) = object : AbstractIrFileNamedPhase<Context>(lower, name, description, prerequisite, verify) {
     override val getName get(): IrFile.() -> String = { this.name }
 }
 
@@ -269,11 +269,30 @@ fun <Context: CommonBackendContext> namedUnitPhase(
         prerequisite: Set<AnyPhase> = emptySet()
 ) = object : AbstractUnitNamedPhase<Context>(lower, name, description, prerequisite) {}
 
-class PerformByIrFile<Context : CommonBackendContext>(
-    private val lower: CompilerPhase<Context, IrFile, IrFile>,
+fun <Context: CommonBackendContext> namedOpUnitPhase(
+        op: Context.() -> Unit,
+        name: String,
+        description: String,
+        prerequisite: Set<AnyPhase>
+) = object : AbstractUnitNamedPhase<Context>(
+        object : CompilerPhase<Context, Unit, Unit> {
+            override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: Unit) {
+                context.op()
+            }
+        },
+        name,
+        description,
+        prerequisite
+) {}
+
+abstract class AbstractPerformByIrFile<Context : CommonBackendContext>(
+    val lower: CompilerPhase<Context, IrFile, IrFile>,
     override val name: String = "PerformByIrFile",
-    override val description: String = "Perform phases by IrFile"
-) : NamedCompilerPhase<Context, IrModuleFragment, IrModuleFragment> {
+    override val description: String = "Perform phases by IrFile",
+    override val prerequisite: Set<AnyPhase> = emptySet(),
+    override val verify: (Context, IrModuleFragment) -> Unit = { _, _ -> }
+) : AbstractNamedCompilerPhase<Context, IrModuleFragment, IrModuleFragment>(),
+    SameTypeIrPhase<Context, IrModuleFragment> {
     override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: IrModuleFragment): IrModuleFragment {
         phaserState.downlevel {
             for (irFile in input.files) {
@@ -287,7 +306,17 @@ class PerformByIrFile<Context : CommonBackendContext>(
 
     override fun getNamedSubphases(startDepth: Int) =
         listOf(Pair(startDepth, this)) + lower.getNamedSubphases(startDepth + 1)
+
+    override val getName get(): IrModuleFragment.() -> String = { this.name.asString() }
 }
+
+fun <Context: CommonBackendContext> performByIrFile(
+        lower: CompilerPhase<Context, IrFile, IrFile>,
+        name: String = "PerformByIrFile",
+        description: String = "Perform phases by IrFile",
+        prerequisite: Set<AnyPhase> = emptySet(),
+        verify: (Context, IrModuleFragment) -> Unit = { _, _ -> }
+) = object : AbstractPerformByIrFile<Context>(lower, name, description, prerequisite, verify) {}
 
 private typealias AnyPhase = CompilerPhase<*, *, *>
 
