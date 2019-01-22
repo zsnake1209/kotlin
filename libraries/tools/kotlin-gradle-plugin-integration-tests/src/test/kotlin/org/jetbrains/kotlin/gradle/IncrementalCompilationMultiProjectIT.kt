@@ -24,11 +24,17 @@ class IncrementalCompilationJsMultiProjectIT : BaseIncrementalCompilationMultiPr
 
     override val additionalLibDependencies: String =
         "implementation \"org.jetbrains.kotlin:kotlin-test-js:${'$'}kotlin_version\""
+
+    override val compileKotlinTaskName: String
+        get() = "compileKotlin2Js"
 }
 
 class IncrementalCompilationJvmMultiProjectIT : BaseIncrementalCompilationMultiProjectIT() {
     override val additionalLibDependencies: String =
         "implementation \"org.jetbrains.kotlin:kotlin-stdlib:${'$'}kotlin_version\""
+
+    override val compileKotlinTaskName: String
+        get() = "compileKotlin"
 
     override fun defaultProject(): Project =
         Project("incrementalMultiproject")
@@ -200,6 +206,7 @@ open class A {
     }
 
     protected abstract val additionalLibDependencies: String
+    protected abstract val compileKotlinTaskName: String
 
     @Test
     fun testAddDependencyToLib() {
@@ -251,18 +258,27 @@ open class A {
         val bKtContent = bKt.readText()
         bKt.delete()
 
-        project.build("build") {
-            assertFailed()
+        fun runFailingBuild() {
+            project.build("build") {
+                assertFailed()
+                assertContains("B.kt has been removed")
+                assertTasksFailed(":lib:$compileKotlinTaskName")
+                val affectedFiles = project.projectDir.getFilesByNames("barUseAB.kt", "barUseB.kt")
+                assertCompiledKotlinSources(project.relativize(affectedFiles))
+            }
         }
 
+        runFailingBuild()
+        runFailingBuild()
+
         bKt.writeText(bKtContent.replace("fun b", "open fun b"))
-        val affectedFiles = project.projectDir.getFilesByNames(
-            "B.kt", "barUseAB.kt", "barUseB.kt",
-            "BB.kt", "fooUseB.kt"
-        )
 
         project.build("build") {
             assertSuccessful()
+            val affectedFiles = project.projectDir.getFilesByNames(
+                "B.kt", "barUseAB.kt", "barUseB.kt",
+                "BB.kt", "fooUseB.kt"
+            )
             assertCompiledKotlinSources(project.relativize(affectedFiles))
         }
     }
