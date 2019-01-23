@@ -24,7 +24,3 @@ private definition_ ::= key_ SEPARATOR VALUE
 private key_ ::= (KEY_KNOWN | KEY_UNKNOWN) PLATFORM?
 
 CODE ::= CODE_CHARS
-
-
-
-
