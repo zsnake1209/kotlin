@@ -72,7 +72,10 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
         if (subType === superType) return true
         val newSubType = transformToNewType(subType)
         val newSuperType = transformToNewType(superType)
+        return newTypeIsSubtypeOf(newSubType, newSuperType)
+    }
 
+    fun TypeCheckerContext.newTypeIsSubtypeOf(newSubType: UnwrappedType, newSuperType: UnwrappedType): Boolean {
         checkSubtypeForSpecialCases(newSubType.lowerIfFlexible(), newSuperType.upperIfFlexible())?.let {
             addSubtypeConstraint(newSubType, newSuperType)
             return it
