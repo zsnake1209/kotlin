@@ -73,6 +73,9 @@ class NativeDefinitionsParserDefinition : ParserDefinition {
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile = NativeDefinitionsFile(viewProvider)
     override fun createElement(node: ASTNode): PsiElement = NativeDefinitionsTypes.Factory.createElement(node)
+
+    override fun spaceExistenceTypeBetweenTokens(left: ASTNode?, right: ASTNode?): ParserDefinition.SpaceRequirements =
+        ParserDefinition.SpaceRequirements.MAY
 }
 
 class CLanguageInjector : LanguageInjector {
