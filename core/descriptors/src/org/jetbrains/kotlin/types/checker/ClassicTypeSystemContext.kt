@@ -11,6 +11,10 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 
 open class ClassicTypeSystemContext : TypeSystemContext {
+    override fun TypeConstructorIM.isDenotable(): Boolean {
+        require(this is TypeConstructor)
+        return this.isDenotable
+    }
 
     override fun identicalArguments(a: SimpleTypeIM, b: SimpleTypeIM): Boolean {
         require(a is SimpleType)
