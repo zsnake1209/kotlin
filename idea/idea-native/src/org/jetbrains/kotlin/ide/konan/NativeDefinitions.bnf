@@ -1,0 +1,30 @@
+{
+  parserClass="org.jetbrains.kotlin.ide.konan.NativeDefinitionsParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="NativeDefinitions"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.jetbrains.kotlin.ide.konan.psi"
+  psiImplPackage="org.jetbrains.kotlin.ide.konan.psi"
+
+  elementTypeHolderClass="org.jetbrains.kotlin.ide.konan.psi.NativeDefinitionsTypes"
+  elementTypeClass="org.jetbrains.kotlin.ide.konan.psi.NativeDefinitionsElementType"
+  tokenTypeClass="org.jetbrains.kotlin.ide.konan.psi.NativeDefinitionsTokenType"
+}
+
+ROOT ::= definitions_ (DELIM CODE)?
+
+private definitions_ ::= definition_item_*
+
+private definition_item_ ::= definition_ | COMMENT
+
+private definition_ ::= key_ SEPARATOR VALUE
+
+private key_ ::= (KEY_KNOWN | KEY_UNKNOWN) PLATFORM?
+
+CODE ::= CODE_CHARS
+
+
+
+
