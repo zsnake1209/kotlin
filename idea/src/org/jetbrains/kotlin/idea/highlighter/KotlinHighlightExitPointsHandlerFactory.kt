@@ -83,9 +83,10 @@ class KotlinHighlightExitPointsHandlerFactory : HighlightUsagesHandlerFactoryBas
 
         override fun computeUsages(targets: MutableList<PsiElement>?) {
             val relevantFunction: KtDeclarationWithBody? =
-                when (target) {
-                    is KtFunctionLiteral -> target
-                    else -> target.getRelevantDeclaration()
+                if (target is KtFunctionLiteral) {
+                    target
+                } else {
+                    target.getRelevantDeclaration()
                 }
 
             relevantFunction?.accept(object : KtVisitorVoid() {
@@ -94,22 +95,34 @@ class KotlinHighlightExitPointsHandlerFactory : HighlightUsagesHandlerFactoryBas
                 }
 
                 override fun visitExpression(expression: KtExpression) {
-                    if (relevantFunction is KtFunctionLiteral && KtPsiUtil.isStatement(expression)) {
-                        if (expression !is KtIfExpression && expression !is KtWhenExpression && expression !is KtBlockExpression) {
-                            val bindingContext = expression.analyze()
-                            if (expression !is KtBlockExpression && expression.isUsedAsResultOfLambda(bindingContext)) {
-                                if (expression.getRelevantDeclaration() == relevantFunction) {
-                                    addOccurrence(expression)
-                                }
-
-                                return
-                            }
+                    if (relevantFunction is KtFunctionLiteral) {
+                        if (occurrenceForFunctionLiteralReturnExpression(expression)) {
+                            return
                         }
                     }
 
                     super.visitExpression(expression)
                 }
 
+                private fun occurrenceForFunctionLiteralReturnExpression(expression: KtExpression): Boolean {
+                    if (!KtPsiUtil.isStatement(expression)) return false
+
+                    if (expression is KtIfExpression || expression is KtWhenExpression || expression is KtBlockExpression) {
+                        return false
+                    }
+
+                    val bindingContext = expression.analyze()
+                    if (!expression.isUsedAsResultOfLambda(bindingContext)) {
+                        return false
+                    }
+
+                    if (expression.getRelevantDeclaration() != relevantFunction) {
+                        return false
+                    }
+
+                    addOccurrence(expression)
+                    return true
+                }
 
                 private fun visitReturnOrThrow(expression: KtExpression) {
                     if (expression.getRelevantDeclaration() == relevantFunction) {
