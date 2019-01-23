@@ -10,16 +10,6 @@ import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 
-
-private fun asSimpleType(kotlinType: KotlinType): SimpleType {
-    return kotlinType.asSimpleType()
-}
-
-private fun asFlexibleType(kotlinType: KotlinType): FlexibleType {
-    return kotlinType.asFlexibleType()
-}
-
-
 open class ClassicTypeSystemContext : TypeSystemContext {
 
     override fun identicalArguments(a: SimpleTypeIM, b: SimpleTypeIM): Boolean {
@@ -30,12 +20,12 @@ open class ClassicTypeSystemContext : TypeSystemContext {
 
     override fun KotlinTypeIM.asSimpleType(): SimpleTypeIM? {
         require(this is KotlinType)
-        return asSimpleType(this)
+        return this.unwrap() as? SimpleType
     }
 
     override fun KotlinTypeIM.asFlexibleType(): FlexibleTypeIM? {
         require(this is KotlinType)
-        return asFlexibleType(this)
+        return this.unwrap() as? FlexibleType
     }
 
     override fun FlexibleTypeIM.asDynamicType(): DynamicTypeIM? {
