@@ -17,10 +17,23 @@
 package org.jetbrains.kotlin.types.checker
 
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker.isSubtypeOf
+import org.jetbrains.kotlin.types.model.KotlinTypeIM
+import org.jetbrains.kotlin.types.model.TypeConstructorIM
 import org.jetbrains.kotlin.utils.SmartSet
 import java.util.*
 
-open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) {
+open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) : ClassicTypeSystemContext(), AbstractTypeCheckerContext {
+    override fun areEqualTypeConstructors(a: TypeConstructorIM, b: TypeConstructorIM): Boolean {
+        require(a is TypeConstructor)
+        require(b is TypeConstructor)
+        return areEqualTypeConstructors(a, b)
+    }
+
+    override fun backupIsSubType(subtype: KotlinTypeIM, supertype: KotlinTypeIM): Boolean {
+        return this.isSubtypeOf(subtype as UnwrappedType, supertype as UnwrappedType)
+    }
+
     protected var argumentsDepth = 0
 
     private var supertypesLocked = false
