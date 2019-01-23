@@ -65,27 +65,8 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
             TypeCheckerContext(false).equalTypes(a.unwrap(), b.unwrap())
 
     fun TypeCheckerContext.equalTypes(a: UnwrappedType, b: UnwrappedType): Boolean {
-        if (a === b) return true
-
-        if (isCommonDenotableType(a) && isCommonDenotableType(b)) {
-            if (!areEqualTypeConstructors(a.constructor, b.constructor)) return false
-            if (a.arguments.isEmpty()) {
-                if (a.hasFlexibleNullability() || b.hasFlexibleNullability()) return true
-
-                return a.isMarkedNullable == b.isMarkedNullable
-            }
-        }
-
-        return isSubtypeOf(a, b) && isSubtypeOf(b, a)
+        return AbstractTypeChecker.equalTypes(this, a, b)
     }
-
-    private fun KotlinType.hasFlexibleNullability() =
-            lowerIfFlexible().isMarkedNullable != upperIfFlexible().isMarkedNullable
-
-    private fun isCommonDenotableType(type: KotlinType) =
-            type.constructor.isDenotable &&
-            !type.isDynamic() && !type.isDefinitelyNotNullType &&
-            type.lowerIfFlexible().constructor == type.upperIfFlexible().constructor
 
     fun TypeCheckerContext.isSubtypeOf(subType: UnwrappedType, superType: UnwrappedType): Boolean {
         if (subType === superType) return true
