@@ -67,4 +67,18 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun TypeParameterIM.getTypeConstructor(): TypeConstructorIM
 
     fun isEqualTypeConstructors(c1: TypeConstructorIM, c2: TypeConstructorIM): Boolean
+
+    fun TypeConstructorIM.isDenotable(): Boolean
+
+    fun KotlinTypeIM.lowerBoundIfFlexible(): SimpleTypeIM = this.asFlexibleType()?.lowerBound() ?: this.asSimpleType()!!
+    fun KotlinTypeIM.upperBoundIfFlexible(): SimpleTypeIM = this.asFlexibleType()?.upperBound() ?: this.asSimpleType()!!
+
+    fun KotlinTypeIM.isDynamic(): Boolean = asFlexibleType()?.asDynamicType() != null
+    fun KotlinTypeIM.isDefinitelyNotNullType(): Boolean = asSimpleType()?.asDefinitelyNotNullType() != null
+
+    fun KotlinTypeIM.hasFlexibleNullability() =
+        lowerBoundIfFlexible().isMarkedNullable() != upperBoundIfFlexible().isMarkedNullable()
+
+    fun KotlinTypeIM.typeConstructor(): TypeConstructorIM =
+        (asSimpleType() ?: lowerBoundIfFlexible()).typeConstructor()
 }
