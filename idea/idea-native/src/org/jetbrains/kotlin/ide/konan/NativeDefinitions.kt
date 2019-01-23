@@ -92,11 +92,11 @@ class NativeDefinitionsSyntaxHighlighter : SyntaxHighlighterBase() {
 
     override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> =
         when (tokenType) {
+            TokenType.BAD_CHARACTER -> BAD_CHAR_KEYS
             NativeDefinitionsTypes.COMMENT -> COMMENT_KEYS
             NativeDefinitionsTypes.DELIM -> COMMENT_KEYS
             NativeDefinitionsTypes.KEY_KNOWN -> KEYWORD_KEYS
             NativeDefinitionsTypes.KEY_UNKNOWN -> BAD_CHAR_KEYS
-            TokenType.BAD_CHARACTER -> BAD_CHAR_KEYS
             NativeDefinitionsTypes.SEPARATOR -> OPERATOR_KEYS
             NativeDefinitionsTypes.VALUE -> VALUE_KEYS
             else -> EMPTY_KEYS
@@ -109,10 +109,10 @@ class NativeDefinitionsSyntaxHighlighter : SyntaxHighlighterBase() {
             return arrayOf(TextAttributesKey.createTextAttributesKey(externalName, key))
         }
 
-        val BAD_CHAR_KEYS = createKeys("Bad char", HighlighterColors.BAD_CHARACTER)
+        val BAD_CHAR_KEYS = createKeys("Unknown key", HighlighterColors.BAD_CHARACTER)
         val COMMENT_KEYS = createKeys("Comment", DefaultLanguageHighlighterColors.LINE_COMMENT)
         val EMPTY_KEYS = emptyArray<TextAttributesKey>()
-        val KEYWORD_KEYS = createKeys("Keyword", DefaultLanguageHighlighterColors.KEYWORD)
+        val KEYWORD_KEYS = createKeys("Known key", DefaultLanguageHighlighterColors.KEYWORD)
         val OPERATOR_KEYS = createKeys("Operator", DefaultLanguageHighlighterColors.OPERATION_SIGN)
         val VALUE_KEYS = createKeys("Value", DefaultLanguageHighlighterColors.STRING)
     }
