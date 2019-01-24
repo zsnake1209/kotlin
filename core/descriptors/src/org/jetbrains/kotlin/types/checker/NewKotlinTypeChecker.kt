@@ -24,7 +24,9 @@ import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy.*
-import org.jetbrains.kotlin.types.checker.TypeCheckerContext.SupertypesPolicy
+import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SupertypesPolicy
+import org.jetbrains.kotlin.types.model.KotlinTypeIM
+import org.jetbrains.kotlin.types.model.SimpleTypeIM
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
@@ -51,18 +53,18 @@ object StrictEqualityTypeChecker {
 
 object ErrorTypesAreEqualToAnything : KotlinTypeChecker {
     override fun isSubtypeOf(subtype: KotlinType, supertype: KotlinType): Boolean =
-            NewKotlinTypeChecker.run { TypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) }
+        NewKotlinTypeChecker.run { TypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) }
 
     override fun equalTypes(a: KotlinType, b: KotlinType): Boolean =
-            NewKotlinTypeChecker.run { TypeCheckerContext(true).equalTypes(a.unwrap(), b.unwrap()) }
+        NewKotlinTypeChecker.run { TypeCheckerContext(true).equalTypes(a.unwrap(), b.unwrap()) }
 }
 
 object NewKotlinTypeChecker : KotlinTypeChecker {
     override fun isSubtypeOf(subtype: KotlinType, supertype: KotlinType): Boolean =
-            TypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) // todo fix flag errorTypeEqualsToAnything
+        TypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) // todo fix flag errorTypeEqualsToAnything
 
     override fun equalTypes(a: KotlinType, b: KotlinType): Boolean =
-            TypeCheckerContext(false).equalTypes(a.unwrap(), b.unwrap())
+        TypeCheckerContext(false).equalTypes(a.unwrap(), b.unwrap())
 
     fun TypeCheckerContext.equalTypes(a: UnwrappedType, b: UnwrappedType): Boolean {
         return AbstractTypeChecker.equalTypes(this, a, b)
@@ -80,7 +82,6 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
     }
 
 
-
     fun transformToNewType(type: SimpleType): SimpleType {
         val constructor = type.constructor
         when (constructor) {
@@ -90,20 +91,36 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
 
                 // it is incorrect calculate this type directly because of recursive star projections
                 if (constructor.newTypeConstructor == null) {
-                    constructor.newTypeConstructor = NewCapturedTypeConstructor(constructor.projection, constructor.supertypes.map { it.unwrap() })
+                    constructor.newTypeConstructor =
+                        NewCapturedTypeConstructor(constructor.projection, constructor.supertypes.map { it.unwrap() })
                 }
-                return NewCapturedType(CaptureStatus.FOR_SUBTYPING, constructor.newTypeConstructor!!,
-                                       lowerType, type.annotations, type.isMarkedNullable)
+                return NewCapturedType(
+                    CaptureStatus.FOR_SUBTYPING, constructor.newTypeConstructor!!,
+                    lowerType, type.annotations, type.isMarkedNullable
+                )
             }
 
             is IntegerValueTypeConstructor -> {
-                val newConstructor = IntersectionTypeConstructor(constructor.supertypes.map { TypeUtils.makeNullableAsSpecified(it, type.isMarkedNullable) })
-                return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(type.annotations, newConstructor, listOf(), false, type.memberScope)
+                val newConstructor =
+                    IntersectionTypeConstructor(constructor.supertypes.map { TypeUtils.makeNullableAsSpecified(it, type.isMarkedNullable) })
+                return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(
+                    type.annotations,
+                    newConstructor,
+                    listOf(),
+                    false,
+                    type.memberScope
+                )
             }
 
             is IntersectionTypeConstructor -> if (type.isMarkedNullable) {
                 val newConstructor = constructor.transformComponents(transform = { it.makeNullable() }) ?: constructor
-                return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(type.annotations, newConstructor, listOf(), false, newConstructor.createScopeForKotlinType())
+                return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(
+                    type.annotations,
+                    newConstructor,
+                    listOf(),
+                    false,
+                    newConstructor.createScopeForKotlinType()
+                )
             }
         }
 
@@ -111,26 +128,25 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
     }
 
     fun transformToNewType(type: UnwrappedType): UnwrappedType =
-            when (type) {
-                is SimpleType -> transformToNewType(type)
-                is FlexibleType -> {
-                    val newLower = transformToNewType(type.lowerBound)
-                    val newUpper = transformToNewType(type.upperBound)
-                    if (newLower !== type.lowerBound || newUpper !== type.upperBound) {
-                        KotlinTypeFactory.flexibleType(newLower, newUpper)
-                    }
-                    else {
-                        type
-                    }
+        when (type) {
+            is SimpleType -> transformToNewType(type)
+            is FlexibleType -> {
+                val newLower = transformToNewType(type.lowerBound)
+                val newUpper = transformToNewType(type.upperBound)
+                if (newLower !== type.lowerBound || newUpper !== type.upperBound) {
+                    KotlinTypeFactory.flexibleType(newLower, newUpper)
+                } else {
+                    type
                 }
-            }.inheritEnhancement(type)
+            }
+        }.inheritEnhancement(type)
 
     private fun TypeCheckerContext.hasNothingSupertype(type: SimpleType) = // todo add tests
-        anySupertype(type, KotlinBuiltIns::isNothingOrNullableNothing) {
+        anySupertype(type, { KotlinBuiltIns.isNothingOrNullableNothing(it as SimpleType) }) {
+            require(it is SimpleType)
             if (it.isClassType) {
                 SupertypesPolicy.None
-            }
-            else {
+            } else {
                 SupertypesPolicy.LowerIfFlexible
             }
         }
@@ -158,7 +174,10 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
             else -> { // at least 2 supertypes with same constructors. Such case is rare
                 when (sameConstructorPolicy) {
                     FORCE_NOT_SUBTYPE -> return false
-                    TAKE_FIRST_FOR_SUBTYPING -> return isSubtypeForSameConstructor(supertypesWithSameConstructor.first().arguments, superType)
+                    TAKE_FIRST_FOR_SUBTYPING -> return isSubtypeForSameConstructor(
+                        supertypesWithSameConstructor.first().arguments,
+                        superType
+                    )
 
                     CHECK_ANY_OF_THEM,
                     INTERSECT_ARGUMENTS_AND_CHECK_AGAIN ->
@@ -170,7 +189,7 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
                 val newArguments = superConstructor.parameters.mapIndexed { index, _ ->
                     val allProjections = supertypesWithSameConstructor.map {
                         it.arguments.getOrNull(index)?.takeIf { it.projectionKind == Variance.INVARIANT }?.type?.unwrap()
-                        ?: error("Incorrect type: $it, subType: $subType, superType: $superType")
+                            ?: error("Incorrect type: $it, subType: $subType, superType: $superType")
                     }
 
                     // todo discuss
@@ -183,13 +202,13 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
     }
 
     private fun TypeCheckerContext.collectAndFilter(classType: SimpleType, constructor: TypeConstructor) =
-            selectOnlyPureKotlinSupertypes(collectAllSupertypesWithGivenTypeConstructor(classType, constructor))
+        selectOnlyPureKotlinSupertypes(collectAllSupertypesWithGivenTypeConstructor(classType, constructor))
 
     // nullability was checked earlier via nullabilityChecker
     // should be used only if you really sure that it is correct
     fun TypeCheckerContext.findCorrespondingSupertypes(
-            baseType: SimpleType,
-            constructor: TypeConstructor
+        baseType: SimpleType,
+        constructor: TypeConstructor
     ): List<SimpleType> {
         if (baseType.isClassType) {
             return collectAndFilter(baseType, constructor)
@@ -203,11 +222,11 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
         // todo add tests
         val classTypeSupertypes = SmartList<SimpleType>()
         anySupertype(baseType, { false }) {
+            require(it is SimpleType)
             if (it.isClassType) {
                 classTypeSupertypes.add(it)
                 SupertypesPolicy.None
-            }
-            else {
+            } else {
                 SupertypesPolicy.LowerIfFlexible
             }
         }
@@ -216,8 +235,8 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
     }
 
     private fun TypeCheckerContext.collectAllSupertypesWithGivenTypeConstructor(
-            baseType: SimpleType,
-            constructor: TypeConstructor
+        baseType: SimpleType,
+        constructor: TypeConstructor
     ): List<SimpleType> {
         if (constructor.declarationDescriptor.safeAs<ClassDescriptor>()?.isCommonFinalClass == true) {
             return if (areEqualTypeConstructors(baseType.constructor, constructor))
@@ -229,6 +248,7 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
         val result: MutableList<SimpleType> = SmartList()
 
         anySupertype(baseType, { false }) {
+            require(it is SimpleType)
             val current = captureFromArguments(it, CaptureStatus.FOR_SUBTYPING) ?: it
 
             when {
@@ -240,7 +260,16 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
                     SupertypesPolicy.LowerIfFlexible
                 }
                 else -> {
-                    SupertypesPolicy.LowerIfFlexibleWithCustomSubstitutor(TypeConstructorSubstitution.create(current).buildSubstitutor())
+                    val substitutor = TypeConstructorSubstitution.create(current).buildSubstitutor()
+
+                    object : SupertypesPolicy.DoCustomTransform() {
+                        override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM): SimpleTypeIM {
+                            return substitutor.safeSubstitute(
+                                type.lowerBoundIfFlexible() as KotlinType,
+                                Variance.INVARIANT
+                            ).asSimpleType()!!
+                        }
+                    }
                 }
             }
         }
@@ -294,13 +323,13 @@ object NullabilityChecker {
 
     // this method checks only nullability
     fun isPossibleSubtype(context: TypeCheckerContext, subType: SimpleType, superType: SimpleType): Boolean =
-            context.runIsPossibleSubtype(subType, superType)
+        context.runIsPossibleSubtype(subType, superType)
 
     fun isSubtypeOfAny(type: UnwrappedType): Boolean =
-            TypeCheckerContext(false).hasNotNullSupertype(type.lowerIfFlexible(), SupertypesPolicy.LowerIfFlexible)
+        TypeCheckerContext(false).hasNotNullSupertype(type.lowerIfFlexible(), SupertypesPolicy.LowerIfFlexible)
 
     fun hasPathByNotMarkedNullableNodes(start: SimpleType, end: TypeConstructor) =
-            TypeCheckerContext(false).hasPathByNotMarkedNullableNodes(start, end)
+        TypeCheckerContext(false).hasPathByNotMarkedNullableNodes(start, end)
 
     private fun TypeCheckerContext.runIsPossibleSubtype(subType: SimpleType, superType: SimpleType): Boolean {
         // it makes for case String? & Any <: String
@@ -344,22 +373,36 @@ object NullabilityChecker {
     }
 
     private fun TypeCheckerContext.hasNotNullSupertype(type: SimpleType, supertypesPolicy: SupertypesPolicy) =
-            anySupertype(type, { (it.isClassType && !it.isMarkedNullable) || it.isDefinitelyNotNullType }) {
-                if (it.isMarkedNullable) SupertypesPolicy.None else supertypesPolicy
-            }
+        anySupertype(type, {
+            require(it is SimpleType)
+            (it.isClassType && !it.isMarkedNullable) || it.isDefinitelyNotNullType
+        }) {
+            require(it is SimpleType)
+            if (it.isMarkedNullable) SupertypesPolicy.None else supertypesPolicy
+        }
 
     private fun TypeCheckerContext.hasPathByNotMarkedNullableNodes(start: SimpleType, end: TypeConstructor) =
-            anySupertype(start, { !it.isMarkedNullable && it.constructor == end }) {
-                if (it.isMarkedNullable) SupertypesPolicy.None else SupertypesPolicy.LowerIfFlexible
-            }
+        anySupertype(start, {
+            require(it is SimpleType)
+            !it.isMarkedNullable && it.constructor == end
+        }) {
+            require(it is SimpleType)
+            if (it.isMarkedNullable) SupertypesPolicy.None else SupertypesPolicy.LowerIfFlexible
+        }
 
 }
 
 fun UnwrappedType.hasSupertypeWithGivenTypeConstructor(typeConstructor: TypeConstructor) =
-        TypeCheckerContext(false).anySupertype(lowerIfFlexible(), { it.constructor == typeConstructor }, { SupertypesPolicy.LowerIfFlexible })
+    TypeCheckerContext(false).anySupertype(lowerIfFlexible(), {
+        require(it is SimpleType)
+        it.constructor == typeConstructor
+    }, { SupertypesPolicy.LowerIfFlexible })
 
 fun UnwrappedType.anySuperTypeConstructor(predicate: (TypeConstructor) -> Boolean) =
-        TypeCheckerContext(false).anySupertype(lowerIfFlexible(), { predicate(it.constructor) }, { SupertypesPolicy.LowerIfFlexible })
+    TypeCheckerContext(false).anySupertype(lowerIfFlexible(), {
+        require(it is SimpleType)
+        predicate(it.constructor)
+    }, { SupertypesPolicy.LowerIfFlexible })
 
 /**
  * ClassType means that type constructor for this type is type for real class or interface
