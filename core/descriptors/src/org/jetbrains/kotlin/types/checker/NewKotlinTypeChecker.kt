@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedTypeConstructorImpl
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.AbstractTypeChecker.checkSubtypeForSpecialCases
+import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy.*
 import org.jetbrains.kotlin.types.checker.TypeCheckerContext.SupertypesPolicy
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
@@ -69,23 +69,17 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
     }
 
     fun TypeCheckerContext.isSubtypeOf(subType: UnwrappedType, superType: UnwrappedType): Boolean {
+        return AbstractTypeChecker.isSubtypeOf(this, subType, superType)
+    }
+
+    fun TypeCheckerContext.transformAndIsSubTypeOf(subType: UnwrappedType, superType: UnwrappedType): Boolean {
         if (subType === superType) return true
         val newSubType = transformToNewType(subType)
         val newSuperType = transformToNewType(superType)
-        return newTypeIsSubtypeOf(newSubType, newSuperType)
+        return doIsSubTypeOf(newSubType, newSuperType)
     }
 
-    fun TypeCheckerContext.newTypeIsSubtypeOf(newSubType: UnwrappedType, newSuperType: UnwrappedType): Boolean {
-        checkSubtypeForSpecialCases(newSubType.lowerIfFlexible(), newSuperType.upperIfFlexible())?.let {
-            addSubtypeConstraint(newSubType, newSuperType)
-            return it
-        }
 
-        // we should add constraints with flexible types, otherwise we never get flexible type as answer in constraint system
-        addSubtypeConstraint(newSubType, newSuperType)?.let { return it }
-
-        return isSubtypeOfForSingleClassifierType(newSubType.lowerIfFlexible(), newSuperType.upperIfFlexible())
-    }
 
     fun transformToNewType(type: SimpleType): SimpleType {
         val constructor = type.constructor
@@ -141,7 +135,7 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
             }
         }
 
-    private fun TypeCheckerContext.isSubtypeOfForSingleClassifierType(subType: SimpleType, superType: SimpleType): Boolean {
+    fun TypeCheckerContext.isSubtypeOfForSingleClassifierType(subType: SimpleType, superType: SimpleType): Boolean {
         assert(subType.isSingleClassifierType || subType.isIntersectionType || subType.isAllowedTypeVariable) {
             "Not singleClassifierType and not intersection subType: $subType"
         }

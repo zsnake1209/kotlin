@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.KotlinTypeFactory.flexibleType
 import org.jetbrains.kotlin.types.checker.*
 import org.jetbrains.kotlin.types.model.CapturedTypeIM
+import org.jetbrains.kotlin.types.model.KotlinTypeIM
 import org.jetbrains.kotlin.types.model.SimpleTypeIM
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.contains
@@ -43,7 +44,9 @@ abstract class TypeCheckerContextForConstraintSystem : TypeCheckerContext(errorT
      * then we can get wrong result.
      * override val sameConstructorPolicy get() = SeveralSupertypesWithSameConstructorPolicy.TAKE_FIRST_FOR_SUBTYPING
      */
-    override final fun addSubtypeConstraint(subType: UnwrappedType, superType: UnwrappedType): Boolean? {
+    final override fun addSubtypeConstraint(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean? {
+        require(subType is UnwrappedType)
+        require(superType is UnwrappedType)
         val hasNoInfer = subType.isTypeVariableWithNoInfer() || superType.isTypeVariableWithNoInfer()
         if (hasNoInfer) return true
 
