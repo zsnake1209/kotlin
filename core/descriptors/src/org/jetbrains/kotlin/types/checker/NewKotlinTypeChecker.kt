@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 object StrictEqualityTypeChecker {
 
-    private val context = ClassicTypeSystemContext()
+    private val context = object : ClassicTypeSystemContext {}
     /**
      * String! != String & A<String!> != A<String>, also A<in Nothing> != A<out Any?>
      * also A<*> != A<out Any?>
@@ -313,37 +313,12 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
     }
 
     private fun TypeCheckerContext.isSubtypeForSameConstructor(
-            capturedSubArguments: List<TypeProjection>,
-            superType: SimpleType
+        capturedSubArguments: List<TypeProjection>,
+        superType: SimpleType
     ): Boolean {
-
-        if (capturedSubArguments === superType.arguments) return true
-
-        val parameters = superType.constructor.parameters
-
-        for (index in parameters.indices) {
-            val superProjection = superType.arguments[index] // todo error index
-            if (superProjection.isStarProjection) continue // A<B> <: A<*>
-
-            val superArgumentType = superProjection.type.unwrap()
-            val subArgumentType = capturedSubArguments[index].let {
-                assert(it.projectionKind == Variance.INVARIANT) { "Incorrect sub argument: $it" }
-                it.type.unwrap()
-            }
-
-            val variance = effectiveVariance(parameters[index].variance, superProjection.projectionKind)
-                           ?: return errorTypeEqualsToAnything // todo exception?
-
-            val correctArgument = runWithArgumentsSettings(subArgumentType) {
-                when (variance) {
-                    Variance.INVARIANT -> equalTypes(subArgumentType, superArgumentType)
-                    Variance.OUT_VARIANCE -> isSubtypeOf(subArgumentType, superArgumentType)
-                    Variance.IN_VARIANCE -> isSubtypeOf(superArgumentType, subArgumentType)
-                }
-            }
-            if (!correctArgument) return false
+        return AbstractTypeChecker.run {
+            isSubtypeForSameConstructor(capturedSubArguments, superType)
         }
-        return true
     }
 
 }

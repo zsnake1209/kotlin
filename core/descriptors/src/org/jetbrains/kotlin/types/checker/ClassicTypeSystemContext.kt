@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 
-open class ClassicTypeSystemContext : TypeSystemContext {
+interface ClassicTypeSystemContext : TypeSystemContext {
     override fun TypeConstructorIM.isDenotable(): Boolean {
         require(this is TypeConstructor)
         return this.isDenotable
@@ -102,7 +102,7 @@ open class ClassicTypeSystemContext : TypeSystemContext {
 
     override fun TypeArgumentIM.getType(): KotlinTypeIM {
         require(this is TypeProjection)
-        return this.type
+        return this.type.unwrap()
     }
 
     override fun TypeConstructorIM.isErrorTypeConstructor(): Boolean {
