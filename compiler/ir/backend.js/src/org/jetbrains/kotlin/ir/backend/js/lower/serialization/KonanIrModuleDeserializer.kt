@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.symbols.impl.*
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
+import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor
@@ -48,6 +49,7 @@ class KonanIrModuleDeserializer(
         : IrModuleDeserializer(logger, builtIns, symbolTable) {
 
     val deserializedSymbols = mutableMapOf<UniqIdKey, IrSymbol>()
+    val builtInSymbolsID = mutableMapOf<DeclarationDescriptor, UniqIdKey>()
     val reachableTopLevels = mutableSetOf<UniqIdKey>()
     val deserializedTopLevels = mutableSetOf<UniqIdKey>()
     val forwardDeclarations = mutableSetOf<IrSymbol>()
@@ -68,7 +70,25 @@ class KonanIrModuleDeserializer(
             deserializedSymbols[UniqIdKey(null, UniqId(currentIndex, false))] = it
             assert(symbolTable.referenceClass(it.descriptor) == it)
             currentIndex++
+        }
 
+        val anyClass = builtIns.anyClass
+        deserializedSymbols[UniqIdKey(null, UniqId(currentIndex++, false))] = anyClass
+        assert(symbolTable.referenceClass(anyClass.descriptor) == anyClass)
+        val constructors = anyClass.descriptor.constructors
+        constructors.forEach {
+            val symbol = symbolTable.referenceConstructor(it)
+            deserializedSymbols[UniqIdKey(null, UniqId(currentIndex, false))] = symbol
+//            assert(symbolTable.ref(symbol.descriptor) == symbol)
+            currentIndex++
+        }
+        anyClass.descriptor.unsubstitutedMemberScope.getContributedDescriptors().forEach {
+            val symbol = symbolTable.referenceFunction(it as SimpleFunctionDescriptor)
+            val id = UniqIdKey(null, UniqId(currentIndex, false))
+            deserializedSymbols[id] = symbol
+            builtInSymbolsID[it] = id
+//            assert(symbolTable.ref(symbol.descriptor) == symbol)
+            currentIndex++
         }
     }
 
@@ -159,7 +179,7 @@ class KonanIrModuleDeserializer(
     }
 
     override fun deserializeDescriptorReference(proto: KonanIr.DescriptorReference)
-        = descriptorReferenceDeserializer.deserializeDescriptorReference(proto)
+        = descriptorReferenceDeserializer.deserializeDescriptorReference(proto) { builtInSymbolsID[it]?.uniqId?.index }
 
     private val ByteArray.codedInputStream: org.jetbrains.kotlin.protobuf.CodedInputStream
         get() {
@@ -310,9 +330,10 @@ class KonanIrModuleDeserializer(
 
         deserializedModuleDescriptor = moduleDescriptor
 
+        var i = 0
         val files = proto.fileList.map {
+            i++
             deserializeIrFile(it, moduleDescriptor, deserializeAllDeclarations)
-
         }
         val module = IrModuleFragmentImpl(moduleDescriptor, builtIns, files)
         module.patchDeclarationParents(null)

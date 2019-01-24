@@ -284,7 +284,8 @@ abstract class IrModuleDeserializer(
         start: Int,
         end: Int
     ): IrDelegatingConstructorCall {
-        val symbol = deserializeIrSymbol(proto.symbol) as IrConstructorSymbol
+        val ds = deserializeIrSymbol(proto.symbol)
+        val symbol = ds as IrConstructorSymbol
         val call = IrDelegatingConstructorCallImpl(
             start,
             end,

@@ -35,6 +35,12 @@ class DeclarationTable(val builtIns: IrBuiltIns, val descriptorTable: Descriptor
         builtIns.basicSymbols.forEach {
             table[it.owner] = UniqId(currentIndex++, false)
         }
+        val anyClass = builtIns.anyClass.owner
+
+        table[anyClass] = UniqId(currentIndex++, false)
+        anyClass.declarations.forEach {
+            table[it] = UniqId(currentIndex++, false)
+        }
     }
 
     fun uniqIdByDeclaration(value: IrDeclaration): UniqId {

@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 
 class DescriptorReferenceDeserializer(val currentModule: ModuleDescriptor, val resolvedForwardDeclarations: MutableMap<UniqIdKey, UniqIdKey>) {
 
-    fun deserializeDescriptorReference(proto: KonanIr.DescriptorReference): DeclarationDescriptor? {
+    fun deserializeDescriptorReference(proto: KonanIr.DescriptorReference, checker: (DeclarationDescriptor) -> Long? = { null }): DeclarationDescriptor? {
         val packageFqName =
             if (proto.packageFqName == "<root>") FqName.ROOT else FqName(proto.packageFqName) // TODO: whould we store an empty string in the protobuf?
         val classFqName = FqName(proto.classFqName)
@@ -64,7 +64,7 @@ class DescriptorReferenceDeserializer(val currentModule: ModuleDescriptor, val r
                 else
                     setOf(member)
 
-            val memberIndices = realMembers.map { it.getUniqId()?.index }.filterNotNull()
+            val memberIndices = realMembers.map { it.getUniqId()?.index ?: checker(it) }.filterNotNull()
 
             if (memberIndices.contains(protoIndex)) {
 
