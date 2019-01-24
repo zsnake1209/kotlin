@@ -34,7 +34,7 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
     }
 
     override fun backupIsSubType(subtype: KotlinTypeIM, supertype: KotlinTypeIM): Boolean {
-        return this.isSubtypeOf(subtype as UnwrappedType, supertype as UnwrappedType)
+        return this.isSubtypeOf((subtype as KotlinType).unwrap(), (supertype as KotlinType).unwrap())
     }
 
     private var supertypesLocked = false
@@ -121,18 +121,6 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
         }
     }
 
-    enum class SeveralSupertypesWithSameConstructorPolicy {
-        TAKE_FIRST_FOR_SUBTYPING,
-        FORCE_NOT_SUBTYPE,
-        CHECK_ANY_OF_THEM,
-        INTERSECT_ARGUMENTS_AND_CHECK_AGAIN
-    }
-
-    enum class LowerCapturedTypePolicy {
-        CHECK_ONLY_LOWER,
-        CHECK_SUBTYPE_AND_LOWER,
-        SKIP_LOWER
-    }
 
     val UnwrappedType.isAllowedTypeVariable: Boolean get() = allowedTypeVariable && constructor is NewTypeVariableConstructor
 }

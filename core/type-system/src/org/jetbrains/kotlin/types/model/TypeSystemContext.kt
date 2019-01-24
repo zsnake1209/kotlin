@@ -37,19 +37,27 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun KotlinTypeIM.asSimpleType(): SimpleTypeIM?
     fun KotlinTypeIM.asFlexibleType(): FlexibleTypeIM?
 
+    fun KotlinTypeIM.isError(): Boolean
+
     fun FlexibleTypeIM.asDynamicType(): DynamicTypeIM?
+
     fun FlexibleTypeIM.asRawType(): RawTypeIM?
-
     fun FlexibleTypeIM.upperBound(): SimpleTypeIM
-    fun FlexibleTypeIM.lowerBound(): SimpleTypeIM
 
+    fun FlexibleTypeIM.lowerBound(): SimpleTypeIM
     fun SimpleTypeIM.asCapturedType(): CapturedTypeIM?
+
     fun SimpleTypeIM.asDefinitelyNotNullType(): DefinitelyNotNullTypeIM?
     fun SimpleTypeIM.isMarkedNullable(): Boolean
+    fun SimpleTypeIM.withNullability(nullable: Boolean): SimpleTypeIM
     fun SimpleTypeIM.typeConstructor(): TypeConstructorIM
 
     fun SimpleTypeIM.argumentsCount(): Int
     fun SimpleTypeIM.getArgument(index: Int): TypeArgumentIM
+
+    fun SimpleTypeIM.isStubType(): Boolean = false
+
+    fun CapturedTypeIM.lowerType(): KotlinTypeIM?
 
     fun TypeArgumentIM.isStarProjection(): Boolean
     fun TypeArgumentIM.getVariance(): TypeVariance
@@ -58,8 +66,8 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun TypeConstructorIM.isErrorTypeConstructor(): Boolean
     fun TypeConstructorIM.parametersCount(): Int
     fun TypeConstructorIM.getParameter(index: Int): TypeParameterIM
-    fun TypeConstructorIM.supertypesCount(): Int
-    fun TypeConstructorIM.getSupertype(index: Int): KotlinTypeIM
+    fun TypeConstructorIM.supertypes(): Collection<KotlinTypeIM>
+    fun TypeConstructorIM.isIntersection(): Boolean
 
     fun TypeParameterIM.getVariance(): TypeVariance
     fun TypeParameterIM.upperBoundCount(): Int

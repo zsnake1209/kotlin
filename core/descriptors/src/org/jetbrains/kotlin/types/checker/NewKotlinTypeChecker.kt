@@ -22,8 +22,8 @@ import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedTypeConstructorImpl
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.checker.TypeCheckerContext.LowerCapturedTypePolicy.*
-import org.jetbrains.kotlin.types.checker.TypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy.*
+import org.jetbrains.kotlin.types.AbstractTypeChecker.checkSubtypeForSpecialCases
+import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy.*
 import org.jetbrains.kotlin.types.checker.TypeCheckerContext.SupertypesPolicy
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
@@ -130,33 +130,6 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
                     }
                 }
             }.inheritEnhancement(type)
-
-    private fun TypeCheckerContext.checkSubtypeForSpecialCases(subType: SimpleType, superType: SimpleType): Boolean? {
-        if (subType.isError || superType.isError) {
-            if (errorTypeEqualsToAnything) return true
-
-            if (subType.isMarkedNullable && !superType.isMarkedNullable) return false
-
-            return StrictEqualityTypeChecker.strictEqualTypes(subType.makeNullableAsSpecified(false), superType.makeNullableAsSpecified(false))
-        }
-
-        if (subType is StubType || superType is StubType) return true
-
-        if (superType is NewCapturedType && superType.lowerType != null) {
-            when (getLowerCapturedTypePolicy(subType, superType)) {
-                CHECK_ONLY_LOWER -> return isSubtypeOf(subType, superType.lowerType)
-                CHECK_SUBTYPE_AND_LOWER -> if(isSubtypeOf(subType, superType.lowerType)) return true
-                SKIP_LOWER -> { /*do nothing*/ }
-            }
-        }
-
-        (superType.constructor as? IntersectionTypeConstructor)?.let {
-            assert(!superType.isMarkedNullable) { "Intersection type should not be marked nullable!: $superType" }
-            return it.supertypes.all { isSubtypeOf(subType, it.unwrap()) }
-        }
-
-        return null
-    }
 
     private fun TypeCheckerContext.hasNothingSupertype(type: SimpleType) = // todo add tests
         anySupertype(type, KotlinBuiltIns::isNothingOrNullableNothing) {

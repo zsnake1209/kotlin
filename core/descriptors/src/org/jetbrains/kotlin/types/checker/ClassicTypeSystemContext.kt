@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.types.checker
 
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
-import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 
@@ -14,6 +13,31 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     override fun TypeConstructorIM.isDenotable(): Boolean {
         require(this is TypeConstructor)
         return this.isDenotable
+    }
+
+    override fun SimpleTypeIM.withNullability(nullable: Boolean): SimpleTypeIM {
+        require(this is SimpleType)
+        return this.makeNullableAsSpecified(nullable)
+    }
+
+    override fun KotlinTypeIM.isError(): Boolean {
+        require(this is KotlinType)
+        return this.isError
+    }
+
+    override fun SimpleTypeIM.isStubType(): Boolean {
+        assert(this is SimpleType)
+        return this is StubType
+    }
+
+    override fun CapturedTypeIM.lowerType(): KotlinTypeIM? {
+        require(this is NewCapturedType)
+        return this.lowerType
+    }
+
+    override fun TypeConstructorIM.isIntersection(): Boolean {
+        assert(this is TypeConstructor)
+        return this is IntersectionTypeConstructor
     }
 
     override fun identicalArguments(a: SimpleTypeIM, b: SimpleTypeIM): Boolean {
@@ -54,7 +78,7 @@ interface ClassicTypeSystemContext : TypeSystemContext {
 
     override fun SimpleTypeIM.asCapturedType(): CapturedTypeIM? {
         assert(this is SimpleType)
-        return this as? NewCapturedType ?: this as? CapturedType//TODO ?!
+        return this as? NewCapturedType
     }
 
     override fun SimpleTypeIM.asDefinitelyNotNullType(): DefinitelyNotNullTypeIM? {
@@ -120,15 +144,9 @@ interface ClassicTypeSystemContext : TypeSystemContext {
         return this.parameters[index]
     }
 
-    override fun TypeConstructorIM.supertypesCount(): Int {
+    override fun TypeConstructorIM.supertypes(): Collection<KotlinTypeIM> {
         require(this is TypeConstructor)
-        return this.supertypes.size
-    }
-
-    override fun TypeConstructorIM.getSupertype(index: Int): KotlinTypeIM {
-        require(this is TypeConstructor)
-        require(this.supertypes is List<*>) { "Expected to provide index access for supertypes" }
-        return (this.supertypes as List<KotlinType>)[index] // TODO: Something better here?
+        return this.supertypes
     }
 
     override fun TypeParameterIM.getVariance(): TypeVariance {
