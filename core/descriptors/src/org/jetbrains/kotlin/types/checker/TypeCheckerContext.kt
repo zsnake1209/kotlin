@@ -23,7 +23,10 @@ import org.jetbrains.kotlin.types.model.TypeConstructorIM
 import org.jetbrains.kotlin.utils.SmartSet
 import java.util.*
 
-open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) : ClassicTypeSystemContext(), AbstractTypeCheckerContext {
+open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) : ClassicTypeSystemContext, AbstractTypeCheckerContext() {
+    override val isErrorTypeEqualsToAnything: Boolean
+        get() = errorTypeEqualsToAnything
+
     override fun areEqualTypeConstructors(a: TypeConstructorIM, b: TypeConstructorIM): Boolean {
         require(a is TypeConstructor)
         require(b is TypeConstructor)
@@ -34,8 +37,6 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
         return this.isSubtypeOf(subtype as UnwrappedType, supertype as UnwrappedType)
     }
 
-    protected var argumentsDepth = 0
-
     private var supertypesLocked = false
     private var supertypesDeque: ArrayDeque<SimpleType>? = null
     private var supertypesSet: MutableSet<SimpleType>? = null
@@ -44,20 +45,6 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
 
     open fun areEqualTypeConstructors(a: TypeConstructor, b: TypeConstructor): Boolean {
         return a == b
-    }
-
-    open fun getLowerCapturedTypePolicy(subType: SimpleType, superType: NewCapturedType) = LowerCapturedTypePolicy.CHECK_SUBTYPE_AND_LOWER
-    open val sameConstructorPolicy get() = SeveralSupertypesWithSameConstructorPolicy.INTERSECT_ARGUMENTS_AND_CHECK_AGAIN
-
-    internal inline fun <T> runWithArgumentsSettings(subArgument: UnwrappedType, f: TypeCheckerContext.() -> T): T {
-        if (argumentsDepth > 100) {
-            error("Arguments depth is too high. Some related argument: $subArgument")
-        }
-
-        argumentsDepth++
-        val result = f()
-        argumentsDepth--
-        return result
     }
 
     private fun initialize() {
