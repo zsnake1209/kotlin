@@ -141,6 +141,8 @@ class IrBuiltIns(
     val primitiveTypesWithComparisons = listOf(int, long, float, double)
     val primitiveFloatingPointTypes = listOf(float, double)
 
+    val basicSymbols = listOf(anyClass, booleanClass, charClass, numberClass, byteClass, shortClass, intClass, longClass, floatClass, doubleClass, nothingClass, unitClass, stringClass, arrayClass, throwableClass)
+
     val lessFunByOperandType = primitiveTypesWithComparisons.defineComparisonOperatorForEachType("less")
     val lessOrEqualFunByOperandType = primitiveTypesWithComparisons.defineComparisonOperatorForEachType("lessOrEqual")
     val greaterOrEqualFunByOperandType = primitiveTypesWithComparisons.defineComparisonOperatorForEachType("greaterOrEqual")

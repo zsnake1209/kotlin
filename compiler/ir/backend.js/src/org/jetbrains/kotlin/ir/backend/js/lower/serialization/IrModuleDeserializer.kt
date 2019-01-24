@@ -57,7 +57,7 @@ abstract class IrModuleDeserializer(
 ) : IrDeserializer {
 
     abstract fun deserializeIrSymbol(proto: KonanIr.IrSymbol): IrSymbol
-    abstract fun deserializeDescriptorReference(proto: KonanIr.DescriptorReference): DeclarationDescriptor
+    abstract fun deserializeDescriptorReference(proto: KonanIr.DescriptorReference): DeclarationDescriptor?
 
     private fun deserializeTypeArguments(proto: KonanIr.TypeArguments): List<IrType> {
         logger.log { "### deserializeTypeArguments" }
@@ -191,7 +191,7 @@ abstract class IrModuleDeserializer(
             -> TODO("Statement deserialization not implemented: ${proto.statementCase}")
         }
 
-        logger.log { "### Deserialized statement: ${ir2string(element)}" }
+//        logger.log { "### Deserialized statement: ${ir2string(element)}" }
 
         return element
     }
@@ -687,7 +687,7 @@ abstract class IrModuleDeserializer(
         val operation = proto.operation
         val expression = deserializeOperation(operation, start, end, type)
 
-        logger.log { "### Deserialized expression: ${ir2string(expression)} ir_type=$type" }
+//        logger.log { "### Deserialized expression: ${ir2string(expression)} ir_type=$type" }
         return expression
     }
 
@@ -758,6 +758,10 @@ abstract class IrModuleDeserializer(
                     IrExpressionBodyImpl(expression)
                 } else null
             }
+        val desc = parameter.descriptor
+        if (desc is WrappedDeclarationDescriptor<*>) {
+            (desc as WrappedDeclarationDescriptor<IrDeclaration>).bind(parameter)
+        }
 
         return parameter
     }

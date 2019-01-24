@@ -17,6 +17,8 @@ abstract class Enum<E : Enum<E>>(val name: String, val ordinal: Int) : Comparabl
 
     override fun toString() = name
 
+    protected fun clone(): Any { throw Exception() }
+
     companion object
 }
 

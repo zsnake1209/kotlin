@@ -26,11 +26,14 @@ class DeclarationTable(val builtIns: IrBuiltIns, val descriptorTable: Descriptor
     val table = mutableMapOf<IrDeclaration, UniqId>()
     val debugIndex = mutableMapOf<UniqId, String>()
     val descriptors = descriptorTable
-    var currentIndex = 0L
+    var currentIndex = 0x100000000L
 
     init {
         builtIns.knownBuiltins.forEach {
             table.put(it, UniqId(currentIndex ++, false))
+        }
+        builtIns.basicSymbols.forEach {
+            table[it.owner] = UniqId(currentIndex++, false)
         }
     }
 

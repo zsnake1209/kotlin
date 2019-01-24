@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 
 class DescriptorReferenceDeserializer(val currentModule: ModuleDescriptor, val resolvedForwardDeclarations: MutableMap<UniqIdKey, UniqIdKey>) {
 
-    fun deserializeDescriptorReference(proto: KonanIr.DescriptorReference): DeclarationDescriptor {
+    fun deserializeDescriptorReference(proto: KonanIr.DescriptorReference): DeclarationDescriptor? {
         val packageFqName =
             if (proto.packageFqName == "<root>") FqName.ROOT else FqName(proto.packageFqName) // TODO: whould we store an empty string in the protobuf?
         val classFqName = FqName(proto.classFqName)
@@ -23,25 +23,25 @@ class DescriptorReferenceDeserializer(val currentModule: ModuleDescriptor, val r
             Pair(clazz, clazz.unsubstitutedMemberScope.getContributedDescriptors() + clazz.getConstructors())
         }
 
-        if (proto.packageFqName.startsWith("cnames") || proto.packageFqName.startsWith("objcnames")) {
-            val descriptor =
-                currentModule.findClassAcrossModuleDependencies(ClassId(packageFqName, FqName(proto.name), false))!!
-            if (!descriptor.fqNameUnsafe.asString().startsWith("cnames") && !descriptor.fqNameUnsafe.asString().startsWith(
-                    "objcnames"
-                )
-            ) {
-                if (descriptor is DeserializedClassDescriptor) {
-                    val uniqId = UniqId(descriptor.getUniqId()!!.index, false)
-                    val newKey = UniqIdKey(null, uniqId)
-                    val oldKey = UniqIdKey(null, UniqId(protoIndex!!, false))
-
-                    resolvedForwardDeclarations.put(oldKey, newKey)
-                } else {
-                    /* ??? */
-                }
-            }
-            return descriptor
-        }
+//        if (proto.packageFqName.startsWith("cnames") || proto.packageFqName.startsWith("objcnames")) {
+//            val descriptor =
+//                currentModule.findClassAcrossModuleDependencies(ClassId(packageFqName, FqName(proto.name), false))!!
+//            if (!descriptor.fqNameUnsafe.asString().startsWith("cnames") && !descriptor.fqNameUnsafe.asString().startsWith(
+//                    "objcnames"
+//                )
+//            ) {
+//                if (descriptor is DeserializedClassDescriptor) {
+//                    val uniqId = UniqId(descriptor.getUniqId()!!.index, false)
+//                    val newKey = UniqIdKey(null, uniqId)
+//                    val oldKey = UniqIdKey(null, UniqId(protoIndex!!, false))
+//
+//                    resolvedForwardDeclarations.put(oldKey, newKey)
+//                } else {
+//                    /* ??? */
+//                }
+//            }
+//            return descriptor
+//        }
 
         if (proto.isEnumEntry) {
             val name = proto.name
@@ -79,6 +79,13 @@ class DescriptorReferenceDeserializer(val currentModule: ModuleDescriptor, val r
 
             }
         }
+
+
+//        if (isEnumOrSubtype(clazz, packageFqName))
+//            return null
         error("Could not find serialized descriptor for index: ${proto.uniqId.index} ${proto.packageFqName},${proto.classFqName},${proto.name}")
     }
+
+    private fun isEnumOrSubtype(clazz: ClassDescriptor?, fqn: FqName) =
+        clazz?.kind == ClassKind.ENUM_CLASS || (clazz?.name == Name.identifier("Enum") && fqn.asString() == "kotlin")
 }

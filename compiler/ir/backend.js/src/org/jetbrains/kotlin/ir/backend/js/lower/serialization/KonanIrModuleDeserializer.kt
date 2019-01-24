@@ -58,11 +58,17 @@ class KonanIrModuleDeserializer(
 
 
     init {
-        var currentIndex = 0L
+        var currentIndex = 0x100000000L
         builtIns.knownBuiltins.forEach {
             deserializedSymbols.put(UniqIdKey(null, UniqId(currentIndex, isLocal = false)), it.symbol)
             assert(symbolTable.referenceSimpleFunction(it.descriptor) == it.symbol)
             currentIndex++
+        }
+        builtIns.basicSymbols.forEach {
+            deserializedSymbols[UniqIdKey(null, UniqId(currentIndex, false))] = it
+            assert(symbolTable.referenceClass(it.descriptor) == it)
+            currentIndex++
+
         }
     }
 
