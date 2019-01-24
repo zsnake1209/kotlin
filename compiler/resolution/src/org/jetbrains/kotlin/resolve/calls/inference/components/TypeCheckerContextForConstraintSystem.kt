@@ -11,6 +11,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.hasNoInferAnnotation
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.KotlinTypeFactory.flexibleType
 import org.jetbrains.kotlin.types.checker.*
+import org.jetbrains.kotlin.types.model.CapturedTypeIM
+import org.jetbrains.kotlin.types.model.SimpleTypeIM
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.contains
 
@@ -23,7 +25,13 @@ abstract class TypeCheckerContextForConstraintSystem : TypeCheckerContext(errorT
 
     abstract fun addLowerConstraint(typeVariable: TypeConstructor, subType: UnwrappedType)
 
-    override fun getLowerCapturedTypePolicy(subType: SimpleType, superType: NewCapturedType) = when {
+    override fun getLowerCapturedTypePolicy(subType: SimpleTypeIM, superType: CapturedTypeIM): LowerCapturedTypePolicy {
+        require(subType is SimpleType)
+        require(superType is NewCapturedType)
+        return getLowerCapturedTypePolicy(subType, superType)
+    }
+
+    private fun getLowerCapturedTypePolicy(subType: SimpleType, superType: NewCapturedType) = when {
         isMyTypeVariable(subType) -> LowerCapturedTypePolicy.SKIP_LOWER
         subType.contains { it.anyBound(this::isMyTypeVariable) } -> LowerCapturedTypePolicy.CHECK_ONLY_LOWER
         else -> LowerCapturedTypePolicy.CHECK_SUBTYPE_AND_LOWER

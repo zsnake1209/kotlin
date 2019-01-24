@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.LowerCapturedTypePolicy.*
 import org.jetbrains.kotlin.types.model.*
 
 
@@ -29,10 +30,21 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
         return result
     }
 
-interface AbstractTypeCheckerContext : TypeSystemContext {
-    fun areEqualTypeConstructors(a: TypeConstructorIM, b: TypeConstructorIM): Boolean
+    open fun getLowerCapturedTypePolicy(subType: SimpleTypeIM, superType: CapturedTypeIM): LowerCapturedTypePolicy = CHECK_SUBTYPE_AND_LOWER
+    open val sameConstructorPolicy get() = SeveralSupertypesWithSameConstructorPolicy.INTERSECT_ARGUMENTS_AND_CHECK_AGAIN
 
-    fun backupIsSubType(subtype: KotlinTypeIM, supertype: KotlinTypeIM): Boolean
+    enum class SeveralSupertypesWithSameConstructorPolicy {
+        TAKE_FIRST_FOR_SUBTYPING,
+        FORCE_NOT_SUBTYPE,
+        CHECK_ANY_OF_THEM,
+        INTERSECT_ARGUMENTS_AND_CHECK_AGAIN
+    }
+
+    enum class LowerCapturedTypePolicy {
+        CHECK_ONLY_LOWER,
+        CHECK_SUBTYPE_AND_LOWER,
+        SKIP_LOWER
+    }
 }
 
 object AbstractTypeChecker {
@@ -45,7 +57,7 @@ object AbstractTypeChecker {
         if (a === b) return true
 
         if (isCommonDenotableType(a) && isCommonDenotableType(b)) {
-            val simpleA = a.lowerBoundIfFlexible()
+            val simpleA = a.lowerBoundIfFlexible() //TODO: Delegate ??
             if (!areEqualTypeConstructors(a.typeConstructor(), b.typeConstructor())) return false
             if (simpleA.argumentsCount() == 0) {
                 if (a.hasFlexibleNullability() || b.hasFlexibleNullability()) return true
@@ -105,6 +117,42 @@ object AbstractTypeChecker {
         if (declared == useSite) return declared
 
         // composite In with Out
+        return null
+    }
+
+    fun AbstractTypeCheckerContext.checkSubtypeForSpecialCases(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean? {
+        if (subType.isError() || superType.isError()) {
+            if (isErrorTypeEqualsToAnything) return true
+
+            if (subType.isMarkedNullable() && !superType.isMarkedNullable()) return false
+
+            return AbstractStrictEqualityTypeChecker.strictEqualTypes(
+                this,
+                subType.withNullability(false),
+                superType.withNullability(false)
+            )
+        }
+
+        if (subType.isStubType() || superType.isStubType()) return true
+
+
+        val superTypeCaptured = superType.asCapturedType()
+        val lowerType = superTypeCaptured?.lowerType()
+        if (superTypeCaptured != null && lowerType != null) {
+            when (getLowerCapturedTypePolicy(subType, superTypeCaptured)) {
+                CHECK_ONLY_LOWER -> return isSubtypeOf(this, subType, lowerType)
+                CHECK_SUBTYPE_AND_LOWER -> if (isSubtypeOf(this, subType, lowerType)) return true
+                SKIP_LOWER -> Unit /*do nothing*/
+            }
+        }
+
+        val superTypeConstructor = superType.typeConstructor()
+        if (superTypeConstructor.isIntersection()) {
+            assert(!superType.isMarkedNullable()) { "Intersection type should not be marked nullable!: $superType" }
+
+            return superTypeConstructor.supertypes().all { isSubtypeOf(this, subType, it) }
+        }
+
         return null
     }
 }
