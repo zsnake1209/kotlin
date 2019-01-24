@@ -74,7 +74,7 @@ class NativeDefinitionsParserDefinition : ParserDefinition {
     override fun createFile(viewProvider: FileViewProvider): PsiFile = NativeDefinitionsFile(viewProvider)
     override fun createElement(node: ASTNode): PsiElement = NativeDefinitionsTypes.Factory.createElement(node)
 
-    @Suppress("DEPRECTAE") // Just switch to correctly named function, when old one is removed.
+    @Suppress("DEPRECATE") // Just switch to correctly named function, when old one is removed.
     override fun spaceExistanceTypeBetweenTokens(left: ASTNode?, right: ASTNode?): ParserDefinition.SpaceRequirements =
         ParserDefinition.SpaceRequirements.MAY
 }
