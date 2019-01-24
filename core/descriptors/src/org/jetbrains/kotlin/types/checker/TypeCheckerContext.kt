@@ -43,87 +43,31 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
         return areEqualTypeConstructors(a, b)
     }
 
-    private var supertypesLocked = false
-    private var supertypesDeque: ArrayDeque<SimpleType>? = null
-    private var supertypesSet: MutableSet<SimpleType>? = null
-
     open fun areEqualTypeConstructors(a: TypeConstructor, b: TypeConstructor): Boolean {
         return a == b
     }
 
-    private fun initialize() {
-        assert(!supertypesLocked)
-        supertypesLocked = true
 
-        if (supertypesDeque == null) {
-            supertypesDeque = ArrayDeque(4)
-        }
-        if (supertypesSet == null) {
-            supertypesSet = SmartSet.create()
-        }
-    }
-
-    private fun clear() {
-        supertypesDeque!!.clear()
-        supertypesSet!!.clear()
-        supertypesLocked = false
-    }
-
-    internal inline fun anySupertype(
-            start: SimpleType,
-            predicate: (SimpleType) -> Boolean,
-            supertypesPolicy: (SimpleType) -> SupertypesPolicy
-    ): Boolean {
-        if (predicate(start)) return true
-
-        initialize()
-
-        val deque = supertypesDeque!!
-        val visitedSupertypes = supertypesSet!!
-
-        deque.push(start)
-        while (deque.isNotEmpty()) {
-            if (visitedSupertypes.size > 1000) {
-                error("Too many supertypes for type: $start. Supertypes = ${visitedSupertypes.joinToString()}")
-            }
-            val current = deque.pop()
-            if (!visitedSupertypes.add(current)) continue
-
-            val policy = supertypesPolicy(current).takeIf { it != SupertypesPolicy.None } ?: continue
-            for (supertype in current.constructor.supertypes) {
-                val newType = policy.transformType(supertype)
-                if (predicate(newType)) {
-                    clear()
-                    return true
-                }
-                deque.add(newType)
-            }
-        }
-
-        clear()
-        return false
-    }
-
-    internal sealed class SupertypesPolicy {
-        abstract fun transformType(type: KotlinType): SimpleType
-
-        object None : SupertypesPolicy() {
-            override fun transformType(type: KotlinType) = throw UnsupportedOperationException("Should not be called")
-        }
-
-        object UpperIfFlexible : SupertypesPolicy() {
-            override fun transformType(type: KotlinType) = type.upperIfFlexible()
-        }
-
-        object LowerIfFlexible : SupertypesPolicy() {
-            override fun transformType(type: KotlinType) = type.lowerIfFlexible()
-        }
-
-        class LowerIfFlexibleWithCustomSubstitutor(val substitutor: TypeSubstitutor): SupertypesPolicy() {
-            override fun transformType(type: KotlinType) =
-                    substitutor.safeSubstitute(type.lowerIfFlexible(), Variance.INVARIANT).asSimpleType()
-        }
-    }
+//    internal sealed class SupertypesPolicy {
+//        abstract fun transformType(type: KotlinType): SimpleType
+//
+//        object None : SupertypesPolicy() {
+//            override fun transformType(type: KotlinType) = throw UnsupportedOperationException("Should not be called")
+//        }
+//
+//        object UpperIfFlexible : SupertypesPolicy() {
+//            override fun transformType(type: KotlinType) = type.upperIfFlexible()
+//        }
+//
+//        object LowerIfFlexible : SupertypesPolicy() {
+//            override fun transformType(type: KotlinType) = type.lowerIfFlexible()
+//        }
+//
+//        class LowerIfFlexibleWithCustomSubstitutor(val substitutor: TypeSubstitutor): SupertypesPolicy() {
+//            override fun transformType(type: KotlinType) =
+//                    substitutor.safeSubstitute(type.lowerIfFlexible(), Variance.INVARIANT).asSimpleType()
+//        }
+//    }
 
 
     val UnwrappedType.isAllowedTypeVariable: Boolean get() = allowedTypeVariable && constructor is NewTypeVariableConstructor

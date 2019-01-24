@@ -8,6 +8,8 @@ package org.jetbrains.kotlin.types
 import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.LowerCapturedTypePolicy.*
 import org.jetbrains.kotlin.types.model.*
+import org.jetbrains.kotlin.utils.SmartSet
+import java.util.*
 
 
 abstract class AbstractTypeCheckerContext : TypeSystemContext {
@@ -53,6 +55,88 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
         CHECK_ONLY_LOWER,
         CHECK_SUBTYPE_AND_LOWER,
         SKIP_LOWER
+    }
+
+    private var supertypesLocked = false
+
+    var supertypesDeque: ArrayDeque<SimpleTypeIM>? = null
+        private set
+    var supertypesSet: MutableSet<SimpleTypeIM>? = null
+        private set
+
+
+    fun initialize() {
+        assert(!supertypesLocked)
+        supertypesLocked = true
+
+        if (supertypesDeque == null) {
+            supertypesDeque = ArrayDeque(4)
+        }
+        if (supertypesSet == null) {
+            supertypesSet = SmartSet.create()
+        }
+    }
+
+    fun clear() {
+        supertypesDeque!!.clear()
+        supertypesSet!!.clear()
+        supertypesLocked = false
+    }
+
+    inline fun anySupertype(
+        start: SimpleTypeIM,
+        predicate: (SimpleTypeIM) -> Boolean,
+        supertypesPolicy: (SimpleTypeIM) -> SupertypesPolicy
+    ): Boolean {
+        if (predicate(start)) return true
+
+        initialize()
+
+        val deque = supertypesDeque!!
+        val visitedSupertypes = supertypesSet!!
+
+        deque.push(start)
+        while (deque.isNotEmpty()) {
+            if (visitedSupertypes.size > 1000) {
+                error("Too many supertypes for type: $start. Supertypes = ${visitedSupertypes.joinToString()}")
+            }
+            val current = deque.pop()
+            if (!visitedSupertypes.add(current)) continue
+
+            val policy = supertypesPolicy(current).takeIf { it != SupertypesPolicy.None } ?: continue
+            for (supertype in current.typeConstructor().supertypes()) {
+                val newType = policy.transformType(this, supertype)
+                if (predicate(newType)) {
+                    clear()
+                    return true
+                }
+                deque.add(newType)
+            }
+        }
+
+        clear()
+        return false
+    }
+
+    sealed class SupertypesPolicy {
+        abstract fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM): SimpleTypeIM
+
+        object None : SupertypesPolicy() {
+            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM) =
+                throw UnsupportedOperationException("Should not be called")
+        }
+
+        object UpperIfFlexible : SupertypesPolicy() {
+            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM) =
+                with(context) { type.upperBoundIfFlexible() }
+        }
+
+        object LowerIfFlexible : SupertypesPolicy() {
+            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM) =
+                with(context) { type.lowerBoundIfFlexible() }
+        }
+
+        abstract class DoCustomTransform : SupertypesPolicy()
     }
 }
 
