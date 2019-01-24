@@ -17,13 +17,23 @@
 package org.jetbrains.kotlin.types.checker
 
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker.isSubtypeOf
+import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker.isSubtypeOfForSingleClassifierType
+import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker.transformAndIsSubTypeOf
 import org.jetbrains.kotlin.types.model.KotlinTypeIM
+import org.jetbrains.kotlin.types.model.SimpleTypeIM
 import org.jetbrains.kotlin.types.model.TypeConstructorIM
 import org.jetbrains.kotlin.utils.SmartSet
 import java.util.*
 
 open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) : ClassicTypeSystemContext, AbstractTypeCheckerContext() {
+    override fun backupIsSubtypeOfForSingleClassifierType(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean {
+        return this.isSubtypeOfForSingleClassifierType(subType as SimpleType, superType as SimpleType)
+    }
+
+    override fun enterIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
+        return transformAndIsSubTypeOf((subType as KotlinType).unwrap(), (superType as KotlinType).unwrap())
+    }
+
     override val isErrorTypeEqualsToAnything: Boolean
         get() = errorTypeEqualsToAnything
 
@@ -33,15 +43,9 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
         return areEqualTypeConstructors(a, b)
     }
 
-    override fun backupIsSubType(subtype: KotlinTypeIM, supertype: KotlinTypeIM): Boolean {
-        return this.isSubtypeOf((subtype as KotlinType).unwrap(), (supertype as KotlinType).unwrap())
-    }
-
     private var supertypesLocked = false
     private var supertypesDeque: ArrayDeque<SimpleType>? = null
     private var supertypesSet: MutableSet<SimpleType>? = null
-
-    open fun addSubtypeConstraint(subType: UnwrappedType, superType: UnwrappedType): Boolean? = null
 
     open fun areEqualTypeConstructors(a: TypeConstructor, b: TypeConstructor): Boolean {
         return a == b

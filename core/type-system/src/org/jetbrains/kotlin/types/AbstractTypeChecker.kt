@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.types
 
+import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.LowerCapturedTypePolicy.*
 import org.jetbrains.kotlin.types.model.*
 
@@ -12,7 +13,14 @@ import org.jetbrains.kotlin.types.model.*
 abstract class AbstractTypeCheckerContext : TypeSystemContext {
     abstract fun areEqualTypeConstructors(a: TypeConstructorIM, b: TypeConstructorIM): Boolean
 
-    abstract fun backupIsSubType(subtype: KotlinTypeIM, supertype: KotlinTypeIM): Boolean
+    /**
+     * Gets called by [AbstractTypeChecker] as entry of isSubTypeOf, it is suggested to call [AbstractTypeChecker.doIsSubTypeOf]
+     */
+    open fun enterIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
+        return doIsSubTypeOf(subType, superType)
+    }
+
+    abstract fun backupIsSubtypeOfForSingleClassifierType(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean
 
     abstract val isErrorTypeEqualsToAnything: Boolean
 
@@ -31,6 +39,7 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
     }
 
     open fun getLowerCapturedTypePolicy(subType: SimpleTypeIM, superType: CapturedTypeIM): LowerCapturedTypePolicy = CHECK_SUBTYPE_AND_LOWER
+    open fun addSubtypeConstraint(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean? = null
     open val sameConstructorPolicy get() = SeveralSupertypesWithSameConstructorPolicy.INTERSECT_ARGUMENTS_AND_CHECK_AGAIN
 
     enum class SeveralSupertypesWithSameConstructorPolicy {
@@ -48,10 +57,9 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 }
 
 object AbstractTypeChecker {
-    fun isSubtypeOf(context: AbstractTypeCheckerContext, subtype: KotlinTypeIM, supertype: KotlinTypeIM): Boolean = with(context) {
-        return context.backupIsSubType(subtype, supertype)
+    fun isSubtypeOf(context: AbstractTypeCheckerContext, subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean = with(context) {
+        return context.enterIsSubTypeOf(subType, superType)
     }
-
 
     fun equalTypes(context: AbstractTypeCheckerContext, a: KotlinTypeIM, b: KotlinTypeIM): Boolean = with(context) {
         if (a === b) return true
@@ -69,6 +77,18 @@ object AbstractTypeChecker {
         return isSubtypeOf(context, a, b) && isSubtypeOf(context, b, a)
     }
 
+
+    fun AbstractTypeCheckerContext.doIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
+        checkSubtypeForSpecialCases(subType.lowerBoundIfFlexible(), superType.upperBoundIfFlexible())?.let {
+            addSubtypeConstraint(subType, superType)
+            return it
+        }
+
+        // we should add constraints with flexible types, otherwise we never get flexible type as answer in constraint system
+        addSubtypeConstraint(subType, superType)?.let { return it }
+
+        return backupIsSubtypeOfForSingleClassifierType(subType.lowerBoundIfFlexible(), superType.upperBoundIfFlexible())
+    }
 
     fun AbstractTypeCheckerContext.isSubtypeForSameConstructor(
         capturedSubArguments: List<TypeArgumentIM>,
