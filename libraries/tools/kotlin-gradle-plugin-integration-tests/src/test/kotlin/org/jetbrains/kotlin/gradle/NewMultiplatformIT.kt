@@ -340,7 +340,8 @@ class NewMultiplatformIT : BaseGradleIT() {
 
     private fun parallelTasksImpl(isParallel: Boolean) = with(Project("new-mpp-parallel", gradleVersion)) {
         val options = defaultBuildOptions().copy(parallelTasksInProject = isParallel)
-        build("assemble", options = options) {
+        val traceLoading = "-Dorg.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.trace.loading=true"
+        build("assemble", traceLoading, options = options) {
             assertSuccessful()
             val tasks = arrayOf(":compileKotlinMetadata", ":compileKotlinJvm", ":compileKotlinJs")
             if (isParallel) {
@@ -354,6 +355,9 @@ class NewMultiplatformIT : BaseGradleIT() {
                 kotlinClassesDir(sourceSet = "js/main") + "new-mpp-parallel.js"
             )
             expectedKotlinOutputFiles.forEach { assertFileExists(it) }
+            assertSubstringCount("Loaded GradleKotlinCompilerWork", 1)
+            assertCompiledKotlinSources(project.relativize(project.allKotlinFiles))
+            assertNotContains("Falling back to sl4j logger")
         }
     }
 
