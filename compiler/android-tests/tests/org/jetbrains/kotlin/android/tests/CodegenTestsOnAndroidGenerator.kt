@@ -95,11 +95,13 @@ class CodegenTestsOnAndroidGenerator private constructor(private val pathManager
             )
             p.pushIndent()
 
-            generateTestMethodsForDirectories(p, File("compiler/testData/codegen/box"), File("compiler/testData/codegen/boxInline"))
+
 
             p.popIndent()
             p.println("}")
         }
+
+        generateTestMethodsForDirectories(p, File("compiler/testData/codegen/box"), File("compiler/testData/codegen/boxInline"))
     }
 
     private fun generateTestMethodsForDirectories(p: Printer, vararg dirs: File) {
@@ -152,6 +154,10 @@ class CodegenTestsOnAndroidGenerator private constructor(private val pathManager
 
         fun addFile(name: String, content: String) {
             rawFiles.add(name to content)
+        }
+
+        fun addTest(testInfo: TestInfo) {
+
         }
 
         private fun writeFiles(filesToCompile: List<KtFile>, environment: KotlinCoreEnvironment) {
@@ -238,15 +244,7 @@ class CodegenTestsOnAndroidGenerator private constructor(private val pathManager
                         })
                     }
 
-                    val classWithBoxMethod = patchFiles(file, testFiles, filesHolder) ?: continue
-
-                    val generatedTestName = generateTestName(file.name)
-                    generateTestMethod(
-                        printer,
-                        generatedTestName,
-                        classWithBoxMethod.asString(),
-                        StringUtil.escapeStringCharacters(file.path)
-                    )
+                    patchFilesAndAddTest(file, testFiles, filesHolder)
                 }
             }
         }
@@ -277,11 +275,11 @@ class CodegenTestsOnAndroidGenerator private constructor(private val pathManager
     }
 
     companion object {
-        private const val testClassPackage = "org.jetbrains.kotlin.android.tests"
-        private const val testClassName = "CodegenTestCaseOnAndroid"
-        private const val baseTestClassPackage = "org.jetbrains.kotlin.android.tests"
-        private const val baseTestClassName = "AbstractCodegenTestCaseOnAndroid"
-        private const val generatorName = "CodegenTestsOnAndroidGenerator"
+        const val testClassPackage = "org.jetbrains.kotlin.android.tests"
+        const val testClassName = "CodegenTestCaseOnAndroid"
+        const val baseTestClassPackage = "org.jetbrains.kotlin.android.tests"
+        const val baseTestClassName = "AbstractCodegenTestCaseOnAndroid"
+        const val generatorName = "CodegenTestsOnAndroidGenerator"
 
 
         @JvmStatic
