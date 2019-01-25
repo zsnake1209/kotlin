@@ -11,22 +11,32 @@ import org.jetbrains.kotlin.backend.common.ir.isSuspend
 import org.jetbrains.kotlin.backend.common.lower.FinallyBlocksLowering
 import org.jetbrains.kotlin.backend.common.pop
 import org.jetbrains.kotlin.backend.common.push
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
+import org.jetbrains.kotlin.ir.backend.js.utils.Namer
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetFieldImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrSetFieldImpl
-import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
+import org.jetbrains.kotlin.ir.symbols.IrReturnableBlockSymbol
+import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classifierOrFail
 import org.jetbrains.kotlin.ir.types.createType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
+import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
+import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
 import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.cast
@@ -180,30 +190,73 @@ class LiveLocalsTransformer(
     }
 }
 
-fun IrSimpleFunction.getOrCreateView(context: JsIrBackendContext) = context.transformedSuspendFunctionsCache.getOrPut(this) {
-    JsIrBuilder.buildFunction(
-        name,
-        context.irBuiltIns.anyNType,
-        parent,
-        visibility,
-        modality,
-        isInline,
-        isExternal,
-        isSuspend
-    ).also {
-        it.copyTypeParametersFrom(this)
-        it.dispatchReceiverParameter = dispatchReceiverParameter
+fun IrSimpleFunction.getOrCreateView(context: JsIrBackendContext): IrSimpleFunction {
+    return context.transformedSuspendFunctionsCache.getOrPut(this) {
+        JsIrBuilder.buildFunction(
+            name,
+            context.irBuiltIns.anyNType,
+            parent,
+            visibility,
+            modality,
+            isInline,
+            isExternal,
+            isTailrec,
+            isSuspend
+        ).also {
+            it.copyTypeParametersFrom(this)
+            it.dispatchReceiverParameter = dispatchReceiverParameter?.copyTo(it)
 
-        valueParameters.mapTo(it.valueParameters) { p -> p.copyTo(it) }
-        val continuationType = context.intrinsics.getContinuation.owner.returnType.classifierOrFail.cast<IrClassSymbol>().createType(
-            hasQuestionMark = false,
-            arguments = listOf(
-                makeTypeProjection(
-                    type = returnType,
-                    variance = Variance.INVARIANT
+            valueParameters.mapTo(it.valueParameters) { p -> p.copyTo(it) }
+            val continuationType = context.intrinsics.getContinuation.owner.returnType.classifierOrFail.cast<IrClassSymbol>().createType(
+                hasQuestionMark = false,
+                arguments = listOf(
+                    makeTypeProjection(
+                        type = returnType,
+                        variance = Variance.INVARIANT
+                    )
                 )
             )
-        )
-        it.valueParameters += JsIrBuilder.buildValueParameter("continuation", valueParameters.size, continuationType).apply { parent = it }
+            it.valueParameters += JsIrBuilder.buildValueParameter(Namer.CONTINUATION, valueParameters.size, continuationType)
+                .apply { parent = it }
+
+            // Fix links to parameters
+            val valueParametersMapping = (valueParameters + dispatchReceiverParameter)
+                .zip(it.valueParameters.dropLast(1) + it.dispatchReceiverParameter).toMap()
+            it.body = body?.deepCopyWithSymbols(this)
+            it.body?.transformChildrenVoid(object : IrElementTransformerVoid() {
+                override fun visitGetValue(expression: IrGetValue) =
+                    valueParametersMapping[expression.symbol.owner]?.let { newParam ->
+                        expression.run { IrGetValueImpl(startOffset, endOffset, type, newParam.symbol, origin) }
+                    } ?: expression
+            })
+        }
+    }
+}
+
+// TODO: Move to the Lowering
+fun IrSimpleFunction.getOriginal(context: JsIrBackendContext): IrSimpleFunction {
+    for ((original, view) in context.transformedSuspendFunctionsCache) {
+        if (view == this) return original
+    }
+    return this
+}
+
+private fun <T: IrDeclarationContainer> T.addContinuationParameterToSuspendFunctions(context: JsIrBackendContext): T {
+    transformDeclarationsFlat {
+        if (it is IrSimpleFunction && it.isSuspend) listOf(it.getOrCreateView(context))
+        else null
+    }
+    return this
+}
+
+class SuspendFunctionBuiltins(symbolTable: SymbolTable, builtIns: KotlinBuiltIns, private val context: JsIrBackendContext) {
+    private val originals = (0..22).map { symbolTable.referenceClass(builtIns.getSuspendFunction(it)) }
+    private val replaced = arrayOfNulls<IrClassSymbol>(23)
+
+    operator fun get(i: Int): IrClassSymbol {
+        if (replaced[i] == null) {
+            replaced[i] = originals[i].owner.addContinuationParameterToSuspendFunctions(context).symbol
+        }
+        return replaced[i]!!
     }
 }

@@ -37,11 +37,15 @@ fun builder(c: suspend () -> String): String {
 }
 
 fun box(): String {
-    if (builder { "OK" } != "OK") return "fail 4"
-    if (builder { suspendHere() } != "OK") return "fail 5"
+    var res = builder { "OK" }
+    if (res != "OK") return res
+    res = builder { suspendHere() }
+    if (res != "OK") return res
 
-    if (builder { throw RuntimeException("OK") } != "Exception: OK") return "fail 6"
-    if (builder { suspendWithException() } != "Exception: OK") return "fail 7"
+    res = builder { throw RuntimeException("OK") }
+    if (res != "Exception: OK") return "fail 6"
+    res = builder { suspendWithException() }
+    if (res != "Exception: OK") return "fail 7"
 
     return "OK"
 }

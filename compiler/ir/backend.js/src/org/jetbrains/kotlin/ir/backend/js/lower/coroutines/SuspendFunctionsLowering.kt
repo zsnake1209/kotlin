@@ -43,6 +43,7 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.DFS
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLoweringPass {
 
@@ -232,10 +233,33 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
     private val returnIfSuspended = context.intrinsics.returnIfSuspended
 
     private fun removeReturnIfSuspendedCallAndSimplifyDelegatingCall(irFunction: IrFunction, delegatingCall: IrCall) {
-        val returnValue =
+        var returnValue =
             if (delegatingCall.descriptor.original == returnIfSuspended.descriptor)
                 delegatingCall.getValueArgument(0)!!
             else delegatingCall
+        if (returnValue is IrCall && returnValue.isSuspend && returnValue.symbol.owner !in suspendLambdas) {
+            // Pass continuation to the call
+            val view = returnValue.symbol.owner.cast<IrSimpleFunction>().getOrCreateView(context)
+            if (view == returnValue.symbol.owner) {
+                returnValue.putValueArgument(
+                    returnValue.valueArgumentsCount - 1,
+                    JsIrBuilder.buildGetValue(irFunction.valueParameters.last().symbol)
+                )
+            } else {
+                val oldReturnValue = returnValue
+                returnValue =
+                    JsIrBuilder.buildCall(view.symbol, returnValue.type, valueParameterCount = returnValue.valueArgumentsCount + 1).apply {
+                        for (i in 0 until oldReturnValue.valueArgumentsCount) {
+                            putValueArgument(i, oldReturnValue.getValueArgument(i))
+                        }
+                        dispatchReceiver = oldReturnValue.dispatchReceiver
+                        putValueArgument(
+                            oldReturnValue.valueArgumentsCount,
+                            JsIrBuilder.buildGetValue(irFunction.valueParameters.last().symbol)
+                        )
+                    }
+            }
+        }
         context.createIrBuilder(irFunction.symbol).run {
             val statements = (irFunction.body as IrBlockBody).statements
             val lastStatement = statements.last()
@@ -245,7 +269,7 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
     }
 
     private fun buildCoroutine(irFunction: IrSimpleFunction, functionReference: IrFunctionReference?): IrClass {
-        val coroutine = CoroutineBuilder(irFunction, functionReference).build()
+        val coroutine = CoroutineBuilder(irFunction.getOriginal(context), functionReference).build()
         builtCoroutines[irFunction] = coroutine
 
         if (functionReference == null) {
@@ -740,7 +764,7 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                 declaration.overriddenSymbols += suspendFunctionInvokeFunctionDeclaration.symbol
                 declaration.overriddenSymbols += functionInvokeFunctionDeclaration.symbol
 
-                createFunction.valueParameters.dropLast(1).mapTo(declaration.valueParameters) { p ->
+                createFunction.valueParameters.mapTo(declaration.valueParameters) { p ->
                     JsIrBuilder.buildValueParameter(p.name, p.index, p.type, p.origin).also { it.parent = declaration }
                 }
 
@@ -755,10 +779,6 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                         declaration.valueParameters.forEachIndexed { index, parameter ->
                             putValueArgument(index, irGet(parameter))
                         }
-                        putValueArgument(
-                            declaration.valueParameters.size,
-                            irCall(getContinuationSymbol, getContinuationSymbol.owner.returnType, listOf(declaration.returnType))
-                        )
                     }
                     val dispatchReceiverVar = JsIrBuilder.buildVar(dispatchReceiverCall.type, irFunction, initializer = dispatchReceiverCall)
                     +dispatchReceiverVar

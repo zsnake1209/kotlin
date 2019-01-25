@@ -29,7 +29,7 @@ public actual inline fun <T> (suspend () -> T).startCoroutineUninterceptedOrRetu
 ): Any? {
     val a = this.asDynamic()
     return if (jsTypeOf(a) == "function") a(completion, false)
-    else a.invoke(completion)
+    else a.invoke_kotlin_coroutines_Continuation___(completion)
 }
 
 /**
@@ -52,7 +52,7 @@ public actual inline fun <R, T> (suspend R.() -> T).startCoroutineUninterceptedO
 ): Any?  {
     val a = this.asDynamic()
     return if(jsTypeOf(a) == "function") a(receiver, completion, false)
-    else a.invoke_P1(receiver, completion)
+    else a.invoke_P1_kotlin_coroutines_Continuation_R_(receiver, completion)
 }
 
 
@@ -86,7 +86,7 @@ public actual fun <T> (suspend () -> T).createCoroutineUnintercepted(
             if (jsTypeOf(a) == "function") {
                 a(completion)
             } else {
-                a.invoke(completion)
+                a.invoke_kotlin_coroutines_Continuation___(completion)
             }
         }
     }
@@ -122,7 +122,7 @@ public actual fun <R, T> (suspend R.() -> T).createCoroutineUnintercepted(
             if (jsTypeOf(a) == "function") {
                 a(receiver, completion)
             } else {
-                a.invoke_P1(receiver, completion)
+                a.invoke_P1_kotlin_coroutines_Continuation_R_(receiver, completion)
             }
         }
     }

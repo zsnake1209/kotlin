@@ -24,12 +24,16 @@ import org.jetbrains.kotlin.ir.SourceRangeInfo
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.lower.CallableReferenceKey
 import org.jetbrains.kotlin.ir.backend.js.lower.ConstructorPair
+import org.jetbrains.kotlin.ir.backend.js.lower.coroutines.SuspendFunctionBuiltins
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ModuleIndex
 import org.jetbrains.kotlin.ir.backend.js.utils.OperatorNames
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
-import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrEnumEntrySymbol
+import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.getPropertyDeclaration
@@ -119,7 +123,7 @@ class JsIrBackendContext(
     val enumEntryExternalToInstanceField = mutableMapOf<IrEnumEntrySymbol, IrField>()
     val callableReferencesCache = mutableMapOf<CallableReferenceKey, IrSimpleFunction>()
     val secondaryConstructorToFactoryCache = mutableMapOf<IrConstructor, ConstructorPair>()
-    val transformedSuspendFunctionsCache = mutableMapOf<IrFunction, IrFunction>()
+    val transformedSuspendFunctionsCache = mutableMapOf<IrSimpleFunction, IrSimpleFunction>()
 
     val coroutineGetContext: IrFunctionSymbol
         get() {
@@ -146,9 +150,6 @@ class JsIrBackendContext(
             return vars.single()
         }
 
-    val coroutineSuspendOrReturn =
-        symbolTable.referenceSimpleFunction(getInternalFunctions(COROUTINE_SUSPEND_OR_RETURN_JS_NAME).single())
-
     val intrinsics = JsIntrinsics(irBuiltIns, this)
 
     private val operatorMap = referenceOperators()
@@ -164,7 +165,11 @@ class JsIrBackendContext(
             )
         }.toMap()
 
-    val suspendFunctions = (0..22).map { symbolTable.referenceClass(builtIns.getSuspendFunction(it)) }
+    private val suspendFunctionsBuiltins = SuspendFunctionBuiltins(symbolTable, builtIns, this)
+
+    val suspendFunctions = suspendFunctionsBuiltins
+
+    val coroutineSuspendOrReturn= symbolTable.referenceSimpleFunction(getInternalFunctions(COROUTINE_SUSPEND_OR_RETURN_JS_NAME).single())
 
     val dynamicType = IrDynamicTypeImpl(createDynamicType(builtIns), emptyList(), Variance.INVARIANT)
 

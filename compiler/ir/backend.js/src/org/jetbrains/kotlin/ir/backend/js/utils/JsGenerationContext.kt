@@ -52,11 +52,7 @@ class JsGenerationContext {
         get() = if (isCoroutineDoResume()) {
             JsThisRef()
         } else {
-            if (currentFunction!!.descriptor.isSuspend) {
-                JsNameRef(currentScope.declareName(Namer.CONTINUATION))
-            } else {
-                getNameForSymbol(currentFunction.valueParameters.last().symbol).makeRef()
-            }
+            getNameForSymbol(currentFunction!!.valueParameters.last().symbol).makeRef()
         }
 
     private fun isCoroutineDoResume(): Boolean {

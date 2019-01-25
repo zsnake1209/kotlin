@@ -300,7 +300,7 @@ class StateMachineBuilder(
             transformLastExpression {
                 JsIrBuilder.buildCall(view.symbol, expression.type, valueParameterCount = expression.valueArgumentsCount + 1).apply {
                     for (i in 0 until expression.valueArgumentsCount) {
-                        putValueArgument(0, expression.getValueArgument(i))
+                        putValueArgument(i, expression.getValueArgument(i))
                     }
                     dispatchReceiver = expression.dispatchReceiver
                     putValueArgument(expression.valueArgumentsCount, thisReceiver)
