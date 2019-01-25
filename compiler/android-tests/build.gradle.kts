@@ -43,5 +43,7 @@ projectTest {
         systemProperty("kotlin.test.android.teamcity", true)
     }
 
+    systemProperty("kotlin.test.android.path.filter", System.getProperty("kotlin.test.android.path.filter"))
+
     workingDir = rootDir
 }
