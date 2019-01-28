@@ -24,8 +24,6 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
     abstract fun intersectTypes(projections: List<KotlinTypeIM>): KotlinTypeIM
 
-    abstract fun nullabilityIsPossibleSupertype(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean
-
     /**
      * Gets called by [AbstractTypeChecker] as entry of isSubTypeOf, it is suggested to call [AbstractTypeChecker.doIsSubTypeOf]
      */
@@ -201,8 +199,7 @@ object AbstractTypeChecker {
 //            "Not singleClassifierType superType: $superType"
 //        }
 
-        // TODO: port NullabilityChecker
-        if (!nullabilityIsPossibleSupertype(subType, superType)) return false
+        if (!AbstractNullabilityChecker.isPossibleSubtype(this, subType, superType)) return false
 
         val superConstructor = superType.typeConstructor()
 
@@ -431,4 +428,67 @@ object AbstractTypeChecker {
 
         return classTypeSupertypes.flatMap { collectAndFilter(it, constructor) }
     }
+}
+
+
+object AbstractNullabilityChecker {
+    // this method checks only nullability
+    fun isPossibleSubtype(context: AbstractTypeCheckerContext, subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean =
+        context.runIsPossibleSubtype(subType, superType)
+
+    private fun AbstractTypeCheckerContext.runIsPossibleSubtype(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean {
+        // it makes for case String? & Any <: String
+        // TODO: Fix diagnostic
+//        kotlin.assert(subType.isIntersectionType || subType.isSingleClassifierType || subType.isAllowedTypeVariable) {
+//            "Not singleClassifierType superType: $superType"
+//        }
+//        kotlin.assert(superType.isSingleClassifierType || superType.isAllowedTypeVariable) {
+//            "Not singleClassifierType superType: $superType"
+//        }
+
+        // superType is actually nullable
+        if (superType.isMarkedNullable()) return true
+
+        // i.e. subType is definitely not null
+        if (subType.isDefinitelyNotNullType()) return true
+
+        // i.e. subType is not-nullable
+        if (hasNotNullSupertype(subType, SupertypesPolicy.LowerIfFlexible)) return true
+
+        // i.e. subType hasn't not-null supertype and isn't definitely not-null, but superType is definitely not-null
+        if (superType.isDefinitelyNotNullType()) return false
+
+        // i.e subType hasn't not-null supertype, but superType has
+        if (hasNotNullSupertype(superType, SupertypesPolicy.UpperIfFlexible)) return false
+
+        // both superType and subType hasn't not-null supertype and are not definitely not null.
+
+        /**
+         * If we still don't know, it means, that superType is not classType, for example -- type parameter.
+         *
+         * For captured types with lower bound this function can give to you false result. Example:
+         *  class A<T>, A<in Number> => \exist Q : Number <: Q. A<Q>
+         *      isPossibleSubtype(Number, Q) = false.
+         *      Such cases should be taken in to account in [NewKotlinTypeChecker.isSubtypeOf] (same for intersection types)
+         */
+
+        // classType cannot has special type in supertype list
+        if (subType.isClassType()) return false
+
+        return hasPathByNotMarkedNullableNodes(subType, superType.typeConstructor())
+    }
+
+    fun AbstractTypeCheckerContext.hasNotNullSupertype(type: SimpleTypeIM, supertypesPolicy: SupertypesPolicy) =
+        anySupertype(type, {
+            (it.isClassType() && !it.isMarkedNullable()) || it.isDefinitelyNotNullType()
+        }) {
+            if (it.isMarkedNullable()) SupertypesPolicy.None else supertypesPolicy
+        }
+
+    fun AbstractTypeCheckerContext.hasPathByNotMarkedNullableNodes(start: SimpleTypeIM, end: TypeConstructorIM) =
+        anySupertype(start, {
+            !it.isMarkedNullable() && isEqualTypeConstructors(it.typeConstructor(), end)
+        }) {
+            if (it.isMarkedNullable()) SupertypesPolicy.None else SupertypesPolicy.LowerIfFlexible
+        }
 }

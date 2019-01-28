@@ -16,20 +16,17 @@
 
 package org.jetbrains.kotlin.types.checker
 
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedTypeConstructorImpl
 import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.AbstractNullabilityChecker.hasNotNullSupertype
+import org.jetbrains.kotlin.types.AbstractNullabilityChecker.hasPathByNotMarkedNullableNodes
 import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
-import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy.*
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SupertypesPolicy
-import org.jetbrains.kotlin.types.model.ArgumentList
 import org.jetbrains.kotlin.types.model.CaptureStatus
-import org.jetbrains.kotlin.types.model.TypeArgumentListIM
-import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
-import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 
 object StrictEqualityTypeChecker {
@@ -165,75 +162,11 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
 
 object NullabilityChecker {
 
-    // this method checks only nullability
-    fun isPossibleSubtype(context: TypeCheckerContext, subType: SimpleType, superType: SimpleType): Boolean =
-        context.runIsPossibleSubtype(subType, superType)
-
     fun isSubtypeOfAny(type: UnwrappedType): Boolean =
         TypeCheckerContext(false).hasNotNullSupertype(type.lowerIfFlexible(), SupertypesPolicy.LowerIfFlexible)
 
     fun hasPathByNotMarkedNullableNodes(start: SimpleType, end: TypeConstructor) =
         TypeCheckerContext(false).hasPathByNotMarkedNullableNodes(start, end)
-
-    private fun TypeCheckerContext.runIsPossibleSubtype(subType: SimpleType, superType: SimpleType): Boolean {
-        // it makes for case String? & Any <: String
-        assert(subType.isIntersectionType || subType.isSingleClassifierType || subType.isAllowedTypeVariable) {
-            "Not singleClassifierType superType: $superType"
-        }
-        assert(superType.isSingleClassifierType || superType.isAllowedTypeVariable) {
-            "Not singleClassifierType superType: $superType"
-        }
-
-        // superType is actually nullable
-        if (superType.isMarkedNullable) return true
-
-        // i.e. subType is definitely not null
-        if (subType.isDefinitelyNotNullType) return true
-
-        // i.e. subType is not-nullable
-        if (hasNotNullSupertype(subType, SupertypesPolicy.LowerIfFlexible)) return true
-
-        // i.e. subType hasn't not-null supertype and isn't definitely not-null, but superType is definitely not-null
-        if (superType.isDefinitelyNotNullType) return false
-
-        // i.e subType hasn't not-null supertype, but superType has
-        if (hasNotNullSupertype(superType, SupertypesPolicy.UpperIfFlexible)) return false
-
-        // both superType and subType hasn't not-null supertype and are not definitely not null.
-
-        /**
-         * If we still don't know, it means, that superType is not classType, for example -- type parameter.
-         *
-         * For captured types with lower bound this function can give to you false result. Example:
-         *  class A<T>, A<in Number> => \exist Q : Number <: Q. A<Q>
-         *      isPossibleSubtype(Number, Q) = false.
-         *      Such cases should be taken in to account in [NewKotlinTypeChecker.isSubtypeOf] (same for intersection types)
-         */
-
-        // classType cannot has special type in supertype list
-        if (subType.isClassType) return false
-
-        return hasPathByNotMarkedNullableNodes(subType, superType.constructor)
-    }
-
-    private fun TypeCheckerContext.hasNotNullSupertype(type: SimpleType, supertypesPolicy: SupertypesPolicy) =
-        anySupertype(type, {
-            require(it is SimpleType)
-            (it.isClassType && !it.isMarkedNullable) || it.isDefinitelyNotNullType
-        }) {
-            require(it is SimpleType)
-            if (it.isMarkedNullable) SupertypesPolicy.None else supertypesPolicy
-        }
-
-    private fun TypeCheckerContext.hasPathByNotMarkedNullableNodes(start: SimpleType, end: TypeConstructor) =
-        anySupertype(start, {
-            require(it is SimpleType)
-            !it.isMarkedNullable && it.constructor == end
-        }) {
-            require(it is SimpleType)
-            if (it.isMarkedNullable) SupertypesPolicy.None else SupertypesPolicy.LowerIfFlexible
-        }
-
 }
 
 fun UnwrappedType.hasSupertypeWithGivenTypeConstructor(typeConstructor: TypeConstructor) =
