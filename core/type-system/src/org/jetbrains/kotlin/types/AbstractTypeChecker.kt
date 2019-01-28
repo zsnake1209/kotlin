@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.types
 
 import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.LowerCapturedTypePolicy.*
+import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SupertypesPolicy
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.SmartList
@@ -21,14 +22,16 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
     abstract fun areEqualTypeConstructors(a: TypeConstructorIM, b: TypeConstructorIM): Boolean
 
+    abstract fun intersectTypes(projections: List<KotlinTypeIM>): KotlinTypeIM
+
+    abstract fun nullabilityIsPossibleSupertype(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean
+
     /**
      * Gets called by [AbstractTypeChecker] as entry of isSubTypeOf, it is suggested to call [AbstractTypeChecker.doIsSubTypeOf]
      */
     open fun enterIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
         return doIsSubTypeOf(subType, superType)
     }
-
-    abstract fun backupIsSubtypeOfForSingleClassifierType(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean
 
     abstract val isErrorTypeEqualsToAnything: Boolean
 
@@ -177,7 +180,71 @@ object AbstractTypeChecker {
         // we should add constraints with flexible types, otherwise we never get flexible type as answer in constraint system
         addSubtypeConstraint(subType, superType)?.let { return it }
 
-        return backupIsSubtypeOfForSingleClassifierType(subType.lowerBoundIfFlexible(), superType.upperBoundIfFlexible())
+        return isSubtypeOfForSingleClassifierType(subType.lowerBoundIfFlexible(), superType.upperBoundIfFlexible())
+    }
+
+    private fun AbstractTypeCheckerContext.hasNothingSupertype(type: SimpleTypeIM) = // todo add tests
+        anySupertype(type, { it.typeConstructor().isNothingConstructor() }) {
+            if (it.isClassType()) {
+                SupertypesPolicy.None
+            } else {
+                SupertypesPolicy.LowerIfFlexible
+            }
+        }
+
+    private fun AbstractTypeCheckerContext.isSubtypeOfForSingleClassifierType(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean {
+        // TODO: fix assertions
+//        assert(subType.isSingleClassifierType || subType.typeConstructor().isIntersection() || subType.isAllowedTypeVariable) {
+//            "Not singleClassifierType and not intersection subType: $subType"
+//        }
+//        assert(superType.isSingleClassifierType || superType.isAllowedTypeVariable) {
+//            "Not singleClassifierType superType: $superType"
+//        }
+
+        // TODO: port NullabilityChecker
+        if (!nullabilityIsPossibleSupertype(subType, superType)) return false
+
+        val superConstructor = superType.typeConstructor()
+
+        if (isEqualTypeConstructors(subType.typeConstructor(), superConstructor) && superConstructor.parametersCount() == 0) return true
+        if (superType.typeConstructor().isAnyConstructor()) return true
+
+        val supertypesWithSameConstructor = findCorrespondingSupertypes(subType, superConstructor)
+        when (supertypesWithSameConstructor.size) {
+            0 -> return hasNothingSupertype(subType) // todo Nothing & Array<Number> <: Array<String>
+            1 -> return isSubtypeForSameConstructor(supertypesWithSameConstructor.first().asArgumentList(), superType)
+
+            else -> { // at least 2 supertypes with same constructors. Such case is rare
+                when (sameConstructorPolicy) {
+                    SeveralSupertypesWithSameConstructorPolicy.FORCE_NOT_SUBTYPE -> return false
+                    SeveralSupertypesWithSameConstructorPolicy.TAKE_FIRST_FOR_SUBTYPING -> return isSubtypeForSameConstructor(
+                        supertypesWithSameConstructor.first().asArgumentList(),
+                        superType
+                    )
+
+                    SeveralSupertypesWithSameConstructorPolicy.CHECK_ANY_OF_THEM,
+                    SeveralSupertypesWithSameConstructorPolicy.INTERSECT_ARGUMENTS_AND_CHECK_AGAIN ->
+                        if (supertypesWithSameConstructor.any { isSubtypeForSameConstructor(it.asArgumentList(), superType) }) return true
+                }
+
+                if (sameConstructorPolicy != SeveralSupertypesWithSameConstructorPolicy.INTERSECT_ARGUMENTS_AND_CHECK_AGAIN) return false
+
+
+                val newArguments = ArgumentList()
+                for (index in 0 until superConstructor.parametersCount()) {
+                    val allProjections = supertypesWithSameConstructor.map {
+                        it.getArgumentOrNull(index)?.takeIf { it.getVariance() == TypeVariance.INV }?.getType()
+                            ?: error("Incorrect type: $it, subType: $subType, superType: $superType")
+                    }
+
+                    // todo discuss
+                    val intersection = intersectTypes(allProjections).asTypeArgument()
+                    newArguments.add(intersection)
+                }
+
+                return isSubtypeForSameConstructor(newArguments, superType)
+            }
+        }
     }
 
     fun AbstractTypeCheckerContext.isSubtypeForSameConstructor(

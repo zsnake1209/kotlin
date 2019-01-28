@@ -17,17 +17,20 @@
 package org.jetbrains.kotlin.types.checker
 
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker.isSubtypeOfForSingleClassifierType
 import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker.transformAndIsSubTypeOf
 import org.jetbrains.kotlin.types.model.KotlinTypeIM
 import org.jetbrains.kotlin.types.model.SimpleTypeIM
 import org.jetbrains.kotlin.types.model.TypeConstructorIM
-import org.jetbrains.kotlin.utils.SmartSet
-import java.util.*
 
 open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) : ClassicTypeSystemContext, AbstractTypeCheckerContext() {
-    override fun backupIsSubtypeOfForSingleClassifierType(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean {
-        return this.isSubtypeOfForSingleClassifierType(subType as SimpleType, superType as SimpleType)
+    override fun intersectTypes(projections: List<KotlinTypeIM>): KotlinTypeIM {
+        return org.jetbrains.kotlin.types.checker.intersectTypes(projections as List<UnwrappedType>)
+    }
+
+    override fun nullabilityIsPossibleSupertype(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean {
+        require(subType is SimpleType)
+        require(superType is SimpleType)
+        return NullabilityChecker.isPossibleSubtype(this, subType, superType)
     }
 
     override fun enterIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {

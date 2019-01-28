@@ -61,7 +61,14 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun SimpleTypeIM.argumentsCount(): Int
     fun SimpleTypeIM.getArgument(index: Int): TypeArgumentIM
 
+    fun SimpleTypeIM.getArgumentOrNull(index: Int): TypeArgumentIM? {
+        if (index in 0 until argumentsCount()) return getArgument(index)
+        return null
+    }
+
     fun SimpleTypeIM.isStubType(): Boolean = false
+
+    fun KotlinTypeIM.asTypeArgument(): TypeArgumentIM
 
     fun CapturedTypeIM.lowerType(): KotlinTypeIM?
 
@@ -110,6 +117,9 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
 
     fun TypeArgumentListIM.size(): Int
     operator fun TypeArgumentListIM.get(index: Int): TypeArgumentIM
+
+    fun TypeConstructorIM.isAnyConstructor(): Boolean
+    fun TypeConstructorIM.isNothingConstructor(): Boolean
 }
 
 enum class CaptureStatus {

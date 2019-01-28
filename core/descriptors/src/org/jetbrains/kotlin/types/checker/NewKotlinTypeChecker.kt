@@ -140,65 +140,6 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
             }
         }.inheritEnhancement(type)
 
-    private fun TypeCheckerContext.hasNothingSupertype(type: SimpleType) = // todo add tests
-        anySupertype(type, { KotlinBuiltIns.isNothingOrNullableNothing(it as SimpleType) }) {
-            require(it is SimpleType)
-            if (it.isClassType) {
-                SupertypesPolicy.None
-            } else {
-                SupertypesPolicy.LowerIfFlexible
-            }
-        }
-
-    fun TypeCheckerContext.isSubtypeOfForSingleClassifierType(subType: SimpleType, superType: SimpleType): Boolean {
-        assert(subType.isSingleClassifierType || subType.isIntersectionType || subType.isAllowedTypeVariable) {
-            "Not singleClassifierType and not intersection subType: $subType"
-        }
-        assert(superType.isSingleClassifierType || superType.isAllowedTypeVariable) {
-            "Not singleClassifierType superType: $superType"
-        }
-
-        if (!NullabilityChecker.isPossibleSubtype(this, subType, superType)) return false
-
-        val superConstructor = superType.constructor
-
-        if (subType.constructor == superConstructor && superConstructor.parameters.isEmpty()) return true
-        if (superType.isAnyOrNullableAny()) return true
-
-        val supertypesWithSameConstructor = findCorrespondingSupertypes(subType, superConstructor)
-        when (supertypesWithSameConstructor.size) {
-            0 -> return hasNothingSupertype(subType) // todo Nothing & Array<Number> <: Array<String>
-            1 -> return isSubtypeForSameConstructor(supertypesWithSameConstructor.first().asArgumentList(), superType)
-
-            else -> { // at least 2 supertypes with same constructors. Such case is rare
-                when (sameConstructorPolicy) {
-                    FORCE_NOT_SUBTYPE -> return false
-                    TAKE_FIRST_FOR_SUBTYPING -> return isSubtypeForSameConstructor(
-                        supertypesWithSameConstructor.first().asArgumentList(),
-                        superType
-                    )
-
-                    CHECK_ANY_OF_THEM,
-                    INTERSECT_ARGUMENTS_AND_CHECK_AGAIN ->
-                        if (supertypesWithSameConstructor.any { isSubtypeForSameConstructor(it.asArgumentList(), superType) }) return true
-                }
-
-                if (sameConstructorPolicy != INTERSECT_ARGUMENTS_AND_CHECK_AGAIN) return false
-
-                val newArguments = superConstructor.parameters.mapIndexedTo(ArgumentList()) { index, _ ->
-                    val allProjections = supertypesWithSameConstructor.map {
-                        it.arguments.getOrNull(index)?.takeIf { it.projectionKind == Variance.INVARIANT }?.type?.unwrap()
-                            ?: error("Incorrect type: $it, subType: $subType, superType: $superType")
-                    }
-
-                    // todo discuss
-                    intersectTypes(allProjections).asTypeProjection()
-                }
-
-                return isSubtypeForSameConstructor(newArguments, superType)
-            }
-        }
-    }
 
     fun TypeCheckerContext.findCorrespondingSupertypes(
         baseType: SimpleType,
@@ -218,15 +159,6 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
 
         // composite In with Out
         return null
-    }
-
-    private fun TypeCheckerContext.isSubtypeForSameConstructor(
-        capturedSubArguments: TypeArgumentListIM,
-        superType: SimpleType
-    ): Boolean {
-        return AbstractTypeChecker.run {
-            isSubtypeForSameConstructor(capturedSubArguments, superType)
-        }
     }
 
 }

@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.types.checker
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -12,6 +14,7 @@ import org.jetbrains.kotlin.descriptors.isFinalClass
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.types.model.CaptureStatus
+import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 interface ClassicTypeSystemContext : TypeSystemContext {
@@ -218,5 +221,20 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     override fun captureFromArguments(type: SimpleTypeIM, status: CaptureStatus): SimpleTypeIM? {
         require(type is SimpleType)
         return org.jetbrains.kotlin.types.checker.captureFromArguments(type, status)
+    }
+
+    override fun TypeConstructorIM.isAnyConstructor(): Boolean {
+        require(this is TypeConstructor)
+        return KotlinBuiltIns.isTypeConstructorForGivenClass(this, FQ_NAMES.any)
+    }
+
+    override fun TypeConstructorIM.isNothingConstructor(): Boolean {
+        require(this is TypeConstructor)
+        return KotlinBuiltIns.isTypeConstructorForGivenClass(this, FQ_NAMES.nothing)
+    }
+
+    override fun KotlinTypeIM.asTypeArgument(): TypeArgumentIM {
+        require(this is KotlinType)
+        return this.asTypeProjection()
     }
 }

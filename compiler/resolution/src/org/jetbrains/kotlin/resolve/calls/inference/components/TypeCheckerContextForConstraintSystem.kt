@@ -210,7 +210,7 @@ abstract class TypeCheckerContextForConstraintSystem : TypeCheckerContext(errorT
         val notTypeVariables = subIntersectionTypes.filterNot(this::isMyTypeVariable)
 
         // todo: may be we can do better then that.
-        if (notTypeVariables.isNotEmpty() && NewKotlinTypeChecker.isSubtypeOf(intersectTypes(notTypeVariables), superType)) {
+        if (notTypeVariables.isNotEmpty() && NewKotlinTypeChecker.isSubtypeOf(intersectTypes(notTypeVariables) as KotlinType, superType)) {
             return true
         }
 
