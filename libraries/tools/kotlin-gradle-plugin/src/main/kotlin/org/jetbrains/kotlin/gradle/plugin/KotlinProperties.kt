@@ -37,6 +37,10 @@ internal fun PropertiesProvider.mapKotlinTaskProperties(task: AbstractKotlinComp
     if (task is Kotlin2JsCompile) {
         incrementalJs?.let { task.incremental = it }
     }
+
+    if (task is org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>) {
+        verbose?.let { task.kotlinOptions.verbose = it }
+    }
 }
 
 internal class PropertiesProvider(private val project: Project) {
@@ -68,6 +72,9 @@ internal class PropertiesProvider(private val project: Project) {
 
     val useFallbackCompilerSearch: Boolean?
         get() = booleanProperty("kotlin.useFallbackCompilerSearch")
+
+    val verbose: Boolean?
+        get() = booleanProperty("kotlin.verbose")
 
     /**
      * Enables parallel tasks execution within a project with Workers API.

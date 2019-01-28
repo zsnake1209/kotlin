@@ -20,12 +20,14 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.CacheableTask
 import org.jetbrains.kotlin.cli.common.arguments.K2MetadataCompilerArguments
 import org.jetbrains.kotlin.compilerRunner.GradleCompilerEnvironment
+import org.jetbrains.kotlin.compilerRunner.KotlinLogger
 import org.jetbrains.kotlin.compilerRunner.OutputItemsCollectorImpl
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformCommonOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformCommonOptionsImpl
 import org.jetbrains.kotlin.gradle.dsl.fillDefaultValues
 import org.jetbrains.kotlin.gradle.internal.tasks.allOutputFiles
+import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
 import org.jetbrains.kotlin.gradle.logging.GradlePrintingMessageCollector
 import org.jetbrains.kotlin.incremental.ChangedFiles
 import java.io.File
@@ -65,10 +67,15 @@ open class KotlinCompileCommon : AbstractKotlinCompile<K2MetadataCompilerArgumen
         kotlinOptionsImpl.updateArguments(args)
     }
 
-    override fun callCompilerAsync(args: K2MetadataCompilerArguments, sourceRoots: SourceRoots, changedFiles: ChangedFiles) {
-        val messageCollector = GradlePrintingMessageCollector(logger)
+    override fun callCompilerAsync(
+        args: K2MetadataCompilerArguments,
+        sourceRoots: SourceRoots,
+        changedFiles: ChangedFiles,
+        log: KotlinLogger
+    ) {
+        val messageCollector = GradlePrintingMessageCollector(log)
         val outputItemCollector = OutputItemsCollectorImpl()
-        val compilerRunner = compilerRunner()
+        val compilerRunner = compilerRunner(log)
         val environment = GradleCompilerEnvironment(
             computedCompilerClasspath, messageCollector, outputItemCollector,
             outputFiles = allOutputFiles()

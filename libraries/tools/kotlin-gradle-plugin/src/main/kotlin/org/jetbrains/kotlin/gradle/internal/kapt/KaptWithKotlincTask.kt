@@ -54,13 +54,13 @@ open class KaptWithKotlincTask : KaptTask(), CompilerArgumentAwareWithInput<K2JV
 
     @TaskAction
     fun compile() {
-        logger.debug("Running kapt annotation processing using the Kotlin compiler")
-        checkAnnotationProcessorClasspath()
-        clearLocalState()
-
         val args = prepareCompilerArguments()
+        val log = GradleKotlinLogger(logger, args.verbose)
+        log.debug("Running kapt annotation processing using the Kotlin compiler")
+        checkAnnotationProcessorClasspath()
+        clearLocalState(log)
 
-        val messageCollector = GradlePrintingMessageCollector(GradleKotlinLogger(logger))
+        val messageCollector = GradlePrintingMessageCollector(log)
         val outputItemCollector = OutputItemsCollectorImpl()
         val environment = GradleCompilerEnvironment(
             compilerClasspath, messageCollector, outputItemCollector,
@@ -70,7 +70,7 @@ open class KaptWithKotlincTask : KaptTask(), CompilerArgumentAwareWithInput<K2JV
             throw GradleException("Could not find tools.jar in system classpath, which is required for kapt to work")
         }
 
-        val compilerRunner = GradleCompilerRunner(this)
+        val compilerRunner = GradleCompilerRunner(this, log)
         compilerRunner.runJvmCompilerAsync(
             sourcesToCompile = emptyList(),
             commonSources = emptyList(),

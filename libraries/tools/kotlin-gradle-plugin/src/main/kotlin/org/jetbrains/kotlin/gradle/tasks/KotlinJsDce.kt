@@ -25,11 +25,13 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.cli.common.arguments.K2JSDceArguments
 import org.jetbrains.kotlin.cli.js.dce.K2JSDce
+import org.jetbrains.kotlin.compilerRunner.ArgumentUtils
 import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
 import org.jetbrains.kotlin.compilerRunner.runToolInSeparateProcess
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDce
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDceOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDceOptionsImpl
+import org.jetbrains.kotlin.gradle.internal.prepareCompilerArguments
 import java.io.File
 
 @CacheableTask
@@ -73,9 +75,10 @@ import java.io.File
 
         val outputDirArgs = arrayOf("-output-dir", destinationDir.path)
 
-        val argsArray = serializedCompilerArguments.toTypedArray()
+        val args = prepareCompilerArguments()
+        val argsArray = ArgumentUtils.convertArgumentsToStringList(args).toTypedArray()
 
-        val log = GradleKotlinLogger(logger)
+        val log = GradleKotlinLogger(logger, args.verbose)
         val allArgs = argsArray + outputDirArgs + inputFiles
         val exitCode = runToolInSeparateProcess(
             allArgs, K2JSDce::class.java.name, computedCompilerClasspath,

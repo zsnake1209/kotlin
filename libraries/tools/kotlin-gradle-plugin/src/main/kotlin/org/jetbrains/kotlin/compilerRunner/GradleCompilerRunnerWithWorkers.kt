@@ -13,10 +13,11 @@ import org.jetbrains.kotlin.gradle.logging.kotlinDebug
 
 internal class GradleCompilerRunnerWithWorkers(
     task: Task,
+    log: KotlinLogger,
     private val workersExecutor: WorkerExecutor
-) : GradleCompilerRunner(task) {
+) : GradleCompilerRunner(task, log) {
     override fun runCompilerAsync(workArgs: GradleKotlinCompilerWorkArguments) {
-        task.logger.kotlinDebug { "Starting Kotlin compiler work from task '${task.path}'" }
+        log.kotlinDebug { "Starting Kotlin compiler work from task '${task.path}'" }
         // todo: write tests with Workers enabled;
         workersExecutor.submit(GradleKotlinCompilerWork::class.java) { config ->
             config.isolationMode = IsolationMode.NONE

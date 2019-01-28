@@ -12,6 +12,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.IsolationMode
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.kotlin.gradle.internal.Kapt3KotlinGradleSubplugin.Companion.KAPT_WORKER_DEPENDENCIES_CONFIGURATION_NAME
+import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
 import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.clearLocalState
 import org.jetbrains.kotlin.gradle.tasks.findKotlinStdlibClasspath
@@ -46,9 +47,10 @@ open class KaptWithoutKotlincTask @Inject constructor(private val workerExecutor
 
     @TaskAction
     fun compile() {
-        logger.info("Running kapt annotation processing using the Gradle Worker API")
+        val log = GradleKotlinLogger(logger, isVerbose)
+        log.info("Running kapt annotation processing using the Gradle Worker API")
         checkAnnotationProcessorClasspath()
-        clearLocalState()
+        clearLocalState(log)
 
         val compileClasspath = classpath.files.toMutableList()
         if (project.plugins.none { it is KotlinAndroidPluginWrapper }) {
@@ -93,7 +95,7 @@ open class KaptWithoutKotlincTask @Inject constructor(private val workerExecutor
                 // for tests
                 config.forkOptions.jvmArgs("-verbose:class")
             }
-            logger.info("Kapt worker classpath: ${config.classpath}")
+            log.info("Kapt worker classpath: ${config.classpath}")
         }
     }
 }

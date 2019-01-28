@@ -5,16 +5,13 @@
 
 package org.jetbrains.kotlin.gradle.logging
 
-import org.gradle.api.logging.Logger
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.compilerRunner.KotlinLogger
 
-internal class GradlePrintingMessageCollector(val logger: KotlinLogger) :
-    MessageCollector {
-    constructor(logger: Logger) : this(GradleKotlinLogger(logger))
 
+internal class GradlePrintingMessageCollector(val logger: KotlinLogger) : MessageCollector {
     private var hasErrors = false
 
     override fun hasErrors() = hasErrors

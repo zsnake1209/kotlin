@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.gradle.utils.stackTraceAsString
 import org.jetbrains.kotlin.incremental.ChangedFiles
 import org.jetbrains.kotlin.incremental.DELETE_MODULE_FILE_PROPERTY
 import org.slf4j.LoggerFactory
+import org.gradle.api.logging.Logger as GradleLogger
 import java.io.*
 import java.net.URLClassLoader
 import java.rmi.RemoteException
@@ -89,11 +90,11 @@ internal class GradleKotlinCompilerWork @Inject constructor(
     private val taskPath = config.taskPath
 
     private val log: KotlinLogger =
-        TaskLoggers.get(taskPath)?.let { GradleKotlinLogger(it).apply { debug("Using '$taskPath' logger") } }
+        TaskLoggers.get(taskPath)?.let { GradleKotlinLogger(it, isVerbose).apply { debug("Using '$taskPath' logger") } }
             ?: run {
                 val logger = LoggerFactory.getLogger("GradleKotlinCompilerWork")
-                val kotlinLogger = if (logger is org.gradle.api.logging.Logger) {
-                    GradleKotlinLogger(logger)
+                val kotlinLogger = if (logger is GradleLogger) {
+                    GradleKotlinLogger(logger, isVerbose)
                 } else SL4JKotlinLogger(logger)
 
                 kotlinLogger.apply {

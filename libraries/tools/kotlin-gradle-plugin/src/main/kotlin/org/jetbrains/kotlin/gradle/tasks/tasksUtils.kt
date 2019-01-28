@@ -2,6 +2,7 @@ package org.jetbrains.kotlin.gradle.tasks
 
 import org.gradle.api.GradleException
 import org.jetbrains.kotlin.cli.common.ExitCode
+import org.jetbrains.kotlin.compilerRunner.KotlinLogger
 import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
 import org.jetbrains.kotlin.gradle.internal.tasks.TaskWithLocalState
 import org.jetbrains.kotlin.gradle.internal.tasks.allOutputFiles
@@ -18,9 +19,7 @@ fun throwGradleExceptionIfError(exitCode: ExitCode) {
     }
 }
 
-internal fun TaskWithLocalState.clearLocalState(reason: String? = null) {
-    val log = GradleKotlinLogger(logger)
-
+internal fun TaskWithLocalState.clearLocalState(log: KotlinLogger, reason: String? = null) {
     log.kotlinDebug {
         val suffix = reason?.let { " ($it)" }.orEmpty()
         "Clearing output$suffix:"

@@ -8,9 +8,13 @@ package org.jetbrains.kotlin.gradle.logging
 import org.gradle.api.logging.Logger
 import org.jetbrains.kotlin.compilerRunner.KotlinLogger
 
-internal class GradleKotlinLogger(private val log: Logger) : KotlinLogger {
+internal class GradleKotlinLogger constructor(private val log: Logger, private val isVerbose: Boolean) : KotlinLogger {
     override fun debug(msg: String) {
-        log.debug(msg)
+        if (isVerbose) {
+            log.lifecycle(msg)
+        } else {
+            log.debug(msg)
+        }
     }
 
     override fun error(msg: String) {
@@ -18,7 +22,11 @@ internal class GradleKotlinLogger(private val log: Logger) : KotlinLogger {
     }
 
     override fun info(msg: String) {
-        log.info(msg)
+        if (isVerbose) {
+            log.lifecycle(msg)
+        } else {
+            log.info(msg)
+        }
     }
 
     override fun warn(msg: String) {
@@ -26,5 +34,5 @@ internal class GradleKotlinLogger(private val log: Logger) : KotlinLogger {
     }
 
     override val isDebugEnabled: Boolean
-        get() = log.isDebugEnabled
+        get() = log.isDebugEnabled || isVerbose
 }

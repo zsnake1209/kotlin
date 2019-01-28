@@ -196,7 +196,7 @@ abstract class BaseGradleIT {
         val projectName: String,
         val gradleVersionRequirement: GradleVersionRequired = defaultGradleVersion,
         directoryPrefix: String? = null,
-        val minLogLevel: LogLevel = LogLevel.DEBUG
+        val minLogLevel: LogLevel = LogLevel.INFO
     ) {
         internal val testCase = this@BaseGradleIT
 
@@ -607,6 +607,7 @@ abstract class BaseGradleIT {
                 add("-Pkotlin.parallel.tasks.in.project=$it")
             }
 
+            add("-Pkotlin.verbose=true")
             // Workaround: override a console type set in the user machine gradle.properties (since Gradle 4.3):
             add("--console=plain")
             add("-Dkotlin.daemon.ea=true")

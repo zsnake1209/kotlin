@@ -52,7 +52,7 @@ const val COULD_NOT_CONNECT_TO_DAEMON_MESSAGE = "Could not connect to Kotlin com
 internal fun kotlinCompilerExecutionStrategy(): String =
     System.getProperty(KOTLIN_COMPILER_EXECUTION_STRATEGY_PROPERTY) ?: DAEMON_EXECUTION_STRATEGY
 
-internal open class GradleCompilerRunner(protected val task: Task) {
+internal open class GradleCompilerRunner(protected val task: Task, protected val log: KotlinLogger) {
     protected val project: Project
         get() = task.project
 

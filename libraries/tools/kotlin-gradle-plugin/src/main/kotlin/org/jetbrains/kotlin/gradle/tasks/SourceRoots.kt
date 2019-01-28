@@ -3,6 +3,7 @@ package org.jetbrains.kotlin.gradle.tasks
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.logging.Logger
+import org.jetbrains.kotlin.compilerRunner.KotlinLogger
 import org.jetbrains.kotlin.gradle.logging.kotlinDebug
 import org.jetbrains.kotlin.gradle.utils.isJavaFile
 import org.jetbrains.kotlin.gradle.utils.isKotlinFile
@@ -16,8 +17,8 @@ internal sealed class SourceRoots(val kotlinSourceFiles: List<File>) {
             "[${files.map { it.canonicalPath }.sorted().joinToString(prefix = "\n\t", separator = ",\n\t")}]"
     }
 
-    open fun log(taskName: String, logger: Logger) {
-        logger.kotlinDebug { "$taskName source roots: ${dumpPaths(kotlinSourceFiles)}" }
+    open fun log(taskName: String, log: KotlinLogger) {
+        log.kotlinDebug { "$taskName source roots: ${dumpPaths(kotlinSourceFiles)}" }
     }
 
     class ForJvm(kotlinSourceFiles: List<File>, val javaSourceRoots: Set<File>) : SourceRoots(kotlinSourceFiles) {
@@ -46,9 +47,9 @@ internal sealed class SourceRoots(val kotlinSourceFiles: List<File>) {
             }
         }
 
-        override fun log(taskName: String, logger: Logger) {
-            super.log(taskName, logger)
-            logger.kotlinDebug { "$taskName java source roots: ${dumpPaths(javaSourceRoots)}" }
+        override fun log(taskName: String, log: KotlinLogger) {
+            super.log(taskName, log)
+            log.kotlinDebug { "$taskName java source roots: ${dumpPaths(javaSourceRoots)}" }
         }
     }
 
