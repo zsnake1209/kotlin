@@ -27,12 +27,6 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
         return org.jetbrains.kotlin.types.checker.intersectTypes(projections as List<UnwrappedType>)
     }
 
-    override fun nullabilityIsPossibleSupertype(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean {
-        require(subType is SimpleType)
-        require(superType is SimpleType)
-        return NullabilityChecker.isPossibleSubtype(this, subType, superType)
-    }
-
     override fun enterIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
         return transformAndIsSubTypeOf((subType as KotlinType).unwrap(), (superType as KotlinType).unwrap())
     }
