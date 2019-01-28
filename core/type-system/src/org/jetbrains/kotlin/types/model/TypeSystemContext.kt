@@ -18,6 +18,8 @@ interface FlexibleTypeIM : KotlinTypeIM
 interface DynamicTypeIM : FlexibleTypeIM
 interface RawTypeIM : FlexibleTypeIM
 
+interface TypeArgumentListIM
+
 
 enum class TypeVariance {
     IN,
@@ -32,6 +34,10 @@ interface TypeSystemOptimizationContext {
      */
     fun identicalArguments(a: SimpleTypeIM, b: SimpleTypeIM) = false
 }
+
+
+class ArgumentList : ArrayList<TypeArgumentIM>(), TypeArgumentListIM
+
 
 interface TypeSystemContext : TypeSystemOptimizationContext {
     fun KotlinTypeIM.asSimpleType(): SimpleTypeIM?
@@ -68,6 +74,7 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun TypeConstructorIM.getParameter(index: Int): TypeParameterIM
     fun TypeConstructorIM.supertypes(): Collection<KotlinTypeIM>
     fun TypeConstructorIM.isIntersection(): Boolean
+    fun TypeConstructorIM.isClassTypeConstructor(): Boolean
 
     fun TypeParameterIM.getVariance(): TypeVariance
     fun TypeParameterIM.upperBoundCount(): Int
@@ -89,4 +96,24 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
 
     fun KotlinTypeIM.typeConstructor(): TypeConstructorIM =
         (asSimpleType() ?: lowerBoundIfFlexible()).typeConstructor()
+
+    fun SimpleTypeIM.isClassType(): Boolean = typeConstructor().isClassTypeConstructor()
+
+    fun TypeConstructorIM.isCommonFinalClassConstructor(): Boolean
+
+    fun captureFromArguments(
+        type: SimpleTypeIM,
+        status: CaptureStatus
+    ): SimpleTypeIM?
+
+    fun SimpleTypeIM.asArgumentList(): TypeArgumentListIM
+
+    fun TypeArgumentListIM.size(): Int
+    operator fun TypeArgumentListIM.get(index: Int): TypeArgumentIM
+}
+
+enum class CaptureStatus {
+    FOR_SUBTYPING,
+    FOR_INCORPORATION,
+    FROM_EXPRESSION
 }

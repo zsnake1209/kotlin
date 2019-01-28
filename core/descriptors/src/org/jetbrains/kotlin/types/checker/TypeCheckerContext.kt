@@ -47,27 +47,18 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
         return a == b
     }
 
+    override fun substitutionSupertypePolicy(type: SimpleTypeIM): SupertypesPolicy.DoCustomTransform {
+        val substitutor = TypeConstructorSubstitution.create(type as SimpleType).buildSubstitutor()
 
-//    internal sealed class SupertypesPolicy {
-//        abstract fun transformType(type: KotlinType): SimpleType
-//
-//        object None : SupertypesPolicy() {
-//            override fun transformType(type: KotlinType) = throw UnsupportedOperationException("Should not be called")
-//        }
-//
-//        object UpperIfFlexible : SupertypesPolicy() {
-//            override fun transformType(type: KotlinType) = type.upperIfFlexible()
-//        }
-//
-//        object LowerIfFlexible : SupertypesPolicy() {
-//            override fun transformType(type: KotlinType) = type.lowerIfFlexible()
-//        }
-//
-//        class LowerIfFlexibleWithCustomSubstitutor(val substitutor: TypeSubstitutor): SupertypesPolicy() {
-//            override fun transformType(type: KotlinType) =
-//                    substitutor.safeSubstitute(type.lowerIfFlexible(), Variance.INVARIANT).asSimpleType()
-//        }
-//    }
+        return object : SupertypesPolicy.DoCustomTransform() {
+            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM): SimpleTypeIM {
+                return substitutor.safeSubstitute(
+                    type.lowerBoundIfFlexible() as KotlinType,
+                    Variance.INVARIANT
+                ).asSimpleType()!!
+            }
+        }
+    }
 
 
     val UnwrappedType.isAllowedTypeVariable: Boolean get() = allowedTypeVariable && constructor is NewTypeVariableConstructor

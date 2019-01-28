@@ -25,13 +25,12 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy.*
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SupertypesPolicy
-import org.jetbrains.kotlin.types.model.KotlinTypeIM
-import org.jetbrains.kotlin.types.model.SimpleTypeIM
+import org.jetbrains.kotlin.types.model.ArgumentList
+import org.jetbrains.kotlin.types.model.CaptureStatus
+import org.jetbrains.kotlin.types.model.TypeArgumentListIM
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
-import org.jetbrains.kotlin.utils.SmartList
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 object StrictEqualityTypeChecker {
 
@@ -169,24 +168,24 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
         val supertypesWithSameConstructor = findCorrespondingSupertypes(subType, superConstructor)
         when (supertypesWithSameConstructor.size) {
             0 -> return hasNothingSupertype(subType) // todo Nothing & Array<Number> <: Array<String>
-            1 -> return isSubtypeForSameConstructor(supertypesWithSameConstructor.first().arguments, superType)
+            1 -> return isSubtypeForSameConstructor(supertypesWithSameConstructor.first().asArgumentList(), superType)
 
             else -> { // at least 2 supertypes with same constructors. Such case is rare
                 when (sameConstructorPolicy) {
                     FORCE_NOT_SUBTYPE -> return false
                     TAKE_FIRST_FOR_SUBTYPING -> return isSubtypeForSameConstructor(
-                        supertypesWithSameConstructor.first().arguments,
+                        supertypesWithSameConstructor.first().asArgumentList(),
                         superType
                     )
 
                     CHECK_ANY_OF_THEM,
                     INTERSECT_ARGUMENTS_AND_CHECK_AGAIN ->
-                        if (supertypesWithSameConstructor.any { isSubtypeForSameConstructor(it.arguments, superType) }) return true
+                        if (supertypesWithSameConstructor.any { isSubtypeForSameConstructor(it.asArgumentList(), superType) }) return true
                 }
 
                 if (sameConstructorPolicy != INTERSECT_ARGUMENTS_AND_CHECK_AGAIN) return false
 
-                val newArguments = superConstructor.parameters.mapIndexed { index, _ ->
+                val newArguments = superConstructor.parameters.mapIndexedTo(ArgumentList()) { index, _ ->
                     val allProjections = supertypesWithSameConstructor.map {
                         it.arguments.getOrNull(index)?.takeIf { it.projectionKind == Variance.INVARIANT }?.type?.unwrap()
                             ?: error("Incorrect type: $it, subType: $subType, superType: $superType")
@@ -201,100 +200,13 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
         }
     }
 
-    private fun TypeCheckerContext.collectAndFilter(classType: SimpleType, constructor: TypeConstructor) =
-        selectOnlyPureKotlinSupertypes(collectAllSupertypesWithGivenTypeConstructor(classType, constructor))
-
-    // nullability was checked earlier via nullabilityChecker
-    // should be used only if you really sure that it is correct
     fun TypeCheckerContext.findCorrespondingSupertypes(
         baseType: SimpleType,
         constructor: TypeConstructor
     ): List<SimpleType> {
-        if (baseType.isClassType) {
-            return collectAndFilter(baseType, constructor)
+        return AbstractTypeChecker.run {
+            findCorrespondingSupertypes(baseType, constructor) as List<SimpleType>
         }
-
-        // i.e. superType is not a classType
-        if (constructor.declarationDescriptor !is ClassDescriptor) {
-            return collectAllSupertypesWithGivenTypeConstructor(baseType, constructor)
-        }
-
-        // todo add tests
-        val classTypeSupertypes = SmartList<SimpleType>()
-        anySupertype(baseType, { false }) {
-            require(it is SimpleType)
-            if (it.isClassType) {
-                classTypeSupertypes.add(it)
-                SupertypesPolicy.None
-            } else {
-                SupertypesPolicy.LowerIfFlexible
-            }
-        }
-
-        return classTypeSupertypes.flatMap { collectAndFilter(it, constructor) }
-    }
-
-    private fun TypeCheckerContext.collectAllSupertypesWithGivenTypeConstructor(
-        baseType: SimpleType,
-        constructor: TypeConstructor
-    ): List<SimpleType> {
-        if (constructor.declarationDescriptor.safeAs<ClassDescriptor>()?.isCommonFinalClass == true) {
-            return if (areEqualTypeConstructors(baseType.constructor, constructor))
-                listOf(captureFromArguments(baseType, CaptureStatus.FOR_SUBTYPING) ?: baseType)
-            else
-                emptyList()
-        }
-
-        val result: MutableList<SimpleType> = SmartList()
-
-        anySupertype(baseType, { false }) {
-            require(it is SimpleType)
-            val current = captureFromArguments(it, CaptureStatus.FOR_SUBTYPING) ?: it
-
-            when {
-                areEqualTypeConstructors(current.constructor, constructor) -> {
-                    result.add(current)
-                    SupertypesPolicy.None
-                }
-                current.arguments.isEmpty() -> {
-                    SupertypesPolicy.LowerIfFlexible
-                }
-                else -> {
-                    val substitutor = TypeConstructorSubstitution.create(current).buildSubstitutor()
-
-                    object : SupertypesPolicy.DoCustomTransform() {
-                        override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM): SimpleTypeIM {
-                            return substitutor.safeSubstitute(
-                                type.lowerBoundIfFlexible() as KotlinType,
-                                Variance.INVARIANT
-                            ).asSimpleType()!!
-                        }
-                    }
-                }
-            }
-        }
-
-        return result
-    }
-
-    private val ClassDescriptor.isCommonFinalClass: Boolean
-        get() = isFinalClass && kind != ClassKind.ENUM_ENTRY && kind != ClassKind.ANNOTATION_CLASS
-
-    /**
-     * If we have several paths to some interface, we should prefer pure kotlin path.
-     * Example:
-     *
-     * class MyList : AbstractList<String>(), MutableList<String>
-     *
-     * We should see `String` in `get` function and others, also MyList is not subtype of MutableList<String?>
-     *
-     * More tests: javaAndKotlinSuperType & purelyImplementedCollection folder
-     */
-    private fun selectOnlyPureKotlinSupertypes(supertypes: List<SimpleType>): List<SimpleType> {
-        if (supertypes.size < 2) return supertypes
-
-        val allPureSupertypes = supertypes.filter { it.arguments.all { !it.type.isFlexible() } }
-        return if (allPureSupertypes.isNotEmpty()) allPureSupertypes else supertypes
     }
 
     fun effectiveVariance(declared: Variance, useSite: Variance): Variance? {
@@ -309,7 +221,7 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
     }
 
     private fun TypeCheckerContext.isSubtypeForSameConstructor(
-        capturedSubArguments: List<TypeProjection>,
+        capturedSubArguments: TypeArgumentListIM,
         superType: SimpleType
     ): Boolean {
         return AbstractTypeChecker.run {
