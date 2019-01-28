@@ -7,12 +7,18 @@ package org.jetbrains.kotlin.types
 
 import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.LowerCapturedTypePolicy.*
+import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SupertypesPolicy
 import org.jetbrains.kotlin.types.model.*
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.SmartSet
 import java.util.*
 
 
 abstract class AbstractTypeCheckerContext : TypeSystemContext {
+
+
+    abstract fun substitutionSupertypePolicy(type: SimpleTypeIM): SupertypesPolicy.DoCustomTransform
+
     abstract fun areEqualTypeConstructors(a: TypeConstructorIM, b: TypeConstructorIM): Boolean
 
     /**
@@ -175,7 +181,7 @@ object AbstractTypeChecker {
     }
 
     fun AbstractTypeCheckerContext.isSubtypeForSameConstructor(
-        capturedSubArguments: List<TypeArgumentIM>,
+        capturedSubArguments: TypeArgumentListIM,
         superType: SimpleTypeIM
     ): Boolean {
         // No way to check, as no index sometimes
@@ -224,7 +230,7 @@ object AbstractTypeChecker {
         return null
     }
 
-    fun AbstractTypeCheckerContext.checkSubtypeForSpecialCases(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean? {
+    private fun AbstractTypeCheckerContext.checkSubtypeForSpecialCases(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean? {
         if (subType.isError() || superType.isError()) {
             if (isErrorTypeEqualsToAnything) return true
 
@@ -258,5 +264,104 @@ object AbstractTypeChecker {
         }
 
         return null
+    }
+
+
+    private inline fun TypeArgumentListIM.all(
+        context: AbstractTypeCheckerContext,
+        crossinline predicate: (TypeArgumentIM) -> Boolean
+    ): Boolean = with(context) {
+        repeat(size()) { index ->
+            if (!predicate(get(index))) return false
+        }
+        return true
+    }
+
+
+    private fun AbstractTypeCheckerContext.collectAllSupertypesWithGivenTypeConstructor(
+        baseType: SimpleTypeIM,
+        constructor: TypeConstructorIM
+    ): List<SimpleTypeIM> {
+        if (constructor.isCommonFinalClassConstructor()) {
+            return if (areEqualTypeConstructors(baseType.typeConstructor(), constructor))
+                listOf(captureFromArguments(baseType, CaptureStatus.FOR_SUBTYPING) ?: baseType)
+            else
+                emptyList()
+        }
+
+        val result: MutableList<SimpleTypeIM> = SmartList()
+
+        anySupertype(baseType, { false }) {
+            //kotlin.require(it is SimpleType)
+            val current = captureFromArguments(it, CaptureStatus.FOR_SUBTYPING) ?: it
+
+            when {
+                areEqualTypeConstructors(current.typeConstructor(), constructor) -> {
+                    result.add(current)
+                    SupertypesPolicy.None
+                }
+                current.argumentsCount() == 0 -> {
+                    SupertypesPolicy.LowerIfFlexible
+                }
+                else -> {
+                    substitutionSupertypePolicy(current)
+                }
+            }
+        }
+
+        return result
+    }
+
+    private fun AbstractTypeCheckerContext.collectAndFilter(classType: SimpleTypeIM, constructor: TypeConstructorIM) =
+        selectOnlyPureKotlinSupertypes(collectAllSupertypesWithGivenTypeConstructor(classType, constructor))
+
+
+    /**
+     * If we have several paths to some interface, we should prefer pure kotlin path.
+     * Example:
+     *
+     * class MyList : AbstractList<String>(), MutableList<String>
+     *
+     * We should see `String` in `get` function and others, also MyList is not subtype of MutableList<String?>
+     *
+     * More tests: javaAndKotlinSuperType & purelyImplementedCollection folder
+     */
+    private fun AbstractTypeCheckerContext.selectOnlyPureKotlinSupertypes(supertypes: List<SimpleTypeIM>): List<SimpleTypeIM> {
+        if (supertypes.size < 2) return supertypes
+
+        val allPureSupertypes = supertypes.filter {
+            it.asArgumentList().all(this) { it.getType().asFlexibleType() == null }
+        }
+        return if (allPureSupertypes.isNotEmpty()) allPureSupertypes else supertypes
+    }
+
+
+    // nullability was checked earlier via nullabilityChecker
+    // should be used only if you really sure that it is correct
+    fun AbstractTypeCheckerContext.findCorrespondingSupertypes(
+        baseType: SimpleTypeIM,
+        constructor: TypeConstructorIM
+    ): List<SimpleTypeIM> {
+        if (baseType.isClassType()) {
+            return collectAndFilter(baseType, constructor)
+        }
+
+        // i.e. superType is not a classType
+        if (!constructor.isClassTypeConstructor()) {
+            return collectAllSupertypesWithGivenTypeConstructor(baseType, constructor)
+        }
+
+        // todo add tests
+        val classTypeSupertypes = SmartList<SimpleTypeIM>()
+        anySupertype(baseType, { false }) {
+            if (it.isClassType()) {
+                classTypeSupertypes.add(it)
+                SupertypesPolicy.None
+            } else {
+                SupertypesPolicy.LowerIfFlexible
+            }
+        }
+
+        return classTypeSupertypes.flatMap { collectAndFilter(it, constructor) }
     }
 }

@@ -5,9 +5,14 @@
 
 package org.jetbrains.kotlin.types.checker
 
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.isFinalClass
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
+import org.jetbrains.kotlin.types.model.CaptureStatus
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 interface ClassicTypeSystemContext : TypeSystemContext {
     override fun TypeConstructorIM.isDenotable(): Boolean {
@@ -175,4 +180,43 @@ interface ClassicTypeSystemContext : TypeSystemContext {
         return c1 == c2
     }
 
+    override fun TypeConstructorIM.isClassTypeConstructor(): Boolean {
+        require(this is TypeConstructor)
+        return declarationDescriptor is ClassDescriptor
+    }
+
+    override fun TypeConstructorIM.isCommonFinalClassConstructor(): Boolean {
+        require(this is TypeConstructor)
+        val classDescriptor = declarationDescriptor as? ClassDescriptor ?: return false
+        return classDescriptor.isFinalClass &&
+                classDescriptor.kind != ClassKind.ENUM_ENTRY &&
+                classDescriptor.kind != ClassKind.ANNOTATION_CLASS
+    }
+
+
+    override fun TypeArgumentListIM.get(index: Int): TypeArgumentIM {
+        return when (this) {
+            is SimpleTypeIM -> getArgument(index)
+            is ArgumentList -> get(index)
+            else -> error("unknown type argument list type: $this, ${this::class}")
+        }
+    }
+
+    override fun TypeArgumentListIM.size(): Int {
+        return when (this) {
+            is SimpleTypeIM -> argumentsCount()
+            is ArgumentList -> size
+            else -> error("unknown type argument list type: $this, ${this::class}")
+        }
+    }
+
+    override fun SimpleTypeIM.asArgumentList(): TypeArgumentListIM {
+        require(this is SimpleType)
+        return this
+    }
+
+    override fun captureFromArguments(type: SimpleTypeIM, status: CaptureStatus): SimpleTypeIM? {
+        require(type is SimpleType)
+        return org.jetbrains.kotlin.types.checker.captureFromArguments(type, status)
+    }
 }

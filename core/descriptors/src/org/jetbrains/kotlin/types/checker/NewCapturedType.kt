@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedTypeConstructor
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.model.CaptureStatus
 import org.jetbrains.kotlin.types.model.CapturedTypeIM
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.builtIns
@@ -108,12 +109,6 @@ fun captureFromArguments(
     }
 
     return KotlinTypeFactory.simpleType(type.annotations, type.constructor, newArguments, type.isMarkedNullable)
-}
-
-enum class CaptureStatus {
-    FOR_SUBTYPING,
-    FOR_INCORPORATION,
-    FROM_EXPRESSION
 }
 
 /**

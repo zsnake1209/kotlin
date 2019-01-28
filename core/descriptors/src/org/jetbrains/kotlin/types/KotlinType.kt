@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.types.checker.StrictEqualityTypeChecker
 import org.jetbrains.kotlin.types.model.FlexibleTypeIM
 import org.jetbrains.kotlin.types.model.KotlinTypeIM
 import org.jetbrains.kotlin.types.model.SimpleTypeIM
+import org.jetbrains.kotlin.types.model.TypeArgumentListIM
 
 /**
  * [KotlinType] has only two direct subclasses: [WrappedType] and [UnwrappedType].
@@ -122,7 +123,7 @@ sealed class UnwrappedType: KotlinType() {
  * then all your types are simple.
  * Or more precisely, all instances are subclasses of [SimpleType] or [WrappedType] (which contains [SimpleType] inside).
  */
-abstract class SimpleType : UnwrappedType(), SimpleTypeIM {
+abstract class SimpleType : UnwrappedType(), SimpleTypeIM, TypeArgumentListIM {
     abstract override fun replaceAnnotations(newAnnotations: Annotations): SimpleType
     abstract override fun makeNullableAsSpecified(newNullability: Boolean): SimpleType
 
