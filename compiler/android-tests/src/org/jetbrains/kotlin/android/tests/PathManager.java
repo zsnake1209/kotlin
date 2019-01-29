@@ -56,10 +56,6 @@ public class PathManager {
         return tmpFolder + "/libs/libtest" + index;
     }
 
-    public String getLibsFolderInAndroidTestedModuleTmpFolder() {
-        return tmpFolder + "/tested-module/libs";
-    }
-
     public String getLibsFolderInAndroidTmpFolder() {
         return tmpFolder + "/libs";
     }
