@@ -22,7 +22,7 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
     abstract fun areEqualTypeConstructors(a: TypeConstructorIM, b: TypeConstructorIM): Boolean
 
-    abstract fun intersectTypes(projections: List<KotlinTypeIM>): KotlinTypeIM
+    abstract fun intersectTypes(types: List<KotlinTypeIM>): KotlinTypeIM
 
     /**
      * Gets called by [AbstractTypeChecker] as entry of isSubTypeOf, it is suggested to call [AbstractTypeChecker.doIsSubTypeOf]
@@ -148,7 +148,7 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 }
 
 object AbstractTypeChecker {
-    fun isSubtypeOf(context: AbstractTypeCheckerContext, subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean = with(context) {
+    fun isSubtypeOf(context: AbstractTypeCheckerContext, subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
         return context.enterIsSubTypeOf(subType, superType)
     }
 
@@ -309,14 +309,13 @@ object AbstractTypeChecker {
 
         if (subType.isStubType() || superType.isStubType()) return true
 
-
         val superTypeCaptured = superType.asCapturedType()
         val lowerType = superTypeCaptured?.lowerType()
         if (superTypeCaptured != null && lowerType != null) {
             when (getLowerCapturedTypePolicy(subType, superTypeCaptured)) {
                 CHECK_ONLY_LOWER -> return isSubtypeOf(this, subType, lowerType)
                 CHECK_SUBTYPE_AND_LOWER -> if (isSubtypeOf(this, subType, lowerType)) return true
-                SKIP_LOWER -> Unit /*do nothing*/
+                SKIP_LOWER -> Unit
             }
         }
 
