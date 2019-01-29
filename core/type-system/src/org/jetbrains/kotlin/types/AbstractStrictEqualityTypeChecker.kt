@@ -34,10 +34,10 @@ object AbstractStrictEqualityTypeChecker {
     }
 
     private fun TypeSystemContext.strictEqualTypesInternal(a: SimpleTypeIM, b: SimpleTypeIM): Boolean {
-        if (a.isMarkedNullable() != b.isMarkedNullable()
+        if (a.argumentsCount() != b.argumentsCount()
+            || a.isMarkedNullable() != b.isMarkedNullable()
             || (a.asDefinitelyNotNullType() == null) != (b.asDefinitelyNotNullType() == null)
             || !isEqualTypeConstructors(a.typeConstructor(), b.typeConstructor())
-            || a.argumentsCount() != b.argumentsCount()
         ) {
             return false
         }
