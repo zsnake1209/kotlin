@@ -16,7 +16,9 @@
 
 package org.jetbrains.kotlin.codegen.inline
 
+import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
 import org.jetbrains.kotlin.codegen.optimization.common.InsnSequence
+import org.jetbrains.kotlin.codegen.optimization.common.asSequence
 import org.jetbrains.kotlin.codegen.optimization.common.isMeaningful
 import org.jetbrains.kotlin.codegen.optimization.fixStack.top
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterSignature
@@ -33,11 +35,26 @@ fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
     frames: Array<Frame<SourceValue>?>,
     toDelete: MutableSet<AbstractInsnNode>
 ): LambdaInfo? {
+    getLambdaIfExistsAndMarkInstructionsInner(sourceValue.insns, processSwap, insnList, frames, toDelete)?.let {
+        markAstoresWithUnreachableAloads(toDelete, processSwap, insnList, frames, it)
+        markSingleAloads(toDelete, processSwap, insnList, frames, it)
+        return it
+    }
+    return null
+}
+
+private fun MethodInliner.getLambdaIfExistsAndMarkInstructionsInner(
+    sourceValues: Set<AbstractInsnNode>,
+    processSwap: Boolean,
+    insnList: InsnList,
+    frames: Array<Frame<SourceValue>?>,
+    toDelete: MutableSet<AbstractInsnNode>
+): LambdaInfo? {
     val toDeleteInner = SmartSet.create<AbstractInsnNode>()
 
     val lambdaSet = SmartSet.create<LambdaInfo?>()
-    sourceValue.insns.mapTo(lambdaSet) {
-        getLambdaIfExistsAndMarkInstructions(it, processSwap, insnList, frames, toDeleteInner)
+    sourceValues.mapTo(lambdaSet) {
+        getLambdaIfExistsAndMarkInstructionsInner(it, processSwap, insnList, frames, toDeleteInner)
     }
 
     return lambdaSet.singleOrNull()?.also {
@@ -45,9 +62,57 @@ fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
     }
 }
 
+// Remove ASTORES with unreachable ALOADs. These ALOADs become unreachable after inlining functions, returning Nothing.
+// See doubleCrossinlineStackTransformation test
+private fun MethodInliner.markAstoresWithUnreachableAloads(
+    toDelete: MutableSet<AbstractInsnNode>,
+    processSwap: Boolean,
+    insnList: InsnList,
+    frames: Array<Frame<SourceValue>?>,
+    lambda: LambdaInfo
+) {
+    val astores = insnList.asSequence().filter { it.opcode == Opcodes.ASTORE && it !in toDelete }.toList()
+    for (astore in astores) {
+        val frame = frames[insnList.indexOf(astore)] ?: continue
+        val sourceInsn = frame.top()!!.singleOrNullInsn() ?: continue
+        if (sourceInsn.opcode != Opcodes.ALOAD) continue
+        val toDeleteInner = hashSetOf<AbstractInsnNode>()
+        if (getLambdaIfExistsAndMarkInstructionsInner(sourceInsn, processSwap, insnList, frames, toDeleteInner) == lambda) {
+            toDelete.addAll(toDeleteInner)
+            toDelete.add(sourceInsn)
+            toDelete.add(astore)
+        }
+    }
+}
+
+// Remove single ALOADs inside catch blocks.
+// See tryCatchFinally/doubleCrossinline.kt
+private fun MethodInliner.markSingleAloads(
+    toDelete: MutableSet<AbstractInsnNode>,
+    processSwap: Boolean,
+    insnList: InsnList,
+    frames: Array<Frame<SourceValue>?>,
+    lambda: LambdaInfo
+) {
+    val aloads = insnList.asSequence().filter { it.opcode == Opcodes.ALOAD && it !in toDelete }.toList()
+    for (aload in aloads) {
+        if (frames[insnList.indexOf(aload)]?.top() != null) continue
+        // Do not remove ALOADs of parameters, passed to assertions, they are removed later. See removeClosureAssertions
+        if (aload.next?.opcode == Opcodes.LDC && aload.next?.next?.let {
+                it is MethodInsnNode && it.owner == IntrinsicMethods.INTRINSICS_CLASS_NAME && it.name == "checkParameterIsNotNull"
+            } == true
+        ) continue
+        val toDeleteInner = hashSetOf<AbstractInsnNode>()
+        if (getLambdaIfExistsAndMarkInstructionsInner(aload, processSwap, insnList, frames, toDeleteInner) == lambda) {
+            toDelete.addAll(toDeleteInner)
+            toDelete.add(aload)
+        }
+    }
+}
+
 private fun SourceValue.singleOrNullInsn() = insns.singleOrNull()
 
-private fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
+private fun MethodInliner.getLambdaIfExistsAndMarkInstructionsInner(
     insnNode: AbstractInsnNode?,
     processSwap: Boolean,
     insnList: InsnList,
@@ -69,7 +134,7 @@ private fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
         if (storeIns is VarInsnNode && storeIns.getOpcode() == Opcodes.ASTORE) {
             val frame = frames[insnList.indexOf(storeIns)] ?: return null
             val topOfStack = frame.top()!!
-            getLambdaIfExistsAndMarkInstructions(topOfStack, processSwap, insnList, frames, toDelete)?.let {
+            getLambdaIfExistsAndMarkInstructionsInner(topOfStack.insns, processSwap, insnList, frames, toDelete)?.let {
                 //remove intermediate lambda astore, aload instruction: see 'complexStack/simple.1.kt' test
                 toDelete.add(storeIns)
                 toDelete.add(insnNode)
@@ -79,7 +144,8 @@ private fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
     } else if (processSwap && insnNode.opcode == Opcodes.SWAP) {
         val swapFrame = frames[insnList.indexOf(insnNode)] ?: return null
         val dispatchReceiver = swapFrame.top()!!
-        getLambdaIfExistsAndMarkInstructions(dispatchReceiver, false, insnList, frames, toDelete)?.let {
+        getLambdaIfExistsAndMarkInstructionsInner(dispatchReceiver.insns, false, insnList, frames, toDelete)
+            ?.let {
             //remove swap instruction (dispatch receiver would be deleted on recursion call): see 'complexStack/simpleExtension.1.kt' test
             toDelete.add(insnNode)
             return it

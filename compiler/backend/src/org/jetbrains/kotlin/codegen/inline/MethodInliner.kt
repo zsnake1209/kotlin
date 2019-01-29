@@ -742,10 +742,7 @@ class MethodInliner(
     private fun isLambdaCall(invoke: AbstractInsnNode?): Boolean {
         if (invoke?.opcode != Opcodes.INVOKEINTERFACE) return false
         invoke as MethodInsnNode
-        if (!invoke.owner.startsWith("kotlin/jvm/functions/Function")) return false
-        if (invoke.name != "invoke") return false
-        if (Type.getReturnType(invoke.desc) != OBJECT_TYPE) return false
-        return Type.getArgumentTypes(invoke.desc).let { it.isNotEmpty() && it.last() == OBJECT_TYPE }
+        return isInvokeOnLambda(invoke.owner, invoke.name)
     }
 
     private fun replaceContinuationsWithFakeOnes(
@@ -756,14 +753,6 @@ class MethodInliner(
             insertNodeBefore(createFakeContinuationMethodNodeForInline(), node, toReplace)
             node.instructions.remove(toReplace)
         }
-    }
-
-    private fun isSuspendCall(invoke: AbstractInsnNode?): Boolean {
-        if (invoke !is MethodInsnNode) return false
-        // We can't have suspending constructors.
-        assert(invoke.opcode != Opcodes.INVOKESPECIAL)
-        if (Type.getReturnType(invoke.desc) != OBJECT_TYPE) return false
-        return Type.getArgumentTypes(invoke.desc).let { it.isNotEmpty() && it.last() == languageVersionSettings.continuationAsmType() }
     }
 
     private fun preprocessNodeBeforeInline(node: MethodNode, labelOwner: LabelOwner) {

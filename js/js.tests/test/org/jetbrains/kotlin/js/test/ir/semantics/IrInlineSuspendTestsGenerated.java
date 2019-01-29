@@ -259,6 +259,21 @@ public class IrInlineSuspendTestsGenerated extends AbstractIrInlineSuspendTests 
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/boxInline/suspend/stateMachine"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS_IR, true);
         }
 
+        @TestMetadata("doubleCrossinlineExtensionLambda.kt")
+        public void testDoubleCrossinlineExtensionLambda_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/doubleCrossinlineExtensionLambda.kt", "kotlin.coroutines");
+        }
+
+        @TestMetadata("doubleCrossinlineStackTransformation.kt")
+        public void testDoubleCrossinlineStackTransformation_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/doubleCrossinlineStackTransformation.kt", "kotlin.coroutines");
+        }
+
+        @TestMetadata("doubleCrossinline.kt")
+        public void testDoubleCrossinline_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/doubleCrossinline.kt", "kotlin.coroutines");
+        }
+
         @TestMetadata("innerLambdaInsideLambda.kt")
         public void testInnerLambdaInsideLambda_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/innerLambdaInsideLambda.kt", "kotlin.coroutines");
