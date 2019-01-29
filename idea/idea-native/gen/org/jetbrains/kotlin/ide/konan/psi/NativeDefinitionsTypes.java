@@ -20,6 +20,7 @@ public interface NativeDefinitionsTypes {
   IElementType ANDROID_ARM64 = new NativeDefinitionsTokenType("android_arm64");
   IElementType ARM32 = new NativeDefinitionsTokenType("arm32");
   IElementType ARM64 = new NativeDefinitionsTokenType("arm64");
+  IElementType BAD_CHARACTER = new NativeDefinitionsTokenType("BAD_CHARACTER");
   IElementType CODE_CHARS = new NativeDefinitionsTokenType("CODE_CHARS");
   IElementType COMMENT = new NativeDefinitionsTokenType("COMMENT");
   IElementType COMPILER_OPTS = new NativeDefinitionsTokenType("compilerOpts");

@@ -16,11 +16,11 @@ import org.jetbrains.kotlin.ide.konan.psi.NativeDefinitionsTypes;
 %eof}
 
 CRLF=\R
-WHITE_SPACE=[\ \v\n\t\f]
+WHITE_SPACE=[\ \v\t\f]
 
 SEPARATOR=[:=]
 PLATFORM_CHAR=[:jletterdigit:]
-KEY_CHAR=[^:=\ \n\t\f\\.] | "\\ "
+KEY_CHAR=[^:=\ \r\n\t\f\\.] | "\\ "
 FIRST_VALUE_CHAR=[^ \n\f\\] | "\\"{CRLF} | "\\".
 VALUE_CHAR= [^\n\f\\] | "\\"{CRLF} | "\\".
 COMMENT=("#"|"!")[^\r\n]*
@@ -138,11 +138,8 @@ X64="x64"
 
 <WAITING_VALUE> {FIRST_VALUE_CHAR}{VALUE_CHAR}* { yybegin(YYINITIAL); return VALUE; }
 
-<WAITING_PLATFORM,WAITING_VALUE> {
-  {CRLF}({CRLF}|{WHITE_SPACE})+ { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
-  {DELIM} { yybegin(CODE_END); return DELIM; }
-}
-
 <CODE_END> [^]* { return CODE_CHARS; }
+
+{CRLF}({CRLF}|{WHITE_SPACE})* { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
 
 [^\r\n\R] { yybegin(YYINITIAL); return TokenType.BAD_CHARACTER; }
