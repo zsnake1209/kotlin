@@ -113,7 +113,7 @@ public class NativeDefinitionsParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // COMMENT | boolDefinition_ | stringDefinition_ | stringsDefinition_
+  // COMMENT | boolDefinition_ | stringDefinition_ | stringsDefinition_ | incorrectDefinition_
   static boolean definitionItem_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "definitionItem_")) return false;
     boolean r;
@@ -121,6 +121,7 @@ public class NativeDefinitionsParser implements PsiParser, LightPsiParser {
     if (!r) r = boolDefinition_(b, l + 1);
     if (!r) r = stringDefinition_(b, l + 1);
     if (!r) r = stringsDefinition_(b, l + 1);
+    if (!r) r = incorrectDefinition_(b, l + 1);
     return r;
   }
 
@@ -133,6 +134,70 @@ public class NativeDefinitionsParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, LANGUAGE);
     if (!r) r = consumeToken(b, LINKER);
     return r;
+  }
+
+  /* ********************************************************** */
+  // UNKNOWN_KEY? UNKNOWN_PLATFORM? SEPARATOR VALUE? | UNKNOWN_KEY UNKNOWN_PLATFORM?
+  static boolean incorrectDefinition_(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incorrectDefinition_")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = incorrectDefinition__0(b, l + 1);
+    if (!r) r = incorrectDefinition__1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // UNKNOWN_KEY? UNKNOWN_PLATFORM? SEPARATOR VALUE?
+  private static boolean incorrectDefinition__0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incorrectDefinition__0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = incorrectDefinition__0_0(b, l + 1);
+    r = r && incorrectDefinition__0_1(b, l + 1);
+    r = r && consumeToken(b, SEPARATOR);
+    r = r && incorrectDefinition__0_3(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // UNKNOWN_KEY?
+  private static boolean incorrectDefinition__0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incorrectDefinition__0_0")) return false;
+    consumeToken(b, UNKNOWN_KEY);
+    return true;
+  }
+
+  // UNKNOWN_PLATFORM?
+  private static boolean incorrectDefinition__0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incorrectDefinition__0_1")) return false;
+    consumeToken(b, UNKNOWN_PLATFORM);
+    return true;
+  }
+
+  // VALUE?
+  private static boolean incorrectDefinition__0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incorrectDefinition__0_3")) return false;
+    consumeToken(b, VALUE);
+    return true;
+  }
+
+  // UNKNOWN_KEY UNKNOWN_PLATFORM?
+  private static boolean incorrectDefinition__1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incorrectDefinition__1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, UNKNOWN_KEY);
+    r = r && incorrectDefinition__1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // UNKNOWN_PLATFORM?
+  private static boolean incorrectDefinition__1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incorrectDefinition__1_1")) return false;
+    consumeToken(b, UNKNOWN_PLATFORM);
+    return true;
   }
 
   /* ********************************************************** */

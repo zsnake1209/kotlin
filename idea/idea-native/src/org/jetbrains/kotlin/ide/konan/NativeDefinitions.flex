@@ -84,6 +84,7 @@ X64="x64"
 
 <YYINITIAL> {
   {DELIM} { yybegin(CODE_END); return DELIM; }
+  {COMMENT} { return COMMENT; }
   {COMPILER_OPTS} { yybegin(WAITING_PLATFORM); return COMPILER_OPTS; }
   {DEPENDS} { yybegin(WAITING_PLATFORM); return DEPENDS; }
   {DISABLE_DESIGNATED_INITIALIZER_CHECKS} { yybegin(WAITING_PLATFORM); return DISABLE_DESIGNATED_INITIALIZER_CHECKS; }
@@ -105,7 +106,6 @@ X64="x64"
   {STATIC_LIBRARIES} { yybegin(WAITING_PLATFORM); return STATIC_LIBRARIES; }
   {STRICT_ENUMS} { yybegin(WAITING_PLATFORM); return STRICT_ENUMS; }
   {KEY_CHAR}+ { yybegin(WAITING_PLATFORM); return UNKNOWN_KEY; }
-  {COMMENT} { return COMMENT; }
 }
 
 <WAITING_PLATFORM> {
@@ -138,8 +138,11 @@ X64="x64"
 
 <WAITING_VALUE> {FIRST_VALUE_CHAR}{VALUE_CHAR}* { yybegin(YYINITIAL); return VALUE; }
 
-<WAITING_PLATFORM,WAITING_VALUE> {CRLF}({CRLF}|{WHITE_SPACE})+ { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+<WAITING_PLATFORM,WAITING_VALUE> {
+  {CRLF}({CRLF}|{WHITE_SPACE})+ { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+  {DELIM} { yybegin(CODE_END); return DELIM; }
+}
 
 <CODE_END> [^]* { return CODE_CHARS; }
 
-[^] { return TokenType.BAD_CHARACTER; }
+[^\r\n\R] { yybegin(YYINITIAL); return TokenType.BAD_CHARACTER; }

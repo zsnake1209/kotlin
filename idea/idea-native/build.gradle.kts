@@ -17,7 +17,7 @@ sourceSets {
         projectDefault()
         java.srcDir("gen")
     }
-    "test" { none() }
+    "test" { projectDefault() }
 
 }
 

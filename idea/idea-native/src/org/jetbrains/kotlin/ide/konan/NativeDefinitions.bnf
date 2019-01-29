@@ -67,7 +67,7 @@
 
 root ::= definitionItem_* (DELIM code)?
 
-private definitionItem_ ::= COMMENT | boolDefinition_ | stringDefinition_ | stringsDefinition_
+private definitionItem_ ::= COMMENT | boolDefinition_ | stringDefinition_ | stringsDefinition_ | incorrectDefinition_
 
 private boolDefinition_ ::= boolKey platform_? SEPARATOR boolValue
 boolKey ::= DISABLE_DESIGNATED_INITIALIZER_CHECKS | EXCLUDE_DEPENDENT_MODULES | EXCLUDE_SYSTEM_LIBS
@@ -85,6 +85,8 @@ stringsKey ::= COMPILER_OPTS | DEPENDS  | ENTRY_POINT | EXCLUDED_FUNCTIONS
                             | NO_STRING_CONVERSION | PACKAGE | STATIC_LIBRARIES | STRICT_ENUMS
 
 stringsValue ::= VALUE
+
+private incorrectDefinition_ ::= UNKNOWN_KEY? UNKNOWN_PLATFORM? SEPARATOR VALUE? | UNKNOWN_KEY UNKNOWN_PLATFORM?
 
 private platform_ ::= ANDROID | ANDROID_ARM32 | ANDROID_ARM64 | ARM32 | ARM64 | IOS | IOS_ARM32
                         | IOS_ARM64 | IOS_X64 | LINUX | LINUX_ARM32_HFP | LINUX_MIPS32
