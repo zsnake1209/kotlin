@@ -23,8 +23,8 @@ import org.jetbrains.kotlin.types.model.SimpleTypeIM
 import org.jetbrains.kotlin.types.model.TypeConstructorIM
 
 open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) : ClassicTypeSystemContext, AbstractTypeCheckerContext() {
-    override fun intersectTypes(projections: List<KotlinTypeIM>): KotlinTypeIM {
-        return org.jetbrains.kotlin.types.checker.intersectTypes(projections as List<UnwrappedType>)
+    override fun intersectTypes(types: List<KotlinTypeIM>): KotlinTypeIM {
+        return org.jetbrains.kotlin.types.checker.intersectTypes(types as List<UnwrappedType>)
     }
 
     override fun enterIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
