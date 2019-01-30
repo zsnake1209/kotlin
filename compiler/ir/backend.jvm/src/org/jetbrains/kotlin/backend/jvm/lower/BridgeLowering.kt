@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.IrStarProjectionImpl
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.commons.Method
 
 class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
@@ -81,16 +82,11 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
                     member.getJvmName().let { memberJvmName ->
                         member.overriddenSymbols.all { it.owner.getJvmName() != memberJvmName }
                     }
-        }.forEach {member ->
+        }.forEach { member ->
             irClass.declarations.add(member.orphanedCopy())
         }
     }
 
-
-    sealed class BridgeTableElement {
-        object AlreadyDefined : BridgeTableElement()
-        class NeedsDefinition(val function: IrSimpleFunction) : BridgeTableElement()
-    }
 
     private fun generateBridges(irFunction: IrSimpleFunction, irClass: IrClass) {
         val ourSignature = irFunction.getJvmSignature()
@@ -119,7 +115,7 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
             val resolved = irFunction.resolveFakeOverride()!!
             val resolvedSignature = resolved.getJvmSignature()
             if (!resolvedSignature.sameCallAs(ourSignature)) {
-                val bridge = createBridgeHeader(irClass, resolved, resolvedSignature, irFunction, ourSignature, isSpecial = false, isSynthetic = false)
+                val bridge = createBridgeHeader(irClass, resolved, irFunction, isSpecial = false, isSynthetic = false)
                 bridge.createBridgeBody(resolved, null, isSpecial = false, invokeStatically = true)
                 irClass.declarations.add(bridge)
                 refToJavaGenerated = true
@@ -128,104 +124,58 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
         }
 
         val methodsToBridge = irFunction.getMethodsToBridge(refToJavaGenerated, specialOverrideSignature)
-        loop@for ((signature, method) in methodsToBridge) {
-            when (method) {
-                is BridgeTableElement.AlreadyDefined -> { /* Do nothing. */ }
-                is BridgeTableElement.NeedsDefinition -> {
-                    if (irFunction.modality == Modality.ABSTRACT && signature.sameCallAs(ourSignature)) continue@loop
+        loop@ for ((signature, method) in methodsToBridge) {
+            if (irFunction.modality == Modality.ABSTRACT && signature.sameCallAs(ourSignature)) continue@loop
 
-                    val defaultValueGenerator = if (signature == specialOverrideSignature) specialOverrideValueGenerator else null
-                    val isSpecial = (defaultValueGenerator != null) ||
-                            (signature.name != ourMethodName &&
-                                    signature.argumentTypes.contentEquals(ourSignature.argumentTypes) &&
-                                    signature.returnType == ourSignature.returnType)
-                    val bridge = createBridgeHeader(
-                        irClass,
-                        irFunction,
-                        ourSignature,
-                        method.function,
-                        signature,
-                        isSpecial = isSpecial,
-                        isSynthetic = !isSpecial
-                    )
+            val defaultValueGenerator = if (signature == specialOverrideSignature) specialOverrideValueGenerator else null
+            val isSpecial = (defaultValueGenerator != null) ||
+                    (signature.name != ourMethodName &&
+                            signature.argumentTypes?.contentEquals(ourSignature.argumentTypes) == true &&
+                            signature.returnType == ourSignature.returnType)
+            val bridge = createBridgeHeader(
+                irClass,
+                irFunction,
+                method,
+                isSpecial = isSpecial,
+                isSynthetic = !isSpecial
+            )
 
-                    bridge.createBridgeBody(targetForCommonBridges, defaultValueGenerator, isSpecial)
-                    irClass.declarations.add(bridge)
-                }
-            }
+            bridge.createBridgeBody(targetForCommonBridges, defaultValueGenerator, isSpecial)
+            irClass.declarations.add(bridge)
         }
-
     }
 
     // Cache signatures
-    inner class InheritancePathItem(val function: IrSimpleFunction, val signature: Method = function.getJvmSignature())
+    inner class InheritancePathItem(val function: IrSimpleFunction, val signature: Method)
 
-    private fun IrSimpleFunction.getMethodsToBridge(
-        refToJavaGenerated: Boolean,
-        specialOverrideSignature: Method?
-    ): Map<Method, BridgeTableElement> {
-        val initialName = getJvmName()
-        val res = mutableMapOf<Method, BridgeTableElement>()
+    sealed class BridgeTableElement {
+        object AlreadyDefined : BridgeTableElement()
+        class NeedsDefinition(val function: IrSimpleFunction) : BridgeTableElement()
+    }
 
-        fun register(signature: Method, irFunction: IrSimpleFunction, inheritancePath: List<InheritancePathItem>) {
-            if (res[signature] === BridgeTableElement.AlreadyDefined) return
-            if (irFunction.origin === IrDeclarationOrigin.FAKE_OVERRIDE) return
+    inner class SignatureCollector(
+        private val target: IrSimpleFunction,
+        private val refToJavaGenerated: Boolean,
+        private val specialOverrideSignature: Method?
+    ) {
+        val signatureMap = mutableMapOf<Method, BridgeTableElement>()
 
-            if (!irFunction.parentAsClass.isInterface &&
-                irFunction.modality === Modality.FINAL
-            ) {
-                // Never redefine final methods.
-                res[signature] = BridgeTableElement.AlreadyDefined
-            } else if (inheritancePath.any {
-                    !it.function.parentAsClass.isInterface &&
-                            it.function !== this@getMethodsToBridge &&
-                            ((it.function.origin != IrDeclarationOrigin.FAKE_OVERRIDE && it.signature != signature) ||
-                                    it.signature.name != signature.name)
-                }) {
-                // There is already an item in `inheritancePath` where a bridge will be created.
-                res[signature] = BridgeTableElement.AlreadyDefined
-            } else if (!refToJavaGenerated &&
-                !irFunction.parentAsClass.isInterface &&
-                inheritancePath.all { it.function.origin === IrDeclarationOrigin.FAKE_OVERRIDE }
-            ) {
-                // Method defined here, no need to redefine
-                res[signature] = BridgeTableElement.AlreadyDefined
-            } else if (
-                irFunction.comesFromJava() &&
-                signature == specialOverrideSignature &&
-                inheritancePath.last { !it.function.comesFromJava() && !it.function.parentAsClass.isInterface }.let {
-                    it.function != this@getMethodsToBridge && it.signature != signature
-                }
-            ) {
-                // Method will be defined in the previous inheritance frame.
-                res[signature] = BridgeTableElement.AlreadyDefined
-            } else {
-                res[signature] = when (val oldValue = res[signature]) {
-                    is BridgeTableElement.NeedsDefinition -> {
-                        // Of all functions that implement the signature, we need to select the most general one, i.e., with argument types
-                        // that will cause the least surprise from the type mapper when copied.
-                        val oldFunction = oldValue.function
-                        if (oldFunction.hasMoreGeneralJvmArgumentTypesThan(irFunction))
-                            oldValue
-                        else
-                            BridgeTableElement.NeedsDefinition(irFunction)
-
-                    }
-                    else -> BridgeTableElement.NeedsDefinition(irFunction)
-                }
-                BridgeTableElement.NeedsDefinition(irFunction)
+        fun collectSignatures(): List<Pair<Method, IrSimpleFunction>> {
+            val targetSignature = target.getJvmSignature()
+            signatureMap[targetSignature] = BridgeTableElement.AlreadyDefined
+            handle(target, targetSignature.name, mutableListOf())
+            return signatureMap.mapNotNull { entry ->
+                entry.value.safeAs<BridgeTableElement.NeedsDefinition>()?.let { entry.key to it.function }
             }
         }
 
-        fun handle(irFunction: IrSimpleFunction, lastJvmName: String, inheritancePath: MutableList<InheritancePathItem>) {
+        private fun handle(irFunction: IrSimpleFunction, lastJvmName: String, inheritancePath: MutableList<InheritancePathItem>) {
             val signature = irFunction.getJvmSignature()
             register(signature, irFunction, inheritancePath)
             if (signature.name != lastJvmName) {
                 val newName = Name.identifier(signature.name)
-                inheritancePath.forEachIndexed { i, inheritancePathItem ->
-                    val renamedItem = inheritancePathItem.function.copyRenamingTo(newName)
-                    register(renamedItem.getJvmSignature(), renamedItem, inheritancePath.slice(0..i))
-                }
+                val renamedItem = target.copyRenamingTo(newName)
+                register(renamedItem.getJvmSignature(), renamedItem, emptyList(), forceNeeded = true)
             }
 
             inheritancePath.add(InheritancePathItem(irFunction, signature))
@@ -235,9 +185,72 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
             inheritancePath.removeAt(inheritancePath.size - 1)
         }
 
-        res[getJvmSignature()] = BridgeTableElement.AlreadyDefined
-        handle(this, getJvmName(), mutableListOf())
-        return res
+        private fun register(
+            signature: Method,
+            irFunction: IrSimpleFunction,
+            inheritancePath: List<InheritancePathItem>,
+            forceNeeded: Boolean = false
+        ) {
+            if (signatureMap[signature] === BridgeTableElement.AlreadyDefined) return
+            if (irFunction.origin === IrDeclarationOrigin.FAKE_OVERRIDE) return
+
+            if (!forceNeeded && bridgeNotNeeded(signature, irFunction, inheritancePath)) {
+                signatureMap[signature] = BridgeTableElement.AlreadyDefined
+            } else {
+                val oldFunction = (signatureMap[signature] as? BridgeTableElement.NeedsDefinition)?.function
+                signatureMap[signature] = BridgeTableElement.NeedsDefinition(chooseMethodToOverride(oldFunction, irFunction))
+            }
+        }
+
+        private fun bridgeNotNeeded(
+            signature: Method,
+            irFunction: IrSimpleFunction,
+            inheritancePath: List<InheritancePathItem>
+        ): Boolean {
+            // Never redefine final functions
+            if (!irFunction.parentAsClass.isInterface && irFunction.modality === Modality.FINAL) return true
+
+            if (inheritancePath.any {
+                    !it.function.parentAsClass.isInterface &&
+                            it.function !== target &&
+                            ((it.function.origin != IrDeclarationOrigin.FAKE_OVERRIDE && it.signature != signature) ||
+                                    it.signature.name != signature.name)
+                }) {
+                // There is already an item in `inheritancePath` where a bridge will be created.
+                return true
+            }
+
+            if (!refToJavaGenerated &&
+                !irFunction.parentAsClass.isInterface &&
+                inheritancePath.all { it.function.origin === IrDeclarationOrigin.FAKE_OVERRIDE }
+            ) {
+                // Method defined here, no need to redefine
+                return true
+            }
+
+            if (irFunction.comesFromJava() &&
+                signature == specialOverrideSignature &&
+                inheritancePath.last { !it.function.comesFromJava() && !it.function.parentAsClass.isInterface }.let {
+                    it.function != target && it.signature != signature
+                }
+            ) {
+                // Method will be defined in the previous inheritance frame.
+                return true
+            }
+
+            return false
+        }
+
+        private fun chooseMethodToOverride(oldFunction: IrSimpleFunction?, newFunction: IrSimpleFunction) =
+            if (oldFunction == null || newFunction.hasMoreGeneralJvmArgumentTypesThan(oldFunction)) newFunction else oldFunction
+
+    }
+
+    private fun IrSimpleFunction.getMethodsToBridge(
+        refToJavaGenerated: Boolean,
+        specialOverrideSignature: Method?
+    ): List<Pair<Method, IrSimpleFunction>> {
+        return SignatureCollector(this, refToJavaGenerated, specialOverrideSignature).collectSignatures()
     }
 
     private fun IrSimpleFunction.copyRenamingTo(newName: Name): IrSimpleFunction =
@@ -260,9 +273,7 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
     private fun createBridgeHeader(
         irClass: IrClass,
         target: IrSimpleFunction,
-        targetSignature: Method,
         interfaceFunction: IrSimpleFunction,
-        interfaceSignature: Method,
         isSpecial: Boolean,
         isSynthetic: Boolean
     ): IrSimpleFunction {
@@ -409,19 +420,17 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
     private fun IrTypeParameter.upperBoundClass(): IrClass {
         val simpleSuperClassifiers = superTypes.asSequence().filterIsInstance<IrSimpleType>().map { it.classifier }
         return simpleSuperClassifiers
-            .filterIsInstance<IrClassSymbol>()
-            .let {
-                it.firstOrNull { !it.owner.isInterface } ?: it.firstOrNull()
-            }?.owner ?: simpleSuperClassifiers.filterIsInstance<IrTypeParameterSymbol>()
-            .map { it.owner.upperBoundClass() }.firstOrNull() ?: context.irBuiltIns.anyClass.owner
+                .filterIsInstance<IrClassSymbol>()
+                .let {
+                    it.firstOrNull { !it.owner.isInterface } ?: it.firstOrNull()
+                }?.owner ?:
+            simpleSuperClassifiers.filterIsInstance<IrTypeParameterSymbol>().map { it.owner.upperBoundClass() }.firstOrNull() ?:
+            context.irBuiltIns.anyClass.owner
     }
 
-    private data class SpecialMethodDescription(val fqClass: String, val arity: Int)
+    private data class SpecialMethodDescription(val kotlinFqClass: String, val name: String, val arity: Int)
 
-    private fun IrSimpleFunction.fqName() =
-        "${getPackageFragment()?.fqName?.asString()}.${parentAsClass.name.asString()}.${name.asString()}"
-
-    private fun IrSimpleFunction.toDescription() = SpecialMethodDescription(fqName(), valueParameters.size)
+    private fun IrSimpleFunction.toDescription() = SpecialMethodDescription(parentAsClass.fqName, name.asString(), valueParameters.size)
 
     private fun constFalse(bridge: IrSimpleFunction) =
         IrConstImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.irBuiltIns.booleanType, IrConstKind.Boolean, false)
@@ -436,16 +445,16 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
         IrGetValueImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, bridge.valueParameters[1].symbol)
 
     private val specialMethodWithDefaultsMap = mapOf<SpecialMethodDescription, (IrSimpleFunction) -> IrExpression>(
-        SpecialMethodDescription("kotlin.collections.Collection.contains", 1) to ::constFalse,
-        SpecialMethodDescription("kotlin.collections.MutableCollection.remove", 1) to ::constFalse,
-        SpecialMethodDescription("kotlin.collections.Map.containsKey", 1) to ::constFalse,
-        SpecialMethodDescription("kotlin.collections.Map.containsValue", 1) to ::constFalse,
-        SpecialMethodDescription("kotlin.collections.MutableMap.remove", 2) to ::constFalse,
-        SpecialMethodDescription("kotlin.collections.Map.getOrDefault", 1) to ::getSecondArg,
-        SpecialMethodDescription("kotlin.collections.Map.get", 1) to ::constNull,
-        SpecialMethodDescription("kotlin.collections.MutableMap.remove", 1) to ::constNull,
-        SpecialMethodDescription("kotlin.collections.List.indexOf", 1) to ::constMinusOne,
-        SpecialMethodDescription("kotlin.collections.List.lastIndexOf", 1) to ::constMinusOne
+        SpecialMethodDescription("kotlin.collections.Collection", "contains", 1) to ::constFalse,
+        SpecialMethodDescription("kotlin.collections.MutableCollection", "remove", 1) to ::constFalse,
+        SpecialMethodDescription("kotlin.collections.Map", "containsKey", 1) to ::constFalse,
+        SpecialMethodDescription("kotlin.collections.Map", "containsValue", 1) to ::constFalse,
+        SpecialMethodDescription("kotlin.collections.MutableMap", "remove", 2) to ::constFalse,
+        SpecialMethodDescription("kotlin.collections.Map", "getOrDefault", 1) to ::getSecondArg,
+        SpecialMethodDescription("kotlin.collections.Map", "get", 1) to ::constNull,
+        SpecialMethodDescription("kotlin.collections.MutableMap", "remove", 1) to ::constNull,
+        SpecialMethodDescription("kotlin.collections.List", "indexOf", 1) to ::constMinusOne,
+        SpecialMethodDescription("kotlin.collections.List", "lastIndexOf", 1) to ::constMinusOne
     )
 
     private fun findSpecialWithOverride(irFunction: IrSimpleFunction): Pair<Method, (IrSimpleFunction) -> IrExpression>? {
@@ -456,50 +465,7 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
             }
         }
         return null
-//        val alreadyVisited = mutableSetOf<IrSimpleFunction>()
-//        fun search(irFunction: IrSimpleFunction): Pair<Method, (IrSimpleFunction) -> IrExpression>? {
-//            if (irFunction in alreadyVisited) return null
-//            alreadyVisited.add(irFunction)
-//            return irFunction.overriddenSymbols.asSequence().mapNotNull { search(it.owner) }.firstOrNull()
-//        }
-//        return search(irFunction)
     }
-
-    private val specialGettersMap = mapOf(
-        "name" to "java.lang.Enum",
-        "ordinal" to "java.lang.Enum",
-        "size" to "kotlin.collections.Collection",
-        "length" to "kotlin.collection.CharSequence",
-        "keySet" to "kotlin.collections.Map",
-        "values" to "kotlin.collections.Map",
-        "entrySet" to "kotlin.collections.Map"
-//        SpecialMethodDescription("java.lang.Enum.name", 0),
-//        SpecialMethodDescription("java.lang.Enum.ordinal", 0),
-//        SpecialMethodDescription("kotlin.collections.Collection.size", 0),
-//        SpecialMethodDescription("kotlin.collections.Map.size", 0),
-//        SpecialMethodDescription("kotlin.collections.CharSequence.length", 0),
-//        SpecialMethodDescription("kotlin.collections.Map.keySet", 0),
-//        SpecialMethodDescription("kotlin.collections.Map.values", 0),
-//        SpecialMethodDescription("kotlin.collections.Map.entrySet", 0)
-    )
-
-    private fun isSpecialGetter(irFunction: IrSimpleFunction): Boolean {
-        if (irFunction.valueParameters.isNotEmpty()) return false
-        specialGettersMap[irFunction.getJvmName()]?.let { classFqName ->
-            return irFunction.parentAsClass.isSubclassOf { it.fqName == classFqName}
-        } ?: return false
-    }
-
-
-    private val BUILTIN_FQ_NAME_PREFIXES = listOf("kotlin.", "java.lang.")
-
-    private fun IrSimpleFunction.directlyOverridesBuiltin(): Boolean =
-        allOverridden().any {
-            it.getJvmSignature() == getJvmSignature() &&
-            it.getPackageFragment()?.fqName?.asString()?.let { fqName ->
-                BUILTIN_FQ_NAME_PREFIXES.any { prefix -> fqName.startsWith(prefix) }
-            } == true
-        }
 
     private fun IrFunction.getJvmName() = getJvmSignature().name
     private fun IrFunction.getJvmSignature() = typeMapper.mapAsmMethod(descriptor)
@@ -516,28 +482,27 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
 
 val IrClass.fqName get() = "${getPackageFragment()?.fqName?.asString()}.${name.asString()}"
 
-fun IrClass.isSubclassOf(pred: (IrClass) -> Boolean): Boolean {
+private class SubclassChecker(val pred: (IrClass) -> Boolean) {
     val alreadyVisited = mutableSetOf<IrClass>()
-    var checkType: ((IrType) -> Boolean)? = null // get mutual recursion between local functions
 
     fun checkClass(irClass: IrClass) = when {
         irClass in alreadyVisited -> false
         pred(irClass) -> true
         else -> {
             alreadyVisited.add(irClass)
-            irClass.superTypes.any { checkType!!(it) }
+            irClass.superTypes.any { checkType(it) }
         }
     }
 
-    checkType = fun(irType: IrType): Boolean =
+    fun checkType(irType: IrType): Boolean =
         irType is IrSimpleType && when (val owner = irType.classifier.owner) {
             is IrClass -> checkClass(owner)
-            is IrTypeParameter -> owner.superTypes.any { checkType!!(it) }
+            is IrTypeParameter -> owner.superTypes.any { checkType(it) }
             else -> false
         }
-
-    return checkClass(this)
 }
+
+fun IrClass.isSubclassOf(pred: (IrClass) -> Boolean) = SubclassChecker(pred).checkClass(this)
 
 fun IrSimpleFunction.allOverridden(): Sequence<IrSimpleFunction> {
     val visited = mutableSetOf<IrSimpleFunction>()
@@ -563,7 +528,9 @@ fun IrSimpleFunction.overriddenInClasses(): List<IrSimpleFunction> {
     }
 }
 
+// TODO: At present, there is no reliable way to distinguish Java imports from Kotlin cross-module imports.
 val ORIGINS_FROM_JAVA = setOf(IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB, IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB)
+
 fun IrDeclaration.comesFromJava() = parentAsClass.origin in ORIGINS_FROM_JAVA
 
 // Method has the same name, same arguments as `other`. Return types may differ.
