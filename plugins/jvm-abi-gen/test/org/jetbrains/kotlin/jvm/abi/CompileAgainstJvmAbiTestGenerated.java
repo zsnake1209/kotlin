@@ -34,6 +34,11 @@ public class CompileAgainstJvmAbiTestGenerated extends AbstractCompileAgainstJvm
         runTest("plugins/jvm-abi-gen/testData/compile/anonymousObject/");
     }
 
+    @TestMetadata("capturedArgumentInInlineFun")
+    public void testCapturedArgumentInInlineFun() throws Exception {
+        runTest("plugins/jvm-abi-gen/testData/compile/capturedArgumentInInlineFun/");
+    }
+
     @TestMetadata("classes")
     public void testClasses() throws Exception {
         runTest("plugins/jvm-abi-gen/testData/compile/classes/");
