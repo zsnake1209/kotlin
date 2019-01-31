@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.idea.refactoring
 
 import com.intellij.codeInsight.TargetElementUtil
-import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
@@ -84,6 +83,14 @@ class InplaceRenameTest : LightPlatformCodeInsightTestCase() {
 
     fun testLocalVarShadowingMemberProperty() {
         doTestMemberInplaceRename("name1")
+    }
+
+    fun testLocalRenameNoOptimizeImports() {
+        doTestMemberInplaceRename("y")
+    }
+
+    fun testMemberRenameOptimizesImports() {
+        doTestMemberInplaceRename("y")
     }
 
     fun testNoReformat() {

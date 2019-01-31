@@ -1,0 +1,10 @@
+package foo
+
+import foo.A
+
+fun f() {
+    val y = 5
+    println(y + y * y)
+}
+
+class A
