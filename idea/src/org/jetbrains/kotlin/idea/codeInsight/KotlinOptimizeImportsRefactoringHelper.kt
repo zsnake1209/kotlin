@@ -24,6 +24,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.refactoring.RefactoringHelper
+import com.intellij.refactoring.util.MoveRenameUsageInfo
 import com.intellij.usageView.UsageInfo
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.SequentialModalProgressTask
@@ -33,6 +34,7 @@ import org.jetbrains.kotlin.idea.util.application.progressIndicatorNullable
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
+import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 
 // Based on com.intellij.refactoring.OptimizeImportsRefactoringHelper
@@ -79,7 +81,9 @@ class KotlinOptimizeImportsRefactoringHelper : RefactoringHelper<Set<KtFile>> {
     }
 
     override fun prepareOperation(usages: Array<UsageInfo>): Set<KtFile> {
-        return usages.mapNotNullTo(LinkedHashSet<KtFile>()) {
+        return usages.filterNot { usage ->
+            usage is MoveRenameUsageInfo && usage.referencedElement.let { referenced -> referenced is KtProperty && referenced.isLocal }
+        }.mapNotNullTo(LinkedHashSet()) {
             if (!it.isNonCodeUsage) it.file as? KtFile else null
         }
     }

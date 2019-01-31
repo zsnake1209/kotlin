@@ -1,0 +1,9 @@
+package foo
+
+class B {
+    fun y() {
+        y()
+    }
+}
+
+class A
