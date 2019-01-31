@@ -17,17 +17,17 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
 import com.intellij.psi.tree.*
-import org.jetbrains.kotlin.ide.konan.psi.*
 import javax.swing.Icon
+import java.io.Reader
+import org.jetbrains.kotlin.ide.konan.psi.*
 import org.jetbrains.kotlin.idea.KotlinIcons
 import org.jetbrains.kotlin.konan.library.KDEFINITIONS_FILE_EXTENSION
-import java.io.Reader
 
 
 const val NATIVE_DEFINITIONS_NAME = "KND"
 const val NATIVE_DEFINITIONS_DESCRIPTION = "Definitions file for Kotlin/Native C interop"
 
-class NativeDefinitionsFileType : LanguageFileType(NativeDefinitionsLanguage.INSTANCE) {
+object NativeDefinitionsFileType : LanguageFileType(NativeDefinitionsLanguage.INSTANCE) {
 
     override fun getName(): String = NATIVE_DEFINITIONS_NAME
 
@@ -36,10 +36,6 @@ class NativeDefinitionsFileType : LanguageFileType(NativeDefinitionsLanguage.INS
     override fun getDefaultExtension(): String = KDEFINITIONS_FILE_EXTENSION
 
     override fun getIcon(): Icon = KotlinIcons.NATIVE
-
-    companion object {
-        val INSTANCE = NativeDefinitionsFileType()
-    }
 }
 
 class NativeDefinitionsLanguage private constructor() : Language(NATIVE_DEFINITIONS_NAME) {
@@ -50,7 +46,7 @@ class NativeDefinitionsLanguage private constructor() : Language(NATIVE_DEFINITI
 
 class NativeDefinitionsFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, NativeDefinitionsLanguage.INSTANCE) {
 
-    override fun getFileType(): FileType = NativeDefinitionsFileType.INSTANCE
+    override fun getFileType(): FileType = NativeDefinitionsFileType
 
     override fun toString(): String = NATIVE_DEFINITIONS_DESCRIPTION
 
@@ -92,7 +88,7 @@ class CLanguageInjector : LanguageInjector {
     }
 }
 
-class NativeDefinitionsSyntaxHighlighter : SyntaxHighlighterBase() {
+object NativeDefinitionsSyntaxHighlighter : SyntaxHighlighterBase() {
 
     override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> =
         when (tokenType) {
@@ -153,22 +149,21 @@ class NativeDefinitionsSyntaxHighlighter : SyntaxHighlighterBase() {
 
     override fun getHighlightingLexer(): Lexer = NativeDefinitionsLexerAdapter()
 
-    companion object {
-        private fun createKeys(externalName: String, key: TextAttributesKey): Array<TextAttributesKey> {
-            return arrayOf(TextAttributesKey.createTextAttributesKey(externalName, key))
-        }
 
-        val BAD_CHAR_KEYS = createKeys("Unknown key", HighlighterColors.BAD_CHARACTER)
-        val COMMENT_KEYS = createKeys("Comment", DefaultLanguageHighlighterColors.LINE_COMMENT)
-        val EMPTY_KEYS = emptyArray<TextAttributesKey>()
-        val KNOWN_EXTENSIONS_KEYS = createKeys("Known extension", DefaultLanguageHighlighterColors.LABEL)
-        val KNOWN_PROPERTIES_KEYS = createKeys("Known property", DefaultLanguageHighlighterColors.KEYWORD)
-        val OPERATOR_KEYS = createKeys("Operator", DefaultLanguageHighlighterColors.OPERATION_SIGN)
-        val VALUE_KEYS = createKeys("Value", DefaultLanguageHighlighterColors.STRING)
+    private fun createKeys(externalName: String, key: TextAttributesKey): Array<TextAttributesKey> {
+        return arrayOf(TextAttributesKey.createTextAttributesKey(externalName, key))
     }
+
+    private val BAD_CHAR_KEYS = createKeys("Unknown key", HighlighterColors.BAD_CHARACTER)
+    private val COMMENT_KEYS = createKeys("Comment", DefaultLanguageHighlighterColors.LINE_COMMENT)
+    private val EMPTY_KEYS = emptyArray<TextAttributesKey>()
+    private val KNOWN_EXTENSIONS_KEYS = createKeys("Known extension", DefaultLanguageHighlighterColors.LABEL)
+    private val KNOWN_PROPERTIES_KEYS = createKeys("Known property", DefaultLanguageHighlighterColors.KEYWORD)
+    private val OPERATOR_KEYS = createKeys("Operator", DefaultLanguageHighlighterColors.OPERATION_SIGN)
+    private val VALUE_KEYS = createKeys("Value", DefaultLanguageHighlighterColors.STRING)
 }
 
 class NativeDefinitionsSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
     override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter =
-        NativeDefinitionsSyntaxHighlighter()
+        NativeDefinitionsSyntaxHighlighter
 }
