@@ -21,17 +21,17 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.util.PatchDeclarationParentsVisitor
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 
-fun makePatchParentsPhase(number: Int) =
-    object : AbstractIrFileCompilerPhase<JvmBackendContext>() {
-        override val name: String = "PatchParents$number"
-        override val description: String = "Patch parent references in IrFile, pass $number"
-        override val prerequisite: Set<CompilerPhase<*, *, *>> = emptySet()
-
-        override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: JvmBackendContext, input: IrFile): IrFile {
+fun makePatchParentsPhase(number: Int) = namedIrFilePhase(
+    lower = object : SameTypeCompilerPhase<CommonBackendContext, IrFile> {
+        override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: CommonBackendContext, input: IrFile): IrFile {
             input.acceptVoid(PatchDeclarationParentsVisitor())
             return input
         }
-    }
+    },
+    name = "PatchParents$number",
+    description = "Patch parent references in IrFile, pass $number",
+    nlevels = 0
+)
 
 class JvmLower(val context: JvmBackendContext) {
     fun lower(irFile: IrFile) {

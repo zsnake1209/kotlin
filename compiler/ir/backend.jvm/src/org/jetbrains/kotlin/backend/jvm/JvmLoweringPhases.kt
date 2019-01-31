@@ -14,10 +14,10 @@ import org.jetbrains.kotlin.name.NameUtils
 
 private fun makeJvmPhase(
     lowering: (JvmBackendContext) -> FileLoweringPass,
-    description: String,
     name: String,
-    prerequisite: Set<CompilerPhase<*, *, *>> = emptySet()
-) = makeIrFilePhase(lowering, description, name, prerequisite)
+    description: String,
+    prerequisite: Set<AnyNamedPhase> = emptySet()
+) = makeIrFilePhase(lowering, name, description, prerequisite)
 
 private val JvmCoercionToUnitPhase = makeJvmPhase(
     ::JvmCoercionToUnitPatcher,
@@ -118,7 +118,6 @@ private val FunctionNVarargInvokePhase = makeJvmPhase(
     description = "Handle invoke functions with large number of arguments"
 )
 
-
 private val InnerClassesPhase = makeJvmPhase(
     ::InnerClassesLowering,
     name = "InnerClasses",
@@ -131,13 +130,11 @@ private val InnerClassConstructorCallsPhase = makeJvmPhase(
     description = "Handle constructor calls for inner classes"
 )
 
-
 private val EnumClassPhase = makeJvmPhase(
     ::EnumClassLowering,
     name = "EnumClass",
     description = "Handle enum classes"
 )
-
 
 private val ObjectClassPhase = makeJvmPhase(
     ::ObjectClassLowering,
@@ -151,13 +148,11 @@ private val InitializersPhase = makeJvmPhase(
     description = "Handle initializer statements"
 )
 
-
 private val SingletonReferencesPhase = makeJvmPhase(
     ::SingletonReferencesLowering,
     name = "SingletonReferences",
     description = "Handle singleton references"
 )
-
 
 private val SyntheticAccessorPhase = makeJvmPhase(
     ::SyntheticAccessorLowering,
@@ -172,13 +167,11 @@ private val BridgePhase = makeJvmPhase(
     description = "Generate bridges"
 )
 
-
 private val JvmOverloadsAnnotationPhase = makeJvmPhase(
     ::JvmOverloadsAnnotationLowering,
     name = "JvmOverloadsAnnotation",
     description = "Handle JvmOverloads annotations"
 )
-
 
 private val JvmStaticAnnotationPhase = makeJvmPhase(
     ::JvmStaticAnnotationLowering,
@@ -186,20 +179,17 @@ private val JvmStaticAnnotationPhase = makeJvmPhase(
     description = "Handle JvmStatic annotations"
 )
 
-
 private val StaticDefaultFunctionPhase = makeJvmPhase(
     ::StaticDefaultFunctionLowering,
     name = "StaticDefaultFunction",
     description = "Generate static functions for default parameters"
 )
 
-
 private val TailrecPhase = makeJvmPhase(
     ::TailrecLowering,
     name = "Tailrec",
     description = "Handle tailrec calls"
 )
-
 
 private val ToArrayPhase = makeJvmPhase(
     ::ToArrayLowering,

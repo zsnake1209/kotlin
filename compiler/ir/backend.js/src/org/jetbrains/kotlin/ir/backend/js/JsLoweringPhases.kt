@@ -27,31 +27,33 @@ private fun ClassLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment
 
 private fun makeJsModulePhase(
     lowering: (JsIrBackendContext) -> FileLoweringPass,
-    description: String,
     name: String,
-    prerequisite: Set<CompilerPhase<*, *, *>> = emptySet()
-) = makeIrModulePhase<JsIrBackendContext>(lowering, description, name, prerequisite)
+    description: String,
+    prerequisite: Set<AnyNamedPhase> = emptySet()
+) = makeIrModulePhase<JsIrBackendContext>(lowering, name, description, prerequisite)
 
 private fun makeCustomJsModulePhase(
     op: (JsIrBackendContext, IrModuleFragment) -> Unit,
     description: String,
     name: String,
-    prerequisite: Set<CompilerPhase<*, *, *>> = emptySet()
-) = object : AbstractIrModuleCompilerPhase<JsIrBackendContext>() {
-    override val name = name
-    override val description = description
-    override val prerequisite = prerequisite
-
-    override fun invoke(
-        phaseConfig: PhaseConfig,
-        phaserState: PhaserState,
-        context: JsIrBackendContext,
-        input: IrModuleFragment
-    ): IrModuleFragment {
-        op(context, input)
-        return input
-    }
-}
+    prerequisite: Set<AnyNamedPhase> = emptySet()
+) = namedIrModulePhase(
+    object : SameTypeCompilerPhase<JsIrBackendContext, IrModuleFragment> {
+        override fun invoke(
+            phaseConfig: PhaseConfig,
+            phaserState: PhaserState,
+            context: JsIrBackendContext,
+            input: IrModuleFragment
+        ): IrModuleFragment {
+            op(context, input)
+            return input
+        }
+    },
+    name,
+    description,
+    prerequisite,
+    nlevels = 0
+)
 
 private val MoveExternalDeclarationsToSeparatePlacePhase = makeJsModulePhase(
     { MoveExternalDeclarationsToSeparatePlace() },
