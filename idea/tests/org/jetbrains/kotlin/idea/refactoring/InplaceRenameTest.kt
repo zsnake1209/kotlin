@@ -249,12 +249,15 @@ class InplaceRenameTest : LightPlatformCodeInsightTestCase() {
             assertFalse(handler.isRenaming(dataContext), "In-place rename is allowed for " + element)
         }
         else {
+            val expectedMessage = InTextDirectivesUtils.findStringWithPrefixes(myFile.text, "// SHOULD_FAIL_WITH: ")
             try {
                 assertTrue(handler.isRenaming(dataContext), "In-place rename not allowed for " + element)
                 CodeInsightTestUtil.doInlineRename(handler, newName, LightPlatformCodeInsightTestCase.getEditor(), element)
+                if (expectedMessage != null) {
+                    TestCase.fail("Refactoring completed without expected conflicts:\n$expectedMessage")
+                }
                 checkResultByFile(getTestName(false) + ".kt.after")
             } catch (e: BaseRefactoringProcessor.ConflictsInTestsException) {
-                val expectedMessage = InTextDirectivesUtils.findStringWithPrefixes(myFile.text, "// SHOULD_FAIL_WITH: ")
                 TestCase.assertEquals(expectedMessage, e.messages.joinToString())
             }
         }
