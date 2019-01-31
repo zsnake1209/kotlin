@@ -14,6 +14,6 @@ import org.jetbrains.kotlin.konan.library.KDEFINITIONS_FILE_EXTENSION
 class KotlinNativeFileTypeFactory : FileTypeFactory() {
     override fun createFileTypes(consumer: FileTypeConsumer) {
         consumer.consume(ArchiveFileType.INSTANCE, KLIB_FILE_EXTENSION)
-        consumer.consume(NativeDefinitionsFileType.INSTANCE, KDEFINITIONS_FILE_EXTENSION)
+        consumer.consume(NativeDefinitionsFileType, KDEFINITIONS_FILE_EXTENSION)
     }
 }
