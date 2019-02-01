@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
@@ -47,6 +47,7 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingUtils.isFunctionLiteral
 import org.jetbrains.kotlin.types.expressions.LabelResolver
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
@@ -298,6 +299,13 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
         }
 
         defaultSourceMapper.callSiteMarker = null
+
+        if (info.generateAssertField) {
+            assert(codegen is ExpressionCodegen) {
+                "codegens other than ExpressionCodegen are not supported yet"
+            }
+            codegen.cast<ExpressionCodegen>().parentCodegen.generateAssertField()
+        }
 
         return result
     }
