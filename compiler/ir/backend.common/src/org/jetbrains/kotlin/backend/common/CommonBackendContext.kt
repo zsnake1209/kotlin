@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.common
 
 import org.jetbrains.kotlin.backend.common.ir.Ir
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.ir.IrElement
@@ -27,4 +28,6 @@ interface CommonBackendContext : BackendContext {
     fun log(message: () -> String)
 
     fun report(element: IrElement?, irFile: IrFile?, message: String, isError: Boolean)
+
+    val configuration: CompilerConfiguration
 }

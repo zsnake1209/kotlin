@@ -49,6 +49,8 @@ class JvmBackendContext(
     val phaseConfig = PhaseConfig(jvmPhases, state.configuration)
     override var inVerbosePhase: Boolean = false
 
+    override val configuration get() = state.configuration
+
     init {
         if (state.configuration.get(CommonConfigurationKeys.LIST_PHASES) == true) {
             phaseConfig.list()

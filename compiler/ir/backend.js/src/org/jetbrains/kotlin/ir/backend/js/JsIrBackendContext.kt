@@ -49,7 +49,7 @@ class JsIrBackendContext(
     override val irBuiltIns: IrBuiltIns,
     val symbolTable: SymbolTable,
     irModuleFragment: IrModuleFragment,
-    val configuration: CompilerConfiguration,
+    override val configuration: CompilerConfiguration,
     val dependencies: List<IrModuleFragment>
 ) : CommonBackendContext {
 

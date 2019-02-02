@@ -131,7 +131,7 @@ abstract class IrPhaseDumperVerifier<in Context : CommonBackendContext, Data : I
     override fun dump(phase: AnyNamedPhase, context: Context, data: Data, beforeOrAfter: BeforeOrAfter) {
         fun separator(title: String) = println("\n\n--- $title ----------------------\n")
 
-//    if (!shouldBeDumped(context, input)) return
+        if (!shouldBeDumped(context, data)) return
 
         val beforeOrAfterStr = beforeOrAfter.name.toLowerCase()
         val title = "IR for ${data.getElementName()} $beforeOrAfterStr ${phase.description}"
@@ -140,6 +140,9 @@ abstract class IrPhaseDumperVerifier<in Context : CommonBackendContext, Data : I
     }
 
     override fun verify(context: Context, data: Data) = verifier(context, data)
+
+    private fun shouldBeDumped(context: Context, input: Data) =
+            input.getElementName() !in context.configuration.get(CommonConfigurationKeys.EXCLUDED_ELEMENTS_FROM_DUMPING, emptySet())
 }
 
 class IrFileDumperVerifier<in Context : CommonBackendContext>(verifier: (Context, IrFile) -> Unit) :
