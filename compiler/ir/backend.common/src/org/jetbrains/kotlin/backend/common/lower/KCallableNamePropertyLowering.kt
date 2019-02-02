@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.backend.common.lower
 
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
+import org.jetbrains.kotlin.backend.common.makeIrFilePhase
 import org.jetbrains.kotlin.builtins.functions.FunctionClassDescriptor
 import org.jetbrains.kotlin.builtins.getFunctionalClassKind
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -37,7 +38,13 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.types.KotlinType
 
-class KCallableNamePropertyLowering(val context: BackendContext) : FileLoweringPass {
+val KCallableNamePropertyPhase = makeIrFilePhase(
+    ::KCallableNamePropertyLowering,
+    name = "KCallableNameProperty",
+    description = "Replace name references for callables with constants"
+)
+
+private class KCallableNamePropertyLowering(val context: BackendContext) : FileLoweringPass {
     override fun lower(irFile: IrFile) {
         irFile.transformChildrenVoid(KCallableNamePropertyTransformer(this))
     }

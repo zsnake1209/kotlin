@@ -17,11 +17,13 @@
 package org.jetbrains.kotlin.backend.jvm
 
 import org.jetbrains.kotlin.backend.common.*
+import org.jetbrains.kotlin.backend.common.lower.*
+import org.jetbrains.kotlin.backend.jvm.lower.*
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.util.PatchDeclarationParentsVisitor
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 
-fun makePatchParentsPhase(number: Int) = namedIrFilePhase(
+private fun makePatchParentsPhase(number: Int) = namedIrFilePhase(
     lower = object : SameTypeCompilerPhase<CommonBackendContext, IrFile> {
         override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: CommonBackendContext, input: IrFile): IrFile {
             input.acceptVoid(PatchDeclarationParentsVisitor())
@@ -31,6 +33,53 @@ fun makePatchParentsPhase(number: Int) = namedIrFilePhase(
     name = "PatchParents$number",
     description = "Patch parent references in IrFile, pass $number",
     nlevels = 0
+)
+
+internal val jvmPhases = namedIrFilePhase(
+    name = "IrLowering",
+    description = "IR lowering",
+    lower = JvmCoercionToUnitPhase then
+            FileClassPhase then
+            KCallableNamePropertyPhase then
+
+            JvmLateinitPhase then
+
+            MoveCompanionObjectFieldsPhase then
+            ConstAndJvmFieldPropertiesPhase then
+            PropertiesPhase then
+            AnnotationPhase then
+
+            JvmDefaultArgumentStubPhase then
+
+            InterfacePhase then
+            InterfaceDelegationPhase then
+            SharedVariablesPhase then
+
+            makePatchParentsPhase(1) then
+
+            JvmLocalDeclarationsPhase then
+            CallableReferencePhase then
+            FunctionNVarargInvokePhase then
+
+            InnerClassesPhase then
+            InnerClassConstructorCallsPhase then
+
+            makePatchParentsPhase(2) then
+
+            EnumClassPhase then
+            ObjectClassPhase then
+            makeInitializersPhase(JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, true) then
+            SingletonReferencesPhase then
+            SyntheticAccessorPhase then
+            BridgePhase then
+            JvmOverloadsAnnotationPhase then
+            JvmStaticAnnotationPhase then
+            StaticDefaultFunctionPhase then
+
+            TailrecPhase then
+            ToArrayPhase then
+
+            makePatchParentsPhase(3)
 )
 
 class JvmLower(val context: JvmBackendContext) {

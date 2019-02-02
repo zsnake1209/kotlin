@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.backend.common.DeclarationContainerLoweringPass
 import org.jetbrains.kotlin.backend.common.descriptors.*
 import org.jetbrains.kotlin.backend.common.ir.copyTo
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
+import org.jetbrains.kotlin.backend.common.makeIrFilePhase
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
@@ -38,6 +39,18 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.NameUtils
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
 import java.util.*
+
+val JvmLocalDeclarationsPhase = makeIrFilePhase(
+    { context ->
+        LocalDeclarationsLowering(context, object : LocalNameProvider {
+            override fun localName(descriptor: DeclarationDescriptor): String =
+                NameUtils.sanitizeAsJavaIdentifier(super.localName(descriptor))
+        }, Visibilities.PUBLIC, true)
+    },
+    name = "JvmLocalDeclarations",
+    description = "Move local declarations to classes",
+    prerequisite = setOf(SharedVariablesPhase)
+)
 
 interface LocalNameProvider {
     fun localName(descriptor: DeclarationDescriptor): String =

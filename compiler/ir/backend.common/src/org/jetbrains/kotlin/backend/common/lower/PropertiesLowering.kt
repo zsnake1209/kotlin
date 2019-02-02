@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.common.lower
 
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
+import org.jetbrains.kotlin.backend.common.makeIrFilePhase
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
@@ -16,6 +17,12 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.utils.addIfNotNull
 import java.util.*
+
+val PropertiesPhase = makeIrFilePhase(
+    ::PropertiesLowering,
+    name = "Properties",
+    description = "Move fields and accessors for properties to their classes"
+)
 
 class PropertiesLowering() : IrElementTransformerVoid(), FileLoweringPass {
     constructor(@Suppress("UNUSED_PARAMETER") context: BackendContext) : this()

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.jvm.lower
 
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
+import org.jetbrains.kotlin.backend.common.makeIrFilePhase
 import org.jetbrains.kotlin.backend.common.utils.isSubtypeOf
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.ir.declarations.IrFile
@@ -15,6 +16,12 @@ import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.psi2ir.transformations.InsertImplicitCasts
+
+internal val JvmCoercionToUnitPhase = makeIrFilePhase(
+    ::JvmCoercionToUnitPatcher,
+    name = "JvmCoercionToUnit",
+    description = "Insert conversions to unit after IrCalls where needed"
+)
 
 class JvmCoercionToUnitPatcher(val context: JvmBackendContext) :
     InsertImplicitCasts(

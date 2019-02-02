@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.backend.jvm.lower
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.lower.DECLARATION_ORIGIN_FUNCTION_FOR_DEFAULT_PARAMETER
+import org.jetbrains.kotlin.backend.common.makeIrFilePhase
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.ir.IrStatement
@@ -26,7 +27,13 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
-class StaticDefaultFunctionLowering() : IrElementTransformerVoid(), ClassLoweringPass {
+internal val StaticDefaultFunctionPhase = makeIrFilePhase(
+    ::StaticDefaultFunctionLowering,
+    name = "StaticDefaultFunction",
+    description = "Generate static functions for default parameters"
+)
+
+private class StaticDefaultFunctionLowering() : IrElementTransformerVoid(), ClassLoweringPass {
     constructor(@Suppress("UNUSED_PARAMETER") context: BackendContext) : this()
 
 
