@@ -124,8 +124,8 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
         }
 
         val methodsToBridge = irFunction.getMethodsToBridge(refToJavaGenerated, specialOverrideSignature)
-        loop@ for ((signature, method) in methodsToBridge) {
-            if (irFunction.modality == Modality.ABSTRACT && signature.sameCallAs(ourSignature)) continue@loop
+        for ((signature, method) in methodsToBridge) {
+            if (irFunction.modality == Modality.ABSTRACT && signature.sameCallAs(ourSignature)) continue
 
             val defaultValueGenerator = if (signature == specialOverrideSignature) specialOverrideValueGenerator else null
             val isSpecial = (defaultValueGenerator != null) ||
