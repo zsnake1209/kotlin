@@ -26,14 +26,14 @@ internal fun getClasspathChanges(
     }
 
     reporter?.apply {
-        report { "classpath: ${pathsAsString(classpath)}" }
-        report { "classpathSet: ${pathsAsString(classpathSet)}" }
-        report { "Modified files: ${pathsAsString(changedFiles.modified)}" }
-        report { "Removed files: ${pathsAsString(changedFiles.removed)}" }
+        report { "classpath: ${classpath.joinToString()}" }
+        report { "classpathSet: ${classpathSet.joinToString()}" }
+        report { "Modified files: ${changedFiles.modified.joinToString()}" }
+        report { "Removed files: ${changedFiles.removed.joinToString()}" }
     }
 
-    val modifiedClasspath = changedFiles.modified.map { it.canonicalFile }.filterTo(HashSet()) { it in classpathSet }
-    val removedClasspath = changedFiles.removed.map { it.canonicalFile }.filterTo(HashSet()) { it in classpathSet }
+    val modifiedClasspath = changedFiles.modified.map { it }.filterTo(HashSet()) { it in classpathSet }
+    val removedClasspath = changedFiles.removed.map { it }.filterTo(HashSet()) { it in classpathSet }
 
     reporter?.apply {
         report { "Modified classpath: ${pathsAsString(modifiedClasspath)}" }
