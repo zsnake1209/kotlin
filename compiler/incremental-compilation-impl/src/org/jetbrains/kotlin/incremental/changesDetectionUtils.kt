@@ -26,6 +26,8 @@ internal fun getClasspathChanges(
     }
 
     reporter?.apply {
+        report { "classpath: ${pathsAsString(classpath)}" }
+        report { "classpathSet: ${pathsAsString(classpathSet)}" }
         report { "Modified files: ${pathsAsString(changedFiles.modified)}" }
         report { "Removed files: ${pathsAsString(changedFiles.removed)}" }
     }
