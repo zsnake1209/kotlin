@@ -25,8 +25,18 @@ internal fun getClasspathChanges(
         }
     }
 
+    reporter?.apply {
+        report { "Modified files: ${pathsAsString(changedFiles.modified)}" }
+        report { "Removed files: ${pathsAsString(changedFiles.removed)}" }
+    }
+
     val modifiedClasspath = changedFiles.modified.filterTo(HashSet()) { it in classpathSet }
     val removedClasspath = changedFiles.removed.filterTo(HashSet()) { it in classpathSet }
+
+    reporter?.apply {
+        report { "Modified classpath: ${pathsAsString(modifiedClasspath)}" }
+        report { "Removed classpath: ${pathsAsString(removedClasspath)}" }
+    }
 
     // todo: removed classes could be processed normally
     if (removedClasspath.isNotEmpty()) return ChangesEither.Unknown("Some files are removed from classpath $removedClasspath")
