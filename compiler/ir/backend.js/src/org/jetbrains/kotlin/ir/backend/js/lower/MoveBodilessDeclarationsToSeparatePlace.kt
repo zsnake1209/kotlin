@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
 import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
+import org.jetbrains.kotlin.ir.util.kotlinPackageFqn
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
@@ -47,22 +48,26 @@ class MoveBodilessDeclarationsToSeparatePlace() : FileLoweringPass {
     private fun isBuiltInClass(declaration: IrDeclaration): Boolean =
         declaration is IrClass && declaration.name in builtInClasses
 
-    private val packageFragment = IrExternalPackageFragmentImpl(object : IrExternalPackageFragmentSymbol {
-        override val descriptor: PackageFragmentDescriptor
-            get() = error("Operation is unsupported")
-
-        private var _owner: IrExternalPackageFragment? = null
-        override val owner get() = _owner!!
-
-        override val isBound get() = _owner != null
-
-        override fun bind(owner: IrExternalPackageFragment) {
-            _owner = owner
-        }
-    }, FqName.ROOT)
+    private val packageFragmentMap = mutableMapOf<FqName, IrExternalPackageFragment>()
 
     override fun lower(irFile: IrFile) {
         val it = irFile.declarations.iterator()
+
+        val packageFragment = packageFragmentMap.getOrPut(irFile.fqName) {
+            IrExternalPackageFragmentImpl(object : IrExternalPackageFragmentSymbol {
+                override val descriptor: PackageFragmentDescriptor
+                    get() = error("Operation is unsupported")
+
+                private var _owner: IrExternalPackageFragment? = null
+                override val owner get() = _owner!!
+
+                override val isBound get() = _owner != null
+
+                override fun bind(owner: IrExternalPackageFragment) {
+                    _owner = owner
+                }
+            }, irFile.fqName)
+        }
 
         while (it.hasNext()) {
             val d = it.next()
