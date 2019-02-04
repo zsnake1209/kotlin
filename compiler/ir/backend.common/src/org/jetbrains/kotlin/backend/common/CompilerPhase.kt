@@ -27,7 +27,7 @@ fun <R> PhaserState.downlevel(nlevels: Int = 1, block: () -> R): R {
     return result
 }
 
-interface CompilerPhase<in Context : CommonBackendContext, Input, Output> {
+interface CompilerPhase<in Context : CommonBackendContext, in Input, out Output> {
     fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: Input): Output
 
     fun getNamedSubphases(startDepth: Int = 0): List<Pair<Int, NamedCompilerPhase<*, *, *>>> = emptyList()
@@ -41,7 +41,7 @@ fun <Context: CommonBackendContext, Input, Output> CompilerPhase<Context,  Input
 
 interface SameTypeCompilerPhase<in Context: CommonBackendContext, Data> : CompilerPhase<Context, Data, Data>
 
-interface NamedCompilerPhase<in Context : CommonBackendContext, Input, Output> : CompilerPhase<Context, Input, Output> {
+interface NamedCompilerPhase<in Context : CommonBackendContext, in Input, out Output> : CompilerPhase<Context, Input, Output> {
     val name: String
     val description: String
     val prerequisite: Set<AnyNamedPhase> get() = emptySet()
@@ -57,8 +57,11 @@ interface PhaseDumperVerifier<in Context : CommonBackendContext, Data> {
 }
 
 abstract class AbstractNamedPhaseWrapper<in Context : CommonBackendContext, Input, Output>(
-    private val lower: CompilerPhase<Context, Input, Output>,
-    private val nlevels: Int = 0
+    override val name: String,
+    override val description: String,
+    override val prerequisite: Set<AnyNamedPhase>,
+    private val nlevels: Int = 0,
+    private val lower: CompilerPhase<Context, Input, Output>
 ) : NamedCompilerPhase<Context, Input, Output> {
     abstract val inputDumperVerifier: PhaseDumperVerifier<Context, Input>
     abstract val outputDumperVerifier: PhaseDumperVerifier<Context, Output>
@@ -109,6 +112,7 @@ abstract class AbstractNamedPhaseWrapper<in Context : CommonBackendContext, Inpu
                 lower.invoke(phaseConfig, phaserState, context, source)
             }
         }
+        // TODO: use a proper logger
         println("${"\t".repeat(phaserState.depth)}$description: $msec msec")
         return result!!
     }
@@ -128,6 +132,7 @@ abstract class IrPhaseDumperVerifier<in Context : CommonBackendContext, Data : I
 ) : PhaseDumperVerifier<Context, Data> {
     abstract fun Data.getElementName(): String
 
+    // TODO: use a proper logger.
     override fun dump(phase: AnyNamedPhase, context: Context, data: Data, beforeOrAfter: BeforeOrAfter) {
         fun separator(title: String) = println("\n\n--- $title ----------------------\n")
 
@@ -174,11 +179,14 @@ infix fun <Context : CommonBackendContext, Input, Mid, Output> CompilerPhase<Con
 }
 
 // Naming compound phases.
-abstract class SameTypeNamedPhaseWrapper<in Context : CommonBackendContext, Data>(
+class SameTypeNamedPhaseWrapper<in Context : CommonBackendContext, Data>(
+    name: String,
+    description: String,
+    prerequisite: Set<AnyNamedPhase>,
+    nlevels: Int = 0,
     lower: CompilerPhase<Context, Data, Data>,
-    nlevels: Int = 0
-) : AbstractNamedPhaseWrapper<Context, Data, Data>(lower, nlevels), SameTypeCompilerPhase<Context, Data> {
-    abstract val dumperVerifier: PhaseDumperVerifier<Context, Data>
+    val dumperVerifier: PhaseDumperVerifier<Context, Data>
+) : AbstractNamedPhaseWrapper<Context, Data, Data>(name, description, prerequisite, nlevels, lower), SameTypeCompilerPhase<Context, Data> {
     override val inputDumperVerifier get() = dumperVerifier
     override val outputDumperVerifier get() = dumperVerifier
 }
@@ -187,73 +195,62 @@ abstract class SameTypeNamedPhaseWrapper<in Context : CommonBackendContext, Data
 // that dumping functions are implemented by mixins.
 
 fun <Context : CommonBackendContext> namedIrModulePhase(
-    lower: CompilerPhase<Context, IrModuleFragment, IrModuleFragment>,
     name: String,
     description: String,
     prerequisite: Set<AnyNamedPhase> = emptySet(),
     verify: (Context, IrModuleFragment) -> Unit = { _, _ -> },
-    nlevels: Int = 1
-) = object : SameTypeNamedPhaseWrapper<Context, IrModuleFragment>(lower, nlevels) {
-    override val dumperVerifier = IrModuleDumperVerifier(verify)
-    override val name = name
-    override val description = description
-    override val prerequisite = prerequisite
-}
+    nlevels: Int = 1,
+    lower: CompilerPhase<Context, IrModuleFragment, IrModuleFragment>
+) = SameTypeNamedPhaseWrapper(name, description, prerequisite, nlevels, lower, IrModuleDumperVerifier(verify))
 
 fun <Context : CommonBackendContext> namedIrFilePhase(
-    lower: CompilerPhase<Context, IrFile, IrFile>,
     name: String,
     description: String,
     prerequisite: Set<AnyNamedPhase> = emptySet(),
     verify: (Context, IrFile) -> Unit = { _, _ -> },
-    nlevels: Int = 1
-) = object : SameTypeNamedPhaseWrapper<Context, IrFile>(lower, nlevels) {
-    override val dumperVerifier = IrFileDumperVerifier(verify)
-    override val name = name
-    override val description = description
-    override val prerequisite = prerequisite
-}
+    nlevels: Int = 1,
+    lower: CompilerPhase<Context, IrFile, IrFile>
+) = SameTypeNamedPhaseWrapper(name, description, prerequisite, nlevels, lower, IrFileDumperVerifier(verify))
 
 fun <Context : CommonBackendContext> namedUnitPhase(
-        lower: CompilerPhase<Context, Unit, Unit>,
-        name: String,
-        description: String,
-        prerequisite: Set<AnyNamedPhase> = emptySet(),
-        nlevels: Int = 1
-) = object : SameTypeNamedPhaseWrapper<Context, Unit>(lower, nlevels) {
-    override val dumperVerifier = EmptyDumperVerifier<Context, Unit>()
-    override val name = name
-    override val description = description
-    override val prerequisite = prerequisite
-}
-
-fun <Context : CommonBackendContext> namedOpUnitPhase(
-    op: Context.() -> Unit,
     name: String,
     description: String,
-    prerequisite: Set<AnyNamedPhase>
-) = object : SameTypeNamedPhaseWrapper<Context, Unit>(
+    prerequisite: Set<AnyNamedPhase> = emptySet(),
+    nlevels: Int = 1,
+    lower: CompilerPhase<Context, Unit, Unit>
+) = SameTypeNamedPhaseWrapper(name, description, prerequisite, nlevels, lower, EmptyDumperVerifier())
+
+fun <Context : CommonBackendContext> namedOpUnitPhase(
+    name: String,
+    description: String,
+    prerequisite: Set<AnyNamedPhase>,
+    op: Context.() -> Unit
+) = namedUnitPhase(
+    name, description, prerequisite,
+    nlevels = 0,
     lower = object : SameTypeCompilerPhase<Context, Unit> {
         override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: Unit) {
             context.op()
         }
     }
-) {
-    override val dumperVerifier = EmptyDumperVerifier<Context, Unit>()
-    override val name = name
-    override val description = description
-    override val prerequisite = prerequisite
-}
+)
 
 fun <Context : CommonBackendContext> performByIrFile(
-    lower: CompilerPhase<Context, IrFile, IrFile>,
     name: String = "PerformByIrFile",
     description: String = "Perform phases by IrFile",
     prerequisite: Set<AnyNamedPhase> = emptySet(),
-    verify: (Context, IrModuleFragment) -> Unit = { _, _ -> }
-) = object : SameTypeNamedPhaseWrapper<Context, IrModuleFragment>(
+    verify: (Context, IrModuleFragment) -> Unit = { _, _ -> },
+    lower: CompilerPhase<Context, IrFile, IrFile>
+) = namedIrModulePhase(
+    name, description, prerequisite, verify,
+    nlevels = 1,
     lower = object : SameTypeCompilerPhase<Context, IrModuleFragment> {
-        override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: IrModuleFragment): IrModuleFragment {
+        override fun invoke(
+            phaseConfig: PhaseConfig,
+            phaserState: PhaserState,
+            context: Context,
+            input: IrModuleFragment
+        ): IrModuleFragment {
             for (irFile in input.files) {
                 lower.invoke(phaseConfig, phaserState, context, irFile)
             }
@@ -263,14 +260,8 @@ fun <Context : CommonBackendContext> performByIrFile(
         }
 
         override fun getNamedSubphases(startDepth: Int) = lower.getNamedSubphases(startDepth)
-    },
-    nlevels = 1
-) {
-    override val dumperVerifier = IrModuleDumperVerifier(verify)
-    override val name = name
-    override val description = description
-    override val prerequisite = prerequisite
-}
+    }
+)
 
 fun <Context : CommonBackendContext> makeIrFilePhase(
     lowering: (Context) -> FileLoweringPass,
@@ -279,14 +270,14 @@ fun <Context : CommonBackendContext> makeIrFilePhase(
     prerequisite: Set<AnyNamedPhase> = emptySet(),
     verify: (Context, IrFile) -> Unit = { _, _ -> }
 ) = namedIrFilePhase(
-    object : SameTypeCompilerPhase<Context, IrFile> {
+    name, description, prerequisite, verify,
+    nlevels = 0,
+    lower = object : SameTypeCompilerPhase<Context, IrFile> {
         override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: IrFile): IrFile {
             lowering(context).lower(input)
             return input
         }
-    },
-    name, description, prerequisite, verify, nlevels = 0
-
+    }
 )
 
 fun <Context : CommonBackendContext> makeIrModulePhase(
@@ -296,7 +287,9 @@ fun <Context : CommonBackendContext> makeIrModulePhase(
     prerequisite: Set<AnyNamedPhase> = emptySet(),
     verify: (Context, IrModuleFragment) -> Unit = { _, _ -> }
 ) = namedIrModulePhase(
-    object : SameTypeCompilerPhase<Context, IrModuleFragment> {
+    name, description, prerequisite, verify,
+    nlevels = 0,
+    lower = object : SameTypeCompilerPhase<Context, IrModuleFragment> {
         override fun invoke(
             phaseConfig: PhaseConfig,
             phaserState: PhaserState,
@@ -306,8 +299,7 @@ fun <Context : CommonBackendContext> makeIrModulePhase(
             lowering(context).lower(input)
             return input
         }
-    },
-    name, description, prerequisite, verify, nlevels = 0
+    }
 )
 
 fun <Context : CommonBackendContext, Input> unitPhase(
@@ -317,15 +309,14 @@ fun <Context : CommonBackendContext, Input> unitPhase(
     op: Context.() -> Unit
 ) =
     object : AbstractNamedPhaseWrapper<Context, Input, Unit>(
+        name, description, prerequisite,
+        nlevels = 0,
         lower = object : CompilerPhase<Context, Input, Unit> {
             override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState, context: Context, input: Input) {
                 context.op()
             }
         }
     ) {
-        override val name = name
-        override val description = description
-        override val prerequisite = prerequisite
         override val inputDumperVerifier = EmptyDumperVerifier<Context, Input>()
         override val outputDumperVerifier = EmptyDumperVerifier<Context, Unit>()
     }
@@ -350,7 +341,7 @@ class PhaseConfig(private val compoundPhase: CompilerPhase<*, *, *>, config: Com
     val phases = compoundPhase.getNamedSubphases().map { (_, phase) -> phase }.associate { it.name to it }
     private val enabledMut = computeEnabled(config).toMutableSet()
 
-    val enabled get() = enabledMut as Set<AnyNamedPhase>
+    val enabled: Set<AnyNamedPhase> get() = enabledMut
 
     val verbose = phaseSetFromConfiguration(config, CommonConfigurationKeys.VERBOSE_PHASES)
     val toDumpStateBefore: Set<AnyNamedPhase>

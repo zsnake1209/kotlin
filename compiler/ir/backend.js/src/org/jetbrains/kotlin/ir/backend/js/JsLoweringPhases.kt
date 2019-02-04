@@ -25,12 +25,23 @@ private fun DeclarationContainerLoweringPass.runOnFilesPostfix(files: Iterable<I
 
 private fun ClassLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) = moduleFragment.files.forEach { runOnFilePostfix(it) }
 
+private fun validationCallback(context: JsIrBackendContext, module: IrModuleFragment) {
+    val validatorConfig = IrValidatorConfig(
+        abortOnError = true,
+        ensureAllNodesAreDifferent = true,
+        checkTypes = false,
+        checkDescriptors = false
+    )
+    module.accept(IrValidator(context, validatorConfig), null)
+    module.accept(CheckDeclarationParentsVisitor, null)
+}
+
 private fun makeJsModulePhase(
     lowering: (JsIrBackendContext) -> FileLoweringPass,
     name: String,
     description: String,
     prerequisite: Set<AnyNamedPhase> = emptySet()
-) = makeIrModulePhase<JsIrBackendContext>(lowering, name, description, prerequisite)
+) = makeIrModulePhase<JsIrBackendContext>(lowering, name, description, prerequisite, verify = ::validationCallback)
 
 private fun makeCustomJsModulePhase(
     op: (JsIrBackendContext, IrModuleFragment) -> Unit,
@@ -38,7 +49,12 @@ private fun makeCustomJsModulePhase(
     name: String,
     prerequisite: Set<AnyNamedPhase> = emptySet()
 ) = namedIrModulePhase(
-    object : SameTypeCompilerPhase<JsIrBackendContext, IrModuleFragment> {
+    name,
+    description,
+    prerequisite,
+    verify = ::validationCallback,
+    nlevels = 0,
+    lower = object : SameTypeCompilerPhase<JsIrBackendContext, IrModuleFragment> {
         override fun invoke(
             phaseConfig: PhaseConfig,
             phaserState: PhaserState,
@@ -48,11 +64,7 @@ private fun makeCustomJsModulePhase(
             op(context, input)
             return input
         }
-    },
-    name,
-    description,
-    prerequisite,
-    nlevels = 0
+    }
 )
 
 private val MoveExternalDeclarationsToSeparatePlacePhase = makeJsModulePhase(
