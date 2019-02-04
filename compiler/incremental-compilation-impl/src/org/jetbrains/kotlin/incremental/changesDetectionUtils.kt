@@ -20,7 +20,7 @@ internal fun getClasspathChanges(
     val classpathSet = HashSet<File>()
     for (file in classpath) {
         when {
-            file.isFile -> classpathSet.add(file)
+            file.isFile -> classpathSet.add(file.canonicalFile)
             file.isDirectory -> file.walk().filterTo(classpathSet) { it.isFile }
         }
     }
@@ -32,8 +32,8 @@ internal fun getClasspathChanges(
         report { "Removed files: ${pathsAsString(changedFiles.removed)}" }
     }
 
-    val modifiedClasspath = changedFiles.modified.filterTo(HashSet()) { it in classpathSet }
-    val removedClasspath = changedFiles.removed.filterTo(HashSet()) { it in classpathSet }
+    val modifiedClasspath = changedFiles.modified.map { it.canonicalFile }.filterTo(HashSet()) { it in classpathSet }
+    val removedClasspath = changedFiles.removed.map { it.canonicalFile }.filterTo(HashSet()) { it in classpathSet }
 
     reporter?.apply {
         report { "Modified classpath: ${pathsAsString(modifiedClasspath)}" }
