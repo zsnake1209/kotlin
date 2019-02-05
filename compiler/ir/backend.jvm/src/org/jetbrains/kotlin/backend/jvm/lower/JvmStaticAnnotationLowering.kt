@@ -36,7 +36,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.annotations.JVM_STATIC_ANNOTATION_FQ_NAME
 import org.jetbrains.org.objectweb.asm.Opcodes
 
-internal val JvmStaticAnnotationPhase = makeIrFilePhase(
+internal val jvmStaticAnnotationPhase = makeIrFilePhase(
     ::JvmStaticAnnotationLowering,
     name = "JvmStaticAnnotation",
     description = "Handle JvmStatic annotations"

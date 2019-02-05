@@ -39,46 +39,46 @@ private fun makePatchParentsPhase(number: Int) = namedIrFilePhase(
 internal val jvmPhases = namedIrFilePhase(
     name = "IrLowering",
     description = "IR lowering",
-    lower = JvmCoercionToUnitPhase then
-            FileClassPhase then
-            KCallableNamePropertyPhase then
+    lower = jvmCoercionToUnitPhase then
+            fileClassPhase then
+            kCallableNamePropertyPhase then
 
-            JvmLateinitPhase then
+            jvmLateinitPhase then
 
-            MoveCompanionObjectFieldsPhase then
-            ConstAndJvmFieldPropertiesPhase then
-            PropertiesPhase then
-            AnnotationPhase then
+            moveCompanionObjectFieldsPhase then
+            constAndJvmFieldPropertiesPhase then
+            propertiesPhase then
+            annotationPhase then
 
-            JvmDefaultArgumentStubPhase then
+            jvmDefaultArgumentStubPhase then
 
-            InterfacePhase then
-            InterfaceDelegationPhase then
-            SharedVariablesPhase then
+            interfacePhase then
+            interfaceDelegationPhase then
+            sharedVariablesPhase then
 
             makePatchParentsPhase(1) then
 
-            JvmLocalDeclarationsPhase then
-            CallableReferencePhase then
-            FunctionNVarargInvokePhase then
+            jvmLocalDeclarationsPhase then
+            callableReferencePhase then
+            functionNVarargInvokePhase then
 
-            InnerClassesPhase then
-            InnerClassConstructorCallsPhase then
+            innerClassesPhase then
+            innerClassConstructorCallsPhase then
 
             makePatchParentsPhase(2) then
 
-            EnumClassPhase then
-            ObjectClassPhase then
+            enumClassPhase then
+            objectClassPhase then
             makeInitializersPhase(JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, true) then
-            SingletonReferencesPhase then
-            SyntheticAccessorPhase then
-            BridgePhase then
-            JvmOverloadsAnnotationPhase then
-            JvmStaticAnnotationPhase then
-            StaticDefaultFunctionPhase then
+            singletonReferencesPhase then
+            syntheticAccessorPhase then
+            bridgePhase then
+            jvmOverloadsAnnotationPhase then
+            jvmStaticAnnotationPhase then
+            staticDefaultFunctionPhase then
 
-            TailrecPhase then
-            ToArrayPhase then
+            tailrecPhase then
+            toArrayPhase then
 
             makePatchParentsPhase(3)
 )

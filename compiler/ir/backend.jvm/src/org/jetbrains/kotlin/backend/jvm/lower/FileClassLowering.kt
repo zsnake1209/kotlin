@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.psi2ir.PsiSourceManager
 import org.jetbrains.kotlin.resolve.source.KotlinSourceElement
 import java.util.*
 
-internal val FileClassPhase = makeIrFilePhase(
+internal val fileClassPhase = makeIrFilePhase(
     ::FileClassLowering,
     name = "FileClass",
     description = "Put file level function and property declaration into a class"

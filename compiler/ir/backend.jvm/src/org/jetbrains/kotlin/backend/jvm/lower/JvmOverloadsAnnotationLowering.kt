@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 import org.jetbrains.kotlin.resolve.jvm.annotations.findJvmOverloadsAnnotation
 
-internal val JvmOverloadsAnnotationPhase = makeIrFilePhase(
+internal val jvmOverloadsAnnotationPhase = makeIrFilePhase(
     ::JvmOverloadsAnnotationLowering,
     name = "JvmOverloadsAnnotation",
     description = "Handle JvmOverloads annotations"

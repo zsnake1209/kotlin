@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
 
-internal val AnnotationPhase = makeIrFilePhase(
+internal val annotationPhase = makeIrFilePhase(
     ::AnnotationLowering,
     name = "Annotation",
     description = "Remove constructors from annotation classes"

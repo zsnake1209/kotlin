@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.isObject
 
-internal val ObjectClassPhase = makeIrFilePhase(
+internal val objectClassPhase = makeIrFilePhase(
     ::ObjectClassLowering,
     name = "ObjectClass",
     description = "Handle object classes"

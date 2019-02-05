@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.ir.util.resolveFakeOverride
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-val JvmLateinitPhase = makeIrFilePhase(
+val jvmLateinitPhase = makeIrFilePhase(
     { context -> LateinitLowering(context, true) },
     name = "Lateinit",
     description = "Insert checks for lateinit field references"

@@ -38,11 +38,11 @@ import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
-internal val SyntheticAccessorPhase = makeIrFilePhase(
+internal val syntheticAccessorPhase = makeIrFilePhase(
     ::SyntheticAccessorLowering,
     name = "SyntheticAccessor",
     description = "Introduce synthetic accessors",
-    prerequisite = setOf(ObjectClassPhase)
+    prerequisite = setOf(objectClassPhase)
 )
 
 private class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElementTransformerVoidWithContext(), FileLoweringPass {

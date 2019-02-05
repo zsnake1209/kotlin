@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.java.JvmAbi.JVM_FIELD_ANNOTATION_FQ_NAME
 import org.jetbrains.kotlin.name.Name
 
-internal val MoveCompanionObjectFieldsPhase = makeIrFilePhase(
+internal val moveCompanionObjectFieldsPhase = makeIrFilePhase(
     ::MoveCompanionObjectFieldsLowering,
     name = "MoveCompanionObjectFields",
     description = "Move companion object fields to static fields of companion's owner"

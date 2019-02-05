@@ -65,7 +65,7 @@ class CrIrType(val type: Type) : IrType {
     override val annotations = emptyList()
 }
 
-internal val CallableReferencePhase = makeIrFilePhase(
+internal val callableReferencePhase = makeIrFilePhase(
     ::CallableReferenceLowering,
     name = "CallableReference",
     description = "Handle callable references"

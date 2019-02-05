@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.utils.addIfNotNull
 import java.util.*
 
-val PropertiesPhase = makeIrFilePhase(
+val propertiesPhase = makeIrFilePhase(
     ::PropertiesLowering,
     name = "Properties",
     description = "Move fields and accessors for properties to their classes"

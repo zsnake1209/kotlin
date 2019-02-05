@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.org.objectweb.asm.Opcodes
 import java.util.*
 
-internal val EnumClassPhase = makeIrFilePhase(
+internal val enumClassPhase = makeIrFilePhase(
     ::EnumClassLowering,
     name = "EnumClass",
     description = "Handle enum classes"

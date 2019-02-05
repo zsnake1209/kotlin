@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
-internal val StaticDefaultFunctionPhase = makeIrFilePhase(
+internal val staticDefaultFunctionPhase = makeIrFilePhase(
     ::StaticDefaultFunctionLowering,
     name = "StaticDefaultFunction",
     description = "Generate static functions for default parameters"

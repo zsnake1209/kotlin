@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.org.objectweb.asm.Opcodes
 
-internal val InterfacePhase = makeIrFilePhase(
+internal val interfacePhase = makeIrFilePhase(
     ::InterfaceLowering,
     name = "Interface",
     description = "Move default implementations of interface members to DefaultImpls class"

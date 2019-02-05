@@ -43,7 +43,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
 import org.jetbrains.kotlin.types.Variance
 
-internal val ToArrayPhase = makeIrFilePhase(
+internal val toArrayPhase = makeIrFilePhase(
     ::ToArrayLowering,
     name = "ToArray",
     description = "Handle toArray functions"
