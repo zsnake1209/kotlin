@@ -17,11 +17,13 @@
 package org.jetbrains.kotlin.ir.util
 
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.SourceManager
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -41,7 +43,7 @@ fun IrFile.dumpTreesFromLineNumber(lineNumber: Int): String {
     return sb.toString()
 }
 
-class DumpIrTreeVisitor(out: Appendable) : IrElementVisitor<Unit, String> {
+class DumpIrTreeVisitor(out: Appendable, private val renderDescriptor: Boolean = false) : IrElementVisitor<Unit, String> {
 
     private val printer = Printer(out, "  ")
     private val elementRenderer = RenderIrElementVisitor()
@@ -119,9 +121,9 @@ class DumpIrTreeVisitor(out: Appendable) : IrElementVisitor<Unit, String> {
             isBound ->
                 owner.dumpInternal(label)
             label != null ->
-                printer.println("$label: ", "UNBOUND: ", DescriptorRenderer.COMPACT.render(descriptor))
+                printer.println("$label: ", "UNBOUND: ", renderDescriptor(descriptor))
             else ->
-                printer.println("UNBOUND: ", DescriptorRenderer.COMPACT.render(descriptor))
+                printer.println("UNBOUND: ", renderDescriptor(descriptor))
         }
     }
 
@@ -178,10 +180,14 @@ class DumpIrTreeVisitor(out: Appendable) : IrElementVisitor<Unit, String> {
             dumpTypeArguments(expression)
             expression.dispatchReceiver?.accept(this, "\$this")
             expression.extensionReceiver?.accept(this, "\$receiver")
-            for (valueParameter in expression.descriptor.valueParameters) {
-                expression.getValueArgument(valueParameter.index)?.accept(this, valueParameter.name.asString())
+            for (i in 0 until expression.valueArgumentsCount) {
+                expression.getValueArgument(i)?.accept(this, expression.descriptor.renderParameterName(i))
             }
         }
+    }
+
+    private fun CallableDescriptor.renderParameterName(index: Int): String {
+        return if (renderDescriptor) valueParameters[index].name.asString() else "arg$index"
     }
 
     private fun dumpTypeArguments(expression: IrMemberAccessExpression) {
@@ -193,11 +199,15 @@ class DumpIrTreeVisitor(out: Appendable) : IrElementVisitor<Unit, String> {
     }
 
     private fun CallableDescriptor.renderTypeParameter(index: Int): String {
-        val typeParameter = original.typeParameters.getOrNull(index)
-        return if (typeParameter != null)
-            DescriptorRenderer.ONLY_NAMES_WITH_SHORT_TYPES.render(typeParameter)
-        else
-            "<`$index>"
+        return if (renderDescriptor) {
+            val typeParameter = original.typeParameters.getOrNull(index)
+            if (typeParameter != null)
+                DescriptorRenderer.ONLY_NAMES_WITH_SHORT_TYPES.render(typeParameter)
+            else
+                "<`$index>"
+        } else {
+            "P$index"
+        }
     }
 
     private fun IrMemberAccessExpression.renderTypeArgument(index: Int): String =
@@ -289,6 +299,9 @@ class DumpIrTreeVisitor(out: Appendable) : IrElementVisitor<Unit, String> {
         }
 
     }
+
+    private fun renderDescriptor(descriptor: DeclarationDescriptor) =
+        if (renderDescriptor) DescriptorRenderer.COMPACT.render(descriptor) else "<DESCRIPTOR>"
 
     private inline fun indented(label: String, body: () -> Unit) {
         printer.println("$label:")
