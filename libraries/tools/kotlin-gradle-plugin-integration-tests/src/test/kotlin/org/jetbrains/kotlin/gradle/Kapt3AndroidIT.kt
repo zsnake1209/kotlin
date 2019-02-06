@@ -128,6 +128,25 @@ open class Kapt3AndroidIT : Kapt3BaseIT() {
     }
 
     @Test
+    fun testInterProjectIC() = with(Project("android-inter-project-ic", directoryPrefix = "kapt2")) {
+        build("assembleDebug") {
+            assertSuccessful()
+            assertKaptSuccessful()
+        }
+
+        /*val aKt = projectDir.getFileByName("a.kt").also { assert(it.exists()) }
+        aKt.modify {
+            assert(it.contains("CrashMe2(1000)"))
+            it.replace("CrashMe2(1000)", "CrashMe2(2000)")
+        }
+
+        build("assembleDebug") {
+            assertSuccessful()
+            assertKaptSuccessful()
+        }*/
+    }
+
+    @Test
     fun testICWithAnonymousClasses() {
         val project = Project("icAnonymousTypes", directoryPrefix = "kapt2")
         setupDataBinding(project)
