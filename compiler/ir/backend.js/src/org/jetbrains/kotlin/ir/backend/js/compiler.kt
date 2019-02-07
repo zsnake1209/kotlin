@@ -64,7 +64,7 @@ fun compile(
     TopDownAnalyzerFacadeForJS.checkForErrors(files, analysisResult.bindingContext)
 
     val symbolTable = SymbolTable()
-//    irDependencyModules.forEach { symbolTable.loadModule(it) }
+    if (!isKlibCompilation) irDependencyModules.forEach { symbolTable.loadModule(it) }
 
     val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
     val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext, symbolTable)
@@ -141,7 +141,7 @@ fun compile(
         )
 
         md.initialize(CompositePackageFragmentProvider(packageProviders))
-        md.setDependencies(listOf(md/*, builtIns.builtInsModule*/))
+        md.setDependencies(listOf(md))
 
 
         val st = SymbolTable()
