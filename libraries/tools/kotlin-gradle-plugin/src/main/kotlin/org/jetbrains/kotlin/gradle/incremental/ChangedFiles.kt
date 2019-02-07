@@ -5,19 +5,26 @@
 
 package org.jetbrains.kotlin.gradle.incremental
 
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
 import org.jetbrains.kotlin.incremental.ChangedFiles
 import java.io.File
 import java.util.*
 
-internal fun ChangedFiles(taskInputs: IncrementalTaskInputs): ChangedFiles {
+internal fun ChangedFiles(taskInputs: IncrementalTaskInputs, log: Logger): ChangedFiles {
     if (!taskInputs.isIncremental) return ChangedFiles.Unknown()
 
     val modified = ArrayList<File>()
     val removed = ArrayList<File>()
 
-    taskInputs.outOfDate { modified.add(it.file) }
-    taskInputs.removed { removed.add(it.file) }
+    taskInputs.outOfDate {
+        log.lifecycle("Out of date: ${it.file}")
+        modified.add(it.file)
+    }
+    taskInputs.removed {
+        log.lifecycle("Removed: ${it.file}")
+        removed.add(it.file)
+    }
 
     return ChangedFiles.Known(modified, removed)
 }

@@ -272,15 +272,6 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
                 }
             else null
 
-        val modified = ArrayList<File>()
-        inputs.outOfDate { modified.add(it.file) }
-        val removed = ArrayList<File>()
-        inputs.removed { removed.add(it.file) }
-
-        logger.debug("Task modified files: ${modified.joinToString { it.canonicalPath }}")
-        logger.debug("Task removed files: ${removed.joinToString { it.canonicalPath }}")
-        logger.debug("Task compile classpath: ${compileClasspath.joinToString { it.canonicalPath }}")
-
         if (!incremental) {
             clearLocalState("IC is disabled")
         }
@@ -314,7 +305,7 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
         sourceRoots.log(this.name, logger)
         val args = prepareCompilerArguments()
         taskBuildDirectory.mkdirs()
-        callCompilerAsync(args, sourceRoots, ChangedFiles(inputs))
+        callCompilerAsync(args, sourceRoots, ChangedFiles(inputs, logger))
     }
 
     @Internal
