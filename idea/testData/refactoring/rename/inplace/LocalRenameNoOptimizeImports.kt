@@ -8,3 +8,5 @@ fun f() {
 }
 
 class A
+
+// NAME: y

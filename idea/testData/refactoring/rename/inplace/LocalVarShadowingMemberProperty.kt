@@ -8,3 +8,5 @@ class ShadeKotlin {
         print(name2)
     }
 }
+
+// NAME: name1

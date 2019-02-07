@@ -5,3 +5,5 @@ fun x(<caret>`is`: A) {
     val `in` = `is`.a
     `in`.b
 }
+
+// NAME: x

@@ -4,3 +4,5 @@ fun foo(x: Int) {
     // y
     val s = "y"
 }
+
+// NAME: w

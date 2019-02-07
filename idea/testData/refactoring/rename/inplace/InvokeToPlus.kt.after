@@ -5,3 +5,5 @@ class A {
 fun test() {
     A().plus(1, "2")
 }
+
+// NAME: plus

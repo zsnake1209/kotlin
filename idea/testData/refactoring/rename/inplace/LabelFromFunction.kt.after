@@ -3,3 +3,5 @@ fun xyzzy(): Any {
         return@foo 1
     }
 }
+
+// NAME: foo

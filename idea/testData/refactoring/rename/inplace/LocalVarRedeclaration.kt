@@ -3,3 +3,5 @@ fun containNames() {
     val <caret>localValA = 11
     val localValB = 12
 }
+
+// NAME: localValB

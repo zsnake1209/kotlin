@@ -3,3 +3,5 @@ fun xyzzy(x: Pair<Int, String>) {
     println(foo)
     println(foo.length())
 }
+
+// NAME: foo

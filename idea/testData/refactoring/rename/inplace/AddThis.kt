@@ -8,3 +8,5 @@ class A {
         innerGoo()
     }
 }
+
+// NAME: foo

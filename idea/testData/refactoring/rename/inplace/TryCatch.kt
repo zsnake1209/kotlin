@@ -5,3 +5,5 @@ fun f() {
         println(e)
     }
 }
+
+// NAME: e1

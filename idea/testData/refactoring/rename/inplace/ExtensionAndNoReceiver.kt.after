@@ -3,3 +3,5 @@ class A
 fun A.b() {}
 
 fun b() {}
+
+// NAME: b
