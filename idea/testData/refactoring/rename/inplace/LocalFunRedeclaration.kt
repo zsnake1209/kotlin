@@ -3,3 +3,5 @@ fun containNames() {
     fun <caret>localFunA() = 11
     fun localFunB() = 12
 }
+
+// NAME: localFunB

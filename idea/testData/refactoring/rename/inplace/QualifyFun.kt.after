@@ -4,5 +4,7 @@ fun foo() {
     fun foo() {
         test.foo()
     }
-    innerGoo()
+    foo()
 }
+
+// NAME: foo

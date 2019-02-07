@@ -6,3 +6,5 @@ fun foo() {
     }
     innerGoo()
 }
+
+// NAME: foo

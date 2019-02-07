@@ -3,3 +3,5 @@ class Bar
 
 fun Foo.example() = "test"
 fun Bar.example() = "test"
+
+// NAME: example

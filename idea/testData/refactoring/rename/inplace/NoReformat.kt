@@ -4,4 +4,6 @@ public class OneLineKotlin {
     public fun simple0() { subject }
     public fun simple1() { subject = 2 }
     public fun simple2() { aux = subject }
-} 
+}
+
+// NAME: subject2

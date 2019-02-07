@@ -9,3 +9,5 @@ class B {
 }
 
 class A
+
+// NAME: y

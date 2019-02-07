@@ -15,3 +15,5 @@ fun foo(s: Second) {
         }
     }
 }
+
+// NAME: get

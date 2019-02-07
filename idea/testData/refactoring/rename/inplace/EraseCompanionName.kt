@@ -14,3 +14,5 @@ fun test() {
     val y: Foo.Bar
     val z: Foo.Bar?
 }
+
+// NAME: EMPTY_STRING

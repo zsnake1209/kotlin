@@ -3,3 +3,5 @@ fun f() {
         println(j + j)
     }
 }
+
+// NAME: j

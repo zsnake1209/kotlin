@@ -5,3 +5,5 @@ fun f() {
     foo(1)
     foo(217)
 }
+
+// NAME: bar

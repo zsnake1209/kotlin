@@ -3,3 +3,5 @@ fun containNames() {
     class <caret>LocalClassA {}
     class LocalClassB {}
 }
+
+// NAME: LocalClassB
