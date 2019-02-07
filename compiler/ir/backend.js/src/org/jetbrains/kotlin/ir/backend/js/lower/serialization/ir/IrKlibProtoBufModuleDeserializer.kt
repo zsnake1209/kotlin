@@ -44,10 +44,15 @@ class IrKlibProtoBufModuleDeserializer(
 
     var deserializedModuleDescriptor: ModuleDescriptor? = null
     var deserializedModuleProtoSymbolTables = mutableMapOf<ModuleDescriptor, IrKlibProtoBuf.IrSymbolTable>()
+    var deserializedModuleProtoStringTables = mutableMapOf<ModuleDescriptor, IrKlibProtoBuf.StringTable>()
     var deserializedModuleProtoTypeTables = mutableMapOf<ModuleDescriptor, IrKlibProtoBuf.IrTypeTable>()
 
     val resolvedForwardDeclarations = mutableMapOf<UniqIdKey, UniqIdKey>()
-    val descriptorReferenceDeserializer = DescriptorReferenceDeserializer(currentModule, resolvedForwardDeclarations)
+    val descriptorReferenceDeserializer = DescriptorReferenceDeserializer(currentModule, resolvedForwardDeclarations, {
+                    knownBuiltInsDescriptors[it]?.index ?: if (isBuiltInFunction(it)) FUNCTION_INDEX_START + builtInFunctionId(it) else null
+        }, { (FUNCTION_INDEX_START + BUILT_IN_UNIQ_ID_CLASS_OFFSET) <= it && it < (FUNCTION_INDEX_START + BUILT_IN_UNIQ_ID_GAP) }, {
+            builtIns.builtIns.getBuiltInClassByFqName(it)
+        })
 
     val moduleRoot = libraryDir
     val irDirectory = File(libraryDir, "ir/")
@@ -135,6 +140,9 @@ class IrKlibProtoBufModuleDeserializer(
         return deserializeIrTypeData(typeData)
     }
 
+    override fun deserializeString(proto: IrKlibProtoBuf.String) =
+        deserializedModuleProtoStringTables[deserializedModuleDescriptor]!!.getStrings(proto.index)
+
     fun deserializeIrSymbolData(proto: IrKlibProtoBuf.IrSymbolData): IrSymbol {
         val key = proto.uniqId.uniqIdKey(deserializedModuleDescriptor!!)
         val topLevelKey = proto.topLevelUniqId.uniqIdKey(deserializedModuleDescriptor!!)
@@ -166,11 +174,23 @@ class IrKlibProtoBufModuleDeserializer(
     }
 
     override fun deserializeDescriptorReference(proto: IrKlibProtoBuf.DescriptorReference) =
-        descriptorReferenceDeserializer.deserializeDescriptorReference(proto, {
-            knownBuiltInsDescriptors[it]?.index ?: if (isBuiltInFunction(it)) FUNCTION_INDEX_START + builtInFunctionId(it) else null
-        }, { (FUNCTION_INDEX_START + BUILT_IN_UNIQ_ID_CLASS_OFFSET) <= it && it < (FUNCTION_INDEX_START + BUILT_IN_UNIQ_ID_GAP) }, {
-            builtIns.builtIns.getBuiltInClassByFqName(it)
-        })
+        descriptorReferenceDeserializer.deserializeDescriptorReference(
+            deserializeString(proto.packageFqName),
+            deserializeString(proto.classFqName),
+            deserializeString(proto.name),
+            if (proto.hasUniqId()) proto.uniqId.index else null,
+            isEnumEntry = proto.isEnumEntry,
+            isEnumSpecial = proto.isEnumSpecial,
+            isDefaultConstructor = proto.isDefaultConstructor,
+            isFakeOverride = proto.isFakeOverride,
+            isGetter = proto.isGetter,
+            isSetter = proto.isSetter
+        )
+//        descriptorReferenceDeserializer.deserializeDescriptorReference(proto, {
+//            knownBuiltInsDescriptors[it]?.index ?: if (isBuiltInFunction(it)) FUNCTION_INDEX_START + builtInFunctionId(it) else null
+//        }, { (FUNCTION_INDEX_START + BUILT_IN_UNIQ_ID_CLASS_OFFSET) <= it && it < (FUNCTION_INDEX_START + BUILT_IN_UNIQ_ID_GAP) }, {
+//            builtIns.builtIns.getBuiltInClassByFqName(it)
+//        })
 
     private val ByteArray.codedInputStream: org.jetbrains.kotlin.protobuf.CodedInputStream
         get() {
@@ -282,6 +302,9 @@ class IrKlibProtoBufModuleDeserializer(
                         classDescriptor,
                         classDescriptor.modality
                 ) { symbol: IrClassSymbol -> IrClassImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin, symbol) }
+                .also {
+                    it.parent = file
+                }
                 declaration
 
             }
@@ -290,10 +313,13 @@ class IrKlibProtoBufModuleDeserializer(
     }
 
     fun deserializeIrFile(fileProto: IrKlibProtoBuf.IrFile, moduleDescriptor: ModuleDescriptor, deserializeAllDeclarations: Boolean): IrFile {
-        val fileEntry = NaiveSourceBasedFileEntryImpl(fileProto.fileEntry.name)
+        val fileEntry = NaiveSourceBasedFileEntryImpl(
+            deserializeString(fileProto.fileEntry.name),
+            fileProto.fileEntry.lineStartOffsetsList.toIntArray()
+        )
 
         // TODO: we need to store "" in protobuf, I suppose. Or better yet, reuse fqname storage from metadata.
-        val fqName = if (fileProto.fqName == "<root>") FqName.ROOT else FqName(fileProto.fqName)
+        val fqName = deserializeString(fileProto.fqName).let { if (it == "<root>") FqName.ROOT else FqName(it) }
 
         val packageFragmentDescriptor = EmptyPackageFragmentDescriptor(moduleDescriptor, fqName)
 
@@ -316,6 +342,7 @@ class IrKlibProtoBufModuleDeserializer(
 
         deserializedModuleDescriptor = moduleDescriptor
         deserializedModuleProtoSymbolTables.put(moduleDescriptor, proto.symbolTable)
+        deserializedModuleProtoStringTables.put(moduleDescriptor, proto.stringTable)
         deserializedModuleProtoTypeTables.put(moduleDescriptor, proto.typeTable)
 
         var i = 0
