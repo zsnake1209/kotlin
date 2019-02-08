@@ -1,12 +1,12 @@
-fun main() {
-    false.toString()
-    1.toByte().toString()
-    1.toShort().toString()
-    1.toString()
-    1L.toString()
-    1.0F.toString()
-    1.0.toString()
-    'c'.toString()
+fun main(a: Boolean, b: Byte, c: Short, d: Int, e: Long, f: Float, g: Double, h: Char) {
+    a.toString()
+    b.toString()
+    c.toString()
+    d.toString()
+    e.toString()
+    f.toString()
+    g.toString()
+    h.toString()
 }
 
 /*Check that all "valueOf" are String ones and there is no boxing*/
