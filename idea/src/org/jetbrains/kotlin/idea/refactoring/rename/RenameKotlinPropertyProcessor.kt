@@ -69,6 +69,47 @@ import org.jetbrains.kotlin.util.findCallableMemberBySignature
 import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.SmartList
 
+open class RenameKotlinLocalVariableProcessor : RenameKotlinPsiProcessor() {
+    override fun canProcessElement(element: PsiElement): Boolean {
+        val namedUnwrappedElement = element.namedUnwrappedElement
+        return namedUnwrappedElement is KtProperty && namedUnwrappedElement.isLocal
+    }
+
+
+    override fun findCollisions(
+        element: PsiElement,
+        newName: String,
+        allRenames: MutableMap<out PsiElement, String>,
+        result: MutableList<UsageInfo>
+    ) {
+        val declaration = element.namedUnwrappedElement as? KtNamedDeclaration ?: return
+        declaration.unsafeResolveToDescriptor() as VariableDescriptor
+
+        val collisions = SmartList<UsageInfo>()
+//        checkOriginalUsagesRetargeting(declaration, newName, result, collisions)
+        checkNewNameUsagesRetargeting(declaration, newName, collisions)
+        result += collisions.filterIsInstance<KtResolvableCollisionUsageInfo>()
+    }
+
+    override fun isToSearchInComments(psiElement: PsiElement) = JavaRefactoringSettings.getInstance().RENAME_SEARCH_IN_COMMENTS_FOR_FIELD
+
+    override fun setToSearchInComments(element: PsiElement, enabled: Boolean) {
+        JavaRefactoringSettings.getInstance().RENAME_SEARCH_IN_COMMENTS_FOR_FIELD = enabled
+    }
+
+    override fun isToSearchForTextOccurrences(element: PsiElement) = JavaRefactoringSettings.getInstance().RENAME_SEARCH_FOR_TEXT_FOR_FIELD
+
+    override fun setToSearchForTextOccurrences(element: PsiElement, enabled: Boolean) {
+        JavaRefactoringSettings.getInstance().RENAME_SEARCH_FOR_TEXT_FOR_FIELD = enabled
+    }
+
+    override fun renameElement(element: PsiElement, newName: String, usages: Array<UsageInfo>, listener: RefactoringElementListener?) {
+        super.renameElement(element, newName, usages, listener)
+
+        usages.forEach { (it as? KtResolvableCollisionUsageInfo)?.apply() }
+    }
+}
+
 class RenameKotlinPropertyProcessor : RenameKotlinPsiProcessor() {
     override fun canProcessElement(element: PsiElement): Boolean {
         val namedUnwrappedElement = element.namedUnwrappedElement

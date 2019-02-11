@@ -169,6 +169,11 @@ public class InplaceRenameTestGenerated extends AbstractInplaceRenameTest {
         runTest("idea/testData/refactoring/rename/inplace/LocalVarShadowingMemberProperty.kt");
     }
 
+    @TestMetadata("LocalVarShadowingMemberProperty2.kt")
+    public void testLocalVarShadowingMemberProperty2() throws Exception {
+        runTest("idea/testData/refactoring/rename/inplace/LocalVarShadowingMemberProperty2.kt");
+    }
+
     @TestMetadata("MemberRenameOptimizesImports.kt")
     public void testMemberRenameOptimizesImports() throws Exception {
         runTest("idea/testData/refactoring/rename/inplace/MemberRenameOptimizesImports.kt");

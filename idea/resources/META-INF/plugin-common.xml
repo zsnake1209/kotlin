@@ -527,6 +527,9 @@
     <renamePsiElementProcessor implementation="org.jetbrains.kotlin.idea.refactoring.rename.RenameKotlinFunctionProcessor"
                                id="KotlinFunction"
                                order="first"/>
+    <renamePsiElementProcessor implementation="org.jetbrains.kotlin.idea.refactoring.rename.RenameKotlinLocalVariableProcessor"
+                               id="KotlinLocalVariable"
+                               order="first"/>
     <renamePsiElementProcessor implementation="org.jetbrains.kotlin.idea.refactoring.rename.RenameKotlinPropertyProcessor"
                                id="KotlinProperty"
                                order="first"/>

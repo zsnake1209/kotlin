@@ -1,0 +1,10 @@
+class C {
+    private var x = 3
+
+    fun f() {
+        val x = 5
+        this.x + 3
+    }
+}
+
+// NAME: x

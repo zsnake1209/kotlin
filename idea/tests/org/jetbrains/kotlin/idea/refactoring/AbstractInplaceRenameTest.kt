@@ -15,6 +15,7 @@ import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
 import com.intellij.testFramework.LightPlatformCodeInsightTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil
 import junit.framework.TestCase
+import org.jetbrains.kotlin.idea.refactoring.rename.ConflictsInTestsExceptionWithPopup
 import org.jetbrains.kotlin.idea.refactoring.rename.KotlinRenameDispatcherHandler
 import org.jetbrains.kotlin.idea.refactoring.rename.RenameKotlinImplicitLambdaParameter
 import org.jetbrains.kotlin.idea.refactoring.rename.findElementForRename
@@ -34,19 +35,25 @@ abstract class AbstractInplaceRenameTest : LightPlatformCodeInsightTestCase() {
         }
 
         val isLambdaTest = InTextDirectivesUtils.isDirectiveDefined(myFile.text, "LAMBDA")
-        val expectedMessage = InTextDirectivesUtils.findStringWithPrefixes(myFile.text, "// SHOULD_FAIL_WITH: ")
+        val dialogConflictMessage = InTextDirectivesUtils.findStringWithPrefixes(myFile.text, "// CONFLICT: ")
+        val popupConflictMessage = InTextDirectivesUtils.findStringWithPrefixes(myFile.text, "// POPUP_CONFLICT: ")
         try {
             if (isLambdaTest) {
                 doTestImplicitLambdaParameter(newName)
             } else {
                 doTestInplaceRename(newName)
             }
-            if (expectedMessage != null) {
-                TestCase.fail("Refactoring completed without expected conflicts:\n$expectedMessage")
+            if (dialogConflictMessage != null || popupConflictMessage != null) {
+                TestCase.fail("Refactoring completed without expected conflicts:\n${dialogConflictMessage ?: popupConflictMessage}")
             }
             checkResultByFile("$path.after")
+        } catch (e: ConflictsInTestsExceptionWithPopup) {
+            TestCase.assertEquals(popupConflictMessage, e.popup.message)
         } catch (e: BaseRefactoringProcessor.ConflictsInTestsException) {
-            TestCase.assertEquals(expectedMessage, e.messages.joinToString())
+            if (dialogConflictMessage == null && popupConflictMessage != null) {
+                TestCase.fail("Dialog conflict, when popup conflict is expected")
+            }
+            TestCase.assertEquals(dialogConflictMessage, e.messages.joinToString())
         }
     }
 

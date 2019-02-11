@@ -1,4 +1,4 @@
-// SHOULD_FAIL_WITH: Variable 'localValB' is already declared in function 'containNames'
+// POPUP_CONFLICT: Name conflicts with other variable
 fun containNames() {
     val <caret>localValA = 11
     val localValB = 12

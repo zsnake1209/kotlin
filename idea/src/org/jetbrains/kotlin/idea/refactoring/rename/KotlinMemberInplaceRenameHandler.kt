@@ -20,13 +20,20 @@ import com.intellij.lang.Language
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.*
 import com.intellij.refactoring.RefactoringActionHandler
+import com.intellij.refactoring.rename.RenameProcessor
 import com.intellij.refactoring.rename.inplace.MemberInplaceRenameHandler
 import com.intellij.refactoring.rename.inplace.MemberInplaceRenamer
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenamer
+import com.intellij.usageView.UsageInfo
+import org.jetbrains.kotlin.asJava.namedUnwrappedElement
+import org.jetbrains.kotlin.descriptors.VariableDescriptor
+import org.jetbrains.kotlin.idea.caches.resolve.unsafeResolveToDescriptor
 import org.jetbrains.kotlin.idea.core.unquote
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
+import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.utils.SmartList
 
 class KotlinMemberInplaceRenameHandler : MemberInplaceRenameHandler() {
     private class RenamerImpl(
@@ -55,6 +62,41 @@ class KotlinMemberInplaceRenameHandler : MemberInplaceRenameHandler() {
         override fun createInplaceRenamerToRestart(variable: PsiNamedElement, editor: Editor, initialName: String): VariableInplaceRenamer {
             return RenamerImpl(variable, substituted, editor, initialName, myOldName)
         }
+
+        override fun createRenameProcessor(element: PsiElement, newName: String): RenameProcessor =
+            if (element is KtProperty && element.isLocal)
+                LocalVariableRenameProcessor(element, newName)
+            else
+                MyRenameProcessor(element, newName)
+
+        // TODO: report bug about bad diagnostic without inner
+        protected inner class LocalVariableRenameProcessor(
+            private val element: PsiElement,
+            private val newName: String
+        ) : MyRenameProcessor(element, newName) {
+            override fun performRefactoring(usages: Array<out UsageInfo>) {
+                val hasRedeclations = hasRedeclarations()
+
+                super.performRefactoring(usages)
+
+                if (hasRedeclations) {
+                    reportProblems()
+                }
+            }
+
+            private fun reportProblems() {
+                InEditorPopup("Name conflicts with other variable", InEditorPopup.Type.ERROR).show(element.project, myEditor)
+            }
+
+
+            private fun hasRedeclarations(): Boolean {
+                val declaration = element.namedUnwrappedElement as? KtNamedDeclaration ?: return false
+                val descriptor = declaration.unsafeResolveToDescriptor() as VariableDescriptor
+                val collisions = SmartList<UsageInfo>()
+                checkRedeclarations(descriptor, newName, collisions)
+                return collisions.isNotEmpty()
+            }
+        }
     }
 
     private fun PsiElement.substitute(): PsiElement {
@@ -70,10 +112,11 @@ class KotlinMemberInplaceRenameHandler : MemberInplaceRenameHandler() {
         val offset = editor.caretModel.offset
         val editorPsiFile = PsiDocumentManager.getInstance(element.project).getPsiFile(editor.document)
         if (nameIdentifier != null
-                && editorPsiFile == elementToRename.containingFile
-                && elementToRename is KtPrimaryConstructor
-                && offset !in nameIdentifier.textRange
-                && offset in elementToRename.textRange) {
+            && editorPsiFile == elementToRename.containingFile
+            && elementToRename is KtPrimaryConstructor
+            && offset !in nameIdentifier.textRange
+            && offset in elementToRename.textRange
+        ) {
             editor.caretModel.moveToOffset(nameIdentifier.textOffset)
         }
 
