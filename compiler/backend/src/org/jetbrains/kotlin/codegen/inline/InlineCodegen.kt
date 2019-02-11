@@ -47,7 +47,6 @@ import org.jetbrains.kotlin.serialization.deserialization.descriptors.Deserializ
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingUtils.isFunctionLiteral
 import org.jetbrains.kotlin.types.expressions.LabelResolver
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
@@ -300,15 +299,12 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
 
         defaultSourceMapper.callSiteMarker = null
 
-        if (info.generateAssertField) {
-            assert(codegen is ExpressionCodegen) {
-                "codegens other than ExpressionCodegen are not supported yet"
-            }
-            codegen.cast<ExpressionCodegen>().parentCodegen.generateAssertField()
-        }
+        generateAssertFieldIfNeeded(info)
 
         return result
     }
+
+    protected abstract fun generateAssertFieldIfNeeded(info: RootInliningContext)
 
     private fun isInlinedToInlineFunInKotlinRuntime(): Boolean {
         val codegen = this.codegen as? ExpressionCodegen ?: return false
@@ -668,6 +664,12 @@ class PsiInlineCodegen(
     typeParameterMappings: TypeParameterMappings,
     sourceCompiler: SourceCompilerForInline
 ) : InlineCodegen<ExpressionCodegen>(codegen, state, function, typeParameterMappings, sourceCompiler), CallGenerator {
+
+    override fun generateAssertFieldIfNeeded(info: RootInliningContext) {
+        if (info.generateAssertField) {
+            codegen.parentCodegen.generateAssertField()
+        }
+    }
 
     override fun genCallInner(
         callableMethod: Callable,
