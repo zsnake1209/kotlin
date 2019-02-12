@@ -11,9 +11,9 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.hasNoInferAnnotation
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.KotlinTypeFactory.flexibleType
 import org.jetbrains.kotlin.types.checker.*
-import org.jetbrains.kotlin.types.model.CapturedTypeIM
-import org.jetbrains.kotlin.types.model.KotlinTypeIM
-import org.jetbrains.kotlin.types.model.SimpleTypeIM
+import org.jetbrains.kotlin.types.model.CapturedTypeMarker
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.contains
 
@@ -26,7 +26,7 @@ abstract class TypeCheckerContextForConstraintSystem : TypeCheckerContext(errorT
 
     abstract fun addLowerConstraint(typeVariable: TypeConstructor, subType: UnwrappedType)
 
-    override fun getLowerCapturedTypePolicy(subType: SimpleTypeIM, superType: CapturedTypeIM): LowerCapturedTypePolicy {
+    override fun getLowerCapturedTypePolicy(subType: SimpleTypeMarker, superType: CapturedTypeMarker): LowerCapturedTypePolicy {
         require(subType is SimpleType)
         require(superType is NewCapturedType)
         return getLowerCapturedTypePolicy(subType, superType)
@@ -44,7 +44,7 @@ abstract class TypeCheckerContextForConstraintSystem : TypeCheckerContext(errorT
      * then we can get wrong result.
      * override val sameConstructorPolicy get() = SeveralSupertypesWithSameConstructorPolicy.TAKE_FIRST_FOR_SUBTYPING
      */
-    final override fun addSubtypeConstraint(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean? {
+    final override fun addSubtypeConstraint(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean? {
         require(subType is UnwrappedType)
         require(superType is UnwrappedType)
         val hasNoInfer = subType.isTypeVariableWithNoInfer() || superType.isTypeVariableWithNoInfer()

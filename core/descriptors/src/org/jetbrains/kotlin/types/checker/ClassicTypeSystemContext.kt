@@ -17,108 +17,108 @@ import org.jetbrains.kotlin.types.model.CaptureStatus
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 
 interface ClassicTypeSystemContext : TypeSystemContext {
-    override fun TypeConstructorIM.isDenotable(): Boolean {
+    override fun TypeConstructorMarker.isDenotable(): Boolean {
         require(this is TypeConstructor, this::errorMessage)
         return this.isDenotable
     }
 
-    override fun SimpleTypeIM.withNullability(nullable: Boolean): SimpleTypeIM {
+    override fun SimpleTypeMarker.withNullability(nullable: Boolean): SimpleTypeMarker {
         require(this is SimpleType, this::errorMessage)
         return this.makeNullableAsSpecified(nullable)
     }
 
-    override fun KotlinTypeIM.isError(): Boolean {
+    override fun KotlinTypeMarker.isError(): Boolean {
         require(this is KotlinType, this::errorMessage)
         return this.isError
     }
 
-    override fun SimpleTypeIM.isStubType(): Boolean {
+    override fun SimpleTypeMarker.isStubType(): Boolean {
         assert(this is SimpleType, this::errorMessage)
         return this is StubType
     }
 
-    override fun CapturedTypeIM.lowerType(): KotlinTypeIM? {
+    override fun CapturedTypeMarker.lowerType(): KotlinTypeMarker? {
         require(this is NewCapturedType, this::errorMessage)
         return this.lowerType
     }
 
-    override fun TypeConstructorIM.isIntersection(): Boolean {
+    override fun TypeConstructorMarker.isIntersection(): Boolean {
         assert(this is TypeConstructor, this::errorMessage)
         return this is IntersectionTypeConstructor
     }
 
-    override fun identicalArguments(a: SimpleTypeIM, b: SimpleTypeIM): Boolean {
+    override fun identicalArguments(a: SimpleTypeMarker, b: SimpleTypeMarker): Boolean {
         require(a is SimpleType, a::errorMessage)
         require(b is SimpleType, b::errorMessage)
         return a.arguments === b.arguments
     }
 
-    override fun KotlinTypeIM.asSimpleType(): SimpleTypeIM? {
+    override fun KotlinTypeMarker.asSimpleType(): SimpleTypeMarker? {
         require(this is KotlinType, this::errorMessage)
         return this.unwrap() as? SimpleType
     }
 
-    override fun KotlinTypeIM.asFlexibleType(): FlexibleTypeIM? {
+    override fun KotlinTypeMarker.asFlexibleType(): FlexibleTypeMarker? {
         require(this is KotlinType, this::errorMessage)
         return this.unwrap() as? FlexibleType
     }
 
-    override fun FlexibleTypeIM.asDynamicType(): DynamicTypeIM? {
+    override fun FlexibleTypeMarker.asDynamicType(): DynamicTypeMarker? {
         assert(this is FlexibleType, this::errorMessage)
         return this as? DynamicType
     }
 
-    override fun FlexibleTypeIM.asRawType(): RawTypeIM? {
+    override fun FlexibleTypeMarker.asRawType(): RawTypeMarker? {
         assert(this is FlexibleType, this::errorMessage)
         return this as? RawType
     }
 
-    override fun FlexibleTypeIM.upperBound(): SimpleTypeIM {
+    override fun FlexibleTypeMarker.upperBound(): SimpleTypeMarker {
         require(this is FlexibleType, this::errorMessage)
         return this.upperBound
     }
 
-    override fun FlexibleTypeIM.lowerBound(): SimpleTypeIM {
+    override fun FlexibleTypeMarker.lowerBound(): SimpleTypeMarker {
         require(this is FlexibleType, this::errorMessage)
         return this.lowerBound
     }
 
-    override fun SimpleTypeIM.asCapturedType(): CapturedTypeIM? {
+    override fun SimpleTypeMarker.asCapturedType(): CapturedTypeMarker? {
         assert(this is SimpleType, this::errorMessage)
         return this as? NewCapturedType
     }
 
-    override fun SimpleTypeIM.asDefinitelyNotNullType(): DefinitelyNotNullTypeIM? {
+    override fun SimpleTypeMarker.asDefinitelyNotNullType(): DefinitelyNotNullTypeMarker? {
         assert(this is SimpleType, this::errorMessage)
         return this as? DefinitelyNotNullType
     }
 
-    override fun SimpleTypeIM.isMarkedNullable(): Boolean {
+    override fun SimpleTypeMarker.isMarkedNullable(): Boolean {
         require(this is SimpleType, this::errorMessage)
         return this.isMarkedNullable
     }
 
-    override fun SimpleTypeIM.typeConstructor(): TypeConstructorIM {
+    override fun SimpleTypeMarker.typeConstructor(): TypeConstructorMarker {
         require(this is SimpleType, this::errorMessage)
         return this.constructor
     }
 
-    override fun SimpleTypeIM.argumentsCount(): Int {
+    override fun SimpleTypeMarker.argumentsCount(): Int {
         require(this is SimpleType, this::errorMessage)
         return this.arguments.size
     }
 
-    override fun SimpleTypeIM.getArgument(index: Int): TypeArgumentIM {
+    override fun SimpleTypeMarker.getArgument(index: Int): TypeArgumentMarker {
         require(this is SimpleType, this::errorMessage)
         return this.arguments[index]
     }
 
-    override fun TypeArgumentIM.isStarProjection(): Boolean {
+    override fun TypeArgumentMarker.isStarProjection(): Boolean {
         require(this is TypeProjection, this::errorMessage)
         return this.isStarProjection
     }
 
-    override fun TypeArgumentIM.getVariance(): TypeVariance {
+    override fun TypeArgumentMarker.getVariance(): TypeVariance {
         require(this is TypeProjection, this::errorMessage)
         return this.projectionKind.convertVariance()
     }
@@ -131,63 +131,63 @@ interface ClassicTypeSystemContext : TypeSystemContext {
         }
     }
 
-    override fun TypeArgumentIM.getType(): KotlinTypeIM {
+    override fun TypeArgumentMarker.getType(): KotlinTypeMarker {
         require(this is TypeProjection, this::errorMessage)
         return this.type.unwrap()
     }
 
-    override fun TypeConstructorIM.isErrorTypeConstructor(): Boolean {
+    override fun TypeConstructorMarker.isErrorTypeConstructor(): Boolean {
         require(this is TypeConstructor, this::errorMessage)
         TODO("not implemented")
     }
 
-    override fun TypeConstructorIM.parametersCount(): Int {
+    override fun TypeConstructorMarker.parametersCount(): Int {
         require(this is TypeConstructor, this::errorMessage)
         return this.parameters.size
     }
 
-    override fun TypeConstructorIM.getParameter(index: Int): TypeParameterIM {
+    override fun TypeConstructorMarker.getParameter(index: Int): TypeParameterMarker {
         require(this is TypeConstructor, this::errorMessage)
         return this.parameters[index]
     }
 
-    override fun TypeConstructorIM.supertypes(): Collection<KotlinTypeIM> {
+    override fun TypeConstructorMarker.supertypes(): Collection<KotlinTypeMarker> {
         require(this is TypeConstructor, this::errorMessage)
         return this.supertypes
     }
 
-    override fun TypeParameterIM.getVariance(): TypeVariance {
+    override fun TypeParameterMarker.getVariance(): TypeVariance {
         require(this is TypeParameterDescriptor, this::errorMessage)
         return this.variance.convertVariance()
     }
 
-    override fun TypeParameterIM.upperBoundCount(): Int {
+    override fun TypeParameterMarker.upperBoundCount(): Int {
         require(this is TypeParameterDescriptor, this::errorMessage)
         return this.upperBounds.size
     }
 
-    override fun TypeParameterIM.getUpperBound(index: Int): KotlinTypeIM {
+    override fun TypeParameterMarker.getUpperBound(index: Int): KotlinTypeMarker {
         require(this is TypeParameterDescriptor, this::errorMessage)
         return this.upperBounds[index]
     }
 
-    override fun TypeParameterIM.getTypeConstructor(): TypeConstructorIM {
+    override fun TypeParameterMarker.getTypeConstructor(): TypeConstructorMarker {
         require(this is TypeParameterDescriptor, this::errorMessage)
         return this.typeConstructor
     }
 
-    override fun isEqualTypeConstructors(c1: TypeConstructorIM, c2: TypeConstructorIM): Boolean {
+    override fun isEqualTypeConstructors(c1: TypeConstructorMarker, c2: TypeConstructorMarker): Boolean {
         assert(c1 is TypeConstructor, c1::errorMessage)
         assert(c2 is TypeConstructor, c2::errorMessage)
         return c1 == c2
     }
 
-    override fun TypeConstructorIM.isClassTypeConstructor(): Boolean {
+    override fun TypeConstructorMarker.isClassTypeConstructor(): Boolean {
         require(this is TypeConstructor, this::errorMessage) 
         return declarationDescriptor is ClassDescriptor
     }
 
-    override fun TypeConstructorIM.isCommonFinalClassConstructor(): Boolean {
+    override fun TypeConstructorMarker.isCommonFinalClassConstructor(): Boolean {
         require(this is TypeConstructor, this::errorMessage) 
         val classDescriptor = declarationDescriptor as? ClassDescriptor ?: return false
         return classDescriptor.isFinalClass &&
@@ -196,43 +196,43 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     }
 
 
-    override fun TypeArgumentListIM.get(index: Int): TypeArgumentIM {
+    override fun TypeArgumentListMarker.get(index: Int): TypeArgumentMarker {
         return when (this) {
-            is SimpleTypeIM -> getArgument(index)
+            is SimpleTypeMarker -> getArgument(index)
             is ArgumentList -> get(index)
             else -> error("unknown type argument list type: $this, ${this::class}")
         }
     }
 
-    override fun TypeArgumentListIM.size(): Int {
+    override fun TypeArgumentListMarker.size(): Int {
         return when (this) {
-            is SimpleTypeIM -> argumentsCount()
+            is SimpleTypeMarker -> argumentsCount()
             is ArgumentList -> size
             else -> error("unknown type argument list type: $this, ${this::class}")
         }
     }
 
-    override fun SimpleTypeIM.asArgumentList(): TypeArgumentListIM {
+    override fun SimpleTypeMarker.asArgumentList(): TypeArgumentListMarker {
         require(this is SimpleType, this::errorMessage) 
         return this
     }
 
-    override fun captureFromArguments(type: SimpleTypeIM, status: CaptureStatus): SimpleTypeIM? {
+    override fun captureFromArguments(type: SimpleTypeMarker, status: CaptureStatus): SimpleTypeMarker? {
         require(type is SimpleType, type::errorMessage) 
         return org.jetbrains.kotlin.types.checker.captureFromArguments(type, status)
     }
 
-    override fun TypeConstructorIM.isAnyConstructor(): Boolean {
+    override fun TypeConstructorMarker.isAnyConstructor(): Boolean {
         require(this is TypeConstructor, this::errorMessage) 
         return KotlinBuiltIns.isTypeConstructorForGivenClass(this, FQ_NAMES.any)
     }
 
-    override fun TypeConstructorIM.isNothingConstructor(): Boolean {
+    override fun TypeConstructorMarker.isNothingConstructor(): Boolean {
         require(this is TypeConstructor, this::errorMessage) 
         return KotlinBuiltIns.isTypeConstructorForGivenClass(this, FQ_NAMES.nothing)
     }
 
-    override fun KotlinTypeIM.asTypeArgument(): TypeArgumentIM {
+    override fun KotlinTypeMarker.asTypeArgument(): TypeArgumentMarker {
         require(this is KotlinType, this::errorMessage)
         return this.asTypeProjection()
     }

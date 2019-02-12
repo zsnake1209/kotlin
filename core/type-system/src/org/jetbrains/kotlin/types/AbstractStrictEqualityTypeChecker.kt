@@ -5,12 +5,12 @@
 
 package org.jetbrains.kotlin.types
 
-import org.jetbrains.kotlin.types.model.KotlinTypeIM
-import org.jetbrains.kotlin.types.model.SimpleTypeIM
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.model.TypeSystemContext
 
 object AbstractStrictEqualityTypeChecker {
-    fun strictEqualTypes(context: TypeSystemContext, a: KotlinTypeIM, b: KotlinTypeIM) = context.strictEqualTypesInternal(a, b)
+    fun strictEqualTypes(context: TypeSystemContext, a: KotlinTypeMarker, b: KotlinTypeMarker) = context.strictEqualTypesInternal(a, b)
 
     /**
      * Note that:
@@ -21,7 +21,7 @@ object AbstractStrictEqualityTypeChecker {
      *
      * Also different error types are not equal even if errorTypeEqualToAnything is true
      */
-    private fun TypeSystemContext.strictEqualTypesInternal(a: KotlinTypeIM, b: KotlinTypeIM): Boolean {
+    private fun TypeSystemContext.strictEqualTypesInternal(a: KotlinTypeMarker, b: KotlinTypeMarker): Boolean {
         if (a === b) return true
 
         val simpleA = a.asSimpleType()
@@ -37,7 +37,7 @@ object AbstractStrictEqualityTypeChecker {
         return false
     }
 
-    private fun TypeSystemContext.strictEqualSimpleTypes(a: SimpleTypeIM, b: SimpleTypeIM): Boolean {
+    private fun TypeSystemContext.strictEqualSimpleTypes(a: SimpleTypeMarker, b: SimpleTypeMarker): Boolean {
         if (a.argumentsCount() != b.argumentsCount()
             || a.isMarkedNullable() != b.isMarkedNullable()
             || (a.asDefinitelyNotNullType() == null) != (b.asDefinitelyNotNullType() == null)

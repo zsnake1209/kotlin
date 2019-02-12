@@ -18,16 +18,16 @@ import java.util.*
 abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
 
-    abstract fun substitutionSupertypePolicy(type: SimpleTypeIM): SupertypesPolicy.DoCustomTransform
+    abstract fun substitutionSupertypePolicy(type: SimpleTypeMarker): SupertypesPolicy.DoCustomTransform
 
-    abstract fun areEqualTypeConstructors(a: TypeConstructorIM, b: TypeConstructorIM): Boolean
+    abstract fun areEqualTypeConstructors(a: TypeConstructorMarker, b: TypeConstructorMarker): Boolean
 
-    abstract fun intersectTypes(types: List<KotlinTypeIM>): KotlinTypeIM
+    abstract fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker
 
     /**
      * Gets called by [AbstractTypeChecker] as entry of isSubTypeOf, it is suggested to call [AbstractTypeChecker.doIsSubTypeOf]
      */
-    open fun enterIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
+    open fun enterIsSubTypeOf(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
         return doIsSubTypeOf(subType, superType)
     }
 
@@ -36,7 +36,7 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
     protected var argumentsDepth = 0
 
 
-    internal inline fun <T> runWithArgumentsSettings(subArgument: KotlinTypeIM, f: AbstractTypeCheckerContext.() -> T): T {
+    internal inline fun <T> runWithArgumentsSettings(subArgument: KotlinTypeMarker, f: AbstractTypeCheckerContext.() -> T): T {
         if (argumentsDepth > 100) {
             error("Arguments depth is too high. Some related argument: $subArgument")
         }
@@ -47,8 +47,8 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
         return result
     }
 
-    open fun getLowerCapturedTypePolicy(subType: SimpleTypeIM, superType: CapturedTypeIM): LowerCapturedTypePolicy = CHECK_SUBTYPE_AND_LOWER
-    open fun addSubtypeConstraint(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean? = null
+    open fun getLowerCapturedTypePolicy(subType: SimpleTypeMarker, superType: CapturedTypeMarker): LowerCapturedTypePolicy = CHECK_SUBTYPE_AND_LOWER
+    open fun addSubtypeConstraint(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean? = null
     open val sameConstructorPolicy get() = SeveralSupertypesWithSameConstructorPolicy.INTERSECT_ARGUMENTS_AND_CHECK_AGAIN
 
     enum class SeveralSupertypesWithSameConstructorPolicy {
@@ -66,9 +66,9 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
     private var supertypesLocked = false
 
-    var supertypesDeque: ArrayDeque<SimpleTypeIM>? = null
+    var supertypesDeque: ArrayDeque<SimpleTypeMarker>? = null
         private set
-    var supertypesSet: MutableSet<SimpleTypeIM>? = null
+    var supertypesSet: MutableSet<SimpleTypeMarker>? = null
         private set
 
 
@@ -91,9 +91,9 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
     }
 
     inline fun anySupertype(
-        start: SimpleTypeIM,
-        predicate: (SimpleTypeIM) -> Boolean,
-        supertypesPolicy: (SimpleTypeIM) -> SupertypesPolicy
+        start: SimpleTypeMarker,
+        predicate: (SimpleTypeMarker) -> Boolean,
+        supertypesPolicy: (SimpleTypeMarker) -> SupertypesPolicy
     ): Boolean {
         if (predicate(start)) return true
 
@@ -126,20 +126,20 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
     }
 
     sealed class SupertypesPolicy {
-        abstract fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM): SimpleTypeIM
+        abstract fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeMarker): SimpleTypeMarker
 
         object None : SupertypesPolicy() {
-            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM) =
+            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeMarker) =
                 throw UnsupportedOperationException("Should not be called")
         }
 
         object UpperIfFlexible : SupertypesPolicy() {
-            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM) =
+            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeMarker) =
                 with(context) { type.upperBoundIfFlexible() }
         }
 
         object LowerIfFlexible : SupertypesPolicy() {
-            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeIM) =
+            override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeMarker) =
                 with(context) { type.lowerBoundIfFlexible() }
         }
 
@@ -148,11 +148,11 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 }
 
 object AbstractTypeChecker {
-    fun isSubtypeOf(context: AbstractTypeCheckerContext, subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
+    fun isSubtypeOf(context: AbstractTypeCheckerContext, subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
         return context.enterIsSubTypeOf(subType, superType)
     }
 
-    fun equalTypes(context: AbstractTypeCheckerContext, a: KotlinTypeIM, b: KotlinTypeIM): Boolean = with(context) {
+    fun equalTypes(context: AbstractTypeCheckerContext, a: KotlinTypeMarker, b: KotlinTypeMarker): Boolean = with(context) {
         if (a === b) return true
 
         if (isCommonDenotableType(a) && isCommonDenotableType(b)) {
@@ -169,7 +169,7 @@ object AbstractTypeChecker {
     }
 
 
-    fun AbstractTypeCheckerContext.doIsSubTypeOf(subType: KotlinTypeIM, superType: KotlinTypeIM): Boolean {
+    fun AbstractTypeCheckerContext.doIsSubTypeOf(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
         checkSubtypeForSpecialCases(subType.lowerBoundIfFlexible(), superType.upperBoundIfFlexible())?.let {
             addSubtypeConstraint(subType, superType)
             return it
@@ -181,7 +181,7 @@ object AbstractTypeChecker {
         return isSubtypeOfForSingleClassifierType(subType.lowerBoundIfFlexible(), superType.upperBoundIfFlexible())
     }
 
-    private fun AbstractTypeCheckerContext.hasNothingSupertype(type: SimpleTypeIM) = // todo add tests
+    private fun AbstractTypeCheckerContext.hasNothingSupertype(type: SimpleTypeMarker) = // todo add tests
         anySupertype(type, { it.typeConstructor().isNothingConstructor() }) {
             if (it.isClassType()) {
                 SupertypesPolicy.None
@@ -190,7 +190,7 @@ object AbstractTypeChecker {
             }
         }
 
-    private fun AbstractTypeCheckerContext.isSubtypeOfForSingleClassifierType(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean {
+    private fun AbstractTypeCheckerContext.isSubtypeOfForSingleClassifierType(subType: SimpleTypeMarker, superType: SimpleTypeMarker): Boolean {
         // TODO: fix assertions
 //        assert(subType.isSingleClassifierType || subType.typeConstructor().isIntersection() || subType.isAllowedTypeVariable) {
 //            "Not singleClassifierType and not intersection subType: $subType"
@@ -245,8 +245,8 @@ object AbstractTypeChecker {
     }
 
     fun AbstractTypeCheckerContext.isSubtypeForSameConstructor(
-        capturedSubArguments: TypeArgumentListIM,
-        superType: SimpleTypeIM
+        capturedSubArguments: TypeArgumentListMarker,
+        superType: SimpleTypeMarker
     ): Boolean {
         // No way to check, as no index sometimes
         //if (capturedSubArguments === superType.arguments) return true
@@ -278,7 +278,7 @@ object AbstractTypeChecker {
         return true
     }
 
-    private fun AbstractTypeCheckerContext.isCommonDenotableType(type: KotlinTypeIM): Boolean =
+    private fun AbstractTypeCheckerContext.isCommonDenotableType(type: KotlinTypeMarker): Boolean =
         type.typeConstructor().isDenotable() &&
                 !type.isDynamic() && !type.isDefinitelyNotNullType() &&
                 type.lowerBoundIfFlexible().typeConstructor() == type.upperBoundIfFlexible().typeConstructor()
@@ -294,7 +294,7 @@ object AbstractTypeChecker {
         return null
     }
 
-    private fun AbstractTypeCheckerContext.checkSubtypeForSpecialCases(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean? {
+    private fun AbstractTypeCheckerContext.checkSubtypeForSpecialCases(subType: SimpleTypeMarker, superType: SimpleTypeMarker): Boolean? {
         if (subType.isError() || superType.isError()) {
             if (isErrorTypeEqualsToAnything) return true
 
@@ -330,9 +330,9 @@ object AbstractTypeChecker {
     }
 
 
-    private inline fun TypeArgumentListIM.all(
+    private inline fun TypeArgumentListMarker.all(
         context: AbstractTypeCheckerContext,
-        crossinline predicate: (TypeArgumentIM) -> Boolean
+        crossinline predicate: (TypeArgumentMarker) -> Boolean
     ): Boolean = with(context) {
         repeat(size()) { index ->
             if (!predicate(get(index))) return false
@@ -342,9 +342,9 @@ object AbstractTypeChecker {
 
 
     private fun AbstractTypeCheckerContext.collectAllSupertypesWithGivenTypeConstructor(
-        baseType: SimpleTypeIM,
-        constructor: TypeConstructorIM
-    ): List<SimpleTypeIM> {
+        baseType: SimpleTypeMarker,
+        constructor: TypeConstructorMarker
+    ): List<SimpleTypeMarker> {
         if (constructor.isCommonFinalClassConstructor()) {
             return if (areEqualTypeConstructors(baseType.typeConstructor(), constructor))
                 listOf(captureFromArguments(baseType, CaptureStatus.FOR_SUBTYPING) ?: baseType)
@@ -352,7 +352,7 @@ object AbstractTypeChecker {
                 emptyList()
         }
 
-        val result: MutableList<SimpleTypeIM> = SmartList()
+        val result: MutableList<SimpleTypeMarker> = SmartList()
 
         anySupertype(baseType, { false }) {
             //kotlin.require(it is SimpleType)
@@ -375,7 +375,7 @@ object AbstractTypeChecker {
         return result
     }
 
-    private fun AbstractTypeCheckerContext.collectAndFilter(classType: SimpleTypeIM, constructor: TypeConstructorIM) =
+    private fun AbstractTypeCheckerContext.collectAndFilter(classType: SimpleTypeMarker, constructor: TypeConstructorMarker) =
         selectOnlyPureKotlinSupertypes(collectAllSupertypesWithGivenTypeConstructor(classType, constructor))
 
 
@@ -389,7 +389,7 @@ object AbstractTypeChecker {
      *
      * More tests: javaAndKotlinSuperType & purelyImplementedCollection folder
      */
-    private fun AbstractTypeCheckerContext.selectOnlyPureKotlinSupertypes(supertypes: List<SimpleTypeIM>): List<SimpleTypeIM> {
+    private fun AbstractTypeCheckerContext.selectOnlyPureKotlinSupertypes(supertypes: List<SimpleTypeMarker>): List<SimpleTypeMarker> {
         if (supertypes.size < 2) return supertypes
 
         val allPureSupertypes = supertypes.filter {
@@ -402,9 +402,9 @@ object AbstractTypeChecker {
     // nullability was checked earlier via nullabilityChecker
     // should be used only if you really sure that it is correct
     fun AbstractTypeCheckerContext.findCorrespondingSupertypes(
-        baseType: SimpleTypeIM,
-        constructor: TypeConstructorIM
-    ): List<SimpleTypeIM> {
+        baseType: SimpleTypeMarker,
+        constructor: TypeConstructorMarker
+    ): List<SimpleTypeMarker> {
         if (baseType.isClassType()) {
             return collectAndFilter(baseType, constructor)
         }
@@ -415,7 +415,7 @@ object AbstractTypeChecker {
         }
 
         // todo add tests
-        val classTypeSupertypes = SmartList<SimpleTypeIM>()
+        val classTypeSupertypes = SmartList<SimpleTypeMarker>()
         anySupertype(baseType, { false }) {
             if (it.isClassType()) {
                 classTypeSupertypes.add(it)
@@ -432,10 +432,10 @@ object AbstractTypeChecker {
 
 object AbstractNullabilityChecker {
     // this method checks only nullability
-    fun isPossibleSubtype(context: AbstractTypeCheckerContext, subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean =
+    fun isPossibleSubtype(context: AbstractTypeCheckerContext, subType: SimpleTypeMarker, superType: SimpleTypeMarker): Boolean =
         context.runIsPossibleSubtype(subType, superType)
 
-    private fun AbstractTypeCheckerContext.runIsPossibleSubtype(subType: SimpleTypeIM, superType: SimpleTypeIM): Boolean {
+    private fun AbstractTypeCheckerContext.runIsPossibleSubtype(subType: SimpleTypeMarker, superType: SimpleTypeMarker): Boolean {
         // it makes for case String? & Any <: String
         // TODO: Fix diagnostic
 //        kotlin.assert(subType.isIntersectionType || subType.isSingleClassifierType || subType.isAllowedTypeVariable) {
@@ -477,14 +477,14 @@ object AbstractNullabilityChecker {
         return hasPathByNotMarkedNullableNodes(subType, superType.typeConstructor())
     }
 
-    fun AbstractTypeCheckerContext.hasNotNullSupertype(type: SimpleTypeIM, supertypesPolicy: SupertypesPolicy) =
+    fun AbstractTypeCheckerContext.hasNotNullSupertype(type: SimpleTypeMarker, supertypesPolicy: SupertypesPolicy) =
         anySupertype(type, {
             (it.isClassType() && !it.isMarkedNullable()) || it.isDefinitelyNotNullType()
         }) {
             if (it.isMarkedNullable()) SupertypesPolicy.None else supertypesPolicy
         }
 
-    fun AbstractTypeCheckerContext.hasPathByNotMarkedNullableNodes(start: SimpleTypeIM, end: TypeConstructorIM) =
+    fun AbstractTypeCheckerContext.hasPathByNotMarkedNullableNodes(start: SimpleTypeMarker, end: TypeConstructorMarker) =
         anySupertype(start, {
             !it.isMarkedNullable() && isEqualTypeConstructors(it.typeConstructor(), end)
         }) {
