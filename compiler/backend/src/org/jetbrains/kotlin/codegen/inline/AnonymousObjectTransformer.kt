@@ -176,7 +176,7 @@ class AnonymousObjectTransformer(
 
         writeOuterInfo(visitor)
 
-        if (inliningContext.generateAssertField) {
+        if (inliningContext.generateAssertField && fieldNames.none { it.key == ASSERTIONS_DISABLED_FIELD_NAME }) {
             val clInitBuilder = classBuilder.newMethod(NO_ORIGIN, Opcodes.ACC_STATIC, "<clinit>", "()V", null, null)
             generateAssertionsDisabledFieldInitialization(classBuilder, clInitBuilder)
             clInitBuilder.visitInsn(Opcodes.RETURN)

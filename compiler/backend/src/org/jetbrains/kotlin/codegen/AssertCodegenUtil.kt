@@ -28,7 +28,7 @@ import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 import org.jetbrains.org.objectweb.asm.tree.FieldInsnNode
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
 
-private const val ASSERTIONS_DISABLED_FIELD_NAME = "\$assertionsDisabled"
+const val ASSERTIONS_DISABLED_FIELD_NAME = "\$assertionsDisabled"
 private const val ALWAYS_ENABLED_ASSERT_FUNCTION_NAME = "alwaysEnabledAssert"
 private const val LAMBDA_INTERNAL_NAME = "kotlin/jvm/functions/Function0"
 private const val ASSERTION_ERROR_INTERNAL_NAME = "java/lang/AssertionError"
