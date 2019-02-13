@@ -58,7 +58,7 @@ open class KtLightMethodImpl protected constructor(
     }
 
     protected open fun buildParametersForList(): List<PsiParameter> =
-        clsDelegate.parameterList.parameters.mapIndexed { index, clsParameter ->
+        (dummyDelegate ?: clsDelegate).parameterList.parameters.mapIndexed { index, clsParameter ->
             KtLightParameter(
                 clsParameter,
                 index,
