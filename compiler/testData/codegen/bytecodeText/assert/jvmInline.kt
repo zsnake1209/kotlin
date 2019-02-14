@@ -12,7 +12,7 @@ class A {
 // A.inlineSite:
 // 1 GETSTATIC A.\$assertionsDisabled
 // A.<clinit>:
-// 1 LDC LA;.class
-// One in A and the other in JvmInlineKt
-// 2 INVOKEVIRTUAL java/lang/Class.desiredAssertionStatus \(\)Z
+// 1 LDC LA;.class\s*INVOKEVIRTUAL java/lang/Class.desiredAssertionStatus \(\)Z
 // 1 PUTSTATIC A.\$assertionsDisabled : Z
+// in declaration site and in inline site
+// 2 INVOKEVIRTUAL java/lang/Class.desiredAssertionStatus \(\)Z
