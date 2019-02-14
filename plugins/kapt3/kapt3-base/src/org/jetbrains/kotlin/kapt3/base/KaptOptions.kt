@@ -92,7 +92,8 @@ enum class KaptFlag(val description: String) {
     CORRECT_ERROR_TYPES("Correct error types"),
     MAP_DIAGNOSTIC_LOCATIONS("Map diagnostic locations"),
     STRICT("Strict mode"),
-    INCLUDE_COMPILE_CLASSPATH("Detect annotation processors in compile classpath");
+    INCLUDE_COMPILE_CLASSPATH("Detect annotation processors in compile classpath"),
+    USE_SPECULATIVE_CLASS_LOADING("Use speculative class loading for annotation processors classpath");
 }
 
 interface KaptSelector {

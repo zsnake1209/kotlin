@@ -7,31 +7,46 @@ package org.jetbrains.kotlin.kapt3.base
 
 import org.jetbrains.kotlin.base.kapt3.KaptFlag
 import org.jetbrains.kotlin.base.kapt3.KaptOptions
-import org.jetbrains.kotlin.kapt3.base.util.KaptLogger
-import org.jetbrains.kotlin.kapt3.base.util.info
+import org.jetbrains.kotlin.kapt3.base.util.*
 import java.io.Closeable
-import java.io.File
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.net.URLClassLoader
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.processing.Processor
 
 class LoadedProcessors(val processors: List<Processor>, val classLoader: ClassLoader)
 
 open class ProcessorLoader(private val options: KaptOptions, private val logger: KaptLogger) : Closeable {
+    companion object {
+        private val classLoaderCache: MutableMap<ClassPath, SpeculativeClassloader> = ConcurrentHashMap()
+    }
+
     private var annotationProcessingClassLoader: URLClassLoader? = null
 
     fun loadProcessors(parentClassLoader: ClassLoader = ClassLoader.getSystemClassLoader()): LoadedProcessors {
-        clearJarURLCache()
-
-        val classpath = LinkedHashSet<File>().apply {
-            addAll(options.processingClasspath)
+        val classPath = classPathOf {
+            for (file in options.processingClasspath) {
+                yield(file.toURI())
+            }
             if (options[KaptFlag.INCLUDE_COMPILE_CLASSPATH]) {
-                addAll(options.compileClasspath)
+                for (file in options.compileClasspath) {
+                    yield(file.toURI())
+                }
             }
         }
-        val classLoader = URLClassLoader(classpath.map { it.toURI().toURL() }.toTypedArray(), parentClassLoader)
+
+        val classLoader = if (options[KaptFlag.USE_SPECULATIVE_CLASS_LOADING]) {
+            logger.info("Use speculative class loading to improve processors latency")
+            (classLoaderCache[classPath]
+                ?.flip()
+                ?: SpeculativeClassloader(classPath.toArray(), parentClassLoader)).also {
+                classLoaderCache[classPath] = it
+            }
+        } else {
+            clearJarURLCache() // TODO: aren't we clearing the jar URL cache too much?
+            CacheInvalidatingURLClassLoader(classPath.toArray(), parentClassLoader)
+        }
+
         this.annotationProcessingClassLoader = classLoader
 
         val processors = if (options.processors.isNotEmpty()) {
@@ -79,28 +94,5 @@ open class ProcessorLoader(private val options: KaptOptions, private val logger:
 
     override fun close() {
         annotationProcessingClassLoader?.close()
-        clearJarURLCache()
-    }
-}
-
-// Copied from com.intellij.ide.ClassUtilCore
-private fun clearJarURLCache() {
-    fun clearMap(cache: Field) {
-        cache.isAccessible = true
-
-        if (!Modifier.isFinal(cache.modifiers)) {
-            cache.set(null, hashMapOf<Any, Any>())
-        } else {
-            val map = cache.get(null) as MutableMap<*, *>
-            map.clear()
-        }
-    }
-
-    try {
-        val jarFileFactory = Class.forName("sun.net.www.protocol.jar.JarFileFactory")
-
-        clearMap(jarFileFactory.getDeclaredField("fileCache"))
-        clearMap(jarFileFactory.getDeclaredField("urlCache"))
-    } catch (ignore: Exception) {
     }
 }

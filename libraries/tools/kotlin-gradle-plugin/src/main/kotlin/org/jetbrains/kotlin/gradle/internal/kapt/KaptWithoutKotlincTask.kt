@@ -59,6 +59,7 @@ open class KaptWithoutKotlincTask @Inject constructor(private val workerExecutor
             if (isVerbose) add("VERBOSE")
             if (mapDiagnosticLocations) add("MAP_DIAGNOSTIC_LOCATIONS")
             if (includeCompileClasspath) add("INCLUDE_COMPILE_CLASSPATH")
+            if (useSpeculativeClassLoading) add("USE_SPECULATIVE_CLASS_LOADING")
         }
 
         val optionsForWorker = KaptOptionsForWorker(

@@ -90,6 +90,9 @@ abstract class KaptTask : ConventionTask(), TaskWithLocalState {
     @get:Internal
     var useBuildCache: Boolean = false
 
+    @get:Internal
+    var useSpeculativeClassLoading: Boolean = false
+
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     val source: Collection<File>
