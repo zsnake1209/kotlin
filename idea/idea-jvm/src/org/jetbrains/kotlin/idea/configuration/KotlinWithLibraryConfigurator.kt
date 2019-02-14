@@ -259,7 +259,7 @@ abstract class KotlinWithLibraryConfigurator protected constructor() : KotlinPro
         }
 
         collector.addMessage(library.name!! + " library was created")
-        return library!!
+        return library
     }
 
     private fun isProjectLibraryPresent(project: Project): Boolean {

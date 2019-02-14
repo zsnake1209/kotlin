@@ -254,7 +254,7 @@ class InflowSlicer(
             ReferencesSearch
                     .search(function, parentUsage.scope.toSearchScope())
                     .filterIsInstance<KtPropertyDelegationMethodsReference>()
-                    .forEach { (it.element?.parent as? KtProperty)?.processPropertyAssignments() }
+                    .forEach { (it.element.parent as? KtProperty)?.processPropertyAssignments() }
         }
 
         val parameterDescriptor = resolveToParameterDescriptorIfAny(BodyResolveMode.FULL) ?: return
