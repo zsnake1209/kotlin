@@ -414,6 +414,11 @@ public class IrBytecodeTextTestGenerated extends AbstractIrBytecodeTextTest {
             runTest("compiler/testData/codegen/bytecodeText/assert/jvmCrossinline.kt");
         }
 
+        @TestMetadata("jvmCrossinlineAssertInLambda.kt")
+        public void testJvmCrossinlineAssertInLambda() throws Exception {
+            runTest("compiler/testData/codegen/bytecodeText/assert/jvmCrossinlineAssertInLambda.kt");
+        }
+
         @TestMetadata("jvmInline.kt")
         public void testJvmInline() throws Exception {
             runTest("compiler/testData/codegen/bytecodeText/assert/jvmInline.kt");
