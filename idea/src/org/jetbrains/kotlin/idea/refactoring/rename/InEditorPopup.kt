@@ -29,7 +29,7 @@ class InEditorPopup(
 ) {
     enum class Type(val icon: Icon, val background: Color) {
         WARNING(AllIcons.General.BalloonWarning, MessageType.WARNING.popupBackground),
-        ERROR(AllIcons.General.BalloonError, MessageType.WARNING.popupBackground)
+        ERROR(AllIcons.General.BalloonError, MessageType.ERROR.popupBackground)
     }
 
     fun show(project: Project, editor: Editor) {
