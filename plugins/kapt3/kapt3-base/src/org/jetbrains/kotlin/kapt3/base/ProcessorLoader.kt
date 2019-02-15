@@ -37,11 +37,14 @@ open class ProcessorLoader(private val options: KaptOptions, private val logger:
 
         val classLoader = if (options[KaptFlag.USE_SPECULATIVE_CLASS_LOADING]) {
             logger.info("Use speculative class loading to improve processors latency")
-            (classLoaderCache[classPath]
+
+            val speculativeClassloader = classLoaderCache[classPath]
                 ?.flip()
-                ?: SpeculativeClassloader(classPath.toArray(), parentClassLoader)).also {
-                classLoaderCache[classPath] = it
-            }
+                ?: SpeculativeClassloader(classPath.toArray(), parentClassLoader)
+
+            classLoaderCache[classPath] = speculativeClassloader
+
+            speculativeClassloader
         } else {
             clearJarURLCache() // TODO: aren't we clearing the jar URL cache too much?
             CacheInvalidatingURLClassLoader(classPath.toArray(), parentClassLoader)
