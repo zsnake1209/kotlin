@@ -27,7 +27,7 @@ internal class SpeculativeClassloader private constructor(
     private val loadedClasses: MutableSet<String> = LinkedHashSet()
 
     // multi-threaded loading doesn't really help
-    private val loaderHelper = thread(start = nextClassLoader != null, name = "speculative class loader") {
+    private val loaderHelper = thread(start = nextClassLoader != null, name = "annotation processor loader") {
         val thread = Thread.currentThread()
         while (thread.isAlive && loop()) {
         }

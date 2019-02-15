@@ -155,13 +155,6 @@ enum class KaptCliOption(
         "Discover annotation processors in compile classpath"
     ),
 
-    USE_SPECULATIVE_CLASS_LOADING_OPTION(
-        "useSpeculativeClassLoading",
-        "true | false",
-        "Use speculative class loading for annotation processors classpath"
-        //, cliToolOption = CliToolOption("-Kapt-use-speculative-classpath", FLAG)
-    ),
-
     INFO_AS_WARNINGS_OPTION("infoAsWarnings", "true | false", "Show information messages as warnings"),
 
     @Deprecated("Do not use in CLI")

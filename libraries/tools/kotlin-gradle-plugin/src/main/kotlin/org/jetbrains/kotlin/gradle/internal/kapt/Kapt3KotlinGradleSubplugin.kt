@@ -90,7 +90,7 @@ class Kapt3KotlinGradleSubplugin : KotlinGradleSubplugin<KotlinCompile> {
         private val USE_WORKER_API = "kapt.use.worker.api"
         private val INFO_AS_WARNINGS = "kapt.info.as.warnings"
         private val INCLUDE_COMPILE_CLASSPATH = "kapt.include.compile.classpath"
-        private val USE_SPECULATIVE_CLASS_LOADING = "kapt.use.speculative.classloading"
+        private val USE_ANNOTATION_PROCESSOR_PRELOADING = "kapt.use.annotation.processor.preloading"
 
         const val KAPT_WORKER_DEPENDENCIES_CONFIGURATION_NAME = "kotlinKaptWorkerDependencies"
 
@@ -120,10 +120,10 @@ class Kapt3KotlinGradleSubplugin : KotlinGradleSubplugin<KotlinCompile> {
             return isWorkerAPISupported() && hasProperty(USE_WORKER_API) && property(USE_WORKER_API) == "true"
         }
 
-        fun Project.isUseSpeculativeClassLoading(): Boolean {
+        fun Project.isUseAnnotationProcessorPreLoading(): Boolean {
             return isUseWorkerApi()
-                    && hasProperty(Kapt3KotlinGradleSubplugin.USE_SPECULATIVE_CLASS_LOADING)
-                    && property(Kapt3KotlinGradleSubplugin.USE_SPECULATIVE_CLASS_LOADING) == "true"
+                    && hasProperty(Kapt3KotlinGradleSubplugin.USE_ANNOTATION_PROCESSOR_PRELOADING)
+                    && property(Kapt3KotlinGradleSubplugin.USE_ANNOTATION_PROCESSOR_PRELOADING) == "true"
         }
 
         fun Project.isInfoAsWarnings(): Boolean {
@@ -383,7 +383,7 @@ class Kapt3KotlinGradleSubplugin : KotlinGradleSubplugin<KotlinCompile> {
         kaptTask.kotlinSourcesDestinationDir = kotlinSourcesOutputDir
         kaptTask.classesDir = classesOutputDir
         kaptTask.includeCompileClasspath = includeCompileClasspath
-        kaptTask.useSpeculativeClassLoading = project.isUseSpeculativeClassLoading()
+        kaptTask.useAnnotationProcessorPreloading = project.isUseAnnotationProcessorPreLoading()
 
         kotlinCompilation?.run {
             output.apply {

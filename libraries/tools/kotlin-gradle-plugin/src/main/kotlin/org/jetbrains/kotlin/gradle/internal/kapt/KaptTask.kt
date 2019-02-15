@@ -91,7 +91,7 @@ abstract class KaptTask : ConventionTask(), TaskWithLocalState {
     var useBuildCache: Boolean = false
 
     @get:Internal
-    var useSpeculativeClassLoading: Boolean = false
+    var useAnnotationProcessorPreloading: Boolean = false
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)

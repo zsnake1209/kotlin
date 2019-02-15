@@ -35,8 +35,8 @@ open class ProcessorLoader(private val options: KaptOptions, private val logger:
             }
         }
 
-        val classLoader = if (options[KaptFlag.USE_SPECULATIVE_CLASS_LOADING]) {
-            logger.info("Use speculative class loading to improve processors latency")
+        val classLoader = if (options[KaptFlag.USE_ANNOTATION_PROCESSOR_PRELOADING]) {
+            logger.info("Use annotation processor class preloading to improve processors latency")
 
             val speculativeClassloader = classLoaderCache[classPath]
                 ?.flip()
