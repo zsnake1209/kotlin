@@ -85,7 +85,7 @@ class KotlinPackageContentModificationListener(private val project: Project) {
 class KotlinPackageStatementPsiTreeChangePreprocessor(private val project: Project) : PsiTreeChangePreprocessor {
     override fun treeChanged(event: PsiTreeChangeEventImpl) {
         val eFile = event.file ?: event.child as? PsiFile
-        if (eFile == null) LOG.debugInTests("Got PsiEvent: $event without file", true)
+        if (eFile == null) LOG.debugIfEnabled("Got PsiEvent: $event without file", true)
         val file = eFile as? KtFile ?: return
 
         when (event.code) {
@@ -94,7 +94,7 @@ class KotlinPackageStatementPsiTreeChangePreprocessor(private val project: Proje
             PsiTreeChangeEventImpl.PsiEventType.CHILD_REPLACED,
             PsiTreeChangeEventImpl.PsiEventType.CHILD_REMOVED -> {
                 val child = event.child ?: run {
-                    LOG.debugInTests("Got PsiEvent: $event without child", true)
+                    LOG.debugIfEnabled("Got PsiEvent: $event without child", true)
                     return
                 }
                 if (child.getParentOfType<KtPackageDirective>(false) != null)
@@ -102,7 +102,7 @@ class KotlinPackageStatementPsiTreeChangePreprocessor(private val project: Proje
             }
             PsiTreeChangeEventImpl.PsiEventType.CHILDREN_CHANGED -> {
                 val parent = event.parent ?: run {
-                    LOG.debugInTests("Got PsiEvent: $event without parent", true)
+                    LOG.debugIfEnabled("Got PsiEvent: $event without parent", true)
                     return
                 }
                 if (parent.getChildrenOfType<KtPackageDirective>().any())
@@ -243,7 +243,7 @@ class PerModulePackageCacheService(private val project: Project) {
     }
 
     private fun invalidateCacheForModuleSourceInfo(moduleSourceInfo: ModuleSourceInfo) {
-        LOG.debugInTests("Invalidated cache for $moduleSourceInfo", false)
+        LOG.debugIfEnabled("Invalidated cache for $moduleSourceInfo", false)
         val perSourceInfoData = cache[moduleSourceInfo.module] ?: return
         val dataForSourceInfo = perSourceInfoData[moduleSourceInfo] ?: return
         dataForSourceInfo.clear()
@@ -263,14 +263,14 @@ class PerModulePackageCacheService(private val project: Project) {
                         if (sourceRootUrls.any { url ->
                                 vfile.containedInOrContains(url)
                             }) {
-                            LOG.debugInTests("Invalidated cache for $module")
+                            LOG.debugIfEnabled("Invalidated cache for $module")
                             data.clear()
                         }
                     }
                 } else {
                     val infoByVirtualFile = getModuleInfoByVirtualFile(project, vfile)
                     if (infoByVirtualFile == null || infoByVirtualFile !is ModuleSourceInfo) {
-                        LOG.debugInTests("Skip $vfile as it has mismatched ModuleInfo=$infoByVirtualFile")
+                        LOG.debugIfEnabled("Skip $vfile as it has mismatched ModuleInfo=$infoByVirtualFile")
                     }
                     (infoByVirtualFile as? ModuleSourceInfo)?.let {
                         invalidateCacheForModuleSourceInfo(it)
@@ -282,13 +282,13 @@ class PerModulePackageCacheService(private val project: Project) {
 
             pendingKtFileChanges.processPending { file ->
                 if (file.virtualFile != null && file.virtualFile !in projectScope) {
-                    LOG.debugInTests("Skip $file without vFile, or not in scope: ${file.virtualFile?.let { it !in projectScope }}")
+                    LOG.debugIfEnabled("Skip $file without vFile, or not in scope: ${file.virtualFile?.let { it !in projectScope }}")
                     return@processPending
                 }
                 val nullableModuleInfo = file.getNullableModuleInfo()
                 (nullableModuleInfo as? ModuleSourceInfo)?.let { invalidateCacheForModuleSourceInfo(it) }
                 if (nullableModuleInfo == null || nullableModuleInfo !is ModuleSourceInfo) {
-                    LOG.debugInTests("Skip $file as it has mismatched ModuleInfo=$nullableModuleInfo")
+                    LOG.debugIfEnabled("Skip $file as it has mismatched ModuleInfo=$nullableModuleInfo")
                 }
                 implicitPackagePrefixCache.update(file)
             }
@@ -329,7 +329,7 @@ class PerModulePackageCacheService(private val project: Project) {
 
         return cacheForCurrentModuleInfo.getOrPut(packageFqName) {
             val packageExists = PackageIndexUtil.packageExists(packageFqName, moduleInfo.contentScope(), project)
-            LOG.debugInTests("Computed cache value for $packageFqName in $moduleInfo is $packageExists")
+            LOG.debugIfEnabled("Computed cache value for $packageFqName in $moduleInfo is $packageExists")
             packageExists
         }
     }
@@ -349,8 +349,10 @@ class PerModulePackageCacheService(private val project: Project) {
 }
 
 
-private fun Logger.debugInTests(message: String, withCurrentTrace: Boolean = false) {
-    if (ApplicationManager.getApplication().isUnitTestMode) {
+private val DEBUG_LOG_ENABLE: Boolean get() = run { System.getProperty("debug.PerModulePackageCache", "false") == "true" }
+
+private fun Logger.debugIfEnabled(message: String, withCurrentTrace: Boolean = false) {
+    if (ApplicationManager.getApplication().isUnitTestMode && DEBUG_LOG_ENABLE) {
         if (withCurrentTrace) {
             val e = Exception().apply { fillInStackTrace() }
             this.debug(message, e)

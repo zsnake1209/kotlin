@@ -65,6 +65,7 @@ sourceSets {
 projectTest {
     dependsOn(":dist")
     workingDir = rootDir
+    this.systemProperties("debug.PerModulePackageCache" to "true")
 }
 
 testsJar()
