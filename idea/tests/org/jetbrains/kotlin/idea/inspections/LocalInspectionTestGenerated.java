@@ -3048,6 +3048,63 @@ public class LocalInspectionTestGenerated extends AbstractLocalInspectionTest {
         }
     }
 
+    @TestMetadata("idea/testData/inspectionsLocal/redundantProgressionStep")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class RedundantProgressionStep extends AbstractLocalInspectionTest {
+        public void testAllFilesPresentInRedundantProgressionStep() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/testData/inspectionsLocal/redundantProgressionStep"), Pattern.compile("^([\\w\\-_]+)\\.kt$"), TargetBackend.ANY, true);
+        }
+
+        @TestMetadata("IntProgression.kt")
+        public void testIntProgression() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/inspectionsLocal/redundantProgressionStep/IntProgression.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("IntProgressionDot.kt")
+        public void testIntProgressionDot() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/inspectionsLocal/redundantProgressionStep/IntProgressionDot.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("IntProgressionDotNotOne.kt")
+        public void testIntProgressionDotNotOne() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/inspectionsLocal/redundantProgressionStep/IntProgressionDotNotOne.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("IntProgressionNotOne.kt")
+        public void testIntProgressionNotOne() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/inspectionsLocal/redundantProgressionStep/IntProgressionNotOne.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("LongProgression.kt")
+        public void testLongProgression() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/inspectionsLocal/redundantProgressionStep/LongProgression.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("LongProgressionDot.kt")
+        public void testLongProgressionDot() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/inspectionsLocal/redundantProgressionStep/LongProgressionDot.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("LongProgressionDotNotOne.kt")
+        public void testLongProgressionDotNotOne() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/inspectionsLocal/redundantProgressionStep/LongProgressionDotNotOne.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("LongProgressionNotOne.kt")
+        public void testLongProgressionNotOne() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/inspectionsLocal/redundantProgressionStep/LongProgressionNotOne.kt");
+            doTest(fileName);
+        }
+    }
+
     @TestMetadata("idea/testData/inspectionsLocal/implicitThis")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

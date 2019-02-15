@@ -3257,6 +3257,15 @@
                      language="kotlin"
     />
 
+    <localInspection implementationClass="org.jetbrains.kotlin.idea.inspections.RedundantProgressionStepInspection"
+                     displayName="Redundant progression step"
+                     groupPath="Kotlin"
+                     groupName="Redundant constructs"
+                     enabledByDefault="true"
+                     level="WEAK WARNING"
+                     language="kotlin"
+    />
+
     <localInspection implementationClass="org.jetbrains.kotlin.idea.inspections.RedundantRequireNotNullCallInspection"
                      displayName="Redundant 'requireNotNull' or 'checkNotNull' call"
                      groupPath="Kotlin"
