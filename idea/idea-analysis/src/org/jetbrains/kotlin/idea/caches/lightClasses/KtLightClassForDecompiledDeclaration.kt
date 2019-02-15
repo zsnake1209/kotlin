@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.idea.caches.lightClasses
 
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.compiled.ClsClassImpl
@@ -40,8 +41,9 @@ class KtLightClassForDecompiledDeclaration(
     override fun getOwnInnerClasses(): List<PsiClass> {
         val nestedClasses = kotlinOrigin?.declarations?.filterIsInstance<KtClassOrObject>() ?: emptyList()
         return clsDelegate.ownInnerClasses.map { innerClsClass ->
-            KtLightClassForDecompiledDeclaration(innerClsClass as ClsClassImpl,
-                                                 nestedClasses.firstOrNull { innerClsClass.name == it.name }, file
+            KtLightClassForDecompiledDeclaration(
+                innerClsClass as ClsClassImpl,
+                nestedClasses.firstOrNull { innerClsClass.name == it.name }, file
             )
         }
     }
@@ -56,7 +58,7 @@ class KtLightClassForDecompiledDeclaration(
 
     override fun getNavigationElement() = kotlinOrigin?.navigationElement ?: file
 
-    override fun getParent() = clsDelegate.parent
+    override fun getParent(): PsiElement? = clsDelegate.parent
 
     override fun equals(other: Any?): Boolean =
         other is KtLightClassForDecompiledDeclaration &&

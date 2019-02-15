@@ -9,6 +9,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.*
 import com.intellij.openapi.roots.libraries.*
@@ -282,7 +283,7 @@ abstract class KotlinWithLibraryConfigurator protected constructor() : KotlinPro
     }
 
     open fun getDefaultPathToJarFile(project: Project): String {
-        return FileUIUtils.createRelativePath(project, project.baseDir, DEFAULT_LIBRARY_DIR)
+        return FileUIUtils.createRelativePath(project, project.guessProjectDir(), DEFAULT_LIBRARY_DIR)
     }
 
     enum class FileState {
@@ -397,14 +398,14 @@ abstract class KotlinWithLibraryConfigurator protected constructor() : KotlinPro
         val project = module.project
         val collector = createConfigureKotlinNotificationCollector(project)
 
-        for (library in findAllUsedLibraries(project).keySet()) {
-            val runtimeJar = LibraryJarDescriptor.RUNTIME_JAR.findExistingJar(library) ?: continue
+        for (usedLibrary in findAllUsedLibraries(project).keySet()) {
+            val runtimeJar = LibraryJarDescriptor.RUNTIME_JAR.findExistingJar(usedLibrary) ?: continue
 
-            val model = library.modifiableModel
+            val model = usedLibrary.modifiableModel
             val libFilesDir = VfsUtilCore.virtualToIoFile(runtimeJar).parent
 
             for (libraryJarDescriptor in libraryJarDescriptors) {
-                if (libraryJarDescriptor.findExistingJar(library) != null) continue
+                if (libraryJarDescriptor.findExistingJar(usedLibrary) != null) continue
 
                 val libFile = libraryJarDescriptor.getPathInPlugin()
                 if (!libFile.exists()) continue
