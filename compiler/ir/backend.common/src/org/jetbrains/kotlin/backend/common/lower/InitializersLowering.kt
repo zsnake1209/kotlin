@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
@@ -29,8 +30,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrSetFieldImpl
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 
@@ -39,8 +39,21 @@ object SYNTHESIZED_INIT_BLOCK: IrStatementOriginImpl("SYNTHESIZED_INIT_BLOCK")
 fun makeInitializersPhase(origin: IrDeclarationOrigin, clinitNeeded: Boolean)= makeIrFilePhase(
     { context -> InitializersLowering(context, origin, clinitNeeded) },
     name = "Initializers",
-    description = "Handle initializer statements"
+    description = "Handle initializer statements",
+    stickyPostconditions = setOf(::checkNonAnonymousInitializers)
 )
+
+fun checkNonAnonymousInitializers(irFile: IrFile) {
+    irFile.acceptVoid(object : IrElementVisitorVoid {
+        override fun visitElement(element: IrElement) {
+            element.acceptChildrenVoid(this)
+        }
+
+        override fun visitAnonymousInitializer(declaration: IrAnonymousInitializer) {
+            error("No anonymous initializers should remain at this stage")
+        }
+    })
+}
 
 class InitializersLowering(
     val context: CommonBackendContext,
@@ -54,6 +67,7 @@ class InitializersLowering(
         val staticInitializerStatements = handleStatics(irClass)
         if (clinitNeeded && staticInitializerStatements.isNotEmpty())
             createStaticInitializationMethod(irClass, staticInitializerStatements)
+        irClass.declarations.removeAll { it is IrAnonymousInitializer }
         irClass.patchDeclarationParents(irClass.parent)
     }
 
