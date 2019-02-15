@@ -155,6 +155,13 @@ enum class KaptCliOption(
         "Discover annotation processors in compile classpath"
     ),
 
+    USE_ANNOTATION_PROCESSOR_PRELOADING_OPTION(
+        "useAnnotationProcessorPreLoading",
+        "true | false",
+        "Use preloading for annotation processors classpath"
+        //, cliToolOption = CliToolOption("-Kapt-use-annotation-processor-preloading", FLAG)
+    ),
+
     INFO_AS_WARNINGS_OPTION("infoAsWarnings", "true | false", "Show information messages as warnings"),
 
     @Deprecated("Do not use in CLI")

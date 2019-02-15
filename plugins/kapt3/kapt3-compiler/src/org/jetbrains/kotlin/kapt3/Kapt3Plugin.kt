@@ -110,6 +110,7 @@ class Kapt3CommandLineProcessor : CommandLineProcessor {
             STRICT_MODE_OPTION -> setFlag(KaptFlag.STRICT, value)
             SHOW_PROCESSOR_TIMINGS -> setFlag(KaptFlag.SHOW_PROCESSOR_TIMINGS, value)
             INCLUDE_COMPILE_CLASSPATH -> setFlag(KaptFlag.INCLUDE_COMPILE_CLASSPATH, value)
+            USE_ANNOTATION_PROCESSOR_PRELOADING_OPTION -> setFlag(KaptFlag.USE_ANNOTATION_PROCESSOR_PRELOADING, value)
 
             DETECT_MEMORY_LEAKS_OPTION -> setSelector(enumValues<DetectMemoryLeaksMode>(), value) { detectMemoryLeaks = it }
             APT_MODE_OPTION -> setSelector(enumValues<AptMode>(), value) { mode = it }
