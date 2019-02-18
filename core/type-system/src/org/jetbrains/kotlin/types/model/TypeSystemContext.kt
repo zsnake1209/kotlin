@@ -119,6 +119,18 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
 
     fun TypeConstructorMarker.isAnyConstructor(): Boolean
     fun TypeConstructorMarker.isNothingConstructor(): Boolean
+
+
+    /**
+     *
+     * SingleClassifierType is one of the following types:
+     *  - classType
+     *  - type for type parameter
+     *  - captured type
+     *
+     * Such types can contains error types in our arguments, but type constructor isn't errorTypeConstructor
+     */
+    fun SimpleTypeMarker.isSingleClassifierType(): Boolean
 }
 
 enum class CaptureStatus {

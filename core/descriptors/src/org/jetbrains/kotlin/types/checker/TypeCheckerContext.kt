@@ -59,5 +59,5 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
     }
 
 
-    val UnwrappedType.isAllowedTypeVariable: Boolean get() = allowedTypeVariable && constructor is NewTypeVariableConstructor
+    override val KotlinTypeMarker.isAllowedTypeVariable: Boolean get() = this is UnwrappedType && allowedTypeVariable && constructor is NewTypeVariableConstructor
 }
