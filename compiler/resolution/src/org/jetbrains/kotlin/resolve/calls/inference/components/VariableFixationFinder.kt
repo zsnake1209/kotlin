@@ -23,31 +23,28 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.DeclaredUpperBoundCons
 import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
 import org.jetbrains.kotlin.resolve.calls.inference.model.VariableWithConstraints
 import org.jetbrains.kotlin.resolve.calls.model.PostponedResolvedAtom
-import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
-import org.jetbrains.kotlin.types.typeUtil.contains
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 class VariableFixationFinder(
     private val trivialConstraintTypeInferenceOracle: TrivialConstraintTypeInferenceOracle
 ) {
-    interface Context: TypeSystemInferenceExtensionContext {
+    interface Context : TypeSystemInferenceExtensionContext {
         val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints>
         val postponedTypeVariables: List<NewTypeVariable>
     }
 
     data class VariableForFixation(
-        val variable: TypeConstructor,
+        val variable: TypeConstructorMarker,
         val hasProperConstraint: Boolean,
         val hasOnlyTrivialProperConstraint: Boolean = false
     )
 
     fun findFirstVariableForFixation(
         c: Context,
-        allTypeVariables: List<TypeConstructor>,
+        allTypeVariables: List<TypeConstructorMarker>,
         postponedKtPrimitives: List<PostponedResolvedAtom>,
         completionMode: ConstraintSystemCompletionMode,
         topLevelType: UnwrappedType
@@ -63,7 +60,7 @@ class VariableFixationFinder(
     }
 
     private fun Context.getTypeVariableReadiness(
-        variable: TypeConstructor,
+        variable: TypeConstructorMarker,
         dependencyProvider: TypeVariableDependencyInformationProvider
     ): TypeVariableFixationReadiness = when {
         !notFixedTypeVariables.contains(variable) ||
@@ -76,14 +73,13 @@ class VariableFixationFinder(
     }
 
     private fun Context.findTypeVariableForFixation(
-        allTypeVariables: List<TypeConstructor>,
+        allTypeVariables: List<TypeConstructorMarker>,
         postponedArguments: List<PostponedResolvedAtom>,
         completionMode: ConstraintSystemCompletionMode,
-        topLevelType: UnwrappedType
+        topLevelType: KotlinTypeMarker
     ): VariableForFixation? {
         val dependencyProvider = TypeVariableDependencyInformationProvider(
-            // TODO: SUB
-            notFixedTypeVariables.cast(), postponedArguments, topLevelType.takeIf { completionMode == PARTIAL }
+            notFixedTypeVariables, postponedArguments, topLevelType.takeIf { completionMode == PARTIAL }, this
         )
 
         val candidate = allTypeVariables.maxBy { getTypeVariableReadiness(it, dependencyProvider) } ?: return null
@@ -99,10 +95,9 @@ class VariableFixationFinder(
         }
     }
 
-    private fun Context.hasDependencyToOtherTypeVariables(typeVariable: TypeConstructor): Boolean {
+    private fun Context.hasDependencyToOtherTypeVariables(typeVariable: TypeConstructorMarker): Boolean {
         for (constraint in notFixedTypeVariables[typeVariable]?.constraints ?: return false) {
-            //TODO: SUB
-            if ((constraint.type as UnwrappedType).arguments.isNotEmpty() && constraint.type.contains { notFixedTypeVariables.containsKey(it.typeConstructor()) }) {
+            if (constraint.type.lowerBoundIfFlexible().argumentsCount() != 0 && constraint.type.contains { notFixedTypeVariables.containsKey(it.typeConstructor()) }) {
                 return true
             }
         }
@@ -116,7 +111,7 @@ class VariableFixationFinder(
         } ?: false
     }
 
-    private fun Context.variableHasProperArgumentConstraints(variable: TypeConstructor): Boolean =
+    private fun Context.variableHasProperArgumentConstraints(variable: TypeConstructorMarker): Boolean =
         notFixedTypeVariables[variable]?.constraints?.any { isProperArgumentConstraint(it) } ?: false
 
     private fun Context.isProperArgumentConstraint(c: Constraint) =
