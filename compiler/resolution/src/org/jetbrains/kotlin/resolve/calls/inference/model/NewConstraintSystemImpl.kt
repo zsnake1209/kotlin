@@ -24,16 +24,7 @@ import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
 import org.jetbrains.kotlin.utils.SmartList
 
 class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : TypeSystemInferenceExtensionContext, ClassicTypeSystemContext,
-    BuiltInsProvider {
-
-    override fun KotlinTypeMarker.typeConstructor(): TypeConstructorMarker {
-        return when (this) {
-            is SimpleTypeMarker -> this.typeConstructor()
-            is FlexibleType -> this.constructor
-            else -> error("?!")
-        }
-    }
-}
+    BuiltInsProvider
 
 fun NewConstraintSystemImpl(
     constraintInjector: ConstraintInjector,
