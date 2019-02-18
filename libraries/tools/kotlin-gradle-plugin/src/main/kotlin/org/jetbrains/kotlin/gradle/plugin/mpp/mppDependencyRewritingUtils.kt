@@ -14,8 +14,13 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.attributes.Usage
 import org.gradle.api.internal.component.SoftwareComponentInternal
 import org.gradle.api.internal.component.UsageContext
+import org.gradle.api.plugins.InvalidPluginException
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilationToRunnableFiles
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetComponent
+import org.jetbrains.kotlin.gradle.utils.*
 
 internal fun Project.rewritePomMppDependenciesToActualTargetModules(
     pomXml: XmlProvider,
@@ -115,45 +120,74 @@ private fun associateDependenciesWithActualModuleDependencies(
             when (dependency) {
                 is ProjectDependency -> {
                     val dependencyProject = dependency.dependencyProject
-                    val dependencyProjectKotlinExtension = dependencyProject.multiplatformExtension
-                        ?: return@associate dependency to dependency
+
+                    val dependencyProjectMultiplatformExtension = run {
+                        val dependencyProjectKotlinExtension = dependencyProject.extensions.findByName("kotlin")
+                            ?: return@associate dependency to dependency
+
+                        ReflectedInstance.tryWrapAcrossClassLoaders<KotlinMultiplatformExtension>(dependencyProjectKotlinExtension)
+                            ?: return@associate dependency to dependency
+                    }
 
                     val resolved = resolvedDependencies[Triple(dependency.group, dependency.name, dependency.version)]
                         ?: return@associate dependency to dependency
 
                     val resolvedToConfiguration = resolved.configuration
-                    val dependencyTargetComponent: KotlinTargetComponent = run {
-                        dependencyProjectKotlinExtension.targets.forEach { target ->
-                            target.components.forEach { component ->
-                                if (component.findUsageContext(resolvedToConfiguration) != null)
-                                    return@run component
+
+                    reflectedAccessAcrossClassLoaders(
+                        {
+                            val dependencyTargetComponent: ReflectedInstance<KotlinTargetComponent> = run {
+                                dependencyProjectMultiplatformExtension.get(KotlinMultiplatformExtension::targets).iterate()
+                                    .forEach { target ->
+                                        target.get(KotlinTarget::components).iterate().forEach { component ->
+                                            if (findUsageContext(component, resolvedToConfiguration) != null)
+                                                return@run component
+                                        }
+                                    }
+
+                                // Failed to find a matching component:
+                                return@associate dependency to dependency
                             }
+
+                            val targetModulePublication =
+                                dependencyTargetComponent
+                                    .tryCastAcrossClassLoaders<KotlinTargetComponentWithPublication>()
+                                    ?.getNullable(KotlinTargetComponentWithPublication::publicationDelegate)
+                                    ?.extract()
+
+                            val rootModulePublication =
+                                dependencyProjectMultiplatformExtension
+                                    .get(KotlinMultiplatformExtension::rootSoftwareComponent)
+                                    .getNullable(KotlinSoftwareComponent::publicationDelegate)
+                                    ?.extract()
+
+                            // During Gradle POM generation, a project dependency is already written as the root module's coordinates. In the
+                            // dependencies mapping, map the root module to the target's module:
+
+                            val rootModule = project.dependencies.module(
+                                listOf(
+                                    rootModulePublication?.groupId ?: dependency.group,
+                                    rootModulePublication?.artifactId ?: dependencyProject.name,
+                                    rootModulePublication?.version ?: dependency.version
+                                ).joinToString(":")
+                            ) as ModuleDependency
+
+                            rootModule to project.dependencies.module(
+                                listOf(
+                                    targetModulePublication?.groupId ?: dependency.group,
+                                    targetModulePublication?.artifactId
+                                        ?: dependencyTargetComponent.get(KotlinTargetComponent::defaultArtifactId).extract(),
+                                    targetModulePublication?.version ?: dependency.version
+                                ).joinToString(":")
+                            ) as ModuleDependency
+                        },
+                        onApiMismatch = { e ->
+                            throw InvalidPluginException(
+                                "Cannot map a project-to-project dependency for Kotlin publication. The Kotlin plugin version in " +
+                                        "$dependencyProject is different from the Kotlin plugin version in $project", e
+                            )
                         }
-                        // Failed to find a matching component:
-                        return@associate dependency to dependency
-                    }
-
-                    val targetModulePublication = (dependencyTargetComponent as? KotlinTargetComponentWithPublication)?.publicationDelegate
-                    val rootModulePublication = dependencyProjectKotlinExtension.rootSoftwareComponent.publicationDelegate
-
-                    // During Gradle POM generation, a project dependency is already written as the root module's coordinates. In the
-                    // dependencies mapping, map the root module to the target's module:
-
-                    val rootModule = project.dependencies.module(
-                        listOf(
-                            rootModulePublication?.groupId ?: dependency.group,
-                            rootModulePublication?.artifactId ?: dependencyProject.name,
-                            rootModulePublication?.version ?: dependency.version
-                        ).joinToString(":")
-                    ) as ModuleDependency
-
-                    rootModule to project.dependencies.module(
-                        listOf(
-                            targetModulePublication?.groupId ?: dependency.group,
-                            targetModulePublication?.artifactId ?: dependencyTargetComponent.defaultArtifactId,
-                            targetModulePublication?.version ?: dependency.version
-                        ).joinToString(":")
-                    ) as ModuleDependency
+                    )
                 }
                 else -> {
                     val resolvedDependency = resolvedDependencies[Triple(dependency.group, dependency.name, dependency.version)]
@@ -184,18 +218,37 @@ private fun associateDependenciesWithActualModuleDependencies(
     }
 }
 
-private fun KotlinTargetComponent.findUsageContext(configurationName: String): UsageContext? {
-    val usageContexts = when (this) {
-        is KotlinVariantWithMetadataDependency -> originalUsages
-        is SoftwareComponentInternal -> usages
-        else -> emptySet()
-    }
-    return usageContexts.find { usageContext ->
-        if (usageContext !is KotlinUsageContext) return@find false
-        val compilation = usageContext.compilation
-        configurationName in compilation.relatedConfigurationNames ||
-                configurationName == compilation.target.apiElementsConfigurationName ||
-                configurationName == compilation.target.runtimeElementsConfigurationName ||
-                configurationName == compilation.target.defaultConfigurationName
-    }
-}
+private fun findUsageContext(
+    reflectedComponent: ReflectedInstance<KotlinTargetComponent>,
+    configurationName: String
+): ReflectedInstance<out UsageContext>? = reflectedAccessAcrossClassLoaders(
+    {
+        val usageContexts: Iterable<ReflectedInstance<out UsageContext>> = when {
+            isInstanceAcrossClassLoaders<KotlinVariantWithMetadataDependency>(reflectedComponent.instance) ->
+                reflectedComponent.tryCastAcrossClassLoaders<KotlinVariantWithMetadataDependency>()!!
+                    .get(KotlinVariantWithMetadataDependency::originalUsages)
+                    .iterate()
+            reflectedComponent.instance is SoftwareComponentInternal -> reflectedComponent.instance.usages.map { ReflectedInstance(it, UsageContext::class) }
+            else -> emptyList()
+        }
+
+        return usageContexts.find { usageContext ->
+            val kotlinUsageContext = usageContext.tryCastAcrossClassLoaders<KotlinUsageContext>()
+                ?: return@find false
+
+            val compilation = kotlinUsageContext.get(KotlinUsageContext::compilation)
+
+            if (configurationName in compilation.get(KotlinCompilation<*>::relatedConfigurationNames).extract())
+                return@find true
+
+            val target = compilation.get(KotlinCompilation<*>::target)
+            val targetConfigurationNames = listOf(
+                target.get(KotlinTarget::apiElementsConfigurationName).extract(),
+                target.get(KotlinTarget::runtimeElementsConfigurationName).extract(),
+                target.get(KotlinTarget::defaultConfigurationName).extract()
+            )
+            return@find configurationName in targetConfigurationNames
+        }
+    },
+    onApiMismatch = { e: ReflectedAccessException -> throw e }
+)

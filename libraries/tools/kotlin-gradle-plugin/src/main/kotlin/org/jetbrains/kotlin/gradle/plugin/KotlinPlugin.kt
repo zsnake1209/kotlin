@@ -533,12 +533,12 @@ internal open class KotlinPlugin(
 
         project.pluginManager.apply(ScriptingGradleSubplugin::class.java)
 
-        rewriteMppDependenciesInPom(target)
+        configurePublishing(target)
 
         super.apply(project)
     }
 
-    private fun rewriteMppDependenciesInPom(target: KotlinTarget) {
+    private fun configurePublishing(target: KotlinTarget) {
         val project = target.project
 
         fun shouldRewritePoms(): Boolean =

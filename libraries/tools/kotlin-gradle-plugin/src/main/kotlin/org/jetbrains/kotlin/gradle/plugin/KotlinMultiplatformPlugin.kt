@@ -21,11 +21,17 @@ import org.gradle.api.*
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.plugins.InvalidPluginException
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.logging.kotlinWarn
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile
+import org.jetbrains.kotlin.gradle.utils.ReflectedAccessException
+import org.jetbrains.kotlin.gradle.utils.ReflectedInstance
+import org.jetbrains.kotlin.gradle.utils.reflectedAccessAcrossClassLoaders
+import kotlin.reflect.KProperty1
 
 abstract class KotlinPlatformPluginBase(protected val platformName: String) : Plugin<Project> {
     companion object {
@@ -178,14 +184,31 @@ open class KotlinPlatformImplementationPluginBase(platformName: String) : Kotlin
         // Access through reflection, because another project's KotlinProjectExtension might be loaded by a different class loader:
         val kotlinExt = project.extensions.getByName("kotlin")
         @Suppress("UNCHECKED_CAST")
-        val sourceSets = kotlinExt.javaClass.getMethod("getSourceSets").invoke(kotlinExt) as NamedDomainObjectCollection<out Named>
-        return sourceSets
+        return reflectedAccessAcrossClassLoaders(
+            {
+                ReflectedInstance.wrapAcrossClassLoaders<KotlinProjectExtension>(kotlinExt)
+                    .get(KotlinProjectExtension::sourceSets)
+                    .extract()
+            },
+            onApiMismatch = { e: ReflectedAccessException ->
+                throw InvalidPluginException(
+                    "Cannot get Kotlin source sets from another project because a different version of the Kotlin Gradle plugin is used in" +
+                            "that project", e
+                )
+            }
+        )
     }
 
-    protected fun getKotlinSourceDirectorySetSafe(from: Any): SourceDirectorySet? {
-        val getKotlin = from.javaClass.getMethod("getKotlin")
-        return getKotlin(from) as? SourceDirectorySet
-    }
+    protected fun getKotlinSourceDirectorySetSafe(from: Any): SourceDirectorySet? = reflectedAccessAcrossClassLoaders(
+        {
+            val sourceSetsProperty: KProperty1<KotlinSourceSet, SourceDirectorySet> = KotlinSourceSet::kotlin
+
+            ReflectedInstance.wrapAcrossClassLoaders<KotlinSourceSet>(from)
+                .get(sourceSetsProperty)
+                .extract()
+        },
+        onApiMismatch = { e: ReflectedAccessException -> return null }
+    )
 
     @Deprecated("Migrate to the new Kotlin source sets and use the addCommonSourceSetToPlatformSourceSet(Named, Project) overload")
     protected open fun addCommonSourceSetToPlatformSourceSet(sourceSet: SourceSet, platformProject: Project) = Unit
