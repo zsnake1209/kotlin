@@ -146,3 +146,8 @@ inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapToNullable(des
     }
     return destination
 }
+
+
+inline fun <R, NR, T> R.swapReceiver(newReceiver: NR, block: NR.(R) -> T): T {
+    return newReceiver.block(this)
+}
