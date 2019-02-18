@@ -17,7 +17,7 @@
 package org.jetbrains.kotlin.types.checker
 
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker.transformAndIsSubTypeOf
+import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker.transformToNewType
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
@@ -28,8 +28,8 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
         return org.jetbrains.kotlin.types.checker.intersectTypes(types as List<UnwrappedType>)
     }
 
-    override fun enterIsSubTypeOf(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
-        return transformAndIsSubTypeOf((subType as KotlinType).unwrap(), (superType as KotlinType).unwrap())
+    override fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
+        return super.prepareType(transformToNewType((type as KotlinType).unwrap()))
     }
 
     override val isErrorTypeEqualsToAnything: Boolean

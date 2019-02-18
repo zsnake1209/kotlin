@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker.hasNotNullSupertype
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker.hasPathByNotMarkedNullableNodes
-import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SupertypesPolicy
 import org.jetbrains.kotlin.types.model.CaptureStatus
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
@@ -69,14 +68,6 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
     fun TypeCheckerContext.isSubtypeOf(subType: UnwrappedType, superType: UnwrappedType): Boolean {
         return AbstractTypeChecker.isSubtypeOf(this, subType, superType)
     }
-
-    fun TypeCheckerContext.transformAndIsSubTypeOf(subType: UnwrappedType, superType: UnwrappedType): Boolean {
-        if (subType === superType) return true
-        val newSubType = transformToNewType(subType)
-        val newSuperType = transformToNewType(superType)
-        return doIsSubTypeOf(newSubType, newSuperType)
-    }
-
 
     fun transformToNewType(type: SimpleType): SimpleType {
         val constructor = type.constructor
