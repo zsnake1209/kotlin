@@ -76,7 +76,6 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun TypeArgumentMarker.getVariance(): TypeVariance
     fun TypeArgumentMarker.getType(): KotlinTypeMarker
 
-    fun TypeConstructorMarker.isErrorTypeConstructor(): Boolean
     fun TypeConstructorMarker.parametersCount(): Int
     fun TypeConstructorMarker.getParameter(index: Int): TypeParameterMarker
     fun TypeConstructorMarker.supertypes(): Collection<KotlinTypeMarker>

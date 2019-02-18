@@ -136,10 +136,6 @@ interface ClassicTypeSystemContext : TypeSystemContext {
         return this.type.unwrap()
     }
 
-    override fun TypeConstructorMarker.isErrorTypeConstructor(): Boolean {
-        require(this is TypeConstructor, this::errorMessage)
-        TODO("not implemented")
-    }
 
     override fun TypeConstructorMarker.parametersCount(): Int {
         require(this is TypeConstructor, this::errorMessage)
