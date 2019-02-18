@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.types
 
-import org.jetbrains.kotlin.types.AbstractTypeChecker.doIsSubTypeOf
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.LowerCapturedTypePolicy.*
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SeveralSupertypesWithSameConstructorPolicy
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SupertypesPolicy
@@ -24,11 +23,8 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
     abstract fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker
 
-    /**
-     * Gets called by [AbstractTypeChecker] as entry of isSubTypeOf, it is suggested to call [AbstractTypeChecker.doIsSubTypeOf]
-     */
-    open fun enterIsSubTypeOf(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
-        return doIsSubTypeOf(subType, superType)
+    open fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
+        return type
     }
 
     abstract val isErrorTypeEqualsToAnything: Boolean
@@ -149,7 +145,8 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
 object AbstractTypeChecker {
     fun isSubtypeOf(context: AbstractTypeCheckerContext, subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
-        return context.enterIsSubTypeOf(subType, superType)
+        if (subType === superType) return true
+        return context.completeIsSubTypeOf(context.prepareType(subType), context.prepareType(superType))
     }
 
     fun equalTypes(context: AbstractTypeCheckerContext, a: KotlinTypeMarker, b: KotlinTypeMarker): Boolean = with(context) {
@@ -169,7 +166,7 @@ object AbstractTypeChecker {
     }
 
 
-    fun AbstractTypeCheckerContext.doIsSubTypeOf(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
+    private fun AbstractTypeCheckerContext.completeIsSubTypeOf(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
         checkSubtypeForSpecialCases(subType.lowerBoundIfFlexible(), superType.upperBoundIfFlexible())?.let {
             addSubtypeConstraint(subType, superType)
             return it
