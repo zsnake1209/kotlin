@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.resolve.calls.tower.ResolutionCandidateApplicability
 import org.jetbrains.kotlin.resolve.scopes.receivers.QualifierReceiver
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.UnwrappedType
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 
 
 sealed class ConstraintPosition
@@ -95,7 +96,7 @@ class NewConstraintError(
 
 class CapturedTypeFromSubtyping(
     val typeVariable: NewTypeVariable,
-    val constraintType: UnwrappedType,
+    val constraintType: KotlinTypeMarker,
     val position: ConstraintPosition
 ) : ConstraintSystemCallDiagnostic(INAPPLICABLE)
 
@@ -103,6 +104,6 @@ class NotEnoughInformationForTypeParameter(val typeVariable: NewTypeVariable) : 
 
 class ConstrainingTypeIsError(
     val typeVariable: NewTypeVariable,
-    val constraintType: UnwrappedType,
+    val constraintType: KotlinTypeMarker,
     val position: IncorporationConstraintPosition
 ) : ConstraintSystemCallDiagnostic(INAPPLICABLE)

@@ -158,8 +158,8 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
             val typeVariable = c.allTypeVariables[typeVariableConstructor]
                     ?: error("Should by type variableConstructor: $typeVariableConstructor. ${c.allTypeVariables.values}")
 
-            var targetType = type as UnwrappedType // TODO: SUB
-            if (targetType.isError) {
+            var targetType = type
+            if (targetType.isError()) {
                 c.addError(ConstrainingTypeIsError(typeVariable, targetType, position))
                 return
             }
@@ -167,16 +167,18 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
             if (type.contains(this::isCapturedTypeFromSubtyping)) {
                 // TypeVariable <: type -> if TypeVariable <: subType => TypeVariable <: type
                 if (kind == UPPER) {
+                    // TODO: SUB
                     val subType =
-                        typeApproximator.approximateToSubType(type, TypeApproximatorConfiguration.SubtypeCapturedTypesApproximation)
+                        typeApproximator.approximateToSubType(type as UnwrappedType, TypeApproximatorConfiguration.SubtypeCapturedTypesApproximation)
                     if (subType != null && !KotlinBuiltIns.isNothingOrNullableNothing(subType)) {
                         targetType = subType
                     }
                 }
 
                 if (kind == LOWER) {
+                    // TODO: SUB
                     val superType =
-                        typeApproximator.approximateToSuperType(type, TypeApproximatorConfiguration.SubtypeCapturedTypesApproximation)
+                        typeApproximator.approximateToSuperType(type as UnwrappedType, TypeApproximatorConfiguration.SubtypeCapturedTypesApproximation)
                     if (superType != null && !KotlinBuiltIns.isAnyOrNullableAny(superType)) { // todo rethink error reporting for Any cases
                         targetType = superType
                     }

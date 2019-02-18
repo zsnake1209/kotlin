@@ -310,7 +310,7 @@ object AbstractTypeChecker {
                 !type.isDynamic() && !type.isDefinitelyNotNullType() &&
                 type.lowerBoundIfFlexible().typeConstructor() == type.upperBoundIfFlexible().typeConstructor()
 
-    private fun effectiveVariance(declared: TypeVariance, useSite: TypeVariance): TypeVariance? {
+    fun effectiveVariance(declared: TypeVariance, useSite: TypeVariance): TypeVariance? {
         if (declared == TypeVariance.INV) return useSite
         if (useSite == TypeVariance.INV) return declared
 
