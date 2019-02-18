@@ -153,7 +153,7 @@ object AbstractTypeChecker {
         if (a === b) return true
 
         if (isCommonDenotableType(a) && isCommonDenotableType(b)) {
-            val simpleA = a.lowerBoundIfFlexible() //TODO: Delegate ??
+            val simpleA = a.lowerBoundIfFlexible()
             if (!areEqualTypeConstructors(a.typeConstructor(), b.typeConstructor())) return false
             if (simpleA.argumentsCount() == 0) {
                 if (a.hasFlexibleNullability() || b.hasFlexibleNullability()) return true
