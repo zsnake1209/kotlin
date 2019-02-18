@@ -57,7 +57,8 @@ class TypeVariableDependencyInformationProvider(
             val from = variableWithConstraints.typeVariable.freshTypeConstructor
 
             for (constraint in variableWithConstraints.constraints) {
-                constraint.type.forAllMyTypeVariables {
+                // TODO: SUB
+                (constraint.type as UnwrappedType).forAllMyTypeVariables {
                     if (isMyTypeVariable(it)) {
                         addConstraintEdge(from, it)
                     }

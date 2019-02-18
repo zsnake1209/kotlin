@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.resolve.calls.inference.model
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.resolve.calls.components.BuiltInsProvider
 import org.jetbrains.kotlin.resolve.calls.components.PostponedArgumentsAnalyzer
 import org.jetbrains.kotlin.resolve.calls.inference.*
 import org.jetbrains.kotlin.resolve.calls.inference.components.ConstraintInjector
@@ -13,17 +14,40 @@ import org.jetbrains.kotlin.resolve.calls.inference.components.KotlinConstraintS
 import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstitutor
 import org.jetbrains.kotlin.resolve.calls.inference.components.ResultTypeResolver
 import org.jetbrains.kotlin.resolve.calls.model.KotlinCallDiagnostic
+import org.jetbrains.kotlin.types.FlexibleType
 import org.jetbrains.kotlin.types.StubType
-import org.jetbrains.kotlin.types.TypeConstructor
-import org.jetbrains.kotlin.types.UnwrappedType
-import org.jetbrains.kotlin.types.typeUtil.contains
-import org.jetbrains.kotlin.types.typeUtil.isUnit
+import org.jetbrains.kotlin.types.checker.ClassicTypeSystemContext
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.model.SimpleTypeMarker
+import org.jetbrains.kotlin.types.model.TypeConstructorMarker
+import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
 import org.jetbrains.kotlin.utils.SmartList
+
+class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : TypeSystemInferenceExtensionContext, ClassicTypeSystemContext,
+    BuiltInsProvider {
+
+    override fun KotlinTypeMarker.typeConstructor(): TypeConstructorMarker {
+        return when (this) {
+            is SimpleTypeMarker -> this.typeConstructor()
+            is FlexibleType -> this.constructor
+            else -> error("?!")
+        }
+    }
+}
+
+fun NewConstraintSystemImpl(
+    constraintInjector: ConstraintInjector,
+    builtIns: KotlinBuiltIns
+): NewConstraintSystemImpl {
+    return NewConstraintSystemImpl(constraintInjector, ClassicTypeSystemContextForCS(builtIns))
+}
 
 class NewConstraintSystemImpl(
     private val constraintInjector: ConstraintInjector,
-    override val builtIns: KotlinBuiltIns
+    val typeSystemContext: TypeSystemInferenceExtensionContext//,
+    //override val builtIns: KotlinBuiltIns
 ) :
+    TypeSystemInferenceExtensionContext by typeSystemContext,
     NewConstraintSystem,
     ConstraintSystemBuilder,
     ConstraintInjector.Context,
@@ -79,7 +103,7 @@ class NewConstraintSystemImpl(
         storage.postponedTypeVariables -= variable
     }
 
-    override fun addSubtypeConstraint(lowerType: UnwrappedType, upperType: UnwrappedType, position: ConstraintPosition) =
+    override fun addSubtypeConstraint(lowerType: KotlinTypeMarker, upperType: KotlinTypeMarker, position: ConstraintPosition) =
         constraintInjector.addInitialSubtypeConstraint(
             apply { checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION) },
             lowerType,
@@ -87,7 +111,7 @@ class NewConstraintSystemImpl(
             position
         )
 
-    override fun addEqualityConstraint(a: UnwrappedType, b: UnwrappedType, position: ConstraintPosition) =
+    override fun addEqualityConstraint(a: KotlinTypeMarker, b: KotlinTypeMarker, position: ConstraintPosition) =
         constraintInjector.addInitialEqualityConstraint(
             apply { checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION) },
             a,
@@ -95,13 +119,13 @@ class NewConstraintSystemImpl(
             position
         )
 
-    override fun getProperSuperTypeConstructors(type: UnwrappedType): List<TypeConstructor> {
+    override fun getProperSuperTypeConstructors(type: KotlinTypeMarker): List<TypeConstructorMarker> {
         checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION)
-        val variableWithConstraints = notFixedTypeVariables[type.constructor] ?: return listOf(type.constructor)
+        val variableWithConstraints = notFixedTypeVariables[type.typeConstructor()] ?: return listOf(type.typeConstructor())
 
         return variableWithConstraints.constraints.mapNotNull {
             if (it.kind == ConstraintKind.LOWER) return@mapNotNull null
-            it.type.constructor.takeUnless { allTypeVariables.containsKey(it) }
+            it.type.typeConstructor().takeUnless { allTypeVariables.containsKey(it) }
         }
     }
 
@@ -169,23 +193,23 @@ class NewConstraintSystemImpl(
         }
         storage.initialConstraints.addAll(otherSystem.initialConstraints)
         storage.maxTypeDepthFromInitialConstraints =
-                Math.max(storage.maxTypeDepthFromInitialConstraints, otherSystem.maxTypeDepthFromInitialConstraints)
+            Math.max(storage.maxTypeDepthFromInitialConstraints, otherSystem.maxTypeDepthFromInitialConstraints)
         storage.errors.addAll(otherSystem.errors)
         storage.fixedTypeVariables.putAll(otherSystem.fixedTypeVariables)
         storage.postponedTypeVariables.addAll(otherSystem.postponedTypeVariables)
     }
 
     // ResultTypeResolver.Context, ConstraintSystemBuilder
-    override fun isProperType(type: UnwrappedType): Boolean {
+    override fun isProperType(type: KotlinTypeMarker): Boolean {
         checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION)
         return !type.contains {
-            storage.allTypeVariables.containsKey(it.constructor)
+            storage.allTypeVariables.containsKey(it.typeConstructor())
         }
     }
 
-    override fun isTypeVariable(type: UnwrappedType): Boolean {
+    override fun isTypeVariable(type: KotlinTypeMarker): Boolean {
         checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION)
-        return notFixedTypeVariables.containsKey(type.constructor)
+        return notFixedTypeVariables.containsKey(type.typeConstructor())
     }
 
     override fun isPostponedTypeVariable(typeVariable: NewTypeVariable): Boolean {
@@ -194,7 +218,7 @@ class NewConstraintSystemImpl(
     }
 
     // ConstraintInjector.Context
-    override val allTypeVariables: Map<TypeConstructor, NewTypeVariable>
+    override val allTypeVariables: Map<TypeConstructorMarker, NewTypeVariable>
         get() {
             checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION)
             return storage.allTypeVariables
@@ -213,13 +237,13 @@ class NewConstraintSystemImpl(
     }
 
     // ConstraintInjector.Context, FixationOrderCalculator.Context
-    override val notFixedTypeVariables: MutableMap<TypeConstructor, MutableVariableWithConstraints>
+    override val notFixedTypeVariables: MutableMap<TypeConstructorMarker, MutableVariableWithConstraints>
         get() {
             checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION)
             return storage.notFixedTypeVariables
         }
 
-    override val fixedTypeVariables: MutableMap<TypeConstructor, UnwrappedType>
+    override val fixedTypeVariables: MutableMap<TypeConstructorMarker, KotlinTypeMarker>
         get() {
             checkState(State.BUILDING, State.COMPLETION, State.TRANSACTION)
             return storage.fixedTypeVariables
@@ -238,7 +262,7 @@ class NewConstraintSystemImpl(
     }
 
     // KotlinConstraintSystemCompleter.Context
-    override fun fixVariable(variable: NewTypeVariable, resultType: UnwrappedType) {
+    override fun fixVariable(variable: NewTypeVariable, resultType: KotlinTypeMarker) {
         checkState(State.BUILDING, State.COMPLETION)
 
         constraintInjector.addInitialEqualityConstraint(this, variable.defaultType, resultType, FixVariableConstraintPosition(variable))
@@ -246,7 +270,7 @@ class NewConstraintSystemImpl(
 
         for (variableWithConstraint in notFixedTypeVariables.values) {
             variableWithConstraint.removeConstrains {
-                it.type.contains { it.constructor == variable.freshTypeConstructor }
+                it.type.contains { it.typeConstructor() == variable.freshTypeConstructor }
             }
         }
 
@@ -254,16 +278,16 @@ class NewConstraintSystemImpl(
     }
 
     // KotlinConstraintSystemCompleter.Context, PostponedArgumentsAnalyzer.Context
-    override fun canBeProper(type: UnwrappedType): Boolean {
+    override fun canBeProper(type: KotlinTypeMarker): Boolean {
         checkState(State.BUILDING, State.COMPLETION)
-        return !type.contains { storage.notFixedTypeVariables.containsKey(it.constructor) }
+        return !type.contains { storage.notFixedTypeVariables.containsKey(it.typeConstructor()) }
     }
 
-    override fun containsOnlyFixedOrPostponedVariables(type: UnwrappedType): Boolean {
+    override fun containsOnlyFixedOrPostponedVariables(type: KotlinTypeMarker): Boolean {
         checkState(State.BUILDING, State.COMPLETION)
         return !type.contains {
-            val variable = storage.notFixedTypeVariables[it.constructor]?.typeVariable
-            variable !in storage.postponedTypeVariables && storage.notFixedTypeVariables.containsKey(it.constructor)
+            val variable = storage.notFixedTypeVariables[it.typeConstructor()]?.typeVariable
+            variable !in storage.postponedTypeVariables && storage.notFixedTypeVariables.containsKey(it.typeConstructor())
         }
     }
 
@@ -273,7 +297,7 @@ class NewConstraintSystemImpl(
         return buildCurrentSubstitutor(emptyMap())
     }
 
-    override fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructor, StubType>): NewTypeSubstitutor {
+    override fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubType>): NewTypeSubstitutor {
         checkState(State.BUILDING, State.COMPLETION)
         return storage.buildCurrentSubstitutor(additionalBindings)
     }
@@ -289,10 +313,10 @@ class NewConstraintSystemImpl(
     }
 
     // PostponedArgumentsAnalyzer.Context
-    override fun hasUpperOrEqualUnitConstraint(type: UnwrappedType): Boolean {
+    override fun hasUpperOrEqualUnitConstraint(type: KotlinTypeMarker): Boolean {
         checkState(State.BUILDING, State.COMPLETION, State.FREEZED)
 
-        val constraints = storage.notFixedTypeVariables[type.constructor]?.constraints ?: return false
+        val constraints = storage.notFixedTypeVariables[type.typeConstructor()]?.constraints ?: return false
 
         return constraints.any { (it.kind == ConstraintKind.UPPER || it.kind == ConstraintKind.EQUALITY) && it.type.isUnit() }
     }

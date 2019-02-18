@@ -14,17 +14,19 @@ import org.jetbrains.kotlin.types.checker.*
 import org.jetbrains.kotlin.types.model.CapturedTypeMarker
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.SimpleTypeMarker
+import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.contains
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 abstract class TypeCheckerContextForConstraintSystem : ClassicTypeCheckerContext(errorTypeEqualsToAnything = true, allowedTypeVariable = false) {
 
     abstract fun isMyTypeVariable(type: SimpleType): Boolean
 
     // super and sub type isSingleClassifierType
-    abstract fun addUpperConstraint(typeVariable: TypeConstructor, superType: UnwrappedType)
+    abstract fun addUpperConstraint(typeVariable: TypeConstructorMarker, superType: KotlinTypeMarker)
 
-    abstract fun addLowerConstraint(typeVariable: TypeConstructor, subType: UnwrappedType)
+    abstract fun addLowerConstraint(typeVariable: TypeConstructorMarker, subType: KotlinTypeMarker)
 
     override fun getLowerCapturedTypePolicy(subType: SimpleTypeMarker, superType: CapturedTypeMarker): LowerCapturedTypePolicy {
         require(subType is SimpleType)
@@ -34,7 +36,8 @@ abstract class TypeCheckerContextForConstraintSystem : ClassicTypeCheckerContext
 
     private fun getLowerCapturedTypePolicy(subType: SimpleType, superType: NewCapturedType) = when {
         isMyTypeVariable(subType) -> LowerCapturedTypePolicy.SKIP_LOWER
-        subType.contains { it.anyBound(this::isMyTypeVariable) } -> LowerCapturedTypePolicy.CHECK_ONLY_LOWER
+        // TODO: SUB
+        subType.contains { (it as UnwrappedType).anyBound(this::isMyTypeVariable) } -> LowerCapturedTypePolicy.CHECK_ONLY_LOWER
         else -> LowerCapturedTypePolicy.CHECK_SUBTYPE_AND_LOWER
     }
 

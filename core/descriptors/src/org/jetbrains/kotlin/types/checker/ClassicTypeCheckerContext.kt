@@ -24,10 +24,6 @@ import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 
 open class ClassicTypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) : ClassicTypeSystemContext, AbstractTypeCheckerContext() {
-    override fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker {
-        @Suppress("UNCHECKED_CAST")
-        return org.jetbrains.kotlin.types.checker.intersectTypes(types as List<UnwrappedType>)
-    }
 
     override fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
         return super.prepareType(transformToNewType((type as KotlinType).unwrap()))

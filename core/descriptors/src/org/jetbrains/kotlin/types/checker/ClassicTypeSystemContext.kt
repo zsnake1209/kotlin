@@ -14,8 +14,9 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.types.model.CaptureStatus
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
+import org.jetbrains.kotlin.types.typeUtil.contains
 
-interface ClassicTypeSystemContext : TypeSystemContext {
+interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     override fun TypeConstructorMarker.isDenotable(): Boolean {
         require(this is TypeConstructor, this::errorMessage)
         return this.isDenotable
@@ -220,6 +221,11 @@ interface ClassicTypeSystemContext : TypeSystemContext {
         return this.asTypeProjection()
     }
 
+    override fun TypeConstructorMarker.isUnitTypeConstructor(): Boolean {
+        require(this is TypeConstructor, this::errorMessage)
+        return KotlinBuiltIns.isTypeConstructorForGivenClass(this, FQ_NAMES.unit)
+    }
+
     /**
      *
      * SingleClassifierType is one of the following types:
@@ -240,6 +246,56 @@ interface ClassicTypeSystemContext : TypeSystemContext {
         require(this is KotlinType, this::errorMessage)
         return typeConstructor().isNothingConstructor() && !TypeUtils.isNullableType(this)
     }
+
+    override fun KotlinTypeMarker.contains(predicate: (KotlinTypeMarker) -> Boolean): Boolean {
+        require(this is KotlinType, this::errorMessage)
+        return containsInternal(this, predicate)
+    }
+
+    override fun SimpleTypeMarker.typeDepth(): Int {
+        require(this is SimpleType, this::errorMessage)
+        return this.typeDepthInternal()
+    }
+
+    override fun KotlinTypeMarker.typeDepth(): Int {
+        require(this is UnwrappedType, this::errorMessage)
+        return this.typeDepthInternal()
+    }
+
+    override fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker {
+        @Suppress("UNCHECKED_CAST")
+        return org.jetbrains.kotlin.types.checker.intersectTypes(types as List<UnwrappedType>)
+    }
+
+    override fun Collection<KotlinTypeMarker>.singleBestRepresentative(): KotlinTypeMarker? {
+        return singleBestRepresentative(this as Collection<KotlinType>)
+    }
+
+    override fun KotlinTypeMarker.isUnit(): Boolean {
+        require(this is UnwrappedType)
+        return KotlinBuiltIns.isUnit(this)
+    }
+
+}
+
+private fun containsInternal(type: KotlinType, predicate: (KotlinTypeMarker) -> Boolean): Boolean = type.contains(predicate)
+
+private fun singleBestRepresentative(collection: Collection<KotlinType>) = collection.singleBestRepresentative()
+
+internal fun UnwrappedType.typeDepthInternal() =
+    when (this) {
+        is SimpleType -> typeDepthInternal()
+        is FlexibleType -> Math.max(lowerBound.typeDepthInternal(), upperBound.typeDepthInternal())
+    }
+
+internal fun SimpleType.typeDepthInternal(): Int {
+    if (this is TypeUtils.SpecialType) return 0
+
+    val maxInArguments = arguments.asSequence().map {
+        if (it.isStarProjection) 1 else it.type.unwrap().typeDepthInternal()
+    }.max() ?: 0
+
+    return maxInArguments + 1
 }
 
 

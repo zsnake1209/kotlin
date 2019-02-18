@@ -25,13 +25,17 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.VariableWithConstraint
 import org.jetbrains.kotlin.resolve.calls.model.PostponedResolvedAtom
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.UnwrappedType
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.model.TypeConstructorMarker
+import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
 import org.jetbrains.kotlin.types.typeUtil.contains
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 class VariableFixationFinder(
     private val trivialConstraintTypeInferenceOracle: TrivialConstraintTypeInferenceOracle
 ) {
-    interface Context {
-        val notFixedTypeVariables: Map<TypeConstructor, VariableWithConstraints>
+    interface Context: TypeSystemInferenceExtensionContext {
+        val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints>
         val postponedTypeVariables: List<NewTypeVariable>
     }
 
@@ -78,7 +82,8 @@ class VariableFixationFinder(
         topLevelType: UnwrappedType
     ): VariableForFixation? {
         val dependencyProvider = TypeVariableDependencyInformationProvider(
-            notFixedTypeVariables, postponedArguments, topLevelType.takeIf { completionMode == PARTIAL }
+            // TODO: SUB
+            notFixedTypeVariables.cast(), postponedArguments, topLevelType.takeIf { completionMode == PARTIAL }
         )
 
         val candidate = allTypeVariables.maxBy { getTypeVariableReadiness(it, dependencyProvider) } ?: return null
@@ -96,7 +101,8 @@ class VariableFixationFinder(
 
     private fun Context.hasDependencyToOtherTypeVariables(typeVariable: TypeConstructor): Boolean {
         for (constraint in notFixedTypeVariables[typeVariable]?.constraints ?: return false) {
-            if (constraint.type.arguments.isNotEmpty() && constraint.type.contains { notFixedTypeVariables.containsKey(it.constructor) }) {
+            //TODO: SUB
+            if ((constraint.type as UnwrappedType).arguments.isNotEmpty() && constraint.type.contains { notFixedTypeVariables.containsKey(it.typeConstructor()) }) {
                 return true
             }
         }
@@ -116,7 +122,7 @@ class VariableFixationFinder(
     private fun Context.isProperArgumentConstraint(c: Constraint) =
         isProperType(c.type) && c.position.initialConstraint.position !is DeclaredUpperBoundConstraintPosition
 
-    private fun Context.isProperType(type: UnwrappedType): Boolean =
-        !type.contains { notFixedTypeVariables.containsKey(it.constructor) }
+    private fun Context.isProperType(type: KotlinTypeMarker): Boolean =
+        !type.contains { notFixedTypeVariables.containsKey(it.typeConstructor()) }
 
 }

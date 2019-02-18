@@ -21,8 +21,6 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
     abstract fun areEqualTypeConstructors(a: TypeConstructorMarker, b: TypeConstructorMarker): Boolean
 
-    abstract fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker
-
     open fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
         return type
     }

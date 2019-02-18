@@ -94,7 +94,8 @@ class TypeVariableDirectionCalculator(
             for (constraint in variable.constraints) {
                 if (!isInterestingConstraint(direction, constraint)) continue
 
-                constraint.type.visitType(direction) { nodeVariable, nodeDirection ->
+                // TODO: SUB
+                (constraint.type as UnwrappedType).visitType(direction) { nodeVariable, nodeDirection ->
                     result.add(NodeWithDirection(nodeVariable, nodeDirection))
                 }
             }

@@ -5,13 +5,12 @@
 
 package org.jetbrains.kotlin.resolve.calls.inference.model
 
-import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstitutor
-import org.jetbrains.kotlin.resolve.calls.inference.substitute
 import org.jetbrains.kotlin.resolve.calls.model.KotlinCallDiagnostic
-import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 
 /**
  * Every type variable can be in the following states:
@@ -36,23 +35,23 @@ import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
  */
 
 interface ConstraintStorage {
-    val allTypeVariables: Map<TypeConstructor, NewTypeVariable>
-    val notFixedTypeVariables: Map<TypeConstructor, VariableWithConstraints>
+    val allTypeVariables: Map<TypeConstructorMarker, NewTypeVariable>
+    val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints>
     val initialConstraints: List<InitialConstraint>
     val maxTypeDepthFromInitialConstraints: Int
     val errors: List<KotlinCallDiagnostic>
     val hasContradiction: Boolean
-    val fixedTypeVariables: Map<TypeConstructor, UnwrappedType>
+    val fixedTypeVariables: Map<TypeConstructorMarker, KotlinTypeMarker>
     val postponedTypeVariables: List<NewTypeVariable>
 
     object Empty : ConstraintStorage {
-        override val allTypeVariables: Map<TypeConstructor, NewTypeVariable> get() = emptyMap()
-        override val notFixedTypeVariables: Map<TypeConstructor, VariableWithConstraints> get() = emptyMap()
+        override val allTypeVariables: Map<TypeConstructorMarker, NewTypeVariable> get() = emptyMap()
+        override val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints> get() = emptyMap()
         override val initialConstraints: List<InitialConstraint> get() = emptyList()
         override val maxTypeDepthFromInitialConstraints: Int get() = 1
         override val errors: List<KotlinCallDiagnostic> get() = emptyList()
         override val hasContradiction: Boolean get() = false
-        override val fixedTypeVariables: Map<TypeConstructor, UnwrappedType> get() = emptyMap()
+        override val fixedTypeVariables: Map<TypeConstructorMarker, KotlinTypeMarker> get() = emptyMap()
         override val postponedTypeVariables: List<NewTypeVariable> get() = emptyList()
     }
 }
@@ -69,7 +68,7 @@ enum class ConstraintKind {
 
 class Constraint(
     val kind: ConstraintKind,
-    val type: UnwrappedType, // flexible types here is allowed
+    val type: KotlinTypeMarker, // flexible types here is allowed
     val position: IncorporationConstraintPosition,
     val typeHashCode: Int = type.hashCode()
 ) {
@@ -98,8 +97,8 @@ interface VariableWithConstraints {
 }
 
 class InitialConstraint(
-    val a: UnwrappedType,
-    val b: UnwrappedType,
+    val a: KotlinTypeMarker,
+    val b: KotlinTypeMarker,
     val constraintKind: ConstraintKind, // see [checkConstraint]
     val position: ConstraintPosition
 ) {
@@ -114,13 +113,17 @@ class InitialConstraint(
     }
 }
 
-fun InitialConstraint.checkConstraint(substitutor: TypeSubstitutor): Boolean {
-    val newA = substitutor.substitute(a)
-    val newB = substitutor.substitute(a)
-    return checkConstraint(newB, constraintKind, newA)
-}
+//fun InitialConstraint.checkConstraint(substitutor: TypeSubstitutor): Boolean {
+//    val newA = substitutor.substitute(a)
+//    val newB = substitutor.substitute(b)
+//    return checkConstraint(newB as KotlinTypeMarker, constraintKind, newA as KotlinTypeMarker)
+//}
 
-fun checkConstraint(constraintType: UnwrappedType, constraintKind: ConstraintKind, resultType: UnwrappedType): Boolean {
+fun checkConstraint(constraintType: KotlinTypeMarker, constraintKind: ConstraintKind, resultType: KotlinTypeMarker): Boolean {
+    require(constraintType is UnwrappedType)
+    require(resultType is UnwrappedType)
+
+
     val typeChecker = KotlinTypeChecker.DEFAULT
     return when (constraintKind) {
         ConstraintKind.EQUALITY -> typeChecker.equalTypes(constraintType, resultType)

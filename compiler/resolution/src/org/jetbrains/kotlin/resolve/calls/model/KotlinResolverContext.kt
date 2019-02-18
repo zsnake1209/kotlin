@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.resolve.calls.components.*
 import org.jetbrains.kotlin.resolve.calls.inference.addSubsystemFromArgument
 import org.jetbrains.kotlin.resolve.calls.inference.components.ConstraintInjector
+import org.jetbrains.kotlin.resolve.calls.inference.model.ClassicTypeSystemContextForCS
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage
 import org.jetbrains.kotlin.resolve.calls.inference.model.NewConstraintSystemImpl
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind

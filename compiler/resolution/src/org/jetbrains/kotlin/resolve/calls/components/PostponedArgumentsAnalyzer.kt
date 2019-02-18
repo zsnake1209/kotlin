@@ -13,19 +13,21 @@ import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.kotlin.types.StubType
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.UnwrappedType
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 
 class PostponedArgumentsAnalyzer(
     private val callableReferenceResolver: CallableReferenceResolver
 ) {
     interface Context {
-        fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructor, StubType>): NewTypeSubstitutor
+        fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubType>): NewTypeSubstitutor
         fun bindingStubsForPostponedVariables(): Map<NewTypeVariable, StubType>
 
         // type can be proper if it not contains not fixed type variables
-        fun canBeProper(type: UnwrappedType): Boolean
+        fun canBeProper(type: KotlinTypeMarker): Boolean
 
-        fun hasUpperOrEqualUnitConstraint(type: UnwrappedType): Boolean
+        fun hasUpperOrEqualUnitConstraint(type: KotlinTypeMarker): Boolean
 
         // mutable operations
         fun addOtherSystem(otherSystem: ConstraintStorage)

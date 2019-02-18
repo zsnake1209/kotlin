@@ -24,17 +24,18 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.VariableWithConstraint
 import org.jetbrains.kotlin.resolve.calls.inference.model.checkConstraint
 import org.jetbrains.kotlin.resolve.constants.IntegerLiteralTypeConstructor
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.checker.intersectTypes
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
 
 class ResultTypeResolver(
     val typeApproximator: TypeApproximator,
     val trivialConstraintTypeInferenceOracle: TrivialConstraintTypeInferenceOracle
 ) {
-    interface Context {
-        fun isProperType(type: UnwrappedType): Boolean
+    interface Context : TypeSystemInferenceExtensionContext {
+        fun isProperType(type: KotlinTypeMarker): Boolean
     }
 
-    fun findResultType(c: Context, variableWithConstraints: VariableWithConstraints, direction: ResolveDirection): UnwrappedType {
+    fun findResultType(c: Context, variableWithConstraints: VariableWithConstraints, direction: ResolveDirection): KotlinTypeMarker {
         findResultTypeOrNull(c, variableWithConstraints, direction)?.let { return it }
 
         // no proper constraints
@@ -43,7 +44,7 @@ class ResultTypeResolver(
         }
     }
 
-    fun findResultTypeOrNull(c: Context, variableWithConstraints: VariableWithConstraints, direction: ResolveDirection): UnwrappedType? {
+    fun findResultTypeOrNull(c: Context, variableWithConstraints: VariableWithConstraints, direction: ResolveDirection): KotlinTypeMarker? {
         findResultIfThereIsEqualsConstraint(c, variableWithConstraints)?.let { return it }
 
         val subType = findSubType(c, variableWithConstraints)
@@ -58,10 +59,10 @@ class ResultTypeResolver(
     }
 
     private fun Context.resultType(
-        firstCandidate: UnwrappedType?,
-        secondCandidate: UnwrappedType?,
+        firstCandidate: KotlinTypeMarker?,
+        secondCandidate: KotlinTypeMarker?,
         variableWithConstraints: VariableWithConstraints
-    ): UnwrappedType? {
+    ): KotlinTypeMarker? {
         if (firstCandidate == null || secondCandidate == null) return firstCandidate ?: secondCandidate
 
         if (isSuitableType(firstCandidate, variableWithConstraints)) return firstCandidate
@@ -73,7 +74,7 @@ class ResultTypeResolver(
         }
     }
 
-    private fun Context.isSuitableType(resultType: UnwrappedType, variableWithConstraints: VariableWithConstraints): Boolean {
+    private fun Context.isSuitableType(resultType: KotlinTypeMarker, variableWithConstraints: VariableWithConstraints): Boolean {
         for (constraint in variableWithConstraints.constraints) {
             if (!isProperType(constraint.type)) continue
             if (!checkConstraint(constraint.type, constraint.kind, resultType)) return false
@@ -87,7 +88,7 @@ class ResultTypeResolver(
     private fun findSubType(c: Context, variableWithConstraints: VariableWithConstraints): UnwrappedType? {
         val lowerConstraints = variableWithConstraints.constraints.filter { it.kind == ConstraintKind.LOWER && c.isProperType(it.type) }
         if (lowerConstraints.isNotEmpty()) {
-            val commonSuperType = NewCommonSuperTypeCalculator.commonSuperType(lowerConstraints.map { it.type })
+            val commonSuperType = with(NewCommonSuperTypeCalculator) { commonSuperType(lowerConstraints.map { it.type }) }
             /**
              *
              * fun <T> Array<out T>.intersect(other: Iterable<T>) {
@@ -115,32 +116,33 @@ class ResultTypeResolver(
         return null
     }
 
-    private fun findSuperType(c: Context, variableWithConstraints: VariableWithConstraints): UnwrappedType? {
+    private fun findSuperType(c: Context, variableWithConstraints: VariableWithConstraints): KotlinTypeMarker? = with(c) {
         val upperConstraints = variableWithConstraints.constraints.filter { it.kind == ConstraintKind.UPPER && c.isProperType(it.type) }
         if (upperConstraints.isNotEmpty()) {
             val upperType = intersectTypes(upperConstraints.map { it.type })
 
-            return typeApproximator.approximateToSubType(upperType, TypeApproximatorConfiguration.CapturedAndIntegerLiteralsTypesApproximation) ?: upperType
+            // TODO: SUB
+            return typeApproximator.approximateToSubType(upperType as UnwrappedType, TypeApproximatorConfiguration.CapturedAndIntegerLiteralsTypesApproximation) ?: upperType
         }
         return null
     }
 
-    fun findResultIfThereIsEqualsConstraint(c: Context, variableWithConstraints: VariableWithConstraints): UnwrappedType? {
+    fun findResultIfThereIsEqualsConstraint(c: Context, variableWithConstraints: VariableWithConstraints): KotlinTypeMarker? = with(c) {
         val properEqualityConstraints = variableWithConstraints.constraints.filter {
             it.kind == ConstraintKind.EQUALITY && c.isProperType(it.type)
         }
 
-        return representativeFromEqualityConstraints(properEqualityConstraints)
+        return c.representativeFromEqualityConstraints(properEqualityConstraints)
     }
 
     // Discriminate integer literal types as they are less specific than separate integer types (Int, Short...)
-    private fun representativeFromEqualityConstraints(constraints: List<Constraint>): UnwrappedType? {
+    private fun Context.representativeFromEqualityConstraints(constraints: List<Constraint>): KotlinTypeMarker? {
         if (constraints.isEmpty()) return null
 
         val constraintTypes = constraints.map { it.type }
-        val nonLiteralTypes = constraintTypes.filter { it.constructor !is IntegerLiteralTypeConstructor }
-        return nonLiteralTypes.singleBestRepresentative()?.unwrap()
-            ?: constraintTypes.singleBestRepresentative()?.unwrap()
+        val nonLiteralTypes = constraintTypes.filter { it.typeConstructor() !is IntegerLiteralTypeConstructor }
+        return nonLiteralTypes.singleBestRepresentative()
+            ?: constraintTypes.singleBestRepresentative()
             ?: constraintTypes.first() // seems like constraint system has contradiction
     }
 }

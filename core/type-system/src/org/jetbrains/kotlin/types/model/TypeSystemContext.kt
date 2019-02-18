@@ -20,6 +20,8 @@ interface RawTypeMarker : FlexibleTypeMarker
 
 interface TypeArgumentListMarker
 
+interface TypeVariableMarker
+
 
 enum class TypeVariance {
     IN,
@@ -33,6 +35,23 @@ interface TypeSystemOptimizationContext {
      *  @return true is a.arguments == b.arguments, or false if not supported
      */
     fun identicalArguments(a: SimpleTypeMarker, b: SimpleTypeMarker) = false
+}
+
+interface TypeSystemInferenceExtensionContext : TypeSystemContext {
+    fun KotlinTypeMarker.contains(predicate: (KotlinTypeMarker) -> Boolean): Boolean
+
+    fun TypeConstructorMarker.isUnitTypeConstructor(): Boolean
+
+    fun SimpleTypeMarker.typeDepth(): Int
+    fun KotlinTypeMarker.typeDepth(): Int
+//
+//    fun KotlinTypeMarker.substitute(typeVariable: TypeVariableMarker, value: KotlinTypeMarker): KotlinTypeMarker
+//
+//    fun approximateCapturedTypes(type: KotlinTypeMarker, toSuper: Boolean): KotlinTypeMarker
+
+    fun Collection<KotlinTypeMarker>.singleBestRepresentative(): KotlinTypeMarker?
+
+    fun KotlinTypeMarker.isUnit(): Boolean
 }
 
 
@@ -150,6 +169,8 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
      * Such types can contains error types in our arguments, but type constructor isn't errorTypeConstructor
      */
     fun SimpleTypeMarker.isSingleClassifierType(): Boolean
+
+    fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker
 }
 
 enum class CaptureStatus {

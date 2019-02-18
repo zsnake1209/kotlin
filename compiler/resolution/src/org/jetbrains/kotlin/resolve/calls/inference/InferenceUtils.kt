@@ -22,9 +22,11 @@ import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstituto
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.model.TypeConstructorMarker
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-fun ConstraintStorage.buildCurrentSubstitutor(additionalBindings: Map<TypeConstructor, StubType>): NewTypeSubstitutorByConstructorMap =
-    NewTypeSubstitutorByConstructorMap(fixedTypeVariables.entries.associate { it.key to it.value } + additionalBindings)
+fun ConstraintStorage.buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubType>): NewTypeSubstitutorByConstructorMap =
+    NewTypeSubstitutorByConstructorMap( (fixedTypeVariables.entries.associate { it.key to it.value } + additionalBindings).cast() ) // TODO: SUB
 
 fun ConstraintStorage.buildResultingSubstitutor(): NewTypeSubstitutor {
     val currentSubstitutorMap = fixedTypeVariables.entries.associate {
@@ -37,7 +39,7 @@ fun ConstraintStorage.buildResultingSubstitutor(): NewTypeSubstitutor {
         )
     }
 
-    return NewTypeSubstitutorByConstructorMap(currentSubstitutorMap + uninferredSubstitutorMap)
+    return NewTypeSubstitutorByConstructorMap((currentSubstitutorMap + uninferredSubstitutorMap).cast()) // TODO: SUB
 }
 
 val CallableDescriptor.returnTypeOrNothing: UnwrappedType
