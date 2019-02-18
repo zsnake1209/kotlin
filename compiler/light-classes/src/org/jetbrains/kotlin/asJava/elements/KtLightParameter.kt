@@ -30,7 +30,7 @@ class KtLightParameter(
 ) : LightParameter(dummyDelegate.name ?: "p$index", dummyDelegate.type, method, KotlinLanguage.INSTANCE),
         KtLightDeclaration<KtParameter, PsiParameter> {
 
-    private val lazyDelegate by lazy { clsDelegateProvider() ?: dummyDelegate }
+    private val lazyDelegate by lazyPub { clsDelegateProvider() ?: dummyDelegate }
 
     override val clsDelegate: PsiParameter get() = lazyDelegate
 
