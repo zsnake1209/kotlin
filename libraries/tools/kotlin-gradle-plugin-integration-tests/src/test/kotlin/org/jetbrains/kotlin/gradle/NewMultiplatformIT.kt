@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.junit.Assert
 import org.junit.Test
+import java.io.File
 import java.util.jar.JarFile
 import java.util.zip.ZipFile
 import kotlin.test.assertEquals
@@ -1533,5 +1534,71 @@ class NewMultiplatformIT : BaseGradleIT() {
                 assertSuccessful()
             }
         }
+    }
+
+    @Test
+    fun testPomRewritingInSinglePlatformProject() = with(Project("kt-27059-pom-rewriting", GradleVersionRequired.AtLeast("4.10.2"))) {
+        setupWorkingDir()
+        gradleBuildScript("mpp-lib").modify(::transformBuildScriptWithPluginsDsl)
+        gradleBuildScript("jvm-app").modify(::transformBuildScriptWithPluginsDsl)
+
+        val groupDir = "build/repo/com/example/"
+
+        build(":mpp-lib:publish") {
+            assertSuccessful()
+            assertFileExists(groupDir + "mpp-lib")
+            assertFileExists(groupDir + "mpp-lib-myjvm")
+        }
+
+        fun doTestPomRewriting(mppProjectDependency: Boolean, legacyPublishing: Boolean, keepPomIntact: Boolean = false) {
+
+            val params = mutableListOf(":jvm-app:publish").apply {
+                if (mppProjectDependency)
+                    add("-PmppProjectDependency=true")
+                if (legacyPublishing)
+                    add("-PlegacyPublishing=true")
+                if (keepPomIntact)
+                    add("-Pkotlin.mpp.keepMppDependenciesIntactInPoms=true")
+            }.toTypedArray()
+
+            build(*params) {
+                assertSuccessful()
+                if (legacyPublishing) {
+                    assertTasksExecuted(":jvm-app:uploadArchives")
+                } else {
+                    assertTasksExecuted(":jvm-app:publishMainPublicationToMavenRepository")
+                }
+
+                val moduleDir = groupDir + "jvm-app/1.0/"
+                val pom = fileInWorkingDir(moduleDir + "jvm-app-1.0.pom").readText().replace("\\s+".toRegex(), "")
+
+                if (!keepPomIntact) {
+                    assertTrue("The POM should contain the dependency on 'mpp-lib' rewritten as 'mpp-lib-myjvm'") {
+                        pom.contains(
+                            "<groupId>com.example</groupId><artifactId>mpp-lib-myjvm</artifactId><version>1.0</version><scope>compile</scope>"
+                        )
+                    }
+                } else {
+                    assertTrue("The POM should contain the original dependency on 'mpp-lib'") {
+                        pom.contains(
+                            "<groupId>com.example</groupId><artifactId>mpp-lib</artifactId><version>1.0</version><scope>compile</scope>"
+                        )
+                    }
+                }
+
+                File(moduleDir).deleteRecursively()
+            }
+        }
+
+        doTestPomRewriting(mppProjectDependency = false, legacyPublishing = false)
+        doTestPomRewriting(mppProjectDependency = false, legacyPublishing = true)
+        doTestPomRewriting(mppProjectDependency = true, legacyPublishing = false)
+
+        // This case doesn't work and never did; TODO investigate KT-29975
+        // doTestPomRewriting(mppProjectDependency = true, legacyPublishing = true)
+
+        // Also check that the flag for keeping POMs intact works:
+        doTestPomRewriting(mppProjectDependency = false, legacyPublishing = false, keepPomIntact = true)
+        doTestPomRewriting(mppProjectDependency = false, legacyPublishing = true, keepPomIntact = true)
     }
 }

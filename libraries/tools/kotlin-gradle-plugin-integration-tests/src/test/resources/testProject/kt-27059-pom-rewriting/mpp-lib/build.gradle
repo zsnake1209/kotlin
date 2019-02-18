@@ -1,0 +1,37 @@
+// Use the plugins DSL in the subproject to force Gradle to use separate class loaders
+plugins {
+    id "org.jetbrains.kotlin.multiplatform" version "<pluginMarkerVersion>"
+    id "maven-publish"
+}
+
+group = "com.example"
+version = "1.0"
+
+kotlin {
+    jvm()
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-stdlib-common'
+            }
+        }
+        jvmMain {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        jvm {
+            artifactId = "mpp-lib-myjvm"
+        }
+    }
+
+    repositories {
+        maven { setUrl("${rootProject.buildDir}/repo") }
+    }
+}
