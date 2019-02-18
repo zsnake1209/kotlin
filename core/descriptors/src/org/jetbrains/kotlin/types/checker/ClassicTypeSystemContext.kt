@@ -7,10 +7,8 @@ package org.jetbrains.kotlin.types.checker
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
-import org.jetbrains.kotlin.descriptors.isFinalClass
+import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.types.model.CaptureStatus
@@ -179,12 +177,12 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     }
 
     override fun TypeConstructorMarker.isClassTypeConstructor(): Boolean {
-        require(this is TypeConstructor, this::errorMessage) 
+        require(this is TypeConstructor, this::errorMessage)
         return declarationDescriptor is ClassDescriptor
     }
 
     override fun TypeConstructorMarker.isCommonFinalClassConstructor(): Boolean {
-        require(this is TypeConstructor, this::errorMessage) 
+        require(this is TypeConstructor, this::errorMessage)
         val classDescriptor = declarationDescriptor as? ClassDescriptor ?: return false
         return classDescriptor.isFinalClass &&
                 classDescriptor.kind != ClassKind.ENUM_ENTRY &&
@@ -209,28 +207,44 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     }
 
     override fun SimpleTypeMarker.asArgumentList(): TypeArgumentListMarker {
-        require(this is SimpleType, this::errorMessage) 
+        require(this is SimpleType, this::errorMessage)
         return this
     }
 
     override fun captureFromArguments(type: SimpleTypeMarker, status: CaptureStatus): SimpleTypeMarker? {
-        require(type is SimpleType, type::errorMessage) 
+        require(type is SimpleType, type::errorMessage)
         return org.jetbrains.kotlin.types.checker.captureFromArguments(type, status)
     }
 
     override fun TypeConstructorMarker.isAnyConstructor(): Boolean {
-        require(this is TypeConstructor, this::errorMessage) 
+        require(this is TypeConstructor, this::errorMessage)
         return KotlinBuiltIns.isTypeConstructorForGivenClass(this, FQ_NAMES.any)
     }
 
     override fun TypeConstructorMarker.isNothingConstructor(): Boolean {
-        require(this is TypeConstructor, this::errorMessage) 
+        require(this is TypeConstructor, this::errorMessage)
         return KotlinBuiltIns.isTypeConstructorForGivenClass(this, FQ_NAMES.nothing)
     }
 
     override fun KotlinTypeMarker.asTypeArgument(): TypeArgumentMarker {
         require(this is KotlinType, this::errorMessage)
         return this.asTypeProjection()
+    }
+
+    /**
+     *
+     * SingleClassifierType is one of the following types:
+     *  - classType
+     *  - type for type parameter
+     *  - captured type
+     *
+     * Such types can contains error types in our arguments, but type constructor isn't errorTypeConstructor
+     */
+    override fun SimpleTypeMarker.isSingleClassifierType(): Boolean {
+        require(this is SimpleType, this::errorMessage)
+        return !isError &&
+                constructor.declarationDescriptor !is TypeAliasDescriptor &&
+                (constructor.declarationDescriptor != null || this is CapturedType || this is NewCapturedType || this is DefinitelyNotNullType)
     }
 }
 
