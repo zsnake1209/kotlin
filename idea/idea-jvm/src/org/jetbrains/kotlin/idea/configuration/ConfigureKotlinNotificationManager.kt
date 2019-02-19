@@ -80,7 +80,11 @@ fun checkHideNonConfiguredNotifications(project: Project) {
                     val moduleSourceRootGroups = notification.notificationState.notConfiguredModules
                         .mapNotNull { ModuleManager.getInstance(project).findModuleByName(it) }
                         .map { moduleSourceRootMap.getWholeModuleGroup(it) }
-                    moduleSourceRootGroups.none(::isNotConfiguredNotificationRequired)
+                    moduleSourceRootGroups.none {
+                        DumbService.getInstance(project).runReadActionInSmartMode<Boolean> {
+                            isNotConfiguredNotificationRequired(it)
+                        }
+                    }
                 } catch (e: IndexNotReadyException) {
                     checkInProgress.set(false)
                     ApplicationManager.getApplication().invokeLater {
