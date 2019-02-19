@@ -45,6 +45,7 @@ fun buildConfiguration(environment: KotlinCoreEnvironment): CompilerConfiguratio
 private val stdKlibFile = File("js/js.translator/testData/out/klibs/stdlib.klib")
 
 private val resultJs = "js/js.translator/testData/out/klibs/result.js"
+private val runtimeKlibPath = "js/js.translator/testData/out/klibs/runtime/"
 
 fun main() {
 
@@ -67,7 +68,8 @@ fun main() {
         CompilationMode.KLIB_WITH_JS,
         emptyList(),
         null,
-        ModuleType.TEST_RUNTIME
+        ModuleType.TEST_RUNTIME,
+        File(runtimeKlibPath)
     )
 
     File(resultJs).writeText(result.generatedCode!!)

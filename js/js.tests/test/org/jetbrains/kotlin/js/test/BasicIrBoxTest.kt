@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.js.test
 
-import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.ir.backend.js.CompilationMode
 import org.jetbrains.kotlin.ir.backend.js.ModuleType
@@ -17,11 +15,16 @@ import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.js.facade.MainCallParameters
 import org.jetbrains.kotlin.js.facade.TranslationUnit
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TargetBackend
 import java.io.File
 
 private var runtimeResults = mutableMapOf<JsIrTestRuntime, CompiledModule>()
+
+private val runtimeKlibPath = "js/js.translator/testData/out/klibs/runtime/"
+
+private val JS_IR_RUNTIME_MODULE_NAME = "JS_IR_RUNTIME"
+
+private val runtimeKlib = CompiledModule(JS_IR_RUNTIME_MODULE_NAME, null, null, ModuleType.TEST_RUNTIME, runtimeKlibPath, emptyList(), true)
 
 abstract class BasicIrBoxTest(
     pathToTestDir: String,
@@ -80,20 +83,20 @@ abstract class BasicIrBoxTest(
             )
         )
 
-        val runtimeConfiguration = config.configuration.copy()
-
-        // TODO: is it right in general? Maybe sometimes we need to compile with newer versions or with additional language features.
-        runtimeConfiguration.languageVersionSettings = LanguageVersionSettingsImpl(
-            LanguageVersion.LATEST_STABLE, ApiVersion.LATEST_STABLE,
-            specificFeatures = mapOf(
-                LanguageFeature.AllowContractsForCustomFunctions to LanguageFeature.State.ENABLED,
-                LanguageFeature.MultiPlatformProjects to LanguageFeature.State.ENABLED
-            ),
-            analysisFlags = mapOf(
-                AnalysisFlags.useExperimental to listOf("kotlin.contracts.ExperimentalContracts", "kotlin.Experimental"),
-                AnalysisFlags.allowResultReturnType to true
-            )
-        )
+//        val runtimeConfiguration = config.configuration.copy()
+//
+//        // TODO: is it right in general? Maybe sometimes we need to compile with newer versions or with additional language features.
+//        runtimeConfiguration.languageVersionSettings = LanguageVersionSettingsImpl(
+//            LanguageVersion.LATEST_STABLE, ApiVersion.LATEST_STABLE,
+//            specificFeatures = mapOf(
+//                LanguageFeature.AllowContractsForCustomFunctions to LanguageFeature.State.ENABLED,
+//                LanguageFeature.MultiPlatformProjects to LanguageFeature.State.ENABLED
+//            ),
+//            analysisFlags = mapOf(
+//                AnalysisFlags.useExperimental to listOf("kotlin.contracts.ExperimentalContracts", "kotlin.Experimental"),
+//                AnalysisFlags.allowResultReturnType to true
+//            )
+//        )
 
         val runtimeFile = File(runtime.path)
         val runtimeResult = runtimeResults.getOrPut(runtime) {
@@ -104,7 +107,7 @@ abstract class BasicIrBoxTest(
         }
 
         val dependencyNames = config.configuration[JSConfigurationKeys.LIBRARIES]!!.map { File(it).name }
-        val dependencies = listOf(runtimeResult) + dependencyNames.mapNotNull {
+        val dependencies = listOf(runtimeKlib) + dependencyNames.mapNotNull {
             compilationCache[it]
         }
 
@@ -112,6 +115,10 @@ abstract class BasicIrBoxTest(
 //        config.configuration.put(CommonConfigurationKeys.PHASES_TO_DUMP_STATE_BEFORE, setOf("ReturnableBlockLowering"))
 //        config.configuration.put(CommonConfigurationKeys.PHASES_TO_DUMP_STATE_AFTER, setOf("MultipleCatchesLowering"))
 //        config.configuration.put(CommonConfigurationKeys.PHASES_TO_VALIDATE, setOf("ALL"))
+
+        val actualOutputFile = if (!isMainModule) {
+            File(outputFile.absolutePath.replace("_v5.js", "/"))
+        } else outputFile
 
         val result = compile(
             config.project,
