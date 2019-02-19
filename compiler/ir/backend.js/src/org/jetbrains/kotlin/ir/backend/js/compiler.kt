@@ -106,11 +106,10 @@ private fun deserializeRuntimeIr(
         moduleDescriptor,
         logggg,
         irBuiltIns,
-        klibDirFile,
         symbolTable,
         null
     )
-    return deserializer.deserializeIrModule(moduleDescriptor, moduleFile.readBytes(), deserializeDeclaration)
+    return deserializer.deserializeIrModule(moduleDescriptor, moduleFile.readBytes(), klibDirFile, deserializeDeclaration)
 }
 
 private fun deserializerRuntimeKlib(
@@ -291,14 +290,13 @@ private fun compileIntoJsAgainstKlib(
         psi2IrContext.moduleDescriptor,
         logggg,
         psi2IrContext.irBuiltIns,
-        runtimeKlibFile,
         symbolTable,
         null
     )
 
     val deserializedModuleFragments = sortedDeps.map {
         val moduleFile = File(it.first.klibPath, moduleHeaderFileName)
-        deserializer.deserializeIrModule(it.second, moduleFile.readBytes(), false)
+        deserializer.deserializeIrModule(it.second, moduleFile.readBytes(), File(it.first.klibPath), false)
     }
 
 //    val runtimeModuleFragment = deserializer.deserializeIrModule(runtimeModule, moduleFile.readBytes(), false)
