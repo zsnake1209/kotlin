@@ -50,28 +50,20 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
     private val typeMapper = state.typeMapper
 
     override fun lower(irClass: IrClass) {
+        // TODO: Bridges should be generated for @JvmDefaults, so the interface check is too optimistic.
         if (irClass.isInterface || irClass.origin == JvmLoweredDeclarationOrigin.DEFAULT_IMPLS) {
             return
         }
 
         for (member in irClass.declarations.filterIsInstance<IrSimpleFunction>()) {
-            if (member.isStatic) continue
-            if (member.isMethodOfAny()) continue
-
-            if (member.origin !== IrDeclarationOrigin.FAKE_OVERRIDE ||
-                (member.modality !== Modality.ABSTRACT && member.overriddenSymbols.any { it.owner.parentAsClass.isInterface }) ||
-                member.findAllReachableDeclarations().any { it.comesFromJava() }
-            ) {
-                createBridges(member)
-            }
+            createBridges(member)
         }
     }
 
 
     private fun createBridges(irFunction: IrSimpleFunction) {
-        val irClass = irFunction.parentAsClass
-        val ourSignature = irFunction.getJvmSignature()
-        val ourMethodName = ourSignature.name
+        if (irFunction.isStatic) return
+        if (irFunction.isMethodOfAny()) return
 
         if (irFunction.origin === IrDeclarationOrigin.FAKE_OVERRIDE &&
             irFunction.overriddenSymbols.all { it.owner.modality !== Modality.ABSTRACT && !it.owner.comesFromJava() }
@@ -79,6 +71,11 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
             // All needed bridges will be generated where functions are implemented.
             return
         }
+
+
+        val irClass = irFunction.parentAsClass
+        val ourSignature = irFunction.getJvmSignature()
+        val ourMethodName = ourSignature.name
 
         val (specialOverride, specialOverrideValueGenerator) =
             findSpecialWithOverride(irFunction) ?: Pair(null, null)
@@ -418,16 +415,28 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
         return null
     }
 
+    private inner class FunctionHandleForIrFunction(val irFunction: IrSimpleFunction) : FunctionHandle {
+        override val isDeclaration get() = irFunction.origin != IrDeclarationOrigin.FAKE_OVERRIDE
+        override val isAbstract get() = irFunction.modality == Modality.ABSTRACT
+        override val mayBeUsedAsSuperImplementation get() = !irFunction.parentAsClass.isInterface
+
+        override fun getOverridden() = irFunction.overriddenSymbols.map { FunctionHandleForIrFunction(it.owner) }
+
+        override fun hashCode(): Int =
+            irFunction.parent.safeAs<IrClass>()?.fqName.hashCode() + 31 * irFunction.getJvmSignature().hashCode()
+
+        override fun equals(other: Any?): Boolean =
+            other is FunctionHandleForIrFunction &&
+                    irFunction.parent.safeAs<IrClass>()?.fqName == other.irFunction.parent.safeAs<IrClass>()?.fqName &&
+                    irFunction.getJvmSignature() == other.irFunction.getJvmSignature()
+    }
+
+    fun IrSimpleFunction.findConcreteSuperDeclaration(): IrSimpleFunction? {
+        return findConcreteSuperDeclaration(FunctionHandleForIrFunction(this))?.irFunction
+    }
+
     private fun IrFunction.getJvmSignature() = typeMapper.mapAsmMethod(descriptor)
     private fun IrFunction.getJvmName() = getJvmSignature().name
-}
-
-private data class FunctionHandleForIrFunction(val irFunction: IrSimpleFunction) : FunctionHandle {
-    override val isDeclaration get() = irFunction.origin != IrDeclarationOrigin.FAKE_OVERRIDE
-    override val isAbstract get() = irFunction.modality == Modality.ABSTRACT
-    override val mayBeUsedAsSuperImplementation get() = !irFunction.parentAsClass.isInterface
-
-    override fun getOverridden() = irFunction.overriddenSymbols.map { FunctionHandleForIrFunction(it.owner) }
 }
 
 private data class SignatureWithSource(val signature: Method, val source: IrSimpleFunction) {
@@ -482,10 +491,6 @@ fun IrSimpleFunction.allOverridden(): Sequence<IrSimpleFunction> {
 
 fun IrSimpleFunction.overriddenInClasses(): Sequence<IrSimpleFunction> =
     allOverridden().filter { !(it.parent.safeAs<IrClass>()?.isInterface ?: true) }
-
-fun IrSimpleFunction.findConcreteSuperDeclaration(): IrSimpleFunction? {
-    return findConcreteSuperDeclaration(FunctionHandleForIrFunction(this))?.irFunction
-}
 
 // TODO: At present, there is no reliable way to distinguish Java imports from Kotlin cross-module imports.
 val ORIGINS_FROM_JAVA = setOf(IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB, IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB)
