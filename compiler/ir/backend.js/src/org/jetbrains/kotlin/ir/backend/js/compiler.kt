@@ -305,6 +305,14 @@ private fun compileIntoJsAgainstKlib(
     val moduleName = configuration.get(CommonConfigurationKeys.MODULE_NAME) as String
 
     if (moduleType == ModuleType.SECONDARY) {
+        deserializedModuleFragments.forEach {
+            ExternalDependenciesGenerator(
+                it.descriptor,
+                symbolTable,
+                psi2IrContext.irBuiltIns
+            ).generateUnboundSymbolsAsDependencies(it)
+            it.patchDeclarationParents()
+        }
         serializeModuleIntoKlib(
             moduleName,
             metadataVersion,
