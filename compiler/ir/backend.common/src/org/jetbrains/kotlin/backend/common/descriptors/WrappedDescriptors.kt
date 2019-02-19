@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.resolve.scopes.TypeIntersectionScope
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver
 import org.jetbrains.kotlin.resolve.scopes.receivers.ReceiverValue
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.*
 
 
@@ -580,10 +581,10 @@ open class WrappedClassDescriptor(
     override fun isActual() = false
 
     private val _typeConstructor: TypeConstructor by lazy {
-        ClassTypeConstructorImpl(
+        LazyTypeConstructor(
             this,
-            emptyList(), /*TODO: Fix stack overflow when wrapped descriptors refer to each other. owner.superTypes.map { it.toKotlinType() }*/
-            emptyList(),
+            { emptyList() },
+            { owner.superTypes.map { it.toKotlinType() } },
             LockBasedStorageManager.NO_LOCKS
         )
     }
@@ -600,6 +601,28 @@ open class WrappedClassDescriptor(
     override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
         visitor!!.visitClassDescriptor(this, null)
     }
+}
+
+class LazyTypeConstructor(
+    val classDescriptor: ClassDescriptor,
+    val parametersBuilder: () -> List<TypeParameterDescriptor>,
+    val superTypesBuilder: () -> List<KotlinType>,
+    storageManager: StorageManager
+) : AbstractClassTypeConstructor(storageManager) {
+    val parameters_ by lazy { parametersBuilder() }
+    val superTypes_ by lazy { superTypesBuilder() }
+
+    override fun getParameters() = parameters_
+
+    override fun computeSupertypes() = superTypes_
+
+    override fun isDenotable() = true
+
+    override fun getDeclarationDescriptor() = classDescriptor
+
+    override val supertypeLoopChecker: SupertypeLoopChecker
+        get() = SupertypeLoopChecker.EMPTY
+
 }
 
 open class WrappedEnumEntryDescriptor(
