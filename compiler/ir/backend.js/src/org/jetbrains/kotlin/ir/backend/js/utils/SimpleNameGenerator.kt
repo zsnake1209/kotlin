@@ -165,11 +165,8 @@ class SimpleNameGenerator : NameGenerator {
                     }
 
 
+                    nameDeclarator = context.staticContext.rootScope::declareFreshName
                     if (declaration.kind == ClassKind.OBJECT || declaration.name.isSpecial || declaration.visibility == Visibilities.LOCAL) {
-                        if (declaration.descriptor !is DeserializedClassDescriptor) {
-                            // TODO: temporary workaround for Unit instance
-                            nameDeclarator = context.staticContext.rootScope::declareFreshName
-                        }
                         val parent = declaration.parent
                         when (parent) {
                             is IrDeclaration -> nameBuilder.append(getNameForDeclaration(parent, context))
