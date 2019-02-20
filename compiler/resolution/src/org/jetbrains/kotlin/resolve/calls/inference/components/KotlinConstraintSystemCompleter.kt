@@ -74,7 +74,7 @@ class KotlinConstraintSystemCompleter(
             val postponedKtPrimitives = getOrderedNotAnalyzedPostponedArguments(topLevelAtoms)
             val variableForFixation =
                 variableFixationFinder.findFirstVariableForFixation(
-                    c, allTypeVariables.cast() /* TODO: SUB */, postponedKtPrimitives, completionMode, topLevelType
+                    c, allTypeVariables, postponedKtPrimitives, completionMode, topLevelType
                 ) ?: break
 
             if (shouldForceCallableReferenceOrLambdaResolution(completionMode, variableForFixation)) {

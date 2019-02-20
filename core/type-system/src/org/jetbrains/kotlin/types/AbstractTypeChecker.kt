@@ -451,6 +451,11 @@ object AbstractNullabilityChecker {
     fun isPossibleSubtype(context: AbstractTypeCheckerContext, subType: SimpleTypeMarker, superType: SimpleTypeMarker): Boolean =
         context.runIsPossibleSubtype(subType, superType)
 
+    fun isSubtypeOfAny(context: AbstractTypeCheckerContext, type: KotlinTypeMarker): Boolean =
+        with(context) {
+            hasNotNullSupertype(type.lowerBoundIfFlexible(), SupertypesPolicy.LowerIfFlexible)
+        }
+
     private fun AbstractTypeCheckerContext.runIsPossibleSubtype(subType: SimpleTypeMarker, superType: SimpleTypeMarker): Boolean {
         // it makes for case String? & Any <: String
         assert(subType.isSingleClassifierType() || subType.typeConstructor().isIntersection() || subType.isAllowedTypeVariable) {

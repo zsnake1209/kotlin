@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.types.FlexibleType
 import org.jetbrains.kotlin.types.StubType
 import org.jetbrains.kotlin.types.checker.ClassicTypeSystemContext
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
-import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
 import org.jetbrains.kotlin.utils.SmartList

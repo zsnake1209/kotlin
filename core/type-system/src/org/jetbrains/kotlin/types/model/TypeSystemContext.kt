@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.types.model
 
+import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
+
 interface KotlinTypeMarker
 interface TypeArgumentMarker
 interface TypeConstructorMarker
@@ -52,6 +54,18 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext {
     fun Collection<KotlinTypeMarker>.singleBestRepresentative(): KotlinTypeMarker?
 
     fun KotlinTypeMarker.isUnit(): Boolean
+
+    fun newBaseTypeCheckerContext(): AbstractTypeCheckerContext
+
+    fun nullableNothingType(): KotlinTypeMarker
+
+    fun KotlinTypeMarker.withNullability(nullable: Boolean): KotlinTypeMarker
+
+
+    fun KotlinTypeMarker.makeDefinitelyNotNullOrNotNull(): KotlinTypeMarker
+    fun SimpleTypeMarker.makeSimpleTypeDefinitelyNotNullOrNotNull(): SimpleTypeMarker
+
+    fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker
 }
 
 
@@ -85,7 +99,7 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
         return null
     }
 
-    fun SimpleTypeMarker.isStubType(): Boolean = false
+    fun SimpleTypeMarker.isStubType(): Boolean
 
     fun KotlinTypeMarker.asTypeArgument(): TypeArgumentMarker
 

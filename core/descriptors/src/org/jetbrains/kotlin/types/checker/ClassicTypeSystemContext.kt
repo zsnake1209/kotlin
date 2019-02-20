@@ -276,6 +276,51 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         return KotlinBuiltIns.isUnit(this)
     }
 
+    override fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker {
+        require(lowerBound is SimpleType)
+        require(upperBound is SimpleType)
+        return KotlinTypeFactory.flexibleType(lowerBound, upperBound)
+    }
+
+    override fun KotlinTypeMarker.withNullability(nullable: Boolean): KotlinTypeMarker {
+        return when (this) {
+            is SimpleTypeMarker -> this.withNullability(nullable)
+            is FlexibleTypeMarker -> createFlexibleType(lowerBound().withNullability(nullable), upperBound().withNullability(nullable))
+            else -> error("sealed")
+        }
+    }
+
+
+    override fun newBaseTypeCheckerContext(): AbstractTypeCheckerContext {
+        return TypeCheckerContext(false)
+    }
+
+    override fun nullableNothingType(): KotlinTypeMarker {
+        return builtIns.nullableNothingType
+    }
+
+    val builtIns: KotlinBuiltIns get() = throw UnsupportedOperationException("Not supported")
+
+    override fun KotlinTypeMarker.makeDefinitelyNotNullOrNotNull(): KotlinTypeMarker {
+        require(this is UnwrappedType)
+        return makeDefinitelyNotNullOrNotNullInternal(this)
+    }
+
+
+    override fun SimpleTypeMarker.makeSimpleTypeDefinitelyNotNullOrNotNull(): SimpleTypeMarker {
+        require(this is SimpleType)
+        return makeSimpleTypeDefinitelyNotNullOrNotNullInternal(this)
+    }
+
+
+}
+
+private fun makeDefinitelyNotNullOrNotNullInternal(type: UnwrappedType): UnwrappedType {
+    return type.makeDefinitelyNotNullOrNotNull()
+}
+
+private fun makeSimpleTypeDefinitelyNotNullOrNotNullInternal(type: SimpleType): SimpleType {
+    return type.makeSimpleTypeDefinitelyNotNullOrNotNull()
 }
 
 private fun containsInternal(type: KotlinType, predicate: (KotlinTypeMarker) -> Boolean): Boolean = type.contains(predicate)

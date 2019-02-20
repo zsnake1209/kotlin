@@ -89,8 +89,8 @@ abstract class ConstraintSystemCallDiagnostic(applicability: ResolutionCandidate
 }
 
 class NewConstraintError(
-    val lowerType: UnwrappedType,
-    val upperType: UnwrappedType,
+    val lowerType: KotlinTypeMarker,
+    val upperType: KotlinTypeMarker,
     val position: IncorporationConstraintPosition
 ) : ConstraintSystemCallDiagnostic(if (position.from is ReceiverConstraintPosition) INAPPLICABLE_WRONG_RECEIVER else INAPPLICABLE)
 
