@@ -24,7 +24,7 @@ private val runtimeKlibPath = "js/js.translator/testData/out/klibs/runtime/"
 
 private val JS_IR_RUNTIME_MODULE_NAME = "JS_IR_RUNTIME"
 
-private val runtimeKlib = CompiledModule(JS_IR_RUNTIME_MODULE_NAME, null, null, ModuleType.TEST_RUNTIME, runtimeKlibPath, emptyList(), true)
+private val runtimeKlib = CompiledModule(JS_IR_RUNTIME_MODULE_NAME, null, null, null, ModuleType.TEST_RUNTIME, runtimeKlibPath, emptyList(), true)
 
 abstract class BasicIrBoxTest(
     pathToTestDir: String,
@@ -98,14 +98,14 @@ abstract class BasicIrBoxTest(
 //            )
 //        )
 
-        val runtimeFile = File(runtime.path)
-        val runtimeResult = runtimeResults.getOrPut(runtime) {
-            runtimeConfiguration.put(CommonConfigurationKeys.MODULE_NAME, "JS_IR_RUNTIME")
-            val result = compile(config.project, runtime.sources.map(::createPsiFile), runtimeConfiguration, moduleType = ModuleType.TEST_RUNTIME)
-            runtimeFile.write(result.generatedCode!!)
-            result
-        }
-
+//        val runtimeFile = File(runtime.path)
+//        val runtimeResult = runtimeResults.getOrPut(runtime) {
+//            runtimeConfiguration.put(CommonConfigurationKeys.MODULE_NAME, "JS_IR_RUNTIME")
+//            val result = compile(config.project, runtime.sources.map(::createPsiFile), runtimeConfiguration, moduleType = ModuleType.TEST_RUNTIME)
+//            runtimeFile.write(result.generatedCode!!)
+//            result
+//        }
+//
         val dependencyNames = config.configuration[JSConfigurationKeys.LIBRARIES]!!.map { File(it).name }
         val dependencies = listOf(runtimeKlib) + dependencyNames.mapNotNull {
             compilationCache[it]
@@ -125,10 +125,14 @@ abstract class BasicIrBoxTest(
             filesToCompile,
             config.configuration,
             listOf(FqName((testPackage?.let { "$it." } ?: "") + testFunction)),
-            CompilationMode.TEST_AGAINST_CACHE,//CompilationMode.TEST_AGAINST_KLIB,
+//            CompilationMode.TEST_AGAINST_CACHE,
+            CompilationMode.TEST_AGAINST_KLIB,
             dependencies,
-            runtimeResult,
-            moduleType = if (isMainModule) ModuleType.MAIN else ModuleType.SECONDARY
+//            listOf(runtimeKlib),
+//            runtimeResult,
+            null,
+            moduleType = if (isMainModule) ModuleType.MAIN else ModuleType.SECONDARY,
+            klibDirectory = actualOutputFile
         )
 
         compilationCache[outputFile.name.replace(".js", ".meta.js")] = result
@@ -136,7 +140,8 @@ abstract class BasicIrBoxTest(
         val generatedCode = result.generatedCode
         if (generatedCode != null) {
             // Prefix to help node.js runner find runtime
-            val runtimePrefix = "// RUNTIME: [\"${runtimeFile.path}\"]\n"
+//            val runtimePrefix = "// RUNTIME: [\"${runtimeFile.path}\"]\n"
+            val runtimePrefix = ""
             val wrappedCode = wrapWithModuleEmulationMarkers(generatedCode, moduleId = config.moduleId, moduleKind = config.moduleKind)
             outputFile.write(runtimePrefix + wrappedCode)
         }
@@ -153,7 +158,9 @@ abstract class BasicIrBoxTest(
     ) {
         // TODO: should we do anything special for module systems?
         // TODO: return list of js from translateFiles and provide then to this function with other js files
-        nashornIrJsTestCheckers[runtime]!!.check(jsFiles, testModuleName, null, testFunction, expectedResult, withModuleSystem)
+
+
+        NashornIrJsTestChecker(null).check(jsFiles, testModuleName, null, testFunction, expectedResult, withModuleSystem)
     }
 }
 

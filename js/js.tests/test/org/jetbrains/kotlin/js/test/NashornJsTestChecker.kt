@@ -161,14 +161,14 @@ object NashornJsTestChecker : AbstractNashornJsTestChecker() {
     }
 }
 
-class NashornIrJsTestChecker(private val runtime: JsIrTestRuntime) : AbstractNashornJsTestChecker() {
+class NashornIrJsTestChecker(private val runtime: JsIrTestRuntime?) : AbstractNashornJsTestChecker() {
     override fun createScriptEngineForTest(): ScriptEngine {
         val engine = createScriptEngine()
 
-        listOf(
+        listOfNotNull(
             BasicBoxTest.TEST_DATA_DIR_PATH + "nashorn-polyfills.js",
-            "libraries/stdlib/js/src/js/polyfills.js"
-//            runtime.path
+            "libraries/stdlib/js/src/js/polyfills.js",
+            runtime?.path
         ).forEach(engine::loadFile)
 
         return engine
