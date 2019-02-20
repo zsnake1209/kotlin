@@ -20,10 +20,17 @@ import org.jetbrains.kotlin.types.checker.ClassicTypeSystemContext
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
+import org.jetbrains.kotlin.types.model.TypeVariableMarker
 import org.jetbrains.kotlin.utils.SmartList
 
 class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : TypeSystemInferenceExtensionContext, ClassicTypeSystemContext,
-    BuiltInsProvider
+    BuiltInsProvider {
+
+    override fun TypeVariableMarker.freshTypeConstructor(): TypeConstructorMarker {
+        require(this is NewTypeVariable)
+        return this.freshTypeConstructor
+    }
+}
 
 fun NewConstraintSystemImpl(
     constraintInjector: ConstraintInjector,

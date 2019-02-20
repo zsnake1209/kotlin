@@ -73,6 +73,16 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext {
 
     fun KotlinTypeMarker.hasExactAnnotation(): Boolean
     fun KotlinTypeMarker.hasNoInferAnnotation(): Boolean
+
+    fun TypeVariableMarker.freshTypeConstructor(): TypeConstructorMarker
+
+
+    fun CapturedTypeMarker.typeConstructorProjection(): TypeArgumentMarker
+
+    fun KotlinTypeMarker.isNullableType(): Boolean
+
+    fun KotlinTypeMarker.isNullableAny() = this.typeConstructor().isAnyConstructor() && this.isNullableType()
+    fun KotlinTypeMarker.isNothing() = this.typeConstructor().isNothingConstructor() && !this.isNullableType()
 }
 
 
@@ -92,6 +102,8 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
 
     fun FlexibleTypeMarker.lowerBound(): SimpleTypeMarker
     fun SimpleTypeMarker.asCapturedType(): CapturedTypeMarker?
+
+    fun KotlinTypeMarker.isCapturedType() = asSimpleType()?.asCapturedType() != null
 
     fun SimpleTypeMarker.asDefinitelyNotNullType(): DefinitelyNotNullTypeMarker?
     fun SimpleTypeMarker.isMarkedNullable(): Boolean
@@ -192,6 +204,8 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun SimpleTypeMarker.isSingleClassifierType(): Boolean
 
     fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker
+
+    fun KotlinTypeMarker.isSimpleType() = asSimpleType() != null
 }
 
 enum class CaptureStatus {

@@ -330,6 +330,20 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         require(this is UnwrappedType)
         return hasNoInferInternal(this)
     }
+
+    override fun TypeVariableMarker.freshTypeConstructor(): TypeConstructorMarker {
+        throw UnsupportedOperationException("!")
+    }
+
+    override fun CapturedTypeMarker.typeConstructorProjection(): TypeArgumentMarker {
+        require(this is NewCapturedType)
+        return this.constructor.projection
+    }
+
+    override fun KotlinTypeMarker.isNullableType(): Boolean {
+        require(this is KotlinType)
+        return TypeUtils.isNullableType(this)
+    }
 }
 
 private fun hasNoInferInternal(type: UnwrappedType): Boolean {

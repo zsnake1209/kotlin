@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.resolve.calls.inference.components
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker
 import org.jetbrains.kotlin.types.AbstractTypeChecker
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
-import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.checker.*
 import org.jetbrains.kotlin.types.model.*
 
@@ -86,11 +85,12 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
 
     // extract type variable only from type like Captured(out T)
     private fun extractTypeVariableForSubtype(type: KotlinTypeMarker): KotlinTypeMarker? {
-        if (type !is NewCapturedType) return null
-        // TODO: SUB
-        val projection = type.constructor.projection
-        return if (projection.projectionKind == Variance.OUT_VARIANCE)
-            projection.type.takeIf { it is SimpleTypeMarker && isMyTypeVariable(it) }?.unwrap()
+
+        val type = type.asSimpleType()?.asCapturedType() ?: return null
+
+        val projection = type.typeConstructorProjection()
+        return if (projection.getVariance() == TypeVariance.OUT)
+            projection.getType().takeIf { it is SimpleTypeMarker && isMyTypeVariable(it) }?.asSimpleType()
         else
             null
     }

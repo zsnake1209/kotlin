@@ -144,7 +144,8 @@ private fun preprocessCallableReference(
     if (expectedType == null) return result
 
     val notCallableTypeConstructor =
-        csBuilder.getProperSuperTypeConstructors(expectedType).firstOrNull { !ReflectionTypes.isPossibleExpectedCallableType(it as TypeConstructor) } // TODO: SUB
+        csBuilder.getProperSuperTypeConstructors(expectedType)
+            .firstOrNull { !ReflectionTypes.isPossibleExpectedCallableType(it.requireIs()) }
 
     argument.lhsResult.safeAs<LHSResult.Type>()?.let {
         val lhsType = it.unboundDetailedReceiver.stableType
@@ -154,7 +155,13 @@ private fun preprocessCallableReference(
         }
     }
     if (notCallableTypeConstructor != null) {
-        diagnosticsHolder.addDiagnostic(NotCallableExpectedType(argument, expectedType, notCallableTypeConstructor as TypeConstructor)) // TODO: SUB
+        diagnosticsHolder.addDiagnostic(
+            NotCallableExpectedType(
+                argument,
+                expectedType,
+                notCallableTypeConstructor.requireIs()
+            )
+        )
     }
     return result
 }
@@ -174,3 +181,8 @@ interface BuiltInsProvider {
 
 internal val ConstraintSystemBuilder.builtIns: KotlinBuiltIns get() = ((this as NewConstraintSystemImpl).typeSystemContext as BuiltInsProvider).builtIns
 internal val NewConstraintSystem.builtIns: KotlinBuiltIns get() = ((this as NewConstraintSystemImpl).typeSystemContext as BuiltInsProvider).builtIns
+
+internal inline fun <reified T : Any> Any.requireIs(): T {
+    require(this is T)
+    return this
+}

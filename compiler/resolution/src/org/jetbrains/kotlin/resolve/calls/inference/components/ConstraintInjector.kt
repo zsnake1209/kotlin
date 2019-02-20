@@ -23,10 +23,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintKind.UPPER
 import org.jetbrains.kotlin.resolve.calls.model.KotlinCallDiagnostic
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.NewCapturedType
-import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker
 import org.jetbrains.kotlin.types.model.*
-import org.jetbrains.kotlin.types.typeUtil.isNothing
-import org.jetbrains.kotlin.types.typeUtil.isNullableAny
 import java.util.*
 
 class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val typeApproximator: TypeApproximator) {
@@ -104,7 +101,7 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
         }
 
         // TODO: SUB
-        if (constraintType is SimpleType) {
+        if (constraintType.isSimpleType()) {
             if (constraint.kind == UPPER && constraintType.isNullableAny()) return true // T <: Any?
         }
 
