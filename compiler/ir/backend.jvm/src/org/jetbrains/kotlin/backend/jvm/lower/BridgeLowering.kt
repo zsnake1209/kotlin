@@ -11,11 +11,9 @@ import org.jetbrains.kotlin.backend.common.bridges.findAllReachableDeclarations
 import org.jetbrains.kotlin.backend.common.bridges.findConcreteSuperDeclaration
 import org.jetbrains.kotlin.backend.common.bridges.generateBridges
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedTypeParameterDescriptor
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedValueParameterDescriptor
-import org.jetbrains.kotlin.backend.common.ir.copyTo
-import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
-import org.jetbrains.kotlin.backend.common.ir.isMethodOfAny
-import org.jetbrains.kotlin.backend.common.ir.isStatic
+import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.irNot
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
@@ -25,6 +23,7 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.declarations.impl.IrTypeParameterImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
@@ -33,13 +32,16 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
+import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.IrStarProjectionImpl
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.commons.Method
 
@@ -84,7 +86,11 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
 
         var targetForCommonBridges = irFunction
 
-        // Special case: fake override redirecting to an implementation with a different JVM name
+        // Special case: fake override redirecting to an implementation with a different JVM name,
+        // or to a function with SpecialOverrideSignature.
+        // TODO: we assume here that all implementations come from classes. There may be a default implementation in
+        // an interface, If it comes from the same module, InterfaceDelegationLowering will build a redirection, and the following code will work.
+        // But in an imported module, there will be no redirection => failure!
         if (irFunction.origin === IrDeclarationOrigin.FAKE_OVERRIDE &&
             irFunction.modality !== Modality.ABSTRACT &&
             irFunction.visibility !== Visibilities.INVISIBLE_FAKE &&
@@ -193,33 +199,34 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
     private fun createBridgeHeader(
         irClass: IrClass,
         target: IrSimpleFunction,
-        interfaceFunction: IrSimpleFunction,
+        signatureFunction: IrSimpleFunction,
         isSpecial: Boolean,
         isSynthetic: Boolean
     ): IrSimpleFunction {
         val modality = if (isSpecial) Modality.FINAL else Modality.OPEN
         val origin = if (isSynthetic) IrDeclarationOrigin.BRIDGE else IrDeclarationOrigin.BRIDGE_SPECIAL
 
-        val visibility = if (interfaceFunction.visibility === Visibilities.INTERNAL) Visibilities.PUBLIC else interfaceFunction.visibility
+        val visibility = if (signatureFunction.visibility === Visibilities.INTERNAL) Visibilities.PUBLIC else signatureFunction.visibility
         val descriptor = WrappedSimpleFunctionDescriptor()
         return IrFunctionImpl(
             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             origin,
             IrSimpleFunctionSymbolImpl(descriptor),
-            Name.identifier(interfaceFunction.getJvmName()),
+            Name.identifier(signatureFunction.getJvmName()),
             visibility,
             modality,
-            returnType = interfaceFunction.returnType.eraseTypeParameters(),
+            returnType = signatureFunction.returnType.eraseTypeParameters(),
             isInline = false,
             isExternal = false,
             isTailrec = false,
-            isSuspend = interfaceFunction.isSuspend
+            isSuspend = signatureFunction.isSuspend
         ).apply {
             descriptor.bind(this)
             parent = irClass
-            dispatchReceiverParameter = target.dispatchReceiverParameter?.copyTo(this)
-            extensionReceiverParameter = interfaceFunction.extensionReceiverParameter?.copyWithTypeErasure(this)
-            interfaceFunction.valueParameters.mapIndexed { i, param ->
+            dispatchReceiverParameter = irClass.thisReceiver?.copyTo(this)
+            extensionReceiverParameter = signatureFunction.extensionReceiverParameter
+                ?.copyWithTypeErasure(this)
+            signatureFunction.valueParameters.mapIndexed { i, param ->
                 valueParameters.add(i, param.copyWithTypeErasure(this))
             }
         }
@@ -355,14 +362,6 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
         return irFunction.findAllReachableDeclarations().filter { it.modality === Modality.FINAL }
     }
 
-    private fun changedOverriddenNames(irFunction: IrSimpleFunction): Set<String> {
-        val ourName = irFunction.getJvmName()
-        val allNames = irFunction.findAllReachableDeclarations()
-            .map { it.getJvmName() }
-            .toSet()
-        return allNames - setOf(ourName)
-    }
-
     // There are two sources of method name change:
     //   1. Special methods renamed from java
     //   2. Internal methods overridden by public ones.
@@ -445,34 +444,28 @@ private data class SignatureWithSource(val signature: Method, val source: IrSimp
     }
 
     override fun equals(other: Any?): Boolean {
-        val otherSignature = other.safeAs<SignatureWithSource>()?.signature ?: return false
-        return signature == otherSignature
+        return other is SignatureWithSource && signature == other.signature
     }
 }
 
-val IrClass.fqName get() = getPackageFragment()?.fqName?.child(name)
-
-private class SubclassChecker(val pred: (IrClass) -> Boolean) {
-    val alreadyVisited = mutableSetOf<IrClass>()
-
-    fun checkClass(irClass: IrClass) = when {
-        irClass in alreadyVisited -> false
-        pred(irClass) -> true
-        else -> {
-            alreadyVisited.add(irClass)
-            irClass.superTypes.any { checkType(it) }
+val IrClass.fqName
+    get(): FqName? {
+        val parentFqName = when (val parent = parent) {
+            is IrPackageFragment -> parent.fqName
+            is IrClass -> parent.fqName
+            else -> return null
         }
+        return parentFqName?.child(name)
     }
 
-    fun checkType(irType: IrType): Boolean =
-        irType is IrSimpleType && when (val owner = irType.classifier.owner) {
-            is IrClass -> checkClass(owner)
-            is IrTypeParameter -> owner.superTypes.any { checkType(it) }
-            else -> false
-        }
-}
-
-fun IrClass.isSubclassOf(pred: (IrClass) -> Boolean) = SubclassChecker(pred).checkClass(this)
+fun IrClass.isSubclassOf(pred: (IrClass) -> Boolean): Boolean =
+    DFS.ifAny(
+        listOf(this),
+        DFS.Neighbors { current ->
+            current.superTypes.mapNotNull { (it as? IrSimpleType)?.classifier?.owner as? IrClass }
+        },
+        pred
+    )
 
 fun IrSimpleFunction.allOverridden(): Sequence<IrSimpleFunction> {
     val visited = mutableSetOf<IrSimpleFunction>()
