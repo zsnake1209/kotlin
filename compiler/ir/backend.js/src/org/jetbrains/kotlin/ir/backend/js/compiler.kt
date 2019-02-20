@@ -50,14 +50,12 @@ class CompiledModule(
     val moduleName: String,
     val generatedCode: String?,
     val moduleFragment: IrModuleFragment?,
+    var moduleDescriptor: ModuleDescriptorImpl?,
     val moduleType: ModuleType,
     val klibPath: String,
     val dependencies: List<CompiledModule>,
     val isBuiltIn: Boolean
-) {
-    val descriptor
-        get() = moduleFragment!!.descriptor as ModuleDescriptorImpl
-}
+)
 
 enum class CompilationMode(val generateJS: Boolean) {
     KLIB(false),
@@ -118,10 +116,20 @@ private fun deserializerRuntimeKlib(
     lookupTracker: LookupTracker,
     metadataVersion: JsKlibMetadataVersion,
     languageVersionSettings: LanguageVersionSettings,
-    deserializeDeclaration: Boolean
+    deserializeDeclarations: Boolean
 ): JsKlib {
     val klibDirFile = File(locationDir)
-    val md = deserializeRuntimeMetadata(klibDirFile, moduleName, lookupTracker, metadataVersion, languageVersionSettings)
+    val md = loadKlibMetadata(
+        moduleName,
+        locationDir,
+        true,
+        lookupTracker,
+        storageManager,
+        metadataVersion,
+        languageVersionSettings,
+        null,
+        emptyList()
+    )
 
     val st = SymbolTable()
     val typeTranslator = TypeTranslator(st, languageVersionSettings).also {
@@ -130,7 +138,7 @@ private fun deserializerRuntimeKlib(
 
     val irBuiltIns = IrBuiltIns(md.builtIns, typeTranslator, st)
 
-    val moduleFragment = deserializeRuntimeIr(md, klibDirFile, deserializeDeclaration, st, irBuiltIns)
+    val moduleFragment = deserializeRuntimeIr(md, klibDirFile, deserializeDeclarations, st, irBuiltIns)
 
     return JsKlib(md, moduleFragment, st, irBuiltIns)
 }
@@ -150,75 +158,83 @@ fun compile(
         CompilationMode.KLIB, CompilationMode.KLIB_WITH_JS ->
             compileIntoKlib(files, project, configuration, dependencies, builtInsModule, moduleType, compileMode.generateJS, klibDirectory)
         CompilationMode.TEST_AGAINST_CACHE ->
+//            error("not supported any more")
             compileIntoJsAgainstCachedDeps(files, project, configuration, dependencies, builtInsModule, moduleType)
         CompilationMode.TEST_AGAINST_KLIB -> compileIntoJsAgainstKlib(files, project, configuration, dependencies, moduleType, klibDirectory)
     }
-}
-
-//val storageManager = LockBasedStorageManager("JsConfig")
 
 
-private fun deserializeRuntimeMetadata(
-    klibDirFile: File,
-    moduleName: String,
-    lookupTracker: LookupTracker,
-    metadataVersion: JsKlibMetadataVersion,
-    languageVersionSettings: LanguageVersionSettings
-): ModuleDescriptor {
-    val metadataFile = File(klibDirFile, metadataFileName(moduleName))
-//    val storageManager = LockBasedStorageManager("JsConfig")
-    val serializer = JsKlibMetadataSerializationUtil
-    val parts = serializer.readModuleAsProto(metadataFile.readBytes())
-    val builtIns = object : KotlinBuiltIns(storageManager) {}//analysisResult.moduleDescriptor.builtIns
-    val md = ModuleDescriptorImpl(Name.special("<$moduleName>"), storageManager, builtIns)
-    builtIns.builtInsModule = md
-    val packageProviders = listOf(
-        functionInterfacePackageFragmentProvider(storageManager, md),
-        createJsKlibMetadataPackageFragmentProvider(
-            storageManager, md, parts.header, parts.body, metadataVersion,
-            CompilerDeserializationConfiguration(languageVersionSettings),
-            lookupTracker
-        )
-    )
 
-    md.initialize(CompositePackageFragmentProvider(packageProviders))
-    md.setDependencies(listOf(md))
-    return md
 }
 
 private fun loadKlibMetadata(
-    klib: CompiledModule,
-    klibMap: Map<CompiledModule, ModuleDescriptorImpl>,
+    moduleName: String,
+    klibPath: String,
+    isBuiltIn: Boolean,
     lookupTracker: LookupTracker,
+    storageManager: LockBasedStorageManager,
     metadataVersion: JsKlibMetadataVersion,
     languageVersionSettings: LanguageVersionSettings,
-    builtinsModule: ModuleDescriptorImpl?
+    builtinsModule: ModuleDescriptorImpl?,
+    dependencies: List<CompiledModule>
 ): ModuleDescriptorImpl {
-    assert(klib.isBuiltIn == (builtinsModule === null))
+    assert(isBuiltIn == (builtinsModule === null))
 
-    val moduleName = klib.moduleName
-    val metadataFile = File(klib.klibPath, metadataFileName(moduleName))
+    val metadataFile = File(klibPath, metadataFileName(moduleName))
 
     val serializer = JsKlibMetadataSerializationUtil
     val parts = serializer.readModuleAsProto(metadataFile.readBytes())
     val builtIns = builtinsModule?.builtIns ?: object : KotlinBuiltIns(storageManager) {}
     val md = ModuleDescriptorImpl(Name.special("<$moduleName>"), storageManager, builtIns)
-    if (klib.isBuiltIn) builtIns.builtInsModule = md
+    if (isBuiltIn) builtIns.builtInsModule = md
     val currentModuleFragmentProvider = createJsKlibMetadataPackageFragmentProvider(
         storageManager, md, parts.header, parts.body, metadataVersion,
         CompilerDeserializationConfiguration(languageVersionSettings),
         lookupTracker
     )
 
-    val packageFragmentProvider = if (klib.isBuiltIn) {
+    val packageFragmentProvider = if (isBuiltIn) {
         val functionFragmentProvider = functionInterfacePackageFragmentProvider(storageManager, md)
         CompositePackageFragmentProvider(listOf(functionFragmentProvider, currentModuleFragmentProvider))
     } else currentModuleFragmentProvider
 
     md.initialize(packageFragmentProvider)
-    md.setDependencies(listOf(md) + klib.dependencies.mapNotNull { klibMap[it] })
+    md.setDependencies(listOf(md) + dependencies.mapNotNull { it.moduleDescriptor })
 
     return md
+}
+
+typealias MetadataDFSHandler = DFS.NodeHandler<CompiledModule, List<CompiledModule>>
+
+private class DependencyMetadataLoader(
+    private val lookupTracker: LookupTracker,
+    private val metadataVersion: JsKlibMetadataVersion,
+    private val languageVersionSettings: LanguageVersionSettings,
+    private val storageManager: LockBasedStorageManager
+) : MetadataDFSHandler {
+    private val sortedDependencies = mutableListOf<CompiledModule>()
+
+    private var runtimeModule: ModuleDescriptorImpl? = null
+
+    override fun beforeChildren(current: CompiledModule) = true
+
+    override fun afterChildren(current: CompiledModule) {
+        val md = current.moduleDescriptor ?: loadKlibMetadata(
+            current.moduleName,
+            current.klibPath,
+            current.isBuiltIn,
+            lookupTracker,
+            storageManager,
+            metadataVersion,
+            languageVersionSettings,
+            runtimeModule,
+            current.dependencies
+        ).also { current.moduleDescriptor = it }
+        sortedDependencies += current
+        if (current.isBuiltIn) runtimeModule = md
+    }
+
+    override fun result() = sortedDependencies
 }
 
 private fun compileIntoJsAgainstKlib(
@@ -229,52 +245,23 @@ private fun compileIntoJsAgainstKlib(
     moduleType: ModuleType,
     klibDirectory: File
 ): CompiledModule {
-
-    val runtimeKlib = dependencies.single { it.isBuiltIn }
-
-    assert(runtimeKlib.dependencies.isEmpty())
-
-    val klibModuleMap = mutableMapOf<CompiledModule, ModuleDescriptorImpl>()
-
-    val runtimeKlibFile = File(runtimeKlib.klibPath)
     val metadataVersion = configuration.get(CommonConfigurationKeys.METADATA_VERSION)  as? JsKlibMetadataVersion
         ?: JsKlibMetadataVersion.INSTANCE
-    val lookupTracker = LookupTracker.DO_NOTHING // configuration.get(CommonConfigurationKeys.LOOKUP_TRACKER, LookupTracker.DO_NOTHING)
+    val lookupTracker = LookupTracker.DO_NOTHING
     val languageSettings = configuration.languageVersionSettings
-//    val runtimeModule = loadKlibMetadata(runtimeKlib, klibModuleMap, lookupTracker, metadataVersion, languageSettings, null)
-    var runtimeModule: ModuleDescriptorImpl? = null
-
-//    klibModuleMap[runtimeKlib] = runtimeModule
-
-//    val dependenciesWithoutRuntime = dependencies.filter { !it.isBuiltIn }
-    val sortedDeps = DFS.dfs(
-        dependencies,
-        CompiledModule::dependencies,
-        object : DFS.NodeHandler<CompiledModule, List<Pair<CompiledModule, ModuleDescriptorImpl>>> {
-
-            private val sortedDependencies = mutableListOf<Pair<CompiledModule, ModuleDescriptorImpl>>()
-
-            override fun beforeChildren(current: CompiledModule) = true
-
-            override fun afterChildren(current: CompiledModule) {
-                val md = loadKlibMetadata(current, klibModuleMap, lookupTracker, metadataVersion, languageSettings, runtimeModule)
-                klibModuleMap[current] = md
-                sortedDependencies += Pair(current, md)
-                if (current.isBuiltIn) runtimeModule = md
-            }
-
-            override fun result() = sortedDependencies
-        })
+    val dfsHandler: MetadataDFSHandler = DependencyMetadataLoader(lookupTracker, metadataVersion, languageSettings, storageManager)
+    val sortedDeps = DFS.dfs(dependencies, CompiledModule::dependencies, dfsHandler)
+    val builtInModule = sortedDeps.firstOrNull()?.moduleDescriptor // null in case compiling builtInModule itself
 
     val analysisResult =
         TopDownAnalyzerFacadeForJS.analyzeFiles(
             files,
             project,
             configuration,
-            sortedDeps.map { it.second },
+            sortedDeps.mapNotNull { it.moduleDescriptor },
             emptyList(),
-            thisIsBuiltInsModule = false,
-            customBuiltInsModule = runtimeModule
+            thisIsBuiltInsModule = builtInModule == null,
+            customBuiltInsModule = builtInModule
         )
 
     ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
@@ -295,11 +282,9 @@ private fun compileIntoJsAgainstKlib(
     )
 
     val deserializedModuleFragments = sortedDeps.map {
-        val moduleFile = File(it.first.klibPath, moduleHeaderFileName)
-        deserializer.deserializeIrModule(it.second, moduleFile.readBytes(), File(it.first.klibPath), false)
+        val moduleFile = File(it.klibPath, moduleHeaderFileName)
+        deserializer.deserializeIrModule(it.moduleDescriptor!!, moduleFile.readBytes(), File(it.klibPath), false)
     }
-
-//    val runtimeModuleFragment = deserializer.deserializeIrModule(runtimeModule, moduleFile.readBytes(), false)
 
     val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files, deserializer)
     val moduleName = configuration.get(CommonConfigurationKeys.MODULE_NAME) as String
@@ -323,9 +308,17 @@ private fun compileIntoJsAgainstKlib(
             dependencies,
             moduleFragment
         )
-        return CompiledModule(moduleName, null, null, moduleType, klibDirectory.absolutePath, dependencies, moduleType == ModuleType.TEST_RUNTIME)
+        return CompiledModule(
+            moduleName,
+            null,
+            null,
+            null,
+            moduleType,
+            klibDirectory.absolutePath,
+            dependencies,
+            moduleType == ModuleType.TEST_RUNTIME
+        )
     }
-
 
     val context = JsIrBackendContext(
         analysisResult.moduleDescriptor,
@@ -346,10 +339,10 @@ private fun compileIntoJsAgainstKlib(
         ).generateUnboundSymbolsAsDependencies(it)
     }
 
-    val files = deserializedModuleFragments.flatMap { it.files } + moduleFragment.files
+    val irFiles = deserializedModuleFragments.flatMap { it.files } + moduleFragment.files
 
     moduleFragment.files.clear()
-    moduleFragment.files += files
+    moduleFragment.files += irFiles
 
     moduleFragment.patchDeclarationParents()
 
@@ -357,12 +350,19 @@ private fun compileIntoJsAgainstKlib(
 
     val jsProgram = moduleFragment.accept(IrModuleToJsTransformer(context), null)
 
-    return CompiledModule(project.name, jsProgram.toString(), null, moduleType, "", emptyList(), moduleType == ModuleType.TEST_RUNTIME)
+    return CompiledModule(project.name, jsProgram.toString(), null, null, moduleType, "", emptyList(), moduleType == ModuleType.TEST_RUNTIME)
 }
 
-fun serializeModuleIntoKlib(moduleName: String, metadataVersion: JsKlibMetadataVersion, languageVersionSettings: LanguageVersionSettings, symbolTable: SymbolTable, bindingContext: BindingContext,
-                            klibDirectory: File, dependencies: List<CompiledModule>,
-                            moduleFragment: IrModuleFragment) {
+fun serializeModuleIntoKlib(
+    moduleName: String,
+    metadataVersion: JsKlibMetadataVersion,
+    languageVersionSettings: LanguageVersionSettings,
+    symbolTable: SymbolTable,
+    bindingContext: BindingContext,
+    klibDirectory: File,
+    dependencies: List<CompiledModule>,
+    moduleFragment: IrModuleFragment
+) {
     val declarationTable = DeclarationTable(moduleFragment.irBuiltins, DescriptorTable(), symbolTable)
 
     val serializedIr = IrModuleSerializer(logggg, declarationTable/*, onlyForInlines = false*/).serializedIrModule(moduleFragment)
@@ -422,10 +422,10 @@ private fun compileIntoJsAgainstCachedDeps(
             files,
             project,
             configuration,
-            dependencies.map { it.descriptor },
+            dependencies.mapNotNull { it.moduleDescriptor },
             emptyList(),
             thisIsBuiltInsModule = builtInsModule == null,
-            customBuiltInsModule = builtInsModule?.descriptor
+            customBuiltInsModule = builtInsModule?.moduleDescriptor
         )
 
     ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
@@ -456,7 +456,16 @@ private fun compileIntoJsAgainstCachedDeps(
         }
 
         ModuleType.SECONDARY -> {
-            return CompiledModule(moduleName, null, moduleFragment, moduleType, "", dependencies, moduleType == ModuleType.TEST_RUNTIME)
+            return CompiledModule(
+                moduleName,
+                null,
+                moduleFragment,
+                moduleFragment.descriptor as ModuleDescriptorImpl,
+                moduleType,
+                "",
+                dependencies,
+                moduleType == ModuleType.TEST_RUNTIME
+            )
         }
 
         ModuleType.TEST_RUNTIME -> {
@@ -477,7 +486,16 @@ private fun compileIntoJsAgainstCachedDeps(
 
     val jsProgram = moduleFragment.accept(IrModuleToJsTransformer(context), null)
 
-    return CompiledModule(moduleName, jsProgram.toString(), context.moduleFragmentCopy, moduleType, "", dependencies, moduleType == ModuleType.TEST_RUNTIME)
+    return CompiledModule(
+        moduleName,
+        jsProgram.toString(),
+        context.moduleFragmentCopy,
+        context.moduleFragmentCopy.descriptor as ModuleDescriptorImpl,
+        moduleType,
+        "",
+        dependencies,
+        moduleType == ModuleType.TEST_RUNTIME
+    )
 }
 
 private fun compileIntoKlib(
@@ -498,76 +516,41 @@ private fun compileIntoKlib(
             emptyList(), //dependencies.map { it.descriptor },
             emptyList(),
             thisIsBuiltInsModule = builtInsModule == null,
-            customBuiltInsModule = builtInsModule?.descriptor
+            customBuiltInsModule = builtInsModule?.moduleDescriptor
         )
 
     ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
 
     TopDownAnalyzerFacadeForJS.checkForErrors(files, analysisResult.bindingContext)
 
-    val irDependencies = dependencies.mapNotNull { it.moduleFragment }
-
     val symbolTable = SymbolTable()
 
-    val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
+    val languageVersionSettings = configuration.languageVersionSettings
+    val psi2IrTranslator = Psi2IrTranslator(languageVersionSettings)
     val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext, symbolTable)
 
     val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files)
-
-    val declarationTable = DeclarationTable(moduleFragment.irBuiltins, DescriptorTable(), psi2IrContext.symbolTable)
-
-    val serializedIr = IrModuleSerializer(logggg, declarationTable/*, onlyForInlines = false*/).serializedIrModule(moduleFragment)
-    val serializer = JsKlibMetadataSerializationUtil
-
-    val moduleName = configuration.get(CommonConfigurationKeys.MODULE_NAME) as String
     val metadataVersion = configuration.get(CommonConfigurationKeys.METADATA_VERSION)  as? JsKlibMetadataVersion
         ?: JsKlibMetadataVersion.INSTANCE
-    val moduleDescription =
-        JsKlibMetadataModuleDescriptor(moduleName, irDependencies.map { it.name.asString() }, moduleFragment.descriptor)
-    val serializedData = serializer.serializeMetadata(
+    val moduleName = configuration.get(CommonConfigurationKeys.MODULE_NAME) as String
+
+    serializeModuleIntoKlib(
+        moduleName,
+        metadataVersion,
+        languageVersionSettings,
+        symbolTable,
         psi2IrContext.bindingContext,
-        moduleDescription,
-        configuration.get(CommonConfigurationKeys.LANGUAGE_VERSION_SETTINGS)!!,
-        metadataVersion
-    ) { declarationDescriptor ->
-        val index = declarationTable.descriptorTable.get(declarationDescriptor)
-        index?.let { newDescriptorUniqId(it) }
-    }
+        klibDirectory,
+        dependencies,
+        moduleFragment
+    )
 
-    val klibDir = klibDirectory.also {
-        it.deleteRecursively()
-        it.mkdirs()
-    }
-
-    val moduleFile = File(klibDir, moduleHeaderFileName)
-    moduleFile.writeBytes(serializedIr.module)
-
-    val irDeclarationDir = File(klibDir, declarationsDirName).also { it.mkdir() }
-
-    for ((id, data) in serializedIr.declarations) {
-        val file = File(irDeclarationDir, id.declarationFileName)
-        file.writeBytes(data)
-    }
-
-
-    val debugFile = File(klibDir, debugDataFileName)
-
-    for ((id, data) in serializedIr.debugIndex) {
-        debugFile.appendText(id.toString())
-        debugFile.appendText(" --- ")
-        debugFile.appendText(data)
-        debugFile.appendText("\n")
-    }
-
-    File(klibDir, "${moduleDescription.name}.${JsKlibMetadataSerializationUtil.CLASS_METADATA_FILE_EXTENSION}").also {
-        it.writeBytes(serializedData.asByteArray())
-    }
 
     val jsProgram = if (generateJsCode) {
         val lookupTracker = configuration.get(CommonConfigurationKeys.LOOKUP_TRACKER, LookupTracker.DO_NOTHING)
         val (md, deserializedModuleFragment, st, irBuiltIns) = deserializerRuntimeKlib(
-            klibDir.absolutePath,
-            moduleDescription.name,
+            klibDirectory.absolutePath,
+            moduleName,
             lookupTracker,
             metadataVersion,
             configuration.languageVersionSettings,
@@ -583,5 +566,5 @@ private fun compileIntoKlib(
         deserializedModuleFragment.accept(IrModuleToJsTransformer(context), null)
     } else null
 
-    return CompiledModule(moduleName, jsProgram?.toString(), null, moduleType, klibDir.absolutePath, emptyList(), moduleType == ModuleType.TEST_RUNTIME)
+    return CompiledModule(moduleName, jsProgram?.toString(), null, null, moduleType, klibDirectory.absolutePath, emptyList(), moduleType == ModuleType.TEST_RUNTIME)
 }
