@@ -75,7 +75,7 @@ tasks.register<Test>("testsFromJps") {
 }
 
 tasks.register<Test>("testAdvanceGradleVersion") {
-    val gradleVersionForTests = "5.1.1"
+    val gradleVersionForTests = "5.3-20190219072348+0000"
     systemProperty("kotlin.gradle.version.for.tests", gradleVersionForTests)
     dependsOn(tasks.getByName("test").dependsOn)
     exclude(jpsIncrementalTestsClass)
