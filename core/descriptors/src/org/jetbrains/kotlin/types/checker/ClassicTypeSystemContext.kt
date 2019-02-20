@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.types.model.CaptureStatus
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
+import org.jetbrains.kotlin.types.typeUtil.canHaveUndefinedNullability
 import org.jetbrains.kotlin.types.typeUtil.contains
 
 interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
@@ -138,6 +139,14 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     }
 
 
+
+    private fun TypeVariance.convertVariance(): Variance {
+        return when (this) {
+            TypeVariance.INV -> Variance.INVARIANT
+            TypeVariance.IN -> Variance.IN_VARIANCE
+            TypeVariance.OUT -> Variance.OUT_VARIANCE
+        }
+    }
 
     override fun TypeArgumentMarker.getType(): KotlinTypeMarker {
         require(this is TypeProjection, this::errorMessage)
@@ -270,6 +279,11 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         return org.jetbrains.kotlin.types.checker.intersectTypes(types as List<UnwrappedType>)
     }
 
+    override fun intersectTypes(types: List<SimpleTypeMarker>): SimpleTypeMarker {
+        @Suppress("UNCHECKED_CAST")
+        return org.jetbrains.kotlin.types.checker.intersectTypes(types as List<SimpleType>)
+    }
+
     override fun Collection<KotlinTypeMarker>.singleBestRepresentative(): KotlinTypeMarker? {
         return singleBestRepresentative(this as Collection<KotlinType>)
     }
@@ -343,6 +357,33 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     override fun KotlinTypeMarker.isNullableType(): Boolean {
         require(this is KotlinType)
         return TypeUtils.isNullableType(this)
+    }
+
+    override fun createSimpleType(
+        constructor: TypeConstructorMarker,
+        arguments: List<TypeArgumentMarker>,
+        nullable: Boolean
+    ): SimpleTypeMarker {
+        require(constructor is TypeConstructor)
+        @Suppress("UNCHECKED_CAST")
+        return KotlinTypeFactory.simpleType(Annotations.EMPTY, constructor, arguments as List<TypeProjection>, nullable)
+    }
+
+    override fun createTypeArgument(type: KotlinTypeMarker, variance: TypeVariance): TypeArgumentMarker {
+        require(type is KotlinType)
+        return TypeProjectionImpl(variance.convertVariance(), type)
+    }
+
+    override fun createStarProjection(typeParameter: TypeParameterMarker): TypeArgumentMarker {
+        require(typeParameter is TypeParameterDescriptor)
+        return StarProjectionImpl(typeParameter)
+    }
+
+    override fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean {
+        require(this is UnwrappedType)
+        return constructor is NewTypeVariableConstructor ||
+                constructor.declarationDescriptor is TypeParameterDescriptor ||
+                this is NewCapturedType
     }
 }
 

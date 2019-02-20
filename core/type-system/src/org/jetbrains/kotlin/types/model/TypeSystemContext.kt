@@ -66,6 +66,7 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext {
     fun SimpleTypeMarker.makeSimpleTypeDefinitelyNotNullOrNotNull(): SimpleTypeMarker
 
     fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker
+    fun createSimpleType(constructor: TypeConstructorMarker, arguments: List<TypeArgumentMarker>, nullable: Boolean): SimpleTypeMarker
 
 
     fun KotlinTypeMarker.removeAnnotations(): KotlinTypeMarker
@@ -83,6 +84,16 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext {
 
     fun KotlinTypeMarker.isNullableAny() = this.typeConstructor().isAnyConstructor() && this.isNullableType()
     fun KotlinTypeMarker.isNothing() = this.typeConstructor().isNothingConstructor() && !this.isNullableType()
+
+    fun createTypeArgument(type: KotlinTypeMarker, variance: TypeVariance): TypeArgumentMarker
+    fun createStarProjection(typeParameter: TypeParameterMarker): TypeArgumentMarker
+
+    fun KotlinTypeMarker.anySuperTypeConstructor(predicate: (TypeConstructorMarker) -> Boolean) =
+        newBaseTypeCheckerContext().anySupertype(lowerBoundIfFlexible(), {
+            predicate(it.typeConstructor())
+        }, { AbstractTypeCheckerContext.SupertypesPolicy.LowerIfFlexible })
+
+    fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean
 }
 
 
@@ -204,6 +215,7 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun SimpleTypeMarker.isSingleClassifierType(): Boolean
 
     fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker
+    fun intersectTypes(types: List<SimpleTypeMarker>): SimpleTypeMarker
 
     fun KotlinTypeMarker.isSimpleType() = asSimpleType() != null
 }
