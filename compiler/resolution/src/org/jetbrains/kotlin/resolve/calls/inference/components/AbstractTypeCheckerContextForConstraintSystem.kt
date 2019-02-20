@@ -5,8 +5,10 @@
 
 package org.jetbrains.kotlin.resolve.calls.inference.components
 
-import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.AbstractNullabilityChecker
+import org.jetbrains.kotlin.types.AbstractTypeChecker
+import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
+import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.checker.*
 import org.jetbrains.kotlin.types.model.*
 
@@ -14,6 +16,7 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
 
     override val KotlinTypeMarker.isAllowedTypeVariable: Boolean
         get() = false
+
     override val isErrorTypeEqualsToAnything: Boolean
         get() = true
 
@@ -37,16 +40,14 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
      * override val sameConstructorPolicy get() = SeveralSupertypesWithSameConstructorPolicy.TAKE_FIRST_FOR_SUBTYPING
      */
     final override fun addSubtypeConstraint(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean? {
-        require(subType is UnwrappedType)
-        require(superType is UnwrappedType)
         val hasNoInfer = subType.isTypeVariableWithNoInfer() || superType.isTypeVariableWithNoInfer()
         if (hasNoInfer) return true
 
         val hasExact = subType.isTypeVariableWithExact() || superType.isTypeVariableWithExact()
 
         // we should strip annotation's because we have incorporation operation and they should be not affected
-        val mySubType = if (hasExact) subType.replaceAnnotations(Annotations.EMPTY) else subType
-        val mySuperType = if (hasExact) superType.replaceAnnotations(Annotations.EMPTY) else superType
+        val mySubType = if (hasExact) subType.removeAnnotations() else subType
+        val mySuperType = if (hasExact) superType.removeAnnotations() else superType
 
         val result = internalAddSubtypeConstraint(mySubType, mySuperType)
         if (!hasExact) return result
@@ -57,10 +58,10 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
         return (result ?: true) && (result2 ?: true)
     }
 
-    private fun UnwrappedType.isTypeVariableWithExact() =
+    private fun KotlinTypeMarker.isTypeVariableWithExact() =
         anyBound(this@AbstractTypeCheckerContextForConstraintSystem::isMyTypeVariable) && hasExactAnnotation()
 
-    private fun UnwrappedType.isTypeVariableWithNoInfer() =
+    private fun KotlinTypeMarker.isTypeVariableWithNoInfer() =
         anyBound(this@AbstractTypeCheckerContextForConstraintSystem::isMyTypeVariable) && hasNoInferAnnotation()
 
     private fun internalAddSubtypeConstraint(subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean? {
@@ -205,7 +206,13 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
         val notTypeVariables = subIntersectionTypes.filterNot(this::isMyTypeVariable)
 
         // todo: may be we can do better then that.
-        if (notTypeVariables.isNotEmpty() && AbstractTypeChecker.isSubtypeOf(ClassicTypeCheckerContext(true), intersectTypes(notTypeVariables) as KotlinType, superType)) {
+        if (notTypeVariables.isNotEmpty() &&
+            AbstractTypeChecker.isSubtypeOf(
+                ClassicTypeCheckerContext(true),
+                intersectTypes(notTypeVariables),
+                superType
+            )
+        ) {
             return true
         }
 

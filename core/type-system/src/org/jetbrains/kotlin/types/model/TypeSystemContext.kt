@@ -66,6 +66,13 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext {
     fun SimpleTypeMarker.makeSimpleTypeDefinitelyNotNullOrNotNull(): SimpleTypeMarker
 
     fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker
+
+
+    fun KotlinTypeMarker.removeAnnotations(): KotlinTypeMarker
+
+
+    fun KotlinTypeMarker.hasExactAnnotation(): Boolean
+    fun KotlinTypeMarker.hasNoInferAnnotation(): Boolean
 }
 
 

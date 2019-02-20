@@ -8,7 +8,10 @@ package org.jetbrains.kotlin.types.checker
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.resolve.calls.inference.CapturedType
+import org.jetbrains.kotlin.resolve.descriptorUtil.hasExactAnnotation
+import org.jetbrains.kotlin.resolve.descriptorUtil.hasNoInferAnnotation
 import org.jetbrains.kotlin.resolve.constants.IntegerLiteralTypeConstructor
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
@@ -313,7 +316,31 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     }
 
 
+    override fun KotlinTypeMarker.removeAnnotations(): KotlinTypeMarker {
+        require(this is UnwrappedType)
+        return this.replaceAnnotations(Annotations.EMPTY)
+    }
+
+    override fun KotlinTypeMarker.hasExactAnnotation(): Boolean {
+        require(this is UnwrappedType)
+        return hasExactInternal(this)
+    }
+
+    override fun KotlinTypeMarker.hasNoInferAnnotation(): Boolean {
+        require(this is UnwrappedType)
+        return hasNoInferInternal(this)
+    }
 }
+
+private fun hasNoInferInternal(type: UnwrappedType): Boolean {
+    return type.hasNoInferAnnotation()
+}
+
+
+private fun hasExactInternal(type: UnwrappedType): Boolean {
+    return type.hasExactAnnotation()
+}
+
 
 private fun makeDefinitelyNotNullOrNotNullInternal(type: UnwrappedType): UnwrappedType {
     return type.makeDefinitelyNotNullOrNotNull()
