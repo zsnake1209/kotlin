@@ -312,8 +312,16 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         return TypeCheckerContext(false)
     }
 
-    override fun nullableNothingType(): KotlinTypeMarker {
+    override fun nullableNothingType(): SimpleTypeMarker {
         return builtIns.nullableNothingType
+    }
+
+    override fun nullableAnyType(): SimpleTypeMarker {
+        return builtIns.nullableAnyType
+    }
+
+    override fun nothingType(): SimpleTypeMarker {
+        return builtIns.nothingType
     }
 
     val builtIns: KotlinBuiltIns get() = throw UnsupportedOperationException("Not supported")
@@ -384,6 +392,21 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         return constructor is NewTypeVariableConstructor ||
                 constructor.declarationDescriptor is TypeParameterDescriptor ||
                 this is NewCapturedType
+    }
+
+    override fun SimpleTypeMarker.replaceArguments(newArguments: List<TypeArgumentMarker>): SimpleTypeMarker {
+        require(this is SimpleType)
+        return this.replace(newArguments as List<TypeProjection>)
+    }
+
+    override fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
+        require(type is UnwrappedType)
+        return NewKotlinTypeChecker.transformToNewType(type)
+    }
+
+    override fun DefinitelyNotNullTypeMarker.original(): SimpleTypeMarker {
+        require(this is DefinitelyNotNullType)
+        return this.original
     }
 }
 

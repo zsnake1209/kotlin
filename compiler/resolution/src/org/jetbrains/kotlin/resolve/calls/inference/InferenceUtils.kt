@@ -65,7 +65,7 @@ fun CallableDescriptor.substituteAndApproximateCapturedTypes(substitutor: NewTyp
 
         override fun prepareTopLevelType(topLevelType: KotlinType, position: Variance) =
             substitutor.safeSubstitute(topLevelType.unwrap()).let { substitutedType ->
-                TypeApproximator().approximateToSuperType(substitutedType, TypeApproximatorConfiguration.CapturedAndIntegerLiteralsTypesApproximation)
+                TypeApproximator(builtIns).approximateToSuperType(substitutedType, TypeApproximatorConfiguration.CapturedAndIntegerLiteralsTypesApproximation)
                         ?: substitutedType
             }
     }

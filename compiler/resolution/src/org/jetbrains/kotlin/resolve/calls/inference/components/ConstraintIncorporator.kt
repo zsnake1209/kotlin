@@ -153,7 +153,7 @@ class ConstraintIncorporator(
         }
     }
 
-    private fun approximateCapturedTypes(type: UnwrappedType, toSuper: Boolean): UnwrappedType =
+    private fun approximateCapturedTypes(type: KotlinTypeMarker, toSuper: Boolean): KotlinTypeMarker =
         if (toSuper) typeApproximator.approximateToSuperType(type, TypeApproximatorConfiguration.IncorporationConfiguration) ?: type
         else typeApproximator.approximateToSubType(type, TypeApproximatorConfiguration.IncorporationConfiguration) ?: type
 }

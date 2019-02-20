@@ -25,10 +25,12 @@ interface TypeArgumentListMarker
 interface TypeVariableMarker
 
 
-enum class TypeVariance {
-    IN,
-    OUT,
-    INV
+enum class TypeVariance(val presentation: String) {
+    IN("in"),
+    OUT("out"),
+    INV("");
+
+    override fun toString(): String = presentation
 }
 
 
@@ -39,7 +41,13 @@ interface TypeSystemOptimizationContext {
     fun identicalArguments(a: SimpleTypeMarker, b: SimpleTypeMarker) = false
 }
 
-interface TypeSystemInferenceExtensionContext : TypeSystemContext {
+interface TypeSystemBuiltInsContext {
+    fun nullableNothingType(): SimpleTypeMarker
+    fun nullableAnyType(): SimpleTypeMarker
+    fun nothingType(): SimpleTypeMarker
+}
+
+interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBuiltInsContext {
     fun KotlinTypeMarker.contains(predicate: (KotlinTypeMarker) -> Boolean): Boolean
 
     fun TypeConstructorMarker.isUnitTypeConstructor(): Boolean
@@ -57,8 +65,6 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext {
 
     fun newBaseTypeCheckerContext(): AbstractTypeCheckerContext
 
-    fun nullableNothingType(): KotlinTypeMarker
-
     fun KotlinTypeMarker.withNullability(nullable: Boolean): KotlinTypeMarker
 
 
@@ -71,6 +77,7 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext {
 
     fun KotlinTypeMarker.removeAnnotations(): KotlinTypeMarker
 
+    fun SimpleTypeMarker.replaceArguments(newArguments: List<TypeArgumentMarker>): SimpleTypeMarker
 
     fun KotlinTypeMarker.hasExactAnnotation(): Boolean
     fun KotlinTypeMarker.hasNoInferAnnotation(): Boolean
@@ -94,6 +101,8 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext {
         }, { AbstractTypeCheckerContext.SupertypesPolicy.LowerIfFlexible })
 
     fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean
+
+    fun DefinitelyNotNullTypeMarker.original(): SimpleTypeMarker
 }
 
 
@@ -218,6 +227,8 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
     fun intersectTypes(types: List<SimpleTypeMarker>): SimpleTypeMarker
 
     fun KotlinTypeMarker.isSimpleType() = asSimpleType() != null
+
+    fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker
 }
 
 enum class CaptureStatus {

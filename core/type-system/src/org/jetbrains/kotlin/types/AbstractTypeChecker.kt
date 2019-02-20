@@ -21,7 +21,7 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 
     abstract fun areEqualTypeConstructors(a: TypeConstructorMarker, b: TypeConstructorMarker): Boolean
 
-    open fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
+    override fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
         return type
     }
 

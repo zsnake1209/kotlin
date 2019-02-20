@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 open class ClassicTypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowedTypeVariable: Boolean = true) : ClassicTypeSystemContext, AbstractTypeCheckerContext() {
 
     override fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
-        return super.prepareType(transformToNewType((type as KotlinType).unwrap()))
+        return transformToNewType((type as KotlinType).unwrap())
     }
 
     override val isErrorTypeEqualsToAnything: Boolean
