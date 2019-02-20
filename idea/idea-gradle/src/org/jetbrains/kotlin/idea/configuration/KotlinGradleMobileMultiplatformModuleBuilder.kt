@@ -314,7 +314,9 @@ sdk.dir=PleaseSpecifyAndroidSdkPathHere
                 // This is for iPhone emulator
                 // Switch here to iosArm64 (or iosArm32) to build library for iPhone device
                 iosX64("$nativeTargetName") {
-                    compilations.main.outputKinds("framework")
+                    binaries {
+                        framework()
+                    }
                 }
                 sourceSets {
                     $commonSourceName {
@@ -354,10 +356,10 @@ sdk.dir=PleaseSpecifyAndroidSdkPathHere
             task copyFramework {
                 def buildType = project.findProperty('kotlin.build.type') ?: 'DEBUG'
                 def target = project.findProperty('kotlin.target') ?: 'ios'
-                dependsOn kotlin.targets."${"$"}target".compilations.main.linkTaskName('FRAMEWORK', buildType)
+                dependsOn kotlin.targets."${"$"}target".binaries.getFramework(buildType).linkTask
 
                 doLast {
-                    def srcFile = kotlin.targets."${"$"}target".compilations.main.getBinary('FRAMEWORK', buildType)
+                    def srcFile = kotlin.targets."${"$"}target".binaries.getFramework(buildType).outputFile
                     def targetDir = getProperty('configuration.build.dir')
                     copy {
                         from srcFile.parent
