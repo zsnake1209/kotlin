@@ -101,7 +101,6 @@ class JvmDeclarationFactory(
             parent = oldConstructor.parent
             returnType = oldConstructor.returnType
             copyTypeParametersFrom(oldConstructor)
-            extensionReceiverParameter = oldConstructor.extensionReceiverParameter?.copyTo(this)
 
             val outerThisType = oldConstructor.parentAsClass.parentAsClass.defaultType
             val outerThisDescriptor = WrappedValueParameterDescriptor()
