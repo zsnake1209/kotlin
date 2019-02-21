@@ -120,9 +120,7 @@ class JvmDeclarationFactory(
             }
             valueParameters.add(outerThisValueParameter)
 
-            oldConstructor.valueParameters.forEach {
-                valueParameters.add(it.index + 1, it.copyTo(this, index = it.index + 1))
-            }
+            oldConstructor.valueParameters.mapTo(valueParameters) { it.copyTo(this, index = it.index + 1) }
         }
     }
 
