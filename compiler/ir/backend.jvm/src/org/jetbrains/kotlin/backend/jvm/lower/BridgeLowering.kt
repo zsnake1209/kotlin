@@ -323,6 +323,7 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
     }
 
     /* Perform type erasure as much as is significant for JVM signature generation. */
+    // TODO: should be a type mapper functionality.
     private fun IrType.eraseTypeParameters() = when (this) {
         is IrErrorType -> this
         is IrSimpleType -> {
