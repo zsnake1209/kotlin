@@ -49,6 +49,8 @@ private const val COROUTINES_METADATA_METHOD_NAME_JVM_NAME = "m"
 private const val COROUTINES_METADATA_CLASS_NAME_JVM_NAME = "c"
 private const val COROUTINES_METADATA_VERSION_JVM_NAME = "v"
 
+const val SUSPEND_FUNCTION_CONTINUATION_PARAMETER = "\$completion"
+
 class CoroutineTransformerMethodVisitor(
     delegate: MethodVisitor,
     access: Int,
@@ -215,7 +217,7 @@ class CoroutineTransformerMethodVisitor(
         }
         methodNode.localVariables.add(
             LocalVariableNode(
-                "\$completion",
+                SUSPEND_FUNCTION_CONTINUATION_PARAMETER,
                 languageVersionSettings.continuationAsmType().descriptor,
                 null,
                 startLabel,
@@ -267,10 +269,10 @@ class CoroutineTransformerMethodVisitor(
 
     private fun fixLvtForParameters(methodNode: MethodNode, startLabel: LabelNode, endLabel: LabelNode) {
         val paramsNum =
-                /* this */ (if (internalNameForDispatchReceiver != null) 1 else 0) +
-                /* real params */ Type.getArgumentTypes(methodNode.desc).size
+                /* this */ (if (isStatic(methodNode.access)) 0 else 1) +
+                /* real params */ Type.getArgumentTypes(methodNode.desc).fold(0) { a, b -> a + b.size }
 
-        for (i in 0..paramsNum) {
+        for (i in 0 until paramsNum) {
             fixRangeOfLvtRecord(methodNode, i, startLabel, endLabel)
         }
     }
