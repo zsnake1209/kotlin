@@ -1,8 +1,8 @@
-LineBreakpoint created at stringUpdate.kt:22
+LineBreakpoint created at stringUpdatePutField.kt:24
 Run Java
 Connected to the target VM
-stringUpdate.kt:22
-Compile bytecode for s
+stringUpdatePutField.kt:24
+Compile bytecode for a.s
 Disconnected from the target VM
 
 Process finished with exit code 0
