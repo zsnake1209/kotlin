@@ -15,6 +15,17 @@ pluginManagement {
     }
 }
 
+buildCache {
+    remote(HttpBuildCache) {
+        url = 'http://204.44.75.204:7777/cache/'
+        push = true
+        credentials {
+            username = 'ci-user'
+            password = 'somePassword'
+        }
+    }
+}
+
 // modules
 include ":kotlin-build-common",
         ":compiler",
