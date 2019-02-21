@@ -25,10 +25,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
-import org.jetbrains.kotlin.ir.util.hasAnnotation
-import org.jetbrains.kotlin.ir.util.isInterface
-import org.jetbrains.kotlin.ir.util.parentAsClass
-import org.jetbrains.kotlin.ir.util.resolveFakeOverride
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
 import java.util.function.UnaryOperator
@@ -64,7 +61,7 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementVis
         }
 
         val toRemove = mutableListOf<IrSimpleFunction>()
-        for (function in actualClass.declarations.filterIsInstance<IrSimpleFunction>()) {
+        for (function in actualClass.functions.toList()) { // Copy the list, because we are adding new declarations from the loop
             if (function.origin !== IrDeclarationOrigin.FAKE_OVERRIDE) continue
 
             // In classes, only generate interface delegation for functions immediately inherited from am interface.
@@ -72,7 +69,7 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementVis
             if (!isDefaultImplsGeneration &&
                 function.overriddenSymbols.any {
                     !it.owner.parentAsClass.isInterface &&
-                            it.owner.resolveFakeOverride()?.modality != Modality.ABSTRACT
+                            it.owner.modality != Modality.ABSTRACT
                 }) {
                 continue
             }
@@ -161,10 +158,6 @@ class InterfaceDelegationLowering(val context: JvmBackendContext) : IrElementVis
             super.visitSimpleFunction(declaration)
         }
     }
-
-    private fun IrSimpleFunction.isMethodOfAny() =
-        ((valueParameters.size == 0 && name.asString() in setOf("hashCode", "toString")) ||
-                (valueParameters.size == 1 && name.asString() == "equals" && valueParameters[0].type == context.irBuiltIns.anyType))
 
     private fun IrSimpleFunction.hasInterfaceParent() =
         (parent as? IrClass)?.isInterface == true
