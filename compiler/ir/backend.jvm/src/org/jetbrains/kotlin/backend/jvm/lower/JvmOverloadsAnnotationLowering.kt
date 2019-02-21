@@ -28,6 +28,8 @@ import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 import org.jetbrains.kotlin.resolve.jvm.annotations.JVM_OVERLOADS_FQ_NAME
 
+// TODO: `IrValueParameter.defaultValue` property does not track default values in super-parameters. See KT-28637.
+
 class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLoweringPass {
 
     override fun lower(irClass: IrClass) {
@@ -41,7 +43,7 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
     }
 
     private fun generateWrappers(target: IrFunction, irClass: IrClass) {
-        val numDefaultParameters = target.symbol.descriptor.valueParameters.count { it.hasDefaultValue() }
+        val numDefaultParameters = target.valueParameters.count { it.defaultValue != null }
         for (i in 0 until numDefaultParameters) {
             val wrapper = generateWrapper(target, i)
             irClass.addMember(wrapper)
@@ -71,7 +73,7 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
         var parametersCopied = 0
         var defaultParametersCopied = 0
         for ((i, valueParameter) in target.valueParameters.withIndex()) {
-            if ((valueParameter.descriptor as ValueParameterDescriptor).hasDefaultValue()) {
+            if (valueParameter.defaultValue != null) {
                 if (defaultParametersCopied < numDefaultParametersToExpect) {
                     defaultParametersCopied++
                     call.putValueArgument(
@@ -168,8 +170,8 @@ class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : ClassLowe
                         this,
                         index = parametersCopied++,
                         defaultValue = null,
-                        isCrossinline = false,
-                        isNoinline = false
+                        isCrossinline = oldValueParameter.isCrossinline,
+                        isNoinline = oldValueParameter.isNoinline
                     )
                 )
             } else if (oldValueParameter.defaultValue == null) {
