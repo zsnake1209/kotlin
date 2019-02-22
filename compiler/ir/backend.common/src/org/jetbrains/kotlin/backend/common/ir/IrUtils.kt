@@ -53,7 +53,6 @@ import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.io.StringWriter
 
 
@@ -283,9 +282,8 @@ fun IrFunction.copyValueParametersToStatic(
     Type parameters should correspond to the function where they are defined.
     `source` is where the type is originally taken from.
  */
-fun IrType.remapTypeParameters(source: IrTypeParametersContainer, target: IrTypeParametersContainer, shift: Int = 0): IrType {
-    if (target.isContainedIn(source)) return this
-    return when (this) {
+fun IrType.remapTypeParameters(source: IrTypeParametersContainer, target: IrTypeParametersContainer, shift: Int = 0): IrType =
+    when (this) {
         is IrSimpleType -> {
             val classifier = classifier.owner
             when {
@@ -313,13 +311,6 @@ fun IrType.remapTypeParameters(source: IrTypeParametersContainer, target: IrType
         }
         else -> this
     }
-}
-
-tailrec fun IrDeclaration.isContainedIn(where: IrDeclaration): Boolean = when {
-    this == where -> true
-    parent !is IrDeclaration -> false
-    else -> (parent as IrDeclaration).isContainedIn(where)
-}
 
 /* Copied from K/N */
 fun IrDeclarationContainer.addChild(declaration: IrDeclaration) {
