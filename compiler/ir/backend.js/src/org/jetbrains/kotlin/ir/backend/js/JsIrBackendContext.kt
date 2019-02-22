@@ -133,9 +133,6 @@ class JsIrBackendContext(
     fun functionN(n: Int) = symbolTable.lazyWrapper.referenceClass(builtIns.getFunction(n))
     fun suspendFunctionN(n: Int) = symbolTable.lazyWrapper.referenceClass(builtIns.getSuspendFunction(n))
 
-//    val functions by lazy { (0..22).map { symbolTable.referenceClass(builtIns.getFunction(it)) } }
-//    val suspendFunctions by lazy { (0..22).map { symbolTable.referenceClass(builtIns.getSuspendFunction(it)) } }
-
     private fun primitivesWithImplicitCompanionObject(): List<Name> {
         val numbers = PrimitiveType.NUMBER_TYPES
             .filter { it.name != "LONG" && it.name != "CHAR" } // skip due to they have own explicit companions
@@ -145,10 +142,6 @@ class JsIrBackendContext(
     }
 
     val dynamicType = IrDynamicTypeImpl(createDynamicType(builtIns), emptyList(), Variance.INVARIANT)
-
-    val originalModuleIndex = ModuleIndex(irModuleFragment)
-
-    lateinit var moduleFragmentCopy: IrModuleFragment
 
     fun getOperatorByName(name: Name, type: KotlinType) = operatorMap[name]?.get(type)
 
