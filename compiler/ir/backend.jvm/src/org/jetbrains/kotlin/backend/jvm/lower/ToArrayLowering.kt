@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.codegen.isJvmInterface
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irCall
@@ -20,6 +21,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
@@ -28,6 +30,7 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.utils.DFS
 
 class ToArrayLowering(private val context: JvmBackendContext) : ClassLoweringPass {
 
@@ -36,7 +39,7 @@ class ToArrayLowering(private val context: JvmBackendContext) : ClassLoweringPas
 
         val irBuiltIns = context.irBuiltIns
 
-        if (!irClass.hasSuperClass { it.defaultType.isCollection() }) return
+        if (!irClass.isCollectionSubClass()) return
 
         if (irClass.hasSuperClass {
                 it != irClass &&
@@ -64,7 +67,7 @@ class ToArrayLowering(private val context: JvmBackendContext) : ClassLoweringPas
                 superTypes.add(irBuiltIns.anyNType)
             }
 
-            val substitutedArrayType = irBuiltIns.getArrayType(Variance.INVARIANT, typeParameter.defaultType)
+            val substitutedArrayType = irBuiltIns.arrayClass.typeWith(typeParameter.defaultType)
             val functionDescriptor = WrappedSimpleFunctionDescriptor()
             val irFunction = IrFunctionImpl(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,
@@ -143,7 +146,7 @@ class ToArrayLowering(private val context: JvmBackendContext) : ClassLoweringPas
                 toArrayName,
                 Visibilities.PUBLIC,
                 Modality.OPEN,
-                returnType = irBuiltIns.getArrayType(Variance.INVARIANT, irBuiltIns.anyType),
+                returnType = irBuiltIns.arrayClass.typeWith(irBuiltIns.anyType),
                 isInline = false,
                 isExternal = false,
                 isTailrec = false,
@@ -184,13 +187,14 @@ class ToArrayLowering(private val context: JvmBackendContext) : ClassLoweringPas
     }
 
     private val kotlinJvmInternalPackageFragment: IrPackageFragment by lazy {
-        val descriptor = WrappedPackageFragmentDescriptor(context.builtIns.builtInsModule) // TODO: what module should we pass here?
         IrExternalPackageFragmentImpl(
-            IrExternalPackageFragmentSymbolImpl(descriptor),
-            FqName("kotlin.jvm.internal")
-        ).apply {
-            descriptor.bind(this)
-        }
+            IrExternalPackageFragmentSymbolImpl(
+                EmptyPackageFragmentDescriptor(
+                    context.ir.irModule.descriptor,
+                    FqName("kotlin.jvm.internal")
+                )
+            )
+        )
     }
 
     private val collectionUtilClass: IrClass by lazy {
@@ -218,7 +222,7 @@ class ToArrayLowering(private val context: JvmBackendContext) : ClassLoweringPas
 
     private fun createToArrayUtilFunction(isGeneric: Boolean): IrSimpleFunction {
         val irBuiltIns = context.irBuiltIns
-        val arrayType = irBuiltIns.getArrayType(Variance.INVARIANT, irBuiltIns.anyNType)
+        val arrayType = irBuiltIns.arrayClass.typeWith(irBuiltIns.anyNType)
 
         val utilFunctionDescriptor = WrappedSimpleFunctionDescriptor()
         return IrFunctionImpl(
@@ -279,8 +283,23 @@ class ToArrayLowering(private val context: JvmBackendContext) : ClassLoweringPas
 
     private val nonGenericToArrayUtilFunction: IrSimpleFunction by lazy { createToArrayUtilFunction(false) }
     private val genericToArrayUtilFunction: IrSimpleFunction by lazy { createToArrayUtilFunction(true) }
-}
 
+
+    private fun IrDeclaration.isGenericToArray(): Boolean {
+        if (this !is IrSimpleFunction) return false
+        val signature = context.state.typeMapper.mapAsmMethod(descriptor)
+        return signature.toString() == "toArray([Ljava/lang/Object;)[Ljava/lang/Object;"
+    }
+
+    private fun IrDeclaration.isNonGenericToArray(): Boolean {
+        if (this !is IrSimpleFunction) return false
+        if (this.name.asString() != "toArray") return false
+        if (!typeParameters.isEmpty() || !valueParameters.isEmpty()) return false
+        if (!returnType.isArray()) return false
+
+        return true
+    }
+}
 
 private fun IrType.hasSuperType(pred: (IrType) -> Boolean): Boolean {
     val alreadyVisited = mutableSetOf<IrType>()
@@ -305,48 +324,14 @@ private fun IrType.hasSuperType(pred: (IrType) -> Boolean): Boolean {
 }
 
 private fun IrClass.hasSuperClass(pred: (IrClass) -> Boolean): Boolean =
-    defaultType.hasSuperType { type ->
-        type is IrSimpleType && type.classifier.owner.let {
-            it is IrClass && pred(it)
-        }
-    }
+    DFS.ifAny(
+        listOf(this),
+        { irClass -> irClass.superTypes.mapNotNull { ((it as? IrSimpleType)?.classifier as? IrClassSymbol)?.owner } },
+        pred
+    )
 
 // Have to check by name, since irBuiltins is unreliable.
 private fun IrClass.isCollectionSubClass() =
     hasSuperClass {
         it.defaultType.isCollection()
     }
-
-private fun IrDeclaration.isGenericToArray(): Boolean {
-    if (this !is IrSimpleFunction) return false
-    if (this.name.asString() != "toArray") return false
-    if (typeParameters.size != 1 || valueParameters.size != 1) return false
-    if (!returnType.isArray()) return false
-
-    val paramType = valueParameters[0].type
-    if (!paramType.isArray()) return false
-
-    val elementType = typeParameters[0].defaultType
-
-    // TODO: check type equality directly on IrTypes
-    if (elementType.toKotlinType() != ((returnType as IrSimpleType).arguments[0] as? IrTypeProjection)?.type?.toKotlinType()) return false
-    if (elementType.toKotlinType() != ((paramType as IrSimpleType).arguments[0] as? IrTypeProjection)?.type?.toKotlinType()) return false
-    return true
-}
-
-private fun IrDeclaration.isNonGenericToArray(): Boolean {
-    if (this !is IrSimpleFunction) return false
-    if (this.name.asString() != "toArray") return false
-    if (!typeParameters.isEmpty() || !valueParameters.isEmpty()) return false
-    if (!returnType.isArray()) return false
-
-    return true
-}
-
-private fun IrBuiltIns.getArrayType(variance: Variance, elemType: IrType) =
-    IrSimpleTypeImpl(
-        arrayClass,
-        hasQuestionMark = false,
-        arguments = listOf(makeTypeProjection(elemType, variance)),
-        annotations = emptyList()
-    )
