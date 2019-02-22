@@ -13,13 +13,11 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.ir.backend.js.CompilationMode
-import org.jetbrains.kotlin.ir.backend.js.ModuleType
 import org.jetbrains.kotlin.ir.backend.js.compile
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.test.JsIrTestRuntime
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.serialization.js.ModuleKind
-import org.jetbrains.kotlin.test.KotlinTestUtils
 import java.io.File
 
 fun buildConfiguration(environment: KotlinCoreEnvironment): CompilerConfiguration {
@@ -41,8 +39,6 @@ fun buildConfiguration(environment: KotlinCoreEnvironment): CompilerConfiguratio
 
     return runtimeConfiguration
 }
-
-private val stdKlibFile = File("js/js.translator/testData/out/klibs/stdlib.klib")
 
 private val resultJs = "js/js.translator/testData/out/klibs/result.js"
 private val runtimeKlibPath = "js/js.translator/testData/out/klibs/runtime/"
@@ -67,12 +63,8 @@ fun main() {
         emptyList(),
         CompilationMode.KLIB_WITH_JS,
         emptyList(),
-        null,
-        ModuleType.TEST_RUNTIME,
-        File(runtimeKlibPath)
+        runtimeKlibPath
     )
 
-    File(resultJs).writeText(result.generatedCode!!)
-
-//    TODO("Write library into $stdKlibFile")
+    result.generatedCode?.let { File(resultJs).writeText(it) }
 }

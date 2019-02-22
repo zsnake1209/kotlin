@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.js.test
 
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.ir.backend.js.CompilationMode
-import org.jetbrains.kotlin.ir.backend.js.ModuleType
 import org.jetbrains.kotlin.ir.backend.js.CompiledModule
 import org.jetbrains.kotlin.ir.backend.js.compile
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
@@ -24,7 +23,7 @@ private val runtimeKlibPath = "js/js.translator/testData/out/klibs/runtime/"
 
 private val JS_IR_RUNTIME_MODULE_NAME = "JS_IR_RUNTIME"
 
-private val runtimeKlib = CompiledModule(JS_IR_RUNTIME_MODULE_NAME, null, null, null, ModuleType.TEST_RUNTIME, runtimeKlibPath, emptyList(), true)
+private val runtimeKlib = CompiledModule(JS_IR_RUNTIME_MODULE_NAME, null, null, runtimeKlibPath, emptyList(), true)
 
 abstract class BasicIrBoxTest(
     pathToTestDir: String,
@@ -83,29 +82,6 @@ abstract class BasicIrBoxTest(
             )
         )
 
-//        val runtimeConfiguration = config.configuration.copy()
-//
-//        // TODO: is it right in general? Maybe sometimes we need to compile with newer versions or with additional language features.
-//        runtimeConfiguration.languageVersionSettings = LanguageVersionSettingsImpl(
-//            LanguageVersion.LATEST_STABLE, ApiVersion.LATEST_STABLE,
-//            specificFeatures = mapOf(
-//                LanguageFeature.AllowContractsForCustomFunctions to LanguageFeature.State.ENABLED,
-//                LanguageFeature.MultiPlatformProjects to LanguageFeature.State.ENABLED
-//            ),
-//            analysisFlags = mapOf(
-//                AnalysisFlags.useExperimental to listOf("kotlin.contracts.ExperimentalContracts", "kotlin.Experimental"),
-//                AnalysisFlags.allowResultReturnType to true
-//            )
-//        )
-
-//        val runtimeFile = File(runtime.path)
-//        val runtimeResult = runtimeResults.getOrPut(runtime) {
-//            runtimeConfiguration.put(CommonConfigurationKeys.MODULE_NAME, "JS_IR_RUNTIME")
-//            val result = compile(config.project, runtime.sources.map(::createPsiFile), runtimeConfiguration, moduleType = ModuleType.TEST_RUNTIME)
-//            runtimeFile.write(result.generatedCode!!)
-//            result
-//        }
-//
         val dependencyNames = config.configuration[JSConfigurationKeys.LIBRARIES]!!.map { File(it).name }
         val dependencies = listOf(runtimeKlib) + dependencyNames.mapNotNull {
             compilationCache[it]
@@ -116,34 +92,26 @@ abstract class BasicIrBoxTest(
 //        config.configuration.put(CommonConfigurationKeys.PHASES_TO_DUMP_STATE_AFTER, setOf("MultipleCatchesLowering"))
 //        config.configuration.put(CommonConfigurationKeys.PHASES_TO_VALIDATE, setOf("ALL"))
 
-        val actualOutputFile = if (!isMainModule) {
-            File(outputFile.absolutePath.replace("_v5.js", "/"))
-        } else outputFile
+        val actualOutputFile = outputFile.absolutePath.let {
+            if (!isMainModule) it.replace("_v5.js", "/") else it
+        }
 
         val result = compile(
             config.project,
             filesToCompile,
             config.configuration,
             listOf(FqName((testPackage?.let { "$it." } ?: "") + testFunction)),
-//            CompilationMode.TEST_AGAINST_CACHE,
-            CompilationMode.TEST_AGAINST_KLIB,
+            if (isMainModule) CompilationMode.JS_AGAINST_KLIB else CompilationMode.KLIB,
             dependencies,
-//            listOf(runtimeKlib),
-//            runtimeResult,
-            null,
-            moduleType = if (isMainModule) ModuleType.MAIN else ModuleType.SECONDARY,
-            klibDirectory = actualOutputFile
+            klibPath = actualOutputFile
         )
 
         compilationCache[outputFile.name.replace(".js", ".meta.js")] = result
 
         val generatedCode = result.generatedCode
         if (generatedCode != null) {
-            // Prefix to help node.js runner find runtime
-//            val runtimePrefix = "// RUNTIME: [\"${runtimeFile.path}\"]\n"
-            val runtimePrefix = ""
             val wrappedCode = wrapWithModuleEmulationMarkers(generatedCode, moduleId = config.moduleId, moduleKind = config.moduleKind)
-            outputFile.write(runtimePrefix + wrappedCode)
+            outputFile.write(wrappedCode)
         }
     }
 
@@ -159,8 +127,7 @@ abstract class BasicIrBoxTest(
         // TODO: should we do anything special for module systems?
         // TODO: return list of js from translateFiles and provide then to this function with other js files
 
-
-        NashornIrJsTestChecker(null).check(jsFiles, testModuleName, null, testFunction, expectedResult, withModuleSystem)
+        NashornIrJsTestChecker().check(jsFiles, testModuleName, null, testFunction, expectedResult, withModuleSystem)
     }
 }
 
