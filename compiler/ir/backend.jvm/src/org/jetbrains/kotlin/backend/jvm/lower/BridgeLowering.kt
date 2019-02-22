@@ -223,7 +223,9 @@ class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass {
         ).apply {
             descriptor.bind(this)
             parent = irClass
-            dispatchReceiverParameter = irClass.thisReceiver?.copyTo(this)
+
+            // Have to specify type explicitly to prevent an attempt to remap it.
+            dispatchReceiverParameter = irClass.thisReceiver?.copyTo(this, type = irClass.defaultType)
             extensionReceiverParameter = signatureFunction.extensionReceiverParameter
                 ?.copyWithTypeErasure(this)
             signatureFunction.valueParameters.mapIndexed { i, param ->
