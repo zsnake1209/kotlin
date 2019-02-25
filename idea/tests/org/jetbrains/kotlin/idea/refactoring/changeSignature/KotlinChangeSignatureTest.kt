@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.asJava.toLightMethods
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
-import org.jetbrains.kotlin.idea.perf.forceUsingUltraLightClassesForTest
 import org.jetbrains.kotlin.idea.refactoring.changeSignature.ui.KotlinChangeSignatureDialog.Companion.getTypeCodeFragmentContext
 import org.jetbrains.kotlin.idea.refactoring.changeSignature.ui.KotlinChangeSignatureDialog.Companion.getTypeInfo
 import org.jetbrains.kotlin.idea.refactoring.changeSignature.ui.KotlinMethodNode
@@ -577,7 +576,6 @@ class KotlinChangeSignatureTest : KotlinLightCodeInsightFixtureTestCase() {
     fun testConvertParameterToReceiverForMember1() = doTest { receiverParameterInfo = newParameters[0] }
 
     fun testConvertParameterToReceiverForMemberUltraLight() {
-        forceUsingUltraLightClassesForTest()
         doTest { receiverParameterInfo = newParameters[0] }
     }
 
