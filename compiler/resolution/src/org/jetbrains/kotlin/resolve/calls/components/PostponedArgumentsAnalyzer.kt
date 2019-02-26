@@ -13,16 +13,16 @@ import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.kotlin.types.StubType
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.UnwrappedType
-import org.jetbrains.kotlin.types.model.KotlinTypeMarker
-import org.jetbrains.kotlin.types.model.TypeConstructorMarker
+import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.types.typeUtil.builtIns
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 class PostponedArgumentsAnalyzer(
     private val callableReferenceResolver: CallableReferenceResolver
 ) {
-    interface Context {
+    interface Context : TypeSystemInferenceExtensionContext {
         fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubType>): NewTypeSubstitutor
-        fun bindingStubsForPostponedVariables(): Map<NewTypeVariable, StubType>
+        fun bindingStubsForPostponedVariables(): Map<TypeVariableMarker, StubType>
 
         // type can be proper if it not contains not fixed type variables
         fun canBeProper(type: KotlinTypeMarker): Boolean
@@ -66,7 +66,7 @@ class PostponedArgumentsAnalyzer(
         diagnosticHolder: KotlinDiagnosticsHolder
     ) {
         val stubsForPostponedVariables = c.bindingStubsForPostponedVariables()
-        val currentSubstitutor = c.buildCurrentSubstitutor(stubsForPostponedVariables.mapKeys { it.key.freshTypeConstructor })
+        val currentSubstitutor = c.buildCurrentSubstitutor(stubsForPostponedVariables.mapKeys { it.key.freshTypeConstructor(c) })
 
         fun substitute(type: UnwrappedType) = currentSubstitutor.safeSubstitute(type)
 
@@ -89,7 +89,7 @@ class PostponedArgumentsAnalyzer(
             receiver,
             parameters,
             expectedTypeForReturnArguments,
-            stubsForPostponedVariables
+            stubsForPostponedVariables.cast() // TODO: SUB
         )
 
         returnArguments.forEach { c.addSubsystemFromArgument(it) }
@@ -117,7 +117,7 @@ class PostponedArgumentsAnalyzer(
                 val variable = variableWithConstraints.typeVariable
 
                 c.getBuilder().unmarkPostponedVariable(variable)
-                c.getBuilder().addEqualityConstraint(variable.defaultType, resultType, CoroutinePosition())
+                c.getBuilder().addEqualityConstraint(variable.defaultType(c), resultType, CoroutinePosition())
             }
         }
     }

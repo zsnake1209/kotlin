@@ -26,6 +26,9 @@ import org.jetbrains.kotlin.resolve.constants.IntegerLiteralTypeConstructor
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
+import org.jetbrains.kotlin.types.model.freshTypeConstructor
+import org.jetbrains.kotlin.types.typeUtil.isPrimitiveNumberType
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 class ResultTypeResolver(
     val typeApproximator: TypeApproximator,
@@ -39,8 +42,8 @@ class ResultTypeResolver(
         findResultTypeOrNull(c, variableWithConstraints, direction)?.let { return it }
 
         // no proper constraints
-        return variableWithConstraints.typeVariable.freshTypeConstructor.builtIns.run {
-            if (direction == ResolveDirection.TO_SUBTYPE) nothingType else nullableAnyType
+        return run {
+            if (direction == ResolveDirection.TO_SUBTYPE) c.nothingType() else c.nullableAnyType()
         }
     }
 

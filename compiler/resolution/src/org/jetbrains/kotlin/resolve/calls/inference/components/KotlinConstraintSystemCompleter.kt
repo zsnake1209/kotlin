@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
+import org.jetbrains.kotlin.types.model.TypeVariableMarker
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
@@ -30,7 +31,7 @@ class KotlinConstraintSystemCompleter(
     interface Context : VariableFixationFinder.Context, ResultTypeResolver.Context {
         override val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints>
 
-        override val postponedTypeVariables: List<NewTypeVariable>
+        override val postponedTypeVariables: List<TypeVariableMarker>
 
         // type can be proper if it not contains not fixed type variables
         fun canBeProper(type: KotlinTypeMarker): Boolean
@@ -40,7 +41,7 @@ class KotlinConstraintSystemCompleter(
         // mutable operations
         fun addError(error: KotlinCallDiagnostic)
 
-        fun fixVariable(variable: NewTypeVariable, resultType: KotlinTypeMarker)
+        fun fixVariable(variable: TypeVariableMarker, resultType: KotlinTypeMarker)
     }
 
     fun runCompletion(

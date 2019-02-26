@@ -117,6 +117,7 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
     fun TypeSubstitutorMarker.safeSubstitute(type: KotlinTypeMarker): KotlinTypeMarker
 
 
+    fun TypeVariableMarker.defaultType(): SimpleTypeMarker
 }
 
 

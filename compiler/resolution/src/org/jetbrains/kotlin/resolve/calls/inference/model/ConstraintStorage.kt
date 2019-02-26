@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
+import org.jetbrains.kotlin.types.model.TypeVariableMarker
 
 /**
  * Every type variable can be in the following states:
@@ -35,24 +36,24 @@ import org.jetbrains.kotlin.types.model.TypeConstructorMarker
  */
 
 interface ConstraintStorage {
-    val allTypeVariables: Map<TypeConstructorMarker, NewTypeVariable>
+    val allTypeVariables: Map<TypeConstructorMarker, TypeVariableMarker>
     val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints>
     val initialConstraints: List<InitialConstraint>
     val maxTypeDepthFromInitialConstraints: Int
     val errors: List<KotlinCallDiagnostic>
     val hasContradiction: Boolean
     val fixedTypeVariables: Map<TypeConstructorMarker, KotlinTypeMarker>
-    val postponedTypeVariables: List<NewTypeVariable>
+    val postponedTypeVariables: List<TypeVariableMarker>
 
     object Empty : ConstraintStorage {
-        override val allTypeVariables: Map<TypeConstructorMarker, NewTypeVariable> get() = emptyMap()
+        override val allTypeVariables: Map<TypeConstructorMarker, TypeVariableMarker> get() = emptyMap()
         override val notFixedTypeVariables: Map<TypeConstructorMarker, VariableWithConstraints> get() = emptyMap()
         override val initialConstraints: List<InitialConstraint> get() = emptyList()
         override val maxTypeDepthFromInitialConstraints: Int get() = 1
         override val errors: List<KotlinCallDiagnostic> get() = emptyList()
         override val hasContradiction: Boolean get() = false
         override val fixedTypeVariables: Map<TypeConstructorMarker, KotlinTypeMarker> get() = emptyMap()
-        override val postponedTypeVariables: List<NewTypeVariable> get() = emptyList()
+        override val postponedTypeVariables: List<TypeVariableMarker> get() = emptyList()
     }
 }
 
@@ -92,7 +93,7 @@ class Constraint(
 }
 
 interface VariableWithConstraints {
-    val typeVariable: NewTypeVariable
+    val typeVariable: TypeVariableMarker
     val constraints: List<Constraint>
 }
 

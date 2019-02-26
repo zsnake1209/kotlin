@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.resolve.calls.model.PostponedResolvedAtom
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
+import org.jetbrains.kotlin.types.model.freshTypeConstructor
 import org.jetbrains.kotlin.utils.SmartSet
 import org.jetbrains.kotlin.utils.addToStdlib.swapReceiver
 
@@ -56,7 +57,7 @@ class TypeVariableDependencyInformationProvider(
         }
 
         for (variableWithConstraints in notFixedTypeVariables.values) {
-            val from = variableWithConstraints.typeVariable.freshTypeConstructor
+            val from = variableWithConstraints.typeVariable.freshTypeConstructor(typeSystemContext)
 
             for (constraint in variableWithConstraints.constraints) {
                 constraint.type.forAllMyTypeVariables {

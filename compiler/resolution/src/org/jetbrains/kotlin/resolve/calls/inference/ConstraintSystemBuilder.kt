@@ -26,20 +26,21 @@ import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
+import org.jetbrains.kotlin.types.model.TypeVariableMarker
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 interface ConstraintSystemOperation {
     val hasContradiction: Boolean
-    fun registerVariable(variable: NewTypeVariable)
-    fun markPostponedVariable(variable: NewTypeVariable)
-    fun unmarkPostponedVariable(variable: NewTypeVariable)
+    fun registerVariable(variable: TypeVariableMarker)
+    fun markPostponedVariable(variable: TypeVariableMarker)
+    fun unmarkPostponedVariable(variable: TypeVariableMarker)
 
     fun addSubtypeConstraint(lowerType: KotlinTypeMarker, upperType: KotlinTypeMarker, position: ConstraintPosition)
     fun addEqualityConstraint(a: KotlinTypeMarker, b: KotlinTypeMarker, position: ConstraintPosition)
 
     fun isProperType(type: KotlinTypeMarker): Boolean
     fun isTypeVariable(type: KotlinTypeMarker): Boolean
-    fun isPostponedTypeVariable(typeVariable: NewTypeVariable): Boolean
+    fun isPostponedTypeVariable(typeVariable: TypeVariableMarker): Boolean
 
     fun getProperSuperTypeConstructors(type: KotlinTypeMarker): List<TypeConstructorMarker>
 }

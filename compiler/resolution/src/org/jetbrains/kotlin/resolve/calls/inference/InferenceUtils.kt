@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstitutor
 import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstitutorByConstructorMap
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage
+import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
@@ -35,7 +36,7 @@ fun ConstraintStorage.buildResultingSubstitutor(): NewTypeSubstitutor {
     val uninferredSubstitutorMap = notFixedTypeVariables.entries.associate { (freshTypeConstructor, typeVariable) ->
         freshTypeConstructor to ErrorUtils.createErrorTypeWithCustomConstructor(
             "Uninferred type",
-            typeVariable.typeVariable.freshTypeConstructor
+            (typeVariable.typeVariable as NewTypeVariable).freshTypeConstructor// TODO: SUB
         )
     }
 

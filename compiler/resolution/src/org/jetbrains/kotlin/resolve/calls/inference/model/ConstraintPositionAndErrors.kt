@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.resolve.scopes.receivers.QualifierReceiver
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.model.TypeVariableMarker
 
 
 sealed class ConstraintPosition
@@ -49,7 +50,7 @@ class ReceiverConstraintPosition(val argument: KotlinCallArgument) : ConstraintP
     override fun toString() = "Receiver $argument"
 }
 
-class FixVariableConstraintPosition(val variable: NewTypeVariable) : ConstraintPosition() {
+class FixVariableConstraintPosition(val variable: TypeVariableMarker) : ConstraintPosition() {
     override fun toString() = "Fix variable $variable"
 }
 
@@ -95,15 +96,15 @@ class NewConstraintError(
 ) : ConstraintSystemCallDiagnostic(if (position.from is ReceiverConstraintPosition) INAPPLICABLE_WRONG_RECEIVER else INAPPLICABLE)
 
 class CapturedTypeFromSubtyping(
-    val typeVariable: NewTypeVariable,
+    val typeVariable: TypeVariableMarker,
     val constraintType: KotlinTypeMarker,
     val position: ConstraintPosition
 ) : ConstraintSystemCallDiagnostic(INAPPLICABLE)
 
-class NotEnoughInformationForTypeParameter(val typeVariable: NewTypeVariable) : ConstraintSystemCallDiagnostic(INAPPLICABLE)
+class NotEnoughInformationForTypeParameter(val typeVariable: TypeVariableMarker) : ConstraintSystemCallDiagnostic(INAPPLICABLE)
 
 class ConstrainingTypeIsError(
-    val typeVariable: NewTypeVariable,
+    val typeVariable: TypeVariableMarker,
     val constraintType: KotlinTypeMarker,
     val position: IncorporationConstraintPosition
 ) : ConstraintSystemCallDiagnostic(INAPPLICABLE)

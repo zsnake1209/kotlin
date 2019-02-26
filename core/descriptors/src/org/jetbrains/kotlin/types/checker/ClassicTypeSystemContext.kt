@@ -425,6 +425,10 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     override fun TypeSubstitutorMarker.safeSubstitute(type: KotlinTypeMarker): KotlinTypeMarker {
         TODO("not implemented")
     }
+
+    override fun TypeVariableMarker.defaultType(): SimpleTypeMarker {
+        TODO("not implemented")
+    }
 }
 
 private fun hasNoInferInternal(type: UnwrappedType): Boolean {

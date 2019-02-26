@@ -16,7 +16,7 @@
 
 package org.jetbrains.kotlin.resolve.calls.inference.components
 
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+
 import org.jetbrains.kotlin.resolve.calls.inference.model.*
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintKind.LOWER
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintKind.UPPER
@@ -30,7 +30,7 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
     private val ALLOWED_DEPTH_DELTA_FOR_INCORPORATION = 1
 
     interface Context : TypeSystemInferenceExtensionContext {
-        val allTypeVariables: Map<TypeConstructorMarker, NewTypeVariable>
+        val allTypeVariables: Map<TypeConstructorMarker, TypeVariableMarker>
 
         var maxTypeDepthFromInitialConstraints: Int
         val notFixedTypeVariables: MutableMap<TypeConstructorMarker, MutableVariableWithConstraints>
@@ -66,7 +66,7 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
         upperType: KotlinTypeMarker,
         incorporatePosition: IncorporationConstraintPosition
     ) {
-        val possibleNewConstraints = Stack<Pair<NewTypeVariable, Constraint>>()
+        val possibleNewConstraints = Stack<Pair<TypeVariableMarker, Constraint>>()
         val typeCheckerContext = TypeCheckerContext(c, incorporatePosition, lowerType, upperType, possibleNewConstraints)
         typeCheckerContext.runIsSubtypeOf(lowerType, upperType)
 
@@ -75,7 +75,7 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
             if (c.shouldWeSkipConstraint(typeVariable, constraint)) continue
 
             val constraints =
-                c.notFixedTypeVariables[typeVariable.freshTypeConstructor] ?: typeCheckerContext.fixedTypeVariable(typeVariable)
+                c.notFixedTypeVariables[typeVariable.freshTypeConstructor(c)] ?: typeCheckerContext.fixedTypeVariable(typeVariable)
 
             // it is important, that we add constraint here(not inside TypeCheckerContext), because inside incorporation we read constraints
             constraints.addConstraint(constraint)?.let {
@@ -88,13 +88,13 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
         c.maxTypeDepthFromInitialConstraints = Math.max(c.maxTypeDepthFromInitialConstraints, initialType.typeDepth())
     }
 
-    private fun Context.shouldWeSkipConstraint(typeVariable: NewTypeVariable, constraint: Constraint): Boolean {
+    private fun Context.shouldWeSkipConstraint(typeVariable: TypeVariableMarker, constraint: Constraint): Boolean {
         assert(constraint.kind != ConstraintKind.EQUALITY)
 
         val constraintType = constraint.type
         if (!isAllowedType(constraintType)) return true
 
-        if (constraintType.typeConstructor() == typeVariable.freshTypeConstructor) {
+        if (constraintType.typeConstructor() == typeVariable.freshTypeConstructor()) {
             if (constraintType.lowerBoundIfFlexible().isMarkedNullable() && constraint.kind == LOWER) return false // T? <: T
 
             return true // T <: T(?!)
@@ -115,7 +115,7 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
         val position: IncorporationConstraintPosition,
         val baseLowerType: KotlinTypeMarker,
         val baseUpperType: KotlinTypeMarker,
-        val possibleNewConstraints: MutableList<Pair<NewTypeVariable, Constraint>>
+        val possibleNewConstraints: MutableList<Pair<TypeVariableMarker, Constraint>>
     ) : AbstractTypeCheckerContextForConstraintSystem(), ConstraintIncorporator.Context, TypeSystemInferenceExtensionContext by c {
 
         val baseContext: AbstractTypeCheckerContext = newBaseTypeCheckerContext()
@@ -203,7 +203,7 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
         override val allTypeVariablesWithConstraints: Collection<VariableWithConstraints>
             get() = c.notFixedTypeVariables.values
 
-        override fun getTypeVariable(typeConstructor: TypeConstructorMarker): NewTypeVariable? {
+        override fun getTypeVariable(typeConstructor: TypeConstructorMarker): TypeVariableMarker? {
             val typeVariable = c.allTypeVariables[typeConstructor]
             if (typeVariable != null && !c.notFixedTypeVariables.containsKey(typeConstructor)) {
                 fixedTypeVariable(typeVariable)
@@ -211,11 +211,11 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
             return typeVariable
         }
 
-        override fun getConstraintsForVariable(typeVariable: NewTypeVariable) =
-            c.notFixedTypeVariables[typeVariable.freshTypeConstructor]?.constraints
+        override fun getConstraintsForVariable(typeVariable: TypeVariableMarker) =
+            c.notFixedTypeVariables[typeVariable.freshTypeConstructor()]?.constraints
                     ?: fixedTypeVariable(typeVariable)
 
-        fun fixedTypeVariable(variable: NewTypeVariable): Nothing {
+        fun fixedTypeVariable(variable: TypeVariableMarker): Nothing {
             error(
                 "Type variable $variable should not be fixed!\n" +
                         renderBaseConstraint()
