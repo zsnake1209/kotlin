@@ -1007,4 +1007,6 @@ class KotlinChangeSignatureTest : KotlinLightCodeInsightFixtureTestCase() {
     fun testKotlinOverridingJavaWithDifferentParamName() = doJavaTest {
         newParameters.add(ParameterInfoImpl(-1, "n", PsiType.INT))
     }
+
+    fun testMoveLambdaParameterToLast() = doTest { swapParameters(0, 1) }
 }

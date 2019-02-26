@@ -29,11 +29,14 @@ import com.intellij.refactoring.rename.UnresolvableCollisionUsageInfo
 import com.intellij.usageView.UsageInfo
 import com.intellij.usageView.UsageViewDescriptor
 import com.intellij.util.containers.MultiMap
+import org.jetbrains.kotlin.idea.core.canMoveLambdaOutsideParentheses
+import org.jetbrains.kotlin.idea.core.moveFunctionLiteralOutsideParentheses
 import org.jetbrains.kotlin.idea.refactoring.broadcastRefactoringExit
 import org.jetbrains.kotlin.idea.refactoring.changeSignature.usages.KotlinFunctionCallUsage
 import org.jetbrains.kotlin.idea.refactoring.changeSignature.usages.KotlinImplicitReceiverUsage
 import org.jetbrains.kotlin.idea.refactoring.changeSignature.usages.KotlinUsageInfo
 import org.jetbrains.kotlin.idea.refactoring.changeSignature.usages.KotlinWrapperForJavaUsageInfos
+import org.jetbrains.kotlin.psi.KtCallExpression
 import java.util.*
 
 class KotlinChangeSignatureProcessor(
@@ -126,6 +129,12 @@ class KotlinChangeSignatureProcessor(
     override fun performRefactoring(usages: Array<out UsageInfo>) {
         try {
             super.performRefactoring(usages)
+            usages.forEach {
+                val callExpression = it.element as? KtCallExpression ?: return@forEach
+                if (callExpression.canMoveLambdaOutsideParentheses()) {
+                    callExpression.moveFunctionLiteralOutsideParentheses()
+                }
+            }
         } finally {
             changeInfo.invalidate()
         }
