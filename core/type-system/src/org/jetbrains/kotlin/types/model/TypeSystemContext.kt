@@ -24,6 +24,8 @@ interface TypeArgumentListMarker
 
 interface TypeVariableMarker
 
+interface TypeSubstitutorMarker
+
 
 enum class TypeVariance(val presentation: String) {
     IN("in"),
@@ -73,6 +75,12 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
 
     fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker
     fun createSimpleType(constructor: TypeConstructorMarker, arguments: List<TypeArgumentMarker>, nullable: Boolean): SimpleTypeMarker
+    fun createCapturedType(
+        constructorProjection: TypeArgumentMarker,
+        constructorSupertypes: List<KotlinTypeMarker>,
+        lowerType: KotlinTypeMarker?,
+        captureStatus: CaptureStatus
+    ): CapturedTypeMarker
 
 
     fun KotlinTypeMarker.removeAnnotations(): KotlinTypeMarker
@@ -103,6 +111,12 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
     fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean
 
     fun DefinitelyNotNullTypeMarker.original(): SimpleTypeMarker
+
+    fun typeSubstitutorByTypeConstructor(map: Map<TypeConstructorMarker, KotlinTypeMarker>): TypeSubstitutorMarker
+
+    fun TypeSubstitutorMarker.safeSubstitute(type: KotlinTypeMarker): KotlinTypeMarker
+
+
 }
 
 

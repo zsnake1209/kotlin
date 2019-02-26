@@ -10,15 +10,10 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintKind
 import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
 import org.jetbrains.kotlin.resolve.calls.inference.model.VariableWithConstraints
 import org.jetbrains.kotlin.types.*
-import org.jetbrains.kotlin.types.checker.NewCapturedType
-import org.jetbrains.kotlin.types.checker.NewCapturedTypeConstructor
-import org.jetbrains.kotlin.types.model.CaptureStatus
-import org.jetbrains.kotlin.types.model.KotlinTypeMarker
-import org.jetbrains.kotlin.types.model.TypeConstructorMarker
-import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
-import org.jetbrains.kotlin.types.typeUtil.contains
+import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.SmartSet
 import org.jetbrains.kotlin.utils.addIfNotNull
+import org.jetbrains.kotlin.utils.addToStdlib.swapReceiver
 import java.util.*
 
 // todo problem: intersection types in constrains: A <: Number, B <: Inv<A & Any> =>? B <: Inv<out Number & Any>
@@ -106,36 +101,48 @@ class ConstraintIncorporator(
         otherConstraint: Constraint
     ) {
 
-        val baseConstraintType = baseConstraint.type as UnwrappedType // TODO: SUB
-        val otherConstraintType = otherConstraint.type as UnwrappedType // TODO: SUB
+        val baseConstraintType = baseConstraint.type
 
         val typeForApproximation = when (otherConstraint.kind) {
             ConstraintKind.EQUALITY -> {
-                baseConstraintType.substituteTypeVariable(otherVariable, otherConstraint.type)
+                baseConstraintType.substitute(c, otherVariable, otherConstraint.type)
             }
             ConstraintKind.UPPER -> {
-                val newCapturedTypeConstructor = NewCapturedTypeConstructor(
-                    TypeProjectionImpl(Variance.OUT_VARIANCE, otherConstraint.type),
-                    listOf(otherConstraint.type)
+                val temporaryCapturedType = c.createCapturedType(
+                    c.createTypeArgument(otherConstraint.type, TypeVariance.OUT),
+                    listOf(otherConstraint.type),
+                    null,
+                    CaptureStatus.FOR_INCORPORATION
                 )
-                val temporaryCapturedType = NewCapturedType(
-                    CaptureStatus.FOR_INCORPORATION,
-                    newCapturedTypeConstructor,
-                    lowerType = null
-                )
-                baseConstraintType.substituteTypeVariable(otherVariable, temporaryCapturedType)
+//                val newCapturedTypeConstructor = NewCapturedTypeConstructor(
+//                    TypeProjectionImpl(Variance.OUT_VARIANCE, otherConstraint.type),
+//                    listOf(otherConstraint.type)
+//                )
+//                val temporaryCapturedType = NewCapturedType(
+//                    CaptureStatus.FOR_INCORPORATION,
+//                    newCapturedTypeConstructor,
+//                    lowerType = null
+//                )
+                baseConstraintType.substitute(c, otherVariable, temporaryCapturedType)
             }
             ConstraintKind.LOWER -> {
-                val newCapturedTypeConstructor = NewCapturedTypeConstructor(
-                    TypeProjectionImpl(Variance.IN_VARIANCE, otherConstraint.type),
-                    emptyList()
+                val temporaryCapturedType = c.createCapturedType(
+                    c.createTypeArgument(otherConstraint.type, TypeVariance.IN),
+                    emptyList(),
+                    otherConstraint.type,
+                    CaptureStatus.FOR_INCORPORATION
                 )
-                val temporaryCapturedType = NewCapturedType(
-                    CaptureStatus.FOR_INCORPORATION,
-                    newCapturedTypeConstructor,
-                    lowerType = otherConstraint.type
-                )
-                baseConstraintType.substituteTypeVariable(otherVariable, temporaryCapturedType)
+
+//                val newCapturedTypeConstructor = NewCapturedTypeConstructor(
+//                    TypeProjectionImpl(Variance.IN_VARIANCE, otherConstraint.type),
+//                    emptyList()
+//                )
+//                val temporaryCapturedType = NewCapturedType(
+//                    CaptureStatus.FOR_INCORPORATION,
+//                    newCapturedTypeConstructor,
+//                    lowerType = otherConstraint.type
+//                )
+                baseConstraintType.substitute(c, otherVariable, temporaryCapturedType)
             }
         }
 
@@ -152,6 +159,12 @@ class ConstraintIncorporator(
             }
         }
     }
+
+    private fun KotlinTypeMarker.substitute(c: Context, typeVariable: NewTypeVariable, value: KotlinTypeMarker): KotlinTypeMarker {
+        val substitutor = c.typeSubstitutorByTypeConstructor(mapOf(typeVariable.freshTypeConstructor to value))
+        return swapReceiver(c) { type -> substitutor.safeSubstitute(type) }
+    }
+
 
     private fun approximateCapturedTypes(type: KotlinTypeMarker, toSuper: Boolean): KotlinTypeMarker =
         if (toSuper) typeApproximator.approximateToSuperType(type, TypeApproximatorConfiguration.IncorporationConfiguration) ?: type

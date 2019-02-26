@@ -9,19 +9,17 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.resolve.calls.components.BuiltInsProvider
 import org.jetbrains.kotlin.resolve.calls.components.PostponedArgumentsAnalyzer
 import org.jetbrains.kotlin.resolve.calls.inference.*
-import org.jetbrains.kotlin.resolve.calls.inference.components.ConstraintInjector
-import org.jetbrains.kotlin.resolve.calls.inference.components.KotlinConstraintSystemCompleter
-import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstitutor
-import org.jetbrains.kotlin.resolve.calls.inference.components.ResultTypeResolver
+import org.jetbrains.kotlin.resolve.calls.inference.components.*
 import org.jetbrains.kotlin.resolve.calls.model.KotlinCallDiagnostic
-import org.jetbrains.kotlin.types.FlexibleType
 import org.jetbrains.kotlin.types.StubType
+import org.jetbrains.kotlin.types.TypeProjectionImpl
+import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.checker.ClassicTypeSystemContext
-import org.jetbrains.kotlin.types.model.KotlinTypeMarker
-import org.jetbrains.kotlin.types.model.TypeConstructorMarker
-import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
-import org.jetbrains.kotlin.types.model.TypeVariableMarker
+import org.jetbrains.kotlin.types.checker.NewCapturedType
+import org.jetbrains.kotlin.types.checker.NewCapturedTypeConstructor
+import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.SmartList
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : TypeSystemInferenceExtensionContext, ClassicTypeSystemContext,
     BuiltInsProvider {
@@ -29,6 +27,36 @@ class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : Typ
     override fun TypeVariableMarker.freshTypeConstructor(): TypeConstructorMarker {
         require(this is NewTypeVariable)
         return this.freshTypeConstructor
+    }
+
+    override fun createCapturedType(
+        constructorProjection: TypeArgumentMarker,
+        constructorSupertypes: List<KotlinTypeMarker>,
+        lowerType: KotlinTypeMarker?,
+        captureStatus: CaptureStatus
+    ): CapturedTypeMarker {
+        require(lowerType is UnwrappedType?)
+        require(constructorProjection is TypeProjectionImpl)
+
+        val newCapturedTypeConstructor = NewCapturedTypeConstructor(
+            constructorProjection,
+            constructorSupertypes as List<UnwrappedType>
+        )
+        return NewCapturedType(
+            CaptureStatus.FOR_INCORPORATION,
+            newCapturedTypeConstructor,
+            lowerType = lowerType
+        )
+    }
+
+    override fun typeSubstitutorByTypeConstructor(map: Map<TypeConstructorMarker, KotlinTypeMarker>): TypeSubstitutorMarker {
+        return NewTypeSubstitutorByConstructorMap(map.cast())
+    }
+
+    override fun TypeSubstitutorMarker.safeSubstitute(type: KotlinTypeMarker): KotlinTypeMarker {
+        require(type is UnwrappedType)
+        require(this is NewTypeSubstitutor)
+        return this.safeSubstitute(type)
     }
 }
 

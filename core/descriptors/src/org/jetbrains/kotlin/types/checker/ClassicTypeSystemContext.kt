@@ -408,6 +408,23 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         require(this is DefinitelyNotNullType)
         return this.original
     }
+
+    override fun createCapturedType(
+        constructorProjection: TypeArgumentMarker,
+        constructorSupertypes: List<KotlinTypeMarker>,
+        lowerType: KotlinTypeMarker?,
+        captureStatus: CaptureStatus
+    ): CapturedTypeMarker {
+        TODO("not implemented")
+    }
+
+    override fun typeSubstitutorByTypeConstructor(map: Map<TypeConstructorMarker, KotlinTypeMarker>): TypeSubstitutorMarker {
+        TODO("not implemented")
+    }
+
+    override fun TypeSubstitutorMarker.safeSubstitute(type: KotlinTypeMarker): KotlinTypeMarker {
+        TODO("not implemented")
+    }
 }
 
 private fun hasNoInferInternal(type: UnwrappedType): Boolean {
