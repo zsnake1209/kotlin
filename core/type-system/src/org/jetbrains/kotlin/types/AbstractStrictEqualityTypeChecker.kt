@@ -26,18 +26,18 @@ object AbstractStrictEqualityTypeChecker {
 
         val simpleA = a.asSimpleType()
         val simpleB = b.asSimpleType()
-        if (simpleA != null && simpleB != null) return strictEqualTypesInternal(simpleA, simpleB)
+        if (simpleA != null && simpleB != null) return strictEqualSimpleTypes(simpleA, simpleB)
 
         val flexibleA = a.asFlexibleType()
         val flexibleB = b.asFlexibleType()
         if (flexibleA != null && flexibleB != null) {
-            return strictEqualTypesInternal(flexibleA.lowerBound(), flexibleB.lowerBound()) &&
-                    strictEqualTypesInternal(flexibleA.upperBound(), flexibleB.upperBound())
+            return strictEqualSimpleTypes(flexibleA.lowerBound(), flexibleB.lowerBound()) &&
+                    strictEqualSimpleTypes(flexibleA.upperBound(), flexibleB.upperBound())
         }
         return false
     }
 
-    private fun TypeSystemContext.strictEqualTypesInternal(a: SimpleTypeMarker, b: SimpleTypeMarker): Boolean {
+    private fun TypeSystemContext.strictEqualSimpleTypes(a: SimpleTypeMarker, b: SimpleTypeMarker): Boolean {
         if (a.argumentsCount() != b.argumentsCount()
             || a.isMarkedNullable() != b.isMarkedNullable()
             || (a.asDefinitelyNotNullType() == null) != (b.asDefinitelyNotNullType() == null)
