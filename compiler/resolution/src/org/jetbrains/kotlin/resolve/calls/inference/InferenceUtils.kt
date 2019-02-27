@@ -23,10 +23,11 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage
 import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.model.StubTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-fun ConstraintStorage.buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubType>): NewTypeSubstitutorByConstructorMap =
+fun ConstraintStorage.buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubTypeMarker>): NewTypeSubstitutorByConstructorMap =
     NewTypeSubstitutorByConstructorMap( (fixedTypeVariables.entries.associate { it.key to it.value } + additionalBindings).cast() ) // TODO: SUB
 
 fun ConstraintStorage.buildResultingSubstitutor(): NewTypeSubstitutor {

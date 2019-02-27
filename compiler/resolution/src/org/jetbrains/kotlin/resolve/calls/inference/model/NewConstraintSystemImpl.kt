@@ -63,6 +63,10 @@ class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : Typ
         require(this is NewTypeSubstitutor)
         return this.safeSubstitute(type)
     }
+
+    override fun createStubType(typeVariable: TypeVariableMarker): StubTypeMarker {
+        return StubType(typeVariable.freshTypeConstructor() as TypeConstructor, typeVariable.defaultType().isMarkedNullable())
+    }
 }
 
 fun NewConstraintSystemImpl(
@@ -327,15 +331,15 @@ class NewConstraintSystemImpl(
         return buildCurrentSubstitutor(emptyMap())
     }
 
-    override fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubType>): NewTypeSubstitutor {
+    override fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubTypeMarker>): NewTypeSubstitutor {
         checkState(State.BUILDING, State.COMPLETION)
         return storage.buildCurrentSubstitutor(additionalBindings)
     }
 
-    override fun bindingStubsForPostponedVariables(): Map<TypeVariableMarker, StubType> {
+    override fun bindingStubsForPostponedVariables(): Map<TypeVariableMarker, StubTypeMarker> {
         checkState(State.BUILDING, State.COMPLETION)
         // TODO: SUB
-        return storage.postponedTypeVariables.associate { it to StubType(it.freshTypeConstructor() as TypeConstructor, it.defaultType().isMarkedNullable()) }
+        return storage.postponedTypeVariables.associate { it to createStubType(it)/*StubType(it.freshTypeConstructor() as TypeConstructor, it.defaultType().isMarkedNullable())*/ }
     }
 
     override fun currentStorage(): ConstraintStorage {

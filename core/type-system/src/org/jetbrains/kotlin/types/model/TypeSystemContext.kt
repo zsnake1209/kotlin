@@ -19,6 +19,7 @@ interface DefinitelyNotNullTypeMarker : SimpleTypeMarker
 interface FlexibleTypeMarker : KotlinTypeMarker
 interface DynamicTypeMarker : FlexibleTypeMarker
 interface RawTypeMarker : FlexibleTypeMarker
+interface StubTypeMarker : SimpleTypeMarker
 
 interface TypeArgumentListMarker
 
@@ -81,6 +82,8 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
         lowerType: KotlinTypeMarker?,
         captureStatus: CaptureStatus
     ): CapturedTypeMarker
+
+    fun createStubType(typeVariable: TypeVariableMarker): StubTypeMarker
 
 
     fun KotlinTypeMarker.removeAnnotations(): KotlinTypeMarker

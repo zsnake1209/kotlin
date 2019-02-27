@@ -429,6 +429,10 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     override fun TypeVariableMarker.defaultType(): SimpleTypeMarker {
         TODO("not implemented")
     }
+
+    override fun createStubType(typeVariable: TypeVariableMarker): StubTypeMarker {
+        TODO("not implemented")
+    }
 }
 
 private fun hasNoInferInternal(type: UnwrappedType): Boolean {

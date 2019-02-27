@@ -21,8 +21,8 @@ class PostponedArgumentsAnalyzer(
     private val callableReferenceResolver: CallableReferenceResolver
 ) {
     interface Context : TypeSystemInferenceExtensionContext {
-        fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubType>): NewTypeSubstitutor
-        fun bindingStubsForPostponedVariables(): Map<TypeVariableMarker, StubType>
+        fun buildCurrentSubstitutor(additionalBindings: Map<TypeConstructorMarker, StubTypeMarker>): NewTypeSubstitutor
+        fun bindingStubsForPostponedVariables(): Map<TypeVariableMarker, StubTypeMarker>
 
         // type can be proper if it not contains not fixed type variables
         fun canBeProper(type: KotlinTypeMarker): Boolean
