@@ -31,7 +31,7 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     }
 
     override fun SimpleTypeMarker.isStubType(): Boolean {
-        assert(this is SimpleType, this::errorMessage)
+        require(this is SimpleType, this::errorMessage)
         return this is StubType
     }
 
@@ -41,7 +41,7 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     }
 
     override fun TypeConstructorMarker.isIntersection(): Boolean {
-        assert(this is TypeConstructor, this::errorMessage)
+        require(this is TypeConstructor, this::errorMessage)
         return this is IntersectionTypeConstructor
     }
 
@@ -62,12 +62,12 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     }
 
     override fun FlexibleTypeMarker.asDynamicType(): DynamicTypeMarker? {
-        assert(this is FlexibleType, this::errorMessage)
+        require(this is FlexibleType, this::errorMessage)
         return this as? DynamicType
     }
 
     override fun FlexibleTypeMarker.asRawType(): RawTypeMarker? {
-        assert(this is FlexibleType, this::errorMessage)
+        require(this is FlexibleType, this::errorMessage)
         return this as? RawType
     }
 
@@ -82,12 +82,12 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     }
 
     override fun SimpleTypeMarker.asCapturedType(): CapturedTypeMarker? {
-        assert(this is SimpleType, this::errorMessage)
+        require(this is SimpleType, this::errorMessage)
         return this as? NewCapturedType
     }
 
     override fun SimpleTypeMarker.asDefinitelyNotNullType(): DefinitelyNotNullTypeMarker? {
-        assert(this is SimpleType, this::errorMessage)
+        require(this is SimpleType, this::errorMessage)
         return this as? DefinitelyNotNullType
     }
 
@@ -171,8 +171,8 @@ interface ClassicTypeSystemContext : TypeSystemContext {
     }
 
     override fun isEqualTypeConstructors(c1: TypeConstructorMarker, c2: TypeConstructorMarker): Boolean {
-        assert(c1 is TypeConstructor, c1::errorMessage)
-        assert(c2 is TypeConstructor, c2::errorMessage)
+        require(c1 is TypeConstructor, c1::errorMessage)
+        require(c2 is TypeConstructor, c2::errorMessage)
         return c1 == c2
     }
 
