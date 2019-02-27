@@ -353,7 +353,7 @@ object AbstractTypeChecker {
         val result: MutableList<SimpleTypeMarker> = SmartList()
 
         anySupertype(baseType, { false }) {
-            //kotlin.require(it is SimpleType)
+
             val current = captureFromArguments(it, CaptureStatus.FOR_SUBTYPING) ?: it
 
             when {
