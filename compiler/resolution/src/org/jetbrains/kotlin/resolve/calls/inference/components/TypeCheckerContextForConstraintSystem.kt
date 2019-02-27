@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.typeUtil.contains
 
-abstract class TypeCheckerContextForConstraintSystem : TypeCheckerContext(errorTypeEqualsToAnything = true, allowedTypeVariable = false) {
+abstract class TypeCheckerContextForConstraintSystem : ClassicTypeCheckerContext(errorTypeEqualsToAnything = true, allowedTypeVariable = false) {
 
     abstract fun isMyTypeVariable(type: SimpleType): Boolean
 
