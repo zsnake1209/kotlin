@@ -48,7 +48,7 @@ object AbstractStrictEqualityTypeChecker {
 
         if (identicalArguments(a, b)) return true
 
-        for (i in 0..(a.argumentsCount() - 1)) {
+        for (i in 0 until a.argumentsCount()) {
             val aArg = a.getArgument(i)
             val bArg = b.getArgument(i)
             if (aArg.isStarProjection() != bArg.isStarProjection()) return false
