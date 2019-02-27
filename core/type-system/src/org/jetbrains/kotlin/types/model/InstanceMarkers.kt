@@ -36,7 +36,7 @@ interface TypeSystemOptimizationContext {
 }
 
 
-class ArgumentList : ArrayList<TypeArgumentMarker>(), TypeArgumentListMarker
+class ArgumentList(initialSize: Int) : ArrayList<TypeArgumentMarker>(initialSize), TypeArgumentListMarker
 
 
 interface TypeSystemContext : TypeSystemOptimizationContext {

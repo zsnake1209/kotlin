@@ -225,7 +225,7 @@ object AbstractTypeChecker {
                 if (sameConstructorPolicy != SeveralSupertypesWithSameConstructorPolicy.INTERSECT_ARGUMENTS_AND_CHECK_AGAIN) return false
 
 
-                val newArguments = ArgumentList()
+                val newArguments = ArgumentList(superConstructor.parametersCount())
                 for (index in 0 until superConstructor.parametersCount()) {
                     val allProjections = supertypesWithSameConstructor.map {
                         it.getArgumentOrNull(index)?.takeIf { it.getVariance() == TypeVariance.INV }?.getType()
