@@ -48,24 +48,24 @@ object StrictEqualityTypeChecker {
 
 object ErrorTypesAreEqualToAnything : KotlinTypeChecker {
     override fun isSubtypeOf(subtype: KotlinType, supertype: KotlinType): Boolean =
-        NewKotlinTypeChecker.run { TypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) }
+        NewKotlinTypeChecker.run { ClassicTypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) }
 
     override fun equalTypes(a: KotlinType, b: KotlinType): Boolean =
-        NewKotlinTypeChecker.run { TypeCheckerContext(true).equalTypes(a.unwrap(), b.unwrap()) }
+        NewKotlinTypeChecker.run { ClassicTypeCheckerContext(true).equalTypes(a.unwrap(), b.unwrap()) }
 }
 
 object NewKotlinTypeChecker : KotlinTypeChecker {
     override fun isSubtypeOf(subtype: KotlinType, supertype: KotlinType): Boolean =
-        TypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) // todo fix flag errorTypeEqualsToAnything
+        ClassicTypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) // todo fix flag errorTypeEqualsToAnything
 
     override fun equalTypes(a: KotlinType, b: KotlinType): Boolean =
-        TypeCheckerContext(false).equalTypes(a.unwrap(), b.unwrap())
+        ClassicTypeCheckerContext(false).equalTypes(a.unwrap(), b.unwrap())
 
-    fun TypeCheckerContext.equalTypes(a: UnwrappedType, b: UnwrappedType): Boolean {
+    fun ClassicTypeCheckerContext.equalTypes(a: UnwrappedType, b: UnwrappedType): Boolean {
         return AbstractTypeChecker.equalTypes(this, a, b)
     }
 
-    fun TypeCheckerContext.isSubtypeOf(subType: UnwrappedType, superType: UnwrappedType): Boolean {
+    fun ClassicTypeCheckerContext.isSubtypeOf(subType: UnwrappedType, superType: UnwrappedType): Boolean {
         return AbstractTypeChecker.isSubtypeOf(this, subType, superType)
     }
 
@@ -129,7 +129,7 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
         }.inheritEnhancement(type)
 
 
-    fun TypeCheckerContext.findCorrespondingSupertypes(
+    fun ClassicTypeCheckerContext.findCorrespondingSupertypes(
         baseType: SimpleType,
         constructor: TypeConstructor
     ): List<SimpleType> {
@@ -154,20 +154,20 @@ object NewKotlinTypeChecker : KotlinTypeChecker {
 object NullabilityChecker {
 
     fun isSubtypeOfAny(type: UnwrappedType): Boolean =
-        TypeCheckerContext(false).hasNotNullSupertype(type.lowerIfFlexible(), SupertypesPolicy.LowerIfFlexible)
+        ClassicTypeCheckerContext(false).hasNotNullSupertype(type.lowerIfFlexible(), SupertypesPolicy.LowerIfFlexible)
 
     fun hasPathByNotMarkedNullableNodes(start: SimpleType, end: TypeConstructor) =
-        TypeCheckerContext(false).hasPathByNotMarkedNullableNodes(start, end)
+        ClassicTypeCheckerContext(false).hasPathByNotMarkedNullableNodes(start, end)
 }
 
 fun UnwrappedType.hasSupertypeWithGivenTypeConstructor(typeConstructor: TypeConstructor) =
-    TypeCheckerContext(false).anySupertype(lowerIfFlexible(), {
+    ClassicTypeCheckerContext(false).anySupertype(lowerIfFlexible(), {
         require(it is SimpleType)
         it.constructor == typeConstructor
     }, { SupertypesPolicy.LowerIfFlexible })
 
 fun UnwrappedType.anySuperTypeConstructor(predicate: (TypeConstructor) -> Boolean) =
-    TypeCheckerContext(false).anySupertype(lowerIfFlexible(), {
+    ClassicTypeCheckerContext(false).anySupertype(lowerIfFlexible(), {
         require(it is SimpleType)
         predicate(it.constructor)
     }, { SupertypesPolicy.LowerIfFlexible })
