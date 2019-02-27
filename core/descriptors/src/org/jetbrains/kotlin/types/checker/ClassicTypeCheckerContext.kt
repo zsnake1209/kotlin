@@ -36,8 +36,8 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
         get() = errorTypeEqualsToAnything
 
     override fun areEqualTypeConstructors(a: TypeConstructorMarker, b: TypeConstructorMarker): Boolean {
-        require(a is TypeConstructor)
-        require(b is TypeConstructor)
+        require(a is TypeConstructor, a::errorMessage)
+        require(b is TypeConstructor, b::errorMessage)
         return areEqualTypeConstructors(a, b)
     }
 
@@ -46,7 +46,9 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
     }
 
     override fun substitutionSupertypePolicy(type: SimpleTypeMarker): SupertypesPolicy.DoCustomTransform {
-        val substitutor = TypeConstructorSubstitution.create(type as SimpleType).buildSubstitutor()
+        require(type is SimpleType, type::errorMessage)
+
+        val substitutor = TypeConstructorSubstitution.create(type).buildSubstitutor()
 
         return object : SupertypesPolicy.DoCustomTransform() {
             override fun transformType(context: AbstractTypeCheckerContext, type: KotlinTypeMarker): SimpleTypeMarker {
@@ -60,4 +62,8 @@ open class TypeCheckerContext(val errorTypeEqualsToAnything: Boolean, val allowe
 
 
     override val KotlinTypeMarker.isAllowedTypeVariable: Boolean get() = this is UnwrappedType && allowedTypeVariable && constructor is NewTypeVariableConstructor
+}
+
+private fun Any.errorMessage(): String {
+    return "ClassicTypeCheckerContext couldn't handle ${this::class} $this"
 }
