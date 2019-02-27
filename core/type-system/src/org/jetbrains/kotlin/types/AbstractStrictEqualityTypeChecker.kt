@@ -13,9 +13,13 @@ object AbstractStrictEqualityTypeChecker {
     fun strictEqualTypes(context: TypeSystemContext, a: KotlinTypeMarker, b: KotlinTypeMarker) = context.strictEqualTypesInternal(a, b)
 
     /**
-     * String! != String & A<String!> != A<String>, also A<in Nothing> != A<out Any?>
-     * also A<*> != A<out Any?>
-     * different error types non-equals even errorTypeEqualToAnything
+     * Note that:
+     * - `String!` != `String`
+     * - `A<String!>` != `A<String>`
+     * - `A<in Nothing>` != `A<out Any?>`
+     * - `A<*>` != `A<out Any?>`
+     *
+     * Also different error types are not equal even if errorTypeEqualToAnything is true
      */
     private fun TypeSystemContext.strictEqualTypesInternal(a: KotlinTypeMarker, b: KotlinTypeMarker): Boolean {
         if (a === b) return true
