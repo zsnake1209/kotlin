@@ -93,6 +93,10 @@ class SimpleNameGenerator : NameGenerator {
 
     private fun getNameForDeclaration(declaration: IrDeclaration, context: JsGenerationContext): JsName =
         nameCache.getOrPut(declaration) {
+            if (declaration is IrProperty) {
+                return@getOrPut context.currentScope.declareName(declaration.getJsName() ?: declaration.name.identifier)
+            }
+
             var nameDeclarator: (String) -> JsName = context.currentScope::declareName
             val nameBuilder = StringBuilder()
 
