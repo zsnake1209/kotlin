@@ -53,9 +53,9 @@ class IrKlibProtoBufModuleDeserializer(
             (FUNCTION_INDEX_START + BUILT_IN_UNIQ_ID_CLASS_OFFSET) <= id && id < (FUNCTION_INDEX_START + BUILT_IN_UNIQ_ID_GAP)
 
         override fun getDescriptorIdOrNull(descriptor: DeclarationDescriptor) =
-            knownBuiltInsDescriptors[descriptor]?.index ?: if (isBuiltInFunction(descriptor)) FUNCTION_INDEX_START + builtInFunctionId(
-                descriptor
-            ) else null
+            knownBuiltInsDescriptors[descriptor]?.index ?: if (isBuiltInFunction(descriptor))
+                FUNCTION_INDEX_START + builtInFunctionId(descriptor)
+            else null
 
     }
 
