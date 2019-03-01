@@ -33,6 +33,8 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.psiUtil.isContractDescriptionCallPsiCheck
+import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
@@ -127,7 +129,12 @@ class EffectSystem(
         bindingTrace: BindingTrace,
         moduleDescriptor: ModuleDescriptor
     ): MutableContextInfo {
-        val computation = getNonTrivialComputation(expression, bindingTrace, moduleDescriptor) ?: return MutableContextInfo.EMPTY
+        val isInContractBlock = expression.parents.filterIsInstance<KtExpression>().any { it.isContractDescriptionCallPsiCheck() }
+        val computation = if (isInContractBlock) {
+            UNKNOWN_COMPUTATION
+        } else {
+            getNonTrivialComputation(expression, bindingTrace, moduleDescriptor) ?: return MutableContextInfo.EMPTY
+        }
         return InfoCollector(observedEffect, constants).collectFromSchema(computation.effects)
     }
 
