@@ -104,10 +104,10 @@ class VariableFixationFinder(
         return false
     }
 
-    private fun Context.variableHasTrivialOrNonProperConstraints(variable: TypeConstructor): Boolean {
+    private fun Context.variableHasTrivialOrNonProperConstraints(variable: TypeConstructorMarker): Boolean {
         return notFixedTypeVariables[variable]?.constraints?.all { constraint ->
             val isProperConstraint = isProperArgumentConstraint(constraint)
-            isProperConstraint && trivialConstraintTypeInferenceOracle.isTrivialConstraint(constraint) || !isProperConstraint
+            isProperConstraint && trivialConstraintTypeInferenceOracle.isTrivialConstraint(this, constraint) || !isProperConstraint
         } ?: false
     }
 

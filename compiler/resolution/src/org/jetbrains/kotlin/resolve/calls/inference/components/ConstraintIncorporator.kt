@@ -146,13 +146,13 @@ class ConstraintIncorporator(
 
         if (baseConstraint.kind != ConstraintKind.UPPER) {
             val generatedConstraintType = approximateCapturedTypes(typeForApproximation, toSuper = false)
-            if (!trivialConstraintTypeInferenceOracle.isGeneratedConstraintTrivial(otherConstraint, generatedConstraintType)) {
+            if (!trivialConstraintTypeInferenceOracle.isGeneratedConstraintTrivial(c, otherConstraint, generatedConstraintType)) {
                 c.addNewIncorporatedConstraint(generatedConstraintType, targetVariable.defaultType(c))
             }
         }
         if (baseConstraint.kind != ConstraintKind.LOWER) {
             val generatedConstraintType = approximateCapturedTypes(typeForApproximation, toSuper = true)
-            if (!trivialConstraintTypeInferenceOracle.isGeneratedConstraintTrivial(otherConstraint, generatedConstraintType)) {
+            if (!trivialConstraintTypeInferenceOracle.isGeneratedConstraintTrivial(c, otherConstraint, generatedConstraintType)) {
                 c.addNewIncorporatedConstraint(targetVariable.defaultType(c), generatedConstraintType)
             }
         }

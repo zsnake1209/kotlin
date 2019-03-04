@@ -14,6 +14,10 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage.Empt
 import org.jetbrains.kotlin.resolve.calls.inference.model.ExpectedTypeConstraintPosition
 import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.kotlin.resolve.calls.tower.forceResolution
+import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstructor
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.model.KotlinTypeMarker
+import org.jetbrains.kotlin.types.typeUtil.isPrimitiveNumberType
 import org.jetbrains.kotlin.resolve.constants.IntegerLiteralTypeConstructor
 import org.jetbrains.kotlin.types.ErrorUtils
 import org.jetbrains.kotlin.types.TypeUtils
@@ -203,6 +207,15 @@ class KotlinCallCompleter(
             !trivialConstraintTypeInferenceOracle.isTrivialConstraint(it) && it.type.constructor !is IntegerLiteralTypeConstructor &&
                     it.kind.isLower() && csBuilder.isProperType(it.type)
         }
+    }
+
+    private fun KotlinTypeMarker.isIntegerValueType(): Boolean {
+        require(this is UnwrappedType)
+        if (constructor is IntegerValueTypeConstructor) return true
+        if (constructor is IntersectionTypeConstructor)
+            return constructor.supertypes.all { it.isPrimitiveNumberType() }
+
+        return false
     }
 
     private fun KotlinResolutionCandidate.computeReturnTypeWithSmartCastInfo(
