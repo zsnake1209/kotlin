@@ -11,6 +11,7 @@ import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import com.intellij.openapi.util.io.FileUtil
 import java.io.File
+import java.lang.StringBuilder
 
 class ScriptEngineV8 : ScriptEngine {
     companion object {
@@ -27,10 +28,43 @@ class ScriptEngineV8 : ScriptEngine {
         (t as? V8Object)?.release()
     }
 
-    override fun getGlobalContext(): GlobalRuntimeContext {
-        val v8result = eval<V8Object>("this")
-        val context = V8ObjectUtils.toMap(v8result) as GlobalRuntimeContext
-        return context.also { v8result.release() }
+    inner class V8RuntimeContext(contextKeys: List<String>, contextValues: List<Any?>) : RuntimeContext {
+        private val map = contextKeys.zip(contextValues).toMap()
+
+        override val keys = map.keys
+        override val values = map.values
+
+        override operator fun get(k: String) = map[k]
+        override operator fun set(k: String, v: Any?) {
+            evalVoid("this['$k'] = ${v?.toString() ?: "void 0"}")
+        }
+
+        override fun toMap() = map
+    }
+
+    override fun restoreState(originalContext: RuntimeContext) {
+        val scriptBuilder = StringBuilder()
+
+        val globalState = getGlobalPropertyNames()
+        for (key in globalState) {
+            if (key !in originalContext) {
+                scriptBuilder.append("this['$key'] = void 0;\n")
+            }
+        }
+        evalVoid(scriptBuilder.toString())
+    }
+
+    private fun getGlobalPropertyNames(): List<String> {
+        val v8Array = eval<V8Array>("Object.getOwnPropertyNames(this)")
+        val javaArray = V8ObjectUtils.toList(v8Array) as List<String>
+        return javaArray.also { v8Array.release() }
+    }
+
+    override fun getGlobalContext(): V8RuntimeContext {
+        val v8ArrayKeys = eval<V8Array>("Object.getOwnPropertyNames(this)")
+        val javaArrayKeys = V8ObjectUtils.toList(v8ArrayKeys).also { v8ArrayKeys.release() } as List<String>
+        val javaArrayValues = arrayOfNulls<Any?>(javaArrayKeys.size)
+        return V8RuntimeContext(javaArrayKeys, javaArrayValues.toList())
     }
 
     private val myRuntime: V8 = V8.createV8Runtime("global", LIBRARY_PATH_BASE)
