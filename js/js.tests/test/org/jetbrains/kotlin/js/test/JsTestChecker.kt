@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.js.test.interop.ScriptEngine
 import org.jetbrains.kotlin.js.test.interop.ScriptEngineNashorn
 import org.jetbrains.kotlin.js.test.interop.ScriptEngineV8
 import org.junit.Assert
+import java.lang.StringBuilder
 
 fun createScriptEngine(): ScriptEngine {
     return ScriptEngineNashorn()
@@ -66,6 +67,12 @@ abstract class AbstractJsTestChecker {
     }
 
     protected abstract fun run(files: List<String>, f: ScriptEngine.() -> Any?): Any?
+}
+
+fun ScriptEngine.runAndRestoreContext2(f: ScriptEngine.() -> Any?): Any? {
+    return try { this.f() } finally {
+        restoreState()
+    }
 }
 
 fun ScriptEngine.runAndRestoreContext(
@@ -126,7 +133,7 @@ abstract class AbstractNashornJsTestChecker: AbstractJsTestChecker() {
 
 object NashornJsTestChecker : AbstractNashornJsTestChecker() {
     const val SETUP_KOTLIN_OUTPUT = "kotlin.kotlin.io.output = new kotlin.kotlin.io.BufferedOutput();"
-    private const val GET_KOTLIN_OUTPUT = "kotlin.kotlin.io.output.buffer;"
+    const val GET_KOTLIN_OUTPUT = "kotlin.kotlin.io.output.buffer;"
 
     override fun beforeRun() {
         engine.evalVoid(SETUP_KOTLIN_OUTPUT)
@@ -164,6 +171,61 @@ class NashornIrJsTestChecker : AbstractNashornJsTestChecker() {
 
         return engine
     }
+}
+
+object V8JsTestChecker : AbstractJsTestChecker() {
+
+    const val SETUP_KOTLIN_OUTPUT = "kotlin.kotlin.io.output = new kotlin.kotlin.io.BufferedOutput();"
+
+    private val engine by lazy { createV8Engine() }
+    private lateinit var originalState: List<String>
+
+    private fun createV8Engine(): ScriptEngineV8 {
+        val v8 = ScriptEngineV8()
+
+        listOf(
+            BasicBoxTest.DIST_DIR_JS_PATH + "kotlin.js",
+            BasicBoxTest.DIST_DIR_JS_PATH + "kotlin-test.js"
+        ).forEach { v8.loadFile(it) }
+
+        v8.overrideAsserter()
+
+        originalState = v8.getGlobalPropertyNames()
+
+        return v8
+    }
+
+    fun run(files: List<String>) {
+        run(files) { null }
+    }
+
+    fun checkStdout(files: List<String>, expectedResult: String) {
+        run(files)
+        val actualResult = engine.eval<String>(NashornJsTestChecker.GET_KOTLIN_OUTPUT)
+        Assert.assertEquals(expectedResult, actualResult)
+    }
+
+    override fun run(files: List<String>, f: ScriptEngine.() -> Any?): Any? {
+        val v8 = engine
+
+        v8.evalVoid(SETUP_KOTLIN_OUTPUT)
+
+        return try {
+            files.forEach { v8.loadFile(it) }
+            v8.f()
+        } finally {
+            val scriptBuilder = StringBuilder()
+
+            val globalState = v8.getGlobalPropertyNames()
+            for (key in globalState) {
+                if (key !in originalState) {
+                    scriptBuilder.append("this['$key'] = void 0;\n")
+                }
+            }
+            v8.evalVoid(scriptBuilder.toString())
+        }
+    }
+
 }
 
 object V8IrJsTestChecker : AbstractJsTestChecker() {

@@ -43,6 +43,7 @@ import org.jetbrains.kotlin.js.parser.sourcemaps.SourceMapParser
 import org.jetbrains.kotlin.js.parser.sourcemaps.SourceMapSuccess
 import org.jetbrains.kotlin.js.sourceMap.SourceFilePathResolver
 import org.jetbrains.kotlin.js.sourceMap.SourceMap3Builder
+import org.jetbrains.kotlin.js.test.interop.ScriptEngineV8
 import org.jetbrains.kotlin.js.test.utils.*
 import org.jetbrains.kotlin.js.util.TextOutputImpl
 import org.jetbrains.kotlin.metadata.DebugProtoBuf
@@ -257,7 +258,8 @@ abstract class BasicBoxTest(
         withModuleSystem: Boolean,
         runtime: JsIrTestRuntime
     ) {
-        NashornJsTestChecker.check(jsFiles, testModuleName, testPackage, testFunction, expectedResult, withModuleSystem)
+//        NashornJsTestChecker.check(jsFiles, testModuleName, testPackage, testFunction, expectedResult, withModuleSystem)
+        V8JsTestChecker.check(jsFiles, testModuleName, testPackage, testFunction, expectedResult, withModuleSystem)
     }
 
     protected open fun performAdditionalChecks(generatedJsFiles: List<String>, outputPrefixFile: File?, outputPostfixFile: File?) {}
@@ -668,7 +670,7 @@ abstract class BasicBoxTest(
         runList += TEST_DATA_DIR_PATH + "nashorn-polyfills.js"
         runList += allJsFiles.map { filesToMinify[it]?.outputPath ?: it }
 
-        val result = engineForMinifier.runAndRestoreContext {
+        val result = engineForMinifier.runAndRestoreContext2 {
             runList.forEach(this::loadFile)
             overrideAsserter()
             eval<String>(NashornJsTestChecker.SETUP_KOTLIN_OUTPUT)
@@ -818,6 +820,7 @@ abstract class BasicBoxTest(
 
         const val KOTLIN_TEST_INTERNAL = "\$kotlin_test_internal\$"
 
-        private val engineForMinifier = createScriptEngine()
+//        private val engineForMinifier = createScriptEngine()
+        private val engineForMinifier by lazy { ScriptEngineV8() }
     }
 }

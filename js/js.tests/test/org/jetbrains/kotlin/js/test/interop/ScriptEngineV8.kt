@@ -9,11 +9,33 @@ import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.utils.V8ObjectUtils
+import org.jetbrains.kotlin.js.test.V8JsTestChecker
 import java.io.File
+import java.lang.StringBuilder
 
 class ScriptEngineV8 : ScriptEngine {
     override fun <T> releaseObject(t: T) {
         (t as? V8Object)?.release()
+    }
+
+
+
+    override fun restoreState() {
+        val scriptBuilder = StringBuilder()
+
+        val globalState = getGlobalPropertyNames()
+        for (key in globalState) {
+            if (key !in originalState) {
+                scriptBuilder.append("this['$key'] = void 0;\n")
+            }
+        }
+        evalVoid(scriptBuilder.toString())
+    }
+
+    fun getGlobalPropertyNames(): List<String> {
+        val v8Array = eval<V8Array>("Object.getOwnPropertyNames(this)")
+        val javaArray = V8ObjectUtils.toList(v8Array) as List<String>
+        return javaArray.also { v8Array.release() }
     }
 
     override fun getGlobalContext(): GlobalRuntimeContext {
@@ -23,6 +45,7 @@ class ScriptEngineV8 : ScriptEngine {
     }
 
     private val myRuntime: V8 = V8.createV8Runtime("global")
+    private val originalState = getGlobalPropertyNames()
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> eval(script: String): T {

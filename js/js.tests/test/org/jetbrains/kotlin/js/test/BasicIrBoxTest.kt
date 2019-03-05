@@ -69,6 +69,9 @@ abstract class BasicIrBoxTest(
         runtime: JsIrTestRuntime,
         isMainModule: Boolean
     ) {
+
+//        return
+
         val filesToCompile = units
             .map { (it as TranslationUnit.SourceFile).file }
             // TODO: split input files to some parts (global common, local common, test)
