@@ -45,8 +45,8 @@ class MultiModuleOrderTest : BasicBoxTest(pathToTestGroupDir, testGroupDir) {
         val mainJsFile = File(parentDir, "$name-main_v5.js").path
         val libJsFile = File(parentDir, "$name-lib_v5.js").path
         try {
-//            NashornJsTestChecker.run(listOf(mainJsFile, libJsFile))
-            V8JsTestChecker.run(listOf(mainJsFile, libJsFile))
+            // TODO: here we could not use V8JsTestChecker since it doesn't provide ScriptException
+            NashornJsTestChecker.run(listOf(mainJsFile, libJsFile))
         }
         catch (e: ScriptException) {
             val message = e.message!!
