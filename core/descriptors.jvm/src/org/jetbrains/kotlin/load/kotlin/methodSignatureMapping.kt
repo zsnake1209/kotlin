@@ -164,5 +164,5 @@ internal object TypeMappingConfigurationImpl : TypeMappingConfiguration<JvmType>
         // DO nothing
     }
 
-    override fun releaseCoroutines() = false
+    override fun releaseCoroutines() = true
 }

@@ -159,7 +159,7 @@ public class KotlinTypeMapper {
 
         @Override
         public boolean releaseCoroutines() {
-            return false;
+            return true;
         }
 
         @Nullable
