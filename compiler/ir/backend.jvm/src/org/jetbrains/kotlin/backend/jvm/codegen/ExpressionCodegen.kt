@@ -114,7 +114,7 @@ class ExpressionCodegen(
 
     val typeMapper = classCodegen.typeMapper
 
-    val returnType = typeMapper.mapReturnType(irFunction.descriptor)
+    val returnType = typeMapper.kotlinTypeMapper.mapReturnType(irFunction.descriptor)
 
     val state = classCodegen.state
 
@@ -128,7 +128,7 @@ class ExpressionCodegen(
         val info = BlockInfo.create()
         val result = irFunction.body!!.accept(this, info)
         markFunctionLineNumber()
-        val returnType = typeMapper.mapReturnType(irFunction.descriptor)
+        val returnType = typeMapper.mapReturnType(irFunction)
         val body = irFunction.body!!
         // If this function has an expression body, return the result of that expression.
         // Otherwise, if it does not end in a return statement, it must be void-returning,
@@ -185,7 +185,7 @@ class ExpressionCodegen(
             null
         }
 
-        val type = typeMapper.mapType(descriptor)
+        val type = typeMapper.kotlinTypeMapper.mapType(descriptor)
         // NOTE: we expect all value parameters to be present in the frame.
         mv.visitLocalVariable(
             nameForDestructuredParameter ?: param.name.asString(),
@@ -351,7 +351,7 @@ class ExpressionCodegen(
 
                     // Upper bound for type of vararg parameter should always have a form of 'Array<out T>',
                     // while its lower bound may be Nothing-typed after approximation
-                    val type = typeMapper.mapType(parameterDescriptor.type.upperIfFlexible())
+                    val type = typeMapper.kotlinTypeMapper.mapType(parameterDescriptor.type.upperIfFlexible())
                     callGenerator.putValueIfNeeded(
                         parameterType,
                         StackValue.operation(type) {
@@ -394,7 +394,7 @@ class ExpressionCodegen(
     }
 
     override fun visitVariable(declaration: IrVariable, data: BlockInfo): StackValue {
-        val varType = typeMapper.mapType(declaration.descriptor)
+        val varType = typeMapper.kotlinTypeMapper.mapType(declaration.descriptor)
         val index = frame.enter(declaration.symbol, varType)
 
         declaration.markLineNumber(startOffset = true)
@@ -438,8 +438,8 @@ class ExpressionCodegen(
 
         val realDescriptor = DescriptorUtils.unwrapFakeOverride(propertyDescriptor)
         val fieldKotlinType = realDescriptor.original.type
-        val fieldType = typeMapper.mapType(fieldKotlinType)
-        val ownerType = typeMapper.mapImplementationOwner(propertyDescriptor)
+        val fieldType = typeMapper.kotlinTypeMapper.mapType(fieldKotlinType)
+        val ownerType = typeMapper.kotlinTypeMapper.mapImplementationOwner(propertyDescriptor)
         val fieldName = propertyDescriptor.name.asString()
         val isStatic = expression.receiver == null // TODO
 
@@ -661,7 +661,7 @@ class ExpressionCodegen(
 //            )
             mv.newarray(boxType(elementJetType.asmType))
         } else {
-            val type = typeMapper.mapType(arrayType)
+            val type = typeMapper.kotlinTypeMapper.mapType(arrayType)
             mv.newarray(correctElementType(type))
         }
     }
@@ -848,7 +848,7 @@ class ExpressionCodegen(
 
             IrTypeOperator.IMPLICIT_INTEGER_COERCION -> {
                 gen(expression.argument, Type.INT_TYPE, data)
-                StackValue.coerce(Type.INT_TYPE, typeMapper.mapType(expression.type.toKotlinType()), mv)
+                StackValue.coerce(Type.INT_TYPE, typeMapper.kotlinTypeMapper.mapType(expression.type.toKotlinType()), mv)
             }
         }
         return expression.onStack
@@ -875,7 +875,7 @@ class ExpressionCodegen(
                 // Convert single arg to string.
                 val arg = expression.arguments[0]
                 val argStackValue = gen(arg, arg.asmType, data)
-                AsmUtil.genToString(argStackValue, argStackValue.type, argStackValue.kotlinType, typeMapper).put(expression.asmType, mv)
+                AsmUtil.genToString(argStackValue, argStackValue.type, argStackValue.kotlinType, typeMapper.kotlinTypeMapper).put(expression.asmType, mv)
                 expression.onStack
             }
             else -> {
@@ -1198,7 +1198,7 @@ class ExpressionCodegen(
         } else {
             val classType = classReference.classType
             if (classType is CrIrType) {
-                putJavaLangClassInstance(mv, classType.type, null, typeMapper)
+                putJavaLangClassInstance(mv, classType.type, null, typeMapper.kotlinTypeMapper)
                 return
             } else {
                 val kotlinType = classType.toKotlinType()
@@ -1207,7 +1207,7 @@ class ExpressionCodegen(
                     putReifiedOperationMarkerIfTypeIsReifiedParameter(kotlinType, ReifiedTypeInliner.OperationKind.JAVA_CLASS, mv, this)
                 }
 
-                putJavaLangClassInstance(mv, typeMapper.mapType(kotlinType), kotlinType, typeMapper)
+                putJavaLangClassInstance(mv, typeMapper.kotlinTypeMapper.mapType(kotlinType), kotlinType, typeMapper.kotlinTypeMapper)
             }
         }
 
@@ -1228,7 +1228,7 @@ class ExpressionCodegen(
     }
 
     val IrExpression.asmType: Type
-        get() = typeMapper.mapType(this.type.toKotlinType())
+        get() = typeMapper.kotlinTypeMapper.mapType(this.type.toKotlinType())
 
     val IrExpression.onStack: StackValue
         get() = StackValue.onStack(this.asmType)
@@ -1238,7 +1238,7 @@ class ExpressionCodegen(
         if (intrinsic != null) {
             return intrinsic.toCallable(
                 irCall,
-                typeMapper.mapSignatureSkipGeneric(irCall.descriptor as FunctionDescriptor),
+                typeMapper.kotlinTypeMapper.mapSignatureSkipGeneric(irCall.descriptor as FunctionDescriptor),
                 classCodegen.context
             )
         }
@@ -1259,14 +1259,14 @@ class ExpressionCodegen(
                 propertyDescriptor.setMethod!!
             }
         }
-        return typeMapper.mapToCallableMethod(descriptor as FunctionDescriptor, isSuper)
+        return typeMapper.kotlinTypeMapper.mapToCallableMethod(descriptor as FunctionDescriptor, isSuper)
     }
 
     private val KotlinType.asmType: Type
-        get() = typeMapper.mapType(this)
+        get() = typeMapper.kotlinTypeMapper.mapType(this)
 
     private val CallableDescriptor.asmType: Type
-        get() = typeMapper.mapType(this)
+        get() = typeMapper.kotlinTypeMapper.mapType(this)
 
 
     private fun getOrCreateCallGenerator(
@@ -1315,7 +1315,7 @@ class ExpressionCodegen(
                 val approximatedType = approximateCapturedTypes(entry.value).upper
                 // type is not generic
                 val signatureWriter = BothSignatureWriter(BothSignatureWriter.Mode.TYPE)
-                val asmType = typeMapper.mapTypeParameter(approximatedType, signatureWriter)
+                val asmType = typeMapper.kotlinTypeMapper.mapTypeParameter(approximatedType, signatureWriter)
 
                 mappings.addParameterMappingToType(
                     key.name.identifier, approximatedType, asmType, signatureWriter.toString(), isReified

@@ -276,7 +276,7 @@ class AnnotationCodegen(
 }
 
 interface InnerClassConsumer {
-    fun addInnerClassInfoFromAnnotation(irClass: IrClass)
+    fun addInnerClassInfoFromAnnotation(innerClass: IrClass)
 }
 
 private fun isBareTypeParameterWithNullableUpperBound(type: IrType): Boolean {

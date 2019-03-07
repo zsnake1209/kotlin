@@ -41,7 +41,7 @@ open class FunctionCodegen(private val irFunction: IrFunction, private val class
         }
 
     private fun doGenerate(): JvmMethodGenericSignature {
-        val signature = classCodegen.typeMapper.mapSignatureWithGeneric(descriptor, OwnerKind.IMPLEMENTATION)
+        val signature = classCodegen.typeMapper.kotlinTypeMapper.mapSignatureWithGeneric(descriptor, OwnerKind.IMPLEMENTATION)
 
         val flags = calculateMethodFlags(irFunction.isStatic)
         val methodVisitor = createMethod(flags, signature)

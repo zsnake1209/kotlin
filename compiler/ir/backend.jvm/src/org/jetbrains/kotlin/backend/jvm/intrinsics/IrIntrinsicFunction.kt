@@ -103,7 +103,7 @@ open class IrIntrinsicFunction(
 
         args.forEachIndexed { i, irExpression ->
             if (irExpression is IrEmptyVarargExpression) {
-                val parameterType = codegen.typeMapper.mapType(irExpression.type.toKotlinType())
+                val parameterType = codegen.typeMapper.mapType(irExpression.type)
                 StackValue.operation(parameterType) {
                     it.aconst(0)
                     it.newarray(AsmUtil.correctElementType(parameterType))
