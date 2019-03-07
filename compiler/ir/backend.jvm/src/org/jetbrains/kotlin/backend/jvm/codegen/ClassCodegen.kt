@@ -103,7 +103,7 @@ open class ClassCodegen protected constructor(
             signature.superclassName,
             signature.interfaces.toTypedArray()
         )
-        AnnotationCodegen.forClass(visitor.visitor, this, context.state).genAnnotations(descriptor, null)
+        AnnotationCodegen.forClass(visitor.visitor, this, context.state).genAnnotations(irClass, null)
         /* TODO: Temporary workaround: ClassBuilder needs a pathless name. */
         val shortName = File(fileEntry.name).name
         visitor.visitSource(shortName, null)
@@ -226,7 +226,7 @@ open class ClassCodegen protected constructor(
         )
 
         if (field.origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY) {
-            AnnotationCodegen.forField(fv, this, state).genAnnotations(field.descriptor, null)
+            AnnotationCodegen.forField(fv, this, state).genAnnotations(field, null)
         }
 
         val descriptor = field.metadata?.descriptor
@@ -298,8 +298,8 @@ open class ClassCodegen protected constructor(
 
     // It's necessary for proper recovering of classId by plain string JVM descriptor when loading annotations
     // See FileBasedKotlinClass.convertAnnotationVisitor
-    override fun addInnerClassInfoFromAnnotation(classDescriptor: ClassDescriptor) {
-        var current: DeclarationDescriptor? = classDescriptor
+    override fun addInnerClassInfoFromAnnotation(irClass: IrClass) {
+        var current: DeclarationDescriptor? = irClass.descriptor
         while (current != null && !isTopLevelDeclaration(current)) {
             if (current is ClassDescriptor) {
                 innerClasses.add(current)

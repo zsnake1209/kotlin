@@ -47,7 +47,11 @@ abstract class IrLazyDeclarationBase(
         createLazyParent()!!
     }
 
-    override val annotations: MutableList<IrCall> = arrayListOf()
+    override val annotations: MutableList<IrCall> by lazy {
+        descriptor.annotations.map {
+            typeTranslator.constantValueGenerator.generateAnnotationConstructorCall(it)
+        }.toMutableList()
+    }
 
     override var metadata: Nothing?
         get() = null

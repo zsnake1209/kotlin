@@ -10,8 +10,12 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.FunctionCodegen
 import org.jetbrains.kotlin.codegen.state.GenerationState
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.hasAnnotation
@@ -22,6 +26,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodGenericSignature
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterKind
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.kotlin.resolve.source.getPsi
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
@@ -46,8 +51,8 @@ open class FunctionCodegen(private val irFunction: IrFunction, private val class
         val methodVisitor = createMethod(flags, signature)
 
         if (irFunction.origin != IrDeclarationOrigin.FUNCTION_FOR_DEFAULT_PARAMETER) {
-            AnnotationCodegen.forMethod(methodVisitor, classCodegen, state).genAnnotations(descriptor, signature.asmMethod.returnType)
-            FunctionCodegen.generateParameterAnnotations(descriptor, methodVisitor, signature, classCodegen, state)
+            AnnotationCodegen.forMethod(methodVisitor, classCodegen, state).genAnnotations(irFunction, signature.asmMethod.returnType)
+            FunctionCodegen.generateParameterAnnotations(descriptor, methodVisitor, signature, DummyOldInnerClassConsumer(), state)
         }
 
         if (!state.classBuilderMode.generateBodies || flags.and(Opcodes.ACC_ABSTRACT) != 0 || irFunction.isExternal) {
@@ -105,20 +110,24 @@ open class FunctionCodegen(private val irFunction: IrFunction, private val class
     }
 
     private fun generateAnnotationDefaultValueIfNeeded(methodVisitor: MethodVisitor) {
-        if (classCodegen.irClass.isAnnotationClass) {
-            val source = JvmCodegenUtil.getDirectMember(descriptor).source
-            (source.getPsi() as? KtParameter)?.defaultValue?.apply {
-                val defaultValue = this
-                val constant = org.jetbrains.kotlin.codegen.ExpressionCodegen.getCompileTimeConstant(
-                    defaultValue, state.bindingContext, true, state.shouldInlineConstVals
-                )
-                assert(!state.classBuilderMode.generateBodies || constant != null) { "Default value for annotation parameter should be compile time value: " + defaultValue.text }
-                if (constant != null) {
-                    val annotationCodegen = AnnotationCodegen.forAnnotationDefaultValue(methodVisitor, classCodegen, state)
-                    annotationCodegen.generateAnnotationDefaultValue(constant, descriptor.returnType!!)
-                }
-            }
+        getAnnotationDefaultValueExpression()?.let { defaultValueExpression ->
+            val annotationCodegen = AnnotationCodegen.forAnnotationDefaultValue(methodVisitor, classCodegen, state)
+            annotationCodegen.generateAnnotationDefaultValue(defaultValueExpression, irFunction.returnType)
         }
+    }
+
+    private fun getAnnotationDefaultValueExpression(): IrExpression? {
+        if (!classCodegen.irClass.isAnnotationClass) return null
+        // TODO: any simpler way to get to the value expression?
+        // Are there other valid IR structures that represent the default value?
+        return irFunction.safeAs<IrSimpleFunction>()
+            ?.correspondingProperty
+            ?.backingField
+            ?.initializer.safeAs<IrExpressionBody>()
+            ?.expression?.safeAs<IrGetValue>()
+            ?.symbol?.owner?.safeAs<IrValueParameter>()
+            ?.defaultValue?.safeAs<IrExpressionBody>()
+            ?.expression
     }
 }
 
@@ -152,4 +161,14 @@ private fun createFrameMapWithReceivers(
     }
 
     return frameMap
+}
+
+/**/// TODO: temporary, to allow calling the old FunctionCodegen.generateParameterAnnotations
+private class DummyOldInnerClassConsumer()
+    : org.jetbrains.kotlin.codegen.InnerClassConsumer {
+
+    override fun addInnerClassInfoFromAnnotation(classDescriptor: ClassDescriptor) {
+
+    }
+
 }

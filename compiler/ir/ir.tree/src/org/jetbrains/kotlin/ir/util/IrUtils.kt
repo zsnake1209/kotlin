@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -366,6 +367,13 @@ val IrClass.isEnumEntry get() = kind == ClassKind.ENUM_ENTRY
 val IrClass.isInterface get() = kind == ClassKind.INTERFACE
 val IrClass.isClass get() = kind == ClassKind.CLASS
 val IrClass.isObject get() = kind == ClassKind.OBJECT
+val IrClass.isAnonymousObject get() = isObject && name == SpecialNames.NO_NAME_PROVIDED
+val IrDeclarationWithName.fqName: FqName?
+    get() = when (val parent = parent) {
+        is IrDeclarationWithName -> parent.fqName?.child(name)
+        is IrPackageFragment -> parent.fqName.child(name)
+        else -> null
+    }
 
 val IrDeclaration.parentAsClass get() = parent as IrClass
 
