@@ -78,21 +78,63 @@ CLASS IR_EXTERNAL_DECLARATION_STUB CLASS name:Int modality:FINAL visibility:publ
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Short flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:mod visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Byte) returnType:kotlin.Int flags:
+    annotations:
+      CALL 'constructor Deprecated(String, ReplaceWith = ..., DeprecationLevel = ...)' type=kotlin.Deprecated origin=null
+        message: CONST String type=kotlin.String value="Use rem(other) instead"
+        replaceWith: CALL 'constructor ReplaceWith(String, vararg String)' type=kotlin.ReplaceWith origin=null
+          expression: CONST String type=kotlin.String value="rem(other)"
+          imports: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
+        level: GET_ENUM 'ERROR' type=kotlin.DeprecationLevel
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Byte flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:mod visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Double) returnType:kotlin.Double flags:
+    annotations:
+      CALL 'constructor Deprecated(String, ReplaceWith = ..., DeprecationLevel = ...)' type=kotlin.Deprecated origin=null
+        message: CONST String type=kotlin.String value="Use rem(other) instead"
+        replaceWith: CALL 'constructor ReplaceWith(String, vararg String)' type=kotlin.ReplaceWith origin=null
+          expression: CONST String type=kotlin.String value="rem(other)"
+          imports: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
+        level: GET_ENUM 'ERROR' type=kotlin.DeprecationLevel
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Double flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:mod visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Float) returnType:kotlin.Float flags:
+    annotations:
+      CALL 'constructor Deprecated(String, ReplaceWith = ..., DeprecationLevel = ...)' type=kotlin.Deprecated origin=null
+        message: CONST String type=kotlin.String value="Use rem(other) instead"
+        replaceWith: CALL 'constructor ReplaceWith(String, vararg String)' type=kotlin.ReplaceWith origin=null
+          expression: CONST String type=kotlin.String value="rem(other)"
+          imports: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
+        level: GET_ENUM 'ERROR' type=kotlin.DeprecationLevel
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Float flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:mod visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Int) returnType:kotlin.Int flags:
+    annotations:
+      CALL 'constructor Deprecated(String, ReplaceWith = ..., DeprecationLevel = ...)' type=kotlin.Deprecated origin=null
+        message: CONST String type=kotlin.String value="Use rem(other) instead"
+        replaceWith: CALL 'constructor ReplaceWith(String, vararg String)' type=kotlin.ReplaceWith origin=null
+          expression: CONST String type=kotlin.String value="rem(other)"
+          imports: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
+        level: GET_ENUM 'ERROR' type=kotlin.DeprecationLevel
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Int flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:mod visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Long) returnType:kotlin.Long flags:
+    annotations:
+      CALL 'constructor Deprecated(String, ReplaceWith = ..., DeprecationLevel = ...)' type=kotlin.Deprecated origin=null
+        message: CONST String type=kotlin.String value="Use rem(other) instead"
+        replaceWith: CALL 'constructor ReplaceWith(String, vararg String)' type=kotlin.ReplaceWith origin=null
+          expression: CONST String type=kotlin.String value="rem(other)"
+          imports: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
+        level: GET_ENUM 'ERROR' type=kotlin.DeprecationLevel
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Long flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:mod visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Short) returnType:kotlin.Int flags:
+    annotations:
+      CALL 'constructor Deprecated(String, ReplaceWith = ..., DeprecationLevel = ...)' type=kotlin.Deprecated origin=null
+        message: CONST String type=kotlin.String value="Use rem(other) instead"
+        replaceWith: CALL 'constructor ReplaceWith(String, vararg String)' type=kotlin.ReplaceWith origin=null
+          expression: CONST String type=kotlin.String value="rem(other)"
+          imports: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
+        level: GET_ENUM 'ERROR' type=kotlin.DeprecationLevel
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Short flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:or visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Int) returnType:kotlin.Int flags:
@@ -129,21 +171,39 @@ CLASS IR_EXTERNAL_DECLARATION_STUB CLASS name:Int modality:FINAL visibility:publ
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Short flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:rem visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Byte) returnType:kotlin.Int flags:
+    annotations:
+      CALL 'constructor SinceKotlin(String)' type=kotlin.SinceKotlin origin=null
+        version: CONST String type=kotlin.String value="1.1"
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Byte flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:rem visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Double) returnType:kotlin.Double flags:
+    annotations:
+      CALL 'constructor SinceKotlin(String)' type=kotlin.SinceKotlin origin=null
+        version: CONST String type=kotlin.String value="1.1"
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Double flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:rem visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Float) returnType:kotlin.Float flags:
+    annotations:
+      CALL 'constructor SinceKotlin(String)' type=kotlin.SinceKotlin origin=null
+        version: CONST String type=kotlin.String value="1.1"
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Float flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:rem visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Int) returnType:kotlin.Int flags:
+    annotations:
+      CALL 'constructor SinceKotlin(String)' type=kotlin.SinceKotlin origin=null
+        version: CONST String type=kotlin.String value="1.1"
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Int flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:rem visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Long) returnType:kotlin.Long flags:
+    annotations:
+      CALL 'constructor SinceKotlin(String)' type=kotlin.SinceKotlin origin=null
+        version: CONST String type=kotlin.String value="1.1"
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Long flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:rem visibility:public modality:FINAL <> ($this:kotlin.Int, other:kotlin.Short) returnType:kotlin.Int flags:
+    annotations:
+      CALL 'constructor SinceKotlin(String)' type=kotlin.SinceKotlin origin=null
+        version: CONST String type=kotlin.String value="1.1"
     $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int flags:
     VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:other index:0 type:kotlin.Short flags:
   FUN IR_EXTERNAL_DECLARATION_STUB name:shl visibility:public modality:FINAL <> ($this:kotlin.Int, bitCount:kotlin.Int) returnType:kotlin.Int flags:
@@ -231,6 +291,9 @@ CLASS IR_EXTERNAL_DECLARATION_STUB CLASS name:Int modality:FINAL visibility:publ
         correspondingProperty: PROPERTY IR_EXTERNAL_DECLARATION_STUB name:MIN_VALUE visibility:public modality:FINAL flags:const,val
         $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int.Companion flags:
     PROPERTY IR_EXTERNAL_DECLARATION_STUB name:SIZE_BITS visibility:public modality:FINAL flags:const,val
+      annotations:
+        CALL 'constructor SinceKotlin(String)' type=kotlin.SinceKotlin origin=null
+          version: CONST String type=kotlin.String value="1.3"
       FIELD IR_EXTERNAL_DECLARATION_STUB name:SIZE_BITS type:kotlin.Int visibility:public flags:final
         EXPRESSION_BODY
           CONST Int type=kotlin.Int value=32
@@ -238,6 +301,9 @@ CLASS IR_EXTERNAL_DECLARATION_STUB CLASS name:Int modality:FINAL visibility:publ
         correspondingProperty: PROPERTY IR_EXTERNAL_DECLARATION_STUB name:SIZE_BITS visibility:public modality:FINAL flags:const,val
         $this: VALUE_PARAMETER IR_EXTERNAL_DECLARATION_STUB name:<this> type:kotlin.Int.Companion flags:
     PROPERTY IR_EXTERNAL_DECLARATION_STUB name:SIZE_BYTES visibility:public modality:FINAL flags:const,val
+      annotations:
+        CALL 'constructor SinceKotlin(String)' type=kotlin.SinceKotlin origin=null
+          version: CONST String type=kotlin.String value="1.3"
       FIELD IR_EXTERNAL_DECLARATION_STUB name:SIZE_BYTES type:kotlin.Int visibility:public flags:final
         EXPRESSION_BODY
           CONST Int type=kotlin.Int value=4
