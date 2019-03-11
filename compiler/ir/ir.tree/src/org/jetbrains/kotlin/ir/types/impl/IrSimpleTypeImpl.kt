@@ -17,24 +17,55 @@ class IrSimpleTypeImpl(
     override val classifier: IrClassifierSymbol,
     override val hasQuestionMark: Boolean,
     override val arguments: List<IrTypeArgument>,
+    override val outerType: IrSimpleType?,
     annotations: List<IrCall>,
     variance: Variance
 ) : IrTypeBase(kotlinType, annotations, variance), IrSimpleType, IrTypeProjection {
 
+    @Deprecated(message = "outerType required")
+    constructor(
+        kotlinType: KotlinType?,
+        classifier: IrClassifierSymbol,
+        hasQuestionMark: Boolean,
+        arguments: List<IrTypeArgument>,
+        annotations: List<IrCall>,
+        variance: Variance
+    ) : this(kotlinType, classifier, hasQuestionMark, arguments, null, annotations, variance)
+
+
+    @Deprecated(message = "outerType required")
     constructor(
         classifier: IrClassifierSymbol,
         hasQuestionMark: Boolean,
         arguments: List<IrTypeArgument>,
         annotations: List<IrCall>
-    ) : this(null, classifier, hasQuestionMark, arguments, annotations, Variance.INVARIANT)
+    ) : this(null, classifier, hasQuestionMark, arguments, null, annotations, Variance.INVARIANT)
 
+    constructor(
+        classifier: IrClassifierSymbol,
+        hasQuestionMark: Boolean,
+        arguments: List<IrTypeArgument>,
+        outerType: IrSimpleType?,
+        annotations: List<IrCall>
+    ) : this(null, classifier, hasQuestionMark, arguments, outerType, annotations, Variance.INVARIANT)
+
+    @Deprecated(message = "outerType required")
     constructor(
         kotlinType: KotlinType?,
         classifier: IrClassifierSymbol,
         hasQuestionMark: Boolean,
         arguments: List<IrTypeArgument>,
         annotations: List<IrCall>
-    ) : this(kotlinType, classifier, hasQuestionMark, arguments, annotations, Variance.INVARIANT)
+    ) : this(kotlinType, classifier, hasQuestionMark, arguments, null, annotations, Variance.INVARIANT)
+
+    constructor(
+        kotlinType: KotlinType?,
+        classifier: IrClassifierSymbol,
+        hasQuestionMark: Boolean,
+        arguments: List<IrTypeArgument>,
+        outerType: IrSimpleType?,
+        annotations: List<IrCall>
+    ) : this(kotlinType, classifier, hasQuestionMark, arguments, outerType, annotations, Variance.INVARIANT)
 
     constructor(
         other: IrSimpleType,
@@ -42,7 +73,7 @@ class IrSimpleTypeImpl(
     ) :
             this(
                 other.safeAs<IrSimpleTypeImpl>()?.kotlinType,
-                other.classifier, other.hasQuestionMark, other.arguments, other.annotations, variance
+                other.classifier, other.hasQuestionMark, other.arguments, other.outerType, other.annotations, variance
             )
 
 }

@@ -21,6 +21,7 @@ interface IrSimpleType : IrType {
     val classifier: IrClassifierSymbol
     val hasQuestionMark: Boolean
     val arguments: List<IrTypeArgument>
+    val outerType: IrSimpleType?
 }
 
 interface IrTypeArgument

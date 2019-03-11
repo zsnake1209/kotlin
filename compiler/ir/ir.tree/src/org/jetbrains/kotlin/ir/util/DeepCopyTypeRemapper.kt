@@ -42,12 +42,19 @@ class DeepCopyTypeRemapper(
 
         val annotations = type.annotations.map { it.transform(deepCopy, null) as IrCall }
 
+        val remappedOuterType = type.outerType?.let { remapType(it) }
+        if (remappedOuterType !is IrSimpleType?) {
+            throw AssertionError("IrSimpleType expected: $remappedOuterType")
+        }
+
         return IrSimpleTypeImpl(
             type.originalKotlinType,
             symbolRemapper.getReferencedClassifier(type.classifier),
             type.hasQuestionMark,
             arguments,
-            annotations)
+            remappedOuterType,
+            annotations
+        )
     }
 
 }

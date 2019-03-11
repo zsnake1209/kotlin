@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
@@ -392,7 +393,7 @@ internal fun KotlinType.render(): String =
     DECLARATION_RENDERER.renderType(this)
 
 internal fun IrDeclaration.renderOriginIfNonTrivial(): String =
-    if (origin != IrDeclarationOrigin.DEFINED) origin.toString() + " " else ""
+    if (origin != IrDeclarationOrigin.DEFINED) "$origin " else ""
 
 internal fun IrType.renderTypeInner(): String =
     when (this) {
@@ -401,7 +402,21 @@ internal fun IrType.renderTypeInner(): String =
         is IrErrorType -> "ERROR"
 
         is IrSimpleType -> buildString {
-            append(DECLARATION_RENDERER.renderClassifierName(classifier.descriptor)) // TODO get rid of descriptors
+            val outerType = this@renderTypeInner.outerType
+
+            when {
+                outerType != null -> {
+                    append(outerType.renderTypeInner())
+                    append(".")
+                    append(classifier.descriptor.name) // TODO get rid of descriptors
+                }
+                classifier is IrTypeParameterSymbol ->
+                    append(classifier.descriptor.name) // TODO get rid of descriptors
+                else ->
+                    append(DECLARATION_RENDERER.renderClassifierName(classifier.descriptor)) // TODO get rid of descriptors
+            }
+
+
             if (arguments.isNotEmpty()) {
                 append(
                     arguments.joinToString(prefix = "<", postfix = ">", separator = ", ") {

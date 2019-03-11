@@ -83,23 +83,57 @@ class TypeTranslator(
                     resolveTypeParameter(ktTypeDescriptor),
                     approximatedType.isMarkedNullable,
                     emptyList(),
+                    null,
                     translateTypeAnnotations(approximatedType.annotations),
                     variance
                 )
 
             is ClassDescriptor ->
-                IrSimpleTypeImpl(
-                    approximatedType,
-                    symbolTable.referenceClass(ktTypeDescriptor),
-                    approximatedType.isMarkedNullable,
-                    translateTypeArguments(approximatedType.arguments),
-                    translateTypeAnnotations(approximatedType.annotations),
-                    variance
-                )
+                translatePossiblyInnerType(approximatedType, variance)
 
             else ->
                 throw AssertionError("Unexpected type descriptor $ktTypeDescriptor :: ${ktTypeDescriptor::class}")
         }
+    }
+
+    private fun translatePossiblyInnerType(kotlinType: KotlinType, variance: Variance): IrSimpleTypeImpl {
+        val classDescriptor = kotlinType.constructor.declarationDescriptor as? ClassDescriptor
+            ?: error("Expected class type, got: $kotlinType")
+        val classSymbol = symbolTable.referenceClass(classDescriptor)
+
+        val ownTypeArguments = kotlinType.arguments.subList(0, classDescriptor.declaredTypeParameters.size)
+        val irTypeArguments = translateTypeArguments(ownTypeArguments)
+
+        val outerType = kotlinType.outerType()?.let {
+            translatePossiblyInnerType(it, variance)
+        }
+
+        val irTypeAnnotations = translateTypeAnnotations(kotlinType.annotations)
+
+        return IrSimpleTypeImpl(
+            kotlinType,
+            classSymbol,
+            kotlinType.isMarkedNullable,
+            irTypeArguments,
+            outerType,
+            irTypeAnnotations,
+            variance
+        )
+    }
+
+    private fun KotlinType.outerType(): KotlinType? {
+        val typeDescriptor = constructor.declarationDescriptor ?: return null
+        val classDescriptor = typeDescriptor as? ClassDescriptor ?: return null
+
+        // TODO there were some bugs with 'isInner' for local classes - investigate
+        if (!classDescriptor.isInner) return null
+
+        val outerClassDescriptor = classDescriptor.containingDeclaration as? ClassDescriptor
+            ?: error("Containing declaration of inner class $classDescriptor is not a class: ${classDescriptor.containingDeclaration}")
+
+        val outerTypeArguments = arguments.subList(classDescriptor.declaredTypeParameters.size, arguments.size)
+
+        return KotlinTypeFactory.simpleNotNullType(Annotations.EMPTY, outerClassDescriptor, outerTypeArguments)
     }
 
     private inner class LegacyTypeApproximation {

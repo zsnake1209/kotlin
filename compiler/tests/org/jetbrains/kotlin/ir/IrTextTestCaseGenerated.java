@@ -1575,5 +1575,10 @@ public class IrTextTestCaseGenerated extends AbstractIrTextTestCase {
         public void testIntersectionType3() throws Exception {
             runTest("compiler/testData/ir/irText/types/intersectionType3.kt");
         }
+
+        @TestMetadata("outerType.kt")
+        public void testOuterType() throws Exception {
+            runTest("compiler/testData/ir/irText/types/outerType.kt");
+        }
     }
 }
