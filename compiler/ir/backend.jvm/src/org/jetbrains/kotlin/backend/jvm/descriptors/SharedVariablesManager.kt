@@ -30,12 +30,13 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.*
 
 private val SHARED_VARIABLE_ORIGIN = object : IrDeclarationOriginImpl("SHARED_VARIABLE_ORIGIN") {}
-private val SHARED_VARIABLE_CALL_ORIGIN = object : IrStatementOriginImpl("SHARED_VARIABLE_CALL") {}
+private val SHARED_VARIABLE_CONSTRUCTOR_CALL_ORIGIN = object : IrStatementOriginImpl("SHARED_VARIABLE_CONSTRUCTOR_CALL") {}
 
 class JvmSharedVariablesManager(
     module: ModuleDescriptor,
@@ -56,51 +57,61 @@ class JvmSharedVariablesManager(
         superTypes.add(irBuiltIns.anyType)
     }
 
-    private class PrimitiveRefProvider(irPrimitiveType: IrType, refClass: IrClass) {
-        val refType: IrType = refClass.defaultType
+    private abstract class RefProvider {
+        abstract val elementType: IrType
+        abstract val refClass: IrClass
+        abstract fun getRefType(valueType: IrType): IrSimpleType
 
-        val refConstructor: IrConstructor = buildConstructor {
-            origin = SHARED_VARIABLE_ORIGIN
-            returnType = refType
-        }.apply {
-            parent = refClass
-            refClass.addMember(this)
+        // Have to initialize fields lazily in order to refer to refClass.
+        val refConstructor: IrConstructor by lazy {
+            buildConstructor {
+                origin = SHARED_VARIABLE_ORIGIN
+                returnType = refClass.defaultType
+            }.apply {
+                parent = refClass
+                refClass.addMember(this)
+            }
         }
 
-        val elementField: IrField = buildField {
-            origin = SHARED_VARIABLE_ORIGIN
-            name = Name.identifier("element")
-            type = irPrimitiveType
-        }.apply {
-            parent = refClass
-            refClass.addMember(this)
+        val elementField: IrField by lazy {
+            buildField {
+                origin = SHARED_VARIABLE_ORIGIN
+                name = Name.identifier("element")
+                type = elementType
+            }.apply {
+                parent = refClass
+                refClass.addMember(this)
+            }
         }
     }
 
-    private val primitiveRefDescriptorProviders: Map<PrimitiveType, PrimitiveRefProvider> =
-        PrimitiveType.values().associate { primitiveType ->
-            val irType = builtIns.getPrimitiveKotlinType(primitiveType).toIrType()!!
+    private inner class PrimitiveRefProvider(primitiveType: PrimitiveType) : RefProvider() {
+        override val elementType = builtIns.getPrimitiveKotlinType(primitiveType).toIrType()!!
 
-            val refClassName = Name.identifier(primitiveType.typeName.asString() + "Ref")
-            val refClass = buildClass {
-                name = refClassName
-            }.apply {
-                parent = refNamespaceClass
-                refNamespaceClass.addMember(this)
-                superTypes.add(irBuiltIns.anyType)
-                thisReceiver = buildValueParameter {
-                    type = IrSimpleTypeImpl(symbol, hasQuestionMark = false, arguments = emptyList(), annotations = emptyList())
-                    name = Name.identifier("$this")
-                }.also {
-                    it.parent = this
-                }
+        override val refClass = buildClass {
+            origin = SHARED_VARIABLE_ORIGIN
+            name = Name.identifier(primitiveType.typeName.asString() + "Ref")
+        }.apply {
+            parent = refNamespaceClass
+            refNamespaceClass.addMember(this)
+            superTypes.add(irBuiltIns.anyType)
+            thisReceiver = buildValueParameter {
+                type = IrSimpleTypeImpl(symbol, hasQuestionMark = false, arguments = emptyList(), annotations = emptyList())
+                name = Name.identifier("$this")
+            }.also {
+                it.parent = this
             }
-
-            primitiveType to PrimitiveRefProvider(irType, refClass)
         }
 
-    private inner class ObjectRefDescriptorsProvider {
-        val refClass: IrClass = buildClass {
+        override fun getRefType(valueType: IrType) = refClass.defaultType
+    }
+
+    private val primitiveRefProviders = PrimitiveType.values().associate { primitiveType ->
+        primitiveType to PrimitiveRefProvider(primitiveType)
+    }
+
+    private val objectRefProvider = object : RefProvider() {
+        override val refClass = buildClass {
             origin = SHARED_VARIABLE_ORIGIN
             name = Name.identifier("ObjectRef")
         }.apply {
@@ -138,48 +149,36 @@ class JvmSharedVariablesManager(
             }
         }
 
-        val refConstructor: IrConstructor = buildConstructor {
-            origin = SHARED_VARIABLE_ORIGIN
-            returnType = refClass.defaultType
-        }.apply {
-            parent = refClass
-            refClass.addMember(this)
-        }
+        override val elementType = refClass.typeParameters[0].defaultType
 
-        val elementField: IrField = buildField {
-            origin = SHARED_VARIABLE_ORIGIN
-            name = Name.identifier("element")
-            type = refClass.typeParameters[0].defaultType
-        }.apply {
-            parent = refClass
-            refClass.addMember(this)
-        }
-
-        fun getRefType(valueType: IrType) = refClass.typeWith(listOf(valueType))
+        override fun getRefType(valueType: IrType) = refClass.typeWith(listOf(valueType))
     }
 
-    private val objectRefDescriptorsProvider = ObjectRefDescriptorsProvider()
+    private fun getProvider(valueType: IrType) = primitiveRefProviders[getPrimitiveType(valueType)] ?: objectRefProvider
+
+    private fun getElementFieldSymbol(valueType: IrType): IrFieldSymbol {
+        return getProvider(valueType).elementField.symbol
+    }
 
     override fun declareSharedVariable(originalDeclaration: IrVariable): IrVariable {
         val valueType = originalDeclaration.type
-        val primitiveRefDescriptorsProvider = primitiveRefDescriptorProviders[getPrimitiveType(valueType)]
-        val refType = primitiveRefDescriptorsProvider?.refType ?: objectRefDescriptorsProvider.getRefType(valueType)
-        val typeArgumentsCount = if (primitiveRefDescriptorsProvider != null) 1 else 0
-
-        val refConstructor =
-            primitiveRefDescriptorsProvider?.refConstructor ?: objectRefDescriptorsProvider.refConstructor
+        val provider = getProvider(valueType)
+        val refType = provider.getRefType(valueType)
+        val refConstructor = provider.refConstructor
+        val typeArgumentsCount = refConstructor.parentAsClass.typeParameters.count()
 
         val refConstructorCall = IrCallImpl(
             originalDeclaration.startOffset, originalDeclaration.endOffset,
             refType,
             refConstructor.symbol, refConstructor.descriptor,
             typeArgumentsCount = typeArgumentsCount,
-            origin = SHARED_VARIABLE_CALL_ORIGIN
+            origin = SHARED_VARIABLE_CONSTRUCTOR_CALL_ORIGIN
         ).apply {
-            if (primitiveRefDescriptorsProvider != null) {
+            if (typeArgumentsCount > 0) {
                 putTypeArgument(0, valueType)
             }
         }
+
         return IrVariableImpl(
             originalDeclaration.startOffset, originalDeclaration.endOffset, originalDeclaration.origin,
             IrVariableSymbolImpl(WrappedVariableDescriptor()),
@@ -201,14 +200,10 @@ class JvmSharedVariablesManager(
         val initializer = originalDeclaration.initializer ?: return sharedVariableDeclaration
 
         val valueType = originalDeclaration.type
-        val primitiveRefDescriptorsProvider = primitiveRefDescriptorProviders[getPrimitiveType(valueType)]
-
-        val elementFieldSymbol =
-            primitiveRefDescriptorsProvider?.elementField?.symbol ?: objectRefDescriptorsProvider.elementField.symbol
 
         val sharedVariableInitialization = IrSetFieldImpl(
             initializer.startOffset, initializer.endOffset,
-            elementFieldSymbol,
+            getElementFieldSymbol(valueType),
             IrGetValueImpl(initializer.startOffset, initializer.endOffset, sharedVariableDeclaration.symbol),
             initializer,
             valueType
@@ -218,12 +213,6 @@ class JvmSharedVariablesManager(
             originalDeclaration.startOffset, originalDeclaration.endOffset, irBuiltIns.unitType, null,
             listOf(sharedVariableDeclaration, sharedVariableInitialization)
         )
-    }
-
-    private fun getElementFieldSymbol(valueType: IrType): IrFieldSymbol {
-        val primitiveRefDescriptorsProvider = primitiveRefDescriptorProviders[getPrimitiveType(valueType)]
-
-        return primitiveRefDescriptorsProvider?.elementField?.symbol ?: objectRefDescriptorsProvider.elementField.symbol
     }
 
     override fun getSharedValue(sharedVariableSymbol: IrVariableSymbol, originalGet: IrGetValue): IrExpression =
