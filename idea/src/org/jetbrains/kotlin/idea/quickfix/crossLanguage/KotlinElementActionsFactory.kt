@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.idea.quickfix.crossLanguage
 
+import com.intellij.codeInsight.AnnotationTargetUtil
 import com.intellij.codeInsight.daemon.QuickFixBundle
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -29,6 +30,7 @@ import com.intellij.openapi.util.text.StringUtilRt
 import com.intellij.psi.*
 import com.intellij.psi.codeStyle.SuggestedNameInfo
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl
+import com.intellij.psi.util.PropertyUtil
 import com.intellij.psi.util.PropertyUtilBase
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForFacade
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForSourceDeclaration
@@ -40,6 +42,7 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.MutablePackageFragmentDescriptor
 import org.jetbrains.kotlin.idea.KotlinLanguage
@@ -449,11 +452,25 @@ class KotlinElementActionsFactory : JvmElementActionsFactory() {
     override fun createAddAnnotationActions(target: JvmModifiersOwner, request: AnnotationRequest): List<IntentionAction> {
         val declaration = (target as? KtLightElement<*, *>)?.kotlinOrigin as? KtModifierListOwner ?: return emptyList()
         if (declaration.language != KotlinLanguage.INSTANCE) return emptyList()
-        return listOf(CreateAnnotationAction(declaration, request))
+        val annotationUseSiteTarget = when (target) {
+            is JvmField -> AnnotationUseSiteTarget.FIELD
+            is JvmMethod -> when {
+                PropertyUtil.isSimplePropertySetter(target as? PsiMethod) -> AnnotationUseSiteTarget.PROPERTY_SETTER
+                PropertyUtil.isSimplePropertyGetter(target as? PsiMethod) -> AnnotationUseSiteTarget.PROPERTY_GETTER
+                else -> null
+            }
+            is JvmParameter ->
+                if ((declaration as? KtParameter)?.hasValOrVar() == true)
+                    AnnotationUseSiteTarget.CONSTRUCTOR_PARAMETER
+                else null
+            else -> null
+        }
+        return listOf(CreateAnnotationAction(declaration, annotationUseSiteTarget, request))
     }
 
     private class CreateAnnotationAction(
         target: KtModifierListOwner,
+        val annotationTarget: AnnotationUseSiteTarget?,
         val request: AnnotationRequest
     ) : IntentionAction {
 
@@ -471,14 +488,23 @@ class KotlinElementActionsFactory : JvmElementActionsFactory() {
 
         override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
             val target = pointer.element ?: return
-            val kotlinAnnotation = JavaPsiFacade.getInstance(project).findClass(
-                request.qualifiedName,
-                target.resolveScope
-            )?.language == KotlinLanguage.INSTANCE
+            val annotationClass = JavaPsiFacade.getInstance(project).findClass(request.qualifiedName, target.resolveScope)
+
+            val kotlinAnnotation = annotationClass?.language == KotlinLanguage.INSTANCE
+
+            val annotationUseSiteTargetPrefix = run prefixEvaluation@{
+                if (annotationTarget == null) return@prefixEvaluation ""
+
+                val targetsSet = annotationClass?.let { AnnotationTargetUtil.getAnnotationTargets(it) } ?: return@prefixEvaluation ""
+                if (targetsSet != AnnotationTargetUtil.DEFAULT_TARGETS) return@prefixEvaluation ""
+
+                "${annotationTarget.renderName}:"
+            }
+
             val entry = target.addAnnotationEntry(
                 KtPsiFactory(target)
                     .createAnnotationEntry(
-                        "@${request.qualifiedName}${
+                        "@$annotationUseSiteTargetPrefix${request.qualifiedName}${
                         request.attributes.mapIndexed { i, p ->
                             if (!kotlinAnnotation && i == 0 && p.name == "value")
                                 renderAttributeValue(p.value).toString()
