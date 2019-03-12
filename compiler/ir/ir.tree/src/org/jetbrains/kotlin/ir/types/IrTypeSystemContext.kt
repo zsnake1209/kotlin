@@ -110,7 +110,7 @@ interface IrTypeSystemContext : TypeSystemContext {
 
     override fun TypeParameterMarker.getTypeConstructor() = this as IrTypeParameterSymbol
 
-    override fun isEqualTypeConstructors(c1: TypeConstructorMarker, c2: TypeConstructorMarker) = (c1 === c2)
+    override fun isEqualTypeConstructors(c1: TypeConstructorMarker, c2: TypeConstructorMarker) = checkIrTypeConstructorEquality(c1, c2)
 
     override fun TypeConstructorMarker.isDenotable() = false
 
@@ -165,14 +165,16 @@ interface IrTypeSystemContext : TypeSystemContext {
 
     override fun SimpleTypeMarker.asArgumentList() = this as IrSimpleType
 
-    override fun TypeConstructorMarker.isAnyConstructor() = this === irBuiltIns.anyClass
+    override fun TypeConstructorMarker.isAnyConstructor() = checkIrTypeConstructorEquality(this, irBuiltIns.anyClass)
 
-    override fun TypeConstructorMarker.isNothingConstructor() = this === irBuiltIns.nothingClass
+    override fun TypeConstructorMarker.isNothingConstructor() = checkIrTypeConstructorEquality(this, irBuiltIns.nothingClass)
 
     override fun KotlinTypeMarker.isNotNullNothing(): Boolean {
         val simpleType = this as? IrSimpleType ?: return false
-        return simpleType.classifier === irBuiltIns.nothingClass && !simpleType.hasQuestionMark
+        return checkIrTypeConstructorEquality(simpleType.classifier, irBuiltIns.nothingClass) && !simpleType.hasQuestionMark
     }
 
     override fun SimpleTypeMarker.isSingleClassifierType() = true
+
+    fun checkIrTypeConstructorEquality(c1: TypeConstructorMarker, c2: TypeConstructorMarker): Boolean
 }
