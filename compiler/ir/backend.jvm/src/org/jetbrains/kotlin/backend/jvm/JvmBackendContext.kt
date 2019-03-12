@@ -11,25 +11,30 @@ import org.jetbrains.kotlin.backend.common.ir.Symbols
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.jvm.descriptors.JvmDeclarationFactory
 import org.jetbrains.kotlin.backend.jvm.descriptors.JvmSharedVariablesManager
+import org.jetbrains.kotlin.backend.jvm.lower.fqName
 import org.jetbrains.kotlin.builtins.ReflectionTypes
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.NotFoundClasses
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.AbstractIrTypeCheckerContext
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi2ir.PsiSourceManager
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 
 class JvmBackendContext(
     val state: GenerationState,
@@ -50,6 +55,50 @@ class JvmBackendContext(
     override var inVerbosePhase: Boolean = false
 
     override val configuration get() = state.configuration
+
+    override val typeCheckerContext = object : AbstractIrTypeCheckerContext(irBuiltIns) {
+        override fun checkIrTypeConstructorEquality(c1: TypeConstructorMarker, c2: TypeConstructorMarker): Boolean {
+            val classifier1 = c1 as IrClassifierSymbol
+            val classifier2 = c2 as IrClassifierSymbol
+            if (!classifier1.isBound || !classifier2.isBound) checkViaDescriptors(classifier1.descriptor, classifier2.descriptor)
+            return checkViaDeclarations(classifier1.owner, classifier2.owner)
+        }
+
+        private fun isClassesEqual(c1: IrClass, c2: IrClass) = c1.fqName == c2.fqName
+
+        private fun checkViaDeclarations(classifier1: org.jetbrains.kotlin.ir.declarations.IrSymbolOwner, classifier2: org.jetbrains.kotlin.ir.declarations.IrSymbolOwner): Boolean {
+            if (classifier1 is IrClass && classifier2 is IrClass) {
+                return isClassesEqual(classifier1, classifier2)
+            }
+
+            if (classifier1 is IrTypeParameter && classifier2 is IrTypeParameter) {
+                if (classifier1.name != classifier2.name) return false
+                val p1 = classifier1.parent
+                val p2 = classifier2.parent
+                if (p1 is IrClass && p2 is IrClass) return isClassesEqual(p1, p2)
+                if (p1 is org.jetbrains.kotlin.ir.declarations.IrSimpleFunction && p2 is org.jetbrains.kotlin.ir.declarations.IrSimpleFunction) {
+                    // TODO: implement correct function equality checking
+                    return p1.descriptor == p2.descriptor
+                }
+                return false
+            }
+
+            return false
+        }
+
+        private fun checkViaDescriptors(classifier1: ClassifierDescriptor, classifier2: ClassifierDescriptor): Boolean {
+            if (classifier1 is ClassDescriptor && classifier2 is ClassDescriptor) {
+                return classifier1.fqNameSafe == classifier2.fqNameSafe
+            }
+            if (classifier1 is TypeParameterDescriptor && classifier2 is TypeParameterDescriptor) {
+                if (classifier1.name != classifier2.name) return false
+
+                return classifier1.typeConstructor == classifier2.typeConstructor
+            }
+
+            return false
+        }
+    }
 
     init {
         if (state.configuration.get(CommonConfigurationKeys.LIST_PHASES) == true) {
