@@ -5,182 +5,193 @@
 
 package org.jetbrains.kotlin.backend.jvm.descriptors
 
-import org.jetbrains.kotlin.backend.common.descriptors.KnownClassDescriptor
-import org.jetbrains.kotlin.backend.common.descriptors.KnownPackageFragmentDescriptor
+import org.jetbrains.kotlin.backend.common.descriptors.*
 import org.jetbrains.kotlin.backend.common.ir.SharedVariablesManager
+import org.jetbrains.kotlin.backend.common.ir.addChild
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.PrimitiveType
-import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.descriptors.impl.ClassConstructorDescriptorImpl
-import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor
-import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOriginImpl
-import org.jetbrains.kotlin.ir.declarations.IrVariable
-import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrFieldImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrVariableImpl
+import org.jetbrains.kotlin.ir.builders.declarations.buildClass
+import org.jetbrains.kotlin.ir.builders.declarations.buildConstructor
+import org.jetbrains.kotlin.ir.builders.declarations.buildField
+import org.jetbrains.kotlin.ir.builders.declarations.buildValueParameter
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrGetValue
-import org.jetbrains.kotlin.ir.expressions.IrSetVariable
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
-import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
 import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
-import org.jetbrains.kotlin.ir.symbols.impl.IrConstructorSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrFieldSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrVariableSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.createFunctionSymbol
-import org.jetbrains.kotlin.ir.types.impl.IrUninitializedType
-import org.jetbrains.kotlin.ir.types.toIrType
+import org.jetbrains.kotlin.ir.symbols.impl.*
+import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.*
 
 private val SHARED_VARIABLE_ORIGIN = object : IrDeclarationOriginImpl("SHARED_VARIABLE_ORIGIN") {}
+private val SHARED_VARIABLE_CALL_ORIGIN = object : IrStatementOriginImpl("SHARED_VARIABLE_CALL") {}
 
 class JvmSharedVariablesManager(
+    module: ModuleDescriptor,
     val builtIns: KotlinBuiltIns,
     val irBuiltIns: IrBuiltIns
 ) : SharedVariablesManager {
-    private val kotlinJvmInternalPackage = KnownPackageFragmentDescriptor(builtIns.builtInsModule, FqName("kotlin.jvm.internal"))
-    private val refNamespaceClass =
-        KnownClassDescriptor.createClass(Name.identifier("Ref"), kotlinJvmInternalPackage, listOf(builtIns.anyType))
+    private val jvmInternalPackage = IrExternalPackageFragmentImpl(
+        IrExternalPackageFragmentSymbolImpl(
+            EmptyPackageFragmentDescriptor(module, FqName("kotlin.jvm.internal"))
+        )
+    )
 
-    private class PrimitiveRefDescriptorsProvider(type: KotlinType, refClass: ClassDescriptor) {
-        val refType: KotlinType = refClass.defaultType
-
-        val refConstructor: ClassConstructorDescriptor =
-            ClassConstructorDescriptorImpl.create(refClass, Annotations.EMPTY, true, SourceElement.NO_SOURCE).apply {
-                initialize(emptyList(), Visibilities.PUBLIC, emptyList())
-                returnType = refType
-            }
-
-        val refConstructorSymbol = IrConstructorSymbolImpl(refConstructor)
-
-        val elementField: PropertyDescriptor =
-            PropertyDescriptorImpl.create(
-                refClass, Annotations.EMPTY, Modality.FINAL, Visibilities.PUBLIC, true,
-                Name.identifier("element"), CallableMemberDescriptor.Kind.DECLARATION, SourceElement.NO_SOURCE,
-                /* lateInit = */ false, /* isConst = */ false, /* isExpect = */ false, /* isActual = */ false,
-                /* isExternal = */ false, /* isDelegated = */ false
-            ).initialize(type, dispatchReceiverParameter = refClass.thisAsReceiverParameter)
-
-        val elementFieldSymbol = IrFieldSymbolImpl(elementField)
-        val elementFieldDeclaration =
-            IrFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, SHARED_VARIABLE_ORIGIN, elementFieldSymbol, type.toIrType()!!)
+    private val refNamespaceClass = buildClass {
+        name = Name.identifier("Ref")
+    }.apply {
+        parent = jvmInternalPackage
+        jvmInternalPackage.addChild(this)
+        superTypes.add(irBuiltIns.anyType)
     }
 
-    private val primitiveRefDescriptorProviders: Map<PrimitiveType, PrimitiveRefDescriptorsProvider> =
-        PrimitiveType.values().associate {
-            val type = builtIns.getPrimitiveKotlinType(it)
+    private class PrimitiveRefProvider(irPrimitiveType: IrType, refClass: IrClass) {
+        val refType: IrType = refClass.defaultType
 
-            val refClassName = Name.identifier(it.typeName.asString() + "Ref")
-            val refClass = KnownClassDescriptor.createClass(refClassName, refNamespaceClass, listOf(builtIns.anyType))
+        val refConstructor: IrConstructor = buildConstructor {
+            origin = SHARED_VARIABLE_ORIGIN
+            returnType = refType
+        }.apply {
+            parent = refClass
+            refClass.addMember(this)
+        }
 
-            it to PrimitiveRefDescriptorsProvider(type, refClass)
+        val elementField: IrField = buildField {
+            origin = SHARED_VARIABLE_ORIGIN
+            name = Name.identifier("element")
+            type = irPrimitiveType
+        }.apply {
+            parent = refClass
+            refClass.addMember(this)
+        }
+    }
+
+    private val primitiveRefDescriptorProviders: Map<PrimitiveType, PrimitiveRefProvider> =
+        PrimitiveType.values().associate { primitiveType ->
+            val irType = builtIns.getPrimitiveKotlinType(primitiveType).toIrType()!!
+
+            val refClassName = Name.identifier(primitiveType.typeName.asString() + "Ref")
+            val refClass = buildClass {
+                name = refClassName
+            }.apply {
+                parent = refNamespaceClass
+                refNamespaceClass.addMember(this)
+                superTypes.add(irBuiltIns.anyType)
+                thisReceiver = buildValueParameter {
+                    type = IrSimpleTypeImpl(symbol, hasQuestionMark = false, arguments = emptyList(), annotations = emptyList())
+                    name = Name.identifier("$this")
+                }.also {
+                    it.parent = this
+                }
+            }
+
+            primitiveType to PrimitiveRefProvider(irType, refClass)
         }
 
     private inner class ObjectRefDescriptorsProvider {
-        val genericRefClass: ClassDescriptor =
-            KnownClassDescriptor.createClassWithTypeParameters(
-                Name.identifier("ObjectRef"), refNamespaceClass, listOf(builtIns.anyType), listOf(Name.identifier("T"))
+        val refClass: IrClass = buildClass {
+            origin = SHARED_VARIABLE_ORIGIN
+            name = Name.identifier("ObjectRef")
+        }.apply {
+            val irClass = this
+            typeParameters.add(
+                IrTypeParameterImpl(
+                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                    SHARED_VARIABLE_ORIGIN,
+                    IrTypeParameterSymbolImpl(WrappedTypeParameterDescriptor()),
+                    Name.identifier("T"),
+                    index = 0,
+                    variance = Variance.INVARIANT,
+                    isReified = false
+                ).apply {
+                    (descriptor as WrappedTypeParameterDescriptor).bind(this)
+                    parent = irClass
+                    superTypes.add(irBuiltIns.anyNType)
+                }
             )
-
-        val genericRefConstructor: ClassConstructorDescriptor =
-            ClassConstructorDescriptorImpl.create(genericRefClass, Annotations.EMPTY, true, SourceElement.NO_SOURCE).apply {
-                initialize(emptyList(), Visibilities.PUBLIC)
-                val typeParameter = typeParameters[0]
-                val typeParameterType = KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(
-                    Annotations.EMPTY,
-                    typeParameter.typeConstructor,
-                    listOf(),
-                    false,
-                    MemberScope.Empty
+            parent = refNamespaceClass
+            refNamespaceClass.addMember(this)
+            superTypes.add(irBuiltIns.anyType)
+            thisReceiver = buildValueParameter {
+                type = IrSimpleTypeImpl(
+                    symbol,
+                    hasQuestionMark = false,
+                    arguments = listOf(
+                        makeTypeProjection(typeParameters[0].defaultType, Variance.INVARIANT)
+                    ),
+                    annotations = emptyList()
                 )
-                returnType = KotlinTypeFactory.simpleNotNullType(
-                    Annotations.EMPTY,
-                    genericRefClass,
-                    listOf(TypeProjectionImpl(Variance.INVARIANT, typeParameterType))
-                )
+                name = Name.identifier("$this")
+            }.also {
+                it.parent = this
             }
+        }
 
-        val constructorTypeParameter: TypeParameterDescriptor =
-            genericRefConstructor.typeParameters[0]
+        val refConstructor: IrConstructor = buildConstructor {
+            origin = SHARED_VARIABLE_ORIGIN
+            returnType = refClass.defaultType
+        }.apply {
+            parent = refClass
+            refClass.addMember(this)
+        }
 
-        fun getSubstitutedRefConstructor(valueType: KotlinType): ClassConstructorDescriptor =
-            genericRefConstructor.substitute(
-                TypeSubstitutor.create(
-                    mapOf(constructorTypeParameter.typeConstructor to TypeProjectionImpl(Variance.INVARIANT, valueType))
-                )
-            )!!
+        val elementField: IrField = buildField {
+            origin = SHARED_VARIABLE_ORIGIN
+            name = Name.identifier("element")
+            type = refClass.typeParameters[0].defaultType
+        }.apply {
+            parent = refClass
+            refClass.addMember(this)
+        }
 
-        val genericElementField: PropertyDescriptor =
-            PropertyDescriptorImpl.create(
-                genericRefClass, Annotations.EMPTY, Modality.FINAL, Visibilities.PUBLIC, true,
-                Name.identifier("element"), CallableMemberDescriptor.Kind.DECLARATION, SourceElement.NO_SOURCE,
-                /* lateInit = */ false, /* isConst = */ false, /* isExpect = */ false, /* isActual = */ false,
-                /* isExternal = */ false, /* isDelegated = */ false
-            ).initialize(
-                type = builtIns.anyType,
-                dispatchReceiverParameter = genericRefClass.thisAsReceiverParameter
-            )
-
-        val genericElementFieldSymbol = IrFieldSymbolImpl(genericElementField)
-        val elementFieldDeclaration =
-            IrFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, SHARED_VARIABLE_ORIGIN, genericElementFieldSymbol, irBuiltIns.anyType)
-
-
-        fun getRefType(valueType: KotlinType) =
-            KotlinTypeFactory.simpleNotNullType(
-                Annotations.EMPTY,
-                genericRefClass,
-                listOf(TypeProjectionImpl(Variance.INVARIANT, valueType))
-            )
+        fun getRefType(valueType: IrType) = refClass.typeWith(listOf(valueType))
     }
 
     private val objectRefDescriptorsProvider = ObjectRefDescriptorsProvider()
 
     override fun declareSharedVariable(originalDeclaration: IrVariable): IrVariable {
-        val variableDescriptor = originalDeclaration.descriptor
-        val sharedVariableDescriptor = LocalVariableDescriptor(
-            variableDescriptor.containingDeclaration, variableDescriptor.annotations, variableDescriptor.name,
-            getSharedVariableType(variableDescriptor.type),
-            false, false, variableDescriptor.isLateInit, variableDescriptor.source
-        )
-        val sharedVariableSymbol = IrVariableSymbolImpl(sharedVariableDescriptor)
-
-        val valueType = originalDeclaration.descriptor.type
+        val valueType = originalDeclaration.type
         val primitiveRefDescriptorsProvider = primitiveRefDescriptorProviders[getPrimitiveType(valueType)]
+        val refType = primitiveRefDescriptorsProvider?.refType ?: objectRefDescriptorsProvider.getRefType(valueType)
+        val typeArgumentsCount = if (primitiveRefDescriptorsProvider != null) 1 else 0
 
         val refConstructor =
-            primitiveRefDescriptorsProvider?.refConstructor ?: objectRefDescriptorsProvider.getSubstitutedRefConstructor(valueType)
-
-        val refConstructorSymbol =
-            primitiveRefDescriptorsProvider?.refConstructorSymbol ?: createFunctionSymbol(refConstructor) as IrConstructorSymbol
-
-        val refConstructorDeclaration = if (refConstructorSymbol.isBound) refConstructorSymbol.owner else
-            IrConstructorImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, SHARED_VARIABLE_ORIGIN, refConstructorSymbol, IrUninitializedType)
-
-        val refConstructorTypeArguments =
-            if (primitiveRefDescriptorsProvider != null) null
-            else mapOf(objectRefDescriptorsProvider.constructorTypeParameter to valueType)
-
+            primitiveRefDescriptorsProvider?.refConstructor ?: objectRefDescriptorsProvider.refConstructor
 
         val refConstructorCall = IrCallImpl(
             originalDeclaration.startOffset, originalDeclaration.endOffset,
-            refConstructor.constructedClass.defaultType.toIrType()!!,
-            refConstructorSymbol, refConstructor,
-            refConstructorTypeArguments?.size ?: 0
-        )
+            refType,
+            refConstructor.symbol, refConstructor.descriptor,
+            typeArgumentsCount = typeArgumentsCount,
+            origin = SHARED_VARIABLE_CALL_ORIGIN
+        ).apply {
+            if (primitiveRefDescriptorsProvider != null) {
+                putTypeArgument(0, valueType)
+            }
+        }
         return IrVariableImpl(
             originalDeclaration.startOffset, originalDeclaration.endOffset, originalDeclaration.origin,
-            sharedVariableSymbol, sharedVariableDescriptor.type.toIrType()!!
-        ).apply { initializer = refConstructorCall }
+            IrVariableSymbolImpl(WrappedVariableDescriptor()),
+            originalDeclaration.name,
+            refType,
+            originalDeclaration.isVar,
+            originalDeclaration.isConst,
+            isLateinit = false
+        ).apply {
+            (descriptor as WrappedVariableDescriptor).bind(this)
+            initializer = refConstructorCall
+        }
     }
 
     override fun defineSharedValue(
@@ -189,18 +200,18 @@ class JvmSharedVariablesManager(
     ): IrStatement {
         val initializer = originalDeclaration.initializer ?: return sharedVariableDeclaration
 
-        val valueType = originalDeclaration.descriptor.type
+        val valueType = originalDeclaration.type
         val primitiveRefDescriptorsProvider = primitiveRefDescriptorProviders[getPrimitiveType(valueType)]
 
-        val elementPropertySymbol =
-            primitiveRefDescriptorsProvider?.elementFieldSymbol ?: objectRefDescriptorsProvider.genericElementFieldSymbol
+        val elementFieldSymbol =
+            primitiveRefDescriptorsProvider?.elementField?.symbol ?: objectRefDescriptorsProvider.elementField.symbol
 
         val sharedVariableInitialization = IrSetFieldImpl(
             initializer.startOffset, initializer.endOffset,
-            elementPropertySymbol,
+            elementFieldSymbol,
             IrGetValueImpl(initializer.startOffset, initializer.endOffset, sharedVariableDeclaration.symbol),
             initializer,
-            originalDeclaration.type
+            valueType
         )
 
         return IrCompositeImpl(
@@ -209,45 +220,50 @@ class JvmSharedVariablesManager(
         )
     }
 
-    private fun getElementFieldSymbol(valueType: KotlinType): IrFieldSymbol {
+    private fun getElementFieldSymbol(valueType: IrType): IrFieldSymbol {
         val primitiveRefDescriptorsProvider = primitiveRefDescriptorProviders[getPrimitiveType(valueType)]
 
-        return primitiveRefDescriptorsProvider?.elementFieldSymbol ?: objectRefDescriptorsProvider.genericElementFieldSymbol
+        return primitiveRefDescriptorsProvider?.elementField?.symbol ?: objectRefDescriptorsProvider.elementField.symbol
     }
 
     override fun getSharedValue(sharedVariableSymbol: IrVariableSymbol, originalGet: IrGetValue): IrExpression =
-        IrGetFieldImpl(
-            originalGet.startOffset, originalGet.endOffset,
-            getElementFieldSymbol(originalGet.descriptor.type),
+        IrTypeOperatorCallImpl(
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             originalGet.type,
-            IrGetValueImpl(originalGet.startOffset, originalGet.endOffset, sharedVariableSymbol),
-            originalGet.origin
+            IrTypeOperator.IMPLICIT_CAST,
+            originalGet.type,
+            (originalGet.type as IrSimpleType).classifier,
+            IrGetFieldImpl(
+                originalGet.startOffset, originalGet.endOffset,
+                getElementFieldSymbol(originalGet.symbol.owner.type),
+                originalGet.type,
+                IrGetValueImpl(originalGet.startOffset, originalGet.endOffset, sharedVariableSymbol),
+                originalGet.origin
+            )
         )
 
     override fun setSharedValue(sharedVariableSymbol: IrVariableSymbol, originalSet: IrSetVariable): IrExpression =
         IrSetFieldImpl(
             originalSet.startOffset, originalSet.endOffset,
-            getElementFieldSymbol(originalSet.descriptor.type),
+            getElementFieldSymbol(originalSet.symbol.owner.type),
             IrGetValueImpl(originalSet.startOffset, originalSet.endOffset, sharedVariableSymbol),
             originalSet.value,
             originalSet.type,
             originalSet.origin
         )
 
-    private fun getSharedVariableType(valueType: KotlinType): KotlinType =
-        primitiveRefDescriptorProviders[getPrimitiveType(valueType)]?.refType ?: objectRefDescriptorsProvider.getRefType(valueType)
-
-    private fun getPrimitiveType(type: KotlinType): PrimitiveType? =
-        when {
-            KotlinBuiltIns.isBoolean(type) -> PrimitiveType.BOOLEAN
-            KotlinBuiltIns.isChar(type) -> PrimitiveType.CHAR
-            KotlinBuiltIns.isByte(type) -> PrimitiveType.BYTE
-            KotlinBuiltIns.isShort(type) -> PrimitiveType.SHORT
-            KotlinBuiltIns.isInt(type) -> PrimitiveType.INT
-            KotlinBuiltIns.isLong(type) -> PrimitiveType.LONG
-            KotlinBuiltIns.isFloat(type) -> PrimitiveType.FLOAT
-            KotlinBuiltIns.isDouble(type) -> PrimitiveType.DOUBLE
+    private fun getPrimitiveType(type: IrType): PrimitiveType? {
+        val kType = type.toKotlinType()
+        return when {
+            KotlinBuiltIns.isBoolean(kType) -> PrimitiveType.BOOLEAN
+            KotlinBuiltIns.isChar(kType) -> PrimitiveType.CHAR
+            KotlinBuiltIns.isByte(kType) -> PrimitiveType.BYTE
+            KotlinBuiltIns.isShort(kType) -> PrimitiveType.SHORT
+            KotlinBuiltIns.isInt(kType) -> PrimitiveType.INT
+            KotlinBuiltIns.isLong(kType) -> PrimitiveType.LONG
+            KotlinBuiltIns.isFloat(kType) -> PrimitiveType.FLOAT
+            KotlinBuiltIns.isDouble(kType) -> PrimitiveType.DOUBLE
             else -> null
         }
-
+    }
 }
