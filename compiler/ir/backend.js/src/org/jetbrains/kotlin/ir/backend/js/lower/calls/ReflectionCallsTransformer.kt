@@ -23,14 +23,18 @@ class ReflectionCallsTransformer(private val context: JsIrBackendContext) : Call
             addWithPredicate(
                 Name.special(Namer.KCALLABLE_GET_NAME),
                 { call ->
-                    call.symbol.owner.dispatchReceiverParameter?.run { type.isSubtypeOfClass(context.irBuiltIns.kCallableClass) } ?: false
+                    call.symbol.owner.dispatchReceiverParameter?.run {
+                        context.run { type.isSubtypeOfClass(irBuiltIns.kCallableClass, typeCheckerContext) }
+                    } ?: false
                 },
                 { call -> irCall(call, context.intrinsics.jsName.symbol, dispatchReceiverAsFirstArgument = true) })
 
             addWithPredicate(
                 Name.identifier(Namer.KPROPERTY_GET),
                 { call ->
-                    call.symbol.owner.dispatchReceiverParameter?.run { type.isSubtypeOfClass(context.irBuiltIns.kPropertyClass) } ?: false
+                    call.symbol.owner.dispatchReceiverParameter?.run {
+                        context.run { type.isSubtypeOfClass(irBuiltIns.kPropertyClass, typeCheckerContext) }
+                    } ?: false
                 },
                 { call -> irCall(call, context.intrinsics.jsPropertyGet.symbol, dispatchReceiverAsFirstArgument = true) }
             )
@@ -38,7 +42,9 @@ class ReflectionCallsTransformer(private val context: JsIrBackendContext) : Call
             addWithPredicate(
                 Name.identifier(Namer.KPROPERTY_SET),
                 { call ->
-                    call.symbol.owner.dispatchReceiverParameter?.run { type.isSubtypeOfClass(context.irBuiltIns.kPropertyClass) } ?: false
+                    call.symbol.owner.dispatchReceiverParameter?.run {
+                        context.run { type.isSubtypeOfClass(irBuiltIns.kPropertyClass, typeCheckerContext) }
+                    } ?: false
                 },
                 { call -> irCall(call, context.intrinsics.jsPropertySet.symbol, dispatchReceiverAsFirstArgument = true) }
             )

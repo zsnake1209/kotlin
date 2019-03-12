@@ -535,7 +535,7 @@ class CallableReferenceLowering(val context: JsIrBackendContext) : FileLoweringP
             val closureParam = unboundParamSymbols[i].owner
             val value = JsIrBuilder.buildGetValue(unboundParamSymbols[i])
             val parameter = callTarget.valueParameters[j]
-            val argument = if (parameter.varargElementType?.let { closureParam.type.isSubtypeOf(it, context.irBuiltIns) } == true) {
+            val argument = if (parameter.varargElementType?.let { closureParam.type.isSubtypeOf(it, context.typeCheckerContext) } == true) {
                 // fun foo(x: X, y: vararg Y): Z
                 // val r: (X, Y) -> Z = ::foo
                 IrVarargImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, parameter.type, parameter.varargElementType!!, listOf(value))

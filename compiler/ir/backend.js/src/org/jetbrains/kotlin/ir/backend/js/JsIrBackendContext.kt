@@ -24,12 +24,12 @@ import org.jetbrains.kotlin.ir.SourceRangeInfo
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.lower.CallableReferenceKey
 import org.jetbrains.kotlin.ir.backend.js.lower.ConstructorPair
-import org.jetbrains.kotlin.ir.backend.js.lower.inline.ModuleIndex
 import org.jetbrains.kotlin.ir.backend.js.utils.OperatorNames
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.types.AbstractIrTypeCheckerContext
 import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.getPropertyDeclaration
@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.createDynamicType
+import org.jetbrains.kotlin.types.model.TypeConstructorMarker
 
 class JsIrBackendContext(
     val module: ModuleDescriptorImpl,
@@ -51,6 +52,10 @@ class JsIrBackendContext(
 ) : CommonBackendContext {
 
     override val builtIns = module.builtIns
+
+    override val typeCheckerContext = object : AbstractIrTypeCheckerContext(irBuiltIns) {
+        override fun checkIrTypeConstructorEquality(c1: TypeConstructorMarker, c2: TypeConstructorMarker) = c1 === c2
+    }
 
     val phaseConfig = PhaseConfig(jsPhases, configuration)
     override var inVerbosePhase: Boolean = false
