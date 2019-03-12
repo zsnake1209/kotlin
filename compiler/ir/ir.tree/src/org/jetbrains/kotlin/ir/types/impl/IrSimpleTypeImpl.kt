@@ -60,3 +60,7 @@ fun makeTypeProjection(type: IrType, variance: Variance): IrTypeProjection =
         type is IrErrorType -> IrErrorTypeImpl(type.originalKotlinType, type.annotations, variance)
         else -> IrTypeProjectionImpl(type, variance)
     }
+
+fun makeTypeIntersection(types: List<IrType>) =
+    if (types.size == 1) types[1]
+    else TODO("Not implemented")
