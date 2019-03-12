@@ -183,6 +183,7 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
     }
 
     override fun TypeConstructorMarker.supertypes(): Collection<KotlinTypeMarker> {
+        if (this is ErrorTypeConstructor) return emptyList()
         require(this is ConeSymbol)
         return when (this) {
             is ConeTypeParameterSymbol -> emptyList()
@@ -242,7 +243,7 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
     }
 
     override fun captureFromArguments(type: SimpleTypeMarker, status: CaptureStatus): SimpleTypeMarker? {
-        TODO("not implemented")
+        return type //TODO
     }
 
     override fun SimpleTypeMarker.asArgumentList(): TypeArgumentListMarker {
