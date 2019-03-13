@@ -91,6 +91,7 @@ class UnsignedTypeGenerator(val type: UnsignedType, out: PrintWriter) : BuiltIns
 
 
         generateExtensionConversions()
+        generateExtensionBinaryOperators()
     }
 
 
@@ -131,12 +132,15 @@ class UnsignedTypeGenerator(val type: UnsignedType, out: PrintWriter) : BuiltIns
     }
 
     private fun generateOperator(name: String, doc: String) {
+        fun printHeader(otherType: String, returnType: String) {
+            out.println("    /** $doc */")
+            out.println("    @kotlin.internal.InlineOnly")
+            out.print("    public inline operator fun $name(other: $otherType): $returnType = ")
+        }
         for (otherType in UnsignedType.values()) {
             val returnType = getOperatorReturnType(type, otherType)
 
-            out.println("    /** $doc */")
-            out.println("    @kotlin.internal.InlineOnly")
-            out.print("    public inline operator fun $name(other: ${otherType.capitalized}): ${returnType.capitalized} = ")
+            printHeader(otherType.capitalized, returnType.capitalized)
             if (type == otherType && type == returnType) {
                 when (name) {
                     "plus", "minus", "times" -> out.println("$className(this.data.$name(other.data))")
@@ -148,9 +152,35 @@ class UnsignedTypeGenerator(val type: UnsignedType, out: PrintWriter) : BuiltIns
                 out.println("${convert("this", type, returnType)}.$name(${convert("other", otherType, returnType)})")
             }
         }
+        for (otherType in PrimitiveType.floatingPoint) {
+            val returnType = otherType.capitalized
+
+            printHeader(returnType, returnType)
+            out.println("this.to$returnType().$name(other)")
+        }
         out.println()
     }
 
+    private fun generateExtensionBinaryOperators() {
+        for ((name, doc) in GeneratePrimitives.binaryOperators) {
+            if (name != "mod") {
+                generateExtensionOperator(name, doc)
+            }
+        }
+    }
+
+    private fun generateExtensionOperator(name: String, doc: String) {
+        for (otherType in PrimitiveType.floatingPoint) {
+            val returnType = otherType.capitalized
+
+            out.println("/** $doc */")
+            out.println("@SinceKotlin(\"1.3\")")
+            out.println("@ExperimentalUnsignedTypes")
+            out.println("@kotlin.internal.InlineOnly")
+            out.println("public inline fun $returnType.$name(other: $className): $returnType = this.$name(other.to$returnType())")
+        }
+        out.println()
+    }
 
     private fun generateUnaryOperators() {
         for ((name, doc) in GeneratePrimitives.unaryOperators) {
@@ -336,11 +366,11 @@ class UnsignedTypeGenerator(val type: UnsignedType, out: PrintWriter) : BuiltIns
                 else -> "$className(this.to$thisSigned())"
             })
         }
+        out.println()
 
         if (type == UnsignedType.UBYTE || type == UnsignedType.USHORT)
             return // conversion from UByte/UShort to Float/Double is not allowed
 
-        out.println()
         for (otherType in PrimitiveType.floatingPoint) {
             val otherName = otherType.capitalized
 
@@ -361,6 +391,7 @@ class UnsignedTypeGenerator(val type: UnsignedType, out: PrintWriter) : BuiltIns
             val conversion = if (otherType == PrimitiveType.DOUBLE) "" else ".toDouble()"
             out.println("doubleTo$className(this$conversion)")
         }
+        out.println()
     }
 
 

@@ -81,6 +81,12 @@ public inline class UInt @PublishedApi internal constructor(@PublishedApi intern
     /** Adds the other value to this value. */
     @kotlin.internal.InlineOnly
     public inline operator fun plus(other: ULong): ULong = this.toULong().plus(other)
+    /** Adds the other value to this value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun plus(other: Float): Float = this.toFloat().plus(other)
+    /** Adds the other value to this value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun plus(other: Double): Double = this.toDouble().plus(other)
 
     /** Subtracts the other value from this value. */
     @kotlin.internal.InlineOnly
@@ -94,6 +100,12 @@ public inline class UInt @PublishedApi internal constructor(@PublishedApi intern
     /** Subtracts the other value from this value. */
     @kotlin.internal.InlineOnly
     public inline operator fun minus(other: ULong): ULong = this.toULong().minus(other)
+    /** Subtracts the other value from this value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun minus(other: Float): Float = this.toFloat().minus(other)
+    /** Subtracts the other value from this value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun minus(other: Double): Double = this.toDouble().minus(other)
 
     /** Multiplies this value by the other value. */
     @kotlin.internal.InlineOnly
@@ -107,6 +119,12 @@ public inline class UInt @PublishedApi internal constructor(@PublishedApi intern
     /** Multiplies this value by the other value. */
     @kotlin.internal.InlineOnly
     public inline operator fun times(other: ULong): ULong = this.toULong().times(other)
+    /** Multiplies this value by the other value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun times(other: Float): Float = this.toFloat().times(other)
+    /** Multiplies this value by the other value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun times(other: Double): Double = this.toDouble().times(other)
 
     /** Divides this value by the other value. */
     @kotlin.internal.InlineOnly
@@ -120,6 +138,12 @@ public inline class UInt @PublishedApi internal constructor(@PublishedApi intern
     /** Divides this value by the other value. */
     @kotlin.internal.InlineOnly
     public inline operator fun div(other: ULong): ULong = this.toULong().div(other)
+    /** Divides this value by the other value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun div(other: Float): Float = this.toFloat().div(other)
+    /** Divides this value by the other value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun div(other: Double): Double = this.toDouble().div(other)
 
     /** Calculates the remainder of dividing this value by the other value. */
     @kotlin.internal.InlineOnly
@@ -133,6 +157,12 @@ public inline class UInt @PublishedApi internal constructor(@PublishedApi intern
     /** Calculates the remainder of dividing this value by the other value. */
     @kotlin.internal.InlineOnly
     public inline operator fun rem(other: ULong): ULong = this.toULong().rem(other)
+    /** Calculates the remainder of dividing this value by the other value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun rem(other: Float): Float = this.toFloat().rem(other)
+    /** Calculates the remainder of dividing this value by the other value. */
+    @kotlin.internal.InlineOnly
+    public inline operator fun rem(other: Double): Double = this.toDouble().rem(other)
 
     /** Increments this value. */
     @kotlin.internal.InlineOnly
@@ -330,3 +360,59 @@ public inline fun Float.toUInt(): UInt = doubleToUInt(this.toDouble())
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun Double.toUInt(): UInt = doubleToUInt(this)
+
+/** Adds the other value to this value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Float.plus(other: UInt): Float = this.plus(other.toFloat())
+/** Adds the other value to this value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Double.plus(other: UInt): Double = this.plus(other.toDouble())
+
+/** Subtracts the other value from this value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Float.minus(other: UInt): Float = this.minus(other.toFloat())
+/** Subtracts the other value from this value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Double.minus(other: UInt): Double = this.minus(other.toDouble())
+
+/** Multiplies this value by the other value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Float.times(other: UInt): Float = this.times(other.toFloat())
+/** Multiplies this value by the other value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Double.times(other: UInt): Double = this.times(other.toDouble())
+
+/** Divides this value by the other value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Float.div(other: UInt): Float = this.div(other.toFloat())
+/** Divides this value by the other value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Double.div(other: UInt): Double = this.div(other.toDouble())
+
+/** Calculates the remainder of dividing this value by the other value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Float.rem(other: UInt): Float = this.rem(other.toFloat())
+/** Calculates the remainder of dividing this value by the other value. */
+@SinceKotlin("1.3")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun Double.rem(other: UInt): Double = this.rem(other.toDouble())
+
