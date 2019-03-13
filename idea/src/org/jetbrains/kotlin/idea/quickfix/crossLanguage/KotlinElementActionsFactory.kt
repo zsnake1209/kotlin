@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.idea.quickfix.crossLanguage
 
-import com.intellij.codeInsight.AnnotationTargetUtil
 import com.intellij.codeInsight.daemon.QuickFixBundle
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -38,15 +37,14 @@ import org.jetbrains.kotlin.asJava.elements.KtLightElement
 import org.jetbrains.kotlin.asJava.toLightMethods
 import org.jetbrains.kotlin.asJava.unwrapped
 import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
-import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.Modality
-import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
+import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.MutablePackageFragmentDescriptor
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
+import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptorIfAny
 import org.jetbrains.kotlin.idea.core.ShortenReferences
 import org.jetbrains.kotlin.idea.core.appendModifier
 import org.jetbrains.kotlin.idea.quickfix.AddModifierFix
@@ -55,6 +53,7 @@ import org.jetbrains.kotlin.idea.quickfix.createFromUsage.callableBuilder.*
 import org.jetbrains.kotlin.idea.quickfix.createFromUsage.createCallable.CreateCallableFromUsageFix
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.idea.util.approximateFlexibleTypes
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.load.java.JvmAbi.JVM_FIELD_ANNOTATION_FQ_NAME
 import org.jetbrains.kotlin.load.java.components.TypeUsage
@@ -73,7 +72,9 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierType
+import org.jetbrains.kotlin.resolve.AnnotationChecker
 import org.jetbrains.kotlin.resolve.annotations.JVM_STATIC_ANNOTATION_FQ_NAME
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.KotlinType
@@ -459,10 +460,6 @@ class KotlinElementActionsFactory : JvmElementActionsFactory() {
                 PropertyUtil.isSimplePropertyGetter(target as? PsiMethod) -> AnnotationUseSiteTarget.PROPERTY_GETTER
                 else -> null
             }
-            is JvmParameter ->
-                if ((declaration as? KtParameter)?.hasValOrVar() == true)
-                    AnnotationUseSiteTarget.CONSTRUCTOR_PARAMETER
-                else null
             else -> null
         }
         return listOf(CreateAnnotationAction(declaration, annotationUseSiteTarget, request))
@@ -495,8 +492,15 @@ class KotlinElementActionsFactory : JvmElementActionsFactory() {
             val annotationUseSiteTargetPrefix = run prefixEvaluation@{
                 if (annotationTarget == null) return@prefixEvaluation ""
 
-                val targetsSet = annotationClass?.let { AnnotationTargetUtil.getAnnotationTargets(it) } ?: return@prefixEvaluation ""
-                if (targetsSet != AnnotationTargetUtil.DEFAULT_TARGETS) return@prefixEvaluation ""
+                val moduleDescriptor = (target as? KtDeclaration)?.resolveToDescriptorIfAny()?.module ?: return@prefixEvaluation ""
+                val annotationClassDescriptor = moduleDescriptor.resolveClassByFqName(
+                    FqName(request.qualifiedName), NoLookupLocation.FROM_IDE
+                ) ?: return@prefixEvaluation ""
+
+                val applicableTargetSet =
+                    AnnotationChecker.applicableTargetSet(annotationClassDescriptor) ?: KotlinTarget.DEFAULT_TARGET_SET
+
+                if (KotlinTarget.PROPERTY !in applicableTargetSet) return@prefixEvaluation ""
 
                 "${annotationTarget.renderName}:"
             }
