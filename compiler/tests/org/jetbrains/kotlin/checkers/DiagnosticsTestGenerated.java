@@ -22140,6 +22140,16 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                 runTest("compiler/testData/diagnostics/tests/typeParameters/functionTypeAsUpperBound.kt");
             }
 
+            @TestMetadata("implicitNothingAsTypeParameter.kt")
+            public void testImplicitNothingAsTypeParameter() throws Exception {
+                runTest("compiler/testData/diagnostics/tests/typeParameters/implicitNothingAsTypeParameter.kt");
+            }
+
+            @TestMetadata("implicitNothingAsTypeParameterNI.kt")
+            public void testImplicitNothingAsTypeParameterNI() throws Exception {
+                runTest("compiler/testData/diagnostics/tests/typeParameters/implicitNothingAsTypeParameterNI.kt");
+            }
+
             @TestMetadata("misplacedConstraints.kt")
             public void testMisplacedConstraints() throws Exception {
                 runTest("compiler/testData/diagnostics/tests/typeParameters/misplacedConstraints.kt");
