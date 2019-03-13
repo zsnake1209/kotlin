@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.ir.backend.js.lower
 
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
-import org.jetbrains.kotlin.backend.common.utils.commonSupertype
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
@@ -21,9 +20,12 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrTryImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
 import org.jetbrains.kotlin.ir.types.IrDynamicType
+import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classifierOrNull
-import org.jetbrains.kotlin.ir.util.isSubtypeOf
+import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.util.commonSuperclass
+import org.jetbrains.kotlin.ir.util.isSubtypeOfClass
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 
 /**
@@ -125,8 +127,21 @@ class MultipleCatchesLowering(val context: JsIrBackendContext) : FileLoweringPas
             private fun buildImplicitCast(value: IrExpression, toType: IrType, toTypeSymbol: IrClassifierSymbol) =
                 JsIrBuilder.buildTypeOperator(toType, IrTypeOperator.IMPLICIT_CAST, value, toType, toTypeSymbol)
 
-            private fun mergeTypes(types: List<IrType>) = types.commonSupertype(context.symbolTable).also {
-                assert(it.isSubtypeOf(context.irBuiltIns.throwableType, context.typeCheckerContext) || it is IrDynamicType)
+//            private fun mergeTypes(types: List<IrType>) = types.commonSupertype(context.symbolTable).also {
+//                assert(it.isSubtypeOf(context.irBuiltIns.throwableType, context.typeCheckerContext) || it is IrDynamicType)
+//            }
+
+            private fun mergeTypes(types: List<IrType>): IrType {
+
+                return types.firstOrNull { it is IrDynamicType } ?: run {
+
+                    val superClassifier =
+                        types.map { (it as IrSimpleType).classifier }.commonSuperclass(context.typeCheckerContext).also {
+                            assert(it.isSubtypeOfClass(context.irBuiltIns.throwableClass, context.typeCheckerContext))
+                        }
+
+                    return IrSimpleTypeImpl(superClassifier, false, emptyList(), emptyList())
+                }
             }
 
         }, irFile)
