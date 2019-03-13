@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.name.FqName
@@ -43,7 +44,7 @@ fun IrType.isNameInPackage(prefix: String, packageFqName: FqName): Boolean {
 
 fun IrType.superTypes(): List<IrType> {
     val classifier = classifierOrNull?.owner ?: return emptyList()
-    return when(classifier) {
+    return when (classifier) {
         is IrClass -> classifier.superTypes
         is IrTypeParameter -> classifier.superTypes
         else -> throw IllegalStateException()
@@ -95,14 +96,50 @@ fun IrType.isPrimitiveArray() = isTypeFromKotlinPackage { it in FQ_NAMES.primiti
 fun IrType.isSubtypeOf(superType: IrType, typeCheckerContext: AbstractIrTypeCheckerContext) =
     AbstractTypeChecker.isSubtypeOf(typeCheckerContext, this, superType)
 
-fun IrType.isSubtypeOfClass(superClass: IrClassSymbol, typeCheckerContext: AbstractIrTypeCheckerContext): Boolean {
-    if (this !is IrSimpleType) return false
-    val klassifier = classifier
-    if (typeCheckerContext.isEqualTypeConstructors(klassifier, superClass)) return true
-    val superTypes = when (klassifier) {
-        is IrTypeParameterSymbol -> klassifier.owner.superTypes
-        is IrClassSymbol -> klassifier.owner.superTypes
+fun IrClassifierSymbol.isSubtypeOfClass(superClass: IrClassSymbol, typeCheckerContext: AbstractIrTypeCheckerContext): Boolean {
+    if (typeCheckerContext.isEqualTypeConstructors(this, superClass)) return true
+    val superTypes = when (this) {
+        is IrTypeParameterSymbol -> owner.superTypes
+        is IrClassSymbol -> owner.superTypes
         else -> error("  ")
     }
     return superTypes.any { it.isSubtypeOfClass(superClass, typeCheckerContext) }
+}
+
+fun IrType.isSubtypeOfClass(superClass: IrClassSymbol, typeCheckerContext: AbstractIrTypeCheckerContext): Boolean {
+    if (this !is IrSimpleType) return false
+    return classifier.isSubtypeOfClass(superClass, typeCheckerContext)
+}
+
+// TODO: extract LCA algorithm and use wherever it's needed (etc resolveFakeOverride)
+fun Collection<IrClassifierSymbol>.commonSuperclass(typeCheckerContext: AbstractIrTypeCheckerContext): IrClassifierSymbol {
+    var superClassifiers: MutableSet<IrClassifierSymbol>? = null
+
+    if (isEmpty()) return typeCheckerContext.irBuiltIns.anyClass
+
+    val order = fold(emptyList<IrClassifierSymbol>()) { _, classifierSymbol ->
+        val visited = mutableSetOf<IrClassifierSymbol>()
+        DFS.topologicalOrder(listOf(classifierSymbol), { classifier ->
+            val superTypes = when (classifier) {
+                is IrClassSymbol -> classifier.owner.superTypes
+                is IrTypeParameterSymbol -> classifier.owner.superTypes
+                else -> error("Unsupported classifier")
+            }
+
+            superTypes.map { (it as IrSimpleType).classifier }
+        }, DFS.VisitedWithSet(visited)).also {
+            val tmp = superClassifiers
+            if (tmp == null) {
+                superClassifiers = visited
+            } else {
+                tmp.apply {
+                    retainAll { c -> visited.any { v -> typeCheckerContext.isEqualTypeConstructors(c, v) } }
+                }
+            }
+        }
+    }
+
+    require(superClassifiers != null)
+
+    return order.first { o -> superClassifiers!!.any { s -> typeCheckerContext.isEqualTypeConstructors(o, s) } }
 }
