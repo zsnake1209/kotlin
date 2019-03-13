@@ -149,6 +149,7 @@ fun IrValueParameter.copyTo(
         descriptor.bind(it)
         it.parent = irFunction
         it.defaultValue = defaultValueCopy
+        it.annotations.addAll(annotations)
     }
 }
 

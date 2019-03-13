@@ -5,11 +5,10 @@
 
 package org.jetbrains.kotlin.backend.jvm.codegen
 
+import org.jetbrains.kotlin.codegen.OwnerKind
 import org.jetbrains.kotlin.codegen.signature.JvmSignatureWriter
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.load.kotlin.TypeMappingMode
@@ -24,8 +23,12 @@ class IrTypeMapper(val kotlinTypeMapper: KotlinTypeMapper) {
 
     fun mapType(irField: IrField) = kotlinTypeMapper.mapType(irField.descriptor)
 
+    fun mapType(irValueParameter: IrValueParameter) = kotlinTypeMapper.mapType(irValueParameter.descriptor)
+
     fun mapType(irType: IrType, sw: JvmSignatureWriter, mode: TypeMappingMode) =
         kotlinTypeMapper.mapType(irType.toKotlinType(), sw, mode)
+
+    fun mapSignatureWithGeneric(f: IrFunction, kind: OwnerKind) = kotlinTypeMapper.mapSignatureWithGeneric(f.descriptor, kind)
 
     fun mapFieldSignature(irType: IrType, irFrield: IrField) =
         kotlinTypeMapper.mapFieldSignature(irType.toKotlinType(), irFrield.descriptor)
