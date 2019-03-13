@@ -17,13 +17,12 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBranchImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrCatchImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrElseBranchImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrTryImpl
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
-import org.jetbrains.kotlin.ir.types.IrDynamicType
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classifierOrNull
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.types.impl.IrStarProjectionImpl
 import org.jetbrains.kotlin.ir.util.commonSuperclass
 import org.jetbrains.kotlin.ir.util.isSubtypeOfClass
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
@@ -127,10 +126,6 @@ class MultipleCatchesLowering(val context: JsIrBackendContext) : FileLoweringPas
             private fun buildImplicitCast(value: IrExpression, toType: IrType, toTypeSymbol: IrClassifierSymbol) =
                 JsIrBuilder.buildTypeOperator(toType, IrTypeOperator.IMPLICIT_CAST, value, toType, toTypeSymbol)
 
-//            private fun mergeTypes(types: List<IrType>) = types.commonSupertype(context.symbolTable).also {
-//                assert(it.isSubtypeOf(context.irBuiltIns.throwableType, context.typeCheckerContext) || it is IrDynamicType)
-//            }
-
             private fun mergeTypes(types: List<IrType>): IrType {
 
                 return types.firstOrNull { it is IrDynamicType } ?: run {
@@ -140,7 +135,11 @@ class MultipleCatchesLowering(val context: JsIrBackendContext) : FileLoweringPas
                             assert(it.isSubtypeOfClass(context.irBuiltIns.throwableClass, context.typeCheckerContext))
                         }
 
-                    return IrSimpleTypeImpl(superClassifier, false, emptyList(), emptyList())
+                    val typeArguments = if (superClassifier is IrClassSymbol) {
+                        superClassifier.owner.typeParameters.map { IrStarProjectionImpl }
+                    } else emptyList<IrTypeArgument>()
+
+                    return IrSimpleTypeImpl(superClassifier, false, typeArguments, emptyList())
                 }
             }
 
