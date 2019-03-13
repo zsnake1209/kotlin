@@ -17,6 +17,8 @@
 package org.jetbrains.kotlin.resolve.calls.results
 
 import org.jetbrains.kotlin.container.DefaultImplementation
+import org.jetbrains.kotlin.container.PlatformExtensionsClashResolver
+import org.jetbrains.kotlin.container.PlatformSpecificExtension
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.MemberDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -30,13 +32,24 @@ interface SpecificityComparisonCallbacks {
 }
 
 @DefaultImplementation(impl = TypeSpecificityComparator.NONE::class)
-interface TypeSpecificityComparator {
+interface TypeSpecificityComparator : PlatformSpecificExtension<TypeSpecificityComparator> {
     fun isDefinitelyLessSpecific(specific: KotlinTypeMarker, general: KotlinTypeMarker): Boolean
 
     object NONE : TypeSpecificityComparator {
         override fun isDefinitelyLessSpecific(specific: KotlinTypeMarker, general: KotlinTypeMarker) = false
     }
 }
+
+/**
+ * We should use NONE for clash resolution, because:
+ * - JvmTypeSpecificityComparator covers cases with flexible types and primitive types loaded from Java, and all this is irrelevant for
+ *   non-JVM modules
+ * - JsTypeSpecifcityComparator covers case with dynamics, which are not allowed in non-JS modules either
+ */
+class TypeSpecificityComparatorClashesResolver : PlatformExtensionsClashResolver.FallbackToDefault<TypeSpecificityComparator>(
+    TypeSpecificityComparator.NONE,
+    TypeSpecificityComparator::class.java
+)
 
 class FlatSignature<out T> constructor(
     val origin: T,
