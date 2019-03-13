@@ -174,8 +174,8 @@ class JvmSharedVariablesManager(
             typeArgumentsCount = typeArgumentsCount,
             origin = SHARED_VARIABLE_CONSTRUCTOR_CALL_ORIGIN
         ).apply {
-            if (typeArgumentsCount > 0) {
-                putTypeArgument(0, valueType)
+            refConstructor.parentAsClass.typeParameters.mapIndexed { i, param ->
+                putTypeArgument(i, valueType)
             }
         }
 
