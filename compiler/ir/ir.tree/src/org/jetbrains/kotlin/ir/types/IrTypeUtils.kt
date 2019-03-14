@@ -53,15 +53,10 @@ fun Collection<IrClassifierSymbol>.commonSuperclass(checker: IrClassifierEqualit
 
     val order = fold(emptyList<IrClassifierSymbol>()) { _, classifierSymbol ->
         val visited = mutableSetOf<IrClassifierSymbol>()
-        DFS.topologicalOrder(listOf(classifierSymbol), { classifier ->
-            val superTypes = when (classifier) {
-                is IrClassSymbol -> classifier.owner.superTypes
-                is IrTypeParameterSymbol -> classifier.owner.superTypes
-                else -> error("Unsupported classifier")
-            }
-
-            superTypes.map { (it as IrSimpleType).classifier }
-        }, DFS.VisitedWithSet(visited)).also {
+        DFS.topologicalOrder(
+            listOf(classifierSymbol), { it.superTypes().map { s -> (s as IrSimpleType).classifier } },
+            DFS.VisitedWithSet(visited)
+        ).also {
             val tmp = superClassifiers
             if (tmp == null) {
                 superClassifiers = visited
