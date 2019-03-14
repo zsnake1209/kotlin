@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrClassifierEqualityChecker
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.FqName
@@ -50,6 +51,8 @@ class JvmBackendContext(
     override var inVerbosePhase: Boolean = false
 
     override val configuration get() = state.configuration
+
+    override val classifierEqualityChecker = IrClassifierEqualityChecker.Companion.FqNameEqualityChecker
 
     init {
         if (state.configuration.get(CommonConfigurationKeys.LIST_PHASES) == true) {

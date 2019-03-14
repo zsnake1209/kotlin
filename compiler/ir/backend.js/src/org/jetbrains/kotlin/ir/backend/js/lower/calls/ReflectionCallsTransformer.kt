@@ -5,12 +5,12 @@
 
 package org.jetbrains.kotlin.ir.backend.js.lower.calls
 
-import org.jetbrains.kotlin.backend.common.utils.isSubtypeOfClass
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.util.irCall
 import org.jetbrains.kotlin.ir.backend.js.utils.Namer
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
 import org.jetbrains.kotlin.name.Name
 
 
@@ -23,14 +23,24 @@ class ReflectionCallsTransformer(private val context: JsIrBackendContext) : Call
             addWithPredicate(
                 Name.special(Namer.KCALLABLE_GET_NAME),
                 { call ->
-                    call.symbol.owner.dispatchReceiverParameter?.run { type.isSubtypeOfClass(context.irBuiltIns.kCallableClass) } ?: false
+                    call.symbol.owner.dispatchReceiverParameter?.run {
+                        type.isSubtypeOfClass(
+                            context.irBuiltIns.kCallableClass,
+                            context.classifierEqualityChecker
+                        )
+                    } ?: false
                 },
                 { call -> irCall(call, context.intrinsics.jsName.symbol, dispatchReceiverAsFirstArgument = true) })
 
             addWithPredicate(
                 Name.identifier(Namer.KPROPERTY_GET),
                 { call ->
-                    call.symbol.owner.dispatchReceiverParameter?.run { type.isSubtypeOfClass(context.irBuiltIns.kPropertyClass) } ?: false
+                    call.symbol.owner.dispatchReceiverParameter?.run {
+                        type.isSubtypeOfClass(
+                            context.irBuiltIns.kPropertyClass,
+                            context.classifierEqualityChecker
+                        )
+                    } ?: false
                 },
                 { call -> irCall(call, context.intrinsics.jsPropertyGet.symbol, dispatchReceiverAsFirstArgument = true) }
             )
@@ -38,7 +48,12 @@ class ReflectionCallsTransformer(private val context: JsIrBackendContext) : Call
             addWithPredicate(
                 Name.identifier(Namer.KPROPERTY_SET),
                 { call ->
-                    call.symbol.owner.dispatchReceiverParameter?.run { type.isSubtypeOfClass(context.irBuiltIns.kPropertyClass) } ?: false
+                    call.symbol.owner.dispatchReceiverParameter?.run {
+                        type.isSubtypeOfClass(
+                            context.irBuiltIns.kPropertyClass,
+                            context.classifierEqualityChecker
+                        )
+                    } ?: false
                 },
                 { call -> irCall(call, context.intrinsics.jsPropertySet.symbol, dispatchReceiverAsFirstArgument = true) }
             )
