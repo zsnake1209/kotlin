@@ -75,6 +75,9 @@ fun Test.setUpBoxTests(jsEnabled: Boolean, jsIrEnabled: Boolean, skipIrKlib: Boo
 
     jvmArgs("-da:jdk.nashorn.internal.runtime.RecompilableScriptFunctionData") // Disable assertion which fails due to a bug in nashorn (KT-23637)
     workingDir = rootDir
+    if (findProperty("kotlin.compiler.js.ir.tests.skip")?.toString()?.toBoolean() == true) {
+        exclude("org/jetbrains/kotlin/js/test/ir/semantics/*")
+    }
     doFirst {
         systemProperty("kotlin.ant.classpath", antLauncherJar.asPath)
         systemProperty("kotlin.ant.launcher.class", "org.apache.tools.ant.Main")
