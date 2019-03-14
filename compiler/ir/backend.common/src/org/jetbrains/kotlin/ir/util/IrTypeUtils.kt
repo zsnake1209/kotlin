@@ -11,12 +11,16 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
+import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.DFS
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 val kotlinPackageFqn = FqName.fromSegments(listOf("kotlin"))
 val kotlinReflectionPackageFqn = kotlinPackageFqn.child(Name.identifier("reflect"))
@@ -89,3 +93,30 @@ fun IrType.getPrimitiveArrayElementType() = (this as? IrSimpleType)?.let {
 
 fun IrType.isNonPrimitiveArray() =
     (this.isArray() || this.isNullableArray()) && !this.isPrimitiveArray()
+
+
+fun IrType.substitute(params: List<IrTypeParameter>, arguments: List<IrType>): IrType =
+    substitute(params.map { it.symbol }.zip(arguments).toMap())
+
+
+fun IrType.substitute(substitutionMap: Map<IrTypeParameterSymbol, IrType>): IrType {
+    if (this !is IrSimpleType) return this
+
+    substitutionMap[classifier]?.let { return it }
+
+    val newArguments = arguments.map {
+        if (it is IrTypeProjection) {
+            makeTypeProjection(it.type.substitute(substitutionMap), it.variance)
+        } else {
+            it
+        }
+    }
+
+    val newAnnotations = annotations.map { it.deepCopyWithSymbols() }
+    return IrSimpleTypeImpl(
+        classifier,
+        hasQuestionMark,
+        newArguments,
+        newAnnotations
+    )
+}

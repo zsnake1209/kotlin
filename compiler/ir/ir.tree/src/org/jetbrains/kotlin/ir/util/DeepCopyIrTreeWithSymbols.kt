@@ -188,7 +188,7 @@ open class DeepCopyIrTreeWithSymbols(
             }
         }
 
-    private fun IrAnnotationContainer.transformAnnotations(declaration: IrAnnotationContainer) {
+    private fun IrMutableAnnotationContainer.transformAnnotations(declaration: IrAnnotationContainer) {
         declaration.annotations.transformTo(annotations)
     }
 

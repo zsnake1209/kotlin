@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.resolve.source.PsiSourceElement
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
-import java.io.File
 import java.util.ArrayList
 import java.util.LinkedHashSet
 
@@ -138,14 +137,11 @@ private fun IrClass.innerAccessFlagsForModalityAndKind(): Int {
     return 0
 }
 
-private fun IrDeclarationWithVisibility.getVisibilityAccessFlag(kind: OwnerKind? = null): Int {
-    val specialCase = specialCaseVisibility(kind)
-    if (specialCase != null) {
-        return specialCase!!
-    }
-    return visibilityToAccessFlag[visibility]
+private fun IrDeclarationWithVisibility.getVisibilityAccessFlag(kind: OwnerKind? = null): Int =
+    specialCaseVisibility(kind)
+        ?: visibilityToAccessFlag[visibility]
         ?: throw IllegalStateException("$visibility is not a valid visibility in backend for ${ir2string(this)}")
-}
+
 
 private fun IrDeclarationWithVisibility.specialCaseVisibility(kind: OwnerKind?): Int? {
 //    if (JvmCodegenUtil.isNonIntrinsicPrivateCompanionObjectInInterface(memberDescriptor)) {
@@ -216,9 +212,9 @@ private fun IrDeclarationWithVisibility.specialCaseVisibility(kind: OwnerKind?):
 //            return getVisibilityAccessFlag(method)
 //        }
 //    }
-    if (this is IrField && correspondingProperty?.isExternal == true) {
-        val method = correspondingProperty?.getter ?: correspondingProperty?.setter
-        ?: error("No get/set method in SyntheticJavaPropertyDescriptor: ${ir2string(correspondingProperty)}")
+    if (this is IrField && correspondingPropertySymbol?.owner?.isExternal == true) {
+        val method = correspondingPropertySymbol?.owner?.getter ?: correspondingPropertySymbol?.owner?.setter
+        ?: error("No get/set method in SyntheticJavaPropertyDescriptor: ${ir2string(correspondingPropertySymbol?.owner)}")
         return method.getVisibilityAccessFlag()
     }
 
@@ -274,7 +270,7 @@ fun IrType.isInlineClassThatRequiresMangling() =
     } ?: false
 
 fun IrClass.isDontMangleClass() =
-    fqName != DescriptorUtils.RESULT_FQ_NAME
+    fqNameWhenAvailable != DescriptorUtils.RESULT_FQ_NAME
 
 fun IrType.isTypeParameterWithUpperBoundThatRequiresMangling() =
     safeAs<IrSimpleType>()?.classifier?.owner.safeAs<IrTypeParameter>()?.let { param ->
@@ -351,7 +347,7 @@ internal fun getSignature(
     for (superType in irClass.superTypes) {
         val superClass = superType.safeAs<IrSimpleType>()?.classifier?.safeAs<IrClassSymbol>()?.owner ?: continue
         if (superClass.isJvmInterface) {
-            val kotlinInterfaceName = superClass.fqName!!
+            val kotlinInterfaceName = superClass.fqNameWhenAvailable!!
 
             sw.writeInterface()
             val jvmInterfaceType = typeMapper.mapSupertype(superType, sw)

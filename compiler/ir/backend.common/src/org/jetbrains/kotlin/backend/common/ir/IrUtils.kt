@@ -249,6 +249,12 @@ fun IrFunction.copyValueParametersToStatic(
     }
 }
 
+fun IrFunctionAccessExpression.passTypeArgumentsFrom(irFunction: IrTypeParametersContainer, offset: Int = 0) {
+    irFunction.typeParameters.forEachIndexed { i, param ->
+        putTypeArgument(i + offset, param.defaultType)
+    }
+}
+
 /*
     Type parameters should correspond to the function where they are defined.
     `source` is where the type is originally taken from.
@@ -348,3 +354,6 @@ fun isElseBranch(branch: IrBranch) = branch is IrElseBranch || ((branch.conditio
 fun IrSimpleFunction.isMethodOfAny() =
     ((valueParameters.size == 0 && name.asString().let { it == "hashCode" || it == "toString" }) ||
             (valueParameters.size == 1 && name.asString() == "equals" && valueParameters[0].type.isNullableAny()))
+
+fun IrValueParameter.isInlineParameter() =
+    !isNoinline && !type.isNullable() && type.isFunctionOrKFunction()

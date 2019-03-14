@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.backend.jvm.intrinsics
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.codegen.AsmUtil.comparisonOperandType
 import org.jetbrains.kotlin.codegen.StackValue
+import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.lexer.KtSingleValueToken
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
@@ -45,7 +46,7 @@ class CompareTo : IntrinsicMethod() {
     }
 
     override fun toCallable(
-        expression: IrMemberAccessExpression,
+        expression: IrFunctionAccessExpression,
         signature: JvmMethodSignature,
         context: JvmBackendContext
     ): IrIntrinsicFunction {
@@ -77,7 +78,7 @@ class PrimitiveComparison(
     }
 
     override fun toCallable(
-        expression: IrMemberAccessExpression,
+        expression: IrFunctionAccessExpression,
         signature: JvmMethodSignature,
         context: JvmBackendContext
     ): IrIntrinsicFunction {

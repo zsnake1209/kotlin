@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.backend.common.descriptors.isFunctionOrKFunctionType
 import org.jetbrains.kotlin.backend.common.descriptors.synthesizedName
 import org.jetbrains.kotlin.backend.common.ir.copyTo
 import org.jetbrains.kotlin.backend.common.ir.createImplicitParameterDeclarationWithWrappedDescriptor
+import org.jetbrains.kotlin.backend.common.ir.isInlineParameter
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.irBlock
 import org.jetbrains.kotlin.backend.common.lower.irIfThen
@@ -99,7 +100,7 @@ internal class CallableReferenceLowering(val context: JvmBackendContext) : FileL
                 ) {
                     val vararg = IrVarargImpl(
                         UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                        context.ir.symbols.array.typeWith(),
+                        context.ir.symbols.array.typeWith(context.irBuiltIns.anyNType),
                         context.irBuiltIns.anyClass.typeWith(),
                         (0 until argumentsCount).map { i -> expression.getValueArgument(i)!! }
                     )
@@ -164,10 +165,13 @@ internal class CallableReferenceLowering(val context: JvmBackendContext) : FileL
         private val boundCalleeParameters = irFunctionReference.getArgumentsWithIr().map { it.first }
         private val unboundCalleeParameters = calleeParameters - boundCalleeParameters
 
-        private val typeArgumentsMap = callee.typeParameters.associate { typeParam ->
-            typeParam to irFunctionReference.getTypeArgument(typeParam.index)!!
+        private val typeParameters = if (callee is IrConstructor)
+            callee.parentAsClass.typeParameters + callee.typeParameters
+        else
+            callee.typeParameters
+        private val typeArgumentsMap = typeParameters.associate { typeParam ->
+            typeParam.symbol to irFunctionReference.getTypeArgument(typeParam.index)!!
         }
-
 
         private lateinit var functionReferenceClass: IrClass
         private lateinit var functionReferenceThis: IrValueParameterSymbol
@@ -181,9 +185,7 @@ internal class CallableReferenceLowering(val context: JvmBackendContext) : FileL
 
         fun build(): BuiltFunctionReference {
             val returnType = irFunctionReference.symbol.owner.returnType
-            val functionReferenceClassSuperTypes: MutableList<IrType> = mutableListOf(
-                functionReferenceOrLambda.owner.defaultType // type arguments?
-            )
+            val functionReferenceClassSuperTypes: MutableList<IrType> = mutableListOf(functionReferenceOrLambda.owner.defaultType)
 
             val numberOfParameters = unboundCalleeParameters.size
             useVararg = (numberOfParameters > MAX_ARGCOUNT_WITHOUT_VARARG)
@@ -384,6 +386,10 @@ internal class CallableReferenceLowering(val context: JvmBackendContext) : FileL
                     }
                     +irReturn(
                         irCall(irFunctionReference.symbol).apply {
+                            for ((typeParameter, typeArgument) in typeArgumentsMap) {
+                                putTypeArgument(typeParameter.owner.index, typeArgument)
+                            }
+
                             var unboundIndex = 0
 
                             calleeParameters.forEach { parameter ->
@@ -595,28 +601,3 @@ private fun IrFunction.isArrayConstructorWithLambda() =
                 it.getPackageFragment()?.fqName?.asString() == "kotlin" &&
                         it.name.asString().endsWith("Array")
             }
-
-private fun IrValueParameter.isInlineParameter() =
-    !isNoinline && !type.isNullable() && type.isFunctionOrKFunction()
-
-private fun IrType.substitute(substitutionMap: Map<IrTypeParameter, IrType>): IrType {
-    if (this !is IrSimpleType) return this
-
-    substitutionMap[classifier]?.let { return it }
-
-    val newArguments = arguments.map {
-        if (it is IrTypeProjection) {
-            makeTypeProjection(it.type.substitute(substitutionMap), it.variance)
-        } else {
-            it
-        }
-    }
-
-    val newAnnotations = annotations.map { it.deepCopyWithSymbols() }
-    return IrSimpleTypeImpl(
-        classifier,
-        hasQuestionMark,
-        newArguments,
-        newAnnotations
-    )
-}

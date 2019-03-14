@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.AsmUtil.genInvokeAppendMethod
 import org.jetbrains.kotlin.codegen.AsmUtil.genStringBuilderConstructor
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
@@ -64,7 +65,7 @@ class Concat : IntrinsicMethod() {
         return JAVA_STRING_TYPE
     }
 
-    override fun toCallable(expression: IrMemberAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
+    override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         val argsTypes = expression.receiverAndArgs().asmTypes(context).toMutableList()
         argsTypes[0] = AsmTypes.JAVA_STRING_TYPE
 

@@ -6,14 +6,12 @@
 package org.jetbrains.kotlin.backend.jvm.codegen
 
 import org.jetbrains.kotlin.codegen.*
-import org.jetbrains.kotlin.codegen.StackValue.*
 import org.jetbrains.kotlin.codegen.`when`.SwitchCodegen.Companion.preferLookupOverSwitch
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.isTrueConst
-import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.org.objectweb.asm.Label
 import org.jetbrains.org.objectweb.asm.Type
 import java.util.*
@@ -185,8 +183,8 @@ class SwitchGenerator(private val expression: IrWhen, private val data: BlockInf
 
     private fun gen(expression: IrElement, data: BlockInfo): StackValue = codegen.gen(expression, data)
 
-    private fun coerceNotToUnit(fromType: Type, fromKotlinType: KotlinType?, toKotlinType: KotlinType): StackValue =
-        codegen.coerceNotToUnit(fromType, fromKotlinType, toKotlinType)
+    private fun coerceNotToUnit(fromType: Type, fromIrType: IrType?, toIrType: IrType): StackValue =
+        codegen.coerceNotToUnit(fromType, fromIrType, toIrType)
 
     abstract inner class Switch(
         val subject: IrGetValue,
@@ -239,7 +237,7 @@ class SwitchGenerator(private val expression: IrWhen, private val data: BlockInf
             for ((thenExpression, label) in expressionToLabels) {
                 mv.visitLabel(label)
                 val stackValue = thenExpression.run { gen(this, data) }
-                coerceNotToUnit(stackValue.type, stackValue.kotlinType, expression.type.toKotlinType())
+                coerceNotToUnit(stackValue.type, stackValue.kotlinType?.toIrType(), expression.type)
                 mv.goTo(endLabel)
             }
         }
@@ -248,11 +246,11 @@ class SwitchGenerator(private val expression: IrWhen, private val data: BlockInf
             mv.visitLabel(defaultLabel)
             return if (elseExpression == null) {
                 // There's no else part. Generate Unit if needed.
-                coerceNotToUnit(Type.VOID_TYPE, null, expression.type.toKotlinType())
+                coerceNotToUnit(Type.VOID_TYPE, null, expression.type)
             } else {
                 // Generate the else part.
                 val stackValue = gen(elseExpression, data)
-                coerceNotToUnit(stackValue.type, stackValue.kotlinType, expression.type.toKotlinType())
+                coerceNotToUnit(stackValue.type, stackValue.kotlinType?.toIrType(), expression.type)
             }
         }
     }

@@ -5,17 +5,20 @@
 
 package org.jetbrains.kotlin.backend.jvm.codegen
 
-import org.jetbrains.kotlin.builtins.isExtensionFunctionType
+import org.jetbrains.kotlin.backend.common.ir.isInlineParameter
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.inline.*
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.getArguments
-import org.jetbrains.kotlin.resolve.inline.InlineUtil.isInlineParameter
+import org.jetbrains.kotlin.ir.util.hasAnnotation
+import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
 import org.jetbrains.kotlin.utils.keysToMap
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.commons.Method
@@ -24,9 +27,9 @@ class IrInlineCodegen(
     codegen: ExpressionCodegen,
     state: GenerationState,
     function: FunctionDescriptor,
-    typeParameterMappings: TypeParameterMappings,
+    typeParameterMappings: IrTypeParameterMappings,
     sourceCompiler: SourceCompilerForInline
-) : InlineCodegen<ExpressionCodegen>(codegen, state, function, typeParameterMappings, sourceCompiler), IrCallGenerator {
+) : InlineCodegen<ExpressionCodegen>(codegen, state, function, typeParameterMappings.toTypeParameterMappings(), sourceCompiler), IrCallGenerator {
     override fun generateAssertFieldIfNeeded(info: RootInliningContext) {
         // TODO: JVM assertions are not implemented yet in IR backend
     }
@@ -42,19 +45,19 @@ class IrInlineCodegen(
     }
 
     override fun genValueAndPut(
-        valueParameterDescriptor: ValueParameterDescriptor?,
+        irValueParameter: IrValueParameter?,
         argumentExpression: IrExpression,
         parameterType: Type,
         parameterIndex: Int,
         codegen: ExpressionCodegen,
         blockInfo: BlockInfo
     ) {
-        if (valueParameterDescriptor?.let { isInlineParameter(it) } == true && isInlineIrExpression(argumentExpression)) {
+        if (irValueParameter?.let { it.isInlineParameter() } == true && isInlineIrExpression(argumentExpression)) {
             val irReference: IrFunctionReference =
                 (argumentExpression as IrBlock).statements.filterIsInstance<IrFunctionReference>().single()
-            rememberClosure(irReference, parameterType, valueParameterDescriptor) as IrExpressionLambdaImpl
+            rememberClosure(irReference, parameterType, irValueParameter) as IrExpressionLambdaImpl
         } else {
-            putValueOnStack(argumentExpression, parameterType, valueParameterDescriptor?.index ?: -1)
+            putValueOnStack(argumentExpression, parameterType, irValueParameter?.index ?: -1)
         }
     }
 
@@ -86,12 +89,12 @@ class IrInlineCodegen(
         invocationParamBuilder.markValueParametersStart()
     }
 
-    override fun genCall(callableMethod: Callable, callDefault: Boolean, codegen: ExpressionCodegen, expression: IrMemberAccessExpression) {
+    override fun genCall(callableMethod: Callable, callDefault: Boolean, codegen: ExpressionCodegen, expression: IrFunctionAccessExpression) {
         val typeArguments = expression.descriptor.typeParameters.keysToMap { expression.getTypeArgumentOrDefault(it) }
         performInline(typeArguments, callDefault, codegen)
     }
 
-    private fun rememberClosure(irReference: IrFunctionReference, type: Type, parameter: ValueParameterDescriptor): LambdaInfo {
+    private fun rememberClosure(irReference: IrFunctionReference, type: Type, parameter: IrValueParameter): LambdaInfo {
         //assert(InlineUtil.isInlinableParameterExpression(ktLambda)) { "Couldn't find inline expression in ${expression.text}" }
         val expression = irReference.symbol.owner as IrFunction
         return IrExpressionLambdaImpl(
@@ -152,3 +155,6 @@ class IrExpressionLambdaImpl(
 
 fun isInlineIrExpression(argumentExpression: IrExpression) =
     argumentExpression is IrBlock && argumentExpression.origin == IrStatementOrigin.LAMBDA
+
+val IrType.isExtensionFunctionType: Boolean
+    get() = isFunctionTypeOrSubtype() && hasAnnotation(KotlinBuiltIns.FQ_NAMES.extensionFunctionType)

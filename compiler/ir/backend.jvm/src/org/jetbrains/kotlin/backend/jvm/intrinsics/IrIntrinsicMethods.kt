@@ -16,52 +16,52 @@
 
 package org.jetbrains.kotlin.backend.jvm.intrinsics
 
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.lexer.KtSingleValueToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.types.SimpleType
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.Type
 
 class IrIntrinsicMethods(irBuiltIns: IrBuiltIns) {
 
     val intrinsics = IntrinsicMethods()
 
-    private val irMapping = hashMapOf<CallableMemberDescriptor, IntrinsicMethod>()
+    private val irMapping = hashMapOf<IrFunctionSymbol, IntrinsicMethod>()
 
     private fun createPrimitiveComparisonIntrinsics(typeToIrFun: Map<SimpleType, IrSimpleFunctionSymbol>, operator: KtSingleValueToken) {
         for ((type, irFunSymbol) in typeToIrFun) {
-            irMapping[irFunSymbol.descriptor] = PrimitiveComparison(type, operator)
+            irMapping[irFunSymbol] = PrimitiveComparison(type, operator)
         }
     }
 
     init {
-        irMapping[irBuiltIns.eqeq] = Equals(KtTokens.EQEQ)
-        irMapping[irBuiltIns.eqeqeq] = Equals(KtTokens.EQEQEQ)
-        irMapping[irBuiltIns.ieee754equalsFunByOperandType[irBuiltIns.float]!!.descriptor] = Ieee754Equals(Type.FLOAT_TYPE)
-        irMapping[irBuiltIns.ieee754equalsFunByOperandType[irBuiltIns.double]!!.descriptor] = Ieee754Equals(Type.DOUBLE_TYPE)
-        irMapping[irBuiltIns.booleanNot] = Not()
+        irMapping[irBuiltIns.eqeqSymbol] = Equals(KtTokens.EQEQ)
+        irMapping[irBuiltIns.eqeqeqSymbol] = Equals(KtTokens.EQEQEQ)
+        irMapping[irBuiltIns.ieee754equalsFunByOperandType[irBuiltIns.float]!!] = Ieee754Equals(Type.FLOAT_TYPE)
+        irMapping[irBuiltIns.ieee754equalsFunByOperandType[irBuiltIns.double]!!] = Ieee754Equals(Type.DOUBLE_TYPE)
+        irMapping[irBuiltIns.booleanNotSymbol] = Not()
 
         createPrimitiveComparisonIntrinsics(irBuiltIns.lessFunByOperandType, KtTokens.LT)
         createPrimitiveComparisonIntrinsics(irBuiltIns.lessOrEqualFunByOperandType, KtTokens.LTEQ)
         createPrimitiveComparisonIntrinsics(irBuiltIns.greaterFunByOperandType, KtTokens.GT)
         createPrimitiveComparisonIntrinsics(irBuiltIns.greaterOrEqualFunByOperandType, KtTokens.GTEQ)
 
-        irMapping[irBuiltIns.enumValueOf] = IrEnumValueOf()
-        irMapping[irBuiltIns.noWhenBranchMatchedException] = IrNoWhenBranchMatchedException()
-        irMapping[irBuiltIns.illegalArgumentException] = IrIllegalArgumentException()
-        irMapping[irBuiltIns.throwNpe] = ThrowNPE()
+        irMapping[irBuiltIns.enumValueOfSymbol] = IrEnumValueOf()
+        irMapping[irBuiltIns.noWhenBranchMatchedExceptionSymbol] = IrNoWhenBranchMatchedException()
+        irMapping[irBuiltIns.illegalArgumentExceptionSymbol] = IrIllegalArgumentException()
+        irMapping[irBuiltIns.throwNpeSymbol] = ThrowNPE()
     }
 
-    fun getIntrinsic(descriptor: CallableMemberDescriptor): IntrinsicMethod? {
-        intrinsics.getIntrinsic(descriptor)?.let { return it }
-        if (descriptor is PropertyAccessorDescriptor) {
-            return intrinsics.getIntrinsic(DescriptorUtils.unwrapFakeOverride(descriptor.correspondingProperty))
+    fun getIntrinsic(symbol: IrFunctionSymbol): IntrinsicMethod? {
+        intrinsics.getIntrinsic(symbol.descriptor)?.let { return it }
+        symbol.owner.safeAs<IrSimpleFunction>()?.correspondingPropertySymbol?.let {
+            return intrinsics.getIntrinsic(DescriptorUtils.unwrapFakeOverride(it.descriptor))
         }
-        return irMapping[descriptor.original]
+        return irMapping[symbol]
     }
 }

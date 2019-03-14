@@ -5,21 +5,18 @@
 
 package org.jetbrains.kotlin.backend.jvm.codegen
 
+import org.jetbrains.kotlin.backend.common.ir.ir2string
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.intrinsics.ComparisonIntrinsic
 import org.jetbrains.kotlin.backend.jvm.intrinsics.IrIntrinsicFunction
 import org.jetbrains.kotlin.backend.jvm.intrinsics.IrIntrinsicMethods
 import org.jetbrains.kotlin.backend.jvm.lower.CrIrType
 import org.jetbrains.kotlin.backend.jvm.lower.JvmBuiltinOptimizationLowering.Companion.isNegation
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.AsmUtil.*
 import org.jetbrains.kotlin.codegen.ExpressionCodegen.putReifiedOperationMarkerIfTypeIsReifiedParameter
 import org.jetbrains.kotlin.codegen.StackValue.*
-import org.jetbrains.kotlin.codegen.inline.NameGenerator
-import org.jetbrains.kotlin.codegen.inline.ReifiedTypeInliner
-import org.jetbrains.kotlin.codegen.inline.ReifiedTypeParametersUsages
-import org.jetbrains.kotlin.codegen.inline.TypeParameterMappings
+import org.jetbrains.kotlin.codegen.inline.*
 import org.jetbrains.kotlin.codegen.intrinsics.JavaClassProperty
 import org.jetbrains.kotlin.codegen.pseudoInsns.fakeAlwaysFalseIfeq
 import org.jetbrains.kotlin.codegen.pseudoInsns.fakeAlwaysTrueIfeq
@@ -28,32 +25,26 @@ import org.jetbrains.kotlin.codegen.signature.BothSignatureWriter
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.config.isReleaseCoroutines
 import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.descriptors.impl.TypeAliasConstructorDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.isMarkedNullable
-import org.jetbrains.kotlin.ir.types.isNothing
-import org.jetbrains.kotlin.ir.types.toKotlinType
+import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
+import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.util.dump
+import org.jetbrains.kotlin.ir.util.isNullConst
+import org.jetbrains.kotlin.ir.util.parentAsClass
+import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
-import org.jetbrains.kotlin.resolve.DescriptorUtils
-import org.jetbrains.kotlin.resolve.DescriptorUtils.isEnumClass
-import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
-import org.jetbrains.kotlin.resolve.inline.InlineUtil
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes.JAVA_THROWABLE_TYPE
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes.OBJECT_TYPE
-import org.jetbrains.kotlin.synthetic.SyntheticJavaPropertyDescriptor
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.TypeUtils
-import org.jetbrains.kotlin.types.typeUtil.isNothing
-import org.jetbrains.kotlin.types.typeUtil.isUnit
-import org.jetbrains.kotlin.types.typesApproximation.approximateCapturedTypes
-import org.jetbrains.kotlin.types.upperIfFlexible
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.kotlin.utils.keysToMap
 import org.jetbrains.org.objectweb.asm.Label
 import org.jetbrains.org.objectweb.asm.Type
@@ -110,11 +101,13 @@ class ExpressionCodegen(
 ) : IrElementVisitor<StackValue, BlockInfo>, BaseExpressionCodegen {
 
     /*TODO*/
-    val intrinsics = IrIntrinsicMethods(classCodegen.context.irBuiltIns)
+    val context = classCodegen.context
+
+    val intrinsics = IrIntrinsicMethods(context.irBuiltIns)
 
     val typeMapper = classCodegen.typeMapper
 
-    val returnType = typeMapper.kotlinTypeMapper.mapReturnType(irFunction.descriptor)
+    val returnType = typeMapper.mapReturnType(irFunction)
 
     val state = classCodegen.state
 
@@ -178,18 +171,15 @@ class ExpressionCodegen(
     }
 
     private fun writeValueParameterInLocalVariableTable(param: IrValueParameter, startLabel: Label) {
-        val descriptor = param.descriptor
-        val nameForDestructuredParameter = if (descriptor is ValueParameterDescriptor) {
-            getNameForDestructuredParameterOrNull(descriptor)
-        } else {
-            null
-        }
+        // TODO: old code has a special treatment for destructuring lambda parameters.
+        // There is no (easy) way to reproduce it with IR structures.
+        // Does not show up in tests, but might come to bite us at some point.
+        val name = param.name.asString()
 
-        val type = typeMapper.kotlinTypeMapper.mapType(descriptor)
+        val type = typeMapper.mapType(param)
         // NOTE: we expect all value parameters to be present in the frame.
         mv.visitLocalVariable(
-            nameForDestructuredParameter ?: param.name.asString(),
-            type.descriptor, null, startLabel, markNewLabel(), findLocalIndex(param.symbol)
+            name, type.descriptor, null, startLabel, markNewLabel(), findLocalIndex(param.symbol)
         )
     }
 
@@ -248,20 +238,21 @@ class ExpressionCodegen(
 
     override fun visitContainerExpression(expression: IrContainerExpression, data: BlockInfo): StackValue {
         val result = visitStatementContainer(expression, data)
-        return coerceNotToUnit(result.type, result.kotlinType, expression.type.toKotlinType())
+        return coerceNotToUnit(result.type, result.kotlinType?.toIrType(), expression.type)
     }
 
     override fun visitMemberAccess(expression: IrMemberAccessExpression, data: BlockInfo): StackValue {
+        assert(expression is IrFunctionAccessExpression) { "No callable references should survive at this point, got ${ir2string(expression)}" }
         expression.markLineNumber(startOffset = true)
-        return generateCall(expression, null, data)
+        return generateCall(expression as IrFunctionAccessExpression, null, data)
     }
 
     override fun visitCall(expression: IrCall, data: BlockInfo): StackValue {
         expression.markLineNumber(startOffset = true)
-        if (expression.descriptor is ConstructorDescriptor) {
+        if (expression.symbol.owner is IrConstructor) {
             return generateNewCall(expression, data)
         }
-        return generateCall(expression, expression.superQualifier, data)
+        return generateCall(expression, expression.superQualifierSymbol, data)
     }
 
     private fun generateNewCall(expression: IrCall, data: BlockInfo): StackValue {
@@ -273,28 +264,28 @@ class ExpressionCodegen(
 
         mv.anew(expression.asmType)
         mv.dup()
-        generateCall(expression, expression.superQualifier, data)
+        generateCall(expression, expression.superQualifierSymbol, data)
         return expression.onStack
     }
 
     fun generateNewArray(
         expression: IrCall, data: BlockInfo
     ): StackValue {
-        val args = expression.descriptor.valueParameters
+        val args = expression.symbol.owner.valueParameters
         assert(args.size == 1 || args.size == 2) { "Unknown constructor called: " + args.size + " arguments" }
 
         if (args.size == 1) {
             val sizeExpression = expression.getValueArgument(0)!!
             gen(sizeExpression, Type.INT_TYPE, data)
-            newArrayInstruction(expression.type.toKotlinType())
+            newArrayInstruction(expression.type)
             return expression.onStack
         }
 
-        return generateCall(expression, expression.superQualifier, data)
+        return generateCall(expression, expression.superQualifierSymbol, data)
     }
 
-    private fun generateCall(expression: IrMemberAccessExpression, superQualifier: ClassDescriptor?, data: BlockInfo): StackValue {
-        val isSuperCall = superQualifier != null
+    private fun generateCall(expression: IrFunctionAccessExpression, superQualifierSymbol: IrClassSymbol?, data: BlockInfo): StackValue {
+        val isSuperCall = superQualifierSymbol != null
         val callable = resolveToCallable(expression, isSuperCall)
         return if (callable is IrIntrinsicFunction) {
             callable.invoke(mv, this, data)
@@ -303,8 +294,9 @@ class ExpressionCodegen(
         }
     }
 
-    fun generateCall(expression: IrMemberAccessExpression, callable: Callable, data: BlockInfo, isSuperCall: Boolean = false): StackValue {
-        val callGenerator = getOrCreateCallGenerator(expression, expression.descriptor)
+    fun generateCall(expression: IrFunctionAccessExpression, callable: Callable, data: BlockInfo, isSuperCall: Boolean = false): StackValue {
+        val callee = expression.symbol.owner
+        val callGenerator = getOrCreateCallGenerator(expression)
 
         val receiver = expression.dispatchReceiver
         receiver?.apply {
@@ -323,19 +315,24 @@ class ExpressionCodegen(
         val defaultMask = DefaultCallArgs(callable.valueParameterTypes.size)
         val extraArgsShift =
             when {
-                expression.descriptor is ConstructorDescriptor && isEnumClass(expression.descriptor.containingDeclaration) -> 2
-                expression.descriptor is ConstructorDescriptor &&
-                        (expression.descriptor.containingDeclaration as ClassDescriptor).isInner -> 1 // skip the `$outer` parameter
+                callee is IrConstructor && callee.parentAsClass.isEnumClass -> 2
+                callee is IrConstructor && callee.parentAsClass.isInner -> 1 // skip the `$outer` parameter
                 else -> 0
             }
-        expression.descriptor.valueParameters.forEachIndexed { i, parameterDescriptor ->
+        val typeParameters = if (callee is IrConstructor)
+            callee.parentAsClass.typeParameters + callee.typeParameters
+        else
+            callee.typeParameters
+        val typeArguments = (0 until typeParameters.size).map { expression.getTypeArgument(it)!! }
+        val typeSubstitutionMap = typeParameters.map { it.symbol }.zip(typeArguments).toMap()
+        expression.symbol.owner.valueParameters.forEachIndexed { i, irParameter ->
             val arg = expression.getValueArgument(i)
             val parameterType = callable.valueParameterTypes[i]
             when {
                 arg != null -> {
-                    callGenerator.genValueAndPut(parameterDescriptor, arg, parameterType, i, this@ExpressionCodegen, data)
+                    callGenerator.genValueAndPut(irParameter, arg, parameterType, i, this@ExpressionCodegen, data)
                 }
-                parameterDescriptor.hasDefaultValue() -> {
+                irParameter.hasDefaultValue() -> {
                     callGenerator.putValueIfNeeded(
                         parameterType,
                         StackValue.createDefaultValue(parameterType),
@@ -346,12 +343,10 @@ class ExpressionCodegen(
                     defaultMask.mark(i - extraArgsShift/*TODO switch to separate lower*/)
                 }
                 else -> {
-                    assert(parameterDescriptor.varargElementType != null)
-                    //empty vararg
-
-                    // Upper bound for type of vararg parameter should always have a form of 'Array<out T>',
-                    // while its lower bound may be Nothing-typed after approximation
-                    val type = typeMapper.kotlinTypeMapper.mapType(parameterDescriptor.type.upperIfFlexible())
+                    assert(irParameter.varargElementType != null)
+                    val type = typeMapper.mapType(
+                        irParameter.type.substitute(typeSubstitutionMap)
+                    )
                     callGenerator.putValueIfNeeded(
                         parameterType,
                         StackValue.operation(type) {
@@ -366,21 +361,21 @@ class ExpressionCodegen(
 
         callGenerator.genCall(
             callable,
-            defaultMask.generateOnStackIfNeeded(callGenerator, expression.descriptor is ConstructorDescriptor, this),
+            defaultMask.generateOnStackIfNeeded(callGenerator, callee is IrConstructor, this),
             this,
             expression
         )
 
-        val returnType = expression.descriptor.returnType
-        if (returnType != null && KotlinBuiltIns.isNothing(returnType)) {
+        val returnType = callee.returnType.substitute(typeSubstitutionMap)
+        if (returnType.isNothing()) {
             mv.aconst(null)
             mv.athrow()
             return expression.onStack
-        } else if (expression.descriptor is ConstructorDescriptor) {
+        } else if (callee is IrConstructor) {
             return none()
         }
 
-        return coerceNotToUnit(callable.returnType, returnType, expression.type.toKotlinType())
+        return coerceNotToUnit(callable.returnType, returnType, expression.type)
     }
 
     override fun visitInstanceInitializerCall(expression: IrInstanceInitializerCall, data: BlockInfo): StackValue {
@@ -394,7 +389,7 @@ class ExpressionCodegen(
     }
 
     override fun visitVariable(declaration: IrVariable, data: BlockInfo): StackValue {
-        val varType = typeMapper.kotlinTypeMapper.mapType(declaration.descriptor)
+        val varType = typeMapper.mapType(declaration)
         val index = frame.enter(declaration.symbol, varType)
 
         declaration.markLineNumber(startOffset = true)
@@ -434,16 +429,14 @@ class ExpressionCodegen(
 
     private fun generateFieldValue(expression: IrFieldAccessExpression, data: BlockInfo): StackValue {
         val receiverValue = expression.receiver?.accept(this, data) ?: StackValue.none()
-        val propertyDescriptor = expression.descriptor
 
-        val realDescriptor = DescriptorUtils.unwrapFakeOverride(propertyDescriptor)
-        val fieldKotlinType = realDescriptor.original.type
-        val fieldType = typeMapper.kotlinTypeMapper.mapType(fieldKotlinType)
-        val ownerType = typeMapper.kotlinTypeMapper.mapImplementationOwner(propertyDescriptor)
-        val fieldName = propertyDescriptor.name.asString()
-        val isStatic = expression.receiver == null // TODO
+        val realField = expression.symbol.owner.resolveFakeOverride()!!
+        val fieldType = typeMapper.mapType(realField)
+        val ownerType = typeMapper.mapImplementationOwner(realField)
+        val fieldName = realField.name.asString()
+        val isStatic = realField.isStatic
 
-        return StackValue.field(fieldType, fieldKotlinType, ownerType, fieldName, isStatic, receiverValue, realDescriptor)
+        return StackValue.field(fieldType, realField.type.toKotlinType(), ownerType, fieldName, isStatic, receiverValue, realField.descriptor)
     }
 
     override fun visitGetField(expression: IrGetField, data: BlockInfo): StackValue {
@@ -536,7 +529,7 @@ class ExpressionCodegen(
         expression.markLineNumber(startOffset = true)
         expression.value.markLineNumber(startOffset = true)
         val value = expression.value.accept(this, data)
-        StackValue.local(findLocalIndex(expression.symbol), expression.descriptor.asmType).store(value, mv)
+        StackValue.local(findLocalIndex(expression.symbol), expression.symbol.owner.asmType).store(value, mv)
         // Assignments can be used as expressions, so return a value. Redundant pushes
         // will be eliminated by the peephole optimizer.
         putUnitInstance(mv)
@@ -576,7 +569,7 @@ class ExpressionCodegen(
         val hasSpread = arguments.firstIsInstanceOrNull<IrSpreadElement>() != null
 
         if (hasSpread) {
-            val arrayOfReferences = KotlinBuiltIns.isArray(outType.toKotlinType())
+            val arrayOfReferences = outType.makeNotNull().isArray()
             if (size == 1) {
                 // Arrays.copyOf(receiverValue, newLength)
                 val argument = (arguments[0] as IrSpreadElement).expression
@@ -624,7 +617,7 @@ class ExpressionCodegen(
                 if (arrayOfReferences) {
                     mv.dup()
                     mv.invokevirtual(owner, "size", "()I", false)
-                    newArrayInstruction(outType.toKotlinType())
+                    newArrayInstruction(outType)
                     mv.invokevirtual(owner, "toArray", toArrayDescriptor, false)
                     mv.checkcast(type)
                 } else {
@@ -633,8 +626,8 @@ class ExpressionCodegen(
             }
         } else {
             mv.iconst(size)
-            newArrayInstruction(expression.type.toKotlinType())
-            val elementKotlinType = classCodegen.context.builtIns.getArrayElementType(outType.toKotlinType())
+            newArrayInstruction(expression.type)
+            val elementIrType = outType.getArrayOrPrimitiveArrayElementType() ?: context.irBuiltIns.anyNType
             for ((i, element) in expression.elements.withIndex()) {
                 mv.dup()
                 StackValue.constant(i).put(mv)
@@ -642,7 +635,7 @@ class ExpressionCodegen(
                 StackValue
                     .arrayElement(
                         elementType,
-                        elementKotlinType,
+                        elementIrType.toKotlinType(),
                         StackValue.onStack(elementType, outType.toKotlinType()),
                         StackValue.onStack(Type.INT_TYPE)
                     )
@@ -652,16 +645,16 @@ class ExpressionCodegen(
         return expression.onStack
     }
 
-    fun newArrayInstruction(arrayType: KotlinType) {
-        if (KotlinBuiltIns.isArray(arrayType)) {
-            val elementJetType = arrayType.arguments[0].type
+    fun newArrayInstruction(arrayType: IrType) {
+        if (arrayType.isArray()) {
+            val elementIrType = arrayType.safeAs<IrSimpleType>()!!.arguments[0].safeAs<IrTypeProjection>()!!.type
 //            putReifiedOperationMarkerIfTypeIsReifiedParameter(
 //                    elementJetType,
 //                    ReifiedTypeInliner.OperationKind.NEW_ARRAY
 //            )
-            mv.newarray(boxType(elementJetType.asmType))
+            mv.newarray(boxType(elementIrType.asmType))
         } else {
-            val type = typeMapper.kotlinTypeMapper.mapType(arrayType)
+            val type = typeMapper.mapType(arrayType)
             mv.newarray(correctElementType(type))
         }
     }
@@ -685,7 +678,7 @@ class ExpressionCodegen(
         expression.markLineNumber(startOffset = true)
         SwitchGenerator(expression, data, this).generate()?.let { return it }
 
-        val type = expression.type.toKotlinType()
+        val irType = expression.type
         val endLabel = Label()
         var exhaustive = false
         for (branch in expression.branches) {
@@ -703,7 +696,7 @@ class ExpressionCodegen(
                 genConditionalJumpWithOptimizationsIfPossible(branch.condition, data, elseLabel)
             }
             gen(branch.result, data).let {
-                coerceNotToUnit(it.type, it.kotlinType, type)
+                coerceNotToUnit(it.type, it.kotlinType?.toIrType(), irType)
             }
             if (branch.condition.isTrueConst()) {
                 exhaustive = true
@@ -715,14 +708,14 @@ class ExpressionCodegen(
 
         if (!exhaustive) {
             // TODO: make all non-exhaustive `if`/`when` return Nothing.
-            if (type.isUnit())
+            if (irType.isUnit())
                 putUnitInstance(mv)
-            else if (!type.isNothing())
-                throw AssertionError("non-exhaustive `if`/`when` wants to return $type")
+            else if (!irType.isNothing())
+                throw AssertionError("non-exhaustive `if`/`when` wants to return $irType")
         }
 
         mv.mark(endLabel)
-        return if (type.isNothing()) none() else expression.onStack
+        return if (irType.isNothing()) none() else expression.onStack
     }
 
     private fun genConditionalJumpWithOptimizationsIfPossible(
@@ -761,7 +754,7 @@ class ExpressionCodegen(
         // For comparison intrinsics, branch directly based on the comparison instead of
         // materializing a boolean and performing and extra jump.
         if (condition is IrCall) {
-            val intrinsic = intrinsics.getIntrinsic(condition.descriptor.original as CallableMemberDescriptor)
+            val intrinsic = intrinsics.getIntrinsic(condition.symbol)
             if (intrinsic is ComparisonIntrinsic) {
                 val callable = resolveToCallable(condition, false)
                 (callable as IrIntrinsicFunction).loadArguments(this, data)
@@ -776,7 +769,7 @@ class ExpressionCodegen(
         if (condition is IrTypeOperatorCall &&
             (condition.operator == IrTypeOperator.NOT_INSTANCEOF || condition.operator == IrTypeOperator.INSTANCEOF)
         ) {
-            val asmType = condition.typeOperand.toKotlinType().asmType
+            val asmType = condition.typeOperand.asmType
             gen(condition.argument, OBJECT_TYPE, data)
             val type = boxType(asmType)
             generateIsCheck(mv, condition.typeOperand.toKotlinType(), type, state.languageVersionSettings.isReleaseCoroutines())
@@ -800,7 +793,7 @@ class ExpressionCodegen(
     }
 
     override fun visitTypeOperator(expression: IrTypeOperatorCall, data: BlockInfo): StackValue {
-        val asmType = expression.typeOperand.toKotlinType().asmType
+        val asmType = expression.typeOperand.asmType
         when (expression.operator) {
             IrTypeOperator.IMPLICIT_COERCION_TO_UNIT -> {
                 val result = expression.argument.accept(this, data)
@@ -848,7 +841,7 @@ class ExpressionCodegen(
 
             IrTypeOperator.IMPLICIT_INTEGER_COERCION -> {
                 gen(expression.argument, Type.INT_TYPE, data)
-                StackValue.coerce(Type.INT_TYPE, typeMapper.kotlinTypeMapper.mapType(expression.type.toKotlinType()), mv)
+                StackValue.coerce(Type.INT_TYPE, typeMapper.mapType(expression.type), mv)
             }
         }
         return expression.onStack
@@ -1015,8 +1008,8 @@ class ExpressionCodegen(
         val catches = aTry.catches
         for (clause in catches) {
             val clauseStart = markNewLabel()
-            val descriptor = clause.parameter
-            val descriptorType = descriptor.asmType
+            val parameter = clause.catchParameter
+            val descriptorType = parameter.asmType
             val index = frame.enter(clause.catchParameter, descriptorType)
             mv.store(index, descriptorType)
 
@@ -1029,7 +1022,7 @@ class ExpressionCodegen(
             val clauseEnd = markNewLabel()
 
             mv.visitLocalVariable(
-                descriptor.name.asString(), descriptorType.descriptor, null, clauseStart, clauseEnd,
+                parameter.name.asString(), descriptorType.descriptor, null, clauseStart, clauseEnd,
                 index
             )
 
@@ -1202,12 +1195,13 @@ class ExpressionCodegen(
                 return
             } else {
                 val kotlinType = classType.toKotlinType()
-                if (TypeUtils.isTypeParameter(kotlinType)) {
-                    assert(TypeUtils.isReifiedTypeParameter(kotlinType)) { "Non-reified type parameter under ::class should be rejected by type checker: " + kotlinType }
+                val classifier = classType.classifierOrNull
+                if (classifier is IrTypeParameterSymbol) {
+                    assert(classifier.owner.isReified) { "Non-reified type parameter under ::class should be rejected by type checker: ${classifier.owner.dump()}" }
                     putReifiedOperationMarkerIfTypeIsReifiedParameter(kotlinType, ReifiedTypeInliner.OperationKind.JAVA_CLASS, mv, this)
                 }
 
-                putJavaLangClassInstance(mv, typeMapper.kotlinTypeMapper.mapType(kotlinType), kotlinType, typeMapper.kotlinTypeMapper)
+                putJavaLangClassInstance(mv, typeMapper.mapType(classType), kotlinType, typeMapper.kotlinTypeMapper)
             }
         }
 
@@ -1217,117 +1211,100 @@ class ExpressionCodegen(
 
     }
 
-    internal fun coerceNotToUnit(fromType: Type, fromKotlinType: KotlinType?, toKotlinType: KotlinType): StackValue {
-        val asmToType = toKotlinType.asmType
+    internal fun coerceNotToUnit(fromType: Type, fromIrType: IrType?, toIrType: IrType): StackValue {
+        val asmToType = toIrType.asmType
         // A void should still be materialized as a Unit to avoid stack depth mismatches.
-        if (asmToType != AsmTypes.UNIT_TYPE || fromType == Type.VOID_TYPE || TypeUtils.isNullableType(toKotlinType)) {
-            coerce(fromType, fromKotlinType, asmToType, toKotlinType, mv)
-            return onStack(asmToType, toKotlinType)
+        if (asmToType != AsmTypes.UNIT_TYPE || fromType == Type.VOID_TYPE || toIrType.isNullable()) {
+            coerce(fromType, fromIrType?.toKotlinType(), asmToType, toIrType.toKotlinType(), mv)
+            return onStack(asmToType, toIrType.toKotlinType())
         }
-        return onStack(fromType, fromKotlinType)
+        return onStack(fromType, fromIrType?.toKotlinType())
     }
 
+    val IrType.asmType: Type
+        get() = typeMapper.mapType(this)
+
     val IrExpression.asmType: Type
-        get() = typeMapper.kotlinTypeMapper.mapType(this.type.toKotlinType())
+        get() = type.asmType
+
+    val IrVariable.asmType: Type
+        get() = type.asmType
 
     val IrExpression.onStack: StackValue
         get() = StackValue.onStack(this.asmType)
 
-    private fun resolveToCallable(irCall: IrMemberAccessExpression, isSuper: Boolean): Callable {
-        val intrinsic = intrinsics.getIntrinsic(irCall.descriptor.original as CallableMemberDescriptor)
+    private fun resolveToCallable(irCall: IrFunctionAccessExpression, isSuper: Boolean): Callable {
+        val intrinsic = intrinsics.getIntrinsic(irCall.symbol)
         if (intrinsic != null) {
             return intrinsic.toCallable(
                 irCall,
-                typeMapper.kotlinTypeMapper.mapSignatureSkipGeneric(irCall.descriptor as FunctionDescriptor),
+                typeMapper.mapSignatureSkipGeneric(irCall.symbol.owner),
                 classCodegen.context
             )
         }
-
-        var descriptor = irCall.descriptor
-        if (descriptor is TypeAliasConstructorDescriptor) {
-            //TODO where is best to unwrap?
-            descriptor = descriptor.underlyingConstructorDescriptor
-        }
-        if (descriptor is PropertyDescriptor) {
-            descriptor = descriptor.getter!!
-        }
-        if (descriptor is CallableMemberDescriptor && JvmCodegenUtil.getDirectMember(descriptor) is SyntheticJavaPropertyDescriptor) {
-            val propertyDescriptor = JvmCodegenUtil.getDirectMember(descriptor) as SyntheticJavaPropertyDescriptor
-            descriptor = if (descriptor is PropertyGetterDescriptor) {
-                propertyDescriptor.getMethod
-            } else {
-                propertyDescriptor.setMethod!!
-            }
-        }
-        return typeMapper.kotlinTypeMapper.mapToCallableMethod(descriptor as FunctionDescriptor, isSuper)
+        return typeMapper.mapToCallableMethod(irCall.symbol.owner, isSuper)
     }
 
-    private val KotlinType.asmType: Type
-        get() = typeMapper.kotlinTypeMapper.mapType(this)
-
-    private val CallableDescriptor.asmType: Type
-        get() = typeMapper.kotlinTypeMapper.mapType(this)
-
-
     private fun getOrCreateCallGenerator(
-        descriptor: CallableDescriptor,
+        irFunction: IrFunction,
         element: IrMemberAccessExpression?,
-        typeParameterMappings: TypeParameterMappings?,
+        typeParameterMappings: IrTypeParameterMappings?,
         isDefaultCompilation: Boolean
     ): IrCallGenerator {
         if (element == null) return IrCallGenerator.DefaultCallGenerator
 
         // We should inline callable containing reified type parameters even if inline is disabled
         // because they may contain something to reify and straight call will probably fail at runtime
-        val isInline = descriptor.isInlineCall(state)
+        val isInline = irFunction.isInlineCall(state)
 
         if (!isInline) return IrCallGenerator.DefaultCallGenerator
 
-        val original = unwrapInitialSignatureDescriptor(DescriptorUtils.unwrapFakeOverride(descriptor.original as FunctionDescriptor))
+        val original = (irFunction as? IrSimpleFunction)?.resolveFakeOverride() ?: irFunction
         return if (isDefaultCompilation) {
             TODO()
         } else {
-            IrInlineCodegen(this, state, original, typeParameterMappings!!, IrSourceCompilerForInline(state, element, this))
+            IrInlineCodegen(this, state, original.descriptor, typeParameterMappings!!, IrSourceCompilerForInline(state, element, this))
         }
     }
 
     internal fun getOrCreateCallGenerator(
-        memberAccessExpression: IrMemberAccessExpression,
-        descriptor: CallableDescriptor
+        functionAccessExpression: IrFunctionAccessExpression
     ): IrCallGenerator {
+        val callee = functionAccessExpression.symbol.owner
+        // TODO: do we need to collect _all_ type arguments?
+        val typeArgumentContainer = if (callee is IrConstructor) callee.parentAsClass else callee
         val typeArguments =
-            if (memberAccessExpression.typeArgumentsCount == 0) {
+            if (functionAccessExpression.typeArgumentsCount == 0) {
                 //avoid ambiguity with type constructor type parameters
                 emptyMap()
-            } else descriptor.original.typeParameters.keysToMap {
-                memberAccessExpression.getTypeArgumentOrDefault(it)
+            } else typeArgumentContainer.typeParameters.keysToMap {
+                functionAccessExpression.getTypeArgumentOrDefault(it)
             }
 
-        val mappings = TypeParameterMappings()
+        val mappings = IrTypeParameterMappings()
         for (entry in typeArguments.entries) {
             val key = entry.key
             val type = entry.value
 
-            val isReified = key.isReified || InlineUtil.isArrayConstructorWithLambda(descriptor)
+            val isReified = key.isReified || callee.isArrayConstructorWithLambda()
 
-            val typeParameterAndReificationArgument = extractReificationArgument(type)
-            if (typeParameterAndReificationArgument == null) {
-                val approximatedType = approximateCapturedTypes(entry.value).upper
+            val reificationArgument = extractReificationArgument(type)
+            if (reificationArgument == null) {
                 // type is not generic
                 val signatureWriter = BothSignatureWriter(BothSignatureWriter.Mode.TYPE)
-                val asmType = typeMapper.kotlinTypeMapper.mapTypeParameter(approximatedType, signatureWriter)
+                val asmType = typeMapper.mapTypeParameter(type, signatureWriter)
 
                 mappings.addParameterMappingToType(
-                    key.name.identifier, approximatedType, asmType, signatureWriter.toString(), isReified
+                    key.name.identifier, type, asmType, signatureWriter.toString(), isReified
                 )
             } else {
                 mappings.addParameterMappingForFurtherReification(
-                    key.name.identifier, type, typeParameterAndReificationArgument.second, isReified
+                    key.name.identifier, type, reificationArgument, isReified
                 )
             }
         }
 
-        return getOrCreateCallGenerator(descriptor, memberAccessExpression, mappings, false)
+        return getOrCreateCallGenerator(callee, functionAccessExpression, mappings, false)
     }
 
     override val frameMap: IrFrameMap
@@ -1374,6 +1351,99 @@ class ExpressionCodegen(
         lastLineNumber = lineNumber
         mv.visitLineNumber(lineNumber, markNewLabel())
     }
+
+    /* Borrowed and modified from compiler/backend/src/org/jetbrains/kotlin/codegen/codegenUtil.kt */
+
+    fun extractReificationArgument(initialType: IrType): IrReificationArgument? {
+        var type = initialType
+        var arrayDepth = 0
+        val isNullable = type.isMarkedNullable()
+        while (type.isArray()) {
+            arrayDepth++
+            type = (type as IrSimpleType).arguments[0].safeAs<IrTypeProjection>()?.type ?: classCodegen.context.irBuiltIns.anyNType
+        }
+
+        val parameter = type.getTypeParameterOrNull() ?: return null
+
+        return IrReificationArgument(parameter.name.asString(), isNullable, arrayDepth)
+    }
+
+    /* From ReifiedTypeInliner.kt */
+    inner class IrReificationArgument(
+        val parameterName: String, val nullable: Boolean, private val arrayDepth: Int
+    ) {
+        fun asString() = "[".repeat(arrayDepth) + parameterName + (if (nullable) "?" else "")
+        fun combine(replacement: IrReificationArgument) =
+            IrReificationArgument(
+                replacement.parameterName,
+                this.nullable || (replacement.nullable && this.arrayDepth == 0),
+                this.arrayDepth + replacement.arrayDepth
+            )
+
+        fun reify(replacementAsmType: Type, irType: IrType) =
+            Pair(
+                Type.getType("[".repeat(arrayDepth) + replacementAsmType),
+                irType.arrayOf(arrayDepth).withHasQuestionMark(nullable)
+            )
+
+        private fun IrType.arrayOf(arrayDepth: Int): IrType {
+            val builtins = classCodegen.context.irBuiltIns
+            var currentType = this
+
+            repeat(arrayDepth) {
+                currentType = builtins.arrayClass.typeWith(currentType)
+            }
+
+            return currentType
+        }
+
+        fun toReificationArgument() = ReificationArgument(parameterName, nullable, arrayDepth)
+    }
+
+    /*TODO: Temporary copy from BridgeLowering */
+    private fun IrType.eraseTypeParameters() = when (this) {
+        is IrErrorType -> this
+        is IrSimpleType -> {
+            val owner = classifier.owner
+            when (owner) {
+                is IrClass -> IrSimpleTypeImpl(
+                    classifier,
+                    hasQuestionMark,
+                    arguments.zip(owner.typeParameters).map { (arg, param) -> arg.eraseTypeParameters(param) },
+                    annotations
+                )
+                is IrTypeParameter -> {
+                    owner.upperBound() // !!!!!! nullability
+                }
+                else -> error("Unknown IrSimpleType classifier kind: $owner")
+            }
+        }
+        else -> error("Unknown IrType kind: $this")
+    }
+
+    private fun IrTypeParameter.upperBound(): IrType {
+        val superSimpleTypes = superTypes.asSequence().filterIsInstance<IrSimpleType>()
+        val res = superSimpleTypes.firstOrNull { it.classifier is IrClassSymbol && !(it.classifier.owner as IrClass).isInterface }
+            ?: superSimpleTypes.firstOrNull { it.classifier is IrClassSymbol }
+            ?: classCodegen.context.irBuiltIns.anyNType
+        return res.eraseTypeParameters()
+    }
+
+    private fun IrTypeArgument.eraseTypeParameters(param: IrTypeParameter): IrTypeArgument = when (this) {
+        is IrTypeProjection -> makeTypeProjection(type.eraseTypeParameters(), variance) // !!!!!! TODO: must be wrong !!!!!!
+        is IrStarProjection -> this
+        else -> error("unknown type argyument kind: $this")
+    }
+
+    fun IrType.getArrayOrPrimitiveArrayElementType() = (this as? IrSimpleType)?.let {
+        if (this.makeNotNull().isArray()) {
+            assert(arguments.size == 1) { "Array should have one type argument" }
+            arguments[0].safeAs<IrTypeProjection>()?.type
+        } else {
+            val primitiveType = getPrimitiveArrayElementType() ?: error("Not an array type $this")
+            return context.irBuiltIns.primitiveTypeToIrType[primitiveType]!!
+        }
+    }
 }
 
 private class DefaultArg(val index: Int)
@@ -1400,6 +1470,87 @@ fun DefaultCallArgs.generateOnStackIfNeeded(callGenerator: IrCallGenerator, isCo
     return toInts.isNotEmpty()
 }
 
-internal fun CallableDescriptor.isInlineCall(state: GenerationState) =
-    (!state.isInlineDisabled || InlineUtil.containsReifiedTypeParameters(this)) &&
-            (InlineUtil.isInline(this) || InlineUtil.isArrayConstructorWithLambda(this))
+internal fun IrFunction.isInlineCall(state: GenerationState) =
+    (!state.isInlineDisabled || containsReifiedTypeParameters()) &&
+            (isInline || isArrayConstructorWithLambda())
+
+/* Copied and modified from InlineUtil.java */
+fun isInline(declaration: IrDeclaration?): Boolean = declaration is IrSimpleFunction && declaration.isInline
+
+/**
+ * @return true if the function is a constructor of one of 9 array classes (Array&lt;T&gt;, IntArray, FloatArray, ...)
+ * which takes the size and an initializer lambda as parameters. Such constructors are marked as 'inline' but they are not loaded
+ * as such because the 'inline' flag is not stored for constructors in the binary metadata. Therefore we pretend that they are inline
+ */
+fun IrFunction.isArrayConstructorWithLambda(): Boolean = this is IrConstructor &&
+        valueParameters.size == 2 &&
+        parentAsClass.isArrayOrPrimitiveArray()
+
+
+fun IrFunction.containsReifiedTypeParameters(): Boolean =
+    typeParameters.any { it.isReified }
+
+fun IrClass.isArrayOrPrimitiveArray() = this.defaultType.let { it.isArray() || it.isPrimitiveArray() }
+
+/* From typeUtil.java */
+fun IrType.getTypeParameterOrNull() = classifierOrNull?.owner?.safeAs<IrTypeParameter>()
+
+/* From ReifiedTypeInliner.kt */
+class IrTypeParameterMappings {
+    private val mappingsByName = hashMapOf<String, IrTypeParameterMapping>()
+
+    fun addParameterMappingToType(name: String, type: IrType, asmType: Type, signature: String, isReified: Boolean) {
+        mappingsByName[name] = IrTypeParameterMapping(
+            name, type, asmType, reificationArgument = null, signature = signature, isReified = isReified
+        )
+    }
+
+    fun addParameterMappingForFurtherReification(
+        name: String,
+        type: IrType,
+        reificationArgument: ExpressionCodegen.IrReificationArgument,
+        isReified: Boolean
+    ) {
+        mappingsByName[name] = IrTypeParameterMapping(
+            name, type, asmType = null, reificationArgument = reificationArgument, signature = null, isReified = isReified
+        )
+    }
+
+    operator fun get(name: String): IrTypeParameterMapping? = mappingsByName[name]
+
+    fun hasReifiedParameters() = mappingsByName.values.any { it.isReified }
+
+    internal inline fun forEach(l: (IrTypeParameterMapping) -> Unit) {
+        mappingsByName.values.forEach(l)
+    }
+
+    fun toTypeParameterMappings() = TypeParameterMappings().also { result ->
+        mappingsByName.forEach { (_, value) ->
+            if (value.asmType == null) {
+                result.addParameterMappingForFurtherReification(
+                    value.name,
+                    value.type.toKotlinType(),
+                    value.reificationArgument!!.toReificationArgument(),
+                    value.isReified
+                )
+            } else {
+                result.addParameterMappingToType(
+                    value.name,
+                    value.type.toKotlinType(),
+                    value.asmType,
+                    value.signature!!,
+                    value.isReified
+                )
+            }
+        }
+    }
+}
+
+class IrTypeParameterMapping(
+    val name: String,
+    val type: IrType,
+    val asmType: Type?,
+    val reificationArgument: ExpressionCodegen.IrReificationArgument?,
+    val signature: String?,
+    val isReified: Boolean
+)

@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
 import org.jetbrains.kotlin.backend.common.ir.copyTo
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
+import org.jetbrains.kotlin.backend.common.ir.passTypeArgumentsFrom
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.irBlock
 import org.jetbrains.kotlin.backend.common.lower.replaceThisByStaticReference
@@ -128,6 +129,8 @@ private class CompanionObjectJvmStaticLowering(val context: JvmBackendContext) :
         val companionInstanceField = context.declarationFactory.getFieldForObjectInstance(companion)
         val companionInstanceFieldSymbol = companionInstanceField.symbol
         val call = IrCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, target.returnType, target.symbol)
+
+        call.passTypeArgumentsFrom(proxy)
 
         call.dispatchReceiver = IrGetFieldImpl(
             UNDEFINED_OFFSET,

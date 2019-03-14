@@ -156,7 +156,7 @@ private class AnnotationLowering(private val context: JvmBackendContext) : FileL
     private val intrinsics = IrIntrinsicMethods(context.irBuiltIns)
 
     private fun IrCall.isGetJava(): Boolean {
-        val intrinsic = intrinsics.getIntrinsic(descriptor.original)
+        val intrinsic = intrinsics.getIntrinsic(symbol)
         return intrinsic is KClassJavaProperty
     }
 }

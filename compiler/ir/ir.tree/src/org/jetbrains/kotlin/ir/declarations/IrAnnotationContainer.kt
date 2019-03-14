@@ -8,5 +8,9 @@ package org.jetbrains.kotlin.ir.declarations
 import org.jetbrains.kotlin.ir.expressions.IrCall
 
 interface IrAnnotationContainer {
-    val annotations: MutableList<IrCall>
+    val annotations: List<IrCall>
+}
+
+interface IrMutableAnnotationContainer: IrAnnotationContainer {
+    override val annotations: MutableList<IrCall>
 }

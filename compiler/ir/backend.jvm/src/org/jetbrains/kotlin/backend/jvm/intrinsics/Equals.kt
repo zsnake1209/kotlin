@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.codegen.AsmUtil.*
 import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
+import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.types.toKotlinType
@@ -59,7 +60,7 @@ class Equals(val operator: IElementType) : IntrinsicMethod(), ComparisonIntrinsi
     }
 
     override fun toCallable(
-        expression: IrMemberAccessExpression,
+        expression: IrFunctionAccessExpression,
         signature: JvmMethodSignature,
         context: JvmBackendContext
     ): IrIntrinsicFunction {
@@ -80,7 +81,7 @@ class Ieee754Equals(val operandType: Type) : IntrinsicMethod() {
     private val boxedOperandType = AsmUtil.boxType(operandType)
 
     override fun toCallable(
-        expression: IrMemberAccessExpression,
+        expression: IrFunctionAccessExpression,
         signature: JvmMethodSignature,
         context: JvmBackendContext
     ): IrIntrinsicFunction {
@@ -133,7 +134,7 @@ class TotalOrderEquals(operandType: Type) : IntrinsicMethod() {
     private val boxedType = AsmUtil.boxType(operandType)
 
     override fun toCallable(
-        expression: IrMemberAccessExpression,
+        expression: IrFunctionAccessExpression,
         signature: JvmMethodSignature,
         context: JvmBackendContext
     ): IrIntrinsicFunction =

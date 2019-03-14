@@ -1,3 +1,5 @@
+// !LANGUAGE: +NewInference
+// NewInference needed because of KT-26531
 
 fun Int.thisRef1() = fun () = this
 fun Int.thisRef2() = fun (): Int {return this}

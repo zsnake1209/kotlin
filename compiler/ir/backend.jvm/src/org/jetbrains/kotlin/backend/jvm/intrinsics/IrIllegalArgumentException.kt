@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.codegen.BlockInfo
 import org.jetbrains.kotlin.backend.jvm.codegen.ExpressionCodegen
 import org.jetbrains.kotlin.codegen.StackValue
+import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes.JAVA_STRING_TYPE
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
@@ -30,7 +31,7 @@ class IrIllegalArgumentException : IntrinsicMethod() {
     val exceptionTypeDescriptor = Type.getType(IllegalArgumentException::class.java)!!
 
     override fun toCallable(
-        expression: IrMemberAccessExpression,
+        expression: IrFunctionAccessExpression,
         signature: JvmMethodSignature,
         context: JvmBackendContext
     ): IrIntrinsicFunction {

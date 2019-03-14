@@ -5,13 +5,12 @@
 
 package org.jetbrains.kotlin.ir.types
 
+import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.types.Variance
 
-interface IrType {
-    val annotations: List<IrCall>
-}
+interface IrType : IrAnnotationContainer
 
 interface IrErrorType : IrType
 

@@ -110,7 +110,7 @@ open class FunctionCodegen(private val irFunction: IrFunction, private val class
         // TODO: any simpler way to get to the value expression?
         // Are there other valid IR structures that represent the default value?
         return irFunction.safeAs<IrSimpleFunction>()
-            ?.correspondingProperty
+            ?.correspondingPropertySymbol?.owner
             ?.backingField
             ?.initializer.safeAs<IrExpressionBody>()
             ?.expression?.safeAs<IrGetValue>()
@@ -157,8 +157,6 @@ fun generateParameterAnnotations(
     innerClassConsumer: InnerClassConsumer,
     state: GenerationState
 ) {
-    if (irFunction.isAccessor()) return
-
     val iterator = irFunction.valueParameters.iterator()
     val kotlinParameterTypes = jvmSignature.valueParameters
     var syntheticParameterCount = 0
@@ -188,12 +186,13 @@ fun generateParameterAnnotations(
 
         if (annotated != null) {
 
-            AnnotationCodegen.forParameter(
-                mv,
-                if (AsmUtil.IS_BUILT_WITH_ASM6) i else i - syntheticParameterCount,
-                innerClassConsumer,
-                state
-            )
+            AnnotationCodegen(innerClassConsumer, state) { descriptor, visible ->
+                mv.visitParameterAnnotation(
+                    if (AsmUtil.IS_BUILT_WITH_ASM6) i else i - syntheticParameterCount,
+                    descriptor,
+                    visible
+                )
+            }
                 .genAnnotations(annotated, parameterSignature.asmType)
         }
     }
@@ -210,7 +209,7 @@ private fun markEnumOrInnerConstructorParameterAsSynthetic(mv: MethodVisitor, i:
     av?.visitEnd()
 }
 
-private fun IrFunction.isAccessor() = this is IrSimpleFunction && correspondingProperty != null
+private fun IrFunction.isAccessor() = this is IrSimpleFunction && correspondingPropertySymbol != null
 
 private fun visitAnnotableParameterCount(mv: MethodVisitor, paramCount: Int) {
     mv.visitAnnotableParameterCount(paramCount, true)
