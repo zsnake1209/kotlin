@@ -254,6 +254,21 @@ public class IrInlineSuspendTestsGenerated extends AbstractIrInlineSuspendTests 
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/boxInline/suspend/stateMachine"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS_IR, true);
         }
 
+        @TestMetadata("decoratedLocalLambda.kt")
+        public void testDecoratedLocalLambda_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/decoratedLocalLambda.kt", "kotlin.coroutines");
+        }
+
+        @TestMetadata("decoratedNoSuspend.kt")
+        public void testDecoratedNoSuspend_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/decoratedNoSuspend.kt", "kotlin.coroutines");
+        }
+
+        @TestMetadata("decorated.kt")
+        public void testDecorated_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/decorated.kt", "kotlin.coroutines");
+        }
+
         @TestMetadata("innerLambdaInsideLambda.kt")
         public void testInnerLambdaInsideLambda_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/innerLambdaInsideLambda.kt", "kotlin.coroutines");
@@ -307,6 +322,16 @@ public class IrInlineSuspendTestsGenerated extends AbstractIrInlineSuspendTests 
         @TestMetadata("multipleSuspensionPoints.kt")
         public void testMultipleSuspensionPoints_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/multipleSuspensionPoints.kt", "kotlin.coroutines");
+        }
+
+        @TestMetadata("noSuspendFunctionDeepTransform.kt")
+        public void testNoSuspendFunctionDeepTransform_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/noSuspendFunctionDeepTransform.kt", "kotlin.coroutines");
+        }
+
+        @TestMetadata("noSuspendFunction.kt")
+        public void testNoSuspendFunction_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/noSuspendFunction.kt", "kotlin.coroutines");
         }
 
         @TestMetadata("normalInline.kt")
