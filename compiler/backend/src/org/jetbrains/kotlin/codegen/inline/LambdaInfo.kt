@@ -33,17 +33,19 @@ import org.jetbrains.org.objectweb.asm.tree.FieldInsnNode
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
 import kotlin.properties.Delegates
 
-abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : LabelOwner {
+interface LambdaInfo : LabelOwner {
+    val capturedVars: List<CapturedParamDesc>
+
+    val lambdaClassType: Type
+}
+
+abstract class InlineableLambdaInfo(@JvmField val isCrossInline: Boolean) : LambdaInfo {
 
     abstract val isBoundCallableReference: Boolean
-
-    abstract val lambdaClassType: Type
 
     abstract val invokeMethod: Method
 
     abstract val invokeMethodDescriptor: FunctionDescriptor
-
-    abstract val capturedVars: List<CapturedParamDesc>
 
     lateinit var node: SMAPAndMethodNode
 
@@ -65,16 +67,27 @@ abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : LabelOwner {
 
 
     companion object {
-        fun LambdaInfo.getCapturedParamInfo(descriptor: EnclosedValueDescriptor): CapturedParamDesc {
+        fun InlineableLambdaInfo.getCapturedParamInfo(descriptor: EnclosedValueDescriptor): CapturedParamDesc {
             return capturedParamDesc(descriptor.fieldName, descriptor.type)
         }
 
-        fun LambdaInfo.capturedParamDesc(fieldName: String, fieldType: Type): CapturedParamDesc {
+        fun InlineableLambdaInfo.capturedParamDesc(fieldName: String, fieldType: Type): CapturedParamDesc {
             return CapturedParamDesc(lambdaClassType, fieldName, fieldType)
         }
     }
 }
 
+class NoinlineableLambda(
+    val expression: KtExpression,
+    override val lambdaClassType: Type,
+    val isCrossInline: Boolean
+) : LambdaInfo {
+    override val capturedVars: List<CapturedParamDesc> = emptyList()
+
+    override fun isMyLabel(name: String): Boolean {
+        TODO("not implemented")
+    }
+}
 
 class DefaultLambda(
     override val lambdaClassType: Type,
@@ -82,7 +95,7 @@ class DefaultLambda(
     val parameterDescriptor: ValueParameterDescriptor,
     val offset: Int,
     val needReification: Boolean
-) : LambdaInfo(parameterDescriptor.isCrossinline) {
+) : InlineableLambdaInfo(parameterDescriptor.isCrossinline) {
 
     override var isBoundCallableReference by Delegates.notNull<Boolean>()
         private set
@@ -182,7 +195,7 @@ fun Type.boxReceiverForBoundReference() =
 fun Type.boxReceiverForBoundReference(kotlinType: KotlinType, state: GenerationState) =
     AsmUtil.boxType(this, kotlinType, state)
 
-abstract class ExpressionLambda(protected val typeMapper: KotlinTypeMapper, isCrossInline: Boolean) : LambdaInfo(isCrossInline) {
+abstract class ExpressionLambda(protected val typeMapper: KotlinTypeMapper, isCrossInline: Boolean) : InlineableLambdaInfo(isCrossInline) {
 
     override fun generateLambdaBody(sourceCompiler: SourceCompilerForInline, reifiedTypeInliner: ReifiedTypeInliner) {
         val jvmMethodSignature = typeMapper.mapSignatureSkipGeneric(invokeMethodDescriptor)

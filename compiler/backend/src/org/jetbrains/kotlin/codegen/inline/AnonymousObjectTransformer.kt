@@ -413,7 +413,7 @@ class AnonymousObjectTransformer(
         transformationInfo: AnonymousObjectTransformationInfo,
         parentFieldRemapper: FieldRemapper
     ): List<CapturedParamInfo> {
-        val capturedLambdas = LinkedHashSet<LambdaInfo>() //captured var of inlined parameter
+        val capturedLambdas = LinkedHashSet<InlineableLambdaInfo>() //captured var of inlined parameter
         val constructorAdditionalFakeParams = ArrayList<CapturedParamInfo>()
         val indexToLambda = transformationInfo.lambdasToInline
         val capturedParams = HashSet<Int>()
@@ -432,9 +432,9 @@ class AnonymousObjectTransformer(
                 fieldName
             val info = capturedParamBuilder.addCapturedParam(
                 Type.getObjectType(transformationInfo.oldClassName), fieldName, newFieldName,
-                Type.getType(fieldNode.desc), lambdaInfo != null, null
+                Type.getType(fieldNode.desc), lambdaInfo is InlineableLambdaInfo, null
             )
-            if (lambdaInfo != null) {
+            if (lambdaInfo is InlineableLambdaInfo) {
                 info.lambda = lambdaInfo
                 capturedLambdas.add(lambdaInfo)
             }
@@ -452,7 +452,7 @@ class AnonymousObjectTransformer(
         val paramTypes = transformationInfo.constructorDesc?.let { Type.getArgumentTypes(it) } ?: emptyArray()
         for (type in paramTypes) {
             val info = indexToLambda[constructorParamBuilder.nextParameterOffset]
-            val parameterInfo = constructorParamBuilder.addNextParameter(type, info != null)
+            val parameterInfo = constructorParamBuilder.addNextParameter(type, info is InlineableLambdaInfo)
             parameterInfo.lambda = info
             if (capturedParams.contains(parameterInfo.index)) {
                 parameterInfo.isCaptured = true
@@ -463,7 +463,7 @@ class AnonymousObjectTransformer(
 
         //For all inlined lambdas add their captured parameters
         //TODO: some of such parameters could be skipped - we should perform additional analysis
-        val capturedLambdasToInline = HashMap<String, LambdaInfo>() //captured var of inlined parameter
+        val capturedLambdasToInline = HashMap<String, InlineableLambdaInfo>() //captured var of inlined parameter
         val allRecapturedParameters = ArrayList<CapturedParamDesc>()
         val addCapturedNotAddOuter =
             parentFieldRemapper.isRoot || parentFieldRemapper is InlinedLambdaRemapper && parentFieldRemapper.parent!!.isRoot

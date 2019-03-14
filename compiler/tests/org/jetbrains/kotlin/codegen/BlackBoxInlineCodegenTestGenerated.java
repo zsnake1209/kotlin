@@ -3910,6 +3910,16 @@ public class BlackBoxInlineCodegenTestGenerated extends AbstractBlackBoxInlineCo
             public void testOneInlineTwoCaptures_1_3() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/oneInlineTwoCaptures.kt", "kotlin.coroutines");
             }
+
+            @TestMetadata("passLambdaObjectToCrossInline.kt")
+            public void testPassLambdaObjectToCrossInline_1_2() throws Exception {
+                runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/passLambdaObjectToCrossInline.kt", "kotlin.coroutines.experimental");
+            }
+
+            @TestMetadata("passLambdaObjectToCrossInline.kt")
+            public void testPassLambdaObjectToCrossInline_1_3() throws Exception {
+                runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/passLambdaObjectToCrossInline.kt", "kotlin.coroutines");
+            }
         }
     }
 

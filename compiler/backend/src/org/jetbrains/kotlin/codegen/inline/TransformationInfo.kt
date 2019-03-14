@@ -84,7 +84,7 @@ class AnonymousObjectTransformationInfo internal constructor(
 
     lateinit var allRecapturedParameters: List<CapturedParamDesc>
 
-    lateinit var capturedLambdasToInline: Map<String, LambdaInfo>
+    lateinit var capturedLambdasToInline: Map<String, InlineableLambdaInfo>
 
     override val wasAlreadyRegenerated: Boolean
         get() = alreadyRegenerated
