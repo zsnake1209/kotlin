@@ -4,6 +4,7 @@
 // WITH_RUNTIME
 // WITH_COROUTINES
 // NO_CHECK_LAMBDA_INLINING
+// CHECK_STATE_MACHINE
 
 inline suspend fun inlineMe(c: suspend () -> Unit) {
     c(); c()
