@@ -19,7 +19,7 @@ fun IrClassifierSymbol.superTypes() = when (this) {
 }
 
 fun IrClassifierSymbol.isSubtypeOfClass(superClass: IrClassSymbol, checker: IrClassifierEqualityChecker): Boolean {
-    if (checker.check(this, superClass)) return true
+    if (checker.areEqual(this, superClass)) return true
     return superTypes().any { it.isSubtypeOfClass(superClass, checker) }
 }
 
@@ -28,17 +28,17 @@ fun IrType.isSubtypeOfClass(superClass: IrClassSymbol, typeCheckerContext: IrCla
     return classifier.isSubtypeOfClass(superClass, typeCheckerContext)
 }
 
-fun IrType.isEqualsTo(that: IrType, checker: IrClassifierEqualityChecker): Boolean {
+fun IrType.isEqualTo(that: IrType, checker: IrClassifierEqualityChecker): Boolean {
     if (this is IrDynamicType && that is IrDynamicType) return true
     if (this is IrErrorType || that is IrErrorType) return false
     if (this === that) return true
-    if (this is IrSimpleType && that is IrSimpleType) return checker.check(this.classifier, that.classifier) &&
+    if (this is IrSimpleType && that is IrSimpleType) return checker.areEqual(this.classifier, that.classifier) &&
             this.arguments.zip(that.arguments).all { (ths, tht) ->
                 when (ths) {
                     is IrStarProjection -> tht is IrStarProjection
                     is IrTypeProjection -> tht is IrTypeProjection
                             && ths.variance == tht.variance
-                            && ths.type.isEqualsTo(tht.type, checker)
+                            && ths.type.isEqualTo(tht.type, checker)
                     else -> error("Unsupported Type Argument")
                 }
             }
@@ -67,7 +67,7 @@ fun Collection<IrClassifierSymbol>.commonSuperclass(checker: IrClassifierEqualit
                 superClassifiers = visited
             } else {
                 tmp.apply {
-                    retainAll { c -> visited.any { v -> checker.check(c, v) } }
+                    retainAll { c -> visited.any { v -> checker.areEqual(c, v) } }
                 }
             }
         }
@@ -75,5 +75,5 @@ fun Collection<IrClassifierSymbol>.commonSuperclass(checker: IrClassifierEqualit
 
     requireNotNull(superClassifiers)
 
-    return order.first { o -> superClassifiers!!.any { s -> checker.check(o, s) } }
+    return order.first { o -> superClassifiers!!.any { s -> checker.areEqual(o, s) } }
 }
