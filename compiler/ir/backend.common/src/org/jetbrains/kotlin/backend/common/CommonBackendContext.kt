@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.symbols.IrClassifierEqualityChecker
 import org.jetbrains.kotlin.name.FqName
 
 interface LoggingContext {
@@ -32,4 +33,6 @@ interface CommonBackendContext : BackendContext, LoggingContext {
     fun report(element: IrElement?, irFile: IrFile?, message: String, isError: Boolean)
 
     val configuration: CompilerConfiguration
+
+    val classifierEqualityChecker: IrClassifierEqualityChecker
 }
