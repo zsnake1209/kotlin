@@ -70,8 +70,8 @@ fun Test.setUpBoxTests(jsEnabled: Boolean, jsIrEnabled: Boolean, skipIrKlib: Boo
     if (jsEnabled) dependsOn(testJsRuntime)
     if (jsIrEnabled && !skipIrKlib) dependsOn(generateIrRuntimeKlib)
 
-    if (jsEnabled && !jsIrEnabled) exclude("org/jetbrains/kotlin/js/test/semantics/ir/*")
-    if (!jsEnabled && jsIrEnabled) include("org/jetbrains/kotlin/js/test/semantics/ir/*")
+    if (jsEnabled && !jsIrEnabled) exclude("org/jetbrains/kotlin/js/test/ir/semantics/*")
+    if (!jsEnabled && jsIrEnabled) include("org/jetbrains/kotlin/js/test/ir/semantics/*")
 
     jvmArgs("-da:jdk.nashorn.internal.runtime.RecompilableScriptFunctionData") // Disable assertion which fails due to a bug in nashorn (KT-23637)
     workingDir = rootDir
