@@ -219,7 +219,7 @@ class MethodInliner(
                     val invokeCall = currentInvokes.remove()
                     val info = invokeCall.lambdaInfo
 
-                    if (info == null) {
+                    if (info !is InlineableLambdaInfo) {
                         //noninlinable lambda
                         super.visitMethodInsn(opcode, owner, name, desc, itf)
                         return
@@ -263,7 +263,7 @@ class MethodInliner(
                         listOf(*info.invokeMethod.argumentTypes), valueParameters, invokeParameters, valueParamShift, this, coroutineDesc
                     )
 
-                    if (invokeCall.lambdaInfo.invokeMethodDescriptor.valueParameters.isEmpty()) {
+                    if (info.invokeMethodDescriptor.valueParameters.isEmpty()) {
                         // There won't be no parameters processing and line call can be left without actual instructions.
                         // Note: if function is called on the line with other instructions like 1 + foo(), 'nop' will still be generated.
                         visitInsn(Opcodes.NOP)
@@ -389,7 +389,7 @@ class MethodInliner(
         return resultNode
     }
 
-    private fun isDefaultLambdaWithReification(lambdaInfo: LambdaInfo) =
+    private fun isDefaultLambdaWithReification(lambdaInfo: InlineableLambdaInfo) =
         lambdaInfo is DefaultLambda && lambdaInfo.needReification
 
     private fun prepareNode(node: MethodNode, finallyDeepShift: Int): MethodNode {
@@ -621,7 +621,7 @@ class MethodInliner(
                             val stackTransformations = mutableSetOf<AbstractInsnNode>()
                             val lambdaInfo =
                                 getLambdaIfExistsAndMarkInstructions(frame.peek(1)!!, false, instructions, sources, stackTransformations)
-                            if (lambdaInfo != null && stackTransformations.all { it is VarInsnNode }) {
+                            if (lambdaInfo is InlineableLambdaInfo && stackTransformations.all { it is VarInsnNode }) {
                                 assert(lambdaInfo.lambdaClassType.internalName == nodeRemapper.originalLambdaInternalName) {
                                     "Wrong bytecode template for contract template: ${lambdaInfo.lambdaClassType.internalName} != ${nodeRemapper.originalLambdaInternalName}"
                                 }

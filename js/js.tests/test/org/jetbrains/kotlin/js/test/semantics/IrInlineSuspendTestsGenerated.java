@@ -319,6 +319,11 @@ public class IrInlineSuspendTestsGenerated extends AbstractIrInlineSuspendTests 
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/numberOfSuspentions.kt", "kotlin.coroutines");
         }
 
+        @TestMetadata("passLambdaObjectToCrossInline.kt")
+        public void testPassLambdaObjectToCrossInline_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/passLambdaObjectToCrossInline.kt", "kotlin.coroutines");
+        }
+
         @TestMetadata("passLambdaObjectToInline.kt")
         public void testPassLambdaObjectToInline_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/passLambdaObjectToInline.kt", "kotlin.coroutines");

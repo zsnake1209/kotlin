@@ -31,7 +31,7 @@ class IrInlineCodegen(
         // TODO: JVM assertions are not implemented yet in IR backend
     }
 
-    override fun putClosureParametersOnStack(next: LambdaInfo, functionReferenceReceiver: StackValue?) {
+    override fun putClosureParametersOnStack(next: InlineableLambdaInfo, functionReferenceReceiver: StackValue?) {
         val lambdaInfo = next as IrExpressionLambdaImpl
         activeLambda = lambdaInfo
 
@@ -91,7 +91,7 @@ class IrInlineCodegen(
         performInline(typeArguments, callDefault, codegen)
     }
 
-    private fun rememberClosure(irReference: IrFunctionReference, type: Type, parameter: ValueParameterDescriptor): LambdaInfo {
+    private fun rememberClosure(irReference: IrFunctionReference, type: Type, parameter: ValueParameterDescriptor): InlineableLambdaInfo {
         //assert(InlineUtil.isInlinableParameterExpression(ktLambda)) { "Couldn't find inline expression in ${expression.text}" }
         val expression = irReference.symbol.owner as IrFunction
         return IrExpressionLambdaImpl(
