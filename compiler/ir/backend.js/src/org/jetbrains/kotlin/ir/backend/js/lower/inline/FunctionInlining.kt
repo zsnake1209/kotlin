@@ -238,26 +238,26 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
 
                     var unboundIndex = 0
                     val unboundArgsSet = unboundFunctionParameters.toSet()
-                    val valueParameters = expression.getArguments().drop(1) // Skip dispatch receiver.
+                    val valueParameters = expression.getArgumentsWithIr().drop(1) // Skip dispatch receiver.
 
                     val immediateCall = IrCallImpl(
                         expression.startOffset, expression.endOffset,
                         expression.type,
-                        functionArgument.symbol, functionArgument.descriptor
+                        functionArgument.symbol
                     ).apply {
                         functionParameters.forEach {
                             val argument =
-                                if (!unboundArgsSet.contains(it))
+                                if (it !in unboundArgsSet)
                                     boundFunctionParametersMap[it]!!
                                 else
-                                    valueParameters[unboundIndex++].second
+                                    valueParameters.getOrNull(unboundIndex++)?.second
                             when (it) {
                                 function.dispatchReceiverParameter -> this.dispatchReceiver = argument
                                 function.extensionReceiverParameter -> this.extensionReceiver = argument
                                 else -> putValueArgument(it.index, argument)
                             }
                         }
-                        assert(unboundIndex == valueParameters.size) { "Not all arguments of <invoke> are used" }
+                        assert(unboundIndex >= valueParameters.size) { "Not all arguments of <invoke> are used" }
                         for (index in 0 until functionArgument.typeArgumentsCount)
                             putTypeArgument(index, functionArgument.getTypeArgument(index))
                     }
