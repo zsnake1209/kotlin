@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrClassifierEqualityChecker
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
+import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.utils.DFS
 
 
@@ -23,9 +24,9 @@ fun IrClassifierSymbol.isSubtypeOfClass(superClass: IrClassSymbol, checker: IrCl
     return superTypes().any { it.isSubtypeOfClass(superClass, checker) }
 }
 
-fun IrType.isSubtypeOfClass(superClass: IrClassSymbol, typeCheckerContext: IrClassifierEqualityChecker): Boolean {
+fun IrType.isSubtypeOfClass(superClass: IrClassSymbol, checker: IrClassifierEqualityChecker): Boolean {
     if (this !is IrSimpleType) return false
-    return classifier.isSubtypeOfClass(superClass, typeCheckerContext)
+    return classifier.isSubtypeOfClass(superClass, checker)
 }
 
 fun IrType.isEqualTo(that: IrType, checker: IrClassifierEqualityChecker): Boolean {
@@ -59,7 +60,7 @@ fun Collection<IrClassifierSymbol>.commonSuperclass(checker: IrClassifierEqualit
             if (superClassifiers == null) {
                 superClassifiers = visited
             } else {
-                superClassifiers?.apply {
+                superClassifiers!!.apply {
                     retainAll { c -> visited.any { v -> checker.areEqual(c, v) } }
                 }
             }
@@ -69,5 +70,10 @@ fun Collection<IrClassifierSymbol>.commonSuperclass(checker: IrClassifierEqualit
     requireNotNull(superClassifiers)
 
     return order.firstOrNull { o -> superClassifiers!!.any { s -> checker.areEqual(o, s) } }
-        ?: error("No common superType found for non-empty set of classifiers")
+        ?: error(
+            "No common superType found for non-empty set of classifiers: ${joinToString(
+                prefix = "[",
+                postfix = "]"
+            ) { it.owner.render() }}"
+        )
 }
