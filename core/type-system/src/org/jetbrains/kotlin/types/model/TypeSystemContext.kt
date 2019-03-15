@@ -50,13 +50,36 @@ interface TypeSystemBuiltInsContext {
     fun nothingType(): SimpleTypeMarker
 }
 
-interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBuiltInsContext {
+interface TypeSystemTypeFactoryContext {
+    fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker
+    fun createSimpleType(constructor: TypeConstructorMarker, arguments: List<TypeArgumentMarker>, nullable: Boolean): SimpleTypeMarker
+    fun createTypeArgument(type: KotlinTypeMarker, variance: TypeVariance): TypeArgumentMarker
+    fun createStarProjection(typeParameter: TypeParameterMarker): TypeArgumentMarker
+}
+
+
+interface TypeCheckerProviderContext {
+    fun newBaseTypeCheckerContext(errorTypesEqualToAnything: Boolean): AbstractTypeCheckerContext
+}
+
+interface TypeSystemCommonSuperTypesContext : TypeSystemContext, TypeSystemTypeFactoryContext, TypeCheckerProviderContext {
+
+    fun KotlinTypeMarker.anySuperTypeConstructor(predicate: (TypeConstructorMarker) -> Boolean) =
+        newBaseTypeCheckerContext(false).anySupertype(lowerBoundIfFlexible(), {
+            predicate(it.typeConstructor())
+        }, { AbstractTypeCheckerContext.SupertypesPolicy.LowerIfFlexible })
+
+    fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean
+
+    fun SimpleTypeMarker.typeDepth(): Int
+    fun KotlinTypeMarker.typeDepth(): Int
+}
+
+interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBuiltInsContext, TypeSystemCommonSuperTypesContext {
     fun KotlinTypeMarker.contains(predicate: (KotlinTypeMarker) -> Boolean): Boolean
 
     fun TypeConstructorMarker.isUnitTypeConstructor(): Boolean
 
-    fun SimpleTypeMarker.typeDepth(): Int
-    fun KotlinTypeMarker.typeDepth(): Int
 //
 //    fun KotlinTypeMarker.substitute(typeVariable: TypeVariableMarker, value: KotlinTypeMarker): KotlinTypeMarker
 //
@@ -66,16 +89,12 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
 
     fun KotlinTypeMarker.isUnit(): Boolean
 
-    fun newBaseTypeCheckerContext(): AbstractTypeCheckerContext
-
     fun KotlinTypeMarker.withNullability(nullable: Boolean): KotlinTypeMarker
 
 
     fun KotlinTypeMarker.makeDefinitelyNotNullOrNotNull(): KotlinTypeMarker
     fun SimpleTypeMarker.makeSimpleTypeDefinitelyNotNullOrNotNull(): SimpleTypeMarker
 
-    fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker
-    fun createSimpleType(constructor: TypeConstructorMarker, arguments: List<TypeArgumentMarker>, nullable: Boolean): SimpleTypeMarker
     fun createCapturedType(
         constructorProjection: TypeArgumentMarker,
         constructorSupertypes: List<KotlinTypeMarker>,
@@ -103,16 +122,6 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
     fun KotlinTypeMarker.isNullableAny() = this.typeConstructor().isAnyConstructor() && this.isNullableType()
     fun KotlinTypeMarker.isNothing() = this.typeConstructor().isNothingConstructor() && !this.isNullableType()
     fun KotlinTypeMarker.isNullableNothing() = this.typeConstructor().isNothingConstructor() && this.isNullableType()
-
-    fun createTypeArgument(type: KotlinTypeMarker, variance: TypeVariance): TypeArgumentMarker
-    fun createStarProjection(typeParameter: TypeParameterMarker): TypeArgumentMarker
-
-    fun KotlinTypeMarker.anySuperTypeConstructor(predicate: (TypeConstructorMarker) -> Boolean) =
-        newBaseTypeCheckerContext().anySupertype(lowerBoundIfFlexible(), {
-            predicate(it.typeConstructor())
-        }, { AbstractTypeCheckerContext.SupertypesPolicy.LowerIfFlexible })
-
-    fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean
 
     fun DefinitelyNotNullTypeMarker.original(): SimpleTypeMarker
 

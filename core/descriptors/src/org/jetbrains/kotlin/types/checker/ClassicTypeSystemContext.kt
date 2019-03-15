@@ -308,8 +308,8 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     }
 
 
-    override fun newBaseTypeCheckerContext(): AbstractTypeCheckerContext {
-        return ClassicTypeCheckerContext(false)
+    override fun newBaseTypeCheckerContext(errorTypesEqualToAnything: Boolean): AbstractTypeCheckerContext {
+        return ClassicTypeCheckerContext(errorTypesEqualToAnything)
     }
 
     override fun nullableNothingType(): SimpleTypeMarker {

@@ -208,7 +208,7 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
         // todo: may be we can do better then that.
         if (notTypeVariables.isNotEmpty() &&
             AbstractTypeChecker.isSubtypeOf(
-                ClassicTypeCheckerContext(true),
+                this as TypeCheckerProviderContext,
                 intersectTypes(notTypeVariables),
                 superType
             )
@@ -231,7 +231,7 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
 //      here we try to add constraint {Any & T} <: S from `id(a)`
 //      Previously we thought that if `Any` isn't a subtype of S => T <: S, which is wrong, now we use weaker upper constraint
 //      TODO: rethink, maybe we should take nullability into account somewhere else
-        if (notTypeVariables.any { AbstractNullabilityChecker.isSubtypeOfAny(newBaseTypeCheckerContext(), it) }) {
+        if (notTypeVariables.any { AbstractNullabilityChecker.isSubtypeOfAny(this as TypeCheckerProviderContext, it) }) {
             return typeVariables.all { simplifyUpperConstraint(it, superType.withNullability(true)) }
         }
 
@@ -239,7 +239,7 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
     }
 
     private fun isSubtypeOfByTypeChecker(subType: KotlinTypeMarker, superType: KotlinTypeMarker) =
-        AbstractTypeChecker.isSubtypeOf(this, subType, superType)
+        AbstractTypeChecker.isSubtypeOf(this as AbstractTypeCheckerContext, subType, superType)
 
     private fun assertInputTypes(subType: KotlinTypeMarker, superType: KotlinTypeMarker) {
         fun correctSubType(subType: SimpleTypeMarker) =

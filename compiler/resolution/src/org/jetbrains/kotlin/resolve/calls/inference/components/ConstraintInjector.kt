@@ -118,7 +118,7 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
         val possibleNewConstraints: MutableList<Pair<TypeVariableMarker, Constraint>>
     ) : AbstractTypeCheckerContextForConstraintSystem(), ConstraintIncorporator.Context, TypeSystemInferenceExtensionContext by c {
 
-        val baseContext: AbstractTypeCheckerContext = newBaseTypeCheckerContext()
+        val baseContext: AbstractTypeCheckerContext = newBaseTypeCheckerContext(isErrorTypeEqualsToAnything)
 
         override fun substitutionSupertypePolicy(type: SimpleTypeMarker): SupertypesPolicy.DoCustomTransform {
             return baseContext.substitutionSupertypePolicy(type)
@@ -133,7 +133,7 @@ class ConstraintInjector(val constraintIncorporator: ConstraintIncorporator, val
         }
 
         fun runIsSubtypeOf(lowerType: KotlinTypeMarker, upperType: KotlinTypeMarker) {
-            if (!AbstractTypeChecker.isSubtypeOf(this@TypeCheckerContext, lowerType, upperType)) {
+            if (!AbstractTypeChecker.isSubtypeOf(this@TypeCheckerContext as AbstractTypeCheckerContext, lowerType, upperType)) {
                 // todo improve error reporting -- add information about base types
                 c.addError(NewConstraintError(lowerType, upperType, position))
             }

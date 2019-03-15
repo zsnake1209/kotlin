@@ -144,6 +144,15 @@ abstract class AbstractTypeCheckerContext : TypeSystemContext {
 }
 
 object AbstractTypeChecker {
+
+    fun isSubtypeOf(context: TypeCheckerProviderContext, subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
+        return AbstractTypeChecker.isSubtypeOf(context.newBaseTypeCheckerContext(true), subType, superType)
+    }
+
+    fun equalTypes(context: TypeCheckerProviderContext, a: KotlinTypeMarker, b: KotlinTypeMarker): Boolean {
+        return AbstractTypeChecker.equalTypes(context.newBaseTypeCheckerContext(false), a, b)
+    }
+
     fun isSubtypeOf(context: AbstractTypeCheckerContext, subType: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
         if (subType === superType) return true
         return context.completeIsSubTypeOf(context.prepareType(subType), context.prepareType(superType))
@@ -451,6 +460,9 @@ object AbstractNullabilityChecker {
     fun isPossibleSubtype(context: AbstractTypeCheckerContext, subType: SimpleTypeMarker, superType: SimpleTypeMarker): Boolean =
         context.runIsPossibleSubtype(subType, superType)
 
+    fun isSubtypeOfAny(context: TypeCheckerProviderContext, type: KotlinTypeMarker): Boolean =
+        AbstractNullabilityChecker.isSubtypeOfAny(context.newBaseTypeCheckerContext(false), type)
+
     fun isSubtypeOfAny(context: AbstractTypeCheckerContext, type: KotlinTypeMarker): Boolean =
         with(context) {
             hasNotNullSupertype(type.lowerBoundIfFlexible(), SupertypesPolicy.LowerIfFlexible)
@@ -503,6 +515,9 @@ object AbstractNullabilityChecker {
         }) {
             if (it.isMarkedNullable()) SupertypesPolicy.None else supertypesPolicy
         }
+
+    fun TypeCheckerProviderContext.hasPathByNotMarkedNullableNodes(start: SimpleTypeMarker, end: TypeConstructorMarker) =
+        newBaseTypeCheckerContext(false).hasPathByNotMarkedNullableNodes(start, end)
 
     fun AbstractTypeCheckerContext.hasPathByNotMarkedNullableNodes(start: SimpleTypeMarker, end: TypeConstructorMarker) =
         anySupertype(start, {

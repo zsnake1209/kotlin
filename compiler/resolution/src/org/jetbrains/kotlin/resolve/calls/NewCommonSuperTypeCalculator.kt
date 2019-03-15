@@ -33,12 +33,12 @@ object NewCommonSuperTypeCalculator {
         return ctx.commonSuperType(types) as UnwrappedType
     }
 
-    fun TypeSystemInferenceExtensionContext.commonSuperType(types: List<KotlinTypeMarker>): KotlinTypeMarker {
+    fun TypeSystemCommonSuperTypesContext.commonSuperType(types: List<KotlinTypeMarker>): KotlinTypeMarker {
         val maxDepth = types.maxBy { it.typeDepth() }?.typeDepth() ?: 0
         return commonSuperType(types, -maxDepth)
     }
 
-    private fun TypeSystemInferenceExtensionContext.commonSuperType(types: List<KotlinTypeMarker>, depth: Int): KotlinTypeMarker {
+    private fun TypeSystemCommonSuperTypesContext.commonSuperType(types: List<KotlinTypeMarker>, depth: Int): KotlinTypeMarker {
         if (types.isEmpty()) throw IllegalStateException("Empty collection for input")
 
         types.singleOrNull()?.let { return it }
@@ -66,12 +66,12 @@ object NewCommonSuperTypeCalculator {
         return createFlexibleType(lowerSuperType, upperSuperType)
     }
 
-    private fun TypeSystemInferenceExtensionContext.commonSuperTypeForSimpleTypes(
+    private fun TypeSystemCommonSuperTypesContext.commonSuperTypeForSimpleTypes(
         types: List<SimpleTypeMarker>,
         depth: Int
     ): SimpleTypeMarker {
         // i.e. result type also should be marked nullable
-        val notAllNotNull = types.any { !AbstractNullabilityChecker.isSubtypeOfAny(newBaseTypeCheckerContext(), it) }
+        val notAllNotNull = types.any { !AbstractNullabilityChecker.isSubtypeOfAny(this, it) }
         val notNullTypes = if (notAllNotNull) types.map { it.withNullability(false) } else types
 
         val commonSuperType = commonSuperTypeForNotNullTypes(notNullTypes, depth)
@@ -81,23 +81,23 @@ object NewCommonSuperTypeCalculator {
             commonSuperType
     }
 
-    private fun TypeSystemInferenceExtensionContext.refineNullabilityForUndefinedNullability(
+    private fun TypeSystemCommonSuperTypesContext.refineNullabilityForUndefinedNullability(
         types: List<SimpleTypeMarker>,
         commonSuperType: SimpleTypeMarker
     ): SimpleTypeMarker? {
         if (!commonSuperType.canHaveUndefinedNullability()) return null
 
         val actuallyNotNull =
-            types.all { newBaseTypeCheckerContext().hasPathByNotMarkedNullableNodes(it, commonSuperType.typeConstructor()) }
+            types.all { hasPathByNotMarkedNullableNodes(it, commonSuperType.typeConstructor()) }
         return if (actuallyNotNull) commonSuperType else null
     }
 
     // Makes representative sample, i.e. (A, B, A) -> (A, B)
-    private fun TypeSystemInferenceExtensionContext.uniquify(types: List<SimpleTypeMarker>): List<SimpleTypeMarker> {
+    private fun TypeSystemCommonSuperTypesContext.uniquify(types: List<SimpleTypeMarker>): List<SimpleTypeMarker> {
         val uniqueTypes = arrayListOf<SimpleTypeMarker>()
         for (type in types) {
             val isNewUniqueType = uniqueTypes.all {
-                !AbstractTypeChecker.equalTypes(newBaseTypeCheckerContext(), it, type) || it.constructor is IntegerLiteralTypeConstructor
+                !AbstractTypeChecker.equalTypes(this, it, type) || it.constructor is IntegerLiteralTypeConstructor
             }
             if (isNewUniqueType) {
                 uniqueTypes += type
@@ -108,13 +108,13 @@ object NewCommonSuperTypeCalculator {
 
     // This function leaves only supertypes, i.e. A0 is a strong supertype for A iff A != A0 && A <: A0
     // Explanation: consider types (A : A0, B : B0, A0, B0), then CST(A, B, A0, B0) == CST(CST(A, A0), CST(B, B0)) == CST(A0, B0)
-    private fun TypeSystemInferenceExtensionContext.filterSupertypes(list: List<SimpleTypeMarker>): List<SimpleTypeMarker> {
+    private fun TypeSystemCommonSuperTypesContext.filterSupertypes(list: List<SimpleTypeMarker>): List<SimpleTypeMarker> {
         val supertypes = list.toMutableList()
         val iterator = supertypes.iterator()
         while (iterator.hasNext()) {
             val potentialSubtype = iterator.next()
             val isSubtype = supertypes.any { supertype ->
-                supertype !== potentialSubtype && AbstractTypeChecker.isSubtypeOf(newBaseTypeCheckerContext(), potentialSubtype, supertype)
+                supertype !== potentialSubtype && AbstractTypeChecker.isSubtypeOf(this, potentialSubtype, supertype)
             }
 
             if (isSubtype) iterator.remove()
@@ -123,7 +123,7 @@ object NewCommonSuperTypeCalculator {
         return supertypes
     }
 
-    private fun TypeSystemInferenceExtensionContext.commonSuperTypeForNotNullTypes(
+    private fun TypeSystemCommonSuperTypesContext.commonSuperTypeForNotNullTypes(
         types: List<SimpleTypeMarker>,
         depth: Int
     ): SimpleTypeMarker {
@@ -140,7 +140,7 @@ object NewCommonSuperTypeCalculator {
         return findSuperTypeConstructorsAndIntersectResult(explicitSupertypes, depth)
     }
 
-    private fun TypeSystemInferenceExtensionContext.findSuperTypeConstructorsAndIntersectResult(
+    private fun TypeSystemCommonSuperTypesContext.findSuperTypeConstructorsAndIntersectResult(
         types: List<SimpleTypeMarker>,
         depth: Int
     ): SimpleTypeMarker {
@@ -150,7 +150,7 @@ object NewCommonSuperTypeCalculator {
     /**
      * Note that if there is captured type C, then no one else is not subtype of C => lowerType cannot help here
      */
-    private fun TypeSystemInferenceExtensionContext.allCommonSuperTypeConstructors(types: List<SimpleTypeMarker>): List<TypeConstructorMarker> {
+    private fun TypeSystemCommonSuperTypesContext.allCommonSuperTypeConstructors(types: List<SimpleTypeMarker>): List<TypeConstructorMarker> {
         val result = collectAllSupertypes(types.first())
         for (type in types) {
             if (type === types.first()) continue
@@ -164,12 +164,12 @@ object NewCommonSuperTypeCalculator {
         }
     }
 
-    private fun TypeSystemInferenceExtensionContext.collectAllSupertypes(type: SimpleTypeMarker) =
+    private fun TypeSystemCommonSuperTypesContext.collectAllSupertypes(type: SimpleTypeMarker) =
         LinkedHashSet<TypeConstructorMarker>().apply {
             type.anySuperTypeConstructor { add(it); false }
         }
 
-    private fun TypeSystemInferenceExtensionContext.superTypeWithGivenConstructor(
+    private fun TypeSystemCommonSuperTypesContext.superTypeWithGivenConstructor(
         types: List<SimpleTypeMarker>,
         constructor: TypeConstructorMarker,
         depth: Int
@@ -220,7 +220,7 @@ object NewCommonSuperTypeCalculator {
     }
 
     // no star projections in arguments
-    private fun TypeSystemInferenceExtensionContext.calculateArgument(
+    private fun TypeSystemCommonSuperTypesContext.calculateArgument(
         parameter: TypeParameterMarker,
         arguments: List<TypeArgumentMarker>,
         depth: Int

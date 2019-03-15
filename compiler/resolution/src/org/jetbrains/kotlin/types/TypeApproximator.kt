@@ -252,22 +252,22 @@ abstract class AbstractTypeApproximator(val ctx: TypeSystemInferenceExtensionCon
             0 -> type.builtIns.nullableAnyType // Let C = in Int, then superType for C and C? is Any?
             1 -> supertypes.single()
 
-        // Consider the following example:
-        // A.getA()::class.java, where `getA()` returns some class from Java
-        // From `::class` we are getting type KClass<Cap<out A!>>, where Cap<out A!> have two supertypes:
-        // - Any (from declared upper bound of type parameter for KClass)
-        // - (A..A?) -- from A!, projection type of captured type
+            // Consider the following example:
+            // A.getA()::class.java, where `getA()` returns some class from Java
+            // From `::class` we are getting type KClass<Cap<out A!>>, where Cap<out A!> have two supertypes:
+            // - Any (from declared upper bound of type parameter for KClass)
+            // - (A..A?) -- from A!, projection type of captured type
 
-        // Now, after approximation we were getting type `KClass<out A>`, because { Any & (A..A?) } = A,
-        // but in old inference type was equal to `KClass<out A!>`.
+            // Now, after approximation we were getting type `KClass<out A>`, because { Any & (A..A?) } = A,
+            // but in old inference type was equal to `KClass<out A!>`.
 
-        // Important note that from the point of type system first type is more specific:
-        // Here, approximation of KClass<Cap<out A!>> is a type KClass<T> such that KClass<Cap<out A!>> <: KClass<out T> =>
-        // So, the the more specific type for T would be "some non-null (because of declared upper bound type) subtype of A", which is `out A`
+            // Important note that from the point of type system first type is more specific:
+            // Here, approximation of KClass<Cap<out A!>> is a type KClass<T> such that KClass<Cap<out A!>> <: KClass<out T> =>
+            // So, the the more specific type for T would be "some non-null (because of declared upper bound type) subtype of A", which is `out A`
 
-        // But for now, to reduce differences in behaviour of old and new inference, we'll approximate such types to `KClass<out A!>`
+            // But for now, to reduce differences in behaviour of old and new inference, we'll approximate such types to `KClass<out A!>`
 
-        // Once NI will be more stabilized, we'll use more specific type
+            // Once NI will be more stabilized, we'll use more specific type
 
             else -> type.typeConstructorProjection().getType()//.unwrap()
         }
@@ -303,7 +303,12 @@ abstract class AbstractTypeApproximator(val ctx: TypeSystemInferenceExtensionCon
     private fun approximateSimpleToSubType(type: SimpleTypeMarker, conf: TypeApproximatorConfiguration, depth: Int) =
         approximateTo(type, conf, toSuper = false, depth = depth)
 
-    private fun approximateTo(type: SimpleTypeMarker, conf: TypeApproximatorConfiguration, toSuper: Boolean, depth: Int): KotlinTypeMarker? {
+    private fun approximateTo(
+        type: SimpleTypeMarker,
+        conf: TypeApproximatorConfiguration,
+        toSuper: Boolean,
+        depth: Int
+    ): KotlinTypeMarker? {
         if (type.isError()) {
             // todo -- fix builtIns. Now builtIns here is DefaultBuiltIns
             return if (conf.errorType) null else type.defaultResult(toSuper)
@@ -435,7 +440,12 @@ abstract class AbstractTypeApproximator(val ctx: TypeSystemInferenceExtensionCon
                         val toSubType = approximateToSubType(argumentType, conf, depth) ?: continue@loop
 
                         // Inv<Foo!> is supertype for Inv<Foo?>
-                        if (!AbstractTypeChecker.equalTypes(newBaseTypeCheckerContext() ,argumentType, toSubType)) return type.defaultResult(toSuper)
+                        if (!AbstractTypeChecker.equalTypes(
+                                this,
+                                argumentType,
+                                toSubType
+                            )
+                        ) return type.defaultResult(toSuper)
 
                         // also Captured(out Nothing) = Nothing
                         newArguments[index] = toSubType.asTypeArgument()
@@ -472,7 +482,7 @@ abstract class AbstractTypeApproximator(val ctx: TypeSystemInferenceExtensionCon
                         }
                     }
 
-                    if (AbstractTypeChecker.equalTypes(newBaseTypeCheckerContext(), argumentType, approximatedSuperType)) {
+                    if (AbstractTypeChecker.equalTypes(this, argumentType, approximatedSuperType)) {
                         newArguments[index] = approximatedSuperType.asTypeArgument()
                     } else {
                         newArguments[index] = createTypeArgument(approximatedSuperType, TypeVariance.OUT)
