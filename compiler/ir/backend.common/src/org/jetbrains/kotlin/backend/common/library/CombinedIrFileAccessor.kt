@@ -19,35 +19,21 @@ package org.jetbrains.kotlin.backend.common.library
 import com.intellij.util.io.ByteBufferWrapper
 import java.io.File
 import java.io.RandomAccessFile
-import java.nio.MappedByteBuffer
-import java.nio.channels.FileChannel
 import java.nio.file.Files
 
 data class DeclarationId(val id: Long, val isLocal: Boolean)
 
-
-fun File.map(mode: FileChannel.MapMode = FileChannel.MapMode.READ_ONLY,
-        start: Long = 0, size: Long = -1): ByteBufferWrapper {
-    val file = RandomAccessFile(path,
-        if (mode == FileChannel.MapMode.READ_ONLY) "r" else "rw")
-    val fileSize = if (mode == FileChannel.MapMode.READ_ONLY)
-        file.length() else size.also { assert(size != -1L) }
-    return if (mode == FileChannel.MapMode.READ_ONLY)
-        ByteBufferWrapper.readOnly(this, start.toInt()) else
-        ByteBufferWrapper.readWrite(this, start.toInt(), fileSize.toInt())
-}
-
 class CombinedIrFileReader(file: File) {
-    private val buffer = file.map(FileChannel.MapMode.READ_ONLY)
+    private val bufferWrapper = ByteBufferWrapper.readOnly(file, 0)
     private val declarationToOffsetSize = mutableMapOf<DeclarationId, Pair<Int, Int>>()
 
     init {
-        val declarationsCount = buffer.buffer.int
+        val declarationsCount = bufferWrapper.buffer.getInt()
         for (i in 0 until declarationsCount) {
-            val id = buffer.buffer.long
-            val isLocal = buffer.buffer.int != 0
-            val offset = buffer.buffer.int
-            val size = buffer.buffer.int
+            val id = bufferWrapper.buffer.long
+            val isLocal = bufferWrapper.buffer.int != 0
+            val offset = bufferWrapper.buffer.int
+            val size = bufferWrapper.buffer.int
             declarationToOffsetSize[DeclarationId(id, isLocal)] = offset to size
         }
     }
@@ -55,12 +41,12 @@ class CombinedIrFileReader(file: File) {
     fun declarationBytes(id: DeclarationId): ByteArray {
         val offsetSize = declarationToOffsetSize[id] ?: throw Error("No declaration with $id here")
         val result = ByteArray(offsetSize.second)
-        buffer.buffer.position(offsetSize.first)
-        buffer.buffer.get(result, 0, offsetSize.second)
+        bufferWrapper.buffer.position(offsetSize.first)
+        bufferWrapper.buffer.get(result, 0, offsetSize.second)
         return result
     }
 
-    fun dispose() = buffer.dispose()
+    fun dispose() = bufferWrapper.dispose()
 }
 
 private const val SINGLE_INDEX_RECORD_SIZE = 20  // sizeof(Long) + 3 * sizeof(Int).
