@@ -308,7 +308,7 @@ class FunctionGenerator(declarationGenerator: DeclarationGenerator) : Declaratio
                     val inAnnotation =
                         valueParameterDescriptor.containingDeclaration.safeAs<ConstructorDescriptor>()?.isAnnotationConstructor() ?: false
                     if (inAnnotation) {
-                        generateDefaultAnnotationParametervalue(defaultValue, valueParameterDescriptor)
+                        generateDefaultAnnotationParameterValue(defaultValue, valueParameterDescriptor)
                     } else
                         bodyGenerator.generateExpressionBody(defaultValue)
                 }
@@ -331,7 +331,7 @@ class FunctionGenerator(declarationGenerator: DeclarationGenerator) : Declaratio
             (descriptor as? ValueParameterDescriptor)?.varargElementType?.toIrType()
         )
 
-    private fun generateDefaultAnnotationParametervalue(
+    private fun generateDefaultAnnotationParameterValue(
         valueExpression: KtExpression,
         valueParameterDescriptor: ValueParameterDescriptor
     ): IrExpressionBody {
