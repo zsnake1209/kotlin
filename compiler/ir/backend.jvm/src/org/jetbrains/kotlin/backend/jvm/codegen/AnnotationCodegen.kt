@@ -38,7 +38,6 @@ import org.jetbrains.kotlin.synthetic.isVisibleOutside
 import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.*
-import java.lang.annotation.Documented
 import java.lang.annotation.ElementType
 import java.lang.annotation.RetentionPolicy
 
@@ -49,14 +48,10 @@ abstract class AnnotationCodegen(
 
     private val typeMapper = state.typeMapper
 
-    class JvmFlagAnnotation(private val fqName: FqName, val jvmFlag: Int) {
-        fun getJvmFlag(annotated: IrAnnotationContainer?): Int {
-            return if (annotated?.hasAnnotation(fqName) != null) jvmFlag else 0
-        }
-    }
+    class JvmFlagAnnotation(private val fqName: FqName, val jvmFlag: Int)
 
     /**
-     * @param returnType can be null if not applicable (e.g. {@code annotated} is a class)
+     * @param returnType can be null if not applicable (e.g. [annotated] is a class)
      */
     fun genAnnotations(annotated: IrAnnotationContainer?, returnType: Type?) {
         if (annotated == null) return
@@ -103,18 +98,15 @@ abstract class AnnotationCodegen(
         returnType: Type?,
         annotationDescriptorsAlreadyPresent: MutableSet<String>
     ) {
-        when (annotated) {
-            is IrClass ->
-                generateAdditionalClassAnnotations(annotationDescriptorsAlreadyPresent, annotated)
-            is IrDeclaration ->
-                generateAdditionalCallableAnnotations(annotated, returnType, annotationDescriptorsAlreadyPresent)
-            else -> {} // do nothing
+        if (annotated is IrDeclaration) {
+            if (returnType != null && !AsmUtil.isPrimitive(returnType)) {
+                generateNullabilityAnnotationForCallable(annotated, annotationDescriptorsAlreadyPresent)
+            }
         }
     }
 
-    private fun generateAdditionalCallableAnnotations( // !!!!!! Change name
+    private fun generateNullabilityAnnotationForCallable(
         declaration: IrDeclaration, // There is no superclass that encompasses IrFunction, IrField and nothing else.
-        returnType: Type?,
         annotationDescriptorsAlreadyPresent: MutableSet<String>
     ) {
         // No need to annotate privates, synthetic accessors and their parameters
@@ -132,27 +124,8 @@ abstract class AnnotationCodegen(
             is IrFunction -> declaration.returnType
             is IrField -> declaration.type
             is IrValueDeclaration -> declaration.type
-            else -> null
+            else -> return
         }
-
-        if (returnType != null && !AsmUtil.isPrimitive(returnType)) {
-            generateNullabilityAnnotation(type, annotationDescriptorsAlreadyPresent)
-        }
-    }
-
-    private fun generateAdditionalClassAnnotations(
-        annotationDescriptorsAlreadyPresent: MutableSet<String>,
-        irClass: IrClass
-    ) {
-        if (irClass.isAnnotationClass) {
-            generateDocumentedAnnotation(irClass, annotationDescriptorsAlreadyPresent)
-            generateRetentionAnnotation(irClass, annotationDescriptorsAlreadyPresent)
-            generateTargetAnnotation(irClass, annotationDescriptorsAlreadyPresent)
-        }
-    }
-
-    private fun generateNullabilityAnnotation(type: IrType?, annotationDescriptorsAlreadyPresent: MutableSet<String>) {
-        if (type == null) return
 
         if (isBareTypeParameterWithNullableUpperBound(type)) {
             // This is to account for the case of, say
@@ -167,45 +140,6 @@ abstract class AnnotationCodegen(
         generateAnnotationIfNotPresent(annotationDescriptorsAlreadyPresent, annotationClass)
     }
 
-
-    private fun generateTargetAnnotation(
-        irClass: IrClass, annotationDescriptorsAlreadyPresent: MutableSet<String>
-    ) {
-        val descriptor = Type.getType(java.lang.annotation.Target::class.java).descriptor
-        if (!annotationDescriptorsAlreadyPresent.add(descriptor)) return
-
-        val annotationTargetMap = annotationTargetMaps[typeMapper.jvmTarget]
-            ?: throw AssertionError("No annotation target map for JVM target $typeMapper.jvmTarget")
-
-        val targets = irClass.applicableTargetSet() ?: return
-        val javaTargets = targets.mapNotNull { annotationTargetMap[it] }
-        val visitor = visitAnnotation(descriptor, true)
-        val arrayVisitor = visitor.visitArray("value")
-        for (javaTarget in javaTargets) {
-            arrayVisitor.visitEnum(null, Type.getType(ElementType::class.java).descriptor, javaTarget.name)
-        }
-        arrayVisitor.visitEnd()
-        visitor.visitEnd()
-    }
-
-    private fun generateRetentionAnnotation(irClass: IrClass, annotationDescriptorsAlreadyPresent: MutableSet<String>) {
-        val policy = getRetentionPolicy(irClass)
-        val descriptor = Type.getType(java.lang.annotation.Retention::class.java).descriptor
-        if (!annotationDescriptorsAlreadyPresent.add(descriptor)) return
-        val visitor = visitAnnotation(descriptor, true)
-        visitor.visitEnum("value", Type.getType(RetentionPolicy::class.java).descriptor, policy.name)
-        visitor.visitEnd()
-    }
-
-    private fun generateDocumentedAnnotation(irClass: IrClass, annotationDescriptorsAlreadyPresent: MutableSet<String>) {
-        val documented = irClass.hasAnnotation(KotlinBuiltIns.FQ_NAMES.mustBeDocumented)
-        if (!documented) return
-        val descriptor = Type.getType(Documented::class.java).descriptor
-        if (!annotationDescriptorsAlreadyPresent.add(descriptor)) return
-        val visitor = visitAnnotation(descriptor, true)
-        visitor.visitEnd()
-    }
-
     private fun generateAnnotationIfNotPresent(annotationDescriptorsAlreadyPresent: MutableSet<String>, annotationClass: Class<*>) {
         val descriptor = Type.getType(annotationClass).descriptor
         if (!annotationDescriptorsAlreadyPresent.contains(descriptor)) {
@@ -213,7 +147,7 @@ abstract class AnnotationCodegen(
         }
     }
 
-    fun generateAnnotationDefaultValue(value: IrExpression, expectedType: IrType) {
+    fun generateAnnotationDefaultValue(value: IrExpression) {
         val visitor = visitAnnotation(null, false)  // Parameters are unimportant
         genCompileTimeValue(null, value, visitor)
         visitor.visitEnd()

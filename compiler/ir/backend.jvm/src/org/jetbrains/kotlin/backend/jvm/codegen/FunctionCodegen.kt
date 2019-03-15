@@ -12,20 +12,16 @@ import org.jetbrains.kotlin.codegen.FunctionCodegen
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
-import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodGenericSignature
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterKind
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
-import org.jetbrains.kotlin.resolve.source.getPsi
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 import org.jetbrains.org.objectweb.asm.Opcodes
@@ -112,7 +108,7 @@ open class FunctionCodegen(private val irFunction: IrFunction, private val class
     private fun generateAnnotationDefaultValueIfNeeded(methodVisitor: MethodVisitor) {
         getAnnotationDefaultValueExpression()?.let { defaultValueExpression ->
             val annotationCodegen = AnnotationCodegen.forAnnotationDefaultValue(methodVisitor, classCodegen, state)
-            annotationCodegen.generateAnnotationDefaultValue(defaultValueExpression, irFunction.returnType)
+            annotationCodegen.generateAnnotationDefaultValue(defaultValueExpression)
         }
     }
 

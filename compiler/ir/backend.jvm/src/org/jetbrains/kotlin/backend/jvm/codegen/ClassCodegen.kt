@@ -225,9 +225,7 @@ open class ClassCodegen protected constructor(
             fieldSignature, null/*TODO support default values*/
         )
 
-        if (field.origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY) {
-            AnnotationCodegen.forField(fv, this, state).genAnnotations(field, null)
-        }
+        AnnotationCodegen.forField(fv, this, state).genAnnotations(field, fieldType)
 
         val descriptor = field.metadata?.descriptor
         if (descriptor != null) {
