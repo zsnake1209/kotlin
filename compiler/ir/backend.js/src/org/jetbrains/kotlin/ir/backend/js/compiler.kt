@@ -204,6 +204,7 @@ fun compile(
                 sortedDeps,
                 builtInModule
             ).let {
+                deserializer.dispose()
                 deserializer = it.deserializer
                 moduleFragment = it.moduleIr
 
@@ -212,6 +213,7 @@ fun compile(
                 }
             }
         } else {
+            deserializer.dispose()
             return CompiledModule(moduleName, null, null, klibPath, dependencies, builtInModule == null)
         }
     } else JsIrBackendContext(moduleDescriptor, irBuiltIns, symbolTable, moduleFragment, configuration, compileMode)
@@ -244,6 +246,7 @@ fun compile(
         moduleFragment.accept(IrModuleToJsTransformer(context), null)
     } else null
 
+    deserializer.dispose()
     return CompiledModule(moduleName, jsProgram?.toString(), null, klibPath, dependencies, builtInModule == null)
 
 }

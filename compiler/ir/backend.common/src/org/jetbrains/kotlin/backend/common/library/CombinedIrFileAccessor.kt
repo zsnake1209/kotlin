@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.backend.common.library
 
+import com.intellij.util.io.ByteBufferWrapper
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.MappedByteBuffer
@@ -26,12 +27,14 @@ data class DeclarationId(val id: Long, val isLocal: Boolean)
 
 
 fun File.map(mode: FileChannel.MapMode = FileChannel.MapMode.READ_ONLY,
-        start: Long = 0, size: Long = -1): MappedByteBuffer {
+        start: Long = 0, size: Long = -1): ByteBufferWrapper {
     val file = RandomAccessFile(path,
         if (mode == FileChannel.MapMode.READ_ONLY) "r" else "rw")
     val fileSize = if (mode == FileChannel.MapMode.READ_ONLY)
         file.length() else size.also { assert(size != -1L) }
-    return file.channel.map(mode, start, fileSize) // Shall we .also { file.close() }?
+    return if (mode == FileChannel.MapMode.READ_ONLY)
+        ByteBufferWrapper.readOnly(this, start.toInt()) else
+        ByteBufferWrapper.readWrite(this, start.toInt(), fileSize.toInt())
 }
 
 class CombinedIrFileReader(file: File) {
@@ -39,12 +42,12 @@ class CombinedIrFileReader(file: File) {
     private val declarationToOffsetSize = mutableMapOf<DeclarationId, Pair<Int, Int>>()
 
     init {
-        val declarationsCount = buffer.int
+        val declarationsCount = buffer.buffer.int
         for (i in 0 until declarationsCount) {
-            val id = buffer.long
-            val isLocal = buffer.int != 0
-            val offset = buffer.int
-            val size = buffer.int
+            val id = buffer.buffer.long
+            val isLocal = buffer.buffer.int != 0
+            val offset = buffer.buffer.int
+            val size = buffer.buffer.int
             declarationToOffsetSize[DeclarationId(id, isLocal)] = offset to size
         }
     }
@@ -52,10 +55,12 @@ class CombinedIrFileReader(file: File) {
     fun declarationBytes(id: DeclarationId): ByteArray {
         val offsetSize = declarationToOffsetSize[id] ?: throw Error("No declaration with $id here")
         val result = ByteArray(offsetSize.second)
-        buffer.position(offsetSize.first)
-        buffer.get(result, 0, offsetSize.second)
+        buffer.buffer.position(offsetSize.first)
+        buffer.buffer.get(result, 0, offsetSize.second)
         return result
     }
+
+    fun dispose() = buffer.dispose()
 }
 
 private const val SINGLE_INDEX_RECORD_SIZE = 20  // sizeof(Long) + 3 * sizeof(Int).
@@ -64,7 +69,7 @@ private const val INDEX_HEADER_SIZE = 4  // sizeof(Int).
 class CombinedIrFileWriter(val declarationCount: Int) {
     private var currentDeclaration = 0
     private var currentPosition = 0
-    private val file =  Files.createTempFile("ir", "").toFile()
+    private val file = Files.createTempFile("ir", "").toFile()
     private val randomAccessFile = RandomAccessFile(file.path, "rw")
 
     init {

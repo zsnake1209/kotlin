@@ -44,4 +44,6 @@ class JsIrLinker(
         moduleToReaderMap[moduleDescriptor] = CombinedIrFileReader(irFile)
         return deserializeIrModuleHeader(moduleDescriptor, byteArray, deserializationStrategy)
     }
+
+    fun dispose() = moduleToReaderMap.forEach { it.value.dispose() }
 }
