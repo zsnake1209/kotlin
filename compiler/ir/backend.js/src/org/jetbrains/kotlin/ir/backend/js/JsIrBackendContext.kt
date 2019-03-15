@@ -57,8 +57,7 @@ class JsIrBackendContext(
     val packageLevelJsModules = mutableListOf<IrFile>()
     val declarationLevelJsModules = mutableListOf<IrDeclaration>()
 
-//    override val claffifierEqualityChecker = IrClassifierEqualityChecker.Companion.SimpleByReferenceIdentity
-    override val classifierEqualityChecker = IrClassifierEqualityChecker.Companion.FqNameEqualityChecker
+    val classifierEqualityChecker = IrClassifierEqualityChecker.Companion.FqNameEqualityChecker
 
     val internalPackageFragmentDescriptor = KnownPackageFragmentDescriptor(builtIns.builtInsModule, FqName("kotlin.js.internal"))
     val implicitDeclarationFile by lazy {

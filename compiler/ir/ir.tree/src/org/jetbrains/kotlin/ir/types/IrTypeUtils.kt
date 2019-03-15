@@ -45,7 +45,6 @@ fun IrType.isEqualTo(that: IrType, checker: IrClassifierEqualityChecker): Boolea
     return false
 }
 
-// TODO: extract LCA algorithm and use wherever it's needed (etc resolveFakeOverride)
 fun Collection<IrClassifierSymbol>.commonSuperclass(checker: IrClassifierEqualityChecker): IrClassifierSymbol {
     var superClassifiers: MutableSet<IrClassifierSymbol>? = null
 
@@ -57,11 +56,10 @@ fun Collection<IrClassifierSymbol>.commonSuperclass(checker: IrClassifierEqualit
             listOf(classifierSymbol), { it.superTypes().map { s -> (s as IrSimpleType).classifier } },
             DFS.VisitedWithSet(visited)
         ).also {
-            val tmp = superClassifiers
-            if (tmp == null) {
+            if (superClassifiers == null) {
                 superClassifiers = visited
             } else {
-                tmp.apply {
+                superClassifiers?.apply {
                     retainAll { c -> visited.any { v -> checker.areEqual(c, v) } }
                 }
             }
@@ -70,5 +68,6 @@ fun Collection<IrClassifierSymbol>.commonSuperclass(checker: IrClassifierEqualit
 
     requireNotNull(superClassifiers)
 
-    return order.first { o -> superClassifiers!!.any { s -> checker.areEqual(o, s) } }
+    return order.firstOrNull { o -> superClassifiers!!.any { s -> checker.areEqual(o, s) } }
+        ?: error("No common superType found for non-empty set of classifiers")
 }

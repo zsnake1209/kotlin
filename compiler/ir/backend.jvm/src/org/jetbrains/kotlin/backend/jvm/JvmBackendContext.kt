@@ -52,7 +52,7 @@ class JvmBackendContext(
 
     override val configuration get() = state.configuration
 
-    override val classifierEqualityChecker = IrClassifierEqualityChecker.Companion.FqNameEqualityChecker
+    val classifierEqualityChecker = IrClassifierEqualityChecker.Companion.FqNameEqualityChecker
 
     init {
         if (state.configuration.get(CommonConfigurationKeys.LIST_PHASES) == true) {
