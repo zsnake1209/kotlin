@@ -1,6 +1,7 @@
 // !LANGUAGE: +MultiPlatformProjects
 // !USE_EXPERIMENTAL: kotlin.ExperimentalMultiplatform
 // TARGET_BACKEND: JVM
+// IGNORE_BACKEND: JVM_IR
 // WITH_RUNTIME
 // FILE: common.kt
 

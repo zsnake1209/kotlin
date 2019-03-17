@@ -160,13 +160,6 @@ abstract class AnnotationCodegen(
             return null
         }
 
-        // We do not generate annotations whose classes are optional (annotated with `@OptionalExpectation`) because if an annotation entry
-        // is resolved to the expected declaration, this means that annotation has no actual class, and thus should not be generated.
-        // (Otherwise we would've resolved the entry to the actual annotation class.)
-        if (annotationClass.isOptionalAnnotationClass()) {
-            return null
-        }
-
         innerClassConsumer.addInnerClassInfoFromAnnotation(annotationClass)
 
         val asmTypeDescriptor = typeMapper.mapType(annotation.type.toKotlinType()).descriptor
