@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.resolve.jvm.annotations.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.synthetic.isVisibleOutside
@@ -46,8 +45,6 @@ abstract class AnnotationCodegen(
 ) {
 
     private val typeMapper = state.typeMapper
-
-    class JvmFlagAnnotation(private val fqName: FqName, val jvmFlag: Int)
 
     /**
      * @param returnType can be null if not applicable (e.g. [annotated] is a class)
@@ -241,16 +238,6 @@ abstract class AnnotationCodegen(
     abstract fun visitAnnotation(descr: String?, visible: Boolean): AnnotationVisitor
 
     companion object {
-        val FIELD_FLAGS = listOf(
-            JvmFlagAnnotation(VOLATILE_ANNOTATION_FQ_NAME, Opcodes.ACC_VOLATILE),
-            JvmFlagAnnotation(TRANSIENT_ANNOTATION_FQ_NAME, Opcodes.ACC_TRANSIENT)
-        )
-
-        val METHOD_FLAGS = listOf(
-            JvmFlagAnnotation(STRICTFP_ANNOTATION_FQ_NAME, Opcodes.ACC_STRICT),
-            JvmFlagAnnotation(SYNCHRONIZED_ANNOTATION_FQ_NAME, Opcodes.ACC_SYNCHRONIZED)
-        )
-
         val NO_ANNOTATION_VISITOR = object : AnnotationVisitor(Opcodes.API_VERSION) {
             override fun visitAnnotation(name: String, desc: String) = safe(super.visitAnnotation(name, desc))
 
