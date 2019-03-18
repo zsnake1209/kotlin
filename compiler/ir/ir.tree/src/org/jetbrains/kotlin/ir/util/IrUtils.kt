@@ -367,10 +367,9 @@ val IrClass.isEnumEntry get() = kind == ClassKind.ENUM_ENTRY
 val IrClass.isInterface get() = kind == ClassKind.INTERFACE
 val IrClass.isClass get() = kind == ClassKind.CLASS
 val IrClass.isObject get() = kind == ClassKind.OBJECT
-val IrClass.isAnonymousObject get() = isObject && name == SpecialNames.NO_NAME_PROVIDED
-val IrDeclarationWithName.fqName: FqName?
+val IrDeclarationWithName.fqNameWhenAvailable: FqName?
     get() = when (val parent = parent) {
-        is IrDeclarationWithName -> parent.fqName?.child(name)
+        is IrDeclarationWithName -> parent.fqNameWhenAvailable?.child(name)
         is IrPackageFragment -> parent.fqName.child(name)
         else -> null
     }

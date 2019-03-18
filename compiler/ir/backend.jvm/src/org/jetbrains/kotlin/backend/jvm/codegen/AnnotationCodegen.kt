@@ -33,7 +33,6 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.resolve.jvm.annotations.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker.Companion.OPTIONAL_EXPECTATION_FQ_NAME
 import org.jetbrains.kotlin.synthetic.isVisibleOutside
 import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
@@ -219,7 +218,8 @@ abstract class AnnotationCodegen(
             }
             is IrGetEnumValue -> {
                 // TODO: Should use asmTypeForClassId, since fqName may fail (internal classes, local declarations).
-                val enumClassInternalName = AsmUtil.asmTypeByFqNameWithoutInnerClasses(value.symbol.owner.parentAsClass.fqName!!).descriptor
+                val enumClassInternalName =
+                    AsmUtil.asmTypeByFqNameWithoutInnerClasses(value.symbol.owner.parentAsClass.fqNameWhenAvailable!!).descriptor
                 val enumEntryName = value.symbol.owner.name
                 annotationVisitor.visitEnum(name, enumClassInternalName, enumEntryName.asString())
             }
@@ -307,7 +307,7 @@ abstract class AnnotationCodegen(
             irClass.getAnnotation(FqName(java.lang.annotation.Retention::class.java.name))?.let { retentionAnnotation ->
                 val value = retentionAnnotation.getValueArgument(0)
                 if (value is IrEnumEntry) {
-                    val enumClassFqName = value.parentAsClass.fqName
+                    val enumClassFqName = value.parentAsClass.fqNameWhenAvailable
                     if (RetentionPolicy::class.java.name == enumClassFqName?.asString()) {
                         return RetentionPolicy.valueOf(value.name.asString())
                     }
@@ -415,9 +415,3 @@ private fun loadAnnotationTargets(targetEntry: IrCall): Set<KotlinTarget>? {
         KotlinTarget.valueOrNull(it.symbol.owner.name.asString())
     }.toSet()
 }
-
-/* Borrowed and translated from ExpectedActualDeclarationChecker */
-// TODO: Descriptor-based code also checks for `descriptor.isExpect`; we don't represent expect/actual distinction in IR thus far.
-fun IrClass.isOptionalAnnotationClass(): Boolean =
-    isAnnotationClass &&
-            hasAnnotation(OPTIONAL_EXPECTATION_FQ_NAME)
