@@ -39,9 +39,10 @@ import org.jetbrains.org.objectweb.asm.*
 import java.lang.annotation.ElementType
 import java.lang.annotation.RetentionPolicy
 
-abstract class AnnotationCodegen(
+class AnnotationCodegen(
     private val innerClassConsumer: InnerClassConsumer,
-    state: GenerationState
+    state: GenerationState,
+    private val visitAnnotationUnsafe: (descriptor: String?, visible: Boolean) -> AnnotationVisitor
 ) {
 
     private val typeMapper = state.typeMapper
@@ -171,8 +172,10 @@ abstract class AnnotationCodegen(
         val annotationClass = annotation.annotationClass
         for (param in annotation.symbol.owner.valueParameters) {
             val value = annotation.getValueArgument(param.index)
-            if (value == null && param.hasDefaultValue()) continue // Default value will be supplied by JVM at runtime.
-            if (value == null) error("No value for annotation parameter $param")
+            if (value == null) {
+                if (param.defaultValue != null) continue // Default value will be supplied by JVM at runtime.
+                else error("No value for annotation parameter $param")
+            }
             genCompileTimeValue(getAnnotationArgumentJvmName(annotationClass, param.name), value, annotationVisitor)
         }
     }
@@ -235,7 +238,7 @@ abstract class AnnotationCodegen(
         }
     }
 
-    abstract fun visitAnnotation(descr: String?, visible: Boolean): AnnotationVisitor
+    private fun visitAnnotation(descr: String?, visible: Boolean) = safe(visitAnnotationUnsafe(descr, visible))
 
     companion object {
         val NO_ANNOTATION_VISITOR = object : AnnotationVisitor(Opcodes.API_VERSION) {
@@ -254,30 +257,6 @@ abstract class AnnotationCodegen(
                 return !declaration.visibility.isVisibleOutside()
             }
             return false
-        }
-
-        private val annotationTargetMaps: Map<JvmTarget, MutableMap<KotlinTarget, ElementType>> =
-            mapOf(
-                JvmTarget.JVM_1_6 to mutableMapOf(
-                    KotlinTarget.CLASS to ElementType.TYPE,
-                    KotlinTarget.ANNOTATION_CLASS to ElementType.ANNOTATION_TYPE,
-                    KotlinTarget.CONSTRUCTOR to ElementType.CONSTRUCTOR,
-                    KotlinTarget.LOCAL_VARIABLE to ElementType.LOCAL_VARIABLE,
-                    KotlinTarget.FUNCTION to ElementType.METHOD,
-                    KotlinTarget.PROPERTY_GETTER to ElementType.METHOD,
-                    KotlinTarget.PROPERTY_SETTER to ElementType.METHOD,
-                    KotlinTarget.FIELD to ElementType.FIELD,
-                    KotlinTarget.VALUE_PARAMETER to ElementType.PARAMETER
-                ),
-                // additional values for jvm8
-                JvmTarget.JVM_1_8 to mutableMapOf(
-                    KotlinTarget.TYPE_PARAMETER to ElementType.TYPE_PARAMETER,
-                    KotlinTarget.TYPE to ElementType.TYPE_USE
-                )
-            )
-
-        init {
-            annotationTargetMaps[JvmTarget.JVM_1_8]!!.putAll(annotationTargetMaps[JvmTarget.JVM_1_6]!!.toList())
         }
 
         private val annotationRetentionMap = mapOf(
@@ -304,49 +283,6 @@ abstract class AnnotationCodegen(
             return RetentionPolicy.RUNTIME
         }
 
-        fun forClass(
-            cv: ClassVisitor,
-            innerClassConsumer: InnerClassConsumer,
-            state: GenerationState
-        ) = object : AnnotationCodegen(innerClassConsumer, state) {
-            override fun visitAnnotation(descr: String?, visible: Boolean) = safe(cv.visitAnnotation(descr, visible))
-        }
-
-        fun forMethod(
-            mv: MethodVisitor,
-            innerClassConsumer: InnerClassConsumer,
-            state: GenerationState
-        ) = object : AnnotationCodegen(innerClassConsumer, state) {
-            override fun visitAnnotation(descr: String?, visible: Boolean) = safe(mv.visitAnnotation(descr, visible))
-        }
-
-        fun forField(
-            fv: FieldVisitor,
-            innerClassConsumer: InnerClassConsumer,
-            state: GenerationState
-        ) = object : AnnotationCodegen(innerClassConsumer, state) {
-            override fun visitAnnotation(descr: String?, visible: Boolean) = safe(fv.visitAnnotation(descr, visible))
-        }
-
-        fun forParameter(
-            mv: MethodVisitor,
-            parameter: Int,
-            innerClassConsumer: InnerClassConsumer,
-            state: GenerationState
-        ) = object : AnnotationCodegen(innerClassConsumer, state) {
-            override fun visitAnnotation(descr: String?, visible: Boolean) = safe(
-                mv.visitParameterAnnotation(parameter, descr, visible)
-            )
-        }
-
-        fun forAnnotationDefaultValue(
-            mv: MethodVisitor,
-            innerClassConsumer: InnerClassConsumer,
-            state: GenerationState
-        ) = object : AnnotationCodegen(innerClassConsumer, state) {
-            override fun visitAnnotation(descr: String?, visible: Boolean) = safe(mv.visitAnnotationDefault())
-        }
-
         /* Temporary? */
         fun IrCall.applicableTargetSet() =
             annotationClass.applicableTargetSet() ?: KotlinTarget.DEFAULT_TARGET_SET
@@ -362,13 +298,6 @@ interface InnerClassConsumer {
 private fun isBareTypeParameterWithNullableUpperBound(type: IrType): Boolean {
     return type.classifierOrNull?.owner is IrTypeParameter && !type.isMarkedNullable() && type.isNullable()
 }
-
-
-fun IrValueParameter.hasDefaultValue(): Boolean = DFS.ifAny(
-    listOf(this),
-    { param -> param.parent.safeAs<IrSimpleFunction>()?.overriddenSymbols?.map { it.owner.valueParameters[param.index] } ?: emptyList() },
-    { param -> param.defaultValue != null}
-)
 
 private val RETENTION_PARAMETER_NAME = Name.identifier("value")
 

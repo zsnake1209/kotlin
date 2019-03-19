@@ -47,7 +47,7 @@ open class FunctionCodegen(private val irFunction: IrFunction, private val class
         val methodVisitor = createMethod(flags, signature)
 
         if (irFunction.origin != IrDeclarationOrigin.FUNCTION_FOR_DEFAULT_PARAMETER) {
-            AnnotationCodegen.forMethod(methodVisitor, classCodegen, state).genAnnotations(irFunction, signature.asmMethod.returnType)
+            AnnotationCodegen(classCodegen, state, methodVisitor::visitAnnotation).genAnnotations(irFunction, signature.asmMethod.returnType)
             FunctionCodegen.generateParameterAnnotations(descriptor, methodVisitor, signature, DummyOldInnerClassConsumer(), state)
         }
 
@@ -107,7 +107,7 @@ open class FunctionCodegen(private val irFunction: IrFunction, private val class
 
     private fun generateAnnotationDefaultValueIfNeeded(methodVisitor: MethodVisitor) {
         getAnnotationDefaultValueExpression()?.let { defaultValueExpression ->
-            val annotationCodegen = AnnotationCodegen.forAnnotationDefaultValue(methodVisitor, classCodegen, state)
+            val annotationCodegen = AnnotationCodegen(classCodegen, state, { descriptor, visible -> methodVisitor.visitAnnotationDefault() })
             annotationCodegen.generateAnnotationDefaultValue(defaultValueExpression)
         }
     }

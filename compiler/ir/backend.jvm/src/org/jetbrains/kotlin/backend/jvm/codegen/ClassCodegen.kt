@@ -103,7 +103,7 @@ open class ClassCodegen protected constructor(
             signature.superclassName,
             signature.interfaces.toTypedArray()
         )
-        AnnotationCodegen.forClass(visitor.visitor, this, context.state).genAnnotations(irClass, null)
+        AnnotationCodegen(this, context.state, visitor.visitor::visitAnnotation).genAnnotations(irClass, null)
         /* TODO: Temporary workaround: ClassBuilder needs a pathless name. */
         val shortName = File(fileEntry.name).name
         visitor.visitSource(shortName, null)
@@ -225,7 +225,7 @@ open class ClassCodegen protected constructor(
             fieldSignature, null/*TODO support default values*/
         )
 
-        AnnotationCodegen.forField(fv, this, state).genAnnotations(field, fieldType)
+        AnnotationCodegen(this, state, fv::visitAnnotation).genAnnotations(field, fieldType)
 
         val descriptor = field.metadata?.descriptor
         if (descriptor != null) {
