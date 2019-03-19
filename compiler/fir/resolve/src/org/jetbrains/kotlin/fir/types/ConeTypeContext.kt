@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.expandedConeType
 import org.jetbrains.kotlin.fir.declarations.superConeTypes
+import org.jetbrains.kotlin.fir.resolve.directExpansionType
 import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.resolve.withArguments
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeSymbol
@@ -36,7 +37,7 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
     override fun KotlinTypeMarker.asSimpleType(): SimpleTypeMarker? {
         assert(this is ConeKotlinType)
         return when (this) {
-            is ConeAbbreviatedType -> directExpansion.asSimpleType()
+            is ConeAbbreviatedType -> directExpansionType(session)
             is ConeCapturedType -> this
             is ConeLookupTagBasedType -> this
             else -> null
