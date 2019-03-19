@@ -2,6 +2,10 @@ import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.npm.NpmTask
 import org.gradle.internal.os.OperatingSystem
 
+tasks.withType<Test> {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+}
+
 plugins {
     kotlin("jvm")
     id("jps-compatible")
