@@ -30,4 +30,6 @@ object StandardClassIds {
     val Float = "Float".baseId()
     val Double = "Double".baseId()
 
+    val Unit = "Unit".baseId()
+
 }
