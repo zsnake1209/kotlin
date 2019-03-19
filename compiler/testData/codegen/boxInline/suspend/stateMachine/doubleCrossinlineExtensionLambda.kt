@@ -47,11 +47,11 @@ fun box(): String {
                 for (x in 1..10) consumer.consume(x)
             }
         }
-        val f2 = f1.onEach {
+        val f2 = f1.onEach<Int> {
             StateMachineChecker.suspendHere()
         }
-        f2.consumeEach { value ->
-            log += value
+        f2.consumeEach {
+            log += this
         }
     }
     StateMachineChecker.check(10)
