@@ -42,7 +42,7 @@ import java.lang.annotation.RetentionPolicy
 class AnnotationCodegen(
     private val innerClassConsumer: InnerClassConsumer,
     state: GenerationState,
-    private val visitAnnotationUnsafe: (descriptor: String?, visible: Boolean) -> AnnotationVisitor
+    private val visitAnnotation: (descriptor: String?, visible: Boolean) -> AnnotationVisitor
 ) {
 
     private val typeMapper = state.typeMapper
@@ -238,17 +238,7 @@ class AnnotationCodegen(
         }
     }
 
-    private fun visitAnnotation(descr: String?, visible: Boolean) = safe(visitAnnotationUnsafe(descr, visible))
-
     companion object {
-        val NO_ANNOTATION_VISITOR = object : AnnotationVisitor(Opcodes.API_VERSION) {
-            override fun visitAnnotation(name: String, desc: String) = safe(super.visitAnnotation(name, desc))
-
-            override fun visitArray(name: String) = safe(super.visitArray(name))
-        }
-
-        private fun safe(av: AnnotationVisitor?): AnnotationVisitor = av ?: NO_ANNOTATION_VISITOR
-
         private fun isInvisibleFromTheOutside(declaration: IrDeclaration?): Boolean {
             if (declaration is IrSimpleFunction && declaration.origin === JvmLoweredDeclarationOrigin.SYNTHETIC_ACCESSOR) {
                 return true
