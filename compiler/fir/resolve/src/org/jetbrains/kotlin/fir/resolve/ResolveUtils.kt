@@ -101,7 +101,6 @@ fun <T : ConeKotlinType> T.withNullability(nullability: ConeNullability): T {
         is ConeAbbreviatedTypeImpl -> ConeAbbreviatedTypeImpl(
             abbreviationLookupTag,
             typeArguments,
-            directExpansion,
             nullability.isNullable
         ) as T
         is ConeFunctionTypeImpl -> ConeFunctionTypeImpl(receiverType, parameterTypes, returnType, lookupTag, nullability.isNullable) as T
@@ -123,7 +122,6 @@ fun <T : ConeKotlinType> T.withArguments(arguments: Array<ConeKotlinTypeProjecti
         is ConeAbbreviatedTypeImpl -> ConeAbbreviatedTypeImpl(
             abbreviationLookupTag,
             arguments,
-            directExpansion,
             nullability.isNullable
         ) as T
         //is ConeFunctionTypeImpl -> ConeFunctionTypeImpl(receiverType, parameterTypes, returnType, lookupTag, nullability.isNullable) as T
