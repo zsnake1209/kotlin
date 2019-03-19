@@ -12,6 +12,8 @@ interface FirCallableMemberDeclaration : @VisitedSupertype FirDeclaration, FirMe
 
     val isOverride: Boolean get() = status.isOverride
 
+    val isStatic: Boolean get() = status.isStatic
+
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitCallableMemberDeclaration(this, data)
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

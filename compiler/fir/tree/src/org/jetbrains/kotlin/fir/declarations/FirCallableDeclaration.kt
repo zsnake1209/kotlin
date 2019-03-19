@@ -15,8 +15,6 @@ interface FirCallableDeclaration :
     @VisitedSupertype FirDeclaration,
     FirTypedDeclaration, FirSymbolOwner<FirCallableDeclaration> {
 
-    val isStatic: Boolean get() = status.isStatic
-
     val receiverTypeRef: FirTypeRef?
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
