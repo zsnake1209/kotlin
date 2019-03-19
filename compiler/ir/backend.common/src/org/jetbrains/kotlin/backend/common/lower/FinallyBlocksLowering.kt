@@ -275,6 +275,7 @@ class FinallyBlocksLowering(val context: CommonBackendContext, private val throw
                 val tmp = scope.createTmpVariable(irReturnableBlock(symbol, type) {
                     +irReturn(symbol, value)
                 })
+                +tmp
                 +finallyExpression.copy()
                 +irGet(tmp)
             }

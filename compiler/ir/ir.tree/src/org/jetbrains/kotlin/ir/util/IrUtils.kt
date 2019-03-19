@@ -187,6 +187,10 @@ val IrClass.defaultType: IrSimpleType
 
 val IrSimpleFunction.isReal: Boolean get() = descriptor.kind.isReal
 
+val IrSimpleFunction.isSynthesized: Boolean get() = descriptor.kind == CallableMemberDescriptor.Kind.SYNTHESIZED
+
+val IrSimpleFunction.isFakeOverride: Boolean get() = origin == IrDeclarationOrigin.FAKE_OVERRIDE
+
 fun IrClass.isSubclassOf(ancestor: IrClass): Boolean {
 
     val alreadyVisited = mutableSetOf<IrClass>()
@@ -240,6 +244,22 @@ fun IrSimpleFunction.collectRealOverrides(): Set<IrSimpleFunction> {
 // TODO: use this implementation instead of any other
 fun IrSimpleFunction.resolveFakeOverride(): IrSimpleFunction? {
     return collectRealOverrides().singleOrNull { it.modality != Modality.ABSTRACT }
+}
+
+fun IrSimpleFunction.isOrOverridesSynthesized(): Boolean {
+    if (isSynthesized) return true
+
+    if (isFakeOverride) return overriddenSymbols.all { it.owner.isOrOverridesSynthesized() }
+
+    return false
+}
+
+fun IrSimpleFunction.findInterfaceImplementation(): IrSimpleFunction? {
+    if (isReal) return null
+
+    if (isOrOverridesSynthesized()) return null
+
+    return resolveFakeOverride()?.run { if (parentAsClass.isInterface) this else null }
 }
 
 fun IrField.resolveFakeOverride(): IrField? {

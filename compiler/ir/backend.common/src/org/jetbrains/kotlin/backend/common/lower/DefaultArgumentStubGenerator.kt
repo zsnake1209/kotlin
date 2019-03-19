@@ -122,7 +122,7 @@ open class DefaultArgumentStubGenerator(
                     irGet(parameter)
                 }
 
-                val temporaryVariable = scope.createTmpVariable(argument, nameHint = parameter.name.asString())
+                val temporaryVariable = scope.createTmpVariable(argument, nameHint = parameter.name.asString()).also { +it }
                 temporaryVariable.parent = newIrFunction
 
                 params.add(temporaryVariable)

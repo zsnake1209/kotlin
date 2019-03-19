@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.IrSimpleType
+import org.jetbrains.kotlin.ir.types.classifierOrFail
 import org.jetbrains.kotlin.ir.types.impl.IrDynamicTypeImpl
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
@@ -250,8 +251,7 @@ class JsIrBackendContext(
     val defaultThrowableCtor by lazy { throwableConstructors.single { it.owner.valueParameters.size == 0 } }
 
     private fun referenceOperators(): Map<Name, MutableMap<IrClassifierSymbol, IrSimpleFunctionSymbol>> {
-        val primitiveIrSymbols =
-            irBuiltIns.run { listOf(booleanClass, charClass, byteClass, shortClass, intClass, floatClass, doubleClass) }
+        val primitiveIrSymbols = irBuiltIns.primitiveIrTypes.map { it.classifierOrFail as IrClassSymbol }
 
         return OperatorNames.ALL.map { name ->
             // TODO to replace KotlinType with IrType we need right equals on IrType

@@ -50,8 +50,7 @@ private class StringConcatenationTransformer(val lower: StringConcatenationLower
     private val context = lower.context
     private val irBuiltIns = context.irBuiltIns
 
-    private val typesWithSpecialAppendFunction =
-        irBuiltIns.run { listOf(booleanType, charType, byteType, shortType, intType, floatType, longType, doubleType, stringType) }
+    private val typesWithSpecialAppendFunction = irBuiltIns.primitiveIrTypes + irBuiltIns.stringType
 
     private val nameToString = Name.identifier("toString")
     private val nameAppend = Name.identifier("append")
@@ -92,7 +91,7 @@ private class StringConcatenationTransformer(val lower: StringConcatenationLower
         expression.transformChildrenVoid(this)
         val blockBuilder = buildersStack.last()
         return blockBuilder.irBlock(expression) {
-            val stringBuilderImpl = scope.createTmpVariable(irCall(constructor))
+            val stringBuilderImpl = scope.createTmpVariable(irCall(constructor)).also { +it }
             expression.arguments.forEach { arg ->
                 val appendFunction = typeToAppendFunction(arg.type)
                 +irCall(appendFunction).apply {

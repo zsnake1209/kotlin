@@ -72,7 +72,7 @@ class InlineClassLowering(val context: BackendContext) {
                                 thisVar = scope.createTmpVariable(
                                     expression,
                                     irType = irClass.defaultType
-                                )
+                                ).also { +it }
                                 thisVar.parent = result
                             }
                         }
