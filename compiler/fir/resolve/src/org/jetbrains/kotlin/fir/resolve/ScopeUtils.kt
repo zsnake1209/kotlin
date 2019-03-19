@@ -19,7 +19,7 @@ fun ConeKotlinType.scope(useSiteSession: FirSession): FirScope? {
     return when (this) {
         is ConeKotlinErrorType -> null
         is ConeClassErrorType -> null
-        is ConeAbbreviatedType -> directExpansion.scope(useSiteSession)
+        is ConeAbbreviatedType -> directExpansionType(useSiteSession)?.scope(useSiteSession)
         is ConeClassLikeType -> {
             val fir = this.lookupTag.toSymbol(useSiteSession)?.firUnsafe<FirRegularClass>() ?: return null
             fir.buildUseSiteScope(useSiteSession)
