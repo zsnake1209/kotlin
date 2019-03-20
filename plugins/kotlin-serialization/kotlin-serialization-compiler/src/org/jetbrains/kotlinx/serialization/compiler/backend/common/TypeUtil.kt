@@ -52,6 +52,9 @@ fun AbstractSerialGenerator.findAddOnSerializer(propertyType: KotlinType, module
     return null
 }
 
+fun KotlinType.isSerializableObject() =
+    toClassDescriptor?.run { kind == ClassKind.OBJECT && hasSerializableAnnotationWithoutArgs } == true
+
 @Suppress("FunctionName", "LocalVariableName")
 fun AbstractSerialGenerator.getSerialTypeInfo(property: SerializableProperty): SerialTypeInfo {
     fun SerializableInfo(serializer: ClassDescriptor?) =
@@ -77,7 +80,7 @@ fun AbstractSerialGenerator.getSerialTypeInfo(property: SerializableProperty): S
             )
             SerializableInfo(serializer)
         }
-        T.toClassDescriptor?.kind == ClassKind.ENUM_CLASS -> {
+        T.isEnum() -> {
             val serializer = property.module.findClassAcrossModuleDependencies(enumSerializerId)
             SerializableInfo(serializer)
         }
@@ -137,6 +140,7 @@ fun findTypeSerializer(module: ModuleDescriptor, kType: KotlinType): ClassDescri
     if (userOverride != null) return userOverride.toClassDescriptor
     if (kType.isTypeParameter()) return null
     if (KotlinBuiltIns.isArray(kType)) return module.getClassFromInternalSerializationPackage(SpecialBuiltins.referenceArraySerializer)
+    if (kType.isSerializableObject()) return module.getClassFromInternalSerializationPackage(SpecialBuiltins.objectSerializer)
     val stdSer = findStandardKotlinTypeSerializer(module, kType) // see if there is a standard serializer
         ?: findEnumTypeSerializer(module, kType)
     if (stdSer != null) return stdSer

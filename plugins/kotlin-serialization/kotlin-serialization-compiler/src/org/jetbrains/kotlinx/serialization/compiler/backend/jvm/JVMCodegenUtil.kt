@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.load.kotlin.TypeMappingMode
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.OtherOrigin
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
@@ -159,6 +160,7 @@ internal fun ImplementationBodyCodegen.generateMethod(
 internal val enumSerializerId = ClassId(internalPackageFqName, Name.identifier(SpecialBuiltins.enumSerializer))
 internal val polymorphicSerializerId = ClassId(packageFqName, Name.identifier(SpecialBuiltins.polymorphicSerializer))
 internal val referenceArraySerializerId = ClassId(internalPackageFqName, Name.identifier(SpecialBuiltins.referenceArraySerializer))
+internal val objectSerializerId = ClassId(internalPackageFqName, Name.identifier(SpecialBuiltins.objectSerializer))
 internal val contextSerializerId = ClassId(packageFqName, Name.identifier(SpecialBuiltins.contextSerializer))
 
 
@@ -296,6 +298,15 @@ internal fun AbstractSerialGenerator.stackValueSerializerInstance(codegen: Class
                 signature.append(AsmTypes.K_CLASS_TYPE.descriptor)
                 // Reference array serializer still needs serializer for its argument type
                 instantiate(argSerializers[0])
+            }
+            objectSerializerId -> {
+                val serializableDescriptor = kType.toClassDescriptor!!
+                val serialName: String =
+                    serializableDescriptor.annotations.serialNameValue ?: serializableDescriptor.fqNameUnsafe.asString()
+                aconst(serialName)
+                signature.append("Ljava/lang/String;")
+                StackValue.singleton(serializableDescriptor, codegen.typeMapper).put(Type.getType("Ljava/lang/Object;"), iv)
+                signature.append("Ljava/lang/Object;")
             }
             // all serializers get arguments with serializers of their generic types
             else -> argSerializers.forEach(::instantiate)
