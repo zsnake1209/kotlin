@@ -193,7 +193,6 @@ private class AdditionalClassAnnotationLowering(private val context: JvmBackendC
 
     private fun generateTargetAnnotation(irClass: IrClass) {
         if (irClass.hasAnnotation(FqName("java.lang.annotation.Target"))) return
-        val kotlinTargets = irClass.getAnnotation(FqName("kotlin.annotation.Target"))
         val annotationTargetMap = annotationTargetMaps[typeMapper.jvmTarget]
             ?: throw AssertionError("No annotation target map for JVM target ${typeMapper.jvmTarget}")
 

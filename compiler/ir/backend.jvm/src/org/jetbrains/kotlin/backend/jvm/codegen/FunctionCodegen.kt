@@ -107,7 +107,7 @@ open class FunctionCodegen(private val irFunction: IrFunction, private val class
 
     private fun generateAnnotationDefaultValueIfNeeded(methodVisitor: MethodVisitor) {
         getAnnotationDefaultValueExpression()?.let { defaultValueExpression ->
-            val annotationCodegen = AnnotationCodegen(classCodegen, state, { descriptor, visible -> methodVisitor.visitAnnotationDefault() })
+            val annotationCodegen = AnnotationCodegen(classCodegen, state) { _, _ -> methodVisitor.visitAnnotationDefault() }
             annotationCodegen.generateAnnotationDefaultValue(defaultValueExpression)
         }
     }

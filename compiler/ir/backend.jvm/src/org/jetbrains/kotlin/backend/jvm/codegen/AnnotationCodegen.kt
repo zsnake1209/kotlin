@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.codegen.state.GenerationState
-import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.*
 import org.jetbrains.kotlin.ir.declarations.*
@@ -33,16 +32,13 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.synthetic.isVisibleOutside
-import org.jetbrains.kotlin.utils.DFS
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.org.objectweb.asm.*
-import java.lang.annotation.ElementType
 import java.lang.annotation.RetentionPolicy
 
 class AnnotationCodegen(
     private val innerClassConsumer: InnerClassConsumer,
     state: GenerationState,
-    private val visitAnnotation: (descriptor: String?, visible: Boolean) -> AnnotationVisitor
+    private val visitAnnotation: (descriptor: String, visible: Boolean) -> AnnotationVisitor
 ) {
 
     private val typeMapper = state.typeMapper
@@ -59,17 +55,17 @@ class AnnotationCodegen(
 
         for (annotation in annotations) {
             val applicableTargets = annotation.applicableTargetSet()
-// Never seems to be invoked in the IR backend.
-//            if (annotated is AnonymousFunctionDescriptor &&
-//                KotlinTarget.FUNCTION !in applicableTargets &&
-//                KotlinTarget.PROPERTY_GETTER !in applicableTargets &&
-//                KotlinTarget.PROPERTY_SETTER !in applicableTargets
-//            ) {
-//                assert(KotlinTarget.EXPRESSION in applicableTargets) {
-//                    "Inconsistent target list for lambda annotation: $applicableTargets on $annotated"
-//                }
-//                continue
-//            }
+            if (annotated is IrSimpleFunction &&
+                annotated.origin === IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA &&
+                KotlinTarget.FUNCTION !in applicableTargets &&
+                KotlinTarget.PROPERTY_GETTER !in applicableTargets &&
+                KotlinTarget.PROPERTY_SETTER !in applicableTargets
+            ) {
+                assert(KotlinTarget.EXPRESSION in applicableTargets) {
+                    "Inconsistent target list for lambda annotation: $applicableTargets on $annotated"
+                }
+                continue
+            }
             if (annotated is IrClass &&
                 KotlinTarget.CLASS !in applicableTargets &&
                 KotlinTarget.ANNOTATION_CLASS !in applicableTargets
@@ -145,7 +141,7 @@ class AnnotationCodegen(
     }
 
     fun generateAnnotationDefaultValue(value: IrExpression) {
-        val visitor = visitAnnotation(null, false)  // Parameters are unimportant
+        val visitor = visitAnnotation("", false)  // Parameters are unimportant
         genCompileTimeValue(null, value, visitor)
         visitor.visitEnd()
     }
@@ -213,13 +209,11 @@ class AnnotationCodegen(
                         genAnnotationArguments(value, visitor)
                         visitor.visitEnd()
                     }
-                    else -> error("Not supported!")
+                    else -> error("Not supported as annotation! ${ir2string(value)}")
                 }
             }
             is IrGetEnumValue -> {
-                // TODO: Should use asmTypeForClassId, since fqName may fail (internal classes, local declarations).
-                val enumClassInternalName =
-                    AsmUtil.asmTypeByFqNameWithoutInnerClasses(value.symbol.owner.parentAsClass.fqNameWhenAvailable!!).descriptor
+                val enumClassInternalName = typeMapper.mapClass(value.symbol.owner.parentAsClass.descriptor).descriptor
                 val enumEntryName = value.symbol.owner.name
                 annotationVisitor.visitEnum(name, enumClassInternalName, enumEntryName.asString())
             }
