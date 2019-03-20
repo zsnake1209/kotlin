@@ -25,7 +25,7 @@ annotation class Anno(
     val arrOfA: Array<A>
 )
 
-@Anno("OK", 42, 2.718281828, 43u, E.E0, A(), A::class, emptyArray(), intArrayOf(), emptyArray(), emptyArray())
+@Anno("OK", 42, 2.718281828, 43u, E.E0, A(), A::class, emptyArray(), intArrayOf(1, 2), arrayOf(E.E0), arrayOf(A()))
 class TTT
 
 fun box(): String {
@@ -39,8 +39,8 @@ fun box(): String {
 //  TODO: problems with KClass/Class conversion in JVM_IR, unrelated to annotation codegen
 //    assert(anno.k == A::class.java)
     assert(anno.arr.isEmpty())
-    assert(anno.intArr.isEmpty())
-    assert(anno.arrOfE.isEmpty())
-    assert(anno.arrOfA.isEmpty())
+    assert(anno.intArr.contentEquals(intArrayOf(1, 2)))
+    assert(anno.arrOfE.contentEquals(arrayOf(E.E0)))
+    assert(anno.arrOfA.size == 1)
     return "OK"
 }
