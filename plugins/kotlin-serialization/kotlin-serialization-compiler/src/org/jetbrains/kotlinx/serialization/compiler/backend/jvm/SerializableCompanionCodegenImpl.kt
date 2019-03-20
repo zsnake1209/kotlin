@@ -18,11 +18,13 @@ package org.jetbrains.kotlinx.serialization.compiler.backend.jvm
 
 import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.SerializableCompanionCodegen
-import org.jetbrains.kotlinx.serialization.compiler.resolve.classSerializer
+import org.jetbrains.kotlinx.serialization.compiler.backend.common.findTypeSerializerOrContext
 import org.jetbrains.kotlinx.serialization.compiler.resolve.getSerializableClassDescriptorByCompanion
 import org.jetbrains.kotlinx.serialization.compiler.resolve.shouldHaveGeneratedMethodsInCompanion
+import org.jetbrains.kotlinx.serialization.compiler.resolve.toSimpleType
 
 class SerializableCompanionCodegenImpl(private val classCodegen: ImplementationBodyCodegen) :
     SerializableCompanionCodegen(classCodegen.descriptor, classCodegen.bindingContext) {
@@ -36,7 +38,11 @@ class SerializableCompanionCodegenImpl(private val classCodegen: ImplementationB
     }
 
     override fun generateSerializerGetter(methodDescriptor: FunctionDescriptor) {
-        val serial = serializableDescriptor.classSerializer ?: return
+        val serial = findTypeSerializerOrContext(
+            serializableDescriptor.module,
+            serializableDescriptor.toSimpleType(),
+            sourceElement = methodDescriptor.findPsi()
+        ) ?: return
         classCodegen.generateMethod(methodDescriptor) { _, _ ->
             stackValueSerializerInstance(
                 classCodegen,

@@ -45,6 +45,7 @@ class SerializableCodegenImpl(
             val serializableClass = codegen.descriptor
             if (serializableClass.isInternalSerializable)
                 SerializableCodegenImpl(codegen).generate()
+            else if (serializableClass.isSerializableObject) return // no-op
             else if (serializableClass.hasSerializableAnnotationWithoutArgs && !serializableClass.hasCompanionObjectAsSerializer) {
                 throw CompilationException(
                     "@Serializable annotation on $serializableClass would be ignored because it is impossible to serialize it automatically. " +
