@@ -185,12 +185,12 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
 
         //val checkers = listOf(VariableApplicabilityChecker(callee.name))
 
-        val info = CallInfo(true, receiver, 0)
+        val info = CallInfo(CallKind.VariableAccess, receiver, emptyList()) { it.resultType }
         val resolver = CallResolver(jump, session)
         resolver.callInfo = info
         resolver.scopes = (scopes + localScopes).asReversed()
 
-        val consumer = createVariableConsumer(session, callee.name, qualifiedAccessExpression.explicitReceiver, qualifiedAccessExpression.explicitReceiver?.resultType)
+        val consumer = createVariableConsumer(session, callee.name, info, inferenceComponents)
         val result = resolver.runTowerResolver(consumer)
         val successCandidates = result.successCandidates()
         val resultExpression = qualifiedAccessExpression.transformCalleeReference(this, successCandidates)
@@ -212,14 +212,14 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
         val arguments = functionCall.arguments
 
 
-        val info = CallInfo(false, receiver, arguments.size)
+        val info = CallInfo(CallKind.Function, receiver, arguments) { it.resultType }
         val resolver = CallResolver(jump, session)
         resolver.callInfo = info
         resolver.scopes = (scopes + localScopes).asReversed()
 
 
 
-        val consumer = createFunctionConsumer(session, name, receiver, receiver?.resultType)
+        val consumer = createFunctionConsumer(session, name, info, inferenceComponents)
         val result = resolver.runTowerResolver(consumer)
         val successCandidates = result.successCandidates()
 
