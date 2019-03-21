@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.load.kotlin.TypeMappingMode
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.OtherOrigin
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
@@ -297,12 +296,10 @@ internal fun AbstractSerialGenerator.stackValueSerializerInstance(codegen: Class
                 instantiate(argSerializers[0])
             }
             objectSerializerId -> {
-                val serializableDescriptor = kType.toClassDescriptor!!
-                val serialName: String =
-                    serializableDescriptor.annotations.serialNameValue ?: serializableDescriptor.fqNameUnsafe.asString()
+                val serialName = kType.serialName()
                 aconst(serialName)
                 signature.append("Ljava/lang/String;")
-                StackValue.singleton(serializableDescriptor, codegen.typeMapper).put(Type.getType("Ljava/lang/Object;"), iv)
+                StackValue.singleton(kType.toClassDescriptor!!, codegen.typeMapper).put(Type.getType("Ljava/lang/Object;"), iv)
                 signature.append("Ljava/lang/Object;")
             }
             // all serializers get arguments with serializers of their generic types

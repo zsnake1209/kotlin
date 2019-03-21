@@ -38,11 +38,13 @@ class SerializableCompanionCodegenImpl(private val classCodegen: ImplementationB
     }
 
     override fun generateSerializerGetter(methodDescriptor: FunctionDescriptor) {
-        val serial = findTypeSerializerOrContext(
-            serializableDescriptor.module,
-            serializableDescriptor.toSimpleType(),
-            sourceElement = methodDescriptor.findPsi()
-        ) ?: return
+        val serial = requireNotNull(
+            findTypeSerializerOrContext(
+                serializableDescriptor.module,
+                serializableDescriptor.toSimpleType(),
+                sourceElement = methodDescriptor.findPsi()
+            )
+        )
         classCodegen.generateMethod(methodDescriptor) { _, _ ->
             stackValueSerializerInstance(
                 classCodegen,
