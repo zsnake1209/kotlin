@@ -41,9 +41,6 @@ object CommonConfigurationKeys {
 
     @JvmField
     val METADATA_VERSION = CompilerConfigurationKey.create<BinaryVersion>("metadata version")
-
-    @JvmField
-    val EXCLUDED_ELEMENTS_FROM_DUMPING = CompilerConfigurationKey.create<Set<String>>("lowering elements which shouldn't be dumped at all")
 }
 
 var CompilerConfiguration.languageVersionSettings: LanguageVersionSettings
