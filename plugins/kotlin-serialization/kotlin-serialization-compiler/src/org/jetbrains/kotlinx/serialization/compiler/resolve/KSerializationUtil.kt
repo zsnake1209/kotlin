@@ -157,7 +157,7 @@ internal val ClassDescriptor?.classSerializer: ClassDescriptor?
     }
 
 internal val ClassDescriptor.hasCompanionObjectAsSerializer: Boolean
-    get() = companionObjectDescriptor?.serializerForClass == this.defaultType
+    get() = isSerializableObject || companionObjectDescriptor?.serializerForClass == this.defaultType
 
 internal fun ClassDescriptor.isSerializerWhichRequiersKClass() = classId in setOf(enumSerializerId, contextSerializerId, polymorphicSerializerId)
 

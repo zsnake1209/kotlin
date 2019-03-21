@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPureClassOrObject
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.*
 import org.jetbrains.kotlinx.serialization.compiler.backend.jvm.enumSerializerId
@@ -90,6 +91,11 @@ fun AbstractSerialGenerator.getSerialTypeInfo(property: SerializableProperty): S
             SerializableInfo(serializer)
         }
     }
+}
+
+fun KotlinType.serialName(): String {
+    val serializableDescriptor = this.toClassDescriptor!!
+    return serializableDescriptor.annotations.serialNameValue ?: serializableDescriptor.fqNameUnsafe.asString()
 }
 
 /**
