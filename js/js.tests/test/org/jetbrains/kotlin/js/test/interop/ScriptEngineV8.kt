@@ -51,8 +51,10 @@ class ScriptEngineV8 : ScriptEngine {
     }
 
     override fun saveState() {
-        val v8ArrayKeys = eval<V8Array>("Object.getOwnPropertyNames(this)")
-        savedState = V8ObjectUtils.toList(v8ArrayKeys).also { v8ArrayKeys.release() } as List<String>
+        if (savedState == null) {
+            val v8ArrayKeys = eval<V8Array>("Object.getOwnPropertyNames(this)")
+            savedState = V8ObjectUtils.toList(v8ArrayKeys).also { v8ArrayKeys.release() } as List<String>
+        }
     }
 
     private val myRuntime: V8 = V8.createV8Runtime("global", LIBRARY_PATH_BASE)
