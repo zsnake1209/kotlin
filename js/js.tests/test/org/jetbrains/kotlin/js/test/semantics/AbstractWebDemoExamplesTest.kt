@@ -9,7 +9,6 @@ import com.google.common.collect.Lists
 import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.kotlin.js.facade.MainCallParameters
 import org.jetbrains.kotlin.js.test.BasicBoxTest
-import org.jetbrains.kotlin.js.test.JsIrTestRuntime
 import org.jetbrains.kotlin.js.test.NashornJsTestChecker
 import java.io.File
 import javax.script.ScriptException
@@ -25,8 +24,7 @@ abstract class AbstractWebDemoExamplesTest(relativePath: String) : BasicBoxTest(
         testPackage: String?,
         testFunction: String,
         expectedResult: String,
-        withModuleSystem: Boolean,
-        runtime: JsIrTestRuntime
+        withModuleSystem: Boolean
     ) {
         NashornJsTestChecker.checkStdout(jsFiles, expectedResult)
     }

@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.js.test
 
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
-import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.ir.backend.js.*
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.config.JsConfig
@@ -52,8 +51,9 @@ abstract class BasicIrBoxTest(
         super.doTest(filePath, expectedResult, mainCallParameters, coroutinesPackage)
     }
 
-    private val runtimes = mapOf(JsIrTestRuntime.DEFAULT to defaultRuntimeKlib,
-                                 JsIrTestRuntime.FULL to fullRuntimeKlib)
+    private val runtimes = mapOf(
+        JsIrTestRuntime.DEFAULT to defaultRuntimeKlib,
+        JsIrTestRuntime.FULL to fullRuntimeKlib)
 
     override fun translateFiles(
         units: List<TranslationUnit>,
@@ -140,8 +140,7 @@ abstract class BasicIrBoxTest(
         testPackage: String?,
         testFunction: String,
         expectedResult: String,
-        withModuleSystem: Boolean,
-        runtime: JsIrTestRuntime
+        withModuleSystem: Boolean
     ) {
         // TODO: should we do anything special for module systems?
         // TODO: return list of js from translateFiles and provide then to this function with other js files
