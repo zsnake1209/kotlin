@@ -10,14 +10,13 @@ import org.jetbrains.kotlin.backend.common.atMostOne
 import org.jetbrains.kotlin.backend.common.descriptors.KnownPackageFragmentDescriptor
 import org.jetbrains.kotlin.backend.common.ir.Ir
 import org.jetbrains.kotlin.backend.common.ir.Symbols
-import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.js.JsDeclarationFactory
 import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
-import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.SourceManager
@@ -43,12 +42,11 @@ import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.Variance
 
 class JsIrBackendContext(
-    val module: ModuleDescriptorImpl,
+    val module: ModuleDescriptor,
     override val irBuiltIns: IrBuiltIns,
     val symbolTable: SymbolTable,
     irModuleFragment: IrModuleFragment,
-    override val configuration: CompilerConfiguration,
-    val phaseConfig: PhaseConfig
+    override val configuration: CompilerConfiguration
 ) : CommonBackendContext {
 
     override val builtIns = module.builtIns
@@ -83,8 +81,7 @@ class JsIrBackendContext(
         }
     }
 
-    override val sharedVariablesManager =
-        JsSharedVariablesManager(irBuiltIns, implicitDeclarationFile)
+    override val sharedVariablesManager = JsSharedVariablesManager(irBuiltIns, implicitDeclarationFile)
     override val declarationFactory = JsDeclarationFactory()
 
     companion object {
@@ -226,10 +223,6 @@ class JsIrBackendContext(
     val newThrowableSymbol = symbolTable.referenceSimpleFunction(getJsInternalFunction("newThrowable"))
 
     val throwISEymbol = symbolTable.referenceSimpleFunction(getFunctions(kotlinPackageFqn.child(Name.identifier("THROW_ISE"))).single())
-    val throwNPESymbol = ir.symbols.ThrowNullPointerException
-    val throwCCESymbol = ir.symbols.ThrowTypeCastException
-    val throwNWBESymbol = ir.symbols.ThrowNoWhenBranchMatchedException
-    val throwUPAESymbol = ir.symbols.ThrowUninitializedPropertyAccessException
 
     val coroutineImplLabelPropertyGetter by lazy { ir.symbols.coroutineImpl.getPropertyGetter("state")!!.owner }
     val coroutineImplLabelPropertySetter by lazy { ir.symbols.coroutineImpl.getPropertySetter("state")!!.owner }
@@ -272,15 +265,15 @@ class JsIrBackendContext(
     private fun findFunctions(memberScope: MemberScope, name: Name): List<SimpleFunctionDescriptor> =
         memberScope.getContributedFunctions(name, NoLookupLocation.FROM_BACKEND).toList()
 
-    internal fun getJsInternalClass(name: String): ClassDescriptor =
+    fun getJsInternalClass(name: String): ClassDescriptor =
         findClass(internalPackage.memberScope, Name.identifier(name))
 
-    internal fun getClass(fqName: FqName): ClassDescriptor =
+    fun getClass(fqName: FqName): ClassDescriptor =
         findClass(module.getPackage(fqName.parent()).memberScope, fqName.shortName())
 
     private fun getIrClass(fqName: FqName): IrClassSymbol = symbolTable.referenceClass(getClass(fqName))
 
-    internal fun getJsInternalFunction(name: String): SimpleFunctionDescriptor =
+    fun getJsInternalFunction(name: String): SimpleFunctionDescriptor =
         findFunctions(internalPackage.memberScope, Name.identifier(name)).single()
 
     fun getFunctions(fqName: FqName): List<SimpleFunctionDescriptor> =
