@@ -2,6 +2,7 @@
 // COMMON_COROUTINES_TEST
 // WITH_RUNTIME
 // WITH_COROUTINES
+// CHECK_STATE_MACHINE
 
 // In this test the following transformation are occuring:
 //   flow$1 -> flowWith$$inlined$flow$1
