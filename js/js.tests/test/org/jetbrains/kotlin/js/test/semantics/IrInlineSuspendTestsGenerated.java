@@ -309,6 +309,11 @@ public class IrInlineSuspendTestsGenerated extends AbstractIrInlineSuspendTests 
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/innerObject.kt", "kotlin.coroutines");
         }
 
+        @TestMetadata("insideObject.kt")
+        public void testInsideObject_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/insideObject.kt", "kotlin.coroutines");
+        }
+
         @TestMetadata("normalInline.kt")
         public void testNormalInline_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/normalInline.kt", "kotlin.coroutines");
@@ -317,6 +322,16 @@ public class IrInlineSuspendTestsGenerated extends AbstractIrInlineSuspendTests 
         @TestMetadata("numberOfSuspentions.kt")
         public void testNumberOfSuspentions_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/numberOfSuspentions.kt", "kotlin.coroutines");
+        }
+
+        @TestMetadata("objectInsideLambdas.kt")
+        public void testObjectInsideLambdas_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/objectInsideLambdas.kt", "kotlin.coroutines");
+        }
+
+        @TestMetadata("oneInlineTwoCaptures.kt")
+        public void testOneInlineTwoCaptures_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/oneInlineTwoCaptures.kt", "kotlin.coroutines");
         }
     }
 }
