@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.codegen.ClassBuilder
 import org.jetbrains.kotlin.codegen.state.GenerationState
 
 class RootInliningContext(
-    expressionMap: Map<Int, LambdaInfo>,
+    expressionMap: Map<Int, FunctionalParameter>,
     state: GenerationState,
     nameGenerator: NameGenerator,
     val sourceCompilerForInline: SourceCompilerForInline,
@@ -22,11 +22,11 @@ class RootInliningContext(
 
 class RegeneratedClassContext(
     parent: InliningContext,
-    expressionMap: Map<Int, LambdaInfo>,
+    expressionMap: Map<Int, FunctionalParameter>,
     state: GenerationState,
     nameGenerator: NameGenerator,
     typeRemapper: TypeRemapper,
-    lambdaInfo: InlineableLambdaInfo?,
+    lambdaInfo: LambdaInfo?,
     override val callSiteInfo: InlineCallSiteInfo
 ) : InliningContext(
     parent, expressionMap, state, nameGenerator, typeRemapper, lambdaInfo, true
@@ -36,11 +36,11 @@ class RegeneratedClassContext(
 
 open class InliningContext(
     val parent: InliningContext?,
-    val expressionMap: Map<Int, LambdaInfo>,
+    val expressionMap: Map<Int, FunctionalParameter>,
     val state: GenerationState,
     val nameGenerator: NameGenerator,
     val typeRemapper: TypeRemapper,
-    val lambdaInfo: InlineableLambdaInfo?,
+    val lambdaInfo: LambdaInfo?,
     val classRegeneration: Boolean
 ) {
 
@@ -65,7 +65,7 @@ open class InliningContext(
         internalNameToAnonymousObjectTransformationInfo.putIfAbsent(internalName, info)
     }
 
-    fun subInlineLambda(lambdaInfo: InlineableLambdaInfo): InliningContext =
+    fun subInlineLambda(lambdaInfo: LambdaInfo): InliningContext =
         subInline(
             nameGenerator.subGenerator("lambda"),
             //mark lambda inlined
@@ -86,7 +86,7 @@ open class InliningContext(
     fun subInline(
         generator: NameGenerator,
         additionalTypeMappings: Map<String, String?> = emptyMap(),
-        lambdaInfo: InlineableLambdaInfo? = this.lambdaInfo
+        lambdaInfo: LambdaInfo? = this.lambdaInfo
     ): InliningContext {
         val isInliningLambda = lambdaInfo != null
         return InliningContext(

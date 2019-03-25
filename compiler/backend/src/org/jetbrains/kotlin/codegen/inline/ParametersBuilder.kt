@@ -38,7 +38,7 @@ class ParametersBuilder private constructor() {
 
     fun addCapturedParam(original: CapturedParamInfo, newFieldName: String): CapturedParamInfo {
         val info = CapturedParamInfo(original.desc, newFieldName, original.isSkipped, nextParameterOffset, original.index)
-        info.lambda = original.lambda
+        info.functionalParameter = original.functionalParameter
         return addParameter(info)
     }
 
@@ -62,7 +62,7 @@ class ParametersBuilder private constructor() {
             CapturedParamDesc(containingLambdaType, fieldName, type), newFieldName, skipped, nextParameterOffset, original?.index ?: -1
         )
         if (original != null) {
-            info.lambda = original.lambda
+            info.functionalParameter = original.functionalParameter
         }
         return addParameter(info)
     }
@@ -111,12 +111,12 @@ class ParametersBuilder private constructor() {
         @JvmOverloads
         @JvmStatic
         fun initializeBuilderFrom(
-            objectType: Type, descriptor: String, inlineLambda: InlineableLambdaInfo? = null, isStatic: Boolean = false
+            objectType: Type, descriptor: String, inlineLambda: LambdaInfo? = null, isStatic: Boolean = false
         ): ParametersBuilder {
             val builder = newBuilder()
             if (inlineLambda?.hasDispatchReceiver != false && !isStatic) {
                 //skipped this for inlined lambda cause it will be removed
-                builder.addThis(objectType, inlineLambda != null).lambda = inlineLambda
+                builder.addThis(objectType, inlineLambda != null).functionalParameter = inlineLambda
             }
 
             for (type in Type.getArgumentTypes(descriptor)) {

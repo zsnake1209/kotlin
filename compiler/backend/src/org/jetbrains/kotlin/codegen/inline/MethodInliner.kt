@@ -217,9 +217,9 @@ class MethodInliner(
                 if (/*INLINE_RUNTIME.equals(owner) &&*/ isInvokeOnLambda(owner, name)) { //TODO add method
                     assert(!currentInvokes.isEmpty())
                     val invokeCall = currentInvokes.remove()
-                    val info = invokeCall.lambdaInfo
+                    val info = invokeCall.functionalParameter
 
-                    if (info !is InlineableLambdaInfo) {
+                    if (info !is LambdaInfo) {
                         //noninlinable lambda
                         super.visitMethodInsn(opcode, owner, name, desc, itf)
                         return
@@ -389,7 +389,7 @@ class MethodInliner(
         return resultNode
     }
 
-    private fun isDefaultLambdaWithReification(lambdaInfo: InlineableLambdaInfo) =
+    private fun isDefaultLambdaWithReification(lambdaInfo: LambdaInfo) =
         lambdaInfo is DefaultLambda && lambdaInfo.needReification
 
     private fun prepareNode(node: MethodNode, finallyDeepShift: Int): MethodNode {
@@ -527,7 +527,7 @@ class MethodInliner(
                         } else if (isSamWrapperConstructorCall(owner, name)) {
                             recordTransformation(SamWrapperTransformationInfo(owner, inliningContext, isAlreadyRegenerated(owner)))
                         } else if (isAnonymousConstructorCall(owner, name)) {
-                            val lambdaMapping = HashMap<Int, LambdaInfo>()
+                            val lambdaMapping = HashMap<Int, FunctionalParameter>()
 
                             var offset = 0
                             var capturesAnonymousObjectThatMustBeRegenerated = false
@@ -621,7 +621,7 @@ class MethodInliner(
                             val stackTransformations = mutableSetOf<AbstractInsnNode>()
                             val lambdaInfo =
                                 getLambdaIfExistsAndMarkInstructions(frame.peek(1)!!, false, instructions, sources, stackTransformations)
-                            if (lambdaInfo is InlineableLambdaInfo && stackTransformations.all { it is VarInsnNode }) {
+                            if (lambdaInfo is LambdaInfo && stackTransformations.all { it is VarInsnNode }) {
                                 assert(lambdaInfo.lambdaClassType.internalName == nodeRemapper.originalLambdaInternalName) {
                                     "Wrong bytecode template for contract template: ${lambdaInfo.lambdaClassType.internalName} != ${nodeRemapper.originalLambdaInternalName}"
                                 }
@@ -812,7 +812,7 @@ class MethodInliner(
     private fun buildConstructorInvocation(
         anonymousType: String,
         desc: String,
-        lambdaMapping: Map<Int, LambdaInfo>,
+        lambdaMapping: Map<Int, FunctionalParameter>,
         needReification: Boolean,
         capturesAnonymousObjectThatMustBeRegenerated: Boolean
     ): AnonymousObjectTransformationInfo {
@@ -845,20 +845,20 @@ class MethodInliner(
         return inliningContext.typeRemapper.hasNoAdditionalMapping(owner)
     }
 
-    internal fun getLambdaIfExists(insnNode: AbstractInsnNode): LambdaInfo? {
+    internal fun getLambdaIfExists(insnNode: AbstractInsnNode): FunctionalParameter? {
         return when {
             insnNode.opcode == Opcodes.ALOAD ->
                 getLambdaIfExists((insnNode as VarInsnNode).`var`)
             insnNode is FieldInsnNode && insnNode.name.startsWith(CAPTURED_FIELD_FOLD_PREFIX) ->
-                findCapturedField(insnNode, nodeRemapper).lambda
+                findCapturedField(insnNode, nodeRemapper).functionalParameter
             else ->
                 null
         }
     }
 
-    private fun getLambdaIfExists(varIndex: Int): LambdaInfo? {
+    private fun getLambdaIfExists(varIndex: Int): FunctionalParameter? {
         if (varIndex < parameters.argsSizeOnStack) {
-            return parameters.getParameterByDeclarationSlot(varIndex).lambda
+            return parameters.getParameterByDeclarationSlot(varIndex).functionalParameter
         }
         return null
     }

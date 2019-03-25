@@ -343,7 +343,7 @@ class AnonymousObjectTransformer(
         for (info in constructorAdditionalFakeParams) {
             val fake = constructorInlineBuilder.addCapturedParamCopy(info)
 
-            if (fake.lambda != null) {
+            if (fake.functionalParameter != null) {
                 //set remap value to skip this fake (captured with lambda already skipped)
                 val composed = StackValue.field(
                     fake.getType(),
@@ -413,9 +413,9 @@ class AnonymousObjectTransformer(
         transformationInfo: AnonymousObjectTransformationInfo,
         parentFieldRemapper: FieldRemapper
     ): List<CapturedParamInfo> {
-        val capturedLambdas = LinkedHashSet<InlineableLambdaInfo>() //captured var of inlined parameter
+        val capturedLambdas = LinkedHashSet<LambdaInfo>() //captured var of inlined parameter
         val constructorAdditionalFakeParams = ArrayList<CapturedParamInfo>()
-        val indexToLambda = transformationInfo.lambdasToInline
+        val indexToLambda = transformationInfo.functionalParameters
         val capturedParams = HashSet<Int>()
 
         //load captured parameters and patch instruction list
@@ -432,10 +432,10 @@ class AnonymousObjectTransformer(
                 fieldName
             val info = capturedParamBuilder.addCapturedParam(
                 Type.getObjectType(transformationInfo.oldClassName), fieldName, newFieldName,
-                Type.getType(fieldNode.desc), lambdaInfo is InlineableLambdaInfo, null
+                Type.getType(fieldNode.desc), lambdaInfo is LambdaInfo, null
             )
-            if (lambdaInfo is InlineableLambdaInfo) {
-                info.lambda = lambdaInfo
+            if (lambdaInfo is LambdaInfo) {
+                info.functionalParameter = lambdaInfo
                 capturedLambdas.add(lambdaInfo)
             }
             constructorAdditionalFakeParams.add(info)
@@ -452,8 +452,8 @@ class AnonymousObjectTransformer(
         val paramTypes = transformationInfo.constructorDesc?.let { Type.getArgumentTypes(it) } ?: emptyArray()
         for (type in paramTypes) {
             val info = indexToLambda[constructorParamBuilder.nextParameterOffset]
-            val parameterInfo = constructorParamBuilder.addNextParameter(type, info is InlineableLambdaInfo)
-            parameterInfo.lambda = info
+            val parameterInfo = constructorParamBuilder.addNextParameter(type, info is LambdaInfo)
+            parameterInfo.functionalParameter = info
             if (capturedParams.contains(parameterInfo.index)) {
                 parameterInfo.isCaptured = true
             } else {
@@ -463,7 +463,7 @@ class AnonymousObjectTransformer(
 
         //For all inlined lambdas add their captured parameters
         //TODO: some of such parameters could be skipped - we should perform additional analysis
-        val capturedLambdasToInline = HashMap<String, InlineableLambdaInfo>() //captured var of inlined parameter
+        val capturedLambdasToInline = HashMap<String, LambdaInfo>() //captured var of inlined parameter
         val allRecapturedParameters = ArrayList<CapturedParamDesc>()
         val addCapturedNotAddOuter =
             parentFieldRemapper.isRoot || parentFieldRemapper is InlinedLambdaRemapper && parentFieldRemapper.parent!!.isRoot
@@ -519,9 +519,9 @@ class AnonymousObjectTransformer(
         return constructorAdditionalFakeParams
     }
 
-    private fun shouldRenameThis0(parentFieldRemapper: FieldRemapper, values: Collection<LambdaInfo>): Boolean {
+    private fun shouldRenameThis0(parentFieldRemapper: FieldRemapper, values: Collection<FunctionalParameter>): Boolean {
         return if (isFirstDeclSiteLambdaFieldRemapper(parentFieldRemapper)) {
-            values.any { it.capturedVars.any { isThis0(it.fieldName) } }
+            values.any { it is LambdaInfo && it.capturedVars.any { isThis0(it.fieldName) } }
         } else false
     }
 

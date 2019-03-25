@@ -32,16 +32,16 @@ fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
     insnList: InsnList,
     frames: Array<Frame<SourceValue>?>,
     toDelete: MutableSet<AbstractInsnNode>
-): LambdaInfo? {
+): FunctionalParameter? {
     val toDeleteInner = SmartSet.create<AbstractInsnNode>()
 
-    val lambdaSet = SmartSet.create<LambdaInfo?>()
+    val lambdaSet = SmartSet.create<FunctionalParameter?>()
     sourceValue.insns.mapTo(lambdaSet) {
         getLambdaIfExistsAndMarkInstructions(it, processSwap, insnList, frames, toDeleteInner)
     }
 
     return lambdaSet.singleOrNull()?.also {
-        if (it is InlineableLambdaInfo) {
+        if (it is LambdaInfo) {
             toDelete.addAll(toDeleteInner)
         }
     }
@@ -55,7 +55,7 @@ private fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
     insnList: InsnList,
     frames: Array<Frame<SourceValue>?>,
     toDelete: MutableSet<AbstractInsnNode>
-): LambdaInfo? {
+): FunctionalParameter? {
     if (insnNode == null) return null
 
     getLambdaIfExists(insnNode)?.let {

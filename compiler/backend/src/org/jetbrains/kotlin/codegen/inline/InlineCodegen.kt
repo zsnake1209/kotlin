@@ -89,12 +89,12 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
 
     protected val invocationParamBuilder = ParametersBuilder.newBuilder()
 
-    protected val expressionMap = linkedMapOf<Int, LambdaInfo>()
+    protected val expressionMap = linkedMapOf<Int, FunctionalParameter>()
 
-    var activeLambda: InlineableLambdaInfo? = null
+    var activeLambda: LambdaInfo? = null
         protected set
 
-    protected val noinlineableLambdas = hashMapOf<Type, Pair<KtExpression, ValueParameterDescriptor>>()
+    protected val noinlineableLambdas = hashMapOf<Type, ValueParameterDescriptor>()
 
     private val defaultSourceMapper = sourceCompiler.lazySourceMapper
 
@@ -242,7 +242,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
                 extractDefaultLambdaOffsetAndDescriptor(jvmSignature, functionDescriptor)
             )
             for (lambda in defaultLambdas) {
-                invocationParamBuilder.buildParameters().getParameterByDeclarationSlot(lambda.offset).lambda = lambda
+                invocationParamBuilder.buildParameters().getParameterByDeclarationSlot(lambda.offset).functionalParameter = lambda
                 val prev = expressionMap.put(lambda.offset, lambda)
                 assert(prev == null) { "Lambda with offset ${lambda.offset} already exists: $prev" }
             }
@@ -318,7 +318,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
 
     private fun generateClosuresBodies() {
         for (info in expressionMap.values) {
-            if (info is InlineableLambdaInfo) {
+            if (info is LambdaInfo) {
                 info.generateLambdaBody(sourceCompiler, reifiedTypeInliner)
             }
         }
@@ -350,9 +350,9 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
                 info.setRemapValue(remappedValue)
             } else {
                 info = invocationParamBuilder.addNextValueParameter(jvmType, false, remappedValue, parameterIndex)
-                val pair = noinlineableLambdas[stackValue.type]
-                if (pair != null && pair.second.isCrossinline) { // TODO should we support noinline lambdas?
-                    info.lambda = NoinlineableLambda(pair.first, stackValue.type, true)
+                val descriptor = noinlineableLambdas[stackValue.type]
+                if (descriptor?.isCrossinline == true) { // TODO should we support noinline lambdas?
+                    info.functionalParameter = NonInlineableFunctionalParameter
                 }
             }
 
@@ -409,14 +409,14 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
     private fun putClosureParametersOnStack() {
         for (next in expressionMap.values) {
             //closure parameters for bounded callable references are generated inplace
-            if (next is InlineableLambdaInfo) { // TODO: Should we put closure parameters for all lambdas, not only inline?
+            if (next is LambdaInfo) { // TODO: Should we put closure parameters for all lambdas, not only inline?
                 if (next is ExpressionLambda && next.isBoundCallableReference) continue
                 putClosureParametersOnStack(next, null)
             }
         }
     }
 
-    abstract protected fun putClosureParametersOnStack(next: InlineableLambdaInfo, functionReferenceReceiver: StackValue?)
+    abstract protected fun putClosureParametersOnStack(next: LambdaInfo, functionReferenceReceiver: StackValue?)
 
     protected fun rememberCapturedForDefaultLambda(defaultLambda: DefaultLambda) {
         for ((paramIndex, captured) in defaultLambda.capturedVars.withIndex()) {
@@ -716,7 +716,7 @@ class PsiInlineCodegen(
         delayedHiddenWriting = recordParameterValueInLocalVal(justProcess, false, *hiddenParameters.toTypedArray())
     }
 
-    override fun putClosureParametersOnStack(next: InlineableLambdaInfo, functionReferenceReceiver: StackValue?) {
+    override fun putClosureParametersOnStack(next: LambdaInfo, functionReferenceReceiver: StackValue?) {
         activeLambda = next
         when (next) {
             is PsiExpressionLambda -> codegen.pushClosureOnStack(next.classDescriptor, true, this, functionReferenceReceiver)
@@ -771,12 +771,12 @@ class PsiInlineCodegen(
             }
         } else {
             val value = codegen.gen(argumentExpression)
-            noinlineableLambdas[value.type] = argumentExpression to valueParameterDescriptor
+            noinlineableLambdas[value.type] = valueParameterDescriptor
             putValueIfNeeded(parameterType, value, ValueKind.GENERAL, parameterIndex)
         }
     }
 
-    private fun rememberClosure(expression: KtExpression, type: Type, parameter: ValueParameterDescriptor): InlineableLambdaInfo {
+    private fun rememberClosure(expression: KtExpression, type: Type, parameter: ValueParameterDescriptor): LambdaInfo {
         val ktLambda = KtPsiUtil.deparenthesize(expression)
         assert(isInlinableParameterExpression(ktLambda)) { "Couldn't find inline expression in ${expression.text}" }
 
@@ -785,7 +785,7 @@ class PsiInlineCodegen(
             parameter.isCrossinline, getBoundCallableReferenceReceiver(expression) != null
         ).also { lambda ->
             val closureInfo = invocationParamBuilder.addNextValueParameter(type, true, null, parameter.index)
-            closureInfo.lambda = lambda
+            closureInfo.functionalParameter = lambda
             expressionMap.put(closureInfo.index, lambda)
         }
     }

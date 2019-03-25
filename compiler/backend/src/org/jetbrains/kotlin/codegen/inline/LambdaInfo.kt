@@ -6,7 +6,10 @@
 package org.jetbrains.kotlin.codegen.inline
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.codegen.*
+import org.jetbrains.kotlin.codegen.AsmUtil
+import org.jetbrains.kotlin.codegen.OwnerKind
+import org.jetbrains.kotlin.codegen.PropertyReferenceCodegen
+import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.binding.CalculatedClosure
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding.*
 import org.jetbrains.kotlin.codegen.binding.MutableClosure
@@ -33,19 +36,19 @@ import org.jetbrains.org.objectweb.asm.tree.FieldInsnNode
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
 import kotlin.properties.Delegates
 
-interface LambdaInfo : LabelOwner {
-    val capturedVars: List<CapturedParamDesc>
+interface FunctionalParameter
 
-    val lambdaClassType: Type
-}
-
-abstract class InlineableLambdaInfo(@JvmField val isCrossInline: Boolean) : LambdaInfo {
+abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : FunctionalParameter, LabelOwner {
 
     abstract val isBoundCallableReference: Boolean
+
+    abstract val lambdaClassType: Type
 
     abstract val invokeMethod: Method
 
     abstract val invokeMethodDescriptor: FunctionDescriptor
+
+    abstract val capturedVars: List<CapturedParamDesc>
 
     lateinit var node: SMAPAndMethodNode
 
@@ -67,27 +70,17 @@ abstract class InlineableLambdaInfo(@JvmField val isCrossInline: Boolean) : Lamb
 
 
     companion object {
-        fun InlineableLambdaInfo.getCapturedParamInfo(descriptor: EnclosedValueDescriptor): CapturedParamDesc {
+        fun LambdaInfo.getCapturedParamInfo(descriptor: EnclosedValueDescriptor): CapturedParamDesc {
             return capturedParamDesc(descriptor.fieldName, descriptor.type)
         }
 
-        fun InlineableLambdaInfo.capturedParamDesc(fieldName: String, fieldType: Type): CapturedParamDesc {
+        fun LambdaInfo.capturedParamDesc(fieldName: String, fieldType: Type): CapturedParamDesc {
             return CapturedParamDesc(lambdaClassType, fieldName, fieldType)
         }
     }
 }
 
-class NoinlineableLambda(
-    val expression: KtExpression,
-    override val lambdaClassType: Type,
-    val isCrossInline: Boolean
-) : LambdaInfo {
-    override val capturedVars: List<CapturedParamDesc> = emptyList()
-
-    override fun isMyLabel(name: String): Boolean {
-        TODO("not implemented")
-    }
-}
+object NonInlineableFunctionalParameter : FunctionalParameter
 
 class DefaultLambda(
     override val lambdaClassType: Type,
@@ -95,7 +88,7 @@ class DefaultLambda(
     val parameterDescriptor: ValueParameterDescriptor,
     val offset: Int,
     val needReification: Boolean
-) : InlineableLambdaInfo(parameterDescriptor.isCrossinline) {
+) : LambdaInfo(parameterDescriptor.isCrossinline) {
 
     override var isBoundCallableReference by Delegates.notNull<Boolean>()
         private set
@@ -195,7 +188,7 @@ fun Type.boxReceiverForBoundReference() =
 fun Type.boxReceiverForBoundReference(kotlinType: KotlinType, state: GenerationState) =
     AsmUtil.boxType(this, kotlinType, state)
 
-abstract class ExpressionLambda(protected val typeMapper: KotlinTypeMapper, isCrossInline: Boolean) : InlineableLambdaInfo(isCrossInline) {
+abstract class ExpressionLambda(protected val typeMapper: KotlinTypeMapper, isCrossInline: Boolean) : LambdaInfo(isCrossInline) {
 
     override fun generateLambdaBody(sourceCompiler: SourceCompilerForInline, reifiedTypeInliner: ReifiedTypeInliner) {
         val jvmMethodSignature = typeMapper.mapSignatureSkipGeneric(invokeMethodDescriptor)
