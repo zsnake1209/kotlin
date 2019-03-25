@@ -3910,6 +3910,16 @@ public class CompileKotlinAgainstInlineKotlinTestGenerated extends AbstractCompi
             public void testOneInlineTwoCaptures_1_3() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/oneInlineTwoCaptures.kt", "kotlin.coroutines");
             }
+
+            @TestMetadata("passParameter.kt")
+            public void testPassParameter_1_2() throws Exception {
+                runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/passParameter.kt", "kotlin.coroutines.experimental");
+            }
+
+            @TestMetadata("passParameter.kt")
+            public void testPassParameter_1_3() throws Exception {
+                runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/passParameter.kt", "kotlin.coroutines");
+            }
         }
     }
 
