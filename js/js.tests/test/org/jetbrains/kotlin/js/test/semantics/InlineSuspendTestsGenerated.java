@@ -379,6 +379,16 @@ public class InlineSuspendTestsGenerated extends AbstractInlineSuspendTests {
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/boxInline/suspend/stateMachine"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS, true);
         }
 
+        @TestMetadata("crossingCoroutineBoundaries.kt")
+        public void testCrossingCoroutineBoundaries_1_2() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/crossingCoroutineBoundaries.kt", "kotlin.coroutines.experimental");
+        }
+
+        @TestMetadata("crossingCoroutineBoundaries.kt")
+        public void testCrossingCoroutineBoundaries_1_3() throws Exception {
+            runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/crossingCoroutineBoundaries.kt", "kotlin.coroutines");
+        }
+
         @TestMetadata("independentInline.kt")
         public void testIndependentInline_1_2() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/stateMachine/independentInline.kt", "kotlin.coroutines.experimental");
