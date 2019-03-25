@@ -89,7 +89,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
 
     protected val invocationParamBuilder = ParametersBuilder.newBuilder()
 
-    protected val expressionMap = linkedMapOf<Int, FunctionalParameter>()
+    protected val expressionMap = linkedMapOf<Int, FunctionalArgument>()
 
     var activeLambda: LambdaInfo? = null
         protected set
@@ -242,7 +242,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
                 extractDefaultLambdaOffsetAndDescriptor(jvmSignature, functionDescriptor)
             )
             for (lambda in defaultLambdas) {
-                invocationParamBuilder.buildParameters().getParameterByDeclarationSlot(lambda.offset).functionalParameter = lambda
+                invocationParamBuilder.buildParameters().getParameterByDeclarationSlot(lambda.offset).functionalArgument = lambda
                 val prev = expressionMap.put(lambda.offset, lambda)
                 assert(prev == null) { "Lambda with offset ${lambda.offset} already exists: $prev" }
             }
@@ -352,7 +352,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
                 info = invocationParamBuilder.addNextValueParameter(jvmType, false, remappedValue, parameterIndex)
                 val descriptor = noinlineableLambdas[stackValue.type]
                 if (descriptor?.isCrossinline == true) { // TODO should we support noinline lambdas?
-                    info.functionalParameter = NonInlineableFunctionalParameter
+                    info.functionalArgument = NonInlineableFunctionalArgument
                 }
             }
 
@@ -409,7 +409,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
     private fun putClosureParametersOnStack() {
         for (next in expressionMap.values) {
             //closure parameters for bounded callable references are generated inplace
-            if (next is LambdaInfo) { // TODO: Should we put closure parameters for all lambdas, not only inline?
+            if (next is LambdaInfo) {
                 if (next is ExpressionLambda && next.isBoundCallableReference) continue
                 putClosureParametersOnStack(next, null)
             }
@@ -785,7 +785,7 @@ class PsiInlineCodegen(
             parameter.isCrossinline, getBoundCallableReferenceReceiver(expression) != null
         ).also { lambda ->
             val closureInfo = invocationParamBuilder.addNextValueParameter(type, true, null, parameter.index)
-            closureInfo.functionalParameter = lambda
+            closureInfo.functionalArgument = lambda
             expressionMap.put(closureInfo.index, lambda)
         }
     }

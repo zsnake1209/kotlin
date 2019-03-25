@@ -26,21 +26,21 @@ import org.jetbrains.org.objectweb.asm.tree.*
 import org.jetbrains.org.objectweb.asm.tree.analysis.Frame
 import org.jetbrains.org.objectweb.asm.tree.analysis.SourceValue
 
-fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
+fun MethodInliner.getFunctionalArgumentIfExistsAndMarkInstructions(
     sourceValue: SourceValue,
     processSwap: Boolean,
     insnList: InsnList,
     frames: Array<Frame<SourceValue>?>,
     toDelete: MutableSet<AbstractInsnNode>
-): FunctionalParameter? {
+): FunctionalArgument? {
     val toDeleteInner = SmartSet.create<AbstractInsnNode>()
 
-    val lambdaSet = SmartSet.create<FunctionalParameter?>()
-    sourceValue.insns.mapTo(lambdaSet) {
+    val functionalArgumentSet = SmartSet.create<FunctionalArgument?>()
+    sourceValue.insns.mapTo(functionalArgumentSet) {
         getLambdaIfExistsAndMarkInstructions(it, processSwap, insnList, frames, toDeleteInner)
     }
 
-    return lambdaSet.singleOrNull()?.also {
+    return functionalArgumentSet.singleOrNull()?.also {
         if (it is LambdaInfo) {
             toDelete.addAll(toDeleteInner)
         }
@@ -55,10 +55,10 @@ private fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
     insnList: InsnList,
     frames: Array<Frame<SourceValue>?>,
     toDelete: MutableSet<AbstractInsnNode>
-): FunctionalParameter? {
+): FunctionalArgument? {
     if (insnNode == null) return null
 
-    getLambdaIfExists(insnNode)?.let {
+    getFunctionalArgumentIfExists(insnNode)?.let {
         //delete lambda aload instruction
         toDelete.add(insnNode)
         return it
@@ -71,7 +71,7 @@ private fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
         if (storeIns is VarInsnNode && storeIns.getOpcode() == Opcodes.ASTORE) {
             val frame = frames[insnList.indexOf(storeIns)] ?: return null
             val topOfStack = frame.top()!!
-            getLambdaIfExistsAndMarkInstructions(topOfStack, processSwap, insnList, frames, toDelete)?.let {
+            getFunctionalArgumentIfExistsAndMarkInstructions(topOfStack, processSwap, insnList, frames, toDelete)?.let {
                 //remove intermediate lambda astore, aload instruction: see 'complexStack/simple.1.kt' test
                 toDelete.add(storeIns)
                 toDelete.add(insnNode)
@@ -81,7 +81,7 @@ private fun MethodInliner.getLambdaIfExistsAndMarkInstructions(
     } else if (processSwap && insnNode.opcode == Opcodes.SWAP) {
         val swapFrame = frames[insnList.indexOf(insnNode)] ?: return null
         val dispatchReceiver = swapFrame.top()!!
-        getLambdaIfExistsAndMarkInstructions(dispatchReceiver, false, insnList, frames, toDelete)?.let {
+        getFunctionalArgumentIfExistsAndMarkInstructions(dispatchReceiver, false, insnList, frames, toDelete)?.let {
             //remove swap instruction (dispatch receiver would be deleted on recursion call): see 'complexStack/simpleExtension.1.kt' test
             toDelete.add(insnNode)
             return it

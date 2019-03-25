@@ -75,7 +75,7 @@ class RegeneratedLambdaFieldRemapper(
 
 
         val result = StackValue.field(
-            if (field.isSkipped && field.functionalParameter is LambdaInfo)
+            if (field.isSkipped && field.functionalArgument is LambdaInfo)
                 Type.getObjectType(parent!!.parent!!.newLambdaInternalName)
             else
                 field.getType(),

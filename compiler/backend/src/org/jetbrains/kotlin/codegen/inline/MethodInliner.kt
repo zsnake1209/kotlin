@@ -217,7 +217,7 @@ class MethodInliner(
                 if (/*INLINE_RUNTIME.equals(owner) &&*/ isInvokeOnLambda(owner, name)) { //TODO add method
                     assert(!currentInvokes.isEmpty())
                     val invokeCall = currentInvokes.remove()
-                    val info = invokeCall.functionalParameter
+                    val info = invokeCall.functionalArgument
 
                     if (info !is LambdaInfo) {
                         //noninlinable lambda
@@ -447,7 +447,7 @@ class MethodInliner(
             override fun visitMethodInsn(opcode: Int, owner: String, name: String, desc: String, itf: Boolean) {
                 if (DEFAULT_LAMBDA_FAKE_CALL == owner) {
                     val index = name.substringAfter(DEFAULT_LAMBDA_FAKE_CALL).toInt()
-                    val lambda = getLambdaIfExists(index) as DefaultLambda
+                    val lambda = getFunctionalArgumentIfExists(index) as DefaultLambda
                     lambda.parameterOffsetsInDefault.zip(lambda.capturedVars).asReversed().forEach { (_, captured) ->
                         val originalBoundReceiverType = lambda.originalBoundReceiverType
                         if (lambda.isBoundCallableReference && AsmUtil.isPrimitive(originalBoundReceiverType)) {
@@ -522,22 +522,23 @@ class MethodInliner(
                         val firstParameterIndex = frame.stackSize - paramCount
                         if (isInvokeOnLambda(owner, name) /*&& methodInsnNode.owner.equals(INLINE_RUNTIME)*/) {
                             val sourceValue = frame.getStack(firstParameterIndex)
-                            val lambdaInfo = getLambdaIfExistsAndMarkInstructions(sourceValue, true, instructions, sources, toDelete)
-                            invokeCalls.add(InvokeCall(lambdaInfo, currentFinallyDeep))
+                            val functionalArgument =
+                                getFunctionalArgumentIfExistsAndMarkInstructions(sourceValue, true, instructions, sources, toDelete)
+                            invokeCalls.add(InvokeCall(functionalArgument, currentFinallyDeep))
                         } else if (isSamWrapperConstructorCall(owner, name)) {
                             recordTransformation(SamWrapperTransformationInfo(owner, inliningContext, isAlreadyRegenerated(owner)))
                         } else if (isAnonymousConstructorCall(owner, name)) {
-                            val lambdaMapping = HashMap<Int, FunctionalParameter>()
+                            val functionalArgumentMapping = HashMap<Int, FunctionalArgument>()
 
                             var offset = 0
                             var capturesAnonymousObjectThatMustBeRegenerated = false
                             for (i in 0 until paramCount) {
                                 val sourceValue = frame.getStack(firstParameterIndex + i)
-                                val lambdaInfo = getLambdaIfExistsAndMarkInstructions(
+                                val functionalArgument = getFunctionalArgumentIfExistsAndMarkInstructions(
                                     sourceValue, false, instructions, sources, toDelete
                                 )
-                                if (lambdaInfo != null) {
-                                    lambdaMapping.put(offset, lambdaInfo)
+                                if (functionalArgument != null) {
+                                    functionalArgumentMapping.put(offset, functionalArgument)
                                 } else if (i < argTypes.size && isAnonymousClassThatMustBeRegenerated(argTypes[i])) {
                                     capturesAnonymousObjectThatMustBeRegenerated = true
                                 }
@@ -547,7 +548,7 @@ class MethodInliner(
 
                             recordTransformation(
                                 buildConstructorInvocation(
-                                    owner, cur.desc, lambdaMapping, awaitClassReification, capturesAnonymousObjectThatMustBeRegenerated
+                                    owner, cur.desc, functionalArgumentMapping, awaitClassReification, capturesAnonymousObjectThatMustBeRegenerated
                                 )
                             )
                             awaitClassReification = false
@@ -595,7 +596,7 @@ class MethodInliner(
                         }
                     }
 
-                    cur.opcode == Opcodes.POP -> getLambdaIfExistsAndMarkInstructions(
+                    cur.opcode == Opcodes.POP -> getFunctionalArgumentIfExistsAndMarkInstructions(
                         frame.top()!!,
                         true,
                         instructions,
@@ -620,7 +621,7 @@ class MethodInliner(
                         ) {
                             val stackTransformations = mutableSetOf<AbstractInsnNode>()
                             val lambdaInfo =
-                                getLambdaIfExistsAndMarkInstructions(frame.peek(1)!!, false, instructions, sources, stackTransformations)
+                                getFunctionalArgumentIfExistsAndMarkInstructions(frame.peek(1)!!, false, instructions, sources, stackTransformations)
                             if (lambdaInfo is LambdaInfo && stackTransformations.all { it is VarInsnNode }) {
                                 assert(lambdaInfo.lambdaClassType.internalName == nodeRemapper.originalLambdaInternalName) {
                                     "Wrong bytecode template for contract template: ${lambdaInfo.lambdaClassType.internalName} != ${nodeRemapper.originalLambdaInternalName}"
@@ -812,7 +813,7 @@ class MethodInliner(
     private fun buildConstructorInvocation(
         anonymousType: String,
         desc: String,
-        lambdaMapping: Map<Int, FunctionalParameter>,
+        lambdaMapping: Map<Int, FunctionalArgument>,
         needReification: Boolean,
         capturesAnonymousObjectThatMustBeRegenerated: Boolean
     ): AnonymousObjectTransformationInfo {
@@ -845,20 +846,20 @@ class MethodInliner(
         return inliningContext.typeRemapper.hasNoAdditionalMapping(owner)
     }
 
-    internal fun getLambdaIfExists(insnNode: AbstractInsnNode): FunctionalParameter? {
+    internal fun getFunctionalArgumentIfExists(insnNode: AbstractInsnNode): FunctionalArgument? {
         return when {
             insnNode.opcode == Opcodes.ALOAD ->
-                getLambdaIfExists((insnNode as VarInsnNode).`var`)
+                getFunctionalArgumentIfExists((insnNode as VarInsnNode).`var`)
             insnNode is FieldInsnNode && insnNode.name.startsWith(CAPTURED_FIELD_FOLD_PREFIX) ->
-                findCapturedField(insnNode, nodeRemapper).functionalParameter
+                findCapturedField(insnNode, nodeRemapper).functionalArgument
             else ->
                 null
         }
     }
 
-    private fun getLambdaIfExists(varIndex: Int): FunctionalParameter? {
+    private fun getFunctionalArgumentIfExists(varIndex: Int): FunctionalArgument? {
         if (varIndex < parameters.argsSizeOnStack) {
-            return parameters.getParameterByDeclarationSlot(varIndex).functionalParameter
+            return parameters.getParameterByDeclarationSlot(varIndex).functionalArgument
         }
         return null
     }

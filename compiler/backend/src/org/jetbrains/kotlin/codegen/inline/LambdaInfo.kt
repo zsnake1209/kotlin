@@ -36,9 +36,9 @@ import org.jetbrains.org.objectweb.asm.tree.FieldInsnNode
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
 import kotlin.properties.Delegates
 
-interface FunctionalParameter
+interface FunctionalArgument
 
-abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : FunctionalParameter, LabelOwner {
+abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : FunctionalArgument, LabelOwner {
 
     abstract val isBoundCallableReference: Boolean
 
@@ -80,7 +80,7 @@ abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : FunctionalPara
     }
 }
 
-object NonInlineableFunctionalParameter : FunctionalParameter
+object NonInlineableFunctionalArgument : FunctionalArgument
 
 class DefaultLambda(
     override val lambdaClassType: Type,
