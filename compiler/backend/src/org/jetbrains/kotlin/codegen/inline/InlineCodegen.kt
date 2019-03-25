@@ -95,8 +95,6 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
     var activeLambda: LambdaInfo? = null
         protected set
 
-    protected val noinlineableLambdas = hashMapOf<Type, ValueParameterDescriptor>()
-
     private val defaultSourceMapper = sourceCompiler.lazySourceMapper
 
     protected var delayedHiddenWriting: Function0<Unit>? = null
@@ -351,8 +349,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
                 info.setRemapValue(remappedValue)
             } else {
                 info = invocationParamBuilder.addNextValueParameter(jvmType, false, remappedValue, parameterIndex)
-                val descriptor = noinlineableLambdas[stackValue.type]
-                if (descriptor?.isCrossinline == true && isCallSiteIsSuspend(descriptor)) {
+                if (kind == ValueKind.NON_INLINEABLE_CALLED_IN_SUSPEND) {
                     info.functionalArgument = NonInlineableFunctionalArgument
                 }
             }
@@ -364,9 +361,6 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
             )
         }
     }
-
-    private fun isCallSiteIsSuspend(descriptor: ValueParameterDescriptor): Boolean =
-        state.bindingContext[CodegenBinding.CALL_SITE_IS_SUSPEND, descriptor] == true
 
     protected fun recordParameterValueInLocalVal(
         delayedWritingToLocals: Boolean,
@@ -775,10 +769,17 @@ class PsiInlineCodegen(
             }
         } else {
             val value = codegen.gen(argumentExpression)
-            noinlineableLambdas[value.type] = valueParameterDescriptor
-            putValueIfNeeded(parameterType, value, ValueKind.GENERAL, parameterIndex)
+            putValueIfNeeded(
+                parameterType,
+                value,
+                if (isCallSiteIsSuspend(valueParameterDescriptor)) ValueKind.NON_INLINEABLE_CALLED_IN_SUSPEND else ValueKind.GENERAL,
+                parameterIndex
+            )
         }
     }
+
+    private fun isCallSiteIsSuspend(descriptor: ValueParameterDescriptor): Boolean =
+        state.bindingContext[CodegenBinding.CALL_SITE_IS_SUSPEND, descriptor] == true
 
     private fun rememberClosure(expression: KtExpression, type: Type, parameter: ValueParameterDescriptor): LambdaInfo {
         val ktLambda = KtPsiUtil.deparenthesize(expression)
