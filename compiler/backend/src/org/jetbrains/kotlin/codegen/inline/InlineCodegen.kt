@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.builtins.BuiltInsPackageFragment
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.AsmUtil.getMethodAsmFlags
 import org.jetbrains.kotlin.codegen.AsmUtil.isPrimitive
+import org.jetbrains.kotlin.codegen.binding.CodegenBinding
 import org.jetbrains.kotlin.codegen.context.ClosureContext
 import org.jetbrains.kotlin.codegen.coroutines.createMethodNodeForCoroutineContext
 import org.jetbrains.kotlin.codegen.coroutines.createMethodNodeForIntercepted
@@ -351,7 +352,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
             } else {
                 info = invocationParamBuilder.addNextValueParameter(jvmType, false, remappedValue, parameterIndex)
                 val descriptor = noinlineableLambdas[stackValue.type]
-                if (descriptor?.isCrossinline == true) { // TODO should we support noinline lambdas?
+                if (descriptor?.isCrossinline == true && isCallSiteIsSuspend(descriptor)) {
                     info.functionalArgument = NonInlineableFunctionalArgument
                 }
             }
@@ -363,6 +364,9 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
             )
         }
     }
+
+    private fun isCallSiteIsSuspend(descriptor: ValueParameterDescriptor): Boolean =
+        state.bindingContext[CodegenBinding.CALL_SITE_IS_SUSPEND, descriptor] == true
 
     protected fun recordParameterValueInLocalVal(
         delayedWritingToLocals: Boolean,
