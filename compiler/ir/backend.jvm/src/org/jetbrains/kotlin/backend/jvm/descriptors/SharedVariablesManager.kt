@@ -168,14 +168,11 @@ class JvmSharedVariablesManager(
         val provider = getProvider(valueType)
         val refType = provider.getRefType(valueType)
         val refConstructor = provider.refConstructor
-        val typeArgumentsCount = refConstructor.parentAsClass.typeParameters.count()
 
-        val refConstructorCall = IrCallImpl(
-            originalDeclaration.startOffset, originalDeclaration.endOffset,
+        val refConstructorCall = IrConstructorCallImpl.fromSymbolDescriptor(
             refType,
-            refConstructor.symbol, refConstructor.descriptor,
-            typeArgumentsCount = typeArgumentsCount,
-            origin = SHARED_VARIABLE_CONSTRUCTOR_CALL_ORIGIN
+            refConstructor.symbol,
+            SHARED_VARIABLE_CONSTRUCTOR_CALL_ORIGIN
         ).apply {
             refConstructor.parentAsClass.typeParameters.mapIndexed { i, param ->
                 putTypeArgument(i, valueType)
