@@ -603,7 +603,9 @@ class MethodInliner(
                         sources,
                         toDelete
                     )?.let {
-                        toDelete.add(cur)
+                        if (it is LambdaInfo) {
+                            toDelete.add(cur)
+                        }
                     }
 
                     cur.opcode == Opcodes.PUTFIELD -> {

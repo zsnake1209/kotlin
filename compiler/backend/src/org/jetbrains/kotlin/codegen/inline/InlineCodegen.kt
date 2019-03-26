@@ -350,7 +350,7 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
             } else {
                 info = invocationParamBuilder.addNextValueParameter(jvmType, false, remappedValue, parameterIndex)
                 if (kind == ValueKind.NON_INLINEABLE_CALLED_IN_SUSPEND) {
-                    info.functionalArgument = NonInlineableFunctionalArgument
+                    info.functionalArgument = CrossinlineLambdaInSuspendContextAsNoInline
                 }
             }
 
