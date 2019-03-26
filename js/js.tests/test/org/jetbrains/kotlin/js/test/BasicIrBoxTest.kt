@@ -17,11 +17,13 @@ import java.io.File
 
 private val fullRuntimeKlibPath = "js/js.translator/testData/out/klibs/runtimeFull/"
 private val defaultRuntimeKlibPath = "js/js.translator/testData/out/klibs/runtimeDefault/"
+private val kotlinTestKlibPath = "js/js.translator/testData/out/klibs/kotlin.test/"
 
 private val JS_IR_RUNTIME_MODULE_NAME = "JS_IR_RUNTIME"
 
 private val fullRuntimeKlib = KlibModuleRef(JS_IR_RUNTIME_MODULE_NAME, fullRuntimeKlibPath)
 private val defaultRuntimeKlib = KlibModuleRef(JS_IR_RUNTIME_MODULE_NAME, defaultRuntimeKlibPath)
+private val kotlinTestKLib = KlibModuleRef("kotlin.test", kotlinTestKlibPath)
 
 abstract class BasicIrBoxTest(
     pathToTestDir: String,
@@ -52,8 +54,8 @@ abstract class BasicIrBoxTest(
     }
 
     private val runtimes = mapOf(
-        JsIrTestRuntime.DEFAULT to defaultRuntimeKlib,
-        JsIrTestRuntime.FULL to fullRuntimeKlib)
+        JsIrTestRuntime.DEFAULT to listOf(defaultRuntimeKlib),
+        JsIrTestRuntime.FULL to listOf(fullRuntimeKlib, kotlinTestKLib))
 
     override fun translateFiles(
         units: List<TranslationUnit>,
@@ -84,17 +86,17 @@ abstract class BasicIrBoxTest(
 //            )
 //        )
 
-        val runtimeKlib = runtimes[runtime]!!
+        val runtimeKlibs = runtimes[runtime]!!
 
         val libraries = config.configuration[JSConfigurationKeys.LIBRARIES]!!.map { File(it).name }
         val transitiveLibraries = config.configuration[JSConfigurationKeys.TRANSITIVE_LIBRARIES]!!.map { File(it).name }
 
         // TODO: Add proper depencencies
-        val dependencies = listOf(runtimeKlib) + libraries.map {
+        val dependencies = runtimeKlibs + libraries.map {
             compilationCache[it] ?: error("Can't find compiled module for dependency $it")
         }
 
-        val allDependencies = listOf(runtimeKlib) + transitiveLibraries.map {
+        val allDependencies = runtimeKlibs + transitiveLibraries.map {
             compilationCache[it] ?: error("Can't find compiled module for dependency $it")
         }
 
