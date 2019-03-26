@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.name.FqName
@@ -21,7 +22,7 @@ object JsAnnotations {
     val jsQualifierFqn = FqName("kotlin.js.JsQualifier")
 }
 
-private fun IrCall.getSingleConstStringArgument() =
+private fun IrConstructorCall.getSingleConstStringArgument() =
     (getValueArgument(0) as IrConst<String>).value
 
 fun IrAnnotationContainer.getJsModule(): String? =
