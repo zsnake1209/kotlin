@@ -434,11 +434,9 @@ class AnonymousObjectTransformer(
                 Type.getObjectType(transformationInfo.oldClassName), fieldName, newFieldName,
                 Type.getType(fieldNode.desc), functionalArgument is LambdaInfo, null
             )
-            if (functionalArgument != null) {
-                info.functionalArgument = functionalArgument
-                if (functionalArgument is LambdaInfo) {
-                    capturedLambdas.add(functionalArgument)
-                }
+            info.functionalArgument = functionalArgument
+            if (functionalArgument is LambdaInfo) {
+                capturedLambdas.add(functionalArgument)
             }
             constructorAdditionalFakeParams.add(info)
             capturedParams.add(varIndex)

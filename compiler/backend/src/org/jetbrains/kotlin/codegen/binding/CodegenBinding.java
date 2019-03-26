@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2017 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
@@ -60,7 +60,7 @@ public class CodegenBinding {
     public static final WritableSlice<FunctionDescriptor, Boolean> CAPTURES_CROSSINLINE_LAMBDA =
             Slices.createSimpleSlice();
 
-    public static final WritableSlice<ValueParameterDescriptor, Boolean> CALL_SITE_IS_SUSPEND =
+    public static final WritableSlice<ValueParameterDescriptor, Boolean> CALL_SITE_IS_SUSPEND_FOR_CROSSINLINE_LAMBDA =
             Slices.createSimpleSlice();
 
     public static final WritableSlice<ClassDescriptor, Boolean> RECURSIVE_SUSPEND_CALLABLE_REFERENCE =

@@ -779,7 +779,7 @@ class PsiInlineCodegen(
     }
 
     private fun isCallSiteIsSuspend(descriptor: ValueParameterDescriptor): Boolean =
-        state.bindingContext[CodegenBinding.CALL_SITE_IS_SUSPEND, descriptor] == true
+        state.bindingContext[CodegenBinding.CALL_SITE_IS_SUSPEND_FOR_CROSSINLINE_LAMBDA, descriptor] == true
 
     private fun rememberClosure(expression: KtExpression, type: Type, parameter: ValueParameterDescriptor): LambdaInfo {
         val ktLambda = KtPsiUtil.deparenthesize(expression)
