@@ -59,5 +59,9 @@ class JsIrLinker(
             ArrayList(unboundTypeParameters).forEach { lazyWrapper.referenceTypeParameter(it.descriptor) }
         }
     }
+
+    val modules get() = deserializersForModules.map {
+        it.key.getCapability(JS_KLIBRARY_CAPABILITY) to  it.value.module
+    }.toMap()
 }
 

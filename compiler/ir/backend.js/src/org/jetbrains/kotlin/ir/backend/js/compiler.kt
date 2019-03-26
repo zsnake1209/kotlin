@@ -144,12 +144,9 @@ fun compile(
 
     val deserializer = JsIrLinker(moduleDescriptor, logggg, irBuiltIns, symbolTable)
 
-    val deserializedModuleFragments = sortedImmediateDependencies.map {
-        val moduleFile = File(it.klibPath, moduleHeaderFileName)
-        deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!
-    }
-
     val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files, deserializer)
+
+    val deserializedModuleFragments = deserializer.modules.values
 
     if (compileMode == CompilationMode.KLIB) {
         deserializedModuleFragments.forEach {

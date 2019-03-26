@@ -331,6 +331,12 @@ abstract class KotlinIrLinker(
         // This is Native specific. Try to eliminate.
         if (topLevelDescriptor.module.isForwardDeclarationModule) return null
 
+        topLevelDescriptor.module.let {
+            if (!deserializersForModules.containsKey(it)) {
+                deserializeIrModuleHeader(it)!!
+            }
+        }
+
         if (topLevelDescriptor !is DeserializedClassDescriptor && topLevelDescriptor !is DeserializedCallableMemberDescriptor) {
             return null
         }
