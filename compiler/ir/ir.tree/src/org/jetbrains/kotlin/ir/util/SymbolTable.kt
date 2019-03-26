@@ -78,10 +78,12 @@ open class SymbolTable : ReferenceSymbolTable {
         abstract fun set(d: D, s: S)
 
         inline fun declare(d: D, createSymbol: () -> S, createOwner: (S) -> B): B {
-            val existing = get(d)
+            @Suppress("UNCHECKED_CAST")
+            val d0 = d.original as D
+            val existing = get(d0)
             val symbol = if (existing == null) {
                 val new = createSymbol()
-                set(d, new)
+                set(d0, new)
                 new
             } else {
                 unboundSymbols.remove(existing)
@@ -91,13 +93,15 @@ open class SymbolTable : ReferenceSymbolTable {
         }
 
         inline fun referenced(d: D, orElse: () -> S): S {
-            val s = get(d)
+            @Suppress("UNCHECKED_CAST")
+            val d0 = d.original as D
+            val s = get(d0)
             if (s == null) {
                 val new = orElse()
                 assert(unboundSymbols.add(new)) {
                     "Symbol for ${new.descriptor} was already referenced"
                 }
-                set(d, new)
+                set(d0, new)
                 return new
             }
             return s
@@ -112,13 +116,6 @@ open class SymbolTable : ReferenceSymbolTable {
 
         override fun set(d: D, s: S) {
             descriptorToSymbol[d] = s
-        }
-
-        fun copyTo(other: FlatSymbolTable<D, B, S>) {
-            for ((d, s) in descriptorToSymbol) {
-                other.descriptorToSymbol[d] = s
-            }
-            other.unboundSymbols.addAll(unboundSymbols)
         }
     }
 
