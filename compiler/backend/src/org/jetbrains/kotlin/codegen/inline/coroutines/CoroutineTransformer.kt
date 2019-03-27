@@ -27,7 +27,6 @@ import org.jetbrains.org.objectweb.asm.tree.TypeInsnNode
 class CoroutineTransformer(
     private val inliningContext: InliningContext,
     private val classBuilder: ClassBuilder,
-    private val sourceFile: String?,
     private val methods: List<MethodNode>,
     private val superClassName: String
 ) {
@@ -107,7 +106,7 @@ class CoroutineTransformer(
                 shouldPreserveClassInitialization = state.constructorCallNormalizationMode.shouldPreserveClassInitialization,
                 containingClassInternalName = classBuilder.thisName,
                 isForNamedFunction = false,
-                sourceFile = sourceFile ?: "",
+                sourceFile = element.containingKtFile.name,
                 isCrossinlineLambda = inliningContext.isContinuation
             )
         }
@@ -136,7 +135,7 @@ class CoroutineTransformer(
                 isForNamedFunction = true,
                 needDispatchReceiver = true,
                 internalNameForDispatchReceiver = classBuilder.thisName,
-                sourceFile = sourceFile ?: ""
+                sourceFile = element.containingKtFile.name
             )
         }
     }
