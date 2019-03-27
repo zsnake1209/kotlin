@@ -74,18 +74,18 @@ class IrLazyProperty(
     override var backingField: IrField? by lazyVar {
         if (descriptor.hasBackingField(bindingContext)) {
             stubGenerator.generateFieldStub(descriptor).apply {
-                correspondingProperty = this@IrLazyProperty
+                correspondingPropertySymbol = this@IrLazyProperty.symbol
             }
         } else null
     }
     override var getter: IrSimpleFunction? by lazyVar {
         descriptor.getter?.let { stubGenerator.generateFunctionStub(it, createPropertyIfNeeded = false) }?.apply {
-            correspondingProperty = this@IrLazyProperty
+            correspondingPropertySymbol = this@IrLazyProperty.symbol
         }
     }
     override var setter: IrSimpleFunction? by lazyVar {
         descriptor.setter?.let { stubGenerator.generateFunctionStub(it, createPropertyIfNeeded = false) }?.apply {
-            correspondingProperty = this@IrLazyProperty
+            correspondingPropertySymbol = this@IrLazyProperty.symbol
         }
     }
 

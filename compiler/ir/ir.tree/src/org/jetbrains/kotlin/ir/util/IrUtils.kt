@@ -60,7 +60,7 @@ fun IrMemberAccessExpression.getArguments(): List<Pair<ParameterDescriptor, IrEx
  */
 fun IrFunctionAccessExpression.getArgumentsWithSymbols(): List<Pair<IrValueParameterSymbol, IrExpression>> {
     val res = mutableListOf<Pair<IrValueParameterSymbol, IrExpression>>()
-    val irFunction = symbol.owner as IrFunction
+    val irFunction = symbol.owner
 
     dispatchReceiver?.let {
         res += (irFunction.dispatchReceiverParameter!!.symbol to it)

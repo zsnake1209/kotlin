@@ -29,11 +29,17 @@ interface IrSimpleFunction :
     val isTailrec: Boolean
     val isSuspend: Boolean
 
-    @Deprecated("Use correspondingPropertySymbol")
-    var correspondingProperty: IrProperty?
-
     var correspondingPropertySymbol: IrPropertySymbol?
 }
 
 val IrFunction.isPropertyAccessor: Boolean
     get() = this is IrSimpleFunction && correspondingPropertySymbol != null
+
+var IrSimpleFunction.correspondingProperty: IrProperty?
+    get() = correspondingPropertySymbol?.owner
+    set(value) {
+        correspondingPropertySymbol = value?.symbol
+    }
+
+val IrFunction.correspondingProperty: IrProperty?
+    get() = if (this is IrSimpleFunction) correspondingPropertySymbol?.owner else null

@@ -22,10 +22,13 @@ interface IrField : IrSymbolDeclaration<IrFieldSymbol>, IrOverridableDeclaration
 
     var initializer: IrExpressionBody?
 
-    @Deprecated("Use correspondingPropertySymbol")
-    var correspondingProperty: IrProperty?
-
     var correspondingPropertySymbol: IrPropertySymbol?
 
     override val metadata: MetadataSource.Property?
 }
+
+var IrField.correspondingProperty: IrProperty?
+    get() = correspondingPropertySymbol?.owner
+    set(value) {
+        correspondingPropertySymbol = value?.symbol
+    }
