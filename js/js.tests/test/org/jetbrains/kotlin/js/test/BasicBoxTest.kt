@@ -90,8 +90,7 @@ abstract class BasicBoxTest(
 
     protected open val incrementalCompilationChecksEnabled = true
 
-    private val _testChecker by lazy { if (runTestInNashorn) NashornJsTestChecker else V8JsTestChecker() }
-    protected open val testChecker get() = _testChecker
+    protected open val testChecker get() = if (runTestInNashorn) NashornJsTestChecker else V8JsTestChecker
 
 
     fun doTest(filePath: String) {
@@ -268,6 +267,7 @@ abstract class BasicBoxTest(
         withModuleSystem: Boolean,
         runtime: JsIrTestRuntime
     ) {
+        threadRunnerState.boxThread = Thread.currentThread()
         testChecker.check(jsFiles, testModuleName, testPackage, testFunction, expectedResult, withModuleSystem)
     }
 

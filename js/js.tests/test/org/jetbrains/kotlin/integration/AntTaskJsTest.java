@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.jetbrains.kotlin.js.test.JsTestCheckerKt.getThreadRunnerState;
+
 public class AntTaskJsTest extends AbstractAntTaskTest {
     private static final String JS_OUT_FILE = "out.js";
     private static final Boolean useHashorn = Boolean.getBoolean(System.getProperty("kotlin.js.useNashorn", "false"));
@@ -39,7 +41,7 @@ public class AntTaskJsTest extends AbstractAntTaskTest {
 
     private AbstractJsTestChecker getTestCheckerInstance() {
         if (testCheckerInstance == null) {
-            testCheckerInstance = useHashorn ? NashornJsTestChecker.INSTANCE : new V8JsTestChecker();
+            testCheckerInstance = useHashorn ? NashornJsTestChecker.INSTANCE : V8JsTestChecker.INSTANCE;
         }
         return testCheckerInstance;
     }
@@ -69,6 +71,8 @@ public class AntTaskJsTest extends AbstractAntTaskTest {
         fileNames.add(JS_OUT_FILE);
 
         List<String> filePaths = CollectionsKt.map(fileNames, s -> getOutputFileByName(s).getAbsolutePath());
+
+        getThreadRunnerState().setAntThread(Thread.currentThread());
 
         getTestCheckerInstance().check(filePaths, "out", "foo", "box", "OK", withModuleSystem);
     }
