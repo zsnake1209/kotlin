@@ -158,6 +158,16 @@ public class InlineSuspendTestsGenerated extends AbstractInlineSuspendTests {
         runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/multipleSuspensionPoints.kt", "kotlin.coroutines");
     }
 
+    @TestMetadata("nonSuspendCrossinline.kt")
+    public void testNonSuspendCrossinline_1_2() throws Exception {
+        runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/nonSuspendCrossinline.kt", "kotlin.coroutines.experimental");
+    }
+
+    @TestMetadata("nonSuspendCrossinline.kt")
+    public void testNonSuspendCrossinline_1_3() throws Exception {
+        runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/nonSuspendCrossinline.kt", "kotlin.coroutines");
+    }
+
     @TestMetadata("returnValue.kt")
     public void testReturnValue_1_2() throws Exception {
         runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/returnValue.kt", "kotlin.coroutines.experimental");
