@@ -90,7 +90,8 @@ abstract class BasicBoxTest(
 
     protected open val incrementalCompilationChecksEnabled = true
 
-    protected open val testChecker get() = if (runTestInNashorn) NashornJsTestChecker else V8JsTestChecker
+    private val _testChecker by lazy { if (runTestInNashorn) NashornJsTestChecker else V8JsTestChecker(ª) }
+    protected open val testChecker get() = _testChecker
 
 
     fun doTest(filePath: String) {

@@ -160,7 +160,7 @@ abstract class AbstractV8JsTestChecker : AbstractJsTestChecker() {
     protected abstract val engine: ScriptEngineV8
 }
 
-object V8JsTestChecker : AbstractV8JsTestChecker() {
+class V8JsTestChecker : AbstractV8JsTestChecker() {
     private lateinit var creatorThread: Thread
     override val engine by lazy {
         creatorThread = Thread.currentThread()
