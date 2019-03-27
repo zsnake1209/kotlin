@@ -161,7 +161,11 @@ abstract class AbstractV8JsTestChecker : AbstractJsTestChecker() {
 }
 
 object V8JsTestChecker : AbstractV8JsTestChecker() {
-    override val engine by lazy { createV8Engine() }
+    private lateinit var creatorThread: Thread
+    override val engine by lazy {
+        creatorThread = Thread.currentThread()
+        createV8Engine()
+    }
 
     private fun createV8Engine(): ScriptEngineV8 {
         val v8 = ScriptEngineV8()
@@ -185,10 +189,18 @@ object V8JsTestChecker : AbstractV8JsTestChecker() {
     }
 
     override fun run(files: List<String>, f: ScriptEngine.() -> Any?): Any? {
-        engine.evalVoid(SETUP_KOTLIN_OUTPUT)
-        return engine.runAndRestoreContext {
-            files.forEach { loadFile(it) }
-            f()
+        try {
+            engine.evalVoid(SETUP_KOTLIN_OUTPUT)
+            return engine.runAndRestoreContext {
+                files.forEach { loadFile(it) }
+                f()
+            }
+        } catch (err: Error) {
+            if (Thread.currentThread() != creatorThread) {
+                throw Error("The thread created V8 Engine is $creatorThread, when it is invoked from ${Thread.currentThread()}", err)
+            } else {
+                throw Error("Threads are same, created V8 Engine is $creatorThread", err)
+            }
         }
     }
 }
