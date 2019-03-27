@@ -161,7 +161,14 @@ abstract class AbstractV8JsTestChecker : AbstractJsTestChecker() {
 }
 
 object V8JsTestChecker : AbstractV8JsTestChecker() {
-    override val engine by lazy { createV8Engine() }
+    override val engine get() = tlsEngine.get()
+
+    private val tlsEngine = object : ThreadLocal<ScriptEngineV8>() {
+        override fun initialValue() = createV8Engine()
+        override fun remove() {
+            get().release()
+        }
+    }
 
     private fun createV8Engine(): ScriptEngineV8 {
         val v8 = ScriptEngineV8()
