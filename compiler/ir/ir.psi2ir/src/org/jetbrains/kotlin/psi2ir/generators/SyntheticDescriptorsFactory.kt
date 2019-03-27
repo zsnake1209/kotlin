@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.ir.descriptors.IrSyntheticPropertyAccessorDescriptor
 import org.jetbrains.kotlin.ir.descriptors.IrSyntheticPropertyAccessorDescriptor.Kind.STATIC_PROPERTY
 import org.jetbrains.kotlin.ir.descriptors.IrSyntheticPropertyGetterDescriptorImpl
 import org.jetbrains.kotlin.ir.descriptors.IrSyntheticPropertySetterDescriptorImpl
-import java.lang.AssertionError
 import java.util.*
 
 

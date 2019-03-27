@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.constants.*
 import org.jetbrains.kotlin.resolve.source.PsiSourceElement
-import org.jetbrains.kotlin.resolve.source.PsiSourceFile
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs

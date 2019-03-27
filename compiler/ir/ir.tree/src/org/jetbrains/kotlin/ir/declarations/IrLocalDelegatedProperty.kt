@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.ir.declarations
 
 import org.jetbrains.kotlin.descriptors.VariableDescriptorWithAccessors
 import org.jetbrains.kotlin.ir.symbols.IrLocalDelegatedPropertySymbol
-import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.IrType
 
 interface IrLocalDelegatedProperty :

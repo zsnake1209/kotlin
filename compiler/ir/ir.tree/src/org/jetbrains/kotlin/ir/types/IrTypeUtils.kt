@@ -5,7 +5,10 @@
 
 package org.jetbrains.kotlin.ir.types
 
-import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.symbols.FqNameEqualityChecker
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
+import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.utils.DFS
 
