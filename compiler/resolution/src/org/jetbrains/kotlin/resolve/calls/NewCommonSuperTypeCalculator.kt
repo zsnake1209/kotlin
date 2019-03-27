@@ -97,7 +97,7 @@ object NewCommonSuperTypeCalculator {
         val uniqueTypes = arrayListOf<SimpleTypeMarker>()
         for (type in types) {
             val isNewUniqueType = uniqueTypes.all {
-                !AbstractTypeChecker.equalTypes(this, it, type) || it.constructor is IntegerLiteralTypeConstructor
+                !AbstractTypeChecker.equalTypes(this, it, type) || it.typeConstructor().isIntegerLiteralTypeConstructor()
             }
             if (isNewUniqueType) {
                 uniqueTypes += type
@@ -135,7 +135,8 @@ object NewCommonSuperTypeCalculator {
         val explicitSupertypes = filterSupertypes(uniqueTypes)
         if (explicitSupertypes.size == 1) return explicitSupertypes.single()
 
-        IntegerLiteralTypeConstructor.findCommonSuperType(explicitSupertypes)?.let { return it }
+        findCommonIntegerLiteralTypesSuperType(explicitSupertypes)?.let { return it }
+//        IntegerLiteralTypeConstructor.findCommonSuperType(explicitSupertypes)?.let { return it }
 
         return findSuperTypeConstructorsAndIntersectResult(explicitSupertypes, depth)
     }

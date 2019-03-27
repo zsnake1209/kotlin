@@ -73,12 +73,16 @@ interface TypeSystemCommonSuperTypesContext : TypeSystemContext, TypeSystemTypeF
 
     fun SimpleTypeMarker.typeDepth(): Int
     fun KotlinTypeMarker.typeDepth(): Int
+
+    fun findCommonIntegerLiteralTypesSuperType(explicitSupertypes: List<SimpleTypeMarker>): SimpleTypeMarker?
 }
 
 interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBuiltInsContext, TypeSystemCommonSuperTypesContext {
     fun KotlinTypeMarker.contains(predicate: (KotlinTypeMarker) -> Boolean): Boolean
 
     fun TypeConstructorMarker.isUnitTypeConstructor(): Boolean
+
+    fun TypeConstructorMarker.getApproximatedIntegerLiteralType(): KotlinTypeMarker
 
 //
 //    fun KotlinTypeMarker.substitute(typeVariable: TypeVariableMarker, value: KotlinTypeMarker): KotlinTypeMarker

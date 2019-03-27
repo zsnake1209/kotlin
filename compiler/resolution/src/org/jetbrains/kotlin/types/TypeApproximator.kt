@@ -344,9 +344,9 @@ abstract class AbstractTypeApproximator(val ctx: TypeSystemInferenceExtensionCon
             return if (conf.typeVariable(typeConstructor)) null else type.defaultResult(toSuper)
         }
 
-        if (typeConstructor is IntegerLiteralTypeConstructor) {
+        if (typeConstructor.isIntegerLiteralTypeConstructor()) {
             return if (conf.integerLiteralType)
-                typeConstructor.getApproximatedType().unwrap().makeNullableAsSpecified(type.isMarkedNullable)
+                typeConstructor.getApproximatedIntegerLiteralType().withNullability(type.isMarkedNullable())
             else
                 null
         }

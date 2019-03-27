@@ -91,7 +91,7 @@ class ResultTypeResolver(
     private fun findSubType(c: Context, variableWithConstraints: VariableWithConstraints): KotlinTypeMarker? {
         val lowerConstraints = variableWithConstraints.constraints.filter { it.kind == ConstraintKind.LOWER && c.isProperType(it.type) }
         if (lowerConstraints.isNotEmpty()) {
-            val commonSuperType = with(NewCommonSuperTypeCalculator) { commonSuperType(lowerConstraints.map { it.type }) }
+            val commonSuperType = with(NewCommonSuperTypeCalculator) { c.commonSuperType(lowerConstraints.map { it.type }) }
             /**
              *
              * fun <T> Array<out T>.intersect(other: Iterable<T>) {

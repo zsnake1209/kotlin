@@ -243,10 +243,10 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
 
     private fun assertInputTypes(subType: KotlinTypeMarker, superType: KotlinTypeMarker) {
         fun correctSubType(subType: SimpleTypeMarker) =
-            subType.isSingleClassifierType() || subType.typeConstructor().isIntersection() || isMyTypeVariable(subType) || subType.isError() || subType.isIntegerLiteralType
+            subType.isSingleClassifierType() || subType.typeConstructor().isIntersection() || isMyTypeVariable(subType) || subType.isError() || subType.isIntegerLiteralType()
 
         fun correctSuperType(superType: SimpleTypeMarker) =
-            superType.isSingleClassifierType() || superType.typeConstructor().isIntersection() || isMyTypeVariable(superType) || superType.isError() || superType.isIntegerLiteralType
+            superType.isSingleClassifierType() || superType.typeConstructor().isIntersection() || isMyTypeVariable(superType) || superType.isError() || superType.isIntegerLiteralType()
 
         assert(subType.bothBounds(::correctSubType)) {
             "Not singleClassifierType and not intersection subType: $subType"

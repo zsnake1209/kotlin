@@ -433,6 +433,15 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     override fun createStubType(typeVariable: TypeVariableMarker): StubTypeMarker {
         TODO("not implemented")
     }
+
+    override fun findCommonIntegerLiteralTypesSuperType(explicitSupertypes: List<SimpleTypeMarker>): SimpleTypeMarker? {
+        return IntegerLiteralTypeConstructor.findCommonSuperType(explicitSupertypes as List<SimpleType>)
+    }
+
+    override fun TypeConstructorMarker.getApproximatedIntegerLiteralType(): KotlinTypeMarker {
+        require(this is IntegerLiteralTypeConstructor, this::errorMessage)
+        return this.getApproximatedType().unwrap()
+    }
 }
 
 private fun hasNoInferInternal(type: UnwrappedType): Boolean {
