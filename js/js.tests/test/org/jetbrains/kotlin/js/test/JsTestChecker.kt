@@ -18,23 +18,6 @@ fun ScriptEngine.overrideAsserter() {
     evalVoid("this['kotlin-test'].kotlin.test.overrideAsserter_wbnzx$(this['kotlin-test'].kotlin.test.DefaultAsserter);")
 }
 
-class ThreadRunnerState {
-    var antThread: Thread? = null
-        get() = field
-        set(value) {
-            if (field == null) field = value
-        }
-
-
-    var boxThread: Thread? = null
-        get() = field
-        set(value) {
-            if (field == null) field = value
-        }
-}
-
-val threadRunnerState = ThreadRunnerState()
-
 fun ScriptEngine.runTestFunction(
     testModuleName: String?,
     testPackageName: String?,
@@ -178,12 +161,13 @@ abstract class AbstractV8JsTestChecker : AbstractJsTestChecker() {
 }
 
 object V8JsTestChecker : AbstractV8JsTestChecker() {
-    private lateinit var creatorThread: Thread
     override val engine get() = tlsEngine.get()
 
     private val tlsEngine = object : ThreadLocal<ScriptEngineV8>() {
         override fun initialValue() = createV8Engine()
-        override fun remove() { get().release() }
+        override fun remove() {
+            get().release()
+        }
     }
 
     private fun createV8Engine(): ScriptEngineV8 {
@@ -208,20 +192,10 @@ object V8JsTestChecker : AbstractV8JsTestChecker() {
     }
 
     override fun run(files: List<String>, f: ScriptEngine.() -> Any?): Any? {
-        try {
-            engine.evalVoid(SETUP_KOTLIN_OUTPUT)
-            return engine.runAndRestoreContext {
-                files.forEach { loadFile(it) }
-                f()
-            }
-        } catch (err: Error) {
-            if (Thread.currentThread() != creatorThread) {
-                throw Error("The thread created V8 Engine is $creatorThread, when it is invoked from ${Thread.currentThread()}, " +
-                                    "AntThread: ${threadRunnerState.antThread}, BoxThread: ${threadRunnerState.boxThread}", err)
-            } else {
-                throw Error("Threads are same, created V8 Engine is $creatorThread," +
-                                    "AntThread: ${threadRunnerState.antThread}, BoxThread: ${threadRunnerState.boxThread}", err)
-            }
+        engine.evalVoid(SETUP_KOTLIN_OUTPUT)
+        return engine.runAndRestoreContext {
+            files.forEach { loadFile(it) }
+            f()
         }
     }
 }

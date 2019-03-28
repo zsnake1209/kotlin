@@ -267,7 +267,6 @@ abstract class BasicBoxTest(
         withModuleSystem: Boolean,
         runtime: JsIrTestRuntime
     ) {
-        threadRunnerState.boxThread = Thread.currentThread()
         testChecker.check(jsFiles, testModuleName, testPackage, testFunction, expectedResult, withModuleSystem)
     }
 

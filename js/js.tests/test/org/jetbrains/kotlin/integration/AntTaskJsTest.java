@@ -20,7 +20,6 @@ import com.intellij.openapi.util.io.FileUtil;
 import kotlin.collections.CollectionsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.js.test.AbstractJsTestChecker;
 import org.jetbrains.kotlin.js.test.NashornJsTestChecker;
 import org.jetbrains.kotlin.js.test.V8JsTestChecker;
 import org.jetbrains.kotlin.test.KotlinTestUtils;
@@ -31,20 +30,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jetbrains.kotlin.js.test.JsTestCheckerKt.getThreadRunnerState;
-
 public class AntTaskJsTest extends AbstractAntTaskTest {
     private static final String JS_OUT_FILE = "out.js";
     private static final Boolean useHashorn = Boolean.getBoolean(System.getProperty("kotlin.js.useNashorn", "false"));
-
-    private AbstractJsTestChecker testCheckerInstance;
-
-    private AbstractJsTestChecker getTestCheckerInstance() {
-        if (testCheckerInstance == null) {
-            testCheckerInstance = useHashorn ? NashornJsTestChecker.INSTANCE : V8JsTestChecker.INSTANCE;
-        }
-        return testCheckerInstance;
-    }
 
     @NotNull
     private String getTestDataDir() {
@@ -72,9 +60,7 @@ public class AntTaskJsTest extends AbstractAntTaskTest {
 
         List<String> filePaths = CollectionsKt.map(fileNames, s -> getOutputFileByName(s).getAbsolutePath());
 
-        getThreadRunnerState().setAntThread(Thread.currentThread());
-
-        getTestCheckerInstance().check(filePaths, "out", "foo", "box", "OK", withModuleSystem);
+        (useHashorn ? NashornJsTestChecker.INSTANCE : V8JsTestChecker.INSTANCE).check(filePaths, "out", "foo", "box", "OK", withModuleSystem);
     }
 
     private void doJsAntTestForPostfixPrefix(@Nullable String prefix, @Nullable String postfix) throws Exception {
