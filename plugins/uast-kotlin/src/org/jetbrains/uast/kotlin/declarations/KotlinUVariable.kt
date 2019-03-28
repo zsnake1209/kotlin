@@ -163,9 +163,7 @@ class KotlinUVariable(
 
     override fun acceptsAnnotationTarget(target: AnnotationUseSiteTarget?): Boolean = true
 
-    override fun getInitializer(): PsiExpression? {
-        return super<AbstractKotlinUVariable>.getInitializer()
-    }
+    override fun getInitializer(): PsiExpression? = javaPsi.initializer
 
     override fun getOriginalElement(): PsiElement? {
         return super<AbstractKotlinUVariable>.getOriginalElement()
