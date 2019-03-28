@@ -14,7 +14,7 @@ internal class KotlinLocalFunctionUVariable(
         val function: KtFunction,
         override val psi: PsiVariable,
         givenParent: UElement?
-) : KotlinAbstractUElement(givenParent), UVariableExPlaceHolder, PsiVariable by psi {
+) : KotlinAbstractUElement(givenParent), UAnchorOwner, UVariableExPlaceHolder, PsiVariable by psi {
 
     override val javaPsi = psi
     override val sourcePsi: PsiElement? = (psi as? UastKotlinPsiVariable?)?.ktElement ?: psi
@@ -23,7 +23,7 @@ internal class KotlinLocalFunctionUVariable(
         createLocalFunctionLambdaExpression(function, this)
     }
     override val typeReference: UTypeReferenceExpression? = null
-    override val uastAnchor: UElement? = null
+    override val uastAnchor: UIdentifier? = null
     override val annotations: List<UAnnotation> = emptyList()
 }
 
