@@ -68,6 +68,8 @@ abstract class AbstractJsTestChecker {
         run(files) { null }
     }
 
+    abstract fun checkStdout(files: List<String>, expectedResult: String)
+
     protected abstract fun run(files: List<String>, f: ScriptEngine.() -> Any?): Any?
 }
 
@@ -108,6 +110,12 @@ abstract class AbstractNashornJsTestChecker : AbstractJsTestChecker() {
         }
     }
 
+    override fun checkStdout(files: List<String>, expectedResult: String) {
+        run(files)
+        val actualResult = engine.eval<String>(GET_KOTLIN_OUTPUT)
+        Assert.assertEquals(expectedResult, actualResult)
+    }
+
     protected abstract val preloadedScripts: List<String>
 
     protected open fun createScriptEngineForTest(): ScriptEngineNashorn {
@@ -134,12 +142,6 @@ object NashornJsTestChecker : AbstractNashornJsTestChecker() {
         BasicBoxTest.DIST_DIR_JS_PATH + "kotlin-test.js"
     )
 
-    fun checkStdout(files: List<String>, expectedResult: String) {
-        run(files)
-        val actualResult = engine.eval<String>(GET_KOTLIN_OUTPUT)
-        Assert.assertEquals(expectedResult, actualResult)
-    }
-
     override fun createScriptEngineForTest(): ScriptEngineNashorn {
         val engine = super.createScriptEngineForTest()
 
@@ -158,6 +160,13 @@ class NashornIrJsTestChecker : AbstractNashornJsTestChecker() {
 
 abstract class AbstractV8JsTestChecker : AbstractJsTestChecker() {
     protected abstract val engine: ScriptEngineV8
+
+    override fun checkStdout(files: List<String>, expectedResult: String) {
+        run(files) {
+            val actualResult = engine.eval<String>(GET_KOTLIN_OUTPUT)
+            Assert.assertEquals(expectedResult, actualResult)
+        }
+    }
 }
 
 object V8JsTestChecker : AbstractV8JsTestChecker() {
@@ -181,14 +190,6 @@ object V8JsTestChecker : AbstractV8JsTestChecker() {
         v8.overrideAsserter()
 
         return v8
-    }
-
-
-    fun checkStdout(files: List<String>, expectedResult: String) {
-        run(files) {
-            val actualResult = engine.eval<String>(GET_KOTLIN_OUTPUT)
-            Assert.assertEquals(expectedResult, actualResult)
-        }
     }
 
     override fun run(files: List<String>, f: ScriptEngine.() -> Any?): Any? {
