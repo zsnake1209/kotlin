@@ -27,7 +27,7 @@ sourceSets {
     "test" { projectDefault() }
 }
 
-val generateIrRuntimeKlib by smartJavaExec {
+val generateIrRuntimeKlib by task<NoDebugJavaExec> {
     val inDirs = arrayOf(fileFrom(rootDir, "core", "builtins", "src"),
                          fileFrom(rootDir, "core", "builtins", "native"),
                          fileFrom(rootDir, "libraries", "stdlib", "common", "src"),
@@ -44,6 +44,8 @@ val generateIrRuntimeKlib by smartJavaExec {
     classpath = sourceSets.test.get().runtimeClasspath
     main = "org.jetbrains.kotlin.ir.backend.js.GenerateIrRuntimeKt"
     workingDir = rootDir
+
+    makeSmart()
 }
 
 testsJar {}
