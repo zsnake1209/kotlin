@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.types.model.CaptureStatus
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
-import org.jetbrains.kotlin.types.typeUtil.canHaveUndefinedNullability
 import org.jetbrains.kotlin.types.typeUtil.contains
 
 interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
@@ -137,7 +136,6 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         require(this is TypeProjection, this::errorMessage)
         return this.projectionKind.convertVariance()
     }
-
 
 
     private fun TypeVariance.convertVariance(): Variance {
@@ -285,6 +283,7 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     }
 
     override fun Collection<KotlinTypeMarker>.singleBestRepresentative(): KotlinTypeMarker? {
+        @Suppress("UNCHECKED_CAST")
         return singleBestRepresentative(this as Collection<KotlinType>)
     }
 
@@ -354,7 +353,7 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     }
 
     override fun TypeVariableMarker.freshTypeConstructor(): TypeConstructorMarker {
-        throw UnsupportedOperationException("!")
+        errorSupportedOnlyInTypeInference()
     }
 
     override fun CapturedTypeMarker.typeConstructorProjection(): TypeArgumentMarker {
@@ -372,18 +371,18 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         arguments: List<TypeArgumentMarker>,
         nullable: Boolean
     ): SimpleTypeMarker {
-        require(constructor is TypeConstructor, this::errorMessage)
+        require(constructor is TypeConstructor, constructor::errorMessage)
         @Suppress("UNCHECKED_CAST")
         return KotlinTypeFactory.simpleType(Annotations.EMPTY, constructor, arguments as List<TypeProjection>, nullable)
     }
 
     override fun createTypeArgument(type: KotlinTypeMarker, variance: TypeVariance): TypeArgumentMarker {
-        require(type is KotlinType, this::errorMessage)
+        require(type is KotlinType, type::errorMessage)
         return TypeProjectionImpl(variance.convertVariance(), type)
     }
 
     override fun createStarProjection(typeParameter: TypeParameterMarker): TypeArgumentMarker {
-        require(typeParameter is TypeParameterDescriptor, this::errorMessage)
+        require(typeParameter is TypeParameterDescriptor, typeParameter::errorMessage)
         return StarProjectionImpl(typeParameter)
     }
 
@@ -400,7 +399,7 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     }
 
     override fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
-        require(type is UnwrappedType, this::errorMessage)
+        require(type is UnwrappedType, type::errorMessage)
         return NewKotlinTypeChecker.transformToNewType(type)
     }
 
@@ -415,23 +414,23 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
         lowerType: KotlinTypeMarker?,
         captureStatus: CaptureStatus
     ): CapturedTypeMarker {
-        error("supported only in type inference context")
+        errorSupportedOnlyInTypeInference()
     }
 
     override fun typeSubstitutorByTypeConstructor(map: Map<TypeConstructorMarker, KotlinTypeMarker>): TypeSubstitutorMarker {
-        error("supported only in type inference context")
+        errorSupportedOnlyInTypeInference()
     }
 
     override fun TypeSubstitutorMarker.safeSubstitute(type: KotlinTypeMarker): KotlinTypeMarker {
-        error("supported only in type inference context")
+        errorSupportedOnlyInTypeInference()
     }
 
     override fun TypeVariableMarker.defaultType(): SimpleTypeMarker {
-        error("supported only in type inference context")
+        errorSupportedOnlyInTypeInference()
     }
 
     override fun createStubType(typeVariable: TypeVariableMarker): StubTypeMarker {
-        error("supported only in type inference context")
+        errorSupportedOnlyInTypeInference()
     }
 
     override fun findCommonIntegerLiteralTypesSuperType(explicitSupertypes: List<SimpleTypeMarker>): SimpleTypeMarker? {
@@ -488,6 +487,10 @@ internal fun SimpleType.typeDepthInternal(): Int {
 @Suppress("NOTHING_TO_INLINE")
 private inline fun Any.errorMessage(): String {
     return "ClassicTypeSystemContext couldn't handle: $this, ${this::class}"
+}
+
+private fun errorSupportedOnlyInTypeInference(): Nothing {
+    error("supported only in type inference context")
 }
 
 fun Variance.convertVariance(): TypeVariance {

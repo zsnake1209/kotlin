@@ -22,61 +22,6 @@ import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : TypeSystemInferenceExtensionContextDelegate,
-    ClassicTypeSystemContext,
-    BuiltInsProvider {
-    override fun TypeVariableMarker.defaultType(): SimpleTypeMarker {
-        require(this is NewTypeVariable)
-        return this.defaultType
-    }
-
-    override fun TypeVariableMarker.freshTypeConstructor(): TypeConstructorMarker {
-        require(this is NewTypeVariable)
-        return this.freshTypeConstructor
-    }
-
-    override fun createCapturedType(
-        constructorProjection: TypeArgumentMarker,
-        constructorSupertypes: List<KotlinTypeMarker>,
-        lowerType: KotlinTypeMarker?,
-        captureStatus: CaptureStatus
-    ): CapturedTypeMarker {
-        require(lowerType is UnwrappedType?)
-        require(constructorProjection is TypeProjectionImpl)
-
-        val newCapturedTypeConstructor = NewCapturedTypeConstructor(
-            constructorProjection,
-            constructorSupertypes as List<UnwrappedType>
-        )
-        return NewCapturedType(
-            CaptureStatus.FOR_INCORPORATION,
-            newCapturedTypeConstructor,
-            lowerType = lowerType
-        )
-    }
-
-    override fun typeSubstitutorByTypeConstructor(map: Map<TypeConstructorMarker, KotlinTypeMarker>): TypeSubstitutorMarker {
-        return NewTypeSubstitutorByConstructorMap(map.cast())
-    }
-
-    override fun TypeSubstitutorMarker.safeSubstitute(type: KotlinTypeMarker): KotlinTypeMarker {
-        require(type is UnwrappedType)
-        require(this is NewTypeSubstitutor)
-        return this.safeSubstitute(type)
-    }
-
-    override fun createStubType(typeVariable: TypeVariableMarker): StubTypeMarker {
-        return StubType(typeVariable.freshTypeConstructor() as TypeConstructor, typeVariable.defaultType().isMarkedNullable())
-    }
-}
-
-fun NewConstraintSystemImpl(
-    constraintInjector: ConstraintInjector,
-    builtIns: KotlinBuiltIns
-): NewConstraintSystemImpl {
-    return NewConstraintSystemImpl(constraintInjector, ClassicTypeSystemContextForCS(builtIns))
-}
-
 class NewConstraintSystemImpl(
     private val constraintInjector: ConstraintInjector,
     val typeSystemContext: TypeSystemInferenceExtensionContext//,

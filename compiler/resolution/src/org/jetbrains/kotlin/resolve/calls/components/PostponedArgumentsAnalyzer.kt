@@ -10,8 +10,6 @@ import org.jetbrains.kotlin.resolve.calls.inference.addSubsystemFromArgument
 import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstitutor
 import org.jetbrains.kotlin.resolve.calls.inference.model.*
 import org.jetbrains.kotlin.resolve.calls.model.*
-import org.jetbrains.kotlin.types.StubType
-import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.types.typeUtil.builtIns
@@ -89,7 +87,7 @@ class PostponedArgumentsAnalyzer(
             receiver,
             parameters,
             expectedTypeForReturnArguments,
-            stubsForPostponedVariables.cast() // TODO: SUB
+            stubsForPostponedVariables.cast()
         )
 
         returnArguments.forEach { c.addSubsystemFromArgument(it) }

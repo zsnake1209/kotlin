@@ -174,14 +174,6 @@ private fun preprocessCollectionLiteralArgument(
     return ResolvedCollectionLiteralAtom(collectionLiteralArgument, expectedType)
 }
 
-
-interface BuiltInsProvider {
-    val builtIns: KotlinBuiltIns
-}
-
-internal val ConstraintSystemBuilder.builtIns: KotlinBuiltIns get() = ((this as NewConstraintSystemImpl).typeSystemContext as BuiltInsProvider).builtIns
-internal val NewConstraintSystem.builtIns: KotlinBuiltIns get() = ((this as NewConstraintSystemImpl).typeSystemContext as BuiltInsProvider).builtIns
-
 internal inline fun <reified T : Any> Any.requireIs(): T {
     require(this is T)
     return this

@@ -32,9 +32,11 @@ class ConstraintIncorporator(
     }
 
     // \alpha is typeVariable, \beta -- other type variable registered in ConstraintStorage
-    fun incorporate(c: Context, typeVariable: TypeVariableMarker, constraint: Constraint) = with(c) {
+    fun incorporate(c: Context, typeVariable: TypeVariableMarker, constraint: Constraint) {
         // we shouldn't incorporate recursive constraint -- It is too dangerous
-        if (constraint.type.contains { it.typeConstructor() == typeVariable.freshTypeConstructor() }) return
+        with(c) {
+            if (constraint.type.contains { it.typeConstructor() == typeVariable.freshTypeConstructor() }) return
+        }
 
         c.directWithVariable(typeVariable, constraint)
         c.otherInsideMyConstraint(typeVariable, constraint)

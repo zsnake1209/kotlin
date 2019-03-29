@@ -86,11 +86,6 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
 
     fun TypeConstructorMarker.getApproximatedIntegerLiteralType(): KotlinTypeMarker
 
-//
-//    fun KotlinTypeMarker.substitute(typeVariable: TypeVariableMarker, value: KotlinTypeMarker): KotlinTypeMarker
-//
-//    fun approximateCapturedTypes(type: KotlinTypeMarker, toSuper: Boolean): KotlinTypeMarker
-
     fun Collection<KotlinTypeMarker>.singleBestRepresentative(): KotlinTypeMarker?
 
     fun KotlinTypeMarker.isUnit(): Boolean
