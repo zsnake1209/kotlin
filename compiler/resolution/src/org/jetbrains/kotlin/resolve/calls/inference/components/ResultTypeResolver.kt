@@ -50,8 +50,8 @@ class ResultTypeResolver(
     fun findResultTypeOrNull(c: Context, variableWithConstraints: VariableWithConstraints, direction: ResolveDirection): KotlinTypeMarker? {
         findResultIfThereIsEqualsConstraint(c, variableWithConstraints)?.let { return it }
 
-        val subType = findSubType(c, variableWithConstraints)
-        val superType = findSuperType(c, variableWithConstraints)
+        val subType = c.findSubType(variableWithConstraints)
+        val superType = c.findSuperType(variableWithConstraints)
         val result = if (direction == ResolveDirection.TO_SUBTYPE || direction == ResolveDirection.UNKNOWN) {
             c.resultType(subType, superType, variableWithConstraints)
         } else {
@@ -88,10 +88,10 @@ class ResultTypeResolver(
         return true
     }
 
-    private fun findSubType(c: Context, variableWithConstraints: VariableWithConstraints): KotlinTypeMarker? {
-        val lowerConstraints = variableWithConstraints.constraints.filter { it.kind == ConstraintKind.LOWER && c.isProperType(it.type) }
+    private fun Context.findSubType(variableWithConstraints: VariableWithConstraints): KotlinTypeMarker? {
+        val lowerConstraints = variableWithConstraints.constraints.filter { it.kind == ConstraintKind.LOWER && isProperType(it.type) }
         if (lowerConstraints.isNotEmpty()) {
-            val commonSuperType = with(NewCommonSuperTypeCalculator) { c.commonSuperType(lowerConstraints.map { it.type }) }
+            val commonSuperType = with(NewCommonSuperTypeCalculator) { commonSuperType(lowerConstraints.map { it.type }) }
             /**
              *
              * fun <T> Array<out T>.intersect(other: Iterable<T>) {
@@ -119,8 +119,8 @@ class ResultTypeResolver(
         return null
     }
 
-    private fun findSuperType(c: Context, variableWithConstraints: VariableWithConstraints): KotlinTypeMarker? = with(c) {
-        val upperConstraints = variableWithConstraints.constraints.filter { it.kind == ConstraintKind.UPPER && c.isProperType(it.type) }
+    private fun Context.findSuperType(variableWithConstraints: VariableWithConstraints): KotlinTypeMarker? {
+        val upperConstraints = variableWithConstraints.constraints.filter { it.kind == ConstraintKind.UPPER && this@findSuperType.isProperType(it.type) }
         if (upperConstraints.isNotEmpty()) {
             val upperType = intersectTypes(upperConstraints.map { it.type })
 
