@@ -9,15 +9,16 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.Constraint
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintKind
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
+import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContextDelegate
 
-class TrivialConstraintTypeInferenceOracle {
+class TrivialConstraintTypeInferenceOracle(context: TypeSystemInferenceExtensionContextDelegate) :
+    TypeSystemInferenceExtensionContext by context {
     // The idea is to add knowledge that constraint `Nothing(?) <: T` is quite useless and
     // it's totally fine to go and resolve postponed argument without fixation T to Nothing(?).
     // In other words, constraint `Nothing(?) <: T` is *not* proper
     fun isTrivialConstraint(
-        context: TypeSystemInferenceExtensionContext,
         constraint: Constraint
-    ): Boolean = with(context) {
+    ): Boolean {
         // TODO: probably we also can take into account `T <: Any(?)` constraints
         return constraint.kind == ConstraintKind.LOWER && constraint.type.typeConstructor().isNothingConstructor()
     }
@@ -26,9 +27,8 @@ class TrivialConstraintTypeInferenceOracle {
     // Even that Nothing(?) is the most specific type for subtype, it doesn't bring valuable information to the user,
     // therefore it is discriminated in favor of supertype
     fun isSuitableResultedType(
-        context: TypeSystemInferenceExtensionContext,
         resultType: KotlinTypeMarker
-    ): Boolean = with(context) {
+    ): Boolean {
         return !resultType.typeConstructor().isNothingConstructor()
     }
 
@@ -38,29 +38,27 @@ class TrivialConstraintTypeInferenceOracle {
     // but can change result of the constraint system.
     // Therefore, here we avoid adding such trivial constraints to have stable constraint system
     fun isGeneratedConstraintTrivial(
-        context: TypeSystemInferenceExtensionContext,
         otherConstraint: Constraint,
         generatedConstraintType: KotlinTypeMarker
-    ): Boolean = with(context) {
+    ): Boolean {
         if (generatedConstraintType.isNothing()) return true
 
         // If type that will be used to generate new constraint already contains `Nothing(?)`,
         // then we can't decide that resulting constraint will be useless
-        if (otherConstraint.type.contains { it.isNothingOrNullableNothing(context) }) return false
+        if (otherConstraint.type.contains { it.isNothingOrNullableNothing() }) return false
 
         // It's important to preserve constraints with nullable Nothing: `Nothing? <: T` (see implicitNothingConstraintFromReturn.kt test)
-        if (generatedConstraintType.containsOnlyNonNullableNothing(context)) return true
+        if (generatedConstraintType.containsOnlyNonNullableNothing()) return true
 
         return false
     }
 
 
-    private fun KotlinTypeMarker.isNothingOrNullableNothing(context: TypeSystemInferenceExtensionContext): Boolean =
-        with(context) {
-            typeConstructor().isNothingConstructor()
-        }
+    private fun KotlinTypeMarker.isNothingOrNullableNothing(): Boolean =
+        typeConstructor().isNothingConstructor()
 
-    private fun KotlinTypeMarker.containsOnlyNonNullableNothing(context: TypeSystemInferenceExtensionContext): Boolean =
-        with(context) { contains { it.isNothing() } && !contains { it.isNullableNothing() } }
+
+    private fun KotlinTypeMarker.containsOnlyNonNullableNothing(): Boolean =
+        contains { it.isNothing() } && !contains { it.isNullableNothing() }
 
 }

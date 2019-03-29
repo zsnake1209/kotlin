@@ -22,7 +22,8 @@ import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : TypeSystemInferenceExtensionContext, ClassicTypeSystemContext,
+class ClassicTypeSystemContextForCS(override val builtIns: KotlinBuiltIns) : TypeSystemInferenceExtensionContextDelegate,
+    ClassicTypeSystemContext,
     BuiltInsProvider {
     override fun TypeVariableMarker.defaultType(): SimpleTypeMarker {
         require(this is NewTypeVariable)
