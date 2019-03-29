@@ -10,11 +10,11 @@ import org.gradle.kotlin.dsl.task
 
 fun Project.smartJavaExec(configure: JavaExec.() -> Unit) = task<JavaExec> {
     configure()
-    makeSmart()
+    passClasspathInJar()
 }
 
-// TODO better name
-fun JavaExec.makeSmart() {
+// Moves the classpath into a jar metadata, to shorten the command line length and to avoid hitting the limit on Windows
+fun JavaExec.passClasspathInJar() {
     val jarTask = project.task("${name}WriteClassPath", Jar::class) {
         val classpath = classpath
         val main = main
@@ -32,7 +32,7 @@ fun JavaExec.makeSmart() {
                 )
             }
         }
-        archiveName = "$main.${this@makeSmart.name}.classpath.container.$extension"
+        archiveName = "$main.${this@passClasspathInJar.name}.classpath.container.$extension"
         destinationDir = temporaryDir
     }
 

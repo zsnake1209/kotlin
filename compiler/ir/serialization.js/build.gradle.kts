@@ -45,7 +45,7 @@ val generateIrRuntimeKlib by task<NoDebugJavaExec> {
     main = "org.jetbrains.kotlin.ir.backend.js.GenerateIrRuntimeKt"
     workingDir = rootDir
 
-    makeSmart()
+    passClasspathInJar()
 }
 
 testsJar {}
