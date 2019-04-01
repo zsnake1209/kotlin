@@ -53,10 +53,8 @@ data class KlibModuleRef(
 internal val JS_KLIBRARY_CAPABILITY = ModuleDescriptor.Capability<File>("JS KLIBRARY")
 internal val moduleHeaderFileName = "module.kji"
 internal val declarationsDirName = "ir/"
-private val logggg = object : LoggingContext {
-    override var inVerbosePhase: Boolean
-        get() = TODO("not implemented")
-        set(_) {}
+private val emptyLoggingContext = object : LoggingContext {
+    override var inVerbosePhase = false
 
     override fun log(message: () -> String) {}
 }
@@ -116,18 +114,16 @@ fun loadIr(
 
     val analysisResult = depsDescriptors.runAnalysis()
 
-    val moduleDescriptor = analysisResult.moduleDescriptor
-
-    val symbolTable = SymbolTable()
-
     val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
-    val psi2IrContext = psi2IrTranslator.createGeneratorContext(moduleDescriptor, analysisResult.bindingContext, symbolTable)
-    val irBuiltIns = psi2IrContext.irBuiltIns
+    val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext)
 
-    val deserializer = JsIrLinker(moduleDescriptor, logggg, irBuiltIns, symbolTable)
+    val irBuiltIns = psi2IrContext.irBuiltIns
+    val symbolTable = psi2IrContext.symbolTable
+    val moduleDescriptor = psi2IrContext.moduleDescriptor
+
+    val deserializer = JsIrLinker(moduleDescriptor, emptyLoggingContext, irBuiltIns, symbolTable)
 
     val deserializedModuleFragments = depsDescriptors.sortedImmediateDependencies.map {
-        val moduleFile = File(it.klibPath, moduleHeaderFileName)
         deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!
     }
 
@@ -157,8 +153,12 @@ private fun loadKlibMetadata(
 ): ModuleDescriptorImpl {
     assert(isBuiltIn == (builtinsModule === null))
     val builtIns = builtinsModule?.builtIns ?: object : KotlinBuiltIns(storageManager) {}
-    val md = ModuleDescriptorImpl(Name.special("<${moduleId.moduleName}>"), storageManager, builtIns,
-                                  capabilities = mapOf(JS_KLIBRARY_CAPABILITY to File(moduleId.klibPath)))
+    val md = ModuleDescriptorImpl(
+        Name.special("<${moduleId.moduleName}>"),
+        storageManager,
+        builtIns,
+        capabilities = mapOf(JS_KLIBRARY_CAPABILITY to File(moduleId.klibPath))
+    )
     if (isBuiltIn) builtIns.builtInsModule = md
     val currentModuleFragmentProvider = createJsKlibMetadataPackageFragmentProvider(
         storageManager, md, parts.header, parts.body, metadataVersion,
@@ -265,7 +265,7 @@ fun serializeModuleIntoKlib(
 ) {
     val declarationTable = JsDeclarationTable(moduleFragment.irBuiltins, DescriptorTable())
 
-    val serializedIr = JsIrModuleSerializer(logggg, declarationTable).serializedIrModule(moduleFragment)
+    val serializedIr = JsIrModuleSerializer(emptyLoggingContext, declarationTable).serializedIrModule(moduleFragment)
     val serializer = JsKlibMetadataSerializationUtil
 
     val moduleDescription =
