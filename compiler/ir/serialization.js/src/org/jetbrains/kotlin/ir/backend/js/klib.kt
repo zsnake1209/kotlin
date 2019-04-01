@@ -35,7 +35,10 @@ import org.jetbrains.kotlin.js.analyzer.JsAnalysisResult
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.CompilerDeserializationConfiguration
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
@@ -74,12 +77,9 @@ fun generateKLib(
 ): KlibModuleRef {
     val depsDescriptors = ModulesStructure(project, files, configuration, immediateDependencies, allDependencies)
 
-    val analysisResult = depsDescriptors.runAnalysis()
+    val psi2IrContext = runAnalysisAndPreparePsi2Ir(depsDescriptors)
 
-    val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
-    val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext)
-
-    val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files)
+    val moduleFragment = psi2IrContext.generateModuleFragment(files)
 
     val moduleName = configuration[CommonConfigurationKeys.MODULE_NAME]!!
     serializeModuleIntoKlib(
@@ -112,10 +112,7 @@ fun loadIr(
 ): IrModuleInfo {
     val depsDescriptors = ModulesStructure(project, files, configuration, immediateDependencies, allDependencies)
 
-    val analysisResult = depsDescriptors.runAnalysis()
-
-    val psi2IrTranslator = Psi2IrTranslator(configuration.languageVersionSettings)
-    val psi2IrContext = psi2IrTranslator.createGeneratorContext(analysisResult.moduleDescriptor, analysisResult.bindingContext)
+    val psi2IrContext = runAnalysisAndPreparePsi2Ir(depsDescriptors)
 
     val irBuiltIns = psi2IrContext.irBuiltIns
     val symbolTable = psi2IrContext.symbolTable
@@ -127,10 +124,27 @@ fun loadIr(
         deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!
     }
 
-    val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files, deserializer)
+    val moduleFragment = psi2IrContext.generateModuleFragment(files, deserializer)
 
     return IrModuleInfo(moduleFragment, deserializedModuleFragments, irBuiltIns, symbolTable, deserializer)
 }
+
+private fun runAnalysisAndPreparePsi2Ir(depsDescriptors: ModulesStructure): GeneratorContext {
+    val analysisResult = depsDescriptors.runAnalysis()
+
+    return GeneratorContext(
+        Psi2IrConfiguration(),
+        analysisResult.moduleDescriptor,
+        analysisResult.bindingContext,
+        depsDescriptors.compilerConfiguration.languageVersionSettings,
+        SymbolTable(),
+        GeneratorExtensions()
+    )
+}
+
+private fun GeneratorContext.generateModuleFragment(files: List<KtFile>, deserializer: JsIrLinker? = null) =
+    Psi2IrTranslator(languageVersionSettings, configuration).generateModuleFragment(this, files, deserializer)
+
 
 private fun loadKlibMetadataParts(
     moduleId: KlibModuleRef
@@ -178,10 +192,10 @@ private fun loadKlibMetadata(
 }
 
 
-class ModulesStructure(
+private class ModulesStructure(
     private val project: Project,
     private val files: List<KtFile>,
-    private val compilerConfiguration: CompilerConfiguration,
+    val compilerConfiguration: CompilerConfiguration,
     immediateDependencies: List<KlibModuleRef>,
     private val allDependencies: List<KlibModuleRef>
 ) {
