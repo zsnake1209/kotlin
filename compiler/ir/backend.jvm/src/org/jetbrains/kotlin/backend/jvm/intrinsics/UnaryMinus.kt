@@ -23,7 +23,7 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 
-class UnaryMinus : IntrinsicMethod() {
+object UnaryMinus : IntrinsicMethod() {
     /*TODO return type*/
     override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         return IrIntrinsicFunction.create(expression, signature, context) {

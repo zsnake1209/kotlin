@@ -28,17 +28,17 @@ import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 import java.lang.UnsupportedOperationException
 
-class CompareTo : IntrinsicMethod() {
+object CompareTo : IntrinsicMethod() {
     private fun genInvoke(type: Type?, v: InstructionAdapter) {
         when (type) {
             Type.CHAR_TYPE, Type.BYTE_TYPE, Type.SHORT_TYPE, Type.INT_TYPE ->
                 v.invokestatic(
-                    IntrinsicMethods.INTRINSICS_CLASS_NAME,
+                    IrIntrinsicMethods.INTRINSICS_CLASS_NAME,
                     "compare",
                     "(II)I",
                     false
                 )
-            Type.LONG_TYPE -> v.invokestatic(IntrinsicMethods.INTRINSICS_CLASS_NAME, "compare", "(JJ)I", false)
+            Type.LONG_TYPE -> v.invokestatic(IrIntrinsicMethods.INTRINSICS_CLASS_NAME, "compare", "(JJ)I", false)
             Type.FLOAT_TYPE -> v.invokestatic("java/lang/Float", "compare", "(FF)I", false)
             Type.DOUBLE_TYPE -> v.invokestatic("java/lang/Double", "compare", "(DD)I", false)
             else -> throw UnsupportedOperationException()

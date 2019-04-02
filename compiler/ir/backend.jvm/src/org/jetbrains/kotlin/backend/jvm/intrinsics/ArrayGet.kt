@@ -23,7 +23,7 @@ import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.Type
 
-class ArrayGet : IntrinsicMethod() {
+object ArrayGet : IntrinsicMethod() {
     override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         val arrayType = calcReceiverType(expression, context)
         val elementType = AsmUtil.correctElementType(arrayType)

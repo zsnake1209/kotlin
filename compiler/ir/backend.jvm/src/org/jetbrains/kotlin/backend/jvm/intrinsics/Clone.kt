@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.Opcodes
 
-class Clone : IntrinsicMethod() {
+object Clone : IntrinsicMethod() {
 
     override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         return IrIntrinsicFunction.create(expression, signature.newReturnType(AsmTypes.OBJECT_TYPE), context) {

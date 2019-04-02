@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 
-class ToString : IntrinsicMethod() {
+object ToString : IntrinsicMethod() {
     override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         val type = AsmUtil.stringValueOfType(calcReceiverType(expression, context))
         return IrIntrinsicFunction.create(expression, signature, context, type) {

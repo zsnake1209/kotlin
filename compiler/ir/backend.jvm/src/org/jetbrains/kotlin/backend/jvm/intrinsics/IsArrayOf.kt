@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.kotlin.types.Variance
 
-class IsArrayOf : IntrinsicMethod() {
+object IsArrayOf : IntrinsicMethod() {
     override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         val typeMapper = context.state.typeMapper
 

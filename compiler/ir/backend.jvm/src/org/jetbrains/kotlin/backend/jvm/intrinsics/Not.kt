@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.Type
 
-class Not : IntrinsicMethod() {
+object Not : IntrinsicMethod() {
     override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         return IrIntrinsicFunction.create(expression, signature, context) {
             StackValue.not(StackValue.onStack(Type.BOOLEAN_TYPE)).put(it)

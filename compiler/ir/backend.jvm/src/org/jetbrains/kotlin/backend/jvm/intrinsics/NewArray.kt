@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 
-class NewArray : IntrinsicMethod() {
+object NewArray : IntrinsicMethod() {
 
     override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         val ktType = expression.type
