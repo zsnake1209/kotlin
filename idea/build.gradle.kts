@@ -3,6 +3,11 @@ plugins {
     id("jps-compatible")
 }
 
+tasks.withType<Test> {
+    maxParallelForks = Math.max(Runtime.getRuntime().availableProcessors() / 2, 1)
+}
+
+
 repositories {
     maven("https://jetbrains.bintray.com/markdown")
 }
