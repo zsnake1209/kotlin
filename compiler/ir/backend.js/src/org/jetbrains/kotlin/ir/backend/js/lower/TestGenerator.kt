@@ -8,7 +8,8 @@ package org.jetbrains.kotlin.ir.backend.js.lower
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.ir.isExpect
 import org.jetbrains.kotlin.backend.common.serialization.fqNameSafe
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
 import org.jetbrains.kotlin.ir.declarations.*
@@ -17,7 +18,6 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.getPackageFragment
 import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
 import org.jetbrains.kotlin.name.FqName
 
@@ -26,7 +26,7 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
     override fun lower(irFile: IrFile) {
         irFile.declarations.forEach {
             if (it is IrClass) {
-                generateTestCalls(it) { suiteForPackage(it.getPackageFragment()?.fqName ?: FqName.ROOT) }
+                generateTestCalls(it) { suiteForPackage(irFile.fqName) }
             }
 
             // TODO top-level functions
@@ -83,9 +83,7 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
                     generateTestCalls(it) { suiteFunBody }
 
                 it is IrSimpleFunction && it.isTest ->
-                    generateCodeForTestMethod(it, beforeFunctions, afterFunctions, irClass) { suiteFunBody }
-
-                else -> emptyList()
+                    generateCodeForTestMethod(it, beforeFunctions, afterFunctions, irClass, suiteFunBody)
             }
         }
     }
@@ -95,9 +93,9 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
         beforeFuns: List<IrSimpleFunction>,
         afterFuns: List<IrSimpleFunction>,
         irClass: IrClass,
-        parentBody: () -> IrBlockBody
+        parentBody: IrBlockBody
     ) {
-        context.testFun!!.createInvocation(testFun.name.asString(), parentBody(), testFun.isIgnored) { fn, body ->
+        context.testFun!!.createInvocation(testFun.name.asString(), parentBody, testFun.isIgnored) { fn, body ->
             val classVal = JsIrBuilder.buildVar(irClass.defaultType, fn, initializer = irClass.instance())
 
             body.statements += classVal
@@ -148,18 +146,17 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
     }
 
     private val IrAnnotationContainer.isTest
-        get() = annotationFinder("Test", "kotlin.test")
+        get() = hasAnnotation("kotlin.test.Test")
 
     private val IrAnnotationContainer.isIgnored
-        get() = annotationFinder("Ignore", "kotlin.test")
+        get() = hasAnnotation("kotlin.test.Ignore")
 
     private val IrAnnotationContainer.isBefore
-        get() = annotationFinder("BeforeTest", "kotlin.test")
+        get() = hasAnnotation("kotlin.test.BeforeTest")
 
     private val IrAnnotationContainer.isAfter
-        get() = annotationFinder("AfterTest", "kotlin.test")
+        get() = hasAnnotation("kotlin.test.AfterTest")
 
-    private fun IrAnnotationContainer.annotationFinder(shortName: String, vararg packages: String) = packages.any { packageName ->
-        annotations.any { it.symbol.owner.parent.fqNameSafe == FqName("$packageName.$shortName") }
-    }
+    private fun IrAnnotationContainer.hasAnnotation(fqName: String) =
+        annotations.any { it.symbol.owner.parent.fqNameSafe == FqName(fqName) }
 }

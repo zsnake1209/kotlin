@@ -82,14 +82,14 @@ class JsIrBackendContext(
         }
     }
 
-    private var testContainer_: IrAnonymousInitializer? = null
+    private var testContainerField: IrAnonymousInitializer? = null
 
-    val hasTests get() = testContainer_ != null
+    val hasTests get() = testContainerField != null
 
     val testContainer
-        get() = testContainer_ ?: JsIrBuilder.buildAnonymousInitializer().apply {
+        get() = testContainerField ?: JsIrBuilder.buildAnonymousInitializer().apply {
             body = JsIrBuilder.buildBlockBody(emptyList())
-            testContainer_ = this
+            testContainerField = this
         }
 
     override val sharedVariablesManager = JsSharedVariablesManager(irBuiltIns, implicitDeclarationFile)
