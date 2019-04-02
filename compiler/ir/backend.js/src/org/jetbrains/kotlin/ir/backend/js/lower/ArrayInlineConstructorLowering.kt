@@ -18,10 +18,11 @@ class ArrayConstructorTransformer(
     val context: JsIrBackendContext
 ) {
     // Inline constructor for CharArray is implemented in runtime
-    private val primitiveArrayInlineToSizeConstructorMap =
+    private val primitiveArrayInlineToSizeConstructorMap by lazy {
         context.intrinsics.primitiveArrays.filter { it.value != PrimitiveType.CHAR }.keys.associate {
             it.inlineConstructor to it.sizeConstructor
         }
+    }
 
     fun transformCall(expression: IrCall): IrCall {
         if (expression.symbol == context.intrinsics.array.inlineConstructor) {

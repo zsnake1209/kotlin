@@ -1008,7 +1008,8 @@ abstract class IrModuleDeserializer(
 
         val symbol = deserializeIrSymbol(proto.symbol) as IrFieldSymbol
         val type = deserializeIrType(proto.type)
-        val field = symbolTable.declareField(UNDEFINED_OFFSET,
+
+        val field = if (symbol.isBound) symbol.owner else symbolTable.declareField(UNDEFINED_OFFSET,
             UNDEFINED_OFFSET,
             irrelevantOrigin,
             symbol.descriptor,

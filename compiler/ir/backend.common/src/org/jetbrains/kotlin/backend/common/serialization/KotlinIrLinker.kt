@@ -417,6 +417,11 @@ abstract class KotlinIrLinker(
         return deserializerForModule.module
     }
 
+    fun invalidateModuleHeaders() {
+        deserializersForModules.clear()
+        fileAnnotations.clear()
+    }
+
     abstract val ModuleDescriptor.irHeader: ByteArray?
 
     fun deserializeIrModuleHeader(moduleDescriptor: ModuleDescriptor): IrModuleFragment? =

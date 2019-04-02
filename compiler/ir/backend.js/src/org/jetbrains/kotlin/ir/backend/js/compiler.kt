@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsDeclarationTable
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrLinker
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrModuleSerializer
@@ -31,9 +32,15 @@ import org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata.createJsK
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata.*
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.patchDeclarationParents
+import org.jetbrains.kotlin.ir.declarations.impl.IrModuleFragmentImpl
+import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
+import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.types.IrSimpleType
+import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
@@ -79,6 +86,53 @@ private fun metadataFileName(moduleName: String) = "$moduleName.${JsKlibMetadata
 
 private val CompilerConfiguration.metadataVersion
     get() = get(CommonConfigurationKeys.METADATA_VERSION) as? JsKlibMetadataVersion ?: JsKlibMetadataVersion.INSTANCE
+
+class ModuleLinkerVisitor(private val stubGenerator: DeclarationStubGenerator): IrElementVisitorVoid {
+
+    private fun referenceSymbol(symbol: IrSymbol) {
+        if (symbol.isBound) return
+
+        when (symbol) {
+            is IrFunctionSymbol -> stubGenerator.generateFunctionStub(symbol.descriptor)
+            is IrClassSymbol -> stubGenerator.generateClassStub(symbol.descriptor)
+            is IrConstructorSymbol -> stubGenerator.generateConstructorStub(symbol.descriptor)
+            is IrPropertySymbol -> stubGenerator.generatePropertyStub(symbol.descriptor)
+            is IrFieldSymbol -> stubGenerator.generateFieldStub(symbol.descriptor)
+            else -> error("Unexpected symbol of ${symbol.descriptor}")
+        }
+    }
+
+    override fun visitElement(element: IrElement) {
+        element.acceptChildrenVoid(this)
+    }
+
+    override fun visitDeclarationReference(expression: IrDeclarationReference) {
+        super.visitDeclarationReference(expression)
+
+        referenceSymbol(expression.symbol)
+    }
+
+
+    override fun visitTypeOperator(expression: IrTypeOperatorCall) {
+        super.visitTypeOperator(expression)
+
+        referenceSymbol(expression.typeOperandClassifier)
+    }
+
+    override fun visitGetObjectValue(expression: IrGetObjectValue) {
+        super.visitGetObjectValue(expression)
+
+        referenceSymbol(expression.symbol)
+    }
+
+    override fun visitExpression(expression: IrExpression) {
+        super.visitExpression(expression)
+
+        val type = expression.type as? IrSimpleType ?: return
+
+        referenceSymbol(type.classifier)
+    }
+}
 
 fun compile(
     project: Project,
@@ -144,11 +198,14 @@ fun compile(
     val deserializer = JsIrLinker(moduleDescriptor, logggg, irBuiltIns, symbolTable)
 
     val deserializedModuleFragments = sortedImmediateDependencies.map {
-        val moduleFile = File(it.klibPath, moduleHeaderFileName)
         deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!
     }
 
-    val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files, deserializer)
+    val stubGenerator = DeclarationStubGenerator(moduleDescriptor, symbolTable, irBuiltIns.languageVersionSettings, deserializer = deserializer)
+    val moduleFragment = psi2IrTranslator.generateModuleFragment(psi2IrContext, files) { g, m ->
+        m.acceptVoid(ModuleLinkerVisitor(stubGenerator))
+//        g.generateUnboundSymbolsAsDependencies(m, deserializer)
+    }
 
     if (compileMode == CompilationMode.KLIB) {
         deserializedModuleFragments.forEach {
@@ -171,30 +228,53 @@ fun compile(
     }
 
     val context = JsIrBackendContext(moduleDescriptor, irBuiltIns, symbolTable, moduleFragment, configuration, phaseConfig)
-
-    deserializedModuleFragments.forEach {
-        ExternalDependenciesGenerator(
-            it.descriptor,
-            symbolTable,
-            irBuiltIns,
-            deserializer = deserializer
-        ).generateUnboundSymbolsAsDependencies()
-    }
+//
+//    deserializedModuleFragments.forEach {
+//        ExternalDependenciesGenerator(
+//            it.descriptor,
+//            symbolTable,
+//            irBuiltIns,
+//            deserializer = deserializer
+//        ).generateUnboundSymbolsAsDependencies()
+//    }
 
     // TODO: check the order
-    val irFiles = deserializedModuleFragments.flatMap { it.files } + moduleFragment.files
+    var irFiles = deserializedModuleFragments.flatMap { it.files } + moduleFragment.files
 
     moduleFragment.files.clear()
-    moduleFragment.files += irFiles
+//    moduleFragment.files += irFiles
 
-    ExternalDependenciesGenerator(
-        moduleDescriptor = context.module,
-        symbolTable = context.symbolTable,
-        irBuiltIns = context.irBuiltIns
-    ).generateUnboundSymbolsAsDependencies()
-    moduleFragment.patchDeclarationParents()
+//    ExternalDependenciesGenerator(
+//        moduleDescriptor = context.module,
+//        symbolTable = context.symbolTable,
+//        irBuiltIns = context.irBuiltIns
+//    ).generateUnboundSymbolsAsDependencies()
+//    moduleFragment.patchDeclarationParents()
 
-    jsPhases.invokeToplevel(context.phaseConfig, context, moduleFragment)
+    context.stubGenerator = stubGenerator
+
+    do {
+
+        context.isDirty = false
+//        val moduleDeserializer = JsIrLinker(moduleDescriptor, logggg, irBuiltIns, symbolTable)
+
+        deserializer.invalidateModuleHeaders()
+        val currentModuleDependencies = sortedImmediateDependencies.map {
+            deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!
+        }
+
+        val tmpModule = IrModuleFragmentImpl(moduleDescriptor, irBuiltIns, irFiles)
+
+//        context.stubGenerator = DeclarationStubGenerator(moduleDescriptor, symbolTable, irBuiltIns.languageVersionSettings, deserializer = moduleDeserializer)
+
+        jsPhases.invokeToplevel(context.phaseConfig, context, tmpModule)
+
+        moduleFragment.files += tmpModule.files
+
+        if (!context.isDirty) break
+
+        irFiles = currentModuleDependencies.flatMap { it.files }
+    } while (true)
 
     val jsProgram = moduleFragment.accept(IrModuleToJsTransformer(context), null)
     return TranslationResult.CompiledJsCode(jsProgram.toString())

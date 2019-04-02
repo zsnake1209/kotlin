@@ -81,7 +81,7 @@ class DeclarationStubGenerator(
     private fun computeOrigin(descriptor: DeclarationDescriptor): IrDeclarationOrigin =
         externalDeclarationOrigin?.invoke(descriptor) ?: IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB
 
-    internal fun generatePropertyStub(
+    fun generatePropertyStub(
         descriptor: PropertyDescriptor,
         bindingContext: BindingContext? = null
     ): IrProperty {
@@ -150,7 +150,7 @@ class DeclarationStubGenerator(
         }
     }
 
-    internal fun generateConstructorStub(descriptor: ClassConstructorDescriptor): IrConstructor {
+    fun generateConstructorStub(descriptor: ClassConstructorDescriptor): IrConstructor {
         val referenced = symbolTable.referenceConstructor(descriptor)
         if (referenced.isBound) {
             return referenced.owner
@@ -184,7 +184,7 @@ class DeclarationStubGenerator(
         }
     }
 
-    internal fun generateClassStub(descriptor: ClassDescriptor): IrClass {
+    fun generateClassStub(descriptor: ClassDescriptor): IrClass {
         val referenceClass = symbolTable.referenceClass(descriptor)
         if (referenceClass.isBound) {
             return referenceClass.owner
