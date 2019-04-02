@@ -360,7 +360,10 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
     }
 
     override fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
-        return type
+        return when (type) {
+            is ConeAbbreviatedType -> prepareType(type.directExpansionType(session) ?: ConeClassErrorType("unresolved"))
+            else -> type
+        }
     }
 }
 
