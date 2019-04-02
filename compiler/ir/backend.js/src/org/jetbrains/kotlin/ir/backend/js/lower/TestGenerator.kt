@@ -26,25 +26,27 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
     override fun lower(irFile: IrFile) {
         irFile.declarations.forEach {
             if (it is IrClass) {
-                generateTestCalls(it) { suiteForPackage(irFile.fqName) }
+                generateTestCalls(it) { suiteForPackage(irFile.fqName).body }
             }
 
             // TODO top-level functions
         }
     }
 
-    private val packageSuites = mutableMapOf<FqName, IrBlockBody>()
+    private val packageSuites = mutableMapOf<FqName, FunctionWithBody>()
 
-    private fun suiteForPackage(fqName: FqName): IrBlockBody = packageSuites.getOrPut(fqName) {
+    private fun suiteForPackage(fqName: FqName) = packageSuites.getOrPut(fqName) {
         context.suiteFun!!.createInvocation(fqName.asString(), context.testContainer.body)
     }
+
+    private data class FunctionWithBody(val function: IrSimpleFunction, val body: IrBlockBody)
 
     private fun IrSimpleFunctionSymbol.createInvocation(
         name: String,
         parentBody: IrBlockBody,
         ignored: Boolean = false,
         initHook: (IrSimpleFunction, IrBlockBody) -> Unit = { _, _ -> }
-    ): IrBlockBody {
+    ): FunctionWithBody {
         val body = JsIrBuilder.buildBlockBody(emptyList())
 
         val function = JsIrBuilder.buildFunction(
@@ -66,7 +68,7 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
             putValueArgument(2, JsIrBuilder.buildFunctionReference(refType, function.symbol))
         }
 
-        return body
+        return FunctionWithBody(function, body)
     }
 
     private fun generateTestCalls(irClass: IrClass, parentBody: () -> IrBlockBody) {
@@ -80,10 +82,10 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
         irClass.declarations.forEach {
             when {
                 it is IrClass ->
-                    generateTestCalls(it) { suiteFunBody }
+                    generateTestCalls(it) { suiteFunBody.body }
 
                 it is IrSimpleFunction && it.isTest ->
-                    generateCodeForTestMethod(it, beforeFunctions, afterFunctions, irClass, suiteFunBody)
+                    generateCodeForTestMethod(it, beforeFunctions, afterFunctions, irClass, suiteFunBody.body)
             }
         }
     }
@@ -95,35 +97,35 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
         irClass: IrClass,
         parentBody: IrBlockBody
     ) {
-        context.testFun!!.createInvocation(testFun.name.asString(), parentBody, testFun.isIgnored) { fn, body ->
-            val classVal = JsIrBuilder.buildVar(irClass.defaultType, fn, initializer = irClass.instance())
+        val (fn, body) = context.testFun!!.createInvocation(testFun.name.asString(), parentBody, testFun.isIgnored)
 
-            body.statements += classVal
+        val classVal = JsIrBuilder.buildVar(irClass.defaultType, fn, initializer = irClass.instance())
 
-            body.statements += beforeFuns.map {
-                JsIrBuilder.buildCall(it.symbol).apply {
-                    dispatchReceiver = JsIrBuilder.buildGetValue(classVal.symbol)
-                }
+        body.statements += classVal
+
+        body.statements += beforeFuns.map {
+            JsIrBuilder.buildCall(it.symbol).apply {
+                dispatchReceiver = JsIrBuilder.buildGetValue(classVal.symbol)
             }
+        }
 
-            val returnStatement = JsIrBuilder.buildReturn(
-                fn.symbol,
-                JsIrBuilder.buildCall(testFun.symbol).apply {
-                    dispatchReceiver = JsIrBuilder.buildGetValue(classVal.symbol)
-                },
-                context.irBuiltIns.unitType
-            )
+        val returnStatement = JsIrBuilder.buildReturn(
+            fn.symbol,
+            JsIrBuilder.buildCall(testFun.symbol).apply {
+                dispatchReceiver = JsIrBuilder.buildGetValue(classVal.symbol)
+            },
+            context.irBuiltIns.unitType
+        )
 
-            if (afterFuns.isEmpty()) {
-                body.statements += returnStatement
-            } else {
-                body.statements += JsIrBuilder.buildTry(context.irBuiltIns.unitType).apply {
-                    tryResult = returnStatement
-                    finallyExpression = JsIrBuilder.buildComposite(context.irBuiltIns.unitType).apply {
-                        statements += afterFuns.map {
-                            JsIrBuilder.buildCall(it.symbol).apply {
-                                dispatchReceiver = JsIrBuilder.buildGetValue(classVal.symbol)
-                            }
+        if (afterFuns.isEmpty()) {
+            body.statements += returnStatement
+        } else {
+            body.statements += JsIrBuilder.buildTry(context.irBuiltIns.unitType).apply {
+                tryResult = returnStatement
+                finallyExpression = JsIrBuilder.buildComposite(context.irBuiltIns.unitType).apply {
+                    statements += afterFuns.map {
+                        JsIrBuilder.buildCall(it.symbol).apply {
+                            dispatchReceiver = JsIrBuilder.buildGetValue(classVal.symbol)
                         }
                     }
                 }
