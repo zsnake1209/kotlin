@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes;
 import org.jetbrains.org.objectweb.asm.Type;
 
-public abstract class IntrinsicMethod {
+public abstract class IntrinsicMethod implements GeneralIntrinsicMethod {
     @NotNull
     public Callable toCallable(
             @NotNull FunctionDescriptor fd,
@@ -37,6 +37,7 @@ public abstract class IntrinsicMethod {
         return toCallable(codegen.getState().getTypeMapper().mapToCallableMethod(fd, false), isSuper, resolvedCall);
     }
 
+    @Override
     public boolean isApplicableToOverload(@NotNull CallableMemberDescriptor descriptor) {
         return true;
     }

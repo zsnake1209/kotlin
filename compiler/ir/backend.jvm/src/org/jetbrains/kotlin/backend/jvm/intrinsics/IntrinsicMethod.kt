@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.codegen.Callable
 import org.jetbrains.kotlin.codegen.CallableMethod
 import org.jetbrains.kotlin.codegen.StackValue
+import org.jetbrains.kotlin.codegen.intrinsics.GeneralIntrinsicMethod
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
@@ -21,7 +22,7 @@ interface ComparisonIntrinsic {
     fun genStackValue(expression: IrMemberAccessExpression, context: JvmBackendContext): StackValue
 }
 
-abstract class IntrinsicMethod {
+abstract class IntrinsicMethod : GeneralIntrinsicMethod {
 
     open fun toCallable(
         expression: IrFunctionAccessExpression,

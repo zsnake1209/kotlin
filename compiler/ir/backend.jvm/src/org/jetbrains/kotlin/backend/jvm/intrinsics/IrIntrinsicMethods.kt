@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.backend.jvm.intrinsics
 
+import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
@@ -29,7 +30,7 @@ import org.jetbrains.org.objectweb.asm.Type
 
 class IrIntrinsicMethods(irBuiltIns: IrBuiltIns) {
 
-    val intrinsics = IntrinsicMethods()
+    val intrinsics = IntrinsicMethods(IntrinsicsListImpl)
 
     private val irMapping = hashMapOf<IrFunctionSymbol, IntrinsicMethod>()
 

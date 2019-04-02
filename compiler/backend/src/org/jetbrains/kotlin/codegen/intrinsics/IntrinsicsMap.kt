@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.name.FqNameUnsafe
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import java.util.*
 
-internal class IntrinsicsMap {
+internal class IntrinsicsMap<IntrinsicMethod : GeneralIntrinsicMethod> {
 
     private val intrinsicsMap = HashMap<Key, IntrinsicMethod>()
 

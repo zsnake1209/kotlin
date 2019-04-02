@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor
 import org.jetbrains.kotlin.builtins.isBuiltinFunctionalType
 import org.jetbrains.kotlin.builtins.isSuspendFunctionType
 import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicMethods
+import org.jetbrains.kotlin.codegen.intrinsics.IntrinsicsListImpl
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
@@ -237,7 +238,7 @@ class KotlinSmartStepIntoHandler : JvmSmartStepIntoHandler() {
     }
 
 
-    private val methods = IntrinsicMethods(JvmTarget.JVM_1_6)
+    private val methods = IntrinsicMethods(IntrinsicsListImpl(JvmTarget.JVM_1_6))
 
     private fun isIntrinsic(descriptor: CallableMemberDescriptor): Boolean {
         return methods.getIntrinsic(descriptor) != null
