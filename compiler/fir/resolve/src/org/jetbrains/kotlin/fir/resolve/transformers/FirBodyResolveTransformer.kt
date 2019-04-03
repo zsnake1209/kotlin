@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.fir.visitors.compose
 import org.jetbrains.kotlin.ir.expressions.IrConstKind
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.calls.results.TypeSpecificityComparator
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.model.SimpleTypeMarker
 import org.jetbrains.kotlin.types.model.TypeConstructorMarker
@@ -201,7 +202,7 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
 
         val consumer = createVariableConsumer(session, callee.name, info, inferenceComponents)
         val result = resolver.runTowerResolver(consumer)
-        val successCandidates = result.successCandidates()
+        val successCandidates = result.successCandidates().map { it.symbol }
         val resultExpression = qualifiedAccessExpression.transformCalleeReference(this, successCandidates)
         storeTypeFromCallee(resultExpression as FirQualifiedAccessExpression)
         return resultExpression.compose()
@@ -231,6 +232,9 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
         val consumer = createFunctionConsumer(session, name, info, inferenceComponents)
         val result = resolver.runTowerResolver(consumer)
         val successCandidates = result.successCandidates()
+        val reducedCandidates = ConeOverloadConflictResolver(TypeSpecificityComparator.NONE, inferenceComponents)
+            .chooseMaximallySpecificCandidates(successCandidates, discriminateGenerics = false)
+
 
 //        fun isInvoke()
 //
@@ -260,7 +264,7 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
 //            }
 //            else -> functionCall
 //        }
-        val resultExpression = functionCall.transformCalleeReference(this, successCandidates)
+        val resultExpression = functionCall.transformCalleeReference(this, reducedCandidates.map { it.symbol })
 
         storeTypeFromCallee(resultExpression as FirFunctionCall)
         return resultExpression.compose()
@@ -316,10 +320,10 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
     }
 
     override fun <T> transformConstExpression(constExpression: FirConstExpression<T>, data: Any?): CompositeTransformResult<FirStatement> {
-        if (data == null) return super.transformConstExpression(constExpression, data)
-        val expectedType = data as FirTypeRef
+        //if (data == null) return super.transformConstExpression(constExpression, data)
+        val expectedType = data as FirTypeRef?
 
-        if (expectedType is FirImplicitTypeRef) {
+        if (expectedType == null || expectedType is FirImplicitTypeRef) {
 
             val symbol = when (constExpression.kind) {
                 IrConstKind.Null -> StandardClassIds.Nothing(symbolProvider)
