@@ -1,7 +1,8 @@
 description = "Kotlin IDEA plugin"
 
 plugins {
-    `java-base`
+    `java-library`
+    `maven-publish`
 }
 
 repositories {
@@ -99,6 +100,9 @@ val embedded by configurations.creating // PILL: used in pill importer
 val libraries by configurations.creating
 val jpsPlugin by configurations.creating
 
+val api by configurations
+api.extendsFrom(libraries)
+
 configurations.all {
     resolutionStrategy {
         preferProjectModules()
@@ -149,5 +153,18 @@ ideaPlugin {
     from(libraries)
     from(jpsPlugin) {
         into("jps")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("internal") {
+            artifactId = "kotlin-plugin-api-${IdeVersionConfigurator.currentIde.name.toLowerCase()}"
+            from(components["java"])
+        }
+    }
+
+    repositories {
+        maven("${rootProject.buildDir}/internal/repo")
     }
 }
