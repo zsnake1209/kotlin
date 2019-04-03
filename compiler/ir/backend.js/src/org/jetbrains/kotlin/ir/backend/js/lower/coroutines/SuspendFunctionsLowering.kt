@@ -334,11 +334,11 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                 ClassKind.CLASS,
                 irFunction.visibility,
                 Modality.FINAL,
-                false,
-                false,
-                false,
-                false,
-                false
+                isCompanion = false,
+                isInner = false,
+                isData = false,
+                isExternal = false,
+                isInline = false
             )
             coroutineClassDescriptor.bind(coroutineClass)
 
@@ -463,21 +463,6 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                 val fakeOverride = createFakeOverride(sm)
                 declarations += fakeOverride
             }
-
-            /*
-
-    return when (descriptor) {
-        is FunctionDescriptor -> descriptor.createFunction()
-        is PropertyDescriptor ->
-            IrPropertyImpl(startOffset, endOffset, IrDeclarationOrigin.FAKE_OVERRIDE, descriptor).apply {
-                // TODO: add field if getter is missing?
-                getter = descriptor.getter?.createFunction() as IrSimpleFunction?
-                setter = descriptor.setter?.createFunction() as IrSimpleFunction?
-            }
-        else -> TODO(descriptor.toString())
-    }
-             */
-
         }
 
         private fun createConstructorBuilder() = object : SymbolWithIrBuilder<IrConstructorSymbol, IrConstructor>() {
@@ -504,9 +489,9 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                     Name.special("<init>"),
                     irFunction.visibility,
                     coroutineClass.defaultType,
-                    false,
-                    false,
-                    false
+                    isInline = false,
+                    isExternal = false,
+                    isPrimary = false
                 )
 
                 descriptor.bind(declaration)
@@ -546,7 +531,7 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                     functionParameters.forEachIndexed { index, parameter ->
                         +irSetField(
                             irGet(coroutineClassThis),
-                            argumentToPropertiesMap[parameter]!!,
+                            argumentToPropertiesMap.getValue(parameter),
                             irGet(declaration.valueParameters[index])
                         )
                     }
@@ -575,9 +560,9 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                         Name.special("<init>"),
                         irFunction.visibility,
                         coroutineClass.defaultType,
-                        false,
-                        false,
-                        false
+                        isInline = false,
+                        isExternal = false,
+                        isPrimary = false
                     )
 
                     descriptor.bind(declaration)
@@ -602,7 +587,7 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                         // Save all arguments to fields.
                         boundParams.forEachIndexed { index, parameter ->
                             +irSetField(
-                                irGet(coroutineClassThis), argumentToPropertiesMap[parameter]!!,
+                                irGet(coroutineClassThis), argumentToPropertiesMap.getValue(parameter),
                                 irGet(declaration.valueParameters[index])
                             )
                         }
@@ -635,10 +620,10 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                     Visibilities.PROTECTED,
                     Modality.FINAL,
                     coroutineClass.defaultType,
-                    false,
-                    false,
-                    false,
-                    false
+                    isInline = false,
+                    isExternal = false,
+                    isTailrec = false,
+                    isSuspend = false
                 )
 
                 descriptor.bind(declaration)
@@ -674,7 +659,7 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                                 if (unboundArgsSet.contains(it))
                                     irGet(declaration.valueParameters[unboundIndex++])
                                 else
-                                    irGetField(irGet(thisReceiver), argumentToPropertiesMap[it]!!)
+                                    irGetField(irGet(thisReceiver), argumentToPropertiesMap.getValue(it))
                             }.forEachIndexed { index, argument ->
                                 putValueArgument(index, argument)
                             }
@@ -712,10 +697,10 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                     Visibilities.PROTECTED,
                     Modality.FINAL,
                     irFunction.returnType,
-                    false,
-                    false,
-                    false,
-                    true
+                    isInline = false,
+                    isExternal = false,
+                    isTailrec = false,
+                    isSuspend = true
                 )
 
                 descriptor.bind(declaration)
@@ -777,8 +762,8 @@ internal class SuspendFunctionsLowering(val context: JsIrBackendContext): FileLo
                 type,
                 Visibilities.PRIVATE,
                 !isMutable,
-                false,
-                false
+                isExternal = false,
+                isStatic = false
             ).also {
                 descriptor.bind(it)
                 it.parent = coroutineClass
