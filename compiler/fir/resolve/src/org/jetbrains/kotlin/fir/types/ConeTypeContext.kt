@@ -344,7 +344,7 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
     }
 
     override fun SimpleTypeMarker.isPrimitiveType(): Boolean {
-        TODO("not implemented")
+        return false //TODO
     }
 
     override fun SimpleTypeMarker.isStubType(): Boolean {
