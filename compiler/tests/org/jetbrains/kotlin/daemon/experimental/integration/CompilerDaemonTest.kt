@@ -50,7 +50,6 @@ import kotlin.script.templates.ScriptTemplateDefinition
 import kotlin.test.fail
 import org.jetbrains.kotlin.daemon.client.experimental.*
 import org.jetbrains.kotlin.daemon.common.experimental.*
-import org.jetbrains.kotlin.daemon.common.experimental.LoopbackNetworkInterface
 
 val TIMEOUT_DAEMON_RUNNER_EXIT_MS = 10000L
 
@@ -1306,7 +1305,10 @@ class CompilerDaemonTest : KotlinIntegrationTestBase() {
             port = serverPort,
             timer = timer,
             onShutdown = onShutdown
-        ).startDaemonLife()
+        ).let {
+            it.startDaemonElections()
+            it.configurePeriodicActivities()
+        }
         println("old daemon init: port = $serverPort")
     }
 }
