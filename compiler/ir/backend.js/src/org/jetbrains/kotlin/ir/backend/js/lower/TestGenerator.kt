@@ -45,7 +45,6 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
         name: String,
         parentBody: IrBlockBody,
         ignored: Boolean = false,
-        initHook: (IrSimpleFunction, IrBlockBody) -> Unit = { _, _ -> }
     ): FunctionWithBody {
         val body = JsIrBuilder.buildBlockBody(emptyList())
 
@@ -57,8 +56,6 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
             it.body = body
             context.implicitDeclarationFile.declarations += it
         }
-
-        initHook(function, body)
 
         parentBody.statements += JsIrBuilder.buildCall(this).apply {
             putValueArgument(0, JsIrBuilder.buildString(context.irBuiltIns.stringType, name))
