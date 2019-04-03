@@ -44,7 +44,7 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
     private fun IrSimpleFunctionSymbol.createInvocation(
         name: String,
         parentBody: IrBlockBody,
-        ignored: Boolean = false,
+        ignored: Boolean = false
     ): FunctionWithBody {
         val body = JsIrBuilder.buildBlockBody(emptyList())
 
