@@ -103,7 +103,7 @@ class ExpressionCodegen(
     /*TODO*/
     val context = classCodegen.context
 
-    val intrinsics = IrIntrinsicMethods(context.irBuiltIns)
+    val intrinsics = IrIntrinsicMethods(context.irBuiltIns, context.ir.symbols)
 
     val typeMapper = classCodegen.typeMapper
 
@@ -1267,11 +1267,10 @@ class ExpressionCodegen(
         }
     }
 
-    internal fun getOrCreateCallGenerator(
+    private fun getOrCreateCallGenerator(
         functionAccessExpression: IrFunctionAccessExpression
     ): IrCallGenerator {
         val callee = functionAccessExpression.symbol.owner
-        // TODO: do we need to collect _all_ type arguments?
         val typeArgumentContainer = if (callee is IrConstructor) callee.parentAsClass else callee
         val typeArguments =
             if (functionAccessExpression.typeArgumentsCount == 0) {

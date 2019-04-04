@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 
-class IrIllegalArgumentException : IntrinsicMethod() {
+object IrIllegalArgumentException : IntrinsicMethod() {
     val exceptionTypeDescriptor = Type.getType(IllegalArgumentException::class.java)!!
 
     override fun toCallable(

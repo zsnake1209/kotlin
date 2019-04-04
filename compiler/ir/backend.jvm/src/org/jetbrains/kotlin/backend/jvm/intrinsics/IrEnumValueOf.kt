@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 
-class IrEnumValueOf : IntrinsicMethod() {
+object IrEnumValueOf : IntrinsicMethod() {
     override fun toCallable(expression: IrFunctionAccessExpression, signature: JvmMethodSignature, context: JvmBackendContext): IrIntrinsicFunction {
         val enumType = context.state.typeMapper.mapType(expression.descriptor.returnType!!)
         val newSignature = context.state.typeMapper.mapSignatureSkipGeneric(expression.descriptor as FunctionDescriptor, OwnerKind.IMPLEMENTATION)

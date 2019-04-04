@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.backend.jvm
 
 import org.jetbrains.kotlin.backend.common.ir.Symbols
 import org.jetbrains.kotlin.backend.common.ir.createImplicitParameterDeclarationWithWrappedDescriptor
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
@@ -18,11 +20,13 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrExternalPackageFragmentSymbolImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -49,7 +53,10 @@ class JvmSymbols(
     private fun createPackage(fqName: FqName): IrPackageFragment =
         IrExternalPackageFragmentImpl(IrExternalPackageFragmentSymbolImpl(EmptyPackageFragmentDescriptor(context.state.module, fqName)))
 
+    private val kotlinPackage: IrPackageFragment = createPackage(KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME)
+    private val kotlinJvmPackage: IrPackageFragment = createPackage(FqName("kotlin.jvm"))
     private val kotlinJvmInternalPackage: IrPackageFragment = createPackage(FqName("kotlin.jvm.internal"))
+    private val kotlinJvmInternalUnsafePackage: IrPackageFragment = createPackage(FqName("kotlin.jvm.internal.unsafe"))
     private val kotlinJvmFunctionsPackage: IrPackageFragment = createPackage(FqName("kotlin.jvm.functions"))
 
     private fun createClass(fqName: FqName, classKind: ClassKind = ClassKind.CLASS, block: (IrClass) -> Unit): IrClass =
@@ -251,4 +258,68 @@ class JvmSymbols(
 
     val getOrCreateKotlinClasses: IrSimpleFunctionSymbol =
         reflection.functions.single { it.owner.name.asString() == "getOrCreateKotlinClasses" }
+
+    val javaClassProperty: IrPropertySymbol = kotlinJvmPackage.addProperty {
+        name = Name.identifier("javaClass")
+    }.apply {
+        val property = this
+        getter = buildFun {
+            name = Name.special("<get-javaClass>")
+        }.apply {
+            val getter = this
+            parent = property.parent
+            addTypeParameter {
+                name = Name.identifier("T")
+            }.apply {
+                superTypes.add(irBuiltIns.anyType)
+            }
+            val typeParameterType = typeParameters[0].defaultType
+            extensionReceiverParameter = buildValueParameter {
+                name = Name.identifier("\$receiver")
+                type = typeParameterType
+            }.apply {
+                parent = getter
+                returnType = javaLangClass.typeWith(typeParameterType)
+            }
+        }
+    }.symbol
+
+    val kClassJavaProperty: IrPropertySymbol = kotlinJvmPackage.addProperty {
+        name = Name.identifier("java")
+    }.apply {
+        val property = this
+        getter = buildFun {
+            name = Name.special("<get-java>")
+        }.apply {
+            val getter = this
+            val extensionReceiverType = irBuiltIns.kClassClass.typeWith()
+            parent = property.parent
+            extensionReceiverParameter = buildValueParameter {
+                name = Name.identifier("\$receiver")
+                type = extensionReceiverType
+            }.apply {
+                parent = getter
+                returnType = javaLangClass.typeWith(extensionReceiverType)
+            }
+        }
+    }.symbol
+
+    val monitorEnter = kotlinJvmInternalUnsafePackage.addFunction("monitorEnter", irBuiltIns.unitType, isStatic = true).apply {
+        addValueParameter("monitor", irBuiltIns.anyType)
+    }.symbol
+
+    val monitorExit = kotlinJvmInternalUnsafePackage.addFunction("monitorExit", irBuiltIns.unitType, isStatic = true).apply {
+        addValueParameter("monitor", irBuiltIns.anyType)
+    }.symbol
+
+    val isArrayOf = kotlinJvmPackage.addFunction("isArrayOf", irBuiltIns.booleanType, isStatic = true).apply {
+        val function = this
+        extensionReceiverParameter = buildValueParameter {
+            name = Name.identifier("\$receiver")
+            type = irBuiltIns.arrayClass.owner.defaultType
+        }.apply {
+            parent = function
+        }
+        addTypeParameter("T", irBuiltIns.anyNType)
+    }.symbol
 }
