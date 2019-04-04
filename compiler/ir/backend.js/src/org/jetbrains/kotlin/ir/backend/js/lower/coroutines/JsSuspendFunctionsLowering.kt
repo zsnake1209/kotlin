@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.DFS
 
-class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunctionsLowering(ctx) {
+class JsSuspendFunctionsLowering(override val context: JsIrBackendContext) : AbstractSuspendFunctionsLowering(context.symbolTable) {
 
     private val coroutineImplExceptionPropertyGetter = context.coroutineImplExceptionPropertyGetter
     private val coroutineImplExceptionPropertySetter = context.coroutineImplExceptionPropertySetter
