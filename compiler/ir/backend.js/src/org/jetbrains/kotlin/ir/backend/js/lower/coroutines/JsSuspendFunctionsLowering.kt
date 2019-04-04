@@ -37,11 +37,21 @@ class JsSuspendFunctionsLowering(override val context: JsIrBackendContext) : Abs
     private var exceptionTrapId = -1
 
     override fun buildStateMachine(
-        body: IrBlock,
+        originalBody: IrBody,
         doResumeFunction: IrFunction,
         transformingFunction: IrFunction,
         argumentToPropertiesMap: Map<IrValueParameter, IrField>
     ) {
+        val body =
+            (originalBody as IrBlockBody).run {
+                IrBlockImpl(
+                    transformingFunction.startOffset,
+                    transformingFunction.endOffset,
+                    context.irBuiltIns.unitType,
+                    STATEMENT_ORIGIN_COROUTINE_IMPL,
+                    statements
+                )
+            }
 
         val coroutineClass = doResumeFunction.parent as IrClass
         val suspendResult = JsIrBuilder.buildVar(

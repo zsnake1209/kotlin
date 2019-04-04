@@ -237,7 +237,7 @@ private class CallsiteRedirectionTransformer(context: JsIrBackendContext) : IrEl
         call: IrFunctionAccessExpression,
         newTarget: IrSimpleFunctionSymbol,
         enclosing: IrFunction?
-    ) = IrCallImpl(call.startOffset, call.endOffset, call.type, newTarget).apply {
+    ) = IrCallImpl(call.startOffset, call.endOffset, call.type, newTarget/*, newTarget.descriptor, call.typeArgumentsCount*/).apply {
 
         // There are 3 possible cases how Type Parameters should be passed
         if (call is IrCall) {
