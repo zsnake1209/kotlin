@@ -107,6 +107,8 @@ configurations.all {
     resolutionStrategy {
         preferProjectModules()
     }
+    
+    exclude("org.jetbrains.intellij.deps", "trove4j") // Idea already has trove4j
 }
 
 dependencies {
