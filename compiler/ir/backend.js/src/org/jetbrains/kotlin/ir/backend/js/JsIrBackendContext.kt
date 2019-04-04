@@ -82,14 +82,15 @@ class JsIrBackendContext(
         }
     }
 
-    private var testContainerField: IrAnonymousInitializer? = null
+    private var testContainerField: IrSimpleFunction? = null
 
     val hasTests get() = testContainerField != null
 
     val testContainer
-        get() = testContainerField ?: JsIrBuilder.buildAnonymousInitializer().apply {
+        get() = testContainerField ?: JsIrBuilder.buildFunction("test fun", irBuiltIns.unitType, implicitDeclarationFile).apply {
             body = JsIrBuilder.buildBlockBody(emptyList())
             testContainerField = this
+            implicitDeclarationFile.declarations += this
         }
 
     override val sharedVariablesManager = JsSharedVariablesManager(irBuiltIns, implicitDeclarationFile)

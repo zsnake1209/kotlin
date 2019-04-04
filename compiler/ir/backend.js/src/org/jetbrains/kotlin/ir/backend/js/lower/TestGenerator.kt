@@ -36,7 +36,7 @@ class TestGenerator(val context: JsIrBackendContext) : FileLoweringPass {
     private val packageSuites = mutableMapOf<FqName, FunctionWithBody>()
 
     private fun suiteForPackage(fqName: FqName) = packageSuites.getOrPut(fqName) {
-        context.suiteFun!!.createInvocation(fqName.asString(), context.testContainer.body)
+        context.suiteFun!!.createInvocation(fqName.asString(), context.testContainer.body as IrBlockBody)
     }
 
     private data class FunctionWithBody(val function: IrSimpleFunction, val body: IrBlockBody)
