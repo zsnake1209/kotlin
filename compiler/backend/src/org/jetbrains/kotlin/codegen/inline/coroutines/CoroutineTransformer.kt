@@ -145,7 +145,7 @@ class CoroutineTransformer(
     }
 
     private fun surroundNoinlineCallsWithMarkersIfNeeded(node: MethodNode, delegate: MethodVisitor): MethodVisitor =
-        if (capturedParams.any { (it.functionalArgument as? CrossinlineLambdaInSuspendContextAsNoInline)?.isSuspend == true })
+        if (capturedParams.any { (it.functionalArgument as? NonInlineableArgumentForInlineableParameterCalledInSuspend)?.isSuspend == true })
             SurroundSuspendLambdaCallsWithSuspendMarkersMethodVisitor(
                 delegate,
                 node.access,
@@ -227,7 +227,7 @@ private class SurroundSuspendLambdaCallsWithSuspendMarkersMethodVisitor(
         this as FieldInsnNode
         if (owner != thisName || desc != "L${invoke.owner};") return false
         val functionalArgument = capturedParams.find { it.newFieldName == name }?.functionalArgument ?: return false
-        return functionalArgument is CrossinlineLambdaInSuspendContextAsNoInline && functionalArgument.isSuspend
+        return functionalArgument is NonInlineableArgumentForInlineableParameterCalledInSuspend && functionalArgument.isSuspend
     }
 }
 

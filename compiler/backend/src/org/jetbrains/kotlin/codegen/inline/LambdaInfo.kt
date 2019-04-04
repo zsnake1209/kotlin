@@ -79,8 +79,8 @@ abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : FunctionalArgu
     }
 }
 
-class CrossinlineLambdaInSuspendContextAsNoInline(val isSuspend: Boolean) : FunctionalArgument
-object InlineOrCrossinlineSuspendLambdaAsNoinline : FunctionalArgument
+class NonInlineableArgumentForInlineableParameterCalledInSuspend(val isSuspend: Boolean) : FunctionalArgument
+object NonInlineableArgumentForInlineableSuspendParameter : FunctionalArgument
 
 class DefaultLambda(
     override val lambdaClassType: Type,

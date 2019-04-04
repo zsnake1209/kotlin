@@ -218,7 +218,7 @@ class MethodInliner(
                     val info = invokeCall.functionalArgument
 
                     if (info !is LambdaInfo) {
-                        if (info == InlineOrCrossinlineSuspendLambdaAsNoinline) {
+                        if (info == NonInlineableArgumentForInlineableSuspendParameter) {
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, NOINLINE_CALL_MARKER, NOINLINE_CALL_MARKER, "()V", false)
                         }
                         //noninlinable lambda
@@ -367,6 +367,8 @@ class MethodInliner(
                     ReifiedTypeInliner.isNeedClassReificationMarker(MethodInsnNode(opcode, owner, name, desc, false))
                 ) {
                     //we shouldn't process here content of inlining lambda it should be reified at external level except default lambdas
+                } else if (owner == NOINLINE_CALL_MARKER && name == NOINLINE_CALL_MARKER) {
+                    // do not generate multiple markers on single invoke
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf)
                 }

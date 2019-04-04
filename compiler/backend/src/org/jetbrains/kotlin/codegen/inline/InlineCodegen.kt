@@ -345,8 +345,9 @@ abstract class InlineCodegen<out T : BaseExpressionCodegen>(
             } else {
                 info = invocationParamBuilder.addNextValueParameter(jvmType, false, remappedValue, parameterIndex)
                 info.functionalArgument = when (kind) {
-                    ValueKind.NON_INLINEABLE_CALLED_IN_SUSPEND -> CrossinlineLambdaInSuspendContextAsNoInline(kotlinType?.isSuspendFunctionTypeOrSubtype == true)
-                    ValueKind.NON_INLINEABLE_SUSPEND_LAMBDA -> InlineOrCrossinlineSuspendLambdaAsNoinline
+                    ValueKind.NON_INLINEABLE_ARGUMENT_FOR_INLINE_PARAMETER_CALLED_IN_SUSPEND ->
+                        NonInlineableArgumentForInlineableParameterCalledInSuspend(kotlinType?.isSuspendFunctionTypeOrSubtype == true)
+                    ValueKind.NON_INLINEABLE_ARGUMENT_FOR_INLINE_SUSPEND_PARAMETER -> NonInlineableArgumentForInlineableSuspendParameter
                     else -> null
                 }
             }
@@ -742,15 +743,15 @@ class PsiInlineCodegen(
         } else {
             val value = codegen.gen(argumentExpression)
             val kind = when {
-                isCallSiteIsSuspend(valueParameterDescriptor) -> ValueKind.NON_INLINEABLE_CALLED_IN_SUSPEND
-                isInlineOrCrossinlineSuspendLambda(valueParameterDescriptor) -> ValueKind.NON_INLINEABLE_SUSPEND_LAMBDA
+                isCallSiteIsSuspend(valueParameterDescriptor) -> ValueKind.NON_INLINEABLE_ARGUMENT_FOR_INLINE_PARAMETER_CALLED_IN_SUSPEND
+                isInlineSuspendParameter(valueParameterDescriptor) -> ValueKind.NON_INLINEABLE_ARGUMENT_FOR_INLINE_SUSPEND_PARAMETER
                 else -> ValueKind.GENERAL
             }
             putValueIfNeeded(parameterType, value, kind, parameterIndex)
         }
     }
 
-    private fun isInlineOrCrossinlineSuspendLambda(descriptor: ValueParameterDescriptor): Boolean =
+    private fun isInlineSuspendParameter(descriptor: ValueParameterDescriptor): Boolean =
         functionDescriptor.isInline && !descriptor.isNoinline && descriptor.type.isSuspendFunctionTypeOrSubtype
 
     private fun isCallSiteIsSuspend(descriptor: ValueParameterDescriptor): Boolean =
