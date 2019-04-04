@@ -12,12 +12,14 @@ import org.jetbrains.kotlin.backend.common.push
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
+import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
 import org.jetbrains.kotlin.ir.util.explicitParameters
+import org.jetbrains.kotlin.ir.util.getPropertySetter
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
@@ -33,6 +35,7 @@ class JsSuspendFunctionsLowering(override val context: JsIrBackendContext) : Abs
     private val coroutineImplLabelPropertySetter = context.coroutineImplLabelPropertySetter
     private val coroutineImplLabelPropertyGetter = context.coroutineImplLabelPropertyGetter
     private val coroutineImplResultSymbolGetter = context.coroutineImplResultSymbolGetter
+    private val coroutineImplResultSymbolSetter = context.coroutineImplResultSymbolSetter
 
     private var exceptionTrapId = -1
 
@@ -188,6 +191,21 @@ class JsSuspendFunctionsLowering(override val context: JsIrBackendContext) : Abs
                 }
             }
         }
+    }
+
+    override fun IrBlockBodyBuilder.generateCoroutineStart(invokeSuspendFunction: IrFunction, receiver: IrExpression) {
+        val dispatchReceiverVar = createTmpVariable(receiver, irType = receiver.type)
+        +irCall(coroutineImplResultSymbolSetter).apply {
+            dispatchReceiver = irGet(dispatchReceiverVar)
+            putValueArgument(0, irGetObject(context.irBuiltIns.unitClass))
+        }
+        +irCall(coroutineImplExceptionPropertySetter).apply {
+            dispatchReceiver = irGet(dispatchReceiverVar)
+            putValueArgument(0, irNull())
+        }
+        +irReturn(irCall(invokeSuspendFunction.symbol).apply {
+            dispatchReceiver = irGet(dispatchReceiverVar)
+        })
     }
 
     private open class VariablesScopeTracker : IrElementVisitorVoid {
