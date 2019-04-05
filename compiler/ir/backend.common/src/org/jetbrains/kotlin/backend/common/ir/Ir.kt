@@ -150,7 +150,7 @@ abstract class Symbols<out T : CommonBackendContext>(val context: T, private val
 
     abstract val coroutineSuspendedGetter: IrSimpleFunctionSymbol
 
-    abstract val continuationGetter: IrSimpleFunctionSymbol
+    abstract val getContinuation: IrSimpleFunctionSymbol
 
     private val binaryOperatorCache = mutableMapOf<Triple<Name, KotlinType, KotlinType>, IrFunctionSymbol>()
 

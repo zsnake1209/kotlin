@@ -173,7 +173,7 @@ class JsIrBackendContext(
                     ).filterNot { it.isExpect }.single().getter!!
                 )
 
-            override val continuationGetter = symbolTable.referenceSimpleFunction(getJsInternalFunction("getContinuation"))
+            override val getContinuation = symbolTable.referenceSimpleFunction(getJsInternalFunction("getContinuation"))
         }
 
         override fun shouldGenerateHandlerParameterForDefaultBodyFun() = true

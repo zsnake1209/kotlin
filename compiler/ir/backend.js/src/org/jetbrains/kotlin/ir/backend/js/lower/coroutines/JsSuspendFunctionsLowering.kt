@@ -5,22 +5,29 @@
 
 package org.jetbrains.kotlin.ir.backend.js.lower.coroutines
 
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
+import org.jetbrains.kotlin.backend.common.ir.copyParameterDeclarationsFrom
 import org.jetbrains.kotlin.backend.common.ir.isSuspend
-import org.jetbrains.kotlin.backend.common.peek
-import org.jetbrains.kotlin.backend.common.pop
-import org.jetbrains.kotlin.backend.common.push
+import org.jetbrains.kotlin.backend.common.lower.AbstractSuspendFunctionsLowering
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.expressions.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.expressions.IrBlockBody
+import org.jetbrains.kotlin.ir.expressions.IrBody
+import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
+import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.util.explicitParameters
-import org.jetbrains.kotlin.ir.util.getPropertySetter
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.Name
@@ -38,6 +45,9 @@ class JsSuspendFunctionsLowering(override val context: JsIrBackendContext) : Abs
     private val coroutineImplResultSymbolSetter = context.coroutineImplResultSymbolSetter
 
     private var exceptionTrapId = -1
+
+    override val stateMachineMethodName = Name.identifier("doResume")
+    override fun getCoroutineBaseClass(function: IrFunction) = context.ir.symbols.coroutineImpl
 
     override fun buildStateMachine(
         originalBody: IrBody,
@@ -130,13 +140,11 @@ class JsSuspendFunctionsLowering(override val context: JsIrBackendContext) : Abs
             switch.branches += IrBranchImpl(state.entryBlock.startOffset, state.entryBlock.endOffset, condition, state.entryBlock)
         }
 
-        val irResultDeclaration = suspendResult
-
         rootLoop.transform(DispatchPointTransformer(::buildDispatch), null)
 
         exceptionTrapId = stateMachineBuilder.rootExceptionTrap.id
 
-        val functionBody = IrBlockBodyImpl(doResumeFunction.startOffset, doResumeFunction.endOffset, listOf(irResultDeclaration, rootLoop))
+        val functionBody = IrBlockBodyImpl(doResumeFunction.startOffset, doResumeFunction.endOffset, listOf(suspendResult, rootLoop))
 
         doResumeFunction.body = functionBody
 
@@ -206,33 +214,5 @@ class JsSuspendFunctionsLowering(override val context: JsIrBackendContext) : Abs
         +irReturn(irCall(invokeSuspendFunction.symbol).apply {
             dispatchReceiver = irGet(dispatchReceiverVar)
         })
-    }
-
-    private open class VariablesScopeTracker : IrElementVisitorVoid {
-
-        protected val scopeStack = mutableListOf<MutableSet<IrVariable>>(mutableSetOf())
-
-        override fun visitElement(element: IrElement) {
-            element.acceptChildrenVoid(this)
-        }
-
-        override fun visitContainerExpression(expression: IrContainerExpression) {
-            if (!expression.isTransparentScope)
-                scopeStack.push(mutableSetOf())
-            super.visitContainerExpression(expression)
-            if (!expression.isTransparentScope)
-                scopeStack.pop()
-        }
-
-        override fun visitCatch(aCatch: IrCatch) {
-            scopeStack.push(mutableSetOf())
-            super.visitCatch(aCatch)
-            scopeStack.pop()
-        }
-
-        override fun visitVariable(declaration: IrVariable) {
-            super.visitVariable(declaration)
-            scopeStack.peek()!!.add(declaration)
-        }
     }
 }
