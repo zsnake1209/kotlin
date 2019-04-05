@@ -1399,41 +1399,6 @@ class ExpressionCodegen(
         fun toReificationArgument() = ReificationArgument(parameterName, nullable, arrayDepth)
     }
 
-    /*TODO: Temporary copy from BridgeLowering */
-    private fun IrType.eraseTypeParameters() = when (this) {
-        is IrErrorType -> this
-        is IrSimpleType -> {
-            val owner = classifier.owner
-            when (owner) {
-                is IrClass -> IrSimpleTypeImpl(
-                    classifier,
-                    hasQuestionMark,
-                    arguments.zip(owner.typeParameters).map { (arg, param) -> arg.eraseTypeParameters(param) },
-                    annotations
-                )
-                is IrTypeParameter -> {
-                    owner.upperBound() // !!!!!! nullability
-                }
-                else -> error("Unknown IrSimpleType classifier kind: $owner")
-            }
-        }
-        else -> error("Unknown IrType kind: $this")
-    }
-
-    private fun IrTypeParameter.upperBound(): IrType {
-        val superSimpleTypes = superTypes.asSequence().filterIsInstance<IrSimpleType>()
-        val res = superSimpleTypes.firstOrNull { it.classifier is IrClassSymbol && !(it.classifier.owner as IrClass).isInterface }
-            ?: superSimpleTypes.firstOrNull { it.classifier is IrClassSymbol }
-            ?: classCodegen.context.irBuiltIns.anyNType
-        return res.eraseTypeParameters()
-    }
-
-    private fun IrTypeArgument.eraseTypeParameters(param: IrTypeParameter): IrTypeArgument = when (this) {
-        is IrTypeProjection -> makeTypeProjection(type.eraseTypeParameters(), variance) // !!!!!! TODO: must be wrong !!!!!!
-        is IrStarProjection -> this
-        else -> error("unknown type argyument kind: $this")
-    }
-
     fun IrType.getArrayOrPrimitiveArrayElementType() = (this as? IrSimpleType)?.let {
         if (this.makeNotNull().isArray()) {
             assert(arguments.size == 1) { "Array should have one type argument" }
