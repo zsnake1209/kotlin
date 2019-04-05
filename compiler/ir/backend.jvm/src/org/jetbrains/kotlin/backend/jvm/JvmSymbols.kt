@@ -7,8 +7,6 @@ package org.jetbrains.kotlin.backend.jvm
 
 import org.jetbrains.kotlin.backend.common.ir.Symbols
 import org.jetbrains.kotlin.backend.common.ir.createImplicitParameterDeclarationWithWrappedDescriptor
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
@@ -53,7 +51,6 @@ class JvmSymbols(
     private fun createPackage(fqName: FqName): IrPackageFragment =
         IrExternalPackageFragmentImpl(IrExternalPackageFragmentSymbolImpl(EmptyPackageFragmentDescriptor(context.state.module, fqName)))
 
-    private val kotlinPackage: IrPackageFragment = createPackage(KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME)
     private val kotlinJvmPackage: IrPackageFragment = createPackage(FqName("kotlin.jvm"))
     private val kotlinJvmInternalPackage: IrPackageFragment = createPackage(FqName("kotlin.jvm.internal"))
     private val kotlinJvmInternalUnsafePackage: IrPackageFragment = createPackage(FqName("kotlin.jvm.internal.unsafe"))
@@ -262,45 +259,24 @@ class JvmSymbols(
     val javaClassProperty: IrPropertySymbol = kotlinJvmPackage.addProperty {
         name = Name.identifier("javaClass")
     }.apply {
-        val property = this
-        getter = buildFun {
-            name = Name.special("<get-javaClass>")
-        }.apply {
-            val getter = this
-            parent = property.parent
-            addTypeParameter {
+        addGetter().apply {
+            val typeParameter = addTypeParameter {
                 name = Name.identifier("T")
             }.apply {
                 superTypes.add(irBuiltIns.anyType)
             }
-            val typeParameterType = typeParameters[0].defaultType
-            extensionReceiverParameter = buildValueParameter {
-                name = Name.identifier("\$receiver")
-                type = typeParameterType
-            }.apply {
-                parent = getter
-                returnType = javaLangClass.typeWith(typeParameterType)
-            }
+            addExtensionReceiver(typeParameter.defaultType)
+            returnType = javaLangClass.typeWith(typeParameter.defaultType)
         }
     }.symbol
 
     val kClassJavaProperty: IrPropertySymbol = kotlinJvmPackage.addProperty {
         name = Name.identifier("java")
     }.apply {
-        val property = this
-        getter = buildFun {
-            name = Name.special("<get-java>")
-        }.apply {
-            val getter = this
+        addGetter().apply {
             val extensionReceiverType = irBuiltIns.kClassClass.typeWith()
-            parent = property.parent
-            extensionReceiverParameter = buildValueParameter {
-                name = Name.identifier("\$receiver")
-                type = extensionReceiverType
-            }.apply {
-                parent = getter
-                returnType = javaLangClass.typeWith(extensionReceiverType)
-            }
+            addExtensionReceiver(extensionReceiverType)
+            returnType = javaLangClass.typeWith(extensionReceiverType)
         }
     }.symbol
 
@@ -313,13 +289,7 @@ class JvmSymbols(
     }.symbol
 
     val isArrayOf = kotlinJvmPackage.addFunction("isArrayOf", irBuiltIns.booleanType, isStatic = true).apply {
-        val function = this
-        extensionReceiverParameter = buildValueParameter {
-            name = Name.identifier("\$receiver")
-            type = irBuiltIns.arrayClass.owner.defaultType
-        }.apply {
-            parent = function
-        }
+        addExtensionReceiver(irBuiltIns.arrayClass.owner.defaultType)
         addTypeParameter("T", irBuiltIns.anyNType)
     }.symbol
 }
