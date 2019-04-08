@@ -16,10 +16,7 @@
 
 package org.jetbrains.uast.kotlin
 
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiComment
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiRecursiveElementWalkingVisitor
+import com.intellij.psi.*
 import org.jetbrains.kotlin.asJava.findFacadeClass
 import org.jetbrains.kotlin.asJava.toLightClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
@@ -39,7 +36,7 @@ class KotlinUFile(
 
     override val javaPsi: PsiElement? = null
 
-    override val sourcePsi: PsiElement? = psi
+    override val sourcePsi: PsiFile = psi
 
     override val allCommentsInFile by lz {
         val comments = ArrayList<UComment>(0)
