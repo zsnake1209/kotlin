@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
 
-abstract class AbstractSuspendFunctionsLowering(val context: CommonBackendContext, val symbolTable: SymbolTable) : FileLoweringPass {
+abstract class AbstractSuspendFunctionsLowering<C: CommonBackendContext>(val context: C, val symbolTable: SymbolTable) : FileLoweringPass {
 
     protected object STATEMENT_ORIGIN_COROUTINE_IMPL : IrStatementOriginImpl("COROUTINE_IMPL")
     protected object DECLARATION_ORIGIN_COROUTINE_IMPL : IrDeclarationOriginImpl("COROUTINE_IMPL")

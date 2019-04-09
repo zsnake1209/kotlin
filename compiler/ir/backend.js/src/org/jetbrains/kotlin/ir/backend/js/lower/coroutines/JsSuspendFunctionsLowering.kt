@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.DFS
 
-class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunctionsLowering(ctx, ctx.symbolTable) {
+class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunctionsLowering<JsIrBackendContext>(ctx, ctx.symbolTable) {
 
     private val coroutineImplExceptionPropertyGetter = ctx.coroutineImplExceptionPropertyGetter
     private val coroutineImplExceptionPropertySetter = ctx.coroutineImplExceptionPropertySetter
@@ -35,7 +35,6 @@ class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunct
     private val coroutineImplLabelPropertyGetter = ctx.coroutineImplLabelPropertyGetter
     private val coroutineImplResultSymbolGetter = ctx.coroutineImplResultSymbolGetter
     private val coroutineImplResultSymbolSetter = ctx.coroutineImplResultSymbolSetter
-    private val dynamicType = ctx.dynamicType
 
     private var exceptionTrapId = -1
 
@@ -87,7 +86,7 @@ class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunct
 
         val suspendableNodes = mutableSetOf<IrElement>()
         val loweredBody =
-            collectSuspendableNodes(body, suspendableNodes, context, stateMachineFunction, dynamicType)
+            collectSuspendableNodes(body, suspendableNodes, context, stateMachineFunction, context.dynamicType)
         val thisReceiver = (stateMachineFunction.dispatchReceiverParameter as IrValueParameter).symbol
 
         val stateMachineBuilder = StateMachineBuilder(
