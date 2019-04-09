@@ -1,6 +1,10 @@
 
 description = "Kotlin Android Extensions IDEA"
 
+tasks.withType<Test> {
+    maxParallelForks = Math.max(Runtime.getRuntime().availableProcessors() / 2, 1)
+}
+
 plugins {
     kotlin("jvm")
     id("jps-compatible")
