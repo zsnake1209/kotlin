@@ -1,3 +1,8 @@
+tasks.withType<Test> {
+    //TODO: support parallelizarion
+    //maxParallelForks = Math.max(Runtime.getRuntime().availableProcessors() / 2, 1)
+}
+
 plugins {
     kotlin("jvm")
     id("jps-compatible")
