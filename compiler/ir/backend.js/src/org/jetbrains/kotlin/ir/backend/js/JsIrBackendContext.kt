@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
@@ -157,37 +157,7 @@ class JsIrBackendContext(
     fun getOperatorByName(name: Name, type: IrSimpleType) = operatorMap[name]?.get(type.classifier)
 
     override val ir = object : Ir<JsIrBackendContext>(this, irModuleFragment) {
-        override val symbols = object : Symbols<JsIrBackendContext>(this@JsIrBackendContext, symbolTable.lazyWrapper) {
-            override val ThrowNullPointerException =
-                symbolTable.referenceSimpleFunction(getFunctions(kotlinPackageFqn.child(Name.identifier("THROW_NPE"))).single())
-
-            override val ThrowNoWhenBranchMatchedException =
-                symbolTable.referenceSimpleFunction(getFunctions(kotlinPackageFqn.child(Name.identifier("noWhenBranchMatchedException"))).single())
-
-            override val ThrowTypeCastException =
-                symbolTable.referenceSimpleFunction(getFunctions(kotlinPackageFqn.child(Name.identifier("THROW_CCE"))).single())
-
-            override val ThrowUninitializedPropertyAccessException =
-                symbolTable.referenceSimpleFunction(getFunctions(FqName("kotlin.throwUninitializedPropertyAccessException")).single())
-
-            override val defaultConstructorMarker =
-                symbolTable.referenceClass(context.getJsInternalClass("DefaultConstructorMarker"))
-
-            override val stringBuilder
-                get() = TODO("not implemented")
-            override val copyRangeTo: Map<ClassDescriptor, IrSimpleFunctionSymbol>
-                get() = TODO("not implemented")
-            override val coroutineImpl =
-                symbolTable.referenceClass(findClass(coroutinePackage.memberScope, COROUTINE_IMPL_NAME))
-            override val workerInterface = symbolTable.referenceClass(findClass(workerPackage.memberScope, "Worker"))
-            override val coroutineSuspendedGetter =
-                symbolTable.referenceSimpleFunction(
-                    coroutineIntrinsicsPackage.memberScope.getContributedVariables(
-                        COROUTINE_SUSPENDED_NAME,
-                        NoLookupLocation.FROM_BACKEND
-                    ).filterNot { it.isExpect }.single().getter!!
-                )
-        }
+        override val symbols = JsSymbols(this@JsIrBackendContext)
 
         override fun shouldGenerateHandlerParameterForDefaultBodyFun() = true
     }
@@ -305,5 +275,37 @@ class JsIrBackendContext(
     override fun report(element: IrElement?, irFile: IrFile?, message: String, isError: Boolean) {
         /*TODO*/
         print(message)
+    }
+
+    class JsSymbols(context: JsIrBackendContext) : Symbols<JsIrBackendContext>(context, context.symbolTable.lazyWrapper) {
+        override val ThrowNullPointerException =
+            context.symbolTable.referenceSimpleFunction(context.getFunctions(kotlinPackageFqn.child(Name.identifier("THROW_NPE"))).single())
+
+        override val ThrowNoWhenBranchMatchedException =
+            context.symbolTable.referenceSimpleFunction(context.getFunctions(kotlinPackageFqn.child(Name.identifier("noWhenBranchMatchedException"))).single())
+
+        override val ThrowTypeCastException =
+            context.symbolTable.referenceSimpleFunction(context.getFunctions(kotlinPackageFqn.child(Name.identifier("THROW_CCE"))).single())
+
+        override val ThrowUninitializedPropertyAccessException =
+            context.symbolTable.referenceSimpleFunction(context.getFunctions(FqName("kotlin.throwUninitializedPropertyAccessException")).single())
+
+        override val defaultConstructorMarker =
+            context.symbolTable.referenceClass(context.getJsInternalClass("DefaultConstructorMarker"))
+
+        override val stringBuilder
+            get() = TODO("not implemented")
+        override val copyRangeTo: Map<ClassDescriptor, IrSimpleFunctionSymbol>
+            get() = TODO("not implemented")
+        override val coroutineImpl =
+            context.symbolTable.referenceClass(context.findClass(context.coroutinePackage.memberScope, COROUTINE_IMPL_NAME))
+        val workerClass = context.symbolTable.referenceClass(context.findClass(context.workerPackage.memberScope, Name.identifier("WebWorker")))
+        override val coroutineSuspendedGetter =
+            context.symbolTable.referenceSimpleFunction(
+                context.coroutineIntrinsicsPackage.memberScope.getContributedVariables(
+                    COROUTINE_SUSPENDED_NAME,
+                    NoLookupLocation.FROM_BACKEND
+                ).filterNot { it.isExpect }.single().getter!!
+            )
     }
 }

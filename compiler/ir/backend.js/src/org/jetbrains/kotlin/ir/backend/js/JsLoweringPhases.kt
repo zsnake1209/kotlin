@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.coroutines.SuspendFunctionsLower
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.FunctionInlining
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.RemoveInlineFunctionsWithReifiedTypeParametersLowering
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ReturnableBlockLowering
+import org.jetbrains.kotlin.ir.backend.js.lower.workers.WorkerIntrinsicLowering
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
@@ -70,6 +71,12 @@ private val moveBodilessDeclarationsToSeparatePlacePhase = makeCustomJsModulePha
     },
     name = "MoveBodilessDeclarationsToSeparatePlace",
     description = "Move `external` and `built-in` declarations into separate place to make the following lowerings do not care about them"
+)
+
+private val workerIntrinsicLoweringPhase = makeJsModulePhase(
+    ::WorkerIntrinsicLowering,
+    name = "WorkerIntrinsicLowering",
+    description = "Move workers to separate script"
 )
 
 private val expectDeclarationsRemovingPhase = makeJsModulePhase(
@@ -357,6 +364,7 @@ val jsPhases = namedIrModulePhase(
             initializersLoweringPhase then
             // Common prefix ends
             moveBodilessDeclarationsToSeparatePlacePhase then
+            workerIntrinsicLoweringPhase then
             enumClassLoweringPhase then
             enumUsageLoweringPhase then
             returnableBlockLoweringPhase then
