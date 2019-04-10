@@ -1,36 +1,36 @@
 FILE fqName:test fileName:/fileAnnotations.kt
   annotations:
-    CALL 'public constructor <init> (x: kotlin.String) [primary] declared in test.A' type=test.A origin=null
+    CALL '#0 public constructor <init> (x: kotlin.String) [primary] declared in test.A' type=test.A origin=null
       x: CONST String type=kotlin.String value="File annotation"
-  CLASS ANNOTATION_CLASS name:A modality:FINAL visibility:public superTypes:[kotlin.Annotation]
+  CLASS #1 ANNOTATION_CLASS name:A modality:FINAL visibility:public superTypes:[kotlin.Annotation]
     annotations:
-      CALL 'public constructor <init> (vararg allowedTargets: kotlin.annotation.AnnotationTarget) [primary] declared in kotlin.annotation.Target' type=kotlin.annotation.Target origin=null
+      CALL '#2 public constructor <init> (vararg allowedTargets: kotlin.annotation.AnnotationTarget) [primary] declared in kotlin.annotation.Target' type=kotlin.annotation.Target origin=null
         allowedTargets: VARARG type=kotlin.Array<out kotlin.annotation.AnnotationTarget> varargElementType=kotlin.annotation.AnnotationTarget
-          GET_ENUM 'ENUM_ENTRY IR_EXTERNAL_DECLARATION_STUB name:FILE' type=kotlin.annotation.AnnotationTarget
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:test.A 
-    CONSTRUCTOR visibility:public <> (x:kotlin.String) returnType:test.A [primary] 
-      VALUE_PARAMETER name:x index:0 type:kotlin.String 
-    PROPERTY name:x visibility:public modality:FINAL [val] 
-      FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final] 
+          GET_ENUM '#3 ENUM_ENTRY #3 IR_EXTERNAL_DECLARATION_STUB name:FILE' type=kotlin.annotation.AnnotationTarget
+    $this: VALUE_PARAMETER #4 INSTANCE_RECEIVER name:<this> type:test.A 
+    CONSTRUCTOR #0 visibility:public <> (x:kotlin.String) returnType:test.A [primary] 
+      VALUE_PARAMETER #5 name:x index:0 type:kotlin.String 
+    PROPERTY #6 name:x visibility:public modality:FINAL [val] 
+      FIELD #7 PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'x: kotlin.String declared in test.A.<init>' type=kotlin.String origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:FINAL <> ($this:test.A) returnType:kotlin.String 
-        correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val] 
-        $this: VALUE_PARAMETER name:<this> type:test.A 
+          GET_VAR '#5 x: kotlin.String declared in test.A.<init>' type=kotlin.String origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #8 DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:FINAL <> ($this:test.A) returnType:kotlin.String 
+        correspondingProperty: PROPERTY #6 name:x visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #9 name:<this> type:test.A 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.String declared in test.A'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: test.A declared in test.A.<get-x>' type=test.A origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+          RETURN type=kotlin.Nothing from='#8 public final fun <get-x> (): kotlin.String declared in test.A'
+            GET_FIELD '#7 FIELD #7 PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
+              receiver: GET_VAR '#9 <this>: test.A declared in test.A.<get-x>' type=test.A origin=null
+    FUN #10 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #11 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
+      $this: VALUE_PARAMETER #12 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #13 name:other index:0 type:kotlin.Any? 
+    FUN #14 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Annotation
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #15 public open fun hashCode (): kotlin.Int declared in kotlin.Annotation
+      $this: VALUE_PARAMETER #16 name:<this> type:kotlin.Any 
+    FUN #17 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Annotation
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
+        #18 public open fun toString (): kotlin.String declared in kotlin.Annotation
+      $this: VALUE_PARAMETER #19 name:<this> type:kotlin.Any 

@@ -1,7 +1,7 @@
 FILE fqName:<root> fileName:/jdkClassSyntheticProperty.kt
-  PROPERTY name:test visibility:public modality:FINAL [val]
-    FUN name:<get-test> visibility:public modality:FINAL <> () returnType:IrErrorType
-      correspondingProperty: PROPERTY name:test visibility:public modality:FINAL [val]
+  PROPERTY #0 name:test visibility:public modality:FINAL [val] 
+    FUN #1 name:<get-test> visibility:public modality:FINAL <> () returnType:IrErrorType 
+      correspondingProperty: PROPERTY #0 name:test visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test> (): IrErrorType declared in <root>'
+        RETURN type=kotlin.Nothing from='#1 public final fun <get-test> (): IrErrorType declared in <root>'
           ERROR_CALL 'Unresolved reference: <Unresolved name: declaredFields>#' type=IrErrorType

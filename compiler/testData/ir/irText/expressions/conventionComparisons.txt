@@ -1,83 +1,83 @@
 FILE fqName:<root> fileName:/conventionComparisons.kt
-  CLASS INTERFACE name:IA modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IA 
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+  CLASS #0 INTERFACE name:IA modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.IA 
+    FUN #2 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #3 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #4 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #5 name:other index:0 type:kotlin.Any? 
+    FUN #6 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #7 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #8 name:<this> type:kotlin.Any 
+    FUN #9 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  CLASS INTERFACE name:IB modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IB 
-    FUN name:compareTo visibility:public modality:ABSTRACT <> ($this:<root>.IB, $receiver:<root>.IA, other:<root>.IA) returnType:kotlin.Int 
-      $this: VALUE_PARAMETER name:<this> type:<root>.IB 
-      $receiver: VALUE_PARAMETER name:<this> type:<root>.IA 
-      VALUE_PARAMETER name:other index:0 type:<root>.IA 
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+        #10 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #11 name:<this> type:kotlin.Any 
+  CLASS #12 INTERFACE name:IB modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #13 INSTANCE_RECEIVER name:<this> type:<root>.IB 
+    FUN #14 name:compareTo visibility:public modality:ABSTRACT <> ($this:<root>.IB, $receiver:<root>.IA, other:<root>.IA) returnType:kotlin.Int 
+      $this: VALUE_PARAMETER #15 name:<this> type:<root>.IB 
+      $receiver: VALUE_PARAMETER #16 name:<this> type:<root>.IA 
+      VALUE_PARAMETER #17 name:other index:0 type:<root>.IA 
+    FUN #18 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #3 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #19 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #20 name:other index:0 type:kotlin.Any? 
+    FUN #21 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #7 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #22 name:<this> type:kotlin.Any 
+    FUN #23 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  FUN name:test1 visibility:public modality:FINAL <> ($receiver:<root>.IB, a1:<root>.IA, a2:<root>.IA) returnType:kotlin.Boolean 
-    $receiver: VALUE_PARAMETER name:<this> type:<root>.IB 
-    VALUE_PARAMETER name:a1 index:0 type:<root>.IA 
-    VALUE_PARAMETER name:a2 index:1 type:<root>.IA 
+        #10 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #24 name:<this> type:kotlin.Any 
+  FUN #25 name:test1 visibility:public modality:FINAL <> ($receiver:<root>.IB, a1:<root>.IA, a2:<root>.IA) returnType:kotlin.Boolean 
+    $receiver: VALUE_PARAMETER #26 name:<this> type:<root>.IB 
+    VALUE_PARAMETER #27 name:a1 index:0 type:<root>.IA 
+    VALUE_PARAMETER #28 name:a2 index:1 type:<root>.IA 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1 (a1: <root>.IA, a2: <root>.IA): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
-          arg0: CALL 'public abstract fun compareTo (other: <root>.IA): kotlin.Int declared in <root>.IB' type=kotlin.Int origin=GT
-            $this: GET_VAR '<this>: <root>.IB declared in <root>.test1' type=<root>.IB origin=null
-            $receiver: GET_VAR 'a1: <root>.IA declared in <root>.test1' type=<root>.IA origin=null
-            other: GET_VAR 'a2: <root>.IA declared in <root>.test1' type=<root>.IA origin=null
+      RETURN type=kotlin.Nothing from='#25 public final fun test1 (a1: <root>.IA, a2: <root>.IA): kotlin.Boolean declared in <root>'
+        CALL '#29 public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
+          arg0: CALL '#14 public abstract fun compareTo (other: <root>.IA): kotlin.Int declared in <root>.IB' type=kotlin.Int origin=GT
+            $this: GET_VAR '#26 <this>: <root>.IB declared in <root>.test1' type=<root>.IB origin=null
+            $receiver: GET_VAR '#27 a1: <root>.IA declared in <root>.test1' type=<root>.IA origin=null
+            other: GET_VAR '#28 a2: <root>.IA declared in <root>.test1' type=<root>.IA origin=null
           arg1: CONST Int type=kotlin.Int value=0
-  FUN name:test2 visibility:public modality:FINAL <> ($receiver:<root>.IB, a1:<root>.IA, a2:<root>.IA) returnType:kotlin.Boolean 
-    $receiver: VALUE_PARAMETER name:<this> type:<root>.IB 
-    VALUE_PARAMETER name:a1 index:0 type:<root>.IA 
-    VALUE_PARAMETER name:a2 index:1 type:<root>.IA 
+  FUN #30 name:test2 visibility:public modality:FINAL <> ($receiver:<root>.IB, a1:<root>.IA, a2:<root>.IA) returnType:kotlin.Boolean 
+    $receiver: VALUE_PARAMETER #31 name:<this> type:<root>.IB 
+    VALUE_PARAMETER #32 name:a1 index:0 type:<root>.IA 
+    VALUE_PARAMETER #33 name:a2 index:1 type:<root>.IA 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2 (a1: <root>.IA, a2: <root>.IA): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greaterOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
-          arg0: CALL 'public abstract fun compareTo (other: <root>.IA): kotlin.Int declared in <root>.IB' type=kotlin.Int origin=GTEQ
-            $this: GET_VAR '<this>: <root>.IB declared in <root>.test2' type=<root>.IB origin=null
-            $receiver: GET_VAR 'a1: <root>.IA declared in <root>.test2' type=<root>.IA origin=null
-            other: GET_VAR 'a2: <root>.IA declared in <root>.test2' type=<root>.IA origin=null
+      RETURN type=kotlin.Nothing from='#30 public final fun test2 (a1: <root>.IA, a2: <root>.IA): kotlin.Boolean declared in <root>'
+        CALL '#34 public final fun greaterOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
+          arg0: CALL '#14 public abstract fun compareTo (other: <root>.IA): kotlin.Int declared in <root>.IB' type=kotlin.Int origin=GTEQ
+            $this: GET_VAR '#31 <this>: <root>.IB declared in <root>.test2' type=<root>.IB origin=null
+            $receiver: GET_VAR '#32 a1: <root>.IA declared in <root>.test2' type=<root>.IA origin=null
+            other: GET_VAR '#33 a2: <root>.IA declared in <root>.test2' type=<root>.IA origin=null
           arg1: CONST Int type=kotlin.Int value=0
-  FUN name:test3 visibility:public modality:FINAL <> ($receiver:<root>.IB, a1:<root>.IA, a2:<root>.IA) returnType:kotlin.Boolean 
-    $receiver: VALUE_PARAMETER name:<this> type:<root>.IB 
-    VALUE_PARAMETER name:a1 index:0 type:<root>.IA 
-    VALUE_PARAMETER name:a2 index:1 type:<root>.IA 
+  FUN #35 name:test3 visibility:public modality:FINAL <> ($receiver:<root>.IB, a1:<root>.IA, a2:<root>.IA) returnType:kotlin.Boolean 
+    $receiver: VALUE_PARAMETER #36 name:<this> type:<root>.IB 
+    VALUE_PARAMETER #37 name:a1 index:0 type:<root>.IA 
+    VALUE_PARAMETER #38 name:a2 index:1 type:<root>.IA 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3 (a1: <root>.IA, a2: <root>.IA): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: CALL 'public abstract fun compareTo (other: <root>.IA): kotlin.Int declared in <root>.IB' type=kotlin.Int origin=LT
-            $this: GET_VAR '<this>: <root>.IB declared in <root>.test3' type=<root>.IB origin=null
-            $receiver: GET_VAR 'a1: <root>.IA declared in <root>.test3' type=<root>.IA origin=null
-            other: GET_VAR 'a2: <root>.IA declared in <root>.test3' type=<root>.IA origin=null
+      RETURN type=kotlin.Nothing from='#35 public final fun test3 (a1: <root>.IA, a2: <root>.IA): kotlin.Boolean declared in <root>'
+        CALL '#39 public final fun less (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: CALL '#14 public abstract fun compareTo (other: <root>.IA): kotlin.Int declared in <root>.IB' type=kotlin.Int origin=LT
+            $this: GET_VAR '#36 <this>: <root>.IB declared in <root>.test3' type=<root>.IB origin=null
+            $receiver: GET_VAR '#37 a1: <root>.IA declared in <root>.test3' type=<root>.IA origin=null
+            other: GET_VAR '#38 a2: <root>.IA declared in <root>.test3' type=<root>.IA origin=null
           arg1: CONST Int type=kotlin.Int value=0
-  FUN name:test4 visibility:public modality:FINAL <> ($receiver:<root>.IB, a1:<root>.IA, a2:<root>.IA) returnType:kotlin.Boolean 
-    $receiver: VALUE_PARAMETER name:<this> type:<root>.IB 
-    VALUE_PARAMETER name:a1 index:0 type:<root>.IA 
-    VALUE_PARAMETER name:a2 index:1 type:<root>.IA 
+  FUN #40 name:test4 visibility:public modality:FINAL <> ($receiver:<root>.IB, a1:<root>.IA, a2:<root>.IA) returnType:kotlin.Boolean 
+    $receiver: VALUE_PARAMETER #41 name:<this> type:<root>.IB 
+    VALUE_PARAMETER #42 name:a1 index:0 type:<root>.IA 
+    VALUE_PARAMETER #43 name:a2 index:1 type:<root>.IA 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test4 (a1: <root>.IA, a2: <root>.IA): kotlin.Boolean declared in <root>'
-        CALL 'public final fun lessOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
-          arg0: CALL 'public abstract fun compareTo (other: <root>.IA): kotlin.Int declared in <root>.IB' type=kotlin.Int origin=LTEQ
-            $this: GET_VAR '<this>: <root>.IB declared in <root>.test4' type=<root>.IB origin=null
-            $receiver: GET_VAR 'a1: <root>.IA declared in <root>.test4' type=<root>.IA origin=null
-            other: GET_VAR 'a2: <root>.IA declared in <root>.test4' type=<root>.IA origin=null
+      RETURN type=kotlin.Nothing from='#40 public final fun test4 (a1: <root>.IA, a2: <root>.IA): kotlin.Boolean declared in <root>'
+        CALL '#44 public final fun lessOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
+          arg0: CALL '#14 public abstract fun compareTo (other: <root>.IA): kotlin.Int declared in <root>.IB' type=kotlin.Int origin=LTEQ
+            $this: GET_VAR '#41 <this>: <root>.IB declared in <root>.test4' type=<root>.IB origin=null
+            $receiver: GET_VAR '#42 a1: <root>.IA declared in <root>.test4' type=<root>.IA origin=null
+            other: GET_VAR '#43 a2: <root>.IA declared in <root>.test4' type=<root>.IA origin=null
           arg1: CONST Int type=kotlin.Int value=0

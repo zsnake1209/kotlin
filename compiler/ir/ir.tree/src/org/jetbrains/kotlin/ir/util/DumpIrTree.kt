@@ -43,7 +43,18 @@ class DumpIrTreeVisitor(
 ) : IrElementVisitor<Unit, String> {
 
     private val printer = Printer(out, "  ")
-    private val elementRenderer = RenderIrElementVisitor()
+
+    private val symbolIndex = HashMap<IrSymbol, Int>()
+
+    private val elementRenderer = RenderIrElementVisitor().apply {
+        symbolLabelProvider = {
+            val index = symbolIndex.getOrPut(it) {
+                symbolIndex.size
+            }
+            "#$index"
+        }
+    }
+
     private fun IrType.render() = elementRenderer.renderType(this)
 
     override fun visitElement(element: IrElement, data: String) {

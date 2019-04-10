@@ -1,117 +1,117 @@
 FILE fqName:<root> fileName:/packageLevelProperties.kt
-  PROPERTY name:test1 visibility:public modality:FINAL [val] 
-    FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static] 
+  PROPERTY #0 name:test1 visibility:public modality:FINAL [val] 
+    FIELD #1 PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static] 
       EXPRESSION_BODY
         CONST Int type=kotlin.Int value=0
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val] 
+    FUN #2 DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #0 name:test1 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
-  PROPERTY name:test2 visibility:public modality:FINAL [val] 
-    FUN name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [val] 
+        RETURN type=kotlin.Nothing from='#2 public final fun <get-test1> (): kotlin.Int declared in <root>'
+          GET_FIELD '#1 FIELD #1 PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
+  PROPERTY #3 name:test2 visibility:public modality:FINAL [val] 
+    FUN #4 name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #3 name:test2 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Int declared in <root>'
+        RETURN type=kotlin.Nothing from='#4 public final fun <get-test2> (): kotlin.Int declared in <root>'
           CONST Int type=kotlin.Int value=0
-  PROPERTY name:test3 visibility:public modality:FINAL [var] 
-    FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [static] 
+  PROPERTY #5 name:test3 visibility:public modality:FINAL [var] 
+    FIELD #6 PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [static] 
       EXPRESSION_BODY
         CONST Int type=kotlin.Int value=0
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:test3 visibility:public modality:FINAL [var] 
+    FUN #7 DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #5 name:test3 visibility:public modality:FINAL [var] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<set-test3> visibility:public modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit 
-      correspondingProperty: PROPERTY name:test3 visibility:public modality:FINAL [var] 
-      VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
+        RETURN type=kotlin.Nothing from='#7 public final fun <get-test3> (): kotlin.Int declared in <root>'
+          GET_FIELD '#6 FIELD #6 PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
+    FUN #8 DEFAULT_PROPERTY_ACCESSOR name:<set-test3> visibility:public modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit 
+      correspondingProperty: PROPERTY #5 name:test3 visibility:public modality:FINAL [var] 
+      VALUE_PARAMETER #9 name:<set-?> index:0 type:kotlin.Int 
       BLOCK_BODY
-        SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [static] ' type=kotlin.Unit origin=null
-          value: GET_VAR '<set-?>: kotlin.Int declared in <root>.<set-test3>' type=kotlin.Int origin=null
-  PROPERTY name:test4 visibility:public modality:FINAL [var] 
-    FIELD PROPERTY_BACKING_FIELD name:test4 type:kotlin.Int visibility:public [static] 
+        SET_FIELD '#6 FIELD #6 PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [static] ' type=kotlin.Unit origin=null
+          value: GET_VAR '#9 <set-?>: kotlin.Int declared in <root>.<set-test3>' type=kotlin.Int origin=null
+  PROPERTY #10 name:test4 visibility:public modality:FINAL [var] 
+    FIELD #11 PROPERTY_BACKING_FIELD name:test4 type:kotlin.Int visibility:public [static] 
       EXPRESSION_BODY
         CONST Int type=kotlin.Int value=1
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test4> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:test4 visibility:public modality:FINAL [var] 
+    FUN #12 DEFAULT_PROPERTY_ACCESSOR name:<get-test4> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #10 name:test4 visibility:public modality:FINAL [var] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test4> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test4 type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
-    FUN name:<set-test4> visibility:public modality:FINAL <> (value:kotlin.Int) returnType:kotlin.Unit 
-      correspondingProperty: PROPERTY name:test4 visibility:public modality:FINAL [var] 
-      VALUE_PARAMETER name:value index:0 type:kotlin.Int 
+        RETURN type=kotlin.Nothing from='#12 public final fun <get-test4> (): kotlin.Int declared in <root>'
+          GET_FIELD '#11 FIELD #11 PROPERTY_BACKING_FIELD name:test4 type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
+    FUN #13 name:<set-test4> visibility:public modality:FINAL <> (value:kotlin.Int) returnType:kotlin.Unit 
+      correspondingProperty: PROPERTY #10 name:test4 visibility:public modality:FINAL [var] 
+      VALUE_PARAMETER #14 name:value index:0 type:kotlin.Int 
       BLOCK_BODY
-        SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test4 type:kotlin.Int visibility:public [static] ' type=kotlin.Unit origin=EQ
-          value: GET_VAR 'value: kotlin.Int declared in <root>.<set-test4>' type=kotlin.Int origin=null
-  PROPERTY name:test5 visibility:public modality:FINAL [var] 
-    FIELD PROPERTY_BACKING_FIELD name:test5 type:kotlin.Int visibility:public [static] 
+        SET_FIELD '#11 FIELD #11 PROPERTY_BACKING_FIELD name:test4 type:kotlin.Int visibility:public [static] ' type=kotlin.Unit origin=EQ
+          value: GET_VAR '#14 value: kotlin.Int declared in <root>.<set-test4>' type=kotlin.Int origin=null
+  PROPERTY #15 name:test5 visibility:public modality:FINAL [var] 
+    FIELD #16 PROPERTY_BACKING_FIELD name:test5 type:kotlin.Int visibility:public [static] 
       EXPRESSION_BODY
         CONST Int type=kotlin.Int value=1
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test5> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:test5 visibility:public modality:FINAL [var] 
+    FUN #17 DEFAULT_PROPERTY_ACCESSOR name:<get-test5> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #15 name:test5 visibility:public modality:FINAL [var] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test5> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test5 type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
-    FUN name:<set-test5> visibility:private modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit 
-      correspondingProperty: PROPERTY name:test5 visibility:public modality:FINAL [var] 
-      VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
+        RETURN type=kotlin.Nothing from='#17 public final fun <get-test5> (): kotlin.Int declared in <root>'
+          GET_FIELD '#16 FIELD #16 PROPERTY_BACKING_FIELD name:test5 type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
+    FUN #18 name:<set-test5> visibility:private modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit 
+      correspondingProperty: PROPERTY #15 name:test5 visibility:public modality:FINAL [var] 
+      VALUE_PARAMETER #19 name:<set-?> index:0 type:kotlin.Int 
       BLOCK_BODY
-        SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test5 type:kotlin.Int visibility:public [static] ' type=kotlin.Unit origin=null
-          value: GET_VAR '<set-?>: kotlin.Int declared in <root>.<set-test5>' type=kotlin.Int origin=null
-  PROPERTY name:test6 visibility:public modality:FINAL [val] 
-    FIELD PROPERTY_BACKING_FIELD name:test6 type:kotlin.Int visibility:public [final,static] 
+        SET_FIELD '#16 FIELD #16 PROPERTY_BACKING_FIELD name:test5 type:kotlin.Int visibility:public [static] ' type=kotlin.Unit origin=null
+          value: GET_VAR '#19 <set-?>: kotlin.Int declared in <root>.<set-test5>' type=kotlin.Int origin=null
+  PROPERTY #20 name:test6 visibility:public modality:FINAL [val] 
+    FIELD #21 PROPERTY_BACKING_FIELD name:test6 type:kotlin.Int visibility:public [final,static] 
       EXPRESSION_BODY
         CONST Int type=kotlin.Int value=1
-    FUN name:<get-test6> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:test6 visibility:public modality:FINAL [val] 
+    FUN #22 name:<get-test6> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #20 name:test6 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test6> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test6 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
-  PROPERTY name:test7 visibility:public modality:FINAL [delegated,val] 
-    FIELD DELEGATE name:test7$delegate type:kotlin.Lazy<kotlin.Int> visibility:private [final,static] 
+        RETURN type=kotlin.Nothing from='#22 public final fun <get-test6> (): kotlin.Int declared in <root>'
+          GET_FIELD '#21 FIELD #21 PROPERTY_BACKING_FIELD name:test6 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
+  PROPERTY #23 name:test7 visibility:public modality:FINAL [delegated,val] 
+    FIELD #24 DELEGATE name:test7$delegate type:kotlin.Lazy<kotlin.Int> visibility:private [final,static] 
       EXPRESSION_BODY
-        CALL 'public final fun lazy <T> (initializer: kotlin.Function0<T of kotlin.lazy>): kotlin.Lazy<T of kotlin.lazy> declared in kotlin' type=kotlin.Lazy<kotlin.Int> origin=null
+        CALL '#25 public final fun lazy <T> (initializer: kotlin.Function0<T of kotlin.lazy>): kotlin.Lazy<T of kotlin.lazy> declared in kotlin' type=kotlin.Lazy<kotlin.Int> origin=null
           <T>: kotlin.Int
           initializer: BLOCK type=kotlin.Function0<kotlin.Int> origin=LAMBDA
-            FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:kotlin.Int 
+            FUN #26 LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:kotlin.Int 
               BLOCK_BODY
-                RETURN type=kotlin.Nothing from='local final fun <anonymous> (): kotlin.Int declared in <root>.test7$delegate'
+                RETURN type=kotlin.Nothing from='#26 local final fun <anonymous> (): kotlin.Int declared in <root>.test7$delegate'
                   CONST Int type=kotlin.Int value=42
-            FUNCTION_REFERENCE 'local final fun <anonymous> (): kotlin.Int declared in <root>.test7$delegate' type=kotlin.Function0<kotlin.Int> origin=LAMBDA
-    FUN DELEGATED_PROPERTY_ACCESSOR name:<get-test7> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:test7 visibility:public modality:FINAL [delegated,val] 
+            FUNCTION_REFERENCE '#26 local final fun <anonymous> (): kotlin.Int declared in <root>.test7$delegate' type=kotlin.Function0<kotlin.Int> origin=LAMBDA
+    FUN #27 DELEGATED_PROPERTY_ACCESSOR name:<get-test7> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #23 name:test7 visibility:public modality:FINAL [delegated,val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test7> (): kotlin.Int declared in <root>'
-          CALL 'public final fun getValue <T> (thisRef: kotlin.Any?, property: kotlin.reflect.KProperty<*>): T of kotlin.getValue [inline] declared in kotlin' type=kotlin.Int origin=null
+        RETURN type=kotlin.Nothing from='#27 public final fun <get-test7> (): kotlin.Int declared in <root>'
+          CALL '#28 public final fun getValue <T> (thisRef: kotlin.Any?, property: kotlin.reflect.KProperty<*>): T of kotlin.getValue [inline] declared in kotlin' type=kotlin.Int origin=null
             <T>: kotlin.Int
-            $receiver: GET_FIELD 'FIELD DELEGATE name:test7$delegate type:kotlin.Lazy<kotlin.Int> visibility:private [final,static] ' type=kotlin.Lazy<kotlin.Int> origin=null
+            $receiver: GET_FIELD '#24 FIELD #24 DELEGATE name:test7$delegate type:kotlin.Lazy<kotlin.Int> visibility:private [final,static] ' type=kotlin.Lazy<kotlin.Int> origin=null
             thisRef: CONST Null type=kotlin.Nothing? value=null
-            property: PROPERTY_REFERENCE 'public final test7: kotlin.Int [delegated,val] ' field=null getter='public final fun <get-test7> (): kotlin.Int declared in <root>' setter=null type=kotlin.reflect.KProperty0<kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
-  PROPERTY name:test8 visibility:public modality:FINAL [delegated,var] 
-    FIELD DELEGATE name:test8$delegate type:java.util.HashMap<kotlin.String, kotlin.Int> visibility:private [final,static] 
+            property: PROPERTY_REFERENCE '#23 public final test7: kotlin.Int [delegated,val] ' field=null getter='#27 public final fun <get-test7> (): kotlin.Int declared in <root>' setter=null type=kotlin.reflect.KProperty0<kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+  PROPERTY #29 name:test8 visibility:public modality:FINAL [delegated,var] 
+    FIELD #30 DELEGATE name:test8$delegate type:java.util.HashMap<kotlin.String, kotlin.Int> visibility:private [final,static] 
       EXPRESSION_BODY
-        CALL 'public final fun hashMapOf <K, V> (): java.util.HashMap<K of kotlin.collections.hashMapOf, V of kotlin.collections.hashMapOf> [inline] declared in kotlin.collections' type=java.util.HashMap<kotlin.String, kotlin.Int> origin=null
+        CALL '#31 public final fun hashMapOf <K, V> (): java.util.HashMap<K of kotlin.collections.hashMapOf, V of kotlin.collections.hashMapOf> [inline] declared in kotlin.collections' type=java.util.HashMap<kotlin.String, kotlin.Int> origin=null
           <K>: kotlin.String
           <V>: kotlin.Int
-    FUN DELEGATED_PROPERTY_ACCESSOR name:<get-test8> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:test8 visibility:public modality:FINAL [delegated,var] 
+    FUN #32 DELEGATED_PROPERTY_ACCESSOR name:<get-test8> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #29 name:test8 visibility:public modality:FINAL [delegated,var] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test8> (): kotlin.Int declared in <root>'
-          CALL 'public final fun getValue <V, V1> (thisRef: kotlin.Any?, property: kotlin.reflect.KProperty<*>): V1 of kotlin.collections.getValue [inline] declared in kotlin.collections' type=kotlin.Int origin=null
+        RETURN type=kotlin.Nothing from='#32 public final fun <get-test8> (): kotlin.Int declared in <root>'
+          CALL '#33 public final fun getValue <V, V1> (thisRef: kotlin.Any?, property: kotlin.reflect.KProperty<*>): V1 of kotlin.collections.getValue [inline] declared in kotlin.collections' type=kotlin.Int origin=null
             <V>: kotlin.Int
             <V1>: kotlin.Int
-            $receiver: GET_FIELD 'FIELD DELEGATE name:test8$delegate type:java.util.HashMap<kotlin.String, kotlin.Int> visibility:private [final,static] ' type=java.util.HashMap<kotlin.String, kotlin.Int> origin=null
+            $receiver: GET_FIELD '#30 FIELD #30 DELEGATE name:test8$delegate type:java.util.HashMap<kotlin.String, kotlin.Int> visibility:private [final,static] ' type=java.util.HashMap<kotlin.String, kotlin.Int> origin=null
             thisRef: CONST Null type=kotlin.Nothing? value=null
-            property: PROPERTY_REFERENCE 'public final test8: kotlin.Int [delegated,var] ' field=null getter='public final fun <get-test8> (): kotlin.Int declared in <root>' setter='public final fun <set-test8> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.reflect.KMutableProperty0<kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
-    FUN DELEGATED_PROPERTY_ACCESSOR name:<set-test8> visibility:public modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit 
-      correspondingProperty: PROPERTY name:test8 visibility:public modality:FINAL [delegated,var] 
-      VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
+            property: PROPERTY_REFERENCE '#29 public final test8: kotlin.Int [delegated,var] ' field=null getter='#32 public final fun <get-test8> (): kotlin.Int declared in <root>' setter='#34 public final fun <set-test8> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.reflect.KMutableProperty0<kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+    FUN #34 DELEGATED_PROPERTY_ACCESSOR name:<set-test8> visibility:public modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit 
+      correspondingProperty: PROPERTY #29 name:test8 visibility:public modality:FINAL [delegated,var] 
+      VALUE_PARAMETER #35 name:<set-?> index:0 type:kotlin.Int 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <set-test8> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>'
-          CALL 'public final fun setValue <V> (thisRef: kotlin.Any?, property: kotlin.reflect.KProperty<*>, value: V of kotlin.collections.setValue): kotlin.Unit [inline] declared in kotlin.collections' type=kotlin.Unit origin=null
+        RETURN type=kotlin.Nothing from='#34 public final fun <set-test8> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>'
+          CALL '#36 public final fun setValue <V> (thisRef: kotlin.Any?, property: kotlin.reflect.KProperty<*>, value: V of kotlin.collections.setValue): kotlin.Unit [inline] declared in kotlin.collections' type=kotlin.Unit origin=null
             <V>: kotlin.Int
-            $receiver: GET_FIELD 'FIELD DELEGATE name:test8$delegate type:java.util.HashMap<kotlin.String, kotlin.Int> visibility:private [final,static] ' type=java.util.HashMap<kotlin.String, kotlin.Int> origin=null
+            $receiver: GET_FIELD '#30 FIELD #30 DELEGATE name:test8$delegate type:java.util.HashMap<kotlin.String, kotlin.Int> visibility:private [final,static] ' type=java.util.HashMap<kotlin.String, kotlin.Int> origin=null
             thisRef: CONST Null type=kotlin.Nothing? value=null
-            property: PROPERTY_REFERENCE 'public final test8: kotlin.Int [delegated,var] ' field=null getter='public final fun <get-test8> (): kotlin.Int declared in <root>' setter='public final fun <set-test8> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.reflect.KMutableProperty0<kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
-            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.<set-test8>' type=kotlin.Int origin=null
+            property: PROPERTY_REFERENCE '#29 public final test8: kotlin.Int [delegated,var] ' field=null getter='#32 public final fun <get-test8> (): kotlin.Int declared in <root>' setter='#34 public final fun <set-test8> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.reflect.KMutableProperty0<kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+            value: GET_VAR '#35 <set-?>: kotlin.Int declared in <root>.<set-test8>' type=kotlin.Int origin=null

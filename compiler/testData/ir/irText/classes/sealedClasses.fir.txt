@@ -1,113 +1,113 @@
 FILE fqName:<root> fileName:/sealedClasses.kt
-  CLASS CLASS name:Expr modality:SEALED visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Expr
-    CONSTRUCTOR visibility:private <> () returnType:<root>.Expr [primary]
+  CLASS #0 CLASS name:Expr modality:SEALED visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.Expr 
+    CONSTRUCTOR #2 visibility:private <> () returnType:<root>.Expr [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Expr modality:SEALED visibility:public superTypes:[kotlin.Any]'
-    CLASS CLASS name:Const modality:FINAL visibility:public superTypes:[<root>.Expr]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Expr.Const
-      CONSTRUCTOR visibility:public <> (number:kotlin.Double) returnType:<root>.Expr.Const [primary]
-        VALUE_PARAMETER name:number index:0 type:kotlin.Double
+        DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class CLASS Expr declared in <root>'
+    CLASS #4 CLASS name:Const modality:FINAL visibility:public superTypes:[<root>.Expr]
+      $this: VALUE_PARAMETER #5 INSTANCE_RECEIVER name:<this> type:<root>.Expr.Const 
+      CONSTRUCTOR #6 visibility:public <> (number:kotlin.Double) returnType:<root>.Expr.Const [primary] 
+        VALUE_PARAMETER #7 name:number index:0 type:kotlin.Double 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'private constructor <init> () [primary] declared in <root>.Expr'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Const modality:FINAL visibility:public superTypes:[<root>.Expr]'
-      PROPERTY name:number visibility:public modality:FINAL [val]
-        FIELD PROPERTY_BACKING_FIELD name:number type:kotlin.Double visibility:public [final]
+          DELEGATING_CONSTRUCTOR_CALL '#8 private constructor <init> () [primary] declared in <root>.Expr'
+          INSTANCE_INITIALIZER_CALL class='#4 class CLASS Const declared in <root>.Expr'
+      PROPERTY #9 name:number visibility:public modality:FINAL [val] 
+        FIELD #10 PROPERTY_BACKING_FIELD name:number type:kotlin.Double visibility:public [final] 
           EXPRESSION_BODY
-            GET_VAR 'number: kotlin.Double declared in <root>.Expr.Const.<init>' type=kotlin.Double origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-        FUN DEFAULT_PROPERTY_ACCESSOR name:<get-number> visibility:public modality:FINAL <> ($this:<root>.Expr.Const) returnType:kotlin.Double
-          correspondingProperty: PROPERTY name:number visibility:public modality:FINAL [val]
-          $this: VALUE_PARAMETER name:<this> type:<root>.Expr.Const
+            GET_VAR '#7 number: kotlin.Double declared in <root>.Expr.Const.<init>' type=kotlin.Double origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+        FUN #11 DEFAULT_PROPERTY_ACCESSOR name:<get-number> visibility:public modality:FINAL <> ($this:<root>.Expr.Const) returnType:kotlin.Double 
+          correspondingProperty: PROPERTY #9 name:number visibility:public modality:FINAL [val] 
+          $this: VALUE_PARAMETER #12 name:<this> type:<root>.Expr.Const 
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-number> (): kotlin.Double declared in <root>.Expr.Const'
-              GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:number type:kotlin.Double visibility:public [final] ' type=kotlin.Double origin=null
-                receiver: GET_VAR '<this>: <root>.Expr.Const declared in <root>.Expr.Const.<get-number>' type=<root>.Expr.Const origin=null
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+            RETURN type=kotlin.Nothing from='#11 public final fun <get-number> (): kotlin.Double declared in <root>.Expr.Const'
+              GET_FIELD '#10 FIELD #10 PROPERTY_BACKING_FIELD name:number type:kotlin.Double visibility:public [final] ' type=kotlin.Double origin=null
+                receiver: GET_VAR '#12 <this>: <root>.Expr.Const declared in <root>.Expr.Const.<get-number>' type=<root>.Expr.Const origin=null
+      FUN #13 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #14 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #15 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #16 name:other index:0 type:kotlin.Any? 
+      FUN #17 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #18 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #19 name:<this> type:kotlin.Any 
+      FUN #20 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    CLASS CLASS name:Sum modality:FINAL visibility:public superTypes:[<root>.Expr]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Expr.Sum
-      CONSTRUCTOR visibility:public <> (e1:<root>.Expr, e2:<root>.Expr) returnType:<root>.Expr.Sum [primary]
-        VALUE_PARAMETER name:e1 index:0 type:<root>.Expr
-        VALUE_PARAMETER name:e2 index:1 type:<root>.Expr
+          #21 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #22 name:<this> type:kotlin.Any 
+    CLASS #23 CLASS name:Sum modality:FINAL visibility:public superTypes:[<root>.Expr]
+      $this: VALUE_PARAMETER #24 INSTANCE_RECEIVER name:<this> type:<root>.Expr.Sum 
+      CONSTRUCTOR #25 visibility:public <> (e1:<root>.Expr, e2:<root>.Expr) returnType:<root>.Expr.Sum [primary] 
+        VALUE_PARAMETER #26 name:e1 index:0 type:<root>.Expr 
+        VALUE_PARAMETER #27 name:e2 index:1 type:<root>.Expr 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'private constructor <init> () [primary] declared in <root>.Expr'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Sum modality:FINAL visibility:public superTypes:[<root>.Expr]'
-      PROPERTY name:e1 visibility:public modality:FINAL [val]
-        FIELD PROPERTY_BACKING_FIELD name:e1 type:<root>.Expr visibility:public [final]
+          DELEGATING_CONSTRUCTOR_CALL '#28 private constructor <init> () [primary] declared in <root>.Expr'
+          INSTANCE_INITIALIZER_CALL class='#23 class CLASS Sum declared in <root>.Expr'
+      PROPERTY #29 name:e1 visibility:public modality:FINAL [val] 
+        FIELD #30 PROPERTY_BACKING_FIELD name:e1 type:<root>.Expr visibility:public [final] 
           EXPRESSION_BODY
-            GET_VAR 'e1: <root>.Expr declared in <root>.Expr.Sum.<init>' type=<root>.Expr origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-        FUN DEFAULT_PROPERTY_ACCESSOR name:<get-e1> visibility:public modality:FINAL <> ($this:<root>.Expr.Sum) returnType:<root>.Expr
-          correspondingProperty: PROPERTY name:e1 visibility:public modality:FINAL [val]
-          $this: VALUE_PARAMETER name:<this> type:<root>.Expr.Sum
+            GET_VAR '#26 e1: <root>.Expr declared in <root>.Expr.Sum.<init>' type=<root>.Expr origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+        FUN #31 DEFAULT_PROPERTY_ACCESSOR name:<get-e1> visibility:public modality:FINAL <> ($this:<root>.Expr.Sum) returnType:<root>.Expr 
+          correspondingProperty: PROPERTY #29 name:e1 visibility:public modality:FINAL [val] 
+          $this: VALUE_PARAMETER #32 name:<this> type:<root>.Expr.Sum 
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-e1> (): <root>.Expr declared in <root>.Expr.Sum'
-              GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:e1 type:<root>.Expr visibility:public [final] ' type=<root>.Expr origin=null
-                receiver: GET_VAR '<this>: <root>.Expr.Sum declared in <root>.Expr.Sum.<get-e1>' type=<root>.Expr.Sum origin=null
-      PROPERTY name:e2 visibility:public modality:FINAL [val]
-        FIELD PROPERTY_BACKING_FIELD name:e2 type:<root>.Expr visibility:public [final]
+            RETURN type=kotlin.Nothing from='#31 public final fun <get-e1> (): <root>.Expr declared in <root>.Expr.Sum'
+              GET_FIELD '#30 FIELD #30 PROPERTY_BACKING_FIELD name:e1 type:<root>.Expr visibility:public [final] ' type=<root>.Expr origin=null
+                receiver: GET_VAR '#32 <this>: <root>.Expr.Sum declared in <root>.Expr.Sum.<get-e1>' type=<root>.Expr.Sum origin=null
+      PROPERTY #33 name:e2 visibility:public modality:FINAL [val] 
+        FIELD #34 PROPERTY_BACKING_FIELD name:e2 type:<root>.Expr visibility:public [final] 
           EXPRESSION_BODY
-            GET_VAR 'e2: <root>.Expr declared in <root>.Expr.Sum.<init>' type=<root>.Expr origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-        FUN DEFAULT_PROPERTY_ACCESSOR name:<get-e2> visibility:public modality:FINAL <> ($this:<root>.Expr.Sum) returnType:<root>.Expr
-          correspondingProperty: PROPERTY name:e2 visibility:public modality:FINAL [val]
-          $this: VALUE_PARAMETER name:<this> type:<root>.Expr.Sum
+            GET_VAR '#27 e2: <root>.Expr declared in <root>.Expr.Sum.<init>' type=<root>.Expr origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+        FUN #35 DEFAULT_PROPERTY_ACCESSOR name:<get-e2> visibility:public modality:FINAL <> ($this:<root>.Expr.Sum) returnType:<root>.Expr 
+          correspondingProperty: PROPERTY #33 name:e2 visibility:public modality:FINAL [val] 
+          $this: VALUE_PARAMETER #36 name:<this> type:<root>.Expr.Sum 
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-e2> (): <root>.Expr declared in <root>.Expr.Sum'
-              GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:e2 type:<root>.Expr visibility:public [final] ' type=<root>.Expr origin=null
-                receiver: GET_VAR '<this>: <root>.Expr.Sum declared in <root>.Expr.Sum.<get-e2>' type=<root>.Expr.Sum origin=null
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+            RETURN type=kotlin.Nothing from='#35 public final fun <get-e2> (): <root>.Expr declared in <root>.Expr.Sum'
+              GET_FIELD '#34 FIELD #34 PROPERTY_BACKING_FIELD name:e2 type:<root>.Expr visibility:public [final] ' type=<root>.Expr origin=null
+                receiver: GET_VAR '#36 <this>: <root>.Expr.Sum declared in <root>.Expr.Sum.<get-e2>' type=<root>.Expr.Sum origin=null
+      FUN #37 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #14 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #38 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #39 name:other index:0 type:kotlin.Any? 
+      FUN #40 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #18 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #41 name:<this> type:kotlin.Any 
+      FUN #42 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    CLASS OBJECT name:NotANumber modality:FINAL visibility:public superTypes:[<root>.Expr]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Expr.NotANumber
-      CONSTRUCTOR visibility:private <> () returnType:<root>.Expr.NotANumber [primary]
+          #21 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #43 name:<this> type:kotlin.Any 
+    CLASS #44 OBJECT name:NotANumber modality:FINAL visibility:public superTypes:[<root>.Expr]
+      $this: VALUE_PARAMETER #45 INSTANCE_RECEIVER name:<this> type:<root>.Expr.NotANumber 
+      CONSTRUCTOR #46 visibility:private <> () returnType:<root>.Expr.NotANumber [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'private constructor <init> () [primary] declared in <root>.Expr'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:NotANumber modality:FINAL visibility:public superTypes:[<root>.Expr]'
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          DELEGATING_CONSTRUCTOR_CALL '#47 private constructor <init> () [primary] declared in <root>.Expr'
+          INSTANCE_INITIALIZER_CALL class='#44 class OBJECT NotANumber declared in <root>.Expr'
+      FUN #48 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #14 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #49 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #50 name:other index:0 type:kotlin.Any? 
+      FUN #51 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #18 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #52 name:<this> type:kotlin.Any 
+      FUN #53 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          #21 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #54 name:<this> type:kotlin.Any 
+    FUN #55 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #14 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #56 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #57 name:other index:0 type:kotlin.Any? 
+    FUN #58 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #18 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #59 name:<this> type:kotlin.Any 
+    FUN #60 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+        #21 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #61 name:<this> type:kotlin.Any 

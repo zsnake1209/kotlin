@@ -1,41 +1,41 @@
 FILE fqName:<root> fileName:/typeAliasCtorForGenericClass.kt
-  CLASS CLASS name:A modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.A
-    TYPE_PARAMETER name:Q index:0 variance: superTypes:[]
-    CONSTRUCTOR visibility:public <> (q:Q of <root>.A) returnType:<root>.A<Q of <root>.A> [primary]
-      VALUE_PARAMETER name:q index:0 type:Q of <root>.A
+  CLASS #0 CLASS name:A modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.A 
+    TYPE_PARAMETER #2 name:Q index:0 variance: superTypes:[]
+    CONSTRUCTOR #3 visibility:public <> (q:Q of <root>.A) returnType:<root>.A<Q of <root>.A> [primary] 
+      VALUE_PARAMETER #4 name:q index:0 type:Q of <root>.A 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:A modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    PROPERTY name:q visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:q type:Q of <root>.A visibility:public [final]
+        DELEGATING_CONSTRUCTOR_CALL '#5 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class CLASS A declared in <root>'
+    PROPERTY #6 name:q visibility:public modality:FINAL [val] 
+      FIELD #7 PROPERTY_BACKING_FIELD name:q type:Q of <root>.A visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'q: Q of <root>.A declared in <root>.A.<init>' type=Q of <root>.A origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-q> visibility:public modality:FINAL <> ($this:<root>.A) returnType:Q of <root>.A
-        correspondingProperty: PROPERTY name:q visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.A
+          GET_VAR '#4 q: Q of <root>.A declared in <root>.A.<init>' type=Q of <root>.A origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #8 DEFAULT_PROPERTY_ACCESSOR name:<get-q> visibility:public modality:FINAL <> ($this:<root>.A) returnType:Q of <root>.A 
+        correspondingProperty: PROPERTY #6 name:q visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #9 name:<this> type:<root>.A 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-q> (): Q of <root>.A declared in <root>.A'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:q type:Q of <root>.A visibility:public [final] ' type=Q of <root>.A origin=null
-              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.<get-q>' type=<root>.A origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          RETURN type=kotlin.Nothing from='#8 public final fun <get-q> (): Q of <root>.A declared in <root>.A'
+            GET_FIELD '#7 FIELD #7 PROPERTY_BACKING_FIELD name:q type:Q of <root>.A visibility:public [final] ' type=Q of <root>.A origin=null
+              receiver: GET_VAR '#9 <this>: <root>.A declared in <root>.A.<get-q>' type=<root>.A origin=null
+    FUN #10 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #11 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #12 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #13 name:other index:0 type:kotlin.Any? 
+    FUN #14 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #15 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #16 name:<this> type:kotlin.Any 
+    FUN #17 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  FUN name:bar visibility:public modality:FINAL <> () returnType:kotlin.Unit
+        #18 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #19 name:<this> type:kotlin.Any 
+  FUN #20 name:bar visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:b type:IrErrorType [val]
+      VAR #21 name:b type:IrErrorType [val] 
         ERROR_CALL 'Unresolved reference: <Unresolved name: B>#' type=IrErrorType
           CONST Int type=kotlin.Int value=2
-      VAR name:b2 type:IrErrorType [val]
+      VAR #22 name:b2 type:IrErrorType [val] 
         ERROR_CALL 'Unresolved reference: <Unresolved name: B2>#' type=IrErrorType
-          GET_VAR 'val b: IrErrorType [val] declared in <root>.bar' type=IrErrorType origin=null
+          GET_VAR '#21 val b: IrErrorType [val] declared in <root>.bar' type=IrErrorType origin=null

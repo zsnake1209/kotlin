@@ -1,63 +1,63 @@
 FILE fqName:<root> fileName:/abstractMembers.kt
-  CLASS CLASS name:AbstractClass modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.AbstractClass 
-    CONSTRUCTOR visibility:public <> () returnType:<root>.AbstractClass [primary] 
+  CLASS #0 CLASS name:AbstractClass modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.AbstractClass 
+    CONSTRUCTOR #2 visibility:public <> () returnType:<root>.AbstractClass [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:AbstractClass modality:ABSTRACT visibility:public superTypes:[kotlin.Any]'
-    FUN name:abstractFun visibility:public modality:ABSTRACT <> ($this:<root>.AbstractClass) returnType:kotlin.Unit 
-      $this: VALUE_PARAMETER name:<this> type:<root>.AbstractClass 
-    PROPERTY name:abstractVal visibility:public modality:ABSTRACT [val] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-abstractVal> visibility:public modality:ABSTRACT <> ($this:<root>.AbstractClass) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY name:abstractVal visibility:public modality:ABSTRACT [val] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.AbstractClass 
-    PROPERTY name:abstractVar visibility:public modality:ABSTRACT [var] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-abstractVar> visibility:public modality:ABSTRACT <> ($this:<root>.AbstractClass) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY name:abstractVar visibility:public modality:ABSTRACT [var] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.AbstractClass 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<set-abstractVar> visibility:public modality:ABSTRACT <> ($this:<root>.AbstractClass, <set-?>:kotlin.Int) returnType:kotlin.Unit 
-        correspondingProperty: PROPERTY name:abstractVar visibility:public modality:ABSTRACT [var] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.AbstractClass 
-        VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+        DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class CLASS AbstractClass declared in <root>'
+    FUN #4 name:abstractFun visibility:public modality:ABSTRACT <> ($this:<root>.AbstractClass) returnType:kotlin.Unit 
+      $this: VALUE_PARAMETER #5 name:<this> type:<root>.AbstractClass 
+    PROPERTY #6 name:abstractVal visibility:public modality:ABSTRACT [val] 
+      FUN #7 DEFAULT_PROPERTY_ACCESSOR name:<get-abstractVal> visibility:public modality:ABSTRACT <> ($this:<root>.AbstractClass) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #6 name:abstractVal visibility:public modality:ABSTRACT [val] 
+        $this: VALUE_PARAMETER #8 name:<this> type:<root>.AbstractClass 
+    PROPERTY #9 name:abstractVar visibility:public modality:ABSTRACT [var] 
+      FUN #10 DEFAULT_PROPERTY_ACCESSOR name:<get-abstractVar> visibility:public modality:ABSTRACT <> ($this:<root>.AbstractClass) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #9 name:abstractVar visibility:public modality:ABSTRACT [var] 
+        $this: VALUE_PARAMETER #11 name:<this> type:<root>.AbstractClass 
+      FUN #12 DEFAULT_PROPERTY_ACCESSOR name:<set-abstractVar> visibility:public modality:ABSTRACT <> ($this:<root>.AbstractClass, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+        correspondingProperty: PROPERTY #9 name:abstractVar visibility:public modality:ABSTRACT [var] 
+        $this: VALUE_PARAMETER #13 name:<this> type:<root>.AbstractClass 
+        VALUE_PARAMETER #14 name:<set-?> index:0 type:kotlin.Int 
+    FUN #15 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #16 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #17 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #18 name:other index:0 type:kotlin.Any? 
+    FUN #19 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #20 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #21 name:<this> type:kotlin.Any 
+    FUN #22 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  CLASS INTERFACE name:Interface modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Interface 
-    FUN name:abstractFun visibility:public modality:ABSTRACT <> ($this:<root>.Interface) returnType:kotlin.Unit 
-      $this: VALUE_PARAMETER name:<this> type:<root>.Interface 
-    PROPERTY name:abstractVal visibility:public modality:ABSTRACT [val] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-abstractVal> visibility:public modality:ABSTRACT <> ($this:<root>.Interface) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY name:abstractVal visibility:public modality:ABSTRACT [val] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.Interface 
-    PROPERTY name:abstractVar visibility:public modality:ABSTRACT [var] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-abstractVar> visibility:public modality:ABSTRACT <> ($this:<root>.Interface) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY name:abstractVar visibility:public modality:ABSTRACT [var] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.Interface 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<set-abstractVar> visibility:public modality:ABSTRACT <> ($this:<root>.Interface, <set-?>:kotlin.Int) returnType:kotlin.Unit 
-        correspondingProperty: PROPERTY name:abstractVar visibility:public modality:ABSTRACT [var] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.Interface 
-        VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+        #23 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #24 name:<this> type:kotlin.Any 
+  CLASS #25 INTERFACE name:Interface modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #26 INSTANCE_RECEIVER name:<this> type:<root>.Interface 
+    FUN #27 name:abstractFun visibility:public modality:ABSTRACT <> ($this:<root>.Interface) returnType:kotlin.Unit 
+      $this: VALUE_PARAMETER #28 name:<this> type:<root>.Interface 
+    PROPERTY #29 name:abstractVal visibility:public modality:ABSTRACT [val] 
+      FUN #30 DEFAULT_PROPERTY_ACCESSOR name:<get-abstractVal> visibility:public modality:ABSTRACT <> ($this:<root>.Interface) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #29 name:abstractVal visibility:public modality:ABSTRACT [val] 
+        $this: VALUE_PARAMETER #31 name:<this> type:<root>.Interface 
+    PROPERTY #32 name:abstractVar visibility:public modality:ABSTRACT [var] 
+      FUN #33 DEFAULT_PROPERTY_ACCESSOR name:<get-abstractVar> visibility:public modality:ABSTRACT <> ($this:<root>.Interface) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #32 name:abstractVar visibility:public modality:ABSTRACT [var] 
+        $this: VALUE_PARAMETER #34 name:<this> type:<root>.Interface 
+      FUN #35 DEFAULT_PROPERTY_ACCESSOR name:<set-abstractVar> visibility:public modality:ABSTRACT <> ($this:<root>.Interface, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+        correspondingProperty: PROPERTY #32 name:abstractVar visibility:public modality:ABSTRACT [var] 
+        $this: VALUE_PARAMETER #36 name:<this> type:<root>.Interface 
+        VALUE_PARAMETER #37 name:<set-?> index:0 type:kotlin.Int 
+    FUN #38 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #16 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #39 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #40 name:other index:0 type:kotlin.Any? 
+    FUN #41 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #20 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #42 name:<this> type:kotlin.Any 
+    FUN #43 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
+        #23 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #44 name:<this> type:kotlin.Any 

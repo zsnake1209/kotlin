@@ -1,139 +1,139 @@
 FILE fqName:<root> fileName:/whenByFloatingPoint.kt
-  FUN name:testSimple visibility:public modality:FINAL <> (x:kotlin.Double) returnType:kotlin.Int
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double
+  FUN #0 name:testSimple visibility:public modality:FINAL <> (x:kotlin.Double) returnType:kotlin.Int 
+    VALUE_PARAMETER #1 name:x index:0 type:kotlin.Double 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testSimple (x: kotlin.Double): kotlin.Int declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun testSimple (x: kotlin.Double): kotlin.Int declared in <root>'
         BLOCK type=kotlin.Int origin=WHEN
-          VAR IR_TEMPORARY_VARIABLE name:tmp0_subject type:kotlin.Double [val]
+          VAR #2 IR_TEMPORARY_VARIABLE name:tmp0_subject type:kotlin.Double [val] 
           WHEN type=kotlin.Int origin=WHEN
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp0_subject: kotlin.Double [val] declared in <root>.testSimple' type=kotlin.Double origin=null
+              if: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#2 val tmp0_subject: kotlin.Double [val] declared in <root>.testSimple' type=kotlin.Double origin=null
                 arg1: CONST Double type=kotlin.Int value=0.0
               then: CONST Int type=kotlin.Int value=0
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CONST Int type=kotlin.Int value=1
-  FUN name:testSmartCastInWhenSubject visibility:public modality:FINAL <> (x:kotlin.Any) returnType:kotlin.Int
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
+  FUN #4 name:testSmartCastInWhenSubject visibility:public modality:FINAL <> (x:kotlin.Any) returnType:kotlin.Int 
+    VALUE_PARAMETER #5 name:x index:0 type:kotlin.Any 
     BLOCK_BODY
       WHEN type=kotlin.Int origin=IF
         BRANCH
           if: TYPE_OP type=kotlin.Boolean origin=NOT_INSTANCEOF typeOperand=kotlin.Double
-            GET_VAR 'x: kotlin.Any declared in <root>.testSmartCastInWhenSubject' type=kotlin.Any origin=null
-          then: RETURN type=kotlin.Nothing from='public final fun testSmartCastInWhenSubject (x: kotlin.Any): kotlin.Int declared in <root>'
+            GET_VAR '#5 x: kotlin.Any declared in <root>.testSmartCastInWhenSubject' type=kotlin.Any origin=null
+          then: RETURN type=kotlin.Nothing from='#4 public final fun testSmartCastInWhenSubject (x: kotlin.Any): kotlin.Int declared in <root>'
             ERROR_CALL 'Unresolved reference: <Unresolved name: unaryMinus>#' type=IrErrorType
               CONST Int type=kotlin.Int value=1
-      RETURN type=kotlin.Nothing from='public final fun testSmartCastInWhenSubject (x: kotlin.Any): kotlin.Int declared in <root>'
+      RETURN type=kotlin.Nothing from='#4 public final fun testSmartCastInWhenSubject (x: kotlin.Any): kotlin.Int declared in <root>'
         BLOCK type=kotlin.Int origin=WHEN
-          VAR IR_TEMPORARY_VARIABLE name:tmp1_subject type:kotlin.Any [val]
+          VAR #6 IR_TEMPORARY_VARIABLE name:tmp1_subject type:kotlin.Any [val] 
           WHEN type=kotlin.Int origin=WHEN
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp1_subject: kotlin.Any [val] declared in <root>.testSmartCastInWhenSubject' type=kotlin.Any origin=null
+              if: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#6 val tmp1_subject: kotlin.Any [val] declared in <root>.testSmartCastInWhenSubject' type=kotlin.Any origin=null
                 arg1: CONST Double type=kotlin.Int value=0.0
               then: CONST Int type=kotlin.Int value=0
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CONST Int type=kotlin.Int value=1
-  FUN name:testSmartCastInWhenCondition visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Any) returnType:kotlin.Int
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any
+  FUN #7 name:testSmartCastInWhenCondition visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Any) returnType:kotlin.Int 
+    VALUE_PARAMETER #8 name:x index:0 type:kotlin.Double 
+    VALUE_PARAMETER #9 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
       WHEN type=kotlin.Int origin=IF
         BRANCH
           if: TYPE_OP type=kotlin.Boolean origin=NOT_INSTANCEOF typeOperand=kotlin.Double
-            GET_VAR 'y: kotlin.Any declared in <root>.testSmartCastInWhenCondition' type=kotlin.Any origin=null
-          then: RETURN type=kotlin.Nothing from='public final fun testSmartCastInWhenCondition (x: kotlin.Double, y: kotlin.Any): kotlin.Int declared in <root>'
+            GET_VAR '#9 y: kotlin.Any declared in <root>.testSmartCastInWhenCondition' type=kotlin.Any origin=null
+          then: RETURN type=kotlin.Nothing from='#7 public final fun testSmartCastInWhenCondition (x: kotlin.Double, y: kotlin.Any): kotlin.Int declared in <root>'
             ERROR_CALL 'Unresolved reference: <Unresolved name: unaryMinus>#' type=IrErrorType
               CONST Int type=kotlin.Int value=1
-      RETURN type=kotlin.Nothing from='public final fun testSmartCastInWhenCondition (x: kotlin.Double, y: kotlin.Any): kotlin.Int declared in <root>'
+      RETURN type=kotlin.Nothing from='#7 public final fun testSmartCastInWhenCondition (x: kotlin.Double, y: kotlin.Any): kotlin.Int declared in <root>'
         BLOCK type=kotlin.Int origin=WHEN
-          VAR IR_TEMPORARY_VARIABLE name:tmp2_subject type:kotlin.Double [val]
+          VAR #10 IR_TEMPORARY_VARIABLE name:tmp2_subject type:kotlin.Double [val] 
           WHEN type=kotlin.Int origin=WHEN
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp2_subject: kotlin.Double [val] declared in <root>.testSmartCastInWhenCondition' type=kotlin.Double origin=null
-                arg1: GET_VAR 'y: kotlin.Any declared in <root>.testSmartCastInWhenCondition' type=kotlin.Any origin=null
+              if: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#10 val tmp2_subject: kotlin.Double [val] declared in <root>.testSmartCastInWhenCondition' type=kotlin.Double origin=null
+                arg1: GET_VAR '#9 y: kotlin.Any declared in <root>.testSmartCastInWhenCondition' type=kotlin.Any origin=null
               then: CONST Int type=kotlin.Int value=0
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CONST Int type=kotlin.Int value=1
-  FUN name:testSmartCastInWhenConditionInBranch visibility:public modality:FINAL <> (x:kotlin.Any) returnType:IrErrorType
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
+  FUN #11 name:testSmartCastInWhenConditionInBranch visibility:public modality:FINAL <> (x:kotlin.Any) returnType:IrErrorType 
+    VALUE_PARAMETER #12 name:x index:0 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testSmartCastInWhenConditionInBranch (x: kotlin.Any): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#11 public final fun testSmartCastInWhenConditionInBranch (x: kotlin.Any): IrErrorType declared in <root>'
         BLOCK type=IrErrorType origin=WHEN
-          VAR IR_TEMPORARY_VARIABLE name:tmp3_subject type:kotlin.Any [val]
+          VAR #13 IR_TEMPORARY_VARIABLE name:tmp3_subject type:kotlin.Any [val] 
           WHEN type=IrErrorType origin=WHEN
             BRANCH
               if: TYPE_OP type=kotlin.Boolean origin=NOT_INSTANCEOF typeOperand=kotlin.Double
-                GET_VAR 'val tmp3_subject: kotlin.Any [val] declared in <root>.testSmartCastInWhenConditionInBranch' type=kotlin.Any origin=null
+                GET_VAR '#13 val tmp3_subject: kotlin.Any [val] declared in <root>.testSmartCastInWhenConditionInBranch' type=kotlin.Any origin=null
               then: ERROR_CALL 'Unresolved reference: <Unresolved name: unaryMinus>#' type=IrErrorType
                 CONST Int type=kotlin.Int value=1
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp3_subject: kotlin.Any [val] declared in <root>.testSmartCastInWhenConditionInBranch' type=kotlin.Any origin=null
+              if: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#13 val tmp3_subject: kotlin.Any [val] declared in <root>.testSmartCastInWhenConditionInBranch' type=kotlin.Any origin=null
                 arg1: CONST Double type=IrErrorType value=0.0
               then: CONST Int type=IrErrorType value=0
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CONST Int type=IrErrorType value=1
-  FUN name:testSmartCastToDifferentTypes visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Int
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any
+  FUN #14 name:testSmartCastToDifferentTypes visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Int 
+    VALUE_PARAMETER #15 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #16 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
       WHEN type=kotlin.Int origin=IF
         BRANCH
           if: TYPE_OP type=kotlin.Boolean origin=NOT_INSTANCEOF typeOperand=kotlin.Double
-            GET_VAR 'x: kotlin.Any declared in <root>.testSmartCastToDifferentTypes' type=kotlin.Any origin=null
-          then: RETURN type=kotlin.Nothing from='public final fun testSmartCastToDifferentTypes (x: kotlin.Any, y: kotlin.Any): kotlin.Int declared in <root>'
+            GET_VAR '#15 x: kotlin.Any declared in <root>.testSmartCastToDifferentTypes' type=kotlin.Any origin=null
+          then: RETURN type=kotlin.Nothing from='#14 public final fun testSmartCastToDifferentTypes (x: kotlin.Any, y: kotlin.Any): kotlin.Int declared in <root>'
             ERROR_CALL 'Unresolved reference: <Unresolved name: unaryMinus>#' type=IrErrorType
               CONST Int type=kotlin.Int value=1
       WHEN type=kotlin.Int origin=IF
         BRANCH
           if: TYPE_OP type=kotlin.Boolean origin=NOT_INSTANCEOF typeOperand=kotlin.Float
-            GET_VAR 'y: kotlin.Any declared in <root>.testSmartCastToDifferentTypes' type=kotlin.Any origin=null
-          then: RETURN type=kotlin.Nothing from='public final fun testSmartCastToDifferentTypes (x: kotlin.Any, y: kotlin.Any): kotlin.Int declared in <root>'
+            GET_VAR '#16 y: kotlin.Any declared in <root>.testSmartCastToDifferentTypes' type=kotlin.Any origin=null
+          then: RETURN type=kotlin.Nothing from='#14 public final fun testSmartCastToDifferentTypes (x: kotlin.Any, y: kotlin.Any): kotlin.Int declared in <root>'
             ERROR_CALL 'Unresolved reference: <Unresolved name: unaryMinus>#' type=IrErrorType
               CONST Int type=kotlin.Int value=1
-      RETURN type=kotlin.Nothing from='public final fun testSmartCastToDifferentTypes (x: kotlin.Any, y: kotlin.Any): kotlin.Int declared in <root>'
+      RETURN type=kotlin.Nothing from='#14 public final fun testSmartCastToDifferentTypes (x: kotlin.Any, y: kotlin.Any): kotlin.Int declared in <root>'
         BLOCK type=kotlin.Int origin=WHEN
-          VAR IR_TEMPORARY_VARIABLE name:tmp4_subject type:kotlin.Any [val]
+          VAR #17 IR_TEMPORARY_VARIABLE name:tmp4_subject type:kotlin.Any [val] 
           WHEN type=kotlin.Int origin=WHEN
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp4_subject: kotlin.Any [val] declared in <root>.testSmartCastToDifferentTypes' type=kotlin.Any origin=null
-                arg1: GET_VAR 'y: kotlin.Any declared in <root>.testSmartCastToDifferentTypes' type=kotlin.Any origin=null
+              if: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#17 val tmp4_subject: kotlin.Any [val] declared in <root>.testSmartCastToDifferentTypes' type=kotlin.Any origin=null
+                arg1: GET_VAR '#16 y: kotlin.Any declared in <root>.testSmartCastToDifferentTypes' type=kotlin.Any origin=null
               then: CONST Int type=kotlin.Int value=0
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CONST Int type=kotlin.Int value=1
-  FUN name:foo visibility:public modality:FINAL <> (x:kotlin.Double) returnType:kotlin.Double
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double
+  FUN #18 name:foo visibility:public modality:FINAL <> (x:kotlin.Double) returnType:kotlin.Double 
+    VALUE_PARAMETER #19 name:x index:0 type:kotlin.Double 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun foo (x: kotlin.Double): kotlin.Double declared in <root>'
-        GET_VAR 'x: kotlin.Double declared in <root>.foo' type=kotlin.Double origin=null
-  FUN name:testWithPrematureExitInConditionSubexpression visibility:public modality:FINAL <> (x:kotlin.Any) returnType:kotlin.Int
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
+      RETURN type=kotlin.Nothing from='#18 public final fun foo (x: kotlin.Double): kotlin.Double declared in <root>'
+        GET_VAR '#19 x: kotlin.Double declared in <root>.foo' type=kotlin.Double origin=null
+  FUN #20 name:testWithPrematureExitInConditionSubexpression visibility:public modality:FINAL <> (x:kotlin.Any) returnType:kotlin.Int 
+    VALUE_PARAMETER #21 name:x index:0 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testWithPrematureExitInConditionSubexpression (x: kotlin.Any): kotlin.Int declared in <root>'
+      RETURN type=kotlin.Nothing from='#20 public final fun testWithPrematureExitInConditionSubexpression (x: kotlin.Any): kotlin.Int declared in <root>'
         BLOCK type=kotlin.Int origin=WHEN
-          VAR IR_TEMPORARY_VARIABLE name:tmp5_subject type:kotlin.Any [val]
+          VAR #22 IR_TEMPORARY_VARIABLE name:tmp5_subject type:kotlin.Any [val] 
           WHEN type=kotlin.Int origin=WHEN
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp5_subject: kotlin.Any [val] declared in <root>.testWithPrematureExitInConditionSubexpression' type=kotlin.Any origin=null
-                arg1: CALL 'public final fun foo (x: kotlin.Double): kotlin.Double declared in <root>' type=kotlin.Double origin=null
+              if: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#22 val tmp5_subject: kotlin.Any [val] declared in <root>.testWithPrematureExitInConditionSubexpression' type=kotlin.Any origin=null
+                arg1: CALL '#18 public final fun foo (x: kotlin.Double): kotlin.Double declared in <root>' type=kotlin.Double origin=null
                   x: WHEN type=kotlin.Int origin=IF
                     BRANCH
                       if: TYPE_OP type=kotlin.Boolean origin=NOT_INSTANCEOF typeOperand=kotlin.Double
-                        GET_VAR 'x: kotlin.Any declared in <root>.testWithPrematureExitInConditionSubexpression' type=kotlin.Any origin=null
-                      then: RETURN type=kotlin.Nothing from='public final fun testWithPrematureExitInConditionSubexpression (x: kotlin.Any): kotlin.Int declared in <root>'
+                        GET_VAR '#21 x: kotlin.Any declared in <root>.testWithPrematureExitInConditionSubexpression' type=kotlin.Any origin=null
+                      then: RETURN type=kotlin.Nothing from='#20 public final fun testWithPrematureExitInConditionSubexpression (x: kotlin.Any): kotlin.Int declared in <root>'
                         CONST Int type=kotlin.Int value=42
                     BRANCH
                       if: CONST Boolean type=kotlin.Boolean value=true
-                      then: GET_VAR 'x: kotlin.Any declared in <root>.testWithPrematureExitInConditionSubexpression' type=kotlin.Any origin=null
+                      then: GET_VAR '#21 x: kotlin.Any declared in <root>.testWithPrematureExitInConditionSubexpression' type=kotlin.Any origin=null
               then: CONST Int type=kotlin.Int value=0
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true

@@ -1,11 +1,11 @@
 FILE fqName:<root> fileName:/javaSyntheticPropertyAccess.kt
-  FUN name:test visibility:public modality:FINAL <> (j:<root>.J) returnType:kotlin.Unit
-    VALUE_PARAMETER name:j index:0 type:<root>.J
+  FUN #0 name:test visibility:public modality:FINAL <> (j:<root>.J) returnType:kotlin.Unit 
+    VALUE_PARAMETER #1 name:j index:0 type:<root>.J 
     BLOCK_BODY
       ERROR_CALL 'No getter found for R|/J.foo|' type=kotlin.Int
       ERROR_CALL 'Unresolved reference: R|/J.foo|' type=IrErrorType
-      VAR name:<unary> type:kotlin.Int [val]
+      VAR #2 name:<unary> type:kotlin.Int [val] 
         ERROR_CALL 'No getter found for R|/J.foo|' type=kotlin.Int
       ERROR_CALL 'Unresolved reference: R|/J.foo|' type=IrErrorType
-      GET_VAR 'val <unary>: kotlin.Int [val] declared in <root>.test' type=kotlin.Int origin=null
+      GET_VAR '#2 val <unary>: kotlin.Int [val] declared in <root>.test' type=kotlin.Int origin=null
       ERROR_CALL 'Unresolved reference: R|/J.foo|' type=IrErrorType

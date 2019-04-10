@@ -1,191 +1,191 @@
 FILE fqName:<root> fileName:/dataClassWithArrayMembers.kt
-  CLASS CLASS name:Test1 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Test1
-    CONSTRUCTOR visibility:public <> (stringArray:kotlin.Array<kotlin.String>, charArray:kotlin.CharArray, booleanArray:kotlin.BooleanArray, byteArray:kotlin.ByteArray, shortArray:kotlin.ShortArray, intArray:kotlin.IntArray, longArray:kotlin.LongArray, floatArray:kotlin.FloatArray, doubleArray:kotlin.DoubleArray) returnType:<root>.Test1 [primary]
-      VALUE_PARAMETER name:stringArray index:0 type:kotlin.Array<kotlin.String>
-      VALUE_PARAMETER name:charArray index:1 type:kotlin.CharArray
-      VALUE_PARAMETER name:booleanArray index:2 type:kotlin.BooleanArray
-      VALUE_PARAMETER name:byteArray index:3 type:kotlin.ByteArray
-      VALUE_PARAMETER name:shortArray index:4 type:kotlin.ShortArray
-      VALUE_PARAMETER name:intArray index:5 type:kotlin.IntArray
-      VALUE_PARAMETER name:longArray index:6 type:kotlin.LongArray
-      VALUE_PARAMETER name:floatArray index:7 type:kotlin.FloatArray
-      VALUE_PARAMETER name:doubleArray index:8 type:kotlin.DoubleArray
+  CLASS #0 CLASS name:Test1 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.Test1 
+    CONSTRUCTOR #2 visibility:public <> (stringArray:kotlin.Array<kotlin.String>, charArray:kotlin.CharArray, booleanArray:kotlin.BooleanArray, byteArray:kotlin.ByteArray, shortArray:kotlin.ShortArray, intArray:kotlin.IntArray, longArray:kotlin.LongArray, floatArray:kotlin.FloatArray, doubleArray:kotlin.DoubleArray) returnType:<root>.Test1 [primary] 
+      VALUE_PARAMETER #3 name:stringArray index:0 type:kotlin.Array<kotlin.String> 
+      VALUE_PARAMETER #4 name:charArray index:1 type:kotlin.CharArray 
+      VALUE_PARAMETER #5 name:booleanArray index:2 type:kotlin.BooleanArray 
+      VALUE_PARAMETER #6 name:byteArray index:3 type:kotlin.ByteArray 
+      VALUE_PARAMETER #7 name:shortArray index:4 type:kotlin.ShortArray 
+      VALUE_PARAMETER #8 name:intArray index:5 type:kotlin.IntArray 
+      VALUE_PARAMETER #9 name:longArray index:6 type:kotlin.LongArray 
+      VALUE_PARAMETER #10 name:floatArray index:7 type:kotlin.FloatArray 
+      VALUE_PARAMETER #11 name:doubleArray index:8 type:kotlin.DoubleArray 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Test1 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]'
-    PROPERTY name:stringArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:stringArray type:kotlin.Array<kotlin.String> visibility:public [final]
+        DELEGATING_CONSTRUCTOR_CALL '#12 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class CLASS Test1 declared in <root>'
+    PROPERTY #13 name:stringArray visibility:public modality:FINAL [val] 
+      FIELD #14 PROPERTY_BACKING_FIELD name:stringArray type:kotlin.Array<kotlin.String> visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'stringArray: kotlin.Array<kotlin.String> declared in <root>.Test1.<init>' type=kotlin.Array<kotlin.String> origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-stringArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.Array<kotlin.String>
-        correspondingProperty: PROPERTY name:stringArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#3 stringArray: kotlin.Array<kotlin.String> declared in <root>.Test1.<init>' type=kotlin.Array<kotlin.String> origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #15 DEFAULT_PROPERTY_ACCESSOR name:<get-stringArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.Array<kotlin.String> 
+        correspondingProperty: PROPERTY #13 name:stringArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #16 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-stringArray> (): kotlin.Array<kotlin.String> declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:stringArray type:kotlin.Array<kotlin.String> visibility:public [final] ' type=kotlin.Array<kotlin.String> origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-stringArray>' type=<root>.Test1 origin=null
-    PROPERTY name:charArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:charArray type:kotlin.CharArray visibility:public [final]
+          RETURN type=kotlin.Nothing from='#15 public final fun <get-stringArray> (): kotlin.Array<kotlin.String> declared in <root>.Test1'
+            GET_FIELD '#14 FIELD #14 PROPERTY_BACKING_FIELD name:stringArray type:kotlin.Array<kotlin.String> visibility:public [final] ' type=kotlin.Array<kotlin.String> origin=null
+              receiver: GET_VAR '#16 <this>: <root>.Test1 declared in <root>.Test1.<get-stringArray>' type=<root>.Test1 origin=null
+    PROPERTY #17 name:charArray visibility:public modality:FINAL [val] 
+      FIELD #18 PROPERTY_BACKING_FIELD name:charArray type:kotlin.CharArray visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'charArray: kotlin.CharArray declared in <root>.Test1.<init>' type=kotlin.CharArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-charArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.CharArray
-        correspondingProperty: PROPERTY name:charArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#4 charArray: kotlin.CharArray declared in <root>.Test1.<init>' type=kotlin.CharArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #19 DEFAULT_PROPERTY_ACCESSOR name:<get-charArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.CharArray 
+        correspondingProperty: PROPERTY #17 name:charArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #20 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-charArray> (): kotlin.CharArray declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:charArray type:kotlin.CharArray visibility:public [final] ' type=kotlin.CharArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-charArray>' type=<root>.Test1 origin=null
-    PROPERTY name:booleanArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:booleanArray type:kotlin.BooleanArray visibility:public [final]
+          RETURN type=kotlin.Nothing from='#19 public final fun <get-charArray> (): kotlin.CharArray declared in <root>.Test1'
+            GET_FIELD '#18 FIELD #18 PROPERTY_BACKING_FIELD name:charArray type:kotlin.CharArray visibility:public [final] ' type=kotlin.CharArray origin=null
+              receiver: GET_VAR '#20 <this>: <root>.Test1 declared in <root>.Test1.<get-charArray>' type=<root>.Test1 origin=null
+    PROPERTY #21 name:booleanArray visibility:public modality:FINAL [val] 
+      FIELD #22 PROPERTY_BACKING_FIELD name:booleanArray type:kotlin.BooleanArray visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'booleanArray: kotlin.BooleanArray declared in <root>.Test1.<init>' type=kotlin.BooleanArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-booleanArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.BooleanArray
-        correspondingProperty: PROPERTY name:booleanArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#5 booleanArray: kotlin.BooleanArray declared in <root>.Test1.<init>' type=kotlin.BooleanArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #23 DEFAULT_PROPERTY_ACCESSOR name:<get-booleanArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.BooleanArray 
+        correspondingProperty: PROPERTY #21 name:booleanArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #24 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-booleanArray> (): kotlin.BooleanArray declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:booleanArray type:kotlin.BooleanArray visibility:public [final] ' type=kotlin.BooleanArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-booleanArray>' type=<root>.Test1 origin=null
-    PROPERTY name:byteArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:byteArray type:kotlin.ByteArray visibility:public [final]
+          RETURN type=kotlin.Nothing from='#23 public final fun <get-booleanArray> (): kotlin.BooleanArray declared in <root>.Test1'
+            GET_FIELD '#22 FIELD #22 PROPERTY_BACKING_FIELD name:booleanArray type:kotlin.BooleanArray visibility:public [final] ' type=kotlin.BooleanArray origin=null
+              receiver: GET_VAR '#24 <this>: <root>.Test1 declared in <root>.Test1.<get-booleanArray>' type=<root>.Test1 origin=null
+    PROPERTY #25 name:byteArray visibility:public modality:FINAL [val] 
+      FIELD #26 PROPERTY_BACKING_FIELD name:byteArray type:kotlin.ByteArray visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'byteArray: kotlin.ByteArray declared in <root>.Test1.<init>' type=kotlin.ByteArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-byteArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.ByteArray
-        correspondingProperty: PROPERTY name:byteArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#6 byteArray: kotlin.ByteArray declared in <root>.Test1.<init>' type=kotlin.ByteArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #27 DEFAULT_PROPERTY_ACCESSOR name:<get-byteArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.ByteArray 
+        correspondingProperty: PROPERTY #25 name:byteArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #28 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-byteArray> (): kotlin.ByteArray declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:byteArray type:kotlin.ByteArray visibility:public [final] ' type=kotlin.ByteArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-byteArray>' type=<root>.Test1 origin=null
-    PROPERTY name:shortArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:shortArray type:kotlin.ShortArray visibility:public [final]
+          RETURN type=kotlin.Nothing from='#27 public final fun <get-byteArray> (): kotlin.ByteArray declared in <root>.Test1'
+            GET_FIELD '#26 FIELD #26 PROPERTY_BACKING_FIELD name:byteArray type:kotlin.ByteArray visibility:public [final] ' type=kotlin.ByteArray origin=null
+              receiver: GET_VAR '#28 <this>: <root>.Test1 declared in <root>.Test1.<get-byteArray>' type=<root>.Test1 origin=null
+    PROPERTY #29 name:shortArray visibility:public modality:FINAL [val] 
+      FIELD #30 PROPERTY_BACKING_FIELD name:shortArray type:kotlin.ShortArray visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'shortArray: kotlin.ShortArray declared in <root>.Test1.<init>' type=kotlin.ShortArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-shortArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.ShortArray
-        correspondingProperty: PROPERTY name:shortArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#7 shortArray: kotlin.ShortArray declared in <root>.Test1.<init>' type=kotlin.ShortArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #31 DEFAULT_PROPERTY_ACCESSOR name:<get-shortArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.ShortArray 
+        correspondingProperty: PROPERTY #29 name:shortArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #32 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-shortArray> (): kotlin.ShortArray declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:shortArray type:kotlin.ShortArray visibility:public [final] ' type=kotlin.ShortArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-shortArray>' type=<root>.Test1 origin=null
-    PROPERTY name:intArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:intArray type:kotlin.IntArray visibility:public [final]
+          RETURN type=kotlin.Nothing from='#31 public final fun <get-shortArray> (): kotlin.ShortArray declared in <root>.Test1'
+            GET_FIELD '#30 FIELD #30 PROPERTY_BACKING_FIELD name:shortArray type:kotlin.ShortArray visibility:public [final] ' type=kotlin.ShortArray origin=null
+              receiver: GET_VAR '#32 <this>: <root>.Test1 declared in <root>.Test1.<get-shortArray>' type=<root>.Test1 origin=null
+    PROPERTY #33 name:intArray visibility:public modality:FINAL [val] 
+      FIELD #34 PROPERTY_BACKING_FIELD name:intArray type:kotlin.IntArray visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'intArray: kotlin.IntArray declared in <root>.Test1.<init>' type=kotlin.IntArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-intArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.IntArray
-        correspondingProperty: PROPERTY name:intArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#8 intArray: kotlin.IntArray declared in <root>.Test1.<init>' type=kotlin.IntArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #35 DEFAULT_PROPERTY_ACCESSOR name:<get-intArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.IntArray 
+        correspondingProperty: PROPERTY #33 name:intArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #36 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-intArray> (): kotlin.IntArray declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:intArray type:kotlin.IntArray visibility:public [final] ' type=kotlin.IntArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-intArray>' type=<root>.Test1 origin=null
-    PROPERTY name:longArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:longArray type:kotlin.LongArray visibility:public [final]
+          RETURN type=kotlin.Nothing from='#35 public final fun <get-intArray> (): kotlin.IntArray declared in <root>.Test1'
+            GET_FIELD '#34 FIELD #34 PROPERTY_BACKING_FIELD name:intArray type:kotlin.IntArray visibility:public [final] ' type=kotlin.IntArray origin=null
+              receiver: GET_VAR '#36 <this>: <root>.Test1 declared in <root>.Test1.<get-intArray>' type=<root>.Test1 origin=null
+    PROPERTY #37 name:longArray visibility:public modality:FINAL [val] 
+      FIELD #38 PROPERTY_BACKING_FIELD name:longArray type:kotlin.LongArray visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'longArray: kotlin.LongArray declared in <root>.Test1.<init>' type=kotlin.LongArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-longArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.LongArray
-        correspondingProperty: PROPERTY name:longArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#9 longArray: kotlin.LongArray declared in <root>.Test1.<init>' type=kotlin.LongArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #39 DEFAULT_PROPERTY_ACCESSOR name:<get-longArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.LongArray 
+        correspondingProperty: PROPERTY #37 name:longArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #40 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-longArray> (): kotlin.LongArray declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:longArray type:kotlin.LongArray visibility:public [final] ' type=kotlin.LongArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-longArray>' type=<root>.Test1 origin=null
-    PROPERTY name:floatArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:floatArray type:kotlin.FloatArray visibility:public [final]
+          RETURN type=kotlin.Nothing from='#39 public final fun <get-longArray> (): kotlin.LongArray declared in <root>.Test1'
+            GET_FIELD '#38 FIELD #38 PROPERTY_BACKING_FIELD name:longArray type:kotlin.LongArray visibility:public [final] ' type=kotlin.LongArray origin=null
+              receiver: GET_VAR '#40 <this>: <root>.Test1 declared in <root>.Test1.<get-longArray>' type=<root>.Test1 origin=null
+    PROPERTY #41 name:floatArray visibility:public modality:FINAL [val] 
+      FIELD #42 PROPERTY_BACKING_FIELD name:floatArray type:kotlin.FloatArray visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'floatArray: kotlin.FloatArray declared in <root>.Test1.<init>' type=kotlin.FloatArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-floatArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.FloatArray
-        correspondingProperty: PROPERTY name:floatArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#10 floatArray: kotlin.FloatArray declared in <root>.Test1.<init>' type=kotlin.FloatArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #43 DEFAULT_PROPERTY_ACCESSOR name:<get-floatArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.FloatArray 
+        correspondingProperty: PROPERTY #41 name:floatArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #44 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-floatArray> (): kotlin.FloatArray declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:floatArray type:kotlin.FloatArray visibility:public [final] ' type=kotlin.FloatArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-floatArray>' type=<root>.Test1 origin=null
-    PROPERTY name:doubleArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:doubleArray type:kotlin.DoubleArray visibility:public [final]
+          RETURN type=kotlin.Nothing from='#43 public final fun <get-floatArray> (): kotlin.FloatArray declared in <root>.Test1'
+            GET_FIELD '#42 FIELD #42 PROPERTY_BACKING_FIELD name:floatArray type:kotlin.FloatArray visibility:public [final] ' type=kotlin.FloatArray origin=null
+              receiver: GET_VAR '#44 <this>: <root>.Test1 declared in <root>.Test1.<get-floatArray>' type=<root>.Test1 origin=null
+    PROPERTY #45 name:doubleArray visibility:public modality:FINAL [val] 
+      FIELD #46 PROPERTY_BACKING_FIELD name:doubleArray type:kotlin.DoubleArray visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'doubleArray: kotlin.DoubleArray declared in <root>.Test1.<init>' type=kotlin.DoubleArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-doubleArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.DoubleArray
-        correspondingProperty: PROPERTY name:doubleArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test1
+          GET_VAR '#11 doubleArray: kotlin.DoubleArray declared in <root>.Test1.<init>' type=kotlin.DoubleArray origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #47 DEFAULT_PROPERTY_ACCESSOR name:<get-doubleArray> visibility:public modality:FINAL <> ($this:<root>.Test1) returnType:kotlin.DoubleArray 
+        correspondingProperty: PROPERTY #45 name:doubleArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #48 name:<this> type:<root>.Test1 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-doubleArray> (): kotlin.DoubleArray declared in <root>.Test1'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:doubleArray type:kotlin.DoubleArray visibility:public [final] ' type=kotlin.DoubleArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-doubleArray>' type=<root>.Test1 origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          RETURN type=kotlin.Nothing from='#47 public final fun <get-doubleArray> (): kotlin.DoubleArray declared in <root>.Test1'
+            GET_FIELD '#46 FIELD #46 PROPERTY_BACKING_FIELD name:doubleArray type:kotlin.DoubleArray visibility:public [final] ' type=kotlin.DoubleArray origin=null
+              receiver: GET_VAR '#48 <this>: <root>.Test1 declared in <root>.Test1.<get-doubleArray>' type=<root>.Test1 origin=null
+    FUN #49 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #50 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #51 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #52 name:other index:0 type:kotlin.Any? 
+    FUN #53 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #54 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #55 name:<this> type:kotlin.Any 
+    FUN #56 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  CLASS CLASS name:Test2 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Test2
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    CONSTRUCTOR visibility:public <> (genericArray:kotlin.Array<T of <root>.Test2>) returnType:<root>.Test2<T of <root>.Test2> [primary]
-      VALUE_PARAMETER name:genericArray index:0 type:kotlin.Array<T of <root>.Test2>
+        #57 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #58 name:<this> type:kotlin.Any 
+  CLASS #59 CLASS name:Test2 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #60 INSTANCE_RECEIVER name:<this> type:<root>.Test2 
+    TYPE_PARAMETER #61 name:T index:0 variance: superTypes:[]
+    CONSTRUCTOR #62 visibility:public <> (genericArray:kotlin.Array<T of <root>.Test2>) returnType:<root>.Test2<T of <root>.Test2> [primary] 
+      VALUE_PARAMETER #63 name:genericArray index:0 type:kotlin.Array<T of <root>.Test2> 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Test2 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]'
-    PROPERTY name:genericArray visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:genericArray type:kotlin.Array<T of <root>.Test2> visibility:public [final]
+        DELEGATING_CONSTRUCTOR_CALL '#64 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#59 class CLASS Test2 declared in <root>'
+    PROPERTY #65 name:genericArray visibility:public modality:FINAL [val] 
+      FIELD #66 PROPERTY_BACKING_FIELD name:genericArray type:kotlin.Array<T of <root>.Test2> visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'genericArray: kotlin.Array<T of <root>.Test2> declared in <root>.Test2.<init>' type=kotlin.Array<T of <root>.Test2> origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-genericArray> visibility:public modality:FINAL <> ($this:<root>.Test2) returnType:kotlin.Array<T of <root>.Test2>
-        correspondingProperty: PROPERTY name:genericArray visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test2
+          GET_VAR '#63 genericArray: kotlin.Array<T of <root>.Test2> declared in <root>.Test2.<init>' type=kotlin.Array<T of <root>.Test2> origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #67 DEFAULT_PROPERTY_ACCESSOR name:<get-genericArray> visibility:public modality:FINAL <> ($this:<root>.Test2) returnType:kotlin.Array<T of <root>.Test2> 
+        correspondingProperty: PROPERTY #65 name:genericArray visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #68 name:<this> type:<root>.Test2 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-genericArray> (): kotlin.Array<T of <root>.Test2> declared in <root>.Test2'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:genericArray type:kotlin.Array<T of <root>.Test2> visibility:public [final] ' type=kotlin.Array<T of <root>.Test2> origin=null
-              receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<get-genericArray>' type=<root>.Test2 origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          RETURN type=kotlin.Nothing from='#67 public final fun <get-genericArray> (): kotlin.Array<T of <root>.Test2> declared in <root>.Test2'
+            GET_FIELD '#66 FIELD #66 PROPERTY_BACKING_FIELD name:genericArray type:kotlin.Array<T of <root>.Test2> visibility:public [final] ' type=kotlin.Array<T of <root>.Test2> origin=null
+              receiver: GET_VAR '#68 <this>: <root>.Test2 declared in <root>.Test2.<get-genericArray>' type=<root>.Test2 origin=null
+    FUN #69 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #50 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #70 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #71 name:other index:0 type:kotlin.Any? 
+    FUN #72 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #54 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #73 name:<this> type:kotlin.Any 
+    FUN #74 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  CLASS CLASS name:Test3 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Test3
-    CONSTRUCTOR visibility:public <> (anyArrayN:kotlin.Array<kotlin.Any>?) returnType:<root>.Test3 [primary]
-      VALUE_PARAMETER name:anyArrayN index:0 type:kotlin.Array<kotlin.Any>?
+        #57 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #75 name:<this> type:kotlin.Any 
+  CLASS #76 CLASS name:Test3 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #77 INSTANCE_RECEIVER name:<this> type:<root>.Test3 
+    CONSTRUCTOR #78 visibility:public <> (anyArrayN:kotlin.Array<kotlin.Any>?) returnType:<root>.Test3 [primary] 
+      VALUE_PARAMETER #79 name:anyArrayN index:0 type:kotlin.Array<kotlin.Any>? 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Test3 modality:FINAL visibility:public [data] superTypes:[kotlin.Any]'
-    PROPERTY name:anyArrayN visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:anyArrayN type:kotlin.Array<kotlin.Any>? visibility:public [final]
+        DELEGATING_CONSTRUCTOR_CALL '#80 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#76 class CLASS Test3 declared in <root>'
+    PROPERTY #81 name:anyArrayN visibility:public modality:FINAL [val] 
+      FIELD #82 PROPERTY_BACKING_FIELD name:anyArrayN type:kotlin.Array<kotlin.Any>? visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'anyArrayN: kotlin.Array<kotlin.Any>? declared in <root>.Test3.<init>' type=kotlin.Array<kotlin.Any>? origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-anyArrayN> visibility:public modality:FINAL <> ($this:<root>.Test3) returnType:kotlin.Array<kotlin.Any>?
-        correspondingProperty: PROPERTY name:anyArrayN visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test3
+          GET_VAR '#79 anyArrayN: kotlin.Array<kotlin.Any>? declared in <root>.Test3.<init>' type=kotlin.Array<kotlin.Any>? origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #83 DEFAULT_PROPERTY_ACCESSOR name:<get-anyArrayN> visibility:public modality:FINAL <> ($this:<root>.Test3) returnType:kotlin.Array<kotlin.Any>? 
+        correspondingProperty: PROPERTY #81 name:anyArrayN visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #84 name:<this> type:<root>.Test3 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-anyArrayN> (): kotlin.Array<kotlin.Any>? declared in <root>.Test3'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:anyArrayN type:kotlin.Array<kotlin.Any>? visibility:public [final] ' type=kotlin.Array<kotlin.Any>? origin=null
-              receiver: GET_VAR '<this>: <root>.Test3 declared in <root>.Test3.<get-anyArrayN>' type=<root>.Test3 origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          RETURN type=kotlin.Nothing from='#83 public final fun <get-anyArrayN> (): kotlin.Array<kotlin.Any>? declared in <root>.Test3'
+            GET_FIELD '#82 FIELD #82 PROPERTY_BACKING_FIELD name:anyArrayN type:kotlin.Array<kotlin.Any>? visibility:public [final] ' type=kotlin.Array<kotlin.Any>? origin=null
+              receiver: GET_VAR '#84 <this>: <root>.Test3 declared in <root>.Test3.<get-anyArrayN>' type=<root>.Test3 origin=null
+    FUN #85 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #50 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #86 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #87 name:other index:0 type:kotlin.Any? 
+    FUN #88 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #54 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #89 name:<this> type:kotlin.Any 
+    FUN #90 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+        #57 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #91 name:<this> type:kotlin.Any 

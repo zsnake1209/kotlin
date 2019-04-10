@@ -1,41 +1,41 @@
 FILE fqName:<root> fileName:/booleanOperators.kt
-  FUN name:test1 visibility:public modality:FINAL <> (a:kotlin.Boolean, b:kotlin.Boolean) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Boolean 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Boolean 
+  FUN #0 name:test1 visibility:public modality:FINAL <> (a:kotlin.Boolean, b:kotlin.Boolean) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #1 name:a index:0 type:kotlin.Boolean 
+    VALUE_PARAMETER #2 name:b index:1 type:kotlin.Boolean 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1 (a: kotlin.Boolean, b: kotlin.Boolean): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun test1 (a: kotlin.Boolean, b: kotlin.Boolean): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
-            if: GET_VAR 'a: kotlin.Boolean declared in <root>.test1' type=kotlin.Boolean origin=null
-            then: GET_VAR 'b: kotlin.Boolean declared in <root>.test1' type=kotlin.Boolean origin=null
+            if: GET_VAR '#1 a: kotlin.Boolean declared in <root>.test1' type=kotlin.Boolean origin=null
+            then: GET_VAR '#2 b: kotlin.Boolean declared in <root>.test1' type=kotlin.Boolean origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test2 visibility:public modality:FINAL <> (a:kotlin.Boolean, b:kotlin.Boolean) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Boolean 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Boolean 
+  FUN #3 name:test2 visibility:public modality:FINAL <> (a:kotlin.Boolean, b:kotlin.Boolean) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #4 name:a index:0 type:kotlin.Boolean 
+    VALUE_PARAMETER #5 name:b index:1 type:kotlin.Boolean 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2 (a: kotlin.Boolean, b: kotlin.Boolean): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#3 public final fun test2 (a: kotlin.Boolean, b: kotlin.Boolean): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=OROR
           BRANCH
-            if: GET_VAR 'a: kotlin.Boolean declared in <root>.test2' type=kotlin.Boolean origin=null
+            if: GET_VAR '#4 a: kotlin.Boolean declared in <root>.test2' type=kotlin.Boolean origin=null
             then: CONST Boolean type=kotlin.Boolean value=true
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
-            then: GET_VAR 'b: kotlin.Boolean declared in <root>.test2' type=kotlin.Boolean origin=null
-  FUN name:test1x visibility:public modality:FINAL <> (a:kotlin.Boolean, b:kotlin.Boolean) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Boolean 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Boolean 
+            then: GET_VAR '#5 b: kotlin.Boolean declared in <root>.test2' type=kotlin.Boolean origin=null
+  FUN #6 name:test1x visibility:public modality:FINAL <> (a:kotlin.Boolean, b:kotlin.Boolean) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #7 name:a index:0 type:kotlin.Boolean 
+    VALUE_PARAMETER #8 name:b index:1 type:kotlin.Boolean 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1x (a: kotlin.Boolean, b: kotlin.Boolean): kotlin.Boolean declared in <root>'
-        CALL 'public final fun and (other: kotlin.Boolean): kotlin.Boolean declared in kotlin.Boolean' type=kotlin.Boolean origin=null
-          $this: GET_VAR 'a: kotlin.Boolean declared in <root>.test1x' type=kotlin.Boolean origin=null
-          other: GET_VAR 'b: kotlin.Boolean declared in <root>.test1x' type=kotlin.Boolean origin=null
-  FUN name:test2x visibility:public modality:FINAL <> (a:kotlin.Boolean, b:kotlin.Boolean) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Boolean 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Boolean 
+      RETURN type=kotlin.Nothing from='#6 public final fun test1x (a: kotlin.Boolean, b: kotlin.Boolean): kotlin.Boolean declared in <root>'
+        CALL '#9 public final fun and (other: kotlin.Boolean): kotlin.Boolean declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+          $this: GET_VAR '#7 a: kotlin.Boolean declared in <root>.test1x' type=kotlin.Boolean origin=null
+          other: GET_VAR '#8 b: kotlin.Boolean declared in <root>.test1x' type=kotlin.Boolean origin=null
+  FUN #10 name:test2x visibility:public modality:FINAL <> (a:kotlin.Boolean, b:kotlin.Boolean) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #11 name:a index:0 type:kotlin.Boolean 
+    VALUE_PARAMETER #12 name:b index:1 type:kotlin.Boolean 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2x (a: kotlin.Boolean, b: kotlin.Boolean): kotlin.Boolean declared in <root>'
-        CALL 'public final fun or (other: kotlin.Boolean): kotlin.Boolean declared in kotlin.Boolean' type=kotlin.Boolean origin=null
-          $this: GET_VAR 'a: kotlin.Boolean declared in <root>.test2x' type=kotlin.Boolean origin=null
-          other: GET_VAR 'b: kotlin.Boolean declared in <root>.test2x' type=kotlin.Boolean origin=null
+      RETURN type=kotlin.Nothing from='#10 public final fun test2x (a: kotlin.Boolean, b: kotlin.Boolean): kotlin.Boolean declared in <root>'
+        CALL '#13 public final fun or (other: kotlin.Boolean): kotlin.Boolean declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+          $this: GET_VAR '#11 a: kotlin.Boolean declared in <root>.test2x' type=kotlin.Boolean origin=null
+          other: GET_VAR '#12 b: kotlin.Boolean declared in <root>.test2x' type=kotlin.Boolean origin=null

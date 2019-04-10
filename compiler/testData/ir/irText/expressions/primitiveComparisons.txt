@@ -1,209 +1,209 @@
 FILE fqName:<root> fileName:/primitiveComparisons.kt
-  FUN name:btest1 visibility:public modality:FINAL <> (a:kotlin.Byte, b:kotlin.Byte) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Byte 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Byte 
+  FUN #0 name:btest1 visibility:public modality:FINAL <> (a:kotlin.Byte, b:kotlin.Byte) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #1 name:a index:0 type:kotlin.Byte 
+    VALUE_PARAMETER #2 name:b index:1 type:kotlin.Byte 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun btest1 (a: kotlin.Byte, b: kotlin.Byte): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
-          arg0: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
-            $this: GET_VAR 'a: kotlin.Byte declared in <root>.btest1' type=kotlin.Byte origin=null
-          arg1: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
-            $this: GET_VAR 'b: kotlin.Byte declared in <root>.btest1' type=kotlin.Byte origin=null
-  FUN name:btest2 visibility:public modality:FINAL <> (a:kotlin.Byte, b:kotlin.Byte) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Byte 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Byte 
+      RETURN type=kotlin.Nothing from='#0 public final fun btest1 (a: kotlin.Byte, b: kotlin.Byte): kotlin.Boolean declared in <root>'
+        CALL '#3 public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
+          arg0: CALL '#4 public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
+            $this: GET_VAR '#1 a: kotlin.Byte declared in <root>.btest1' type=kotlin.Byte origin=null
+          arg1: CALL '#4 public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
+            $this: GET_VAR '#2 b: kotlin.Byte declared in <root>.btest1' type=kotlin.Byte origin=null
+  FUN #5 name:btest2 visibility:public modality:FINAL <> (a:kotlin.Byte, b:kotlin.Byte) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #6 name:a index:0 type:kotlin.Byte 
+    VALUE_PARAMETER #7 name:b index:1 type:kotlin.Byte 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun btest2 (a: kotlin.Byte, b: kotlin.Byte): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
-            $this: GET_VAR 'a: kotlin.Byte declared in <root>.btest2' type=kotlin.Byte origin=null
-          arg1: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
-            $this: GET_VAR 'b: kotlin.Byte declared in <root>.btest2' type=kotlin.Byte origin=null
-  FUN name:btest3 visibility:public modality:FINAL <> (a:kotlin.Byte, b:kotlin.Byte) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Byte 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Byte 
+      RETURN type=kotlin.Nothing from='#5 public final fun btest2 (a: kotlin.Byte, b: kotlin.Byte): kotlin.Boolean declared in <root>'
+        CALL '#8 public final fun less (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: CALL '#4 public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
+            $this: GET_VAR '#6 a: kotlin.Byte declared in <root>.btest2' type=kotlin.Byte origin=null
+          arg1: CALL '#4 public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
+            $this: GET_VAR '#7 b: kotlin.Byte declared in <root>.btest2' type=kotlin.Byte origin=null
+  FUN #9 name:btest3 visibility:public modality:FINAL <> (a:kotlin.Byte, b:kotlin.Byte) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #10 name:a index:0 type:kotlin.Byte 
+    VALUE_PARAMETER #11 name:b index:1 type:kotlin.Byte 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun btest3 (a: kotlin.Byte, b: kotlin.Byte): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greaterOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
-          arg0: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
-            $this: GET_VAR 'a: kotlin.Byte declared in <root>.btest3' type=kotlin.Byte origin=null
-          arg1: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
-            $this: GET_VAR 'b: kotlin.Byte declared in <root>.btest3' type=kotlin.Byte origin=null
-  FUN name:btest4 visibility:public modality:FINAL <> (a:kotlin.Byte, b:kotlin.Byte) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Byte 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Byte 
+      RETURN type=kotlin.Nothing from='#9 public final fun btest3 (a: kotlin.Byte, b: kotlin.Byte): kotlin.Boolean declared in <root>'
+        CALL '#12 public final fun greaterOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
+          arg0: CALL '#4 public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
+            $this: GET_VAR '#10 a: kotlin.Byte declared in <root>.btest3' type=kotlin.Byte origin=null
+          arg1: CALL '#4 public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
+            $this: GET_VAR '#11 b: kotlin.Byte declared in <root>.btest3' type=kotlin.Byte origin=null
+  FUN #13 name:btest4 visibility:public modality:FINAL <> (a:kotlin.Byte, b:kotlin.Byte) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #14 name:a index:0 type:kotlin.Byte 
+    VALUE_PARAMETER #15 name:b index:1 type:kotlin.Byte 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun btest4 (a: kotlin.Byte, b: kotlin.Byte): kotlin.Boolean declared in <root>'
-        CALL 'public final fun lessOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
-          arg0: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
-            $this: GET_VAR 'a: kotlin.Byte declared in <root>.btest4' type=kotlin.Byte origin=null
-          arg1: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
-            $this: GET_VAR 'b: kotlin.Byte declared in <root>.btest4' type=kotlin.Byte origin=null
-  FUN name:stest1 visibility:public modality:FINAL <> (a:kotlin.Short, b:kotlin.Short) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Short 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Short 
+      RETURN type=kotlin.Nothing from='#13 public final fun btest4 (a: kotlin.Byte, b: kotlin.Byte): kotlin.Boolean declared in <root>'
+        CALL '#16 public final fun lessOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
+          arg0: CALL '#4 public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
+            $this: GET_VAR '#14 a: kotlin.Byte declared in <root>.btest4' type=kotlin.Byte origin=null
+          arg1: CALL '#4 public open fun toInt (): kotlin.Int declared in kotlin.Byte' type=kotlin.Int origin=null
+            $this: GET_VAR '#15 b: kotlin.Byte declared in <root>.btest4' type=kotlin.Byte origin=null
+  FUN #17 name:stest1 visibility:public modality:FINAL <> (a:kotlin.Short, b:kotlin.Short) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #18 name:a index:0 type:kotlin.Short 
+    VALUE_PARAMETER #19 name:b index:1 type:kotlin.Short 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun stest1 (a: kotlin.Short, b: kotlin.Short): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
-          arg0: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
-            $this: GET_VAR 'a: kotlin.Short declared in <root>.stest1' type=kotlin.Short origin=null
-          arg1: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
-            $this: GET_VAR 'b: kotlin.Short declared in <root>.stest1' type=kotlin.Short origin=null
-  FUN name:stest2 visibility:public modality:FINAL <> (a:kotlin.Short, b:kotlin.Short) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Short 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Short 
+      RETURN type=kotlin.Nothing from='#17 public final fun stest1 (a: kotlin.Short, b: kotlin.Short): kotlin.Boolean declared in <root>'
+        CALL '#3 public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
+          arg0: CALL '#20 public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
+            $this: GET_VAR '#18 a: kotlin.Short declared in <root>.stest1' type=kotlin.Short origin=null
+          arg1: CALL '#20 public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
+            $this: GET_VAR '#19 b: kotlin.Short declared in <root>.stest1' type=kotlin.Short origin=null
+  FUN #21 name:stest2 visibility:public modality:FINAL <> (a:kotlin.Short, b:kotlin.Short) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #22 name:a index:0 type:kotlin.Short 
+    VALUE_PARAMETER #23 name:b index:1 type:kotlin.Short 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun stest2 (a: kotlin.Short, b: kotlin.Short): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
-            $this: GET_VAR 'a: kotlin.Short declared in <root>.stest2' type=kotlin.Short origin=null
-          arg1: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
-            $this: GET_VAR 'b: kotlin.Short declared in <root>.stest2' type=kotlin.Short origin=null
-  FUN name:stest3 visibility:public modality:FINAL <> (a:kotlin.Short, b:kotlin.Short) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Short 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Short 
+      RETURN type=kotlin.Nothing from='#21 public final fun stest2 (a: kotlin.Short, b: kotlin.Short): kotlin.Boolean declared in <root>'
+        CALL '#8 public final fun less (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: CALL '#20 public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
+            $this: GET_VAR '#22 a: kotlin.Short declared in <root>.stest2' type=kotlin.Short origin=null
+          arg1: CALL '#20 public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
+            $this: GET_VAR '#23 b: kotlin.Short declared in <root>.stest2' type=kotlin.Short origin=null
+  FUN #24 name:stest3 visibility:public modality:FINAL <> (a:kotlin.Short, b:kotlin.Short) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #25 name:a index:0 type:kotlin.Short 
+    VALUE_PARAMETER #26 name:b index:1 type:kotlin.Short 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun stest3 (a: kotlin.Short, b: kotlin.Short): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greaterOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
-          arg0: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
-            $this: GET_VAR 'a: kotlin.Short declared in <root>.stest3' type=kotlin.Short origin=null
-          arg1: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
-            $this: GET_VAR 'b: kotlin.Short declared in <root>.stest3' type=kotlin.Short origin=null
-  FUN name:stest4 visibility:public modality:FINAL <> (a:kotlin.Short, b:kotlin.Short) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Short 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Short 
+      RETURN type=kotlin.Nothing from='#24 public final fun stest3 (a: kotlin.Short, b: kotlin.Short): kotlin.Boolean declared in <root>'
+        CALL '#12 public final fun greaterOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
+          arg0: CALL '#20 public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
+            $this: GET_VAR '#25 a: kotlin.Short declared in <root>.stest3' type=kotlin.Short origin=null
+          arg1: CALL '#20 public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
+            $this: GET_VAR '#26 b: kotlin.Short declared in <root>.stest3' type=kotlin.Short origin=null
+  FUN #27 name:stest4 visibility:public modality:FINAL <> (a:kotlin.Short, b:kotlin.Short) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #28 name:a index:0 type:kotlin.Short 
+    VALUE_PARAMETER #29 name:b index:1 type:kotlin.Short 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun stest4 (a: kotlin.Short, b: kotlin.Short): kotlin.Boolean declared in <root>'
-        CALL 'public final fun lessOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
-          arg0: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
-            $this: GET_VAR 'a: kotlin.Short declared in <root>.stest4' type=kotlin.Short origin=null
-          arg1: CALL 'public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
-            $this: GET_VAR 'b: kotlin.Short declared in <root>.stest4' type=kotlin.Short origin=null
-  FUN name:itest1 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int 
+      RETURN type=kotlin.Nothing from='#27 public final fun stest4 (a: kotlin.Short, b: kotlin.Short): kotlin.Boolean declared in <root>'
+        CALL '#16 public final fun lessOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
+          arg0: CALL '#20 public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
+            $this: GET_VAR '#28 a: kotlin.Short declared in <root>.stest4' type=kotlin.Short origin=null
+          arg1: CALL '#20 public open fun toInt (): kotlin.Int declared in kotlin.Short' type=kotlin.Int origin=null
+            $this: GET_VAR '#29 b: kotlin.Short declared in <root>.stest4' type=kotlin.Short origin=null
+  FUN #30 name:itest1 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #31 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #32 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun itest1 (a: kotlin.Int, b: kotlin.Int): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
-          arg0: GET_VAR 'a: kotlin.Int declared in <root>.itest1' type=kotlin.Int origin=null
-          arg1: GET_VAR 'b: kotlin.Int declared in <root>.itest1' type=kotlin.Int origin=null
-  FUN name:itest2 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int 
+      RETURN type=kotlin.Nothing from='#30 public final fun itest1 (a: kotlin.Int, b: kotlin.Int): kotlin.Boolean declared in <root>'
+        CALL '#3 public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
+          arg0: GET_VAR '#31 a: kotlin.Int declared in <root>.itest1' type=kotlin.Int origin=null
+          arg1: GET_VAR '#32 b: kotlin.Int declared in <root>.itest1' type=kotlin.Int origin=null
+  FUN #33 name:itest2 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #34 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #35 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun itest2 (a: kotlin.Int, b: kotlin.Int): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: GET_VAR 'a: kotlin.Int declared in <root>.itest2' type=kotlin.Int origin=null
-          arg1: GET_VAR 'b: kotlin.Int declared in <root>.itest2' type=kotlin.Int origin=null
-  FUN name:itest3 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int 
+      RETURN type=kotlin.Nothing from='#33 public final fun itest2 (a: kotlin.Int, b: kotlin.Int): kotlin.Boolean declared in <root>'
+        CALL '#8 public final fun less (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: GET_VAR '#34 a: kotlin.Int declared in <root>.itest2' type=kotlin.Int origin=null
+          arg1: GET_VAR '#35 b: kotlin.Int declared in <root>.itest2' type=kotlin.Int origin=null
+  FUN #36 name:itest3 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #37 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #38 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun itest3 (a: kotlin.Int, b: kotlin.Int): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greaterOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
-          arg0: GET_VAR 'a: kotlin.Int declared in <root>.itest3' type=kotlin.Int origin=null
-          arg1: GET_VAR 'b: kotlin.Int declared in <root>.itest3' type=kotlin.Int origin=null
-  FUN name:itest4 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int 
+      RETURN type=kotlin.Nothing from='#36 public final fun itest3 (a: kotlin.Int, b: kotlin.Int): kotlin.Boolean declared in <root>'
+        CALL '#12 public final fun greaterOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
+          arg0: GET_VAR '#37 a: kotlin.Int declared in <root>.itest3' type=kotlin.Int origin=null
+          arg1: GET_VAR '#38 b: kotlin.Int declared in <root>.itest3' type=kotlin.Int origin=null
+  FUN #39 name:itest4 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #40 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #41 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun itest4 (a: kotlin.Int, b: kotlin.Int): kotlin.Boolean declared in <root>'
-        CALL 'public final fun lessOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
-          arg0: GET_VAR 'a: kotlin.Int declared in <root>.itest4' type=kotlin.Int origin=null
-          arg1: GET_VAR 'b: kotlin.Int declared in <root>.itest4' type=kotlin.Int origin=null
-  FUN name:ltest1 visibility:public modality:FINAL <> (a:kotlin.Long, b:kotlin.Long) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Long 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Long 
+      RETURN type=kotlin.Nothing from='#39 public final fun itest4 (a: kotlin.Int, b: kotlin.Int): kotlin.Boolean declared in <root>'
+        CALL '#16 public final fun lessOrEqual (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
+          arg0: GET_VAR '#40 a: kotlin.Int declared in <root>.itest4' type=kotlin.Int origin=null
+          arg1: GET_VAR '#41 b: kotlin.Int declared in <root>.itest4' type=kotlin.Int origin=null
+  FUN #42 name:ltest1 visibility:public modality:FINAL <> (a:kotlin.Long, b:kotlin.Long) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #43 name:a index:0 type:kotlin.Long 
+    VALUE_PARAMETER #44 name:b index:1 type:kotlin.Long 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun ltest1 (a: kotlin.Long, b: kotlin.Long): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greater (arg0: kotlin.Long, arg1: kotlin.Long): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
-          arg0: GET_VAR 'a: kotlin.Long declared in <root>.ltest1' type=kotlin.Long origin=null
-          arg1: GET_VAR 'b: kotlin.Long declared in <root>.ltest1' type=kotlin.Long origin=null
-  FUN name:ltest2 visibility:public modality:FINAL <> (a:kotlin.Long, b:kotlin.Long) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Long 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Long 
+      RETURN type=kotlin.Nothing from='#42 public final fun ltest1 (a: kotlin.Long, b: kotlin.Long): kotlin.Boolean declared in <root>'
+        CALL '#45 public final fun greater (arg0: kotlin.Long, arg1: kotlin.Long): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
+          arg0: GET_VAR '#43 a: kotlin.Long declared in <root>.ltest1' type=kotlin.Long origin=null
+          arg1: GET_VAR '#44 b: kotlin.Long declared in <root>.ltest1' type=kotlin.Long origin=null
+  FUN #46 name:ltest2 visibility:public modality:FINAL <> (a:kotlin.Long, b:kotlin.Long) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #47 name:a index:0 type:kotlin.Long 
+    VALUE_PARAMETER #48 name:b index:1 type:kotlin.Long 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun ltest2 (a: kotlin.Long, b: kotlin.Long): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Long, arg1: kotlin.Long): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: GET_VAR 'a: kotlin.Long declared in <root>.ltest2' type=kotlin.Long origin=null
-          arg1: GET_VAR 'b: kotlin.Long declared in <root>.ltest2' type=kotlin.Long origin=null
-  FUN name:ltest3 visibility:public modality:FINAL <> (a:kotlin.Long, b:kotlin.Long) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Long 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Long 
+      RETURN type=kotlin.Nothing from='#46 public final fun ltest2 (a: kotlin.Long, b: kotlin.Long): kotlin.Boolean declared in <root>'
+        CALL '#49 public final fun less (arg0: kotlin.Long, arg1: kotlin.Long): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: GET_VAR '#47 a: kotlin.Long declared in <root>.ltest2' type=kotlin.Long origin=null
+          arg1: GET_VAR '#48 b: kotlin.Long declared in <root>.ltest2' type=kotlin.Long origin=null
+  FUN #50 name:ltest3 visibility:public modality:FINAL <> (a:kotlin.Long, b:kotlin.Long) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #51 name:a index:0 type:kotlin.Long 
+    VALUE_PARAMETER #52 name:b index:1 type:kotlin.Long 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun ltest3 (a: kotlin.Long, b: kotlin.Long): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greaterOrEqual (arg0: kotlin.Long, arg1: kotlin.Long): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
-          arg0: GET_VAR 'a: kotlin.Long declared in <root>.ltest3' type=kotlin.Long origin=null
-          arg1: GET_VAR 'b: kotlin.Long declared in <root>.ltest3' type=kotlin.Long origin=null
-  FUN name:ltest4 visibility:public modality:FINAL <> (a:kotlin.Long, b:kotlin.Long) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Long 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Long 
+      RETURN type=kotlin.Nothing from='#50 public final fun ltest3 (a: kotlin.Long, b: kotlin.Long): kotlin.Boolean declared in <root>'
+        CALL '#53 public final fun greaterOrEqual (arg0: kotlin.Long, arg1: kotlin.Long): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
+          arg0: GET_VAR '#51 a: kotlin.Long declared in <root>.ltest3' type=kotlin.Long origin=null
+          arg1: GET_VAR '#52 b: kotlin.Long declared in <root>.ltest3' type=kotlin.Long origin=null
+  FUN #54 name:ltest4 visibility:public modality:FINAL <> (a:kotlin.Long, b:kotlin.Long) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #55 name:a index:0 type:kotlin.Long 
+    VALUE_PARAMETER #56 name:b index:1 type:kotlin.Long 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun ltest4 (a: kotlin.Long, b: kotlin.Long): kotlin.Boolean declared in <root>'
-        CALL 'public final fun lessOrEqual (arg0: kotlin.Long, arg1: kotlin.Long): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
-          arg0: GET_VAR 'a: kotlin.Long declared in <root>.ltest4' type=kotlin.Long origin=null
-          arg1: GET_VAR 'b: kotlin.Long declared in <root>.ltest4' type=kotlin.Long origin=null
-  FUN name:ftest1 visibility:public modality:FINAL <> (a:kotlin.Float, b:kotlin.Float) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Float 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Float 
+      RETURN type=kotlin.Nothing from='#54 public final fun ltest4 (a: kotlin.Long, b: kotlin.Long): kotlin.Boolean declared in <root>'
+        CALL '#57 public final fun lessOrEqual (arg0: kotlin.Long, arg1: kotlin.Long): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
+          arg0: GET_VAR '#55 a: kotlin.Long declared in <root>.ltest4' type=kotlin.Long origin=null
+          arg1: GET_VAR '#56 b: kotlin.Long declared in <root>.ltest4' type=kotlin.Long origin=null
+  FUN #58 name:ftest1 visibility:public modality:FINAL <> (a:kotlin.Float, b:kotlin.Float) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #59 name:a index:0 type:kotlin.Float 
+    VALUE_PARAMETER #60 name:b index:1 type:kotlin.Float 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun ftest1 (a: kotlin.Float, b: kotlin.Float): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greater (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
-          arg0: GET_VAR 'a: kotlin.Float declared in <root>.ftest1' type=kotlin.Float origin=null
-          arg1: GET_VAR 'b: kotlin.Float declared in <root>.ftest1' type=kotlin.Float origin=null
-  FUN name:ftest2 visibility:public modality:FINAL <> (a:kotlin.Float, b:kotlin.Float) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Float 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Float 
+      RETURN type=kotlin.Nothing from='#58 public final fun ftest1 (a: kotlin.Float, b: kotlin.Float): kotlin.Boolean declared in <root>'
+        CALL '#61 public final fun greater (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
+          arg0: GET_VAR '#59 a: kotlin.Float declared in <root>.ftest1' type=kotlin.Float origin=null
+          arg1: GET_VAR '#60 b: kotlin.Float declared in <root>.ftest1' type=kotlin.Float origin=null
+  FUN #62 name:ftest2 visibility:public modality:FINAL <> (a:kotlin.Float, b:kotlin.Float) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #63 name:a index:0 type:kotlin.Float 
+    VALUE_PARAMETER #64 name:b index:1 type:kotlin.Float 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun ftest2 (a: kotlin.Float, b: kotlin.Float): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: GET_VAR 'a: kotlin.Float declared in <root>.ftest2' type=kotlin.Float origin=null
-          arg1: GET_VAR 'b: kotlin.Float declared in <root>.ftest2' type=kotlin.Float origin=null
-  FUN name:ftest3 visibility:public modality:FINAL <> (a:kotlin.Float, b:kotlin.Float) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Float 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Float 
+      RETURN type=kotlin.Nothing from='#62 public final fun ftest2 (a: kotlin.Float, b: kotlin.Float): kotlin.Boolean declared in <root>'
+        CALL '#65 public final fun less (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: GET_VAR '#63 a: kotlin.Float declared in <root>.ftest2' type=kotlin.Float origin=null
+          arg1: GET_VAR '#64 b: kotlin.Float declared in <root>.ftest2' type=kotlin.Float origin=null
+  FUN #66 name:ftest3 visibility:public modality:FINAL <> (a:kotlin.Float, b:kotlin.Float) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #67 name:a index:0 type:kotlin.Float 
+    VALUE_PARAMETER #68 name:b index:1 type:kotlin.Float 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun ftest3 (a: kotlin.Float, b: kotlin.Float): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greaterOrEqual (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
-          arg0: GET_VAR 'a: kotlin.Float declared in <root>.ftest3' type=kotlin.Float origin=null
-          arg1: GET_VAR 'b: kotlin.Float declared in <root>.ftest3' type=kotlin.Float origin=null
-  FUN name:ftest4 visibility:public modality:FINAL <> (a:kotlin.Float, b:kotlin.Float) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Float 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Float 
+      RETURN type=kotlin.Nothing from='#66 public final fun ftest3 (a: kotlin.Float, b: kotlin.Float): kotlin.Boolean declared in <root>'
+        CALL '#69 public final fun greaterOrEqual (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
+          arg0: GET_VAR '#67 a: kotlin.Float declared in <root>.ftest3' type=kotlin.Float origin=null
+          arg1: GET_VAR '#68 b: kotlin.Float declared in <root>.ftest3' type=kotlin.Float origin=null
+  FUN #70 name:ftest4 visibility:public modality:FINAL <> (a:kotlin.Float, b:kotlin.Float) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #71 name:a index:0 type:kotlin.Float 
+    VALUE_PARAMETER #72 name:b index:1 type:kotlin.Float 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun ftest4 (a: kotlin.Float, b: kotlin.Float): kotlin.Boolean declared in <root>'
-        CALL 'public final fun lessOrEqual (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
-          arg0: GET_VAR 'a: kotlin.Float declared in <root>.ftest4' type=kotlin.Float origin=null
-          arg1: GET_VAR 'b: kotlin.Float declared in <root>.ftest4' type=kotlin.Float origin=null
-  FUN name:dtest1 visibility:public modality:FINAL <> (a:kotlin.Double, b:kotlin.Double) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Double 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Double 
+      RETURN type=kotlin.Nothing from='#70 public final fun ftest4 (a: kotlin.Float, b: kotlin.Float): kotlin.Boolean declared in <root>'
+        CALL '#73 public final fun lessOrEqual (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
+          arg0: GET_VAR '#71 a: kotlin.Float declared in <root>.ftest4' type=kotlin.Float origin=null
+          arg1: GET_VAR '#72 b: kotlin.Float declared in <root>.ftest4' type=kotlin.Float origin=null
+  FUN #74 name:dtest1 visibility:public modality:FINAL <> (a:kotlin.Double, b:kotlin.Double) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #75 name:a index:0 type:kotlin.Double 
+    VALUE_PARAMETER #76 name:b index:1 type:kotlin.Double 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun dtest1 (a: kotlin.Double, b: kotlin.Double): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greater (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
-          arg0: GET_VAR 'a: kotlin.Double declared in <root>.dtest1' type=kotlin.Double origin=null
-          arg1: GET_VAR 'b: kotlin.Double declared in <root>.dtest1' type=kotlin.Double origin=null
-  FUN name:dtest2 visibility:public modality:FINAL <> (a:kotlin.Double, b:kotlin.Double) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Double 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Double 
+      RETURN type=kotlin.Nothing from='#74 public final fun dtest1 (a: kotlin.Double, b: kotlin.Double): kotlin.Boolean declared in <root>'
+        CALL '#77 public final fun greater (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
+          arg0: GET_VAR '#75 a: kotlin.Double declared in <root>.dtest1' type=kotlin.Double origin=null
+          arg1: GET_VAR '#76 b: kotlin.Double declared in <root>.dtest1' type=kotlin.Double origin=null
+  FUN #78 name:dtest2 visibility:public modality:FINAL <> (a:kotlin.Double, b:kotlin.Double) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #79 name:a index:0 type:kotlin.Double 
+    VALUE_PARAMETER #80 name:b index:1 type:kotlin.Double 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun dtest2 (a: kotlin.Double, b: kotlin.Double): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: GET_VAR 'a: kotlin.Double declared in <root>.dtest2' type=kotlin.Double origin=null
-          arg1: GET_VAR 'b: kotlin.Double declared in <root>.dtest2' type=kotlin.Double origin=null
-  FUN name:dtest3 visibility:public modality:FINAL <> (a:kotlin.Double, b:kotlin.Double) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Double 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Double 
+      RETURN type=kotlin.Nothing from='#78 public final fun dtest2 (a: kotlin.Double, b: kotlin.Double): kotlin.Boolean declared in <root>'
+        CALL '#81 public final fun less (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: GET_VAR '#79 a: kotlin.Double declared in <root>.dtest2' type=kotlin.Double origin=null
+          arg1: GET_VAR '#80 b: kotlin.Double declared in <root>.dtest2' type=kotlin.Double origin=null
+  FUN #82 name:dtest3 visibility:public modality:FINAL <> (a:kotlin.Double, b:kotlin.Double) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #83 name:a index:0 type:kotlin.Double 
+    VALUE_PARAMETER #84 name:b index:1 type:kotlin.Double 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun dtest3 (a: kotlin.Double, b: kotlin.Double): kotlin.Boolean declared in <root>'
-        CALL 'public final fun greaterOrEqual (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
-          arg0: GET_VAR 'a: kotlin.Double declared in <root>.dtest3' type=kotlin.Double origin=null
-          arg1: GET_VAR 'b: kotlin.Double declared in <root>.dtest3' type=kotlin.Double origin=null
-  FUN name:dtest4 visibility:public modality:FINAL <> (a:kotlin.Double, b:kotlin.Double) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:a index:0 type:kotlin.Double 
-    VALUE_PARAMETER name:b index:1 type:kotlin.Double 
+      RETURN type=kotlin.Nothing from='#82 public final fun dtest3 (a: kotlin.Double, b: kotlin.Double): kotlin.Boolean declared in <root>'
+        CALL '#85 public final fun greaterOrEqual (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GTEQ
+          arg0: GET_VAR '#83 a: kotlin.Double declared in <root>.dtest3' type=kotlin.Double origin=null
+          arg1: GET_VAR '#84 b: kotlin.Double declared in <root>.dtest3' type=kotlin.Double origin=null
+  FUN #86 name:dtest4 visibility:public modality:FINAL <> (a:kotlin.Double, b:kotlin.Double) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #87 name:a index:0 type:kotlin.Double 
+    VALUE_PARAMETER #88 name:b index:1 type:kotlin.Double 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun dtest4 (a: kotlin.Double, b: kotlin.Double): kotlin.Boolean declared in <root>'
-        CALL 'public final fun lessOrEqual (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
-          arg0: GET_VAR 'a: kotlin.Double declared in <root>.dtest4' type=kotlin.Double origin=null
-          arg1: GET_VAR 'b: kotlin.Double declared in <root>.dtest4' type=kotlin.Double origin=null
+      RETURN type=kotlin.Nothing from='#86 public final fun dtest4 (a: kotlin.Double, b: kotlin.Double): kotlin.Boolean declared in <root>'
+        CALL '#89 public final fun lessOrEqual (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LTEQ
+          arg0: GET_VAR '#87 a: kotlin.Double declared in <root>.dtest4' type=kotlin.Double origin=null
+          arg1: GET_VAR '#88 b: kotlin.Double declared in <root>.dtest4' type=kotlin.Double origin=null

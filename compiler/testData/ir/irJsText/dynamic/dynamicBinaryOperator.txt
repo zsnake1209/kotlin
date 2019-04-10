@@ -1,36 +1,36 @@
 FILE fqName:<root> fileName:/dynamicBinaryOperator.kt
-  FUN name:testBinaryPlus visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #0 name:testBinaryPlus visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
+    VALUE_PARAMETER #1 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testBinaryPlus (d: dynamic): dynamic declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun testBinaryPlus (d: dynamic): dynamic declared in <root>'
         DYN_OP operator=BINARY_PLUS type=dynamic
-          receiver: GET_VAR 'd: dynamic declared in <root>.testBinaryPlus' type=dynamic origin=null
+          receiver: GET_VAR '#1 d: dynamic declared in <root>.testBinaryPlus' type=dynamic origin=null
           0: CONST Int type=kotlin.Int value=1
-  FUN name:testBinaryMinus visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #2 name:testBinaryMinus visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
+    VALUE_PARAMETER #3 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testBinaryMinus (d: dynamic): dynamic declared in <root>'
+      RETURN type=kotlin.Nothing from='#2 public final fun testBinaryMinus (d: dynamic): dynamic declared in <root>'
         DYN_OP operator=BINARY_MINUS type=dynamic
-          receiver: GET_VAR 'd: dynamic declared in <root>.testBinaryMinus' type=dynamic origin=null
+          receiver: GET_VAR '#3 d: dynamic declared in <root>.testBinaryMinus' type=dynamic origin=null
           0: CONST Int type=kotlin.Int value=1
-  FUN name:testMul visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #4 name:testMul visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
+    VALUE_PARAMETER #5 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testMul (d: dynamic): dynamic declared in <root>'
+      RETURN type=kotlin.Nothing from='#4 public final fun testMul (d: dynamic): dynamic declared in <root>'
         DYN_OP operator=MUL type=dynamic
-          receiver: GET_VAR 'd: dynamic declared in <root>.testMul' type=dynamic origin=null
+          receiver: GET_VAR '#5 d: dynamic declared in <root>.testMul' type=dynamic origin=null
           0: CONST Int type=kotlin.Int value=2
-  FUN name:testDiv visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #6 name:testDiv visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
+    VALUE_PARAMETER #7 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testDiv (d: dynamic): dynamic declared in <root>'
+      RETURN type=kotlin.Nothing from='#6 public final fun testDiv (d: dynamic): dynamic declared in <root>'
         DYN_OP operator=DIV type=dynamic
-          receiver: GET_VAR 'd: dynamic declared in <root>.testDiv' type=dynamic origin=null
+          receiver: GET_VAR '#7 d: dynamic declared in <root>.testDiv' type=dynamic origin=null
           0: CONST Int type=kotlin.Int value=2
-  FUN name:testMod visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #8 name:testMod visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
+    VALUE_PARAMETER #9 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testMod (d: dynamic): dynamic declared in <root>'
+      RETURN type=kotlin.Nothing from='#8 public final fun testMod (d: dynamic): dynamic declared in <root>'
         DYN_OP operator=MOD type=dynamic
-          receiver: GET_VAR 'd: dynamic declared in <root>.testMod' type=dynamic origin=null
+          receiver: GET_VAR '#9 d: dynamic declared in <root>.testMod' type=dynamic origin=null
           0: CONST Int type=kotlin.Int value=2

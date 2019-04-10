@@ -1,64 +1,64 @@
 FILE fqName:<root> fileName:/callableReferenceTypeArguments.kt
-  CLASS OBJECT name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Host 
-    CONSTRUCTOR visibility:private <> () returnType:<root>.Host [primary] 
+  CLASS #0 OBJECT name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.Host 
+    CONSTRUCTOR #2 visibility:private <> () returnType:<root>.Host [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    FUN name:objectMember visibility:public modality:FINAL <T> ($this:<root>.Host, x:T of <root>.Host.objectMember) returnType:kotlin.Unit [inline] 
-      TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
-      $this: VALUE_PARAMETER name:<this> type:<root>.Host 
-      VALUE_PARAMETER name:x index:0 type:T of <root>.Host.objectMember 
+        DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class OBJECT Host declared in <root>'
+    FUN #4 name:objectMember visibility:public modality:FINAL <T> ($this:<root>.Host, x:T of <root>.Host.objectMember) returnType:kotlin.Unit [inline] 
+      TYPE_PARAMETER #5 name:T index:0 variance: superTypes:[kotlin.Any?]
+      $this: VALUE_PARAMETER #6 name:<this> type:<root>.Host 
+      VALUE_PARAMETER #7 name:x index:0 type:T of <root>.Host.objectMember 
       BLOCK_BODY
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+    FUN #8 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #10 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #11 name:other index:0 type:kotlin.Any? 
+    FUN #12 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #14 name:<this> type:kotlin.Any 
+    FUN #15 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  FUN name:topLevel1 visibility:public modality:FINAL <T> (x:T of <root>.topLevel1) returnType:kotlin.Unit [inline] 
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
-    VALUE_PARAMETER name:x index:0 type:T of <root>.topLevel1 
+        #16 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #17 name:<this> type:kotlin.Any 
+  FUN #18 name:topLevel1 visibility:public modality:FINAL <T> (x:T of <root>.topLevel1) returnType:kotlin.Unit [inline] 
+    TYPE_PARAMETER #19 name:T index:0 variance: superTypes:[kotlin.Any?]
+    VALUE_PARAMETER #20 name:x index:0 type:T of <root>.topLevel1 
     BLOCK_BODY
-  FUN name:topLevel2 visibility:public modality:FINAL <T> (x:kotlin.collections.List<T of <root>.topLevel2>) returnType:kotlin.Unit [inline] 
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
-    VALUE_PARAMETER name:x index:0 type:kotlin.collections.List<T of <root>.topLevel2> 
+  FUN #21 name:topLevel2 visibility:public modality:FINAL <T> (x:kotlin.collections.List<T of <root>.topLevel2>) returnType:kotlin.Unit [inline] 
+    TYPE_PARAMETER #22 name:T index:0 variance: superTypes:[kotlin.Any?]
+    VALUE_PARAMETER #23 name:x index:0 type:kotlin.collections.List<T of <root>.topLevel2> 
     BLOCK_BODY
-  PROPERTY name:test1 visibility:public modality:FINAL [val] 
-    FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static] 
+  PROPERTY #24 name:test1 visibility:public modality:FINAL [val] 
+    FIELD #25 PROPERTY_BACKING_FIELD name:test1 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static] 
       EXPRESSION_BODY
-        FUNCTION_REFERENCE 'public final fun topLevel1 <T> (x: T of <root>.topLevel1): kotlin.Unit [inline] declared in <root>' type=kotlin.reflect.KFunction1<@[CALL 'public constructor <init> (name: kotlin.String) [primary] declared in kotlin.ParameterName' type=kotlin.ParameterName origin=null] kotlin.Int, kotlin.Unit> origin=null
+        FUNCTION_REFERENCE '#18 public final fun topLevel1 <T> (x: T of <root>.topLevel1): kotlin.Unit [inline] declared in <root>' type=kotlin.reflect.KFunction1<@[CALL 'public constructor <init> (name: kotlin.String) [primary] declared in kotlin.ParameterName' type=kotlin.ParameterName origin=null] kotlin.Int, kotlin.Unit> origin=null
           <T>: kotlin.Int
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.Int, kotlin.Unit> 
-      correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val] 
+    FUN #26 DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.Int, kotlin.Unit> 
+      correspondingProperty: PROPERTY #24 name:test1 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Function1<kotlin.Int, kotlin.Unit> declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static] ' type=kotlin.Function1<kotlin.Int, kotlin.Unit> origin=null
-  PROPERTY name:test2 visibility:public modality:FINAL [val] 
-    FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> visibility:public [final,static] 
+        RETURN type=kotlin.Nothing from='#26 public final fun <get-test1> (): kotlin.Function1<kotlin.Int, kotlin.Unit> declared in <root>'
+          GET_FIELD '#25 FIELD #25 PROPERTY_BACKING_FIELD name:test1 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static] ' type=kotlin.Function1<kotlin.Int, kotlin.Unit> origin=null
+  PROPERTY #27 name:test2 visibility:public modality:FINAL [val] 
+    FIELD #28 PROPERTY_BACKING_FIELD name:test2 type:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> visibility:public [final,static] 
       EXPRESSION_BODY
-        FUNCTION_REFERENCE 'public final fun topLevel2 <T> (x: kotlin.collections.List<T of <root>.topLevel2>): kotlin.Unit [inline] declared in <root>' type=kotlin.reflect.KFunction1<@[CALL 'public constructor <init> (name: kotlin.String) [primary] declared in kotlin.ParameterName' type=kotlin.ParameterName origin=null] kotlin.collections.List<kotlin.String>, kotlin.Unit> origin=null
+        FUNCTION_REFERENCE '#21 public final fun topLevel2 <T> (x: kotlin.collections.List<T of <root>.topLevel2>): kotlin.Unit [inline] declared in <root>' type=kotlin.reflect.KFunction1<@[CALL 'public constructor <init> (name: kotlin.String) [primary] declared in kotlin.ParameterName' type=kotlin.ParameterName origin=null] kotlin.collections.List<kotlin.String>, kotlin.Unit> origin=null
           <T>: kotlin.String
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> 
-      correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [val] 
+    FUN #29 DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> 
+      correspondingProperty: PROPERTY #27 name:test2 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> visibility:public [final,static] ' type=kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> origin=null
-  PROPERTY name:test3 visibility:public modality:FINAL [val] 
-    FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static] 
+        RETURN type=kotlin.Nothing from='#29 public final fun <get-test2> (): kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> declared in <root>'
+          GET_FIELD '#28 FIELD #28 PROPERTY_BACKING_FIELD name:test2 type:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> visibility:public [final,static] ' type=kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> origin=null
+  PROPERTY #30 name:test3 visibility:public modality:FINAL [val] 
+    FIELD #31 PROPERTY_BACKING_FIELD name:test3 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static] 
       EXPRESSION_BODY
-        FUNCTION_REFERENCE 'public final fun objectMember <T> (x: T of <root>.Host.objectMember): kotlin.Unit [inline] declared in <root>.Host' type=kotlin.reflect.KFunction1<@[CALL 'public constructor <init> (name: kotlin.String) [primary] declared in kotlin.ParameterName' type=kotlin.ParameterName origin=null] kotlin.Int, kotlin.Unit> origin=null
+        FUNCTION_REFERENCE '#4 public final fun objectMember <T> (x: T of <root>.Host.objectMember): kotlin.Unit [inline] declared in <root>.Host' type=kotlin.reflect.KFunction1<@[CALL 'public constructor <init> (name: kotlin.String) [primary] declared in kotlin.ParameterName' type=kotlin.ParameterName origin=null] kotlin.Int, kotlin.Unit> origin=null
           <T>: kotlin.Int
-          $this: GET_OBJECT 'CLASS OBJECT name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]' type=<root>.Host
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.Int, kotlin.Unit> 
-      correspondingProperty: PROPERTY name:test3 visibility:public modality:FINAL [val] 
+          $this: GET_OBJECT '#0 class OBJECT Host declared in <root>' type=<root>.Host
+    FUN #32 DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.Int, kotlin.Unit> 
+      correspondingProperty: PROPERTY #30 name:test3 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.Function1<kotlin.Int, kotlin.Unit> declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static] ' type=kotlin.Function1<kotlin.Int, kotlin.Unit> origin=null
+        RETURN type=kotlin.Nothing from='#32 public final fun <get-test3> (): kotlin.Function1<kotlin.Int, kotlin.Unit> declared in <root>'
+          GET_FIELD '#31 FIELD #31 PROPERTY_BACKING_FIELD name:test3 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static] ' type=kotlin.Function1<kotlin.Int, kotlin.Unit> origin=null

@@ -1,382 +1,382 @@
 FILE fqName:<root> fileName:/delegatedImplementation.kt
-  CLASS INTERFACE name:IBase modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IBase 
-    FUN name:foo visibility:public modality:ABSTRACT <> ($this:<root>.IBase, x:kotlin.Int, s:kotlin.String) returnType:kotlin.Unit 
-      $this: VALUE_PARAMETER name:<this> type:<root>.IBase 
-      VALUE_PARAMETER name:x index:0 type:kotlin.Int 
-      VALUE_PARAMETER name:s index:1 type:kotlin.String 
-    FUN name:bar visibility:public modality:ABSTRACT <> ($this:<root>.IBase) returnType:kotlin.Int 
-      $this: VALUE_PARAMETER name:<this> type:<root>.IBase 
-    FUN name:qux visibility:public modality:ABSTRACT <> ($this:<root>.IBase, $receiver:kotlin.String) returnType:kotlin.Unit 
-      $this: VALUE_PARAMETER name:<this> type:<root>.IBase 
-      $receiver: VALUE_PARAMETER name:<this> type:kotlin.String 
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+  CLASS #0 INTERFACE name:IBase modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.IBase 
+    FUN #2 name:foo visibility:public modality:ABSTRACT <> ($this:<root>.IBase, x:kotlin.Int, s:kotlin.String) returnType:kotlin.Unit 
+      $this: VALUE_PARAMETER #3 name:<this> type:<root>.IBase 
+      VALUE_PARAMETER #4 name:x index:0 type:kotlin.Int 
+      VALUE_PARAMETER #5 name:s index:1 type:kotlin.String 
+    FUN #6 name:bar visibility:public modality:ABSTRACT <> ($this:<root>.IBase) returnType:kotlin.Int 
+      $this: VALUE_PARAMETER #7 name:<this> type:<root>.IBase 
+    FUN #8 name:qux visibility:public modality:ABSTRACT <> ($this:<root>.IBase, $receiver:kotlin.String) returnType:kotlin.Unit 
+      $this: VALUE_PARAMETER #9 name:<this> type:<root>.IBase 
+      $receiver: VALUE_PARAMETER #10 name:<this> type:kotlin.String 
+    FUN #11 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #12 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #13 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #14 name:other index:0 type:kotlin.Any? 
+    FUN #15 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #16 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #17 name:<this> type:kotlin.Any 
+    FUN #18 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  CLASS OBJECT name:BaseImpl modality:FINAL visibility:public superTypes:[<root>.IBase]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.BaseImpl 
-    CONSTRUCTOR visibility:private <> () returnType:<root>.BaseImpl [primary] 
+        #19 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #20 name:<this> type:kotlin.Any 
+  CLASS #21 OBJECT name:BaseImpl modality:FINAL visibility:public superTypes:[<root>.IBase]
+    $this: VALUE_PARAMETER #22 INSTANCE_RECEIVER name:<this> type:<root>.BaseImpl 
+    CONSTRUCTOR #23 visibility:private <> () returnType:<root>.BaseImpl [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:BaseImpl modality:FINAL visibility:public superTypes:[<root>.IBase]'
-    FUN name:foo visibility:public modality:OPEN <> ($this:<root>.BaseImpl, x:kotlin.Int, s:kotlin.String) returnType:kotlin.Unit 
+        DELEGATING_CONSTRUCTOR_CALL '#24 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#21 class OBJECT BaseImpl declared in <root>'
+    FUN #25 name:foo visibility:public modality:OPEN <> ($this:<root>.BaseImpl, x:kotlin.Int, s:kotlin.String) returnType:kotlin.Unit 
       overridden:
-        public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.BaseImpl 
-      VALUE_PARAMETER name:x index:0 type:kotlin.Int 
-      VALUE_PARAMETER name:s index:1 type:kotlin.String 
+        #2 public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase
+      $this: VALUE_PARAMETER #26 name:<this> type:<root>.BaseImpl 
+      VALUE_PARAMETER #27 name:x index:0 type:kotlin.Int 
+      VALUE_PARAMETER #28 name:s index:1 type:kotlin.String 
       BLOCK_BODY
-    FUN name:bar visibility:public modality:OPEN <> ($this:<root>.BaseImpl) returnType:kotlin.Int 
+    FUN #29 name:bar visibility:public modality:OPEN <> ($this:<root>.BaseImpl) returnType:kotlin.Int 
       overridden:
-        public abstract fun bar (): kotlin.Int declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.BaseImpl 
+        #6 public abstract fun bar (): kotlin.Int declared in <root>.IBase
+      $this: VALUE_PARAMETER #30 name:<this> type:<root>.BaseImpl 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public open fun bar (): kotlin.Int declared in <root>.BaseImpl'
+        RETURN type=kotlin.Nothing from='#29 public open fun bar (): kotlin.Int declared in <root>.BaseImpl'
           CONST Int type=kotlin.Int value=42
-    FUN name:qux visibility:public modality:OPEN <> ($this:<root>.BaseImpl, $receiver:kotlin.String) returnType:kotlin.Unit 
+    FUN #31 name:qux visibility:public modality:OPEN <> ($this:<root>.BaseImpl, $receiver:kotlin.String) returnType:kotlin.Unit 
       overridden:
-        public abstract fun qux (): kotlin.Unit declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.BaseImpl 
-      $receiver: VALUE_PARAMETER name:<this> type:kotlin.String 
+        #8 public abstract fun qux (): kotlin.Unit declared in <root>.IBase
+      $this: VALUE_PARAMETER #32 name:<this> type:<root>.BaseImpl 
+      $receiver: VALUE_PARAMETER #33 name:<this> type:kotlin.String 
       BLOCK_BODY
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+    FUN #34 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #11 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IBase
+      $this: VALUE_PARAMETER #35 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #36 name:other index:0 type:kotlin.Any? 
+    FUN #37 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #15 public open fun hashCode (): kotlin.Int declared in <root>.IBase
+      $this: VALUE_PARAMETER #38 name:<this> type:kotlin.Any 
+    FUN #39 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  CLASS INTERFACE name:IOther modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IOther 
-    PROPERTY name:x visibility:public modality:ABSTRACT [val] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:ABSTRACT <> ($this:<root>.IOther) returnType:kotlin.String 
-        correspondingProperty: PROPERTY name:x visibility:public modality:ABSTRACT [val] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.IOther 
-    PROPERTY name:y visibility:public modality:ABSTRACT [var] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-y> visibility:public modality:ABSTRACT <> ($this:<root>.IOther) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY name:y visibility:public modality:ABSTRACT [var] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.IOther 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<set-y> visibility:public modality:ABSTRACT <> ($this:<root>.IOther, <set-?>:kotlin.Int) returnType:kotlin.Unit 
-        correspondingProperty: PROPERTY name:y visibility:public modality:ABSTRACT [var] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.IOther 
-        VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
-    PROPERTY name:z1 visibility:public modality:ABSTRACT [val] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-z1> visibility:public modality:ABSTRACT <> ($this:<root>.IOther, $receiver:kotlin.Byte) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY name:z1 visibility:public modality:ABSTRACT [val] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.IOther 
-        $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
-    PROPERTY name:z2 visibility:public modality:ABSTRACT [var] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-z2> visibility:public modality:ABSTRACT <> ($this:<root>.IOther, $receiver:kotlin.Byte) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY name:z2 visibility:public modality:ABSTRACT [var] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.IOther 
-        $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<set-z2> visibility:public modality:ABSTRACT <> ($this:<root>.IOther, $receiver:kotlin.Byte, <set-?>:kotlin.Int) returnType:kotlin.Unit 
-        correspondingProperty: PROPERTY name:z2 visibility:public modality:ABSTRACT [var] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.IOther 
-        $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
-        VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+        #18 public open fun toString (): kotlin.String declared in <root>.IBase
+      $this: VALUE_PARAMETER #40 name:<this> type:kotlin.Any 
+  CLASS #41 INTERFACE name:IOther modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #42 INSTANCE_RECEIVER name:<this> type:<root>.IOther 
+    PROPERTY #43 name:x visibility:public modality:ABSTRACT [val] 
+      FUN #44 DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:ABSTRACT <> ($this:<root>.IOther) returnType:kotlin.String 
+        correspondingProperty: PROPERTY #43 name:x visibility:public modality:ABSTRACT [val] 
+        $this: VALUE_PARAMETER #45 name:<this> type:<root>.IOther 
+    PROPERTY #46 name:y visibility:public modality:ABSTRACT [var] 
+      FUN #47 DEFAULT_PROPERTY_ACCESSOR name:<get-y> visibility:public modality:ABSTRACT <> ($this:<root>.IOther) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #46 name:y visibility:public modality:ABSTRACT [var] 
+        $this: VALUE_PARAMETER #48 name:<this> type:<root>.IOther 
+      FUN #49 DEFAULT_PROPERTY_ACCESSOR name:<set-y> visibility:public modality:ABSTRACT <> ($this:<root>.IOther, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+        correspondingProperty: PROPERTY #46 name:y visibility:public modality:ABSTRACT [var] 
+        $this: VALUE_PARAMETER #50 name:<this> type:<root>.IOther 
+        VALUE_PARAMETER #51 name:<set-?> index:0 type:kotlin.Int 
+    PROPERTY #52 name:z1 visibility:public modality:ABSTRACT [val] 
+      FUN #53 DEFAULT_PROPERTY_ACCESSOR name:<get-z1> visibility:public modality:ABSTRACT <> ($this:<root>.IOther, $receiver:kotlin.Byte) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #52 name:z1 visibility:public modality:ABSTRACT [val] 
+        $this: VALUE_PARAMETER #54 name:<this> type:<root>.IOther 
+        $receiver: VALUE_PARAMETER #55 name:<this> type:kotlin.Byte 
+    PROPERTY #56 name:z2 visibility:public modality:ABSTRACT [var] 
+      FUN #57 DEFAULT_PROPERTY_ACCESSOR name:<get-z2> visibility:public modality:ABSTRACT <> ($this:<root>.IOther, $receiver:kotlin.Byte) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #56 name:z2 visibility:public modality:ABSTRACT [var] 
+        $this: VALUE_PARAMETER #58 name:<this> type:<root>.IOther 
+        $receiver: VALUE_PARAMETER #59 name:<this> type:kotlin.Byte 
+      FUN #60 DEFAULT_PROPERTY_ACCESSOR name:<set-z2> visibility:public modality:ABSTRACT <> ($this:<root>.IOther, $receiver:kotlin.Byte, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+        correspondingProperty: PROPERTY #56 name:z2 visibility:public modality:ABSTRACT [var] 
+        $this: VALUE_PARAMETER #61 name:<this> type:<root>.IOther 
+        $receiver: VALUE_PARAMETER #62 name:<this> type:kotlin.Byte 
+        VALUE_PARAMETER #63 name:<set-?> index:0 type:kotlin.Int 
+    FUN #64 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #12 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #65 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #66 name:other index:0 type:kotlin.Any? 
+    FUN #67 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #16 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #68 name:<this> type:kotlin.Any 
+    FUN #69 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  FUN name:otherImpl visibility:public modality:FINAL <> (x0:kotlin.String, y0:kotlin.Int) returnType:<root>.IOther 
-    VALUE_PARAMETER name:x0 index:0 type:kotlin.String 
-    VALUE_PARAMETER name:y0 index:1 type:kotlin.Int 
+        #19 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #70 name:<this> type:kotlin.Any 
+  FUN #71 name:otherImpl visibility:public modality:FINAL <> (x0:kotlin.String, y0:kotlin.Int) returnType:<root>.IOther 
+    VALUE_PARAMETER #72 name:x0 index:0 type:kotlin.String 
+    VALUE_PARAMETER #73 name:y0 index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun otherImpl (x0: kotlin.String, y0: kotlin.Int): <root>.IOther declared in <root>'
+      RETURN type=kotlin.Nothing from='#71 public final fun otherImpl (x0: kotlin.String, y0: kotlin.Int): <root>.IOther declared in <root>'
         BLOCK type=<root>.otherImpl.<no name provided> origin=OBJECT_LITERAL
-          CLASS CLASS name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.IOther]
-            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.otherImpl.<no name provided> 
-            CONSTRUCTOR visibility:public <> () returnType:<root>.otherImpl.<no name provided> [primary] 
+          CLASS #74 CLASS name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.IOther]
+            $this: VALUE_PARAMETER #75 INSTANCE_RECEIVER name:<this> type:<root>.otherImpl.<no name provided> 
+            CONSTRUCTOR #76 visibility:public <> () returnType:<root>.otherImpl.<no name provided> [primary] 
               BLOCK_BODY
-                DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-                INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.IOther]'
-            PROPERTY name:x visibility:public modality:OPEN [val] 
-              FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final] 
+                DELEGATING_CONSTRUCTOR_CALL '#24 public constructor <init> () [primary] declared in kotlin.Any'
+                INSTANCE_INITIALIZER_CALL class='#74 class CLASS <no name provided> declared in <root>.otherImpl'
+            PROPERTY #77 name:x visibility:public modality:OPEN [val] 
+              FIELD #78 PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final] 
                 EXPRESSION_BODY
-                  GET_VAR 'x0: kotlin.String declared in <root>.otherImpl' type=kotlin.String origin=null
-              FUN DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>) returnType:kotlin.String 
-                correspondingProperty: PROPERTY name:x visibility:public modality:OPEN [val] 
+                  GET_VAR '#72 x0: kotlin.String declared in <root>.otherImpl' type=kotlin.String origin=null
+              FUN #79 DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>) returnType:kotlin.String 
+                correspondingProperty: PROPERTY #77 name:x visibility:public modality:OPEN [val] 
                 overridden:
-                  public abstract fun <get-x> (): kotlin.String declared in <root>.IOther
-                $this: VALUE_PARAMETER name:<this> type:<root>.otherImpl.<no name provided> 
+                  #44 public abstract fun <get-x> (): kotlin.String declared in <root>.IOther
+                $this: VALUE_PARAMETER #80 name:<this> type:<root>.otherImpl.<no name provided> 
                 BLOCK_BODY
-                  RETURN type=kotlin.Nothing from='public open fun <get-x> (): kotlin.String declared in <root>.otherImpl.<no name provided>'
-                    GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
-                      receiver: GET_VAR '<this>: <root>.otherImpl.<no name provided> declared in <root>.otherImpl.<no name provided>.<get-x>' type=<root>.otherImpl.<no name provided> origin=null
-            PROPERTY name:y visibility:public modality:OPEN [var] 
-              FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public 
+                  RETURN type=kotlin.Nothing from='#79 public open fun <get-x> (): kotlin.String declared in <root>.otherImpl.<no name provided>'
+                    GET_FIELD '#78 FIELD #78 PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
+                      receiver: GET_VAR '#80 <this>: <root>.otherImpl.<no name provided> declared in <root>.otherImpl.<no name provided>.<get-x>' type=<root>.otherImpl.<no name provided> origin=null
+            PROPERTY #81 name:y visibility:public modality:OPEN [var] 
+              FIELD #82 PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public 
                 EXPRESSION_BODY
-                  GET_VAR 'y0: kotlin.Int declared in <root>.otherImpl' type=kotlin.Int origin=null
-              FUN DEFAULT_PROPERTY_ACCESSOR name:<get-y> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>) returnType:kotlin.Int 
-                correspondingProperty: PROPERTY name:y visibility:public modality:OPEN [var] 
+                  GET_VAR '#73 y0: kotlin.Int declared in <root>.otherImpl' type=kotlin.Int origin=null
+              FUN #83 DEFAULT_PROPERTY_ACCESSOR name:<get-y> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>) returnType:kotlin.Int 
+                correspondingProperty: PROPERTY #81 name:y visibility:public modality:OPEN [var] 
                 overridden:
-                  public abstract fun <get-y> (): kotlin.Int declared in <root>.IOther
-                $this: VALUE_PARAMETER name:<this> type:<root>.otherImpl.<no name provided> 
+                  #47 public abstract fun <get-y> (): kotlin.Int declared in <root>.IOther
+                $this: VALUE_PARAMETER #84 name:<this> type:<root>.otherImpl.<no name provided> 
                 BLOCK_BODY
-                  RETURN type=kotlin.Nothing from='public open fun <get-y> (): kotlin.Int declared in <root>.otherImpl.<no name provided>'
-                    GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public ' type=kotlin.Int origin=null
-                      receiver: GET_VAR '<this>: <root>.otherImpl.<no name provided> declared in <root>.otherImpl.<no name provided>.<get-y>' type=<root>.otherImpl.<no name provided> origin=null
-              FUN DEFAULT_PROPERTY_ACCESSOR name:<set-y> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>, <set-?>:kotlin.Int) returnType:kotlin.Unit 
-                correspondingProperty: PROPERTY name:y visibility:public modality:OPEN [var] 
+                  RETURN type=kotlin.Nothing from='#83 public open fun <get-y> (): kotlin.Int declared in <root>.otherImpl.<no name provided>'
+                    GET_FIELD '#82 FIELD #82 PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public ' type=kotlin.Int origin=null
+                      receiver: GET_VAR '#84 <this>: <root>.otherImpl.<no name provided> declared in <root>.otherImpl.<no name provided>.<get-y>' type=<root>.otherImpl.<no name provided> origin=null
+              FUN #85 DEFAULT_PROPERTY_ACCESSOR name:<set-y> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+                correspondingProperty: PROPERTY #81 name:y visibility:public modality:OPEN [var] 
                 overridden:
-                  public abstract fun <set-y> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther
-                $this: VALUE_PARAMETER name:<this> type:<root>.otherImpl.<no name provided> 
-                VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
+                  #49 public abstract fun <set-y> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther
+                $this: VALUE_PARAMETER #86 name:<this> type:<root>.otherImpl.<no name provided> 
+                VALUE_PARAMETER #87 name:<set-?> index:0 type:kotlin.Int 
                 BLOCK_BODY
-                  SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public ' type=kotlin.Unit origin=null
-                    receiver: GET_VAR '<this>: <root>.otherImpl.<no name provided> declared in <root>.otherImpl.<no name provided>.<set-y>' type=<root>.otherImpl.<no name provided> origin=null
-                    value: GET_VAR '<set-?>: kotlin.Int declared in <root>.otherImpl.<no name provided>.<set-y>' type=kotlin.Int origin=null
-            PROPERTY name:z1 visibility:public modality:OPEN [val] 
-              FUN name:<get-z1> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>, $receiver:kotlin.Byte) returnType:kotlin.Int 
-                correspondingProperty: PROPERTY name:z1 visibility:public modality:OPEN [val] 
+                  SET_FIELD '#82 FIELD #82 PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public ' type=kotlin.Unit origin=null
+                    receiver: GET_VAR '#86 <this>: <root>.otherImpl.<no name provided> declared in <root>.otherImpl.<no name provided>.<set-y>' type=<root>.otherImpl.<no name provided> origin=null
+                    value: GET_VAR '#87 <set-?>: kotlin.Int declared in <root>.otherImpl.<no name provided>.<set-y>' type=kotlin.Int origin=null
+            PROPERTY #88 name:z1 visibility:public modality:OPEN [val] 
+              FUN #89 name:<get-z1> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>, $receiver:kotlin.Byte) returnType:kotlin.Int 
+                correspondingProperty: PROPERTY #88 name:z1 visibility:public modality:OPEN [val] 
                 overridden:
-                  public abstract fun <get-z1> (): kotlin.Int declared in <root>.IOther
-                $this: VALUE_PARAMETER name:<this> type:<root>.otherImpl.<no name provided> 
-                $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
+                  #53 public abstract fun <get-z1> (): kotlin.Int declared in <root>.IOther
+                $this: VALUE_PARAMETER #90 name:<this> type:<root>.otherImpl.<no name provided> 
+                $receiver: VALUE_PARAMETER #91 name:<this> type:kotlin.Byte 
                 BLOCK_BODY
-                  RETURN type=kotlin.Nothing from='public open fun <get-z1> (): kotlin.Int declared in <root>.otherImpl.<no name provided>'
+                  RETURN type=kotlin.Nothing from='#89 public open fun <get-z1> (): kotlin.Int declared in <root>.otherImpl.<no name provided>'
                     CONST Int type=kotlin.Int value=1
-            PROPERTY name:z2 visibility:public modality:OPEN [var] 
-              FUN name:<get-z2> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>, $receiver:kotlin.Byte) returnType:kotlin.Int 
-                correspondingProperty: PROPERTY name:z2 visibility:public modality:OPEN [var] 
+            PROPERTY #92 name:z2 visibility:public modality:OPEN [var] 
+              FUN #93 name:<get-z2> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>, $receiver:kotlin.Byte) returnType:kotlin.Int 
+                correspondingProperty: PROPERTY #92 name:z2 visibility:public modality:OPEN [var] 
                 overridden:
-                  public abstract fun <get-z2> (): kotlin.Int declared in <root>.IOther
-                $this: VALUE_PARAMETER name:<this> type:<root>.otherImpl.<no name provided> 
-                $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
+                  #57 public abstract fun <get-z2> (): kotlin.Int declared in <root>.IOther
+                $this: VALUE_PARAMETER #94 name:<this> type:<root>.otherImpl.<no name provided> 
+                $receiver: VALUE_PARAMETER #95 name:<this> type:kotlin.Byte 
                 BLOCK_BODY
-                  RETURN type=kotlin.Nothing from='public open fun <get-z2> (): kotlin.Int declared in <root>.otherImpl.<no name provided>'
+                  RETURN type=kotlin.Nothing from='#93 public open fun <get-z2> (): kotlin.Int declared in <root>.otherImpl.<no name provided>'
                     CONST Int type=kotlin.Int value=2
-              FUN name:<set-z2> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>, $receiver:kotlin.Byte, value:kotlin.Int) returnType:kotlin.Unit 
-                correspondingProperty: PROPERTY name:z2 visibility:public modality:OPEN [var] 
+              FUN #96 name:<set-z2> visibility:public modality:OPEN <> ($this:<root>.otherImpl.<no name provided>, $receiver:kotlin.Byte, value:kotlin.Int) returnType:kotlin.Unit 
+                correspondingProperty: PROPERTY #92 name:z2 visibility:public modality:OPEN [var] 
                 overridden:
-                  public abstract fun <set-z2> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther
-                $this: VALUE_PARAMETER name:<this> type:<root>.otherImpl.<no name provided> 
-                $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
-                VALUE_PARAMETER name:value index:0 type:kotlin.Int 
+                  #60 public abstract fun <set-z2> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther
+                $this: VALUE_PARAMETER #97 name:<this> type:<root>.otherImpl.<no name provided> 
+                $receiver: VALUE_PARAMETER #98 name:<this> type:kotlin.Byte 
+                VALUE_PARAMETER #99 name:value index:0 type:kotlin.Int 
                 BLOCK_BODY
-            FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+            FUN #100 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
               overridden:
-                public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IOther
-              $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-              VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-            FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+                #64 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IOther
+              $this: VALUE_PARAMETER #101 name:<this> type:kotlin.Any 
+              VALUE_PARAMETER #102 name:other index:0 type:kotlin.Any? 
+            FUN #103 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
               overridden:
-                public open fun hashCode (): kotlin.Int declared in <root>.IOther
-              $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-            FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+                #67 public open fun hashCode (): kotlin.Int declared in <root>.IOther
+              $this: VALUE_PARAMETER #104 name:<this> type:kotlin.Any 
+            FUN #105 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
               overridden:
-                public open fun toString (): kotlin.String declared in <root>.IOther
-              $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-          CALL 'public constructor <init> () [primary] declared in <root>.otherImpl.<no name provided>' type=<root>.otherImpl.<no name provided> origin=OBJECT_LITERAL
-  CLASS CLASS name:Test1 modality:FINAL visibility:public superTypes:[<root>.IBase]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Test1 
-    CONSTRUCTOR visibility:public <> () returnType:<root>.Test1 [primary] 
+                #69 public open fun toString (): kotlin.String declared in <root>.IOther
+              $this: VALUE_PARAMETER #106 name:<this> type:kotlin.Any 
+          CALL '#76 public constructor <init> () [primary] declared in <root>.otherImpl.<no name provided>' type=<root>.otherImpl.<no name provided> origin=OBJECT_LITERAL
+  CLASS #107 CLASS name:Test1 modality:FINAL visibility:public superTypes:[<root>.IBase]
+    $this: VALUE_PARAMETER #108 INSTANCE_RECEIVER name:<this> type:<root>.Test1 
+    CONSTRUCTOR #109 visibility:public <> () returnType:<root>.Test1 [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Test1 modality:FINAL visibility:public superTypes:[<root>.IBase]'
-    FIELD DELEGATE name:Test1$IBase$delegate type:<root>.BaseImpl visibility:private [final] 
+        DELEGATING_CONSTRUCTOR_CALL '#24 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#107 class CLASS Test1 declared in <root>'
+    FIELD #110 DELEGATE name:Test1$IBase$delegate type:<root>.BaseImpl visibility:private [final] 
       EXPRESSION_BODY
-        GET_OBJECT 'CLASS OBJECT name:BaseImpl modality:FINAL visibility:public superTypes:[<root>.IBase]' type=<root>.BaseImpl
-    FUN DELEGATED_MEMBER name:bar visibility:public modality:OPEN <> ($this:<root>.Test1) returnType:kotlin.Int 
+        GET_OBJECT '#21 class OBJECT BaseImpl declared in <root>' type=<root>.BaseImpl
+    FUN #111 DELEGATED_MEMBER name:bar visibility:public modality:OPEN <> ($this:<root>.Test1) returnType:kotlin.Int 
       overridden:
-        public abstract fun bar (): kotlin.Int declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.Test1 
+        #6 public abstract fun bar (): kotlin.Int declared in <root>.IBase
+      $this: VALUE_PARAMETER #112 name:<this> type:<root>.Test1 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public open fun bar (): kotlin.Int declared in <root>.Test1'
-          CALL 'public abstract fun bar (): kotlin.Int declared in <root>.IBase' type=kotlin.Int origin=null
-            $this: GET_FIELD 'FIELD DELEGATE name:Test1$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.bar' type=<root>.Test1 origin=null
-    FUN DELEGATED_MEMBER name:foo visibility:public modality:OPEN <> ($this:<root>.Test1, x:kotlin.Int, s:kotlin.String) returnType:kotlin.Unit 
+        RETURN type=kotlin.Nothing from='#111 public open fun bar (): kotlin.Int declared in <root>.Test1'
+          CALL '#6 public abstract fun bar (): kotlin.Int declared in <root>.IBase' type=kotlin.Int origin=null
+            $this: GET_FIELD '#110 FIELD #110 DELEGATE name:Test1$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
+              receiver: GET_VAR '#112 <this>: <root>.Test1 declared in <root>.Test1.bar' type=<root>.Test1 origin=null
+    FUN #113 DELEGATED_MEMBER name:foo visibility:public modality:OPEN <> ($this:<root>.Test1, x:kotlin.Int, s:kotlin.String) returnType:kotlin.Unit 
       overridden:
-        public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.Test1 
-      VALUE_PARAMETER name:x index:0 type:kotlin.Int 
-      VALUE_PARAMETER name:s index:1 type:kotlin.String 
+        #2 public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase
+      $this: VALUE_PARAMETER #114 name:<this> type:<root>.Test1 
+      VALUE_PARAMETER #115 name:x index:0 type:kotlin.Int 
+      VALUE_PARAMETER #116 name:s index:1 type:kotlin.String 
       BLOCK_BODY
-        CALL 'public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase' type=kotlin.Unit origin=null
-          $this: GET_FIELD 'FIELD DELEGATE name:Test1$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
-            receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.foo' type=<root>.Test1 origin=null
-          x: GET_VAR 'x: kotlin.Int declared in <root>.Test1.foo' type=kotlin.Int origin=null
-          s: GET_VAR 's: kotlin.String declared in <root>.Test1.foo' type=kotlin.String origin=null
-    FUN DELEGATED_MEMBER name:qux visibility:public modality:OPEN <> ($this:<root>.Test1, $receiver:kotlin.String) returnType:kotlin.Unit 
+        CALL '#2 public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase' type=kotlin.Unit origin=null
+          $this: GET_FIELD '#110 FIELD #110 DELEGATE name:Test1$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
+            receiver: GET_VAR '#114 <this>: <root>.Test1 declared in <root>.Test1.foo' type=<root>.Test1 origin=null
+          x: GET_VAR '#115 x: kotlin.Int declared in <root>.Test1.foo' type=kotlin.Int origin=null
+          s: GET_VAR '#116 s: kotlin.String declared in <root>.Test1.foo' type=kotlin.String origin=null
+    FUN #117 DELEGATED_MEMBER name:qux visibility:public modality:OPEN <> ($this:<root>.Test1, $receiver:kotlin.String) returnType:kotlin.Unit 
       overridden:
-        public abstract fun qux (): kotlin.Unit declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.Test1 
-      $receiver: VALUE_PARAMETER name:<this> type:kotlin.String 
+        #8 public abstract fun qux (): kotlin.Unit declared in <root>.IBase
+      $this: VALUE_PARAMETER #118 name:<this> type:<root>.Test1 
+      $receiver: VALUE_PARAMETER #119 name:<this> type:kotlin.String 
       BLOCK_BODY
-        CALL 'public abstract fun qux (): kotlin.Unit declared in <root>.IBase' type=kotlin.Unit origin=null
-          $this: GET_FIELD 'FIELD DELEGATE name:Test1$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
-            receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.qux' type=<root>.Test1 origin=null
-          $receiver: GET_VAR '<this>: kotlin.String declared in <root>.Test1.qux' type=kotlin.String origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+        CALL '#8 public abstract fun qux (): kotlin.Unit declared in <root>.IBase' type=kotlin.Unit origin=null
+          $this: GET_FIELD '#110 FIELD #110 DELEGATE name:Test1$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
+            receiver: GET_VAR '#118 <this>: <root>.Test1 declared in <root>.Test1.qux' type=<root>.Test1 origin=null
+          $receiver: GET_VAR '#119 <this>: kotlin.String declared in <root>.Test1.qux' type=kotlin.String origin=null
+    FUN #120 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #11 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IBase
+      $this: VALUE_PARAMETER #121 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #122 name:other index:0 type:kotlin.Any? 
+    FUN #123 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #15 public open fun hashCode (): kotlin.Int declared in <root>.IBase
+      $this: VALUE_PARAMETER #124 name:<this> type:kotlin.Any 
+    FUN #125 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  CLASS CLASS name:Test2 modality:FINAL visibility:public superTypes:[<root>.IBase; <root>.IOther]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Test2 
-    CONSTRUCTOR visibility:public <> () returnType:<root>.Test2 [primary] 
+        #18 public open fun toString (): kotlin.String declared in <root>.IBase
+      $this: VALUE_PARAMETER #126 name:<this> type:kotlin.Any 
+  CLASS #127 CLASS name:Test2 modality:FINAL visibility:public superTypes:[<root>.IBase; <root>.IOther]
+    $this: VALUE_PARAMETER #128 INSTANCE_RECEIVER name:<this> type:<root>.Test2 
+    CONSTRUCTOR #129 visibility:public <> () returnType:<root>.Test2 [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Test2 modality:FINAL visibility:public superTypes:[<root>.IBase; <root>.IOther]'
-    FIELD DELEGATE name:Test2$IBase$delegate type:<root>.BaseImpl visibility:private [final] 
+        DELEGATING_CONSTRUCTOR_CALL '#24 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#127 class CLASS Test2 declared in <root>'
+    FIELD #130 DELEGATE name:Test2$IBase$delegate type:<root>.BaseImpl visibility:private [final] 
       EXPRESSION_BODY
-        GET_OBJECT 'CLASS OBJECT name:BaseImpl modality:FINAL visibility:public superTypes:[<root>.IBase]' type=<root>.BaseImpl
-    FUN DELEGATED_MEMBER name:bar visibility:public modality:OPEN <> ($this:<root>.Test2) returnType:kotlin.Int 
+        GET_OBJECT '#21 class OBJECT BaseImpl declared in <root>' type=<root>.BaseImpl
+    FUN #131 DELEGATED_MEMBER name:bar visibility:public modality:OPEN <> ($this:<root>.Test2) returnType:kotlin.Int 
       overridden:
-        public abstract fun bar (): kotlin.Int declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
+        #6 public abstract fun bar (): kotlin.Int declared in <root>.IBase
+      $this: VALUE_PARAMETER #132 name:<this> type:<root>.Test2 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public open fun bar (): kotlin.Int declared in <root>.Test2'
-          CALL 'public abstract fun bar (): kotlin.Int declared in <root>.IBase' type=kotlin.Int origin=null
-            $this: GET_FIELD 'FIELD DELEGATE name:Test2$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
-              receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.bar' type=<root>.Test2 origin=null
-    FUN DELEGATED_MEMBER name:foo visibility:public modality:OPEN <> ($this:<root>.Test2, x:kotlin.Int, s:kotlin.String) returnType:kotlin.Unit 
+        RETURN type=kotlin.Nothing from='#131 public open fun bar (): kotlin.Int declared in <root>.Test2'
+          CALL '#6 public abstract fun bar (): kotlin.Int declared in <root>.IBase' type=kotlin.Int origin=null
+            $this: GET_FIELD '#130 FIELD #130 DELEGATE name:Test2$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
+              receiver: GET_VAR '#132 <this>: <root>.Test2 declared in <root>.Test2.bar' type=<root>.Test2 origin=null
+    FUN #133 DELEGATED_MEMBER name:foo visibility:public modality:OPEN <> ($this:<root>.Test2, x:kotlin.Int, s:kotlin.String) returnType:kotlin.Unit 
       overridden:
-        public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
-      VALUE_PARAMETER name:x index:0 type:kotlin.Int 
-      VALUE_PARAMETER name:s index:1 type:kotlin.String 
+        #2 public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase
+      $this: VALUE_PARAMETER #134 name:<this> type:<root>.Test2 
+      VALUE_PARAMETER #135 name:x index:0 type:kotlin.Int 
+      VALUE_PARAMETER #136 name:s index:1 type:kotlin.String 
       BLOCK_BODY
-        CALL 'public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase' type=kotlin.Unit origin=null
-          $this: GET_FIELD 'FIELD DELEGATE name:Test2$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
-            receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.foo' type=<root>.Test2 origin=null
-          x: GET_VAR 'x: kotlin.Int declared in <root>.Test2.foo' type=kotlin.Int origin=null
-          s: GET_VAR 's: kotlin.String declared in <root>.Test2.foo' type=kotlin.String origin=null
-    FUN DELEGATED_MEMBER name:qux visibility:public modality:OPEN <> ($this:<root>.Test2, $receiver:kotlin.String) returnType:kotlin.Unit 
+        CALL '#2 public abstract fun foo (x: kotlin.Int, s: kotlin.String): kotlin.Unit declared in <root>.IBase' type=kotlin.Unit origin=null
+          $this: GET_FIELD '#130 FIELD #130 DELEGATE name:Test2$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
+            receiver: GET_VAR '#134 <this>: <root>.Test2 declared in <root>.Test2.foo' type=<root>.Test2 origin=null
+          x: GET_VAR '#135 x: kotlin.Int declared in <root>.Test2.foo' type=kotlin.Int origin=null
+          s: GET_VAR '#136 s: kotlin.String declared in <root>.Test2.foo' type=kotlin.String origin=null
+    FUN #137 DELEGATED_MEMBER name:qux visibility:public modality:OPEN <> ($this:<root>.Test2, $receiver:kotlin.String) returnType:kotlin.Unit 
       overridden:
-        public abstract fun qux (): kotlin.Unit declared in <root>.IBase
-      $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
-      $receiver: VALUE_PARAMETER name:<this> type:kotlin.String 
+        #8 public abstract fun qux (): kotlin.Unit declared in <root>.IBase
+      $this: VALUE_PARAMETER #138 name:<this> type:<root>.Test2 
+      $receiver: VALUE_PARAMETER #139 name:<this> type:kotlin.String 
       BLOCK_BODY
-        CALL 'public abstract fun qux (): kotlin.Unit declared in <root>.IBase' type=kotlin.Unit origin=null
-          $this: GET_FIELD 'FIELD DELEGATE name:Test2$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
-            receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.qux' type=<root>.Test2 origin=null
-          $receiver: GET_VAR '<this>: kotlin.String declared in <root>.Test2.qux' type=kotlin.String origin=null
-    FIELD DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] 
+        CALL '#8 public abstract fun qux (): kotlin.Unit declared in <root>.IBase' type=kotlin.Unit origin=null
+          $this: GET_FIELD '#130 FIELD #130 DELEGATE name:Test2$IBase$delegate type:<root>.BaseImpl visibility:private [final] ' type=<root>.BaseImpl origin=null
+            receiver: GET_VAR '#138 <this>: <root>.Test2 declared in <root>.Test2.qux' type=<root>.Test2 origin=null
+          $receiver: GET_VAR '#139 <this>: kotlin.String declared in <root>.Test2.qux' type=kotlin.String origin=null
+    FIELD #140 DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] 
       EXPRESSION_BODY
-        CALL 'public final fun otherImpl (x0: kotlin.String, y0: kotlin.Int): <root>.IOther declared in <root>' type=<root>.IOther origin=null
+        CALL '#71 public final fun otherImpl (x0: kotlin.String, y0: kotlin.Int): <root>.IOther declared in <root>' type=<root>.IOther origin=null
           x0: CONST String type=kotlin.String value=""
           y0: CONST Int type=kotlin.Int value=42
-    PROPERTY DELEGATED_MEMBER name:z1 visibility:public modality:OPEN [val] 
-      FUN DELEGATED_MEMBER name:<get-z1> visibility:public modality:OPEN <> ($this:<root>.Test2, $receiver:kotlin.Byte) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY DELEGATED_MEMBER name:z1 visibility:public modality:OPEN [val] 
+    PROPERTY #141 DELEGATED_MEMBER name:z1 visibility:public modality:OPEN [val] 
+      FUN #142 DELEGATED_MEMBER name:<get-z1> visibility:public modality:OPEN <> ($this:<root>.Test2, $receiver:kotlin.Byte) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #141 DELEGATED_MEMBER name:z1 visibility:public modality:OPEN [val] 
         overridden:
-          public abstract fun <get-z1> (): kotlin.Int declared in <root>.IOther
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
-        $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
+          #53 public abstract fun <get-z1> (): kotlin.Int declared in <root>.IOther
+        $this: VALUE_PARAMETER #143 name:<this> type:<root>.Test2 
+        $receiver: VALUE_PARAMETER #144 name:<this> type:kotlin.Byte 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-z1> (): kotlin.Int declared in <root>.Test2'
-            CALL 'public abstract fun <get-z1> (): kotlin.Int declared in <root>.IOther' type=kotlin.Int origin=null
-              $this: GET_FIELD 'FIELD DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
-                receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<get-z1>' type=<root>.Test2 origin=null
-              $receiver: GET_VAR '<this>: kotlin.Byte declared in <root>.Test2.<get-z1>' type=kotlin.Byte origin=null
-    PROPERTY DELEGATED_MEMBER name:x visibility:public modality:OPEN [val] 
-      FUN DELEGATED_MEMBER name:<get-x> visibility:public modality:OPEN <> ($this:<root>.Test2) returnType:kotlin.String 
-        correspondingProperty: PROPERTY DELEGATED_MEMBER name:x visibility:public modality:OPEN [val] 
+          RETURN type=kotlin.Nothing from='#142 public open fun <get-z1> (): kotlin.Int declared in <root>.Test2'
+            CALL '#53 public abstract fun <get-z1> (): kotlin.Int declared in <root>.IOther' type=kotlin.Int origin=null
+              $this: GET_FIELD '#140 FIELD #140 DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
+                receiver: GET_VAR '#143 <this>: <root>.Test2 declared in <root>.Test2.<get-z1>' type=<root>.Test2 origin=null
+              $receiver: GET_VAR '#144 <this>: kotlin.Byte declared in <root>.Test2.<get-z1>' type=kotlin.Byte origin=null
+    PROPERTY #145 DELEGATED_MEMBER name:x visibility:public modality:OPEN [val] 
+      FUN #146 DELEGATED_MEMBER name:<get-x> visibility:public modality:OPEN <> ($this:<root>.Test2) returnType:kotlin.String 
+        correspondingProperty: PROPERTY #145 DELEGATED_MEMBER name:x visibility:public modality:OPEN [val] 
         overridden:
-          public abstract fun <get-x> (): kotlin.String declared in <root>.IOther
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
+          #44 public abstract fun <get-x> (): kotlin.String declared in <root>.IOther
+        $this: VALUE_PARAMETER #147 name:<this> type:<root>.Test2 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-x> (): kotlin.String declared in <root>.Test2'
-            CALL 'public abstract fun <get-x> (): kotlin.String declared in <root>.IOther' type=kotlin.String origin=null
-              $this: GET_FIELD 'FIELD DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
-                receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<get-x>' type=<root>.Test2 origin=null
-    PROPERTY DELEGATED_MEMBER name:z2 visibility:public modality:OPEN [var] 
-      FUN DELEGATED_MEMBER name:<get-z2> visibility:public modality:OPEN <> ($this:<root>.Test2, $receiver:kotlin.Byte) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY DELEGATED_MEMBER name:z2 visibility:public modality:OPEN [var] 
+          RETURN type=kotlin.Nothing from='#146 public open fun <get-x> (): kotlin.String declared in <root>.Test2'
+            CALL '#44 public abstract fun <get-x> (): kotlin.String declared in <root>.IOther' type=kotlin.String origin=null
+              $this: GET_FIELD '#140 FIELD #140 DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
+                receiver: GET_VAR '#147 <this>: <root>.Test2 declared in <root>.Test2.<get-x>' type=<root>.Test2 origin=null
+    PROPERTY #148 DELEGATED_MEMBER name:z2 visibility:public modality:OPEN [var] 
+      FUN #149 DELEGATED_MEMBER name:<get-z2> visibility:public modality:OPEN <> ($this:<root>.Test2, $receiver:kotlin.Byte) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #148 DELEGATED_MEMBER name:z2 visibility:public modality:OPEN [var] 
         overridden:
-          public abstract fun <get-z2> (): kotlin.Int declared in <root>.IOther
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
-        $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
+          #57 public abstract fun <get-z2> (): kotlin.Int declared in <root>.IOther
+        $this: VALUE_PARAMETER #150 name:<this> type:<root>.Test2 
+        $receiver: VALUE_PARAMETER #151 name:<this> type:kotlin.Byte 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-z2> (): kotlin.Int declared in <root>.Test2'
-            CALL 'public abstract fun <get-z2> (): kotlin.Int declared in <root>.IOther' type=kotlin.Int origin=null
-              $this: GET_FIELD 'FIELD DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
-                receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<get-z2>' type=<root>.Test2 origin=null
-              $receiver: GET_VAR '<this>: kotlin.Byte declared in <root>.Test2.<get-z2>' type=kotlin.Byte origin=null
-      FUN DELEGATED_MEMBER name:<set-z2> visibility:public modality:OPEN <> ($this:<root>.Test2, $receiver:kotlin.Byte, <set-?>:kotlin.Int) returnType:kotlin.Unit 
-        correspondingProperty: PROPERTY DELEGATED_MEMBER name:z2 visibility:public modality:OPEN [var] 
+          RETURN type=kotlin.Nothing from='#149 public open fun <get-z2> (): kotlin.Int declared in <root>.Test2'
+            CALL '#57 public abstract fun <get-z2> (): kotlin.Int declared in <root>.IOther' type=kotlin.Int origin=null
+              $this: GET_FIELD '#140 FIELD #140 DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
+                receiver: GET_VAR '#150 <this>: <root>.Test2 declared in <root>.Test2.<get-z2>' type=<root>.Test2 origin=null
+              $receiver: GET_VAR '#151 <this>: kotlin.Byte declared in <root>.Test2.<get-z2>' type=kotlin.Byte origin=null
+      FUN #152 DELEGATED_MEMBER name:<set-z2> visibility:public modality:OPEN <> ($this:<root>.Test2, $receiver:kotlin.Byte, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+        correspondingProperty: PROPERTY #148 DELEGATED_MEMBER name:z2 visibility:public modality:OPEN [var] 
         overridden:
-          public abstract fun <set-z2> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
-        $receiver: VALUE_PARAMETER name:<this> type:kotlin.Byte 
-        VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
+          #60 public abstract fun <set-z2> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther
+        $this: VALUE_PARAMETER #153 name:<this> type:<root>.Test2 
+        $receiver: VALUE_PARAMETER #154 name:<this> type:kotlin.Byte 
+        VALUE_PARAMETER #155 name:<set-?> index:0 type:kotlin.Int 
         BLOCK_BODY
-          CALL 'public abstract fun <set-z2> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther' type=kotlin.Unit origin=null
-            $this: GET_FIELD 'FIELD DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
-              receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<set-z2>' type=<root>.Test2 origin=null
-            $receiver: GET_VAR '<this>: kotlin.Byte declared in <root>.Test2.<set-z2>' type=kotlin.Byte origin=null
-            <set-?>: GET_VAR '<set-?>: kotlin.Int declared in <root>.Test2.<set-z2>' type=kotlin.Int origin=null
-    PROPERTY DELEGATED_MEMBER name:y visibility:public modality:OPEN [var] 
-      FUN DELEGATED_MEMBER name:<get-y> visibility:public modality:OPEN <> ($this:<root>.Test2) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY DELEGATED_MEMBER name:y visibility:public modality:OPEN [var] 
+          CALL '#60 public abstract fun <set-z2> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther' type=kotlin.Unit origin=null
+            $this: GET_FIELD '#140 FIELD #140 DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
+              receiver: GET_VAR '#153 <this>: <root>.Test2 declared in <root>.Test2.<set-z2>' type=<root>.Test2 origin=null
+            $receiver: GET_VAR '#154 <this>: kotlin.Byte declared in <root>.Test2.<set-z2>' type=kotlin.Byte origin=null
+            <set-?>: GET_VAR '#155 <set-?>: kotlin.Int declared in <root>.Test2.<set-z2>' type=kotlin.Int origin=null
+    PROPERTY #156 DELEGATED_MEMBER name:y visibility:public modality:OPEN [var] 
+      FUN #157 DELEGATED_MEMBER name:<get-y> visibility:public modality:OPEN <> ($this:<root>.Test2) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #156 DELEGATED_MEMBER name:y visibility:public modality:OPEN [var] 
         overridden:
-          public abstract fun <get-y> (): kotlin.Int declared in <root>.IOther
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
+          #47 public abstract fun <get-y> (): kotlin.Int declared in <root>.IOther
+        $this: VALUE_PARAMETER #158 name:<this> type:<root>.Test2 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-y> (): kotlin.Int declared in <root>.Test2'
-            CALL 'public abstract fun <get-y> (): kotlin.Int declared in <root>.IOther' type=kotlin.Int origin=null
-              $this: GET_FIELD 'FIELD DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
-                receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<get-y>' type=<root>.Test2 origin=null
-      FUN DELEGATED_MEMBER name:<set-y> visibility:public modality:OPEN <> ($this:<root>.Test2, <set-?>:kotlin.Int) returnType:kotlin.Unit 
-        correspondingProperty: PROPERTY DELEGATED_MEMBER name:y visibility:public modality:OPEN [var] 
+          RETURN type=kotlin.Nothing from='#157 public open fun <get-y> (): kotlin.Int declared in <root>.Test2'
+            CALL '#47 public abstract fun <get-y> (): kotlin.Int declared in <root>.IOther' type=kotlin.Int origin=null
+              $this: GET_FIELD '#140 FIELD #140 DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
+                receiver: GET_VAR '#158 <this>: <root>.Test2 declared in <root>.Test2.<get-y>' type=<root>.Test2 origin=null
+      FUN #159 DELEGATED_MEMBER name:<set-y> visibility:public modality:OPEN <> ($this:<root>.Test2, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+        correspondingProperty: PROPERTY #156 DELEGATED_MEMBER name:y visibility:public modality:OPEN [var] 
         overridden:
-          public abstract fun <set-y> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther
-        $this: VALUE_PARAMETER name:<this> type:<root>.Test2 
-        VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
+          #49 public abstract fun <set-y> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther
+        $this: VALUE_PARAMETER #160 name:<this> type:<root>.Test2 
+        VALUE_PARAMETER #161 name:<set-?> index:0 type:kotlin.Int 
         BLOCK_BODY
-          CALL 'public abstract fun <set-y> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther' type=kotlin.Unit origin=null
-            $this: GET_FIELD 'FIELD DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
-              receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<set-y>' type=<root>.Test2 origin=null
-            <set-?>: GET_VAR '<set-?>: kotlin.Int declared in <root>.Test2.<set-y>' type=kotlin.Int origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+          CALL '#49 public abstract fun <set-y> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IOther' type=kotlin.Unit origin=null
+            $this: GET_FIELD '#140 FIELD #140 DELEGATE name:Test2$IOther$delegate type:<root>.IOther visibility:private [final] ' type=<root>.IOther origin=null
+              receiver: GET_VAR '#160 <this>: <root>.Test2 declared in <root>.Test2.<set-y>' type=<root>.Test2 origin=null
+            <set-?>: GET_VAR '#161 <set-?>: kotlin.Int declared in <root>.Test2.<set-y>' type=kotlin.Int origin=null
+    FUN #162 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IBase
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IOther
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #11 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IBase
+        #64 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IOther
+      $this: VALUE_PARAMETER #163 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #164 name:other index:0 type:kotlin.Any? 
+    FUN #165 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in <root>.IBase
-        public open fun hashCode (): kotlin.Int declared in <root>.IOther
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #15 public open fun hashCode (): kotlin.Int declared in <root>.IBase
+        #67 public open fun hashCode (): kotlin.Int declared in <root>.IOther
+      $this: VALUE_PARAMETER #166 name:<this> type:kotlin.Any 
+    FUN #167 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in <root>.IBase
-        public open fun toString (): kotlin.String declared in <root>.IOther
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
+        #18 public open fun toString (): kotlin.String declared in <root>.IBase
+        #69 public open fun toString (): kotlin.String declared in <root>.IOther
+      $this: VALUE_PARAMETER #168 name:<this> type:kotlin.Any 

@@ -1,200 +1,200 @@
 FILE fqName:<root> fileName:/floatingPointCompareTo.kt
-  FUN name:test1d visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Double) returnType:kotlin.Int 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double 
-    VALUE_PARAMETER name:y index:1 type:kotlin.Double 
+  FUN #0 name:test1d visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Double) returnType:kotlin.Int 
+    VALUE_PARAMETER #1 name:x index:0 type:kotlin.Double 
+    VALUE_PARAMETER #2 name:y index:1 type:kotlin.Double 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1d (x: kotlin.Double, y: kotlin.Double): kotlin.Int declared in <root>'
-        CALL 'public open fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Double' type=kotlin.Int origin=null
-          $this: GET_VAR 'x: kotlin.Double declared in <root>.test1d' type=kotlin.Double origin=null
-          other: GET_VAR 'y: kotlin.Double declared in <root>.test1d' type=kotlin.Double origin=null
-  FUN name:test2d visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Any) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double 
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any 
+      RETURN type=kotlin.Nothing from='#0 public final fun test1d (x: kotlin.Double, y: kotlin.Double): kotlin.Int declared in <root>'
+        CALL '#3 public open fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Double' type=kotlin.Int origin=null
+          $this: GET_VAR '#1 x: kotlin.Double declared in <root>.test1d' type=kotlin.Double origin=null
+          other: GET_VAR '#2 y: kotlin.Double declared in <root>.test1d' type=kotlin.Double origin=null
+  FUN #4 name:test2d visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #5 name:x index:0 type:kotlin.Double 
+    VALUE_PARAMETER #6 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2d (x: kotlin.Double, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#4 public final fun test2d (x: kotlin.Double, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-              GET_VAR 'y: kotlin.Any declared in <root>.test2d' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: CALL 'public open fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Double' type=kotlin.Int origin=null
-                $this: GET_VAR 'x: kotlin.Double declared in <root>.test2d' type=kotlin.Double origin=null
+              GET_VAR '#6 y: kotlin.Any declared in <root>.test2d' type=kotlin.Any origin=null
+            then: CALL '#7 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: CALL '#3 public open fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Double' type=kotlin.Int origin=null
+                $this: GET_VAR '#5 x: kotlin.Double declared in <root>.test2d' type=kotlin.Double origin=null
                 other: TYPE_OP type=kotlin.Double origin=IMPLICIT_CAST typeOperand=kotlin.Double
-                  GET_VAR 'y: kotlin.Any declared in <root>.test2d' type=kotlin.Any origin=null
+                  GET_VAR '#6 y: kotlin.Any declared in <root>.test2d' type=kotlin.Any origin=null
               arg1: CONST Int type=kotlin.Int value=0
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test3d visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any 
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any 
+  FUN #8 name:test3d visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #9 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #10 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3d (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#8 public final fun test3d (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'x: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
+                  GET_VAR '#9 x: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'y: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
+                  GET_VAR '#10 y: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: CALL 'public open fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Double' type=kotlin.Int origin=null
+            then: CALL '#7 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: CALL '#3 public open fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Double' type=kotlin.Int origin=null
                 $this: TYPE_OP type=kotlin.Double origin=IMPLICIT_CAST typeOperand=kotlin.Double
-                  GET_VAR 'x: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
+                  GET_VAR '#9 x: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
                 other: TYPE_OP type=kotlin.Double origin=IMPLICIT_CAST typeOperand=kotlin.Double
-                  GET_VAR 'y: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
+                  GET_VAR '#10 y: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
               arg1: CONST Int type=kotlin.Int value=0
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test1f visibility:public modality:FINAL <> (x:kotlin.Float, y:kotlin.Float) returnType:kotlin.Int 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Float 
-    VALUE_PARAMETER name:y index:1 type:kotlin.Float 
+  FUN #11 name:test1f visibility:public modality:FINAL <> (x:kotlin.Float, y:kotlin.Float) returnType:kotlin.Int 
+    VALUE_PARAMETER #12 name:x index:0 type:kotlin.Float 
+    VALUE_PARAMETER #13 name:y index:1 type:kotlin.Float 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1f (x: kotlin.Float, y: kotlin.Float): kotlin.Int declared in <root>'
-        CALL 'public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
-          $this: GET_VAR 'x: kotlin.Float declared in <root>.test1f' type=kotlin.Float origin=null
-          other: GET_VAR 'y: kotlin.Float declared in <root>.test1f' type=kotlin.Float origin=null
-  FUN name:test2f visibility:public modality:FINAL <> (x:kotlin.Float, y:kotlin.Any) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Float 
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any 
+      RETURN type=kotlin.Nothing from='#11 public final fun test1f (x: kotlin.Float, y: kotlin.Float): kotlin.Int declared in <root>'
+        CALL '#14 public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
+          $this: GET_VAR '#12 x: kotlin.Float declared in <root>.test1f' type=kotlin.Float origin=null
+          other: GET_VAR '#13 y: kotlin.Float declared in <root>.test1f' type=kotlin.Float origin=null
+  FUN #15 name:test2f visibility:public modality:FINAL <> (x:kotlin.Float, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #16 name:x index:0 type:kotlin.Float 
+    VALUE_PARAMETER #17 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2f (x: kotlin.Float, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#15 public final fun test2f (x: kotlin.Float, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-              GET_VAR 'y: kotlin.Any declared in <root>.test2f' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: CALL 'public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
-                $this: GET_VAR 'x: kotlin.Float declared in <root>.test2f' type=kotlin.Float origin=null
+              GET_VAR '#17 y: kotlin.Any declared in <root>.test2f' type=kotlin.Any origin=null
+            then: CALL '#7 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: CALL '#14 public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
+                $this: GET_VAR '#16 x: kotlin.Float declared in <root>.test2f' type=kotlin.Float origin=null
                 other: TYPE_OP type=kotlin.Float origin=IMPLICIT_CAST typeOperand=kotlin.Float
-                  GET_VAR 'y: kotlin.Any declared in <root>.test2f' type=kotlin.Any origin=null
+                  GET_VAR '#17 y: kotlin.Any declared in <root>.test2f' type=kotlin.Any origin=null
               arg1: CONST Int type=kotlin.Int value=0
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test3f visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any 
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any 
+  FUN #18 name:test3f visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #19 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #20 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3f (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#18 public final fun test3f (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-                  GET_VAR 'x: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
+                  GET_VAR '#19 x: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-                  GET_VAR 'y: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
+                  GET_VAR '#20 y: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: CALL 'public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
+            then: CALL '#7 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: CALL '#14 public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
                 $this: TYPE_OP type=kotlin.Float origin=IMPLICIT_CAST typeOperand=kotlin.Float
-                  GET_VAR 'x: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
+                  GET_VAR '#19 x: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
                 other: TYPE_OP type=kotlin.Float origin=IMPLICIT_CAST typeOperand=kotlin.Float
-                  GET_VAR 'y: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
+                  GET_VAR '#20 y: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
               arg1: CONST Int type=kotlin.Int value=0
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:testFD visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any 
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any 
+  FUN #21 name:testFD visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #22 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #23 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testFD (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#21 public final fun testFD (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-                  GET_VAR 'x: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
+                  GET_VAR '#22 x: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'y: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
+                  GET_VAR '#23 y: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: CALL 'public final fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
+            then: CALL '#7 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: CALL '#24 public final fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
                 $this: TYPE_OP type=kotlin.Float origin=IMPLICIT_CAST typeOperand=kotlin.Float
-                  GET_VAR 'x: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
+                  GET_VAR '#22 x: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
                 other: TYPE_OP type=kotlin.Double origin=IMPLICIT_CAST typeOperand=kotlin.Double
-                  GET_VAR 'y: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
+                  GET_VAR '#23 y: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
               arg1: CONST Int type=kotlin.Int value=0
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:testDF visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any 
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any 
+  FUN #25 name:testDF visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #26 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #27 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testDF (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#25 public final fun testDF (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'x: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
+                  GET_VAR '#26 x: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-                  GET_VAR 'y: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
+                  GET_VAR '#27 y: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: CALL 'public final fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Double' type=kotlin.Int origin=null
+            then: CALL '#7 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: CALL '#28 public final fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Double' type=kotlin.Int origin=null
                 $this: TYPE_OP type=kotlin.Double origin=IMPLICIT_CAST typeOperand=kotlin.Double
-                  GET_VAR 'x: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
+                  GET_VAR '#26 x: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
                 other: TYPE_OP type=kotlin.Float origin=IMPLICIT_CAST typeOperand=kotlin.Float
-                  GET_VAR 'y: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
+                  GET_VAR '#27 y: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
               arg1: CONST Int type=kotlin.Int value=0
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test1fr visibility:public modality:FINAL <> ($receiver:kotlin.Float, x:kotlin.Float) returnType:kotlin.Int 
-    $receiver: VALUE_PARAMETER name:<this> type:kotlin.Float 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Float 
+  FUN #29 name:test1fr visibility:public modality:FINAL <> ($receiver:kotlin.Float, x:kotlin.Float) returnType:kotlin.Int 
+    $receiver: VALUE_PARAMETER #30 name:<this> type:kotlin.Float 
+    VALUE_PARAMETER #31 name:x index:0 type:kotlin.Float 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1fr (x: kotlin.Float): kotlin.Int declared in <root>'
-        CALL 'public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
-          $this: GET_VAR '<this>: kotlin.Float declared in <root>.test1fr' type=kotlin.Float origin=null
-          other: GET_VAR 'x: kotlin.Float declared in <root>.test1fr' type=kotlin.Float origin=null
-  FUN name:test2fr visibility:public modality:FINAL <> ($receiver:kotlin.Float, x:kotlin.Any) returnType:kotlin.Boolean 
-    $receiver: VALUE_PARAMETER name:<this> type:kotlin.Float 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any 
+      RETURN type=kotlin.Nothing from='#29 public final fun test1fr (x: kotlin.Float): kotlin.Int declared in <root>'
+        CALL '#14 public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
+          $this: GET_VAR '#30 <this>: kotlin.Float declared in <root>.test1fr' type=kotlin.Float origin=null
+          other: GET_VAR '#31 x: kotlin.Float declared in <root>.test1fr' type=kotlin.Float origin=null
+  FUN #32 name:test2fr visibility:public modality:FINAL <> ($receiver:kotlin.Float, x:kotlin.Any) returnType:kotlin.Boolean 
+    $receiver: VALUE_PARAMETER #33 name:<this> type:kotlin.Float 
+    VALUE_PARAMETER #34 name:x index:0 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2fr (x: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#32 public final fun test2fr (x: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-              GET_VAR 'x: kotlin.Any declared in <root>.test2fr' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: CALL 'public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
-                $this: GET_VAR '<this>: kotlin.Float declared in <root>.test2fr' type=kotlin.Float origin=null
+              GET_VAR '#34 x: kotlin.Any declared in <root>.test2fr' type=kotlin.Any origin=null
+            then: CALL '#7 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: CALL '#14 public open fun compareTo (other: kotlin.Float): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
+                $this: GET_VAR '#33 <this>: kotlin.Float declared in <root>.test2fr' type=kotlin.Float origin=null
                 other: TYPE_OP type=kotlin.Float origin=IMPLICIT_CAST typeOperand=kotlin.Float
-                  GET_VAR 'x: kotlin.Any declared in <root>.test2fr' type=kotlin.Any origin=null
+                  GET_VAR '#34 x: kotlin.Any declared in <root>.test2fr' type=kotlin.Any origin=null
               arg1: CONST Int type=kotlin.Int value=0
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test3fr visibility:public modality:FINAL <> ($receiver:kotlin.Float, x:kotlin.Any) returnType:kotlin.Boolean 
-    $receiver: VALUE_PARAMETER name:<this> type:kotlin.Float 
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any 
+  FUN #35 name:test3fr visibility:public modality:FINAL <> ($receiver:kotlin.Float, x:kotlin.Any) returnType:kotlin.Boolean 
+    $receiver: VALUE_PARAMETER #36 name:<this> type:kotlin.Float 
+    VALUE_PARAMETER #37 name:x index:0 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3fr (x: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#35 public final fun test3fr (x: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-              GET_VAR 'x: kotlin.Any declared in <root>.test3fr' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: CALL 'public final fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
-                $this: GET_VAR '<this>: kotlin.Float declared in <root>.test3fr' type=kotlin.Float origin=null
+              GET_VAR '#37 x: kotlin.Any declared in <root>.test3fr' type=kotlin.Any origin=null
+            then: CALL '#7 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: CALL '#24 public final fun compareTo (other: kotlin.Double): kotlin.Int declared in kotlin.Float' type=kotlin.Int origin=null
+                $this: GET_VAR '#36 <this>: kotlin.Float declared in <root>.test3fr' type=kotlin.Float origin=null
                 other: TYPE_OP type=kotlin.Double origin=IMPLICIT_CAST typeOperand=kotlin.Double
-                  GET_VAR 'x: kotlin.Any declared in <root>.test3fr' type=kotlin.Any origin=null
+                  GET_VAR '#37 x: kotlin.Any declared in <root>.test3fr' type=kotlin.Any origin=null
               arg1: CONST Int type=kotlin.Int value=0
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true

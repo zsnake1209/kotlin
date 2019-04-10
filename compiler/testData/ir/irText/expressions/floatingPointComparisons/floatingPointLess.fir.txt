@@ -1,38 +1,38 @@
 FILE fqName:<root> fileName:/floatingPointLess.kt
-  FUN name:test1d visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Double) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double
-    VALUE_PARAMETER name:y index:1 type:kotlin.Double
+  FUN #0 name:test1d visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Double) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #1 name:x index:0 type:kotlin.Double 
+    VALUE_PARAMETER #2 name:y index:1 type:kotlin.Double 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1d (x: kotlin.Double, y: kotlin.Double): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: GET_VAR 'x: kotlin.Double declared in <root>.test1d' type=kotlin.Double origin=null
-          arg1: GET_VAR 'y: kotlin.Double declared in <root>.test1d' type=kotlin.Double origin=null
-  FUN name:test2d visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Any) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any
+      RETURN type=kotlin.Nothing from='#0 public final fun test1d (x: kotlin.Double, y: kotlin.Double): kotlin.Boolean declared in <root>'
+        CALL '#3 public final fun less (arg0: kotlin.Double, arg1: kotlin.Double): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: GET_VAR '#1 x: kotlin.Double declared in <root>.test1d' type=kotlin.Double origin=null
+          arg1: GET_VAR '#2 y: kotlin.Double declared in <root>.test1d' type=kotlin.Double origin=null
+  FUN #4 name:test2d visibility:public modality:FINAL <> (x:kotlin.Double, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #5 name:x index:0 type:kotlin.Double 
+    VALUE_PARAMETER #6 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2d (x: kotlin.Double, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#4 public final fun test2d (x: kotlin.Double, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-              GET_VAR 'y: kotlin.Any declared in <root>.test2d' type=kotlin.Any origin=null
+              GET_VAR '#6 y: kotlin.Any declared in <root>.test2d' type=kotlin.Any origin=null
             then: ERROR_CALL 'Comparison of arguments with different types: kotlin/Double, kotlin/Any' type=kotlin.Boolean
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test3d visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any
+  FUN #7 name:test3d visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #8 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #9 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3d (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#7 public final fun test3d (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'x: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
+                  GET_VAR '#8 x: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'y: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
+                  GET_VAR '#9 y: kotlin.Any declared in <root>.test3d' type=kotlin.Any origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false
@@ -40,40 +40,40 @@ FILE fqName:<root> fileName:/floatingPointLess.kt
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test1f visibility:public modality:FINAL <> (x:kotlin.Float, y:kotlin.Float) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Float
-    VALUE_PARAMETER name:y index:1 type:kotlin.Float
+  FUN #10 name:test1f visibility:public modality:FINAL <> (x:kotlin.Float, y:kotlin.Float) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #11 name:x index:0 type:kotlin.Float 
+    VALUE_PARAMETER #12 name:y index:1 type:kotlin.Float 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1f (x: kotlin.Float, y: kotlin.Float): kotlin.Boolean declared in <root>'
-        CALL 'public final fun less (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
-          arg0: GET_VAR 'x: kotlin.Float declared in <root>.test1f' type=kotlin.Float origin=null
-          arg1: GET_VAR 'y: kotlin.Float declared in <root>.test1f' type=kotlin.Float origin=null
-  FUN name:test2f visibility:public modality:FINAL <> (x:kotlin.Float, y:kotlin.Any) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Float
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any
+      RETURN type=kotlin.Nothing from='#10 public final fun test1f (x: kotlin.Float, y: kotlin.Float): kotlin.Boolean declared in <root>'
+        CALL '#13 public final fun less (arg0: kotlin.Float, arg1: kotlin.Float): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=LT
+          arg0: GET_VAR '#11 x: kotlin.Float declared in <root>.test1f' type=kotlin.Float origin=null
+          arg1: GET_VAR '#12 y: kotlin.Float declared in <root>.test1f' type=kotlin.Float origin=null
+  FUN #14 name:test2f visibility:public modality:FINAL <> (x:kotlin.Float, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #15 name:x index:0 type:kotlin.Float 
+    VALUE_PARAMETER #16 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2f (x: kotlin.Float, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#14 public final fun test2f (x: kotlin.Float, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-              GET_VAR 'y: kotlin.Any declared in <root>.test2f' type=kotlin.Any origin=null
+              GET_VAR '#16 y: kotlin.Any declared in <root>.test2f' type=kotlin.Any origin=null
             then: ERROR_CALL 'Comparison of arguments with different types: kotlin/Float, kotlin/Any' type=kotlin.Boolean
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test3f visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any
+  FUN #17 name:test3f visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #18 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #19 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3f (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#17 public final fun test3f (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-                  GET_VAR 'x: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
+                  GET_VAR '#18 x: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-                  GET_VAR 'y: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
+                  GET_VAR '#19 y: kotlin.Any declared in <root>.test3f' type=kotlin.Any origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false
@@ -81,19 +81,19 @@ FILE fqName:<root> fileName:/floatingPointLess.kt
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:testFD visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any
+  FUN #20 name:testFD visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #21 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #22 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testFD (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#20 public final fun testFD (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-                  GET_VAR 'x: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
+                  GET_VAR '#21 x: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'y: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
+                  GET_VAR '#22 y: kotlin.Any declared in <root>.testFD' type=kotlin.Any origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false
@@ -101,19 +101,19 @@ FILE fqName:<root> fileName:/floatingPointLess.kt
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:testDF visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any
+  FUN #23 name:testDF visibility:public modality:FINAL <> (x:kotlin.Any, y:kotlin.Any) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #24 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #25 name:y index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testDF (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#23 public final fun testDF (x: kotlin.Any, y: kotlin.Any): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'x: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
+                  GET_VAR '#24 x: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-                  GET_VAR 'y: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
+                  GET_VAR '#25 y: kotlin.Any declared in <root>.testDF' type=kotlin.Any origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false

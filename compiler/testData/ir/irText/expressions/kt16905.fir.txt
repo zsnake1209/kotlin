@@ -1,81 +1,81 @@
 FILE fqName:<root> fileName:/kt16905.kt
-  CLASS CLASS name:Outer modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Outer
-    CONSTRUCTOR visibility:public <> () returnType:<root>.Outer [primary]
+  CLASS #0 CLASS name:Outer modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.Outer 
+    CONSTRUCTOR #2 visibility:public <> () returnType:<root>.Outer [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Outer modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    CLASS CLASS name:Inner modality:OPEN visibility:public [inner] superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Outer.Inner
-      CONSTRUCTOR visibility:public <> () returnType:<root>.Outer.Inner [primary]
+        DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class CLASS Outer declared in <root>'
+    CLASS #4 CLASS name:Inner modality:OPEN visibility:public [inner] superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #5 INSTANCE_RECEIVER name:<this> type:<root>.Outer.Inner 
+      CONSTRUCTOR #6 visibility:public <> () returnType:<root>.Outer.Inner [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Inner modality:OPEN visibility:public [inner] superTypes:[kotlin.Any]'
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          DELEGATING_CONSTRUCTOR_CALL '#7 public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL class='#4 class CLASS Inner declared in <root>.Outer'
+      FUN #8 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #10 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #11 name:other index:0 type:kotlin.Any? 
+      FUN #12 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #14 name:<this> type:kotlin.Any 
+      FUN #15 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    CLASS CLASS name:InnerDerived0 modality:FINAL visibility:public [inner] superTypes:[<root>.Outer.Inner]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Outer.InnerDerived0
-      CONSTRUCTOR visibility:public <> () returnType:<root>.Outer.InnerDerived0 [primary]
+          #16 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #17 name:<this> type:kotlin.Any 
+    CLASS #18 CLASS name:InnerDerived0 modality:FINAL visibility:public [inner] superTypes:[<root>.Outer.Inner]
+      $this: VALUE_PARAMETER #19 INSTANCE_RECEIVER name:<this> type:<root>.Outer.InnerDerived0 
+      CONSTRUCTOR #20 visibility:public <> () returnType:<root>.Outer.InnerDerived0 [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in <root>.Outer.Inner'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:InnerDerived0 modality:FINAL visibility:public [inner] superTypes:[<root>.Outer.Inner]'
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          DELEGATING_CONSTRUCTOR_CALL '#21 public constructor <init> () [primary] declared in <root>.Outer.Inner'
+          INSTANCE_INITIALIZER_CALL class='#18 class CLASS InnerDerived0 declared in <root>.Outer'
+      FUN #22 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #23 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #24 name:other index:0 type:kotlin.Any? 
+      FUN #25 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #26 name:<this> type:kotlin.Any 
+      FUN #27 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    CLASS CLASS name:InnerDerived1 modality:FINAL visibility:public [inner] superTypes:[<root>.Outer.Inner]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Outer.InnerDerived1
-      CONSTRUCTOR visibility:public <> () returnType:<root>.Outer.InnerDerived1 [primary]
+          #16 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #28 name:<this> type:kotlin.Any 
+    CLASS #29 CLASS name:InnerDerived1 modality:FINAL visibility:public [inner] superTypes:[<root>.Outer.Inner]
+      $this: VALUE_PARAMETER #30 INSTANCE_RECEIVER name:<this> type:<root>.Outer.InnerDerived1 
+      CONSTRUCTOR #31 visibility:public <> () returnType:<root>.Outer.InnerDerived1 [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in <root>.Outer.Inner'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:InnerDerived1 modality:FINAL visibility:public [inner] superTypes:[<root>.Outer.Inner]'
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          DELEGATING_CONSTRUCTOR_CALL '#32 public constructor <init> () [primary] declared in <root>.Outer.Inner'
+          INSTANCE_INITIALIZER_CALL class='#29 class CLASS InnerDerived1 declared in <root>.Outer'
+      FUN #33 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #34 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #35 name:other index:0 type:kotlin.Any? 
+      FUN #36 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #37 name:<this> type:kotlin.Any 
+      FUN #38 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          #16 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #39 name:<this> type:kotlin.Any 
+    FUN #40 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #41 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #42 name:other index:0 type:kotlin.Any? 
+    FUN #43 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #44 name:<this> type:kotlin.Any 
+    FUN #45 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  FUN name:test visibility:public modality:FINAL <> () returnType:IrErrorType
+        #16 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #46 name:<this> type:kotlin.Any 
+  FUN #47 name:test visibility:public modality:FINAL <> () returnType:IrErrorType 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test (): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#47 public final fun test (): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Unresolved name: OI>#' type=IrErrorType

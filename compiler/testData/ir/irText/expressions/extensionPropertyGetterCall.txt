@@ -1,14 +1,14 @@
 FILE fqName:<root> fileName:/extensionPropertyGetterCall.kt
-  PROPERTY name:okext visibility:public modality:FINAL [val] 
-    FUN name:<get-okext> visibility:public modality:FINAL <> ($receiver:kotlin.String) returnType:kotlin.String 
-      correspondingProperty: PROPERTY name:okext visibility:public modality:FINAL [val] 
-      $receiver: VALUE_PARAMETER name:<this> type:kotlin.String 
+  PROPERTY #0 name:okext visibility:public modality:FINAL [val] 
+    FUN #1 name:<get-okext> visibility:public modality:FINAL <> ($receiver:kotlin.String) returnType:kotlin.String 
+      correspondingProperty: PROPERTY #0 name:okext visibility:public modality:FINAL [val] 
+      $receiver: VALUE_PARAMETER #2 name:<this> type:kotlin.String 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-okext> (): kotlin.String declared in <root>'
+        RETURN type=kotlin.Nothing from='#1 public final fun <get-okext> (): kotlin.String declared in <root>'
           CONST String type=kotlin.String value="OK"
-  FUN name:test5 visibility:public modality:FINAL <> ($receiver:kotlin.String) returnType:kotlin.String 
-    $receiver: VALUE_PARAMETER name:<this> type:kotlin.String 
+  FUN #3 name:test5 visibility:public modality:FINAL <> ($receiver:kotlin.String) returnType:kotlin.String 
+    $receiver: VALUE_PARAMETER #4 name:<this> type:kotlin.String 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test5 (): kotlin.String declared in <root>'
-        CALL 'public final fun <get-okext> (): kotlin.String declared in <root>' type=kotlin.String origin=GET_PROPERTY
-          $receiver: GET_VAR '<this>: kotlin.String declared in <root>.test5' type=kotlin.String origin=null
+      RETURN type=kotlin.Nothing from='#3 public final fun test5 (): kotlin.String declared in <root>'
+        CALL '#1 public final fun <get-okext> (): kotlin.String declared in <root>' type=kotlin.String origin=GET_PROPERTY
+          $receiver: GET_VAR '#4 <this>: kotlin.String declared in <root>.test5' type=kotlin.String origin=null

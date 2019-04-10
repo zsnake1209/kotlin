@@ -1,84 +1,84 @@
 FILE fqName:<root> fileName:/membersImportedFromObject.kt
-  CLASS OBJECT name:A modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.A
-    CONSTRUCTOR visibility:private <> () returnType:<root>.A [primary]
+  CLASS #0 OBJECT name:A modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.A 
+    CONSTRUCTOR #2 visibility:private <> () returnType:<root>.A [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:A modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    FUN name:foo visibility:public modality:FINAL <> ($this:<root>.A) returnType:kotlin.Int
-      $this: VALUE_PARAMETER name:<this> type:<root>.A
+        DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class OBJECT A declared in <root>'
+    FUN #4 name:foo visibility:public modality:FINAL <> ($this:<root>.A) returnType:kotlin.Int 
+      $this: VALUE_PARAMETER #5 name:<this> type:<root>.A 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun foo (): kotlin.Int declared in <root>.A'
+        RETURN type=kotlin.Nothing from='#4 public final fun foo (): kotlin.Int declared in <root>.A'
           CONST Int type=kotlin.Int value=1
-    FUN name:fooExt visibility:public modality:FINAL <> ($this:<root>.A) returnType:kotlin.Int
-      $this: VALUE_PARAMETER name:<this> type:<root>.A
+    FUN #6 name:fooExt visibility:public modality:FINAL <> ($this:<root>.A) returnType:kotlin.Int 
+      $this: VALUE_PARAMETER #7 name:<this> type:<root>.A 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun fooExt (): kotlin.Int declared in <root>.A'
+        RETURN type=kotlin.Nothing from='#6 public final fun fooExt (): kotlin.Int declared in <root>.A'
           CONST Int type=kotlin.Int value=2
-    PROPERTY name:bar visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:bar type:kotlin.Int visibility:public [final]
+    PROPERTY #8 name:bar visibility:public modality:FINAL [val] 
+      FIELD #9 PROPERTY_BACKING_FIELD name:bar type:kotlin.Int visibility:public [final] 
         EXPRESSION_BODY
           CONST Int type=kotlin.Int value=42
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-bar> visibility:public modality:FINAL <> ($this:<root>.A) returnType:kotlin.Int
-        correspondingProperty: PROPERTY name:bar visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.A
+      FUN #10 DEFAULT_PROPERTY_ACCESSOR name:<get-bar> visibility:public modality:FINAL <> ($this:<root>.A) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #8 name:bar visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #11 name:<this> type:<root>.A 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-bar> (): kotlin.Int declared in <root>.A'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:bar type:kotlin.Int visibility:public [final] ' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.<get-bar>' type=<root>.A origin=null
-    PROPERTY name:barExt visibility:public modality:FINAL [val]
-      FUN name:<get-barExt> visibility:public modality:FINAL <> ($this:<root>.A) returnType:IrErrorType
-        correspondingProperty: PROPERTY name:barExt visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.A
+          RETURN type=kotlin.Nothing from='#10 public final fun <get-bar> (): kotlin.Int declared in <root>.A'
+            GET_FIELD '#9 FIELD #9 PROPERTY_BACKING_FIELD name:bar type:kotlin.Int visibility:public [final] ' type=kotlin.Int origin=null
+              receiver: GET_VAR '#11 <this>: <root>.A declared in <root>.A.<get-bar>' type=<root>.A origin=null
+    PROPERTY #12 name:barExt visibility:public modality:FINAL [val] 
+      FUN #13 name:<get-barExt> visibility:public modality:FINAL <> ($this:<root>.A) returnType:IrErrorType 
+        correspondingProperty: PROPERTY #12 name:barExt visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #14 name:<this> type:<root>.A 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-barExt> (): IrErrorType declared in <root>.A'
+          RETURN type=kotlin.Nothing from='#13 public final fun <get-barExt> (): IrErrorType declared in <root>.A'
             CONST Int type=IrErrorType value=43
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+    FUN #15 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #16 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #17 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #18 name:other index:0 type:kotlin.Any? 
+    FUN #19 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #20 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #21 name:<this> type:kotlin.Any 
+    FUN #22 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  PROPERTY name:test1 visibility:public modality:FINAL [val]
-    FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static]
+        #23 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #24 name:<this> type:kotlin.Any 
+  PROPERTY #25 name:test1 visibility:public modality:FINAL [val] 
+    FIELD #26 PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static] 
       EXPRESSION_BODY
-        CALL 'public final fun foo (): kotlin.Int declared in <root>.A' type=kotlin.Int origin=null
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Int
-      correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val]
+        CALL '#4 public final fun foo (): kotlin.Int declared in <root>.A' type=kotlin.Int origin=null
+    FUN #27 DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #25 name:test1 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
-  PROPERTY name:test2 visibility:public modality:FINAL [val]
-    FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Int visibility:public [final,static]
+        RETURN type=kotlin.Nothing from='#27 public final fun <get-test1> (): kotlin.Int declared in <root>'
+          GET_FIELD '#26 FIELD #26 PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
+  PROPERTY #28 name:test2 visibility:public modality:FINAL [val] 
+    FIELD #29 PROPERTY_BACKING_FIELD name:test2 type:kotlin.Int visibility:public [final,static] 
       EXPRESSION_BODY
-        CALL 'public final fun <get-bar> (): kotlin.Int declared in <root>.A' type=kotlin.Int origin=null
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Int
-      correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [val]
+        CALL '#10 public final fun <get-bar> (): kotlin.Int declared in <root>.A' type=kotlin.Int origin=null
+    FUN #30 DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #28 name:test2 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
-  PROPERTY name:test3 visibility:public modality:FINAL [val]
-    FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [final,static]
+        RETURN type=kotlin.Nothing from='#30 public final fun <get-test2> (): kotlin.Int declared in <root>'
+          GET_FIELD '#29 FIELD #29 PROPERTY_BACKING_FIELD name:test2 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
+  PROPERTY #31 name:test3 visibility:public modality:FINAL [val] 
+    FIELD #32 PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [final,static] 
       EXPRESSION_BODY
-        CALL 'public final fun fooExt (): kotlin.Int declared in <root>.A' type=kotlin.Int origin=null
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Int
-      correspondingProperty: PROPERTY name:test3 visibility:public modality:FINAL [val]
+        CALL '#6 public final fun fooExt (): kotlin.Int declared in <root>.A' type=kotlin.Int origin=null
+    FUN #33 DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #31 name:test3 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
-  PROPERTY name:test4 visibility:public modality:FINAL [val]
-    FIELD PROPERTY_BACKING_FIELD name:test4 type:IrErrorType visibility:public [final,static]
+        RETURN type=kotlin.Nothing from='#33 public final fun <get-test3> (): kotlin.Int declared in <root>'
+          GET_FIELD '#32 FIELD #32 PROPERTY_BACKING_FIELD name:test3 type:kotlin.Int visibility:public [final,static] ' type=kotlin.Int origin=null
+  PROPERTY #34 name:test4 visibility:public modality:FINAL [val] 
+    FIELD #35 PROPERTY_BACKING_FIELD name:test4 type:IrErrorType visibility:public [final,static] 
       EXPRESSION_BODY
-        CALL 'public final fun <get-barExt> (): IrErrorType declared in <root>.A' type=IrErrorType origin=null
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test4> visibility:public modality:FINAL <> () returnType:IrErrorType
-      correspondingProperty: PROPERTY name:test4 visibility:public modality:FINAL [val]
+        CALL '#13 public final fun <get-barExt> (): IrErrorType declared in <root>.A' type=IrErrorType origin=null
+    FUN #36 DEFAULT_PROPERTY_ACCESSOR name:<get-test4> visibility:public modality:FINAL <> () returnType:IrErrorType 
+      correspondingProperty: PROPERTY #34 name:test4 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test4> (): IrErrorType declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test4 type:IrErrorType visibility:public [final,static] ' type=IrErrorType origin=null
+        RETURN type=kotlin.Nothing from='#36 public final fun <get-test4> (): IrErrorType declared in <root>'
+          GET_FIELD '#35 FIELD #35 PROPERTY_BACKING_FIELD name:test4 type:IrErrorType visibility:public [final,static] ' type=IrErrorType origin=null

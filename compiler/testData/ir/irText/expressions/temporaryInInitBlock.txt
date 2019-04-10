@@ -1,47 +1,47 @@
 FILE fqName:<root> fileName:/temporaryInInitBlock.kt
-  CLASS CLASS name:C modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.C 
-    CONSTRUCTOR visibility:public <> (x:kotlin.Any?) returnType:<root>.C [primary] 
-      VALUE_PARAMETER name:x index:0 type:kotlin.Any? 
+  CLASS #0 CLASS name:C modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.C 
+    CONSTRUCTOR #2 visibility:public <> (x:kotlin.Any?) returnType:<root>.C [primary] 
+      VALUE_PARAMETER #3 name:x index:0 type:kotlin.Any? 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:C modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    PROPERTY name:s visibility:public modality:FINAL [val] 
-      FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.String? visibility:public [final] 
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-s> visibility:public modality:FINAL <> ($this:<root>.C) returnType:kotlin.String? 
-        correspondingProperty: PROPERTY name:s visibility:public modality:FINAL [val] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.C 
+        DELEGATING_CONSTRUCTOR_CALL '#4 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class CLASS C declared in <root>'
+    PROPERTY #5 name:s visibility:public modality:FINAL [val] 
+      FIELD #6 PROPERTY_BACKING_FIELD name:s type:kotlin.String? visibility:public [final] 
+      FUN #7 DEFAULT_PROPERTY_ACCESSOR name:<get-s> visibility:public modality:FINAL <> ($this:<root>.C) returnType:kotlin.String? 
+        correspondingProperty: PROPERTY #5 name:s visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #8 name:<this> type:<root>.C 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-s> (): kotlin.String? declared in <root>.C'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.String? visibility:public [final] ' type=kotlin.String? origin=null
-              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.<get-s>' type=<root>.C origin=null
-    ANONYMOUS_INITIALIZER isStatic=false
+          RETURN type=kotlin.Nothing from='#7 public final fun <get-s> (): kotlin.String? declared in <root>.C'
+            GET_FIELD '#6 FIELD #6 PROPERTY_BACKING_FIELD name:s type:kotlin.String? visibility:public [final] ' type=kotlin.String? origin=null
+              receiver: GET_VAR '#8 <this>: <root>.C declared in <root>.C.<get-s>' type=<root>.C origin=null
+    ANONYMOUS_INITIALIZER #9 isStatic=false
       BLOCK_BODY
-        SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.String? visibility:public [final] ' type=kotlin.Unit origin=null
-          receiver: GET_VAR '<this>: <root>.C declared in <root>.C' type=<root>.C origin=null
+        SET_FIELD '#6 FIELD #6 PROPERTY_BACKING_FIELD name:s type:kotlin.String? visibility:public [final] ' type=kotlin.Unit origin=null
+          receiver: GET_VAR '#1 <this>: <root>.C declared in <root>.C' type=<root>.C origin=null
           value: BLOCK type=kotlin.String? origin=SAFE_CALL
-            VAR IR_TEMPORARY_VARIABLE name:tmp0_safe_receiver type:kotlin.Any? [val] 
-              GET_VAR 'x: kotlin.Any? declared in <root>.C.<init>' type=kotlin.Any? origin=null
+            VAR #10 IR_TEMPORARY_VARIABLE name:tmp0_safe_receiver type:kotlin.Any? [val] 
+              GET_VAR '#3 x: kotlin.Any? declared in <root>.C.<init>' type=kotlin.Any? origin=null
             WHEN type=kotlin.String? origin=null
               BRANCH
-                if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                  arg0: GET_VAR 'val tmp0_safe_receiver: kotlin.Any? [val] declared in <root>.C' type=kotlin.Any? origin=null
+                if: CALL '#11 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                  arg0: GET_VAR '#10 val tmp0_safe_receiver: kotlin.Any? [val] declared in <root>.C' type=kotlin.Any? origin=null
                   arg1: CONST Null type=kotlin.Nothing? value=null
                 then: CONST Null type=kotlin.Nothing? value=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
-                then: CALL 'public open fun toString (): kotlin.String declared in kotlin.Any' type=kotlin.String origin=null
-                  $this: GET_VAR 'val tmp0_safe_receiver: kotlin.Any? [val] declared in <root>.C' type=kotlin.Any? origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+                then: CALL '#12 public open fun toString (): kotlin.String declared in kotlin.Any' type=kotlin.String origin=null
+                  $this: GET_VAR '#10 val tmp0_safe_receiver: kotlin.Any? [val] declared in <root>.C' type=kotlin.Any? origin=null
+    FUN #13 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #14 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #15 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #16 name:other index:0 type:kotlin.Any? 
+    FUN #17 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #18 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #19 name:<this> type:kotlin.Any 
+    FUN #20 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
+        #12 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #21 name:<this> type:kotlin.Any 

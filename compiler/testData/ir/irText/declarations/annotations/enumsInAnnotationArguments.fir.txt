@@ -1,135 +1,135 @@
 FILE fqName:<root> fileName:/enumsInAnnotationArguments.kt
-  CLASS ENUM_CLASS name:En modality:FINAL visibility:public superTypes:[kotlin.Enum]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.En
-    CONSTRUCTOR visibility:private <> () returnType:<root>.En [primary]
+  CLASS #0 ENUM_CLASS name:En modality:FINAL visibility:public superTypes:[kotlin.Enum]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.En 
+    CONSTRUCTOR #2 visibility:private <> () returnType:<root>.En [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> (name: kotlin.String, ordinal: kotlin.Int) [primary] declared in kotlin.Enum'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS ENUM_CLASS name:En modality:FINAL visibility:public superTypes:[kotlin.Enum]'
-    CLASS ENUM_ENTRY name:A modality:FINAL visibility:public superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.En.A
-      CONSTRUCTOR visibility:public <> () returnType:<root>.En.A [primary]
+        DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> (name: kotlin.String, ordinal: kotlin.Int) [primary] declared in kotlin.Enum'
+        INSTANCE_INITIALIZER_CALL class='#0 class ENUM_CLASS En declared in <root>'
+    CLASS #4 ENUM_ENTRY name:A modality:FINAL visibility:public superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #5 INSTANCE_RECEIVER name:<this> type:<root>.En.A 
+      CONSTRUCTOR #6 visibility:public <> () returnType:<root>.En.A [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS ENUM_ENTRY name:A modality:FINAL visibility:public superTypes:[kotlin.Any]'
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          DELEGATING_CONSTRUCTOR_CALL '#7 public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL class='#4 class ENUM_ENTRY A declared in <root>.En'
+      FUN #8 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #10 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #11 name:other index:0 type:kotlin.Any? 
+      FUN #12 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #14 name:<this> type:kotlin.Any 
+      FUN #15 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    CLASS ENUM_ENTRY name:B modality:FINAL visibility:public superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.En.B
-      CONSTRUCTOR visibility:public <> () returnType:<root>.En.B [primary]
+          #16 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #17 name:<this> type:kotlin.Any 
+    CLASS #18 ENUM_ENTRY name:B modality:FINAL visibility:public superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #19 INSTANCE_RECEIVER name:<this> type:<root>.En.B 
+      CONSTRUCTOR #20 visibility:public <> () returnType:<root>.En.B [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS ENUM_ENTRY name:B modality:FINAL visibility:public superTypes:[kotlin.Any]'
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          DELEGATING_CONSTRUCTOR_CALL '#21 public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL class='#18 class ENUM_ENTRY B declared in <root>.En'
+      FUN #22 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #23 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #24 name:other index:0 type:kotlin.Any? 
+      FUN #25 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #26 name:<this> type:kotlin.Any 
+      FUN #27 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    CLASS ENUM_ENTRY name:C modality:FINAL visibility:public superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.En.C
-      CONSTRUCTOR visibility:public <> () returnType:<root>.En.C [primary]
+          #16 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #28 name:<this> type:kotlin.Any 
+    CLASS #29 ENUM_ENTRY name:C modality:FINAL visibility:public superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #30 INSTANCE_RECEIVER name:<this> type:<root>.En.C 
+      CONSTRUCTOR #31 visibility:public <> () returnType:<root>.En.C [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS ENUM_ENTRY name:C modality:FINAL visibility:public superTypes:[kotlin.Any]'
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          DELEGATING_CONSTRUCTOR_CALL '#32 public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL class='#29 class ENUM_ENTRY C declared in <root>.En'
+      FUN #33 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #34 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #35 name:other index:0 type:kotlin.Any? 
+      FUN #36 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #37 name:<this> type:kotlin.Any 
+      FUN #38 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    CLASS ENUM_ENTRY name:D modality:FINAL visibility:public superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.En.D
-      CONSTRUCTOR visibility:public <> () returnType:<root>.En.D [primary]
+          #16 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #39 name:<this> type:kotlin.Any 
+    CLASS #40 ENUM_ENTRY name:D modality:FINAL visibility:public superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #41 INSTANCE_RECEIVER name:<this> type:<root>.En.D 
+      CONSTRUCTOR #42 visibility:public <> () returnType:<root>.En.D [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS ENUM_ENTRY name:D modality:FINAL visibility:public superTypes:[kotlin.Any]'
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          DELEGATING_CONSTRUCTOR_CALL '#43 public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL class='#40 class ENUM_ENTRY D declared in <root>.En'
+      FUN #44 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #45 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #46 name:other index:0 type:kotlin.Any? 
+      FUN #47 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #48 name:<this> type:kotlin.Any 
+      FUN #49 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:clone visibility:protected modality:FINAL <> ($this:kotlin.Enum) returnType:kotlin.Any
+          #16 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #50 name:<this> type:kotlin.Any 
+    FUN #51 FAKE_OVERRIDE name:clone visibility:protected modality:FINAL <> ($this:kotlin.Enum) returnType:kotlin.Any 
       overridden:
-        protected final fun clone (): kotlin.Any declared in kotlin.Enum
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Enum
-    FUN FAKE_OVERRIDE name:compareTo visibility:public modality:FINAL <> ($this:kotlin.Enum, other:E of <uninitialized parent>) returnType:kotlin.Int
+        #52 protected final fun clone (): kotlin.Any declared in kotlin.Enum
+      $this: VALUE_PARAMETER #53 name:<this> type:kotlin.Enum 
+    FUN #54 FAKE_OVERRIDE name:compareTo visibility:public modality:FINAL <> ($this:kotlin.Enum, other:E of <uninitialized parent>) returnType:kotlin.Int 
       overridden:
-        public final fun compareTo (other: E of <uninitialized parent>): kotlin.Int declared in kotlin.Enum
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Enum
-      VALUE_PARAMETER name:other index:0 type:E of <uninitialized parent>
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:FINAL <> ($this:kotlin.Enum, other:kotlin.Any?) returnType:kotlin.Boolean
+        #55 public final fun compareTo (other: E of <uninitialized parent>): kotlin.Int declared in kotlin.Enum
+      $this: VALUE_PARAMETER #56 name:<this> type:kotlin.Enum 
+      VALUE_PARAMETER #57 name:other index:0 type:E of <uninitialized parent> 
+    FUN #58 FAKE_OVERRIDE name:equals visibility:public modality:FINAL <> ($this:kotlin.Enum, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public final fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Enum
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Enum
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:FINAL <> ($this:kotlin.Enum) returnType:kotlin.Int
+        #59 public final fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Enum
+      $this: VALUE_PARAMETER #60 name:<this> type:kotlin.Enum 
+      VALUE_PARAMETER #61 name:other index:0 type:kotlin.Any? 
+    FUN #62 FAKE_OVERRIDE name:hashCode visibility:public modality:FINAL <> ($this:kotlin.Enum) returnType:kotlin.Int 
       overridden:
-        public final fun hashCode (): kotlin.Int declared in kotlin.Enum
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Enum
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Enum) returnType:kotlin.String
+        #63 public final fun hashCode (): kotlin.Int declared in kotlin.Enum
+      $this: VALUE_PARAMETER #64 name:<this> type:kotlin.Enum 
+    FUN #65 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Enum) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Enum
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Enum
-  CLASS ANNOTATION_CLASS name:TestAnn modality:FINAL visibility:public superTypes:[kotlin.Annotation]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.TestAnn
-    CONSTRUCTOR visibility:public <> (x:<root>.En) returnType:<root>.TestAnn [primary]
-      VALUE_PARAMETER name:x index:0 type:<root>.En
-    PROPERTY name:x visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:x type:<root>.En visibility:public [final]
+        #66 public open fun toString (): kotlin.String declared in kotlin.Enum
+      $this: VALUE_PARAMETER #67 name:<this> type:kotlin.Enum 
+  CLASS #68 ANNOTATION_CLASS name:TestAnn modality:FINAL visibility:public superTypes:[kotlin.Annotation]
+    $this: VALUE_PARAMETER #69 INSTANCE_RECEIVER name:<this> type:<root>.TestAnn 
+    CONSTRUCTOR #70 visibility:public <> (x:<root>.En) returnType:<root>.TestAnn [primary] 
+      VALUE_PARAMETER #71 name:x index:0 type:<root>.En 
+    PROPERTY #72 name:x visibility:public modality:FINAL [val] 
+      FIELD #73 PROPERTY_BACKING_FIELD name:x type:<root>.En visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'x: <root>.En declared in <root>.TestAnn.<init>' type=<root>.En origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:FINAL <> ($this:<root>.TestAnn) returnType:<root>.En
-        correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.TestAnn
+          GET_VAR '#71 x: <root>.En declared in <root>.TestAnn.<init>' type=<root>.En origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #74 DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:FINAL <> ($this:<root>.TestAnn) returnType:<root>.En 
+        correspondingProperty: PROPERTY #72 name:x visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #75 name:<this> type:<root>.TestAnn 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): <root>.En declared in <root>.TestAnn'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:<root>.En visibility:public [final] ' type=<root>.En origin=null
-              receiver: GET_VAR '<this>: <root>.TestAnn declared in <root>.TestAnn.<get-x>' type=<root>.TestAnn origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          RETURN type=kotlin.Nothing from='#74 public final fun <get-x> (): <root>.En declared in <root>.TestAnn'
+            GET_FIELD '#73 FIELD #73 PROPERTY_BACKING_FIELD name:x type:<root>.En visibility:public [final] ' type=<root>.En origin=null
+              receiver: GET_VAR '#75 <this>: <root>.TestAnn declared in <root>.TestAnn.<get-x>' type=<root>.TestAnn origin=null
+    FUN #76 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #9 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #77 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #78 name:other index:0 type:kotlin.Any? 
+    FUN #79 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #13 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #80 name:<this> type:kotlin.Any 
+    FUN #81 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  FUN name:test1 visibility:public modality:FINAL <> () returnType:kotlin.Unit
+        #16 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #82 name:<this> type:kotlin.Any 
+  FUN #83 name:test1 visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY

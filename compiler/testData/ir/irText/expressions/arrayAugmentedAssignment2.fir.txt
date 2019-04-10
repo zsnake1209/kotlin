@@ -1,42 +1,42 @@
 FILE fqName:<root> fileName:/arrayAugmentedAssignment2.kt
-  CLASS INTERFACE name:IA modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IA
-    FUN name:get visibility:public modality:ABSTRACT <> ($this:<root>.IA, index:kotlin.String) returnType:kotlin.Int
-      $this: VALUE_PARAMETER name:<this> type:<root>.IA
-      VALUE_PARAMETER name:index index:0 type:kotlin.String
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+  CLASS #0 INTERFACE name:IA modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.IA 
+    FUN #2 name:get visibility:public modality:ABSTRACT <> ($this:<root>.IA, index:kotlin.String) returnType:kotlin.Int 
+      $this: VALUE_PARAMETER #3 name:<this> type:<root>.IA 
+      VALUE_PARAMETER #4 name:index index:0 type:kotlin.String 
+    FUN #5 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #6 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #7 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #8 name:other index:0 type:kotlin.Any? 
+    FUN #9 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #10 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #11 name:<this> type:kotlin.Any 
+    FUN #12 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  CLASS INTERFACE name:IB modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IB
-    FUN name:set visibility:public modality:ABSTRACT <> ($this:<root>.IB, index:kotlin.String, value:kotlin.Int) returnType:kotlin.Unit
-      $this: VALUE_PARAMETER name:<this> type:<root>.IB
-      VALUE_PARAMETER name:index index:0 type:kotlin.String
-      VALUE_PARAMETER name:value index:1 type:kotlin.Int
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+        #13 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #14 name:<this> type:kotlin.Any 
+  CLASS #15 INTERFACE name:IB modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #16 INSTANCE_RECEIVER name:<this> type:<root>.IB 
+    FUN #17 name:set visibility:public modality:ABSTRACT <> ($this:<root>.IB, index:kotlin.String, value:kotlin.Int) returnType:kotlin.Unit 
+      $this: VALUE_PARAMETER #18 name:<this> type:<root>.IB 
+      VALUE_PARAMETER #19 name:index index:0 type:kotlin.String 
+      VALUE_PARAMETER #20 name:value index:1 type:kotlin.Int 
+    FUN #21 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #6 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #22 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #23 name:other index:0 type:kotlin.Any? 
+    FUN #24 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #10 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #25 name:<this> type:kotlin.Any 
+    FUN #26 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  FUN name:test visibility:public modality:FINAL <> (a:<root>.IA) returnType:kotlin.Unit
-    VALUE_PARAMETER name:a index:0 type:<root>.IA
+        #13 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #27 name:<this> type:kotlin.Any 
+  FUN #28 name:test visibility:public modality:FINAL <> (a:<root>.IA) returnType:kotlin.Unit 
+    VALUE_PARAMETER #29 name:a index:0 type:<root>.IA 
     BLOCK_BODY
       ERROR_CALL 'FirArraySetCall (resolve isn't supported yet)' type=kotlin.Unit

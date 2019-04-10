@@ -1,67 +1,67 @@
 FILE fqName:<root> fileName:/thisReferenceBeforeClassDeclared.kt
-  FUN name:test visibility:public modality:FINAL <> () returnType:kotlin.Unit
+  FUN #0 name:test visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:test1 type:IrErrorType [val]
+      VAR #1 name:test1 type:IrErrorType [val] 
         BLOCK type=<root>.test.<no name provided> origin=OBJECT_LITERAL
-          CLASS OBJECT name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.WithCompanion]
-            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.test.<no name provided>
-            CONSTRUCTOR visibility:private <> () returnType:IrErrorType [primary]
+          CLASS #2 OBJECT name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.WithCompanion]
+            $this: VALUE_PARAMETER #3 INSTANCE_RECEIVER name:<this> type:<root>.test.<no name provided> 
+            CONSTRUCTOR #4 visibility:private <> () returnType:IrErrorType [primary] 
               BLOCK_BODY
-                DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> (a: <root>.WithCompanion.Companion) [primary] declared in <root>.WithCompanion'
+                DELEGATING_CONSTRUCTOR_CALL '#5 public constructor <init> (a: <root>.WithCompanion.Companion) [primary] declared in <root>.WithCompanion'
                   a: ERROR_CALL 'Unresolved reference: this#' type=<root>.WithCompanion
-                INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.WithCompanion]'
-          CALL 'private constructor <init> () [primary] declared in <root>.test.<no name provided>' type=<root>.test.<no name provided> origin=null
-      VAR name:test2 type:IrErrorType [val]
+                INSTANCE_INITIALIZER_CALL class='#2 class OBJECT <no name provided> declared in <root>.test'
+          CALL '#4 private constructor <init> () [primary] declared in <root>.test.<no name provided>' type=<root>.test.<no name provided> origin=null
+      VAR #6 name:test2 type:IrErrorType [val] 
         BLOCK type=<root>.test.<no name provided> origin=OBJECT_LITERAL
-          CLASS OBJECT name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.WithCompanion]
-            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.test.<no name provided>
-            CONSTRUCTOR visibility:private <> () returnType:IrErrorType [primary]
+          CLASS #7 OBJECT name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.WithCompanion]
+            $this: VALUE_PARAMETER #8 INSTANCE_RECEIVER name:<this> type:<root>.test.<no name provided> 
+            CONSTRUCTOR #9 visibility:private <> () returnType:IrErrorType [primary] 
               BLOCK_BODY
-                DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> (a: <root>.WithCompanion.Companion) [primary] declared in <root>.WithCompanion'
+                DELEGATING_CONSTRUCTOR_CALL '#10 public constructor <init> (a: <root>.WithCompanion.Companion) [primary] declared in <root>.WithCompanion'
                   a: ERROR_CALL 'Unresolved reference: <Unresolved name: foo>#' type=IrErrorType
-                INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.WithCompanion]'
-          CALL 'private constructor <init> () [primary] declared in <root>.test.<no name provided>' type=<root>.test.<no name provided> origin=null
-  CLASS CLASS name:WithCompanion modality:OPEN visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.WithCompanion
-    CONSTRUCTOR visibility:public <> (a:<root>.WithCompanion.Companion) returnType:<root>.WithCompanion [primary]
-      VALUE_PARAMETER name:a index:0 type:<root>.WithCompanion.Companion
+                INSTANCE_INITIALIZER_CALL class='#7 class OBJECT <no name provided> declared in <root>.test'
+          CALL '#9 private constructor <init> () [primary] declared in <root>.test.<no name provided>' type=<root>.test.<no name provided> origin=null
+  CLASS #11 CLASS name:WithCompanion modality:OPEN visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #12 INSTANCE_RECEIVER name:<this> type:<root>.WithCompanion 
+    CONSTRUCTOR #13 visibility:public <> (a:<root>.WithCompanion.Companion) returnType:<root>.WithCompanion [primary] 
+      VALUE_PARAMETER #14 name:a index:0 type:<root>.WithCompanion.Companion 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:WithCompanion modality:OPEN visibility:public superTypes:[kotlin.Any]'
-    CLASS OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.WithCompanion.Companion
-      CONSTRUCTOR visibility:private <> () returnType:<root>.WithCompanion.Companion [primary]
+        DELEGATING_CONSTRUCTOR_CALL '#15 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#11 class CLASS WithCompanion declared in <root>'
+    CLASS #16 OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #17 INSTANCE_RECEIVER name:<this> type:<root>.WithCompanion.Companion 
+      CONSTRUCTOR #18 visibility:private <> () returnType:<root>.WithCompanion.Companion [primary] 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]'
-      FUN name:foo visibility:public modality:FINAL <> ($this:<root>.WithCompanion.Companion) returnType:<root>.WithCompanion.Companion
-        $this: VALUE_PARAMETER name:<this> type:<root>.WithCompanion.Companion
+          DELEGATING_CONSTRUCTOR_CALL '#19 public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL class='#16 class OBJECT Companion declared in <root>.WithCompanion'
+      FUN #20 name:foo visibility:public modality:FINAL <> ($this:<root>.WithCompanion.Companion) returnType:<root>.WithCompanion.Companion 
+        $this: VALUE_PARAMETER #21 name:<this> type:<root>.WithCompanion.Companion 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun foo (): <root>.WithCompanion.Companion declared in <root>.WithCompanion.Companion'
+          RETURN type=kotlin.Nothing from='#20 public final fun foo (): <root>.WithCompanion.Companion declared in <root>.WithCompanion.Companion'
             ERROR_CALL 'Unresolved reference: this#' type=<root>.WithCompanion.Companion
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+      FUN #22 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+          #23 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #24 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #25 name:other index:0 type:kotlin.Any? 
+      FUN #26 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+          #27 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #28 name:<this> type:kotlin.Any 
+      FUN #29 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          #30 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #31 name:<this> type:kotlin.Any 
+    FUN #32 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #23 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #33 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #34 name:other index:0 type:kotlin.Any? 
+    FUN #35 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #27 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #36 name:<this> type:kotlin.Any 
+    FUN #37 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+        #30 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #38 name:<this> type:kotlin.Any 

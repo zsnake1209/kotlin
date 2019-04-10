@@ -1,61 +1,61 @@
 FILE fqName:<root> fileName:/nullableFloatingPointEqeq.kt
-  FUN name:testDD visibility:public modality:FINAL <> (x:kotlin.Double?, y:kotlin.Double?) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double?
-    VALUE_PARAMETER name:y index:1 type:kotlin.Double?
+  FUN #0 name:testDD visibility:public modality:FINAL <> (x:kotlin.Double?, y:kotlin.Double?) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #1 name:x index:0 type:kotlin.Double? 
+    VALUE_PARAMETER #2 name:y index:1 type:kotlin.Double? 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testDD (x: kotlin.Double?, y: kotlin.Double?): kotlin.Boolean declared in <root>'
-        CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-          arg0: GET_VAR 'x: kotlin.Double? declared in <root>.testDD' type=kotlin.Double? origin=null
-          arg1: GET_VAR 'y: kotlin.Double? declared in <root>.testDD' type=kotlin.Double? origin=null
-  FUN name:testDF visibility:public modality:FINAL <> (x:kotlin.Double?, y:kotlin.Any?) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double?
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any?
+      RETURN type=kotlin.Nothing from='#0 public final fun testDD (x: kotlin.Double?, y: kotlin.Double?): kotlin.Boolean declared in <root>'
+        CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+          arg0: GET_VAR '#1 x: kotlin.Double? declared in <root>.testDD' type=kotlin.Double? origin=null
+          arg1: GET_VAR '#2 y: kotlin.Double? declared in <root>.testDD' type=kotlin.Double? origin=null
+  FUN #4 name:testDF visibility:public modality:FINAL <> (x:kotlin.Double?, y:kotlin.Any?) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #5 name:x index:0 type:kotlin.Double? 
+    VALUE_PARAMETER #6 name:y index:1 type:kotlin.Any? 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testDF (x: kotlin.Double?, y: kotlin.Any?): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#4 public final fun testDF (x: kotlin.Double?, y: kotlin.Any?): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float?
-              GET_VAR 'y: kotlin.Any? declared in <root>.testDF' type=kotlin.Any? origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Double? declared in <root>.testDF' type=kotlin.Double? origin=null
-              arg1: GET_VAR 'y: kotlin.Any? declared in <root>.testDF' type=kotlin.Any? origin=null
+              GET_VAR '#6 y: kotlin.Any? declared in <root>.testDF' type=kotlin.Any? origin=null
+            then: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#5 x: kotlin.Double? declared in <root>.testDF' type=kotlin.Double? origin=null
+              arg1: GET_VAR '#6 y: kotlin.Any? declared in <root>.testDF' type=kotlin.Any? origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:testDI visibility:public modality:FINAL <> (x:kotlin.Double?, y:kotlin.Any?) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Double?
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any?
+  FUN #7 name:testDI visibility:public modality:FINAL <> (x:kotlin.Double?, y:kotlin.Any?) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #8 name:x index:0 type:kotlin.Double? 
+    VALUE_PARAMETER #9 name:y index:1 type:kotlin.Any? 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testDI (x: kotlin.Double?, y: kotlin.Any?): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#7 public final fun testDI (x: kotlin.Double?, y: kotlin.Any?): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Int?
-              GET_VAR 'y: kotlin.Any? declared in <root>.testDI' type=kotlin.Any? origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Double? declared in <root>.testDI' type=kotlin.Double? origin=null
-              arg1: GET_VAR 'y: kotlin.Any? declared in <root>.testDI' type=kotlin.Any? origin=null
+              GET_VAR '#9 y: kotlin.Any? declared in <root>.testDI' type=kotlin.Any? origin=null
+            then: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#8 x: kotlin.Double? declared in <root>.testDI' type=kotlin.Double? origin=null
+              arg1: GET_VAR '#9 y: kotlin.Any? declared in <root>.testDI' type=kotlin.Any? origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:testDI2 visibility:public modality:FINAL <> (x:kotlin.Any?, y:kotlin.Any?) returnType:kotlin.Boolean
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any?
-    VALUE_PARAMETER name:y index:1 type:kotlin.Any?
+  FUN #10 name:testDI2 visibility:public modality:FINAL <> (x:kotlin.Any?, y:kotlin.Any?) returnType:kotlin.Boolean 
+    VALUE_PARAMETER #11 name:x index:0 type:kotlin.Any? 
+    VALUE_PARAMETER #12 name:y index:1 type:kotlin.Any? 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testDI2 (x: kotlin.Any?, y: kotlin.Any?): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#10 public final fun testDI2 (x: kotlin.Any?, y: kotlin.Any?): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: WHEN type=kotlin.Boolean origin=ANDAND
               BRANCH
                 if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Int?
-                  GET_VAR 'x: kotlin.Any? declared in <root>.testDI2' type=kotlin.Any? origin=null
+                  GET_VAR '#11 x: kotlin.Any? declared in <root>.testDI2' type=kotlin.Any? origin=null
                 then: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                  GET_VAR 'y: kotlin.Any? declared in <root>.testDI2' type=kotlin.Any? origin=null
+                  GET_VAR '#12 y: kotlin.Any? declared in <root>.testDI2' type=kotlin.Any? origin=null
               BRANCH
                 if: CONST Boolean type=kotlin.Boolean value=true
                 then: CONST Boolean type=kotlin.Boolean value=false
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any? declared in <root>.testDI2' type=kotlin.Any? origin=null
-              arg1: GET_VAR 'y: kotlin.Any? declared in <root>.testDI2' type=kotlin.Any? origin=null
+            then: CALL '#3 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#11 x: kotlin.Any? declared in <root>.testDI2' type=kotlin.Any? origin=null
+              arg1: GET_VAR '#12 y: kotlin.Any? declared in <root>.testDI2' type=kotlin.Any? origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false

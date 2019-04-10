@@ -1,29 +1,29 @@
 FILE fqName:<root> fileName:/dynamicWithSmartCast.kt
-  FUN name:test1 visibility:public modality:FINAL <> (d:dynamic) returnType:kotlin.Int 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #0 name:test1 visibility:public modality:FINAL <> (d:dynamic) returnType:kotlin.Int 
+    VALUE_PARAMETER #1 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1 (d: dynamic): kotlin.Int declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun test1 (d: dynamic): kotlin.Int declared in <root>'
         WHEN type=kotlin.Int origin=IF
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.String
-              GET_VAR 'd: dynamic declared in <root>.test1' type=dynamic origin=null
-            then: CALL 'public open fun <get-length> (): kotlin.Int declared in kotlin.String' type=kotlin.Int origin=GET_PROPERTY
+              GET_VAR '#1 d: dynamic declared in <root>.test1' type=dynamic origin=null
+            then: CALL '#2 public open fun <get-length> (): kotlin.Int declared in kotlin.String' type=kotlin.Int origin=GET_PROPERTY
               $this: TYPE_OP type=kotlin.String origin=IMPLICIT_CAST typeOperand=kotlin.String
-                GET_VAR 'd: dynamic declared in <root>.test1' type=dynamic origin=null
+                GET_VAR '#1 d: dynamic declared in <root>.test1' type=dynamic origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Int type=kotlin.Int value=-1
-  FUN name:test2 visibility:public modality:FINAL <> (d:dynamic) returnType:kotlin.Int 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #3 name:test2 visibility:public modality:FINAL <> (d:dynamic) returnType:kotlin.Int 
+    VALUE_PARAMETER #4 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2 (d: dynamic): kotlin.Int declared in <root>'
+      RETURN type=kotlin.Nothing from='#3 public final fun test2 (d: dynamic): kotlin.Int declared in <root>'
         WHEN type=kotlin.Int origin=IF
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Array<*>
-              GET_VAR 'd: dynamic declared in <root>.test2' type=dynamic origin=null
-            then: CALL 'public final fun <get-size> (): kotlin.Int declared in kotlin.Array' type=kotlin.Int origin=GET_PROPERTY
+              GET_VAR '#4 d: dynamic declared in <root>.test2' type=dynamic origin=null
+            then: CALL '#5 public final fun <get-size> (): kotlin.Int declared in kotlin.Array' type=kotlin.Int origin=GET_PROPERTY
               $this: TYPE_OP type=kotlin.Array<out kotlin.Any?> origin=IMPLICIT_CAST typeOperand=kotlin.Array<out kotlin.Any?>
-                GET_VAR 'd: dynamic declared in <root>.test2' type=dynamic origin=null
+                GET_VAR '#4 d: dynamic declared in <root>.test2' type=dynamic origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Int type=kotlin.Int value=-1

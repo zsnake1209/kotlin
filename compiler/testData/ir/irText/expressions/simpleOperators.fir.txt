@@ -1,78 +1,78 @@
 FILE fqName:<root> fileName:/simpleOperators.kt
-  FUN name:test1 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+  FUN #0 name:test1 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #1 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #2 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun test1 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: plus, [kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test1' type=kotlin.Int origin=null
-  FUN name:test2 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#2 b: kotlin.Int declared in <root>.test1' type=kotlin.Int origin=null
+  FUN #3 name:test2 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #4 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #5 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#3 public final fun test2 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: minus, [kotlin/Int.minus, kotlin/Int.minus, kotlin/Int.minus, kotlin/Int.minus, kotlin/Int.minus, kotlin/Int.minus]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test2' type=kotlin.Int origin=null
-  FUN name:test3 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#5 b: kotlin.Int declared in <root>.test2' type=kotlin.Int origin=null
+  FUN #6 name:test3 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #7 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #8 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#6 public final fun test3 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: times, [kotlin/Int.times, kotlin/Int.times, kotlin/Int.times, kotlin/Int.times, kotlin/Int.times, kotlin/Int.times]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test3' type=kotlin.Int origin=null
-  FUN name:test4 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#8 b: kotlin.Int declared in <root>.test3' type=kotlin.Int origin=null
+  FUN #9 name:test4 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #10 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #11 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test4 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#9 public final fun test4 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: div, [kotlin/Int.div, kotlin/Int.div, kotlin/Int.div, kotlin/Int.div, kotlin/Int.div, kotlin/Int.div]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test4' type=kotlin.Int origin=null
-  FUN name:test5 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#11 b: kotlin.Int declared in <root>.test4' type=kotlin.Int origin=null
+  FUN #12 name:test5 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #13 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #14 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test5 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#12 public final fun test5 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: rem, [kotlin/Int.rem, kotlin/Int.rem, kotlin/Int.rem, kotlin/Int.rem, kotlin/Int.rem, kotlin/Int.rem]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test5' type=kotlin.Int origin=null
-  FUN name:test6 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#14 b: kotlin.Int declared in <root>.test5' type=kotlin.Int origin=null
+  FUN #15 name:test6 visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #16 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #17 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test6 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#15 public final fun test6 (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: rangeTo, [kotlin/Int.rangeTo, kotlin/Int.rangeTo, kotlin/Int.rangeTo, kotlin/Int.rangeTo]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test6' type=kotlin.Int origin=null
-  FUN name:test1x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#17 b: kotlin.Int declared in <root>.test6' type=kotlin.Int origin=null
+  FUN #18 name:test1x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #19 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #20 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#18 public final fun test1x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: plus, [kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test1x' type=kotlin.Int origin=null
-  FUN name:test2x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#20 b: kotlin.Int declared in <root>.test1x' type=kotlin.Int origin=null
+  FUN #21 name:test2x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #22 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #23 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#21 public final fun test2x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: minus, [kotlin/Int.minus, kotlin/Int.minus, kotlin/Int.minus, kotlin/Int.minus, kotlin/Int.minus, kotlin/Int.minus]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test2x' type=kotlin.Int origin=null
-  FUN name:test3x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#23 b: kotlin.Int declared in <root>.test2x' type=kotlin.Int origin=null
+  FUN #24 name:test3x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #25 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #26 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#24 public final fun test3x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: times, [kotlin/Int.times, kotlin/Int.times, kotlin/Int.times, kotlin/Int.times, kotlin/Int.times, kotlin/Int.times]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test3x' type=kotlin.Int origin=null
-  FUN name:test4x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#26 b: kotlin.Int declared in <root>.test3x' type=kotlin.Int origin=null
+  FUN #27 name:test4x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #28 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #29 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test4x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#27 public final fun test4x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: div, [kotlin/Int.div, kotlin/Int.div, kotlin/Int.div, kotlin/Int.div, kotlin/Int.div, kotlin/Int.div]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test4x' type=kotlin.Int origin=null
-  FUN name:test5x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Int
-    VALUE_PARAMETER name:b index:1 type:kotlin.Int
+          GET_VAR '#29 b: kotlin.Int declared in <root>.test4x' type=kotlin.Int origin=null
+  FUN #30 name:test5x visibility:public modality:FINAL <> (a:kotlin.Int, b:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #31 name:a index:0 type:kotlin.Int 
+    VALUE_PARAMETER #32 name:b index:1 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test5x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#30 public final fun test5x (a: kotlin.Int, b: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: rem, [kotlin/Int.rem, kotlin/Int.rem, kotlin/Int.rem, kotlin/Int.rem, kotlin/Int.rem, kotlin/Int.rem]>#' type=IrErrorType
-          GET_VAR 'b: kotlin.Int declared in <root>.test5x' type=kotlin.Int origin=null
+          GET_VAR '#32 b: kotlin.Int declared in <root>.test5x' type=kotlin.Int origin=null

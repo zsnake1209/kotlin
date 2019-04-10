@@ -1,53 +1,53 @@
 FILE fqName:<root> fileName:/localDifferentReceivers.kt
-  CLASS CLASS name:MyClass modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.MyClass
-    CONSTRUCTOR visibility:public <> (value:kotlin.String) returnType:<root>.MyClass [primary]
-      VALUE_PARAMETER name:value index:0 type:kotlin.String
+  CLASS #0 CLASS name:MyClass modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.MyClass 
+    CONSTRUCTOR #2 visibility:public <> (value:kotlin.String) returnType:<root>.MyClass [primary] 
+      VALUE_PARAMETER #3 name:value index:0 type:kotlin.String 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:MyClass modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    PROPERTY name:value visibility:public modality:FINAL [val]
-      FIELD PROPERTY_BACKING_FIELD name:value type:kotlin.String visibility:public [final]
+        DELEGATING_CONSTRUCTOR_CALL '#4 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class CLASS MyClass declared in <root>'
+    PROPERTY #5 name:value visibility:public modality:FINAL [val] 
+      FIELD #6 PROPERTY_BACKING_FIELD name:value type:kotlin.String visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'value: kotlin.String declared in <root>.MyClass.<init>' type=kotlin.String origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-value> visibility:public modality:FINAL <> ($this:<root>.MyClass) returnType:kotlin.String
-        correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.MyClass
+          GET_VAR '#3 value: kotlin.String declared in <root>.MyClass.<init>' type=kotlin.String origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #7 DEFAULT_PROPERTY_ACCESSOR name:<get-value> visibility:public modality:FINAL <> ($this:<root>.MyClass) returnType:kotlin.String 
+        correspondingProperty: PROPERTY #5 name:value visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #8 name:<this> type:<root>.MyClass 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-value> (): kotlin.String declared in <root>.MyClass'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.MyClass declared in <root>.MyClass.<get-value>' type=<root>.MyClass origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+          RETURN type=kotlin.Nothing from='#7 public final fun <get-value> (): kotlin.String declared in <root>.MyClass'
+            GET_FIELD '#6 FIELD #6 PROPERTY_BACKING_FIELD name:value type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
+              receiver: GET_VAR '#8 <this>: <root>.MyClass declared in <root>.MyClass.<get-value>' type=<root>.MyClass origin=null
+    FUN #9 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #10 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #11 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #12 name:other index:0 type:kotlin.Any? 
+    FUN #13 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #14 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #15 name:<this> type:kotlin.Any 
+    FUN #16 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  FUN name:provideDelegate visibility:public modality:FINAL <> (host:kotlin.Any?, p:kotlin.Any) returnType:kotlin.String
-    VALUE_PARAMETER name:host index:0 type:kotlin.Any?
-    VALUE_PARAMETER name:p index:1 type:kotlin.Any
+        #17 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #18 name:<this> type:kotlin.Any 
+  FUN #19 name:provideDelegate visibility:public modality:FINAL <> (host:kotlin.Any?, p:kotlin.Any) returnType:kotlin.String 
+    VALUE_PARAMETER #20 name:host index:0 type:kotlin.Any? 
+    VALUE_PARAMETER #21 name:p index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun provideDelegate (host: kotlin.Any?, p: kotlin.Any): kotlin.String declared in <root>'
-        CALL 'public final fun <get-value> (): kotlin.String declared in <root>.MyClass' type=kotlin.String origin=null
-  FUN name:getValue visibility:public modality:FINAL <> (receiver:kotlin.Any?, p:kotlin.Any) returnType:kotlin.String
-    VALUE_PARAMETER name:receiver index:0 type:kotlin.Any?
-    VALUE_PARAMETER name:p index:1 type:kotlin.Any
+      RETURN type=kotlin.Nothing from='#19 public final fun provideDelegate (host: kotlin.Any?, p: kotlin.Any): kotlin.String declared in <root>'
+        CALL '#7 public final fun <get-value> (): kotlin.String declared in <root>.MyClass' type=kotlin.String origin=null
+  FUN #22 name:getValue visibility:public modality:FINAL <> (receiver:kotlin.Any?, p:kotlin.Any) returnType:kotlin.String 
+    VALUE_PARAMETER #23 name:receiver index:0 type:kotlin.Any? 
+    VALUE_PARAMETER #24 name:p index:1 type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun getValue (receiver: kotlin.Any?, p: kotlin.Any): kotlin.String declared in <root>'
+      RETURN type=kotlin.Nothing from='#22 public final fun getValue (receiver: kotlin.Any?, p: kotlin.Any): kotlin.String declared in <root>'
         ERROR_CALL 'Unresolved reference: this#' type=kotlin.String
-  FUN name:box visibility:public modality:FINAL <> () returnType:kotlin.String
+  FUN #25 name:box visibility:public modality:FINAL <> () returnType:kotlin.String 
     BLOCK_BODY
-      VAR name:testO type:IrErrorType [val]
-      VAR name:testK type:IrErrorType [val]
-      VAR name:testOK type:IrErrorType [val]
+      VAR #26 name:testO type:IrErrorType [val] 
+      VAR #27 name:testK type:IrErrorType [val] 
+      VAR #28 name:testOK type:IrErrorType [val] 
         ERROR_CALL 'Unresolved reference: <Ambiguity: plus, [kotlin/plus, kotlin/plus, kotlin/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/collections/plus, kotlin/sequences/plus, kotlin/sequences/plus, kotlin/sequences/plus, kotlin/sequences/plus, kotlin/text/plus]>#' type=IrErrorType
-          GET_VAR 'val testK: IrErrorType [val] declared in <root>.box' type=IrErrorType origin=null
-      RETURN type=kotlin.Nothing from='public final fun box (): kotlin.String declared in <root>'
-        GET_VAR 'val testOK: IrErrorType [val] declared in <root>.box' type=IrErrorType origin=null
+          GET_VAR '#27 val testK: IrErrorType [val] declared in <root>.box' type=IrErrorType origin=null
+      RETURN type=kotlin.Nothing from='#25 public final fun box (): kotlin.String declared in <root>'
+        GET_VAR '#28 val testOK: IrErrorType [val] declared in <root>.box' type=IrErrorType origin=null

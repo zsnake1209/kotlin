@@ -1,83 +1,83 @@
 FILE fqName:<root> fileName:/dynamicMemberIncrementDecrement.kt
-  FUN name:testMemberIncrementDecrement visibility:public modality:FINAL <> (d:dynamic) returnType:kotlin.Unit 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #0 name:testMemberIncrementDecrement visibility:public modality:FINAL <> (d:dynamic) returnType:kotlin.Unit 
+    VALUE_PARAMETER #1 name:d index:0 type:dynamic 
     BLOCK_BODY
-      VAR name:t1 type:dynamic [val] 
+      VAR #2 name:t1 type:dynamic [val] 
         DYN_OP operator=PREFIX_INCREMENT type=dynamic
           receiver: DYN_MEMBER memberName='prefixIncr' type=dynamic
-            GET_VAR 'd: dynamic declared in <root>.testMemberIncrementDecrement' type=dynamic origin=null
-      VAR name:t2 type:dynamic [val] 
+            GET_VAR '#1 d: dynamic declared in <root>.testMemberIncrementDecrement' type=dynamic origin=null
+      VAR #3 name:t2 type:dynamic [val] 
         DYN_OP operator=PREFIX_DECREMENT type=dynamic
           receiver: DYN_MEMBER memberName='prefixDecr' type=dynamic
-            GET_VAR 'd: dynamic declared in <root>.testMemberIncrementDecrement' type=dynamic origin=null
-      VAR name:t3 type:dynamic [val] 
+            GET_VAR '#1 d: dynamic declared in <root>.testMemberIncrementDecrement' type=dynamic origin=null
+      VAR #4 name:t3 type:dynamic [val] 
         DYN_OP operator=POSTFIX_INCREMENT type=dynamic
           receiver: DYN_MEMBER memberName='postfixIncr' type=dynamic
-            GET_VAR 'd: dynamic declared in <root>.testMemberIncrementDecrement' type=dynamic origin=null
-      VAR name:t4 type:dynamic [val] 
+            GET_VAR '#1 d: dynamic declared in <root>.testMemberIncrementDecrement' type=dynamic origin=null
+      VAR #5 name:t4 type:dynamic [val] 
         DYN_OP operator=POSTFIX_DECREMENT type=dynamic
           receiver: DYN_MEMBER memberName='postfixDecr' type=dynamic
-            GET_VAR 'd: dynamic declared in <root>.testMemberIncrementDecrement' type=dynamic origin=null
-  FUN name:testSafeMemberIncrementDecrement visibility:public modality:FINAL <> (d:dynamic) returnType:kotlin.Unit 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+            GET_VAR '#1 d: dynamic declared in <root>.testMemberIncrementDecrement' type=dynamic origin=null
+  FUN #6 name:testSafeMemberIncrementDecrement visibility:public modality:FINAL <> (d:dynamic) returnType:kotlin.Unit 
+    VALUE_PARAMETER #7 name:d index:0 type:dynamic 
     BLOCK_BODY
-      VAR name:t1 type:dynamic [val] 
+      VAR #8 name:t1 type:dynamic [val] 
         BLOCK type=dynamic origin=SAFE_CALL
-          VAR IR_TEMPORARY_VARIABLE name:tmp0_safe_receiver type:dynamic [val] 
-            GET_VAR 'd: dynamic declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+          VAR #9 IR_TEMPORARY_VARIABLE name:tmp0_safe_receiver type:dynamic [val] 
+            GET_VAR '#7 d: dynamic declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
           WHEN type=dynamic origin=null
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp0_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+              if: CALL '#10 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#9 val tmp0_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
                 arg1: CONST Null type=kotlin.Nothing? value=null
               then: CONST Null type=kotlin.Nothing? value=null
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: DYN_OP operator=PREFIX_INCREMENT type=dynamic
                 receiver: DYN_MEMBER memberName='prefixIncr' type=dynamic
-                  GET_VAR 'val tmp0_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
-      VAR name:t2 type:dynamic [val] 
+                  GET_VAR '#9 val tmp0_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+      VAR #11 name:t2 type:dynamic [val] 
         BLOCK type=dynamic origin=SAFE_CALL
-          VAR IR_TEMPORARY_VARIABLE name:tmp1_safe_receiver type:dynamic [val] 
-            GET_VAR 'd: dynamic declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+          VAR #12 IR_TEMPORARY_VARIABLE name:tmp1_safe_receiver type:dynamic [val] 
+            GET_VAR '#7 d: dynamic declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
           WHEN type=dynamic origin=null
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp1_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+              if: CALL '#10 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#12 val tmp1_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
                 arg1: CONST Null type=kotlin.Nothing? value=null
               then: CONST Null type=kotlin.Nothing? value=null
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: DYN_OP operator=PREFIX_DECREMENT type=dynamic
                 receiver: DYN_MEMBER memberName='prefixDecr' type=dynamic
-                  GET_VAR 'val tmp1_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
-      VAR name:t3 type:dynamic [val] 
+                  GET_VAR '#12 val tmp1_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+      VAR #13 name:t3 type:dynamic [val] 
         BLOCK type=dynamic origin=SAFE_CALL
-          VAR IR_TEMPORARY_VARIABLE name:tmp2_safe_receiver type:dynamic [val] 
-            GET_VAR 'd: dynamic declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+          VAR #14 IR_TEMPORARY_VARIABLE name:tmp2_safe_receiver type:dynamic [val] 
+            GET_VAR '#7 d: dynamic declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
           WHEN type=dynamic origin=null
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp2_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+              if: CALL '#10 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#14 val tmp2_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
                 arg1: CONST Null type=kotlin.Nothing? value=null
               then: CONST Null type=kotlin.Nothing? value=null
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: DYN_OP operator=POSTFIX_INCREMENT type=dynamic
                 receiver: DYN_MEMBER memberName='postfixIncr' type=dynamic
-                  GET_VAR 'val tmp2_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
-      VAR name:t4 type:dynamic [val] 
+                  GET_VAR '#14 val tmp2_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+      VAR #15 name:t4 type:dynamic [val] 
         BLOCK type=dynamic origin=SAFE_CALL
-          VAR IR_TEMPORARY_VARIABLE name:tmp3_safe_receiver type:dynamic [val] 
-            GET_VAR 'd: dynamic declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+          VAR #16 IR_TEMPORARY_VARIABLE name:tmp3_safe_receiver type:dynamic [val] 
+            GET_VAR '#7 d: dynamic declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
           WHEN type=dynamic origin=null
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp3_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+              if: CALL '#10 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#16 val tmp3_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
                 arg1: CONST Null type=kotlin.Nothing? value=null
               then: CONST Null type=kotlin.Nothing? value=null
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: DYN_OP operator=POSTFIX_DECREMENT type=dynamic
                 receiver: DYN_MEMBER memberName='postfixDecr' type=dynamic
-                  GET_VAR 'val tmp3_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null
+                  GET_VAR '#16 val tmp3_safe_receiver: dynamic [val] declared in <root>.testSafeMemberIncrementDecrement' type=dynamic origin=null

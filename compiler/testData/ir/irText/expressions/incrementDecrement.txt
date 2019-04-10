@@ -1,167 +1,167 @@
 FILE fqName:<root> fileName:/incrementDecrement.kt
-  PROPERTY name:p visibility:public modality:FINAL [var] 
-    FIELD PROPERTY_BACKING_FIELD name:p type:kotlin.Int visibility:public [static] 
+  PROPERTY #0 name:p visibility:public modality:FINAL [var] 
+    FIELD #1 PROPERTY_BACKING_FIELD name:p type:kotlin.Int visibility:public [static] 
       EXPRESSION_BODY
         CONST Int type=kotlin.Int value=0
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-p> visibility:public modality:FINAL <> () returnType:kotlin.Int 
-      correspondingProperty: PROPERTY name:p visibility:public modality:FINAL [var] 
+    FUN #2 DEFAULT_PROPERTY_ACCESSOR name:<get-p> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #0 name:p visibility:public modality:FINAL [var] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-p> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:p type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<set-p> visibility:public modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit 
-      correspondingProperty: PROPERTY name:p visibility:public modality:FINAL [var] 
-      VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int 
+        RETURN type=kotlin.Nothing from='#2 public final fun <get-p> (): kotlin.Int declared in <root>'
+          GET_FIELD '#1 FIELD #1 PROPERTY_BACKING_FIELD name:p type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
+    FUN #3 DEFAULT_PROPERTY_ACCESSOR name:<set-p> visibility:public modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit 
+      correspondingProperty: PROPERTY #0 name:p visibility:public modality:FINAL [var] 
+      VALUE_PARAMETER #4 name:<set-?> index:0 type:kotlin.Int 
       BLOCK_BODY
-        SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:p type:kotlin.Int visibility:public [static] ' type=kotlin.Unit origin=null
-          value: GET_VAR '<set-?>: kotlin.Int declared in <root>.<set-p>' type=kotlin.Int origin=null
-  PROPERTY name:arr visibility:public modality:FINAL [val] 
-    FIELD PROPERTY_BACKING_FIELD name:arr type:kotlin.IntArray visibility:public [final,static] 
+        SET_FIELD '#1 FIELD #1 PROPERTY_BACKING_FIELD name:p type:kotlin.Int visibility:public [static] ' type=kotlin.Unit origin=null
+          value: GET_VAR '#4 <set-?>: kotlin.Int declared in <root>.<set-p>' type=kotlin.Int origin=null
+  PROPERTY #5 name:arr visibility:public modality:FINAL [val] 
+    FIELD #6 PROPERTY_BACKING_FIELD name:arr type:kotlin.IntArray visibility:public [final,static] 
       EXPRESSION_BODY
-        CALL 'public final fun intArrayOf (vararg elements: kotlin.Int): kotlin.IntArray declared in kotlin' type=kotlin.IntArray origin=null
+        CALL '#7 public final fun intArrayOf (vararg elements: kotlin.Int): kotlin.IntArray declared in kotlin' type=kotlin.IntArray origin=null
           elements: VARARG type=kotlin.IntArray varargElementType=kotlin.Int
             CONST Int type=kotlin.Int value=1
             CONST Int type=kotlin.Int value=2
             CONST Int type=kotlin.Int value=3
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-arr> visibility:public modality:FINAL <> () returnType:kotlin.IntArray 
-      correspondingProperty: PROPERTY name:arr visibility:public modality:FINAL [val] 
+    FUN #8 DEFAULT_PROPERTY_ACCESSOR name:<get-arr> visibility:public modality:FINAL <> () returnType:kotlin.IntArray 
+      correspondingProperty: PROPERTY #5 name:arr visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-arr> (): kotlin.IntArray declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:arr type:kotlin.IntArray visibility:public [final,static] ' type=kotlin.IntArray origin=null
-  FUN name:testVarPrefix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+        RETURN type=kotlin.Nothing from='#8 public final fun <get-arr> (): kotlin.IntArray declared in <root>'
+          GET_FIELD '#6 FIELD #6 PROPERTY_BACKING_FIELD name:arr type:kotlin.IntArray visibility:public [final,static] ' type=kotlin.IntArray origin=null
+  FUN #9 name:testVarPrefix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:x type:kotlin.Int [var] 
+      VAR #10 name:x type:kotlin.Int [var] 
         CONST Int type=kotlin.Int value=0
-      VAR name:x1 type:kotlin.Int [val] 
+      VAR #11 name:x1 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=PREFIX_INCR
-          SET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Unit origin=PREFIX_INCR
-            CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_INCR
-              $this: GET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Int origin=PREFIX_INCR
-          GET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Int origin=PREFIX_INCR
-      VAR name:x2 type:kotlin.Int [val] 
+          SET_VAR '#10 var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Unit origin=PREFIX_INCR
+            CALL '#12 public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_INCR
+              $this: GET_VAR '#10 var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Int origin=PREFIX_INCR
+          GET_VAR '#10 var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Int origin=PREFIX_INCR
+      VAR #13 name:x2 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=PREFIX_DECR
-          SET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Unit origin=PREFIX_DECR
-            CALL 'public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_DECR
-              $this: GET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Int origin=PREFIX_DECR
-          GET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Int origin=PREFIX_DECR
-  FUN name:testVarPostfix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+          SET_VAR '#10 var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Unit origin=PREFIX_DECR
+            CALL '#14 public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_DECR
+              $this: GET_VAR '#10 var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Int origin=PREFIX_DECR
+          GET_VAR '#10 var x: kotlin.Int [var] declared in <root>.testVarPrefix' type=kotlin.Int origin=PREFIX_DECR
+  FUN #15 name:testVarPostfix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:x type:kotlin.Int [var] 
+      VAR #16 name:x type:kotlin.Int [var] 
         CONST Int type=kotlin.Int value=0
-      VAR name:x1 type:kotlin.Int [val] 
+      VAR #17 name:x1 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=POSTFIX_INCR
-          VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Int [val] 
-            GET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPostfix' type=kotlin.Int origin=POSTFIX_INCR
-          SET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPostfix' type=kotlin.Unit origin=POSTFIX_INCR
-            CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
-              $this: GET_VAR 'val tmp0: kotlin.Int [val] declared in <root>.testVarPostfix' type=kotlin.Int origin=null
-          GET_VAR 'val tmp0: kotlin.Int [val] declared in <root>.testVarPostfix' type=kotlin.Int origin=null
-      VAR name:x2 type:kotlin.Int [val] 
+          VAR #18 IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Int [val] 
+            GET_VAR '#16 var x: kotlin.Int [var] declared in <root>.testVarPostfix' type=kotlin.Int origin=POSTFIX_INCR
+          SET_VAR '#16 var x: kotlin.Int [var] declared in <root>.testVarPostfix' type=kotlin.Unit origin=POSTFIX_INCR
+            CALL '#12 public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
+              $this: GET_VAR '#18 val tmp0: kotlin.Int [val] declared in <root>.testVarPostfix' type=kotlin.Int origin=null
+          GET_VAR '#18 val tmp0: kotlin.Int [val] declared in <root>.testVarPostfix' type=kotlin.Int origin=null
+      VAR #19 name:x2 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=POSTFIX_DECR
-          VAR IR_TEMPORARY_VARIABLE name:tmp1 type:kotlin.Int [val] 
-            GET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPostfix' type=kotlin.Int origin=POSTFIX_DECR
-          SET_VAR 'var x: kotlin.Int [var] declared in <root>.testVarPostfix' type=kotlin.Unit origin=POSTFIX_DECR
-            CALL 'public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_DECR
-              $this: GET_VAR 'val tmp1: kotlin.Int [val] declared in <root>.testVarPostfix' type=kotlin.Int origin=null
-          GET_VAR 'val tmp1: kotlin.Int [val] declared in <root>.testVarPostfix' type=kotlin.Int origin=null
-  FUN name:testPropPrefix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+          VAR #20 IR_TEMPORARY_VARIABLE name:tmp1 type:kotlin.Int [val] 
+            GET_VAR '#16 var x: kotlin.Int [var] declared in <root>.testVarPostfix' type=kotlin.Int origin=POSTFIX_DECR
+          SET_VAR '#16 var x: kotlin.Int [var] declared in <root>.testVarPostfix' type=kotlin.Unit origin=POSTFIX_DECR
+            CALL '#14 public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_DECR
+              $this: GET_VAR '#20 val tmp1: kotlin.Int [val] declared in <root>.testVarPostfix' type=kotlin.Int origin=null
+          GET_VAR '#20 val tmp1: kotlin.Int [val] declared in <root>.testVarPostfix' type=kotlin.Int origin=null
+  FUN #21 name:testPropPrefix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:p1 type:kotlin.Int [val] 
+      VAR #22 name:p1 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=PREFIX_INCR
           BLOCK type=kotlin.Int origin=PREFIX_INCR
-            CALL 'public final fun <set-p> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=PREFIX_INCR
-              <set-?>: CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_INCR
-                $this: CALL 'public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_INCR
-            CALL 'public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_INCR
-      VAR name:p2 type:kotlin.Int [val] 
+            CALL '#3 public final fun <set-p> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=PREFIX_INCR
+              <set-?>: CALL '#12 public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_INCR
+                $this: CALL '#2 public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_INCR
+            CALL '#2 public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_INCR
+      VAR #23 name:p2 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=PREFIX_DECR
           BLOCK type=kotlin.Int origin=PREFIX_DECR
-            CALL 'public final fun <set-p> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=PREFIX_DECR
-              <set-?>: CALL 'public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_DECR
-                $this: CALL 'public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_DECR
-            CALL 'public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_DECR
-  FUN name:testPropPostfix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+            CALL '#3 public final fun <set-p> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=PREFIX_DECR
+              <set-?>: CALL '#14 public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_DECR
+                $this: CALL '#2 public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_DECR
+            CALL '#2 public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_DECR
+  FUN #24 name:testPropPostfix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:p1 type:kotlin.Int [val] 
+      VAR #25 name:p1 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=POSTFIX_INCR
           BLOCK type=kotlin.Int origin=POSTFIX_INCR
-            VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Int [val] 
-              CALL 'public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=POSTFIX_INCR
-            CALL 'public final fun <set-p> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=POSTFIX_INCR
-              <set-?>: CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
-                $this: GET_VAR 'val tmp0: kotlin.Int [val] declared in <root>.testPropPostfix' type=kotlin.Int origin=null
-            GET_VAR 'val tmp0: kotlin.Int [val] declared in <root>.testPropPostfix' type=kotlin.Int origin=null
-      VAR name:p2 type:kotlin.Int [val] 
+            VAR #26 IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Int [val] 
+              CALL '#2 public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=POSTFIX_INCR
+            CALL '#3 public final fun <set-p> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=POSTFIX_INCR
+              <set-?>: CALL '#12 public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
+                $this: GET_VAR '#26 val tmp0: kotlin.Int [val] declared in <root>.testPropPostfix' type=kotlin.Int origin=null
+            GET_VAR '#26 val tmp0: kotlin.Int [val] declared in <root>.testPropPostfix' type=kotlin.Int origin=null
+      VAR #27 name:p2 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=PREFIX_DECR
           BLOCK type=kotlin.Int origin=PREFIX_DECR
-            CALL 'public final fun <set-p> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=PREFIX_DECR
-              <set-?>: CALL 'public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_DECR
-                $this: CALL 'public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_DECR
-            CALL 'public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_DECR
-  FUN name:testArrayPrefix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+            CALL '#3 public final fun <set-p> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=PREFIX_DECR
+              <set-?>: CALL '#14 public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_DECR
+                $this: CALL '#2 public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_DECR
+            CALL '#2 public final fun <get-p> (): kotlin.Int declared in <root>' type=kotlin.Int origin=PREFIX_DECR
+  FUN #28 name:testArrayPrefix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:a1 type:kotlin.Int [val] 
+      VAR #29 name:a1 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=PREFIX_INCR
-          VAR IR_TEMPORARY_VARIABLE name:tmp0_array type:kotlin.IntArray [val] 
-            CALL 'public final fun <get-arr> (): kotlin.IntArray declared in <root>' type=kotlin.IntArray origin=GET_PROPERTY
-          VAR IR_TEMPORARY_VARIABLE name:tmp1_index0 type:kotlin.Int [val] 
+          VAR #30 IR_TEMPORARY_VARIABLE name:tmp0_array type:kotlin.IntArray [val] 
+            CALL '#8 public final fun <get-arr> (): kotlin.IntArray declared in <root>' type=kotlin.IntArray origin=GET_PROPERTY
+          VAR #31 IR_TEMPORARY_VARIABLE name:tmp1_index0 type:kotlin.Int [val] 
             CONST Int type=kotlin.Int value=0
-          CALL 'public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=PREFIX_INCR
-            $this: GET_VAR 'val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
-            index: GET_VAR 'val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
-            value: CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_INCR
-              $this: CALL 'public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=PREFIX_INCR
-                $this: GET_VAR 'val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
-                index: GET_VAR 'val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
-          CALL 'public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=PREFIX_INCR
-            $this: GET_VAR 'val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
-            index: GET_VAR 'val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
-      VAR name:a2 type:kotlin.Int [val] 
+          CALL '#32 public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=PREFIX_INCR
+            $this: GET_VAR '#30 val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
+            index: GET_VAR '#31 val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
+            value: CALL '#12 public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_INCR
+              $this: CALL '#33 public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=PREFIX_INCR
+                $this: GET_VAR '#30 val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
+                index: GET_VAR '#31 val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
+          CALL '#33 public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=PREFIX_INCR
+            $this: GET_VAR '#30 val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
+            index: GET_VAR '#31 val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
+      VAR #34 name:a2 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=PREFIX_DECR
-          VAR IR_TEMPORARY_VARIABLE name:tmp2_array type:kotlin.IntArray [val] 
-            CALL 'public final fun <get-arr> (): kotlin.IntArray declared in <root>' type=kotlin.IntArray origin=GET_PROPERTY
-          VAR IR_TEMPORARY_VARIABLE name:tmp3_index0 type:kotlin.Int [val] 
+          VAR #35 IR_TEMPORARY_VARIABLE name:tmp2_array type:kotlin.IntArray [val] 
+            CALL '#8 public final fun <get-arr> (): kotlin.IntArray declared in <root>' type=kotlin.IntArray origin=GET_PROPERTY
+          VAR #36 IR_TEMPORARY_VARIABLE name:tmp3_index0 type:kotlin.Int [val] 
             CONST Int type=kotlin.Int value=0
-          CALL 'public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=PREFIX_DECR
-            $this: GET_VAR 'val tmp2_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
-            index: GET_VAR 'val tmp3_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
-            value: CALL 'public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_DECR
-              $this: CALL 'public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=PREFIX_DECR
-                $this: GET_VAR 'val tmp2_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
-                index: GET_VAR 'val tmp3_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
-          CALL 'public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=PREFIX_DECR
-            $this: GET_VAR 'val tmp2_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
-            index: GET_VAR 'val tmp3_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
-  FUN name:testArrayPostfix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+          CALL '#32 public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=PREFIX_DECR
+            $this: GET_VAR '#35 val tmp2_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
+            index: GET_VAR '#36 val tmp3_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
+            value: CALL '#14 public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PREFIX_DECR
+              $this: CALL '#33 public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=PREFIX_DECR
+                $this: GET_VAR '#35 val tmp2_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
+                index: GET_VAR '#36 val tmp3_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
+          CALL '#33 public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=PREFIX_DECR
+            $this: GET_VAR '#35 val tmp2_array: kotlin.IntArray [val] declared in <root>.testArrayPrefix' type=kotlin.IntArray origin=null
+            index: GET_VAR '#36 val tmp3_index0: kotlin.Int [val] declared in <root>.testArrayPrefix' type=kotlin.Int origin=null
+  FUN #37 name:testArrayPostfix visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:a1 type:kotlin.Int [val] 
+      VAR #38 name:a1 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=POSTFIX_INCR
-          VAR IR_TEMPORARY_VARIABLE name:tmp0_array type:kotlin.IntArray [val] 
-            CALL 'public final fun <get-arr> (): kotlin.IntArray declared in <root>' type=kotlin.IntArray origin=GET_PROPERTY
-          VAR IR_TEMPORARY_VARIABLE name:tmp1_index0 type:kotlin.Int [val] 
+          VAR #39 IR_TEMPORARY_VARIABLE name:tmp0_array type:kotlin.IntArray [val] 
+            CALL '#8 public final fun <get-arr> (): kotlin.IntArray declared in <root>' type=kotlin.IntArray origin=GET_PROPERTY
+          VAR #40 IR_TEMPORARY_VARIABLE name:tmp1_index0 type:kotlin.Int [val] 
             CONST Int type=kotlin.Int value=0
-          VAR IR_TEMPORARY_VARIABLE name:tmp2 type:kotlin.Int [val] 
-            CALL 'public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=POSTFIX_INCR
-              $this: GET_VAR 'val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPostfix' type=kotlin.IntArray origin=null
-              index: GET_VAR 'val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
-          CALL 'public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=POSTFIX_INCR
-            $this: GET_VAR 'val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPostfix' type=kotlin.IntArray origin=null
-            index: GET_VAR 'val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
-            value: CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
-              $this: GET_VAR 'val tmp2: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
-          GET_VAR 'val tmp2: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
-      VAR name:a2 type:kotlin.Int [val] 
+          VAR #41 IR_TEMPORARY_VARIABLE name:tmp2 type:kotlin.Int [val] 
+            CALL '#33 public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=POSTFIX_INCR
+              $this: GET_VAR '#39 val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPostfix' type=kotlin.IntArray origin=null
+              index: GET_VAR '#40 val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
+          CALL '#32 public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=POSTFIX_INCR
+            $this: GET_VAR '#39 val tmp0_array: kotlin.IntArray [val] declared in <root>.testArrayPostfix' type=kotlin.IntArray origin=null
+            index: GET_VAR '#40 val tmp1_index0: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
+            value: CALL '#12 public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
+              $this: GET_VAR '#41 val tmp2: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
+          GET_VAR '#41 val tmp2: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
+      VAR #42 name:a2 type:kotlin.Int [val] 
         BLOCK type=kotlin.Int origin=POSTFIX_DECR
-          VAR IR_TEMPORARY_VARIABLE name:tmp3_array type:kotlin.IntArray [val] 
-            CALL 'public final fun <get-arr> (): kotlin.IntArray declared in <root>' type=kotlin.IntArray origin=GET_PROPERTY
-          VAR IR_TEMPORARY_VARIABLE name:tmp4_index0 type:kotlin.Int [val] 
+          VAR #43 IR_TEMPORARY_VARIABLE name:tmp3_array type:kotlin.IntArray [val] 
+            CALL '#8 public final fun <get-arr> (): kotlin.IntArray declared in <root>' type=kotlin.IntArray origin=GET_PROPERTY
+          VAR #44 IR_TEMPORARY_VARIABLE name:tmp4_index0 type:kotlin.Int [val] 
             CONST Int type=kotlin.Int value=0
-          VAR IR_TEMPORARY_VARIABLE name:tmp5 type:kotlin.Int [val] 
-            CALL 'public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=POSTFIX_DECR
-              $this: GET_VAR 'val tmp3_array: kotlin.IntArray [val] declared in <root>.testArrayPostfix' type=kotlin.IntArray origin=null
-              index: GET_VAR 'val tmp4_index0: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
-          CALL 'public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=POSTFIX_DECR
-            $this: GET_VAR 'val tmp3_array: kotlin.IntArray [val] declared in <root>.testArrayPostfix' type=kotlin.IntArray origin=null
-            index: GET_VAR 'val tmp4_index0: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
-            value: CALL 'public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_DECR
-              $this: GET_VAR 'val tmp5: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
-          GET_VAR 'val tmp5: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
+          VAR #45 IR_TEMPORARY_VARIABLE name:tmp5 type:kotlin.Int [val] 
+            CALL '#33 public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=POSTFIX_DECR
+              $this: GET_VAR '#43 val tmp3_array: kotlin.IntArray [val] declared in <root>.testArrayPostfix' type=kotlin.IntArray origin=null
+              index: GET_VAR '#44 val tmp4_index0: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
+          CALL '#32 public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=POSTFIX_DECR
+            $this: GET_VAR '#43 val tmp3_array: kotlin.IntArray [val] declared in <root>.testArrayPostfix' type=kotlin.IntArray origin=null
+            index: GET_VAR '#44 val tmp4_index0: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
+            value: CALL '#14 public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_DECR
+              $this: GET_VAR '#45 val tmp5: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null
+          GET_VAR '#45 val tmp5: kotlin.Int [val] declared in <root>.testArrayPostfix' type=kotlin.Int origin=null

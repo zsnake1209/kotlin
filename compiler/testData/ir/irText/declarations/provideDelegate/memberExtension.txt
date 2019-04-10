@@ -1,102 +1,102 @@
 FILE fqName:<root> fileName:/memberExtension.kt
-  CLASS OBJECT name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Host 
-    CONSTRUCTOR visibility:private <> () returnType:<root>.Host [primary] 
+  CLASS #0 OBJECT name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.Host 
+    CONSTRUCTOR #2 visibility:private <> () returnType:<root>.Host [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    CLASS CLASS name:StringDelegate modality:FINAL visibility:public superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Host.StringDelegate 
-      CONSTRUCTOR visibility:public <> (s:kotlin.String) returnType:<root>.Host.StringDelegate [primary] 
-        VALUE_PARAMETER name:s index:0 type:kotlin.String 
+        DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class OBJECT Host declared in <root>'
+    CLASS #4 CLASS name:StringDelegate modality:FINAL visibility:public superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #5 INSTANCE_RECEIVER name:<this> type:<root>.Host.StringDelegate 
+      CONSTRUCTOR #6 visibility:public <> (s:kotlin.String) returnType:<root>.Host.StringDelegate [primary] 
+        VALUE_PARAMETER #7 name:s index:0 type:kotlin.String 
         BLOCK_BODY
-          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:StringDelegate modality:FINAL visibility:public superTypes:[kotlin.Any]'
-      PROPERTY name:s visibility:public modality:FINAL [val] 
-        FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.String visibility:public [final] 
+          DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL class='#4 class CLASS StringDelegate declared in <root>.Host'
+      PROPERTY #8 name:s visibility:public modality:FINAL [val] 
+        FIELD #9 PROPERTY_BACKING_FIELD name:s type:kotlin.String visibility:public [final] 
           EXPRESSION_BODY
-            GET_VAR 's: kotlin.String declared in <root>.Host.StringDelegate.<init>' type=kotlin.String origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-        FUN DEFAULT_PROPERTY_ACCESSOR name:<get-s> visibility:public modality:FINAL <> ($this:<root>.Host.StringDelegate) returnType:kotlin.String 
-          correspondingProperty: PROPERTY name:s visibility:public modality:FINAL [val] 
-          $this: VALUE_PARAMETER name:<this> type:<root>.Host.StringDelegate 
+            GET_VAR '#7 s: kotlin.String declared in <root>.Host.StringDelegate.<init>' type=kotlin.String origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+        FUN #10 DEFAULT_PROPERTY_ACCESSOR name:<get-s> visibility:public modality:FINAL <> ($this:<root>.Host.StringDelegate) returnType:kotlin.String 
+          correspondingProperty: PROPERTY #8 name:s visibility:public modality:FINAL [val] 
+          $this: VALUE_PARAMETER #11 name:<this> type:<root>.Host.StringDelegate 
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-s> (): kotlin.String declared in <root>.Host.StringDelegate'
-              GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
-                receiver: GET_VAR '<this>: <root>.Host.StringDelegate declared in <root>.Host.StringDelegate.<get-s>' type=<root>.Host.StringDelegate origin=null
-      FUN name:getValue visibility:public modality:FINAL <> ($this:<root>.Host.StringDelegate, receiver:kotlin.String, p:kotlin.Any) returnType:kotlin.String 
-        $this: VALUE_PARAMETER name:<this> type:<root>.Host.StringDelegate 
-        VALUE_PARAMETER name:receiver index:0 type:kotlin.String 
-        VALUE_PARAMETER name:p index:1 type:kotlin.Any 
+            RETURN type=kotlin.Nothing from='#10 public final fun <get-s> (): kotlin.String declared in <root>.Host.StringDelegate'
+              GET_FIELD '#9 FIELD #9 PROPERTY_BACKING_FIELD name:s type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
+                receiver: GET_VAR '#11 <this>: <root>.Host.StringDelegate declared in <root>.Host.StringDelegate.<get-s>' type=<root>.Host.StringDelegate origin=null
+      FUN #12 name:getValue visibility:public modality:FINAL <> ($this:<root>.Host.StringDelegate, receiver:kotlin.String, p:kotlin.Any) returnType:kotlin.String 
+        $this: VALUE_PARAMETER #13 name:<this> type:<root>.Host.StringDelegate 
+        VALUE_PARAMETER #14 name:receiver index:0 type:kotlin.String 
+        VALUE_PARAMETER #15 name:p index:1 type:kotlin.Any 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun getValue (receiver: kotlin.String, p: kotlin.Any): kotlin.String declared in <root>.Host.StringDelegate'
-            CALL 'public final fun plus (other: kotlin.Any?): kotlin.String declared in kotlin.String' type=kotlin.String origin=PLUS
-              $this: GET_VAR 'receiver: kotlin.String declared in <root>.Host.StringDelegate.getValue' type=kotlin.String origin=null
-              other: CALL 'public final fun <get-s> (): kotlin.String declared in <root>.Host.StringDelegate' type=kotlin.String origin=GET_PROPERTY
-                $this: GET_VAR '<this>: <root>.Host.StringDelegate declared in <root>.Host.StringDelegate.getValue' type=<root>.Host.StringDelegate origin=null
-      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+          RETURN type=kotlin.Nothing from='#12 public final fun getValue (receiver: kotlin.String, p: kotlin.Any): kotlin.String declared in <root>.Host.StringDelegate'
+            CALL '#16 public final fun plus (other: kotlin.Any?): kotlin.String declared in kotlin.String' type=kotlin.String origin=PLUS
+              $this: GET_VAR '#14 receiver: kotlin.String declared in <root>.Host.StringDelegate.getValue' type=kotlin.String origin=null
+              other: CALL '#10 public final fun <get-s> (): kotlin.String declared in <root>.Host.StringDelegate' type=kotlin.String origin=GET_PROPERTY
+                $this: GET_VAR '#13 <this>: <root>.Host.StringDelegate declared in <root>.Host.StringDelegate.getValue' type=<root>.Host.StringDelegate origin=null
+      FUN #17 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
         overridden:
-          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-        VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+          #18 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER #19 name:<this> type:kotlin.Any 
+        VALUE_PARAMETER #20 name:other index:0 type:kotlin.Any? 
+      FUN #21 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
         overridden:
-          public open fun hashCode (): kotlin.Int declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+          #22 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER #23 name:<this> type:kotlin.Any 
+      FUN #24 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
         overridden:
-          public open fun toString (): kotlin.String declared in kotlin.Any
-        $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN name:provideDelegate visibility:public modality:FINAL <> ($this:<root>.Host, $receiver:kotlin.String, host:kotlin.Any?, p:kotlin.Any) returnType:<root>.Host.StringDelegate 
-      $this: VALUE_PARAMETER name:<this> type:<root>.Host 
-      $receiver: VALUE_PARAMETER name:<this> type:kotlin.String 
-      VALUE_PARAMETER name:host index:0 type:kotlin.Any? 
-      VALUE_PARAMETER name:p index:1 type:kotlin.Any 
+          #25 public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER #26 name:<this> type:kotlin.Any 
+    FUN #27 name:provideDelegate visibility:public modality:FINAL <> ($this:<root>.Host, $receiver:kotlin.String, host:kotlin.Any?, p:kotlin.Any) returnType:<root>.Host.StringDelegate 
+      $this: VALUE_PARAMETER #28 name:<this> type:<root>.Host 
+      $receiver: VALUE_PARAMETER #29 name:<this> type:kotlin.String 
+      VALUE_PARAMETER #30 name:host index:0 type:kotlin.Any? 
+      VALUE_PARAMETER #31 name:p index:1 type:kotlin.Any 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun provideDelegate (host: kotlin.Any?, p: kotlin.Any): <root>.Host.StringDelegate declared in <root>.Host'
-          CALL 'public constructor <init> (s: kotlin.String) [primary] declared in <root>.Host.StringDelegate' type=<root>.Host.StringDelegate origin=null
-            s: GET_VAR '<this>: kotlin.String declared in <root>.Host.provideDelegate' type=kotlin.String origin=null
-    PROPERTY name:plusK visibility:public modality:FINAL [delegated,val] 
-      FIELD DELEGATE name:plusK$delegate type:<root>.Host.StringDelegate visibility:private [final] 
+        RETURN type=kotlin.Nothing from='#27 public final fun provideDelegate (host: kotlin.Any?, p: kotlin.Any): <root>.Host.StringDelegate declared in <root>.Host'
+          CALL '#6 public constructor <init> (s: kotlin.String) [primary] declared in <root>.Host.StringDelegate' type=<root>.Host.StringDelegate origin=null
+            s: GET_VAR '#29 <this>: kotlin.String declared in <root>.Host.provideDelegate' type=kotlin.String origin=null
+    PROPERTY #32 name:plusK visibility:public modality:FINAL [delegated,val] 
+      FIELD #33 DELEGATE name:plusK$delegate type:<root>.Host.StringDelegate visibility:private [final] 
         EXPRESSION_BODY
-          CALL 'public final fun provideDelegate (host: kotlin.Any?, p: kotlin.Any): <root>.Host.StringDelegate declared in <root>.Host' type=<root>.Host.StringDelegate origin=null
-            $this: GET_VAR '<this>: <root>.Host declared in <root>.Host' type=<root>.Host origin=null
+          CALL '#27 public final fun provideDelegate (host: kotlin.Any?, p: kotlin.Any): <root>.Host.StringDelegate declared in <root>.Host' type=<root>.Host.StringDelegate origin=null
+            $this: GET_VAR '#1 <this>: <root>.Host declared in <root>.Host' type=<root>.Host origin=null
             $receiver: CONST String type=kotlin.String value="K"
-            host: GET_VAR '<this>: <root>.Host declared in <root>.Host' type=<root>.Host origin=null
-            p: PROPERTY_REFERENCE 'public final plusK: kotlin.String [delegated,val] ' field=null getter='public final fun <get-plusK> (): kotlin.String declared in <root>.Host' setter=null type=kotlin.reflect.KProperty2<kotlin.String, <root>.Host, kotlin.String> origin=PROPERTY_REFERENCE_FOR_DELEGATE
-      FUN DELEGATED_PROPERTY_ACCESSOR name:<get-plusK> visibility:public modality:FINAL <> ($this:<root>.Host, $receiver:kotlin.String) returnType:kotlin.String 
-        correspondingProperty: PROPERTY name:plusK visibility:public modality:FINAL [delegated,val] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.Host 
-        $receiver: VALUE_PARAMETER name:<this> type:kotlin.String 
+            host: GET_VAR '#1 <this>: <root>.Host declared in <root>.Host' type=<root>.Host origin=null
+            p: PROPERTY_REFERENCE '#32 public final plusK: kotlin.String [delegated,val] ' field=null getter='#34 public final fun <get-plusK> (): kotlin.String declared in <root>.Host' setter=null type=kotlin.reflect.KProperty2<kotlin.String, <root>.Host, kotlin.String> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+      FUN #34 DELEGATED_PROPERTY_ACCESSOR name:<get-plusK> visibility:public modality:FINAL <> ($this:<root>.Host, $receiver:kotlin.String) returnType:kotlin.String 
+        correspondingProperty: PROPERTY #32 name:plusK visibility:public modality:FINAL [delegated,val] 
+        $this: VALUE_PARAMETER #35 name:<this> type:<root>.Host 
+        $receiver: VALUE_PARAMETER #36 name:<this> type:kotlin.String 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-plusK> (): kotlin.String declared in <root>.Host'
-            CALL 'public final fun getValue (receiver: kotlin.String, p: kotlin.Any): kotlin.String declared in <root>.Host.StringDelegate' type=kotlin.String origin=null
-              $this: GET_FIELD 'FIELD DELEGATE name:plusK$delegate type:<root>.Host.StringDelegate visibility:private [final] ' type=<root>.Host.StringDelegate origin=null
-                receiver: GET_VAR '<this>: <root>.Host declared in <root>.Host.<get-plusK>' type=<root>.Host origin=null
-              receiver: GET_VAR '<this>: kotlin.String declared in <root>.Host.<get-plusK>' type=kotlin.String origin=null
-              p: PROPERTY_REFERENCE 'public final plusK: kotlin.String [delegated,val] ' field=null getter='public final fun <get-plusK> (): kotlin.String declared in <root>.Host' setter=null type=kotlin.reflect.KProperty2<kotlin.String, <root>.Host, kotlin.String> origin=PROPERTY_REFERENCE_FOR_DELEGATE
-    PROPERTY name:ok visibility:public modality:FINAL [val] 
-      FIELD PROPERTY_BACKING_FIELD name:ok type:kotlin.String visibility:public [final] 
+          RETURN type=kotlin.Nothing from='#34 public final fun <get-plusK> (): kotlin.String declared in <root>.Host'
+            CALL '#12 public final fun getValue (receiver: kotlin.String, p: kotlin.Any): kotlin.String declared in <root>.Host.StringDelegate' type=kotlin.String origin=null
+              $this: GET_FIELD '#33 FIELD #33 DELEGATE name:plusK$delegate type:<root>.Host.StringDelegate visibility:private [final] ' type=<root>.Host.StringDelegate origin=null
+                receiver: GET_VAR '#35 <this>: <root>.Host declared in <root>.Host.<get-plusK>' type=<root>.Host origin=null
+              receiver: GET_VAR '#36 <this>: kotlin.String declared in <root>.Host.<get-plusK>' type=kotlin.String origin=null
+              p: PROPERTY_REFERENCE '#32 public final plusK: kotlin.String [delegated,val] ' field=null getter='#34 public final fun <get-plusK> (): kotlin.String declared in <root>.Host' setter=null type=kotlin.reflect.KProperty2<kotlin.String, <root>.Host, kotlin.String> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+    PROPERTY #37 name:ok visibility:public modality:FINAL [val] 
+      FIELD #38 PROPERTY_BACKING_FIELD name:ok type:kotlin.String visibility:public [final] 
         EXPRESSION_BODY
-          CALL 'public final fun <get-plusK> (): kotlin.String declared in <root>.Host' type=kotlin.String origin=GET_PROPERTY
-            $this: GET_VAR '<this>: <root>.Host declared in <root>.Host' type=<root>.Host origin=null
+          CALL '#34 public final fun <get-plusK> (): kotlin.String declared in <root>.Host' type=kotlin.String origin=GET_PROPERTY
+            $this: GET_VAR '#1 <this>: <root>.Host declared in <root>.Host' type=<root>.Host origin=null
             $receiver: CONST String type=kotlin.String value="O"
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ok> visibility:public modality:FINAL <> ($this:<root>.Host) returnType:kotlin.String 
-        correspondingProperty: PROPERTY name:ok visibility:public modality:FINAL [val] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.Host 
+      FUN #39 DEFAULT_PROPERTY_ACCESSOR name:<get-ok> visibility:public modality:FINAL <> ($this:<root>.Host) returnType:kotlin.String 
+        correspondingProperty: PROPERTY #37 name:ok visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #40 name:<this> type:<root>.Host 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-ok> (): kotlin.String declared in <root>.Host'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:ok type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.Host declared in <root>.Host.<get-ok>' type=<root>.Host origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+          RETURN type=kotlin.Nothing from='#39 public final fun <get-ok> (): kotlin.String declared in <root>.Host'
+            GET_FIELD '#38 FIELD #38 PROPERTY_BACKING_FIELD name:ok type:kotlin.String visibility:public [final] ' type=kotlin.String origin=null
+              receiver: GET_VAR '#40 <this>: <root>.Host declared in <root>.Host.<get-ok>' type=<root>.Host origin=null
+    FUN #41 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #18 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #42 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #43 name:other index:0 type:kotlin.Any? 
+    FUN #44 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #22 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #45 name:<this> type:kotlin.Any 
+    FUN #46 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
+        #25 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #47 name:<this> type:kotlin.Any 

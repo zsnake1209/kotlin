@@ -1,96 +1,96 @@
 FILE fqName:<root> fileName:/integerCoercionToT.kt
-  CLASS INTERFACE name:CPointed modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.CPointed 
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+  CLASS #0 INTERFACE name:CPointed modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.CPointed 
+    FUN #2 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #3 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #4 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #5 name:other index:0 type:kotlin.Any? 
+    FUN #6 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #7 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #8 name:<this> type:kotlin.Any 
+    FUN #9 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  FUN name:reinterpret visibility:public modality:FINAL <T> ($receiver:<root>.CPointed) returnType:T of <root>.reinterpret [inline] 
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[<root>.CPointed]
-    $receiver: VALUE_PARAMETER name:<this> type:<root>.CPointed 
+        #10 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #11 name:<this> type:kotlin.Any 
+  FUN #12 name:reinterpret visibility:public modality:FINAL <T> ($receiver:<root>.CPointed) returnType:T of <root>.reinterpret [inline] 
+    TYPE_PARAMETER #13 name:T index:0 variance: superTypes:[<root>.CPointed]
+    $receiver: VALUE_PARAMETER #14 name:<this> type:<root>.CPointed 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun reinterpret <T> (): T of <root>.reinterpret [inline] declared in <root>'
-        CALL 'public final fun TODO (): kotlin.Nothing [inline] declared in kotlin' type=kotlin.Nothing origin=null
-  CLASS CLASS name:CInt32VarX modality:FINAL visibility:public superTypes:[<root>.CPointed]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.CInt32VarX<T of <root>.CInt32VarX> 
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
-    CONSTRUCTOR visibility:public <> () returnType:<root>.CInt32VarX<T of <root>.CInt32VarX> [primary] 
+      RETURN type=kotlin.Nothing from='#12 public final fun reinterpret <T> (): T of <root>.reinterpret [inline] declared in <root>'
+        CALL '#15 public final fun TODO (): kotlin.Nothing [inline] declared in kotlin' type=kotlin.Nothing origin=null
+  CLASS #16 CLASS name:CInt32VarX modality:FINAL visibility:public superTypes:[<root>.CPointed]
+    $this: VALUE_PARAMETER #17 INSTANCE_RECEIVER name:<this> type:<root>.CInt32VarX<T of <root>.CInt32VarX> 
+    TYPE_PARAMETER #18 name:T index:0 variance: superTypes:[kotlin.Any?]
+    CONSTRUCTOR #19 visibility:public <> () returnType:<root>.CInt32VarX<T of <root>.CInt32VarX> [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:CInt32VarX modality:FINAL visibility:public superTypes:[<root>.CPointed]'
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+        DELEGATING_CONSTRUCTOR_CALL '#20 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#16 class CLASS CInt32VarX declared in <root>'
+    FUN #21 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.CPointed
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #2 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.CPointed
+      $this: VALUE_PARAMETER #22 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #23 name:other index:0 type:kotlin.Any? 
+    FUN #24 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in <root>.CPointed
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #6 public open fun hashCode (): kotlin.Int declared in <root>.CPointed
+      $this: VALUE_PARAMETER #25 name:<this> type:kotlin.Any 
+    FUN #26 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in <root>.CPointed
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  PROPERTY name:value visibility:public modality:FINAL [var] 
-    FUN name:<get-value> visibility:public modality:FINAL <T_INT> ($receiver:<root>.CInt32VarX<T_INT of <root>.<get-value>>) returnType:T_INT of <root>.<get-value> 
-      correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [var] 
-      TYPE_PARAMETER name:T_INT index:0 variance: superTypes:[kotlin.Int]
-      $receiver: VALUE_PARAMETER name:<this> type:<root>.CInt32VarX<T_INT of <root>.<get-value>> 
+        #9 public open fun toString (): kotlin.String declared in <root>.CPointed
+      $this: VALUE_PARAMETER #27 name:<this> type:kotlin.Any 
+  PROPERTY #28 name:value visibility:public modality:FINAL [var] 
+    FUN #29 name:<get-value> visibility:public modality:FINAL <T_INT> ($receiver:<root>.CInt32VarX<T_INT of <root>.<get-value>>) returnType:T_INT of <root>.<get-value> 
+      correspondingProperty: PROPERTY #28 name:value visibility:public modality:FINAL [var] 
+      TYPE_PARAMETER #30 name:T_INT index:0 variance: superTypes:[kotlin.Int]
+      $receiver: VALUE_PARAMETER #31 name:<this> type:<root>.CInt32VarX<T_INT of <root>.<get-value>> 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-value> <T_INT> (): T_INT of <root>.<get-value> declared in <root>'
-          CALL 'public final fun TODO (): kotlin.Nothing [inline] declared in kotlin' type=kotlin.Nothing origin=null
-    FUN name:<set-value> visibility:public modality:FINAL <T_INT> ($receiver:<root>.CInt32VarX<T_INT of <root>.<set-value>>, value:T_INT of <root>.<set-value>) returnType:kotlin.Unit 
-      correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [var] 
-      TYPE_PARAMETER name:T_INT index:0 variance: superTypes:[kotlin.Int]
-      $receiver: VALUE_PARAMETER name:<this> type:<root>.CInt32VarX<T_INT of <root>.<set-value>> 
-      VALUE_PARAMETER name:value index:0 type:T_INT of <root>.<set-value> 
+        RETURN type=kotlin.Nothing from='#29 public final fun <get-value> <T_INT> (): T_INT of <root>.<get-value> declared in <root>'
+          CALL '#15 public final fun TODO (): kotlin.Nothing [inline] declared in kotlin' type=kotlin.Nothing origin=null
+    FUN #32 name:<set-value> visibility:public modality:FINAL <T_INT> ($receiver:<root>.CInt32VarX<T_INT of <root>.<set-value>>, value:T_INT of <root>.<set-value>) returnType:kotlin.Unit 
+      correspondingProperty: PROPERTY #28 name:value visibility:public modality:FINAL [var] 
+      TYPE_PARAMETER #33 name:T_INT index:0 variance: superTypes:[kotlin.Int]
+      $receiver: VALUE_PARAMETER #34 name:<this> type:<root>.CInt32VarX<T_INT of <root>.<set-value>> 
+      VALUE_PARAMETER #35 name:value index:0 type:T_INT of <root>.<set-value> 
       BLOCK_BODY
-  CLASS CLASS name:IdType modality:FINAL visibility:public superTypes:[<root>.CPointed]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IdType 
-    CONSTRUCTOR visibility:public <> (value:kotlin.Int) returnType:<root>.IdType [primary] 
-      VALUE_PARAMETER name:value index:0 type:kotlin.Int 
+  CLASS #36 CLASS name:IdType modality:FINAL visibility:public superTypes:[<root>.CPointed]
+    $this: VALUE_PARAMETER #37 INSTANCE_RECEIVER name:<this> type:<root>.IdType 
+    CONSTRUCTOR #38 visibility:public <> (value:kotlin.Int) returnType:<root>.IdType [primary] 
+      VALUE_PARAMETER #39 name:value index:0 type:kotlin.Int 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:IdType modality:FINAL visibility:public superTypes:[<root>.CPointed]'
-    PROPERTY name:value visibility:public modality:FINAL [val] 
-      FIELD PROPERTY_BACKING_FIELD name:value type:kotlin.Int visibility:public [final] 
+        DELEGATING_CONSTRUCTOR_CALL '#20 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#36 class CLASS IdType declared in <root>'
+    PROPERTY #40 name:value visibility:public modality:FINAL [val] 
+      FIELD #41 PROPERTY_BACKING_FIELD name:value type:kotlin.Int visibility:public [final] 
         EXPRESSION_BODY
-          GET_VAR 'value: kotlin.Int declared in <root>.IdType.<init>' type=kotlin.Int origin=INITIALIZE_PROPERTY_FROM_PARAMETER
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-value> visibility:public modality:FINAL <> ($this:<root>.IdType) returnType:kotlin.Int 
-        correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [val] 
-        $this: VALUE_PARAMETER name:<this> type:<root>.IdType 
+          GET_VAR '#39 value: kotlin.Int declared in <root>.IdType.<init>' type=kotlin.Int origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN #42 DEFAULT_PROPERTY_ACCESSOR name:<get-value> visibility:public modality:FINAL <> ($this:<root>.IdType) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #40 name:value visibility:public modality:FINAL [val] 
+        $this: VALUE_PARAMETER #43 name:<this> type:<root>.IdType 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-value> (): kotlin.Int declared in <root>.IdType'
-            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:kotlin.Int visibility:public [final] ' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.IdType declared in <root>.IdType.<get-value>' type=<root>.IdType origin=null
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+          RETURN type=kotlin.Nothing from='#42 public final fun <get-value> (): kotlin.Int declared in <root>.IdType'
+            GET_FIELD '#41 FIELD #41 PROPERTY_BACKING_FIELD name:value type:kotlin.Int visibility:public [final] ' type=kotlin.Int origin=null
+              receiver: GET_VAR '#43 <this>: <root>.IdType declared in <root>.IdType.<get-value>' type=<root>.IdType origin=null
+    FUN #44 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.CPointed
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #2 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.CPointed
+      $this: VALUE_PARAMETER #45 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #46 name:other index:0 type:kotlin.Any? 
+    FUN #47 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in <root>.CPointed
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #6 public open fun hashCode (): kotlin.Int declared in <root>.CPointed
+      $this: VALUE_PARAMETER #48 name:<this> type:kotlin.Any 
+    FUN #49 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in <root>.CPointed
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-  FUN name:foo visibility:public modality:FINAL <> (value:<root>.IdType, cv:<root>.CInt32VarX<kotlin.Int>) returnType:kotlin.Unit 
-    VALUE_PARAMETER name:value index:0 type:<root>.IdType 
-    VALUE_PARAMETER name:cv index:1 type:<root>.CInt32VarX<kotlin.Int> 
+        #9 public open fun toString (): kotlin.String declared in <root>.CPointed
+      $this: VALUE_PARAMETER #50 name:<this> type:kotlin.Any 
+  FUN #51 name:foo visibility:public modality:FINAL <> (value:<root>.IdType, cv:<root>.CInt32VarX<kotlin.Int>) returnType:kotlin.Unit 
+    VALUE_PARAMETER #52 name:value index:0 type:<root>.IdType 
+    VALUE_PARAMETER #53 name:cv index:1 type:<root>.CInt32VarX<kotlin.Int> 
     BLOCK_BODY
-      CALL 'public final fun <set-value> <T_INT> (value: T_INT of <root>.<set-value>): kotlin.Unit declared in <root>' type=kotlin.Unit origin=EQ
+      CALL '#32 public final fun <set-value> <T_INT> (value: T_INT of <root>.<set-value>): kotlin.Unit declared in <root>' type=kotlin.Unit origin=EQ
         <T_INT>: kotlin.Int
-        $receiver: GET_VAR 'cv: <root>.CInt32VarX<kotlin.Int> declared in <root>.foo' type=<root>.CInt32VarX<kotlin.Int> origin=null
-        value: CALL 'public final fun <get-value> (): kotlin.Int declared in <root>.IdType' type=kotlin.Int origin=GET_PROPERTY
-          $this: GET_VAR 'value: <root>.IdType declared in <root>.foo' type=<root>.IdType origin=null
+        $receiver: GET_VAR '#53 cv: <root>.CInt32VarX<kotlin.Int> declared in <root>.foo' type=<root>.CInt32VarX<kotlin.Int> origin=null
+        value: CALL '#42 public final fun <get-value> (): kotlin.Int declared in <root>.IdType' type=kotlin.Int origin=GET_PROPERTY
+          $this: GET_VAR '#52 value: <root>.IdType declared in <root>.foo' type=<root>.IdType origin=null

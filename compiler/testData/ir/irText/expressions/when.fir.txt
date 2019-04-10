@@ -1,91 +1,91 @@
 FILE fqName:<root> fileName:/when.kt
-  CLASS OBJECT name:A modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.A
-    CONSTRUCTOR visibility:private <> () returnType:<root>.A [primary]
+  CLASS #0 OBJECT name:A modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.A 
+    CONSTRUCTOR #2 visibility:private <> () returnType:<root>.A [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:A modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+        DELEGATING_CONSTRUCTOR_CALL '#3 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#0 class OBJECT A declared in <root>'
+    FUN #4 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #5 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #6 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #7 name:other index:0 type:kotlin.Any? 
+    FUN #8 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #9 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #10 name:<this> type:kotlin.Any 
+    FUN #11 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  FUN name:testWithSubject visibility:public modality:FINAL <> (x:kotlin.Any?) returnType:kotlin.String
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any?
+        #12 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #13 name:<this> type:kotlin.Any 
+  FUN #14 name:testWithSubject visibility:public modality:FINAL <> (x:kotlin.Any?) returnType:kotlin.String 
+    VALUE_PARAMETER #15 name:x index:0 type:kotlin.Any? 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testWithSubject (x: kotlin.Any?): kotlin.String declared in <root>'
+      RETURN type=kotlin.Nothing from='#14 public final fun testWithSubject (x: kotlin.Any?): kotlin.String declared in <root>'
         BLOCK type=kotlin.String origin=WHEN
-          VAR IR_TEMPORARY_VARIABLE name:tmp0_subject type:kotlin.Any? [val]
+          VAR #16 IR_TEMPORARY_VARIABLE name:tmp0_subject type:kotlin.Any? [val] 
           WHEN type=kotlin.String origin=WHEN
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
+              if: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#16 val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
                 arg1: CONST Null type=kotlin.Nothing? value=null
               then: CONST String type=kotlin.String value="null"
             BRANCH
-              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
+              if: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#16 val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
                 arg1: ERROR_CALL 'Unresolved reference: <Unresolved name: A>#' type=IrErrorType
               then: CONST String type=kotlin.String value="A"
             BRANCH
               if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.String
-                GET_VAR 'val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
+                GET_VAR '#16 val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
               then: CONST String type=kotlin.String value="String"
             BRANCH
               if: TYPE_OP type=kotlin.Boolean origin=NOT_INSTANCEOF typeOperand=kotlin.Number
-                GET_VAR 'val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
+                GET_VAR '#16 val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
               then: CONST String type=kotlin.String value="!Number"
             BRANCH
               if: ERROR_CALL 'Unresolved reference: <Ambiguity: contains, [kotlin/collections/Set.contains, kotlin/collections/Collection.contains]>#' type=IrErrorType
-                GET_VAR 'val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
+                GET_VAR '#16 val tmp0_subject: kotlin.Any? [val] declared in <root>.testWithSubject' type=kotlin.Any? origin=null
               then: CONST String type=kotlin.String value="nothingness?"
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CONST String type=kotlin.String value="something"
-  FUN name:test visibility:public modality:FINAL <> (x:kotlin.Any?) returnType:kotlin.String
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any?
+  FUN #18 name:test visibility:public modality:FINAL <> (x:kotlin.Any?) returnType:kotlin.String 
+    VALUE_PARAMETER #19 name:x index:0 type:kotlin.Any? 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test (x: kotlin.Any?): kotlin.String declared in <root>'
+      RETURN type=kotlin.Nothing from='#18 public final fun test (x: kotlin.Any?): kotlin.String declared in <root>'
         WHEN type=kotlin.String origin=WHEN
           BRANCH
-            if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
+            if: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#19 x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
               arg1: CONST Null type=kotlin.Nothing? value=null
             then: CONST String type=kotlin.String value="null"
           BRANCH
-            if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
+            if: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#19 x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
               arg1: ERROR_CALL 'Unresolved reference: <Unresolved name: A>#' type=IrErrorType
             then: CONST String type=kotlin.String value="A"
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.String
-              GET_VAR 'x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
+              GET_VAR '#19 x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
             then: CONST String type=kotlin.String value="String"
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=NOT_INSTANCEOF typeOperand=kotlin.Number
-              GET_VAR 'x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
+              GET_VAR '#19 x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
             then: CONST String type=kotlin.String value="!Number"
           BRANCH
             if: ERROR_CALL 'Unresolved reference: <Ambiguity: contains, [kotlin/collections/Set.contains, kotlin/collections/Collection.contains]>#' type=IrErrorType
-              GET_VAR 'x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
+              GET_VAR '#19 x: kotlin.Any? declared in <root>.test' type=kotlin.Any? origin=null
             then: CONST String type=kotlin.String value="nothingness?"
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST String type=kotlin.String value="something"
-  FUN name:testComma visibility:public modality:FINAL <> (x:kotlin.Int) returnType:kotlin.String
-    VALUE_PARAMETER name:x index:0 type:kotlin.Int
+  FUN #20 name:testComma visibility:public modality:FINAL <> (x:kotlin.Int) returnType:kotlin.String 
+    VALUE_PARAMETER #21 name:x index:0 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun testComma (x: kotlin.Int): kotlin.String declared in <root>'
+      RETURN type=kotlin.Nothing from='#20 public final fun testComma (x: kotlin.Int): kotlin.String declared in <root>'
         BLOCK type=kotlin.String origin=WHEN
-          VAR IR_TEMPORARY_VARIABLE name:tmp1_subject type:kotlin.Int [val]
+          VAR #22 IR_TEMPORARY_VARIABLE name:tmp1_subject type:kotlin.Int [val] 
           WHEN type=kotlin.String origin=WHEN
             BRANCH
               if: WHEN type=kotlin.Boolean origin=null
@@ -94,26 +94,26 @@ FILE fqName:<root> fileName:/when.kt
                     BRANCH
                       if: WHEN type=kotlin.Boolean origin=null
                         BRANCH
-                          if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                            arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                          if: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                            arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                             arg1: CONST Int type=kotlin.String value=1
                           then: CONST Boolean type=kotlin.Boolean value=true
                         BRANCH
                           if: CONST Boolean type=kotlin.Boolean value=true
-                          then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                            arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                          then: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                            arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                             arg1: CONST Int type=kotlin.String value=2
                       then: CONST Boolean type=kotlin.Boolean value=true
                     BRANCH
                       if: CONST Boolean type=kotlin.Boolean value=true
-                      then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                        arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                      then: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                        arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                         arg1: CONST Int type=kotlin.String value=3
                   then: CONST Boolean type=kotlin.Boolean value=true
                 BRANCH
                   if: CONST Boolean type=kotlin.Boolean value=true
-                  then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                    arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                  then: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                    arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                     arg1: CONST Int type=kotlin.String value=4
               then: CONST String type=kotlin.String value="1234"
             BRANCH
@@ -121,33 +121,33 @@ FILE fqName:<root> fileName:/when.kt
                 BRANCH
                   if: WHEN type=kotlin.Boolean origin=null
                     BRANCH
-                      if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                        arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                      if: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                        arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                         arg1: CONST Int type=kotlin.String value=5
                       then: CONST Boolean type=kotlin.Boolean value=true
                     BRANCH
                       if: CONST Boolean type=kotlin.Boolean value=true
-                      then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                        arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                      then: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                        arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                         arg1: CONST Int type=kotlin.String value=6
                   then: CONST Boolean type=kotlin.Boolean value=true
                 BRANCH
                   if: CONST Boolean type=kotlin.Boolean value=true
-                  then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                    arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                  then: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                    arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                     arg1: CONST Int type=kotlin.String value=7
               then: CONST String type=kotlin.String value="567"
             BRANCH
               if: WHEN type=kotlin.Boolean origin=null
                 BRANCH
-                  if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                    arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                  if: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                    arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                     arg1: CONST Int type=kotlin.String value=8
                   then: CONST Boolean type=kotlin.Boolean value=true
                 BRANCH
                   if: CONST Boolean type=kotlin.Boolean value=true
-                  then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                    arg0: GET_VAR 'val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
+                  then: CALL '#17 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                    arg0: GET_VAR '#22 val tmp1_subject: kotlin.Int [val] declared in <root>.testComma' type=kotlin.Int origin=null
                     arg1: CONST Int type=kotlin.String value=9
               then: CONST String type=kotlin.String value="89"
             BRANCH

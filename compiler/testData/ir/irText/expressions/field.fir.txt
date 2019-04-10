@@ -1,29 +1,29 @@
 FILE fqName:<root> fileName:/field.kt
-  PROPERTY name:testSimple visibility:public modality:FINAL [var]
-    FIELD PROPERTY_BACKING_FIELD name:testSimple type:kotlin.Int visibility:public [static]
+  PROPERTY #0 name:testSimple visibility:public modality:FINAL [var] 
+    FIELD #1 PROPERTY_BACKING_FIELD name:testSimple type:kotlin.Int visibility:public [static] 
       EXPRESSION_BODY
         CONST Int type=kotlin.Int value=0
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-testSimple> visibility:public modality:FINAL <> () returnType:kotlin.Int
-      correspondingProperty: PROPERTY name:testSimple visibility:public modality:FINAL [var]
+    FUN #2 DEFAULT_PROPERTY_ACCESSOR name:<get-testSimple> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #0 name:testSimple visibility:public modality:FINAL [var] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-testSimple> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:testSimple type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
-    FUN name:<set-testSimple> visibility:public modality:FINAL <> (value:kotlin.Int) returnType:kotlin.Unit
-      correspondingProperty: PROPERTY name:testSimple visibility:public modality:FINAL [var]
-      VALUE_PARAMETER name:value index:0 type:kotlin.Int
+        RETURN type=kotlin.Nothing from='#2 public final fun <get-testSimple> (): kotlin.Int declared in <root>'
+          GET_FIELD '#1 FIELD #1 PROPERTY_BACKING_FIELD name:testSimple type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
+    FUN #3 name:<set-testSimple> visibility:public modality:FINAL <> (value:kotlin.Int) returnType:kotlin.Unit 
+      correspondingProperty: PROPERTY #0 name:testSimple visibility:public modality:FINAL [var] 
+      VALUE_PARAMETER #4 name:value index:0 type:kotlin.Int 
       BLOCK_BODY
         ERROR_CALL 'Unresolved reference: <Unresolved name: field>#' type=IrErrorType
-  PROPERTY name:testAugmented visibility:public modality:FINAL [var]
-    FIELD PROPERTY_BACKING_FIELD name:testAugmented type:kotlin.Int visibility:public [static]
+  PROPERTY #5 name:testAugmented visibility:public modality:FINAL [var] 
+    FIELD #6 PROPERTY_BACKING_FIELD name:testAugmented type:kotlin.Int visibility:public [static] 
       EXPRESSION_BODY
         CONST Int type=kotlin.Int value=0
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-testAugmented> visibility:public modality:FINAL <> () returnType:kotlin.Int
-      correspondingProperty: PROPERTY name:testAugmented visibility:public modality:FINAL [var]
+    FUN #7 DEFAULT_PROPERTY_ACCESSOR name:<get-testAugmented> visibility:public modality:FINAL <> () returnType:kotlin.Int 
+      correspondingProperty: PROPERTY #5 name:testAugmented visibility:public modality:FINAL [var] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-testAugmented> (): kotlin.Int declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:testAugmented type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
-    FUN name:<set-testAugmented> visibility:public modality:FINAL <> (value:kotlin.Int) returnType:kotlin.Unit
-      correspondingProperty: PROPERTY name:testAugmented visibility:public modality:FINAL [var]
-      VALUE_PARAMETER name:value index:0 type:kotlin.Int
+        RETURN type=kotlin.Nothing from='#7 public final fun <get-testAugmented> (): kotlin.Int declared in <root>'
+          GET_FIELD '#6 FIELD #6 PROPERTY_BACKING_FIELD name:testAugmented type:kotlin.Int visibility:public [static] ' type=kotlin.Int origin=null
+    FUN #8 name:<set-testAugmented> visibility:public modality:FINAL <> (value:kotlin.Int) returnType:kotlin.Unit 
+      correspondingProperty: PROPERTY #5 name:testAugmented visibility:public modality:FINAL [var] 
+      VALUE_PARAMETER #9 name:value index:0 type:kotlin.Int 
       BLOCK_BODY
         ERROR_CALL 'Unresolved reference: <Unresolved name: field>#' type=IrErrorType

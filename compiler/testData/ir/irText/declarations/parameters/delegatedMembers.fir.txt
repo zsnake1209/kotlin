@@ -1,37 +1,37 @@
 FILE fqName:<root> fileName:/delegatedMembers.kt
-  CLASS INTERFACE name:IBase modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IBase
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    FUN name:foo visibility:public modality:ABSTRACT <> ($this:<root>.IBase, x:kotlin.Int) returnType:kotlin.Unit
-      $this: VALUE_PARAMETER name:<this> type:<root>.IBase
-      VALUE_PARAMETER name:x index:0 type:kotlin.Int
-    PROPERTY name:bar visibility:public modality:ABSTRACT [val]
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-bar> visibility:public modality:ABSTRACT <> ($this:<root>.IBase) returnType:kotlin.Int
-        correspondingProperty: PROPERTY name:bar visibility:public modality:ABSTRACT [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.IBase
-    FUN name:qux visibility:public modality:ABSTRACT <X> ($this:<root>.IBase, t:T of <root>.IBase, x:X of <root>.IBase.qux) returnType:kotlin.Unit
-      TYPE_PARAMETER name:X index:0 variance: superTypes:[]
-      $this: VALUE_PARAMETER name:<this> type:<root>.IBase
-      VALUE_PARAMETER name:t index:0 type:T of <root>.IBase
-      VALUE_PARAMETER name:x index:1 type:X of <root>.IBase.qux
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+  CLASS #0 INTERFACE name:IBase modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.IBase 
+    TYPE_PARAMETER #2 name:T index:0 variance: superTypes:[]
+    FUN #3 name:foo visibility:public modality:ABSTRACT <> ($this:<root>.IBase, x:kotlin.Int) returnType:kotlin.Unit 
+      $this: VALUE_PARAMETER #4 name:<this> type:<root>.IBase 
+      VALUE_PARAMETER #5 name:x index:0 type:kotlin.Int 
+    PROPERTY #6 name:bar visibility:public modality:ABSTRACT [val] 
+      FUN #7 DEFAULT_PROPERTY_ACCESSOR name:<get-bar> visibility:public modality:ABSTRACT <> ($this:<root>.IBase) returnType:kotlin.Int 
+        correspondingProperty: PROPERTY #6 name:bar visibility:public modality:ABSTRACT [val] 
+        $this: VALUE_PARAMETER #8 name:<this> type:<root>.IBase 
+    FUN #9 name:qux visibility:public modality:ABSTRACT <X> ($this:<root>.IBase, t:T of <root>.IBase, x:X of <root>.IBase.qux) returnType:kotlin.Unit 
+      TYPE_PARAMETER #10 name:X index:0 variance: superTypes:[]
+      $this: VALUE_PARAMETER #11 name:<this> type:<root>.IBase 
+      VALUE_PARAMETER #12 name:t index:0 type:T of <root>.IBase 
+      VALUE_PARAMETER #13 name:x index:1 type:X of <root>.IBase.qux 
+    FUN #14 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #15 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #16 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #17 name:other index:0 type:kotlin.Any? 
+    FUN #18 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #19 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #20 name:<this> type:kotlin.Any 
+    FUN #21 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  CLASS CLASS name:Test modality:FINAL visibility:public superTypes:[]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Test
-    TYPE_PARAMETER name:TT index:0 variance: superTypes:[]
-    CONSTRUCTOR visibility:public <> (impl:<root>.IBase<TT of <root>.Test>) returnType:<root>.Test<TT of <root>.Test> [primary]
-      VALUE_PARAMETER name:impl index:0 type:<root>.IBase<TT of <root>.Test>
+        #22 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #23 name:<this> type:kotlin.Any 
+  CLASS #24 CLASS name:Test modality:FINAL visibility:public superTypes:[]
+    $this: VALUE_PARAMETER #25 INSTANCE_RECEIVER name:<this> type:<root>.Test 
+    TYPE_PARAMETER #26 name:TT index:0 variance: superTypes:[]
+    CONSTRUCTOR #27 visibility:public <> (impl:<root>.IBase<TT of <root>.Test>) returnType:<root>.Test<TT of <root>.Test> [primary] 
+      VALUE_PARAMETER #28 name:impl index:0 type:<root>.IBase<TT of <root>.Test> 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Test modality:FINAL visibility:public superTypes:[]'
+        DELEGATING_CONSTRUCTOR_CALL '#29 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#24 class CLASS Test declared in <root>'

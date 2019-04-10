@@ -1,102 +1,102 @@
 FILE fqName:<root> fileName:/localVariableOfIntersectionType.kt
-  CLASS INTERFACE name:In modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.In
-    TYPE_PARAMETER name:T index:0 variance:in superTypes:[]
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+  CLASS #0 INTERFACE name:In modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #1 INSTANCE_RECEIVER name:<this> type:<root>.In 
+    TYPE_PARAMETER #2 name:T index:0 variance:in superTypes:[]
+    FUN #3 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #4 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #5 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #6 name:other index:0 type:kotlin.Any? 
+    FUN #7 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #8 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #9 name:<this> type:kotlin.Any 
+    FUN #10 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  CLASS INTERFACE name:Inv modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Inv
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    PROPERTY name:t visibility:public modality:ABSTRACT [val]
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-t> visibility:public modality:ABSTRACT <> ($this:<root>.Inv) returnType:T of <root>.Inv
-        correspondingProperty: PROPERTY name:t visibility:public modality:ABSTRACT [val]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Inv
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+        #11 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #12 name:<this> type:kotlin.Any 
+  CLASS #13 INTERFACE name:Inv modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #14 INSTANCE_RECEIVER name:<this> type:<root>.Inv 
+    TYPE_PARAMETER #15 name:T index:0 variance: superTypes:[]
+    PROPERTY #16 name:t visibility:public modality:ABSTRACT [val] 
+      FUN #17 DEFAULT_PROPERTY_ACCESSOR name:<get-t> visibility:public modality:ABSTRACT <> ($this:<root>.Inv) returnType:T of <root>.Inv 
+        correspondingProperty: PROPERTY #16 name:t visibility:public modality:ABSTRACT [val] 
+        $this: VALUE_PARAMETER #18 name:<this> type:<root>.Inv 
+    FUN #19 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #4 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #20 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #21 name:other index:0 type:kotlin.Any? 
+    FUN #22 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #8 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #23 name:<this> type:kotlin.Any 
+    FUN #24 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  CLASS INTERFACE name:Z modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Z
-    FUN name:create visibility:public modality:ABSTRACT <T> ($this:<root>.Z, x:<root>.In<T of <root>.Z.create>, y:<root>.In<T of <root>.Z.create>) returnType:<root>.Inv<T of <root>.Z.create>
-      TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-      $this: VALUE_PARAMETER name:<this> type:<root>.Z
-      VALUE_PARAMETER name:x index:0 type:<root>.In<T of <root>.Z.create>
-      VALUE_PARAMETER name:y index:1 type:<root>.In<T of <root>.Z.create>
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+        #11 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #25 name:<this> type:kotlin.Any 
+  CLASS #26 INTERFACE name:Z modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #27 INSTANCE_RECEIVER name:<this> type:<root>.Z 
+    FUN #28 name:create visibility:public modality:ABSTRACT <T> ($this:<root>.Z, x:<root>.In<T of <root>.Z.create>, y:<root>.In<T of <root>.Z.create>) returnType:<root>.Inv<T of <root>.Z.create> 
+      TYPE_PARAMETER #29 name:T index:0 variance: superTypes:[]
+      $this: VALUE_PARAMETER #30 name:<this> type:<root>.Z 
+      VALUE_PARAMETER #31 name:x index:0 type:<root>.In<T of <root>.Z.create> 
+      VALUE_PARAMETER #32 name:y index:1 type:<root>.In<T of <root>.Z.create> 
+    FUN #33 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #4 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #34 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #35 name:other index:0 type:kotlin.Any? 
+    FUN #36 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #8 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #37 name:<this> type:kotlin.Any 
+    FUN #38 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  CLASS INTERFACE name:IA modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IA
-    FUN name:foo visibility:public modality:ABSTRACT <> ($this:<root>.IA) returnType:kotlin.Unit
-      $this: VALUE_PARAMETER name:<this> type:<root>.IA
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+        #11 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #39 name:<this> type:kotlin.Any 
+  CLASS #40 INTERFACE name:IA modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #41 INSTANCE_RECEIVER name:<this> type:<root>.IA 
+    FUN #42 name:foo visibility:public modality:ABSTRACT <> ($this:<root>.IA) returnType:kotlin.Unit 
+      $this: VALUE_PARAMETER #43 name:<this> type:<root>.IA 
+    FUN #44 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #4 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #45 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #46 name:other index:0 type:kotlin.Any? 
+    FUN #47 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #8 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #48 name:<this> type:kotlin.Any 
+    FUN #49 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  CLASS INTERFACE name:IB modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IB
-    FUN name:bar visibility:public modality:ABSTRACT <> ($this:<root>.IB) returnType:kotlin.Unit
-      $this: VALUE_PARAMETER name:<this> type:<root>.IB
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+        #11 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #50 name:<this> type:kotlin.Any 
+  CLASS #51 INTERFACE name:IB modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #52 INSTANCE_RECEIVER name:<this> type:<root>.IB 
+    FUN #53 name:bar visibility:public modality:ABSTRACT <> ($this:<root>.IB) returnType:kotlin.Unit 
+      $this: VALUE_PARAMETER #54 name:<this> type:<root>.IB 
+    FUN #55 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #4 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #56 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #57 name:other index:0 type:kotlin.Any? 
+    FUN #58 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #8 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #59 name:<this> type:kotlin.Any 
+    FUN #60 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-  FUN name:test visibility:public modality:FINAL <> (a:<root>.In<<root>.IA>, b:<root>.In<<root>.IB>, z:<root>.Z) returnType:kotlin.Unit
-    VALUE_PARAMETER name:a index:0 type:<root>.In<<root>.IA>
-    VALUE_PARAMETER name:b index:1 type:<root>.In<<root>.IB>
-    VALUE_PARAMETER name:z index:2 type:<root>.Z
+        #11 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #61 name:<this> type:kotlin.Any 
+  FUN #62 name:test visibility:public modality:FINAL <> (a:<root>.In<<root>.IA>, b:<root>.In<<root>.IB>, z:<root>.Z) returnType:kotlin.Unit 
+    VALUE_PARAMETER #63 name:a index:0 type:<root>.In<<root>.IA> 
+    VALUE_PARAMETER #64 name:b index:1 type:<root>.In<<root>.IB> 
+    VALUE_PARAMETER #65 name:z index:2 type:<root>.Z 
     BLOCK_BODY
       ERROR_CALL 'Unresolved reference: <Unresolved name: foo>#' type=IrErrorType
       ERROR_CALL 'Unresolved reference: <Unresolved name: bar>#' type=IrErrorType
-      VAR name:t type:T of <root>.Inv [val]
-        CALL 'public abstract fun <get-t> (): T of <root>.Inv declared in <root>.Inv' type=T of <root>.Inv origin=null
+      VAR #66 name:t type:T of <root>.Inv [val] 
+        CALL '#17 public abstract fun <get-t> (): T of <root>.Inv declared in <root>.Inv' type=T of <root>.Inv origin=null
       ERROR_CALL 'Unresolved reference: <Unresolved name: foo>#' type=IrErrorType
       ERROR_CALL 'Unresolved reference: <Unresolved name: bar>#' type=IrErrorType

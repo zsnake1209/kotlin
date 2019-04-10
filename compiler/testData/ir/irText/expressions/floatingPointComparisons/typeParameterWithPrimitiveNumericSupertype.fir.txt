@@ -1,150 +1,150 @@
 FILE fqName:<root> fileName:/typeParameterWithPrimitiveNumericSupertype.kt
-  FUN name:test0 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test0) returnType:kotlin.Boolean
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:T of <root>.test0
+  FUN #0 name:test0 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test0) returnType:kotlin.Boolean 
+    TYPE_PARAMETER #1 name:T index:0 variance: superTypes:[]
+    VALUE_PARAMETER #2 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #3 name:y index:1 type:T of <root>.test0 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test0 <T> (x: kotlin.Any, y: T of <root>.test0): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun test0 <T> (x: kotlin.Any, y: T of <root>.test0): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Int
-              GET_VAR 'x: kotlin.Any declared in <root>.test0' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any declared in <root>.test0' type=kotlin.Any origin=null
-              arg1: GET_VAR 'y: T of <root>.test0 declared in <root>.test0' type=T of <root>.test0 origin=null
+              GET_VAR '#2 x: kotlin.Any declared in <root>.test0' type=kotlin.Any origin=null
+            then: CALL '#4 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#2 x: kotlin.Any declared in <root>.test0' type=kotlin.Any origin=null
+              arg1: GET_VAR '#3 y: T of <root>.test0 declared in <root>.test0' type=T of <root>.test0 origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test1 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test1) returnType:kotlin.Boolean
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:T of <root>.test1
+  FUN #5 name:test1 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test1) returnType:kotlin.Boolean 
+    TYPE_PARAMETER #6 name:T index:0 variance: superTypes:[]
+    VALUE_PARAMETER #7 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #8 name:y index:1 type:T of <root>.test1 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1 <T> (x: kotlin.Any, y: T of <root>.test1): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#5 public final fun test1 <T> (x: kotlin.Any, y: T of <root>.test1): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-              GET_VAR 'x: kotlin.Any declared in <root>.test1' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any declared in <root>.test1' type=kotlin.Any origin=null
-              arg1: GET_VAR 'y: T of <root>.test1 declared in <root>.test1' type=T of <root>.test1 origin=null
+              GET_VAR '#7 x: kotlin.Any declared in <root>.test1' type=kotlin.Any origin=null
+            then: CALL '#4 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#7 x: kotlin.Any declared in <root>.test1' type=kotlin.Any origin=null
+              arg1: GET_VAR '#8 y: T of <root>.test1 declared in <root>.test1' type=T of <root>.test1 origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test2 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test2) returnType:kotlin.Boolean
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:T of <root>.test2
+  FUN #9 name:test2 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test2) returnType:kotlin.Boolean 
+    TYPE_PARAMETER #10 name:T index:0 variance: superTypes:[]
+    VALUE_PARAMETER #11 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #12 name:y index:1 type:T of <root>.test2 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2 <T> (x: kotlin.Any, y: T of <root>.test2): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#9 public final fun test2 <T> (x: kotlin.Any, y: T of <root>.test2): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Float
-              GET_VAR 'x: kotlin.Any declared in <root>.test2' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any declared in <root>.test2' type=kotlin.Any origin=null
-              arg1: GET_VAR 'y: T of <root>.test2 declared in <root>.test2' type=T of <root>.test2 origin=null
+              GET_VAR '#11 x: kotlin.Any declared in <root>.test2' type=kotlin.Any origin=null
+            then: CALL '#4 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#11 x: kotlin.Any declared in <root>.test2' type=kotlin.Any origin=null
+              arg1: GET_VAR '#12 y: T of <root>.test2 declared in <root>.test2' type=T of <root>.test2 origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test3 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test3) returnType:kotlin.Boolean
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:T of <root>.test3
+  FUN #13 name:test3 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test3) returnType:kotlin.Boolean 
+    TYPE_PARAMETER #14 name:T index:0 variance: superTypes:[]
+    VALUE_PARAMETER #15 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #16 name:y index:1 type:T of <root>.test3 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3 <T> (x: kotlin.Any, y: T of <root>.test3): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#13 public final fun test3 <T> (x: kotlin.Any, y: T of <root>.test3): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Int
-              GET_VAR 'x: kotlin.Any declared in <root>.test3' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any declared in <root>.test3' type=kotlin.Any origin=null
-              arg1: GET_VAR 'y: T of <root>.test3 declared in <root>.test3' type=T of <root>.test3 origin=null
+              GET_VAR '#15 x: kotlin.Any declared in <root>.test3' type=kotlin.Any origin=null
+            then: CALL '#4 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#15 x: kotlin.Any declared in <root>.test3' type=kotlin.Any origin=null
+              arg1: GET_VAR '#16 y: T of <root>.test3 declared in <root>.test3' type=T of <root>.test3 origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test4 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test4) returnType:kotlin.Boolean
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:T of <root>.test4
+  FUN #17 name:test4 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test4) returnType:kotlin.Boolean 
+    TYPE_PARAMETER #18 name:T index:0 variance: superTypes:[]
+    VALUE_PARAMETER #19 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #20 name:y index:1 type:T of <root>.test4 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test4 <T> (x: kotlin.Any, y: T of <root>.test4): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#17 public final fun test4 <T> (x: kotlin.Any, y: T of <root>.test4): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Int
-              GET_VAR 'x: kotlin.Any declared in <root>.test4' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any declared in <root>.test4' type=kotlin.Any origin=null
-              arg1: GET_VAR 'y: T of <root>.test4 declared in <root>.test4' type=T of <root>.test4 origin=null
+              GET_VAR '#19 x: kotlin.Any declared in <root>.test4' type=kotlin.Any origin=null
+            then: CALL '#4 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#19 x: kotlin.Any declared in <root>.test4' type=kotlin.Any origin=null
+              arg1: GET_VAR '#20 y: T of <root>.test4 declared in <root>.test4' type=T of <root>.test4 origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test5 visibility:public modality:FINAL <T, R> (x:kotlin.Any, y:R of <root>.test5) returnType:kotlin.Boolean
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    TYPE_PARAMETER name:R index:0 variance: superTypes:[]
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:R of <root>.test5
+  FUN #21 name:test5 visibility:public modality:FINAL <T, R> (x:kotlin.Any, y:R of <root>.test5) returnType:kotlin.Boolean 
+    TYPE_PARAMETER #22 name:T index:0 variance: superTypes:[]
+    TYPE_PARAMETER #23 name:R index:0 variance: superTypes:[]
+    VALUE_PARAMETER #24 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #25 name:y index:1 type:R of <root>.test5 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test5 <T, R> (x: kotlin.Any, y: R of <root>.test5): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#21 public final fun test5 <T, R> (x: kotlin.Any, y: R of <root>.test5): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Int
-              GET_VAR 'x: kotlin.Any declared in <root>.test5' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any declared in <root>.test5' type=kotlin.Any origin=null
-              arg1: GET_VAR 'y: R of <root>.test5 declared in <root>.test5' type=R of <root>.test5 origin=null
+              GET_VAR '#24 x: kotlin.Any declared in <root>.test5' type=kotlin.Any origin=null
+            then: CALL '#4 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#24 x: kotlin.Any declared in <root>.test5' type=kotlin.Any origin=null
+              arg1: GET_VAR '#25 y: R of <root>.test5 declared in <root>.test5' type=R of <root>.test5 origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  FUN name:test6 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test6) returnType:kotlin.Boolean
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    VALUE_PARAMETER name:x index:0 type:kotlin.Any
-    VALUE_PARAMETER name:y index:1 type:T of <root>.test6
+  FUN #26 name:test6 visibility:public modality:FINAL <T> (x:kotlin.Any, y:T of <root>.test6) returnType:kotlin.Boolean 
+    TYPE_PARAMETER #27 name:T index:0 variance: superTypes:[]
+    VALUE_PARAMETER #28 name:x index:0 type:kotlin.Any 
+    VALUE_PARAMETER #29 name:y index:1 type:T of <root>.test6 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test6 <T> (x: kotlin.Any, y: T of <root>.test6): kotlin.Boolean declared in <root>'
+      RETURN type=kotlin.Nothing from='#26 public final fun test6 <T> (x: kotlin.Any, y: T of <root>.test6): kotlin.Boolean declared in <root>'
         WHEN type=kotlin.Boolean origin=ANDAND
           BRANCH
             if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Int
-              GET_VAR 'x: kotlin.Any declared in <root>.test6' type=kotlin.Any origin=null
-            then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'x: kotlin.Any declared in <root>.test6' type=kotlin.Any origin=null
-              arg1: GET_VAR 'y: T of <root>.test6 declared in <root>.test6' type=T of <root>.test6 origin=null
+              GET_VAR '#28 x: kotlin.Any declared in <root>.test6' type=kotlin.Any origin=null
+            then: CALL '#4 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+              arg0: GET_VAR '#28 x: kotlin.Any declared in <root>.test6' type=kotlin.Any origin=null
+              arg1: GET_VAR '#29 y: T of <root>.test6 declared in <root>.test6' type=T of <root>.test6 origin=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: CONST Boolean type=kotlin.Boolean value=false
-  CLASS CLASS name:F modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.F
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[]
-    CONSTRUCTOR visibility:public <> () returnType:<root>.F<T of <root>.F> [primary]
+  CLASS #30 CLASS name:F modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #31 INSTANCE_RECEIVER name:<this> type:<root>.F 
+    TYPE_PARAMETER #32 name:T index:0 variance: superTypes:[]
+    CONSTRUCTOR #33 visibility:public <> () returnType:<root>.F<T of <root>.F> [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:F modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    FUN name:testCapturedType visibility:public modality:FINAL <> ($this:<root>.F, x:T of <root>.F, y:kotlin.Any) returnType:kotlin.Boolean
-      $this: VALUE_PARAMETER name:<this> type:<root>.F
-      VALUE_PARAMETER name:x index:0 type:T of <root>.F
-      VALUE_PARAMETER name:y index:1 type:kotlin.Any
+        DELEGATING_CONSTRUCTOR_CALL '#34 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#30 class CLASS F declared in <root>'
+    FUN #35 name:testCapturedType visibility:public modality:FINAL <> ($this:<root>.F, x:T of <root>.F, y:kotlin.Any) returnType:kotlin.Boolean 
+      $this: VALUE_PARAMETER #36 name:<this> type:<root>.F 
+      VALUE_PARAMETER #37 name:x index:0 type:T of <root>.F 
+      VALUE_PARAMETER #38 name:y index:1 type:kotlin.Any 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun testCapturedType (x: T of <root>.F, y: kotlin.Any): kotlin.Boolean declared in <root>.F'
+        RETURN type=kotlin.Nothing from='#35 public final fun testCapturedType (x: T of <root>.F, y: kotlin.Any): kotlin.Boolean declared in <root>.F'
           WHEN type=kotlin.Boolean origin=ANDAND
             BRANCH
               if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Double
-                GET_VAR 'y: kotlin.Any declared in <root>.F.testCapturedType' type=kotlin.Any origin=null
-              then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-                arg0: GET_VAR 'x: T of <root>.F declared in <root>.F.testCapturedType' type=T of <root>.F origin=null
-                arg1: GET_VAR 'y: kotlin.Any declared in <root>.F.testCapturedType' type=kotlin.Any origin=null
+                GET_VAR '#38 y: kotlin.Any declared in <root>.F.testCapturedType' type=kotlin.Any origin=null
+              then: CALL '#4 public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                arg0: GET_VAR '#37 x: T of <root>.F declared in <root>.F.testCapturedType' type=T of <root>.F origin=null
+                arg1: GET_VAR '#38 y: kotlin.Any declared in <root>.F.testCapturedType' type=kotlin.Any origin=null
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CONST Boolean type=kotlin.Boolean value=false
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+    FUN #39 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        #40 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #41 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #42 name:other index:0 type:kotlin.Any? 
+    FUN #43 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        #44 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #45 name:<this> type:kotlin.Any 
+    FUN #46 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+        #47 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #48 name:<this> type:kotlin.Any 

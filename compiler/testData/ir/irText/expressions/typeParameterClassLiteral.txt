@@ -1,61 +1,61 @@
 FILE fqName:<root> fileName:/typeParameterClassLiteral.kt
-  FUN name:classRefFun visibility:public modality:FINAL <T> () returnType:kotlin.reflect.KClass<T of <root>.classRefFun> [inline] 
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any]
+  FUN #0 name:classRefFun visibility:public modality:FINAL <T> () returnType:kotlin.reflect.KClass<T of <root>.classRefFun> [inline] 
+    TYPE_PARAMETER #1 name:T index:0 variance: superTypes:[kotlin.Any]
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun classRefFun <T> (): kotlin.reflect.KClass<T of <root>.classRefFun> [inline] declared in <root>'
-        CLASS_REFERENCE 'TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<T of <root>.classRefFun>
-  FUN name:classRefExtFun visibility:public modality:FINAL <T> ($receiver:kotlin.Any) returnType:kotlin.reflect.KClass<T of <root>.classRefExtFun> [inline] 
-    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any]
-    $receiver: VALUE_PARAMETER name:<this> type:kotlin.Any 
+      RETURN type=kotlin.Nothing from='#0 public final fun classRefFun <T> (): kotlin.reflect.KClass<T of <root>.classRefFun> [inline] declared in <root>'
+        CLASS_REFERENCE '#1 TYPE_PARAMETER #1 name:T index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<T of <root>.classRefFun>
+  FUN #2 name:classRefExtFun visibility:public modality:FINAL <T> ($receiver:kotlin.Any) returnType:kotlin.reflect.KClass<T of <root>.classRefExtFun> [inline] 
+    TYPE_PARAMETER #3 name:T index:0 variance: superTypes:[kotlin.Any]
+    $receiver: VALUE_PARAMETER #4 name:<this> type:kotlin.Any 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun classRefExtFun <T> (): kotlin.reflect.KClass<T of <root>.classRefExtFun> [inline] declared in <root>'
-        CLASS_REFERENCE 'TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<T of <root>.classRefExtFun>
-  PROPERTY name:classRefExtVal visibility:public modality:FINAL [val] 
-    FUN name:<get-classRefExtVal> visibility:public modality:FINAL <T> ($receiver:T of <root>.<get-classRefExtVal>) returnType:kotlin.reflect.KClass<T of <root>.<get-classRefExtVal>> [inline] 
-      correspondingProperty: PROPERTY name:classRefExtVal visibility:public modality:FINAL [val] 
-      TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any]
-      $receiver: VALUE_PARAMETER name:<this> type:T of <root>.<get-classRefExtVal> 
+      RETURN type=kotlin.Nothing from='#2 public final fun classRefExtFun <T> (): kotlin.reflect.KClass<T of <root>.classRefExtFun> [inline] declared in <root>'
+        CLASS_REFERENCE '#3 TYPE_PARAMETER #3 name:T index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<T of <root>.classRefExtFun>
+  PROPERTY #5 name:classRefExtVal visibility:public modality:FINAL [val] 
+    FUN #6 name:<get-classRefExtVal> visibility:public modality:FINAL <T> ($receiver:T of <root>.<get-classRefExtVal>) returnType:kotlin.reflect.KClass<T of <root>.<get-classRefExtVal>> [inline] 
+      correspondingProperty: PROPERTY #5 name:classRefExtVal visibility:public modality:FINAL [val] 
+      TYPE_PARAMETER #7 name:T index:0 variance: superTypes:[kotlin.Any]
+      $receiver: VALUE_PARAMETER #8 name:<this> type:T of <root>.<get-classRefExtVal> 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-classRefExtVal> <T> (): kotlin.reflect.KClass<T of <root>.<get-classRefExtVal>> [inline] declared in <root>'
-          CLASS_REFERENCE 'TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<T of <root>.<get-classRefExtVal>>
-  CLASS CLASS name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Host 
-    CONSTRUCTOR visibility:public <> () returnType:<root>.Host [primary] 
+        RETURN type=kotlin.Nothing from='#6 public final fun <get-classRefExtVal> <T> (): kotlin.reflect.KClass<T of <root>.<get-classRefExtVal>> [inline] declared in <root>'
+          CLASS_REFERENCE '#7 TYPE_PARAMETER #7 name:T index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<T of <root>.<get-classRefExtVal>>
+  CLASS #9 CLASS name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER #10 INSTANCE_RECEIVER name:<this> type:<root>.Host 
+    CONSTRUCTOR #11 visibility:public <> () returnType:<root>.Host [primary] 
       BLOCK_BODY
-        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Host modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    FUN name:classRefGenericMemberFun visibility:public modality:FINAL <TF> ($this:<root>.Host) returnType:kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberFun> [inline] 
-      TYPE_PARAMETER name:TF index:0 variance: superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER name:<this> type:<root>.Host 
+        DELEGATING_CONSTRUCTOR_CALL '#12 public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL class='#9 class CLASS Host declared in <root>'
+    FUN #13 name:classRefGenericMemberFun visibility:public modality:FINAL <TF> ($this:<root>.Host) returnType:kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberFun> [inline] 
+      TYPE_PARAMETER #14 name:TF index:0 variance: superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #15 name:<this> type:<root>.Host 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun classRefGenericMemberFun <TF> (): kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberFun> [inline] declared in <root>.Host'
-          CLASS_REFERENCE 'TYPE_PARAMETER name:TF index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberFun>
-    FUN name:classRefGenericMemberExtFun visibility:public modality:FINAL <TF> ($this:<root>.Host, $receiver:kotlin.Any) returnType:kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberExtFun> [inline] 
-      TYPE_PARAMETER name:TF index:0 variance: superTypes:[kotlin.Any]
-      $this: VALUE_PARAMETER name:<this> type:<root>.Host 
-      $receiver: VALUE_PARAMETER name:<this> type:kotlin.Any 
+        RETURN type=kotlin.Nothing from='#13 public final fun classRefGenericMemberFun <TF> (): kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberFun> [inline] declared in <root>.Host'
+          CLASS_REFERENCE '#14 TYPE_PARAMETER #14 name:TF index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberFun>
+    FUN #16 name:classRefGenericMemberExtFun visibility:public modality:FINAL <TF> ($this:<root>.Host, $receiver:kotlin.Any) returnType:kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberExtFun> [inline] 
+      TYPE_PARAMETER #17 name:TF index:0 variance: superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER #18 name:<this> type:<root>.Host 
+      $receiver: VALUE_PARAMETER #19 name:<this> type:kotlin.Any 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun classRefGenericMemberExtFun <TF> (): kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberExtFun> [inline] declared in <root>.Host'
-          CLASS_REFERENCE 'TYPE_PARAMETER name:TF index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberExtFun>
-    PROPERTY name:classRefGenericMemberExtVal visibility:public modality:FINAL [val] 
-      FUN name:<get-classRefGenericMemberExtVal> visibility:public modality:FINAL <TV> ($this:<root>.Host, $receiver:TV of <root>.Host.<get-classRefGenericMemberExtVal>) returnType:kotlin.reflect.KClass<TV of <root>.Host.<get-classRefGenericMemberExtVal>> [inline] 
-        correspondingProperty: PROPERTY name:classRefGenericMemberExtVal visibility:public modality:FINAL [val] 
-        TYPE_PARAMETER name:TV index:0 variance: superTypes:[kotlin.Any]
-        $this: VALUE_PARAMETER name:<this> type:<root>.Host 
-        $receiver: VALUE_PARAMETER name:<this> type:TV of <root>.Host.<get-classRefGenericMemberExtVal> 
+        RETURN type=kotlin.Nothing from='#16 public final fun classRefGenericMemberExtFun <TF> (): kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberExtFun> [inline] declared in <root>.Host'
+          CLASS_REFERENCE '#17 TYPE_PARAMETER #17 name:TF index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<TF of <root>.Host.classRefGenericMemberExtFun>
+    PROPERTY #20 name:classRefGenericMemberExtVal visibility:public modality:FINAL [val] 
+      FUN #21 name:<get-classRefGenericMemberExtVal> visibility:public modality:FINAL <TV> ($this:<root>.Host, $receiver:TV of <root>.Host.<get-classRefGenericMemberExtVal>) returnType:kotlin.reflect.KClass<TV of <root>.Host.<get-classRefGenericMemberExtVal>> [inline] 
+        correspondingProperty: PROPERTY #20 name:classRefGenericMemberExtVal visibility:public modality:FINAL [val] 
+        TYPE_PARAMETER #22 name:TV index:0 variance: superTypes:[kotlin.Any]
+        $this: VALUE_PARAMETER #23 name:<this> type:<root>.Host 
+        $receiver: VALUE_PARAMETER #24 name:<this> type:TV of <root>.Host.<get-classRefGenericMemberExtVal> 
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-classRefGenericMemberExtVal> <TV> (): kotlin.reflect.KClass<TV of <root>.Host.<get-classRefGenericMemberExtVal>> [inline] declared in <root>.Host'
-            CLASS_REFERENCE 'TYPE_PARAMETER name:TV index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<TV of <root>.Host.<get-classRefGenericMemberExtVal>>
-    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
+          RETURN type=kotlin.Nothing from='#21 public final fun <get-classRefGenericMemberExtVal> <TV> (): kotlin.reflect.KClass<TV of <root>.Host.<get-classRefGenericMemberExtVal>> [inline] declared in <root>.Host'
+            CLASS_REFERENCE '#22 TYPE_PARAMETER #22 name:TV index:0 variance: superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<TV of <root>.Host.<get-classRefGenericMemberExtVal>>
+    FUN #25 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
       overridden:
-        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-      VALUE_PARAMETER name:other index:0 type:kotlin.Any? 
-    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
+        #26 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER #27 name:<this> type:kotlin.Any 
+      VALUE_PARAMETER #28 name:other index:0 type:kotlin.Any? 
+    FUN #29 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
       overridden:
-        public open fun hashCode (): kotlin.Int declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
-    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
+        #30 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER #31 name:<this> type:kotlin.Any 
+    FUN #32 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
       overridden:
-        public open fun toString (): kotlin.String declared in kotlin.Any
-      $this: VALUE_PARAMETER name:<this> type:kotlin.Any 
+        #33 public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER #34 name:<this> type:kotlin.Any 

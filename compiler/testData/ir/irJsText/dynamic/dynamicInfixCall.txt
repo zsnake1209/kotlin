@@ -1,17 +1,17 @@
 FILE fqName:<root> fileName:/dynamicInfixCall.kt
-  FUN name:test1 visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #0 name:test1 visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
+    VALUE_PARAMETER #1 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1 (d: dynamic): dynamic declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun test1 (d: dynamic): dynamic declared in <root>'
         DYN_OP operator=INVOKE type=dynamic
           receiver: DYN_MEMBER memberName='foo' type=dynamic
-            GET_VAR 'd: dynamic declared in <root>.test1' type=dynamic origin=null
+            GET_VAR '#1 d: dynamic declared in <root>.test1' type=dynamic origin=null
           0: CONST Int type=kotlin.Int value=123
-  FUN name:test2 visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
-    VALUE_PARAMETER name:d index:0 type:dynamic 
+  FUN #2 name:test2 visibility:public modality:FINAL <> (d:dynamic) returnType:dynamic 
+    VALUE_PARAMETER #3 name:d index:0 type:dynamic 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2 (d: dynamic): dynamic declared in <root>'
+      RETURN type=kotlin.Nothing from='#2 public final fun test2 (d: dynamic): dynamic declared in <root>'
         DYN_OP operator=INVOKE type=dynamic
           receiver: DYN_MEMBER memberName='invoke' type=dynamic
-            GET_VAR 'd: dynamic declared in <root>.test2' type=dynamic origin=null
+            GET_VAR '#3 d: dynamic declared in <root>.test2' type=dynamic origin=null
           0: CONST Int type=kotlin.Int value=123

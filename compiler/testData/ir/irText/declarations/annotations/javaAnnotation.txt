@@ -1,17 +1,17 @@
 FILE fqName:<root> fileName:/javaAnnotation.kt
-  FUN name:test1 visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+  FUN #0 name:test1 visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     annotations:
-      CALL 'public/*package*/ constructor <init> (value: kotlin.String, i: kotlin.Int) [primary] declared in <root>.JavaAnn' type=<root>.JavaAnn origin=null
+      CALL '#1 public/*package*/ constructor <init> (value: kotlin.String, i: kotlin.Int) [primary] declared in <root>.JavaAnn' type=<root>.JavaAnn origin=null
     BLOCK_BODY
-  FUN name:test2 visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+  FUN #2 name:test2 visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     annotations:
-      CALL 'public/*package*/ constructor <init> (value: kotlin.String, i: kotlin.Int) [primary] declared in <root>.JavaAnn' type=<root>.JavaAnn origin=null
+      CALL '#1 public/*package*/ constructor <init> (value: kotlin.String, i: kotlin.Int) [primary] declared in <root>.JavaAnn' type=<root>.JavaAnn origin=null
         value: CONST String type=kotlin.String value="abc"
         i: CONST Int type=kotlin.Int value=123
     BLOCK_BODY
-  FUN name:test3 visibility:public modality:FINAL <> () returnType:kotlin.Unit 
+  FUN #3 name:test3 visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     annotations:
-      CALL 'public/*package*/ constructor <init> (value: kotlin.String, i: kotlin.Int) [primary] declared in <root>.JavaAnn' type=<root>.JavaAnn origin=null
+      CALL '#1 public/*package*/ constructor <init> (value: kotlin.String, i: kotlin.Int) [primary] declared in <root>.JavaAnn' type=<root>.JavaAnn origin=null
         value: CONST String type=kotlin.String value="abc"
         i: CONST Int type=kotlin.Int value=123
     BLOCK_BODY

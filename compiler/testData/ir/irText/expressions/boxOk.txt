@@ -1,5 +1,5 @@
 FILE fqName:<root> fileName:/boxOk.kt
-  FUN name:box visibility:public modality:FINAL <> () returnType:kotlin.String 
+  FUN #0 name:box visibility:public modality:FINAL <> () returnType:kotlin.String 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun box (): kotlin.String declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun box (): kotlin.String declared in <root>'
         CONST String type=kotlin.String value="OK"

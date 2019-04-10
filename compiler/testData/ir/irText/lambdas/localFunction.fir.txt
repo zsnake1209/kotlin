@@ -1,12 +1,12 @@
 FILE fqName:<root> fileName:/localFunction.kt
-  FUN name:outer visibility:public modality:FINAL <> () returnType:kotlin.Unit
+  FUN #0 name:outer visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      VAR name:x type:kotlin.Int [var]
+      VAR #1 name:x type:kotlin.Int [var] 
         CONST Int type=kotlin.Int value=0
-      FUN name:local visibility:local modality:FINAL <> () returnType:kotlin.Unit
+      FUN #2 name:local visibility:local modality:FINAL <> () returnType:kotlin.Unit 
         BLOCK_BODY
-          VAR name:<unary> type:kotlin.Int [val]
-            GET_VAR 'var x: kotlin.Int [var] declared in <root>.outer' type=kotlin.Int origin=null
+          VAR #3 name:<unary> type:kotlin.Int [val] 
+            GET_VAR '#1 var x: kotlin.Int [var] declared in <root>.outer' type=kotlin.Int origin=null
           ERROR_CALL 'Unresolved reference: R|<local>/x|' type=IrErrorType
-          GET_VAR 'val <unary>: kotlin.Int [val] declared in <root>.outer.local' type=kotlin.Int origin=null
-      CALL 'local final fun local (): kotlin.Unit declared in <local>' type=kotlin.Unit origin=null
+          GET_VAR '#3 val <unary>: kotlin.Int [val] declared in <root>.outer.local' type=kotlin.Int origin=null
+      CALL '#4 local final fun local (): kotlin.Unit declared in <local>' type=kotlin.Unit origin=null

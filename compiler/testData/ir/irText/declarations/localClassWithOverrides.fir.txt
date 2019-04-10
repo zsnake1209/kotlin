@@ -1,75 +1,75 @@
 FILE fqName:<root> fileName:/localClassWithOverrides.kt
-  FUN name:outer visibility:public modality:FINAL <> () returnType:kotlin.Unit
+  FUN #0 name:outer visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-      CLASS CLASS name:ALocal modality:ABSTRACT visibility:local superTypes:[kotlin.Any]
-        $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.outer.ALocal
-        CONSTRUCTOR visibility:public <> () returnType:IrErrorType [primary]
+      CLASS #1 CLASS name:ALocal modality:ABSTRACT visibility:local superTypes:[kotlin.Any]
+        $this: VALUE_PARAMETER #2 INSTANCE_RECEIVER name:<this> type:<root>.outer.ALocal 
+        CONSTRUCTOR #3 visibility:public <> () returnType:IrErrorType [primary] 
           BLOCK_BODY
-            DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
-            INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:ALocal modality:ABSTRACT visibility:local superTypes:[kotlin.Any]'
-        FUN name:afun visibility:public modality:ABSTRACT <> ($this:<root>.outer.ALocal) returnType:kotlin.Unit
-          $this: VALUE_PARAMETER name:<this> type:<root>.outer.ALocal
-        PROPERTY name:aval visibility:public modality:ABSTRACT [val]
-          FUN DEFAULT_PROPERTY_ACCESSOR name:<get-aval> visibility:public modality:ABSTRACT <> ($this:<root>.outer.ALocal) returnType:kotlin.Int
-            correspondingProperty: PROPERTY name:aval visibility:public modality:ABSTRACT [val]
-            $this: VALUE_PARAMETER name:<this> type:<root>.outer.ALocal
-        PROPERTY name:avar visibility:public modality:ABSTRACT [var]
-          FUN DEFAULT_PROPERTY_ACCESSOR name:<get-avar> visibility:public modality:ABSTRACT <> ($this:<root>.outer.ALocal) returnType:kotlin.Int
-            correspondingProperty: PROPERTY name:avar visibility:public modality:ABSTRACT [var]
-            $this: VALUE_PARAMETER name:<this> type:<root>.outer.ALocal
-          FUN DEFAULT_PROPERTY_ACCESSOR name:<set-avar> visibility:public modality:ABSTRACT <> ($this:<root>.outer.ALocal, <set-?>:kotlin.Int) returnType:kotlin.Unit
-            correspondingProperty: PROPERTY name:avar visibility:public modality:ABSTRACT [var]
-            $this: VALUE_PARAMETER name:<this> type:<root>.outer.ALocal
-            VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
-        FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+            DELEGATING_CONSTRUCTOR_CALL '#4 public constructor <init> () [primary] declared in kotlin.Any'
+            INSTANCE_INITIALIZER_CALL class='#1 class CLASS ALocal declared in <root>.outer'
+        FUN #5 name:afun visibility:public modality:ABSTRACT <> ($this:<root>.outer.ALocal) returnType:kotlin.Unit 
+          $this: VALUE_PARAMETER #6 name:<this> type:<root>.outer.ALocal 
+        PROPERTY #7 name:aval visibility:public modality:ABSTRACT [val] 
+          FUN #8 DEFAULT_PROPERTY_ACCESSOR name:<get-aval> visibility:public modality:ABSTRACT <> ($this:<root>.outer.ALocal) returnType:kotlin.Int 
+            correspondingProperty: PROPERTY #7 name:aval visibility:public modality:ABSTRACT [val] 
+            $this: VALUE_PARAMETER #9 name:<this> type:<root>.outer.ALocal 
+        PROPERTY #10 name:avar visibility:public modality:ABSTRACT [var] 
+          FUN #11 DEFAULT_PROPERTY_ACCESSOR name:<get-avar> visibility:public modality:ABSTRACT <> ($this:<root>.outer.ALocal) returnType:kotlin.Int 
+            correspondingProperty: PROPERTY #10 name:avar visibility:public modality:ABSTRACT [var] 
+            $this: VALUE_PARAMETER #12 name:<this> type:<root>.outer.ALocal 
+          FUN #13 DEFAULT_PROPERTY_ACCESSOR name:<set-avar> visibility:public modality:ABSTRACT <> ($this:<root>.outer.ALocal, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+            correspondingProperty: PROPERTY #10 name:avar visibility:public modality:ABSTRACT [var] 
+            $this: VALUE_PARAMETER #14 name:<this> type:<root>.outer.ALocal 
+            VALUE_PARAMETER #15 name:<set-?> index:0 type:kotlin.Int 
+        FUN #16 FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean 
           overridden:
-            public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
-          $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-          VALUE_PARAMETER name:other index:0 type:kotlin.Any?
-        FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+            #17 public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+          $this: VALUE_PARAMETER #18 name:<this> type:kotlin.Any 
+          VALUE_PARAMETER #19 name:other index:0 type:kotlin.Any? 
+        FUN #20 FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int 
           overridden:
-            public open fun hashCode (): kotlin.Int declared in kotlin.Any
-          $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-        FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+            #21 public open fun hashCode (): kotlin.Int declared in kotlin.Any
+          $this: VALUE_PARAMETER #22 name:<this> type:kotlin.Any 
+        FUN #23 FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String 
           overridden:
-            public open fun toString (): kotlin.String declared in kotlin.Any
-          $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-      CLASS CLASS name:Local modality:FINAL visibility:local superTypes:[IrErrorType]
-        $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.outer.Local
-        CONSTRUCTOR visibility:public <> () returnType:IrErrorType [primary]
+            #24 public open fun toString (): kotlin.String declared in kotlin.Any
+          $this: VALUE_PARAMETER #25 name:<this> type:kotlin.Any 
+      CLASS #26 CLASS name:Local modality:FINAL visibility:local superTypes:[IrErrorType]
+        $this: VALUE_PARAMETER #27 INSTANCE_RECEIVER name:<this> type:<root>.outer.Local 
+        CONSTRUCTOR #28 visibility:public <> () returnType:IrErrorType [primary] 
           BLOCK_BODY
             ERROR_CALL 'Cannot find delegated constructor call' type=IrErrorType
-            INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Local modality:FINAL visibility:local superTypes:[IrErrorType]'
-        FUN name:afun visibility:public modality:FINAL <> ($this:<root>.outer.Local) returnType:kotlin.Unit
-          $this: VALUE_PARAMETER name:<this> type:<root>.outer.Local
+            INSTANCE_INITIALIZER_CALL class='#26 class CLASS Local declared in <root>.outer'
+        FUN #29 name:afun visibility:public modality:FINAL <> ($this:<root>.outer.Local) returnType:kotlin.Unit 
+          $this: VALUE_PARAMETER #30 name:<this> type:<root>.outer.Local 
           BLOCK_BODY
-        PROPERTY name:aval visibility:public modality:FINAL [val]
-          FIELD PROPERTY_BACKING_FIELD name:aval type:kotlin.Int visibility:public [final]
+        PROPERTY #31 name:aval visibility:public modality:FINAL [val] 
+          FIELD #32 PROPERTY_BACKING_FIELD name:aval type:kotlin.Int visibility:public [final] 
             EXPRESSION_BODY
               CONST Int type=kotlin.Int value=1
-          FUN DEFAULT_PROPERTY_ACCESSOR name:<get-aval> visibility:public modality:FINAL <> ($this:<root>.outer.Local) returnType:IrErrorType
-            correspondingProperty: PROPERTY name:aval visibility:public modality:FINAL [val]
-            $this: VALUE_PARAMETER name:<this> type:<root>.outer.Local
+          FUN #33 DEFAULT_PROPERTY_ACCESSOR name:<get-aval> visibility:public modality:FINAL <> ($this:<root>.outer.Local) returnType:IrErrorType 
+            correspondingProperty: PROPERTY #31 name:aval visibility:public modality:FINAL [val] 
+            $this: VALUE_PARAMETER #34 name:<this> type:<root>.outer.Local 
             BLOCK_BODY
-              RETURN type=kotlin.Nothing from='public final fun <get-aval> (): IrErrorType declared in <root>.outer.Local'
-                GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:aval type:kotlin.Int visibility:public [final] ' type=kotlin.Int origin=null
-                  receiver: GET_VAR '<this>: <root>.outer.Local declared in <root>.outer.Local.<get-aval>' type=<root>.outer.Local origin=null
-        PROPERTY name:avar visibility:public modality:FINAL [var]
-          FIELD PROPERTY_BACKING_FIELD name:avar type:kotlin.Int visibility:public
+              RETURN type=kotlin.Nothing from='#33 public final fun <get-aval> (): IrErrorType declared in <root>.outer.Local'
+                GET_FIELD '#32 FIELD #32 PROPERTY_BACKING_FIELD name:aval type:kotlin.Int visibility:public [final] ' type=kotlin.Int origin=null
+                  receiver: GET_VAR '#34 <this>: <root>.outer.Local declared in <root>.outer.Local.<get-aval>' type=<root>.outer.Local origin=null
+        PROPERTY #35 name:avar visibility:public modality:FINAL [var] 
+          FIELD #36 PROPERTY_BACKING_FIELD name:avar type:kotlin.Int visibility:public 
             EXPRESSION_BODY
               CONST Int type=kotlin.Int value=2
-          FUN DEFAULT_PROPERTY_ACCESSOR name:<get-avar> visibility:public modality:FINAL <> ($this:<root>.outer.Local) returnType:IrErrorType
-            correspondingProperty: PROPERTY name:avar visibility:public modality:FINAL [var]
-            $this: VALUE_PARAMETER name:<this> type:<root>.outer.Local
+          FUN #37 DEFAULT_PROPERTY_ACCESSOR name:<get-avar> visibility:public modality:FINAL <> ($this:<root>.outer.Local) returnType:IrErrorType 
+            correspondingProperty: PROPERTY #35 name:avar visibility:public modality:FINAL [var] 
+            $this: VALUE_PARAMETER #38 name:<this> type:<root>.outer.Local 
             BLOCK_BODY
-              RETURN type=kotlin.Nothing from='public final fun <get-avar> (): IrErrorType declared in <root>.outer.Local'
-                GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:avar type:kotlin.Int visibility:public ' type=kotlin.Int origin=null
-                  receiver: GET_VAR '<this>: <root>.outer.Local declared in <root>.outer.Local.<get-avar>' type=<root>.outer.Local origin=null
-          FUN DEFAULT_PROPERTY_ACCESSOR name:<set-avar> visibility:public modality:FINAL <> ($this:<root>.outer.Local, <set-?>:kotlin.Int) returnType:kotlin.Unit
-            correspondingProperty: PROPERTY name:avar visibility:public modality:FINAL [var]
-            $this: VALUE_PARAMETER name:<this> type:<root>.outer.Local
-            VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
+              RETURN type=kotlin.Nothing from='#37 public final fun <get-avar> (): IrErrorType declared in <root>.outer.Local'
+                GET_FIELD '#36 FIELD #36 PROPERTY_BACKING_FIELD name:avar type:kotlin.Int visibility:public ' type=kotlin.Int origin=null
+                  receiver: GET_VAR '#38 <this>: <root>.outer.Local declared in <root>.outer.Local.<get-avar>' type=<root>.outer.Local origin=null
+          FUN #39 DEFAULT_PROPERTY_ACCESSOR name:<set-avar> visibility:public modality:FINAL <> ($this:<root>.outer.Local, <set-?>:kotlin.Int) returnType:kotlin.Unit 
+            correspondingProperty: PROPERTY #35 name:avar visibility:public modality:FINAL [var] 
+            $this: VALUE_PARAMETER #40 name:<this> type:<root>.outer.Local 
+            VALUE_PARAMETER #41 name:<set-?> index:0 type:kotlin.Int 
             BLOCK_BODY
-              SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:avar type:kotlin.Int visibility:public ' type=kotlin.Unit origin=null
-                receiver: GET_VAR '<this>: <root>.outer.Local declared in <root>.outer.Local.<set-avar>' type=<root>.outer.Local origin=null
-                value: GET_VAR '<set-?>: kotlin.Int declared in <root>.outer.Local.<set-avar>' type=kotlin.Int origin=null
+              SET_FIELD '#36 FIELD #36 PROPERTY_BACKING_FIELD name:avar type:kotlin.Int visibility:public ' type=kotlin.Unit origin=null
+                receiver: GET_VAR '#40 <this>: <root>.outer.Local declared in <root>.outer.Local.<set-avar>' type=<root>.outer.Local origin=null
+                value: GET_VAR '#41 <set-?>: kotlin.Int declared in <root>.outer.Local.<set-avar>' type=kotlin.Int origin=null

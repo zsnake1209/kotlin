@@ -1,80 +1,80 @@
 FILE fqName:<root> fileName:/kt28006.kt
-  PROPERTY name:test1 visibility:public modality:FINAL [val]
-    FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.String visibility:public [final,static]
+  PROPERTY #0 name:test1 visibility:public modality:FINAL [val] 
+    FIELD #1 PROPERTY_BACKING_FIELD name:test1 type:kotlin.String visibility:public [final,static] 
       EXPRESSION_BODY
         CONST String type=kotlin.String value="\uD83E\uDD17"
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.String
-      correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val]
+    FUN #2 DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.String 
+      correspondingProperty: PROPERTY #0 name:test1 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.String declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
-  PROPERTY name:test2 visibility:public modality:FINAL [val]
-    FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.String visibility:public [final,static]
+        RETURN type=kotlin.Nothing from='#2 public final fun <get-test1> (): kotlin.String declared in <root>'
+          GET_FIELD '#1 FIELD #1 PROPERTY_BACKING_FIELD name:test1 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
+  PROPERTY #3 name:test2 visibility:public modality:FINAL [val] 
+    FIELD #4 PROPERTY_BACKING_FIELD name:test2 type:kotlin.String visibility:public [final,static] 
       EXPRESSION_BODY
         CONST String type=kotlin.String value="\uD83E\uDD17\uD83E\uDD17"
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.String
-      correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [val]
+    FUN #5 DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.String 
+      correspondingProperty: PROPERTY #3 name:test2 visibility:public modality:FINAL [val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.String declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
-  PROPERTY name:testConst1 visibility:public modality:FINAL [const,val]
-    FIELD PROPERTY_BACKING_FIELD name:testConst1 type:kotlin.String visibility:public [final,static]
+        RETURN type=kotlin.Nothing from='#5 public final fun <get-test2> (): kotlin.String declared in <root>'
+          GET_FIELD '#4 FIELD #4 PROPERTY_BACKING_FIELD name:test2 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
+  PROPERTY #6 name:testConst1 visibility:public modality:FINAL [const,val] 
+    FIELD #7 PROPERTY_BACKING_FIELD name:testConst1 type:kotlin.String visibility:public [final,static] 
       EXPRESSION_BODY
         CONST String type=kotlin.String value="\uD83E\uDD17"
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-testConst1> visibility:public modality:FINAL <> () returnType:kotlin.String
-      correspondingProperty: PROPERTY name:testConst1 visibility:public modality:FINAL [const,val]
+    FUN #8 DEFAULT_PROPERTY_ACCESSOR name:<get-testConst1> visibility:public modality:FINAL <> () returnType:kotlin.String 
+      correspondingProperty: PROPERTY #6 name:testConst1 visibility:public modality:FINAL [const,val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-testConst1> (): kotlin.String declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:testConst1 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
-  PROPERTY name:testConst2 visibility:public modality:FINAL [const,val]
-    FIELD PROPERTY_BACKING_FIELD name:testConst2 type:kotlin.String visibility:public [final,static]
+        RETURN type=kotlin.Nothing from='#8 public final fun <get-testConst1> (): kotlin.String declared in <root>'
+          GET_FIELD '#7 FIELD #7 PROPERTY_BACKING_FIELD name:testConst1 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
+  PROPERTY #9 name:testConst2 visibility:public modality:FINAL [const,val] 
+    FIELD #10 PROPERTY_BACKING_FIELD name:testConst2 type:kotlin.String visibility:public [final,static] 
       EXPRESSION_BODY
         CONST String type=kotlin.String value="\uD83E\uDD17\uD83E\uDD17"
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-testConst2> visibility:public modality:FINAL <> () returnType:kotlin.String
-      correspondingProperty: PROPERTY name:testConst2 visibility:public modality:FINAL [const,val]
+    FUN #11 DEFAULT_PROPERTY_ACCESSOR name:<get-testConst2> visibility:public modality:FINAL <> () returnType:kotlin.String 
+      correspondingProperty: PROPERTY #9 name:testConst2 visibility:public modality:FINAL [const,val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-testConst2> (): kotlin.String declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:testConst2 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
-  PROPERTY name:testConst3 visibility:public modality:FINAL [const,val]
-    FIELD PROPERTY_BACKING_FIELD name:testConst3 type:kotlin.String visibility:public [final,static]
+        RETURN type=kotlin.Nothing from='#11 public final fun <get-testConst2> (): kotlin.String declared in <root>'
+          GET_FIELD '#10 FIELD #10 PROPERTY_BACKING_FIELD name:testConst2 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
+  PROPERTY #12 name:testConst3 visibility:public modality:FINAL [const,val] 
+    FIELD #13 PROPERTY_BACKING_FIELD name:testConst3 type:kotlin.String visibility:public [final,static] 
       EXPRESSION_BODY
         ERROR_CALL 'Cannot bind 2 arguments to plus call with 1 parameters' type=kotlin.String
           CONST String type=kotlin.String value="\uDD17"
-          CALL 'public final fun <get-testConst2> (): kotlin.String declared in <root>' type=kotlin.String origin=null
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-testConst3> visibility:public modality:FINAL <> () returnType:kotlin.String
-      correspondingProperty: PROPERTY name:testConst3 visibility:public modality:FINAL [const,val]
+          CALL '#11 public final fun <get-testConst2> (): kotlin.String declared in <root>' type=kotlin.String origin=null
+    FUN #14 DEFAULT_PROPERTY_ACCESSOR name:<get-testConst3> visibility:public modality:FINAL <> () returnType:kotlin.String 
+      correspondingProperty: PROPERTY #12 name:testConst3 visibility:public modality:FINAL [const,val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-testConst3> (): kotlin.String declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:testConst3 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
-  PROPERTY name:testConst4 visibility:public modality:FINAL [const,val]
-    FIELD PROPERTY_BACKING_FIELD name:testConst4 type:kotlin.String visibility:public [final,static]
+        RETURN type=kotlin.Nothing from='#14 public final fun <get-testConst3> (): kotlin.String declared in <root>'
+          GET_FIELD '#13 FIELD #13 PROPERTY_BACKING_FIELD name:testConst3 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
+  PROPERTY #15 name:testConst4 visibility:public modality:FINAL [const,val] 
+    FIELD #16 PROPERTY_BACKING_FIELD name:testConst4 type:kotlin.String visibility:public [final,static] 
       EXPRESSION_BODY
-        CALL 'public final fun plus (other: kotlin.Any?): kotlin.String declared in kotlin.String' type=kotlin.String origin=null
-          other: CALL 'public final fun <get-testConst2> (): kotlin.String declared in <root>' type=kotlin.String origin=null
-    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-testConst4> visibility:public modality:FINAL <> () returnType:kotlin.String
-      correspondingProperty: PROPERTY name:testConst4 visibility:public modality:FINAL [const,val]
+        CALL '#17 public final fun plus (other: kotlin.Any?): kotlin.String declared in kotlin.String' type=kotlin.String origin=null
+          other: CALL '#11 public final fun <get-testConst2> (): kotlin.String declared in <root>' type=kotlin.String origin=null
+    FUN #18 DEFAULT_PROPERTY_ACCESSOR name:<get-testConst4> visibility:public modality:FINAL <> () returnType:kotlin.String 
+      correspondingProperty: PROPERTY #15 name:testConst4 visibility:public modality:FINAL [const,val] 
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-testConst4> (): kotlin.String declared in <root>'
-          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:testConst4 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
-  FUN name:test1 visibility:public modality:FINAL <> (x:kotlin.Int) returnType:kotlin.String
-    VALUE_PARAMETER name:x index:0 type:kotlin.Int
+        RETURN type=kotlin.Nothing from='#18 public final fun <get-testConst4> (): kotlin.String declared in <root>'
+          GET_FIELD '#16 FIELD #16 PROPERTY_BACKING_FIELD name:testConst4 type:kotlin.String visibility:public [final,static] ' type=kotlin.String origin=null
+  FUN #19 name:test1 visibility:public modality:FINAL <> (x:kotlin.Int) returnType:kotlin.String 
+    VALUE_PARAMETER #20 name:x index:0 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1 (x: kotlin.Int): kotlin.String declared in <root>'
+      RETURN type=kotlin.Nothing from='#19 public final fun test1 (x: kotlin.Int): kotlin.String declared in <root>'
         ERROR_CALL 'Cannot bind 2 arguments to plus call with 1 parameters' type=kotlin.String
           CONST String type=kotlin.String value="\uDD17"
-          GET_VAR 'x: kotlin.Int declared in <root>.test1' type=kotlin.Int origin=null
-  FUN name:test2 visibility:public modality:FINAL <> (x:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:x index:0 type:kotlin.Int
+          GET_VAR '#20 x: kotlin.Int declared in <root>.test1' type=kotlin.Int origin=null
+  FUN #21 name:test2 visibility:public modality:FINAL <> (x:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #22 name:x index:0 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2 (x: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#21 public final fun test2 (x: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: plus, [kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus]>#' type=IrErrorType
           CONST String type=kotlin.String value="\uD83E"
           CONST String type=kotlin.String value="\uDD17"
-  FUN name:test3 visibility:public modality:FINAL <> (x:kotlin.Int) returnType:IrErrorType
-    VALUE_PARAMETER name:x index:0 type:kotlin.Int
+  FUN #23 name:test3 visibility:public modality:FINAL <> (x:kotlin.Int) returnType:IrErrorType 
+    VALUE_PARAMETER #24 name:x index:0 type:kotlin.Int 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3 (x: kotlin.Int): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#23 public final fun test3 (x: kotlin.Int): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Ambiguity: plus, [kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus, kotlin/Int.plus]>#' type=IrErrorType
           CONST String type=kotlin.String value="\uD83E"
           CONST String type=kotlin.String value="\uDD17"
-          GET_VAR 'x: kotlin.Int declared in <root>.test3' type=kotlin.Int origin=null
+          GET_VAR '#24 x: kotlin.Int declared in <root>.test3' type=kotlin.Int origin=null

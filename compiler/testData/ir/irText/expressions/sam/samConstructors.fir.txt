@@ -1,37 +1,37 @@
 FILE fqName:<root> fileName:/samConstructors.kt
-  FUN name:test1 visibility:public modality:FINAL <> () returnType:IrErrorType
+  FUN #0 name:test1 visibility:public modality:FINAL <> () returnType:IrErrorType 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test1 (): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#0 public final fun test1 (): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Unresolved name: Runnable>#' type=IrErrorType
           BLOCK type=IrErrorType origin=LAMBDA
-            FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:IrErrorType
+            FUN #1 LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:IrErrorType 
               BLOCK_BODY
-                RETURN type=kotlin.Nothing from='local final fun <anonymous> (): IrErrorType declared in <root>.test1'
-                  GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
-            FUNCTION_REFERENCE 'local final fun <anonymous> (): IrErrorType declared in <root>.test1' type=IrErrorType origin=LAMBDA
-  FUN name:test2 visibility:public modality:FINAL <> (a:kotlin.Function0) returnType:IrErrorType
-    VALUE_PARAMETER name:a index:0 type:kotlin.Function0
+                RETURN type=kotlin.Nothing from='#1 local final fun <anonymous> (): IrErrorType declared in <root>.test1'
+                  GET_OBJECT '#2 class OBJECT Unit declared in kotlin' type=kotlin.Unit
+            FUNCTION_REFERENCE '#1 local final fun <anonymous> (): IrErrorType declared in <root>.test1' type=IrErrorType origin=LAMBDA
+  FUN #3 name:test2 visibility:public modality:FINAL <> (a:kotlin.Function0) returnType:IrErrorType 
+    VALUE_PARAMETER #4 name:a index:0 type:kotlin.Function0 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test2 (a: kotlin.Function0): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#3 public final fun test2 (a: kotlin.Function0): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Unresolved name: Runnable>#' type=IrErrorType
-          GET_VAR 'a: kotlin.Function0 declared in <root>.test2' type=kotlin.Function0 origin=null
-  FUN name:foo visibility:public modality:FINAL <> () returnType:kotlin.Unit
+          GET_VAR '#4 a: kotlin.Function0 declared in <root>.test2' type=kotlin.Function0 origin=null
+  FUN #5 name:foo visibility:public modality:FINAL <> () returnType:kotlin.Unit 
     BLOCK_BODY
-  FUN name:test3 visibility:public modality:FINAL <> () returnType:IrErrorType
+  FUN #6 name:test3 visibility:public modality:FINAL <> () returnType:IrErrorType 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test3 (): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#6 public final fun test3 (): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Unresolved name: Runnable>#' type=IrErrorType
           ERROR_CALL 'Unresolved reference: <Unresolved name: foo>#' type=IrErrorType
-  FUN name:test4 visibility:public modality:FINAL <> () returnType:IrErrorType
+  FUN #7 name:test4 visibility:public modality:FINAL <> () returnType:IrErrorType 
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='public final fun test4 (): IrErrorType declared in <root>'
+      RETURN type=kotlin.Nothing from='#7 public final fun test4 (): IrErrorType declared in <root>'
         ERROR_CALL 'Unresolved reference: <Unresolved name: Comparator>#' type=IrErrorType
           BLOCK type=IrErrorType origin=LAMBDA
-            FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> (a:IrErrorType, b:IrErrorType) returnType:IrErrorType
-              VALUE_PARAMETER name:a index:0 type:IrErrorType
-              VALUE_PARAMETER name:b index:1 type:IrErrorType
+            FUN #8 LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> (a:IrErrorType, b:IrErrorType) returnType:IrErrorType 
+              VALUE_PARAMETER #9 name:a index:0 type:IrErrorType 
+              VALUE_PARAMETER #10 name:b index:1 type:IrErrorType 
               BLOCK_BODY
-                RETURN type=kotlin.Nothing from='local final fun <anonymous> (a: IrErrorType, b: IrErrorType): IrErrorType declared in <root>.test4'
+                RETURN type=kotlin.Nothing from='#8 local final fun <anonymous> (a: IrErrorType, b: IrErrorType): IrErrorType declared in <root>.test4'
                   ERROR_CALL 'Unresolved reference: <Unresolved name: minus>#' type=IrErrorType
-                    GET_VAR 'b: IrErrorType declared in <root>.test4.<anonymous>' type=IrErrorType origin=null
-            FUNCTION_REFERENCE 'local final fun <anonymous> (a: IrErrorType, b: IrErrorType): IrErrorType declared in <root>.test4' type=IrErrorType origin=LAMBDA
+                    GET_VAR '#10 b: IrErrorType declared in <root>.test4.<anonymous>' type=IrErrorType origin=null
+            FUNCTION_REFERENCE '#8 local final fun <anonymous> (a: IrErrorType, b: IrErrorType): IrErrorType declared in <root>.test4' type=IrErrorType origin=LAMBDA

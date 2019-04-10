@@ -34,6 +34,21 @@ fun IrElement.render() =
     accept(RenderIrElementVisitor(), null)
 
 class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
+    var symbolLabelProvider: ((IrSymbol) -> String)? = null
+
+    private fun prependSymbolLabel(irSymbol: IrSymbol, text: String) =
+        symbolLabelProvider?.let { "${it(irSymbol)} $text" } ?: text
+
+    private inline fun <T : IrSymbolOwner> T.withSymbolLabel(prefix: String, b: T.() -> String) =
+        buildString {
+            append(prefix)
+            append(' ')
+            symbolLabelProvider?.let {
+                append(it(symbol))
+            }
+            append(' ')
+            append(b())
+        }
 
     fun renderType(type: IrType) = type.render()
 
@@ -86,10 +101,13 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
             annotations.joinToString(prefix = "", postfix = " ", separator = " ") { "@[${it.render()}]" }
 
     private fun IrSymbol.renderReference() =
-        if (isBound)
-            owner.accept(symbolReferenceRenderer, null)
-        else
-            "UNBOUND ${javaClass.simpleName}"
+        prependSymbolLabel(
+            this,
+            if (isBound)
+                owner.accept(symbolReferenceRenderer, null)
+            else
+                "UNBOUND ${javaClass.simpleName}"
+        )
 
     private val symbolReferenceRenderer = BoundSymbolReferenceRenderer()
 
@@ -98,6 +116,16 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
 
         override fun visitElement(element: IrElement, data: Nothing?) =
             element.accept(this@RenderIrElementVisitor, null)
+
+        override fun visitClass(declaration: IrClass, data: Nothing?): String =
+            buildString {
+                append("class ")
+                append(declaration.kind)
+                append(' ')
+                append(declaration.name.asString())
+                append(' ')
+                renderDeclaredIn(declaration)
+            }
 
         override fun visitVariable(declaration: IrVariable, data: Nothing?) =
             buildString {
@@ -264,12 +292,9 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
     override fun visitFile(declaration: IrFile, data: Nothing?): String =
         "FILE fqName:${declaration.fqName} fileName:${declaration.path}"
 
-    override fun visitFunction(declaration: IrFunction, data: Nothing?): String =
-        "FUN ${declaration.renderOriginIfNonTrivial()}"
-
     override fun visitSimpleFunction(declaration: IrSimpleFunction, data: Nothing?): String =
-        declaration.run {
-            "FUN ${renderOriginIfNonTrivial()}" +
+        declaration.withSymbolLabel("FUN") {
+            renderOriginIfNonTrivial() +
                     "name:$name visibility:$visibility modality:$modality " +
                     renderTypeParameters() + " " +
                     renderValueParameterTypes() + " " +
@@ -304,8 +329,8 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         }.joinToString(separator = ", ", prefix = "(", postfix = ")")
 
     override fun visitConstructor(declaration: IrConstructor, data: Nothing?): String =
-        declaration.run {
-            "CONSTRUCTOR ${renderOriginIfNonTrivial()}" +
+        declaration.withSymbolLabel("CONSTRUCTOR") {
+            renderOriginIfNonTrivial() +
                     "visibility:$visibility " +
                     renderTypeParameters() + " " +
                     renderValueParameterTypes() + " " +
@@ -321,10 +346,8 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         )
 
     override fun visitProperty(declaration: IrProperty, data: Nothing?): String =
-        declaration.run {
-            "PROPERTY ${renderOriginIfNonTrivial()}" +
-                    "name:$name visibility:$visibility modality:$modality " +
-                    renderPropertyFlags()
+        declaration.withSymbolLabel("PROPERTY") {
+            "${renderOriginIfNonTrivial()}name:$name visibility:$visibility modality:$modality ${renderPropertyFlags()}"
         }
 
     private fun IrProperty.renderPropertyFlags() =
@@ -337,9 +360,10 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         )
 
     override fun visitField(declaration: IrField, data: Nothing?): String =
-        "FIELD ${declaration.renderOriginIfNonTrivial()}" +
-                "name:${declaration.name} type:${declaration.type.render()} visibility:${declaration.visibility} " +
-                declaration.renderFieldFlags()
+        declaration.withSymbolLabel("FIELD") {
+            "${renderOriginIfNonTrivial()}name:$name type:${type.render()} visibility:$visibility ${renderFieldFlags()}"
+        }
+
 
     private fun IrField.renderFieldFlags() =
         renderFlagsList(
@@ -349,8 +373,8 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         )
 
     override fun visitClass(declaration: IrClass, data: Nothing?): String =
-        declaration.run {
-            "CLASS ${renderOriginIfNonTrivial()}" +
+        declaration.withSymbolLabel("CLASS") {
+            renderOriginIfNonTrivial() +
                     "$kind name:$name modality:$modality visibility:$visibility " +
                     renderClassFlags() +
                     "superTypes:[${superTypes.joinToString(separator = "; ") { it.render() }}]"
@@ -366,8 +390,9 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         )
 
     override fun visitVariable(declaration: IrVariable, data: Nothing?): String =
-        "VAR ${declaration.renderOriginIfNonTrivial()}" +
-                "name:${declaration.name} type:${declaration.type.render()} ${declaration.renderVariableFlags()}"
+        declaration.withSymbolLabel("VAR") {
+            "${renderOriginIfNonTrivial()}name:$name type:${type.render()} ${renderVariableFlags()}"
+        }
 
     private fun IrVariable.renderVariableFlags(): String =
         renderFlagsList(
@@ -377,21 +402,26 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         )
 
     override fun visitEnumEntry(declaration: IrEnumEntry, data: Nothing?): String =
-        "ENUM_ENTRY ${declaration.renderOriginIfNonTrivial()}name:${declaration.name}"
+        declaration.withSymbolLabel("ENUM_ENTRY") {
+            "${renderOriginIfNonTrivial()}name:$name"
+        }
 
     override fun visitAnonymousInitializer(declaration: IrAnonymousInitializer, data: Nothing?): String =
-        "ANONYMOUS_INITIALIZER isStatic=${declaration.isStatic}"
+        declaration.withSymbolLabel("ANONYMOUS_INITIALIZER") {
+            "isStatic=$isStatic"
+        }
+
 
     override fun visitTypeParameter(declaration: IrTypeParameter, data: Nothing?): String =
-        declaration.run {
-            "TYPE_PARAMETER ${renderOriginIfNonTrivial()}" +
+        declaration.withSymbolLabel("TYPE_PARAMETER") {
+            renderOriginIfNonTrivial() +
                     "name:$name index:$index variance:$variance " +
                     "superTypes:[${superTypes.joinToString(separator = "; ") { it.render() }}]"
         }
 
     override fun visitValueParameter(declaration: IrValueParameter, data: Nothing?): String =
-        declaration.run {
-            "VALUE_PARAMETER ${renderOriginIfNonTrivial()}" +
+        declaration.withSymbolLabel("VALUE_PARAMETER") {
+            renderOriginIfNonTrivial() +
                     "name:$name " +
                     (if (index >= 0) "index:$index " else "") +
                     "type:${type.render()} " +
@@ -407,9 +437,8 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         )
 
     override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty, data: Nothing?): String =
-        declaration.run {
-            "LOCAL_DELEGATED_PROPERTY ${declaration.renderOriginIfNonTrivial()}" +
-                    "name:$name type:${type.render()} flags:${renderLocalDelegatedPropertyFlags()}"
+        declaration.withSymbolLabel("LOCAL_DELEGATED_PROPERTY") {
+            "${declaration.renderOriginIfNonTrivial()}name:$name type:${type.render()} flags:${renderLocalDelegatedPropertyFlags()}"
         }
 
     private fun IrLocalDelegatedProperty.renderLocalDelegatedPropertyFlags() =
@@ -466,7 +495,7 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         "ENUM_CONSTRUCTOR_CALL '${expression.symbol.renderReference()}'"
 
     override fun visitInstanceInitializerCall(expression: IrInstanceInitializerCall, data: Nothing?): String =
-        "INSTANCE_INITIALIZER_CALL classDescriptor='${expression.classSymbol.renderReference()}'"
+        "INSTANCE_INITIALIZER_CALL class='${expression.classSymbol.renderReference()}'"
 
     override fun visitGetValue(expression: IrGetValue, data: Nothing?): String =
         "GET_VAR '${expression.symbol.renderReference()}' type=${expression.type.render()} origin=${expression.origin}"
