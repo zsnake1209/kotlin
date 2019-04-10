@@ -169,7 +169,7 @@ class JvmSharedVariablesManager(
         val refType = provider.getRefType(valueType)
         val refConstructor = provider.refConstructor
 
-        val refConstructorCall = IrConstructorCallImpl.fromSymbolDescriptor(
+        val refConstructorCall = IrConstructorCallImpl.fromSymbolOwner(
             refType,
             refConstructor.symbol,
             SHARED_VARIABLE_CONSTRUCTOR_CALL_ORIGIN

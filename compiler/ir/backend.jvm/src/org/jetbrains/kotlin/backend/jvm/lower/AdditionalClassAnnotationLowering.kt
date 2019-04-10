@@ -142,7 +142,7 @@ private class AdditionalClassAnnotationLowering(private val context: JvmBackendC
         }
 
         irClass.annotations.add(
-            IrConstructorCallImpl.fromSymbolDescriptor(
+            IrConstructorCallImpl.fromSymbolOwner(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, documentedConstructor.returnType, documentedConstructor.symbol
             )
         )
@@ -160,7 +160,7 @@ private class AdditionalClassAnnotationLowering(private val context: JvmBackendC
         val javaRetentionPolicy = annotationRetentionMap[kotlinRetentionPolicy] ?: rpRuntime
 
         irClass.annotations.add(
-            IrConstructorCallImpl.fromSymbolDescriptor(
+            IrConstructorCallImpl.fromSymbolOwner(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, retentionConstructor.returnType, retentionConstructor.symbol
             ).apply {
                 putValueArgument(
@@ -228,7 +228,7 @@ private class AdditionalClassAnnotationLowering(private val context: JvmBackendC
         }
 
         irClass.annotations.add(
-            IrConstructorCallImpl.fromSymbolDescriptor(
+            IrConstructorCallImpl.fromSymbolOwner(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, targetConstructor.returnType, targetConstructor.symbol
             ).apply {
                 putValueArgument(0, vararg)
