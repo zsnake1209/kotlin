@@ -67,7 +67,7 @@ abstract class AbstractFirDiagnosticsSmokeTest : BaseDiagnosticsTest() {
         //For BuiltIns, registered in sessionProvider automatically
         val allProjectScope = GlobalSearchScope.allScope(project)
         FirLibrarySession.create(
-            builtInsModuleInfo, sessionProvider, allProjectScope,
+            builtInsModuleInfo, sessionProvider, allProjectScope, allProjectScope,
             environment
         )
 

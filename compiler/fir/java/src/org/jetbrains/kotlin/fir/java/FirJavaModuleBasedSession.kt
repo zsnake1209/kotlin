@@ -35,7 +35,7 @@ class FirJavaModuleBasedSession(
             FirCompositeSymbolProvider(
                 listOf(
                     service<FirProvider>(),
-                    JavaSymbolProvider(this, sessionProvider.project, scope),
+                    //JavaSymbolProvider(this, sessionProvider.project, scope),
                     dependenciesProvider ?: FirDependenciesSymbolProviderImpl(this)
                 )
             )
@@ -46,7 +46,7 @@ class FirJavaModuleBasedSession(
 class FirLibrarySession private constructor(
     moduleInfo: ModuleInfo,
     override val sessionProvider: FirProjectSessionProvider,
-    scope: GlobalSearchScope,
+    javaScope: GlobalSearchScope,
     packagePartProvider: PackagePartProvider,
     kotlinClassFinder: KotlinClassFinder,
     javaClassFinder: JavaClassFinder
@@ -63,7 +63,7 @@ class FirLibrarySession private constructor(
                         javaClassFinder
                     ),
                     FirLibrarySymbolProviderImpl(this),
-                    JavaSymbolProvider(this, sessionProvider.project, scope),
+                    JavaSymbolProvider(this, sessionProvider.project, javaScope),
                     FirDependenciesSymbolProviderImpl(this)
                 )
             )
@@ -75,9 +75,10 @@ class FirLibrarySession private constructor(
             moduleInfo: ModuleInfo,
             sessionProvider: FirProjectSessionProvider,
             scope: GlobalSearchScope,
+            javaScope: GlobalSearchScope,
             environment: KotlinCoreEnvironment
         ): FirLibrarySession = create(
-            moduleInfo, sessionProvider, scope, environment.project,
+            moduleInfo, sessionProvider, scope, javaScope, environment.project,
             environment.createPackagePartProvider(scope)
         )
 
@@ -85,6 +86,7 @@ class FirLibrarySession private constructor(
             moduleInfo: ModuleInfo,
             sessionProvider: FirProjectSessionProvider,
             scope: GlobalSearchScope,
+            javaScope: GlobalSearchScope,
             project: Project,
             packagePartProvider: PackagePartProvider
         ): FirLibrarySession {
@@ -94,7 +96,7 @@ class FirLibrarySession private constructor(
             }
 
             return FirLibrarySession(
-                moduleInfo, sessionProvider, scope,
+                moduleInfo, sessionProvider, javaScope,
                 packagePartProvider,
                 VirtualFileFinderFactory.getInstance(project).create(scope),
                 javaClassFinder
