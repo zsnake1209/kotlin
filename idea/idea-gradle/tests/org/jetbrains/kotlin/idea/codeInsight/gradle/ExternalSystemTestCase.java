@@ -51,8 +51,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.jetbrains.kotlin.test.testFramework.EdtTestUtil.runInEdtAndWait;
-
 // part of com.intellij.openapi.externalSystem.test.ExternalSystemTestCase
 public abstract class ExternalSystemTestCase extends KtUsefulTestCase {
     private File ourTempDir;
@@ -222,11 +220,6 @@ public abstract class ExternalSystemTestCase extends KtUsefulTestCase {
             while ((each = each.getCause()) != null);
             throw throwable;
         }
-    }
-
-    @Override
-    protected void invokeTestRunnable(@NotNull Runnable runnable) throws Exception {
-        runInEdtAndWait(runnable);
     }
 
     protected static String getRoot() {
