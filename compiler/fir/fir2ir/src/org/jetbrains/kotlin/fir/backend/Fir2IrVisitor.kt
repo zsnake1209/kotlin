@@ -148,7 +148,7 @@ internal class Fir2IrVisitor(
             }
 
             file.annotations.forEach {
-                val irCall = it.accept(this@Fir2IrVisitor, data) as? IrCall ?: return@forEach
+                val irCall = it.accept(this@Fir2IrVisitor, data) as? IrConstructorCall ?: return@forEach
                 annotations += irCall
             }
         }
@@ -256,7 +256,7 @@ internal class Fir2IrVisitor(
             }
             addFakeOverrides(klass, processedFunctionNames)
             klass.annotations.forEach {
-                val irCall = it.accept(this@Fir2IrVisitor, null) as? IrCall ?: return@forEach
+                val irCall = it.accept(this@Fir2IrVisitor, null) as? IrConstructorCall ?: return@forEach
                 annotations += irCall
             }
         }
@@ -487,7 +487,7 @@ internal class Fir2IrVisitor(
             setter = property.setter.accept(this@Fir2IrVisitor, type) as IrSimpleFunction
         }
         property.annotations.forEach {
-            annotations += it.accept(this@Fir2IrVisitor, null) as IrCall
+            annotations += it.accept(this@Fir2IrVisitor, null) as IrConstructorCall
         }
         return this
     }
@@ -658,7 +658,7 @@ internal class Fir2IrVisitor(
                     if (irConstructor == null) {
                         IrErrorCallExpressionImpl(startOffset, endOffset, type, "No annotation constructor found: ${irClass.name}")
                     } else {
-                        IrCallImpl(startOffset, endOffset, type, irConstructor.symbol)
+                        IrConstructorCallImpl.fromSymbolDescriptor(startOffset, endOffset, type, irConstructor.symbol)
                     }
 
                 }
