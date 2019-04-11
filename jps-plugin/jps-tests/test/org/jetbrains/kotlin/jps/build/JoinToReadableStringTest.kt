@@ -5,9 +5,9 @@
 
 package org.jetbrains.kotlin.jps.build
 
-import com.intellij.testFramework.UsefulTestCase
+import org.jetbrains.kotlin.test.testFramework.KtUsefulTestCase
 
-class JoinToReadableStringTest : UsefulTestCase() {
+class JoinToReadableStringTest : KtUsefulTestCase() {
     fun test0() {
         assertEquals(
             "",

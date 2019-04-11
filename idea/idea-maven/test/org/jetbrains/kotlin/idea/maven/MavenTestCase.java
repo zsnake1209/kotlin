@@ -30,7 +30,6 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.PsiTestUtil;
-import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.util.ui.UIUtil;
@@ -41,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.indices.MavenIndicesManager;
 import org.jetbrains.idea.maven.project.*;
 import org.jetbrains.idea.maven.server.MavenServerManager;
+import org.jetbrains.kotlin.test.testFramework.KtUsefulTestCase;
 
 import java.awt.*;
 import java.io.File;
@@ -49,11 +49,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public abstract class MavenTestCase extends UsefulTestCase {
+public abstract class MavenTestCase extends KtUsefulTestCase {
 
     private static final String mavenMirrorUrl = System.getProperty("idea.maven.test.mirror",
                                                                     // use JB maven proxy server for internal use by default, see details at
