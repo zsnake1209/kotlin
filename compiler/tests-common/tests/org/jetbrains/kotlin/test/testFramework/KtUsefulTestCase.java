@@ -54,6 +54,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.testFramework.MockComponentManagerCreationTracer;
 import org.jetbrains.kotlin.types.FlexibleTypeImpl;
 import org.jetbrains.kotlin.utils.ExceptionUtilsKt;
 import org.junit.Assert;
@@ -110,6 +111,12 @@ public abstract class KtUsefulTestCase extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+        application = ApplicationManager.getApplication();
+
+        if (application != null && application.isDisposed()) {
+            MockComponentManagerCreationTracer.diagnoseDisposedButNotClearedApplication(application);
+        }
+
         super.setUp();
 
         if (shouldContainTempFiles()) {
@@ -167,19 +174,20 @@ public abstract class KtUsefulTestCase extends TestCase {
         }
         finally {
             super.tearDown();
+            resetApplicationToNull(application);
         }
     }
 
     public static void resetApplicationToNull(Application old) {
-        //if (old != null) return;
-        //resetApplicationToNull();
+        if (old != null) return;
+        resetApplicationToNull();
     }
 
     public static void resetApplicationToNull() {
         try {
-            //Field ourApplicationField = ApplicationManager.class.getDeclaredField("ourApplication");
-            //ourApplicationField.setAccessible(true);
-            //ourApplicationField.set(null, null);
+            Field ourApplicationField = ApplicationManager.class.getDeclaredField("ourApplication");
+            ourApplicationField.setAccessible(true);
+            ourApplicationField.set(null, null);
         }
         catch (Exception e) {
             throw ExceptionUtilsKt.rethrow(e);
