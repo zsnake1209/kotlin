@@ -6,16 +6,11 @@
 package org.jetbrains.kotlin.ir.types
 
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
-import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
-import org.jetbrains.kotlin.ir.symbols.impl.IrClassSymbolImpl
-import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.impl.*
-import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
@@ -28,13 +23,10 @@ fun IrType.withHasQuestionMark(hasQuestionMark: Boolean): IrType =
             if (this.hasQuestionMark == hasQuestionMark)
                 this
             else
-                IrSimpleTypeImpl(
-                    originalKotlinType?.run { if (hasQuestionMark) makeNullable() else makeNotNullable() },
-                    classifier,
-                    hasQuestionMark,
-                    arguments,
-                    annotations
-                )
+                toBuilder().also { b ->
+                    b.hasQuestionMark = hasQuestionMark
+                    b.kotlinType = originalKotlinType?.run { if (hasQuestionMark) makeNullable() else makeNotNullable() }
+                }.buildSimpleType()
         else -> this
     }
 
@@ -49,27 +41,19 @@ val IrType.classOrNull: IrClassSymbol?
 
 fun IrType.makeNotNull() =
     if (this is IrSimpleType && this.hasQuestionMark) {
-        IrSimpleTypeImpl(
-            originalKotlinType?.makeNotNullable(),
-            classifier,
-            false,
-            arguments,
-            annotations,
-            Variance.INVARIANT
-        )
+        toBuilder().apply {
+            kotlinType = originalKotlinType?.makeNotNullable()
+            hasQuestionMark = false
+        }.buildSimpleType()
     } else
         this
 
 fun IrType.makeNullable() =
     if (this is IrSimpleType && !this.hasQuestionMark)
-        IrSimpleTypeImpl(
-            originalKotlinType?.makeNullable(),
-            classifier,
-            true,
-            arguments,
-            annotations,
-            Variance.INVARIANT
-        )
+        toBuilder().apply {
+            kotlinType = originalKotlinType?.makeNullable()
+            hasQuestionMark = true
+        }.buildSimpleType()
     else
         this
 
