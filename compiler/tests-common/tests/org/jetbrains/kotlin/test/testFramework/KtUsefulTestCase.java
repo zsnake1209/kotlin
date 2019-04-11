@@ -392,6 +392,10 @@ public abstract class KtUsefulTestCase extends TestCase {
         return t;
     }
 
+    protected static <T> void assertEmpty(Collection<T> collection) {
+        assertOrderedEquals("", collection);
+    }
+
     protected static <T> void assertEmpty(String errorMsg, Collection<T> collection) {
         assertOrderedEquals(errorMsg, collection);
     }
