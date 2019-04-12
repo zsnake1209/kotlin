@@ -79,7 +79,7 @@ public abstract class KtUsefulTestCase extends TestCase {
     private static final Map<String, Long> TOTAL_SETUP_COST_MILLIS = new HashMap<>();
     private static final Map<String, Long> TOTAL_TEARDOWN_COST_MILLIS = new HashMap<>();
 
-    private Application application;
+    //private Application application;
 
     static {
         IdeaForkJoinWorkerThreadFactory.setupPoisonFactory();
@@ -107,11 +107,11 @@ public abstract class KtUsefulTestCase extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        application = ApplicationManager.getApplication();
-
-        if (application != null && application.isDisposed()) {
-            MockComponentManagerCreationTracer.diagnoseDisposedButNotClearedApplication(application);
-        }
+        //application = ApplicationManager.getApplication();
+        //
+        //if (application != null && application.isDisposed()) {
+        //    MockComponentManagerCreationTracer.diagnoseDisposedButNotClearedApplication(application);
+        //}
 
         super.setUp();
 
@@ -164,8 +164,8 @@ public abstract class KtUsefulTestCase extends TestCase {
         }
         finally {
             super.tearDown();
-            resetApplicationToNull(application);
-            application = null;
+            //resetApplicationToNull(application);
+            //application = null;
         }
     }
 
@@ -175,14 +175,14 @@ public abstract class KtUsefulTestCase extends TestCase {
     }
 
     public static void resetApplicationToNull() {
-        try {
-            Field ourApplicationField = ApplicationManager.class.getDeclaredField("ourApplication");
-            ourApplicationField.setAccessible(true);
-            ourApplicationField.set(null, null);
-        }
-        catch (Exception e) {
-            throw ExceptionUtilsKt.rethrow(e);
-        }
+        //try {
+        //    Field ourApplicationField = ApplicationManager.class.getDeclaredField("ourApplication");
+        //    ourApplicationField.setAccessible(true);
+        //    ourApplicationField.set(null, null);
+        //}
+        //catch (Exception e) {
+        //    throw ExceptionUtilsKt.rethrow(e);
+        //}
     }
 
 
