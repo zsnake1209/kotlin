@@ -100,7 +100,7 @@ interface IrBuilderExtension {
         callee: IrFunctionSymbol,
         vararg args: IrExpression,
         typeHint: IrType? = null
-    ): IrCall {
+    ): IrMemberAccessExpression {
         val call = typeHint?.let { irCall(callee, type = it) } ?: irCall(callee)
         call.dispatchReceiver = dispatchReceiver
         args.forEachIndexed(call::putValueArgument)
@@ -113,7 +113,7 @@ interface IrBuilderExtension {
         typeArguments: List<IrType?>,
         valueArguments: List<IrExpression>,
         returnTypeHint: IrType? = null
-    ): IrCall = irInvoke(
+    ): IrMemberAccessExpression = irInvoke(
         dispatchReceiver,
         callee,
         args = *valueArguments.toTypedArray(),

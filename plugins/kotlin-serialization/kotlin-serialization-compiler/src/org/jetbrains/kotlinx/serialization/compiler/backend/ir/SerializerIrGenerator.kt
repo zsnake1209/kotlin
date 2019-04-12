@@ -127,12 +127,13 @@ class SerializerIrGenerator(val irClass: IrClass, override val compilerContext: 
                     )
                 }
                 (ctor.body as? IrBlockBody)?.statements?.addAll(initIrBody.body.statements)
+                Unit
             }
         }
     }
 
     private fun IrBlockBodyBuilder.copySerialInfoAnnotationsToDescriptor(
-        annotations: List<IrCall>,
+        annotations: List<IrConstructorCall>,
         receiver: IrExpression,
         method: IrFunctionSymbol
     ) {
