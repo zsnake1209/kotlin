@@ -69,8 +69,7 @@ public abstract class ExternalSystemTestCase extends KtUsefulTestCase {
         super.setUp();
         ensureTempDirCreated();
 
-        myTestDir = new File(ourTempDir, getTestName(false));
-        FileUtil.ensureExists(myTestDir);
+        myTestDir = FileUtil.createTempDirectory(ourTempDir, getTestName(false), "", false);
 
         setUpFixtures();
         myProject = myTestFixture.getProject();
@@ -134,8 +133,7 @@ public abstract class ExternalSystemTestCase extends KtUsefulTestCase {
     private void ensureTempDirCreated() throws IOException {
         if (ourTempDir != null) return;
 
-        ourTempDir = new File(FileUtil.getTempDirectory(), getTestsTempDir());
-        FileUtil.delete(ourTempDir);
+        ourTempDir = FileUtil.createTempDirectory(getTestsTempDir(), "");
         FileUtil.ensureExists(ourTempDir);
     }
 
@@ -147,7 +145,7 @@ public abstract class ExternalSystemTestCase extends KtUsefulTestCase {
     }
 
     private void setUpInWriteAction() throws Exception {
-        File projectDir = new File(myTestDir, "project");
+        File projectDir = FileUtil.createTempDirectory(myTestDir, "project",  "", false);
         FileUtil.ensureExists(projectDir);
         myProjectRoot = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(projectDir);
     }

@@ -116,11 +116,11 @@ public class KotlinTestUtils {
     private static final List<File> filesToDelete = new ArrayList<>();
 
     // It's important that this is not created per test, but rather per process.
-    public static final String IDEA_SYSTEM_PATH;
+    public static final String NEW_TMP_DIR;
 
     static {
         try {
-            IDEA_SYSTEM_PATH = FileUtil.createTempDirectory(new File(System.getProperty("java.io.tmpdir")), "idea-system", "", false).getPath();
+            NEW_TMP_DIR = FileUtil.createTempDirectory(new File(System.getProperty("java.io.tmpdir")), "idea-system", "", false).getPath();
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -1326,7 +1326,12 @@ public class KotlinTestUtils {
     }
 
     public static void setIdeaSystemPathProperties() {
-        System.setProperty(PROPERTY_SYSTEM_PATH, IDEA_SYSTEM_PATH);
-        System.setProperty(PROPERTY_CONFIG_PATH, IDEA_SYSTEM_PATH + "/config");
+        //There is hardcoded name in UsefulTestCase for project folder under temp root,
+        //  On parallel execution it causes to name clash,
+        //  so we change temp root to avoid conflicts.
+        // PR was sent to IDEA via https://github.com/JetBrains/intellij-community/pull/1120
+        System.setProperty("java.io.tmpdir", NEW_TMP_DIR);
+        System.setProperty(PROPERTY_SYSTEM_PATH, NEW_TMP_DIR + "/idea-system");
+        System.setProperty(PROPERTY_CONFIG_PATH, NEW_TMP_DIR + "/idea-system/config");
     }
 }
