@@ -32,7 +32,7 @@ import java.util.Arrays;
 public class CompileEnvironmentTest extends TestCase {
 
     public void testSmokeWithCompilerOutput() throws IOException {
-        File tempDir = FileUtil.createTempDirectory("compilerTest", "compilerTest");
+        File tempDir = FileUtil.createTempDirectory("compilerTest", "compilerTest", false);
         try {
             File out = new File(tempDir, "out");
             File stdlib = ForTestCompileRuntime.runtimeJarForTests();
