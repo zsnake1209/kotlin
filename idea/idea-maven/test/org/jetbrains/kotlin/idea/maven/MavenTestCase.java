@@ -30,6 +30,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.PsiTestUtil;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.util.ui.UIUtil;
@@ -76,8 +77,6 @@ public abstract class MavenTestCase extends KtUsefulTestCase {
         }
     }
 
-    private File ourTempDir;
-
     protected IdeaProjectTestFixture myTestFixture;
 
     protected Project myProject;
@@ -91,11 +90,6 @@ public abstract class MavenTestCase extends KtUsefulTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        ensureTempDirCreated();
-
-        myDir = new File(ourTempDir, getTestName(false));
-        FileUtil.ensureExists(myDir);
 
         setUpFixtures();
 
@@ -139,22 +133,13 @@ public abstract class MavenTestCase extends KtUsefulTestCase {
         });
     }
 
-    private void ensureTempDirCreated() throws IOException {
-        if (ourTempDir != null) return;
-
-        ourTempDir = new File(FileUtil.getTempDirectory(), "mavenTests");
-        FileUtil.delete(ourTempDir);
-        FileUtil.ensureExists(ourTempDir);
-    }
-
     protected void setUpFixtures() throws Exception {
         myTestFixture = IdeaTestFixtureFactory.getFixtureFactory().createFixtureBuilder(getName()).getFixture();
         myTestFixture.setUp();
     }
 
     protected void setUpInWriteAction() throws Exception {
-        File projectDir = new File(myDir, "project");
-        projectDir.mkdirs();
+        File projectDir = FileUtil.createTempDirectory("project", "", false);
         myProjectRoot = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(projectDir);
     }
 
@@ -180,14 +165,6 @@ public abstract class MavenTestCase extends KtUsefulTestCase {
         }
         finally {
             super.tearDown();
-            FileUtil.delete(myDir);
-            // cannot use reliably the result of the com.intellij.openapi.util.io.FileUtil.delete() method
-            // because com.intellij.openapi.util.io.FileUtilRt.deleteRecursivelyNIO() does not honor this contract
-            if (myDir.exists()) {
-                System.err.println("Cannot delete " + myDir);
-                //printDirectoryContent(myDir);
-                myDir.deleteOnExit();
-            }
             resetClassFields(getClass());
         }
     }

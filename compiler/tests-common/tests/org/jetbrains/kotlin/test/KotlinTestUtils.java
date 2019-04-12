@@ -116,11 +116,15 @@ public class KotlinTestUtils {
     private static final List<File> filesToDelete = new ArrayList<>();
 
     // It's important that this is not created per test, but rather per process.
-    public static final String IDEA_SYSTEM_PATH;
+    public static final String PROCESS_TMP_ROOT_FOLDER;
+    public static final String IDEA_SYSTEM;
+    public static final String IDEA_CONFIG;
 
     static {
         try {
-            IDEA_SYSTEM_PATH = FileUtil.createTempDirectory(new File(System.getProperty("java.io.tmpdir")), "idea-system", "", false).getPath();
+            PROCESS_TMP_ROOT_FOLDER = FileUtil.createTempDirectory(new File(System.getProperty("java.io.tmpdir")), "testRoot", "", false).getPath();
+            IDEA_SYSTEM = FileUtil.createTempDirectory(new File(PROCESS_TMP_ROOT_FOLDER), "idea-system", "", false).getPath();
+            IDEA_CONFIG = FileUtil.createTempDirectory(new File(PROCESS_TMP_ROOT_FOLDER), "idea-config", "", false).getPath();
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -1326,7 +1330,12 @@ public class KotlinTestUtils {
     }
 
     public static void setIdeaSystemPathProperties() {
-        System.setProperty(PROPERTY_SYSTEM_PATH, IDEA_SYSTEM_PATH);
-        System.setProperty(PROPERTY_CONFIG_PATH, IDEA_SYSTEM_PATH + "/config");
+        // UsefulTestCase temp dir construction could cause folder clash on parallel test execution:
+        //  myTempDir = new File(ORIGINAL_TEMP_DIR, TEMP_DIR_MARKER + testName).getPath();
+        // So we need to substitute "java.io.tmpdir" system property to avoid such clashing across different processes.
+        // IDEA PR: https://github.com/JetBrains/intellij-community/pull/1120
+        System.setProperty("java.io.tmpdir", PROCESS_TMP_ROOT_FOLDER);
+        System.setProperty(PROPERTY_SYSTEM_PATH, IDEA_SYSTEM);
+        System.setProperty(PROPERTY_CONFIG_PATH, IDEA_CONFIG);
     }
 }
