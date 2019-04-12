@@ -129,6 +129,7 @@ class AutoboxingTransformer(val context: JsIrBackendContext) : AbstractValueUsag
         get() = when (this) {
             is IrCall -> this.callTarget
             is IrDelegatingConstructorCall -> this.symbol.owner
+            is IrConstructorCall -> this.symbol.owner
             else -> TODO(this.render())
         }
 
