@@ -39,6 +39,7 @@ import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture;
 import org.jetbrains.android.dom.wrappers.LazyValueResourceElementWrapper;
 import org.jetbrains.android.sdk.AndroidPlatform;
@@ -56,7 +57,7 @@ import java.nio.file.Paths;
  *  Copied from AS 2.3 sources
  */
 @SuppressWarnings({"JUnitTestCaseWithNonTrivialConstructors"})
-public abstract class AndroidTestBase extends KtUsefulTestCase {
+public abstract class AndroidTestBase extends UsefulTestCase {
 
     protected JavaCodeInsightTestFixture myFixture;
 
