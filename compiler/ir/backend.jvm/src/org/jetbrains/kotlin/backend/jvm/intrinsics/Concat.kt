@@ -20,15 +20,15 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.codegen.BlockInfo
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
+import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 
-class Concat : IntrinsicMethod() {
+object Concat : IntrinsicMethod() {
     override fun toCallable(
-        expression: IrMemberAccessExpression,
+        expression: IrFunctionAccessExpression,
         signature: JvmMethodSignature,
         context: JvmBackendContext
     ): IrIntrinsicFunction {
