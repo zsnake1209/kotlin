@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public abstract class MavenTestCase extends KtUsefulTestCase {
+public abstract class MavenTestCase extends UsefulTestCase {
 
     private static final String mavenMirrorUrl = System.getProperty("idea.maven.test.mirror",
                                                                     // use JB maven proxy server for internal use by default, see details at
