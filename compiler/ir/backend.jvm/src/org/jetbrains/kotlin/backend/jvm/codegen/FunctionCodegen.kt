@@ -7,13 +7,10 @@ package org.jetbrains.kotlin.backend.jvm.codegen
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.codegen.*
-import org.jetbrains.kotlin.codegen.FunctionCodegen
 import org.jetbrains.kotlin.codegen.state.GenerationState
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
@@ -34,8 +31,6 @@ open class FunctionCodegen(
 
     val state = classCodegen.state
 
-    val descriptor = irFunction.descriptor
-
     fun generate(): JvmMethodGenericSignature =
         try {
             doGenerate()
@@ -44,21 +39,21 @@ open class FunctionCodegen(
         }
 
     private fun doGenerate(): JvmMethodGenericSignature {
-        val signature = classCodegen.typeMapper.mapSignatureWithGeneric(descriptor, OwnerKind.IMPLEMENTATION)
+        val signature = classCodegen.typeMapper.mapSignatureWithGeneric(irFunction, OwnerKind.IMPLEMENTATION)
 
         val flags = calculateMethodFlags(irFunction.isStatic)
         val methodVisitor = createMethod(flags, signature)
 
         if (irFunction.origin != IrDeclarationOrigin.FUNCTION_FOR_DEFAULT_PARAMETER) {
             AnnotationCodegen(classCodegen, state, methodVisitor::visitAnnotation).genAnnotations(irFunction, signature.asmMethod.returnType)
-            FunctionCodegen.generateParameterAnnotations(descriptor, methodVisitor, signature, DummyOldInnerClassConsumer(), state)
+            generateParameterAnnotations(irFunction, methodVisitor, signature, classCodegen, state)
         }
 
         if (!state.classBuilderMode.generateBodies || flags.and(Opcodes.ACC_ABSTRACT) != 0 || irFunction.isExternal) {
             generateAnnotationDefaultValueIfNeeded(methodVisitor)
             methodVisitor.visitEnd()
         } else {
-            val frameMap = createFrameMapWithReceivers(classCodegen.state, irFunction, signature)
+            val frameMap = createFrameMapWithReceivers(signature)
             ExpressionCodegen(irFunction, frameMap, InstructionAdapter(methodVisitor), classCodegen, isInlineLambda).generate()
         }
 
@@ -119,7 +114,7 @@ open class FunctionCodegen(
         // TODO: any simpler way to get to the value expression?
         // Are there other valid IR structures that represent the default value?
         return irFunction.safeAs<IrSimpleFunction>()
-            ?.correspondingProperty
+            ?.correspondingPropertySymbol?.owner
             ?.backingField
             ?.initializer.safeAs<IrExpressionBody>()
             ?.expression?.safeAs<IrGetValue>()
@@ -127,46 +122,101 @@ open class FunctionCodegen(
             ?.defaultValue?.safeAs<IrExpressionBody>()
             ?.expression
     }
-}
 
-private fun createFrameMapWithReceivers(
-    state: GenerationState,
-    irFunction: IrFunction,
-    signature: JvmMethodSignature
-): IrFrameMap {
-    val frameMap = IrFrameMap()
-    if (irFunction is IrConstructor) {
-        frameMap.enter((irFunction.parent as IrClass).thisReceiver!!, AsmTypes.OBJECT_TYPE)
-    } else if (irFunction.dispatchReceiverParameter != null) {
-        frameMap.enter(irFunction.dispatchReceiverParameter!!, AsmTypes.OBJECT_TYPE)
-    }
+    private fun createFrameMapWithReceivers(signature: JvmMethodSignature): IrFrameMap {
+        val frameMap = IrFrameMap()
+        if (irFunction is IrConstructor) {
+            frameMap.enter((irFunction.parent as IrClass).thisReceiver!!, AsmTypes.OBJECT_TYPE)
+        } else if (irFunction.dispatchReceiverParameter != null) {
+            frameMap.enter(irFunction.dispatchReceiverParameter!!, AsmTypes.OBJECT_TYPE)
+        }
 
-    for (parameter in signature.valueParameters) {
-        if (parameter.kind == JvmMethodParameterKind.RECEIVER) {
-            val receiverParameter = irFunction.extensionReceiverParameter
-            if (receiverParameter?.descriptor != null) {
-                frameMap.enter(receiverParameter, state.typeMapper.mapType(receiverParameter.descriptor))
-            } else {
+        for (parameter in signature.valueParameters) {
+            if (parameter.kind == JvmMethodParameterKind.RECEIVER) {
+                val receiverParameter = irFunction.extensionReceiverParameter
+                if (receiverParameter != null) {
+                    frameMap.enter(receiverParameter, classCodegen.typeMapper.mapType(receiverParameter))
+                } else {
+                    frameMap.enterTemp(parameter.asmType)
+                }
+            } else if (parameter.kind != JvmMethodParameterKind.VALUE) {
                 frameMap.enterTemp(parameter.asmType)
             }
-        } else if (parameter.kind != JvmMethodParameterKind.VALUE) {
-            frameMap.enterTemp(parameter.asmType)
         }
-    }
 
-    for (parameter in irFunction.valueParameters) {
-        frameMap.enter(parameter, state.typeMapper.mapType(parameter.type.toKotlinType()))
-    }
+        for (parameter in irFunction.valueParameters) {
+            frameMap.enter(parameter, classCodegen.typeMapper.mapType(parameter.type))
+        }
 
-    return frameMap
+        return frameMap
+    }
 }
 
-/**/// TODO: temporary, to allow calling the old FunctionCodegen.generateParameterAnnotations
-private class DummyOldInnerClassConsumer()
-    : org.jetbrains.kotlin.codegen.InnerClassConsumer {
 
-    override fun addInnerClassInfoFromAnnotation(classDescriptor: ClassDescriptor) {
-
+// Borrowed from org.jetbrains.kotlin.codegen.FunctionCodegen.java
+fun generateParameterAnnotations(
+    irFunction: IrFunction,
+    mv: MethodVisitor,
+    jvmSignature: JvmMethodSignature,
+    innerClassConsumer: InnerClassConsumer,
+    state: GenerationState
+) {
+    val iterator = irFunction.valueParameters.iterator()
+    val kotlinParameterTypes = jvmSignature.valueParameters
+    var syntheticParameterCount = 0
+    kotlinParameterTypes.forEachIndexed { i, parameterSignature ->
+        val kind = parameterSignature.kind
+        if (kind.isSkippedInGenericSignature) {
+            if (AsmUtil.IS_BUILT_WITH_ASM6) {
+                markEnumOrInnerConstructorParameterAsSynthetic(mv, i, state.classBuilderMode)
+            } else {
+                syntheticParameterCount++
+            }
+        }
+    }
+    if (!AsmUtil.IS_BUILT_WITH_ASM6) {
+        visitAnnotableParameterCount(mv, kotlinParameterTypes.size - syntheticParameterCount)
     }
 
+    kotlinParameterTypes.forEachIndexed { i, parameterSignature ->
+        val kind = parameterSignature.kind
+        if (kind.isSkippedInGenericSignature) return@forEachIndexed
+
+        val annotated = when (kind) {
+            JvmMethodParameterKind.VALUE -> iterator.next()
+            JvmMethodParameterKind.RECEIVER -> irFunction.extensionReceiverParameter
+            else -> null
+        }
+
+        if (annotated != null) {
+
+            AnnotationCodegen(
+                innerClassConsumer,
+                state
+            ) { descriptor, visible ->
+                mv.visitParameterAnnotation(
+                    if (AsmUtil.IS_BUILT_WITH_ASM6) i else i - syntheticParameterCount,
+                    descriptor,
+                    visible
+                )
+            }
+                .genAnnotations(annotated, parameterSignature.asmType)
+        }
+    }
+}
+
+private fun markEnumOrInnerConstructorParameterAsSynthetic(mv: MethodVisitor, i: Int, mode: ClassBuilderMode) {
+    // IDEA's ClsPsi builder fails to annotate synthetic parameters
+    if (mode === ClassBuilderMode.LIGHT_CLASSES) return
+
+    // This is needed to avoid RuntimeInvisibleParameterAnnotations error in javac:
+    // see MethodWriter.visitParameterAnnotation()
+
+    val av = mv.visitParameterAnnotation(i, "Ljava/lang/Synthetic;", true)
+    av?.visitEnd()
+}
+
+private fun visitAnnotableParameterCount(mv: MethodVisitor, paramCount: Int) {
+    mv.visitAnnotableParameterCount(paramCount, true)
+    mv.visitAnnotableParameterCount(paramCount, false)
 }

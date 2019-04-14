@@ -595,26 +595,3 @@ internal class CallableReferenceLowering(val context: JvmBackendContext) : FileL
         const val MAX_ARGCOUNT_WITHOUT_VARARG = 22
     }
 }
-
-// TODO: Move to IrUtils
-private fun IrType.substitute(substitutionMap: Map<IrTypeParameterSymbol, IrType>): IrType {
-    if (this !is IrSimpleType) return this
-
-    substitutionMap[classifier]?.let { return it }
-
-    val newArguments = arguments.map {
-        if (it is IrTypeProjection) {
-            makeTypeProjection(it.type.substitute(substitutionMap), it.variance)
-        } else {
-            it
-        }
-    }
-
-    val newAnnotations = annotations.map { it.deepCopyWithSymbols() }
-    return IrSimpleTypeImpl(
-        classifier,
-        hasQuestionMark,
-        newArguments,
-        newAnnotations
-    )
-}
