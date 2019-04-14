@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
 import org.jetbrains.kotlin.backend.common.ir.copyParameterDeclarationsFrom
 import org.jetbrains.kotlin.backend.common.ir.isMethodOfAny
+import org.jetbrains.kotlin.backend.common.ir.passTypeArgumentsFrom
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.phaser.makeIrFilePhase
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
@@ -26,6 +27,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
+import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.*
 import org.jetbrains.kotlin.name.Name
@@ -145,6 +147,7 @@ private class InterfaceDelegationLowering(val context: JvmBackendContext) : IrEl
                 +irReturn(
                     irCall(defaultImplFun.symbol, irFunction.returnType).apply {
                         var offset = 0
+                        passTypeArgumentsFrom(irFunction)
                         irFunction.dispatchReceiverParameter?.let { putValueArgument(offset++, irGet(it)) }
                         irFunction.extensionReceiverParameter?.let { putValueArgument(offset++, irGet(it)) }
                         irFunction.valueParameters.mapIndexed { i, parameter -> putValueArgument(i + offset, irGet(parameter)) }

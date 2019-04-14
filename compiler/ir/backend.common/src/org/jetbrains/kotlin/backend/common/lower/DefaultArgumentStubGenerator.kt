@@ -7,9 +7,7 @@ package org.jetbrains.kotlin.backend.common.lower
 
 import org.jetbrains.kotlin.backend.common.*
 import org.jetbrains.kotlin.backend.common.descriptors.*
-import org.jetbrains.kotlin.backend.common.ir.copyTo
-import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
-import org.jetbrains.kotlin.backend.common.ir.ir2string
+import org.jetbrains.kotlin.backend.common.ir.*
 import org.jetbrains.kotlin.backend.common.phaser.makeIrFilePhase
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement
@@ -136,11 +134,9 @@ open class DefaultArgumentStubGenerator(
                     endOffset = irFunction.endOffset,
                     type = context.irBuiltIns.unitType,
                     symbol = irFunction.symbol, descriptor = irFunction.symbol.descriptor,
-                    typeArgumentsCount = irFunction.typeParameters.size
+                    typeArgumentsCount = newIrFunction.typeParameters.size
                 ).apply {
-                    newIrFunction.typeParameters.forEachIndexed { i, param ->
-                        putTypeArgument(i, param.defaultType)
-                    }
+                    passTypeArgumentsFrom(newIrFunction)
                     dispatchReceiver = newIrFunction.dispatchReceiverParameter?.let { irGet(it) }
 
                     params.forEachIndexed { i, variable -> putValueArgument(i, irGet(variable)) }
@@ -164,9 +160,7 @@ open class DefaultArgumentStubGenerator(
         params: MutableList<IrVariable>
     ): IrExpression {
         val dispatchCall = irCall(irFunction).apply {
-            newIrFunction.typeParameters.forEachIndexed { i, param ->
-                putTypeArgument(i, param.defaultType)
-            }
+            passTypeArgumentsFrom(newIrFunction)
             dispatchReceiver = newIrFunction.dispatchReceiverParameter?.let { irGet(it) }
             extensionReceiver = newIrFunction.extensionReceiverParameter?.let { irGet(it) }
 
@@ -434,6 +428,9 @@ private fun IrFunction.generateDefaultsFunctionImpl(
         )
     }
 
+    if (this is IrConstructor) {
+        newFunction.copyTypeParametersFrom(this.parentAsClass)
+    }
     newFunction.copyTypeParametersFrom(this)
     val newValueParameters = valueParameters.map { it.copyTo(newFunction) } + syntheticParameters
     newValueParameters.forEach {
