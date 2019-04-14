@@ -30,6 +30,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.testFramework.EdtTestUtil;
+import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.util.ArrayUtil;
@@ -38,7 +39,6 @@ import com.intellij.util.ThrowableRunnable;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.test.testFramework.KtUsefulTestCase;
 import org.junit.After;
 import org.junit.Before;
 
@@ -54,7 +54,7 @@ import java.util.List;
 import static org.jetbrains.kotlin.test.testFramework.EdtTestUtil.runInEdtAndWait;
 
 // part of com.intellij.openapi.externalSystem.test.ExternalSystemTestCase
-public abstract class ExternalSystemTestCase extends KtUsefulTestCase {
+public abstract class ExternalSystemTestCase extends UsefulTestCase {
 
     protected IdeaProjectTestFixture myTestFixture;
 
