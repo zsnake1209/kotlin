@@ -149,6 +149,7 @@ fun IrValueParameter.copyTo(
         descriptor.bind(it)
         it.parent = irFunction
         it.defaultValue = defaultValueCopy
+        it.annotations.addAll(annotations.map { it.deepCopyWithSymbols() })
     }
 }
 
@@ -157,7 +158,6 @@ fun IrTypeParameter.copyToWithoutSuperTypes(
     shift: Int = 0,
     origin: IrDeclarationOrigin = this.origin
 ): IrTypeParameter {
-    val source = parent as IrTypeParametersContainer
     val descriptor = WrappedTypeParameterDescriptor(symbol.descriptor.annotations, symbol.descriptor.source)
     val symbol = IrTypeParameterSymbolImpl(descriptor)
     return IrTypeParameterImpl(startOffset, endOffset, origin, symbol, name, shift + index, isReified, variance).also { copied ->
@@ -245,6 +245,12 @@ fun IrFunction.copyValueParametersToStatic(
                 index = oldValueParameter.index + shift
             )
         )
+    }
+}
+
+fun IrFunctionAccessExpression.passTypeArgumentsFrom(irFunction: IrTypeParametersContainer, offset: Int = 0) {
+    irFunction.typeParameters.forEachIndexed { i, param ->
+        putTypeArgument(i + offset, param.defaultType)
     }
 }
 
@@ -347,3 +353,6 @@ fun isElseBranch(branch: IrBranch) = branch is IrElseBranch || ((branch.conditio
 fun IrSimpleFunction.isMethodOfAny() =
     ((valueParameters.size == 0 && name.asString().let { it == "hashCode" || it == "toString" }) ||
             (valueParameters.size == 1 && name.asString() == "equals" && valueParameters[0].type.isNullableAny()))
+
+fun IrValueParameter.isInlineParameter() =
+    !isNoinline && !type.isNullable() && type.isFunctionOrKFunction()

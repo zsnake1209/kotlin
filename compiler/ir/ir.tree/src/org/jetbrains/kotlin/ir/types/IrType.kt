@@ -5,13 +5,11 @@
 
 package org.jetbrains.kotlin.ir.types
 
-import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.types.Variance
 
-interface IrType {
-    val annotations: List<IrCall>
-
+interface IrType : IrAnnotationContainer {
     /**
      * @return true if this type is equal to [other] symbolically. Note that this is NOT EQUIVALENT to the full type checking algorithm
      * used in the compiler frontend. For example, this method will return `false` on the types `List<*>` and `List<Any?>`,

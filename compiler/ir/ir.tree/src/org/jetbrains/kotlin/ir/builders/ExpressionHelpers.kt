@@ -204,18 +204,18 @@ fun IrBuilderWithScope.irGet(type: IrType, receiver: IrExpression?, getterSymbol
         startOffset, endOffset,
         type,
         getterSymbol, getterSymbol.descriptor,
-        typeArgumentsCount = 0,
+        typeArgumentsCount = getterSymbol.owner.typeParameters.size,
         dispatchReceiver = receiver,
         extensionReceiver = null,
         origin = IrStatementOrigin.GET_PROPERTY
     )
 
-fun IrBuilderWithScope.irSet(type: IrType, receiver: IrExpression?, getterSymbol: IrFunctionSymbol, value: IrExpression): IrCall =
+fun IrBuilderWithScope.irSet(type: IrType, receiver: IrExpression?, setterSymbol: IrFunctionSymbol, value: IrExpression): IrCall =
     IrSetterCallImpl(
         startOffset, endOffset,
         type,
-        getterSymbol, getterSymbol.descriptor,
-        typeArgumentsCount = 0,
+        setterSymbol, setterSymbol.descriptor,
+        typeArgumentsCount = setterSymbol.owner.typeParameters.size,
         dispatchReceiver = receiver,
         extensionReceiver = null,
         argument = value,
