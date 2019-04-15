@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.backend.jvm.intrinsics
 
-import org.jetbrains.coverage.org.objectweb.asm.Opcodes.IADD
 import org.jetbrains.kotlin.backend.jvm.JvmSymbols
 import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.ir.declarations.IrClass
