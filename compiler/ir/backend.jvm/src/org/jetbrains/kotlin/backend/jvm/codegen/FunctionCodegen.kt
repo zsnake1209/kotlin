@@ -215,8 +215,3 @@ private fun markEnumOrInnerConstructorParameterAsSynthetic(mv: MethodVisitor, i:
     val av = mv.visitParameterAnnotation(i, "Ljava/lang/Synthetic;", true)
     av?.visitEnd()
 }
-
-private fun visitAnnotableParameterCount(mv: MethodVisitor, paramCount: Int) {
-    mv.visitAnnotableParameterCount(paramCount, true)
-    mv.visitAnnotableParameterCount(paramCount, false)
-}
