@@ -24,10 +24,7 @@ import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrReturnableBlockImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
+import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrReturnableBlockSymbolImpl
 import org.jetbrains.kotlin.ir.util.*
@@ -48,8 +45,12 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
 
     private val arrayConstructorTransformer = ArrayConstructorTransformer(context)
 
+    override fun visitConstructorCall(expression: IrConstructorCall): IrExpression {
+        return arrayConstructorTransformer.transformConstructorCall(super.visitConstructorCall(expression) as IrConstructorCall)
+    }
+
     override fun visitCall(expression: IrCall): IrExpression {
-        val callSite = arrayConstructorTransformer.transformCall(super.visitCall(expression) as IrCall)
+        val callSite = super.visitCall(expression) as IrCall
 
         if (!callSite.symbol.owner.needsInlining)
             return callSite
@@ -240,11 +241,17 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
                     val unboundArgsSet = unboundFunctionParameters.toSet()
                     val valueParameters = expression.getArgumentsWithIr().drop(1) // Skip dispatch receiver.
 
-                    val immediateCall = IrCallImpl(
-                        expression.startOffset, expression.endOffset,
-                        expression.type,
-                        functionArgument.symbol
-                    ).apply {
+                    val newCall = if (function is IrConstructor) {
+                        IrConstructorCallImpl.fromSymbolOwner(expression.startOffset, expression.endOffset, expression.type, function.symbol)
+                    } else {
+                        IrCallImpl(
+                            expression.startOffset, expression.endOffset,
+                            expression.type,
+                            functionArgument.symbol
+                        )
+                    }
+
+                    val immediateCall = newCall.apply {
                         functionParameters.forEach {
                             val argument =
                                 if (it !in unboundArgsSet)
@@ -261,7 +268,14 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
                         for (index in 0 until functionArgument.typeArgumentsCount)
                             putTypeArgument(index, functionArgument.getTypeArgument(index))
                     }
-                    return this@FunctionInlining.visitCall(super.visitCall(immediateCall) as IrCall)
+
+                    if (immediateCall is IrCall) {
+                        return this@FunctionInlining.visitCall(super.visitCall(immediateCall) as IrCall)
+                    } else {
+                        with(immediateCall as IrConstructorCall) {
+                            return this@FunctionInlining.visitConstructorCall(super.visitConstructorCall(this) as IrConstructorCall)
+                        }
+                    }
                 }
                 if (functionArgument !is IrBlock)
                     return super.visitCall(expression)

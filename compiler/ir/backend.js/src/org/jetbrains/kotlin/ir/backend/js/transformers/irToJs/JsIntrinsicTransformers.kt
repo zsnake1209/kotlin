@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.backend.js.utils.Namer
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionReference
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
@@ -19,7 +20,7 @@ import org.jetbrains.kotlin.ir.util.getInlineClassBackingField
 import org.jetbrains.kotlin.ir.util.getInlinedClass
 import org.jetbrains.kotlin.js.backend.ast.*
 
-typealias IrCallTransformer = (IrCall, context: JsGenerationContext) -> JsExpression
+typealias IrCallTransformer = (IrFunctionAccessExpression, context: JsGenerationContext) -> JsExpression
 
 class JsIntrinsicTransformers(backendContext: JsIrBackendContext) {
     private val transformers: Map<IrSymbol, IrCallTransformer>
@@ -111,7 +112,7 @@ class JsIntrinsicTransformers(backendContext: JsIrBackendContext) {
             }
 
             addIfNotNull(intrinsics.jsCode) { call, context ->
-                val jsCode = translateJsCode(call, context.currentScope)
+                val jsCode = translateJsCode(call as IrCall, context.currentScope)
 
                 when (jsCode) {
                     is JsExpression -> jsCode
@@ -120,21 +121,21 @@ class JsIntrinsicTransformers(backendContext: JsIrBackendContext) {
                 }
             }
 
-            add(intrinsics.jsName) { call: IrCall, context ->
-                val args = translateCallArguments(call, context)
+            add(intrinsics.jsName) { call, context ->
+                val args = translateCallArguments(call as IrCall, context)
                 val receiver = args[0]
                 JsNameRef(Namer.KCALLABLE_NAME, receiver)
             }
 
-            add(intrinsics.jsPropertyGet) { call: IrCall, context ->
-                val args = translateCallArguments(call, context)
+            add(intrinsics.jsPropertyGet) { call, context ->
+                val args = translateCallArguments(call as IrCall, context)
                 val reference = args[0]
                 val receiver = args[1]
                 JsInvocation(JsNameRef(Namer.KPROPERTY_GET, reference), listOf(receiver))
             }
 
-            add(intrinsics.jsPropertySet) { call: IrCall, context ->
-                val args = translateCallArguments(call, context)
+            add(intrinsics.jsPropertySet) { call, context ->
+                val args = translateCallArguments(call as IrCall, context)
                 val reference = args[0]
                 val receiver = args[1]
                 val value = args[2]
@@ -189,14 +190,14 @@ class JsIntrinsicTransformers(backendContext: JsIrBackendContext) {
                 }
             }
 
-            add(intrinsics.jsBoxIntrinsic) { call: IrCall, context ->
-                val arg = translateCallArguments(call, context).single()
+            add(intrinsics.jsBoxIntrinsic) { call, context ->
+                val arg = translateCallArguments(call as IrCall, context).single()
                 val inlineClass = call.getTypeArgument(0)!!.getInlinedClass()!!
                 val constructor = inlineClass.declarations.filterIsInstance<IrConstructor>().single { it.isPrimary }
                 JsNew(context.getNameForSymbol(constructor.symbol).makeRef(), listOf(arg))
             }
 
-            add(intrinsics.jsUnboxIntrinsic) { call: IrCall, context ->
+            add(intrinsics.jsUnboxIntrinsic) { call, context ->
                 val arg = translateCallArguments(call, context).single()
                 val inlineClass = call.getTypeArgument(1)!!.getInlinedClass()!!
                 val field = getInlineClassBackingField(inlineClass)
@@ -204,10 +205,10 @@ class JsIntrinsicTransformers(backendContext: JsIrBackendContext) {
                 JsNameRef(fieldName, arg)
             }
 
-            add(intrinsics.jsBind) { call: IrCall, context: JsGenerationContext ->
+            add(intrinsics.jsBind) { call, context: JsGenerationContext ->
                 val receiver = call.getValueArgument(0)!!
                 val reference = call.getValueArgument(1) as IrFunctionReference
-                val superClass = call.superQualifierSymbol!!
+                val superClass = (call as IrCall).superQualifierSymbol!!
 
                 val jsReceiver = receiver.accept(IrElementToJsExpressionTransformer(), context)
                 val functionName = context.getNameForSymbol(reference.symbol)

@@ -14,6 +14,9 @@ import org.jetbrains.kotlin.js.backend.ast.JsFunction
 
 open class IrFunctionToJsTransformer : BaseIrElementToJsNodeTransformer<JsFunction, JsGenerationContext> {
     override fun visitSimpleFunction(declaration: IrSimpleFunction, context: JsGenerationContext): JsFunction {
+        if (declaration.name.asString() == "box") {
+            println("")
+        }
         val funcName = context.getNameForSymbol(declaration.symbol)
         return translateFunction(declaration, funcName, false, context)
     }

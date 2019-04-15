@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.isStaticMethodOfClass
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.util.findDeclaration
@@ -42,9 +43,9 @@ class EnumIntrinsicsTransformer(private val context: JsIrBackendContext) : Calls
         it.name == Name.identifier("values") && it.valueParameters.count() == 0
     }
 
-    override fun transformCall(call: IrCall) = when (call.symbol) {
-        context.intrinsics.enumValueOfIntrinsic -> transformEnumValueOfIntrinsic(call)
-        context.intrinsics.enumValuesIntrinsic -> transformEnumValuesIntrinsic(call)
+    override fun transformCall(call: IrFunctionAccessExpression) = when (call.symbol) {
+        context.intrinsics.enumValueOfIntrinsic -> transformEnumValueOfIntrinsic(call as IrCall)
+        context.intrinsics.enumValuesIntrinsic -> transformEnumValuesIntrinsic(call as IrCall)
         else -> call
     }
 }

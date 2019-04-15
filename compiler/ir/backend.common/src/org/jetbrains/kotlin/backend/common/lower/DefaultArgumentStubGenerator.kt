@@ -248,6 +248,49 @@ open class DefaultParameterInjector(
                     }
             }
 
+            override fun visitConstructorCall(expression: IrConstructorCall): IrExpression {
+                super.visitConstructorCall(expression)
+                val functionDeclaration = expression.symbol.owner
+
+                if (!functionDeclaration.needsDefaultArgumentsLowering(skipInline, skipExternalMethods))
+                    return expression
+
+                val argumentsCount = argumentCount(expression)
+                if (argumentsCount == functionDeclaration.valueParameters.size)
+                    return expression
+
+                val (symbol, params) = parametersForCall(expression)
+                val descriptor = symbol.descriptor
+                val declaration = symbol.owner
+
+                for (i in 0 until expression.typeArgumentsCount) {
+                    log { "$descriptor [$i]: $expression.getTypeArgument(i)" }
+                }
+                declaration.typeParameters.forEach { log { "$declaration[${it.index}] : $it" } }
+
+                return IrConstructorCallImpl.fromSymbolOwner(
+                    expression.startOffset,
+                    expression.endOffset,
+                    symbol.owner.returnType,
+                    symbol as IrConstructorSymbol,
+                    DEFAULT_DISPATCH_CALL
+                )
+                    .apply {
+                        this.copyTypeArgumentsFrom(expression)
+
+                        params.forEach {
+                            log { "call::params@${it.first.index}/${it.first.name.asString()}: ${ir2string(it.second)}" }
+                            putValueArgument(it.first.index, it.second)
+                        }
+
+                        dispatchReceiver = expression.dispatchReceiver
+                        extensionReceiver = expression.extensionReceiver
+
+                        log { "call::extension@: ${ir2string(expression.extensionReceiver)}" }
+                        log { "call::dispatch@: ${ir2string(expression.dispatchReceiver)}" }
+                    }
+            }
+
             override fun visitCall(expression: IrCall): IrExpression {
                 super.visitCall(expression)
                 val functionDeclaration = expression.symbol.owner
