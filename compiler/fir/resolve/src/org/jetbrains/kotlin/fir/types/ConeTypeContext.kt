@@ -46,9 +46,12 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
         assert(this is ConeKotlinType)
         return when (this) {
             is ConeAbbreviatedType -> directExpansionType(session)
+                ?: ConeClassErrorType("no expansion for type-alias: ${this.abbreviationLookupTag.classId}")
             is ConeCapturedType -> this
             is ConeLookupTagBasedType -> this
-            else -> null
+            is ConeDefinitelyNotNullType -> this
+            is ConeFlexibleType -> null
+            else -> error("Unknown simpleType: $this")
         }
     }
 
