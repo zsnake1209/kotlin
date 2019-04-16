@@ -85,10 +85,13 @@ public class TranslationContext {
         DynamicContext rootDynamicContext = DynamicContext.rootContext(
                 staticContext.getFragment().getScope(), staticContext.getFragment().getInitializerBlock());
         AliasingContext rootAliasingContext = AliasingContext.getCleanContext();
-        return new TranslationContext(null, staticContext, rootDynamicContext, rootAliasingContext, null, null);
+        return new TranslationContext(null, staticContext, rootDynamicContext, rootAliasingContext, null, null, false);
     }
 
     private final Map<JsExpression, TemporaryConstVariable> expressionToTempConstVariableCache = new HashMap<>();
+
+    // Needed for callable reference translation
+    private final boolean doNotCaptureContinuation;
 
     private TranslationContext(
             @Nullable TranslationContext parent,
@@ -96,7 +99,8 @@ public class TranslationContext {
             @NotNull DynamicContext dynamicContext,
             @NotNull AliasingContext aliasingContext,
             @Nullable UsageTracker usageTracker,
-            @Nullable DeclarationDescriptor declarationDescriptor
+            @Nullable DeclarationDescriptor declarationDescriptor,
+            boolean doNotCaptureContinuation
     ) {
         this.parent = parent;
         this.dynamicContext = dynamicContext;
@@ -110,6 +114,8 @@ public class TranslationContext {
         else {
             this.classDescriptor = parent != null ? parent.classDescriptor : null;
         }
+
+        this.doNotCaptureContinuation = doNotCaptureContinuation || parent != null && parent.doNotCaptureContinuation;
 
         continuationParameterDescriptor = calculateContinuationParameter();
         inlineFunctionContext = parent != null ? parent.inlineFunctionContext : null;
@@ -173,31 +179,31 @@ public class TranslationContext {
             aliasingContext = this.aliasingContext.inner();
         }
 
-        return new TranslationContext(this, this.staticContext, dynamicContext, aliasingContext, this.usageTracker, descriptor);
+        return new TranslationContext(this, this.staticContext, dynamicContext, aliasingContext, this.usageTracker, descriptor, false);
     }
 
     @NotNull
     public TranslationContext newFunctionBodyWithUsageTracker(@NotNull JsFunction fun, @NotNull MemberDescriptor descriptor) {
         DynamicContext dynamicContext = DynamicContext.newContext(fun.getScope(), fun.getBody());
         UsageTracker usageTracker = new UsageTracker(this.usageTracker, descriptor);
-        return new TranslationContext(this, this.staticContext, dynamicContext, this.aliasingContext.inner(), usageTracker, descriptor);
+        return new TranslationContext(this, this.staticContext, dynamicContext, this.aliasingContext.inner(), usageTracker, descriptor, false);
     }
 
     @NotNull
     public TranslationContext innerWithUsageTracker(@NotNull MemberDescriptor descriptor) {
         UsageTracker usageTracker = new UsageTracker(this.usageTracker, descriptor);
-        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext.inner(), usageTracker, descriptor);
+        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext.inner(), usageTracker, descriptor, false);
     }
 
     @NotNull
     public TranslationContext inner(@NotNull MemberDescriptor descriptor) {
-        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext.inner(), usageTracker, descriptor);
+        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext.inner(), usageTracker, descriptor, false);
     }
 
     @NotNull
     public TranslationContext innerBlock(@NotNull JsBlock block) {
         return new TranslationContext(this, staticContext, dynamicContext.innerBlock(block), aliasingContext, usageTracker,
-                                      this.declarationDescriptor);
+                                      this.declarationDescriptor, false);
     }
 
     @NotNull
@@ -212,12 +218,12 @@ public class TranslationContext {
             innerBlock = dynamicContext.jsBlock();
         }
         DynamicContext dynamicContext = DynamicContext.newContext(getScopeForDescriptor(descriptor), innerBlock);
-        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext, usageTracker, descriptor);
+        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext, usageTracker, descriptor, false);
     }
 
     @NotNull
     private TranslationContext innerWithAliasingContext(AliasingContext aliasingContext) {
-        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext, usageTracker, declarationDescriptor);
+        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext, usageTracker, declarationDescriptor, false);
     }
 
     @NotNull
@@ -235,6 +241,11 @@ public class TranslationContext {
     public TranslationContext innerContextWithDescriptorsAliased(@NotNull Map<DeclarationDescriptor, JsExpression> aliases) {
         if (aliases.isEmpty()) return this;
         return this.innerWithAliasingContext(aliasingContext.withDescriptorsAliased(aliases));
+    }
+
+    @NotNull
+    public TranslationContext innerWithContinuationNotTracked() {
+        return new TranslationContext(this, staticContext, dynamicContext, aliasingContext.inner(), usageTracker, declarationDescriptor, true);
     }
 
     @Nullable
@@ -540,9 +551,11 @@ public class TranslationContext {
 
     @Nullable
     public JsExpression getAliasForDescriptor(@NotNull DeclarationDescriptor descriptor) {
-        JsExpression nameRef = captureIfNeedAndGetCapturedName(descriptor);
-        if (nameRef != null) {
-            return nameRef;
+        if (!doNotCaptureContinuation || continuationParameterDescriptor != descriptor) {
+            JsExpression nameRef = captureIfNeedAndGetCapturedName(descriptor);
+            if (nameRef != null) {
+                return nameRef;
+            }
         }
 
         JsExpression alias = aliasingContext.getAliasForDescriptor(descriptor);
