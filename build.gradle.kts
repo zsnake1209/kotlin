@@ -264,6 +264,7 @@ val gradlePluginProjects = listOf(
         ":kotlin-noarg",
         ":kotlin-noarg:plugin-marker",
         ":kotlin-sam-with-receiver"
+        
 )
 
 apply {
