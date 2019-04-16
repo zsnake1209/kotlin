@@ -140,6 +140,9 @@ class ImportIntoFragmentInliningScope private constructor(
         get() = JsBlock(
             JsBlock(fragment.inlinedLocalDeclarations.values.toList()),
             fragment.declarationBlock,
+            JsBlock(fragment.classes.values.map {
+                it.postDeclarationBlock // preDeclarationBlock is only used in IR backend
+            }),
             fragment.exportBlock,
             JsExpressionStatement(JsFunction(JsDynamicScope, fragment.initializerBlock, ""))
         ).also { block ->
