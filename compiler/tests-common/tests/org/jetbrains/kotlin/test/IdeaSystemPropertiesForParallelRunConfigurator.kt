@@ -12,12 +12,24 @@ import java.io.File
 
 // It's important that this is not created per test, but rather per process.
 object IdeaSystemPropertiesForParallelRunConfigurator {
-    private val GRADLE_WORKER = System.getProperty("org.gradle.test.worker") ?: ""
+    private val GRADLE_WORKER = System.getProperty("org.gradle.test.worker") ?: null
+    private val SYSTEM_TMP = System.getProperty("java.io.tmpdir")
     //TODO: try to remove folder on jvm shutdown (there are some flashing test with deleteOnExit = true)
     private val PROCESS_TMP_ROOT_FOLDER =
-        FileUtil.createTempDirectory(File(System.getProperty("java.io.tmpdir")), "testRoot", GRADLE_WORKER, false).path
-    private val IDEA_SYSTEM = FileUtil.createTempDirectory(File(PROCESS_TMP_ROOT_FOLDER), "idea-system", "", false).path
-    private val IDEA_CONFIG = FileUtil.createTempDirectory(File(PROCESS_TMP_ROOT_FOLDER), "idea-config", "", false).path
+        FileUtil.createTempDirectory(File(SYSTEM_TMP), "testRoot", "_GW$GRADLE_WORKER", false).path
+
+    private val IDEA_SYSTEM =
+        if (GRADLE_WORKER != null)
+            File("idea-system$GRADLE_WORKER", SYSTEM_TMP).run { this.mkdir(); path }  //reuse idea indexes
+        else
+            FileUtil.createTempDirectory(File(PROCESS_TMP_ROOT_FOLDER), "idea-system", "", false).path
+
+    private val IDEA_CONFIG =
+        if (GRADLE_WORKER != null)
+            File("idea-config$GRADLE_WORKER", SYSTEM_TMP).run { this.mkdir(); path } //reuse idea config
+        else
+            FileUtil.createTempDirectory(File(PROCESS_TMP_ROOT_FOLDER), "idea-config", "", false).path
+
 
     init {
         // UsefulTestCase temp dir construction could cause folder clash on parallel test execution:
@@ -27,6 +39,7 @@ object IdeaSystemPropertiesForParallelRunConfigurator {
         System.setProperty("java.io.tmpdir", PROCESS_TMP_ROOT_FOLDER)
         System.setProperty(PROPERTY_SYSTEM_PATH, IDEA_SYSTEM)
         System.setProperty(PROPERTY_CONFIG_PATH, IDEA_CONFIG)
+        System.err.println("WORKERRRR" + GRADLE_WORKER);
     }
 
     @JvmStatic
