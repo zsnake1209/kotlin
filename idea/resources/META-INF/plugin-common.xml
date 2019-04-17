@@ -3411,6 +3411,8 @@
         The extensions below all are needed for all IDEs: IJ, AS, CL & AC.
         Thus they are kept in "common" part.
     -->
+    <storageComponentContainerContributor implementation="org.jetbrains.kotlin.samWithReceiver.ide.IdeSamWithReceiverComponentContributor"/>
+
     <idePlatformKind implementation="org.jetbrains.kotlin.platform.impl.JvmIdePlatformKind"/>
     <idePlatformKind implementation="org.jetbrains.kotlin.platform.impl.JsIdePlatformKind"/>
 
