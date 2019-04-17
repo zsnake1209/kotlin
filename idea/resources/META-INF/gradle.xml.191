@@ -8,6 +8,9 @@
     </extensionPoints>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <scriptDefinitionContributor implementation="org.jetbrains.kotlin.idea.core.script.GradleScriptDefinitionsContributor" order="first"/>
+        <scriptAdditionalIdeaDependenciesProvider implementation="org.jetbrains.kotlin.idea.core.script.GradleScriptAdditionalIdeaDependenciesProvider"/>
+
         <buildSystemTypeDetector implementation="org.jetbrains.kotlin.idea.configuration.GradleDetector"/>
     </extensions>
 
