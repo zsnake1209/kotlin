@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.resolve.substitution
 
+import org.jetbrains.kotlin.fir.resolve.withNullability
 import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.types.impl.ConeAbbreviatedTypeImpl
@@ -124,6 +125,6 @@ class ConeSubstitutorByMap(val substitution: Map<ConeTypeParameterSymbol, ConeKo
 
     override fun substituteType(type: ConeKotlinType): ConeKotlinType? {
         if (type !is ConeTypeParameterType) return null
-        return substitution[type.lookupTag]
+        return substitution[type.lookupTag]?.withNullability(type.nullability)
     }
 }
