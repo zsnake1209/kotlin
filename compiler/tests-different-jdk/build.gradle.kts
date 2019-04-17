@@ -24,7 +24,8 @@ sourceSets {
 
 fun Project.codegenTest(target: Int, jvm: Int,
                         jdk: String = "JDK_${if (jvm <= 8) "1" else ""}$jvm",
-                        body: Test.() -> Unit): Test = projectTest("codegenTarget${target}Jvm${jvm}Test") {
+                        parallel: Boolean = true,
+                        body: Test.() -> Unit): Test = projectTest("codegenTarget${target}Jvm${jvm}Test", parallel = parallel) {
     dependsOn(":dist")
     workingDir = rootDir
 
@@ -39,7 +40,7 @@ fun Project.codegenTest(target: Int, jvm: Int,
     group = "verification"
 }
 
-codegenTest(target = 6, jvm = 6, jdk = "JDK_18") {
+codegenTest(target = 6, jvm = 6, jdk = "JDK_18", parallel = false) {
     dependsOn(testJvm6ServerRuntime)
 
     val port = project.findProperty("kotlin.compiler.codegen.tests.port")?.toString() ?: "5100"
