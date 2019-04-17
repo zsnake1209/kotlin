@@ -45,6 +45,11 @@ abstract class AbstractConeSubstitutor : ConeSubstitutor {
 
     abstract fun substituteType(type: ConeKotlinType): ConeKotlinType?
 
+    fun makeNullableIfNeed(isNullable: Boolean, type: ConeKotlinType?): ConeKotlinType? {
+        if (!isNullable) return type
+        return type?.withNullability(ConeNullability.NULLABLE)
+    }
+
     override fun substituteOrSelf(type: ConeKotlinType): ConeKotlinType {
         return substituteOrNull(type) ?: type
     }
@@ -125,6 +130,6 @@ class ConeSubstitutorByMap(val substitution: Map<ConeTypeParameterSymbol, ConeKo
 
     override fun substituteType(type: ConeKotlinType): ConeKotlinType? {
         if (type !is ConeTypeParameterType) return null
-        return substitution[type.lookupTag]?.withNullability(type.nullability)
+        return makeNullableIfNeed(type.isMarkedNullable, substitution[type.lookupTag])
     }
 }
