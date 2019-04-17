@@ -3405,4 +3405,16 @@
 
     <stripTrailingSpacesFilterFactory implementation="org.jetbrains.kotlin.idea.editor.KotlinStripTrailingSpacesFilterFactory"/>
   </extensions>
+
+  <extensions defaultExtensionNs="org.jetbrains.kotlin">
+    <!--
+        The extensions below all are needed for all IDEs: IJ, AS, CL & AC.
+        Thus they are kept in "common" part.
+    -->
+    <idePlatformKind implementation="org.jetbrains.kotlin.platform.impl.JvmIdePlatformKind"/>
+    <idePlatformKind implementation="org.jetbrains.kotlin.platform.impl.JsIdePlatformKind"/>
+
+    <idePlatformKindTooling implementation="org.jetbrains.kotlin.idea.core.platform.impl.JvmIdePlatformKindTooling"/>
+    <idePlatformKindTooling implementation="org.jetbrains.kotlin.idea.core.platform.impl.JsIdePlatformKindTooling"/>
+  </extensions>
 </idea-plugin>
