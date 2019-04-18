@@ -47,10 +47,11 @@ class CallInfo(
 
 interface CheckerSink {
     fun reportApplicability(new: CandidateApplicability)
+    val components: InferenceComponents
 }
 
 
-class CheckerSinkImpl : CheckerSink {
+class CheckerSinkImpl(override val components: InferenceComponents) : CheckerSink {
     var current = CandidateApplicability.RESOLVED
     override fun reportApplicability(new: CandidateApplicability) {
         if (new < current) current = new
@@ -449,11 +450,13 @@ class NoExplicitReceiverTowerDataConsumer<T : ConeSymbol>(
 
 }
 
-class CallResolver(val typeCalculator: ReturnTypeCalculator, val session: FirSession) {
+class CallResolver(val typeCalculator: ReturnTypeCalculator, val components: InferenceComponents) {
 
     var callInfo: CallInfo? = null
 
     var scopes: List<FirScope>? = null
+
+    val session: FirSession get() = components.session
 
     private fun processImplicitReceiver(
         towerDataConsumer: TowerDataConsumer,
@@ -468,7 +471,7 @@ class CallResolver(val typeCalculator: ReturnTypeCalculator, val session: FirSes
     }
 
     fun runTowerResolver(towerDataConsumer: TowerDataConsumer, implicitReceiverValues: List<ImplicitReceiverValue>): CandidateCollector {
-        val collector = CandidateCollector(callInfo!!)
+        val collector = CandidateCollector(callInfo!!, components)
 
         var group = 0
 
@@ -507,7 +510,7 @@ enum class CandidateApplicability {
     RESOLVED
 }
 
-class CandidateCollector(val callInfo: CallInfo) {
+class CandidateCollector(val callInfo: CallInfo, val components: InferenceComponents) {
 
     val groupNumbers = mutableListOf<Int>()
     val candidates = mutableListOf<Candidate>()
@@ -527,7 +530,7 @@ class CandidateCollector(val callInfo: CallInfo) {
         candidate: Candidate
     ): CandidateApplicability {
 
-        val sink = CheckerSinkImpl()
+        val sink = CheckerSinkImpl(components)
 
 
         callInfo.callKind.sequence().forEach {

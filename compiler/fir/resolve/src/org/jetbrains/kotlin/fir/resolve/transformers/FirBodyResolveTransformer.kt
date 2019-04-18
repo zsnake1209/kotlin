@@ -188,7 +188,7 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
 
         override val session: FirSession
             get() = this@FirBodyResolveTransformer.session
-    })
+    }, session)
 
     private fun <T : FirQualifiedAccess> transformCallee(qualifiedAccess: T): T {
         val callee = qualifiedAccess.calleeReference as? FirSimpleNamedReference ?: return qualifiedAccess
@@ -196,7 +196,7 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
         val receiver = qualifiedAccess.explicitReceiver?.transformSingle(this, null)
 
         val info = CallInfo(CallKind.VariableAccess, receiver, emptyList(), emptyList()) { it.resultType }
-        val resolver = CallResolver(jump, session)
+        val resolver = CallResolver(jump, inferenceComponents)
         resolver.callInfo = info
         resolver.scopes = (scopes + localScopes).asReversed()
 
@@ -300,7 +300,7 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
         val typeArguments = functionCall.typeArguments
 
         val info = CallInfo(CallKind.Function, explicitReceiver, arguments, typeArguments) { it.resultType }
-        val resolver = CallResolver(jump, session)
+        val resolver = CallResolver(jump, inferenceComponents)
         resolver.callInfo = info
         resolver.scopes = (scopes + localScopes).asReversed()
 
@@ -412,7 +412,7 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
                 return listOfNotNull(newLambdaExpression.body?.statements?.last() as? FirExpression) to InferenceSession.default
             }
 
-        }, { it.resultType }, session)
+        }, { it.resultType }, inferenceComponents)
 
         completer.complete(candidate.system.asConstraintSystemCompleterContext(), completionMode, listOf(functionCall), initialType) {
             analyzer.analyze(
@@ -809,7 +809,7 @@ private object StoreNameReference : FirTransformer<FirNamedReference>() {
     }
 }
 
-private object StoreType : FirTransformer<FirResolvedTypeRef>() {
+internal object StoreType : FirTransformer<FirResolvedTypeRef>() {
     override fun <E : FirElement> transformElement(element: E, data: FirResolvedTypeRef): CompositeTransformResult<E> {
         return element.compose()
     }
