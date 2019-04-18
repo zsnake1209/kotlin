@@ -207,11 +207,6 @@ public class FirResolveTestCaseGenerated extends AbstractFirResolveTestCase {
             runTest("compiler/fir/resolve/testData/resolve/expresssions/companion.kt");
         }
 
-        @TestMetadata("components.kt")
-        public void testComponents() throws Exception {
-            runTest("compiler/fir/resolve/testData/resolve/expresssions/components.kt");
-        }
-
         @TestMetadata("constructor.kt")
         public void testConstructor() throws Exception {
             runTest("compiler/fir/resolve/testData/resolve/expresssions/constructor.kt");
