@@ -8,11 +8,17 @@ package org.jetbrains.kotlin.fir
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 
-fun <T : FirElement, D> MutableList<T>.transformInplace(transformer: FirTransformer<D>, data: D) {
+fun <T : FirElement, D> MutableList<T>.transformInplace(
+    transformer: FirTransformer<D>, data: D, specificElement: T? = null, replaceTo: T? = null
+) {
     val iterator = this.listIterator()
     while (iterator.hasNext()) {
         val next = iterator.next()
         val result = next.transform<T, D>(transformer, data)
+        if (specificElement != null && result == specificElement) {
+            iterator.set(replaceTo!!)
+            continue
+        }
         if (result.isSingle) {
             iterator.set(result.single)
         } else {

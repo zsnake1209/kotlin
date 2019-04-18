@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirRegularClass
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.transformInplace
+import org.jetbrains.kotlin.fir.transformSingle
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.name.Name
@@ -46,6 +47,19 @@ open class FirClassImpl(
 
     override val declarations = mutableListOf<FirDeclaration>()
 
+    override var companionObject: FirRegularClass? = null
+
+    fun addDeclaration(declaration: FirDeclaration) {
+        declarations += declaration
+        if (companionObject == null && declaration is FirRegularClass && declaration.isCompanion) {
+            companionObject = declaration
+        }
+    }
+
+    fun addDeclarations(declarations: Collection<FirDeclaration>) {
+        declarations.forEach(this::addDeclaration)
+    }
+
     override fun replaceSupertypes(newSupertypes: List<FirTypeRef>): FirRegularClass {
         superTypeRefs.clear()
         superTypeRefs.addAll(newSupertypes)
@@ -57,7 +71,9 @@ open class FirClassImpl(
         val result = super<FirAbstractMemberDeclaration>.transformChildren(transformer, data) as FirRegularClass
 
         // Transform declarations in last turn
-        declarations.transformInplace(transformer, data)
+        val prevCompanionObject = companionObject
+        companionObject = companionObject?.transformSingle(transformer, data)
+        declarations.transformInplace(transformer, data, prevCompanionObject, companionObject)
         return result
     }
 }
