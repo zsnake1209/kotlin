@@ -11,6 +11,7 @@ fun bar() {
     listOf(A()).forEach { println(it) } // inline from stdlib
     listOf("").joinToString() // not inline from stdlib
     listOf("").size // property from stdlib
+    listOf("").indices // property from stdlib without backing method
     listOf("").last() // overloaded extension from stdlib
     mutableMapOf(1 to "1").entries.first().setValue("123") // call on nested method in stdlib
     val intRange = 0L..3L
