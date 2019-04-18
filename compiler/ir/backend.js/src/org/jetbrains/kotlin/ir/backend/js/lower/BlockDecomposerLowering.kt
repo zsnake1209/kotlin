@@ -74,7 +74,7 @@ abstract class AbstractBlockDecomposerLowering(context: CommonBackendContext) : 
             )
 
             val newBody = toBlockBody(initFunction)
-            newBody.patchDeclarationParents(initFunction)
+//            newBody.patchDeclarationParents(initFunction)
             initFunction.body = newBody
 
             lower(initFunction)
