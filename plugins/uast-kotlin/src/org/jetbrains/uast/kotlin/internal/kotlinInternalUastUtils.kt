@@ -96,7 +96,7 @@ internal fun resolveSource(context: KtElement, descriptor: DeclarationDescriptor
     return when (source) {
         is KtFunction -> LightClassUtil.getLightClassMethod(source)
         is PsiMethod -> source
-        null -> resolveDeserialized(context, descriptor)
+        null -> resolveDeserialized(context, descriptor) as? PsiMethod
         else -> null
     }
 }
@@ -128,7 +128,7 @@ internal fun resolveToPsiClass(uElement: UElement, declarationDescriptor: Declar
     }?.toPsiType(uElement, context, true).let { PsiTypesUtil.getPsiClass(it) }
 
 
-private fun resolveDeserialized(context: KtElement, descriptor: DeclarationDescriptor): PsiMethod? {
+internal fun resolveDeserialized(context: KtElement, descriptor: DeclarationDescriptor): PsiModifierListOwner? {
     if (descriptor !is DeserializedCallableMemberDescriptor) return null
 
     val psiClass = resolveContainingDeserializedClass(context, descriptor) ?: return null
@@ -151,6 +151,14 @@ private fun resolveDeserialized(context: KtElement, descriptor: DeclarationDescr
                 ?: return null
 
             psiClass.constructors.firstOrNull { it.matchesDesc(signature.desc) }
+        }
+        is ProtoBuf.Property -> {
+            val signature = JvmProtoBufUtil.getJvmFieldSignature(proto, nameResolver, typeTable)
+                ?: getMethodSignatureFromDescriptor(context, descriptor)
+                ?: return null
+
+            psiClass.methods.firstOrNull { it.name == signature.name && it.matchesDesc(signature.desc) }
+                ?: psiClass.fields.firstOrNull { it.name == signature.name }
         }
         else -> null
     }
