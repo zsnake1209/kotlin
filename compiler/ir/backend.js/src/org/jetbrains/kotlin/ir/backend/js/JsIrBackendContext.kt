@@ -202,7 +202,6 @@ class JsIrBackendContext(
         getIrClass(JS_INTERNAL_PACKAGE_FQNAME.child(Name.identifier("${it.identifier}CompanionObject")))
     }
 
-    val coroutineImpl = ir.symbols.coroutineImpl
     val continuationClass = symbolTable.referenceClass(
         coroutinePackage.memberScope.getContributedClassifier(
             CONTINUATION_NAME,
@@ -214,7 +213,6 @@ class JsIrBackendContext(
     // Top-level functions forced to be loaded
 
     val coroutineSuspendOrReturn = symbolTable.referenceSimpleFunction(getJsInternalFunction(COROUTINE_SUSPEND_OR_RETURN_JS_NAME))
-    val coroutineSuspendGetter = ir.symbols.coroutineSuspendedGetter
     val coroutineGetContext: IrSimpleFunctionSymbol
         get() {
             val contextGetter =
