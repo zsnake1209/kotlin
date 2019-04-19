@@ -44,7 +44,6 @@ import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
-import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
@@ -109,7 +108,7 @@ internal class CallableReferenceLowering(val context: JvmBackendContext) : FileL
                     val vararg = IrVarargImpl(
                         UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                         context.ir.symbols.array.typeWith(context.irBuiltIns.anyNType),
-                        context.irBuiltIns.anyClass.typeWith(),
+                        context.irBuiltIns.anyNType,
                         (0 until argumentsCount).map { i -> expression.getValueArgument(i)!! }
                     )
                     val invokeFun = context.ir.symbols.functionN.owner.declarations.single {

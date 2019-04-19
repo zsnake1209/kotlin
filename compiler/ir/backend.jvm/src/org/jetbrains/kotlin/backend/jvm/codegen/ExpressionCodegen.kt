@@ -1006,15 +1006,6 @@ class ExpressionCodegen(
     }
 
     private fun resolveToCallable(irCall: IrFunctionAccessExpression, isSuper: Boolean): Callable {
-// !!!!!! Needed?     Not present in current master
-//        val intrinsic = classCodegen.context.irIntrinsics.getIntrinsic(irCall.symbol)
-//        if (intrinsic != null) {
-//            return intrinsic.toCallable(
-//                irCall,
-//                typeMapper.mapSignatureSkipGeneric(irCall.symbol.owner),
-//                classCodegen.context
-//            )
-//        }
         return typeMapper.mapToCallableMethod(irCall.symbol.owner, isSuper)
     }
 
@@ -1196,7 +1187,7 @@ internal fun IrFunction.isInlineCall(state: GenerationState) =
             (isInline || isArrayConstructorWithLambda())
 
 val IrType.isReifiedTypeParameter: Boolean
-    get() = this.safeAs<IrSimpleType>()?.classifier.safeAs<IrTypeParameterSymbol>()?.owner?.isReified == true
+    get() = this.classifierOrNull?.safeAs<IrTypeParameterSymbol>()?.owner?.isReified == true
 
 /* Copied and modified from InlineUtil.java */
 fun isInline(declaration: IrDeclaration?): Boolean = declaration is IrSimpleFunction && declaration.isInline

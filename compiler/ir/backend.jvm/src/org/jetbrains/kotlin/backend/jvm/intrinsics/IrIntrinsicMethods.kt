@@ -26,8 +26,8 @@ import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
-import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.util.functions
@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.ir.util.properties
 import org.jetbrains.kotlin.lexer.KtSingleValueToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.expressions.OperatorConventions
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
@@ -43,17 +44,62 @@ import org.jetbrains.org.objectweb.asm.Type
 
 class IrIntrinsicMethods(val irBuiltIns: IrBuiltIns, val symbols: JvmSymbols) {
 
+    private val KOTLIN = FqName("kotlin")
+    private val KOTLIN_JVM = FqName("kotlin.jvm")
+    private val KOTLIN_JVM_INTERNAL_UNSAFE = FqName("kotlin.jvm.internal.unsafe")
+
     private val intrinsicsMap = (
             listOf(
-                symbols.javaClassProperty.owner.getter!!.symbol.toKey() to JavaClassProperty,
-                symbols.kClassJavaProperty.owner.getter!!.symbol.toKey() to KClassJavaProperty,
-                symbols.monitorEnter.toKey() to MonitorInstruction.MONITOR_ENTER,
-                symbols.monitorExit.toKey() to MonitorInstruction.MONITOR_EXIT,
-                symbols.isArrayOf.toKey() to IsArrayOf,
+                Key(KOTLIN_JVM, FqName("T"),"<get-javaClass>", emptyList()) to JavaClassProperty,
+                Key(
+                    KOTLIN_JVM.child(Name.identifier("KClass")),
+                    null,
+                    "<get-java>",
+                    emptyList()
+                ) to KClassJavaProperty,
+                Key(
+                    KOTLIN_JVM_INTERNAL_UNSAFE,
+                    null,
+                    "monitorEnter",
+                    listOf(irBuiltIns.anyClass.owner.fqNameWhenAvailable!!)
+                ) to MonitorInstruction.MONITOR_ENTER,
+                Key(
+                    KOTLIN_JVM_INTERNAL_UNSAFE,
+                    null,
+                    "monitorExit",
+                    listOf(irBuiltIns.anyClass.owner.fqNameWhenAvailable!!)
+                ) to MonitorInstruction.MONITOR_EXIT,
+                Key(
+                    KOTLIN_JVM,
+                    FqName("kotlin.Array"),
+                    "isArrayOf",
+                    emptyList()
+                ) to IsArrayOf,
                 symbols.arrayOf.toKey() to ArrayOf,
-                symbols.extensionToString.toKey() to ToString,
-                symbols.stringPlus.toKey() to StringPlus,
-                symbols.arrayOfNulls.toKey() to NewArray,
+                Key(
+                    KOTLIN,
+                    irBuiltIns.anyClass.owner.fqNameWhenAvailable!!,
+                    "toString",
+                    emptyList()
+                ) to ToString,
+                Key(
+                    KOTLIN,
+                    irBuiltIns.stringClass.owner.fqNameWhenAvailable!!,
+                    "plus",
+                    listOf(irBuiltIns.anyClass.owner.fqNameWhenAvailable!!)
+                ) to StringPlus,
+                Key(
+                    KOTLIN,
+                    null,
+                    "arrayOfNulls",
+                    listOf(irBuiltIns.intClass.owner.fqNameWhenAvailable)
+                ) to NewArray,
+                Key(
+                    KOTLIN.child(Name.identifier("Cloneable")),
+                    null,
+                    "clone",
+                    emptyList()
+                ) to Clone,
                 irBuiltIns.eqeqSymbol.toKey()!! to Equals(KtTokens.EQEQ),
                 irBuiltIns.eqeqeqSymbol.toKey()!! to Equals(KtTokens.EQEQEQ),
                 irBuiltIns.ieee754equalsFunByOperandType[irBuiltIns.float]!!.toKey()!! to Ieee754Equals(Type.FLOAT_TYPE),
@@ -93,7 +139,7 @@ class IrIntrinsicMethods(val irBuiltIns: IrBuiltIns, val symbols: JvmSymbols) {
                     methodWithArity(irBuiltIns.booleanClass, "not", 0, Not) +
                     methodWithArity(irBuiltIns.stringClass, "plus", 1, Concat) +
                     methodWithArity(irBuiltIns.stringClass, "get", 1, StringGetChar) +
-                    methodWithArity(symbols.cloneable, "clone", 0, Clone) +
+//                    methodWithArity(symbols.cloneable, "clone", 0, Clone) +
                     symbols.primitiveIteratorsByType.values.flatMap { iteratorClass ->
                         methodWithArity(iteratorClass, "next", 0, IteratorNext)
                     } +
@@ -146,7 +192,7 @@ class IrIntrinsicMethods(val irBuiltIns: IrBuiltIns, val symbols: JvmSymbols) {
         }
 
         private fun getParameterFqName(parameter: IrValueParameter?): FqName? =
-            parameter?.type?.safeAs<IrSimpleType>()?.classifier?.owner?.let {
+            parameter?.type?.classifierOrNull?.owner?.let {
                 when (it) {
                     is IrClass -> it.fqNameWhenAvailable
                     is IrTypeParameter -> FqName(it.name.asString())
