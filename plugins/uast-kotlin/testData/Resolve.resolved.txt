@@ -34,6 +34,18 @@ UBlockExpression -> UQualifiedReferenceExpression -> KtLightMethodImpl:foo: foo
     UBlockExpression -> UQualifiedReferenceExpression -> null: null
     UCallExpression (kind = UastCallKind(name='method_call'), argCount = 1)) -> USimpleNameReferenceExpression (identifier = listOf) -> PsiMethod:listOf: listOf
     UQualifiedReferenceExpression -> USimpleNameReferenceExpression (identifier = indices) -> PsiMethod:getIndices: getIndices
+    UTypeReferenceExpression (name = java.util.Date) -> USimpleNameReferenceExpression (identifier = java) -> PsiPackage:java: java
+    UTypeReferenceExpression (name = java.util.Date) -> USimpleNameReferenceExpression (identifier = util) -> PsiPackage:java.util: util
+    UTypeReferenceExpression (name = java.util.Date) -> USimpleNameReferenceExpression (identifier = Date) -> PsiClass:Date: Date
+    ULocalVariable (name = date) -> UQualifiedReferenceExpression -> PsiMethod:Date: Date
+    UQualifiedReferenceExpression -> UQualifiedReferenceExpression -> null: null
+    UQualifiedReferenceExpression -> USimpleNameReferenceExpression (identifier = java) -> PsiPackage:java: java
+    UQualifiedReferenceExpression -> USimpleNameReferenceExpression (identifier = util) -> PsiPackage:java.util: util
+    UCallExpression (kind = UastCallKind(name='constructor_call'), argCount = 0)) -> USimpleNameReferenceExpression (identifier = Date) -> PsiMethod:Date: Date
+    UBinaryExpression (operator = =) -> UQualifiedReferenceExpression -> null: null
+    UQualifiedReferenceExpression -> USimpleNameReferenceExpression (identifier = date) -> LightVariableBuilder:date: date
+    UQualifiedReferenceExpression -> USimpleNameReferenceExpression (identifier = time) -> PsiMethod:setTime: setTime
+    UBinaryExpression (operator = =) -> USimpleNameReferenceExpression (identifier = =) -> null: null
     UBlockExpression -> UQualifiedReferenceExpression -> null: null
     UCallExpression (kind = UastCallKind(name='method_call'), argCount = 1)) -> USimpleNameReferenceExpression (identifier = listOf) -> PsiMethod:listOf: listOf
     UCallExpression (kind = UastCallKind(name='method_call'), argCount = 0)) -> USimpleNameReferenceExpression (identifier = last) -> PsiMethod:last: last
