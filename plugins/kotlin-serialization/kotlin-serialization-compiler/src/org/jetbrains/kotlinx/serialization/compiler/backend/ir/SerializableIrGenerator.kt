@@ -13,9 +13,10 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
+import org.jetbrains.kotlin.ir.types.IrSimpleType
+import org.jetbrains.kotlin.ir.types.IrTypeProjection
+import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
@@ -107,9 +108,20 @@ class SerializableIrGenerator(
                 }
         }
 
+    private fun copyTypeArgumentsToDelegatingConstructorCall(superClass: ClassDescriptor, delegatingConstructorCallImpl: IrDelegatingConstructorCallImpl) {
+        val thisClassTypeArgs =
+            (irClass.superTypes.find { it.getClass()?.descriptor == superClass } as? IrSimpleType)?.arguments
+        thisClassTypeArgs?.forEachIndexed { index, argument ->
+            delegatingConstructorCallImpl.putTypeArgument(
+                index,
+                (argument as? IrTypeProjection)?.type
+            )
+        }
+    }
+
     private fun IrBlockBodyBuilder.generateSuperNonSerializableCall(superClass: ClassDescriptor) {
-        val suitableCtor = superClass.constructors.singleOrNull { it.valueParameters.size == 0 }
-            ?: throw IllegalArgumentException("Non-serializable parent of serializable $serializableDescriptor must have no arg constructor")
+        val suitableCtor = superClass.constructors.find { it.isPrimary && it.valueParameters.size == 0 }
+            ?: throw IllegalArgumentException("Non-serializable parent of serializable $serializableDescriptor must have primary no arg constructor")
         val ctorRef = compilerContext.externalSymbols.referenceConstructor(suitableCtor)
         +IrDelegatingConstructorCallImpl(
             startOffset,
@@ -117,7 +129,7 @@ class SerializableIrGenerator(
             compilerContext.irBuiltIns.unitType,
             ctorRef,
             suitableCtor
-        )
+        ).also { call -> copyTypeArgumentsToDelegatingConstructorCall(superClass, call) }
     }
 
     // returns offset in serializable properties array
@@ -141,6 +153,7 @@ class SerializableIrGenerator(
             superCtorRef.owner.descriptor
         )
         arguments.forEachIndexed { index, parameter -> call.putValueArgument(index, irGet(parameter)) }
+        copyTypeArgumentsToDelegatingConstructorCall(superClass, call)
         +call
         return superProperties.size
     }
