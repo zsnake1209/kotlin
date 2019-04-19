@@ -45,15 +45,17 @@ class CallableReferenceLowering(val context: JsIrBackendContext) : FileLoweringP
     private val callableNameConst get() = JsIrBuilder.buildString(context.irBuiltIns.stringType, Namer.KCALLABLE_NAME)
     private val getterConst get() = JsIrBuilder.buildString(context.irBuiltIns.stringType, Namer.KPROPERTY_GET)
     private val setterConst get() = JsIrBuilder.buildString(context.irBuiltIns.stringType, Namer.KPROPERTY_SET)
-    private val callableToFactoryFunction = context.callableReferencesCache
+    private val callableToFactoryFunction = mutableMapOf<CallableReferenceKey, IrSimpleFunction>()//context.callableReferencesCache
 
     private val newDeclarations = mutableListOf<IrDeclaration>()
-    private val implicitDeclarationFile = context.implicitDeclarationFile
+    private lateinit var implicitDeclarationFile: IrFile// = context.implicitDeclarationFile
 
     override fun lower(irFile: IrFile) {
         newDeclarations.clear()
+        callableToFactoryFunction.clear()
+        implicitDeclarationFile = irFile
         irFile.transformChildrenVoid(CallableReferenceLowerTransformer())
-        implicitDeclarationFile.declarations += newDeclarations
+        irFile.declarations += newDeclarations
     }
 
     private fun makeCallableKey(declaration: IrFunction, reference: IrCallableReference) =
