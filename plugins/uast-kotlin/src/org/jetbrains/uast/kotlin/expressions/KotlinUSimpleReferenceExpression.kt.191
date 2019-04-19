@@ -48,6 +48,13 @@ open class KotlinUSimpleReferenceExpression(
         if (declarationDescriptor is ImportedFromObjectCallableDescriptor<*>) {
             declarationDescriptor = declarationDescriptor.callableFromObject
         }
+        if (declarationDescriptor is SyntheticJavaPropertyDescriptor) {
+            declarationDescriptor = when (psi.readWriteAccess()) {
+                ReferenceAccess.WRITE, ReferenceAccess.READ_WRITE ->
+                    declarationDescriptor.setMethod ?: declarationDescriptor.getMethod
+                ReferenceAccess.READ -> declarationDescriptor.getMethod
+            }
+        }
 
         if (declarationDescriptor is PackageViewDescriptor) {
             return@lz JavaPsiFacade.getInstance(psi.project).findPackage(declarationDescriptor.fqName.asString())
