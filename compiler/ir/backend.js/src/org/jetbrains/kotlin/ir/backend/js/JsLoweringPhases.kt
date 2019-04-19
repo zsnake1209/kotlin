@@ -281,16 +281,22 @@ private val secondaryFactoryInjectorLoweringPhase = makeJsModulePhase(
     prerequisite = setOf(innerClassesLoweringPhase)
 )
 
-private val inlineClassLoweringPhase = makeCustomJsModulePhase(
-    { context, module ->
-        InlineClassLowering(context).run {
-            inlineClassDeclarationLowering.runOnFilesPostfix(module)
-            inlineClassUsageLowering.lower(module)
-        }
+private val inlineClassDeclarationsLoweringPhase = makeJsModulePhase(
+    { context ->
+        InlineClassLowering(context).inlineClassDeclarationLowering
     },
-    name = "InlineClassLowering",
-    description = "Handle inline classes"
+    name = "InlineClassDeclarationsLowering",
+    description = "Handle inline classes declarations"
 )
+
+private val inlineClassUsageLoweringPhase = makeJsModulePhase(
+    { context ->
+        InlineClassLowering(context).inlineClassUsageLowering
+    },
+    name = "InlineClassUsageLowering",
+    description = "Handle inline classes usages"
+)
+
 
 private val autoboxingTransformerPhase = makeJsModulePhase(
     ::AutoboxingTransformer,
@@ -391,6 +397,9 @@ val jsPhases = namedIrModulePhase(
                         secondaryConstructorLoweringPhase then
                         secondaryFactoryInjectorLoweringPhase then
                         classReferenceLoweringPhase then
+                        inlineClassDeclarationsLoweringPhase then
+                        inlineClassUsageLoweringPhase then
+                        autoboxingTransformerPhase then
                         blockDecomposerLoweringPhase then
                         primitiveCompanionLoweringPhase then // remove?
                         constLoweringPhase then

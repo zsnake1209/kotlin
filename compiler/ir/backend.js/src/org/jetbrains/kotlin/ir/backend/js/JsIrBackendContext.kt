@@ -136,6 +136,7 @@ class JsIrBackendContext(
     val enumEntryExternalToInstanceField = mutableMapOf<IrEnumEntrySymbol, IrField>()
     val callableReferencesCache = mutableMapOf<CallableReferenceKey, IrSimpleFunction>()
     val secondaryConstructorToFactoryCache = mutableMapOf<IrConstructor, ConstructorPair>()
+    val inlineClassTransformedFunctionsCache = mutableMapOf<IrFunctionSymbol, IrSimpleFunctionSymbol>()
 
     val intrinsics = JsIntrinsics(irBuiltIns, this)
 

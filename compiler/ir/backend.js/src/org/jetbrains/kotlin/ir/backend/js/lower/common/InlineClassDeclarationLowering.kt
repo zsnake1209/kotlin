@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.ir.backend.js.lower.common
 
-import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
@@ -16,11 +15,11 @@ import org.jetbrains.kotlin.backend.common.lower.irBlock
 import org.jetbrains.kotlin.backend.common.lower.irBlockBody
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.expressions.*
-import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.util.*
@@ -31,8 +30,8 @@ import org.jetbrains.kotlin.name.Name
 private const val INLINE_CLASS_IMPL_SUFFIX = "-impl"
 
 // TODO: Support incremental compilation
-class InlineClassLowering(val context: BackendContext) {
-    private val transformedFunction = mutableMapOf<IrFunctionSymbol, IrSimpleFunctionSymbol>()
+class InlineClassLowering(val context: JsIrBackendContext) {
+    private val transformedFunction = context.inlineClassTransformedFunctionsCache
 
     val inlineClassDeclarationLowering = object : ClassLoweringPass {
         override fun lower(irClass: IrClass) {
