@@ -385,7 +385,6 @@ val jsPhases = namedIrModulePhase(
 
                         defaultArgumentStubGeneratorPhase then
                         defaultParameterInjectorPhase then
-                        defaultParameterCleanerPhase then
 
                         jsDefaultCallbackGeneratorPhase then
                         removeInlineFunctionsWithReifiedTypeParametersLoweringPhase then
