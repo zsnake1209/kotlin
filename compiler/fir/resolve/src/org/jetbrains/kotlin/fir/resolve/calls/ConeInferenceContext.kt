@@ -199,7 +199,7 @@ interface ConeInferenceContext : TypeSystemInferenceExtensionContext,
     }
 
     override fun SimpleTypeMarker.makeSimpleTypeDefinitelyNotNullOrNotNull(): SimpleTypeMarker {
-        TODO("not implemented")
+        return this //TODO("not implemented")
     }
 
     override fun createCapturedType(
