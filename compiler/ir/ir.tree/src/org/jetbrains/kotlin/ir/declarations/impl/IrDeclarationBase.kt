@@ -36,4 +36,10 @@ abstract class IrDeclarationBase(
 
     override val metadata: MetadataSource?
         get() = null
+
+    var createdOn: Int = 0
+
+    var loweredUpTo: Int = 0
+
+    var removedAt: Int = Integer.MAX_VALUE
 }

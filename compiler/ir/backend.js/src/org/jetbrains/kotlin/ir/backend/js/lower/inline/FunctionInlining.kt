@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl

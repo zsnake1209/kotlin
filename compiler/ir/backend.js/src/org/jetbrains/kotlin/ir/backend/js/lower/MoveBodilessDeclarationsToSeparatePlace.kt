@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.ir.backend.js.lower
 
+import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.ir.addChild
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
@@ -53,6 +54,14 @@ private class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFra
         _owner = owner
     }
 }
+
+//class MoveBodilessDeclarationsToSeparatePlaceLowering(context: JsIrBackendContext): FileLoweringPass {
+//    override fun lower(irFile: IrFile) {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+//
+//
+//}
 
 fun moveBodilessDeclarationsToSeparatePlace(context: JsIrBackendContext, module: IrModuleFragment) {
     val externalPackageFragment = IrExternalPackageFragmentImpl(

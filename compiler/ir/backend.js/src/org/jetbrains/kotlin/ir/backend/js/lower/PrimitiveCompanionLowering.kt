@@ -26,7 +26,7 @@ class PrimitiveCompanionLowering(val context: JsIrBackendContext) : FileLowering
                 if (!symbol.isBound) return expression
                 val declaration = symbol.owner
                 if (!declaration.isCompanion) return expression
-                val parent = declaration.parent as IrClass
+                val parent = declaration.parent as? IrClass ?: return expression
                 if (!parent.defaultType.isPrimitiveType() && !parent.defaultType.isString()) return expression
                 val actualCompanion = context.primitiveCompanionObjects[parent.name] ?: return expression
                 return expression.run { IrGetObjectValueImpl(startOffset, endOffset, actualCompanion.owner.defaultType, actualCompanion) }

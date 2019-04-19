@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.ir.backend.js
 
 import org.jetbrains.kotlin.backend.common.*
 import org.jetbrains.kotlin.backend.common.phaser.*
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.backend.js.lower.*
 import org.jetbrains.kotlin.ir.backend.js.lower.calls.CallsLowering
 import org.jetbrains.kotlin.ir.backend.js.lower.common.*
@@ -14,12 +15,13 @@ import org.jetbrains.kotlin.ir.backend.js.lower.coroutines.JsSuspendFunctionsLow
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.FunctionInlining
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.RemoveInlineFunctionsWithReifiedTypeParametersLowering
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ReturnableBlockLowering
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 
 private fun ClassLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) = moduleFragment.files.forEach { runOnFilePostfix(it) }
 
-private fun validationCallback(context: JsIrBackendContext, module: IrModuleFragment) {
+private fun validationCallback(context: JsIrBackendContext, module: IrElement) {
     val validatorConfig = IrValidatorConfig(
         abortOnError = false,
         ensureAllNodesAreDifferent = true,
@@ -35,7 +37,7 @@ private fun makeJsModulePhase(
     name: String,
     description: String,
     prerequisite: Set<AnyNamedPhase> = emptySet()
-) = makeIrModulePhase<JsIrBackendContext>(lowering, name, description, prerequisite, verify = ::validationCallback)
+) = makeIrFilePhase<JsIrBackendContext>(lowering, name, description, prerequisite, verify = ::validationCallback)
 
 private fun makeCustomJsModulePhase(
     op: (JsIrBackendContext, IrModuleFragment) -> Unit,
@@ -69,8 +71,8 @@ private val moveBodilessDeclarationsToSeparatePlacePhase = makeCustomJsModulePha
     description = "Move `external` and `built-in` declarations into separate place to make the following lowerings do not care about them"
 )
 
-private val expectDeclarationsRemovingPhase = makeJsModulePhase(
-    ::ExpectDeclarationsRemoving,
+private val expectDeclarationsRemovingPhase = makeCustomJsModulePhase(
+    { context, module -> ExpectDeclarationsRemoving(context).lower(module) },
     name = "ExpectDeclarationsRemoving",
     description = "Remove expect declaration from module fragment"
 )
@@ -238,8 +240,8 @@ private val propertiesLoweringPhase = makeJsModulePhase(
     description = "Move fields and accessors out from its property"
 )
 
-private val initializersLoweringPhase = makeCustomJsModulePhase(
-    { context, module -> InitializersLowering(context, JsLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, false).lower(module) },
+private val initializersLoweringPhase = makeJsModulePhase(
+    { context -> InitializersLowering(context, JsLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, false) },
     name = "InitializersLowering",
     description = "Merge init block and field initializers into [primary] constructor",
     prerequisite = setOf(enumClassConstructorLoweringPhase)
@@ -296,10 +298,14 @@ private val autoboxingTransformerPhase = makeJsModulePhase(
     description = "Insert box/unbox intrinsics"
 )
 
-private val blockDecomposerLoweringPhase = makeCustomJsModulePhase(
-    { context, module ->
-        BlockDecomposerLowering(context).lower(module)
-        module.patchDeclarationParents()
+private val blockDecomposerLoweringPhase = makeJsModulePhase(
+    { context ->
+        object : FileLoweringPass {
+            override fun lower(irFile: IrFile) {
+                BlockDecomposerLowering(context).lower(irFile)
+                irFile.patchDeclarationParents()
+            }
+        }
     },
     name = "BlockDecomposerLowering",
     description = "Transform statement-like-expression nodes into pure-statement to make it easily transform into JS",
@@ -346,46 +352,49 @@ private val staticMembersLoweringPhase = makeJsModulePhase(
 val jsPhases = namedIrModulePhase(
     name = "IrModuleLowering",
     description = "IR module lowering",
-    lower = testGenerationPhase then
-            expectDeclarationsRemovingPhase then
-            functionInliningPhase then
-            lateinitLoweringPhase then
-            tailrecLoweringPhase then
-            enumClassConstructorLoweringPhase then
-            sharedVariablesLoweringPhase then
-            localDelegatedPropertiesLoweringPhase then
-            localDeclarationsLoweringPhase then
-            innerClassesLoweringPhase then
-            innerClassConstructorCallsLoweringPhase then
-            propertiesLoweringPhase then
-            initializersLoweringPhase then
-            // Common prefix ends
+    lower = expectDeclarationsRemovingPhase then
             moveBodilessDeclarationsToSeparatePlacePhase then
-            enumClassLoweringPhase then
-            enumUsageLoweringPhase then
-            returnableBlockLoweringPhase then
-            unitMaterializationLoweringPhase then
-            suspendFunctionsLoweringPhase then
-            privateMembersLoweringPhase then
-            callableReferenceLoweringPhase then
-            defaultArgumentStubGeneratorPhase then
-            defaultParameterInjectorPhase then
-            defaultParameterCleanerPhase then
-            jsDefaultCallbackGeneratorPhase then
-            removeInlineFunctionsWithReifiedTypeParametersLoweringPhase then
-            throwableSuccessorsLoweringPhase then
-            varargLoweringPhase then
-            multipleCatchesLoweringPhase then
-            bridgesConstructionPhase then
-            typeOperatorLoweringPhase then
-            secondaryConstructorLoweringPhase then
-            secondaryFactoryInjectorLoweringPhase then
-            classReferenceLoweringPhase then
-            inlineClassLoweringPhase then
-            autoboxingTransformerPhase then
-            blockDecomposerLoweringPhase then
-            primitiveCompanionLoweringPhase then
-            constLoweringPhase then
-            callsLoweringPhase then
-            staticMembersLoweringPhase
+            functionInliningPhase then
+            performByIrFile(
+                name = "IrLowerByFile",
+                description = "IR Lowering by file",
+                lower = lateinitLoweringPhase then
+                        tailrecLoweringPhase then
+                        enumClassConstructorLoweringPhase then
+                        sharedVariablesLoweringPhase then
+                        localDelegatedPropertiesLoweringPhase then
+                        localDeclarationsLoweringPhase then
+                        innerClassesLoweringPhase then
+                        innerClassConstructorCallsLoweringPhase then
+                        propertiesLoweringPhase then
+                        initializersLoweringPhase then
+                        // Common prefix ends
+                        enumClassLoweringPhase then // remove?
+                        enumUsageLoweringPhase then // remove?
+                        returnableBlockLoweringPhase then
+                        unitMaterializationLoweringPhase then
+                        suspendFunctionsLoweringPhase then
+                        privateMembersLoweringPhase then
+                        callableReferenceLoweringPhase then
+
+                        defaultArgumentStubGeneratorPhase then
+                        defaultParameterInjectorPhase then
+                        defaultParameterCleanerPhase then
+
+                        jsDefaultCallbackGeneratorPhase then
+                        removeInlineFunctionsWithReifiedTypeParametersLoweringPhase then
+                        throwableSuccessorsLoweringPhase then
+                        varargLoweringPhase then
+                        multipleCatchesLoweringPhase then
+                        bridgesConstructionPhase then
+                        typeOperatorLoweringPhase then
+                        secondaryConstructorLoweringPhase then
+                        secondaryFactoryInjectorLoweringPhase then
+                        classReferenceLoweringPhase then
+                        blockDecomposerLoweringPhase then
+                        primitiveCompanionLoweringPhase then // remove?
+                        constLoweringPhase then
+                        callsLoweringPhase then
+                        staticMembersLoweringPhase
+            )
 )
