@@ -22,13 +22,16 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.MetadataSource
 import org.jetbrains.kotlin.ir.expressions.IrCall
+import java.util.*
+import kotlin.collections.ArrayList
 
 abstract class IrDeclarationBase(
     startOffset: Int,
     endOffset: Int,
     override var origin: IrDeclarationOrigin
 ) : IrElementBase(startOffset, endOffset),
-    IrDeclaration {
+    IrDeclaration,
+    HasStageController {
 
     override lateinit var parent: IrDeclarationParent
 
@@ -36,10 +39,40 @@ abstract class IrDeclarationBase(
 
     override val metadata: MetadataSource?
         get() = null
+//
+//    var createdOn: Int = 0
+//
+//    var loweredUpTo: Int = 0
+//
+//    var removedAt: Int = Integer.MAX_VALUE
 
-    var createdOn: Int = 0
+    override var stageController: StageController = NoopController()
+}
 
-    var loweredUpTo: Int = 0
+interface HasStageController {
+    var stageController: StageController
+}
 
-    var removedAt: Int = Integer.MAX_VALUE
+interface StageController {
+    val currentStage: Int
+}
+
+class NoopController : StageController {
+    override val currentStage: Int = 0
+}
+
+class ListManager<T>(val hasStageController: HasStageController) {
+
+    private val changePoints = TreeMap<Int, MutableList<T>>(mapOf(0 to mutableListOf<T>()))
+
+    fun get(): MutableList<T> {
+        val stage = hasStageController.stageController.currentStage
+        var result = changePoints[stage]
+        if (result == null) {
+            result = mutableListOf<T>()
+            result.addAll(changePoints.lowerEntry(stage)!!.value)
+            changePoints[stage] = result
+        }
+        return result
+    }
 }

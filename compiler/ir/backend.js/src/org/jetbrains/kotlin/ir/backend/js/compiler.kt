@@ -55,6 +55,8 @@ fun compile(
 
     jsPhases.invokeToplevel(phaseConfig, context, moduleFragment)
 
+    context.stage = 100
+
     val jsProgram = moduleFragment.accept(IrModuleToJsTransformer(context), null)
     return jsProgram.toString()
 }

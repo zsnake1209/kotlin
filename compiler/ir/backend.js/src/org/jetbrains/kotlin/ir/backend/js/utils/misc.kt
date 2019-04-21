@@ -27,28 +27,3 @@ fun IrDeclaration.hasStaticDispatch() = when (this) {
     is IrField -> isStatic
     else -> true
 }
-
-var IrDeclaration.createdOn: Int
-    get() = if (this is IrDeclarationBase) this.createdOn else 0
-    set(c) {
-        if (this is IrDeclarationBase) this.createdOn = c
-    }
-
-var IrDeclaration.removedAt: Int
-    get() = if (this is IrDeclarationBase) this.removedAt else Integer.MAX_VALUE
-    set(c) {
-        if (this is IrDeclarationBase) this.removedAt = c
-    }
-
-// To be used later
-var IrDeclaration.loweredUpTo: Int
-    get() = if (this is IrDeclarationBase) this.loweredUpTo else 0
-    set(c) {
-        if (this is IrDeclarationBase) this.loweredUpTo = c
-    }
-
-
-fun JsIrBackendContext.shouldSkip(declaration: IrDeclaration): Boolean {
-    return stage <= declaration.createdOn || declaration.removedAt < stage
-}
-

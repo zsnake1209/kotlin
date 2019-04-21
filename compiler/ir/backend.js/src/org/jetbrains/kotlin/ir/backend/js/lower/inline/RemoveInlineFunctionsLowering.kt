@@ -9,15 +9,13 @@ import org.jetbrains.kotlin.backend.common.DeclarationContainerLoweringPass
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.impl.IrDeclarationBase
+import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
 
 
 class RemoveInlineFunctionsLowering(val context: JsIrBackendContext) : DeclarationContainerLoweringPass {
     override fun lower(irDeclarationContainer: IrDeclarationContainer) {
-        irDeclarationContainer.declarations.forEach {
-            if (it is IrFunction && it.isInline) {
-                (it as? IrDeclarationBase)?.removedAt = context.stage
-            }
+        irDeclarationContainer.transformDeclarationsFlat {
+            if (it is IrFunction && it.isInline) listOf() else null
         }
     }
 }
