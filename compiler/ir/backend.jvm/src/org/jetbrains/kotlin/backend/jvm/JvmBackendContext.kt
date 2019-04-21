@@ -32,6 +32,7 @@ class JvmBackendContext(
     symbolTable: SymbolTable,
     val phaseConfig: PhaseConfig
 ) : CommonBackendContext {
+    override var stage: Int = 0
     override val builtIns = state.module.builtIns
     override val declarationFactory: JvmDeclarationFactory = JvmDeclarationFactory(state)
     override val sharedVariablesManager = JvmSharedVariablesManager(state.module, builtIns, irBuiltIns)

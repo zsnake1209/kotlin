@@ -18,15 +18,24 @@ private class CompositePhase<Context : CommonBackendContext, Input, Output>(
 
     override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState<Input>, context: Context, input: Input): Output {
         var currentState = phaserState as PhaserState<Any?>
+        // TODO proper stage management
+        val currentStage = context.stage
+        var stageIndex = 1
+
+        context.stage = stageIndex++
         var result = phases.first().invoke(phaseConfig, currentState, context, input)
+
         for ((previous, next) in phases.zip(phases.drop(1))) {
             if (next !is SameTypeCompilerPhase<*, *>) {
                 // Discard `stickyPostcoditions`, they are useless since data type is changing.
                 currentState = currentState.changeType()
             }
             currentState.stickyPostconditions.addAll(previous.stickyPostconditions)
+
+            context.stage = stageIndex++
             result = next.invoke(phaseConfig, currentState, context, result)
         }
+        context.stage = currentStage
         return result as Output
     }
 

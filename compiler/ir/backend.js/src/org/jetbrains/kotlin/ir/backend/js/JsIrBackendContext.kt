@@ -50,6 +50,7 @@ class JsIrBackendContext(
     irModuleFragment: IrModuleFragment,
     override val configuration: CompilerConfiguration
 ) : CommonBackendContext {
+    override var stage: Int = 0
 
     override val builtIns = module.builtIns
 

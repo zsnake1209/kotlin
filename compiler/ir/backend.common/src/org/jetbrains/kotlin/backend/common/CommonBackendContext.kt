@@ -23,4 +23,6 @@ interface CommonBackendContext : BackendContext, LoggingContext {
     fun report(element: IrElement?, irFile: IrFile?, message: String, isError: Boolean)
 
     val configuration: CompilerConfiguration
+
+    var stage: Int
 }

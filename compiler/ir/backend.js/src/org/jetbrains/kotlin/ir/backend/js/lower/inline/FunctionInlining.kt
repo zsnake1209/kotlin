@@ -21,8 +21,8 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 class FunctionInlining(val context: JsIrBackendContext) : IrElementTransformerVoidWithContext() {
-    fun inline(irModule: IrModuleFragment): IrElement {
-        return irModule.accept(this, data = null)
+    fun inline(irFile: IrFile): IrElement {
+        return irFile.accept(this, data = null)
     }
 
     private val arrayConstructorTransformer = ArrayConstructorTransformer(context)

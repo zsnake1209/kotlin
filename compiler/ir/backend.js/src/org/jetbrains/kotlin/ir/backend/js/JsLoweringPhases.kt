@@ -15,9 +15,12 @@ import org.jetbrains.kotlin.ir.backend.js.lower.coroutines.JsSuspendFunctionsLow
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.FunctionInlining
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.RemoveInlineFunctionsLowering
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ReturnableBlockLowering
+import org.jetbrains.kotlin.ir.backend.js.utils.removedAt
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationContainer
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
+import org.jetbrains.kotlin.ir.util.transformFlat
 
 private fun ClassLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) = moduleFragment.files.forEach { runOnFilePostfix(it) }
 
@@ -83,18 +86,22 @@ private val lateinitLoweringPhase = makeJsModulePhase(
     description = "Insert checks for lateinit field references"
 )
 
-private val functionInliningPhase = makeCustomJsModulePhase(
-    { context, module ->
-        FunctionInlining(context).inline(module)
-        module.patchDeclarationParents()
+private val functionInliningPhase = makeJsModulePhase(
+    { context ->
+        object : FileLoweringPass {
+            override fun lower(irFile: IrFile) {
+                FunctionInlining(context).inline(irFile)
+                irFile.patchDeclarationParents()
+            }
+        }
     },
     name = "FunctionInliningPhase",
     description = "Perform function inlining",
     prerequisite = setOf(expectDeclarationsRemovingPhase)
 )
 
-private val removeInlineFunctionsLoweringPhase = makeCustomJsModulePhase(
-    { _, _ -> RemoveInlineFunctionsLowering() },
+private val removeInlineFunctionsLoweringPhase = makeJsModulePhase(
+    { RemoveInlineFunctionsLowering(it) },
     name = "RemoveInlineFunctionsLowering",
     description = "Remove Inline functions with reified parameters from context",
     prerequisite = setOf(functionInliningPhase)
@@ -153,7 +160,7 @@ private val returnableBlockLoweringPhase = makeJsModulePhase(
 )
 
 private val localDelegatedPropertiesLoweringPhase = makeJsModulePhase(
-    { LocalDelegatedPropertiesLowering() },
+    { context -> LocalDelegatedPropertiesLowering() },
     name = "LocalDelegatedPropertiesLowering",
     description = "Transform Local Delegated properties"
 )
@@ -354,18 +361,33 @@ private val staticMembersLoweringPhase = makeJsModulePhase(
     description = "Move static member declarations to top-level"
 )
 
+private val finalizeIrPhase = makeCustomJsModulePhase(
+    { _, module ->
+        module.files.forEach { file ->
+            object : DeclarationContainerLoweringPass {
+                override fun lower(irDeclarationContainer: IrDeclarationContainer) {
+                    irDeclarationContainer.declarations.transformFlat { declaration ->
+                        if (declaration.removedAt < Integer.MAX_VALUE) emptyList() else null
+                    }
+                }
+            }.runOnFilePostfix(file)
+        }
+    },
+    name = "FinalizeIrLowering",
+    description = "Remove traces of persistent IR"
+)
 
 val jsPhases = namedIrModulePhase(
     name = "IrModuleLowering",
     description = "IR module lowering",
     lower = expectDeclarationsRemovingPhase then
             moveBodilessDeclarationsToSeparatePlacePhase then
-            functionInliningPhase then
-            removeInlineFunctionsLoweringPhase then
             performByIrFile(
                 name = "IrLowerByFile",
                 description = "IR Lowering by file",
-                lower = lateinitLoweringPhase then
+                lower = functionInliningPhase then
+                        removeInlineFunctionsLoweringPhase then
+                        lateinitLoweringPhase then
                         tailrecLoweringPhase then
                         enumClassConstructorLoweringPhase then
                         sharedVariablesLoweringPhase then
@@ -404,5 +426,5 @@ val jsPhases = namedIrModulePhase(
                         constLoweringPhase then
                         callsLoweringPhase then
                         staticMembersLoweringPhase
-            )
+            ) then finalizeIrPhase
 )

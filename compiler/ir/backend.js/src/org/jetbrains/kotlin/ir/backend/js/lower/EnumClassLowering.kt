@@ -18,6 +18,8 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
+import org.jetbrains.kotlin.ir.backend.js.utils.removedAt
+import org.jetbrains.kotlin.ir.backend.js.utils.shouldSkip
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
@@ -41,6 +43,11 @@ import java.util.*
 class EnumUsageLowering(val context: JsIrBackendContext) : FileLoweringPass {
     override fun lower(irFile: IrFile) {
         irFile.transformChildrenVoid(object : IrElementTransformerVoid() {
+            override fun visitDeclaration(declaration: IrDeclaration): IrStatement {
+                if (context.shouldSkip(declaration)) return declaration
+                return super.visitDeclaration(declaration)
+            }
+
             override fun visitGetEnumValue(expression: IrGetEnumValue): IrExpression {
                 val enumEntry = expression.symbol.owner
                 val klass = enumEntry.parent as IrClass
@@ -85,7 +92,8 @@ class EnumClassLowering(val context: JsIrBackendContext) : DeclarationContainerL
     override fun lower(irDeclarationContainer: IrDeclarationContainer) {
         irDeclarationContainer.transformDeclarationsFlat { declaration ->
             if (declaration is IrClass && declaration.isEnumClass &&
-                !declaration.descriptor.isExpect && !declaration.isEffectivelyExternal()
+                !declaration.descriptor.isExpect && !declaration.isEffectivelyExternal() &&
+                !context.shouldSkip(declaration)
             ) {
                 EnumClassTransformer(context, declaration).transform()
             } else null
@@ -103,7 +111,8 @@ class EnumClassConstructorLowering(val context: JsIrBackendContext) : Declaratio
     override fun lower(irDeclarationContainer: IrDeclarationContainer) {
         irDeclarationContainer.transformDeclarationsFlat { declaration ->
             if (declaration is IrClass && declaration.isEnumClass &&
-                !declaration.descriptor.isExpect && !declaration.isEffectivelyExternal()
+                !declaration.descriptor.isExpect && !declaration.isEffectivelyExternal() &&
+                !context.shouldSkip(declaration)
             ) {
                 EnumClassConstructorTransformer(context, declaration).transform()
             } else null
@@ -257,6 +266,11 @@ class EnumClassConstructorTransformer(val context: JsIrBackendContext, private v
         }
 
         irClass.transformChildrenVoid(object : IrElementTransformerVoid() {
+            override fun visitDeclaration(declaration: IrDeclaration): IrStatement {
+                if (context.shouldSkip(declaration)) return declaration
+                return super.visitDeclaration(declaration)
+            }
+
             override fun visitGetValue(expression: IrGetValue): IrExpression {
                 fromOldToNewParameter[expression.symbol]?.let {
                     return builder.irGet(it)
