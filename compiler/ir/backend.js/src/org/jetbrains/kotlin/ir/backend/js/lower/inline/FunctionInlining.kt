@@ -39,7 +39,7 @@ import org.jetbrains.kotlin.util.OperatorNameConventions
 typealias Context = JsIrBackendContext
 
 // backend.native/compiler/ir/backend.native/src/org/jetbrains/kotlin/backend/konan/lower/FunctionInlining.kt
-internal class FunctionInlining(val context: Context): IrElementTransformerVoidWithContext() {
+internal class FunctionInlining(val context: Context) : IrElementTransformerVoidWithContext() {
     //-------------------------------------------------------------------------//
 
     fun inline(irModule: IrModuleFragment): IrElement {
@@ -100,11 +100,13 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
 
     private val IrFunction.needsInlining get() = isInlineConstructor || (this.isInline && !this.isExternal)
 
-    private inner class Inliner(val callSite: IrCall,
-                                val callee: IrFunction,
-                                val currentScope: ScopeWithIr,
-                                val parent: IrDeclarationParent?,
-                                val context: Context) {
+    private inner class Inliner(
+        val callSite: IrCall,
+        val callee: IrFunction,
+        val currentScope: ScopeWithIr,
+        val parent: IrDeclarationParent?,
+        val context: Context
+    ) {
 
         val copyIrElement = run {
             val typeParameters =
@@ -183,7 +185,8 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
             statements.addAll(0, evaluationStatements)
 
             val isCoroutineIntrinsicCall = callSite.descriptor.isBuiltInSuspendCoroutineUninterceptedOrReturn(
-                context.configuration.languageVersionSettings)
+                context.configuration.languageVersionSettings
+            )
 
             return IrReturnableBlockImpl(
                 startOffset = startOffset,
@@ -267,8 +270,14 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
                     return super.visitCall(expression)
 
                 val functionDeclaration = functionArgument.statements[0] as IrFunction
-                val newExpression = inlineFunction(expression, functionDeclaration) // Inline the lambda. Lambda parameters will be substituted with lambda arguments.
-                return newExpression.transform(this, null)                          // Substitute lambda arguments with target function arguments.
+                val newExpression = inlineFunction(
+                    expression,
+                    functionDeclaration
+                ) // Inline the lambda. Lambda parameters will be substituted with lambda arguments.
+                return newExpression.transform(
+                    this,
+                    null
+                )                          // Substitute lambda arguments with target function arguments.
             }
 
             //-----------------------------------------------------------------//
@@ -291,8 +300,10 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
         private fun IrValueParameter.isInlineParameter() =
             !isNoinline && !type.isNullable() && type.isFunctionOrKFunction()
 
-        private inner class ParameterToArgument(val parameter: IrValueParameter,
-                                                val argumentExpression: IrExpression) {
+        private inner class ParameterToArgument(
+            val parameter: IrValueParameter,
+            val argumentExpression: IrExpression
+        ) {
 
             val isInlinableLambdaArgument: Boolean
                 get() {
@@ -302,7 +313,8 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
                     // Do pattern-matching on IR.
                     if (argumentExpression !is IrBlock) return false
                     if (argumentExpression.origin != IrStatementOrigin.LAMBDA &&
-                        argumentExpression.origin != IrStatementOrigin.ANONYMOUS_FUNCTION) return false
+                        argumentExpression.origin != IrStatementOrigin.ANONYMOUS_FUNCTION
+                    ) return false
                     val statements = argumentExpression.statements
                     val irFunction = statements[0]
                     val irCallableReference = statements[1]
@@ -324,7 +336,8 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
             val parameterToArgument = mutableListOf<ParameterToArgument>()
 
             if (callSite.dispatchReceiver != null &&                 // Only if there are non null dispatch receivers both
-                callee.dispatchReceiverParameter != null)        // on call site and in function declaration.
+                callee.dispatchReceiverParameter != null
+            )        // on call site and in function declaration.
                 parameterToArgument += ParameterToArgument(
                     parameter = callee.dispatchReceiverParameter!!,
                     argumentExpression = callSite.dispatchReceiver!!
@@ -411,14 +424,22 @@ internal class FunctionInlining(val context: Context): IrElementTransformerVoidW
                 }
 
                 if (it.isImmutableVariableLoad) {
-                    substituteMap[it.parameter] = it.argumentExpression.transform(substitutor, data = null)   // Arguments may reference the previous ones - substitute them.
+                    substituteMap[it.parameter] = it.argumentExpression.transform(
+                        substitutor,
+                        data = null
+                    )   // Arguments may reference the previous ones - substitute them.
                     return@forEach
                 }
 
-                val newVariable = currentScope.scope.createTemporaryVariableWithWrappedDescriptor(  // Create new variable and init it with the parameter expression.
-                    irExpression = it.argumentExpression.transform(substitutor, data = null),   // Arguments may reference the previous ones - substitute them.
-                    nameHint = callee.symbol.owner.name.toString(),
-                    isMutable = false)
+                val newVariable =
+                    currentScope.scope.createTemporaryVariableWithWrappedDescriptor(  // Create new variable and init it with the parameter expression.
+                        irExpression = it.argumentExpression.transform(
+                            substitutor,
+                            data = null
+                        ),   // Arguments may reference the previous ones - substitute them.
+                        nameHint = callee.symbol.owner.name.toString(),
+                        isMutable = false
+                    )
 
                 evaluationStatements.add(newVariable)
                 val getVal = IrGetValueImpl(
