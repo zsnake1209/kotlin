@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.calls.CallsLowering
 import org.jetbrains.kotlin.ir.backend.js.lower.common.*
 import org.jetbrains.kotlin.ir.backend.js.lower.coroutines.JsSuspendFunctionsLowering
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.FunctionInlining
-import org.jetbrains.kotlin.ir.backend.js.lower.inline.RemoveInlineFunctionsWithReifiedTypeParametersLowering
+import org.jetbrains.kotlin.ir.backend.js.lower.inline.RemoveInlineFunctionsLowering
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ReturnableBlockLowering
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -93,9 +93,9 @@ private val functionInliningPhase = makeCustomJsModulePhase(
     prerequisite = setOf(expectDeclarationsRemovingPhase)
 )
 
-private val removeInlineFunctionsWithReifiedTypeParametersLoweringPhase = makeJsModulePhase(
-    { RemoveInlineFunctionsWithReifiedTypeParametersLowering() },
-    name = "RemoveInlineFunctionsWithReifiedTypeParametersLowering",
+private val removeInlineFunctionsLoweringPhase = makeCustomJsModulePhase(
+    { _, _ -> RemoveInlineFunctionsLowering() },
+    name = "RemoveInlineFunctionsLowering",
     description = "Remove Inline functions with reified parameters from context",
     prerequisite = setOf(functionInliningPhase)
 )
@@ -264,7 +264,7 @@ private val typeOperatorLoweringPhase = makeJsModulePhase(
     ::TypeOperatorLowering,
     name = "TypeOperatorLowering",
     description = "Lower IrTypeOperator with corresponding logic",
-    prerequisite = setOf(bridgesConstructionPhase, removeInlineFunctionsWithReifiedTypeParametersLoweringPhase)
+    prerequisite = setOf(bridgesConstructionPhase, removeInlineFunctionsLoweringPhase)
 )
 
 private val secondaryConstructorLoweringPhase = makeJsModulePhase(
@@ -361,6 +361,7 @@ val jsPhases = namedIrModulePhase(
     lower = expectDeclarationsRemovingPhase then
             moveBodilessDeclarationsToSeparatePlacePhase then
             functionInliningPhase then
+            removeInlineFunctionsLoweringPhase then
             performByIrFile(
                 name = "IrLowerByFile",
                 description = "IR Lowering by file",
@@ -387,7 +388,6 @@ val jsPhases = namedIrModulePhase(
                         defaultParameterInjectorPhase then
 
                         jsDefaultCallbackGeneratorPhase then
-                        removeInlineFunctionsWithReifiedTypeParametersLoweringPhase then
                         throwableSuccessorsLoweringPhase then
                         varargLoweringPhase then
                         multipleCatchesLoweringPhase then
