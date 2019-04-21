@@ -25,7 +25,7 @@ class EnumIntrinsicsTransformer(private val context: JsIrBackendContext) : Calls
     ): IrExpression {
         val enum = call.getTypeArgument(0)?.getClass() ?: return call
         if (!enum.isEnumClass) return call
-        val staticMethod = enum.findDeclaration(staticMethodPredicate)
+        val staticMethod = enum.findDeclaration(staticMethodPredicate) // This enum is potentially not lowered yet.
         if (staticMethod == null || !staticMethod.isStaticMethodOfClass)
             throw IllegalStateException("Enum class should have static method for ${call.symbol.owner.name}")
 
