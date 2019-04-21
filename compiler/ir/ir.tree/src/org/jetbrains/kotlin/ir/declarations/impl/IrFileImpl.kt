@@ -35,8 +35,7 @@ class IrFileImpl(
     override val fqName: FqName
 ) :
     IrElementBase(0, fileEntry.maxOffset),
-    IrFile,
-    HasStageController {
+    IrFile {
 
     constructor(
         fileEntry: SourceManager.FileEntry,
@@ -54,9 +53,7 @@ class IrFileImpl(
 
     override val packageFragmentDescriptor: PackageFragmentDescriptor get() = symbol.descriptor
 
-    override var stageController: StageController = NoopController()
-
-    private val declarationsByStage = ListManager<IrDeclaration>(this)
+    private val declarationsByStage = ListManager<IrDeclaration>()
 
     override val declarations: MutableList<IrDeclaration>
         get() = declarationsByStage.get()

@@ -17,11 +17,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.inline.RemoveInlineFunctionsLowe
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ReturnableBlockLowering
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.impl.HasStageController
-import org.jetbrains.kotlin.ir.declarations.impl.StageController
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
-import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 private fun ClassLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) = moduleFragment.files.forEach { runOnFilePostfix(it) }
 
@@ -362,34 +358,34 @@ private val staticMembersLoweringPhase = makeJsModulePhase(
     description = "Move static member declarations to top-level"
 )
 
-private val injectStageController = makeCustomJsModulePhase(
-    { context, module ->
-        val stageController = object : StageController {
-            override val currentStage: Int
-                get() = context.stage
-        }
-
-        module.files.forEach { file ->
-            object : IrElementVisitorVoid {
-                override fun visitElement(element: IrElement) {
-                    if (element is HasStageController) {
-                        element.stageController = stageController
-                    }
-                    element.acceptChildrenVoid(this)
-                }
-            }.visitFile(file)
-        }
-    },
-    name = "FinalizeIrLowering",
-    description = "Remove traces of persistent IR"
-)
+//private val injectStageController = makeCustomJsModulePhase(
+//    { context, module ->
+//        val stageController = object : StageController {
+//            override val currentStage: Int
+//                get() = context.stage
+//        }
+//
+//        module.files.forEach { file ->
+//            object : IrElementVisitorVoid {
+//                override fun visitElement(element: IrElement) {
+//                    if (element is HasStageController) {
+//                        element.stageController = stageController
+//                    }
+//                    element.acceptChildrenVoid(this)
+//                }
+//            }.visitFile(file)
+//        }
+//    },
+//    name = "FinalizeIrLowering",
+//    description = "Remove traces of persistent IR"
+//)
 
 val jsPhases = namedIrModulePhase(
     name = "IrModuleLowering",
     description = "IR module lowering",
     lower = expectDeclarationsRemovingPhase then
             moveBodilessDeclarationsToSeparatePlacePhase then
-            injectStageController then
+//            injectStageController then
             performByIrFile(
                 name = "IrLowerByFile",
                 description = "IR Lowering by file",

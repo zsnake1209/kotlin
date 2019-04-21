@@ -75,7 +75,7 @@ class IrClassImpl(
 
     override var thisReceiver: IrValueParameter? = null
 
-    private val declarationsByStage = ListManager<IrDeclaration>(this)
+    private val declarationsByStage = ListManager<IrDeclaration>()
 
     override val declarations: MutableList<IrDeclaration>
         get() = declarationsByStage.get()

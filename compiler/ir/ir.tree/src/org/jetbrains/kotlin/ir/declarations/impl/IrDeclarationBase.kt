@@ -30,8 +30,7 @@ abstract class IrDeclarationBase(
     endOffset: Int,
     override var origin: IrDeclarationOrigin
 ) : IrElementBase(startOffset, endOffset),
-    IrDeclaration,
-    HasStageController {
+    IrDeclaration{
 
     override lateinit var parent: IrDeclarationParent
 
@@ -45,13 +44,10 @@ abstract class IrDeclarationBase(
 //    var loweredUpTo: Int = 0
 //
 //    var removedAt: Int = Integer.MAX_VALUE
-
-    override var stageController: StageController = NoopController()
 }
 
-interface HasStageController {
-    var stageController: StageController
-}
+// TODO hack
+var stageController: StageController = NoopController()
 
 interface StageController {
     val currentStage: Int
@@ -61,12 +57,11 @@ class NoopController : StageController {
     override val currentStage: Int = 0
 }
 
-class ListManager<T>(val hasStageController: HasStageController) {
-
+class ListManager<T> {
     private val changePoints = TreeMap<Int, MutableList<T>>(mapOf(0 to mutableListOf<T>()))
 
     fun get(): MutableList<T> {
-        val stage = hasStageController.stageController.currentStage
+        val stage = stageController.currentStage
         var result = changePoints[stage]
         if (result == null) {
             result = mutableListOf<T>()

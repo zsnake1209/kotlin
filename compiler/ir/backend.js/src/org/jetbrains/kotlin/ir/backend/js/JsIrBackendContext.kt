@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.ConstructorPair
 import org.jetbrains.kotlin.ir.backend.js.utils.OperatorNames
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
+import org.jetbrains.kotlin.ir.declarations.impl.StageController
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.IrDynamicType
@@ -49,8 +50,11 @@ class JsIrBackendContext(
     val symbolTable: SymbolTable,
     irModuleFragment: IrModuleFragment,
     override val configuration: CompilerConfiguration
-) : CommonBackendContext {
+) : CommonBackendContext, StageController {
     override var stage: Int = 0
+
+    override val currentStage: Int
+        get() = stage
 
     override val builtIns = module.builtIns
 
