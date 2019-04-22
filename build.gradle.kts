@@ -233,6 +233,13 @@ extra["compilerModules"] = arrayOf(
     ":compiler:light-classes",
     ":compiler:cli",
     ":compiler:cli-js",
+    ":compiler:cli-config-base",
+    ":compiler:cli-config-jvm",
+    ":compiler:cli-messages",
+    ":compiler:cli-args-base",
+    ":compiler:cli-args-jvm",
+    ":compiler:cli-args-js",
+    ":compiler:cli-args-metadata",
     ":compiler:incremental-compilation-impl",
     ":js:js.ast",
     ":js:js.serializer",
@@ -411,7 +418,7 @@ allprojects {
 
         // Aggregate task for build related checks
         tasks.register("checkBuild")
-        
+
         apply(from = "$rootDir/gradle/cacheRedirector.gradle.kts")
     }
 }

@@ -69,14 +69,6 @@ abstract class SimplePlatform(val platformName: String) {
     open val targetPlatformVersion: TargetPlatformVersion = TargetPlatformVersion.NoVersion
 }
 
-interface TargetPlatformVersion {
-    val description: String
-
-    object NoVersion : TargetPlatformVersion {
-        override val description = ""
-    }
-}
-
 fun TargetPlatform?.isCommon(): Boolean = this != null && this.size > 1
 
 fun SimplePlatform.toTargetPlatform(): TargetPlatform = TargetPlatform(setOf(this))

@@ -58,7 +58,7 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
     @Argument(value = "-module-name", valueDescription = "<name>", description = "Name of the generated .kotlin_module file")
     var moduleName: String? by NullableStringFreezableVar(null)
 
-    @GradleOption(DefaultValues.JvmTargetVersions::class)
+    @GradleOption(JvmDefaultValues.JvmTargetVersions::class)
     @Argument(
         value = "-jvm-target",
         valueDescription = "<version>",

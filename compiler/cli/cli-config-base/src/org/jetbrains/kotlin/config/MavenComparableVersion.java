@@ -20,13 +20,7 @@
 package org.jetbrains.kotlin.config;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Generic implementation of version comparison.
@@ -73,7 +67,7 @@ public class MavenComparableVersion
         int STRING_ITEM = 1;
         int LIST_ITEM = 2;
 
-        int compareTo( Item item );
+        int compareTo(Item item);
 
         int getType();
 
@@ -375,7 +369,7 @@ public class MavenComparableVersion
             {
                 if ( i == startIndex )
                 {
-                    list.add( IntegerItem.ZERO );
+                    list.add(IntegerItem.ZERO );
                 }
                 else
                 {
@@ -387,7 +381,7 @@ public class MavenComparableVersion
             {
                 if ( i == startIndex )
                 {
-                    list.add( IntegerItem.ZERO );
+                    list.add(IntegerItem.ZERO );
                 }
                 else
                 {
