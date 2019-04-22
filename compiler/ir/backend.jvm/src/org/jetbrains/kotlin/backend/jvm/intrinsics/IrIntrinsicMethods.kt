@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.backend.jvm.intrinsics
 
 import org.jetbrains.kotlin.backend.jvm.JvmSymbols
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
@@ -35,7 +36,6 @@ import org.jetbrains.kotlin.ir.util.properties
 import org.jetbrains.kotlin.lexer.KtSingleValueToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.expressions.OperatorConventions
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
@@ -44,7 +44,6 @@ import org.jetbrains.org.objectweb.asm.Type
 
 class IrIntrinsicMethods(val irBuiltIns: IrBuiltIns, val symbols: JvmSymbols) {
 
-    private val KOTLIN = FqName("kotlin")
     private val KOTLIN_JVM = FqName("kotlin.jvm")
     private val KOTLIN_JVM_INTERNAL_UNSAFE = FqName("kotlin.jvm.internal.unsafe")
 
@@ -52,8 +51,8 @@ class IrIntrinsicMethods(val irBuiltIns: IrBuiltIns, val symbols: JvmSymbols) {
             listOf(
                 Key(KOTLIN_JVM, FqName("T"),"<get-javaClass>", emptyList()) to JavaClassProperty,
                 Key(
-                    KOTLIN_JVM.child(Name.identifier("KClass")),
-                    null,
+                    KOTLIN_JVM,
+                    KotlinBuiltIns.FQ_NAMES.kClass.toSafe(),
                     "<get-java>",
                     emptyList()
                 ) to KClassJavaProperty,
@@ -61,41 +60,41 @@ class IrIntrinsicMethods(val irBuiltIns: IrBuiltIns, val symbols: JvmSymbols) {
                     KOTLIN_JVM_INTERNAL_UNSAFE,
                     null,
                     "monitorEnter",
-                    listOf(irBuiltIns.anyClass.owner.fqNameWhenAvailable!!)
+                    listOf(KotlinBuiltIns.FQ_NAMES.any.toSafe())
                 ) to MonitorInstruction.MONITOR_ENTER,
                 Key(
                     KOTLIN_JVM_INTERNAL_UNSAFE,
                     null,
                     "monitorExit",
-                    listOf(irBuiltIns.anyClass.owner.fqNameWhenAvailable!!)
+                    listOf(KotlinBuiltIns.FQ_NAMES.any.toSafe())
                 ) to MonitorInstruction.MONITOR_EXIT,
                 Key(
                     KOTLIN_JVM,
-                    FqName("kotlin.Array"),
+                    KotlinBuiltIns.FQ_NAMES.array.toSafe(),
                     "isArrayOf",
                     emptyList()
                 ) to IsArrayOf,
                 symbols.arrayOf.toKey() to ArrayOf,
                 Key(
-                    KOTLIN,
-                    irBuiltIns.anyClass.owner.fqNameWhenAvailable!!,
+                    KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME,
+                    KotlinBuiltIns.FQ_NAMES.any.toSafe(),
                     "toString",
                     emptyList()
                 ) to ToString,
                 Key(
-                    KOTLIN,
-                    irBuiltIns.stringClass.owner.fqNameWhenAvailable!!,
+                    KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME,
+                    KotlinBuiltIns.FQ_NAMES.string.toSafe(),
                     "plus",
-                    listOf(irBuiltIns.anyClass.owner.fqNameWhenAvailable!!)
+                    listOf(KotlinBuiltIns.FQ_NAMES.any.toSafe())
                 ) to StringPlus,
                 Key(
-                    KOTLIN,
+                    KotlinBuiltIns.BUILT_INS_PACKAGE_FQ_NAME,
                     null,
                     "arrayOfNulls",
-                    listOf(irBuiltIns.intClass.owner.fqNameWhenAvailable)
+                    listOf(KotlinBuiltIns.FQ_NAMES._int.toSafe())
                 ) to NewArray,
                 Key(
-                    KOTLIN.child(Name.identifier("Cloneable")),
+                    KotlinBuiltIns.FQ_NAMES.cloneable.toSafe(),
                     null,
                     "clone",
                     emptyList()
@@ -139,7 +138,6 @@ class IrIntrinsicMethods(val irBuiltIns: IrBuiltIns, val symbols: JvmSymbols) {
                     methodWithArity(irBuiltIns.booleanClass, "not", 0, Not) +
                     methodWithArity(irBuiltIns.stringClass, "plus", 1, Concat) +
                     methodWithArity(irBuiltIns.stringClass, "get", 1, StringGetChar) +
-//                    methodWithArity(symbols.cloneable, "clone", 0, Clone) +
                     symbols.primitiveIteratorsByType.values.flatMap { iteratorClass ->
                         methodWithArity(iteratorClass, "next", 0, IteratorNext)
                     } +
