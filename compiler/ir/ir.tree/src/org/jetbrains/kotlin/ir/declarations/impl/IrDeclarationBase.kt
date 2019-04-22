@@ -217,19 +217,15 @@ class DumbPersistentList<T>(val innerList: MutableList<Wrapper<T>>): SimpleList<
         return result
     }
 
-    override fun listIterator(): ListIterator<T> {
-        return listIterator(0)
+    override fun listIterator(index: Int): ListIterator<T> {
+        TODO("not implemented")
     }
 
-    override fun listIterator(index: Int): ListIterator<T> {
+    override fun listIterator(): ListIterator<T> {
         return object : ListIterator<T> {
-            val innerIterator = innerList.listIterator().also {
-                for (i in 0..index) {
-                    next()
-                }
-            }
+            val innerIterator = innerList.listIterator()
 
-            var aliveBefore = index
+            var aliveBefore = 0
 
             override fun hasNext(): Boolean {
                 while (innerIterator.hasNext()) {

@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
+import org.jetbrains.kotlin.ir.declarations.impl.NoopController
 import org.jetbrains.kotlin.ir.declarations.impl.StageController
 import org.jetbrains.kotlin.ir.declarations.impl.stageController
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
@@ -26,6 +27,8 @@ fun compile(
     immediateDependencies: List<KlibModuleRef>,
     allDependencies: List<KlibModuleRef>
 ): String {
+    stageController = NoopController()
+
     val (moduleFragment, dependencyModules, irBuiltIns, symbolTable, deserializer) =
         loadIr(project, files, configuration, immediateDependencies, allDependencies)
 

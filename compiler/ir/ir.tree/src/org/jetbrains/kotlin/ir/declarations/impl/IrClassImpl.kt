@@ -91,7 +91,7 @@ class IrClassImpl(
     }
 
     override val declarations: SimpleList<IrDeclaration>
-        get() = SimpleMutableList(declarationsByStage.get())
+        get() = declarationsByStage.get()
 
     override val typeParameters: MutableList<IrTypeParameter> = SmartList()
 

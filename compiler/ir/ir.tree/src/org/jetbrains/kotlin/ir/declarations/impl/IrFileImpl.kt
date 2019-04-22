@@ -57,7 +57,7 @@ class IrFileImpl(
     var loweredUpTo = 0
 
     override val declarations: SimpleList<IrDeclaration>
-        get() = SimpleMutableList(declarationsByStage.get())
+        get() = declarationsByStage.get()
 
     override val annotations: MutableList<IrCall> = ArrayList()
 
