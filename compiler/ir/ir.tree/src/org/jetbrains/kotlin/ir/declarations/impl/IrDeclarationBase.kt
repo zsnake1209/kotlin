@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.ir.declarations.impl
 import org.jetbrains.kotlin.ir.IrElementBase
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.util.transformFlat
 import kotlin.collections.ArrayList
 
 abstract class IrDeclarationBase(
@@ -34,12 +35,6 @@ abstract class IrDeclarationBase(
 
     override val metadata: MetadataSource?
         get() = null
-//
-//    var createdOn: Int = 0
-//
-//    var loweredUpTo: Int = 0
-//
-//    var removedAt: Int = Integer.MAX_VALUE
 }
 
 // TODO hack
@@ -58,46 +53,119 @@ class NoopController : StageController {
 }
 
 class ListManager<T>(val fileFn: () -> IrFile?) {
-//    private val changePoints = TreeMap<Int, MutableList<T>>(mapOf(0 to mutableListOf<T>()))
+    private val proxy = DumbPersistentList<T>(mutableListOf<Wrapper<T>>())
 
-    private val proxy = DumbPersistentMutableList<T>(mutableListOf<Wrapper<T>>())
-
-    fun get(): MutableList<T> {
+    fun get(): SimpleList<T> {
         return proxy
     }
-
-    /*{
-        val stage = stageController.currentStage
-        var result = changePoints[0]!!
-//        if (result == null) {
-//            val file = try {
-//                fileFn()
-//            } catch (t: Throwable) {
-//                return changePoints[0]!!
-//            }
-//            if (file == null) return changePoints[0]!!
-//
-//            stageController.lowerUpTo(file, stage)
-//            result = mutableListOf<T>()
-//            result.addAll(changePoints.lowerEntry(stage)!!.value)
-//            changePoints[stage] = result
-//        }
-        return result
-    }*/
 }
 
-class Wrapper<T>(val value: T,
-                 val addedOn: Int = stageController.currentStage,
-                 var removedOn: Int = Int.MAX_VALUE) {
+class Wrapper<T>(
+    val value: T,
+    val addedOn: Int = stageController.currentStage,
+    var removedOn: Int = Int.MAX_VALUE
+) {
     val alive: Boolean get() = addedOn <= stageController.currentStage && stageController.currentStage < removedOn
 }
 
-class DumbPersistentMutableList<T>(val innerList: MutableList<Wrapper<T>>): MutableList<T> {
+class DumbPersistentList<T>(val innerList: MutableList<Wrapper<T>>): SimpleList<T> {
+    override fun add(element: T): Boolean = innerList.add(Wrapper(element))
+
+    override fun addFirst(element: T) {
+        innerList.add(0, Wrapper(element))
+    }
+
+    override fun addAll(elements: Collection<T>): Boolean = innerList.addAll(elements.map { Wrapper(it) })
+
+    override fun addFirstAll(elements: Collection<T>) {
+        innerList.addAll(0, elements.map { Wrapper(it) })
+    }
+
+    override fun plusAssign(element: T) {
+        add(element)
+    }
+
+    override fun plusAssign(elements: Collection<T>) {
+        addAll(elements)
+    }
+
+    override fun removeAll(predicate: (T) -> Boolean): Boolean {
+        var result = false
+        innerList.forEach {
+            if (it.alive && predicate(it.value)) {
+                it.removedOn = stageController.currentStage
+                result = true
+            }
+        }
+        return result
+    }
+
+    override fun removeAll(elements: Collection<T>): Boolean {
+        return removeAll { it in elements }
+    }
+
+    override fun clear() {
+        removeAll { true }
+    }
+
+    override fun transform(transformation: (T) -> T) {
+        innerList.transformFlat {
+            if (it.alive) {
+                val newValue = transformation(it.value)
+                if (newValue === it.value) null else {
+                    it.removedOn = stageController.currentStage
+                    listOf(it, Wrapper(newValue))
+                }
+            } else null
+        }
+    }
+
+    override fun transformFlat(transformation: (T) -> List<T>?) {
+        innerList.transformFlat {
+            if (!it.alive) null else {
+                transformation(it.value)?.let {newElements ->
+                    val result = mutableListOf(it)
+
+                    var preserved = false
+
+                    for (e in newElements) {
+                        if (it.value === e) {
+                            preserved = true
+                        } else {
+                            result += Wrapper(e)
+                        }
+                    }
+
+                    if (!preserved) {
+                        it.removedOn = stageController.currentStage
+                    }
+
+                    result
+                }
+            }
+        }
+    }
+
+    override fun remove(element: T): Boolean {
+        innerList.forEach {
+            if (it.alive && it.value == element) {
+                it.removedOn = stageController.currentStage
+                return true
+            }
+        }
+
+        return false
+    }
+
     override val size: Int
         get() = innerList.count { it.alive }
 
-    override fun add(element: T): Boolean {
-        return innerList.add(Wrapper(element))
+    override fun contains(element: T): Boolean {
+        return innerList.find { it.alive && it.value == element } != null
+    }
+
+    override fun containsAll(elements: Collection<T>): Boolean {
+        return elements.all { contains(it) }
     }
 
     private fun skipNAlive(n: Int): Int {
@@ -110,32 +178,6 @@ class DumbPersistentMutableList<T>(val innerList: MutableList<Wrapper<T>>): Muta
         }
 
         return result
-    }
-
-    override fun add(index: Int, element: T) {
-        return innerList.add(skipNAlive(index), Wrapper(element))
-    }
-
-    override fun addAll(index: Int, elements: Collection<T>): Boolean {
-        return innerList.addAll(skipNAlive(index), elements.map { Wrapper(it) })
-    }
-
-    override fun addAll(elements: Collection<T>): Boolean {
-        return innerList.addAll(elements.map { Wrapper(it) })
-    }
-
-    override fun clear() {
-        innerList.forEach {
-            it.removedOn = stageController.currentStage
-        }
-    }
-
-    override fun contains(element: T): Boolean {
-        return innerList.find { it.alive && it.value == element } != null
-    }
-
-    override fun containsAll(elements: Collection<T>): Boolean {
-        return elements.all { contains(it) }
     }
 
     override fun get(index: Int): T {
@@ -155,10 +197,10 @@ class DumbPersistentMutableList<T>(val innerList: MutableList<Wrapper<T>>): Muta
     }
 
     override fun isEmpty(): Boolean {
-        return innerList.none { it.alive }
+        return size == 0
     }
 
-    override fun iterator(): MutableIterator<T> {
+    override fun iterator(): Iterator<T> {
         return listIterator()
     }
 
@@ -175,31 +217,29 @@ class DumbPersistentMutableList<T>(val innerList: MutableList<Wrapper<T>>): Muta
         return result
     }
 
-    override fun listIterator(): MutableListIterator<T> {
+    override fun listIterator(): ListIterator<T> {
         return listIterator(0)
     }
 
-    override fun listIterator(index: Int): MutableListIterator<T> {
-        val result = object : MutableListIterator<T> {
-            var innerIndex = skipNAlive(index)
+    override fun listIterator(index: Int): ListIterator<T> {
+        return object : ListIterator<T> {
+            val innerIterator = innerList.listIterator().also {
+                for (i in 0..index) {
+                    next()
+                }
+            }
+
             var aliveBefore = index
 
-            var lastIndex = -1
-
-            private fun advance() {
-                while (innerIndex < innerList.size && !innerList[innerIndex].alive) ++innerIndex
-            }
-
-            override fun add(element: T) {
-                lastIndex = -1
-                innerList.add(innerIndex, Wrapper(element))
-                ++innerIndex
-                ++aliveBefore
-            }
-
             override fun hasNext(): Boolean {
-                advance()
-                return innerIndex < innerList.size
+                while (innerIterator.hasNext()) {
+                    val n = innerIterator.next()
+                    if (n.alive) {
+                        innerIterator.previous()
+                        return true
+                    }
+                }
+                return false
             }
 
             override fun hasPrevious(): Boolean {
@@ -207,12 +247,14 @@ class DumbPersistentMutableList<T>(val innerList: MutableList<Wrapper<T>>): Muta
             }
 
             override fun next(): T {
-                advance()
-                val result = innerList[innerIndex].value
-                lastIndex = innerIndex
-                ++innerIndex
-                ++aliveBefore
-                return result
+                while (innerIterator.hasNext()) {
+                    val n = innerIterator.next()
+                    if (n.alive) {
+                        ++aliveBefore
+                        return n.value
+                    }
+                }
+                throw NoSuchElementException()
             }
 
             override fun nextIndex(): Int {
@@ -220,86 +262,23 @@ class DumbPersistentMutableList<T>(val innerList: MutableList<Wrapper<T>>): Muta
             }
 
             override fun previous(): T {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                while (innerIterator.hasPrevious()) {
+                    val p = innerIterator.previous()
+                    if (p.alive) {
+                        --aliveBefore
+                        return p.value
+                    }
+                }
+                throw NoSuchElementException()
             }
 
             override fun previousIndex(): Int {
                 return aliveBefore - 1
             }
-
-            override fun remove() {
-                val w = innerList[lastIndex]
-                w.removedOn = stageController.currentStage
-                lastIndex = -1
-            }
-
-            override fun set(element: T) {
-                val w = innerList[lastIndex]
-                if (w.value !== element) {
-                    w.removedOn = stageController.currentStage
-                    innerList.add(lastIndex, Wrapper(element))
-                }
-                lastIndex = -1
-            }
-        }
-
-        return result
-    }
-
-    override fun remove(element: T): Boolean {
-        var result = false
-        innerList.forEach {
-            if (it.value == element) {
-                it.removedOn = stageController.currentStage
-                result = true
-            }
-        }
-        return result
-    }
-
-    override fun removeAll(elements: Collection<T>): Boolean {
-        var result = false
-        innerList.forEach {
-            if (it.value in elements) {
-                it.removedOn = stageController.currentStage
-                result = true
-            }
-        }
-        return result
-    }
-
-    override fun removeAt(index: Int): T {
-        val translatedIndex = skipNAlive(index + 1) - 1
-        innerList[translatedIndex].value
-        val w = innerList[translatedIndex]
-        w.removedOn = stageController.currentStage
-        return w.value
-    }
-
-    override fun retainAll(elements: Collection<T>): Boolean {
-        var result = false
-        innerList.forEach {
-            if (it.alive && it.value !in elements) {
-                it.removedOn = stageController.currentStage
-                result = true
-            }
-        }
-        return result
-    }
-
-    override fun set(index: Int, element: T): T {
-        val translatedIndex = skipNAlive(index + 1) - 1
-        val w = innerList[translatedIndex]
-        if (w.value !== element) {
-            w.removedOn = stageController.currentStage
-            add(index, element)
-            return w.value
-        } else {
-            return element
         }
     }
 
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
-        TODO("not implemented")
+    override fun subList(fromIndex: Int, toIndex: Int): List<T> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
