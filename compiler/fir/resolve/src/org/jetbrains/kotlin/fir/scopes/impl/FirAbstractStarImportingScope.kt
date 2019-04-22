@@ -28,7 +28,7 @@ abstract class FirAbstractStarImportingScope(
         for (import in starImports) {
             val relativeClassName = import.relativeClassName
             val classId = when {
-                name.identifier.isEmpty() -> return true
+                !name.isSpecial && name.identifier.isEmpty() -> return true
                 relativeClassName == null -> ClassId(import.packageFqName, name)
                 else -> ClassId(import.packageFqName, relativeClassName.child(name), false)
             }
