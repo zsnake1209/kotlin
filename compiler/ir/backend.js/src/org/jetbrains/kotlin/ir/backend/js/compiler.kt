@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.invokeToplevel
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.ir.backend.js.lower.TestGenerator
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
@@ -78,8 +79,15 @@ fun compile(
 
     jsPhases.invokeToplevel(phaseConfig, context, moduleFragment)
 
-    context.stage = perFilePhaseList.size + 1
+    context.stage = 0
+    val generator = TestGenerator(context)
+    moduleFragment.files.forEach {
+        generator.lower(it)
+    }
+    context.implicitDeclarationFile.loweredUpTo = 0
+    stageController.lowerUpTo(context.implicitDeclarationFile, perFilePhaseList.size + 1)
 
+    context.stage = perFilePhaseList.size + 1
     val jsProgram = moduleFragment.accept(IrModuleToJsTransformer(context), null)
     return jsProgram.toString()
 }

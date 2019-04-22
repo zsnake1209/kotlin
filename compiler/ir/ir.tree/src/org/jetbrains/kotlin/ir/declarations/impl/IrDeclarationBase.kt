@@ -20,6 +20,8 @@ import org.jetbrains.kotlin.ir.IrElementBase
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.util.transformFlat
+import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.collections.ArrayList
 
 abstract class IrDeclarationBase(
@@ -29,7 +31,13 @@ abstract class IrDeclarationBase(
 ) : IrElementBase(startOffset, endOffset),
     IrDeclaration{
 
-    override lateinit var parent: IrDeclarationParent
+    private val parentManager = VarManager<IrDeclarationParent>()
+
+    override var parent: IrDeclarationParent
+        get() = parentManager.get()
+        set(c) {
+            parentManager.set(c)
+        }
 
     override val annotations: MutableList<IrCall> = ArrayList()
 
@@ -50,6 +58,18 @@ class NoopController : StageController {
     override val currentStage: Int = 0
 
     override fun lowerUpTo(file: IrFile, stageNonInclusive: Int) {}
+}
+
+class VarManager<T> {
+    private val changes = TreeMap<Int, T>()
+
+    fun get(): T {
+        return changes.lowerEntry(stageController.currentStage + 1)!!.value
+    }
+
+    fun set(v: T) {
+        changes[stageController.currentStage] = v
+    }
 }
 
 class ListManager<T>(val fileFn: () -> IrFile?) {
