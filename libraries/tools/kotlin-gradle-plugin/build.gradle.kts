@@ -32,15 +32,12 @@ pill {
 dependencies {
     compile(project(":kotlin-gradle-plugin-api"))
     compile(project(":kotlin-gradle-plugin-model"))
-    compileOnly(project(":compiler"))
-    compileOnly(project(":compiler:incremental-compilation-impl"))
     compileOnly(project(":daemon-common"))
 
     compile(kotlinStdlib())
     compile(project(":kotlin-native:kotlin-native-utils"))
     compileOnly(project(":kotlin-reflect-api"))
     compileOnly(project(":kotlin-android-extensions"))
-    compileOnly(project(":kotlin-build-common"))
     compileOnly(project(":kotlin-compiler-runner"))
     compileOnly(project(":kotlin-annotation-processing"))
     compileOnly(project(":kotlin-annotation-processing-gradle"))
@@ -48,7 +45,7 @@ dependencies {
 
     compile("com.google.code.gson:gson:${rootProject.extra["versions.jar.gson"]}")
     compile("de.undercouch:gradle-download-task:3.4.3")
-    
+
     compileOnly("com.android.tools.build:gradle:2.0.0")
     compileOnly("com.android.tools.build:gradle-core:2.0.0")
     compileOnly("com.android.tools.build:builder:2.0.0")
