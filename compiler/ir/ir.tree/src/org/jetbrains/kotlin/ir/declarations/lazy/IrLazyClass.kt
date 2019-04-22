@@ -75,8 +75,8 @@ class IrLazyClass(
     }
 
 
-    override val declarations: MutableList<IrDeclaration> by lazyVar {
-        ArrayList<IrDeclaration>().also {
+    override val declarations: SimpleList<IrDeclaration> by lazyVar {
+        SimpleMutableList<IrDeclaration>(ArrayList<IrDeclaration>().also {
             typeTranslator.buildWithScope(this) {
                 generateChildStubs(descriptor.constructors, it)
                 generateMemberStubs(descriptor.defaultType.memberScope, it)
@@ -86,7 +86,7 @@ class IrLazyClass(
             it.forEach {
                 it.parent = this //initialize parent for non lazy cases
             }
-        }
+        })
     }
 
     override val typeParameters: MutableList<IrTypeParameter> by lazy {
@@ -116,6 +116,6 @@ class IrLazyClass(
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
         thisReceiver = thisReceiver?.transform(transformer, data)
         typeParameters.transform { it.transform(transformer, data) }
-        declarations.transform { it.transform(transformer, data) }
+        declarations.transform { it.transform(transformer, data) as IrDeclaration }
     }
 }

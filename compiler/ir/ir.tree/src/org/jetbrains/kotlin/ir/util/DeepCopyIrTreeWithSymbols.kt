@@ -81,7 +81,7 @@ open class DeepCopyIrTreeWithSymbols(
         mapTo(destination) { it.transform() }
 
     private fun <T : IrDeclarationContainer> T.transformDeclarationsTo(destination: T) =
-        declarations.transformTo(destination.declarations)
+        declarations.forEach { destination.declarations.add(it.transform()) }
 
     private fun IrType.remapType() = typeRemapper.remapType(this)
 

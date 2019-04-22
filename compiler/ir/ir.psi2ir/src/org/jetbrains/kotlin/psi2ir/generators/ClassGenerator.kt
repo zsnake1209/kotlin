@@ -385,8 +385,10 @@ class ClassGenerator(
     private fun generateMembersDeclaredInClassBody(irClass: IrClass, ktClassOrObject: KtPureClassOrObject) {
         // generate real body declarations
         ktClassOrObject.body?.let { ktClassBody ->
-            ktClassBody.declarations.mapNotNullTo(irClass.declarations) { ktDeclaration ->
-                declarationGenerator.generateClassMemberDeclaration(ktDeclaration, irClass)
+            ktClassBody.declarations.forEach { ktDeclaration ->
+                declarationGenerator.generateClassMemberDeclaration(ktDeclaration, irClass)?.let {
+                    irClass.declarations += it
+                }
             }
         }
 
@@ -396,7 +398,9 @@ class ClassGenerator(
             .getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS, MemberScope.ALL_NAME_FILTER)
             .asSequence()
             .filterIsInstance<SyntheticClassOrObjectDescriptor>()
-            .mapTo(irClass.declarations) { declarationGenerator.generateSyntheticClassOrObject(it.syntheticDeclaration) }
+            .forEach {
+                irClass.declarations += declarationGenerator.generateSyntheticClassOrObject(it.syntheticDeclaration)
+            }
 
         // synthetic functions and properties to classes must be contributed by corresponding lowering
     }

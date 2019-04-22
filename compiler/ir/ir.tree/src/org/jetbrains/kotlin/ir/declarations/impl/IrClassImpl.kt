@@ -75,7 +75,7 @@ class IrClassImpl(
 
     override var thisReceiver: IrValueParameter? = null
 
-    override val declarations: MutableList<IrDeclaration> = ArrayList()
+    override val declarations: SimpleList<IrDeclaration> = SimpleMutableList(ArrayList())
 
     override val typeParameters: MutableList<IrTypeParameter> = SmartList()
 
@@ -95,6 +95,6 @@ class IrClassImpl(
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
         thisReceiver = thisReceiver?.transform(transformer, data)
         typeParameters.transform { it.transform(transformer, data) }
-        declarations.transform { it.transform(transformer, data) }
+        declarations.transform { it.transform(transformer, data) as IrDeclaration }
     }
 }
