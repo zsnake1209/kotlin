@@ -19,10 +19,10 @@ private class CompositePhase<Context : CommonBackendContext, Input, Output>(
     override fun invoke(phaseConfig: PhaseConfig, phaserState: PhaserState<Input>, context: Context, input: Input): Output {
         var currentState = phaserState as PhaserState<Any?>
         // TODO proper stage management
-        val currentStage = context.stage
-        var stageIndex = 1
 
-        context.stage = stageIndex++
+        var stageIndex = context.stage
+
+        if (stageIndex > 0) context.stage = stageIndex++
         var result = phases.first().invoke(phaseConfig, currentState, context, input)
 
         for ((previous, next) in phases.zip(phases.drop(1))) {
@@ -32,10 +32,9 @@ private class CompositePhase<Context : CommonBackendContext, Input, Output>(
             }
             currentState.stickyPostconditions.addAll(previous.stickyPostconditions)
 
-            context.stage = stageIndex++
+            if (stageIndex > 0) context.stage = stageIndex++
             result = next.invoke(phaseConfig, currentState, context, result)
         }
-        context.stage = currentStage
         return result as Output
     }
 
@@ -149,6 +148,7 @@ fun <Context : CommonBackendContext> performByIrFile(
             input: IrModuleFragment
         ): IrModuleFragment {
             for (irFile in input.files) {
+                context.stage = 1
                 lower.invoke(phaseConfig, phaserState.changeType(), context, irFile)
             }
 
