@@ -19,12 +19,11 @@ package org.jetbrains.kotlin.ir.declarations.impl
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.IrElementBase
 import org.jetbrains.kotlin.ir.SourceManager
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.MetadataSource
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.symbols.IrFileSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrFileSymbolImpl
+import org.jetbrains.kotlin.ir.util.transform
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.FqName
@@ -57,8 +56,8 @@ class IrFileImpl(
 
     var loweredUpTo = 0
 
-    override val declarations: MutableList<IrDeclaration>
-        get() = declarationsByStage.get()
+    override val declarations: SimpleList<IrDeclaration>
+        get() = SimpleMutableList(declarationsByStage.get())
 
     override val annotations: MutableList<IrCall> = ArrayList()
 
@@ -72,8 +71,6 @@ class IrFileImpl(
     }
 
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
-        declarations.forEachIndexed { i, irDeclaration ->
-            declarations[i] = irDeclaration.transform(transformer, data) as IrDeclaration
-        }
+        declarations.transform { it.transform(transformer, data) as IrDeclaration }
     }
 }

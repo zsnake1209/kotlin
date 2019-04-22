@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.phaser.makeIrFilePhase
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
-import org.jetbrains.kotlin.backend.jvm.intrinsics.IrIntrinsicMethods
 import org.jetbrains.kotlin.backend.jvm.intrinsics.KClassJavaProperty
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
@@ -54,7 +53,7 @@ private class AnnotationLowering(private val context: JvmBackendContext) : FileL
     override fun visitClass(irClass: IrClass): IrStatement {
         if (!irClass.isAnnotationClass) return super.visitClass(irClass)
 
-        irClass.declarations.removeIf {
+        irClass.declarations.removeAll {
             it is IrConstructor
         }
 

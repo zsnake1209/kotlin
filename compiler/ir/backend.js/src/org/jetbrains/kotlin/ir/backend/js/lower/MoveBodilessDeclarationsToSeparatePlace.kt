@@ -102,22 +102,23 @@ fun moveBodilessDeclarationsToSeparatePlace(context: JsIrBackendContext, module:
             return null
         }
 
-        val it = irFile.declarations.iterator()
-
-        while (it.hasNext()) {
-            val d = it.next() as? IrDeclarationWithName ?: continue
+        irFile.declarations.transformFlat {
+            val d = it as? IrDeclarationWithName ?: return@transformFlat null
 
             if (isBuiltInClass(d)) {
-                it.remove()
                 bodilessBuiltInsPackageFragment.addChild(d)
+                return@transformFlat emptyList()
             } else if (d.isEffectivelyExternal()) {
                 if (d.getJsModule() != null)
                     context.declarationLevelJsModules.add(d)
 
-                it.remove()
                 externalPackageFragment.addChild(d)
+                return@transformFlat emptyList()
             }
+
+            null
         }
+
         return irFile
     }
 
