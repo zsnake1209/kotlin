@@ -408,10 +408,10 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
 
                 val expectedReturnTypeRef = expectedReturnType?.let { newLambdaExpression.returnTypeRef.resolvedTypeFromPrototype(it) }
                 replacements[lambdaArgument] =
-                        newLambdaExpression.transformSingle(this@FirBodyResolveTransformer, LambdaResolution(expectedReturnTypeRef))
+                    newLambdaExpression.transformSingle(this@FirBodyResolveTransformer, LambdaResolution(expectedReturnTypeRef))
 
 
-                return listOfNotNull(newLambdaExpression.body?.statements?.last() as? FirExpression) to InferenceSession.default
+                return listOfNotNull(newLambdaExpression.body?.statements?.lastOrNull() as? FirExpression) to InferenceSession.default
             }
 
         }, { it.resultType }, inferenceComponents)
