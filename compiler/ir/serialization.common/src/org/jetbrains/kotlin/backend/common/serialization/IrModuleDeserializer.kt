@@ -556,7 +556,6 @@ abstract class IrModuleDeserializer(
         val argument = deserializeExpression(proto.argument)
         return IrTypeOperatorCallImpl(start, end, type, operator, operand).apply {
             this.argument = argument
-            this.typeOperandClassifier = operand.classifierOrFail
         }
     }
 
