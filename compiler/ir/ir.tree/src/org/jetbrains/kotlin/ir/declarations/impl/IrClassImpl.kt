@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.transform
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
@@ -75,7 +76,19 @@ class IrClassImpl(
 
     override var thisReceiver: IrValueParameter? = null
 
-    private val declarationsByStage = ListManager<IrDeclaration>()
+    private val declarationsByStage = ListManager<IrDeclaration> {
+        var result = parent
+
+        while (result !is IrFile) {
+            if (result is IrDeclaration) {
+                result = result.parent
+            } else {
+                return@ListManager null
+            }
+        }
+
+        result
+    }
 
     override val declarations: MutableList<IrDeclaration>
         get() = declarationsByStage.get()

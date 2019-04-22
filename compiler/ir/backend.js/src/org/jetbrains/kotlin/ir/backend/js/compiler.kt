@@ -10,6 +10,9 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.invokeToplevel
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
+import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
+import org.jetbrains.kotlin.ir.declarations.impl.StageController
 import org.jetbrains.kotlin.ir.declarations.impl.stageController
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
@@ -30,7 +33,21 @@ fun compile(
 
     val context = JsIrBackendContext(moduleDescriptor, irBuiltIns, symbolTable, moduleFragment, configuration)
 
-    stageController = context
+    stageController = object: StageController {
+        override val currentStage: Int
+            get() = context.stage
+
+        override fun lowerUpTo(file: IrFile, stageNonInclusive: Int) {
+            val loweredUpTo = (file as? IrFileImpl)?.loweredUpTo ?: 0
+            val originalStage = context.stage
+            for (i in loweredUpTo + 1 until stageNonInclusive) {
+                context.stage = i
+                perFilePhaseList[i - 1](context).lower(file)
+                (file as? IrFileImpl)?.loweredUpTo = i
+            }
+            context.stage = originalStage
+        }
+    }
 
     // Load declarations referenced during `context` initialization
     dependencyModules.forEach {
@@ -58,7 +75,7 @@ fun compile(
 
     jsPhases.invokeToplevel(phaseConfig, context, moduleFragment)
 
-    context.stage = 100
+    context.stage = perFilePhaseList.size + 1
 
     val jsProgram = moduleFragment.accept(IrModuleToJsTransformer(context), null)
     return jsProgram.toString()

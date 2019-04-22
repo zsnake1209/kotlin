@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.lower
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 
 // Phase composition.
 private class CompositePhase<Context : CommonBackendContext, Input, Output>(
@@ -24,6 +25,7 @@ private class CompositePhase<Context : CommonBackendContext, Input, Output>(
 
         if (stageIndex > 0) context.stage = stageIndex++
         var result = phases.first().invoke(phaseConfig, currentState, context, input)
+        (result as? IrFileImpl)?.loweredUpTo = stageIndex - 1
 
         for ((previous, next) in phases.zip(phases.drop(1))) {
             if (next !is SameTypeCompilerPhase<*, *>) {
@@ -34,6 +36,7 @@ private class CompositePhase<Context : CommonBackendContext, Input, Output>(
 
             if (stageIndex > 0) context.stage = stageIndex++
             result = next.invoke(phaseConfig, currentState, context, result)
+            (result as? IrFileImpl)?.loweredUpTo = stageIndex - 1
         }
         return result as Output
     }
@@ -148,7 +151,6 @@ fun <Context : CommonBackendContext> performByIrFile(
             input: IrModuleFragment
         ): IrModuleFragment {
             for (irFile in input.files) {
-                context.stage = 1
                 lower.invoke(phaseConfig, phaserState.changeType(), context, irFile)
             }
 

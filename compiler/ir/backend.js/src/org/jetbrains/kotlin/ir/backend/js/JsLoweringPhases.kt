@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.inline.RemoveInlineFunctionsLowe
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ReturnableBlockLowering
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.impl.stageController
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 
 private fun ClassLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) = moduleFragment.files.forEach { runOnFilePostfix(it) }
@@ -36,8 +37,8 @@ private fun makeJsModulePhase(
     lowering: (JsIrBackendContext) -> FileLoweringPass,
     name: String,
     description: String,
-    prerequisite: Set<AnyNamedPhase> = emptySet()
-) = makeIrFilePhase<JsIrBackendContext>(lowering, name, description, prerequisite, verify = ::validationCallback)
+    prerequisite: Set<Any?> = emptySet()
+) = lowering
 
 private fun makeCustomJsModulePhase(
     op: (JsIrBackendContext, IrModuleFragment) -> Unit,
@@ -380,55 +381,74 @@ private val staticMembersLoweringPhase = makeJsModulePhase(
 //    description = "Remove traces of persistent IR"
 //)
 
+val perFilePhaseList = listOf(
+    functionInliningPhase,
+    removeInlineFunctionsLoweringPhase,
+    lateinitLoweringPhase,
+    tailrecLoweringPhase,
+    enumClassConstructorLoweringPhase,
+    sharedVariablesLoweringPhase,
+    localDelegatedPropertiesLoweringPhase,
+    localDeclarationsLoweringPhase,
+    innerClassesLoweringPhase,
+    innerClassConstructorCallsLoweringPhase,
+    propertiesLoweringPhase,
+    initializersLoweringPhase,
+    // Common prefix ends
+    enumClassLoweringPhase, // remove?
+    enumUsageLoweringPhase, // remove?
+    returnableBlockLoweringPhase,
+    unitMaterializationLoweringPhase,
+    suspendFunctionsLoweringPhase,
+    privateMembersLoweringPhase,
+    callableReferenceLoweringPhase,
+
+    defaultArgumentStubGeneratorPhase,
+    defaultParameterInjectorPhase,
+
+    jsDefaultCallbackGeneratorPhase,
+    throwableSuccessorsLoweringPhase,
+    varargLoweringPhase,
+    multipleCatchesLoweringPhase,
+    bridgesConstructionPhase,
+    typeOperatorLoweringPhase,
+    secondaryConstructorLoweringPhase,
+    secondaryFactoryInjectorLoweringPhase,
+    classReferenceLoweringPhase,
+    inlineClassDeclarationsLoweringPhase,
+    inlineClassUsageLoweringPhase,
+    autoboxingTransformerPhase,
+    blockDecomposerLoweringPhase,
+    primitiveCompanionLoweringPhase, // remove?
+    constLoweringPhase,
+    callsLoweringPhase,
+    staticMembersLoweringPhase
+)
+
+fun compositePhase(phaseList: List<(JsIrBackendContext) -> FileLoweringPass>): CompilerPhase<JsIrBackendContext, IrFile, IrFile> {
+    return object: CompilerPhase<JsIrBackendContext, IrFile, IrFile> {
+        override fun invoke(
+            phaseConfig: PhaseConfig,
+            phaserState: PhaserState<IrFile>,
+            context: JsIrBackendContext,
+            input: IrFile
+        ): IrFile {
+            stageController.lowerUpTo(input, perFilePhaseList.size + 1)
+            return input
+        }
+    }
+}
+
+val jsPerFileStages = performByIrFile(
+    name = "IrLowerByFile",
+    description = "IR Lowering by file",
+    lower = compositePhase(perFilePhaseList)
+)
+
 val jsPhases = namedIrModulePhase(
     name = "IrModuleLowering",
     description = "IR module lowering",
     lower = expectDeclarationsRemovingPhase then
             moveBodilessDeclarationsToSeparatePlacePhase then
-//            injectStageController then
-            performByIrFile(
-                name = "IrLowerByFile",
-                description = "IR Lowering by file",
-                lower = functionInliningPhase then
-                        removeInlineFunctionsLoweringPhase then
-                        lateinitLoweringPhase then
-                        tailrecLoweringPhase then
-                        enumClassConstructorLoweringPhase then
-                        sharedVariablesLoweringPhase then
-                        localDelegatedPropertiesLoweringPhase then
-                        localDeclarationsLoweringPhase then
-                        innerClassesLoweringPhase then
-                        innerClassConstructorCallsLoweringPhase then
-                        propertiesLoweringPhase then
-                        initializersLoweringPhase then
-                        // Common prefix ends
-                        enumClassLoweringPhase then // remove?
-                        enumUsageLoweringPhase then // remove?
-                        returnableBlockLoweringPhase then
-                        unitMaterializationLoweringPhase then
-                        suspendFunctionsLoweringPhase then
-                        privateMembersLoweringPhase then
-                        callableReferenceLoweringPhase then
-
-                        defaultArgumentStubGeneratorPhase then
-                        defaultParameterInjectorPhase then
-
-                        jsDefaultCallbackGeneratorPhase then
-                        throwableSuccessorsLoweringPhase then
-                        varargLoweringPhase then
-                        multipleCatchesLoweringPhase then
-                        bridgesConstructionPhase then
-                        typeOperatorLoweringPhase then
-                        secondaryConstructorLoweringPhase then
-                        secondaryFactoryInjectorLoweringPhase then
-                        classReferenceLoweringPhase then
-                        inlineClassDeclarationsLoweringPhase then
-                        inlineClassUsageLoweringPhase then
-                        autoboxingTransformerPhase then
-                        blockDecomposerLoweringPhase then
-                        primitiveCompanionLoweringPhase then // remove?
-                        constLoweringPhase then
-                        callsLoweringPhase then
-                        staticMembersLoweringPhase
-            )
+            jsPerFileStages
 )

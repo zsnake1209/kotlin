@@ -53,7 +53,9 @@ class IrFileImpl(
 
     override val packageFragmentDescriptor: PackageFragmentDescriptor get() = symbol.descriptor
 
-    private val declarationsByStage = ListManager<IrDeclaration>()
+    private val declarationsByStage = ListManager<IrDeclaration> { this }
+
+    var loweredUpTo = 0
 
     override val declarations: MutableList<IrDeclaration>
         get() = declarationsByStage.get()

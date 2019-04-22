@@ -50,11 +50,8 @@ class JsIrBackendContext(
     val symbolTable: SymbolTable,
     irModuleFragment: IrModuleFragment,
     override val configuration: CompilerConfiguration
-) : CommonBackendContext, StageController {
+) : CommonBackendContext {
     override var stage: Int = 0
-
-    override val currentStage: Int
-        get() = stage
 
     override val builtIns = module.builtIns
 

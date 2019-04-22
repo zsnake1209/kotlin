@@ -17,13 +17,11 @@
 package org.jetbrains.kotlin.ir.declarations.impl
 
 import org.jetbrains.kotlin.ir.IrElementBase
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.declarations.MetadataSource
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.absoluteValue
 
 abstract class IrDeclarationBase(
     startOffset: Int,
@@ -51,20 +49,35 @@ var stageController: StageController = NoopController()
 
 interface StageController {
     val currentStage: Int
+
+    fun lowerUpTo(file: IrFile, stageNonInclusive: Int)
 }
 
 class NoopController : StageController {
     override val currentStage: Int = 0
+
+    override fun lowerUpTo(file: IrFile, stageNonInclusive: Int) {}
 }
 
-class ListManager<T> {
+class ListManager<T>(val fileFn: () -> IrFile?) {
     private val changePoints = TreeMap<Int, MutableList<T>>(mapOf(0 to mutableListOf<T>()))
 
     fun get(): MutableList<T> {
         val stage = stageController.currentStage
         var result = changePoints[stage]
         if (result == null) {
+            val file = try {
+                fileFn()
+            } catch (t: Throwable) {
+                return changePoints[0]!!
+            }
+            if (file == null) return changePoints[0]!!
+
+            stageController.lowerUpTo(file, stage)
             result = mutableListOf<T>()
+//            if (stage - 1 !in changePoints) {
+//                println("!!!!")
+//            }
             result.addAll(changePoints.lowerEntry(stage)!!.value)
             changePoints[stage] = result
         }
