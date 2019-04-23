@@ -18,10 +18,9 @@ package org.jetbrains.kotlinx.serialization.compiler.backend.jvm
 
 import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.SerializableCompanionCodegen
-import org.jetbrains.kotlinx.serialization.compiler.backend.common.findTypeSerializerOrContext
+import org.jetbrains.kotlinx.serialization.compiler.backend.common.findTypeSerializer
 import org.jetbrains.kotlinx.serialization.compiler.resolve.getSerializableClassDescriptorByCompanion
 import org.jetbrains.kotlinx.serialization.compiler.resolve.shouldHaveGeneratedMethodsInCompanion
 import org.jetbrains.kotlinx.serialization.compiler.resolve.toSimpleType
@@ -39,10 +38,9 @@ class SerializableCompanionCodegenImpl(private val classCodegen: ImplementationB
 
     override fun generateSerializerGetter(methodDescriptor: FunctionDescriptor) {
         val serial = requireNotNull(
-            findTypeSerializerOrContext(
+            findTypeSerializer(
                 serializableDescriptor.module,
-                serializableDescriptor.toSimpleType(),
-                sourceElement = methodDescriptor.findPsi()
+                serializableDescriptor.toSimpleType()
             )
         )
         classCodegen.generateMethod(methodDescriptor) { _, _ ->

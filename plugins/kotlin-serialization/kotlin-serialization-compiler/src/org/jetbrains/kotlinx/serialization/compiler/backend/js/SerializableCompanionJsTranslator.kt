@@ -20,13 +20,12 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.js.backend.ast.JsNameRef
 import org.jetbrains.kotlin.js.backend.ast.JsReturn
-import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.declaration.DeclarationBodyVisitor
 import org.jetbrains.kotlin.psi.KtPureClassOrObject
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.SerializableCompanionCodegen
-import org.jetbrains.kotlinx.serialization.compiler.backend.common.findTypeSerializerOrContext
+import org.jetbrains.kotlinx.serialization.compiler.backend.common.findTypeSerializer
 import org.jetbrains.kotlinx.serialization.compiler.resolve.getSerializableClassDescriptorByCompanion
 import org.jetbrains.kotlinx.serialization.compiler.resolve.shouldHaveGeneratedMethodsInCompanion
 import org.jetbrains.kotlinx.serialization.compiler.resolve.toSimpleType
@@ -40,10 +39,9 @@ class SerializableCompanionJsTranslator(
     override fun generateSerializerGetter(methodDescriptor: FunctionDescriptor) {
         val f = context.buildFunction(methodDescriptor) { jsFun, context ->
             val serializer = requireNotNull(
-                findTypeSerializerOrContext(
+                findTypeSerializer(
                     serializableDescriptor.module,
-                    serializableDescriptor.toSimpleType(),
-                    sourceElement = methodDescriptor.findPsi()
+                    serializableDescriptor.toSimpleType()
                 )
             )
             val args = jsFun.parameters.map { JsNameRef(it.name) }
