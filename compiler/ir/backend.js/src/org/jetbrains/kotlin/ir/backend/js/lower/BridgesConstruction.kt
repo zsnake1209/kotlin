@@ -138,7 +138,8 @@ class BridgesConstruction(val context: JsIrBackendContext) : ClassLoweringPass {
 
             val toTake = irFunction.valueParameters.size - if (call.isSuspend xor irFunction.isSuspend) 1 else 0
 
-            irFunction.valueParameters.subList(0, toTake).mapIndexed { i, valueParameter ->
+            irFunction.valueParameters.mapIndexed { i, valueParameter ->
+                if (i >= toTake) return@mapIndexed
                 call.putValueArgument(i, irCastIfNeeded(irGet(valueParameter), delegateTo.valueParameters[i].type))
             }
 

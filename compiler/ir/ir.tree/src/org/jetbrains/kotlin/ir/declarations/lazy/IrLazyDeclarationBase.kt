@@ -8,10 +8,7 @@ package org.jetbrains.kotlin.ir.declarations.lazy
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrElementBase
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.declarations.IrValueParameter
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.util.DeclarationStubGenerator
@@ -50,10 +47,10 @@ abstract class IrLazyDeclarationBase(
         createLazyParent()!!
     }
 
-    override val annotations: MutableList<IrCall> by lazy {
-        descriptor.annotations.map {
+    override val annotations: SimpleList<IrCall> by lazy {
+        SimpleMutableList(descriptor.annotations.map {
             typeTranslator.constantValueGenerator.generateAnnotationConstructorCall(it)
-        }.toMutableList()
+        }.toMutableList())
     }
 
     override var metadata: Nothing?

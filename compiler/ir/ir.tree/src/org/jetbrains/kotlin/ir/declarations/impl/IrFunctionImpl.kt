@@ -8,16 +8,13 @@ package org.jetbrains.kotlin.ir.declarations.impl
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrProperty
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.SmartList
 
 class IrFunctionImpl(
     startOffset: Int,
@@ -58,7 +55,8 @@ class IrFunctionImpl(
 
     override val descriptor: FunctionDescriptor = symbol.descriptor
 
-    override val overriddenSymbols: MutableList<IrSimpleFunctionSymbol> = SmartList()
+    override val overriddenSymbols: SimpleList<IrSimpleFunctionSymbol> =
+        DumbPersistentList()
 
     @Suppress("OverridingDeprecatedMember")
     override var correspondingProperty: IrProperty?
@@ -67,7 +65,7 @@ class IrFunctionImpl(
             correspondingPropertySymbol = value?.symbol
         }
 
-    override var correspondingPropertySymbol: IrPropertySymbol? = null
+    override var correspondingPropertySymbol: IrPropertySymbol? by NullablePersistentVar()
 
     // Used by kotlin-native in InteropLowering.kt and IrUtils2.kt
     constructor(

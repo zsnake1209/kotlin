@@ -8,10 +8,7 @@ package org.jetbrains.kotlin.ir.declarations.lazy
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrProperty
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.DeclarationStubGenerator
@@ -61,8 +58,8 @@ class IrLazyFunction(
 
     override val descriptor: FunctionDescriptor = symbol.descriptor
 
-    override val typeParameters: MutableList<IrTypeParameter> by lazy {
-        typeTranslator.buildWithScope(this) {
+    override val typeParameters: SimpleList<IrTypeParameter> by lazy {
+        SimpleMutableList(typeTranslator.buildWithScope(this) {
             stubGenerator.symbolTable.withScope(descriptor) {
                 val propertyIfAccessor = descriptor.propertyIfAccessor
                 propertyIfAccessor.typeParameters.mapTo(arrayListOf()) {
@@ -75,14 +72,14 @@ class IrLazyFunction(
                     }
                 }
             }
-        }
+        })
     }
 
 
-    override val overriddenSymbols: MutableList<IrSimpleFunctionSymbol> by lazy {
-        descriptor.overriddenDescriptors.mapTo(arrayListOf()) {
+    override val overriddenSymbols: SimpleList<IrSimpleFunctionSymbol> by lazy {
+        SimpleMutableList(descriptor.overriddenDescriptors.mapTo(arrayListOf()) {
             stubGenerator.generateFunctionStub(it.original).symbol
-        }
+        })
     }
 
     @Suppress("OverridingDeprecatedMember")

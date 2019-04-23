@@ -127,9 +127,9 @@ class IrPropertyImpl(
 
     override val descriptor: PropertyDescriptor = symbol.descriptor
 
-    override var backingField: IrField? = null
-    override var getter: IrSimpleFunction? = null
-    override var setter: IrSimpleFunction? = null
+    override var backingField: IrField? by NullablePersistentVar()
+    override var getter: IrSimpleFunction? by NullablePersistentVar()
+    override var setter: IrSimpleFunction? by NullablePersistentVar()
 
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R {
         return visitor.visitProperty(this, data)
@@ -141,7 +141,7 @@ class IrPropertyImpl(
         setter?.accept(visitor, data)
     }
 
-    override var metadata: MetadataSource? = null
+    override var metadata: MetadataSource? by NullablePersistentVar()
 
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
         backingField = backingField?.transform(transformer, data) as? IrField

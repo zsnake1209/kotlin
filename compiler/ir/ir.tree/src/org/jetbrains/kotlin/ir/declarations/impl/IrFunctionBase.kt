@@ -21,11 +21,9 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.impl.IrUninitializedType
-import org.jetbrains.kotlin.ir.util.transform
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.SmartList
 
 abstract class IrFunctionBase(
     startOffset: Int,
@@ -40,22 +38,27 @@ abstract class IrFunctionBase(
     IrDeclarationBase(startOffset, endOffset, origin),
     IrFunction {
 
-    final override var returnType: IrType = returnType
-        get() = if (field === IrUninitializedType) {
-            error("Return type is not initialized")
-        } else {
-            field
+    private var returnTypeField: IrType by PersistentVar(returnType)
+
+    final override var returnType: IrType
+        get() = returnTypeField.let {
+            if (it !== IrUninitializedType) it else error("Return type is not initialized")
+        }
+        set(c) {
+            returnTypeField = c
         }
 
-    override val typeParameters: MutableList<IrTypeParameter> = SmartList()
+    override val typeParameters: SimpleList<IrTypeParameter> =
+        DumbPersistentList()
 
-    override var dispatchReceiverParameter: IrValueParameter? = null
-    override var extensionReceiverParameter: IrValueParameter? = null
-    override val valueParameters: MutableList<IrValueParameter> = ArrayList()
+    override var dispatchReceiverParameter: IrValueParameter? by NullablePersistentVar()
+    override var extensionReceiverParameter: IrValueParameter? by NullablePersistentVar()
+    override val valueParameters: SimpleList<IrValueParameter> =
+        DumbPersistentList()
 
-    final override var body: IrBody? = null
+    final override var body: IrBody? by NullablePersistentVar()
 
-    override var metadata: MetadataSource? = null
+    override var metadata: MetadataSource? by NullablePersistentVar()
 
     override fun <D> acceptChildren(visitor: IrElementVisitor<Unit, D>, data: D) {
         typeParameters.forEach { it.accept(visitor, data) }

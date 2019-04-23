@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.ir.declarations.IrExternalPackageFragment
 import org.jetbrains.kotlin.ir.declarations.SimpleList
 import org.jetbrains.kotlin.ir.declarations.SimpleMutableList
 import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
-import org.jetbrains.kotlin.ir.util.transform
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.FqName
@@ -43,7 +42,8 @@ class IrExternalPackageFragmentImpl(
 
     override val packageFragmentDescriptor: PackageFragmentDescriptor get() = symbol.descriptor
 
-    override val declarations: SimpleList<IrDeclaration> = SimpleMutableList<IrDeclaration>(ArrayList())
+    override val declarations: SimpleList<IrDeclaration> =
+        SimpleMutableList<IrDeclaration>(ArrayList())
 
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R =
         visitor.visitExternalPackageFragment(this, data)

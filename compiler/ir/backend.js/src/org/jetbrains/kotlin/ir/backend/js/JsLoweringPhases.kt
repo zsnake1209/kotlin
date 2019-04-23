@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.inline.RemoveInlineFunctionsLowe
 import org.jetbrains.kotlin.ir.backend.js.lower.inline.ReturnableBlockLowering
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.impl.stageController
+import org.jetbrains.kotlin.ir.declarations.stageController
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 
 private fun ClassLoweringPass.runOnFilesPostfix(moduleFragment: IrModuleFragment) = moduleFragment.files.forEach { runOnFilePostfix(it) }
@@ -420,7 +420,7 @@ fun compositePhase(): CompilerPhase<JsIrBackendContext, IrFile, IrFile> {
 val jsPerFileStages = performByIrFile(
     name = "IrLowerByFile",
     description = "IR Lowering by file",
-    lower = compositePhase(perFilePhaseList)
+    lower = compositePhase()
 )
 
 val jsPhases = namedIrModulePhase(
@@ -439,4 +439,12 @@ fun generateTests(context: JsIrBackendContext, moduleFragment: IrModuleFragment)
     }
     context.implicitDeclarationFile.loweredUpTo = 0
     stageController.lowerUpTo(context.implicitDeclarationFile, perFilePhaseList.size + 1)
+}
+
+fun <T> JsIrBackendContext.withStage(stage: Int, fn: () -> T): T {
+    val currentStage = this.stage
+    this.stage = stage
+    val result = fn()
+    this.stage = currentStage
+    return result
 }

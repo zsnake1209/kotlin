@@ -18,10 +18,7 @@ package org.jetbrains.kotlin.ir.declarations.impl
 
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.Visibility
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.ir.declarations.IrProperty
-import org.jetbrains.kotlin.ir.declarations.MetadataSource
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
@@ -77,7 +74,7 @@ class IrFieldImpl(
 
     override val descriptor: PropertyDescriptor = symbol.descriptor
 
-    override var initializer: IrExpressionBody? = null
+    override var initializer: IrExpressionBody? by NullablePersistentVar()
 
     @Suppress("OverridingDeprecatedMember")
     override var correspondingProperty: IrProperty?
@@ -86,11 +83,12 @@ class IrFieldImpl(
             correspondingPropertySymbol = value?.symbol
         }
 
-    override var correspondingPropertySymbol: IrPropertySymbol? = null
+    override var correspondingPropertySymbol: IrPropertySymbol? by NullablePersistentVar()
 
-    override val overriddenSymbols: MutableList<IrFieldSymbol> = mutableListOf()
+    override val overriddenSymbols: SimpleList<IrFieldSymbol> =
+        DumbPersistentList()
 
-    override var metadata: MetadataSource.Property? = null
+    override var metadata: MetadataSource.Property? by NullablePersistentVar()
 
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R {
         return visitor.visitField(this, data)

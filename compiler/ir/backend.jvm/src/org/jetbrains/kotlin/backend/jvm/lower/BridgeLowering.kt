@@ -238,8 +238,8 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
             dispatchReceiverParameter = irClass.thisReceiver?.copyTo(this, type = irClass.defaultType)
             extensionReceiverParameter = signatureFunction.extensionReceiverParameter
                 ?.copyWithTypeErasure(this)
-            signatureFunction.valueParameters.mapIndexed { i, param ->
-                valueParameters.add(i, param.copyWithTypeErasure(this))
+            signatureFunction.valueParameters.forEach { param ->
+                valueParameters.add(param.copyWithTypeErasure(this))
             }
         }
     }
@@ -309,8 +309,8 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
                     copyTypeParametersFrom(this@orphanedCopy)
                     this@orphanedCopy.dispatchReceiverParameter?.let { dispatchReceiverParameter = it.copyTo(this) }
                     this@orphanedCopy.extensionReceiverParameter?.let { extensionReceiverParameter = it.copyTo(this) }
-                    this@orphanedCopy.valueParameters.forEachIndexed { index, param ->
-                        valueParameters.add(index, param.copyTo(this))
+                    this@orphanedCopy.valueParameters.forEach { param ->
+                        valueParameters.add(param.copyTo(this))
                     }
                     /* Do NOT copy overriddenSymbols */
                 }

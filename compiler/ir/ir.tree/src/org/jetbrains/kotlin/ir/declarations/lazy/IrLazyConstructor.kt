@@ -7,9 +7,7 @@ package org.jetbrains.kotlin.ir.declarations.lazy
 
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.Visibility
-import org.jetbrains.kotlin.ir.declarations.IrConstructor
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.util.DeclarationStubGenerator
 import org.jetbrains.kotlin.ir.util.TypeTranslator
@@ -56,8 +54,8 @@ class IrLazyConstructor(
         TypeTranslator
     )
 
-    override val typeParameters: MutableList<IrTypeParameter> by lazy {
-        typeTranslator.buildWithScope(this) {
+    override val typeParameters: SimpleList<IrTypeParameter> by lazy {
+        SimpleMutableList(typeTranslator.buildWithScope(this) {
             stubGenerator.symbolTable.withScope(descriptor) {
                 val classTypeParametersCount = descriptor.constructedClass.original.declaredTypeParameters.size
                 val allConstructorTypeParameters = descriptor.typeParameters
@@ -65,7 +63,7 @@ class IrLazyConstructor(
                     stubGenerator.generateOrGetTypeParameterStub(it)
                 }
             }
-        }
+        })
     }
 
     init {

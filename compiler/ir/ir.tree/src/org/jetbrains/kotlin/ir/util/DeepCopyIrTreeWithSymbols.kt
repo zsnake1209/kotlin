@@ -80,6 +80,9 @@ open class DeepCopyIrTreeWithSymbols(
     private inline fun <reified T : IrElement> List<T>.transformTo(destination: MutableList<T>) =
         mapTo(destination) { it.transform() }
 
+    private inline fun <reified T : IrElement> List<T>.transformTo(destination: SimpleList<T>) =
+        mapTo(destination) { it.transform() }
+
     private fun <T : IrDeclarationContainer> T.transformDeclarationsTo(destination: T) =
         declarations.forEach { destination.declarations.add(it.transform()) }
 

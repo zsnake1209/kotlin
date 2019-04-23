@@ -17,10 +17,7 @@
 package org.jetbrains.kotlin.ir.declarations.impl
 
 import org.jetbrains.kotlin.descriptors.VariableDescriptorWithAccessors
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
-import org.jetbrains.kotlin.ir.declarations.IrVariable
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrLocalDelegatedPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrLocalDelegatedPropertySymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
@@ -104,11 +101,11 @@ class IrLocalDelegatedPropertyImpl(
     override val descriptor: VariableDescriptorWithAccessors
         get() = symbol.descriptor
 
-    override lateinit var delegate: IrVariable
+    override var delegate: IrVariable by LateInitPersistentVar()
 
-    override lateinit var getter: IrFunction
+    override var getter: IrFunction by LateInitPersistentVar()
 
-    override var setter: IrFunction? = null
+    override var setter: IrFunction? by NullablePersistentVar()
 
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R =
         visitor.visitLocalDelegatedProperty(this, data)

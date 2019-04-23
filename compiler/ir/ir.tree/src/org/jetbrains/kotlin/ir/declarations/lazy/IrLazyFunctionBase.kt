@@ -6,9 +6,7 @@
 package org.jetbrains.kotlin.ir.declarations.lazy
 
 import org.jetbrains.kotlin.descriptors.Visibility
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrValueParameter
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.DeclarationStubGenerator
@@ -43,12 +41,12 @@ abstract class IrLazyFunctionBase(
         }
     }
 
-    override val valueParameters: MutableList<IrValueParameter> by lazy {
-        typeTranslator.buildWithScope(this) {
+    override val valueParameters: SimpleList<IrValueParameter> by lazy {
+        SimpleMutableList(typeTranslator.buildWithScope(this) {
             descriptor.valueParameters.mapTo(arrayListOf()) {
                 stubGenerator.generateValueParameterStub(it).apply { parent = this@IrLazyFunctionBase }
             }
-        }
+        })
     }
 
     final override var body: IrBody? = null

@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.symbols.IrFileSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrFileSymbolImpl
-import org.jetbrains.kotlin.ir.util.transform
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.FqName
@@ -52,16 +51,15 @@ class IrFileImpl(
 
     override val packageFragmentDescriptor: PackageFragmentDescriptor get() = symbol.descriptor
 
-    private val declarationsByStage = ListManager<IrDeclaration> { this }
-
     var loweredUpTo = 0
 
-    override val declarations: SimpleList<IrDeclaration>
-        get() = declarationsByStage.get()
+    override val declarations: SimpleList<IrDeclaration> =
+        DumbPersistentList()
 
-    override val annotations: MutableList<IrCall> = ArrayList()
+    override val annotations: SimpleList<IrCall> =
+        DumbPersistentList()
 
-    override var metadata: MetadataSource.File? = null
+    override var metadata: MetadataSource.File? by NullablePersistentVar()
 
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R =
         visitor.visitFile(this, data)

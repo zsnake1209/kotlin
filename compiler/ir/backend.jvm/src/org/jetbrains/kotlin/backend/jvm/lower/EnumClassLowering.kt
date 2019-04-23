@@ -145,8 +145,8 @@ private class EnumClassLowering(val context: JvmBackendContext) : ClassLoweringP
 
                 val nameParameter = makeNameValueParameter(newConstructor)
                 val ordinalParameter = makeOrdinalValueParameter(newConstructor)
-                valueParameters.add(0, nameParameter)
-                valueParameters.add(1, ordinalParameter)
+                valueParameters.add(nameParameter)
+                valueParameters.add(ordinalParameter)
                 valueParameters.addAll(enumConstructor.valueParameters.map { param ->
                     param.copyTo(newConstructor, index = param.index + 2).also { newParam ->
                         loweredEnumConstructorParameters[param.symbol] = newParam

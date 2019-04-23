@@ -23,13 +23,10 @@ import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.util.file
-import org.jetbrains.kotlin.ir.util.transform
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyExternal
-import org.jetbrains.kotlin.utils.SmartList
 
 class IrClassImpl(
     startOffset: Int,
@@ -74,30 +71,18 @@ class IrClassImpl(
 
     override val descriptor: ClassDescriptor get() = symbol.descriptor
 
-    override var thisReceiver: IrValueParameter? = null
+    override var thisReceiver: IrValueParameter? by NullablePersistentVar()
 
-    private val declarationsByStage = ListManager<IrDeclaration> {
-        var result = parent
+    override val declarations: SimpleList<IrDeclaration> =
+        DumbPersistentList()
 
-        while (result !is IrFile) {
-            if (result is IrDeclaration) {
-                result = result.parent
-            } else {
-                return@ListManager null
-            }
-        }
+    override val typeParameters: SimpleList<IrTypeParameter> =
+        DumbPersistentList()
 
-        result
-    }
+    override val superTypes: SimpleList<IrType> =
+        DumbPersistentList()
 
-    override val declarations: SimpleList<IrDeclaration>
-        get() = declarationsByStage.get()
-
-    override val typeParameters: MutableList<IrTypeParameter> = SmartList()
-
-    override val superTypes: MutableList<IrType> = SmartList()
-
-    override var metadata: MetadataSource? = null
+    override var metadata: MetadataSource? by NullablePersistentVar()
 
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R =
         visitor.visitClass(this, data)
