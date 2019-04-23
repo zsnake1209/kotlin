@@ -359,28 +359,6 @@ private val staticMembersLoweringPhase = makeJsModulePhase(
     description = "Move static member declarations to top-level"
 )
 
-//private val injectStageController = makeCustomJsModulePhase(
-//    { context, module ->
-//        val stageController = object : StageController {
-//            override val currentStage: Int
-//                get() = context.stage
-//        }
-//
-//        module.files.forEach { file ->
-//            object : IrElementVisitorVoid {
-//                override fun visitElement(element: IrElement) {
-//                    if (element is HasStageController) {
-//                        element.stageController = stageController
-//                    }
-//                    element.acceptChildrenVoid(this)
-//                }
-//            }.visitFile(file)
-//        }
-//    },
-//    name = "FinalizeIrLowering",
-//    description = "Remove traces of persistent IR"
-//)
-
 val perFilePhaseList = listOf(
     functionInliningPhase,
     removeInlineFunctionsLoweringPhase,
@@ -425,7 +403,7 @@ val perFilePhaseList = listOf(
     staticMembersLoweringPhase
 )
 
-fun compositePhase(phaseList: List<(JsIrBackendContext) -> FileLoweringPass>): CompilerPhase<JsIrBackendContext, IrFile, IrFile> {
+fun compositePhase(): CompilerPhase<JsIrBackendContext, IrFile, IrFile> {
     return object: CompilerPhase<JsIrBackendContext, IrFile, IrFile> {
         override fun invoke(
             phaseConfig: PhaseConfig,
