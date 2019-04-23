@@ -49,6 +49,8 @@ fun AbstractSerialGenerator.findAddOnSerializer(propertyType: KotlinType, module
     additionalSerializersInScopeOfCurrentFile[propertyType]?.let { return it }
     if (propertyType in contextualKClassListInCurrentFile)
         return module.getClassFromSerializationPackage(SpecialBuiltins.contextSerializer)
+    if (propertyType.toClassDescriptor?.annotations?.hasAnnotation(SerializationAnnotations.polymorphicFqName) == true)
+        return module.getClassFromSerializationPackage(SpecialBuiltins.polymorphicSerializer)
     if (propertyType.isMarkedNullable) return findAddOnSerializer(propertyType.makeNotNullable(), module)
     return null
 }
