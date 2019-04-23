@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.ir.backend.js.lower.inline
 
+import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.descriptors.*
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrElement
@@ -21,7 +22,7 @@ import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.Name
 
 internal class DeepCopyIrTreeWithSymbolsForInliner(
-    val context: Context,
+    val context: BackendContext,
     val typeArguments: Map<IrTypeParameterSymbol, IrType?>?,
     val parent: IrDeclarationParent?
 ) {
