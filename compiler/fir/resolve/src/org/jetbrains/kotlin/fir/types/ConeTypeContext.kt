@@ -248,7 +248,13 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
     }
 
     override fun TypeConstructorMarker.isDenotable(): Boolean {
-        return true // TODO
+        //TODO
+        return when (this) {
+            is ConeCapturedTypeConstructor -> false
+            is ConeTypeVariableTypeConstructor -> false
+            is ConeSymbol -> true
+            else -> true
+        }
     }
 
     override fun TypeConstructorMarker.isCommonFinalClassConstructor(): Boolean {
