@@ -61,21 +61,15 @@ fun analyzeLiveness(node: MethodNode): List<VariableLivenessFrame> {
 private fun analyzeVisibleByDebuggerVariables(
     node: MethodNode,
     typeAnnotatedFrames: Array<Frame<BasicValue>?>
-): List<BitSet> {
-    val res = ArrayList<BitSet>(node.instructions.size())
-    for (index in 0 until node.instructions.size()) {
-        val bitSet = BitSet(node.maxLocals)
-        for (local in node.localVariables) {
-            if (
-            // Inliner fake variables, despite being present in LVT, are not read, thus are always dead
-                !local.name.isInvisibleDebuggerVariable() &&
-                node.instructions.indexOf(local.start) < index && index < node.instructions.indexOf(local.end) &&
-                Type.getType(local.desc).sort == typeAnnotatedFrames[index]?.getLocal(local.index)?.type?.sort
-            ) {
-                bitSet.set(local.index)
+): Array<BitSet> {
+    val res = Array(node.instructions.size()) { BitSet(node.maxLocals) }
+    for (local in node.localVariables) {
+        if (local.name.isInvisibleDebuggerVariable()) continue
+        for (index in node.instructions.indexOf(local.start) until node.instructions.indexOf(local.end)) {
+            if (Type.getType(local.desc).sort == typeAnnotatedFrames[index]?.getLocal(local.index)?.type?.sort) {
+                res[index].set(local.index)
             }
         }
-        res.add(bitSet)
     }
     return res
 }
