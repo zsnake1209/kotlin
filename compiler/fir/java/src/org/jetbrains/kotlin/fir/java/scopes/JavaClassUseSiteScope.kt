@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.typeContext
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.types.AbstractStrictEqualityTypeChecker
 
 class JavaClassUseSiteScope(
     klass: FirRegularClass,
@@ -44,18 +45,7 @@ class JavaClassUseSiteScope(
     private val context: ConeTypeContext = session.typeContext
 
     private fun isEqualTypes(a: ConeKotlinType, b: ConeKotlinType): Boolean {
-        if (a is ConeFlexibleType) return isEqualTypes(a.lowerBound, b)
-        if (b is ConeFlexibleType) return isEqualTypes(a, b.lowerBound)
-        with(context) {
-            if (a is ConeClassLikeType && b is ConeClassLikeType) {
-                val aId = a.lookupTag.classId
-                val bId = b.lookupTag.classId
-                val aMapped = JavaToKotlinClassMap.mapJavaToKotlin(aId.asSingleFqName()) ?: aId
-                val bMapped = JavaToKotlinClassMap.mapJavaToKotlin(bId.asSingleFqName()) ?: bId
-                return aMapped == bMapped
-            }
-            return isEqualTypeConstructors(a.typeConstructor(), b.typeConstructor())
-        }
+        return AbstractStrictEqualityTypeChecker.strictEqualTypes(context, a, b)
     }
 
     private fun isEqualTypes(a: FirTypeRef, b: FirTypeRef) =
