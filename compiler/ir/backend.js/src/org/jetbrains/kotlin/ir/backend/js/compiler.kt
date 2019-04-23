@@ -36,19 +36,18 @@ fun compile(
 
     val context = JsIrBackendContext(moduleDescriptor, irBuiltIns, symbolTable, moduleFragment, configuration)
 
-    stageController = object: StageController {
+    stageController = object : StageController {
         override val currentStage: Int
             get() = context.stage
 
         override fun lowerUpTo(file: IrFile, stageNonInclusive: Int) {
             val loweredUpTo = (file as? IrFileImpl)?.loweredUpTo ?: 0
-            val originalStage = context.stage
             for (i in loweredUpTo + 1 until stageNonInclusive) {
-                context.stage = i
-                perFilePhaseList[i - 1](context).lower(file)
+                context.withStage(i) {
+                    perFilePhaseList[i - 1].forEach { it(context).lower(file) }
+                }
                 (file as? IrFileImpl)?.loweredUpTo = i
             }
-            context.stage = originalStage
         }
     }
 
