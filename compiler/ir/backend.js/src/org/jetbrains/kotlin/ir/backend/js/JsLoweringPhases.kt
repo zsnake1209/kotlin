@@ -452,3 +452,13 @@ val jsPhases = namedIrModulePhase(
             moveBodilessDeclarationsToSeparatePlacePhase then
             jsPerFileStages
 )
+
+fun generateTests(context: JsIrBackendContext, moduleFragment: IrModuleFragment) {
+    context.stage = 0
+    val generator = TestGenerator(context)
+    moduleFragment.files.forEach {
+        generator.lower(it)
+    }
+    context.implicitDeclarationFile.loweredUpTo = 0
+    stageController.lowerUpTo(context.implicitDeclarationFile, perFilePhaseList.size + 1)
+}

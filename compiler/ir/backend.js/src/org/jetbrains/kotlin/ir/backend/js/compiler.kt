@@ -79,13 +79,7 @@ fun compile(
 
     jsPhases.invokeToplevel(phaseConfig, context, moduleFragment)
 
-    context.stage = 0
-    val generator = TestGenerator(context)
-    moduleFragment.files.forEach {
-        generator.lower(it)
-    }
-    context.implicitDeclarationFile.loweredUpTo = 0
-    stageController.lowerUpTo(context.implicitDeclarationFile, perFilePhaseList.size + 1)
+    generateTests(context, moduleFragment)
 
     context.stage = perFilePhaseList.size + 1
     val jsProgram = moduleFragment.accept(IrModuleToJsTransformer(context), null)
