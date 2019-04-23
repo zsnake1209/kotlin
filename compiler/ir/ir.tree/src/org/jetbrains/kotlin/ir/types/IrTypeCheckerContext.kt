@@ -60,4 +60,14 @@ class IrTypeCheckerContext(override val irBuiltIns: IrBuiltIns) : IrTypeSystemCo
         // TODO remove 'Exact' annotation only
         return removeAnnotations()
     }
+
+    override fun KotlinTypeMarker.isUninferredParameter(): Boolean = false
+
+    override fun captureFromExpression(type: KotlinTypeMarker): KotlinTypeMarker? =
+        error("Captured type is unsupported in IR")
+
+    override fun SimpleTypeMarker.isPrimitiveType(): Boolean {
+        // TODO this is currently used in overload resolution only
+        return false
+    }
 }

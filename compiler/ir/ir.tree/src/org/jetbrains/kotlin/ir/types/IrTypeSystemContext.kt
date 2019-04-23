@@ -328,6 +328,14 @@ interface IrTypeSystemContext : TypeSystemInferenceExtensionContext {
     @Suppress("UNCHECKED_CAST")
     override fun intersectTypes(types: List<KotlinTypeMarker>): KotlinTypeMarker =
         makeTypeIntersection(types as List<IrType>)
+
+    override fun TypeConstructorMarker.isCapturedTypeConstructor(): Boolean = false
+
+    override fun createErrorTypeWithCustomConstructor(debugName: String, constructor: TypeConstructorMarker): KotlinTypeMarker =
+        TODO("IrTypeSystemContext doesn't support constraint system resolution")
+
+    override fun CapturedTypeMarker.captureStatus(): CaptureStatus =
+        error("Captured type is unsupported in IR")
 }
 
 fun extractTypeParameters(klass: IrDeclarationParent): List<IrTypeParameter> {
