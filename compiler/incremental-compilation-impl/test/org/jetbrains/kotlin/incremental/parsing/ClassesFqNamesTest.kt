@@ -14,21 +14,7 @@ import org.junit.Test
 import java.io.File
 
 class ClassesFqNamesTest : KtUsefulTestCase() {
-    private lateinit var workingDir: File
 
-    @Before
-    override fun setUp() {
-        super.setUp()
-        workingDir = FileUtil.createTempDirectory("ClassesFqNamesTest", null)
-    }
-
-    @After
-    override fun tearDown() {
-        workingDir.deleteRecursively()
-        super.tearDown()
-    }
-
-    @Test
     fun testSingleClass() {
         doTest(
             setOf("test.Foo"),
@@ -39,7 +25,6 @@ class ClassesFqNamesTest : KtUsefulTestCase() {
         )
     }
 
-    @Test
     fun testComplexPackage() {
         doTest(
             setOf("foo.bar.юникод.Foo"),
@@ -54,7 +39,6 @@ class ClassesFqNamesTest : KtUsefulTestCase() {
         )
     }
 
-    @Test
     fun testDifferentTypeOfClasses() {
         doTest(
             setOf("test.C", "test.I", "test.O", "test.E", "test.A"),
@@ -133,7 +117,7 @@ class ClassesFqNamesTest : KtUsefulTestCase() {
     }
 
     private fun doTest(expectedClasses: Set<String>, code: String) {
-        val testKt = File(workingDir, "test.kt")
+        val testKt = FileUtil.createTempFile("test.kt", "")
         testKt.writeText(code)
 
         val expected = expectedClasses.sorted().joinToString("\n")
