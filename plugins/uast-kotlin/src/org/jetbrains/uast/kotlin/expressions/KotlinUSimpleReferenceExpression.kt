@@ -64,7 +64,7 @@ open class KotlinUSimpleReferenceExpression(
         if (declarationDescriptor is DeclarationDescriptorWithSource) {
             declarationDescriptor.source.getPsi()?.let { it.getMaybeLightElement() ?: it }?.let { return@lz it }
         }
-        return@lz resolveDeserialized(psi, declarationDescriptor)
+        return@lz resolveDeserialized(psi, declarationDescriptor, psi.readWriteAccess())
     }
 
     override val identifier get() = psi.getReferencedName()
@@ -190,10 +190,6 @@ open class KotlinUSimpleReferenceExpression(
             val source = accessorDescriptor.toSource()
             return resolveSource(psi, accessorDescriptor, source)
         }
-    }
-
-    enum class ReferenceAccess(val isRead: Boolean, val isWrite: Boolean) {
-        READ(true, false), WRITE(false, true), READ_WRITE(true, true)
     }
 
     private fun KtExpression.readWriteAccess(): ReferenceAccess {

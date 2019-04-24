@@ -130,7 +130,11 @@ internal fun resolveToPsiClass(uElement: UElement, declarationDescriptor: Declar
     }?.toPsiType(uElement, context, true).let { PsiTypesUtil.getPsiClass(it) }
 
 
-internal fun resolveDeserialized(context: KtElement, descriptor: DeclarationDescriptor): PsiModifierListOwner? {
+internal fun resolveDeserialized(
+    context: KtElement,
+    descriptor: DeclarationDescriptor,
+    accessHint: ReferenceAccess? = null
+): PsiModifierListOwner? {
     if (descriptor !is DeserializedCallableMemberDescriptor) return null
 
     val psiClass = resolveContainingDeserializedClass(context, descriptor) ?: return null
@@ -162,9 +166,8 @@ internal fun resolveDeserialized(context: KtElement, descriptor: DeclarationDesc
             if (propertySignature != null) {
                 with(propertySignature) {
                     when {
-                        //TODO: prefer by READ/WRITE hint
-                        hasGetter() -> getter
-                        hasSetter() -> setter
+                        hasGetter() && accessHint?.isRead != false -> getter
+                        hasSetter() && accessHint?.isWrite != false -> setter
                         else -> null // it should have been handled by the previous case
                     }
                 }?.let { methodSignature ->
@@ -398,5 +401,10 @@ internal fun KotlinULambdaExpression.getFunctionalInterfaceType(): PsiType? {
 }
 
 internal fun unwrapFakeFileForLightClass(file: PsiFile): PsiFile = (file as? FakeFileForLightClass)?.ktFile ?: file
+
+// mb merge with org.jetbrains.kotlin.idea.references.ReferenceAccess ?
+internal enum class ReferenceAccess(val isRead: Boolean, val isWrite: Boolean) {
+    READ(true, false), WRITE(false, true), READ_WRITE(true, true)
+}
 
 
