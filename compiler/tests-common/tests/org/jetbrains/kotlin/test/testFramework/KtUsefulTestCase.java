@@ -103,7 +103,7 @@ public abstract class KtUsefulTestCase extends TestCase {
         String testName =  FileUtil.sanitizeFileName(getTestName(true));
         if (StringUtil.isEmptyOrSpaces(testName)) testName = "";
         testName = new File(testName).getName(); // in case the test name contains file separators
-        myTempDir = FileUtil.createTempDirectory(TEMP_DIR_MARKER, testName, false);
+        myTempDir = KotlinTestUtils.tmpDirForTest(TEMP_DIR_MARKER, testName);
         FileUtil.resetCanonicalTempPathCache(myTempDir.getPath());
         boolean isStressTest = isStressTest();
         ApplicationInfoImpl.setInStressTest(isStressTest);
@@ -126,12 +126,12 @@ public abstract class KtUsefulTestCase extends TestCase {
                 if (files != null) {
                     for (File file : files) {
                         if (!shouldKeepTmpFile(file)) {
-                            FileUtil.delete(file);
+                            KotlinTestUtils.delete(file);
                         }
                     }
                 }
             } else {
-                FileUtil.delete(myTempDir);
+                KotlinTestUtils.delete(myTempDir);
             }
         }
 
@@ -343,6 +343,14 @@ public abstract class KtUsefulTestCase extends TestCase {
             Assert.assertEquals(erroMsg, expectedString, actualString);
             Assert.fail("Warning! 'toString' does not reflect the difference.\nExpected: " + expectedString + "\nActual: " + actualString);
         }
+    }
+
+    public File tmpFile(String name) throws IOException {
+        return tmpFile(name, "");
+    }
+
+    public File tmpFile(String prefix, String suffix) throws IOException {
+        return FileUtil.createTempFile(prefix, suffix, false);
     }
 
     @SafeVarargs

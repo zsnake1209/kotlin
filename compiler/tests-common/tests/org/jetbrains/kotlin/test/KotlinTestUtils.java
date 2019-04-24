@@ -15,7 +15,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.ShutDownTracker;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.CharsetToolkit;
@@ -87,12 +89,15 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.intellij.openapi.application.PathManager.PROPERTY_CONFIG_PATH;
 import static com.intellij.openapi.application.PathManager.PROPERTY_SYSTEM_PATH;
+import static com.intellij.openapi.util.io.FileUtilRt.doIOOperation;
 import static org.jetbrains.kotlin.test.InTextDirectivesUtils.*;
 
 public class KotlinTestUtils {
@@ -419,6 +424,12 @@ public class KotlinTestUtils {
         return normalizeFile(FileUtil.createTempDirectory(testClassName, testName, false));
     }
 
+    public static File tmpDirWithAutoDelete(@NotNull String testClassName, @NotNull String testName) throws IOException {
+        File directory = FileUtil.createTempDirectory(testClassName, testName, false);
+        deleteOnShutdown(directory);
+        return normalizeFile(directory);
+    }
+
     @NotNull
     public static File tmpDirForTest(TestCase test) throws IOException {
         return tmpDirForTest(test.getClass().getSimpleName(), test.getName());
@@ -431,7 +442,14 @@ public class KotlinTestUtils {
 
     @NotNull
     public static File tmpDirForReusableFolder(String name) throws IOException {
-        return normalizeFile(FileUtil.createTempDirectory(new File(System.getProperty("java.io.tmpdir")), name, "", true));
+        File directory = FileUtil.createTempDirectory(new File(System.getProperty("java.io.tmpdir")), name, "", false);
+        deleteOnShutdown(directory);
+        return normalizeFile(directory);
+    }
+
+    @NotNull
+    public static File tmpFile(String prefix, String suffix) throws IOException {
+        return FileUtil.createTempFile(prefix, suffix);
     }
 
     private static File normalizeFile(File file) throws IOException {
@@ -445,13 +463,96 @@ public class KotlinTestUtils {
         if (filesToDelete.isEmpty()) {
             ShutDownTracker.getInstance().registerShutdownTask(() -> {
                 for (File victim : filesToDelete) {
-                    FileUtil.delete(victim);
+                    delete(victim);
                 }
             });
         }
 
         filesToDelete.add(file);
     }
+
+    public static boolean delete(@NotNull File file) {
+        return deleteRecursivelyNIO(file);
+    }
+
+    static boolean deleteRecursivelyNIO(File file) {
+        try {
+
+            Files.walkFileTree(file.toPath(), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    performDelete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    performDelete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    if (SystemInfoRt.isWindows && attrs.isOther()) {
+                        performDelete(dir);
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+
+                    return super.preVisitDirectory(dir, attrs);
+                }
+
+                private void performDelete(final Path fileObject) throws IOException {
+                    Boolean result = doIOOperation(new FileUtilRt.RepeatableIOOperation<Boolean, RuntimeException>() {
+                        @Override
+                        public Boolean execute(boolean lastAttempt) {
+                            try {
+                                Files.deleteIfExists(fileObject);
+                                return Boolean.TRUE;
+                            }
+                            catch (AccessDeniedException e) {
+                                // file is read-only: fallback to standard java.io API
+                                try {
+                                    final File file = fileObject.toFile();
+                                    if (file == null) {
+                                        return Boolean.FALSE;
+                                    }
+                                    if (file.delete() || !file.exists()) {
+                                        return Boolean.TRUE;
+                                    }
+                                }
+                                catch (Throwable ignored) {
+                                    return Boolean.FALSE;
+                                }
+                            }
+                            catch (IOException e) {
+                                //TODO: there is nothing in old reflection implementation
+                            }
+                            return lastAttempt ? Boolean.FALSE : null;
+                        }
+                    });
+                    if (!Boolean.TRUE.equals(result)) {
+                        throw new IOException("Failed to delete " + fileObject) {
+                            @Override
+                            public synchronized Throwable fillInStackTrace() {
+                                return this; // optimization: the stacktrace is not needed: the exception is used to terminate tree walking and to pass the result
+                            }
+                        };
+                    }
+                }
+
+            });
+
+        }
+        catch (NoSuchFileException e) {
+            //Nothing?
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
 
     @NotNull
     public static KtFile createFile(@NotNull @NonNls String name, @NotNull String text, @NotNull Project project) {

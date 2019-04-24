@@ -82,7 +82,7 @@ abstract class AbstractKotlinKapt3Test : CodegenTestCase() {
     }
 
     private fun createTempFile(prefix: String, suffix: String, text: String): File {
-        return FileUtil.createTempFile(prefix, suffix, false).apply {
+        return tmpFile(prefix, suffix).apply {
             writeText(text)
         }
     }

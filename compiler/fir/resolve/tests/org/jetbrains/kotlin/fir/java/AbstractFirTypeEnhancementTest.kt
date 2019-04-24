@@ -61,11 +61,6 @@ abstract class AbstractFirTypeEnhancementTest : KtUsefulTestCase() {
         javaFilesDir = KotlinTestUtils.tmpDirForTest(this)
     }
 
-    override fun tearDown() {
-        FileUtil.delete(javaFilesDir)
-        super.tearDown()
-    }
-
     private fun createJarWithForeignAnnotations(): File =
         MockLibraryUtil.compileJavaFilesLibraryToJar(FOREIGN_ANNOTATIONS_SOURCES_PATH, "foreign-annotations")
 

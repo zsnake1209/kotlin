@@ -32,7 +32,7 @@ import java.util.Arrays;
 public class CompileEnvironmentTest extends TestCase {
 
     public void testSmokeWithCompilerOutput() throws IOException {
-        File tempDir = FileUtil.createTempDirectory("compilerTest", "compilerTest");
+        File tempDir = KotlinTestUtils.tmpDirWithAutoDelete("compilerTest", "compilerTest");
         try {
             File out = new File(tempDir, "out");
             File stdlib = ForTestCompileRuntime.runtimeJarForTests();
@@ -51,7 +51,7 @@ public class CompileEnvironmentTest extends TestCase {
             assertEquals(1, files[1].listFiles().length); // SmokeKt
         }
         finally {
-            FileUtil.delete(tempDir);
+            KotlinTestUtils.delete(tempDir);
         }
     }
 

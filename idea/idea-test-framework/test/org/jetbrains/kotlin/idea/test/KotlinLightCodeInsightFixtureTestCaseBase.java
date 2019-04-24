@@ -28,6 +28,7 @@ import gnu.trove.THashSet;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.test.KotlinTestUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -70,7 +71,7 @@ public abstract class KotlinLightCodeInsightFixtureTestCaseBase extends LightCod
             @NonNls @NotNull String content,
             @NotNull Charset charset
     ) throws IOException {
-        File temp = FileUtil.createTempFile("copy", "." + ext);
+        File temp = KotlinTestUtils.tmpFile("copy", "." + ext);
         setContentOnDisk(temp, bom, content, charset);
 
         myFilesToDelete.add(temp);

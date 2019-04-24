@@ -117,7 +117,7 @@ class ClassesFqNamesTest : KtUsefulTestCase() {
     }
 
     private fun doTest(expectedClasses: Set<String>, code: String) {
-        val testKt = FileUtil.createTempFile("test.kt", "")
+        val testKt = tmpFile("test.kt")
         testKt.writeText(code)
 
         val expected = expectedClasses.sorted().joinToString("\n")

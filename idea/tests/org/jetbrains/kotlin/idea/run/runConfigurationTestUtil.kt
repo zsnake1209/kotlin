@@ -27,6 +27,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiElement
 import com.intellij.testFramework.MapDataContext
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
+import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.junit.Assert
 
 fun getJavaRunParameters(configuration: RunConfiguration): JavaParameters {
@@ -65,7 +66,7 @@ fun createLibraryWithLongPaths(project: Project): Library {
             for (i in 0..maxCommandlineLengthWindows / maxFilenameLengthWindows) {
                 val tmpFile = VirtualFileManager.constructUrl(
                     LocalFileSystem.getInstance().protocol,
-                    FileUtil.createTempFile("file$i", "a".repeat(maxFilenameLengthWindows)).path
+                    KotlinTestUtils.tmpFile("file$i", "a".repeat(maxFilenameLengthWindows)).path
                 )
                 addRoot(tmpFile, OrderRootType.CLASSES)
             }

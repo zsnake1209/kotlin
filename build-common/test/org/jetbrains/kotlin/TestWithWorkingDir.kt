@@ -18,6 +18,7 @@ package org.jetbrains.kotlin
 
 import com.intellij.openapi.util.io.FileUtil
 import junit.framework.TestCase
+import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.junit.After
 import org.junit.Before
 import java.io.File
@@ -30,7 +31,7 @@ abstract class TestWithWorkingDir : TestCase() {
     @Before
     public override fun setUp() {
         super.setUp()
-        workingDir = FileUtil.createTempDirectory(this::class.java.simpleName, null, /* deleteOnExit = */ true)
+        workingDir = KotlinTestUtils.tmpDirWithAutoDelete(this::class.java.simpleName, "")
     }
 
     @After
