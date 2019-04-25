@@ -55,7 +55,7 @@ dependencies {
         compileOnly(project(it)) { isTransitive = false }
     }
 
-    compileOnly(project(":compiler:daemon-common")) { isTransitive = false }
+    compileOnly(project(":daemon-common")) { isTransitive = false }
     compileOnly(project(":kotlin-daemon-client")) { isTransitive = false }
 
     compileOnly("com.android.tools.build:gradle:2.0.0")
