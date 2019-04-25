@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.incremental.js
 
 import org.jetbrains.kotlin.name.FqName
 import java.io.File
-import java.io.Serializable
 import java.security.MessageDigest
 
 interface IncrementalResultsConsumer {
@@ -43,8 +42,6 @@ interface IncrementalResultsConsumer {
 
     fun processPackageMetadata(packageName: String, metadata: ByteArray)
 }
-
-class JsInlineFunctionHash(val sourceFilePath: String, val fqName: String, val inlineFunctionMd5Hash: Long): Serializable
 
 class FunctionWithSourceInfo(val expression: Any, val line: Int, val column: Int) {
     val md5: Long
