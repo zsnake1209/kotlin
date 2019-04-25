@@ -195,7 +195,8 @@ abstract class Symbols<out T : CommonBackendContext>(val context: T, private val
 
     val stringPlus = getSimpleFunction(Name.identifier("plus")) {
         it.dispatchReceiverParameter == null && it.extensionReceiverParameter != null &&
-                KotlinBuiltIns.isStringOrNullableString(it.extensionReceiverParameter!!.type) && it.valueParameters.size == 1
+                KotlinBuiltIns.isStringOrNullableString(it.extensionReceiverParameter!!.type) && it.valueParameters.size == 1 &&
+                KotlinBuiltIns.isNullableAny(it.valueParameters.first().type)
     }
 
     companion object {
