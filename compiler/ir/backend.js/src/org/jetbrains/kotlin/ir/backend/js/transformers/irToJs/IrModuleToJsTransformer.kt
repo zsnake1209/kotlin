@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.utils.addIfNotNull
 
 class IrModuleToJsTransformer(
     private val backendContext: JsIrBackendContext,
-    private val mainFunctionDescriptor: FunctionDescriptor?,
+    private val mainFunction: IrSimpleFunction?,
     private val mainArguments: List<String>?
 ) : BaseIrElementToJsNodeTransformer<JsNode, Nothing?> {
 
@@ -199,13 +199,11 @@ class IrModuleToJsTransformer(
     }
 
     private fun generateCallToMain(rootContext: JsGenerationContext): List<JsStatement> {
-        if (mainFunctionDescriptor == null) return emptyList()
-
-        val functionSymbol = backendContext.symbolTable.referenceSimpleFunction(mainFunctionDescriptor)
-        require(functionSymbol.isBound)
-        val functionDeclaration = functionSymbol.owner
-        val jsName = rootContext.getNameForStaticFunction(functionDeclaration)
-        return listOf(JsInvocation(jsName.makeRef(), generateMainArguments(functionDeclaration, rootContext)).makeStmt())
+        if (mainArguments == null) return emptyList() // in case `NO_MAIN` and `main(..)` exists
+        return mainFunction?.let {
+            val jsName = rootContext.getNameForStaticFunction(it)
+            listOf(JsInvocation(jsName.makeRef(), generateMainArguments(it, rootContext)).makeStmt())
+        } ?: emptyList()
     }
 
     private fun generateImportStatements(

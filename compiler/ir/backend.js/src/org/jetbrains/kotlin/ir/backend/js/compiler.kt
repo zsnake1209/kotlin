@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.backend.common.phaser.invokeToplevel
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.idea.MainFunctionDetector
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
+import org.jetbrains.kotlin.ir.backend.js.utils.JsMainFunctionDetector
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.psi.KtFile
@@ -29,7 +30,7 @@ fun compile(
 
     val moduleDescriptor = moduleFragment.descriptor
 
-    val mainFunctionDetector = MainFunctionDetector(bindingContext, irBuiltIns.languageVersionSettings)
+    val mainFunction = JsMainFunctionDetector.getMainFunctionOrNull(moduleFragment)
 
     val context = JsIrBackendContext(moduleDescriptor, irBuiltIns, symbolTable, moduleFragment, configuration)
 
@@ -60,6 +61,6 @@ fun compile(
     jsPhases.invokeToplevel(phaseConfig, context, moduleFragment)
 
     val jsProgram =
-        moduleFragment.accept(IrModuleToJsTransformer(context, mainFunctionDetector.getMainFunction(moduleDescriptor), mainArguments), null)
+        moduleFragment.accept(IrModuleToJsTransformer(context, mainFunction, mainArguments), null)
     return jsProgram.toString()
 }
