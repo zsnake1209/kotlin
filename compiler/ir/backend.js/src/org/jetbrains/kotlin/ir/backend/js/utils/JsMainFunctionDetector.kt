@@ -38,7 +38,9 @@ object JsMainFunctionDetector {
 
             val argument = type.arguments.single() as? IrTypeProjection ?: return false
 
-            return argument.variance == Variance.INVARIANT && argument.type.isString()
+            if (argument.variance == Variance.IN_VARIANCE) return false
+
+            return argument.type.isString()
         } else {
             require(allowEmptyParameters)
 
