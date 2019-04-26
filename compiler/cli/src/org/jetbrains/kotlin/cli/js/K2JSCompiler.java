@@ -196,6 +196,13 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
             ContentRootsKt.addKotlinSourceRoot(configuration, arg, commonSources.contains(arg));
         }
 
+        if (arguments.getOutputFile() == null) {
+            messageCollector.report(ERROR, "Specify output file via -output", null);
+            return ExitCode.COMPILATION_ERROR;
+        }
+        File outputFile = new File(arguments.getOutputFile());
+        configuration.put(CommonConfigurationKeys.MODULE_NAME, FileUtil.getNameWithoutExtension(outputFile));
+
         KotlinCoreEnvironment environmentForJS =
                 KotlinCoreEnvironment.createForProduction(rootDisposable, configuration, EnvironmentConfigFiles.JS_CONFIG_FILES);
 
@@ -206,10 +213,6 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
 
         if (!checkKotlinPackageUsage(environmentForJS, sourcesFiles)) return ExitCode.COMPILATION_ERROR;
 
-        if (arguments.getOutputFile() == null) {
-            messageCollector.report(ERROR, "Specify output file via -output", null);
-            return ExitCode.COMPILATION_ERROR;
-        }
 
         if (messageCollector.hasErrors()) {
             return ExitCode.COMPILATION_ERROR;
@@ -223,10 +226,6 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
         if (arguments.getVerbose()) {
             reportCompiledSourcesList(messageCollector, sourcesFiles);
         }
-
-        File outputFile = new File(arguments.getOutputFile());
-
-        configuration.put(CommonConfigurationKeys.MODULE_NAME, FileUtil.getNameWithoutExtension(outputFile));
 
         JsConfig config = new JsConfig(project, configuration);
         JsConfig.Reporter reporter = new JsConfig.Reporter() {
