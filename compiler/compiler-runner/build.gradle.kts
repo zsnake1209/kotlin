@@ -10,6 +10,7 @@ plugins {
 
 dependencies {
     compile(project(":kotlin-build-common"))
+    compile(project(":compiler:cli-messages"))
     compileOnly(project(":daemon-common"))
     compileOnly(project(":daemon-common-new"))
     compile(projectRuntimeJar(":kotlin-daemon-client"))
