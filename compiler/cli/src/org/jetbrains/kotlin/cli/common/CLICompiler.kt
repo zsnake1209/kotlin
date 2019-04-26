@@ -24,13 +24,18 @@ import org.jetbrains.kotlin.cli.common.ExitCode.COMPILATION_ERROR
 import org.jetbrains.kotlin.cli.common.ExitCode.INTERNAL_ERROR
 import org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments
 import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.ERROR
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.INFO
 import org.jetbrains.kotlin.cli.common.messages.GroupingMessageCollector
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.common.messages.MessageCollectorUtil
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
+import org.jetbrains.kotlin.cli.metadata.MetadataSerializer
+import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.Services
+import org.jetbrains.kotlin.metadata.builtins.BuiltInsBinaryVersion
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
 import org.jetbrains.kotlin.progress.CompilationCanceledException
 import org.jetbrains.kotlin.progress.CompilationCanceledStatus
@@ -38,6 +43,7 @@ import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStat
 import org.jetbrains.kotlin.utils.KotlinPaths
 import java.io.File
 import java.io.PrintStream
+import java.util.Objects.requireNonNull
 
 abstract class CLICompiler<A : CommonCompilerArguments> : CLITool<A>() {
 
@@ -134,5 +140,17 @@ abstract class CLICompiler<A : CommonCompilerArguments> : CLITool<A>() {
         rootDisposable: Disposable,
         paths: KotlinPaths?
     ): ExitCode
+
+    protected fun serializeMetadata(environment: KotlinCoreEnvironment) {
+        requireNonNull(environment.configuration[CLIConfigurationKeys.METADATA_DESTINATION_DIRECTORY]) {
+            "METADATA_DESTINATION_DIRECTORY should be set"
+        }
+
+        requireNonNull(environment.configuration[CommonConfigurationKeys.MODULE_NAME] == null) {
+            "MODULE_NAME should be set"
+        }
+
+        MetadataSerializer(BuiltInsBinaryVersion.INSTANCE, true).serialize(environment)
+    }
 }
 

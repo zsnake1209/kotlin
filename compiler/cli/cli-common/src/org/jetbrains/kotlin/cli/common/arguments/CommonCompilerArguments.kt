@@ -274,6 +274,13 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
     )
     var checkStickyPhaseConditions: Boolean by FreezableVar(false)
 
+    @Argument(
+        value = "-Xserialize-metadata-only",
+        valueDescription = "<path>",
+        description = "Write .kotlin_metadata file to the specified folder. Skips usual code generation"
+    )
+    var serializeMetadataOnly: String? by FreezableVar(null)
+
     open fun configureAnalysisFlags(collector: MessageCollector): MutableMap<AnalysisFlag<*>, Any> {
         return HashMap<AnalysisFlag<*>, Any>().apply {
             put(AnalysisFlags.skipMetadataVersionCheck, skipMetadataVersionCheck)

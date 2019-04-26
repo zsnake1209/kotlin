@@ -38,14 +38,12 @@ import org.jetbrains.kotlin.cli.common.ExitCode;
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments;
 import org.jetbrains.kotlin.cli.common.arguments.K2JsArgumentConstants;
 import org.jetbrains.kotlin.cli.common.config.ContentRootsKt;
-import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport;
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity;
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector;
-import org.jetbrains.kotlin.cli.common.messages.MessageUtil;
+import org.jetbrains.kotlin.cli.common.messages.*;
 import org.jetbrains.kotlin.cli.common.output.OutputUtilsKt;
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles;
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment;
 import org.jetbrains.kotlin.cli.jvm.plugins.PluginCliParser;
+import org.jetbrains.kotlin.codegen.CompilationException;
 import org.jetbrains.kotlin.config.*;
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker;
 import org.jetbrains.kotlin.incremental.components.LookupTracker;
@@ -289,6 +287,24 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
 
         if (config.getConfiguration().getBoolean(JSConfigurationKeys.SOURCE_MAP)) {
             checkDuplicateSourceFileNames(messageCollector, sourcesFiles, config);
+        }
+
+        // TODO(dsavvinov): this is a temporary, a big ugly way to support generation of metadata from platform source-sets (needed
+        // in HMPP). Proper implementation would teach K2MetadataCompiler to analyze sources in a platform-specific way (like IDEA does)
+        // rather than teaching platform compilers to emit metadata instead of platform binaries.
+        if (arguments.getSerializeMetadataOnly() != null) {
+            try {
+                serializeMetadata(environmentForJS);
+            } catch (CompilationException e) {
+                messageCollector.report(
+                        EXCEPTION,
+                        OutputMessageUtil.renderException(e),
+                        MessageUtil.psiElementToMessageLocation(e.getElement())
+                );
+                return ExitCode.INTERNAL_ERROR;
+            }
+
+            return ExitCode.OK;
         }
 
         MainCallParameters mainCallParameters = createMainCallParameters(arguments.getMain());

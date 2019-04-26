@@ -37,6 +37,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinToJVMBytecodeCompiler
 import org.jetbrains.kotlin.cli.jvm.plugins.PluginCliParser
+import org.jetbrains.kotlin.cli.metadata.MetadataSerializer
 import org.jetbrains.kotlin.codegen.CompilationException
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
@@ -161,6 +162,14 @@ class K2JVMCompiler : CLICompiler<K2JVMCompilerArguments>() {
 
                 messageCollector.report(ERROR, "No source files")
                 return COMPILATION_ERROR
+            }
+
+            // TODO(dsavvinov): this is a temporary, a big ugly way to support generation of metadata from platform source-sets (needed
+            // in HMPP). Proper implementation would teach K2MetadataCompiler to analyze sources in a platform-specific way (like IDEA does)
+            // rather than teaching platform compilers to emit metadata instead of platform binaries.
+            if (arguments.serializeMetadataOnly != null) {
+                serializeMetadata(environment)
+                return OK
             }
 
             KotlinToJVMBytecodeCompiler.compileModules(environment, buildFile, moduleChunk.modules)

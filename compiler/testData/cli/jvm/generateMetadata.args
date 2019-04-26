@@ -1,0 +1,5 @@
+$TESTDATA_DIR$/generateMetadata.kt
+-d
+$TEMP_DIR$
+-Xserialize-metadata-only=$TEMP_DIR$/metadata
+

@@ -103,6 +103,8 @@ where advanced options include:
   -Xread-deserialized-contracts Enable reading of contracts from metadata
   -Xreport-output-files      Report source to output files mapping
   -Xreport-perf              Report detailed performance statistics
+  -Xserialize-metadata-only=<path>
+                             Write .kotlin_metadata file to the specified folder. Skips usual code generation
   -Xskip-metadata-version-check Load classes with bad metadata version anyway (incl. pre-release classes)
   -Xuse-experimental=<fq.name> Enable, but don't propagate usages of experimental API for marker annotation with the given fully qualified name
   -Xverbose-phases           Be verbose while performing these backend phases

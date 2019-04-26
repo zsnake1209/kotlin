@@ -1,0 +1,5 @@
+$TESTDATA_DIR$/generateMetadata.kt
+-output
+$TEMP_DIR$/out.js
+-Xserialize-metadata-only=$TEMP_DIR$/metadata
+

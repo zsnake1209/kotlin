@@ -261,6 +261,11 @@ public class CliTestGenerated extends AbstractCliTest {
             runTest("compiler/testData/cli/jvm/flagAllowingResultAsReturnType.args");
         }
 
+        @TestMetadata("generateMetadata.args")
+        public void testGenerateMetadata() throws Exception {
+            runTest("compiler/testData/cli/jvm/generateMetadata.args");
+        }
+
         @TestMetadata("help.args")
         public void testHelp() throws Exception {
             runTest("compiler/testData/cli/jvm/help.args");
@@ -687,6 +692,11 @@ public class CliTestGenerated extends AbstractCliTest {
         @TestMetadata("emptySources.args")
         public void testEmptySources() throws Exception {
             runTest("compiler/testData/cli/js/emptySources.args");
+        }
+
+        @TestMetadata("generateMetadata.args")
+        public void testGenerateMetadata() throws Exception {
+            runTest("compiler/testData/cli/js/generateMetadata.args");
         }
 
         @TestMetadata("inlineCycle.args")

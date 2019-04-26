@@ -24,6 +24,7 @@ fun <A : CommonCompilerArguments> CompilerConfiguration.setupCommonArguments(
     put(CommonConfigurationKeys.DISABLE_INLINE, arguments.noInline)
     putIfNotNull(CLIConfigurationKeys.INTELLIJ_PLUGIN_ROOT, arguments.intellijPluginRoot)
     put(CommonConfigurationKeys.REPORT_OUTPUT_FILES, arguments.reportOutputFiles)
+    putIfNotNull(CLIConfigurationKeys.METADATA_DESTINATION_DIRECTORY, arguments.serializeMetadataOnly?.let(::File))
 
     val metadataVersionString = arguments.metadataVersion
     if (metadataVersionString != null) {
