@@ -40,6 +40,7 @@ abstract class KotlinAbstractUElement(private val givenParent: UElement?) : Kotl
     }
 
     protected open fun convertParent(): UElement? {
+        @Suppress("DEPRECATION")
         val psi = psi //TODO: `psi` is deprecated but it seems that it couldn't be simply replaced for this case
         var parent = psi?.parent ?: psi?.containingFile
 
@@ -226,7 +227,7 @@ abstract class KotlinAbstractUExpression(givenParent: UElement?) :
 
     override val annotations: List<UAnnotation>
         get() {
-            val annotatedExpression = psi?.parent as? KtAnnotatedExpression ?: return emptyList()
+            val annotatedExpression = sourcePsi?.parent as? KtAnnotatedExpression ?: return emptyList()
             return annotatedExpression.annotationEntries.map { KotlinUAnnotation(it, this) }
         }
 }

@@ -201,7 +201,6 @@ internal object KotlinConverter {
                                    givenParent: UElement?,
                                    expectedTypes: Array<out Class<out UElement>>
     ): UElement? {
-        @Suppress("UNCHECKED_CAST")
         fun <P : PsiElement> build(ctor: (P, UElement?) -> UElement): () -> UElement? {
             return {
                 @Suppress("UNCHECKED_CAST")
@@ -309,7 +308,6 @@ internal object KotlinConverter {
                                    givenParent: UElement?,
                                    requiredType: Array<out Class<out UElement>>
     ): UExpression? {
-        @Suppress("UNCHECKED_CAST")
         fun <P : PsiElement> build(ctor: (P, UElement?) -> UExpression): () -> UExpression? {
             return {
                 @Suppress("UNCHECKED_CAST")
@@ -456,19 +454,16 @@ internal object KotlinConverter {
         givenParent: UElement?,
         expectedTypes: Array<out Class<out UElement>>
     ): UElement? {
-        @Suppress("UNCHECKED_CAST")
         fun <P : PsiElement> build(ctor: (P, UElement?) -> UElement): () -> UElement? = {
             @Suppress("UNCHECKED_CAST")
             ctor(element as P, givenParent)
         }
 
-        @Suppress("UNCHECKED_CAST")
         fun <P : PsiElement, K : KtElement> buildKt(ktElement: K, ctor: (P, K, UElement?) -> UElement): () -> UElement? = {
             @Suppress("UNCHECKED_CAST")
             ctor(element as P, ktElement, givenParent)
         }
 
-        @Suppress("UNCHECKED_CAST")
         fun <P : PsiElement, K : KtElement> buildKtOpt(ktElement: K?, ctor: (P, K?, UElement?) -> UElement): () -> UElement? = {
             @Suppress("UNCHECKED_CAST")
             ctor(element as P, ktElement, givenParent)
@@ -645,7 +640,6 @@ internal object KotlinConverter {
     internal fun KtPsiFactory.createAnalyzableProperty(text: String, context: PsiElement): KtProperty =
             createAnalyzableDeclaration(text, context)
 
-    @Suppress("UNCHECKED_CAST")
     internal fun <TDeclaration : KtDeclaration> KtPsiFactory.createAnalyzableDeclaration(text: String, context: PsiElement): TDeclaration {
         val file = createAnalyzableFile("dummy.kt", text, context)
         val declarations = file.declarations

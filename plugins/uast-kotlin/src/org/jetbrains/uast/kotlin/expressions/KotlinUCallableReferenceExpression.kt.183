@@ -50,6 +50,6 @@ class KotlinUCallableReferenceExpression(
 
     override fun resolve() = sourcePsi.callableReference.resolveCallToDeclaration()
 
-    override fun multiResolve(): Iterable<ResolveResult> = getResolveResultVariants(psi.callableReference)
+    override fun multiResolve(): Iterable<ResolveResult> = getResolveResultVariants(sourcePsi.callableReference)
 
 }
