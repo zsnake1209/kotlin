@@ -9,7 +9,7 @@ dependencies {
     compile(project(":kotlin-build-common"))
     compile(project(":core:descriptors"))
     compile(project(":core:descriptors.jvm"))
-    compile(project(":kotlin-compiler-runner"))
+    compile(project(":kotlin-compiler-runner")) { isTransitive = false }
     compile(project(":daemon-common"))
     compile(project(":daemon-common-new"))
     compile(projectRuntimeJar(":kotlin-daemon-client"))
