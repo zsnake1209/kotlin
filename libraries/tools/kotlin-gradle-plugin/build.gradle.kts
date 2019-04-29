@@ -58,21 +58,7 @@ dependencies {
         jarContents(compileOnly(project(it)) { isTransitive = false })
     }
 
-    compileOnly(project(":daemon-common")) { isTransitive = false }
-    compileOnly(project(":kotlin-daemon-client")) { isTransitive = false }
-
-    compileOnly("com.android.tools.build:gradle:2.0.0")
-    compileOnly("com.android.tools.build:gradle-core:2.0.0")
-    compileOnly("com.android.tools.build:builder:2.0.0")
-    compileOnly("com.android.tools.build:builder-model:2.0.0")
-    compileOnly("org.codehaus.groovy:groovy-all:2.4.12")
     compileOnly(gradleApi())
-
-    runtime(projectRuntimeJar(":kotlin-compiler-embeddable"))
-    runtime(projectRuntimeJar(":kotlin-annotation-processing-gradle"))
-    runtime(projectRuntimeJar(":kotlin-android-extensions"))
-    runtime(projectRuntimeJar(":kotlin-scripting-compiler-embeddable"))
-    runtime(projectRuntimeJar(":kotlin-scripting-compiler-impl-embeddable"))
     runtime(project(":kotlin-reflect"))
 
     jarContents(compileOnly(intellijDep()) {
