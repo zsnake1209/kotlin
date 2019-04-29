@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    compile(project(":kotlin-build-common"))
+    compile(project(":kotlin-build-base"))
     compile(project(":compiler:cli-messages"))
     compileOnly(project(":daemon-common"))
     compileOnly(project(":daemon-common-new"))
