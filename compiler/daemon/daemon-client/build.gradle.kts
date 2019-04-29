@@ -24,7 +24,7 @@ dependencies {
     compileOnly(project(":compiler:util"))
     compileOnly(project(":compiler:cli-common"))
     compileOnly(project(":daemon-common"))
-    compileOnly(project(":js:js.frontend"))
+    compileOnly(project(":compiler:ic:ic-js-base"))
     compileOnly(commonDep("net.rubygrapefruit", "native-platform"))
 
     embedded(project(":daemon-common")) { isTransitive = false }
