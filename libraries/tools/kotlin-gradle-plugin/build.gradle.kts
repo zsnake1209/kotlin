@@ -44,6 +44,7 @@ val compilerModulesToInclude =
 dependencies {
     compile(project(":kotlin-gradle-plugin-api"))
     compile(project(":kotlin-gradle-plugin-model"))
+    compile(project(":kotlin-compiler-runner"))
 
     compile(kotlinStdlib())
     compile(project(":kotlin-native:kotlin-native-utils"))
