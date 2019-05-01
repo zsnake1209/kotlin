@@ -133,8 +133,9 @@ open class DefaultArgumentStubGenerator(
                     endOffset = irFunction.endOffset,
                     type = context.irBuiltIns.unitType,
                     symbol = irFunction.symbol, descriptor = irFunction.symbol.descriptor,
-                    typeArgumentsCount = newIrFunction.typeParameters.size
+                    typeArgumentsCount = newIrFunction.parentAsClass.typeParameters.size + newIrFunction.typeParameters.size
                 ).apply {
+                    passTypeArgumentsFrom(newIrFunction.parentAsClass)
                     passTypeArgumentsFrom(newIrFunction)
                     dispatchReceiver = newIrFunction.dispatchReceiverParameter?.let { irGet(it) }
 
@@ -427,9 +428,6 @@ private fun IrFunction.generateDefaultsFunctionImpl(
         )
     }
 
-    if (this is IrConstructor) {
-        newFunction.copyTypeParametersFrom(this.parentAsClass)
-    }
     newFunction.copyTypeParametersFrom(this)
     val newValueParameters = valueParameters.map { it.copyTo(newFunction) } + syntheticParameters
     newValueParameters.forEach {
