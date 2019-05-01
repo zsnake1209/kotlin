@@ -12,8 +12,13 @@ import org.jetbrains.kotlin.backend.jvm.lower.allOverridden
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
 import org.jetbrains.kotlin.codegen.*
+import org.jetbrains.kotlin.codegen.AsmUtil.LABELED_THIS_PARAMETER
+import org.jetbrains.kotlin.codegen.AsmUtil.RECEIVER_PARAMETER_NAME
 import org.jetbrains.kotlin.codegen.inline.DefaultSourceMapper
 import org.jetbrains.kotlin.codegen.signature.BothSignatureWriter
+import org.jetbrains.kotlin.codegen.state.GenerationState
+import org.jetbrains.kotlin.config.LanguageFeature
+import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
@@ -24,11 +29,15 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.load.java.JavaVisibilities
 import org.jetbrains.kotlin.load.kotlin.TypeMappingMode
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmClassSignature
+import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterKind
+import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.kotlin.resolve.source.PsiSourceElement
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import org.jetbrains.org.objectweb.asm.MethodVisitor
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
 import java.util.ArrayList
@@ -162,7 +171,7 @@ private fun IrDeclarationWithVisibility.specialCaseVisibility(kind: OwnerKind?):
 //        return ACC_PUBLIC
 //    }
     if (this is IrClass && Visibilities.isPrivate(visibility) &&
-            parent.safeAs<IrClass>()?.let { it.isInterface } ?: false) { // TODO: non-intrinsic
+            parent.safeAs<IrClass>()?.isInterface ?: false) { // TODO: non-intrinsic
         return Opcodes.ACC_PUBLIC
     }
 
