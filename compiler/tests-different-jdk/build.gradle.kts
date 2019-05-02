@@ -45,7 +45,7 @@ codegenTest(target = 6, jvm = 6, jdk = "JDK_18") {
     systemProperty("kotlin.test.default.jvm.target", "1.6")
     systemProperty("kotlin.test.java.compilation.target", "1.6")
 
-    val port = project.findProperty("kotlin.compiler.codegen.tests.port") ?: "5100"
+    val port = project.findProperty("kotlin.compiler.codegen.tests.port") ?: "5101"
     systemProperty("kotlin.test.box.in.separate.process.port", port)
     systemProperty("kotlin.test.box.in.separate.process.server.classpath", testJvm6ServerRuntime.asPath)
 }

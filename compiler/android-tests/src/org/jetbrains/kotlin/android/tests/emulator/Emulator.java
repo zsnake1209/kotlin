@@ -34,6 +34,7 @@ public class Emulator {
 
     public static final String ARM = "arm";
     public static final String X86 = "x86";
+    private static final String AVD_NAME = "kotlin_box_test_avd";
 
     private final static Pattern EMULATOR_PATTERN = Pattern.compile("emulator-([0-9])*");
 
@@ -47,20 +48,19 @@ public class Emulator {
 
     private GeneralCommandLine getCreateCommand() {
         GeneralCommandLine commandLine = new GeneralCommandLine();
-        String androidCmdName = SystemInfo.isWindows ? "android.bat" : "android";
+        String androidCmdName = "bin/avdmanager";
         commandLine.setExePath(pathManager.getToolsFolderInAndroidSdk() + "/" + androidCmdName);
         commandLine.addParameter("create");
         commandLine.addParameter("avd");
         commandLine.addParameter("--force");
         commandLine.addParameter("-n");
-        commandLine.addParameter("my_avd");
+        commandLine.addParameter(AVD_NAME);
         commandLine.addParameter("-p");
         commandLine.addParameter(pathManager.getAndroidEmulatorRoot());
-        commandLine.addParameter("-t");
-        commandLine.addParameter("1");
-
         commandLine.addParameter("-b");
         commandLine.addParameter(getEmulatorAbi());
+        commandLine.addParameter("-k");
+        commandLine.addParameter("system-images;android-19;default;x86");
         return commandLine;
     }
 
@@ -73,7 +73,7 @@ public class Emulator {
         String emulatorCmdName = SystemInfo.isWindows ? "emulator.exe" : "emulator";
         commandLine.setExePath(pathManager.getToolsFolderInAndroidSdk() + "/" + emulatorCmdName);
         commandLine.addParameter("-avd");
-        commandLine.addParameter("my_avd");
+        commandLine.addParameter(AVD_NAME);
         if (platform != X86) {
             //problem with qemu options
             commandLine.addParameter("-no-audio");
