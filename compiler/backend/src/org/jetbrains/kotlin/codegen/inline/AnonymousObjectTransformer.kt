@@ -163,9 +163,13 @@ class AnonymousObjectTransformer(
         }
 
         deferringMethods.forEach { method ->
+            val continuationToRemove = CoroutineTransformer.findFakeContinuationConstructorClassName(method.intermediate)
             coroutineTransformer.replaceFakesWithReals(method.intermediate)
             removeFinallyMarkers(method.intermediate)
             method.visitEnd()
+            if (continuationToRemove != null && coroutineTransformer.safeToRemoveContinuationClass(method.intermediate)) {
+                transformationResult.addClassToRemove(continuationToRemove)
+            }
         }
 
         SourceMapper.flushToClassBuilder(sourceMapper, classBuilder)

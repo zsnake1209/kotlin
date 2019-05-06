@@ -215,6 +215,9 @@ class CoroutineTransformer(
     fun unregisterClassBuilder(continuationClassName: String) =
         (inliningContext as RegeneratedClassContext).continuationBuilders.remove(continuationClassName)
 
+    // If tail-call optimization took place, we do not need continuation class anymore, unless it is used by $$forInline method
+    fun safeToRemoveContinuationClass(method: MethodNode): Boolean = !generateForInline && !isStateMachine(method)
+
     companion object {
         fun findFakeContinuationConstructorClassName(node: MethodNode): String? {
             val marker = node.instructions.asSequence().firstOrNull(::isBeforeFakeContinuationConstructorCallMarker) ?: return null
