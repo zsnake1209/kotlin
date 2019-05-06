@@ -43,6 +43,11 @@ public class IrInlineSuspendTestsGenerated extends AbstractIrInlineSuspendTests 
         runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/crossinlineSuspendLambdaInsideCrossinlineSuspendLambda.kt", "kotlin.coroutines");
     }
 
+    @TestMetadata("enclodingMethod.kt")
+    public void testEnclodingMethod_1_3() throws Exception {
+        runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/enclodingMethod.kt", "kotlin.coroutines");
+    }
+
     @TestMetadata("inlineOrdinaryOfCrossinlineSuspend.kt")
     public void testInlineOrdinaryOfCrossinlineSuspend_1_3() throws Exception {
         runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/inlineOrdinaryOfCrossinlineSuspend.kt", "kotlin.coroutines");
