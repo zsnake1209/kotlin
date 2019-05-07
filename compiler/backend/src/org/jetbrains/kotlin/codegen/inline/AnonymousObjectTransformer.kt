@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.coroutines.DEBUG_METADATA_ANNOTATION_ASM_TYPE
 import org.jetbrains.kotlin.codegen.coroutines.isCapturedSuspendLambda
 import org.jetbrains.kotlin.codegen.coroutines.isCoroutineSuperClass
+import org.jetbrains.kotlin.codegen.coroutines.isResumeImplMethodName
 import org.jetbrains.kotlin.codegen.inline.coroutines.CoroutineTransformer
 import org.jetbrains.kotlin.codegen.inline.coroutines.FOR_INLINE_SUFFIX
 import org.jetbrains.kotlin.codegen.serialization.JvmCodegenStringTable
@@ -239,7 +240,16 @@ class AnonymousObjectTransformer(
 
     private fun writeOuterInfo(visitor: ClassVisitor) {
         val info = inliningContext.callSiteInfo
-        visitor.visitOuterClass(info.ownerClassName, info.functionName?.removeSuffix(FOR_INLINE_SUFFIX), info.functionDesc)
+        if (info.functionName?.endsWith(FOR_INLINE_SUFFIX) == true &&
+            // call site is suspend function
+            (continuationClassName != null ||
+                    // or suspend lambda
+                    languageVersionSettings.isResumeImplMethodName(info.functionName.removeSuffix(FOR_INLINE_SUFFIX)))
+        ) {
+            visitor.visitOuterClass(info.ownerClassName, info.functionName.removeSuffix(FOR_INLINE_SUFFIX), info.functionDesc)
+        } else {
+            visitor.visitOuterClass(info.ownerClassName, info.functionName, info.functionDesc)
+        }
     }
 
     private fun inlineMethodAndUpdateGlobalResult(
