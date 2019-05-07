@@ -108,11 +108,6 @@ public class IrInlineSuspendTestsGenerated extends AbstractIrInlineSuspendTests 
         runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/returnValue.kt", "kotlin.coroutines");
     }
 
-    @TestMetadata("tcoContinuation.kt")
-    public void testTcoContinuation_1_3() throws Exception {
-        runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/tcoContinuation.kt", "kotlin.coroutines");
-    }
-
     @TestMetadata("tryCatchStackTransform.kt")
     public void testTryCatchStackTransform_1_3() throws Exception {
         runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/tryCatchStackTransform.kt", "kotlin.coroutines");

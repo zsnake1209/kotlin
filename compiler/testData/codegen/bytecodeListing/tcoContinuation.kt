@@ -1,10 +1,8 @@
-// IGNORE_BACKEND: JVM_IR
-// FILE: flow.kt
 // COMMON_COROUTINES_TEST
-// FULL_JDK
 // WITH_RUNTIME
 // WITH_COROUTINES
-package flow
+
+// There should be no $foo$$inlined$map$1$1 class
 
 interface FlowCollector<T> {
     suspend fun emit(value: T)
@@ -33,24 +31,10 @@ public inline fun <T, R> Flow<T>.transform(crossinline transformer: suspend Flow
 
 public inline fun <T, R> Flow<T>.map(crossinline transformer: suspend (value: T) -> R): Flow<R> = transform { value -> return@transform emit(transformer(value)) }
 
-// FILE: box.kt
-// COMMON_COROUTINES_TEST
-
-import flow.*
-
 suspend fun foo() {
     flow<Int> {
         emit(1)
     }.map { it + 1 }
         .collect {
         }
-}
-
-fun box() : String {
-    try {
-        Class.forName("BoxKt\$foo\$\$inlined\$map\$1\$1")
-        return "FAIL"
-    } catch (ignored: ClassNotFoundException) {
-        return "OK"
-    }
 }

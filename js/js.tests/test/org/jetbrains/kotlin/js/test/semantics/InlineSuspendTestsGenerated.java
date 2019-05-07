@@ -178,16 +178,6 @@ public class InlineSuspendTestsGenerated extends AbstractInlineSuspendTests {
         runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/returnValue.kt", "kotlin.coroutines");
     }
 
-    @TestMetadata("tcoContinuation.kt")
-    public void testTcoContinuation_1_2() throws Exception {
-        runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/tcoContinuation.kt", "kotlin.coroutines.experimental");
-    }
-
-    @TestMetadata("tcoContinuation.kt")
-    public void testTcoContinuation_1_3() throws Exception {
-        runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/tcoContinuation.kt", "kotlin.coroutines");
-    }
-
     @TestMetadata("tryCatchStackTransform.kt")
     public void testTryCatchStackTransform_1_2() throws Exception {
         runTestWithPackageReplacement("compiler/testData/codegen/boxInline/suspend/tryCatchStackTransform.kt", "kotlin.coroutines.experimental");
