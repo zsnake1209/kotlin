@@ -240,13 +240,8 @@ class AnonymousObjectTransformer(
 
     private fun writeOuterInfo(visitor: ClassVisitor) {
         val info = inliningContext.callSiteInfo
-        if (info.functionName?.endsWith(FOR_INLINE_SUFFIX) == true &&
-            // call site is suspend function
-            (continuationClassName != null ||
-                    // or suspend lambda
-                    languageVersionSettings.isResumeImplMethodName(info.functionName.removeSuffix(FOR_INLINE_SUFFIX)))
-        ) {
-            visitor.visitOuterClass(info.ownerClassName, info.functionName.removeSuffix(FOR_INLINE_SUFFIX), info.functionDesc)
+        if (info.isSuspend && info.isInlineOrInsideInline) {
+            visitor.visitOuterClass(info.ownerClassName, info.functionName?.removeSuffix(FOR_INLINE_SUFFIX), info.functionDesc)
         } else {
             visitor.visitOuterClass(info.ownerClassName, info.functionName, info.functionDesc)
         }
@@ -293,7 +288,8 @@ class AnonymousObjectTransformer(
                 transformationInfo.oldClassName,
                 sourceNode.name,
                 if (isConstructor) transformationInfo.newConstructorDescriptor else sourceNode.desc,
-                inliningContext.callSiteInfo.isInlineOrInsideInline
+                inliningContext.callSiteInfo.isInlineOrInsideInline,
+                isSuspendFunctionOrLambda(sourceNode)
             ), null
         )
 
@@ -302,6 +298,12 @@ class AnonymousObjectTransformer(
         deferringVisitor.visitMaxs(-1, -1)
         return result
     }
+
+    private fun isSuspendFunctionOrLambda(sourceNode: MethodNode): Boolean =
+        (sourceNode.desc.endsWith(";Lkotlin/coroutines/Continuation;)Ljava/lang/Object;") ||
+                sourceNode.desc.endsWith(";Lkotlin/coroutines/experimental/Continuation;)Ljava/lang/Object;")) &&
+                (CoroutineTransformer.findFakeContinuationConstructorClassName(sourceNode) != null ||
+                        languageVersionSettings.isResumeImplMethodName(sourceNode.name.removeSuffix(FOR_INLINE_SUFFIX)))
 
     private fun generateConstructorAndFields(
         classBuilder: ClassBuilder,
