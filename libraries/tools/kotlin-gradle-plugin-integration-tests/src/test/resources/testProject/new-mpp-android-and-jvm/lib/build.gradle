@@ -1,0 +1,54 @@
+group 'com.example.mpplib'
+version '1.0.0'
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-multiplatform'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    testImplementation 'junit:junit:4.12'
+}
+
+def complexLibAttribute = Attribute.of('org.jetbrains.qa.complexlib', String)
+
+kotlin {
+    android('androidLib') {
+        attributes { attribute(complexLibAttribute, 'andrLib') }
+    }
+    jvm('jvmLib') {
+        attributes { attribute(complexLibAttribute, 'jvmLib') }
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation kotlin('stdlib-common')
+            }
+        }
+        jvmLibMain {
+            dependencies {
+                implementation kotlin('stdlib-jdk8')
+            }
+        }
+        androidLibMain {
+            dependencies {
+                implementation kotlin('stdlib')
+            }
+        }
+    }
+}
