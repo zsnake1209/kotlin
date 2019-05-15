@@ -405,7 +405,6 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
 
         if (defaultsOnly) return
 
-        args.allowNoSourceFiles = true
         args.classpathAsList = try {
             compileClasspath.toList()
         } catch (e: Exception) {
@@ -427,6 +426,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
         val messageCollector = GradlePrintingMessageCollector(logger)
         val outputItemCollector = OutputItemsCollectorImpl()
         val compilerRunner = compilerRunner()
+        args.allowNoSourceFiles = true
 
         val icEnv = if (incremental) {
             logger.info(USING_JVM_INCREMENTAL_COMPILATION_MESSAGE)
