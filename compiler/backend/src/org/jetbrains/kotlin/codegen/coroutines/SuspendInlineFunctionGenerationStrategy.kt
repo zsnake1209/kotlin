@@ -10,11 +10,13 @@ import org.jetbrains.kotlin.codegen.ExpressionCodegen
 import org.jetbrains.kotlin.codegen.FunctionCodegen
 import org.jetbrains.kotlin.codegen.FunctionGenerationStrategy
 import org.jetbrains.kotlin.codegen.TransformationMethodVisitor
+import org.jetbrains.kotlin.codegen.inline.MaxStackFrameSizeAndLocalsCalculator
 import org.jetbrains.kotlin.codegen.inline.coroutines.FOR_INLINE_SUFFIX
 import org.jetbrains.kotlin.codegen.inline.coroutines.findReceiverOfInvoke
 import org.jetbrains.kotlin.codegen.inline.coroutines.surroundInvokesWithSuspendMarkers
 import org.jetbrains.kotlin.codegen.inline.isInvokeOnLambda
 import org.jetbrains.kotlin.codegen.optimization.common.asSequence
+import org.jetbrains.kotlin.codegen.optimization.fixStack.FixStackMethodTransformer
 import org.jetbrains.kotlin.codegen.optimization.transformer.MethodTransformer
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.config.JVMConstructorCallNormalizationMode
@@ -100,9 +102,14 @@ private class SurroundSuspendParameterCallsWithSuspendMarkersMethodVisitor(
 ): TransformationMethodVisitor(delegate, access, name, desc, null, null) {
     override fun performTransformations(methodNode: MethodNode) {
         fun AbstractInsnNode.index() = methodNode.instructions.indexOf(this)
-        fun AbstractInsnNode.isSuspendParameter() = opcode == Opcodes.ALOAD &&
-                (this as VarInsnNode).`var` - (if (methodNode.access and Opcodes.ACC_STATIC != 0) 0 else 1) < valueParameters.size &&
-                valueParameters[`var`].type.isSuspendFunctionTypeOrSubtype
+        fun AbstractInsnNode.isSuspendParameter(): Boolean {
+            if (this !is VarInsnNode) return false
+            val index = `var` - (if (methodNode.access and Opcodes.ACC_STATIC != 0) 0 else 1)
+            return opcode == Opcodes.ALOAD && index < valueParameters.size && !valueParameters[index].isNoinline &&
+                    valueParameters[index].type.isSuspendFunctionTypeOrSubtype
+        }
+
+        FixStackMethodTransformer().transform(thisName, methodNode)
 
         val sourceFrames = MethodTransformer.analyze(thisName, methodNode, SourceInterpreter())
 
