@@ -53,7 +53,8 @@ fun compileWasm(
     ExternalDependenciesGenerator(
         moduleDescriptor = moduleDescriptor,
         symbolTable = symbolTable,
-        irBuiltIns = irBuiltIns
+        irBuiltIns = irBuiltIns,
+        deserializer = deserializer
     ).generateUnboundSymbolsAsDependencies()
     moduleFragment.patchDeclarationParents()
 

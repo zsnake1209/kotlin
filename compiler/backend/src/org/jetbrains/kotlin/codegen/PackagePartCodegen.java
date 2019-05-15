@@ -123,7 +123,9 @@ public class PackagePartCodegen extends MemberCodegen<KtFile> {
     ) {
         List<MemberDescriptor> members = CodegenUtil.getMemberDescriptorsToGenerate(codegen.element, codegen.bindingContext);
 
-        JvmSerializerExtension extension = new JvmSerializerExtension(codegen.v.getSerializationBindings(), codegen.state);
+        JvmSerializerExtension extension = new JvmSerializerExtension(
+                codegen.v.getSerializationBindings(), codegen.state, codegen.state.getTypeMapper(), (descriptor) -> null
+        );
         DescriptorSerializer serializer = DescriptorSerializer.createTopLevel(extension);
         ProtoBuf.Package.Builder builder = serializer.packagePartProto(codegen.element.getPackageFqName(), members);
         extension.serializeJvmPackage(builder, packagePartType);

@@ -61,7 +61,8 @@ fun compile(
     ExternalDependenciesGenerator(
         moduleDescriptor = moduleDescriptor,
         symbolTable = symbolTable,
-        irBuiltIns = irBuiltIns
+        irBuiltIns = irBuiltIns,
+        deserializer = null
     ).generateUnboundSymbolsAsDependencies()
     moduleFragment.patchDeclarationParents()
 

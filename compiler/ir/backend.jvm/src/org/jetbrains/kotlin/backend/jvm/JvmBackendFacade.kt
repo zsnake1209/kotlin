@@ -7,16 +7,21 @@ package org.jetbrains.kotlin.backend.jvm
 
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
+import org.jetbrains.kotlin.backend.common.EmptyLoggingContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen
 import org.jetbrains.kotlin.backend.jvm.lower.MultifileFacadeFileEntry
+import org.jetbrains.kotlin.backend.jvm.serialization.JvmIrDeserializer
+//import org.jetbrains.kotlin.backend.jvm.serialization.JvmIrDeserializer
 import org.jetbrains.kotlin.codegen.CompilationErrorHandler
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.MetadataSource
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
+import org.jetbrains.kotlin.ir.util.IrDeserializer
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.render
@@ -37,9 +42,10 @@ object JvmBackendFacade {
     ) {
         val psi2ir = Psi2IrTranslator(state.languageVersionSettings, facadeClassGenerator = ::facadeClassGenerator)
         val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = JvmGeneratorExtensions)
-        val irModuleFragment = psi2ir.generateModuleFragment(psi2irContext, files)
+        val deserializer = JvmIrDeserializer(state.module, EmptyLoggingContext, psi2irContext.irBuiltIns, psi2irContext.symbolTable, state.languageVersionSettings)
+        val irModuleFragment = psi2ir.generateModuleFragment(psi2irContext, files, deserializer)
 
-        doGenerateFilesInternal(state, errorHandler, irModuleFragment, psi2irContext, phaseConfig)
+        doGenerateFilesInternal(state, errorHandler, irModuleFragment, psi2irContext, phaseConfig, deserializer)
     }
 
     internal fun doGenerateFilesInternal(
@@ -47,10 +53,11 @@ object JvmBackendFacade {
         errorHandler: CompilationErrorHandler,
         irModuleFragment: IrModuleFragment,
         psi2irContext: GeneratorContext,
-        phaseConfig: PhaseConfig
+        phaseConfig: PhaseConfig,
+        deserializer: IrDeserializer?
     ) {
         doGenerateFilesInternal(
-            state, errorHandler, irModuleFragment, psi2irContext.symbolTable, psi2irContext.sourceManager, phaseConfig
+            state, errorHandler, irModuleFragment, psi2irContext.symbolTable, psi2irContext.sourceManager, phaseConfig, deserializer
         )
     }
 
@@ -61,6 +68,7 @@ object JvmBackendFacade {
         symbolTable: SymbolTable,
         sourceManager: PsiSourceManager,
         phaseConfig: PhaseConfig,
+        deserializer: IrDeserializer? = null,
         firMode: Boolean = false
     ) {
         val context = JvmBackendContext(
@@ -78,8 +86,16 @@ object JvmBackendFacade {
             symbolTable,
             irModuleFragment.irBuiltins,
             JvmGeneratorExtensions.externalDeclarationOrigin,
+            deserializer,
             facadeClassGenerator = ::facadeClassGenerator
         ).generateUnboundSymbolsAsDependencies()
+
+        for (irFile in irModuleFragment.files) {
+            irFile.metadata?.serializedIr = serializeIrFile(context, irFile)
+            for (irClass in irFile.declarations.filterIsInstance<IrClass>()) {
+                (irClass.metadata as? MetadataSource.Class)?.serializedIr = serializeToplevelIrClass(context, irClass)
+            }
+        }
 
         for (irFile in irModuleFragment.files) {
             for (extension in IrGenerationExtension.getInstances(context.state.project)) {
