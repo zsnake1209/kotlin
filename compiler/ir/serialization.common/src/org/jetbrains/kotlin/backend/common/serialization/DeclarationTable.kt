@@ -57,7 +57,7 @@ abstract class GlobalDeclarationTable(private val mangler: KotlinMangler, privat
 }
 
 class DeclarationTable(
-    private val descriptorTable: DescriptorTable,
+    val descriptorTable: DescriptorTable,
     private val globalDeclarationTable: GlobalDeclarationTable,
     startIndex: Long
 ) {

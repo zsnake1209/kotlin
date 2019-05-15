@@ -965,7 +965,7 @@ abstract class IrFileDeserializer(
             }
         }
 
-    private fun deserializeIrClass(proto: ProtoClass) =
+    fun deserializeIrClass(proto: ProtoClass) =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
             val modality = deserializeModality(proto.modality)
 
@@ -1123,7 +1123,7 @@ abstract class IrFileDeserializer(
             "internal" -> Visibilities.INTERNAL
             "invisible_fake" -> Visibilities.INVISIBLE_FAKE // TODO: eventually we should not serialize fake overrides, so this will be gone.
             "local" -> Visibilities.LOCAL
-            else -> error("Unexpected visibility value: $value")
+            else -> error("Unexpected visibility value: ${deserializeString(value.name)}")
         }
     }
 

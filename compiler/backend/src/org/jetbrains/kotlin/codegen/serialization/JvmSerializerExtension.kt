@@ -43,7 +43,8 @@ import org.jetbrains.org.objectweb.asm.commons.Method
 class JvmSerializerExtension @JvmOverloads constructor(
     private val bindings: JvmSerializationBindings,
     state: GenerationState,
-    private val typeMapper: KotlinTypeMapperBase = state.typeMapper
+    private val typeMapper: KotlinTypeMapperBase = state.typeMapper,
+    private val uniqIdProvider: ((DeclarationDescriptor) -> JvmProtoBuf.DescriptorUniqId?) = { null }
 ) : SerializerExtension() {
     private val globalBindings = state.globalSerializationBindings
     private val codegenBinding = state.bindingContext
@@ -80,6 +81,9 @@ class JvmSerializerExtension @JvmOverloads constructor(
     ) {
         if (moduleName != JvmProtoBufUtil.DEFAULT_MODULE_NAME) {
             proto.setExtension(JvmProtoBuf.classModuleName, stringTable.getStringIndex(moduleName))
+        }
+        uniqIdProvider(descriptor)?.let {
+            proto.setExtension(JvmProtoBuf.classUniqId, it)
         }
 
         val containerAsmType =
@@ -169,6 +173,9 @@ class JvmSerializerExtension @JvmOverloads constructor(
                 proto.setExtension(JvmProtoBuf.constructorSignature, signature)
             }
         }
+        uniqIdProvider(descriptor)?.let {
+            proto.setExtension(JvmProtoBuf.constructorUniqId, it)
+        }
     }
 
     override fun serializeFunction(
@@ -187,6 +194,10 @@ class JvmSerializerExtension @JvmOverloads constructor(
 
         if (descriptor.needsInlineParameterNullCheckRequirement()) {
             versionRequirementTable?.writeInlineParameterNullCheckRequirement(proto::addVersionRequirement)
+        }
+
+        uniqIdProvider(descriptor)?.let {
+            proto.setExtension(JvmProtoBuf.functionUniqId, it)
         }
     }
 
@@ -242,6 +253,10 @@ class JvmSerializerExtension @JvmOverloads constructor(
 
         if (getter?.needsInlineParameterNullCheckRequirement() == true || setter?.needsInlineParameterNullCheckRequirement() == true) {
             versionRequirementTable?.writeInlineParameterNullCheckRequirement(proto::addVersionRequirement)
+        }
+
+        uniqIdProvider(descriptor)?.let {
+            proto.setExtension(JvmProtoBuf.propertyUniqId, it)
         }
     }
 
