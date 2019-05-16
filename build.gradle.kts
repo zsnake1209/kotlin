@@ -172,6 +172,8 @@ extra["versions.jflex"] = "1.7.0"
 extra["versions.markdown"] = "0.1.25"
 extra["versions.trove4j"] = "1.0.20181211"
 extra["versions.kotlin-native-shared"] = "1.0-dev-50"
+
+// NOTE: please, also change KTOR_NAME in pathUtil.kt and all versions in corresponding jar names in daemon tests.
 extra["versions.ktor-network"] = "1.0.1"
 
 if (!project.hasProperty("versions.kotlin-native")) {

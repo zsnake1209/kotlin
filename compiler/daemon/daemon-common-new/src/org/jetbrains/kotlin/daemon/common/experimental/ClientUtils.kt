@@ -134,7 +134,7 @@ private suspend fun tryConnectToDaemonBySockets(
             log.info("OK - daemon($port) connected to server!!!")
             daemon
         } catch (e: Throwable) {
-            report(DaemonReportCategory.INFO, "kcannot find or connect to socket")
+            report(DaemonReportCategory.INFO, "cannot find or connect to socket, exception:\n${e.javaClass.name}:${e.message}")
             daemon.close()
             null
         }

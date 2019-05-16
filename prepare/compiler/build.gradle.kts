@@ -26,6 +26,7 @@ val libraries by configurations.creating {
     extendsFrom(compile)
 }
 val trove4jJar by configurations.creating
+val ktorNetworkJar by configurations.creating
 
 val default by configurations
 default.extendsFrom(runtimeJar)
@@ -56,6 +57,7 @@ dependencies {
     }
 
     trove4jJar(intellijDep()) { includeIntellijCoreJarDependencies(project) { it.startsWith("trove4j") } }
+    ktorNetworkJar(commonDep("io.ktor", "ktor-network"))
 
     fatJarContents(kotlinBuiltins())
     fatJarContents(commonDep("javax.inject"))
@@ -132,6 +134,7 @@ val pack = if (shrink) proguard else packCompiler
 
 dist(targetName = "$compilerBaseName.jar", fromTask = pack) {
     from(trove4jJar)
+    from(ktorNetworkJar)
 }
 
 runtimeJarArtifactBy(pack, pack.outputs.files.singleFile) {
