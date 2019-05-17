@@ -65,19 +65,19 @@ fun collectSuspendableNodes(
     val terminatorsCollector = SuspendedTerminatorsCollector(suspendableNodes)
     body.acceptVoid(terminatorsCollector)
 
-    if (terminatorsCollector.shouldFinalliesBeLowered) {
-        val finallyLower = FinallyBlocksLowering(context, throwableType)
-
-        function.body = IrBlockBodyImpl(body.startOffset, body.endOffset, body.statements)
-        function.transform(finallyLower, null)
-
-        val newBody = function.body as IrBlockBody
-        function.body = null
-        suspendableNodes.clear()
-        val newBlock = JsIrBuilder.buildBlock(body.type, newBody.statements)
-
-        return collectSuspendableNodes(newBlock, suspendableNodes, context, function, throwableType)
-    }
+//    if (terminatorsCollector.shouldFinalliesBeLowered) {
+//        val finallyLower = FinallyBlocksLowering(context, throwableType)
+//
+//        function.body = IrBlockBodyImpl(body.startOffset, body.endOffset, body.statements)
+//        function.transform(finallyLower, null)
+//
+//        val newBody = function.body as IrBlockBody
+//        function.body = null
+//        suspendableNodes.clear()
+//        val newBlock = JsIrBuilder.buildBlock(body.type, newBody.statements)
+//
+//        return collectSuspendableNodes(newBlock, suspendableNodes, context, function, throwableType)
+//    }
 
     return body
 }

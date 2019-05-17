@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.ir.backend.js.lower.coroutines
 import org.jetbrains.kotlin.backend.common.descriptors.synthesizedName
 import org.jetbrains.kotlin.backend.common.ir.isSuspend
 import org.jetbrains.kotlin.backend.common.lower.AbstractSuspendFunctionsLowering
+import org.jetbrains.kotlin.backend.common.lower.FinallyBlocksLowering
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
@@ -45,9 +46,12 @@ class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunct
     override fun buildStateMachine(
         originalBody: IrBody,
         stateMachineFunction: IrFunction,
-        transformingFunction: IrFunction,
+        transformingFunction_: IrFunction,
         argumentToPropertiesMap: Map<IrValueParameter, IrField>
     ) {
+
+        val transformingFunction = transformingFunction_.transform(FinallyBlocksLowering(context, context.dynamicType), null) as IrFunction
+
         val body =
             (originalBody as IrBlockBody).run {
                 IrBlockImpl(
@@ -58,6 +62,19 @@ class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunct
                     statements
                 )
             }
+
+        transformingFunction.acceptVoid(object : IrElementVisitorVoid {
+            override fun visitElement(element: IrElement) {
+                element.acceptChildrenVoid(this)
+            }
+
+            override fun visitTry(aTry: IrTry) {
+                super.visitTry(aTry)
+                if (aTry.catches.isEmpty() && aTry.finallyExpression == null) {
+                    println("")
+                }
+            }
+        })
 
         val coroutineClass = stateMachineFunction.parent as IrClass
         val suspendResult = JsIrBuilder.buildVar(
@@ -83,7 +100,9 @@ class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunct
             COROUTINE_ROOT_LOOP,
             rootTry,
             JsIrBuilder.buildBoolean(context.irBuiltIns.booleanType, true)
-        )
+        ).also {
+            it.label = "\$sm"
+        }
 
         val suspendableNodes = mutableSetOf<IrElement>()
         val loweredBody =

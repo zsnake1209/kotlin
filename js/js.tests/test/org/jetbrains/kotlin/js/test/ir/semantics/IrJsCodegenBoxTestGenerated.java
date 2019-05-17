@@ -5270,6 +5270,11 @@ public class IrJsCodegenBoxTestGenerated extends AbstractIrJsCodegenBoxTest {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/controlFlow/ifStatement.kt", "kotlin.coroutines");
             }
 
+            @TestMetadata("inlineSuspendFinally.kt")
+            public void testInlineSuspendFinally_1_3() throws Exception {
+                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/controlFlow/inlineSuspendFinally.kt", "kotlin.coroutines");
+            }
+
             @TestMetadata("kt22694_1_3.kt")
             public void testKt22694_1_3() throws Exception {
                 runTest("compiler/testData/codegen/box/coroutines/controlFlow/kt22694_1_3.kt");
