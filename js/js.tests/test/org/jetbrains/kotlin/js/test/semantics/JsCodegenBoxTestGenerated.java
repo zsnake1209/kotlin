@@ -165,6 +165,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/arrays"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS, true);
         }
 
+        @TestMetadata("arrayConstructorWithNonInlineLambda.kt")
+        public void testArrayConstructorWithNonInlineLambda() throws Exception {
+            runTest("compiler/testData/codegen/box/arrays/arrayConstructorWithNonInlineLambda.kt");
+        }
+
         @TestMetadata("arrayConstructorsSimple.kt")
         public void testArrayConstructorsSimple() throws Exception {
             runTest("compiler/testData/codegen/box/arrays/arrayConstructorsSimple.kt");
@@ -20391,11 +20396,6 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
         @TestMetadata("nullableUnsignedEqualsLiteral.kt")
         public void testNullableUnsignedEqualsLiteral() throws Exception {
             runTest("compiler/testData/codegen/box/unsignedTypes/nullableUnsignedEqualsLiteral.kt");
-        }
-
-        @TestMetadata("signedToUnsignedLiteralConversion.kt")
-        public void testSignedToUnsignedLiteralConversion() throws Exception {
-            runTest("compiler/testData/codegen/box/unsignedTypes/signedToUnsignedLiteralConversion.kt");
         }
 
         @TestMetadata("unsignedIntCompare.kt")
