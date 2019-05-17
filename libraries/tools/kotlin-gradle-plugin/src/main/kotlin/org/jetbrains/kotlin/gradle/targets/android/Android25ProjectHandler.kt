@@ -12,6 +12,7 @@ import com.android.build.gradle.tasks.MergeResources
 import com.android.builder.model.SourceProvider
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.compile.AbstractCompile
 import org.jetbrains.kotlin.gradle.internal.Kapt3GradleSubplugin
@@ -126,8 +127,17 @@ class Android25ProjectHandler(
         return project.files(Callable { variantData.mergeResources?.computeResourceSetList0() ?: emptyList() })
     }
 
-    override fun getLibraryOutputTask(variant: BaseVariant): AbstractArchiveTask? =
-        (variant as? LibraryVariant)?.packageLibrary
+    // TODO the return type is actually `AbstractArchiveTask | TaskProvider<out AbstractArchiveTask>`;
+   //      change the signature once the Gradle versions that don't support task providers (< 4.8)
+   //      are not supported anymore
+    override fun getLibraryOutputTask(variant: BaseVariant): Any? {
+        val getPackageLibraryProvider = variant.javaClass.methods
+            .find { it.name == "getPackageLibraryProvider" && it.parameterCount == 0 }
+            ?: return (variant as? LibraryVariant)?.packageLibrary
+
+        @Suppress("UNCHECKED_CAST")
+        return (getPackageLibraryProvider(variant) as TaskProvider<out AbstractArchiveTask>).get()
+    }
 
     override fun setUpDependencyResolution(variant: BaseVariant, compilation: KotlinJvmAndroidCompilation) {
         val project = compilation.target.project
