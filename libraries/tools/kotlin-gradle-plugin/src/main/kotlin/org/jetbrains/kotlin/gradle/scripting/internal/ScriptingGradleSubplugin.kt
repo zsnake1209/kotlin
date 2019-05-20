@@ -14,20 +14,16 @@ import org.gradle.api.artifacts.transform.ArtifactTransform
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.compile.AbstractCompile
-import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
-import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 import org.jetbrains.kotlin.gradle.dsl.multiplatformExtensionOrNull
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.internal.state.KGPContext
 import org.jetbrains.kotlin.gradle.scripting.ScriptingExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.useLazyTaskConfiguration
 import org.jetbrains.kotlin.gradle.utils.isGradleVersionAtLeast
-import org.jetbrains.kotlin.scripting.definitions.ScriptDefinitionsFromClasspathDiscoverySource
-import org.jetbrains.kotlin.scripting.definitions.reporter
 import java.io.File
-import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 
 private const val MIN_SUPPORTED_GRADLE_MAJOR_VERSION = 5
 private const val MIN_SUPPORTED_GRADLE_MINOR_VERSION = 0
@@ -163,15 +159,8 @@ private fun configureDiscoveryTransformation(
 }
 
 internal class DiscoverScriptExtensionsTransform : ArtifactTransform() {
-
     override fun transform(input: File): List<File> {
-        val definitions =
-            ScriptDefinitionsFromClasspathDiscoverySource(
-                listOf(input),
-                defaultJvmScriptingHostConfiguration,
-                PrintingMessageCollector(System.out, MessageRenderer.WITHOUT_PATHS, false).reporter
-            ).definitions
-        val extensions = definitions.mapTo(arrayListOf()) { it.fileExtension }
+        val extensions = KGPContext.instance.discoverScriptExtensions(input)
         return if (extensions.isNotEmpty()) {
             val outputFile = outputDirectory.resolve("${input.nameWithoutExtension}.discoveredScriptsExtensions.txt")
             outputFile.writeText(extensions.joinToString("\n"))

@@ -79,8 +79,12 @@ object LibraryUtils {
     }
 
     fun isKotlinJavascriptIrLibrary(candidate: File): Boolean {
+        fun isZipOrJar(path: String): Boolean =
+            path.endsWith(".jar", ignoreCase = true)
+                    || path.endsWith(".zip", ignoreCase = true)
+
         return when {
-            FileUtil.isJarOrZip(candidate) -> isZippedKlib(candidate)
+            isZipOrJar(candidate.path) -> isZippedKlib(candidate)
             !File(candidate, "manifest").isFile -> false
             !File(candidate, "ir").isDirectory -> false
             else -> true

@@ -18,6 +18,7 @@ import kotlin.script.experimental.api.KotlinType
 import kotlin.script.experimental.host.ScriptingHostConfiguration
 import kotlin.script.experimental.host.createCompilationConfigurationFromTemplate
 import kotlin.script.experimental.host.createEvaluationConfigurationFromTemplate
+import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 import kotlin.script.templates.ScriptTemplateDefinition
 
 const val SCRIPT_DEFINITION_MARKERS_PATH = "META-INF/kotlin/script/templates/"
@@ -43,6 +44,21 @@ class ScriptDefinitionsFromClasspathDiscoverySource(
             hostConfiguration,
             messageReporter
         )
+    }
+
+    companion object {
+        /**
+         * Used in Gradle in isolated classloader.
+         */
+        @Suppress("unused")
+        @JvmStatic
+        fun discoverScriptExtensionsFromGradle(file: File): List<String> =
+            ScriptDefinitionsFromClasspathDiscoverySource(
+                classpath = listOf(file),
+                hostConfiguration = defaultJvmScriptingHostConfiguration,
+                // todo fix
+                messageReporter = { severity, message -> }
+            ).definitions.mapTo(arrayListOf()) { it.fileExtension }
     }
 }
 
