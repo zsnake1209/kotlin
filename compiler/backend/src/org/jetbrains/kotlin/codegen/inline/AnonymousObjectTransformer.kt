@@ -240,6 +240,9 @@ class AnonymousObjectTransformer(
 
     private fun writeOuterInfo(visitor: ClassVisitor) {
         val info = inliningContext.callSiteInfo
+        // Since $$forInline functions are not generated if retransformation is the last one (i.e. call site is not inline)
+        // link to the function in OUTERCLASS field becomes invalid. However, since $$forInline function always has no-inline
+        // companion without the suffix, use it.
         if (info.isSuspend && info.isInlineOrInsideInline) {
             visitor.visitOuterClass(info.ownerClassName, info.functionName?.removeSuffix(FOR_INLINE_SUFFIX), info.functionDesc)
         } else {
