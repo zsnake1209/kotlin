@@ -44,6 +44,11 @@ public class MultiPlatformOldInferenceHighlightingTestGenerated extends Abstract
         runTest("idea/testData/multiModuleHighlighting/multiplatform/catchHeaderExceptionInPlatformModule/");
     }
 
+    @TestMetadata("completionHandlexCoroutines")
+    public void testCompletionHandlexCoroutines() throws Exception {
+        runTest("idea/testData/multiModuleHighlighting/multiplatform/completionHandlexCoroutines/");
+    }
+
     @TestMetadata("contracts")
     public void testContracts() throws Exception {
         runTest("idea/testData/multiModuleHighlighting/multiplatform/contracts/");
