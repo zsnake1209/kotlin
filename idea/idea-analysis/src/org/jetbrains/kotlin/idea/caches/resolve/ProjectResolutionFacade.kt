@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.analyzer.*
 import org.jetbrains.kotlin.analyzer.common.CommonAnalysisParameters
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.jvm.JvmBuiltIns
-import org.jetbrains.kotlin.caches.resolve.CompositeCompilerServices
+import org.jetbrains.kotlin.caches.resolve.CompositeAnalyzerServices
 import org.jetbrains.kotlin.caches.resolve.CompositeResolverForModuleFactory
 import org.jetbrains.kotlin.caches.resolve.resolution
 import org.jetbrains.kotlin.context.GlobalContextImpl
@@ -155,7 +155,7 @@ internal class ProjectResolutionFacade(
                     commonPlatformParameters,
                     jvmPlatformParameters,
                     modulePlatform!!,
-                    CompositeCompilerServices(modulePlatform.componentPlatforms.map { it.toTargetPlatform().findCompilerServices })
+                    CompositeAnalyzerServices(modulePlatform.componentPlatforms.map { it.toTargetPlatform().findAnalyzerServices })
                 )
             },
             builtIns = builtIns,
