@@ -44,6 +44,10 @@ val mirroredUrls = listOf(
     "https://cdn.azul.com/zulu/bin"
 )
 
+val aliases = mapOf(
+    "https://repo.maven.apache.org/maven2" to "https://repo1.maven.org/maven2" // Maven Central
+)
+
 val isTeamcityBuild = project.hasProperty("teamcity") || System.getenv("TEAMCITY_VERSION") != null
 
 fun Project.cacheRedirectorEnabled(): Boolean = findProperty("cacheRedirectorEnabled")?.toString()?.toBoolean() == true
@@ -51,8 +55,11 @@ fun Project.cacheRedirectorEnabled(): Boolean = findProperty("cacheRedirectorEna
 fun URI.toCacheRedirectorUri() = URI("https://cache-redirector.jetbrains.com/$host/$path")
 
 fun URI.maybeRedirect(): URI {
-    return if (mirroredUrls.any { toString().trimEnd('/').startsWith(it) }) {
-        toCacheRedirectorUri()
+    val url = toString().trimEnd('/')
+    val dealiasedUrl = aliases.getOrDefault(url, url)
+
+    return if (mirroredUrls.any { dealiasedUrl.startsWith(it) }) {
+        URI(dealiasedUrl).toCacheRedirectorUri()
     } else {
         this
     }
