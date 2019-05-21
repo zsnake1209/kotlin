@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.codegen.coroutines
 
+import org.jetbrains.kotlin.builtins.isSuspendFunctionType
 import org.jetbrains.kotlin.codegen.ExpressionCodegen
 import org.jetbrains.kotlin.codegen.FunctionCodegen
 import org.jetbrains.kotlin.codegen.FunctionGenerationStrategy
@@ -104,7 +105,8 @@ private class SurroundSuspendParameterCallsWithSuspendMarkersMethodVisitor(
         fun AbstractInsnNode.isInlineSuspendParameter(): Boolean {
             if (this !is VarInsnNode) return false
             val index = `var` - (if (methodNode.access and Opcodes.ACC_STATIC != 0) 0 else 1)
-            return opcode == Opcodes.ALOAD && index < valueParameters.size && InlineUtil.isInlineParameter(valueParameters[index])
+            return opcode == Opcodes.ALOAD && index < valueParameters.size && InlineUtil.isInlineParameter(valueParameters[index]) &&
+                    valueParameters[index].type.isSuspendFunctionType
         }
 
         FixStackMethodTransformer().transform(thisName, methodNode)
