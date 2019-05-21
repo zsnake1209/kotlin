@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.resolve.OverridingUtil
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeConstructor
 
 interface RefineKotlinTypeChecker {
     fun isSubtypeOf(subtype: KotlinType, supertype: KotlinType): Boolean
@@ -16,6 +17,7 @@ interface RefineKotlinTypeChecker {
     fun refineType(type: KotlinType): KotlinType
     fun refineSupertypes(classDescriptor: ClassDescriptor, moduleDescriptor: ModuleDescriptor): Collection<KotlinType>
     fun refineSupertypes(classDescriptor: ClassDescriptor): Collection<KotlinType>
+    fun isRefinementNeeded(typeConstructor: TypeConstructor): Boolean
 
     val overridingUtil: OverridingUtil
 
@@ -28,6 +30,7 @@ interface RefineKotlinTypeChecker {
             classDescriptor.typeConstructor.supertypes
 
         override fun refineSupertypes(classDescriptor: ClassDescriptor) = classDescriptor.typeConstructor.supertypes
+        override fun isRefinementNeeded(typeConstructor: TypeConstructor) = false
 
         override val overridingUtil: OverridingUtil
             get() = OverridingUtil.DEFAULT
