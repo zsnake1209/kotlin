@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.idea.project
 
+import org.jetbrains.kotlin.caches.resolve.CompositeAnalyzerServices
 import org.jetbrains.kotlin.js.resolve.JsPlatformAnalyzerServices
 import org.jetbrains.kotlin.platform.SimplePlatform
 import org.jetbrains.kotlin.platform.TargetPlatform
