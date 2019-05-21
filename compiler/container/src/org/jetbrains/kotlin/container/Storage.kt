@@ -45,7 +45,10 @@ class ComponentStorage(private val myId: String, parent: ComponentStorage?) : Va
     private val registry = ComponentRegistry()
 
     init {
-        parent?.let { registry.addAll(it.registry) }
+        parent?.let {
+            registry.addAll(it.registry)
+            clashResolvers.addAll(it.clashResolvers)
+        }
     }
 
 
