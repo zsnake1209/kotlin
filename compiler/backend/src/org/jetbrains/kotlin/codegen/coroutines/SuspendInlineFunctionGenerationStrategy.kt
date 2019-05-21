@@ -5,12 +5,10 @@
 
 package org.jetbrains.kotlin.codegen.coroutines
 
-import org.jetbrains.kotlin.builtins.isSuspendFunctionTypeOrSubtype
 import org.jetbrains.kotlin.codegen.ExpressionCodegen
 import org.jetbrains.kotlin.codegen.FunctionCodegen
 import org.jetbrains.kotlin.codegen.FunctionGenerationStrategy
 import org.jetbrains.kotlin.codegen.TransformationMethodVisitor
-import org.jetbrains.kotlin.codegen.inline.MaxStackFrameSizeAndLocalsCalculator
 import org.jetbrains.kotlin.codegen.inline.coroutines.FOR_INLINE_SUFFIX
 import org.jetbrains.kotlin.codegen.inline.coroutines.findReceiverOfInvoke
 import org.jetbrains.kotlin.codegen.inline.coroutines.surroundInvokesWithSuspendMarkers
@@ -23,6 +21,7 @@ import org.jetbrains.kotlin.config.JVMConstructorCallNormalizationMode
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.resolve.inline.InlineUtil
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.org.objectweb.asm.MethodVisitor
@@ -102,11 +101,10 @@ private class SurroundSuspendParameterCallsWithSuspendMarkersMethodVisitor(
 ): TransformationMethodVisitor(delegate, access, name, desc, null, null) {
     override fun performTransformations(methodNode: MethodNode) {
         fun AbstractInsnNode.index() = methodNode.instructions.indexOf(this)
-        fun AbstractInsnNode.isSuspendParameter(): Boolean {
+        fun AbstractInsnNode.isInlineSuspendParameter(): Boolean {
             if (this !is VarInsnNode) return false
             val index = `var` - (if (methodNode.access and Opcodes.ACC_STATIC != 0) 0 else 1)
-            return opcode == Opcodes.ALOAD && index < valueParameters.size && !valueParameters[index].isNoinline &&
-                    valueParameters[index].type.isSuspendFunctionTypeOrSubtype
+            return opcode == Opcodes.ALOAD && index < valueParameters.size && InlineUtil.isInlineParameter(valueParameters[index])
         }
 
         FixStackMethodTransformer().transform(thisName, methodNode)
@@ -120,7 +118,7 @@ private class SurroundSuspendParameterCallsWithSuspendMarkersMethodVisitor(
             insn as MethodInsnNode
             if (!isInvokeOnLambda(insn.owner, insn.name)) continue
             val frame = sourceFrames[insn.index()] ?: continue
-            val aload = findReceiverOfInvoke(frame, insn).takeIf { it?.isSuspendParameter() == true } as? VarInsnNode ?: continue
+            val aload = findReceiverOfInvoke(frame, insn).takeIf { it?.isInlineSuspendParameter() == true } as? VarInsnNode ?: continue
             noinlineInvokes.add(insn to aload)
         }
 
