@@ -8,7 +8,11 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import java.net.URI
 
-// https://youtrack.jetbrains.com/issue/ADM-23180
+/**
+ *  The list of repositories supported by cache redirector should be synced with the list in https://youtrack.jetbrains.com/issue/ADM-23180
+ *  To add a repository to the list create an issue in ADM project (example issue https://youtrack.jetbrains.com/issue/IJI-149)
+ *  Repositories in `buildscript` blocks are *NOT* substituted by this script and should be handled manually
+ */
 val mirroredUrls = listOf(
     "https://dl.bintray.com/groovy/maven",
     "https://dl.bintray.com/kotlin/kotlin-dev",
@@ -78,62 +82,82 @@ fun RepositoryHandler.redirect() {
 }
 
 // teamcity.jetbrains.com is located in the same local network with build agents
-fun URI.isProxiedOrLocal() = host == "cache-redirector.jetbrains.com" || scheme == "file" || host == "teamcity.jetbrains.com"
+fun URI.isCachedOrLocal() = host == "cache-redirector.jetbrains.com" || scheme == "file" || host == "teamcity.jetbrains.com"
 
-fun RepositoryHandler.findNonProxiedRepositories(): List<String> {
-    val mavenNonProxiedRepos = filterIsInstance<MavenArtifactRepository>()
-        .filterNot { it.url.isProxiedOrLocal() }
+fun RepositoryHandler.findNonCachedRepositories(): List<String> {
+    val mavenNonCachedRepos = filterIsInstance<MavenArtifactRepository>()
+        .filterNot { it.url.isCachedOrLocal() }
         .map { it.url.toString() }
 
-    val ivyNonProxiedRepos = filterIsInstance<IvyArtifactRepository>()
-        .filterNot { it.url.isProxiedOrLocal() }
+    val ivyNonCachedRepos = filterIsInstance<IvyArtifactRepository>()
+        .filterNot { it.url.isCachedOrLocal() }
         .map { it.url.toString() }
 
-    return mavenNonProxiedRepos + ivyNonProxiedRepos
+    return mavenNonCachedRepos + ivyNonCachedRepos
 }
 
 fun escape(s: String): String {
     return s.replace("[\\|'\\[\\]]".toRegex(), "\\|$0").replace("\n".toRegex(), "|n").replace("\r".toRegex(), "|r")
 }
 
+fun testStarted(testName: String) {
+    println("##teamcity[testStarted name='%s']".format(escape(testName)))
+}
+
+fun testFinished(testName: String) {
+    println("##teamcity[testFinished name='%s']".format(escape(testName)))
+}
+
 fun testFailed(name: String, message: String, details: String) {
     println("##teamcity[testFailed name='%s' message='%s' details='%s']".format(escape(name), escape(message), escape(details)))
 }
 
-fun Task.logNonProxiedRepo(project: Project, repoUrl: String) {
-    val msg = "Repository $repoUrl in project ${project.displayName} should be proxied with cache-redirector"
+fun Task.logNonCachedRepo(testName: String, repoUrl: String) {
+    val msg = "Repository $repoUrl in ${project.displayName} should be cached with cache-redirector"
+    val details = "Using non cached repository may lead to download failures in CI builds." +
+            " Check https://github.com/JetBrains/kotlin/blob/master/gradle/cacheRedirector.gradle.kts for details."
 
     if (isTeamcityBuild) {
-        testFailed("Check repositories for: '${project.displayName}'", msg, "")
+        testFailed(testName, msg, details)
     }
 
-    logger.warn("WARNING - $msg")
+    logger.warn("WARNING - $msg\n$details")
 }
 
-fun Task.logInvalidRepo(project: Project) {
-    val msg = "Invalid ivy repo found in project $path: Url must be not null"
+fun Task.logInvalidIvyRepo(testName: String) {
+    val msg = "Invalid ivy repo found in ${project.displayName}"
+    val details = "Url must be not null"
 
     if (isTeamcityBuild) {
-        testFailed("Check repositories for: '${project.displayName}'", msg, "")
+        testFailed(testName, msg, details)
     }
 
-    logger.warn("WARNING - $msg")
+    logger.warn("WARNING - $msg: $details")
 }
 
-val checkRepositories = tasks.register("checkRepositories") {
+val checkRepositories: TaskProvider<Task> = tasks.register("checkRepositories") {
     doLast {
+        val testName = "$name in ${project.displayName}"
+        if (isTeamcityBuild) {
+            testStarted(testName)
+        }
+
         repositories.filterIsInstance<IvyArtifactRepository>().forEach {
             if (it.url == null) {
-                logInvalidRepo(project)
+                logInvalidIvyRepo(testName)
             }
         }
 
-        repositories.findNonProxiedRepositories().forEach {
-            logNonProxiedRepo(project, it)
+        repositories.findNonCachedRepositories().forEach {
+            logNonCachedRepo(testName, it)
         }
 
-        buildscript.repositories.findNonProxiedRepositories().forEach {
-            logNonProxiedRepo(project, it)
+        buildscript.repositories.findNonCachedRepositories().forEach {
+            logNonCachedRepo(testName, it)
+        }
+
+        if (isTeamcityBuild) {
+            testFinished(testName)
         }
     }
 }
