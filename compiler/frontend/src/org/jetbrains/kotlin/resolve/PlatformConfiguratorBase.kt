@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.resolve.checkers.*
 import org.jetbrains.kotlin.resolve.lazy.DelegationFilter
 import org.jetbrains.kotlin.types.DynamicTypesSettings
 import org.jetbrains.kotlin.types.DynamicTypesSettingsClashesResolver
-import org.jetbrains.kotlin.types.expressions.FunctionWithBigAritySupportClashesResolver
 
 private val DEFAULT_DECLARATION_CHECKERS = listOf(
     DataClassDeclarationChecker(),
@@ -57,8 +56,7 @@ private val DEFAULT_ANNOTATION_CHECKERS = listOf<AdditionalAnnotationChecker>()
 private val DEFAULT_CLASH_RESOLVERS = listOf<PlatformExtensionsClashResolver<*>>(
     IdentifierCheckerClashesResolver(),
     TypeSpecificityComparatorClashesResolver(),
-    DynamicTypesSettingsClashesResolver(),
-    FunctionWithBigAritySupportClashesResolver()
+    DynamicTypesSettingsClashesResolver()
 )
 
 fun StorageComponentContainer.configureDefaultCheckers() {

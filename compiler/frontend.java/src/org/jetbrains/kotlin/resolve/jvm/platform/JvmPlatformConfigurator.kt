@@ -103,6 +103,6 @@ object JvmPlatformConfigurator : PlatformConfiguratorBase(
         container.useImpl<JvmTypeSpecificityComparator>()
         container.useImpl<JvmDefaultSuperCallChecker>()
         container.useImpl<JvmSamConversionTransformer>()
-        container.useInstance(FunctionWithBigAritySupport.LANGUAGE_VERSION_DEPENDENT)
+        container.useInstance(FunctionWithBigAritySupport.LanguageVersionDependent)
     }
 }

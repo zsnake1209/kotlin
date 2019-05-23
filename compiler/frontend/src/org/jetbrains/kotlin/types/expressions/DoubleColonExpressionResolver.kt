@@ -824,22 +824,15 @@ class DoubleColonExpressionResolver(
 
 // By default, function types with big arity are supported. On platforms where they are not supported by default (e.g. JVM),
 // LANGUAGE_VERSION_DEPENDENT should be used which makes the code check if the corresponding language feature is enabled.
-@DefaultImplementation(FunctionWithBigAritySupport::class)
-class FunctionWithBigAritySupport private constructor(val shouldCheckLanguageVersionSettings: Boolean) : PlatformSpecificExtension<FunctionWithBigAritySupport>{
-    constructor() : this(false)
+@DefaultImplementation(FunctionWithBigAritySupport.Enabled::class)
+interface FunctionWithBigAritySupport {
+    val shouldCheckLanguageVersionSettings: Boolean
 
-    companion object {
-        @JvmField
-        val LANGUAGE_VERSION_DEPENDENT = FunctionWithBigAritySupport(true)
+    object Enabled : FunctionWithBigAritySupport {
+        override val shouldCheckLanguageVersionSettings: Boolean = false
     }
-}
 
-class FunctionWithBigAritySupportClashesResolver :
-    PlatformExtensionsClashResolver<FunctionWithBigAritySupport>(FunctionWithBigAritySupport::class.java) {
-
-    override fun resolveExtensionsClash(extensions: List<FunctionWithBigAritySupport>): FunctionWithBigAritySupport =
-        if (extensions.any { it.shouldCheckLanguageVersionSettings })
-            FunctionWithBigAritySupport.LANGUAGE_VERSION_DEPENDENT
-        else
-            FunctionWithBigAritySupport()
+    object LanguageVersionDependent : FunctionWithBigAritySupport {
+        override val shouldCheckLanguageVersionSettings: Boolean = true
+    }
 }
