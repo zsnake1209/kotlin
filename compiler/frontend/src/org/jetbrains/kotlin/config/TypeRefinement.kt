@@ -85,4 +85,4 @@ private fun TypeConstructor.areThereExpectSupertypes(): Boolean {
 }
 
 private fun TypeConstructor.isExpectClass() =
-    declarationDescriptor?.safeAs<ClassDescriptor>()?.isExpect == true
+    true || declarationDescriptor?.safeAs<ClassDescriptor>()?.isExpect == true
