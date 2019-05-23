@@ -60,24 +60,16 @@ class ComponentStorage(private val myId: String, parent: ComponentStorage?) : Va
         if (entry.isNotEmpty()) {
             registerDependency(request, context)
 
-            return when {
-                // Fastpath
-                entry.size == 1 -> {
-                    entry.single()
-                }
+            if (entry.size == 1) return entry.single()
 
-                entry.all { it.isDefaultComponent() } -> {
-                    entry.first()
-                }
+            val nonDefault = entry.filterNot { it.isDefaultComponent() }
+            if (nonDefault.isEmpty()) return entry.first()
 
-                else -> {
-                    entry.singleOrNull { !it.isDefaultComponent() }
-                        ?: throw InvalidCardinalityException(
-                            "Request $request cannot be satisfied because there is more than one type registered\n" +
-                                    "Clashed registrations: ${entry.joinToString()}"
-                        )
-                }
-            }
+            return nonDefault.singleOrNull { !it.isDefaultComponent() }
+                ?: throw InvalidCardinalityException(
+                    "Request $request cannot be satisfied because there is more than one type registered\n" +
+                            "Clashed registrations: ${entry.joinToString()}"
+                )
         }
         return null
     }
