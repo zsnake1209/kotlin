@@ -37,10 +37,10 @@ class DynamicTypesAllowed : DynamicTypesSettings() {
         get() = true
 }
 
-class DynamicTypesSettingsClashesResolver : PlatformExtensionsClashResolver<DynamicTypesSettings>(DynamicTypesSettings::class.java) {
-    override fun resolveExtensionsClash(extensions: List<DynamicTypesSettings>): DynamicTypesSettings =
-        if (extensions.any { it.dynamicTypesAllowed }) DynamicTypesAllowed() else DynamicTypesSettings()
-}
+class DynamicTypesSettingsClashesResolver : PlatformExtensionsClashResolver.FallbackToDefault<DynamicTypesSettings>(
+    DynamicTypesSettings(),
+    DynamicTypesSettings::class.java
+)
 
 fun KotlinType.isDynamic(): Boolean = unwrap() is DynamicType
 
