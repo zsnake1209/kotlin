@@ -29,9 +29,8 @@ interface SamConversionResolver : PlatformSpecificExtension<SamConversionResolve
     }
 
     fun resolveFunctionTypeIfSamInterface(classDescriptor: JavaClassDescriptor): SimpleType?
-}
 
-class SamConversionResolverClashesResolver : PlatformExtensionsClashResolver.FallbackToDefault<SamConversionResolver>(
-    SamConversionResolver.Empty,
-    SamConversionResolver::class.java
-)
+    companion object {
+        val CLASH_RESOLVER = PlatformExtensionsClashResolver.FallbackToDefault(Empty, SamConversionResolver::class.java)
+    }
+}

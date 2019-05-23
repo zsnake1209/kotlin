@@ -30,17 +30,16 @@ import org.jetbrains.kotlin.types.typeUtil.builtIns
 open class DynamicTypesSettings : PlatformSpecificExtension<DynamicTypesSettings> {
     open val dynamicTypesAllowed: Boolean
         get() = false
+
+    companion object {
+        val CLASH_RESOLVER = PlatformExtensionsClashResolver.FallbackToDefault(DynamicTypesSettings(), DynamicTypesSettings::class.java)
+    }
 }
 
 class DynamicTypesAllowed : DynamicTypesSettings() {
     override val dynamicTypesAllowed: Boolean
         get() = true
 }
-
-class DynamicTypesSettingsClashesResolver : PlatformExtensionsClashResolver.FallbackToDefault<DynamicTypesSettings>(
-    DynamicTypesSettings(),
-    DynamicTypesSettings::class.java
-)
 
 fun KotlinType.isDynamic(): Boolean = unwrap() is DynamicType
 

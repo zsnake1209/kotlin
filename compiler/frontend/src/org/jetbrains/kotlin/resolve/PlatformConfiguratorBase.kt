@@ -8,11 +8,10 @@ package org.jetbrains.kotlin.resolve
 import org.jetbrains.kotlin.builtins.PlatformToKotlinClassMap
 import org.jetbrains.kotlin.container.*
 import org.jetbrains.kotlin.resolve.calls.checkers.*
-import org.jetbrains.kotlin.resolve.calls.results.TypeSpecificityComparatorClashesResolver
+import org.jetbrains.kotlin.resolve.calls.results.TypeSpecificityComparator
 import org.jetbrains.kotlin.resolve.checkers.*
 import org.jetbrains.kotlin.resolve.lazy.DelegationFilter
 import org.jetbrains.kotlin.types.DynamicTypesSettings
-import org.jetbrains.kotlin.types.DynamicTypesSettingsClashesResolver
 
 private val DEFAULT_DECLARATION_CHECKERS = listOf(
     DataClassDeclarationChecker(),
@@ -55,8 +54,8 @@ private val DEFAULT_ANNOTATION_CHECKERS = listOf<AdditionalAnnotationChecker>()
 
 private val DEFAULT_CLASH_RESOLVERS = listOf<PlatformExtensionsClashResolver<*>>(
     IdentifierCheckerClashesResolver(),
-    TypeSpecificityComparatorClashesResolver(),
-    DynamicTypesSettingsClashesResolver()
+    TypeSpecificityComparator.CLASH_RESOLVER,
+    DynamicTypesSettings.CLASH_RESOLVER
 )
 
 fun StorageComponentContainer.configureDefaultCheckers() {

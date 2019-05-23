@@ -41,7 +41,7 @@ interface PlatformSpecificExtension<S : PlatformSpecificExtension<S>>
 abstract class PlatformExtensionsClashResolver<E : PlatformSpecificExtension<E>>(val applicableTo: Class<E>) {
     abstract fun resolveExtensionsClash(extensions: List<E>): E
 
-    abstract class FallbackToDefault<E : PlatformSpecificExtension<E>>(
+    class FallbackToDefault<E : PlatformSpecificExtension<E>>(
         private val defaultValue: E,
         applicableTo: Class<E>
     ) : PlatformExtensionsClashResolver<E>(applicableTo) {
