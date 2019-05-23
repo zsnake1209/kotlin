@@ -38,16 +38,6 @@ interface TypeSpecificityComparator : PlatformSpecificExtension<TypeSpecificityC
     object NONE : TypeSpecificityComparator {
         override fun isDefinitelyLessSpecific(specific: KotlinTypeMarker, general: KotlinTypeMarker) = false
     }
-
-    companion object {
-        /**
-         * We should use NONE for clash resolution, because:
-         * - JvmTypeSpecificityComparator covers cases with flexible types and primitive types loaded from Java, and all this is irrelevant for
-         *   non-JVM modules
-         * - JsTypeSpecifcityComparator covers case with dynamics, which are not allowed in non-JS modules either
-         */
-        val CLASH_RESOLVER = PlatformExtensionsClashResolver.FallbackToDefault(NONE, TypeSpecificityComparator::class.java)
-    }
 }
 
 class FlatSignature<out T> constructor(
