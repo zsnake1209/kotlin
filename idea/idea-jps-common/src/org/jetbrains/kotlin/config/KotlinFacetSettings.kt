@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.cli.common.arguments.parseCommandLineArguments
 import org.jetbrains.kotlin.platform.IdePlatformKind
 import org.jetbrains.kotlin.platform.TargetPlatformVersion
 import org.jetbrains.kotlin.platform.TargetPlatform
+import org.jetbrains.kotlin.platform.compat.toOldPlatform
 import org.jetbrains.kotlin.utils.DescriptionAware
 
 @Deprecated("Use IdePlatformKind instead.", level = DeprecationLevel.ERROR)
@@ -193,6 +194,16 @@ class KotlinFacetSettings {
             val compilerArguments = this.compilerArguments ?: return null
             return IdePlatformKind.platformByCompilerArguments(compilerArguments)
         }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(
+        message = "This accessor is deprecated and will be removed soon, use API from 'org.jetbrains.kotlin.platform.*' packages instead",
+        replaceWith = ReplaceWith("targetPlatform"),
+        level = DeprecationLevel.ERROR
+    )
+    fun getPlatform(): org.jetbrains.kotlin.resolve.TargetPlatform? {
+        return platform?.toOldPlatform()
+    }
 
     var coroutineSupport: LanguageFeature.State?
         get() {
