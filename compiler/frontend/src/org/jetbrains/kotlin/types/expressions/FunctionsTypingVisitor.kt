@@ -111,7 +111,7 @@ internal class FunctionsTypingVisitor(facade: ExpressionTypingInternals) : Expre
         )
 
         components.modifiersChecker.withTrace(context.trace).checkModifiersForLocalDeclaration(function, functionDescriptor)
-        components.identifierCheckers.forEach { it.checkDeclaration(function, context.trace) }
+        components.identifierChecker.checkDeclaration(function, context.trace)
         components.declarationsCheckerBuilder.withTrace(context.trace).checkFunction(function, functionDescriptor)
 
         return if (isDeclaration) {
@@ -152,9 +152,9 @@ internal class FunctionsTypingVisitor(facade: ExpressionTypingInternals) : Expre
         val suspendFunctionTypeExpected = expectedType.isSuspendFunctionType()
 
         val functionDescriptor = createFunctionLiteralDescriptor(expression, context)
-        expression.valueParameters.forEach { param ->
-            components.identifierCheckers.forEach { it.checkDeclaration(param, context.trace) }
-            UnderscoreChecker.checkNamed(param, context.trace, components.languageVersionSettings, allowSingleUnderscore = true)
+        expression.valueParameters.forEach {
+            components.identifierChecker.checkDeclaration(it, context.trace)
+            UnderscoreChecker.checkNamed(it, context.trace, components.languageVersionSettings, allowSingleUnderscore = true)
         }
         val safeReturnType = computeReturnType(expression, context, functionDescriptor, functionTypeExpected)
         functionDescriptor.setReturnType(safeReturnType)

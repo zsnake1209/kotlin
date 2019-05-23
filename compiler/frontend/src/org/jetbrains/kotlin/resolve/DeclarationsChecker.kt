@@ -52,13 +52,13 @@ internal class DeclarationsCheckerBuilder(
     private val descriptorResolver: DescriptorResolver,
     private val originalModifiersChecker: ModifiersChecker,
     private val annotationChecker: AnnotationChecker,
-    private val identifierCheckers: Iterable<IdentifierChecker>,
+    private val identifierChecker: IdentifierChecker,
     private val languageVersionSettings: LanguageVersionSettings,
     private val typeSpecificityComparator: TypeSpecificityComparator,
     private val diagnosticSuppressor: PlatformDiagnosticSuppressor
 ) {
     fun withTrace(trace: BindingTrace) = DeclarationsChecker(
-        descriptorResolver, originalModifiersChecker, annotationChecker, identifierCheckers, trace, languageVersionSettings,
+        descriptorResolver, originalModifiersChecker, annotationChecker, identifierChecker, trace, languageVersionSettings,
         typeSpecificityComparator, diagnosticSuppressor
     )
 }
@@ -67,7 +67,7 @@ class DeclarationsChecker(
     private val descriptorResolver: DescriptorResolver,
     modifiersChecker: ModifiersChecker,
     private val annotationChecker: AnnotationChecker,
-    private val identifierCheckers: Iterable<IdentifierChecker>,
+    private val identifierChecker: IdentifierChecker,
     private val trace: BindingTrace,
     private val languageVersionSettings: LanguageVersionSettings,
     typeSpecificityComparator: TypeSpecificityComparator,
@@ -89,20 +89,20 @@ class DeclarationsChecker(
         for ((classOrObject, classDescriptor) in bodiesResolveContext.declaredClasses.entries) {
             checkClass(classDescriptor, classOrObject)
             modifiersChecker.checkModifiersForDeclaration(classOrObject, classDescriptor)
-            identifierCheckers.forEach { it.checkDeclaration(classOrObject, trace) }
+            identifierChecker.checkDeclaration(classOrObject, trace)
             exposedChecker.checkClassHeader(classOrObject, classDescriptor)
         }
 
         for ((function, functionDescriptor) in bodiesResolveContext.functions.entries) {
             checkFunction(function, functionDescriptor)
             modifiersChecker.checkModifiersForDeclaration(function, functionDescriptor)
-            identifierCheckers.forEach { it.checkDeclaration(function, trace) }
+            identifierChecker.checkDeclaration(function, trace)
         }
 
         for ((property, propertyDescriptor) in bodiesResolveContext.properties.entries) {
             checkProperty(property, propertyDescriptor)
             modifiersChecker.checkModifiersForDeclaration(property, propertyDescriptor)
-            identifierCheckers.forEach { it.checkDeclaration(property, trace) }
+            identifierChecker.checkDeclaration(property, trace)
         }
 
         val destructuringDeclarations = bodiesResolveContext.destructuringDeclarationEntries.entries
@@ -112,7 +112,7 @@ class DeclarationsChecker(
 
         for (multiDeclaration in destructuringDeclarations) {
             modifiersChecker.checkModifiersForDestructuringDeclaration(multiDeclaration)
-            identifierCheckers.forEach { it.checkDeclaration(multiDeclaration, trace) }
+            identifierChecker.checkDeclaration(multiDeclaration, trace)
         }
 
         for ((declaration, constructorDescriptor) in bodiesResolveContext.secondaryConstructors.entries) {
@@ -246,7 +246,7 @@ class DeclarationsChecker(
 
     private fun checkConstructorDeclaration(constructorDescriptor: ClassConstructorDescriptor, declaration: KtConstructor<*>) {
         modifiersChecker.checkModifiersForDeclaration(declaration, constructorDescriptor)
-        identifierCheckers.forEach { it.checkDeclaration(declaration, trace) }
+        identifierChecker.checkDeclaration(declaration, trace)
         checkVarargParameters(trace, constructorDescriptor)
         checkConstructorVisibility(constructorDescriptor, declaration)
         checkExpectedClassConstructor(constructorDescriptor, declaration)
@@ -845,7 +845,7 @@ class DeclarationsChecker(
             val accessor = if (accessorDescriptor is PropertyGetterDescriptor) property.getter else property.setter
             if (accessor != null) {
                 modifiersChecker.checkModifiersForDeclaration(accessor, accessorDescriptor)
-                identifierCheckers.forEach { it.checkDeclaration(accessor, trace) }
+                identifierChecker.checkDeclaration(accessor, trace)
             } else {
                 modifiersChecker.runDeclarationCheckers(property, accessorDescriptor)
             }
