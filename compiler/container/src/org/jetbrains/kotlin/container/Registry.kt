@@ -80,7 +80,7 @@ internal class ComponentRegistry {
          */
         for (resolver in clashResolvers) {
             val clashedComponents = registrationMap[resolver.applicableTo] as? Collection<ComponentDescriptor> ?: continue
-            if (clashedComponents.isEmpty()) continue // Shouldn't actually happen, but just in case
+            if (clashedComponents.size <= 1) continue
 
             val substituteDescriptor = ClashResolutionDescriptor(container, resolver, clashedComponents.toList())
             registrationMap[resolver.applicableTo] = substituteDescriptor
