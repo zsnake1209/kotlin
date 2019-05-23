@@ -23,7 +23,7 @@ object JsPlatforms {
         level = DeprecationLevel.ERROR
     )
     object CompatJsPlatform : TargetPlatform(setOf(DefaultSimpleJsPlatform)),
-        // Needed for backward compatibility, because old code uses INSTANCECHECKs instead of calling extensions
+        // Needed for backward compatibility, because old code uses INSTANCEOF checks instead of calling extensions
         org.jetbrains.kotlin.js.resolve.JsPlatform {}
 
     val defaultJsPlatform: TargetPlatform

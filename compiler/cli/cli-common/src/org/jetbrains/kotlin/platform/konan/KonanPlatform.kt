@@ -23,7 +23,7 @@ object KonanPlatforms {
         level = DeprecationLevel.ERROR
     )
     object CompatKonanPlatform : TargetPlatform(setOf(DefaultSimpleKonanPlatform)),
-        // Needed for backward compatibility, because old code uses INSTANCECHECKs instead of calling extensions
+        // Needed for backward compatibility, because old code uses INSTANCEOF checks instead of calling extensions
         org.jetbrains.kotlin.resolve.konan.platform.KonanPlatform {}
 
     val defaultKonanPlatform: TargetPlatform

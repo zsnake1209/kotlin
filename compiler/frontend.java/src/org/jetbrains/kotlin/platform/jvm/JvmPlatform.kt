@@ -38,7 +38,7 @@ object JvmPlatforms {
         level = DeprecationLevel.ERROR
     )
     object CompatJvmPlatform : TargetPlatform(setOf(UNSPECIFIED_SIMPLE_JVM_PLATFORM)),
-        // Needed for backward compatibility, because old code uses INSTANCECHECKs instead of calling extensions
+        // Needed for backward compatibility, because old code uses INSTANCEOF checks instead of calling extensions
         org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform {}
 }
 
