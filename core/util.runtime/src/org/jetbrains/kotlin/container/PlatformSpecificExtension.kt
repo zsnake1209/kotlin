@@ -16,16 +16,28 @@ package org.jetbrains.kotlin.container
  * In multiplatform modules such components require special treatment. Namely,
  * if several components of the same type are provided, then it's not an illegal state;
  * rather, we have to carefully resolve clash on case-by-case basis.
- * See [PlatformExtensionsClashResolver] also
+ * See also [PlatformExtensionsClashResolver].
+ */
+interface PlatformSpecificExtension<S : PlatformSpecificExtension<S>>
+
+/**
+ * Allows to specify which [PlatformSpecificExtension] should be used if there were two or more registrations
+ * for [applicableTo] class in the container.
+ *
+ * [PlatformExtensionsClashResolver] should be registred in the container via [useClashResolver]-extension.
+ *
+ * NB. YOU DON'T NEED this mechanism for the most popular case of "one or several default vs.
+ * zero or one non-default". Just use [DefaultImplementation], and default instances will be automatically
+ * discriminated (see respective KDoc).
+ * Use [PlatformExtensionsClashResolver] only for cases when you need more invloved logic.
  *
  * Example: [org.jetbrains.kotlin.resolve.IdentifierChecker]. It is used in platform-agnostic code,
  * which resolves and checks identifiers for correctness. Each platform has it's own rules
  * regarding identifier correctness. In MPP modules we can't choose only one IdentifierChecker;
  * instead, we have to provide a "composite" IdentifierChecker which will launch checks of *each*
  * platform.
+ *
  */
-interface PlatformSpecificExtension<S : PlatformSpecificExtension<S>>
-
 abstract class PlatformExtensionsClashResolver<E : PlatformSpecificExtension<E>>(val applicableTo: Class<E>) {
     abstract fun resolveExtensionsClash(extensions: List<E>): E
 
