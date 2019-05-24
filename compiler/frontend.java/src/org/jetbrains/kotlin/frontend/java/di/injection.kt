@@ -106,7 +106,6 @@ fun StorageComponentContainer.configureJavaSpecificComponents(
     useInstance(JavaDeprecationSettings)
     useInstance(moduleClassResolver)
 
-    // configureJavaClassFinder != null <=> javac integration is enabled
     if (configureJavaClassFinder != null) {
         configureJavaClassFinder()
     } else {
@@ -117,7 +116,6 @@ fun StorageComponentContainer.configureJavaSpecificComponents(
 
     useInstance(languageVersionSettings.getFlag(JvmAnalysisFlags.jsr305))
 
-    // Currently, false in IDE environment (ideally, should be true everywhere)
     if (useBuiltInsProvider) {
         useInstance((moduleContext.module.builtIns as JvmBuiltIns).settings)
         useImpl<JvmBuiltInsPackageFragmentProvider>()
