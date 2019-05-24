@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.builtins.PlatformToKotlinClassMap
 import org.jetbrains.kotlin.container.*
 import org.jetbrains.kotlin.resolve.calls.checkers.*
 import org.jetbrains.kotlin.resolve.calls.results.TypeSpecificityComparator
-import org.jetbrains.kotlin.resolve.calls.results.TypeSpecificityComparator.NONE
 import org.jetbrains.kotlin.resolve.checkers.*
 import org.jetbrains.kotlin.resolve.lazy.DelegationFilter
 import org.jetbrains.kotlin.types.DynamicTypesSettings
@@ -60,9 +59,9 @@ private val DEFAULT_CLASH_RESOLVERS = listOf<PlatformExtensionsClashResolver<*>>
      * We should use NONE for clash resolution, because:
      * - JvmTypeSpecificityComparator covers cases with flexible types and primitive types loaded from Java, and all this is irrelevant for
      *   non-JVM modules
-     * - JsTypeSpecifcityComparator covers case with dynamics, which are not allowed in non-JS modules either
+     * - JsTypeSpecificityComparator covers case with dynamics, which are not allowed in non-JS modules either
      */
-    PlatformExtensionsClashResolver.FallbackToDefault(NONE, TypeSpecificityComparator::class.java),
+    PlatformExtensionsClashResolver.FallbackToDefault(TypeSpecificityComparator.NONE, TypeSpecificityComparator::class.java),
 
     PlatformExtensionsClashResolver.FallbackToDefault(DynamicTypesSettings(), DynamicTypesSettings::class.java)
 )
