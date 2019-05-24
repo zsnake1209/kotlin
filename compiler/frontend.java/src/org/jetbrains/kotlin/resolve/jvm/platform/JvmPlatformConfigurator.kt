@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.load.java.components.SamConversionResolver
-import org.jetbrains.kotlin.load.java.components.SamConversionResolver.Empty
 import org.jetbrains.kotlin.load.java.sam.JvmSamConversionTransformer
 import org.jetbrains.kotlin.load.java.sam.SamConversionResolverImpl
 import org.jetbrains.kotlin.resolve.PlatformConfiguratorBase
@@ -76,7 +75,7 @@ object JvmPlatformConfigurator : PlatformConfiguratorBase(
     ),
 
     additionalClashResolvers = listOf(
-        PlatformExtensionsClashResolver.FallbackToDefault(Empty, SamConversionResolver::class.java)
+        PlatformExtensionsClashResolver.FallbackToDefault(SamConversionResolver.Empty, SamConversionResolver::class.java)
     ),
 
     identifierChecker = JvmSimpleNameBacktickChecker,
