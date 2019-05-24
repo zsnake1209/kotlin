@@ -65,7 +65,7 @@ class ComponentStorage(private val myId: String, parent: ComponentStorage?) : Va
             val nonDefault = entry.filterNot { it.isDefaultComponent() }
             if (nonDefault.isEmpty()) return entry.first()
 
-            return nonDefault.singleOrNull { !it.isDefaultComponent() }
+            return nonDefault.singleOrNull()
                 ?: throw InvalidCardinalityException(
                     "Request $request cannot be satisfied because there is more than one type registered\n" +
                             "Clashed registrations: ${entry.joinToString()}"
