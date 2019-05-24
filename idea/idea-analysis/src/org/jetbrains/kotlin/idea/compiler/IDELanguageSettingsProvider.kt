@@ -74,7 +74,7 @@ object IDELanguageSettingsProvider : LanguageSettingsProvider {
         return result
     }
 
-    // TODO: remove!
+    // TODO(dsavvinov): get rid of this method; instead store proper instance of TargetPlatformVersion in platform-instance
     override fun getTargetPlatform(moduleInfo: ModuleInfo, project: Project): TargetPlatformVersion =
         when (moduleInfo) {
             is ModuleSourceInfo -> (moduleInfo.module.platform?.subplatformOfType<JdkPlatform>())?.targetVersion
