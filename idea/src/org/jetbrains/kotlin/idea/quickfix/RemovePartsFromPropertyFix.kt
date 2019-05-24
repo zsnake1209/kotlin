@@ -21,11 +21,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.Errors
+import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.core.quickfix.QuickFixUtil
 import org.jetbrains.kotlin.idea.intentions.SpecifyTypeExplicitlyIntention
+import org.jetbrains.kotlin.idea.resolve.frontendService
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.checker.RefineKotlinTypeChecker
 import org.jetbrains.kotlin.types.isError
 
 open class RemovePartsFromPropertyFix(
@@ -79,6 +82,17 @@ open class RemovePartsFromPropertyFix(
         }
         val replaceElement = element?.replace(newElement) as? KtProperty
         if (replaceElement != null && typeToAdd != null) {
+            // `refineType` call here is needed to avoid InvalidModuleException exception
+            //
+            // It happens because after refinement KotlinTypes may access ModuleDescriptor content
+            // and that module becomes invalid after replacement two lines above
+            //
+            // The actual problem is that we use a type obtained from the obsolete analysis session
+            // The ideal fix would be using a String that needs to be rendered instead of actual type
+            //
+            // But calling another type refinement also helps because it makes KotlinType instance using new module descriptor
+            typeToAdd = replaceElement.getResolutionFacade().frontendService<RefineKotlinTypeChecker>().refineType(typeToAdd)
+
             SpecifyTypeExplicitlyIntention.addTypeAnnotation(editor, replaceElement, typeToAdd)
         }
     }
