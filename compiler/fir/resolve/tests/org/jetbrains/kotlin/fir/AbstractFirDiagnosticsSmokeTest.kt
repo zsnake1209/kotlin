@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.platform.konan.KonanPlatforms
 import org.jetbrains.kotlin.resolve.PlatformDependentAnalyzerServices
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatformAnalyzerServices
 import java.io.File
-import java.lang.IllegalStateException
 import java.util.*
 
 abstract class AbstractFirDiagnosticsSmokeTest : BaseDiagnosticsTest() {

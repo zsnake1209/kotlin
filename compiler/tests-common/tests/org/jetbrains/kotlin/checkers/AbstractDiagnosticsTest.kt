@@ -64,7 +64,6 @@ import org.jetbrains.kotlin.test.util.RecursiveDescriptorComparator.RECURSIVE_AL
 import org.jetbrains.kotlin.utils.keysToMap
 import org.junit.Assert
 import java.io.File
-import java.lang.IllegalStateException
 import java.util.*
 import java.util.function.Predicate
 import java.util.regex.Pattern
