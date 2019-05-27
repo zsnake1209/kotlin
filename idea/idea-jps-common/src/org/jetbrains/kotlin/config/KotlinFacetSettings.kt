@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.cli.common.arguments.parseCommandLineArguments
 import org.jetbrains.kotlin.platform.IdePlatformKind
 import org.jetbrains.kotlin.platform.TargetPlatformVersion
 import org.jetbrains.kotlin.platform.TargetPlatform
-import org.jetbrains.kotlin.platform.compat.toOldPlatform
+import org.jetbrains.kotlin.platform.compat.toIdePlatform
 import org.jetbrains.kotlin.utils.DescriptionAware
 
 @Deprecated("Use IdePlatformKind instead.", level = DeprecationLevel.ERROR)
@@ -201,8 +201,8 @@ class KotlinFacetSettings {
         replaceWith = ReplaceWith("targetPlatform"),
         level = DeprecationLevel.ERROR
     )
-    fun getPlatform(): org.jetbrains.kotlin.resolve.TargetPlatform? {
-        return platform?.toOldPlatform()
+    fun getPlatform(): org.jetbrains.kotlin.platform.IdePlatform<*, *>? {
+        return platform?.toIdePlatform()
     }
 
     var coroutineSupport: LanguageFeature.State?
