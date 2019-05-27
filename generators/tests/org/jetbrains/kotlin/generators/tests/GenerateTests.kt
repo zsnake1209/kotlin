@@ -398,6 +398,7 @@ fun main(args: Array<String>) {
 
         testClass<AbstractMultiLineStringIndentTest> {
             model("editor/enterHandler/multilineString")
+            model("editor/enterHandler/afterUnmatchedBrace")
         }
 
         testClass<AbstractQuickDocProviderTest> {
