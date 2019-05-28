@@ -26,6 +26,14 @@ suspend fun O(block: suspend (String) -> String) = block("O")
 
 inline suspend fun K(block: suspend (String) -> String) = block("K")
 
+suspend fun ok(o: String): String {
+    return o + run {
+        if (o != "K") {
+            (::ok)("K")
+        } else ""
+    }
+}
+
 fun box(): String {
     var result = ""
 
@@ -35,9 +43,11 @@ fun box(): String {
 
         val a = A()
         result += O(a::id) + K(a::id)
+
+        result += ok("O")
     }
 
-    if (result != "OKOKOK") return "fail: $result"
+    if (result != "OKOKOKOK") return "fail: $result"
 
     return "OK"
 }
