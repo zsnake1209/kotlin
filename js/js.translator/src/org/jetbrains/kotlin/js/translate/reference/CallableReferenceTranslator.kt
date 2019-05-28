@@ -126,8 +126,7 @@ object CallableReferenceTranslator {
             aliases[valueArg.getArgumentExpression()!!] = TranslationUtils.coerce(context, paramRef, type)
         }
 
-        var functionContext = context.innerBlock(function.body).innerContextWithAliasesForExpressions(aliases)
-            .inner(functionDescriptor).innerWithContinuationNotTracked()
+        var functionContext = context.innerBlock(function.body).innerContextWithAliasesForExpressions(aliases).inner(functionDescriptor)
 
         functionContext.continuationParameterDescriptor?.let { continuationDescriptor ->
             function.parameters += JsParameter(context.getNameForDescriptor(continuationDescriptor))
