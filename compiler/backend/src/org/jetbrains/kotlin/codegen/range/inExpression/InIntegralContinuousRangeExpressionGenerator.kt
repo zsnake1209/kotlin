@@ -16,17 +16,21 @@
 
 package org.jetbrains.kotlin.codegen.range.inExpression
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.range.BoundedValue
 import org.jetbrains.kotlin.codegen.range.comparison.ComparisonGenerator
+import org.jetbrains.kotlin.codegen.range.comparison.RangeContainsTypeInfo
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
+import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.org.objectweb.asm.Label
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 
 class InIntegralContinuousRangeExpressionGenerator(
     operatorReference: KtSimpleNameExpression,
+    private val rangeContainsTypeInfo: RangeContainsTypeInfo,
     private val boundedValue: BoundedValue,
     private val comparisonGenerator: ComparisonGenerator,
     private val frameMap: FrameMap
@@ -38,6 +42,7 @@ class InIntegralContinuousRangeExpressionGenerator(
 
     private fun gen(argument: StackValue): BranchedValue =
         object : BranchedValue(argument, null, comparisonGenerator.comparedType, Opcodes.IFEQ) {
+
             override fun condJump(jumpLabel: Label, v: InstructionAdapter, jumpIfFalse: Boolean) {
                 if (jumpIfFalse) {
                     genJumpIfFalse(v, jumpLabel)
@@ -54,7 +59,7 @@ class InIntegralContinuousRangeExpressionGenerator(
 
                     boundedValue.putHighLow(v, operandType)
 
-                    arg1.put(operandType, v)
+                    putCoercedArgumentOnStack(v)
                     v.store(arg1Var, operandType)
                     v.load(arg1Var, operandType)
 
@@ -95,7 +100,7 @@ class InIntegralContinuousRangeExpressionGenerator(
 
                     boundedValue.putHighLow(v, operandType)
 
-                    arg1.put(operandType, v)
+                    putCoercedArgumentOnStack(v)
                     v.store(arg1Var, operandType)
                     v.load(arg1Var, operandType)
 
@@ -126,6 +131,71 @@ class InIntegralContinuousRangeExpressionGenerator(
                     }
                 }
 
+            }
+
+            private fun putCoercedArgumentOnStack(v: InstructionAdapter) {
+                val argumentKotlinType = rangeContainsTypeInfo.valueParameterType
+                val rangeElementKotlinType = rangeContainsTypeInfo.rangeElementType
+
+                when {
+                    KotlinBuiltIns.isUInt(rangeElementKotlinType) -> coerceArgToUInt(v, argumentKotlinType)
+                    KotlinBuiltIns.isULong(rangeElementKotlinType) -> coerceArgToULong(v, argumentKotlinType)
+                    else -> arg1.put(operandType, v)
+                }
+            }
+
+            private fun coerceArgToUInt(v: InstructionAdapter, argumentKotlinType: KotlinType) {
+                arg1.put(arg1.type, v)
+                when {
+                    KotlinBuiltIns.isUByte(argumentKotlinType) -> {
+                        v.iconst(0xFF)
+                        v.visitInsn(Opcodes.IAND)
+                    }
+
+                    KotlinBuiltIns.isUShort(argumentKotlinType) -> {
+                        v.iconst(0xFFFF)
+                        v.visitInsn(Opcodes.IAND)
+                    }
+
+                    KotlinBuiltIns.isUInt(argumentKotlinType) -> {
+                        // nop
+                    }
+
+                    KotlinBuiltIns.isULong(argumentKotlinType) -> {
+                        v.visitInsn(Opcodes.L2I)
+                    }
+
+                    else -> throw AssertionError("Unexpected argument type: $argumentKotlinType")
+                }
+            }
+
+            private fun coerceArgToULong(v: InstructionAdapter, argumentKotlinType: KotlinType) {
+                arg1.put(arg1.type, v)
+                when {
+                    KotlinBuiltIns.isUByte(argumentKotlinType) -> {
+                        v.visitInsn(Opcodes.I2L)
+                        v.lconst(0xFF)
+                        v.visitInsn(Opcodes.LAND)
+                    }
+
+                    KotlinBuiltIns.isUShort(argumentKotlinType) -> {
+                        v.visitInsn(Opcodes.I2L)
+                        v.lconst(0xFFFF)
+                        v.visitInsn(Opcodes.LAND)
+                    }
+
+                    KotlinBuiltIns.isUInt(argumentKotlinType) -> {
+                        v.visitInsn(Opcodes.I2L)
+                        v.lconst(0xFFFF_FFFF)
+                        v.visitInsn(Opcodes.LAND)
+                    }
+
+                    KotlinBuiltIns.isULong(argumentKotlinType) -> {
+                        // nop
+                    }
+
+                    else -> throw AssertionError("Unexpected argument type: $argumentKotlinType")
+                }
             }
         }
 }

@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.codegen.ExpressionCodegen
 import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.range.comparison.getComparisonGeneratorForKotlinType
 import org.jetbrains.kotlin.codegen.range.comparison.getComparisonGeneratorForRangeContainsCall
+import org.jetbrains.kotlin.codegen.range.comparison.getRangeContainsTypeInfo
 import org.jetbrains.kotlin.codegen.range.forLoop.ForInDefinitelySafeSimpleProgressionLoopGenerator
 import org.jetbrains.kotlin.codegen.range.forLoop.ForLoopGenerator
 import org.jetbrains.kotlin.codegen.range.inExpression.CallBasedInExpressionGenerator
@@ -60,12 +61,14 @@ abstract class PrimitiveNumberRangeIntrinsicRangeValue(
         operatorReference: KtSimpleNameExpression,
         resolvedCall: ResolvedCall<out CallableDescriptor>
     ): InExpressionGenerator {
-        val comparisonGenerator = getComparisonGeneratorForRangeContainsCall(codegen, resolvedCall)
-        val comparedType = comparisonGenerator?.comparedType
+        val rangeContainsTypeInfo = getRangeContainsTypeInfo(resolvedCall)
+            ?: return CallBasedInExpressionGenerator(codegen, operatorReference)
+        val comparisonGenerator = getComparisonGeneratorForRangeContainsCall(codegen, rangeContainsTypeInfo)
+            ?: return CallBasedInExpressionGenerator(codegen, operatorReference)
+
+        val comparedType = comparisonGenerator.comparedType
 
         return when {
-            comparisonGenerator == null -> CallBasedInExpressionGenerator(codegen, operatorReference)
-
             comparedType == Type.DOUBLE_TYPE || comparedType == Type.FLOAT_TYPE -> {
                 val rangeLiteral = getBoundedValue(codegen) as? BoundedValue
                     ?: throw AssertionError("Floating point intrinsic range value should be a range literal")
@@ -74,7 +77,7 @@ abstract class PrimitiveNumberRangeIntrinsicRangeValue(
 
             else ->
                 InIntegralContinuousRangeExpressionGenerator(
-                    operatorReference, getBoundedValue(codegen), comparisonGenerator, codegen.frameMap
+                    operatorReference, rangeContainsTypeInfo, getBoundedValue(codegen), comparisonGenerator, codegen.frameMap
                 )
         }
     }
