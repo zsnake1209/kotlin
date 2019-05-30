@@ -78,10 +78,11 @@ object KotlinTypeFactory {
             annotations, constructor, arguments, nullable,
             computeMemberScope(constructor, arguments, kotlinTypeRefiner)
         ) f@{ refiner ->
-            val expandedTypeOrRefinedConstructor = refineConstructor(constructor, refiner, arguments) ?: return@f null
+            val refinedArguments = arguments.map { it.refine(refiner) }
+            val expandedTypeOrRefinedConstructor = refineConstructor(constructor, refiner, refinedArguments) ?: return@f null
             expandedTypeOrRefinedConstructor.expandedType?.let { return@f it }
 
-            simpleType(annotations, expandedTypeOrRefinedConstructor.refinedConstructor!!, arguments, nullable, module)
+            simpleType(annotations, expandedTypeOrRefinedConstructor.refinedConstructor!!, refinedArguments, nullable, kotlinTypeRefiner)
         }
     }
 
@@ -126,10 +127,12 @@ object KotlinTypeFactory {
             val expandedTypeOrRefinedConstructor = refineConstructor(constructor, kotlinTypeRefiner, arguments) ?: return@SimpleTypeImpl null
             expandedTypeOrRefinedConstructor.expandedType?.let { return@SimpleTypeImpl it }
 
+            val refinedArguments = arguments.map { it.refine(kotlinTypeRefiner) }
+
             simpleTypeWithNonTrivialMemberScope(
                 annotations,
                 expandedTypeOrRefinedConstructor.refinedConstructor!!,
-                arguments,
+                refinedArguments,
                 nullable,
                 memberScope
             )
