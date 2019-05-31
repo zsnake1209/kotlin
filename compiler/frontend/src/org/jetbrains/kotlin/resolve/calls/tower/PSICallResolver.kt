@@ -42,6 +42,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.scopes.*
 import org.jetbrains.kotlin.resolve.scopes.receivers.*
 import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.types.expressions.*
 import org.jetbrains.kotlin.types.model.TypeSystemInferenceExtensionContext
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
@@ -67,7 +68,8 @@ class PSICallResolver(
     private val kotlinConstraintSystemCompleter: KotlinConstraintSystemCompleter,
     private val deprecationResolver: DeprecationResolver,
     private val moduleDescriptor: ModuleDescriptor,
-    private val callableReferenceResolver: CallableReferenceResolver
+    private val callableReferenceResolver: CallableReferenceResolver,
+    private val kotlinTypeRefiner: KotlinTypeRefiner
 ) {
     private val givenCandidatesName = Name.special("<given candidates>")
 
@@ -571,7 +573,7 @@ class PSICallResolver(
             null -> null
             is QualifierReceiver -> QualifierReceiverKotlinCallArgument(oldReceiver) // todo report warning if isSafeCall
             is ReceiverValue -> {
-                val detailedReceiver = context.transformToReceiverWithSmartCastInfo(oldReceiver)
+                val detailedReceiver = context.transformToReceiverWithSmartCastInfo(oldReceiver).refine()
 
                 var subCallArgument: ReceiverKotlinCallArgument? = null
                 if (oldReceiver is ExpressionReceiver) {
@@ -712,5 +714,10 @@ class PSICallResolver(
         }
         catchScope.addVariableDescriptor(variableDescriptor)
         return replaceScope(catchScope)
+    }
+
+    private fun ReceiverValueWithSmartCastInfo.refine(): ReceiverValueWithSmartCastInfo {
+        if (receiverValue is ImplicitReceiver) return this
+        return ReceiverValueWithSmartCastInfo(receiverValue, possibleTypes,  isStable)
     }
 }
