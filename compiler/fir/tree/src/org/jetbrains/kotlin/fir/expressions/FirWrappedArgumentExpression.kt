@@ -5,20 +5,25 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirWrappedArgumentExpression : FirExpression {
-    val expression: FirExpression
+abstract class FirWrappedArgumentExpression(
+    session: FirSession,
+    psi: PsiElement?
+) : FirExpression(session, psi) {
+    abstract val expression: FirExpression
 
-    val isSpread: Boolean
+    open val isSpread: Boolean
         get() = false
 
     override val typeRef: FirTypeRef
         get() = expression.typeRef
 
     override fun replaceTypeRef(newTypeRef: FirTypeRef) {
-        throw AssertionError("We should not try to replace type reference in ${this::class}")
+        expression.replaceTypeRef(newTypeRef)
     }
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
