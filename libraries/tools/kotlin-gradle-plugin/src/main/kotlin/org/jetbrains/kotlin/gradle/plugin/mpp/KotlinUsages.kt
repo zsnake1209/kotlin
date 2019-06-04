@@ -54,11 +54,16 @@ object KotlinUsages {
         }
     )
 
+    val javaApiUsages = setOf(JAVA_API, "java-api-jars")
+    val javaRuntimeUsages = setOf(JAVA_RUNTIME_JARS, JAVA_RUNTIME)
+
     private class KotlinJavaRuntimeJarsCompatibility : AttributeCompatibilityRule<Usage> {
         // When Gradle resolves a plain old JAR dependency with no metadata attached, the Usage attribute of that dependency
         // is 'java-runtime-jars'. This rule tells Gradle that Kotlin consumers can consume plain old JARs:
         override fun execute(details: CompatibilityCheckDetails<Usage>) = with(details) {
             when {
+                (consumerValue?.name in javaApiUsages || consumerValue?.name in javaRuntimeUsages)
+                        && producerValue?.name == KOTLIN_API -> compatible()
                 consumerValue?.name == KOTLIN_API && producerValue?.name.let { it == JAVA_API || it == "java-api-jars" } ->
                     compatible()
                 consumerValue?.name in values && producerValue?.name.let { it == JAVA_RUNTIME || it == JAVA_RUNTIME_JARS } ->
@@ -105,9 +110,6 @@ object KotlinUsages {
             if (candidateNames.filterNotNull().toSet() == setOf(KOTLIN_RUNTIME, KOTLIN_API)) {
                 chooseCandidateByName(KOTLIN_RUNTIME)
             }
-
-            val javaApiUsages = setOf(JAVA_API, "java-api-jars")
-            val javaRuntimeUsages = setOf(JAVA_RUNTIME_JARS, JAVA_RUNTIME)
 
             if (javaApiUsages.any { it in candidateNames } &&
                 javaRuntimeUsages.any { it in candidateNames } &&

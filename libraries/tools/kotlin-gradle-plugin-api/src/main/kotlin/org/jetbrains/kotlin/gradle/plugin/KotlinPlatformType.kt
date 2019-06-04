@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.gradle.plugin
 
 import org.gradle.api.Named
 import org.gradle.api.attributes.*
-import org.gradle.util.GradleVersion
 import java.io.Serializable
 
 enum class KotlinPlatformType: Named, Serializable {
@@ -24,15 +23,27 @@ enum class KotlinPlatformType: Named, Serializable {
             // Allow the input metadata configuration consume platform-specific artifacts if no metadata is available, KT-26834
             if (consumerValue == common)
                 compatible()
+
+            // KT-31675: when a platform-specific consumer accidentally (or transitively) depends on the
+            // `-metadata` part of an MPP. We need to allow allow doing so, at least until there's no libraries left which are published
+            // without Gradle module metadata.
+            if (producerValue == common)
+                compatible()
         }
     }
 
+    @Suppress("UnstableApiUsage")
     class DisambiguationRule : AttributeDisambiguationRule<KotlinPlatformType> {
         override fun execute(details: MultipleCandidatesDetails<KotlinPlatformType?>) = with(details) {
+            if (details.consumerValue in details.candidateValues) {
+                closestMatch(consumerValue)
+                return
+            }
+
             if (candidateValues == setOf(androidJvm, jvm))
                 closestMatch(androidJvm)
 
-            if (common in candidateValues)
+            if (common in candidateValues/* && consumerValue == null*/)
                 // then the consumer requests common or requests no platform-specific artifacts,
                 // so common is the best match, KT-26834
                 closestMatch(common)
