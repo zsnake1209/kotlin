@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.ir.util.lineStartOffsets
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
+import org.jetbrains.kotlin.library.SerializedIr
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 
