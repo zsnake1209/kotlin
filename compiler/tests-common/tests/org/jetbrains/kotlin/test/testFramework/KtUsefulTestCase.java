@@ -387,7 +387,7 @@ public abstract class KtUsefulTestCase extends TestCase {
         //if (policy != null) {
         //    return policy.runInDispatchThread();
         //}
-        return true;
+        return false;
     }
 
     @NotNull
