@@ -33,6 +33,11 @@ public abstract class KotlinMultiFileTestWithJava<M, F> extends KtUsefulTestCase
     protected String coroutinesPackage;
 
     @Override
+    protected boolean runInDispatchThread() {
+        return false;
+    }
+
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         // TODO: do not create temporary directory for tests without Java sources

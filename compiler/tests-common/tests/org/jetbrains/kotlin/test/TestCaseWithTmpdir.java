@@ -28,4 +28,9 @@ public abstract class TestCaseWithTmpdir extends KtUsefulTestCase {
         super.setUp();
         tmpdir = KotlinTestUtils.tmpDirForTest(this);
     }
+
+    @Override
+    protected boolean runInDispatchThread() {
+        return false;
+    }
 }
