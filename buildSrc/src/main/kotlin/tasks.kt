@@ -20,60 +20,15 @@
 
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.internal.tasks.testing.filter.DefaultTestFilter
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.project
 import org.gradle.kotlin.dsl.task
 import java.io.File
-import java.lang.Character.isLowerCase
-import java.lang.Character.isUpperCase
 import java.nio.file.Files
 import java.nio.file.Path
 
 fun Project.projectTest(taskName: String = "test", parallel: Boolean = false, body: Test.() -> Unit = {}): Test = getOrCreateTask(taskName) {
-    doFirst {
-        val commandLineIncludePatterns = (filter as? DefaultTestFilter)?.commandLineIncludePatterns ?: emptySet()
-        val patterns = filter.includePatterns + commandLineIncludePatterns
-        if (patterns.isEmpty() || patterns.any { '*' in it }) return@doFirst
-        patterns.forEach { pattern ->
-            var isClassPattern = false
-            val maybeMethodName = pattern.substringAfterLast('.')
-            val maybeClassFqName = if (maybeMethodName.isFirstChar(::isLowerCase)) {
-                pattern.substringBeforeLast('.')
-            } else {
-                isClassPattern = true
-                pattern
-            }
-
-            if (!maybeClassFqName.substringAfterLast('.').isFirstChar(::isUpperCase)) {
-                return@forEach
-            }
-
-            val classFileNameWithoutExtension = maybeClassFqName.replace('.', '/')
-            val classFileName = "$classFileNameWithoutExtension.class"
-
-            if (isClassPattern) {
-                val innerClassPattern = "$pattern$*"
-                if (pattern in commandLineIncludePatterns) {
-                    commandLineIncludePatterns.add(innerClassPattern)
-                    (filter as? DefaultTestFilter)?.setCommandLineIncludePatterns(commandLineIncludePatterns)
-                } else {
-                    filter.includePatterns.add(innerClassPattern)
-                }
-            }
-
-            include {
-                val path = it.path
-                if (it.isDirectory) {
-                    classFileNameWithoutExtension.startsWith(path)
-                } else {
-                    path == classFileName || (path.endsWith(".class") && path.startsWith("$classFileNameWithoutExtension$"))
-                }
-            }
-        }
-    }
-
     doFirst {
         val agent = tasks.findByPath(":test-instrumenter:jar")!!.outputs.files.singleFile
 
