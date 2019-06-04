@@ -299,16 +299,15 @@ public abstract class KtUsefulTestCase extends TestCase {
     }
 
     protected void invokeTestRunnable(@NotNull Runnable runnable) throws Exception {
-        //IdeaTestExecutionPolicy policy = IdeaTestExecutionPolicy.current();
-        //if (policy != null && !policy.runInDispatchThread()) {
-        //    runnable.run();
-        //}
-        //else {
+        if (runInDispatchThread()) {
             EdtTestUtilKt.runInEdtAndWait(() -> {
                 runnable.run();
                 return null;
             });
-        //}
+        }
+        else {
+            runnable.run();
+        }
     }
 
     private void defaultRunBare() throws Throwable {

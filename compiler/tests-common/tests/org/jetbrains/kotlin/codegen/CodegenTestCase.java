@@ -92,6 +92,11 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
 
     protected ConfigurationKind configurationKind = ConfigurationKind.JDK_ONLY;
 
+    @Override
+    protected boolean runInDispatchThread() {
+        return false;
+    }
+
     protected final void createEnvironmentWithMockJdkAndIdeaAnnotations(
             @NotNull ConfigurationKind configurationKind,
             @NotNull File... javaSourceRoots
