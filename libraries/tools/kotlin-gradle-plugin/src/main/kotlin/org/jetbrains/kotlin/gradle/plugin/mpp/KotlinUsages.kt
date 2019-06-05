@@ -104,6 +104,7 @@ object KotlinUsages {
             val candidateNames = candidateValues.map { it?.name }.toSet()
 
             fun chooseCandidateByName(name: String?): Unit = closestMatch(candidateValues.single { it?.name == name }!!)
+            fun chooseFirstCandidateByName(names: Iterable<String>) = names.first { it in candidateNames }.let(::chooseCandidateByName)
 
             // if both API and runtime artifacts are chosen according to the compatibility rules, then
             // the consumer requested nothing specific, so provide them with the runtime variant, which is more complete:
@@ -111,15 +112,12 @@ object KotlinUsages {
                 chooseCandidateByName(KOTLIN_RUNTIME)
             }
 
-            if (javaApiUsages.any { it in candidateNames } &&
-                javaRuntimeUsages.any { it in candidateNames } &&
-                values.none { it in candidateNames }
-            ) {
+            if (javaApiUsages.any { it in candidateNames } || javaRuntimeUsages.any { it in candidateNames }) {
                 when (consumerValue?.name) {
-                    KOTLIN_API, in javaApiUsages ->
-                        chooseCandidateByName(javaApiUsages.first { it in candidateNames })
-                    null, KOTLIN_RUNTIME, in javaRuntimeUsages ->
-                        chooseCandidateByName(javaRuntimeUsages.first { it in candidateNames })
+                    KOTLIN_API -> chooseFirstCandidateByName(listOf(KOTLIN_API) + javaApiUsages)
+                    in javaApiUsages -> chooseFirstCandidateByName(javaApiUsages)
+                    KOTLIN_RUNTIME -> chooseFirstCandidateByName(listOf(KOTLIN_RUNTIME, KOTLIN_API) + javaRuntimeUsages)
+                    null, in javaRuntimeUsages -> chooseCandidateByName(javaRuntimeUsages.first { it in candidateNames })
                 }
             }
 

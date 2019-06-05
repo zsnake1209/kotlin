@@ -35,18 +35,13 @@ enum class KotlinPlatformType: Named, Serializable {
     @Suppress("UnstableApiUsage")
     class DisambiguationRule : AttributeDisambiguationRule<KotlinPlatformType> {
         override fun execute(details: MultipleCandidatesDetails<KotlinPlatformType?>) = with(details) {
-            if (details.consumerValue in details.candidateValues) {
+            if (consumerValue in details.candidateValues) {
                 closestMatch(consumerValue)
                 return
             }
 
             if (candidateValues == setOf(androidJvm, jvm))
                 closestMatch(androidJvm)
-
-            if (common in candidateValues/* && consumerValue == null*/)
-                // then the consumer requests common or requests no platform-specific artifacts,
-                // so common is the best match, KT-26834
-                closestMatch(common)
         }
     }
 
