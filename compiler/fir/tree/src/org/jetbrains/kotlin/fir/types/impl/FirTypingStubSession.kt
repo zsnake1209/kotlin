@@ -6,12 +6,9 @@
 package org.jetbrains.kotlin.fir.types.impl
 
 import org.jetbrains.kotlin.analyzer.ModuleInfo
-import org.jetbrains.kotlin.fir.FirSession
-import kotlin.reflect.KClass
+import org.jetbrains.kotlin.fir.FirSessionBase
 
-object FirTypingStubSession : FirSession {
+object FirTypingStubSession : FirSessionBase(null) {
     override val moduleInfo: ModuleInfo?
-        get() = error("Stub session")
-    override val components: Map<KClass<*>, Any>
         get() = error("Stub session")
 }
