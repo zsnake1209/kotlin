@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.resolve.FirSymbolProvider
 import org.jetbrains.kotlin.fir.resolve.impl.FirCompositeSymbolProvider
 import org.jetbrains.kotlin.fir.resolve.impl.FirDependenciesSymbolProviderImpl
 import org.jetbrains.kotlin.fir.resolve.impl.FirLibrarySymbolProviderImpl
+import org.jetbrains.kotlin.fir.types.FirCorrespondingSupertypesCache
 import org.jetbrains.kotlin.load.java.JavaClassFinder
 import org.jetbrains.kotlin.load.java.JavaClassFinderImpl
 import org.jetbrains.kotlin.load.kotlin.KotlinClassFinder
@@ -29,6 +30,8 @@ class FirJavaModuleBasedSession(
 ) : FirModuleBasedSession(moduleInfo), FirSymbolProviderAwareSession {
 
     override val firSymbolProvider: FirSymbolProvider
+
+    override val correspondingSupertypesCache: FirCorrespondingSupertypesCache = FirCorrespondingSupertypesCache(this)
 
     init {
         sessionProvider.sessionCache[moduleInfo] = this
@@ -57,6 +60,7 @@ class FirLibrarySession private constructor(
 ) : FirSessionBase(), FirSymbolProviderAwareSession {
 
     override val firSymbolProvider: FirSymbolProvider
+    override val correspondingSupertypesCache: FirCorrespondingSupertypesCache = FirCorrespondingSupertypesCache(this)
 
     init {
         sessionProvider.sessionCache[moduleInfo] = this

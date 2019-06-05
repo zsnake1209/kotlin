@@ -6,7 +6,9 @@
 package org.jetbrains.kotlin.fir
 
 import org.jetbrains.kotlin.fir.resolve.FirSymbolProvider
+import org.jetbrains.kotlin.fir.types.FirCorrespondingSupertypesCache
 
 interface FirSymbolProviderAwareSession : FirSession {
     val firSymbolProvider: FirSymbolProvider
+    val correspondingSupertypesCache: FirCorrespondingSupertypesCache
 }
