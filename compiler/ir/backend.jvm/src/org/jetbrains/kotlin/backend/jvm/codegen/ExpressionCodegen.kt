@@ -309,6 +309,7 @@ class ExpressionCodegen(
                 mv.load(0, OBJECT_TYPE)
             expression.descriptor is ConstructorDescriptor ->
                 throw AssertionError("IrCall with ConstructorDescriptor: ${expression.javaClass.simpleName}")
+            callee.isSuspend -> addInlineMarker(mv, isStartNotEnd = true)
         }
 
         val receiver = expression.dispatchReceiver
@@ -374,6 +375,11 @@ class ExpressionCodegen(
         }
 
         expression.markLineNumber(true)
+
+        if (callee.isSuspend) {
+            addSuspendMarker(mv, isStartNotEnd = true)
+        }
+
         callGenerator.genCall(
             callable,
             defaultMask.generateOnStackIfNeeded(callGenerator, callee is IrConstructor, this),
@@ -382,6 +388,12 @@ class ExpressionCodegen(
         )
 
         val returnType = callee.returnType.substitute(typeSubstitutionMap)
+
+        if (callee.isSuspend) {
+            addSuspendMarker(mv, isStartNotEnd = false)
+            addInlineMarker(mv, isStartNotEnd = false)
+        }
+
         return when {
             returnType.isNothing() -> {
                 mv.aconst(null)
