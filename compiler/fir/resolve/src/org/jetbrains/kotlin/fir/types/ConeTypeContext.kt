@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.types
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.FirSymbolProviderAwareSession
 import org.jetbrains.kotlin.fir.declarations.FirRegularClass
 import org.jetbrains.kotlin.fir.declarations.expandedConeType
 import org.jetbrains.kotlin.fir.declarations.superConeTypes
@@ -46,6 +47,13 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
 
     override fun SimpleTypeMarker.possibleIntegerTypes(): Collection<KotlinTypeMarker> {
         TODO("not implemented")
+    }
+
+    override fun SimpleTypeMarker.fastCorrespondingSupertypes(constructor: TypeConstructorMarker): List<SimpleTypeMarker>? {
+        require(this is ConeLookupTagBasedType)
+        return (session as? FirSymbolProviderAwareSession)
+            ?.correspondingSupertypesCache
+            ?.getCorrespondingSupertypes(this, constructor)
     }
 
     override fun SimpleTypeMarker.isIntegerLiteralType(): Boolean {
@@ -396,7 +404,8 @@ private val NOTHING_CLASS_ID = ClassId.topLevel(FqName("kotlin.Nothing"))
 
 class ConeTypeCheckerContext(override val isErrorTypeEqualsToAnything: Boolean, override val session: FirSession) :
     AbstractTypeCheckerContext(), ConeTypeContext {
-    override fun substitutionSupertypePolicy(type: SimpleTypeMarker): SupertypesPolicy.DoCustomTransform {
+    override fun substitutionSupertypePolicy(type: SimpleTypeMarker): SupertypesPolicy {
+        if (type.argumentsCount() == 0) return SupertypesPolicy.LowerIfFlexible
         require(type is ConeKotlinType)
         val declaration = when (type) {
             is ConeClassType -> type.lookupTag.toSymbol(session)?.firUnsafe<FirRegularClass>()
