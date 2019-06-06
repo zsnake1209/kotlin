@@ -110,9 +110,10 @@ fun Project.`samWithReceiver`(configure: org.jetbrains.kotlin.samWithReceiver.gr
 
 tasks["build"].dependsOn(":prepare-deps:build")
 
+tasks.register("checkBuild")
+
 allprojects {
     afterEvaluate {
         apply(from = "$rootDir/../gradle/cacheRedirector.gradle.kts")
-        tasks["check"].dependsOn(tasks["checkRepositories"])
     }
 }
