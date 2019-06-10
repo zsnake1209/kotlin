@@ -9,12 +9,14 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.*
-import org.gradle.jvm.tasks.Jar
 import java.io.File
 
 internal open class InspectClassesForMultiModuleIC : DefaultTask() {
-    @get:Internal
-    lateinit var jarTask: Jar
+    @get:Input
+    internal lateinit var archivePath: String
+
+    @get:Input
+    internal lateinit var archiveName: String
 
     @get:Input
     lateinit var sourceSetName: String
@@ -22,7 +24,7 @@ internal open class InspectClassesForMultiModuleIC : DefaultTask() {
     @Suppress("MemberVisibilityCanBePrivate")
     @get:OutputFile
     internal val classesListFile: File
-        get() = File(File(project.buildDir, KOTLIN_BUILD_DIR_NAME), "${sanitizeFileName(jarTask.archiveName)}-classes.txt")
+        get() = File(File(project.buildDir, KOTLIN_BUILD_DIR_NAME), "${sanitizeFileName(archiveName)}-classes.txt")
 
     @Suppress("MemberVisibilityCanBePrivate")
     @get:InputFiles
@@ -34,10 +36,6 @@ internal open class InspectClassesForMultiModuleIC : DefaultTask() {
             val fileTrees = sourceSet.output.classesDirs.map { project.fileTree(it).include("**/*.class") }
             return project.files(fileTrees)
         }
-
-    @get:Input
-    internal val archivePath: String
-        get() = jarTask.archivePath.canonicalPath
 
     @TaskAction
     fun run() {
