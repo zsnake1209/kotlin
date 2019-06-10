@@ -64,6 +64,11 @@ public class MultiplatformAnalysisTestGenerated extends AbstractMultiplatformAna
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/testData/multiplatformTypeRefinement"), Pattern.compile("^([^\\.]+)$"), TargetBackend.ANY, false);
         }
 
+        @TestMetadata("callableReferences")
+        public void testCallableReferences() throws Exception {
+            runTest("idea/testData/multiplatformTypeRefinement/callableReferences/");
+        }
+
         @TestMetadata("diamondModuleDependency1")
         public void testDiamondModuleDependency1() throws Exception {
             runTest("idea/testData/multiplatformTypeRefinement/diamondModuleDependency1/");
