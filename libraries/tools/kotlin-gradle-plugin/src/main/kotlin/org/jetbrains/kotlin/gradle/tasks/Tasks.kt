@@ -170,14 +170,14 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
         get() = (classpath + additionalClasspath)
             .filterTo(LinkedHashSet(), File::exists)
 
-    private val sourceFilesExtensionsSources: MutableList<Iterable<String>> = mutableListOf()
+    private val sourceFilesExtensionsSources = project.objects.listProperty(String::class.java)
 
     @get:Input
     val sourceFilesExtensions: List<String>
-        get() = DEFAULT_KOTLIN_SOURCE_FILES_EXTENSIONS + sourceFilesExtensionsSources.flatten()
+        get() = DEFAULT_KOTLIN_SOURCE_FILES_EXTENSIONS + sourceFilesExtensionsSources.get()
 
     internal fun sourceFilesExtensions(extensions: Iterable<String>) {
-        sourceFilesExtensionsSources.add(extensions)
+        sourceFilesExtensionsSources.addAll(extensions)
     }
 
     private val kotlinExt: KotlinProjectExtension
