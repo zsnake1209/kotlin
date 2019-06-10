@@ -23,7 +23,7 @@ abstract class FirWrappedArgumentExpression(
         get() = expression.typeRef
 
     override fun replaceTypeRef(newTypeRef: FirTypeRef) {
-        expression.replaceTypeRef(newTypeRef)
+        throw AssertionError("We should not try to replace type reference in ${this::class}")
     }
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
