@@ -38,7 +38,7 @@ import org.jetbrains.kotlin.utils.Jsr305State
 class JavaClassEnhancementScope(
     private val session: FirSession,
     private val useSiteScope: JavaClassUseSiteScope
-) : FirScope {
+) : FirScope() {
     private val owner: FirRegularClass = useSiteScope.symbol.fir
 
     private val javaTypeParameterStack: JavaTypeParameterStack =
