@@ -89,8 +89,8 @@ abstract class AbstractKotlinCompileTool<T : CommonToolArguments>
 
     @get:Classpath
     @get:InputFiles
-    internal val computedCompilerClasspath: List<File>
-        get() = compilerClasspath?.takeIf { it.isNotEmpty() }
+    internal val computedCompilerClasspath: List<File> by lazy {
+        compilerClasspath?.takeIf { it.isNotEmpty() }
             ?: compilerJarFile?.let {
                 // a hack to remove compiler jar from the cp, will be dropped when compilerJarFile will be removed
                 listOf(it) + findKotlinCompilerClasspath(project).filter { !it.name.startsWith("kotlin-compiler") }
@@ -109,6 +109,7 @@ abstract class AbstractKotlinCompileTool<T : CommonToolArguments>
                 findKotlinCompilerClasspath(project)
             }
             ?: throw IllegalStateException("Could not find Kotlin Compiler classpath")
+    }
 
 
     protected abstract fun findKotlinCompilerClasspath(project: Project): List<File>
@@ -153,8 +154,9 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
 
     @get:Classpath
     @get:InputFiles
-    val pluginClasspath: FileCollection
-        get() = project.configurations.getByName(PLUGIN_CLASSPATH_CONFIGURATION_NAME)
+    val pluginClasspath: FileCollection by lazy {
+        project.configurations.getByName(PLUGIN_CLASSPATH_CONFIGURATION_NAME)
+    }
 
     @get:Internal
     internal val pluginOptions = CompilerPluginOptions()
@@ -202,10 +204,11 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractKo
     internal val coroutinesStr: String
         get() = coroutines.name
 
-    private val coroutines: Coroutines
-        get() = kotlinExt.experimental.coroutines
+    private val coroutines: Coroutines by lazy {
+        kotlinExt.experimental.coroutines
             ?: coroutinesFromGradleProperties
             ?: Coroutines.DEFAULT
+    }
 
     @get:Internal
     internal var friendTaskName: String? = null
