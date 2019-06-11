@@ -44,8 +44,6 @@ abstract class KotlinIrLinker(
     private val firstKnownBuiltinsIndex: Long
 ) : DescriptorUniqIdAware, IrDeserializer {
 
-    override var successfullyInvokedLately: Boolean = false
-
     protected val deserializedSymbols = mutableMapOf<UniqIdKey, IrSymbol>()
     private val reachableTopLevels = mutableSetOf<UniqIdKey>()
     private val deserializedTopLevels = mutableSetOf<UniqIdKey>()
@@ -396,17 +394,16 @@ abstract class KotlinIrLinker(
         return topLevelDescriptor
     }
 
-    override fun findDeserializedDeclaration(symbol: IrSymbol): IrDeclaration? {
+    override fun findDeserializedDeclaration(symbol: IrSymbol, backoff: (IrSymbol) -> IrDeclaration): IrDeclaration? {
 
         if (!symbol.isBound) {
-            findDeserializedDeclarationForDescriptor(symbol.descriptor) ?: return null
+            findDeserializedDeclarationForDescriptor(symbol.descriptor) ?: return backoff(symbol)
         }
 
         assert(symbol.isBound) {
             "findDeserializedDeclaration: symbol ${symbol} is unbound, descriptor = ${symbol.descriptor}, hash = ${symbol.descriptor.hashCode()}"
         }
 
-        successfullyInvokedLately = true
         return symbol.owner as IrDeclaration
     }
 
