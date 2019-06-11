@@ -25,6 +25,8 @@ import org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata.KlibMetad
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.ExpectDeclarationRemover
+import org.jetbrains.kotlin.ir.util.EmptyDeserializer
+import org.jetbrains.kotlin.ir.util.IrDeserializer
 import org.jetbrains.kotlin.ir.util.IrDeserializer
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
