@@ -29,12 +29,14 @@ import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtensionProperty
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.types.refinement.TypeRefinement
 
 class JsNameClashChecker(
     private val nameSuggestion: NameSuggestion,
+    private val moduleDescriptor: ModuleDescriptor,
     private val kotlinTypeRefiner: KotlinTypeRefiner
 ) : DeclarationChecker {
     companion object {
@@ -152,7 +154,7 @@ class JsNameClashChecker(
                         .forEach { collect(it, scope)  }
             }
             is ClassDescriptor -> {
-                val memberScope = if (descriptor.isActual)
+                val memberScope = if (descriptor.module != moduleDescriptor)
                     @UseExperimental(TypeRefinement::class)
                     kotlinTypeRefiner.refineType(descriptor.defaultType).memberScope
                 else
