@@ -53,7 +53,7 @@ object JvmBackendFacade {
         irModuleFragment: IrModuleFragment,
         psi2irContext: GeneratorContext,
         phaseConfig: PhaseConfig,
-        deserializer: IrDeserializer?
+        deserializer: IrDeserializer
     ) {
         doGenerateFilesInternal(
             state, errorHandler, irModuleFragment, psi2irContext.symbolTable, psi2irContext.sourceManager, phaseConfig, deserializer
@@ -67,7 +67,7 @@ object JvmBackendFacade {
         symbolTable: SymbolTable,
         sourceManager: PsiSourceManager,
         phaseConfig: PhaseConfig,
-        deserializer: IrDeserializer? = null,
+        deserializer: IrDeserializer,
         firMode: Boolean = false
     ) {
         val context = JvmBackendContext(
