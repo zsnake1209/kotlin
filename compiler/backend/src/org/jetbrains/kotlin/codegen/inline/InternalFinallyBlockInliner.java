@@ -162,7 +162,7 @@ public class InternalFinallyBlockInliner extends CoveringTryCatchNodeProcessor {
             checkClusterInvariant(clustersFromInnermost);
 
             int originalDepthIndex = 0;
-
+            List<TryCatchBlockNodeInfo> nestedUnsplitBlocksWithoutFinally = new ArrayList();
             while (tryCatchBlockIterator.hasNext()) {
                 TryBlockCluster<TryCatchBlockNodeInfo> clusterToFindFinally = tryCatchBlockIterator.next();
                 List<TryCatchBlockNodeInfo> clusterBlocks = clusterToFindFinally.getBlocks();
@@ -170,7 +170,10 @@ public class InternalFinallyBlockInliner extends CoveringTryCatchNodeProcessor {
 
                 FinallyBlockInfo finallyInfo =
                         findFinallyBlockBody(nodeWithDefaultHandlerIfExists, getTryBlocksMetaInfo().getAllIntervals());
-                if (finallyInfo == null) continue;
+                if (finallyInfo == null)  {
+                    nestedUnsplitBlocksWithoutFinally.addAll(clusterToFindFinally.getBlocks());
+                    continue;
+                }
 
                 if (nodeWithDefaultHandlerIfExists.getOnlyCopyNotProcess()) {
                     //lambdas finally generated before non-local return instruction,
@@ -220,8 +223,12 @@ public class InternalFinallyBlockInliner extends CoveringTryCatchNodeProcessor {
                 //Copying finally body before non-local return instruction
                 insertNodeBefore(finallyBlockCopy, inlineFun, instrInsertFinallyBefore);
 
-                updateExceptionTable(clusterBlocks, newFinallyStart, newFinallyEnd,
-                                     tryCatchBlockInlinedInFinally, labelsInsideFinally, (LabelNode) insertedBlockEnd.info);
+                nestedUnsplitBlocksWithoutFinally.addAll(clusterBlocks);
+                updateExceptionTable(
+                        nestedUnsplitBlocksWithoutFinally, newFinallyStart, newFinallyEnd,
+                        tryCatchBlockInlinedInFinally, labelsInsideFinally, (LabelNode) insertedBlockEnd.info
+                );
+                nestedUnsplitBlocksWithoutFinally.clear();
             }
 
             //skip just inserted finally
