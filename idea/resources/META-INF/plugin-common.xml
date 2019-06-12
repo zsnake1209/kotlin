@@ -1865,6 +1865,7 @@
                      groupName="Redundant constructs"
                      enabledByDefault="true"
                      level="WARNING"
+                     runForWholeFile="true"
                      language="kotlin"
     />
 
