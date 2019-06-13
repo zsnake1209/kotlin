@@ -33,7 +33,7 @@ inline fun JKNonCodeElementsListOwner.takeNonCodeElementsFrom(other: JKNonCodeEl
 fun JKTreeElement.commentsFromInside(): List<JKCommentElement> {
     val comments = mutableListOf<JKCommentElement>()
     fun recurse(element: JKTreeElement): JKTreeElement {
-        comments += (element.leftNonCodeElements + element.rightNonCodeElements).filterIsInstance()
+        comments += (element.leftNonCodeElements + element.rightNonCodeElements).filterIsInstance<JKCommentElement>()
         return applyRecursive(element, ::recurse)
     }
     applyRecursive(this, ::recurse)
