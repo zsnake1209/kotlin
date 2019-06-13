@@ -16,17 +16,13 @@
 
 package org.jetbrains.kotlin.codegen
 
-import com.google.common.collect.Lists
-import org.jetbrains.kotlin.cfg.TailRecursionKind
 import org.jetbrains.kotlin.codegen.context.MethodContext
 import org.jetbrains.kotlin.codegen.coroutines.*
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
-import org.jetbrains.kotlin.psi.ValueArgument
 import org.jetbrains.kotlin.resolve.calls.callUtil.*
 import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.org.objectweb.asm.Type
@@ -102,7 +98,8 @@ class TailRecursionCodegen(
                 }
                 is DefaultValueArgument -> {
                     AsmUtil.pop(v, type)
-                    DefaultParameterValueLoader.DEFAULT.genValue(parameterDescriptor, codegen).put(type, v)
+                    //Initialization in proper order is performed in loop below
+                    continue@loop
                 }
                 is VarargValueArgument -> {
                     // assign the parameter below
@@ -111,6 +108,17 @@ class TailRecursionCodegen(
             }
 
             store(parameterDescriptor, type)
+        }
+
+        for (parameterDescriptor in fd.valueParameters) {
+            val arg = valueArguments[parameterDescriptor.index]
+            val type = types[parameterDescriptor.index]
+
+            if (arg is DefaultValueArgument) {
+                AsmUtil.pop(v, type)
+                DefaultParameterValueLoader.DEFAULT.genValue(parameterDescriptor, codegen).put(type, v)
+                store(parameterDescriptor, type)
+            }
         }
     }
 
