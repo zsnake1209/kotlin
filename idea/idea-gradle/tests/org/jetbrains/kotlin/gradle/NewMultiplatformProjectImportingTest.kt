@@ -886,6 +886,20 @@ class NewMultiplatformProjectImportingTest : MultiplePluginVersionGradleImportin
         }
     }
 
+    @Test
+    @PluginTargetVersions(gradleVersion = "4.0+", pluginVersion = "1.3.50+")
+    fun testJvmOnJvmWithJava() {
+        configureByFiles()
+        importProject(true)
+
+        checkProjectStructure(false, false, false ) {
+            module("jvm-on-mpp.jvm-mod.main") {
+                moduleDependency("org.jetbrains.qa.mpp-mod-a.jvmMain", DependencyScope.COMPILE, false)
+                moduleDependency("org.jetbrains.qa.mpp-mod-a.commonMain", DependencyScope.COMPILE, false)
+            }
+        }
+    }
+
     private fun checkProjectStructure(
         exhaustiveModuleList: Boolean = true,
         exhaustiveSourceSourceRootList: Boolean = true,

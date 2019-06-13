@@ -1,0 +1,75 @@
+group 'org.jetbrains.qa'
+version '1.0.0'
+
+apply plugin: 'kotlin-multiplatform'
+apply plugin: 'maven-publish'
+apply plugin: 'kotlin-allopen'
+apply plugin: 'kotlin-noarg'
+
+buildscript {
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-noarg:$kotlin_version"
+    }
+    repositories {
+        {{kotlin_plugin_repositories}}
+    }
+}
+
+repositories {
+    {{kotlin_plugin_repositories}}
+}
+
+kotlin {
+    jvm {
+        withJava()
+    }
+
+    js() {
+        def testRuntimeClasspath = compilations.test.runtimeDependencyFiles
+
+        [tasks.getByName(compilations.main.compileKotlinTaskName), tasks.getByName(compilations.test.compileKotlinTaskName)]*.kotlinOptions {
+            sourceMap = true // for debugging
+            sourceMapEmbedSources = "always" // for debugging
+            moduleKind = 'umd'
+        }
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation kotlin('stdlib-common', kotlin_version)
+                implementation kotlin('stdlib', kotlin_version)
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation kotlin('test-common', kotlin_version)
+                implementation kotlin('test-annotations-common', kotlin_version)
+            }
+        }
+        jvmMain {
+            kotlin.srcDir('src/jvmMain/customSrc')
+
+            dependencies {
+                implementation kotlin('stdlib-jdk8', kotlin_version)
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation kotlin('test', kotlin_version)
+                implementation kotlin('test-junit', kotlin_version)
+            }
+        }
+        jsMain {
+            dependencies {
+                implementation kotlin('stdlib-js', kotlin_version)
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation kotlin('test-js', kotlin_version)
+            }
+        }
+    }
+}
