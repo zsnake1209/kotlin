@@ -24,19 +24,18 @@ import org.jetbrains.kotlin.js.naming.SuggestedName
 import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.DescriptorEquivalenceForOverrides
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtensionProperty
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.types.refinement.TypeRefinement
 
 class JsNameClashChecker(
     private val nameSuggestion: NameSuggestion,
-    private val moduleDescriptor: ModuleDescriptor,
     private val kotlinTypeRefiner: KotlinTypeRefiner
 ) : DeclarationChecker {
     companion object {
@@ -94,7 +93,12 @@ class JsNameClashChecker(
                 val scope = getScope(overrideFqn.scope)
                 val name = overrideFqn.names.last()
                 val existing = scope[name] as? CallableMemberDescriptor
-                if (existing != null && existing != overrideFqn.descriptor && !isFakeOverridingNative(existing)) {
+                val overrideDescriptor = overrideFqn.descriptor as? CallableMemberDescriptor
+                if (existing != null &&
+                    overrideDescriptor != null &&
+                    !DescriptorEquivalenceForOverrides.areCallableDescriptorsEquivalent(existing, overrideDescriptor) &&
+                    !isFakeOverridingNative(existing)
+                ) {
                     diagnosticHolder.report(ErrorsJs.JS_FAKE_NAME_CLASH.on(declaration, name, override, existing))
                     break
                 }
@@ -154,11 +158,8 @@ class JsNameClashChecker(
                         .forEach { collect(it, scope)  }
             }
             is ClassDescriptor -> {
-                val memberScope = if (descriptor.module != moduleDescriptor)
-                    @UseExperimental(TypeRefinement::class)
-                    kotlinTypeRefiner.refineType(descriptor.defaultType).memberScope
-                else
-                    descriptor.defaultType.memberScope
+                @UseExperimental(TypeRefinement::class)
+                val memberScope = kotlinTypeRefiner.refineType(descriptor.defaultType).memberScope
                 collect(memberScope, scope)
             }
         }
