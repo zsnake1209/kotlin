@@ -52,6 +52,7 @@ import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import org.jetbrains.kotlin.serialization.deserialization.IncompatibleVersionErrorData
 import org.jetbrains.kotlin.serialization.deserialization.getName
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
+import org.jetbrains.kotlin.utils.getOrPutNullable
 
 class KotlinDeserializedJvmSymbolsProvider(
     val session: FirSession,
@@ -60,10 +61,9 @@ class KotlinDeserializedJvmSymbolsProvider(
     private val kotlinClassFinder: KotlinClassFinder,
     private val javaClassFinder: JavaClassFinder
 ) : AbstractFirSymbolProvider() {
-
-    private val classesCache = mutableMapOf<ClassId, FirClassSymbol>()
-    private val typeAliasCache = mutableMapOf<ClassId, FirTypeAliasSymbol?>()
-    private val packagePartsCache = mutableMapOf<FqName, Collection<PackagePartsCacheData>>()
+    private val classesCache = HashMap<ClassId, FirClassSymbol>()
+    private val typeAliasCache = HashMap<ClassId, FirTypeAliasSymbol?>()
+    private val packagePartsCache = HashMap<FqName, Collection<PackagePartsCacheData>>()
 
     private class PackagePartsCacheData(
         val proto: ProtoBuf.Package,
@@ -153,7 +153,7 @@ class KotlinDeserializedJvmSymbolsProvider(
     private fun findAndDeserializeTypeAlias(
         classId: ClassId
     ): FirTypeAliasSymbol? {
-        return typeAliasCache.getOrPut(classId) {
+        return typeAliasCache.getOrPutNullable(classId) {
             getPackageParts(classId.packageFqName).firstNotNullResult { part ->
                 val ids = part.typeAliasNameIndex[classId.shortClassName]
                 if (ids == null || ids.isEmpty()) return@firstNotNullResult null
