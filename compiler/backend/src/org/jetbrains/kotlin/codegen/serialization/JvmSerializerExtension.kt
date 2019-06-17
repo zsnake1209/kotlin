@@ -161,6 +161,9 @@ class JvmSerializerExtension @JvmOverloads constructor(
         for (annotation in typeParameter.nonSourceAnnotations) {
             proto.addExtension(JvmProtoBuf.typeParameterAnnotation, annotationSerializer.serializeAnnotation(annotation))
         }
+        uniqIdProvider(typeParameter)?.let {
+            proto.setExtension(JvmProtoBuf.typeParamUniqId, it)
+        }
     }
 
     override fun serializeConstructor(
