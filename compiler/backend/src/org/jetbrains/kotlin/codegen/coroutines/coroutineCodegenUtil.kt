@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -477,6 +477,10 @@ fun InstructionAdapter.invokeDoResumeWithUnit(thisName: String) {
     // .doResume(Unit, null)
     StackValue.putUnitInstance(this)
 
+    invokeDoResumeWithNullException(thisName)
+}
+
+fun InstructionAdapter.invokeDoResumeWithNullException(thisName: String) {
     aconst(null)
 
     invokevirtual(
@@ -490,6 +494,10 @@ fun InstructionAdapter.invokeDoResumeWithUnit(thisName: String) {
 fun InstructionAdapter.invokeInvokeSuspendWithUnit(thisName: String) {
     StackValue.putUnitInstance(this)
 
+    invokeInvokeSuspend(thisName)
+}
+
+fun InstructionAdapter.invokeInvokeSuspend(thisName: String) {
     invokevirtual(
         thisName,
         INVOKE_SUSPEND_METHOD_NAME,

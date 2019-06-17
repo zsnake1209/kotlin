@@ -78,12 +78,16 @@ private class DispatchedContinuation<T>(
     }
 }
 
-fun box(): String {
-    if (builder(false, 0) { "OK" } != "OK") return "fail 4"
-    if (builder(true, 1) { suspendHere() } != "OK") return "fail 5"
+suspend fun dummy() {}
 
-    if (builder(false, 0) { throw RuntimeException("OK") } != "Exception: OK") return "fail 6"
-    if (builder(true, 1) { suspendWithException() } != "Exception: OK") return "fail 7"
+fun box(): String {
+    // TODO: rewrite startCoroutineUninterceptedOrReturn in stdlib
+    var i = 0
+    if (builder(false, 0) { val res = "OK"; i++; res } != "OK") return "fail 4"
+    if (builder(true, 1) { val res = suspendHere(); i++; res } != "OK") return "fail 5"
+
+    if (builder(false, 0) { i++; dummy(); throw RuntimeException("OK") } != "Exception: OK") return "fail 6"
+    if (builder(true, 1) { val res = suspendWithException(); i++; res } != "Exception: OK") return "fail 7"
 
     return "OK"
 }

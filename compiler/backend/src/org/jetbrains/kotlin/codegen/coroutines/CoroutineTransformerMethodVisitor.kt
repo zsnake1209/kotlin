@@ -69,7 +69,8 @@ class CoroutineTransformerMethodVisitor(
     // It's only matters for named functions, may differ from '!isStatic(access)' in case of DefaultImpls
     private val needDispatchReceiver: Boolean = false,
     // May differ from containingClassInternalName in case of DefaultImpls
-    private val internalNameForDispatchReceiver: String? = null
+    private val internalNameForDispatchReceiver: String? = null,
+    private val onTailCall: () -> Unit = {}
 ) : TransformationMethodVisitor(delegate, access, name, desc, signature, exceptions) {
 
     private val classBuilderForCoroutineState: ClassBuilder by lazy(obtainClassBuilderForCoroutineState)
@@ -109,6 +110,7 @@ class CoroutineTransformerMethodVisitor(
 
             if (allSuspensionPointsAreTailCalls(containingClassInternalName, methodNode, suspensionPoints)) {
                 dropSuspensionMarkers(methodNode, suspensionPoints)
+                onTailCall() // TODO: Use it in the inliner
                 return
             }
 
@@ -120,7 +122,14 @@ class CoroutineTransformerMethodVisitor(
 
             prepareMethodNodePreludeForNamedFunction(methodNode)
         } else {
-            ReturnUnitMethodTransformer.cleanUpReturnsUnitMarkers(methodNode, ReturnUnitMethodTransformer.findReturnsUnitMarks(methodNode))
+            ReturnUnitMethodTransformer.transform(containingClassInternalName, methodNode)
+
+            // TODO: addCompletionParameterToLVT(methodNode)
+
+            if (allSuspensionPointsAreTailCalls(containingClassInternalName, methodNode, suspensionPoints)) {
+                onTailCall()
+                return
+            }
         }
 
         for (suspensionPoint in suspensionPoints) {
@@ -500,35 +509,6 @@ class CoroutineTransformerMethodVisitor(
         suspensionPoints.removeAll { dceResult.isRemoved(it.suspensionCallBegin) || dceResult.isRemoved(it.suspensionCallEnd) }
     }
 
-    private fun collectSuspensionPoints(methodNode: MethodNode): MutableList<SuspensionPoint> {
-        val suspensionPoints = mutableListOf<SuspensionPoint>()
-        val beforeSuspensionPointMarkerStack = Stack<AbstractInsnNode>()
-
-        for (methodInsn in methodNode.instructions.toArray().filterIsInstance<MethodInsnNode>()) {
-            when {
-                isBeforeSuspendMarker(methodInsn) -> {
-                    beforeSuspensionPointMarkerStack.add(methodInsn.previous)
-                }
-
-                isAfterSuspendMarker(methodInsn) -> {
-                    suspensionPoints.add(SuspensionPoint(beforeSuspensionPointMarkerStack.pop(), methodInsn))
-                }
-            }
-        }
-
-        assert(beforeSuspensionPointMarkerStack.isEmpty()) { "Unbalanced suspension markers stack" }
-
-        return suspensionPoints
-    }
-
-    private fun dropSuspensionMarkers(methodNode: MethodNode, suspensionPoints: List<SuspensionPoint>) {
-        // Drop markers
-        suspensionPoints.forEach {
-            it.removeBeforeSuspendMarker(methodNode)
-            it.removeAfterSuspendMarker(methodNode)
-        }
-    }
-
     private fun spillVariables(suspensionPoints: List<SuspensionPoint>, methodNode: MethodNode): List<List<SpilledVariableDescriptor>> {
         val instructions = methodNode.instructions
         val frames = performRefinedTypeAnalysis(methodNode, containingClassInternalName)
@@ -804,6 +784,37 @@ class CoroutineTransformerMethodVisitor(
     }
 
     private data class SpilledVariableDescriptor(val fieldName: String, val variableName: String)
+
+    companion object {
+        fun collectSuspensionPoints(methodNode: MethodNode): MutableList<SuspensionPoint> {
+            val suspensionPoints = mutableListOf<SuspensionPoint>()
+            val beforeSuspensionPointMarkerStack = Stack<AbstractInsnNode>()
+
+            for (methodInsn in methodNode.instructions.toArray().filterIsInstance<MethodInsnNode>()) {
+                when {
+                    isBeforeSuspendMarker(methodInsn) -> {
+                        beforeSuspensionPointMarkerStack.add(methodInsn.previous)
+                    }
+
+                    isAfterSuspendMarker(methodInsn) -> {
+                        suspensionPoints.add(SuspensionPoint(beforeSuspensionPointMarkerStack.pop(), methodInsn))
+                    }
+                }
+            }
+
+            assert(beforeSuspensionPointMarkerStack.isEmpty()) { "Unbalanced suspension markers stack" }
+
+            return suspensionPoints
+        }
+
+        fun dropSuspensionMarkers(methodNode: MethodNode, suspensionPoints: List<SuspensionPoint>) {
+            // Drop markers
+            suspensionPoints.forEach {
+                it.removeBeforeSuspendMarker(methodNode)
+                it.removeAfterSuspendMarker(methodNode)
+            }
+        }
+    }
 }
 
 internal fun InstructionAdapter.generateContinuationConstructorCall(
@@ -886,7 +897,7 @@ private fun Type.normalize() =
  * ICONST_1
  * INVOKESTATIC InlineMarker.mark()
  */
-private class SuspensionPoint(
+class SuspensionPoint(
     // ICONST_0
     val suspensionCallBegin: AbstractInsnNode,
     // INVOKESTATIC InlineMarker.mark()

@@ -30,11 +30,15 @@ fun builder2(c: suspend () -> Unit) {
     continuation.resume(Unit)
 }
 
+suspend fun dummy() {}
+
 fun box(): String {
+    var i = 0
 
     try {
         builder1 {
             suspendHere()
+            i++
         }
         return "fail 1"
     } catch (e: kotlin.KotlinNullPointerException) {
@@ -43,6 +47,7 @@ fun box(): String {
     try {
         builder2 {
             suspendHere()
+            i++
         }
         return "fail 3"
     } catch (e: java.lang.IllegalStateException) {
@@ -54,6 +59,8 @@ fun box(): String {
     try {
         builder1 {
             result = "fail 5"
+            dummy()
+            i++
         }
         return "fail 6"
     } catch (e: kotlin.KotlinNullPointerException) {
@@ -62,6 +69,8 @@ fun box(): String {
     try {
         builder2 {
             result = "fail 8"
+            dummy()
+            i++
         }
         return "fail 9"
     } catch (e: java.lang.IllegalStateException) {

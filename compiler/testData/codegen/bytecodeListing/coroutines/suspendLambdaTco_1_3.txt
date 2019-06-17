@@ -10,6 +10,20 @@ final class SuspendLambdaTcoKt$c$1 {
 }
 
 @kotlin.Metadata
+final class SuspendLambdaTcoKt$complex$1 {
+    public final static field INSTANCE: SuspendLambdaTcoKt$complex$1
+    field label: int
+    private field p$0: int
+    private field p$1: java.lang.Object
+    private field p$: long
+    inner class SuspendLambdaTcoKt$complex$1
+    static method <clinit>(): void
+    method <init>(p0: kotlin.coroutines.Continuation): void
+    public final method invoke(p0: java.lang.Object, p1: java.lang.Object, p2: java.lang.Object, p3: java.lang.Object): java.lang.Object
+    public final @org.jetbrains.annotations.Nullable method invokeSuspend(@org.jetbrains.annotations.NotNull p0: java.lang.Object): java.lang.Object
+}
+
+@kotlin.Metadata
 final class SuspendLambdaTcoKt$d$1 {
     public final static field INSTANCE: SuspendLambdaTcoKt$d$1
     field label: int
@@ -33,6 +47,21 @@ final class SuspendLambdaTcoKt$test$1 {
 }
 
 @kotlin.Metadata
+final class SuspendLambdaTcoKt$test$2 {
+    public final static field INSTANCE: SuspendLambdaTcoKt$test$2
+    field label: int
+    private field p$0: int
+    private field p$1: java.lang.Object
+    private field p$: long
+    inner class SuspendLambdaTcoKt$test$2
+    static method <clinit>(): void
+    method <init>(p0: kotlin.coroutines.Continuation): void
+    public synthetic method invoke(p0: java.lang.Object, p1: java.lang.Object, p2: java.lang.Object, p3: java.lang.Object): java.lang.Object
+    public final @org.jetbrains.annotations.Nullable method invoke(p0: long, p1: int, @org.jetbrains.annotations.NotNull p2: java.lang.Object, @org.jetbrains.annotations.NotNull p3: kotlin.coroutines.Continuation): java.lang.Object
+    public final @org.jetbrains.annotations.Nullable method invokeSuspend(@org.jetbrains.annotations.NotNull p0: java.lang.Object): java.lang.Object
+}
+
+@kotlin.Metadata
 final class SuspendLambdaTcoKt$test$c$1 {
     synthetic final field $i: kotlin.jvm.internal.Ref$IntRef
     field label: int
@@ -45,14 +74,18 @@ final class SuspendLambdaTcoKt$test$c$1 {
 @kotlin.Metadata
 public final class SuspendLambdaTcoKt {
     private final static @org.jetbrains.annotations.NotNull field c: kotlin.jvm.functions.Function1
+    private final static @org.jetbrains.annotations.NotNull field complex: kotlin.jvm.functions.Function4
     private final static @org.jetbrains.annotations.NotNull field d: kotlin.jvm.functions.Function1
     inner class SuspendLambdaTcoKt$c$1
+    inner class SuspendLambdaTcoKt$complex$1
     inner class SuspendLambdaTcoKt$d$1
     inner class SuspendLambdaTcoKt$test$1
+    inner class SuspendLambdaTcoKt$test$2
     inner class SuspendLambdaTcoKt$test$c$1
     static method <clinit>(): void
     public final static @org.jetbrains.annotations.Nullable method dummy(@org.jetbrains.annotations.NotNull p0: kotlin.coroutines.Continuation): java.lang.Object
     public final static @org.jetbrains.annotations.NotNull method getC(): kotlin.jvm.functions.Function1
+    public final static @org.jetbrains.annotations.NotNull method getComplex(): kotlin.jvm.functions.Function4
     public final static @org.jetbrains.annotations.NotNull method getD(): kotlin.jvm.functions.Function1
     public final static method test(): void
 }

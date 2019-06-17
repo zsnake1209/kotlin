@@ -13,4 +13,11 @@ fun test() {
     suspend fun local() {
         return dummy()
     }
+    suspend fun Long.localComplex(i: Int, a: Any): Unit {
+        return dummy()
+    }
+}
+
+val complex : suspend Long.(Int, Any) -> Unit = { _, _ ->
+    dummy()
 }

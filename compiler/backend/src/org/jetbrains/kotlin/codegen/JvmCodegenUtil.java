@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.backend.common.CodegenUtil;
 import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor;
 import org.jetbrains.kotlin.codegen.binding.CalculatedClosure;
+import org.jetbrains.kotlin.codegen.binding.MutableClosure;
 import org.jetbrains.kotlin.codegen.context.CodegenContext;
 import org.jetbrains.kotlin.codegen.context.FacadePartWithSourceFile;
 import org.jetbrains.kotlin.codegen.context.MethodContext;
@@ -85,10 +86,15 @@ public class JvmCodegenUtil {
     }
 
     public static boolean isConst(@NotNull CalculatedClosure closure) {
-        return closure.getCapturedOuterClassDescriptor() == null &&
-               closure.getCapturedReceiverFromOuterContext() == null &&
-               closure.getCaptureVariables().isEmpty() &&
-               !closure.isSuspend();
+        boolean isStateless = closure.getCapturedOuterClassDescriptor() == null &&
+                              closure.getCapturedReceiverFromOuterContext() == null &&
+                              closure.getCaptureVariables().isEmpty();
+        if (!isStateless) return false;
+        if (closure.isSuspend()) {
+            return closure.isTailCall();
+        } else {
+            return true;
+        }
     }
 
     private static boolean isCallInsideSameClassAsFieldRepresentingProperty(

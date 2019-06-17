@@ -85,8 +85,7 @@ class CoroutineTransformer(
     }
 
     private fun isResumeImpl(node: MethodNode): Boolean =
-        state.languageVersionSettings.isResumeImplMethodName(node.name.removeSuffix(FOR_INLINE_SUFFIX)) &&
-                inliningContext.isContinuation
+        state.languageVersionSettings.isResumeImplMethodName(node.name.removeSuffix(FOR_INLINE_SUFFIX))
 
     private fun isSuspendFunctionWithFakeConstructorCall(node: MethodNode): Boolean = findFakeContinuationConstructorClassName(node) != null
 

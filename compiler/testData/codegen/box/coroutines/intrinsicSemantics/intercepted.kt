@@ -27,7 +27,7 @@ suspend fun suspendWithExceptionIntercepted(): String = suspendCoroutineUninterc
     COROUTINE_SUSPENDED
 }
 
-fun builder(expectedCount: Int, c: suspend () -> String): String {
+fun builder(expectedCount: Int, tag: String, c: suspend () -> String): String {
     var fromSuspension: String? = null
     var counter = 0
 
@@ -48,7 +48,7 @@ fun builder(expectedCount: Int, c: suspend () -> String): String {
         "Exception: ${e.message}"
     }
 
-    if (counter != expectedCount) throw RuntimeException("fail 0")
+    if (counter != expectedCount) throw RuntimeException("fail 0: $tag expected: $expectedCount, got: $counter")
     return fromSuspension!!
 }
 
@@ -74,11 +74,13 @@ private class DispatchedContinuation<T>(
 }
 
 fun box(): String {
-    if (builder(0) { suspendHereUnintercepted() } != "OK") return "fail 2"
-    if (builder(1) { suspendHereIntercepted() } != "OK") return "fail 3"
+    // TODO: rewrite startCoroutineUninterceptedOrReturn in stdlib
+    var i = 0
+    if (builder(0, "suspendHereUnintercepted") { val res = suspendHereUnintercepted(); i++; res } != "OK") return "fail 2"
+    if (builder(1, "suspendHereIntercepted") { val res = suspendHereIntercepted(); i++; res } != "OK") return "fail 3"
 
-    if (builder(0) { suspendWithExceptionUnintercepted() } != "Exception: OK") return "fail 4"
-    if (builder(1) { suspendWithExceptionIntercepted() } != "Exception: OK") return "fail 5"
+    if (builder(0, "suspendWithExceptionUnintercepted") { val res = suspendWithExceptionUnintercepted(); i++; res } != "Exception: OK") return "fail 4"
+    if (builder(1, "suspendWithExceptionIntercepted") { val res = suspendWithExceptionIntercepted(); i++; res } != "Exception: OK") return "fail 5"
 
     return "OK"
 }

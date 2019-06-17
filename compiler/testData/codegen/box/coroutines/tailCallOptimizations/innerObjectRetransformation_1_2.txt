@@ -10,9 +10,10 @@ public interface flow/FlowCollector {
 
 @kotlin.Metadata
 final class flow/InnerObjectRetransformationKt$box$1 {
+    public final static field INSTANCE: flow.InnerObjectRetransformationKt$box$1
     inner class flow/InnerObjectRetransformationKt$box$1
-    method <init>(p0: kotlin.coroutines.experimental.Continuation): void
-    public final @org.jetbrains.annotations.NotNull method create(@org.jetbrains.annotations.NotNull p0: kotlin.coroutines.experimental.Continuation): kotlin.coroutines.experimental.Continuation
+    static method <clinit>(): void
+    method <init>(): void
     public final @org.jetbrains.annotations.Nullable method doResume(@org.jetbrains.annotations.Nullable p0: java.lang.Object, @org.jetbrains.annotations.Nullable p1: java.lang.Throwable): java.lang.Object
     public final method invoke(p0: java.lang.Object): java.lang.Object
 }

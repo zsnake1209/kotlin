@@ -49,11 +49,14 @@ import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor;
 import org.jetbrains.kotlin.descriptors.impl.SyntheticFieldDescriptor;
 import org.jetbrains.kotlin.descriptors.impl.TypeAliasConstructorDescriptor;
 import org.jetbrains.kotlin.diagnostics.Errors;
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation;
 import org.jetbrains.kotlin.lexer.KtTokens;
 import org.jetbrains.kotlin.load.java.JvmAbi;
 import org.jetbrains.kotlin.load.java.sam.SamConstructorDescriptor;
 import org.jetbrains.kotlin.load.kotlin.MethodSignatureMappingKt;
 import org.jetbrains.kotlin.load.kotlin.TypeSignatureMappingKt;
+import org.jetbrains.kotlin.name.FqName;
+import org.jetbrains.kotlin.name.FqNamesUtilKt;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.psi.psiUtil.PsiUtilsKt;
@@ -1139,14 +1142,20 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         }
 
 
-        ClassDescriptor superClass = DescriptorUtilsKt.getSuperClassNotAny(classDescriptor);
+        ClassDescriptor superClass;
+        if (!closure.isSuspend() || !closure.isTailCall()) {
+            superClass = DescriptorUtilsKt.getSuperClassNotAny(classDescriptor);
+        } else {
+            superClass = DescriptorUtilsKt.resolveTopLevelClass(state.getModule(), new FqName("kotlin.jvm.internal.Lambda"),
+                                                                NoLookupLocation.FROM_BACKEND);
+        }
         if (superClass != null) {
             pushClosureOnStack(
                     superClass, putThis && closure.getCapturedOuterClassDescriptor() == null, callGenerator, /* functionReferenceReceiver = */ null
             );
         }
 
-        if (closure.isSuspend()) {
+        if (closure.isSuspend() && !closure.isTailCall()) {
             // resultContinuation
             if (closure.isSuspendLambda()) {
                 // When inlining crossinline lambda, the ACONST_NULL is never popped.

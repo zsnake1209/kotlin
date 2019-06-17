@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -16,12 +16,14 @@ import org.jetbrains.kotlin.codegen.binding.CalculatedClosure;
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding;
 import org.jetbrains.kotlin.codegen.context.ClosureContext;
 import org.jetbrains.kotlin.codegen.context.EnclosedValueDescriptor;
+import org.jetbrains.kotlin.codegen.coroutines.CoroutineCodegenKt;
 import org.jetbrains.kotlin.codegen.coroutines.CoroutineCodegenUtilKt;
 import org.jetbrains.kotlin.codegen.serialization.JvmSerializerExtension;
 import org.jetbrains.kotlin.codegen.signature.BothSignatureWriter;
 import org.jetbrains.kotlin.codegen.signature.JvmSignatureWriter;
 import org.jetbrains.kotlin.codegen.state.GenerationState;
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper;
+import org.jetbrains.kotlin.config.LanguageFeature;
 import org.jetbrains.kotlin.config.LanguageVersionSettings;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor;
@@ -275,7 +277,13 @@ public class ClosureCodegen extends MemberCodegen<KtElement> {
                         v.dup();
 
                         codegen.pushClosureOnStack(classDescriptor, true, codegen.defaultCallGenerator, functionReferenceReceiver);
-                        v.invokespecial(asmType.getInternalName(), "<init>", constructor.getDescriptor(), false);
+                        String constructorDescriptor = constructor.getDescriptor();
+                        if (closure.isSuspend() && closure.isTailCall()) {
+                            constructorDescriptor = CoroutineCodegenKt
+                                    .removeContinuationParameter(constructorDescriptor, state.getLanguageVersionSettings().supportsFeature(
+                                            LanguageFeature.ReleaseCoroutines));
+                        }
+                        v.invokespecial(asmType.getInternalName(), "<init>", constructorDescriptor, false);
                     }
 
                     return Unit.INSTANCE;

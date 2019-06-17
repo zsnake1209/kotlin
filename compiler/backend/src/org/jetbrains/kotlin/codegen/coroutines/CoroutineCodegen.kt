@@ -12,9 +12,14 @@ import org.jetbrains.kotlin.codegen.binding.CalculatedClosure
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding.CAPTURES_CROSSINLINE_LAMBDA
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding.CLOSURE
+import org.jetbrains.kotlin.codegen.binding.MutableClosure
 import org.jetbrains.kotlin.codegen.context.ClosureContext
 import org.jetbrains.kotlin.codegen.context.MethodContext
 import org.jetbrains.kotlin.codegen.inline.coroutines.SurroundSuspendLambdaCallsWithSuspendMarkersMethodVisitor
+import org.jetbrains.kotlin.codegen.optimization.common.asSequence
+import org.jetbrains.kotlin.codegen.optimization.fixStack.peek
+import org.jetbrains.kotlin.codegen.optimization.fixStack.top
+import org.jetbrains.kotlin.codegen.optimization.transformer.MethodTransformer
 import org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings.METHOD_FOR_FUNCTION
 import org.jetbrains.kotlin.codegen.serialization.JvmSerializerExtension
 import org.jetbrains.kotlin.config.LanguageFeature
@@ -46,7 +51,10 @@ import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 import org.jetbrains.org.objectweb.asm.commons.Method
-import org.jetbrains.org.objectweb.asm.tree.MethodNode
+import org.jetbrains.org.objectweb.asm.tree.*
+import org.jetbrains.org.objectweb.asm.tree.analysis.Frame
+import org.jetbrains.org.objectweb.asm.tree.analysis.SourceInterpreter
+import org.jetbrains.org.objectweb.asm.tree.analysis.SourceValue
 
 abstract class AbstractCoroutineCodegen(
     outerExpressionCodegen: ExpressionCodegen,
@@ -159,7 +167,7 @@ class CoroutineCodegenForLambda private constructor(
     outerExpressionCodegen: ExpressionCodegen,
     element: KtElement,
     private val closureContext: ClosureContext,
-    classBuilder: ClassBuilder,
+    private val classBuilder: SuspendLambdaClassBuilder,
     private val originalSuspendFunctionDescriptor: FunctionDescriptor,
     private val forInline: Boolean
 ) : AbstractCoroutineCodegen(
@@ -374,48 +382,53 @@ class CoroutineCodegenForLambda private constructor(
             store(cloneIndex, AsmTypes.OBJECT_TYPE)
 
             // Pass lambda parameters to 'invoke' call on newly constructed object
-            var index = 1
-            for (parameter in allFunctionParameters()) {
-                val fieldInfoForCoroutineLambdaParameter = parameter.getFieldInfoForCoroutineLambdaParameter()
-                if (isBigArity) {
-                    load(cloneIndex, fieldInfoForCoroutineLambdaParameter.ownerType)
-                    load(1, AsmTypes.OBJECT_TYPE)
-                    iconst(index - 1)
-                    aload(AsmTypes.OBJECT_TYPE)
+            storeParametersInFields(cloneIndex, generateErasedCreate)
+
+            load(cloneIndex, AsmTypes.OBJECT_TYPE)
+            areturn(AsmTypes.OBJECT_TYPE)
+        }
+    }
+
+    private fun InstructionAdapter.storeParametersInFields(receiver: Int, erasedTypes: Boolean) {
+        val isBigArity = JvmCodegenUtil.isDeclarationOfBigArityCreateCoroutineMethod(createCoroutineDescriptor)
+        var index = 1
+        for (parameter in allFunctionParameters()) {
+            val fieldInfoForCoroutineLambdaParameter = parameter.getFieldInfoForCoroutineLambdaParameter()
+            if (isBigArity) {
+                load(receiver, fieldInfoForCoroutineLambdaParameter.ownerType)
+                load(1, AsmTypes.OBJECT_TYPE)
+                iconst(index - 1)
+                aload(AsmTypes.OBJECT_TYPE)
+                StackValue.coerce(
+                    AsmTypes.OBJECT_TYPE, builtIns.nullableAnyType,
+                    fieldInfoForCoroutineLambdaParameter.fieldType, fieldInfoForCoroutineLambdaParameter.fieldKotlinType,
+                    this
+                )
+                putfield(
+                    fieldInfoForCoroutineLambdaParameter.ownerInternalName,
+                    fieldInfoForCoroutineLambdaParameter.fieldName,
+                    fieldInfoForCoroutineLambdaParameter.fieldType.descriptor
+                )
+            } else {
+                if (erasedTypes) {
+                    load(index, AsmTypes.OBJECT_TYPE)
                     StackValue.coerce(
                         AsmTypes.OBJECT_TYPE, builtIns.nullableAnyType,
                         fieldInfoForCoroutineLambdaParameter.fieldType, fieldInfoForCoroutineLambdaParameter.fieldKotlinType,
                         this
                     )
-                    putfield(
-                        fieldInfoForCoroutineLambdaParameter.ownerInternalName,
-                        fieldInfoForCoroutineLambdaParameter.fieldName,
-                        fieldInfoForCoroutineLambdaParameter.fieldType.descriptor
-                    )
                 } else {
-                    if (generateErasedCreate) {
-                        load(index, AsmTypes.OBJECT_TYPE)
-                        StackValue.coerce(
-                            AsmTypes.OBJECT_TYPE, builtIns.nullableAnyType,
-                            fieldInfoForCoroutineLambdaParameter.fieldType, fieldInfoForCoroutineLambdaParameter.fieldKotlinType,
-                            this
-                        )
-                    } else {
-                        load(index, fieldInfoForCoroutineLambdaParameter.fieldType)
-                    }
-                    AsmUtil.genAssignInstanceFieldFromParam(
-                        fieldInfoForCoroutineLambdaParameter,
-                        index,
-                        this,
-                        cloneIndex,
-                        generateErasedCreate
-                    )
+                    load(index, fieldInfoForCoroutineLambdaParameter.fieldType)
                 }
-                index += if (isBigArity || generateErasedCreate) 1 else fieldInfoForCoroutineLambdaParameter.fieldType.size
+                AsmUtil.genAssignInstanceFieldFromParam(
+                    fieldInfoForCoroutineLambdaParameter,
+                    index,
+                    this,
+                    receiver,
+                    erasedTypes
+                )
             }
-
-            load(cloneIndex, AsmTypes.OBJECT_TYPE)
-            areturn(AsmTypes.OBJECT_TYPE)
+            index += if (isBigArity || erasedTypes) 1 else fieldInfoForCoroutineLambdaParameter.fieldType.size
         }
     }
 
@@ -475,7 +488,14 @@ class CoroutineCodegenForLambda private constructor(
                         shouldPreserveClassInitialization = constructorCallNormalizationMode.shouldPreserveClassInitialization,
                         containingClassInternalName = v.thisName,
                         isForNamedFunction = false,
-                        languageVersionSettings = languageVersionSettings
+                        languageVersionSettings = languageVersionSettings,
+                        onTailCall = {
+                            // TODO: Support tail-call crossinline suspend lambdas
+                            if (!forInline) {
+                                (closure as MutableClosure).setTailCall()
+                                classBuilder.isTailCall = true
+                            }
+                        }
                     )
                     return if (forInline) AddEndLabelMethodVisitor(
                         MethodNodeCopyingMethodVisitor(
@@ -501,6 +521,222 @@ class CoroutineCodegenForLambda private constructor(
         )
     }
 
+    private class SuspendLambdaClassBuilder(
+        val delegate: ClassBuilder,
+        private val classNode: ClassNode = ClassNode()
+    ) : AbstractClassBuilder.Concrete(classNode) {
+        var isTailCall = false
+        lateinit var codegen: CoroutineCodegenForLambda
+        private val lambdaInternalName = "kotlin/jvm/internal/Lambda"
+
+        override fun done() {
+            super.done()
+            if (isTailCall && !codegen.forInline) {
+                classNode.superName = lambdaInternalName
+                if (codegen.languageVersionSettings.isReleaseCoroutines()) {
+                    classNode.interfaces.add("kotlin/coroutines/jvm/internal/SuspendFunction")
+                }
+                classNode.methods.removeIf { it.name == "create" }
+
+                // Generate invoke, than just calls invokeSuspend with continuation parameter
+                val invokeMethod =
+                    classNode.methods.single { it.name == "invoke" && it.desc == codegen.invokeSignature().asmMethod.descriptor }
+                        .also { classNode.methods.remove(it) }
+                generateTailCallInvoke(invokeMethod)
+
+                // Replace ALOAD 0 with ALOAD 1 in invokeSuspend
+                val invokeSuspendMethod = classNode.methods.single {
+                    codegen.languageVersionSettings.isResumeImplMethodName(it.name)
+                }
+                fixContinuationAccesses(invokeSuspendMethod)
+
+                // Generate correct init
+                fixConstructor(classNode)
+            }
+            classNode.accept(delegate.visitor)
+        }
+
+        private fun fixConstructor(classNode: ClassNode) {
+            val constructor = classNode.methods.single { it.name == "<init>" }.also { classNode.methods.remove(it) }
+            val mv = classNode.visitMethod(
+                constructor.access,
+                constructor.name,
+                constructor.desc.removeContinuationParameter(codegen.languageVersionSettings.isReleaseCoroutines()),
+                constructor.signature,
+                constructor.exceptions.toTypedArray()
+            )
+            // suspend lambda's constructor accepts arity and continuation, but lambda's constructor accepts only arity
+            val supercall = constructor.instructions.last.previous
+            assert(supercall?.opcode == Opcodes.INVOKESPECIAL) {
+                "Supercall must be second to last instruction in <init>"
+            }
+            supercall as MethodInsnNode
+            supercall.owner = lambdaInternalName
+            supercall.desc = "(I)V"
+            assert(supercall.previous?.opcode == Opcodes.ALOAD) {
+                "Last parameter of supercall should be continuation"
+            }
+            constructor.instructions.remove(supercall.previous)
+            constructor.instructions.resetLabels()
+            mv.visitCode()
+            constructor.instructions.accept(mv)
+            mv.visitEnd()
+        }
+
+        private fun fixContinuationAccesses(invokeSuspendMethod: MethodNode) {
+            fun AbstractInsnNode.index() = invokeSuspendMethod.instructions.indexOf(this)
+
+            val suspensionPoints = CoroutineTransformerMethodVisitor.collectSuspensionPoints(invokeSuspendMethod)
+            val frames = MethodTransformer.analyze("fake", invokeSuspendMethod, SourceInterpreter())
+
+            val continuationAccesses = mutableSetOf<AbstractInsnNode>()
+
+            // Pass continuation argument to suspension points
+            suspensionPoints.flatMapTo(continuationAccesses) { suspensionPoint ->
+                frames[suspensionPoint.suspensionCallBegin.index()]?.top()?.insns // If suspension point is intrinsic, stack is empty
+                    ?: emptySet()
+            }
+
+            // Pass continuation argument as receiver
+            invokeSuspendMethod.instructions.asSequence()
+                .filterIsInstance<MethodInsnNode>()
+                .filter { it.owner == codegen.languageVersionSettings.continuationAsmType().internalName }
+                .asIterable()
+                .flatMapTo(continuationAccesses) { call ->
+                    val parametersSize = Type.getArgumentTypes(call.desc).size
+                    frames[call.index()]?.let { it.peek(parametersSize)?.insns ?: error("$call's receiver is not found") } ?: emptySet()
+                }
+
+            // Replace all CHECKCAST continuation's targets
+            invokeSuspendMethod.instructions.asSequence()
+                .filterIsInstance<TypeInsnNode>()
+                .filter { it.opcode == Opcodes.CHECKCAST && it.desc == codegen.languageVersionSettings.continuationAsmType().internalName }
+                .asIterable()
+                .flatMapTo(continuationAccesses) { checkcast ->
+                    frames[checkcast.index()]?.let {
+                        it.top()?.insns ?: error("$checkcast expects continuation on top of the stack")
+                    } ?: emptySet()
+                }
+
+            val aload0s = mutableSetOf<VarInsnNode>()
+            continuationAccesses.flatMapTo(aload0s) {
+                when (it.opcode) {
+                    Opcodes.ACONST_NULL -> emptySet() // Passing null as completion. See KT-26658
+                    Opcodes.ALOAD -> findAllAload0s(invokeSuspendMethod, frames, it as VarInsnNode).asIterable()
+                    Opcodes.GETSTATIC -> emptySet() // There can be singleton as completion
+                    else -> error("Expected ACONST_NULL, ALOAD or GETSTATIC as continuation access")
+                }
+            }
+            for (aload0 in aload0s) {
+                assert(aload0.isAload0()) { "Cannot replace continuation access $aload0, ALOAD 0 expected" }
+                aload0.`var` = 1
+            }
+
+            CoroutineTransformerMethodVisitor.dropSuspensionMarkers(invokeSuspendMethod, suspensionPoints)
+        }
+
+        // Unroll ALOAD N, ASTORE M sequences generated by the inliner, until we find ALOAD 0
+        // TODO: Why RedundantLocalsEliminationMethodTransformer does not remove them?
+        private fun findAllAload0s(method: MethodNode, frames: Array<Frame<SourceValue>?>, aload: VarInsnNode): Sequence<VarInsnNode> =
+            sequence {
+                fun AbstractInsnNode.index() = method.instructions.indexOf(this)
+
+                suspend fun SequenceScope<VarInsnNode>.checkAload(aload: AbstractInsnNode) {
+                    assert(aload.opcode == Opcodes.ALOAD) {
+                        "Expected ALOAD, but got $aload"
+                    }
+                    aload as VarInsnNode
+                    if (aload.isAload0()) yield(aload)
+                    else (yieldAll(findAllAload0s(method, frames, aload)))
+                }
+
+                assert(aload.opcode == Opcodes.ALOAD) { "$aload is not ALOAD" }
+                if (aload.isAload0()) yield(aload)
+                else {
+                    val astores = frames[aload.index()]?.getLocal(aload.`var`)?.insns
+                        ?: error("No sources of $aload found")
+                    for (astore in astores) {
+                        assert(astore.opcode == Opcodes.ASTORE) { "Source of $aload shall be ASTORE, but got $astore" }
+                        val sources = frames[astore.index()]?.top()?.insns
+                            ?: error("No sources of $astore found")
+                        for (source in sources) {
+                            if (source.opcode == Opcodes.CHECKCAST) {
+                                // Instead of ALOAD N, ASTORE M we got ALOAD N, CHECKCAST Continuation, ASTORE M. Handle it
+                                source as TypeInsnNode
+                                assert(source.desc == codegen.languageVersionSettings.continuationAsmType().internalName) {
+                                    "Expected CHECKCAST Continuation, but got $source"
+                                }
+                                val newAloads = frames[source.index()]?.top()?.insns
+                                    ?: error("No sources of $source found")
+                                for (newAload in newAloads) {
+                                    checkAload(newAload)
+                                }
+                            } else {
+                                checkAload(source)
+                            }
+                        }
+                    }
+                }
+            }
+
+        private fun AbstractInsnNode.isAload0() = opcode == Opcodes.ALOAD && (this as VarInsnNode).`var` == 0
+
+        private fun generateTailCallInvoke(invokeMethod: MethodNode) {
+            val mv = classNode.visitMethod(
+                invokeMethod.access, invokeMethod.name, invokeMethod.desc, null, ArrayUtil.EMPTY_STRING_ARRAY
+            )
+            // copy invoke's annotations
+            if (invokeMethod.invisibleAnnotations != null) {
+                for (annotation in invokeMethod.invisibleAnnotations) {
+                    mv.visitAnnotation(annotation.desc, false)
+                }
+            }
+            if (invokeMethod.visibleAnnotations != null) {
+                for (annotation in invokeMethod.visibleAnnotations) {
+                    mv.visitAnnotation(annotation.desc, true)
+                }
+            }
+            if (invokeMethod.invisibleParameterAnnotations != null) {
+                for ((index, annotations) in invokeMethod.invisibleParameterAnnotations.withIndex()) {
+                    if (annotations == null) continue
+                    for (annotation in annotations) {
+                        mv.visitParameterAnnotation(index, annotation.desc, false)
+                    }
+                }
+            }
+            if (invokeMethod.visibleParameterAnnotations != null) {
+                for ((index, annotations) in invokeMethod.visibleParameterAnnotations.withIndex()) {
+                    if (annotations == null) continue
+                    for (annotation in annotations) {
+                        mv.visitParameterAnnotation(index, annotation.desc, true)
+                    }
+                }
+            }
+            mv.visitCode()
+            with(codegen) {
+                with(InstructionAdapter(mv)) {
+                    // TODO: inline invokeSuspend
+                    storeParametersInFields(0, doNotGenerateInvokeBridge)
+                    load(0, AsmTypes.OBJECT_TYPE)
+                    val continuationIndex = invokeSignature().valueParameters.map { it.asmType.size }.reduce(Int::plus)
+                    if (languageVersionSettings.isReleaseCoroutines()) {
+                        load(continuationIndex, RELEASE_CONTINUATION_ASM_TYPE)
+                        invokeInvokeSuspend(v.thisName)
+                    } else {
+                        load(continuationIndex, EXPERIMENTAL_CONTINUATION_ASM_TYPE)
+                        invokeDoResumeWithNullException(v.thisName)
+                    }
+                    areturn(AsmTypes.OBJECT_TYPE)
+                }
+            }
+            mv.visitEnd()
+        }
+
+        private fun CoroutineCodegenForLambda.invokeSignature(): JvmMethodSignature = typeMapper.mapSignatureSkipGeneric(
+            if (doNotGenerateInvokeBridge) getErasedInvokeFunction(funDescriptor) else funDescriptor
+        )
+    }
+
     companion object {
         @JvmStatic
         fun create(
@@ -511,6 +747,7 @@ class CoroutineCodegenForLambda private constructor(
         ): ClosureCodegen? {
             if (!originalSuspendLambdaDescriptor.isSuspendLambdaOrLocalFunction() || declaration is KtCallableReferenceExpression) return null
 
+            val suspendLambdaClassBuilder = SuspendLambdaClassBuilder(classBuilder)
             return CoroutineCodegenForLambda(
                 expressionCodegen,
                 declaration,
@@ -521,14 +758,20 @@ class CoroutineCodegenForLambda private constructor(
                     ),
                     originalSuspendLambdaDescriptor, expressionCodegen, expressionCodegen.state.typeMapper
                 ),
-                classBuilder,
+                suspendLambdaClassBuilder,
                 originalSuspendLambdaDescriptor,
                 // Local suspend lambdas, which call crossinline suspend parameters of containing functions must be generated after inlining
                 expressionCodegen.bindingContext[CAPTURES_CROSSINLINE_LAMBDA, originalSuspendLambdaDescriptor] == true
-            )
+            ).also { suspendLambdaClassBuilder.codegen = it }
         }
     }
 }
+
+fun String.removeContinuationParameter(isReleaseCoroutines: Boolean): String =
+    if (isReleaseCoroutines)
+        replace(RELEASE_CONTINUATION_ASM_TYPE.descriptor, "")
+    else
+        replace(EXPERIMENTAL_CONTINUATION_ASM_TYPE.descriptor, "")
 
 fun isCapturedSuspendLambda(closure: CalculatedClosure, name: String, bindingContext: BindingContext): Boolean {
     for ((param, value) in closure.captureVariables) {
