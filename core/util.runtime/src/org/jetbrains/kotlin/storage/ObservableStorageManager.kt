@@ -38,6 +38,14 @@ abstract class ObservableStorageManager(private val delegate: StorageManager) : 
         return delegate.createMemoizedFunctionWithNullableValues(compute.observable, map)
     }
 
+    override fun <K, V : Any> createRecursionTolerantCacheWithNullableValues(): RecursionTolerantCacheWithNullableValues<K, V> {
+        return delegate.createRecursionTolerantCacheWithNullableValues()
+    }
+
+    override fun <K, V : Any> createRecursionTolerantCacheWithNotNullValues(): RecursionTolerantCacheWithNotNullValues<K, V> {
+        return delegate.createRecursionTolerantCacheWithNotNullValues()
+    }
+
     override fun <K, V : Any> createCacheWithNullableValues(): CacheWithNullableValues<K, V> {
         return delegate.createCacheWithNullableValues()
     }

@@ -411,12 +411,12 @@ public class LockBasedStorageManager implements StorageManager {
         }
     }
 
-    private static class MapBasedMemoizedFunction<K, V> implements MemoizedFunctionToNullable<K, V> {
+    private static class MapBasedRecursionTolerantMemoizedFunction<K, V> {
         private final LockBasedStorageManager storageManager;
         private final ConcurrentMap<K, Object> cache;
         private final Function1<? super K, ? extends V> compute;
 
-        public MapBasedMemoizedFunction(
+        public MapBasedRecursionTolerantMemoizedFunction(
                 @NotNull LockBasedStorageManager storageManager,
                 @NotNull ConcurrentMap<K, Object> map,
                 @NotNull Function1<? super K, ? extends V> compute
@@ -426,9 +426,8 @@ public class LockBasedStorageManager implements StorageManager {
             this.compute = compute;
         }
 
-        @Override
         @Nullable
-        public V invoke(K input) {
+        public V invoke(K input, @Nullable Function0<? extends V> onRecursion) {
             Object value = cache.get(input);
             if (value != null && value != NotValue.COMPUTING) return WrappedValues.unescapeExceptionOrNull(value);
 
@@ -436,7 +435,13 @@ public class LockBasedStorageManager implements StorageManager {
             try {
                 value = cache.get(input);
                 if (value == NotValue.COMPUTING) {
-                    throw recursionDetected(input);
+                    if (onRecursion == null)
+                        throw recursionDetected(input);
+                    try {
+                        return onRecursion.invoke();
+                    } catch (Throwable throwable) {
+                        throw storageManager.exceptionHandlingStrategy.handleException(throwable);
+                    }
                 }
                 if (value != null) return WrappedValues.unescapeExceptionOrNull(value);
 
@@ -495,7 +500,6 @@ public class LockBasedStorageManager implements StorageManager {
             );
         }
 
-        @Override
         public boolean isComputed(K key) {
             Object value = cache.get(key);
             return value != null && value != NotValue.COMPUTING;
@@ -503,6 +507,22 @@ public class LockBasedStorageManager implements StorageManager {
 
         protected LockBasedStorageManager getStorageManager() {
             return storageManager;
+        }
+    }
+
+    private static class MapBasedMemoizedFunction<K, V> extends MapBasedRecursionTolerantMemoizedFunction <K, V> implements MemoizedFunctionToNullable<K, V> {
+        public MapBasedMemoizedFunction(
+                @NotNull LockBasedStorageManager storageManager,
+                @NotNull ConcurrentMap<K, Object> map,
+                @NotNull Function1<? super K, ? extends V> compute
+        ) {
+            super(storageManager, map, compute);
+        }
+
+        @Override
+        @Nullable
+        public V invoke(K input) {
+            return super.invoke(input, null);
         }
     }
 
@@ -546,14 +566,12 @@ public class LockBasedStorageManager implements StorageManager {
 
     @NotNull
     @Override
-    public <K, V> CacheWithNullableValues<K, V> createCacheWithNullableValues() {
-        return new CacheWithNullableValuesBasedOnMemoizedFunction<K, V>(
-                this, LockBasedStorageManager.<KeyWithComputation<K,V>>createConcurrentHashMap());
+    public <K, V> RecursionTolerantCacheWithNullableValues<K, V> createRecursionTolerantCacheWithNullableValues() {
+        return new RecursionTolerantCacheWithNullableValuesBasedOnMemoizedFunction<K, V>(this, LockBasedStorageManager.<KeyWithComputation<K,V>>createConcurrentHashMap());
     }
 
-    private static class CacheWithNullableValuesBasedOnMemoizedFunction<K, V> extends MapBasedMemoizedFunction<KeyWithComputation<K, V>, V> implements CacheWithNullableValues<K, V> {
-
-        private CacheWithNullableValuesBasedOnMemoizedFunction(
+    private static class RecursionTolerantCacheWithNullableValuesBasedOnMemoizedFunction<K, V> extends MapBasedRecursionTolerantMemoizedFunction<KeyWithComputation<K, V>, V> implements RecursionTolerantCacheWithNullableValues<K, V> {
+        public RecursionTolerantCacheWithNullableValuesBasedOnMemoizedFunction(
                 @NotNull LockBasedStorageManager storageManager,
                 @NotNull ConcurrentMap<KeyWithComputation<K, V>, Object> map
         ) {
@@ -567,8 +585,65 @@ public class LockBasedStorageManager implements StorageManager {
 
         @Nullable
         @Override
+        public V computeIfAbsent(K key, @NotNull Function0<? extends V> computation, @NotNull Function0<? extends V> onRecursive) {
+            return computeIfAbsentInternal(key, computation, onRecursive);
+        }
+
+        protected V computeIfAbsentInternal (K key, @NotNull Function0<? extends V> computation, @Nullable Function0<? extends V> onRecursive) {
+            return invoke(new KeyWithComputation<K, V>(key, computation), onRecursive);
+        }
+    }
+
+    @NotNull
+    @Override
+    public <K, V> RecursionTolerantCacheWithNotNullValues<K, V> createRecursionTolerantCacheWithNotNullValues() {
+        return new RecursionTolerantCacheWithNotNullValuesBasedOnMemoizedFunction<K, V>(this, LockBasedStorageManager.<KeyWithComputation<K,V>>createConcurrentHashMap());
+    }
+
+    private static class RecursionTolerantCacheWithNotNullValuesBasedOnMemoizedFunction<K, V> extends RecursionTolerantCacheWithNullableValuesBasedOnMemoizedFunction<K, V> implements RecursionTolerantCacheWithNotNullValues<K, V> {
+        public RecursionTolerantCacheWithNotNullValuesBasedOnMemoizedFunction(
+                @NotNull LockBasedStorageManager storageManager,
+                @NotNull ConcurrentMap<KeyWithComputation<K, V>, Object> map
+        ) {
+            super(storageManager, map);
+        }
+
+        @NotNull
+        @Override
+        public V computeIfAbsent(K key, @NotNull Function0<? extends V> computation, @NotNull Function0<? extends V> onRecursive) {
+            return computeIfAbsentInternal(key, computation, onRecursive);
+        }
+
+        @Override
+        protected V computeIfAbsentInternal(
+                K key, @NotNull Function0<? extends V> computation, @Nullable Function0<? extends V> onRecursive
+        ) {
+            V result = super.computeIfAbsentInternal(key, computation, onRecursive);
+            assert result != null : "computeIfAbsent() returned null under " + getStorageManager();
+            return result;
+        }
+    }
+
+    @NotNull
+    @Override
+    public <K, V> CacheWithNullableValues<K, V> createCacheWithNullableValues() {
+        return new CacheWithNullableValuesBasedOnMemoizedFunction<K, V>(
+                this, LockBasedStorageManager.<KeyWithComputation<K,V>>createConcurrentHashMap());
+    }
+
+    private static class CacheWithNullableValuesBasedOnMemoizedFunction<K, V> extends RecursionTolerantCacheWithNullableValuesBasedOnMemoizedFunction<K, V> implements CacheWithNullableValues<K, V> {
+
+        private CacheWithNullableValuesBasedOnMemoizedFunction(
+                @NotNull LockBasedStorageManager storageManager,
+                @NotNull ConcurrentMap<KeyWithComputation<K, V>, Object> map
+        ) {
+            super(storageManager, map);
+        }
+
+        @Nullable
+        @Override
         public V computeIfAbsent(K key, @NotNull Function0<? extends V> computation) {
-            return invoke(new KeyWithComputation<K, V>(key, computation));
+            return computeIfAbsentInternal(key, computation, null);
         }
     }
 
@@ -578,7 +653,7 @@ public class LockBasedStorageManager implements StorageManager {
         return new CacheWithNotNullValuesBasedOnMemoizedFunction<K, V>(this, LockBasedStorageManager.<KeyWithComputation<K,V>>createConcurrentHashMap());
     }
 
-    private static class CacheWithNotNullValuesBasedOnMemoizedFunction<K, V> extends CacheWithNullableValuesBasedOnMemoizedFunction<K, V> implements CacheWithNotNullValues<K, V> {
+    private static class CacheWithNotNullValuesBasedOnMemoizedFunction<K, V> extends RecursionTolerantCacheWithNotNullValuesBasedOnMemoizedFunction<K, V> implements CacheWithNotNullValues<K, V> {
 
         private CacheWithNotNullValuesBasedOnMemoizedFunction(
                 @NotNull LockBasedStorageManager storageManager,
@@ -590,9 +665,7 @@ public class LockBasedStorageManager implements StorageManager {
         @NotNull
         @Override
         public V computeIfAbsent(K key, @NotNull Function0<? extends V> computation) {
-            V result = super.computeIfAbsent(key, computation);
-            assert result != null : "computeIfAbsent() returned null under " + getStorageManager();
-            return result;
+            return computeIfAbsentInternal(key, computation, null);
         }
     }
 

@@ -50,3 +50,11 @@ interface CacheWithNullableValues<in K, V : Any> {
 interface CacheWithNotNullValues<in K, V : Any> {
     fun computeIfAbsent(key: K, computation: () -> V): V
 }
+
+interface RecursionTolerantCacheWithNullableValues<in K, V : Any> {
+    fun computeIfAbsent(key: K, computation: () -> V, onRecursive: () -> V): V?
+}
+
+interface RecursionTolerantCacheWithNotNullValues<in K, V : Any> {
+    fun computeIfAbsent(key: K, computation: () -> V, onRecursive: () -> V): V
+}

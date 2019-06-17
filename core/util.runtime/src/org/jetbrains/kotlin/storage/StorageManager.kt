@@ -34,6 +34,10 @@ interface StorageManager {
     fun <K, V : Any> createCacheWithNullableValues(): CacheWithNullableValues<K, V>
     fun <K, V : Any> createCacheWithNotNullValues(): CacheWithNotNullValues<K, V>
 
+    fun <K, V : Any> createRecursionTolerantCacheWithNullableValues(): RecursionTolerantCacheWithNullableValues<K, V>
+
+    fun <K, V : Any> createRecursionTolerantCacheWithNotNullValues(): RecursionTolerantCacheWithNotNullValues<K, V>
+
     fun <K, V : Any> createMemoizedFunction(compute: (K) -> V, map: ConcurrentMap<K, Any>): MemoizedFunctionToNotNull<K, V>
 
     fun <K, V : Any> createMemoizedFunctionWithNullableValues(compute: (K) -> V, map: ConcurrentMap<K, Any>): MemoizedFunctionToNullable<K, V>
