@@ -37,6 +37,7 @@ import org.jetbrains.kotlin.idea.search.usagesSearch.getAccessorNames
 import org.jetbrains.kotlin.idea.search.usagesSearch.getClassNameForCompanionObject
 import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.idea.util.textRangeIn
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -187,6 +188,7 @@ class UnusedSymbolInspection : AbstractKotlinInspection() {
 private fun checkVisibility(declaration: KtNamedDeclaration): Boolean = when {
     declaration is KtClassOrObject && declaration.isTopLevel() -> false
     declaration.isPrivate() || declaration.parent is KtBlockExpression -> true
+    declaration is KtSecondaryConstructor -> declaration.getContainingClassOrObject().hasModifier(KtTokens.SEALED_KEYWORD)
     declaration is KtTypeParameter -> (declaration.parent.parent as? KtNamedDeclaration)?.let { checkVisibility(it) } ?: false
     else -> false
 }
