@@ -38,10 +38,7 @@ import org.jetbrains.kotlin.idea.search.usagesSearch.getClassNameForCompanionObj
 import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.idea.util.textRangeIn
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
-import org.jetbrains.kotlin.psi.psiUtil.isAncestor
-import org.jetbrains.kotlin.psi.psiUtil.isPrivate
-import org.jetbrains.kotlin.psi.psiUtil.isPrivateNestedClassOrObject
+import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.isInlineClassType
 
@@ -163,6 +160,7 @@ class UnusedSymbolInspection : AbstractKotlinInspection() {
         if (declaration is KtProperty && declaration.isLocal) return
         if (declaration is KtEnumEntry) return
         if (declaration is KtObjectDeclaration && declaration.isCompanion()) return // never mark companion object as unused (there are too many reasons it can be needed for)
+        if (declaration is KtSecondaryConstructor && declaration.containingClass()?.isEnum() == true) return
 
         if (declaration is KtProperty && declaration.isSerializationImplicitlyUsedField()) return
         if (declaration is KtNamedFunction && declaration.isSerializationImplicitlyUsedMethod()) return

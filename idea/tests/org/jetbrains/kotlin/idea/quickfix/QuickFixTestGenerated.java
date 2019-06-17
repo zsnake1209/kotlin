@@ -10293,6 +10293,11 @@ public class QuickFixTestGenerated extends AbstractQuickFixTest {
             runTest("idea/testData/quickfix/removeUnused/unusedPropertyAsConstructorParameter2.kt");
         }
 
+        @TestMetadata("unusedSecondaryConstructor.kt")
+        public void testUnusedSecondaryConstructor() throws Exception {
+            runTest("idea/testData/quickfix/removeUnused/unusedSecondaryConstructor.kt");
+        }
+
         @TestMetadata("unusedTypeParameter.kt")
         public void testUnusedTypeParameter() throws Exception {
             runTest("idea/testData/quickfix/removeUnused/unusedTypeParameter.kt");
