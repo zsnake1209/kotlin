@@ -49,6 +49,8 @@ abstract class AbstractTypeConstructor(storageManager: StorageManager) : TypeCon
             kotlinTypeRefiner.refineTypes(this@AbstractTypeConstructor.getSupertypes())
         }
 
+        private val delegate: AbstractTypeConstructor get() = this@AbstractTypeConstructor
+
         override fun getParameters(): List<TypeParameterDescriptor> = this@AbstractTypeConstructor.parameters
 
         override fun getSupertypes(): List<KotlinType> = refinedSupertypes
@@ -63,7 +65,12 @@ abstract class AbstractTypeConstructor(storageManager: StorageManager) : TypeCon
         override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor =
             this@AbstractTypeConstructor.refine(kotlinTypeRefiner)
 
-        override fun equals(other: Any?) = this@AbstractTypeConstructor.equals(other)
+        override fun equals(other: Any?): Boolean = if (other is ModuleViewTypeConstructor) {
+            this@AbstractTypeConstructor == other.delegate
+        } else {
+            this@AbstractTypeConstructor == other
+        }
+
         override fun hashCode() = this@AbstractTypeConstructor.hashCode()
         override fun toString() = this@AbstractTypeConstructor.toString()
     }
