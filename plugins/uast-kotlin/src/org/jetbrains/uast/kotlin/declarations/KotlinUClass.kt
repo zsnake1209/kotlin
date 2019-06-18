@@ -135,8 +135,14 @@ open class KotlinUClass private constructor(
     }
 
     override fun getSuperClass(): UClass? = super.getSuperClass()
-    override fun getFields(): Array<UField> = super.getFields()
-    override fun getInitializers(): Array<UClassInitializer> = super.getInitializers()
+    override fun getFields(): Array<UField> =
+        javaPsi.fields
+            .mapNotNull { KotlinConverter.convertDeclaration(it, this, arrayOf(UField::class.java)) as? UField }
+            .toTypedArray()
+
+    override fun getInitializers(): Array<UClassInitializer> = javaPsi.initializers
+        .mapNotNull { KotlinConverter.convertPsiElement(it, this, arrayOf(UClassInitializer::class.java)) as? UClassInitializer }
+        .toTypedArray()
 
     override fun getMethods(): Array<UMethod> {
         val hasPrimaryConstructor = ktClass?.hasPrimaryConstructor() ?: false
@@ -150,7 +156,8 @@ open class KotlinUClass private constructor(
                 else
                     KotlinConstructorUMethod(ktClass, psiMethod, this)
             } else {
-                getLanguagePlugin().convertOpt(psiMethod, this) ?: reportConvertFailure(psiMethod)
+                KotlinConverter.convertDeclaration(psiMethod, this, arrayOf(UMethod::class.java)) as? UMethod
+                    ?: reportConvertFailure(psiMethod)
             }
         }
 
