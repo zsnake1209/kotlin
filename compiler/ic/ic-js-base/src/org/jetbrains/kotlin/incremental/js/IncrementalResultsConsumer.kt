@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.incremental.js
 
-import org.jetbrains.kotlin.name.FqName
 import java.io.File
 import java.security.MessageDigest
 
