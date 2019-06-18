@@ -123,16 +123,19 @@ class TypeAliasExpander(
 
         checkRepeatedAnnotations(underlyingType.annotations, argumentType.annotations)
 
-        val substitutedType =
-            if (argumentType is DynamicType)
-                argumentType.combineAnnotations(underlyingType.annotations)
-            else
-                argumentType.asSimpleType().combineNullabilityAndAnnotations(underlyingType)
+        val substitutedType = when (argumentType) {
+            is DynamicType -> argumentType.combineAnnotations(underlyingType.annotations)
+            is FlexibleType -> argumentType.combineAnnotations(underlyingType.annotations)
+            else -> argumentType.asSimpleType().combineNullabilityAndAnnotations(underlyingType)
+        }
 
         return TypeProjectionImpl(resultingVariance, substitutedType)
     }
 
     private fun DynamicType.combineAnnotations(newAnnotations: Annotations): DynamicType =
+        replaceAnnotations(createCombinedAnnotations(newAnnotations))
+
+    private fun FlexibleType.combineAnnotations(newAnnotations: Annotations) =
         replaceAnnotations(createCombinedAnnotations(newAnnotations))
 
     private fun SimpleType.combineAnnotations(newAnnotations: Annotations): SimpleType =
