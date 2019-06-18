@@ -16,6 +16,8 @@
 
 package org.jetbrains.uast.kotlin
 
+
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -361,6 +363,7 @@ internal fun KtElement.canAnalyze(): Boolean {
     if (!isValid) return false
     val containingFile = containingFile as? KtFile ?: return false // EA-114080, EA-113475, EA-134193
     if (containingFile.doNotAnalyze != null) return false // To prevent exceptions during analysis
+    ApplicationManager.getApplication()?.assertReadAccessAllowed() // analysis should be done under read lock
     return true
 }
 
