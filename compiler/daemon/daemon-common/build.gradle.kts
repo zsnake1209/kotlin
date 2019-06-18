@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":compiler:util"))
     implementation(project(":compiler:cli-common"))
     implementation(project(":compiler:ic:ic-js-base"))
+    implementation(project(":kotlin-build-base"))
     implementation(commonDep("org.jetbrains.kotlinx", "kotlinx-coroutines-core")) {
         isTransitive = false
     }
