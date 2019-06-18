@@ -53,6 +53,7 @@ object SerialEntityNames {
 
     const val SERIAL_DESCRIPTOR_CLASS = "SerialDescriptor"
     const val SERIAL_DESCRIPTOR_CLASS_IMPL = "SerialClassDescImpl"
+    const val SERIAL_DESCRIPTOR_FOR_ENUM = "EnumDescriptor"
 
     //exceptions
     const val SERIAL_EXC = "SerializationException"

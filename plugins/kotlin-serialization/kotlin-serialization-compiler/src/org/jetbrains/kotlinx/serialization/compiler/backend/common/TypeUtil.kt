@@ -97,7 +97,11 @@ fun AbstractSerialGenerator.getSerialTypeInfo(property: SerializableProperty): S
 
 fun KotlinType.serialName(): String {
     val serializableDescriptor = this.toClassDescriptor!!
-    return serializableDescriptor.annotations.serialNameValue ?: serializableDescriptor.fqNameUnsafe.asString()
+    return serializableDescriptor.serialName()
+}
+
+fun ClassDescriptor.serialName(): String {
+    return annotations.serialNameValue ?: fqNameUnsafe.asString()
 }
 
 /**
@@ -199,7 +203,9 @@ fun findStandardKotlinTypeSerializer(module: ModuleDescriptor, kType: KotlinType
 
 fun findEnumTypeSerializer(module: ModuleDescriptor, kType: KotlinType): ClassDescriptor? {
     val classDescriptor = kType.toClassDescriptor ?: return null
-    return if (classDescriptor.kind == ClassKind.ENUM_CLASS) module.findClassAcrossModuleDependencies(enumSerializerId) else null
+    return if (classDescriptor.kind == ClassKind.ENUM_CLASS && !classDescriptor.isSerializableEnum())
+        module.findClassAcrossModuleDependencies(enumSerializerId)
+    else null
 }
 
 internal fun KtPureClassOrObject.bodyPropertiesDescriptorsMap(
