@@ -4156,11 +4156,8 @@ public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> UShortArray.group
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun <R> UIntArray.map(transform: (UInt) -> R): List<R> {
-    return when (size) {
-        0 -> emptyList()
-        1 -> listOf(transform(get(0)))
-        else -> mapTo(ArrayList<R>(size), transform)
-    }
+    if (size == 0) return emptyList()
+    return mapTo(ArrayList<R>(size), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -4173,11 +4170,8 @@ public inline fun <R> UIntArray.map(transform: (UInt) -> R): List<R> {
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun <R> ULongArray.map(transform: (ULong) -> R): List<R> {
-    return when (size) {
-        0 -> emptyList()
-        1 -> listOf(transform(get(0)))
-        else -> mapTo(ArrayList<R>(size), transform)
-    }
+    if (size == 0) return emptyList()
+    return mapTo(ArrayList<R>(size), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -4190,11 +4184,8 @@ public inline fun <R> ULongArray.map(transform: (ULong) -> R): List<R> {
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun <R> UByteArray.map(transform: (UByte) -> R): List<R> {
-    return when (size) {
-        0 -> emptyList()
-        1 -> listOf(transform(get(0)))
-        else -> mapTo(ArrayList<R>(size), transform)
-    }
+    if (size == 0) return emptyList()
+    return mapTo(ArrayList<R>(size), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -4207,11 +4198,8 @@ public inline fun <R> UByteArray.map(transform: (UByte) -> R): List<R> {
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun <R> UShortArray.map(transform: (UShort) -> R): List<R> {
-    return when (size) {
-        0 -> emptyList()
-        1 -> listOf(transform(get(0)))
-        else -> mapTo(ArrayList<R>(size), transform)
-    }
+    if (size == 0) return emptyList()
+    return mapTo(ArrayList<R>(size), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -4224,11 +4212,8 @@ public inline fun <R> UShortArray.map(transform: (UShort) -> R): List<R> {
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun <R> UIntArray.mapIndexed(transform: (index: Int, UInt) -> R): List<R> {
-    return when (size) {
-        0 -> emptyList()
-        1 -> listOf(transform(0, get(0)))
-        else -> mapIndexedTo(ArrayList<R>(size), transform)
-    }
+    if (size == 0) return emptyList()
+    return mapIndexedTo(ArrayList<R>(size), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -4241,11 +4226,8 @@ public inline fun <R> UIntArray.mapIndexed(transform: (index: Int, UInt) -> R): 
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun <R> ULongArray.mapIndexed(transform: (index: Int, ULong) -> R): List<R> {
-    return when (size) {
-        0 -> emptyList()
-        1 -> listOf(transform(0, get(0)))
-        else -> mapIndexedTo(ArrayList<R>(size), transform)
-    }
+    if (size == 0) return emptyList()
+    return mapIndexedTo(ArrayList<R>(size), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -4258,11 +4240,8 @@ public inline fun <R> ULongArray.mapIndexed(transform: (index: Int, ULong) -> R)
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun <R> UByteArray.mapIndexed(transform: (index: Int, UByte) -> R): List<R> {
-    return when (size) {
-        0 -> emptyList()
-        1 -> listOf(transform(0, get(0)))
-        else -> mapIndexedTo(ArrayList<R>(size), transform)
-    }
+    if (size == 0) return emptyList()
+    return mapIndexedTo(ArrayList<R>(size), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -4275,11 +4254,8 @@ public inline fun <R> UByteArray.mapIndexed(transform: (index: Int, UByte) -> R)
 @ExperimentalUnsignedTypes
 @kotlin.internal.InlineOnly
 public inline fun <R> UShortArray.mapIndexed(transform: (index: Int, UShort) -> R): List<R> {
-    return when (size) {
-        0 -> emptyList()
-        1 -> listOf(transform(0, get(0)))
-        else -> mapIndexedTo(ArrayList<R>(size), transform)
-    }
+    if (size == 0) return emptyList()
+    return mapIndexedTo(ArrayList<R>(size), transform).optimizeReadOnlyList()
 }
 
 /**
