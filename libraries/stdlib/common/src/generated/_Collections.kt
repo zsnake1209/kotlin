@@ -673,14 +673,14 @@ public inline fun <T> Iterable<T>.dropWhile(predicate: (T) -> Boolean): List<T> 
             list.add(item)
             yielding = true
         }
-    return list
+    return list.optimizeReadOnlyList()
 }
 
 /**
  * Returns a list containing only elements matching the given [predicate].
  */
 public inline fun <T> Iterable<T>.filter(predicate: (T) -> Boolean): List<T> {
-    return filterTo(ArrayList<T>(), predicate)
+    return filterTo(ArrayList<T>(), predicate).optimizeReadOnlyList()
 }
 
 /**
@@ -689,7 +689,7 @@ public inline fun <T> Iterable<T>.filter(predicate: (T) -> Boolean): List<T> {
  * and returns the result of predicate evaluation on the element.
  */
 public inline fun <T> Iterable<T>.filterIndexed(predicate: (index: Int, T) -> Boolean): List<T> {
-    return filterIndexedTo(ArrayList<T>(), predicate)
+    return filterIndexedTo(ArrayList<T>(), predicate).optimizeReadOnlyList()
 }
 
 /**
@@ -708,7 +708,7 @@ public inline fun <T, C : MutableCollection<in T>> Iterable<T>.filterIndexedTo(d
  * Returns a list containing all elements that are instances of specified type parameter R.
  */
 public inline fun <reified R> Iterable<*>.filterIsInstance(): List<@kotlin.internal.NoInfer R> {
-    return filterIsInstanceTo(ArrayList<R>())
+    return filterIsInstanceTo(ArrayList<R>()).optimizeReadOnlyList()
 }
 
 /**
@@ -723,14 +723,14 @@ public inline fun <reified R, C : MutableCollection<in R>> Iterable<*>.filterIsI
  * Returns a list containing all elements not matching the given [predicate].
  */
 public inline fun <T> Iterable<T>.filterNot(predicate: (T) -> Boolean): List<T> {
-    return filterNotTo(ArrayList<T>(), predicate)
+    return filterNotTo(ArrayList<T>(), predicate).optimizeReadOnlyList()
 }
 
 /**
  * Returns a list containing all elements that are not `null`.
  */
 public fun <T : Any> Iterable<T?>.filterNotNull(): List<T> {
-    return filterNotNullTo(ArrayList<T>())
+    return filterNotNullTo(ArrayList<T>()).optimizeReadOnlyList()
 }
 
 /**
@@ -861,7 +861,7 @@ public inline fun <T> Iterable<T>.takeWhile(predicate: (T) -> Boolean): List<T> 
             break
         list.add(item)
     }
-    return list
+    return list.optimizeReadOnlyList()
 }
 
 /**
@@ -876,7 +876,7 @@ public fun <T> Iterable<T>.reversed(): List<T> {
     if (this is Collection && size <= 1) return toList()
     val list = toMutableList()
     list.reverse()
-    return list
+    return list.optimizeReadOnlyList()
 }
 
 /**
@@ -917,7 +917,7 @@ public fun <T : Comparable<T>> Iterable<T>.sorted(): List<T> {
         @Suppress("UNCHECKED_CAST")
         return (toTypedArray<Comparable<T>>() as Array<T>).apply { sort() }.asList()
     }
-    return toMutableList().apply { sort() }
+    return toMutableList().apply { sort() }.optimizeReadOnlyList()
 }
 
 /**
@@ -958,7 +958,7 @@ public fun <T> Iterable<T>.sortedWith(comparator: Comparator<in T>): List<T> {
        @Suppress("UNCHECKED_CAST")
        return (toTypedArray<Any?>() as Array<T>).apply { sortWith(comparator) }.asList()
     }
-    return toMutableList().apply { sortWith(comparator) }
+    return toMutableList().apply { sortWith(comparator) }.optimizeReadOnlyList()
 }
 
 /**
@@ -1241,7 +1241,7 @@ public fun <T> Iterable<T>.toSet(): Set<T> {
  * @sample samples.collections.Collections.Transformations.flatMap
  */
 public inline fun <T, R> Iterable<T>.flatMap(transform: (T) -> Iterable<R>): List<R> {
-    return flatMapTo(ArrayList<R>(), transform)
+    return flatMapTo(ArrayList<R>(), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -1336,7 +1336,12 @@ public inline fun <T, K> Iterable<T>.groupingBy(crossinline keySelector: (T) -> 
  * @sample samples.collections.Collections.Transformations.map
  */
 public inline fun <T, R> Iterable<T>.map(transform: (T) -> R): List<R> {
-    return mapTo(ArrayList<R>(collectionSizeOrDefault(10)), transform)
+    val collectionSize = collectionSizeOrDefault(10)
+    return when (collectionSize) {
+        0 -> emptyList()
+        1 -> listOf(transform(iterator().next()))
+        else -> mapTo(ArrayList<R>(collectionSize), transform)
+    }
 }
 
 /**
@@ -1346,7 +1351,12 @@ public inline fun <T, R> Iterable<T>.map(transform: (T) -> R): List<R> {
  * and returns the result of the transform applied to the element.
  */
 public inline fun <T, R> Iterable<T>.mapIndexed(transform: (index: Int, T) -> R): List<R> {
-    return mapIndexedTo(ArrayList<R>(collectionSizeOrDefault(10)), transform)
+    val collectionSize = collectionSizeOrDefault(10)
+    return when (collectionSize) {
+        0 -> emptyList()
+        1 -> listOf(transform(0, iterator().next()))
+        else -> mapIndexedTo(ArrayList<R>(collectionSize), transform)
+    }
 }
 
 /**
@@ -1356,7 +1366,7 @@ public inline fun <T, R> Iterable<T>.mapIndexed(transform: (index: Int, T) -> R)
  * and returns the result of the transform applied to the element.
  */
 public inline fun <T, R : Any> Iterable<T>.mapIndexedNotNull(transform: (index: Int, T) -> R?): List<R> {
-    return mapIndexedNotNullTo(ArrayList<R>(), transform)
+    return mapIndexedNotNullTo(ArrayList<R>(), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -1388,7 +1398,7 @@ public inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapIndexedTo(d
  * to each element in the original collection.
  */
 public inline fun <T, R : Any> Iterable<T>.mapNotNull(transform: (T) -> R?): List<R> {
-    return mapNotNullTo(ArrayList<R>(), transform)
+    return mapNotNullTo(ArrayList<R>(), transform).optimizeReadOnlyList()
 }
 
 /**
@@ -1445,7 +1455,7 @@ public inline fun <T, K> Iterable<T>.distinctBy(selector: (T) -> K): List<T> {
         if (set.add(key))
             list.add(e)
     }
-    return list
+    return list.optimizeReadOnlyList()
 }
 
 /**
@@ -2049,7 +2059,7 @@ public inline fun <T> Iterable<T>.partition(predicate: (T) -> Boolean): Pair<Lis
             second.add(element)
         }
     }
-    return Pair(first, second)
+    return Pair(first.optimizeReadOnlyList(), second.optimizeReadOnlyList())
 }
 
 /**
@@ -2081,7 +2091,7 @@ public operator fun <T> Iterable<T>.plus(elements: Array<out T>): List<T> {
     val result = ArrayList<T>()
     result.addAll(this)
     result.addAll(elements)
-    return result
+    return result.optimizeReadOnlyList()
 }
 
 /**
@@ -2091,7 +2101,7 @@ public operator fun <T> Collection<T>.plus(elements: Array<out T>): List<T> {
     val result = ArrayList<T>(this.size + elements.size)
     result.addAll(this)
     result.addAll(elements)
-    return result
+    return result.optimizeReadOnlyList()
 }
 
 /**
@@ -2102,7 +2112,7 @@ public operator fun <T> Iterable<T>.plus(elements: Iterable<T>): List<T> {
     val result = ArrayList<T>()
     result.addAll(this)
     result.addAll(elements)
-    return result
+    return result.optimizeReadOnlyList()
 }
 
 /**
@@ -2113,11 +2123,11 @@ public operator fun <T> Collection<T>.plus(elements: Iterable<T>): List<T> {
         val result = ArrayList<T>(this.size + elements.size)
         result.addAll(this)
         result.addAll(elements)
-        return result
+        return result.optimizeReadOnlyList()
     } else {
         val result = ArrayList<T>(this)
         result.addAll(elements)
-        return result
+        return result.optimizeReadOnlyList()
     }
 }
 
@@ -2128,7 +2138,7 @@ public operator fun <T> Iterable<T>.plus(elements: Sequence<T>): List<T> {
     val result = ArrayList<T>()
     result.addAll(this)
     result.addAll(elements)
-    return result
+    return result.optimizeReadOnlyList()
 }
 
 /**
@@ -2138,7 +2148,7 @@ public operator fun <T> Collection<T>.plus(elements: Sequence<T>): List<T> {
     val result = ArrayList<T>(this.size + 10)
     result.addAll(this)
     result.addAll(elements)
-    return result
+    return result.optimizeReadOnlyList()
 }
 
 /**
@@ -2186,13 +2196,13 @@ public fun <T> Iterable<T>.windowed(size: Int, step: Int = 1, partialWindows: Bo
             result.add(List(windowSize) { this[it + index] })
             index += step
         }
-        return result
+        return result.optimizeReadOnlyList()
     }
     val result = ArrayList<List<T>>()
     windowedIterator(iterator(), size, step, partialWindows, reuseBuffer = false).forEach {
         result.add(it)
     }
-    return result
+    return result.optimizeReadOnlyList()
 }
 
 /**
@@ -2228,13 +2238,13 @@ public fun <T, R> Iterable<T>.windowed(size: Int, step: Int = 1, partialWindows:
             result.add(transform(window))
             index += step
         }
-        return result
+        return result.optimizeReadOnlyList()
     }
     val result = ArrayList<R>()
     windowedIterator(iterator(), size, step, partialWindows, reuseBuffer = true).forEach {
         result.add(transform(it))
     }
-    return result
+    return result.optimizeReadOnlyList()
 }
 
 /**
@@ -2262,7 +2272,7 @@ public inline fun <T, R, V> Iterable<T>.zip(other: Array<out R>, transform: (a: 
         if (i >= arraySize) break
         list.add(transform(element, other[i++]))
     }
-    return list
+    return list.optimizeReadOnlyList()
 }
 
 /**
@@ -2289,7 +2299,7 @@ public inline fun <T, R, V> Iterable<T>.zip(other: Iterable<R>, transform: (a: T
     while (first.hasNext() && second.hasNext()) {
         list.add(transform(first.next(), second.next()))
     }
-    return list
+    return list.optimizeReadOnlyList()
 }
 
 /**
