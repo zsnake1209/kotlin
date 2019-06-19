@@ -16,8 +16,6 @@ dependencies {
     compileOnly(project(":compiler:ir.tree"))
     compileOnly(project(":compiler:ir.psi2ir"))
     compileOnly(project(":compiler:ir.backend.common"))
-    compileOnly(project(":compiler:ir.serialization.jvm"))
-
 
     compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
 

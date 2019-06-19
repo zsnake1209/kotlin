@@ -10,15 +10,11 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.descriptors.FirModuleDescriptor
-import org.jetbrains.kotlin.ir.backend.jvm.lower.serialization.ir.JvmIrDeserializer
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.impl.IrModuleFragmentImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
-import org.jetbrains.kotlin.ir.util.ConstantValueGenerator
-import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.TypeTranslator
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.PsiSourceManager
 
@@ -58,7 +54,6 @@ object Fir2IrConverter {
         builtIns: IrBuiltIns,
         languageVersionSettings: LanguageVersionSettings
     ) {
-        val deserializer = JvmIrDeserializer(irModule.descriptor, EmptyLoggingContext, builtIns, symbolTable, languageVersionSettings)
-        ExternalDependenciesGenerator(irModule.descriptor, symbolTable, builtIns, deserializer = deserializer).generateUnboundSymbolsAsDependencies()
+        ExternalDependenciesGenerator(irModule.descriptor, symbolTable, builtIns, deserializer = EmptyDeserializer).generateUnboundSymbolsAsDependencies()
     }
 }

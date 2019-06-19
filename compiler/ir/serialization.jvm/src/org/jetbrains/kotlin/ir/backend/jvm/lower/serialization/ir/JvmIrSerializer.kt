@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi2ir.PsiSourceManager
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberDescriptor
 
-class JvmIrModuleSerializer(
+class JvmIrSerializer(
     logger: LoggingContext,
     declarationTable: DeclarationTable,
     val psiSourceManager: PsiSourceManager,

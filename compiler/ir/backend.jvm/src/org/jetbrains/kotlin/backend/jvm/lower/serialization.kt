@@ -6,12 +6,12 @@
 package org.jetbrains.kotlin.backend.jvm.lower
 
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
-import org.jetbrains.kotlin.ir.backend.jvm.lower.serialization.ir.JvmIrModuleSerializer
+import org.jetbrains.kotlin.ir.backend.jvm.lower.serialization.ir.JvmIrSerializer
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
 
 fun serializeIrFile(context: JvmBackendContext, irFile: IrFile): ByteArray {
-    return JvmIrModuleSerializer(
+    return JvmIrSerializer(
         context,
         context.declarationTable,
         context.psiSourceManager,
@@ -21,7 +21,7 @@ fun serializeIrFile(context: JvmBackendContext, irFile: IrFile): ByteArray {
 
 fun serializeToplevelIrClass(context: JvmBackendContext, irClass: IrClass): ByteArray {
     assert(irClass.parent is IrFile)
-    return JvmIrModuleSerializer(
+    return JvmIrSerializer(
         context,
         context.declarationTable,
         context.psiSourceManager,
