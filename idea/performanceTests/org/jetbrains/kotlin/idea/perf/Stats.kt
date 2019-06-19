@@ -77,6 +77,19 @@ inline fun tcSimplePerfTest(file: String, name: String, stats: Stats, block: () 
     println("##teamcity[buildStatisticValue key='$name' value='$spentMs']")
 }
 
+inline fun attempts(block: (v: String) -> Unit) {
+    attempts(3) {
+        val n = if (it == 0) "" else it.toString()
+        block(n)
+    }
+}
+
+inline fun attempts(count: Int, block: (v: Int) -> Unit) {
+    for (attempt in 0..count) {
+        block(attempt)
+    }
+}
+
 fun String.tcEscape(): String {
     return this
         .replace("|", "||")
