@@ -25,14 +25,12 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 @UseExperimental(TypeRefinement::class)
 class KotlinTypeRefinerImpl(
     private val moduleDescriptor: ModuleDescriptor,
-    private val storageManager: StorageManager,
-    languageVersionSettings: LanguageVersionSettings
+    private val storageManager: StorageManager
 ) : KotlinTypeRefiner() {
     init {
         moduleDescriptor.getCapability(REFINER_CAPABILITY)?.value = this
     }
 
-    private val isRefinementDisabled = !languageVersionSettings.isTypeRefinementEnabled
     private val refinedTypeCache = storageManager.createRecursionTolerantCacheWithNotNullValues<KotlinType, KotlinType>()
     private val _isRefinementNeededForTypeConstructor =
         storageManager.createMemoizedFunction<TypeConstructor, Boolean> { it.areThereExpectSupertypesOrTypeArguments() }
@@ -41,8 +39,6 @@ class KotlinTypeRefinerImpl(
     @TypeRefinement
     override fun refineType(type: KotlinType): KotlinType {
         return when {
-            isRefinementDisabled -> type
-
             type.hasNotTrivialRefinementFactory -> {
                 val cached = refinedTypeCache.computeIfAbsent(
                     key = type,
@@ -80,7 +76,6 @@ class KotlinTypeRefinerImpl(
     override fun refineSupertypes(classDescriptor: ClassDescriptor): Collection<KotlinType> {
         // Note that we can't omit refinement even if classDescriptor.module == moduleDescriptor,
         // because such class may have supertypes which need refinement
-        if (isRefinementDisabled) return classDescriptor.typeConstructor.supertypes
         return classDescriptor.typeConstructor.supertypes.map { refineType(it) }
     }
 
