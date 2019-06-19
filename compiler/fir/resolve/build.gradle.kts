@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    testRuntime(intellijDep())
     compile(project(":core:descriptors"))
     compile(project(":core:descriptors.jvm"))
     compile(project(":core:deserialization"))
@@ -12,7 +13,7 @@ dependencies {
 
     compileOnly(intellijCoreDep()) { includeJars("intellij-core", "guava", rootProject = rootProject) }
 
-    testCompileOnly(intellijDep()) { includeJars("openapi", "java-api", "idea", "idea_rt", "util", "asm-all", "extensions", rootProject = rootProject) }
+    testCompileOnly(intellijDep())// { includeJars("openapi", "java-api", "idea", "idea_rt", "util", "asm-all", "extensions", rootProject = rootProject) }
 
     testRuntime(intellijDep())
 

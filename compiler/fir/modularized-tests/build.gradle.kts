@@ -9,9 +9,9 @@ plugins {
 }
 
 dependencies {
-    testCompileOnly(intellijDep()) {
+    testCompileOnly(intellijDep())/* {
         includeJars("openapi", "java-api", "extensions", "idea", "idea_rt", "util", "asm-all", rootProject = rootProject)
-    }
+    }*/
 
     testRuntime(intellijDep())
 
