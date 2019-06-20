@@ -12,7 +12,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(treeElement)
     }
 
-    fun visitTreeElementRaw(treeElement: JKTreeElement)
+    fun visitTreeElementRaw(treeElement: JKTreeElement) 
 
     override fun visitTreeRoot(treeRoot: JKTreeRoot) {
         printLeftNonCodeElements(treeRoot)
@@ -100,8 +100,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(annotationNameParameter)
     }
 
-    fun visitAnnotationNameParameterRaw(annotationNameParameter: JKAnnotationNameParameter) =
-        visitAnnotationParameterRaw(annotationNameParameter)
+    fun visitAnnotationNameParameterRaw(annotationNameParameter: JKAnnotationNameParameter) = visitAnnotationParameterRaw(annotationNameParameter)
 
     override fun visitAnnotationListOwner(annotationListOwner: JKAnnotationListOwner) {
         printLeftNonCodeElements(annotationListOwner)
@@ -157,8 +156,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(mutabilityModifierElement)
     }
 
-    fun visitMutabilityModifierElementRaw(mutabilityModifierElement: JKMutabilityModifierElement) =
-        visitModifierElementRaw(mutabilityModifierElement)
+    fun visitMutabilityModifierElementRaw(mutabilityModifierElement: JKMutabilityModifierElement) = visitModifierElementRaw(mutabilityModifierElement)
 
     override fun visitModalityModifierElement(modalityModifierElement: JKModalityModifierElement) {
         printLeftNonCodeElements(modalityModifierElement)
@@ -166,8 +164,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(modalityModifierElement)
     }
 
-    fun visitModalityModifierElementRaw(modalityModifierElement: JKModalityModifierElement) =
-        visitModifierElementRaw(modalityModifierElement)
+    fun visitModalityModifierElementRaw(modalityModifierElement: JKModalityModifierElement) = visitModifierElementRaw(modalityModifierElement)
 
     override fun visitVisibilityModifierElement(visibilityModifierElement: JKVisibilityModifierElement) {
         printLeftNonCodeElements(visibilityModifierElement)
@@ -175,8 +172,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(visibilityModifierElement)
     }
 
-    fun visitVisibilityModifierElementRaw(visibilityModifierElement: JKVisibilityModifierElement) =
-        visitModifierElementRaw(visibilityModifierElement)
+    fun visitVisibilityModifierElementRaw(visibilityModifierElement: JKVisibilityModifierElement) = visitModifierElementRaw(visibilityModifierElement)
 
     override fun visitExtraModifierElement(extraModifierElement: JKExtraModifierElement) {
         printLeftNonCodeElements(extraModifierElement)
@@ -288,8 +284,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(methodReferenceExpression)
     }
 
-    fun visitMethodReferenceExpressionRaw(methodReferenceExpression: JKMethodReferenceExpression) =
-        visitExpressionRaw(methodReferenceExpression)
+    fun visitMethodReferenceExpressionRaw(methodReferenceExpression: JKMethodReferenceExpression) = visitExpressionRaw(methodReferenceExpression)
 
     override fun visitExpressionStatement(expressionStatement: JKExpressionStatement) {
         printLeftNonCodeElements(expressionStatement)
@@ -393,8 +388,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(packageAccessExpression)
     }
 
-    fun visitPackageAccessExpressionRaw(packageAccessExpression: JKPackageAccessExpression) =
-        visitAssignableExpressionRaw(packageAccessExpression)
+    fun visitPackageAccessExpressionRaw(packageAccessExpression: JKPackageAccessExpression) = visitAssignableExpressionRaw(packageAccessExpression)
 
     override fun visitClassAccessExpression(classAccessExpression: JKClassAccessExpression) {
         printLeftNonCodeElements(classAccessExpression)
@@ -482,8 +476,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(stringLiteralExpression)
     }
 
-    fun visitStringLiteralExpressionRaw(stringLiteralExpression: JKStringLiteralExpression) =
-        visitLiteralExpressionRaw(stringLiteralExpression)
+    fun visitStringLiteralExpressionRaw(stringLiteralExpression: JKStringLiteralExpression) = visitLiteralExpressionRaw(stringLiteralExpression)
 
     override fun visitStubExpression(stubExpression: JKStubExpression) {
         printLeftNonCodeElements(stubExpression)
@@ -515,8 +508,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(blockStatementWithoutBrackets)
     }
 
-    fun visitBlockStatementWithoutBracketsRaw(blockStatementWithoutBrackets: JKBlockStatementWithoutBrackets) =
-        visitStatementRaw(blockStatementWithoutBrackets)
+    fun visitBlockStatementWithoutBracketsRaw(blockStatementWithoutBrackets: JKBlockStatementWithoutBrackets) = visitStatementRaw(blockStatementWithoutBrackets)
 
     override fun visitThisExpression(thisExpression: JKThisExpression) {
         printLeftNonCodeElements(thisExpression)
@@ -564,8 +556,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(breakWithLabelStatement)
     }
 
-    fun visitBreakWithLabelStatementRaw(breakWithLabelStatement: JKBreakWithLabelStatement) =
-        visitBreakStatementRaw(breakWithLabelStatement)
+    fun visitBreakWithLabelStatementRaw(breakWithLabelStatement: JKBreakWithLabelStatement) = visitBreakStatementRaw(breakWithLabelStatement)
 
     override fun visitIfStatement(ifStatement: JKIfStatement) {
         printLeftNonCodeElements(ifStatement)
@@ -613,8 +604,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(delegationConstructorCall)
     }
 
-    fun visitDelegationConstructorCallRaw(delegationConstructorCall: JKDelegationConstructorCall) =
-        visitMethodCallExpressionRaw(delegationConstructorCall)
+    fun visitDelegationConstructorCallRaw(delegationConstructorCall: JKDelegationConstructorCall) = visitMethodCallExpressionRaw(delegationConstructorCall)
 
     override fun visitLabel(label: JKLabel) {
         printLeftNonCodeElements(label)
@@ -758,8 +748,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(javaMethodCallExpression)
     }
 
-    fun visitJavaMethodCallExpressionRaw(javaMethodCallExpression: JKJavaMethodCallExpression) =
-        visitMethodCallExpressionRaw(javaMethodCallExpression)
+    fun visitJavaMethodCallExpressionRaw(javaMethodCallExpression: JKJavaMethodCallExpression) = visitMethodCallExpressionRaw(javaMethodCallExpression)
 
     override fun visitClassBody(classBody: JKClassBody) {
         printLeftNonCodeElements(classBody)
@@ -791,8 +780,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(javaDefaultNewExpression)
     }
 
-    fun visitJavaDefaultNewExpressionRaw(javaDefaultNewExpression: JKJavaDefaultNewExpression) =
-        visitExpressionRaw(javaDefaultNewExpression)
+    fun visitJavaDefaultNewExpressionRaw(javaDefaultNewExpression: JKJavaDefaultNewExpression) = visitExpressionRaw(javaDefaultNewExpression)
 
     override fun visitJavaNewEmptyArray(javaNewEmptyArray: JKJavaNewEmptyArray) {
         printLeftNonCodeElements(javaNewEmptyArray)
@@ -856,8 +844,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(javaAssignmentExpression)
     }
 
-    fun visitJavaAssignmentExpressionRaw(javaAssignmentExpression: JKJavaAssignmentExpression) =
-        visitExpressionRaw(javaAssignmentExpression)
+    fun visitJavaAssignmentExpressionRaw(javaAssignmentExpression: JKJavaAssignmentExpression) = visitExpressionRaw(javaAssignmentExpression)
 
     override fun visitJavaThrowStatement(javaThrowStatement: JKJavaThrowStatement) {
         printLeftNonCodeElements(javaThrowStatement)
@@ -929,8 +916,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(javaSynchronizedStatement)
     }
 
-    fun visitJavaSynchronizedStatementRaw(javaSynchronizedStatement: JKJavaSynchronizedStatement) =
-        visitStatementRaw(javaSynchronizedStatement)
+    fun visitJavaSynchronizedStatementRaw(javaSynchronizedStatement: JKJavaSynchronizedStatement) = visitStatementRaw(javaSynchronizedStatement)
 
     override fun visitJavaAnnotationMethod(javaAnnotationMethod: JKJavaAnnotationMethod) {
         printLeftNonCodeElements(javaAnnotationMethod)
@@ -946,8 +932,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(javaStaticInitDeclaration)
     }
 
-    fun visitJavaStaticInitDeclarationRaw(javaStaticInitDeclaration: JKJavaStaticInitDeclaration) =
-        visitDeclarationRaw(javaStaticInitDeclaration)
+    fun visitJavaStaticInitDeclarationRaw(javaStaticInitDeclaration: JKJavaStaticInitDeclaration) = visitDeclarationRaw(javaStaticInitDeclaration)
 
     override fun visitKtGetterOrSetter(ktGetterOrSetter: JKKtGetterOrSetter) {
         printLeftNonCodeElements(ktGetterOrSetter)
@@ -1019,8 +1004,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(ktMethodCallExpression)
     }
 
-    fun visitKtMethodCallExpressionRaw(ktMethodCallExpression: JKKtMethodCallExpression) =
-        visitMethodCallExpressionRaw(ktMethodCallExpression)
+    fun visitKtMethodCallExpressionRaw(ktMethodCallExpression: JKKtMethodCallExpression) = visitMethodCallExpressionRaw(ktMethodCallExpression)
 
     override fun visitKtAlsoCallExpression(ktAlsoCallExpression: JKKtAlsoCallExpression) {
         printLeftNonCodeElements(ktAlsoCallExpression)
@@ -1100,8 +1084,7 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(ktConvertedFromForLoopSyntheticWhileStatement)
     }
 
-    fun visitKtConvertedFromForLoopSyntheticWhileStatementRaw(ktConvertedFromForLoopSyntheticWhileStatement: JKKtConvertedFromForLoopSyntheticWhileStatement) =
-        visitStatementRaw(ktConvertedFromForLoopSyntheticWhileStatement)
+    fun visitKtConvertedFromForLoopSyntheticWhileStatementRaw(ktConvertedFromForLoopSyntheticWhileStatement: JKKtConvertedFromForLoopSyntheticWhileStatement) = visitStatementRaw(ktConvertedFromForLoopSyntheticWhileStatement)
 
     override fun visitKtThrowExpression(ktThrowExpression: JKKtThrowExpression) {
         printLeftNonCodeElements(ktThrowExpression)
@@ -1133,6 +1116,5 @@ interface JKVisitorWithCommentsPrinting : JKVisitorVoid {
         printRightNonCodeElements(ktAnnotationArrayInitializerExpression)
     }
 
-    fun visitKtAnnotationArrayInitializerExpressionRaw(ktAnnotationArrayInitializerExpression: JKKtAnnotationArrayInitializerExpression) =
-        visitExpressionRaw(ktAnnotationArrayInitializerExpression)
+    fun visitKtAnnotationArrayInitializerExpressionRaw(ktAnnotationArrayInitializerExpression: JKKtAnnotationArrayInitializerExpression) = visitExpressionRaw(ktAnnotationArrayInitializerExpression)
 }

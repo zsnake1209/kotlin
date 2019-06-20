@@ -13,28 +13,41 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiRecursiveElementVisitor
 import kotlinx.coroutines.withContext
+import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
+import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.core.util.EDT
+import org.jetbrains.kotlin.idea.core.util.range
+import org.jetbrains.kotlin.idea.formatter.commitAndUnblockDocument
 import org.jetbrains.kotlin.idea.inspections.AbstractApplicabilityBasedInspection
 import org.jetbrains.kotlin.idea.inspections.AbstractKotlinInspection
 import org.jetbrains.kotlin.idea.intentions.SelfTargetingIntention
 import org.jetbrains.kotlin.idea.intentions.SelfTargetingRangeIntention
+import org.jetbrains.kotlin.idea.quickfix.KotlinIntentionActionsFactory
 import org.jetbrains.kotlin.idea.quickfix.QuickFixActionBase
 import org.jetbrains.kotlin.idea.util.application.runReadAction
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.j2k.ConverterSettings
 import org.jetbrains.kotlin.nj2k.NewJ2kConverterContext
+import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
+import org.jetbrains.kotlin.resolve.diagnostics.Diagnostics
 import org.jetbrains.kotlin.utils.mapToIndex
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 
-class InspectionLikeProcessingGroup(val inspectionLikeProcessings: List<InspectionLikeProcessing>) : ProcessingGroup {
+class InspectionLikeProcessingGroup(
+    override val description: String,
+    val inspectionLikeProcessings: List<InspectionLikeProcessing>
+) : ProcessingGroup {
 
-    constructor(vararg inspectionLikeProcessings: InspectionLikeProcessing) : this(inspectionLikeProcessings.toList())
+    constructor(description: String, vararg inspectionLikeProcessings: InspectionLikeProcessing) :
+            this(description, inspectionLikeProcessings.toList())
 
     private val processingsToPriorityMap = inspectionLikeProcessings.mapToIndex()
     fun priority(processing: InspectionLikeProcessing): Int = processingsToPriorityMap.getValue(processing)
@@ -51,10 +64,10 @@ class InspectionLikeProcessingGroup(val inspectionLikeProcessings: List<Inspecti
                         if (element.isValid) {
                             if (writeActionNeeded) {
                                 runWriteAction {
-                                    action()
+                                    runAction(action, element)
                                 }
                             } else {
-                                action()
+                                runAction(action, element)
                             }
                         } else {
                             modificationStamp = null
@@ -72,6 +85,11 @@ class InspectionLikeProcessingGroup(val inspectionLikeProcessings: List<Inspecti
         PROCESS
     }
 
+    private inline fun runAction(action: () -> Unit, element: PsiElement) {
+        val file = element.containingFile //element can be deleted after action performed
+        action()
+        runWriteAction { file.commitAndUnblockDocument() }
+    }
 
     private data class ActionData(val element: PsiElement, val action: () -> Unit, val priority: Int, val writeActionNeeded: Boolean)
 
@@ -80,6 +98,8 @@ class InspectionLikeProcessingGroup(val inspectionLikeProcessings: List<Inspecti
         context: NewJ2kConverterContext,
         rangeMarker: RangeMarker?
     ): List<ActionData> {
+        val diagnostics = analyzeFileRange(file, rangeMarker)
+
         val availableActions = ArrayList<ActionData>()
 
         file.accept(object : PsiRecursiveElementVisitor() {
@@ -91,7 +111,7 @@ class InspectionLikeProcessingGroup(val inspectionLikeProcessings: List<Inspecti
 
                 if (rangeResult == RangeFilterResult.PROCESS) {
                     inspectionLikeProcessings.forEach { processing ->
-                        val action = processing.createAction(element, context.converter.settings)
+                        val action = processing.createAction(element, diagnostics, context.converter.settings)
                         if (action != null) {
                             availableActions.add(
                                 ActionData(
@@ -109,6 +129,17 @@ class InspectionLikeProcessingGroup(val inspectionLikeProcessings: List<Inspecti
         return availableActions
     }
 
+    private fun analyzeFileRange(file: KtFile, rangeMarker: RangeMarker?): Diagnostics {
+        val elements = if (rangeMarker == null)
+            listOf(file)
+        else
+            file.elementsInRange(rangeMarker.range!!).filterIsInstance<KtElement>()
+
+        return if (elements.isNotEmpty())
+            file.getResolutionFacade().analyzeWithAllCompilerChecks(elements).bindingContext.diagnostics
+        else
+            Diagnostics.EMPTY
+    }
 
     private fun rangeFilter(element: PsiElement, rangeMarker: RangeMarker?): RangeFilterResult {
         if (rangeMarker == null) return RangeFilterResult.PROCESS
@@ -124,7 +155,7 @@ class InspectionLikeProcessingGroup(val inspectionLikeProcessings: List<Inspecti
 }
 
 interface InspectionLikeProcessing {
-    fun createAction(element: PsiElement, settings: ConverterSettings?): (() -> Unit)?
+    fun createAction(element: PsiElement, diagnostics: Diagnostics, settings: ConverterSettings?): (() -> Unit)?
 
     val writeActionNeeded: Boolean
 }
@@ -133,7 +164,7 @@ abstract class ApplicabilityBasedInspectionLikeProcessing<E : PsiElement>(privat
     protected abstract fun isApplicableTo(element: E, settings: ConverterSettings?): Boolean
     protected abstract fun apply(element: E)
 
-    final override fun createAction(element: PsiElement, settings: ConverterSettings?): (() -> Unit)? {
+    final override fun createAction(element: PsiElement, diagnostics: Diagnostics, settings: ConverterSettings?): (() -> Unit)? {
         if (!element::class.isSubclassOf(classTag)) return null
         @Suppress("UNCHECKED_CAST")
         if (!isApplicableTo(element as E, settings)) return null
@@ -155,7 +186,7 @@ inline fun <reified TElement : PsiElement, TIntention : SelfTargetingRangeIntent
     // Intention can either need or not need write apply
     override val writeActionNeeded = intention.startInWriteAction()
 
-    override fun createAction(element: PsiElement, settings: ConverterSettings?): (() -> Unit)? {
+    override fun createAction(element: PsiElement, diagnostics: Diagnostics, settings: ConverterSettings?): (() -> Unit)? {
         if (!TElement::class.java.isInstance(element)) return null
         val tElement = element as TElement
         if (intention.applicabilityRange(tElement) == null) return null
@@ -217,7 +248,7 @@ fun <TInspection : AbstractKotlinInspection> generalInspectionBasedProcessing(
         }
     }
 
-    override fun createAction(element: PsiElement, settings: ConverterSettings?): (() -> Unit)? {
+    override fun createAction(element: PsiElement, diagnostics: Diagnostics, settings: ConverterSettings?): (() -> Unit)? {
         val holder = ProblemsHolder(InspectionManager.getInstance(element.project), element.containingFile, false)
         val visitor = inspection.buildVisitor(
             holder,
@@ -250,7 +281,7 @@ inline fun <reified TElement : PsiElement, TInspection : AbstractApplicabilityBa
             return acceptInformationLevel || inspection.inspectionHighlightType(element) != ProblemHighlightType.INFORMATION
         }
 
-        override fun createAction(element: PsiElement, settings: ConverterSettings?): (() -> Unit)? {
+        override fun createAction(element: PsiElement, diagnostics: Diagnostics, settings: ConverterSettings?): (() -> Unit)? {
             if (!TElement::class.java.isInstance(element)) return null
             val tElement = element as TElement
             if (!isApplicable(tElement)) return null
@@ -261,3 +292,41 @@ inline fun <reified TElement : PsiElement, TInspection : AbstractApplicabilityBa
             }
         }
     }
+
+fun diagnosticBasedProcessingWithFixFactory(
+    fixFactory: KotlinIntentionActionsFactory,
+    vararg diagnosticFactory: DiagnosticFactory<*>
+): InspectionLikeProcessing =
+    diagnosticBasedProcessing(*diagnosticFactory) { element: PsiElement, diagnostic: Diagnostic ->
+        fixFactory.createActions(diagnostic).singleOrNull()
+            ?.invoke(element.project, null, element.containingFile)
+    }
+
+
+inline fun <reified TElement : PsiElement> diagnosticBasedProcessing(
+    vararg diagnosticFactory: DiagnosticFactory<*>,
+    crossinline fix: (TElement, Diagnostic) -> Unit
+) = object : InspectionLikeProcessing {
+    override val writeActionNeeded = true
+
+    override fun createAction(element: PsiElement, diagnostics: Diagnostics, settings: ConverterSettings?): (() -> Unit)? {
+        if (!TElement::class.java.isInstance(element)) return null
+        val diagnostic = diagnostics.forElement(element).firstOrNull { it.factory in diagnosticFactory } ?: return null
+        return {
+            fix(element as TElement, diagnostic)
+        }
+    }
+}
+
+inline fun <reified TElement : PsiElement> diagnosticBasedProcessingFactory(
+    vararg diagnosticFactory: DiagnosticFactory<*>,
+    crossinline fixFactory: (TElement, Diagnostic) -> (() -> Unit)?
+) = object : InspectionLikeProcessing {
+    override val writeActionNeeded = true
+
+    override fun createAction(element: PsiElement, diagnostics: Diagnostics, settings: ConverterSettings?): (() -> Unit)? {
+        if (!TElement::class.java.isInstance(element)) return null
+        val diagnostic = diagnostics.forElement(element).firstOrNull { it.factory in diagnosticFactory } ?: return null
+        return fixFactory(element as TElement, diagnostic)
+    }
+}

@@ -5,9 +5,7 @@
 
 package org.jetbrains.kotlin.nj2k.conversions
 
-import org.jetbrains.kotlin.nj2k.tree.JKClassBody
-import org.jetbrains.kotlin.nj2k.tree.JKKtInitDeclaration
-import org.jetbrains.kotlin.nj2k.tree.JKTreeElement
+import org.jetbrains.kotlin.nj2k.tree.*
 
 class MoveInitBlocksToTheEndConversion : RecursiveApplicableConversionBase() {
     override fun applyToElement(element: JKTreeElement): JKTreeElement {

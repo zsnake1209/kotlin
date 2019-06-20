@@ -1,3 +1,5 @@
+// ERROR: Type mismatch: inferred type is Passenger.PassChild? but Passenger.PassChild was expected
+// ERROR: Type mismatch: inferred type is Passenger.PassChild? but Passenger.PassChild was expected
 class Passenger {
     open class PassParent
 

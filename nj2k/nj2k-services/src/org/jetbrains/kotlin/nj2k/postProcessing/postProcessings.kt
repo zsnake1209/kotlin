@@ -18,10 +18,11 @@ import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
 
 
 interface GeneralPostProcessing {
+    val description: String
     suspend fun runProcessing(file: KtFile, rangeMarker: RangeMarker?, converterContext: NewJ2kConverterContext)
 }
 
-abstract class SimplePostProcessing() : GeneralPostProcessing {
+abstract class SimplePostProcessing(override val description: String) : GeneralPostProcessing {
     final override suspend fun runProcessing(file: KtFile, rangeMarker: RangeMarker?, converterContext: NewJ2kConverterContext) {
         withContext(EDT) {
             CommandProcessor.getInstance().runUndoTransparentAction {
@@ -35,7 +36,7 @@ abstract class SimplePostProcessing() : GeneralPostProcessing {
     abstract fun applySimpleProcessing(file: KtFile, rangeMarker: RangeMarker?, converterContext: NewJ2kConverterContext)
 }
 
-abstract class ElementsBasedPostProcessing() : SimplePostProcessing() {
+abstract class ElementsBasedPostProcessing(description: String) : SimplePostProcessing(description) {
     final override fun applySimpleProcessing(file: KtFile, rangeMarker: RangeMarker?, converterContext: NewJ2kConverterContext) {
         val elements =
             rangeMarker?.let { marker ->
@@ -49,17 +50,12 @@ abstract class ElementsBasedPostProcessing() : SimplePostProcessing() {
 
 interface ProcessingGroup : GeneralPostProcessing
 
-data class NamedPostProcessingGroup(
-    val description: String,
-    val processings: List<GeneralPostProcessing>
-)
-
 fun postProcessing(
+    description: String,
     action: (file: KtFile, rangeMarker: RangeMarker?, converterContext: NewJ2kConverterContext) -> Unit
 ): GeneralPostProcessing =
-    object : SimplePostProcessing() {
+    object : SimplePostProcessing(description) {
         override fun applySimpleProcessing(file: KtFile, rangeMarker: RangeMarker?, converterContext: NewJ2kConverterContext) {
             action(file, rangeMarker, converterContext)
         }
     }
-

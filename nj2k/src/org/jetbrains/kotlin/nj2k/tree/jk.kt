@@ -172,6 +172,8 @@ fun JKExtraModifiersOwner.elementByModifier(modifier: ExtraModifier): JKExtraMod
 fun JKExtraModifiersOwner.hasExtraModifier(modifier: ExtraModifier): Boolean =
     extraModifierElements.any { it.extraModifier == modifier }
 
+//val JKExtraModifiersOwner.extraModifiers
+
 enum class ExtraModifier(override val text: String) : Modifier {
     ACTUAL("actual"),
     ANNOTATION("annotation"),

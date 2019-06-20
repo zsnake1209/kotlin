@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.nj2k
 
+import com.intellij.codeInsight.daemon.impl.quickfix.AddTypeArgumentsFix
 import com.intellij.lang.jvm.JvmAnnotatedElement
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.*
@@ -254,7 +255,7 @@ class JavaToJKTreeBuilder constructor(
                 if (method.isConstructor || !method.hasTypeParameters()) return typeArgumentList
             }
 
-            return FixTypeArguments.addTypeArguments(this, null)
+            return AddTypeArgumentsFix.addTypeArguments(this, null)
                 ?.safeAs<PsiMethodCallExpression>()
                 ?.typeArgumentList
                 ?: typeArgumentList
@@ -639,7 +640,7 @@ class JavaToJKTreeBuilder constructor(
             }
         }
 
-        fun <T : PsiModifierListOwner> T.annotationList(docCommentOwner: PsiDocCommentOwner?): JKAnnotationList {
+        fun <T : JvmAnnotatedElement> T.annotationList(docCommentOwner: PsiDocCommentOwner?): JKAnnotationList {
             val plainAnnotations = annotations.map { it.cast<PsiAnnotation>().toJK() }
             val deprecatedAnnotation = docCommentOwner?.docComment?.deprecatedAnnotation() ?: return JKAnnotationListImpl(plainAnnotations)
             return JKAnnotationListImpl(
