@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.IrFieldImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.declarations.lazy.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrErrorExpressionImpl
@@ -34,7 +33,8 @@ class DeclarationStubGenerator(
     val symbolTable: SymbolTable,
     languageVersionSettings: LanguageVersionSettings,
     private val externalDeclarationOrigin: ((DeclarationDescriptor) -> IrDeclarationOrigin)? = null,
-    private val deserializer: IrDeserializer? = null
+    private val deserializer: IrDeserializer? = null,
+    private val facadeClassGenerator: (DeclarationDescriptor) -> IrClass? = { null }
 ) {
     private val lazyTable = symbolTable.lazyWrapper
 
@@ -48,6 +48,8 @@ class DeclarationStubGenerator(
     private val typeTranslator = TypeTranslator(lazyTable, languageVersionSettings, moduleDescriptor.builtIns, LazyScopedTypeParametersResolver(lazyTable), true)
     private val constantValueGenerator = ConstantValueGenerator(moduleDescriptor, lazyTable)
 
+    private val facadeClassMap = mutableMapOf<PackageFragmentDescriptor, IrClass?>()
+
     init {
         typeTranslator.constantValueGenerator = constantValueGenerator
         constantValueGenerator.typeTranslator = typeTranslator
@@ -59,6 +61,17 @@ class DeclarationStubGenerator(
             return referenced.owner
         }
         return symbolTable.declareExternalPackageFragment(descriptor)
+    }
+
+    fun generateOrGetFacadeClass(descriptor: DeclarationDescriptor): IrClass? {
+        val packageFragment = descriptor.containingDeclaration as? PackageFragmentDescriptor ?: return null
+        return facadeClassMap.getOrPut(packageFragment) {
+            facadeClassGenerator(descriptor)?.also { facade ->
+                val packageStub = generateOrGetEmptyExternalPackageFragmentStub(packageFragment)
+                facade.parent = packageStub
+                packageStub.declarations.add(facade)
+            }
+        }
     }
 
     fun generateMemberStub(descriptor: DeclarationDescriptor): IrDeclaration =
