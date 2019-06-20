@@ -109,6 +109,7 @@ data class IrModuleInfo(
     val allDependencies: List<IrModuleFragment>,
     val bultins: IrBuiltIns,
     val symbolTable: SymbolTable,
+    val bindingContext: BindingContext,
     val deserializer: JsIrLinker
 )
 
@@ -135,7 +136,7 @@ fun loadIr(
 
     val moduleFragment = psi2IrContext.generateModuleFragment(files, deserializer)
 
-    return IrModuleInfo(moduleFragment, deserializedModuleFragments, irBuiltIns, symbolTable, deserializer)
+    return IrModuleInfo(moduleFragment, deserializedModuleFragments, irBuiltIns, symbolTable, psi2IrContext.bindingContext, deserializer)
 }
 
 private fun runAnalysisAndPreparePsi2Ir(depsDescriptors: ModulesStructure): GeneratorContext {

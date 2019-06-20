@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.ir.backend.js
 
 import com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.invokeToplevel
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -25,7 +26,7 @@ fun compile(
     friendDependencies: List<KotlinLibrary>,
     mainArguments: List<String>?
 ): String {
-    val (moduleFragment, dependencyModules, irBuiltIns, symbolTable, deserializer) =
+    val (moduleFragment, dependencyModules, irBuiltIns, symbolTable, bindingContext, deserializer) =
         loadIr(project, files, configuration, allDependencies, friendDependencies)
 
     val moduleDescriptor = moduleFragment.descriptor
@@ -33,6 +34,13 @@ fun compile(
     val mainFunction = JsMainFunctionDetector.getMainFunctionOrNull(moduleFragment)
 
     val context = JsIrBackendContext(moduleDescriptor, irBuiltIns, symbolTable, moduleFragment, configuration)
+
+    val extensions = IrGenerationExtension.getInstances(project)
+    extensions.forEach { extension ->
+        moduleFragment.files.forEach {
+            irFile -> extension.generate(irFile, context, bindingContext)
+        }
+    }
 
     // Load declarations referenced during `context` initialization
     dependencyModules.forEach {
