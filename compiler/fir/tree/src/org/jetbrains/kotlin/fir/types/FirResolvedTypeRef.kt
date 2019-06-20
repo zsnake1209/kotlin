@@ -5,17 +5,27 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirAbstractElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirResolvedTypeRef : FirTypeRef {
+abstract class FirResolvedTypeRef(
+    session: FirSession,
+    psi: PsiElement?,
     val type: ConeKotlinType
+) : FirTypeRef, FirAbstractElement(session, psi) {
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitResolvedTypeRef(this, data)
 }
 
-interface FirResolvedFunctionTypeRef : @VisitedSupertype FirResolvedTypeRef, FirFunctionTypeRef {
+abstract class FirResolvedFunctionTypeRef(
+    session: FirSession,
+    psi: PsiElement?,
+    type: ConeKotlinType
+) : @VisitedSupertype FirResolvedTypeRef(session, psi, type), FirFunctionTypeRef {
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitResolvedFunctionTypeRef(this, data)
 }

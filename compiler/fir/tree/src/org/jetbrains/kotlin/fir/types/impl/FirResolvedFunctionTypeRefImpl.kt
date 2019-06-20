@@ -6,9 +6,12 @@
 package org.jetbrains.kotlin.fir.types.impl
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.fir.*
+import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
+import org.jetbrains.kotlin.fir.transformInplace
+import org.jetbrains.kotlin.fir.transformSingle
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.FirResolvedFunctionTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -22,8 +25,8 @@ class FirResolvedFunctionTypeRefImpl(
     override var receiverTypeRef: FirTypeRef?,
     override val valueParameters: MutableList<FirValueParameter>,
     override var returnTypeRef: FirTypeRef,
-    override val type: ConeKotlinType
-) : FirResolvedFunctionTypeRef, FirAbstractElement(session, psi) {
+    type: ConeKotlinType
+) : FirResolvedFunctionTypeRef(session, psi, type) {
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         receiverTypeRef = receiverTypeRef?.transformSingle(transformer, data)

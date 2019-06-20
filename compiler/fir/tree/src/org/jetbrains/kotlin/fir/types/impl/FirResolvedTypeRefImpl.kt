@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.types.impl
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.fir.FirAbstractElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
@@ -15,6 +14,6 @@ import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 class FirResolvedTypeRefImpl(
     session: FirSession,
     psi: PsiElement?,
-    override val type: ConeKotlinType,
+    type: ConeKotlinType,
     override val annotations: List<FirAnnotationCall> = emptyList()
-) : FirResolvedTypeRef, FirAbstractElement(session, psi)
+) : FirResolvedTypeRef(session, psi, type)
