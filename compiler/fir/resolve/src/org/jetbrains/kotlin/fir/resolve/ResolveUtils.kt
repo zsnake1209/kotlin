@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.resolve
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.render
+import org.jetbrains.kotlin.fir.scopes.impl.FirClassDeclaredMemberScopeProvider
 import org.jetbrains.kotlin.fir.service
 import org.jetbrains.kotlin.fir.symbols.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
@@ -34,6 +35,9 @@ inline fun <K, V, VA : V> MutableMap<K, V>.getOrPut(key: K, defaultValue: (K) ->
 val FirSession.firSymbolProvider: FirSymbolProvider get() = _firSymbolProvider as FirSymbolProvider? ?: service()
 val FirSession.correspondingSupertypesCache: FirCorrespondingSupertypesCache
     get() = _correspondingSupertypesCache as FirCorrespondingSupertypesCache? ?: service()
+
+val FirSession.firClassDeclaredMemberScopeProvider: FirClassDeclaredMemberScopeProvider
+    get() = _firClassDeclaredMemberScopeProvider as FirClassDeclaredMemberScopeProvider? ?: service()
 
 fun ConeClassLikeLookupTag.toSymbol(useSiteSession: FirSession): ConeClassifierSymbol? {
     val firSymbolProvider = useSiteSession.firSymbolProvider

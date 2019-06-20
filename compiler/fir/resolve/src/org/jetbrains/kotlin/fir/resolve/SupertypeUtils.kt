@@ -9,8 +9,10 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.scopes.FirScope
-import org.jetbrains.kotlin.fir.scopes.impl.*
-import org.jetbrains.kotlin.fir.service
+import org.jetbrains.kotlin.fir.scopes.impl.FirClassSubstitutionScope
+import org.jetbrains.kotlin.fir.scopes.impl.FirClassUseSiteScope
+import org.jetbrains.kotlin.fir.scopes.impl.FirSuperTypeScope
+import org.jetbrains.kotlin.fir.scopes.impl.declaredMemberScope
 import org.jetbrains.kotlin.fir.symbols.ConeClassifierSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
@@ -52,7 +54,7 @@ val DECLARED = scopeSessionKey<FirScope>()
 data class SubstitutionScopeKey<T : FirClassSubstitutionScope>(val type: ConeClassLikeType) : ScopeSessionKey<T>() {}
 
 fun FirRegularClass.buildUseSiteScope(useSiteSession: FirSession, builder: ScopeSession): FirScope? {
-    val symbolProvider = useSiteSession.service<FirSymbolProvider>()
+    val symbolProvider = useSiteSession.firSymbolProvider
     return symbolProvider.getClassUseSiteMemberScope(this.classId, useSiteSession, builder)
 }
 

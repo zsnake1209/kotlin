@@ -88,7 +88,11 @@ class FirLibrarySession private constructor(
             FirSymbolProvider::class,
             _firSymbolProvider as FirSymbolProvider
         )
-        registerComponent(FirClassDeclaredMemberScopeProvider::class, FirClassDeclaredMemberScopeProvider())
+
+        _firClassDeclaredMemberScopeProvider = FirClassDeclaredMemberScopeProvider()
+        registerComponent(
+            FirClassDeclaredMemberScopeProvider::class, _firClassDeclaredMemberScopeProvider as FirClassDeclaredMemberScopeProvider
+        )
 
         _correspondingSupertypesCache = FirCorrespondingSupertypesCache(this)
         registerComponent(
