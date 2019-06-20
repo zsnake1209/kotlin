@@ -16,4 +16,4 @@ class FirResolvedTypeRefImpl(
     override val psi: PsiElement?,
     override val type: ConeKotlinType,
     override val annotations: List<FirAnnotationCall> = emptyList()
-) : FirResolvedTypeRef
+) : FirResolvedTypeRef()

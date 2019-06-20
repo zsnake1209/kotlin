@@ -8,14 +8,14 @@ package org.jetbrains.kotlin.fir.types
 import org.jetbrains.kotlin.fir.VisitedSupertype
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirResolvedTypeRef : FirTypeRef {
-    val type: ConeKotlinType
+abstract class FirResolvedTypeRef : FirTypeRef {
+    abstract val type: ConeKotlinType
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitResolvedTypeRef(this, data)
 }
 
-interface FirResolvedFunctionTypeRef : @VisitedSupertype FirResolvedTypeRef, FirFunctionTypeRef {
+abstract class FirResolvedFunctionTypeRef : @VisitedSupertype FirResolvedTypeRef(), FirFunctionTypeRef {
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitResolvedFunctionTypeRef(this, data)
 }

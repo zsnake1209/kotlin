@@ -20,7 +20,7 @@ sealed class FirImplicitBuiltinTypeRef(
     override val session: FirSession,
     override val psi: PsiElement?,
     val id: ClassId
-) : FirImplicitTypeRef, FirResolvedTypeRef {
+) : FirImplicitTypeRef, FirResolvedTypeRef() {
     override val annotations: List<FirAnnotationCall>
         get() = emptyList()
 

@@ -26,7 +26,7 @@ class FirResolvedFunctionTypeRefImpl(
     override val valueParameters: MutableList<FirValueParameter>,
     override var returnTypeRef: FirTypeRef,
     override val type: ConeKotlinType
-) : FirResolvedFunctionTypeRef {
+) : FirResolvedFunctionTypeRef() {
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         receiverTypeRef = receiverTypeRef?.transformSingle(transformer, data)
