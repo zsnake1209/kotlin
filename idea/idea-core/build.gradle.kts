@@ -7,6 +7,7 @@ plugins {
 dependencies {
     compile(kotlinStdlib())
     compileOnly(project(":kotlin-reflect-api"))
+    compile(project(":compiler:psi"))
     compile(project(":core:descriptors"))
     compile(project(":core:descriptors.jvm"))
     compile(project(":compiler:frontend"))
@@ -19,12 +20,18 @@ dependencies {
     compile(project(":kotlin-scripting-compiler-impl"))
     compile(commonDep("org.jetbrains.kotlinx", "kotlinx-coroutines-core")) { isTransitive = false }
     compile(commonDep("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")) { isTransitive = false }
-    compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
-    compileOnly(intellijDep()) {
-        Ide.IJ191.orHigher {
-            this@compileOnly.includeJars("platform-api")
+
+    compileOnly(intellijDep())
+
+    Platform[192].orHigher {
+        compileOnly(intellijPluginDep("java")) {
+            includeJars(
+                "java-api", "java-impl",
+                "external-system-rt", "external-system-impl"
+            )
         }
     }
+    
     compileOnly(intellijPluginDep("gradle"))
 }
 

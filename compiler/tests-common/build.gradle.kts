@@ -41,6 +41,10 @@ dependencies {
         includeJars("openapi", "platform-api", "platform-impl", "idea", "idea_rt", "guava", "trove4j", "picocontainer", "asm-all", "log4j", "jdom", "bootstrap", rootProject = rootProject)
         isTransitive = false
     }
+
+    Platform[192].orHigher {
+        testCompile(intellijDep()) { includeJars("platform-util-ui") }
+    }
 }
 
 sourceSets {

@@ -23,7 +23,13 @@ dependencies {
     testCompile(project(":compiler:frontend.java"))
     testCompile(projectTests(":jps-plugin"))
     testCompile(commonDep("junit:junit"))
-    testCompile(intellijDep()) { includeJars("openapi", "idea", "idea_rt", "groovy-all", "jps-builders", rootProject = rootProject) }
+    testCompile(intellijDep()) { includeJars("openapi", "util", "idea", "idea_rt", "groovy-all", rootProject = rootProject) }
+    Platform[191].orLower {
+        testCompile(intellijDep()) { includeJars("jps-builders") }
+    }
+    Platform[192].orHigher {
+        testCompile(intellijPluginDep("java")) { includeJars("jps-builders") }
+    }
     testCompile(jpsStandalone()) { includeJars("jps-model") }
     testCompile(jpsBuildTest())
 }
@@ -38,5 +44,6 @@ projectTest {
     doFirst {
         environment("kotlin.tests.android.timeout", "45")
     }
+
     workingDir = rootDir
 }

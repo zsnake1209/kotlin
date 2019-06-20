@@ -18,13 +18,19 @@ dependencies {
     testCompile(project(":compiler:cli"))
     testCompile(project(":compiler:cli-common"))
     testCompile(project(":compiler:frontend.java"))
-    testCompile(project(":compiler:daemon-common"))
+    testCompile(project(":daemon-common"))
     testCompile(projectRuntimeJar(":kotlin-daemon-client"))
     testCompile(projectTests(":compiler:tests-common"))
     testCompile(commonDep("junit:junit"))
     testCompileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     testCompile(intellijDep()) { includeJars("idea", "idea_rt", "openapi", "log4j", "jdom", "jps-model") }
     testRuntime(project(":kotlin-reflect"))
+
+    testRuntimeOnly(intellijCoreDep()) { includeJars("intellij-core") }
+
+    Platform[192].orHigher {
+        testRuntimeOnly(intellijDep()) { includeJars("platform-concurrency") }
+    }
 }
 
 sourceSets {

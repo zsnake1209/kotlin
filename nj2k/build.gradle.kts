@@ -15,7 +15,19 @@ dependencies {
     compile(project(":compiler:frontend.java"))
     compile(project(":compiler:light-classes"))
     compile(project(":compiler:util"))
-    compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
+
+    compileOnly(intellijCoreDep()) { includeJars("intellij-core", "guava", rootProject = rootProject) }
+    compileOnly(intellijDep()) { includeJars("platform-api", "platform-impl", rootProject = rootProject) }
+
+    Platform[191].orLower {
+        compileOnly(intellijDep()) { includeJars("java-impl") }
+    }
+
+    Platform[192].orHigher {
+        compileOnly(intellijPluginDep("java")) { includeJars("java-api", "java-impl") }
+        testCompileOnly(intellijPluginDep("java")) { includeJars("java-api", "java-impl") }
+        testRuntime(intellijPluginDep("java"))
+    }
 
     testCompile(project(":idea"))
     testCompile(projectTests(":j2k"))
@@ -25,10 +37,8 @@ dependencies {
     testCompile(project(":kotlin-test:kotlin-test-junit"))
     testCompile(commonDep("junit:junit"))
 
-    when {
-        Ide.IJ181.orHigher() || Ide.AS33.orHigher() -> testCompileOnly(intellijDep()) { includeJars("platform-api", "platform-impl") }
-        Ide.AS32() -> testCompileOnly(intellijDep()) { includeJars("idea") }
-    }
+    testCompileOnly(intellijDep())
+
     testCompile(project(":idea:idea-native")) { isTransitive = false }
     testCompile(project(":idea:idea-gradle-native")) { isTransitive = false }
 

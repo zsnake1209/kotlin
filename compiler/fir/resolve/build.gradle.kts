@@ -10,9 +10,17 @@ dependencies {
     compile(project(":compiler:fir:cones"))
     compile(project(":compiler:fir:tree"))
 
-    compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
+    compileOnly(intellijCoreDep()) { includeJars("intellij-core", "guava", rootProject = rootProject) }
 
-    testCompileOnly(intellijDep()) { includeJars("openapi", "idea", "idea_rt", "util", "asm-all", rootProject = rootProject) }
+    testCompileOnly(intellijDep()) { includeJars("openapi", "idea", "idea_rt", "util", "asm-all", "extensions", rootProject = rootProject) }
+
+    Platform[191].orLower {
+        testCompileOnly(intellijDep()) { includeJars("java-api") }
+    }
+
+    Platform[192].orHigher {
+        testCompileOnly(intellijPluginDep("java")) { includeJars("java-api") }
+    }
 
     testRuntime(intellijDep())
 
