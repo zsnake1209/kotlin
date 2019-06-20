@@ -21,6 +21,8 @@ abstract class FirSession(val sessionProvider: FirSessionProvider?) {
 
     var _correspondingSupertypesCache: Any? = null
 
+    var _firClassDeclaredMemberScopeProvider: Any? = null
+
     fun <T : Any> getService(kclass: KClass<T>): T =
         components[kclass] as T
 
