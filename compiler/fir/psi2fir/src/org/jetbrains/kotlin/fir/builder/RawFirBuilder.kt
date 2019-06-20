@@ -866,7 +866,7 @@ class RawFirBuilder(val session: FirSession, val stubMode: Boolean) {
             }
 
             for (annotationEntry in typeReference.annotationEntries) {
-                firType.annotations += annotationEntry.convert<FirAnnotationCall>()
+                (firType.annotations as MutableList<FirAnnotationCall>) += annotationEntry.convert<FirAnnotationCall>()
             }
             return firType
         }
