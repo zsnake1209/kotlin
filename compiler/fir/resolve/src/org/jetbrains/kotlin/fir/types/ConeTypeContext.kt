@@ -224,7 +224,7 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
         return when (this) {
             is ConeTypeVariableTypeConstructor -> emptyList()
             is FirTypeParameterSymbol -> fir.bounds.map { it.coneTypeUnsafe() }
-            is FirClassSymbol -> fir.superConeTypes
+            is FirClassSymbol -> superConeTypes
             is FirTypeAliasSymbol -> listOfNotNull(fir.expandedConeType)
             is ConeCapturedTypeConstructor -> supertypes!!
             else -> error("?!:13")

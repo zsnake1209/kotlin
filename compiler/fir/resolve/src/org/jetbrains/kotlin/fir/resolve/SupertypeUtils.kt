@@ -115,7 +115,7 @@ private tailrec fun ConeClassifierSymbol.collectSuperClasses(
     when (this) {
         is FirClassSymbol -> {
             val superClassType =
-                fir.superConeTypes
+                superConeTypes
                     .map { it.computePartialExpansion(useSiteSession) }
                     .firstOrNull {
                         it !is ConeClassErrorType &&
@@ -141,7 +141,7 @@ private fun ConeClassifierSymbol.collectSuperTypes(
         is FirClassSymbol -> {
             val listSizeBefore = list.size
             val superClassTypes =
-                fir.superConeTypes.mapNotNullTo(list) { it.computePartialExpansion(useSiteSession) }
+                superConeTypes.mapNotNullTo(list) { it.computePartialExpansion(useSiteSession) }
                     .let { it.subList(listSizeBefore, it.size) }
             if (deep)
                 superClassTypes.forEach {
