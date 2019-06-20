@@ -25,7 +25,7 @@ fun lookupSuperTypes(
     deep: Boolean,
     useSiteSession: FirSession
 ): List<ConeClassLikeType> {
-    return mutableListOf<ConeClassLikeType>().also {
+    return ArrayList<ConeClassLikeType>(klass.superTypeRefs.size).also {
         if (lookupInterfaces) klass.symbol.collectSuperTypes(it, deep, useSiteSession)
         else klass.symbol.collectSuperClasses(it, useSiteSession)
     }
@@ -139,9 +139,10 @@ private fun ConeClassifierSymbol.collectSuperTypes(
 ) {
     when (this) {
         is FirClassSymbol -> {
+            val listSizeBefore = list.size
             val superClassTypes =
-                fir.superConeTypes.mapNotNull { it.computePartialExpansion(useSiteSession) }
-            list += superClassTypes
+                fir.superConeTypes.mapNotNullTo(list) { it.computePartialExpansion(useSiteSession) }
+                    .let { it.subList(listSizeBefore, it.size) }
             if (deep)
                 superClassTypes.forEach {
                     if (it !is ConeClassErrorType) {
