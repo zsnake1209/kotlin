@@ -39,4 +39,4 @@ interface FirClass : FirDeclarationContainer, FirStatement, FirAnnotationContain
     }
 }
 
-val FirClass.superConeTypes get() = superTypeRefs.mapNotNull { it.coneTypeSafe<ConeClassLikeType>() }
+val FirClass.superConeTypes get() = superTypeRefs.mapNotNullTo(ArrayList(superTypeRefs.size)) { it.coneTypeSafe<ConeClassLikeType>() }
