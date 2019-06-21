@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrVariableSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.load.java.JavaVisibilities
 import org.jetbrains.kotlin.load.kotlin.JvmPackagePartSource
 import org.jetbrains.kotlin.load.kotlin.KotlinJvmBinarySourceElement
 import org.jetbrains.kotlin.name.FqName
@@ -34,6 +35,7 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolData as P
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind as ProtoSymbolKind
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoTypeIndex
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoString
+import org.jetbrains.kotlin.backend.common.serialization.proto.Visibility as ProtoVisibility
 
 class JvmIrDeserializer(
     val module: ModuleDescriptor,
@@ -231,5 +233,13 @@ class JvmIrDeserializer(
             require(bodyData.hasStatement())
             return deserializeStatement(bodyData.statement)
         }
+
+        override fun deserializeVisibility(value: ProtoVisibility): Visibility = when (deserializeString(value.name)) {
+            "package" -> JavaVisibilities.PACKAGE_VISIBILITY
+            "protected_static" -> JavaVisibilities.PROTECTED_STATIC_VISIBILITY
+            "protected_and_package" -> JavaVisibilities.PROTECTED_AND_PACKAGE
+            else -> super.deserializeVisibility(value)
+        }
+
     }
 }
