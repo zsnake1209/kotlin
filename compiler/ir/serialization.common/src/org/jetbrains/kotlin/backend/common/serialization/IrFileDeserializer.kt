@@ -1114,7 +1114,7 @@ abstract class IrFileDeserializer(
             }
         }
 
-    private fun deserializeVisibility(value: ProtoVisibility): Visibility { // TODO: switch to enum
+    protected open fun deserializeVisibility(value: ProtoVisibility): Visibility { // TODO: switch to enum
         return when (deserializeString(value.name)) {
             "public" -> Visibilities.PUBLIC
             "private" -> Visibilities.PRIVATE
