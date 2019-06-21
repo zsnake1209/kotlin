@@ -83,10 +83,6 @@ fun AbstractSerialGenerator.getSerialTypeInfo(property: SerializableProperty): S
             )
             SerializableInfo(serializer)
         }
-        T.isEnum() -> {
-            val serializer = property.module.findClassAcrossModuleDependencies(enumSerializerId)
-            SerializableInfo(serializer)
-        }
         else -> {
             val serializer =
                 findTypeSerializerOrContext(property.module, property.type, property.descriptor.findPsi())
