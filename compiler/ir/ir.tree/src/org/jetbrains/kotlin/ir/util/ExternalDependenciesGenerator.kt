@@ -36,40 +36,24 @@ class ExternalDependenciesGenerator(
     )
 
     fun generateUnboundSymbolsAsDependencies() {
-        // We need at least one iteration; deserialization may lead to new unbound symbols being produced.
-        var needMoreIterations = true
-        while (needMoreIterations) {
-            needMoreIterations = false
+        stubGenerator.unboundSymbolGeneration = true
 
-            stubGenerator.unboundSymbolGeneration = true
-            val allUnbound = symbolTable.run {
-                unboundClasses + unboundConstructors + unboundEnumEntries + unboundFields +
-                        unboundSimpleFunctions + unboundProperties + unboundTypeParameters
-            }
-            for (symbol in allUnbound) {
+        var unbound = symbolTable.allUnbound
+        while (!unbound.isEmpty()) {
+            for (symbol in unbound) {
                 deserializer.findDeserializedDeclaration(symbol, stubGenerator::generateStubBySymbol)
-                if (symbol.isBound) needMoreIterations = true
+                assert(symbol.isBound) { "$symbol unbound even after deserialization attempt" }
             }
+
+            unbound = symbolTable.allUnbound
         }
 
         deserializer.declareForwardDeclarations()
-
-        assertEmpty(symbolTable.unboundClasses, "classes")
-        assertEmpty(symbolTable.unboundConstructors, "constructors")
-        assertEmpty(symbolTable.unboundEnumEntries, "enum entries")
-        assertEmpty(symbolTable.unboundFields, "fields")
-        assertEmpty(symbolTable.unboundSimpleFunctions, "simple functions")
-        assertEmpty(symbolTable.unboundProperties, "properties")
-        assertEmpty(symbolTable.unboundTypeParameters, "type parameters")
-    }
-
-    private fun assertEmpty(s: Set<IrSymbol>, marker: String) {
-        assert(s.isEmpty()) {
-            "$marker: ${s.size} unbound:\n" +
-                    s.toList().subList(0, min(10, s.size)).joinToString(separator = "\n") { it.descriptor.toString() }
-        }
     }
 }
+
+private val SymbolTable.allUnbound get() =
+    unboundClasses + unboundConstructors + unboundEnumEntries + unboundFields + unboundSimpleFunctions + unboundProperties + unboundTypeParameters
 
 object EmptyDeserializer : IrDeserializer {
     override fun findDeserializedDeclaration(symbol: IrSymbol, backoff: (IrSymbol) -> IrDeclaration): IrDeclaration? = backoff(symbol)
