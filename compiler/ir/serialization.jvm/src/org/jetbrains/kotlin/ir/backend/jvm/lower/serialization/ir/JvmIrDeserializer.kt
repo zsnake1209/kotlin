@@ -10,9 +10,9 @@ import org.jetbrains.kotlin.backend.common.descriptors.*
 import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.impl.IrLoopBase
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
@@ -21,10 +21,14 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrVariableSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.load.kotlin.JvmPackagePartSource
 import org.jetbrains.kotlin.load.kotlin.KotlinJvmBinarySourceElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberDescriptor
 
@@ -62,6 +66,7 @@ class JvmIrDeserializer(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                 IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB
             )
+            generateFakeOverrides(deserializedToplevel, backoff)
             deserializedToplevel.patchDeclarationParents(packageFragment) // TODO: toplevel's parent should be the module
             assert(symbol.isBound)
             return symbol.owner as IrDeclaration
@@ -79,6 +84,7 @@ class JvmIrDeserializer(
                 val member = moduleDeserializer.deserializeDeclaration(declaration, packageFragment)
                 packageFragment.declarations.add(member)
             }
+            generateFakeOverrides(packageFragment, backoff)
             packageFragment.patchDeclarationParents(packageFragment)
             assert(symbol.isBound)
             return symbol.owner as IrDeclaration
@@ -223,4 +229,42 @@ class JvmIrDeserializer(
         override fun deserializeLoopHeader(loopIndex: Int, loopBuilder: () -> IrLoopBase) =
             moduleLoops.getOrPut(loopIndex, loopBuilder)
     }
-}
+
+    // Fake overrides are not serialized and deserialized, so we need to patch them up
+    private fun generateFakeOverrides(declaration: IrElement, backoff: (IrSymbol) -> IrDeclaration) {
+        fun IrSimpleFunction.touchOverridden() {
+            overriddenSymbols.forEach { findDeserializedDeclaration(it, backoff) }
+        }
+
+        declaration.acceptVoid(object : IrElementVisitorVoid {
+            override fun visitElement(element: IrElement) {
+                element.acceptChildrenVoid(this)
+            }
+
+            override fun visitClass(declaration: IrClass) {
+                declaration.descriptor.unsubstitutedMemberScope.getContributedDescriptors(DescriptorKindFilter.CALLABLES).filter {
+                    it is CallableMemberDescriptor && it.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE
+                }.forEach {
+                    val symbol = when (it) {
+                        is SimpleFunctionDescriptor -> symbolTable.referenceSimpleFunction(it)
+                        is PropertyDescriptor -> symbolTable.referenceProperty(it)
+                        else -> error("Unknown kind of descriptor for fake override $it")
+                    }
+                    val override = backoff(symbol)
+                    override.parent = declaration
+                    declaration.declarations.add(override)
+
+                    // Make sure overridden declarations are instantiated.
+                    when (override) {
+                        is IrSimpleFunction -> override.touchOverridden()
+                        is IrProperty -> {
+                            override.getter?.touchOverridden()
+                            override.setter?.touchOverridden()
+                            override.backingField?.overriddenSymbols?.forEach { findDeserializedDeclaration(it, backoff) }
+                        }
+                    }
+                }
+                super.visitClass(declaration)
+            }
+        })
+    }}
