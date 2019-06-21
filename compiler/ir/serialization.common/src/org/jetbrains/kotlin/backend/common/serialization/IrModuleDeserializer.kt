@@ -32,7 +32,6 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.*
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.render
-import org.jetbrains.kotlin.load.java.JavaVisibilities
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedTypeParameterDescriptor
 import org.jetbrains.kotlin.types.Variance
@@ -1076,9 +1075,6 @@ abstract class IrModuleDeserializer(
             "internal" -> Visibilities.INTERNAL
             "invisible_fake" -> Visibilities.INVISIBLE_FAKE // TODO: eventually we should not serialize fake overrides, so this will be gone.
             "local" -> Visibilities.LOCAL
-            "package" -> JavaVisibilities.PACKAGE_VISIBILITY
-            "protected_and_package" -> JavaVisibilities.PROTECTED_AND_PACKAGE
-            "protected_static" -> JavaVisibilities.PROTECTED_STATIC_VISIBILITY
             else -> error("Unexpected visibility value: ${deserializeString(value.name)}")
         }
     }
