@@ -35,7 +35,6 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.load.java.JvmAnnotationNames
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader
-import org.jetbrains.kotlin.metadata.jvm.JvmProtoBuf
 import org.jetbrains.kotlin.metadata.jvm.deserialization.BitEncoding
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
@@ -87,9 +86,9 @@ open class ClassCodegen protected constructor(
 
     private var sourceMapper: DefaultSourceMapper? = null
 
-    private fun uniqIdProvider(descriptor: DeclarationDescriptor): JvmProtoBuf.DescriptorUniqId? {
-        val index = context.declarationTable.descriptorTable.get(descriptor) ?: return null
-        return JvmProtoBuf.DescriptorUniqId.newBuilder().setIndex(index).build()
+    private fun uniqIdProvider(descriptor: DeclarationDescriptor): Long? {
+        val index = context.declarationTable.descriptorTable.get(descriptor)
+        return index
     }
 
     private val serializerExtension = JvmSerializerExtension(visitor.serializationBindings, state, typeMapper, ::uniqIdProvider)
