@@ -44,7 +44,7 @@ class JvmSerializerExtension @JvmOverloads constructor(
     private val bindings: JvmSerializationBindings,
     state: GenerationState,
     private val typeMapper: KotlinTypeMapperBase = state.typeMapper,
-    private val uniqIdProvider: ((DeclarationDescriptor) -> JvmProtoBuf.DescriptorUniqId?) = { null }
+    private val uniqIdProvider: ((DeclarationDescriptor) -> Long?) = { null }
 ) : SerializerExtension() {
     private val globalBindings = state.globalSerializationBindings
     private val codegenBinding = state.bindingContext
