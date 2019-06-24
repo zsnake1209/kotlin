@@ -39,22 +39,20 @@ import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.UN
 // Is creating synthetic origin is a good idea or not?
 object SERIALIZABLE_PLUGIN_ORIGIN : IrDeclarationOriginImpl("SERIALIZER")
 
-class SerializerIrGenerator(val irClass: IrClass, override val compilerContext: BackendContext, bindingContext: BindingContext) :
+open class SerializerIrGenerator(val irClass: IrClass, final override val compilerContext: BackendContext, bindingContext: BindingContext) :
     SerializerCodegen(irClass.descriptor, bindingContext), IrBuilderExtension {
 
-    override val translator: TypeTranslator = compilerContext.createTypeTranslator(serializableDescriptor.module)
+    final override val translator: TypeTranslator = compilerContext.createTypeTranslator(serializableDescriptor.module)
     private val _table = SymbolTable()
-    override val BackendContext.localSymbolTable: SymbolTable
+    final override val BackendContext.localSymbolTable: SymbolTable
         get() = _table
 
-    private val serializableIrClass = compilerContext.externalSymbols.referenceClass(serializableDescriptor).owner
+    protected val serializableIrClass = compilerContext.externalSymbols.referenceClass(serializableDescriptor).owner
 
     override fun generateSerialDesc() {
         val desc: PropertyDescriptor = generatedSerialDescPropertyDescriptor ?: return
         val serialDescImplClass = serializerDescriptor
             .getClassFromInternalSerializationPackage(SERIAL_DESCRIPTOR_CLASS_IMPL)
-        val serialDescImplConstructor = serialDescImplClass
-            .unsubstitutedPrimaryConstructor!!
 
         val addFuncS = serialDescImplClass.referenceMethod(CallingConventions.addElement)
 
@@ -79,36 +77,14 @@ class SerializerIrGenerator(val irClass: IrClass, override val compilerContext: 
             initIrBody.parent = irClass
             val ctor = irClass.declarations.filterIsInstance<IrConstructor>().find { it.isPrimary }
                 ?: throw AssertionError("Serializer must have primary constructor")
-            val serialClassDescImplCtor = compilerContext.externalSymbols.referenceConstructor(serialDescImplConstructor)
             compilerContext.localSymbolTable.withScope(initIrBody.descriptor) {
                 initIrBody.body = compilerContext.createIrBuilder(initIrBody.symbol).irBlockBody {
                     val localDesc = irTemporary(
-                        irInvoke(
-                            null, serialClassDescImplCtor,
-                            irString(serialName), if (isGeneratedSerializer) irGet(thisAsReceiverParameter) else irNull(),
-                            typeHint = serialClassDescImplCtor.owner.returnType
-                        ),
+                        instantiateNewDescriptor(serialDescImplClass, irGet(thisAsReceiverParameter)),
                         nameHint = "serialDesc"
                     )
 
-                    fun addFieldCall(prop: SerializableProperty) = irInvoke(
-                        irGet(localDesc),
-                        addFuncS,
-                        irString(prop.name),
-                        irBoolean(prop.optional),
-                        typeHint = compilerContext.irBuiltIns.unitType
-                    )
-
-                    for (classProp in serializableProperties) {
-                        if (classProp.transient) continue
-                        +addFieldCall(classProp)
-                        // add property annotations
-                        copySerialInfoAnnotationsToDescriptor(
-                            classProp.irField.correspondingProperty?.annotations.orEmpty(),
-                            irGet(localDesc),
-                            serialDescImplClass.referenceMethod(CallingConventions.addAnnotation)
-                        )
-                    }
+                    addElementsContentToDescriptor(serialDescImplClass, localDesc, addFuncS)
                     // add class annotations
                     copySerialInfoAnnotationsToDescriptor(
                         serializableIrClass.annotations,
@@ -131,7 +107,39 @@ class SerializerIrGenerator(val irClass: IrClass, override val compilerContext: 
         }
     }
 
-    private fun IrBlockBodyBuilder.copySerialInfoAnnotationsToDescriptor(
+    protected open fun IrBlockBodyBuilder.instantiateNewDescriptor(serialDescImplClass: ClassDescriptor, correctThis: IrExpression): IrExpression {
+        val serialDescImplConstructor = serialDescImplClass
+            .unsubstitutedPrimaryConstructor!!
+        val serialClassDescImplCtor = compilerContext.externalSymbols.referenceConstructor(serialDescImplConstructor)
+        return irInvoke(
+            null, serialClassDescImplCtor,
+            irString(serialName), if (isGeneratedSerializer) correctThis else irNull(),
+            typeHint = serialClassDescImplCtor.owner.returnType
+        )
+    }
+
+    protected open fun IrBlockBodyBuilder.addElementsContentToDescriptor(serialDescImplClass: ClassDescriptor, localDescriptor: IrVariable, addFunction: IrFunctionSymbol) {
+        fun addFieldCall(prop: SerializableProperty) = irInvoke(
+            irGet(localDescriptor),
+            addFunction,
+            irString(prop.name),
+            irBoolean(prop.optional),
+            typeHint = compilerContext.irBuiltIns.unitType
+        )
+
+        for (classProp in serializableProperties) {
+            if (classProp.transient) continue
+            +addFieldCall(classProp)
+            // add property annotations
+            copySerialInfoAnnotationsToDescriptor(
+                classProp.irField.correspondingProperty?.annotations.orEmpty(),
+                irGet(localDescriptor),
+                serialDescImplClass.referenceMethod(CallingConventions.addAnnotation)
+            )
+        }
+    }
+
+    protected fun IrBlockBodyBuilder.copySerialInfoAnnotationsToDescriptor(
         annotations: List<IrConstructorCall>,
         receiver: IrExpression,
         method: IrFunctionSymbol
@@ -185,7 +193,7 @@ class SerializerIrGenerator(val irClass: IrClass, override val compilerContext: 
         /* Already implemented in .generateSerialClassDesc ? */
     }
 
-    fun ClassDescriptor.referenceMethod(methodName: String) =
+    protected fun ClassDescriptor.referenceMethod(methodName: String) =
         getFuncDesc(methodName).single().let { compilerContext.externalSymbols.referenceFunction(it) }
 
     override fun generateSave(function: FunctionDescriptor) = irClass.contributeFunction(function) { saveFunc ->
@@ -445,8 +453,12 @@ class SerializerIrGenerator(val irClass: IrClass, override val compilerContext: 
             context: BackendContext,
             bindingContext: BindingContext
         ) {
-            if (getSerializableClassDescriptorBySerializer(irClass.descriptor) != null)
+            val serializableDesc = getSerializableClassDescriptorBySerializer(irClass.descriptor) ?: return
+            if (serializableDesc.isSerializableEnum()) {
+                SerializerForEnumsGenerator(irClass, context, bindingContext).generate()
+            } else {
                 SerializerIrGenerator(irClass, context, bindingContext).generate()
+            }
         }
     }
 }
