@@ -878,6 +878,7 @@ open class IrModuleSerializer(
 
     private fun serializeIrDeclarationBase(declaration: IrDeclaration) =
         KotlinIr.IrDeclarationBase.newBuilder()
+            .setSymbol(serializeIrSymbol((declaration as IrSymbolOwner).symbol))
             .setCoordinates(serializeCoordinates(declaration.startOffset, declaration.endOffset))
             .setAnnotations(serializeAnnotations(declaration.annotations))
             .setOrigin(serializeIrDeclarationOrigin(declaration.origin))
@@ -886,7 +887,6 @@ open class IrModuleSerializer(
     private fun serializeIrValueParameter(parameter: IrValueParameter): KotlinIr.IrValueParameter {
         val proto = KotlinIr.IrValueParameter.newBuilder()
             .setBase(serializeIrDeclarationBase(parameter))
-            .setSymbol(serializeIrSymbol(parameter.symbol))
             .setName(serializeName(parameter.name))
             .setIndex(parameter.index)
             .setType(serializeIrType(parameter.type))
@@ -902,7 +902,6 @@ open class IrModuleSerializer(
     private fun serializeIrTypeParameter(parameter: IrTypeParameter): KotlinIr.IrTypeParameter {
         val proto = KotlinIr.IrTypeParameter.newBuilder()
             .setBase(serializeIrDeclarationBase(parameter))
-            .setSymbol(serializeIrSymbol(parameter.symbol))
             .setName(serializeName(parameter.name))
             .setIndex(parameter.index)
             .setVariance(serializeIrTypeVariance(parameter.variance))
@@ -952,14 +951,12 @@ open class IrModuleSerializer(
     private fun serializeIrConstructor(declaration: IrConstructor): KotlinIr.IrConstructor =
         KotlinIr.IrConstructor.newBuilder()
             .setBase(serializeIrFunctionBase(declaration))
-            .setSymbol(serializeIrSymbol(declaration.symbol))
             .setIsPrimary(declaration.isPrimary)
             .build()
 
     private fun serializeIrFunction(declaration: IrSimpleFunction): KotlinIr.IrFunction {
         val proto = KotlinIr.IrFunction.newBuilder()
             .setBase(serializeIrFunctionBase(declaration))
-            .setSymbol(serializeIrSymbol(declaration.symbol))
             .setModality(serializeModality(declaration.modality))
             .setIsTailrec(declaration.isTailrec)
             .setIsSuspend(declaration.isSuspend)
@@ -974,7 +971,6 @@ open class IrModuleSerializer(
     private fun serializeIrAnonymousInit(declaration: IrAnonymousInitializer) =
         KotlinIr.IrAnonymousInit.newBuilder()
             .setBase(serializeIrDeclarationBase(declaration))
-            .setSymbol(serializeIrSymbol(declaration.symbol))
             .setBody(serializeStatement(declaration.body))
             .build()
 
@@ -986,7 +982,6 @@ open class IrModuleSerializer(
             .setType(serializeIrType(variable.type))
             .setDelegate(serializeIrVariable(variable.delegate))
             .setGetter(serializeIrFunction(variable.getter as IrSimpleFunction)) // TODO: can it be non simple?
-            .setSymbol(serializeIrSymbol(variable.symbol))
 
         variable.setter?.let { proto.setSetter(serializeIrFunction(it as IrSimpleFunction)) } // TODO: ditto.
 
@@ -1007,7 +1002,6 @@ open class IrModuleSerializer(
             .setIsLateinit(property.isLateinit)
             .setIsDelegated(property.isDelegated)
             .setIsExternal(property.isExternal)
-            .setSymbol(serializeIrSymbol(property.symbol))
 
         val backingField = property.backingField
         val getter = property.getter
@@ -1025,7 +1019,6 @@ open class IrModuleSerializer(
     private fun serializeIrField(field: IrField): KotlinIr.IrField {
         val proto = KotlinIr.IrField.newBuilder()
             .setBase(serializeIrDeclarationBase(field))
-            .setSymbol(serializeIrSymbol(field.symbol))
             .setName(serializeName(field.name))
             .setVisibility(serializeVisibility(field.visibility))
             .setIsFinal(field.isFinal)
@@ -1042,7 +1035,6 @@ open class IrModuleSerializer(
     private fun serializeIrVariable(variable: IrVariable): KotlinIr.IrVariable {
         val proto = KotlinIr.IrVariable.newBuilder()
             .setBase(serializeIrDeclarationBase(variable))
-            .setSymbol(serializeIrSymbol(variable.symbol))
             .setName(serializeName(variable.name))
             .setType(serializeIrType(variable.type))
             .setIsConst(variable.isConst)
@@ -1074,7 +1066,6 @@ open class IrModuleSerializer(
         val proto = KotlinIr.IrClass.newBuilder()
             .setBase(serializeIrDeclarationBase(clazz))
             .setName(serializeName(clazz.name))
-            .setSymbol(serializeIrSymbol(clazz.symbol))
             .setKind(serializeClassKind(clazz.kind))
             .setVisibility(serializeVisibility(clazz.visibility))
             .setModality(serializeModality(clazz.modality))
@@ -1097,7 +1088,6 @@ open class IrModuleSerializer(
         val proto = KotlinIr.IrEnumEntry.newBuilder()
             .setBase(serializeIrDeclarationBase(enumEntry))
             .setName(serializeName(enumEntry.name))
-            .setSymbol(serializeIrSymbol(enumEntry.symbol))
 
         enumEntry.initializerExpression?.let {
             proto.initializer = serializeExpression(it)
