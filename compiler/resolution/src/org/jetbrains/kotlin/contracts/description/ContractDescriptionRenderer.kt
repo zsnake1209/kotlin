@@ -73,6 +73,14 @@ class ContractDescriptionRenderer(private val builder: StringBuilder) : Contract
         builder.append(variableReference.descriptor.name)
     }
 
+    override fun visitFunctionReference(functionReference: FunctionReference, data: Unit) {
+        builder.append(functionReference.descriptor.name)
+    }
+
+    override fun visitLambdaParameterReceiverReference(receiverReference: LambdaParameterReceiverReference, data: Unit) {
+        builder.append("receiver of ${receiverReference.variableReference.descriptor.name}")
+    }
+
     private fun ContractDescriptionElement.isAtom(): Boolean =
         this is VariableReference || this is ConstantReference || this is IsNullPredicate || this is IsInstancePredicate
 

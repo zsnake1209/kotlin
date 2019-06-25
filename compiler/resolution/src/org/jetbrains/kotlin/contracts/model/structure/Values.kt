@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.contracts.model.ESEffect
 import org.jetbrains.kotlin.contracts.model.ESExpression
 import org.jetbrains.kotlin.contracts.model.ESExpressionVisitor
 import org.jetbrains.kotlin.contracts.model.ESValue
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueDescriptor
 import org.jetbrains.kotlin.resolve.scopes.receivers.ReceiverValue
 import java.util.*
@@ -72,6 +73,29 @@ open class ESVariable(val descriptor: ValueDescriptor) : AbstractESValue(descrip
     override fun hashCode(): Int = descriptor.hashCode()
 
     override fun toString(): String = descriptor.toString()
+}
+
+
+/**
+ * [ESFunction] is [ESValue] that represents function in Effect System
+ */
+class ESFunction(val descriptor: FunctionDescriptor) : AbstractESValue(null) {
+    override fun <T> accept(visitor: ESExpressionVisitor<T>): T = visitor.visitFunction(this)
+}
+
+
+/**
+ * [ESLambdaParameterReceiverReference] is [ESValue] that represents receiver of some
+ *   lambda function in Effect System
+ *
+ * [ESLambdaParameterReceiverReference] is declaration of receiver on a contract declaration-site.
+ *   On the call-site it transforms to [ESReceiverValue]
+ *
+ * @property lambda is [ESValue] represents variable with lambda, whose
+ *   receiver [ESLambdaParameterReceiverReference] references
+ */
+class ESLambdaParameterReceiverReference(val lambda: ESValue) : AbstractESValue(null) {
+    override fun <T> accept(visitor: ESExpressionVisitor<T>): T = visitor.visitReceiverReference(this)
 }
 
 

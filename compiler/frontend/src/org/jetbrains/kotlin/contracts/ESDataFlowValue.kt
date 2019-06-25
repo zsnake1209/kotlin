@@ -76,7 +76,7 @@ class ESReceiverWithDataFlowValue(
 /**
  * [ESLambda] represents lambda functions in Effect System
  */
-class ESLambda(val lambda: KtLambdaExpression) : AbstractESValue(null) {
+class ESLambda(val lambda: KtLambdaExpression, val receiverValue: ReceiverValue?) : AbstractESValue(null) {
     override fun <T> accept(visitor: ESExpressionVisitor<T>): T {
         throw IllegalStateException("Lambdas shouldn't be visited by ESExpressionVisitor")
     }
