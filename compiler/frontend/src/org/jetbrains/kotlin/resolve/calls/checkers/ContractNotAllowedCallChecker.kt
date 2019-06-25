@@ -6,11 +6,10 @@
 package org.jetbrains.kotlin.resolve.calls.checkers
 
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.contracts.parsing.isAnonymous
 import org.jetbrains.kotlin.contracts.parsing.isContractCallDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
-import org.jetbrains.kotlin.descriptors.isOverridable
+import org.jetbrains.kotlin.contracts.parsing.isLambda
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.psiUtil.isFirstStatement
@@ -45,16 +44,23 @@ object ContractNotAllowedCallChecker : CallChecker {
             || (scope.parent as? LexicalScope)?.kind != LexicalScopeKind.FUNCTION_INNER_SCOPE
         ) {
             if (scope.kind == LexicalScopeKind.FUNCTION_INNER_SCOPE) {
-                contractNotAllowed("Contracts are allowed only in function body block")
                 inFunctionBodyBlock = false
-            } else {
-                contractNotAllowed("Contracts are allowed only for top-level functions")
             }
         }
 
-        if (functionDescriptor?.isOperator == true) contractNotAllowed("Contracts are not allowed for operator functions")
+        functionDescriptor?.let {
+            if (it.isLambda) contractNotAllowed("Contracts are not allowed for lambda functions")
 
-        if (functionDescriptor?.isOverridable == true) contractNotAllowed("Contracts are not allowed for open functions")
+            if (it.isAnonymous) contractNotAllowed("Contracts are not allowed for anonymous functions")
+
+            if (it.isOperator) contractNotAllowed("Contracts are not allowed for operator functions")
+
+            if (it.isSuspend) contractNotAllowed("Contracts are not allowed for suspend functions")
+
+            if (it.isOverridable) contractNotAllowed("Contracts are not allowed for open functions")
+
+            if (it.isOverride) contractNotAllowed("Contracts are not allowed for override functions")
+        }
 
         if (!callElement.isFirstStatement() && inFunctionBodyBlock) {
             contractNotAllowed("Contract should be the first statement")
