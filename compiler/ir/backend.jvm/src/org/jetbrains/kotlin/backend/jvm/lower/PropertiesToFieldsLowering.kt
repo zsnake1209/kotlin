@@ -48,12 +48,12 @@ class PropertiesToFieldsLowering(val context: CommonBackendContext) : IrElementT
 
     override fun visitCall(expression: IrCall): IrExpression {
         val simpleFunction = (expression.symbol.owner as? IrSimpleFunction) ?: return super.visitCall(expression)
-        val property = simpleFunction.correspondingProperty ?: return super.visitCall(expression)
+        val property = simpleFunction.correspondingPropertySymbol?.owner ?: return super.visitCall(expression)
 
         if (shouldSubstituteAccessorWithField(property, simpleFunction)) {
-            when (expression) {
-                is IrGetterCallImpl -> return substituteGetter(property, expression)
-                is IrSetterCallImpl -> return substituteSetter(property, expression)
+            when (simpleFunction) {
+                property.getter -> return substituteGetter(property, expression)
+                property.setter -> return substituteSetter(property, expression)
             }
         }
 
