@@ -360,6 +360,7 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
                 declaration.acceptChildrenVoid(this)
                 declaration.transformDeclarationsFlat { element ->
                     if (element is IrSimpleFunction && element.isSuspend && element !in suspendLambdas) {
+                        originals.add(element)
                         listOf(element.getOrCreateView().also { views.add(it) })
                     } else null
                 }

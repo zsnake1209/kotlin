@@ -23,7 +23,7 @@ import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.util.constructedClass
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.explicitParameters
-import org.jetbrains.kotlin.ir.util.fqNameForIrSerialization
+import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
@@ -56,7 +56,7 @@ class MemoizedInlineClassReplacements {
         get() = explicitParameters.any { it.type.erasedUpperBound.isInline && !it.type.isDontMangleType() }
                 || (this is IrConstructor && constructedClass.isInline)
 
-    private fun IrType.isDontMangleType() = getClass()?.fqNameForIrSerialization == DescriptorUtils.RESULT_FQ_NAME
+    private fun IrType.isDontMangleType() = getClass()?.fqNameWhenAvailable == DescriptorUtils.RESULT_FQ_NAME
 
     private val IrFunction.hasStaticReplacement: Boolean
         get() = origin != IrDeclarationOrigin.FAKE_OVERRIDE &&
