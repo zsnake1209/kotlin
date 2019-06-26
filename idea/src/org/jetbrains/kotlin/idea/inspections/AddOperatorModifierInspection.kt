@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.idea.util.nameIdentifierTextRangeInThis
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.util.OperatorChecks
+import org.jetbrains.kotlin.util.OperatorNameConventions
 
 class AddOperatorModifierInspection : AbstractApplicabilityBasedInspection<KtNamedFunction>(KtNamedFunction::class.java) {
     override fun inspectionHighlightRangeInElement(element: KtNamedFunction) = element.nameIdentifierTextRangeInThis()
@@ -23,6 +24,7 @@ class AddOperatorModifierInspection : AbstractApplicabilityBasedInspection<KtNam
 
     override fun isApplicable(element: KtNamedFunction): Boolean {
         if (element.nameIdentifier == null || element.hasModifier(KtTokens.OPERATOR_KEYWORD)) return false
+        if (element.nameAsName !in OperatorNameConventions.ALL_OPERATION_NAMES) return false
         val functionDescriptor = element.resolveToDescriptorIfAny() ?: return false
         return !functionDescriptor.isOperator && OperatorChecks.check(functionDescriptor).isSuccess
     }
