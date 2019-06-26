@@ -55,7 +55,7 @@ class CheckIrElementVisitor(
             return
 
         if (actualType != expectedType) {
-            reportError(this, "unexpected expression.type: expected ${expectedType.render()}, got ${actualType.render()}")
+            reportError(this, "unexpected type: expected ${expectedType.render()}, got ${actualType.render()}")
         }
     }
 
@@ -146,6 +146,7 @@ class CheckIrElementVisitor(
         if (function.dispatchReceiverParameter?.type is IrDynamicType) {
             reportError(expression, "Dispatch receivers with 'dynamic' type are not allowed")
         }
+        // TODO: Why don't we check parameters as well?
 
         val returnType = expression.symbol.owner.returnType
         // TODO: We don't have the proper type substitution yet, so skip generics for now.
