@@ -348,7 +348,6 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
 
     private fun addContinuationParameter(irFile: IrFile, suspendLambdas: Set<IrFunction>): Set<IrFunction> {
         val views = hashSetOf<IrFunction>()
-        val originals = arrayListOf<IrFunction>()
 
         // Collect all suspend functions
         irFile.acceptVoid(object : IrElementVisitorVoid {
@@ -360,16 +359,11 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
                 declaration.acceptChildrenVoid(this)
                 declaration.transformDeclarationsFlat { element ->
                     if (element is IrSimpleFunction && element.isSuspend && element !in suspendLambdas) {
-                        originals.add(element)
                         listOf(element.getOrCreateView().also { views.add(it) })
                     } else null
                 }
             }
         })
-        // remove original functions
-        for (original in originals) {
-            original.parentAsClass.declarations.remove(original)
-        }
         // fix return targets
         for (view in views) {
             view.transformChildrenVoid(object : IrElementTransformerVoid() {
