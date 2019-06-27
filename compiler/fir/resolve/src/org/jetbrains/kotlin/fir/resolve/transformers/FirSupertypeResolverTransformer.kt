@@ -14,11 +14,7 @@ import org.jetbrains.kotlin.fir.resolve.lookupSuperTypes
 import org.jetbrains.kotlin.fir.scopes.FirPosition
 import org.jetbrains.kotlin.fir.scopes.addImportingScopes
 import org.jetbrains.kotlin.fir.scopes.impl.FirNestedClassifierScope
-import org.jetbrains.kotlin.fir.types.ConeClassLikeType
-import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
-import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.coneTypeSafe
-import org.jetbrains.kotlin.fir.types.impl.FirErrorTypeRefImpl
+import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.fir.visitors.compose
 import org.jetbrains.kotlin.name.ClassId
@@ -144,7 +140,7 @@ class FirSupertypeResolverTransformer : FirAbstractTreeTransformer() {
 
                 if (superTypeClassId.outerClasses().any(currentlyComputing::contains)) {
                     resultingTypeRefs.add(
-                        FirErrorTypeRefImpl(session, superTypeRef.psi, "Recursion detected: ${superTypeRef.render()}")
+                        FirErrorTypeRef(session, superTypeRef.psi, "Recursion detected: ${superTypeRef.render()}")
                     )
 
                     continue

@@ -202,7 +202,7 @@ open class FirBodyResolveTransformer(
     private fun <T> typeFromCallee(access: T): FirResolvedTypeRef where T : FirQualifiedAccess {
         return when (val newCallee = access.calleeReference) {
             is FirErrorNamedReference ->
-                FirErrorTypeRefImpl(session, access.psi, newCallee.errorReason)
+                FirErrorTypeRef(session, access.psi, newCallee.errorReason)
             is FirResolvedCallableReference -> {
                 val symbol = newCallee.coneSymbol
                 if (symbol is ConeCallableSymbol) {
@@ -219,7 +219,7 @@ open class FirBodyResolveTransformer(
                     val firUnsafe = symbol.firUnsafe<FirElement>()
                     // TODO: unhack
                     if (firUnsafe is FirEnumEntry) {
-                        (firUnsafe.superTypeRefs.firstOrNull() as? FirResolvedTypeRef) ?: FirErrorTypeRefImpl(
+                        (firUnsafe.superTypeRefs.firstOrNull() as? FirResolvedTypeRef) ?: FirErrorTypeRef(
                             session,
                             null,
                             "no enum item supertype"
@@ -390,7 +390,7 @@ open class FirBodyResolveTransformer(
                 } else {
                     val superTypeRef = implicitReceiverStack.filterIsInstance<ImplicitDispatchReceiverValue>().lastOrNull()
                         ?.boundSymbol?.fir?.superTypeRefs?.firstOrNull()
-                        ?: FirErrorTypeRefImpl(session, qualifiedAccessExpression.psi, "No super type")
+                        ?: FirErrorTypeRef(session, qualifiedAccessExpression.psi, "No super type")
                     qualifiedAccessExpression.resultType = superTypeRef
                     callee.replaceSuperTypeRef(superTypeRef)
                 }
@@ -478,7 +478,7 @@ open class FirBodyResolveTransformer(
                     returnTypeRef = (af.returnTypeRef as? FirResolvedTypeRef)
                         ?: resolvedLambdaAtom?.returnType?.let { af.returnTypeRef.resolvedTypeFromPrototype(it) }
                         ?: af.body?.resultType?.takeIf { af.returnTypeRef is FirImplicitTypeRef }
-                        ?: FirErrorTypeRefImpl(session, af.psi, "No result type for lambda")
+                        ?: FirErrorTypeRef(session, af.psi, "No result type for lambda")
                 )
                 af.replaceTypeRef(af.constructFunctionalTypeRef(session))
                 af.compose()
@@ -701,7 +701,7 @@ open class FirBodyResolveTransformer(
             val type = commonSuperType((listOf(tryExpression.tryBlock) + tryExpression.catches.map { it.block }).mapNotNull {
                 val expression = it.statements.lastOrNull() as? FirExpression
                 if (expression != null) {
-                    (expression.resultType as? FirResolvedTypeRef) ?: FirErrorTypeRefImpl(session, null, "No type for when branch result")
+                    (expression.resultType as? FirResolvedTypeRef) ?: FirErrorTypeRef(session, null, "No type for when branch result")
                 } else {
                     FirImplicitUnitTypeRef(session, null)
                 }
@@ -791,7 +791,7 @@ open class FirBodyResolveTransformer(
         block.resultType = if (resultExpression == null) {
             FirImplicitUnitTypeRef(session, block.psi)
         } else {
-            (resultExpression.resultType as? FirResolvedTypeRef) ?: FirErrorTypeRefImpl(session, null, "No type for block")
+            (resultExpression.resultType as? FirResolvedTypeRef) ?: FirErrorTypeRef(session, null, "No type for block")
         }
 
         return block.compose()
@@ -812,7 +812,7 @@ open class FirBodyResolveTransformer(
             val type = commonSuperType(whenExpression.branches.mapNotNull {
                 val expression = it.result.statements.lastOrNull() as? FirExpression
                 if (expression != null) {
-                    (expression.resultType as? FirResolvedTypeRef) ?: FirErrorTypeRefImpl(session, null, "No type for when branch result")
+                    (expression.resultType as? FirResolvedTypeRef) ?: FirErrorTypeRef(session, null, "No type for when branch result")
                 } else {
                     FirImplicitUnitTypeRef(session, null)
                 }
@@ -963,7 +963,7 @@ open class FirBodyResolveTransformer(
                     variable.transformReturnTypeRef(
                         this,
                         when (val resultType = initializer.resultType) {
-                            is FirImplicitTypeRef -> FirErrorTypeRefImpl(
+                            is FirImplicitTypeRef -> FirErrorTypeRef(
                                 session,
                                 null,
                                 "No result type for initializer"
@@ -979,7 +979,7 @@ open class FirBodyResolveTransformer(
                     // TODO: type from delegate
                     variable.transformReturnTypeRef(
                         this,
-                        FirErrorTypeRefImpl(
+                        FirErrorTypeRef(
                             session,
                             null,
                             "Not supported: type from delegate"
@@ -990,7 +990,7 @@ open class FirBodyResolveTransformer(
                     variable.transformReturnTypeRef(
                         this,
                         when (val resultType = variable.getter.returnTypeRef) {
-                            is FirImplicitTypeRef -> FirErrorTypeRefImpl(
+                            is FirImplicitTypeRef -> FirErrorTypeRef(
                                 session,
                                 null,
                                 "No result type for getter"
@@ -1001,7 +1001,7 @@ open class FirBodyResolveTransformer(
                 }
                 else -> {
                     variable.transformReturnTypeRef(
-                        this, FirErrorTypeRefImpl(session, null, "Cannot infer variable type without initializer / getter / delegate")
+                        this, FirErrorTypeRef(session, null, "Cannot infer variable type without initializer / getter / delegate")
                     )
                 }
             }
@@ -1049,7 +1049,7 @@ open class FirBodyResolveTransformer(
 
     override fun transformExpression(expression: FirExpression, data: Any?): CompositeTransformResult<FirStatement> {
         if (expression.resultType is FirImplicitTypeRef && expression !is FirWrappedArgumentExpression) {
-            val type = FirErrorTypeRefImpl(session, expression.psi, "Type calculating for ${expression::class} is not supported")
+            val type = FirErrorTypeRef(session, expression.psi, "Type calculating for ${expression::class} is not supported")
             expression.resultType = type
         }
         return (expression.transformChildren(this, data) as FirStatement).compose()
@@ -1133,7 +1133,7 @@ class ReturnTypeCalculatorWithJump(val session: FirSession, val scopeSession: Sc
 
     private fun cycleErrorType(declaration: FirTypedDeclaration): FirResolvedTypeRef? {
         if (declaration.returnTypeRef is FirComputingImplicitTypeRef) {
-            declaration.transformReturnTypeRef(storeType, FirErrorTypeRefImpl(session, null, "cycle"))
+            declaration.transformReturnTypeRef(storeType, FirErrorTypeRef(session, null, "cycle"))
             return declaration.returnTypeRef as FirResolvedTypeRef
         }
         return null
@@ -1143,7 +1143,7 @@ class ReturnTypeCalculatorWithJump(val session: FirSession, val scopeSession: Sc
 
         if (declaration is FirValueParameter && declaration.returnTypeRef is FirImplicitTypeRef) {
             // TODO?
-            declaration.transformReturnTypeRef(storeType, FirErrorTypeRefImpl(session, null, "Unsupported: implicit VP type"))
+            declaration.transformReturnTypeRef(storeType, FirErrorTypeRef(session, null, "Unsupported: implicit VP type"))
         }
         val returnTypeRef = declaration.returnTypeRef
         if (returnTypeRef is FirResolvedTypeRef) return returnTypeRef
@@ -1162,7 +1162,7 @@ class ReturnTypeCalculatorWithJump(val session: FirSession, val scopeSession: Sc
             classId.outerClassId
         }.mapTo(mutableListOf()) { provider.getFirClassifierByFqName(it) }
 
-        if (file == null || outerClasses.any { it == null }) return FirErrorTypeRefImpl(
+        if (file == null || outerClasses.any { it == null }) return FirErrorTypeRef(
             session,
             null,
             "I don't know what todo"
