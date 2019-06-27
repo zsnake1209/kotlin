@@ -89,7 +89,7 @@ class DataCollector {
                     return
                 }
                 val classNameWithParameters = NameWithTypeParameters(className, klass.typeParameterList?.text ?: "")
-                if (klass.isInterface() || (klass.hasModifier(KtTokens.ABSTRACT_KEYWORD) && "Abstract" !in (klass.name ?: ""))) {
+                if (shouldBeProcessed(klass)) {
                     packagePerClass[classNameWithParameters] = file.packageFqName
                     val isBaseTT = klass.annotationEntries.any {
                         it.shortName?.asString() == BASE_TRANSFORMED_TYPE_ANNOTATION_NAME
@@ -116,6 +116,14 @@ class DataCollector {
                 super.visitClass(klass)
             }
         })
+    }
+
+    private fun shouldBeProcessed(klass: KtClass): Boolean {
+        if (klass.isInterface()) return true
+        if (klass.hasModifier(KtTokens.ABSTRACT_KEYWORD) && "Abstract" !in (klass.name ?: "")) return true
+        if (klass.annotationEntries.any { it.shortName?.asString() == VISITED_CLASS_ANNOTATION_NAME }) return true
+
+        return false
     }
 
 
