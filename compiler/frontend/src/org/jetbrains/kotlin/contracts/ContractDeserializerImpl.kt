@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.contracts
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.contracts.description.expressions.*
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
@@ -61,7 +62,7 @@ class ContractDeserializerImpl(
 
         fun deserializeContract(proto: ProtoBuf.Contract): ContractDescription? {
             val effects = proto.effectList.map { deserializePossiblyConditionalEffect(it) ?: return null }
-            return ContractDescription(effects, ownerFunction, storageManager)
+            return ContractDescription(effects, ownerFunction, storageManager, ExtensionContractComponents.DEFAULT)
         }
 
         private fun deserializePossiblyConditionalEffect(proto: ProtoBuf.Effect): EffectDeclaration? {

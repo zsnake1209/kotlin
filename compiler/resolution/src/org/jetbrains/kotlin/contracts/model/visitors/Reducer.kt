@@ -27,8 +27,11 @@ import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
  */
 class Reducer(
     private val builtIns: KotlinBuiltIns,
-    private val additionalReducer: AdditionalReducer?
+    private val additionalReducer: AdditionalReducer?,
+    extensionReducerConstructors: Collection<ExtensionReducerConstructor>
 ) : ESExpressionVisitor<ESExpression?> {
+    private val extensionReducers = extensionReducerConstructors.map { it(this) }
+
     fun reduceEffects(schema: List<ESEffect>): List<ESEffect> =
         schema.mapNotNull { reduceEffect(it) }
 
@@ -47,6 +50,10 @@ class Reducer(
                 // Leave everything else as is
                 return effect
             }
+            is ExtensionEffect -> return extensionReducers.fold(effect) { extensionEffect, extensionReducer ->
+                extensionReducer.reduce(extensionEffect)
+            }
+
             else -> return effect
         }
     }

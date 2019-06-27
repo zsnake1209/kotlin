@@ -16,16 +16,19 @@
 
 package org.jetbrains.kotlin.frontend.di
 
-import org.jetbrains.kotlin.platform.TargetPlatform
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.context.ModuleContext
 import org.jetbrains.kotlin.contracts.ContractDeserializerImpl
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
+import org.jetbrains.kotlin.extensions.ContractsExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
 import org.jetbrains.kotlin.incremental.components.LookupTracker
+import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.platform.TargetPlatformVersion
 import org.jetbrains.kotlin.platform.isCommon
 import org.jetbrains.kotlin.resolve.*
@@ -64,6 +67,12 @@ fun StorageComponentContainer.configureModule(
 
     for (extension in StorageComponentContainerContributor.getInstances(moduleContext.project)) {
         extension.registerModuleComponents(this, platform, moduleContext.module)
+    }
+
+    if (languageVersionSettings.supportsFeature(LanguageFeature.ContextualEffects)) {
+        useInstance(ExtensionContractComponents.DEFAULT)
+    } else {
+        useInstance(ExtensionContractComponents(ContractsExtension.getInstances(moduleContext.project)))
     }
 
     configurePlatformIndependentComponents()

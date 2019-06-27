@@ -16,14 +16,12 @@
 
 package org.jetbrains.kotlin.contracts.interpretation
 
-import org.jetbrains.kotlin.contracts.description.BooleanExpression
-import org.jetbrains.kotlin.contracts.description.ConditionalEffectDeclaration
-import org.jetbrains.kotlin.contracts.description.ContractDescription
-import org.jetbrains.kotlin.contracts.description.EffectDeclaration
+import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.contracts.description.expressions.ConstantReference
 import org.jetbrains.kotlin.contracts.description.expressions.FunctionReference
 import org.jetbrains.kotlin.contracts.description.expressions.LambdaParameterReceiverReference
 import org.jetbrains.kotlin.contracts.description.expressions.VariableReference
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
 import org.jetbrains.kotlin.contracts.model.ESEffect
 import org.jetbrains.kotlin.contracts.model.ESExpression
 import org.jetbrains.kotlin.contracts.model.Functor
@@ -33,10 +31,12 @@ import org.jetbrains.kotlin.contracts.model.structure.ESFunction
 import org.jetbrains.kotlin.contracts.model.structure.ESLambdaParameterReceiverReference
 import org.jetbrains.kotlin.contracts.model.structure.ESVariable
 
+typealias ExtensionEffectDeclarationInterpreterConstructor = (ContractInterpretationDispatcher) -> EffectDeclarationInterpreter
+
 /**
  * This class manages conversion of [ContractDescription] to [Functor]
  */
-class ContractInterpretationDispatcher {
+class ContractInterpretationDispatcher(private val components: ExtensionContractComponents) {
     private val constantsInterpreter = ConstantValuesInterpreter()
     private val conditionInterpreter = ConditionInterpreter(this)
     private val conditionalEffectInterpreter = ConditionalEffectInterpreter(this)
@@ -45,16 +45,18 @@ class ContractInterpretationDispatcher {
         CallsEffectInterpreter(this)
     )
 
+    private val extensionInterpreters: Collection<EffectDeclarationInterpreter> = components.extensionInterpretersConstructors.map { it(this) }
+
     fun convertContractDescriptorToFunctor(contractDescription: ContractDescription): Functor? {
         val resultingClauses = contractDescription.effects.map { effect ->
-            if (effect is ConditionalEffectDeclaration) {
-                conditionalEffectInterpreter.interpret(effect) ?: return null
-            } else {
-                effectsInterpreters.mapNotNull { it.tryInterpret(effect) }.singleOrNull() ?: return null
+            when (effect) {
+                is ConditionalEffectDeclaration -> conditionalEffectInterpreter.interpret(effect) ?: return null
+                is ExtensionEffectDeclaration -> extensionInterpreters.mapNotNull { it.tryInterpret(effect) }.singleOrNull() ?: return null
+                else -> effectsInterpreters.mapNotNull { it.tryInterpret(effect) }.singleOrNull() ?: return null
             }
         }
 
-        return SubstitutingFunctor(resultingClauses, contractDescription.ownerFunction)
+        return SubstitutingFunctor(resultingClauses, contractDescription.ownerFunction, components.extensionSubstitutors)
     }
 
     internal fun interpretEffect(effectDeclaration: EffectDeclaration): ESEffect? {

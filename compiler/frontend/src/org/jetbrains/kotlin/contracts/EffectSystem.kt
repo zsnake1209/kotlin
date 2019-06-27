@@ -16,11 +16,15 @@
 
 package org.jetbrains.kotlin.contracts
 
+import com.intellij.util.containers.MultiMap
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.contracts.extensions.ExtensionBindingContextData
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
 import org.jetbrains.kotlin.contracts.model.Computation
 import org.jetbrains.kotlin.contracts.model.ESEffect
+import org.jetbrains.kotlin.contracts.model.ExtensionEffect
 import org.jetbrains.kotlin.contracts.model.MutableContextInfo
 import org.jetbrains.kotlin.contracts.model.functors.EqualsFunctor
 import org.jetbrains.kotlin.contracts.model.structure.ESCalls
@@ -29,6 +33,8 @@ import org.jetbrains.kotlin.contracts.model.structure.ESReturns
 import org.jetbrains.kotlin.contracts.model.structure.UNKNOWN_COMPUTATION
 import org.jetbrains.kotlin.contracts.model.visitors.InfoCollector
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.extensions.ContractsExtension
+import org.jetbrains.kotlin.extensions.contractExtensions
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtExpression
@@ -43,7 +49,8 @@ import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowValueFactory
 class EffectSystem(
     val languageVersionSettings: LanguageVersionSettings,
     val dataFlowValueFactory: DataFlowValueFactory,
-    val builtIns: KotlinBuiltIns
+    val builtIns: KotlinBuiltIns,
+    private val contractComponents: ExtensionContractComponents
 ) {
     fun getDataFlowInfoForFinishedCall(
         resolvedCall: ResolvedCall<*>,
@@ -93,11 +100,42 @@ class EffectSystem(
         val callExpression = resolvedCall.call.callElement as? KtCallExpression ?: return
         if (callExpression is KtDeclaration) return
 
+        val extensionInfos = MultiMap.create<KtExpression, Pair<ContractsExtension, ExtensionBindingContextData>>()
+
         val resultingContextInfo = getContextInfoWhen(ESReturns(ESConstants.wildcard), callExpression, bindingTrace, moduleDescriptor)
-        for (effect in resultingContextInfo.firedEffects) {
-            val callsEffect = effect as? ESCalls ?: continue
-            val lambdaExpression = (callsEffect.callable as? ESLambda)?.lambda ?: continue
-            bindingTrace.record(BindingContext.LAMBDA_INVOCATIONS, lambdaExpression, callsEffect.kind)
+        loop@ for (effect in resultingContextInfo.firedEffects) {
+            when (effect) {
+                is ESCalls -> {
+                    val callsEffect = effect as? ESCalls ?: continue@loop
+                    val lambdaExpression = (callsEffect.callable as? ESLambda)?.lambda ?: continue@loop
+                    bindingTrace.record(BindingContext.LAMBDA_INVOCATIONS, lambdaExpression, callsEffect.kind)
+                }
+                is ExtensionEffect -> {
+                    for (contractsExtension in contractComponents.contractExtensions) {
+                        val (expression, data) = contractsExtension.collectDefiniteInvocations(
+                            effect,
+                            resolvedCall,
+                            bindingTrace.bindingContext
+                        ) ?: continue@loop
+                        extensionInfos.putValue(expression, contractsExtension to data)
+                    }
+                }
+            }
+        }
+
+        // record info from extensions
+        for (expression in extensionInfos.keySet()) {
+            val newData = extensionInfos[expression]
+                .groupBy { it.first }
+                .mapValues { (_, value) -> value.map { it.second } }
+
+            val dataMap = bindingTrace[BindingContext.EXTENSION_SLICE, expression]?.toMutableMap() ?: mutableMapOf()
+            for ((extension, effects) in newData) {
+                val oldValue = dataMap[extension.id] ?: extension.emptyBindingContextData()
+                dataMap[extension.id] = effects.fold(oldValue, ExtensionBindingContextData::combine)
+            }
+
+            bindingTrace.record(BindingContext.EXTENSION_SLICE, expression, dataMap)
         }
     }
 
@@ -129,7 +167,7 @@ class EffectSystem(
     }
 
     private fun getNonTrivialComputation(expression: KtExpression, trace: BindingTrace, moduleDescriptor: ModuleDescriptor): Computation? {
-        val visitor = EffectsExtractingVisitor(trace, moduleDescriptor, dataFlowValueFactory, languageVersionSettings)
+        val visitor = EffectsExtractingVisitor(trace, moduleDescriptor, dataFlowValueFactory, languageVersionSettings, contractComponents)
         return visitor.extractOrGetCached(expression).takeUnless { it == UNKNOWN_COMPUTATION }
     }
 }

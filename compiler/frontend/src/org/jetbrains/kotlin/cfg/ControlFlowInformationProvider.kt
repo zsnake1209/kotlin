@@ -23,11 +23,13 @@ import org.jetbrains.kotlin.cfg.variable.*
 import org.jetbrains.kotlin.cfg.variable.VariableUseState.*
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.Errors.*
+import org.jetbrains.kotlin.extensions.contractExtensions
 import org.jetbrains.kotlin.idea.MainFunctionDetector
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
@@ -57,7 +59,8 @@ class ControlFlowInformationProvider private constructor(
     private val trace: BindingTrace,
     private val pseudocode: Pseudocode,
     private val languageVersionSettings: LanguageVersionSettings,
-    private val diagnosticSuppressor: PlatformDiagnosticSuppressor
+    private val diagnosticSuppressor: PlatformDiagnosticSuppressor,
+    private val contractComponents: ExtensionContractComponents
 ) {
 
     private val pseudocodeVariablesData by lazy {
@@ -68,13 +71,15 @@ class ControlFlowInformationProvider private constructor(
         declaration: KtElement,
         trace: BindingTrace,
         languageVersionSettings: LanguageVersionSettings,
-        diagnosticSuppressor: PlatformDiagnosticSuppressor
+        diagnosticSuppressor: PlatformDiagnosticSuppressor,
+        contractComponents: ExtensionContractComponents
     ) : this(
         declaration,
         trace,
         ControlFlowProcessor(trace, languageVersionSettings).generatePseudocode(declaration),
         languageVersionSettings,
-        diagnosticSuppressor
+        diagnosticSuppressor,
+        contractComponents
     )
 
     fun checkForLocalClassOrObjectMode() {
@@ -118,6 +123,16 @@ class ControlFlowInformationProvider private constructor(
         checkDefiniteReturn(expectedReturnType ?: NO_EXPECTED_TYPE, unreachableCode)
 
         markAndCheckTailCalls()
+
+        runExtensionAnalyzers()
+    }
+
+    private fun runExtensionAnalyzers() {
+        if (subroutine !is KtFunction) return
+
+        contractComponents.contractExtensions.forEach {
+            it.analyzeFunction(subroutine, pseudocode, trace.bindingContext, trace)
+        }
     }
 
     /**
@@ -222,7 +237,7 @@ class ControlFlowInformationProvider private constructor(
                 val expectedType = functionDescriptor?.returnType
 
                 val providerForLocalDeclaration = ControlFlowInformationProvider(
-                    element, trace, localDeclarationInstruction.body, languageVersionSettings, diagnosticSuppressor
+                    element, trace, localDeclarationInstruction.body, languageVersionSettings, diagnosticSuppressor, contractComponents
                 )
 
                 providerForLocalDeclaration.checkFunction(expectedType)

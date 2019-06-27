@@ -22,8 +22,10 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.contracts.description.ContractDescription
 import org.jetbrains.kotlin.contracts.description.ContractProviderKey
 import org.jetbrains.kotlin.contracts.description.LazyContractProvider
-import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.psiUtil.isContractDescriptionCallPsiCheck
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
@@ -31,7 +33,11 @@ import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.scopes.LexicalScope
 import org.jetbrains.kotlin.storage.StorageManager
 
-class ContractParsingServices(val languageVersionSettings: LanguageVersionSettings, private val storageManager: StorageManager) {
+class ContractParsingServices(
+    val languageVersionSettings: LanguageVersionSettings,
+    private val storageManager: StorageManager,
+    private val components: ExtensionContractComponents
+) {
     /**
      * ! IMPORTANT NOTICE !
      *
@@ -76,7 +82,7 @@ class ContractParsingServices(val languageVersionSettings: LanguageVersionSettin
             // Small optimization: do not even try to parse contract if we already have errors
             if (collector.hasErrors() || contractNotAllowed) return null
 
-            val parsedContract = PsiContractParserDispatcher(collector, callContext, storageManager).parseContract()
+            val parsedContract = PsiContractParserDispatcher(collector, callContext, storageManager, components).parseContract()
 
             // Make sure that at least generic error will be reported if we couldn't parse contract
             // (null returned => at least one error was reported)

@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.isExtensionFunctionType
 import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.contracts.description.expressions.*
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
 import org.jetbrains.kotlin.contracts.parsing.ContractsDslNames.CALLS_IN_PLACE_EFFECT
 import org.jetbrains.kotlin.contracts.parsing.ContractsDslNames.CONDITIONAL_EFFECT
 import org.jetbrains.kotlin.contracts.parsing.ContractsDslNames.RETURNS_EFFECT
@@ -31,6 +32,7 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.extensions.contractExtensions
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -39,6 +41,10 @@ import org.jetbrains.kotlin.resolve.calls.callUtil.getType
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
 import org.jetbrains.kotlin.storage.StorageManager
+
+interface ExtensionParserDispatcher {
+    fun parseEffects(expression: KtExpression): Collection<EffectDeclaration>
+}
 
 interface PsiContractVariableParserDispatcher {
     fun parseVariable(expression: KtExpression?): VariableReference?
@@ -50,7 +56,8 @@ interface PsiContractVariableParserDispatcher {
 class PsiContractParserDispatcher(
     private val collector: ContractParsingDiagnosticsCollector,
     private val callContext: ContractCallContext,
-    private val storageManager: StorageManager
+    private val storageManager: StorageManager,
+    private val components: ExtensionContractComponents
 ) : PsiContractVariableParserDispatcher {
     private val conditionParser = PsiConditionParser(collector, callContext, this)
     private val constantParser = PsiConstantParser(callContext)
@@ -60,6 +67,9 @@ class PsiContractParserDispatcher(
         CALLS_IN_PLACE_EFFECT to PsiCallsEffectParser(collector, callContext, this),
         CONDITIONAL_EFFECT to PsiConditionalEffectParser(collector, callContext, this)
     )
+
+    private val extensionParserDispatchers: Collection<ExtensionParserDispatcher> =
+        components.contractExtensions.map { it.getPsiParserDispatcher(collector, callContext, this) }
 
     fun parseContract(): ContractDescription? {
         // Must be non-null because of checks in 'checkContractAndRecordIfPresent', but actually is not, see EA-124365
@@ -81,7 +91,7 @@ class PsiContractParserDispatcher(
         val effects = effectsWithExpression.map { it.first }
         if (effects.isEmpty()) return null
 
-        return ContractDescription(effects, callContext.functionDescriptor, storageManager)
+        return ContractDescription(effects, callContext.functionDescriptor, storageManager, components)
     }
 
     fun parseCondition(expression: KtExpression?): BooleanExpression? = expression?.accept(conditionParser, Unit)
@@ -93,8 +103,11 @@ class PsiContractParserDispatcher(
         val returnType = expression.getType(callContext.bindingContext) ?: return emptyList()
         val parser = effectsParsers[returnType.constructor.declarationDescriptor?.name]
         if (parser == null) {
-            collector.badDescription("unrecognized effect", expression)
-            return emptyList()
+            val extensionEffects = extensionParserDispatchers.flatMap { it.parseEffects(expression) }
+            if (extensionEffects.isEmpty()) {
+                collector.badDescription("unrecognized effect", expression)
+            }
+            return extensionEffects
         }
 
         return parser.tryParseEffect(expression)

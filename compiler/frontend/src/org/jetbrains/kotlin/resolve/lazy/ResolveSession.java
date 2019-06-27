@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.config.LanguageVersionSettings;
 import org.jetbrains.kotlin.context.GlobalContext;
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.descriptors.annotations.Annotations;
 import org.jetbrains.kotlin.incremental.components.LookupLocation;
@@ -85,6 +86,13 @@ public class ResolveSession implements KotlinCodeAnalyzer, LazyClassContext {
     private final SyntheticResolveExtension syntheticResolveExtension;
 
     private Project project;
+
+    private ExtensionContractComponents contractComponents;
+
+    @Inject
+    public void setContractComponents(ExtensionContractComponents contractComponents) {
+        this.contractComponents = contractComponents;
+    }
 
     @Inject
     public void setAnnotationResolve(AnnotationResolver annotationResolver) {
@@ -458,6 +466,10 @@ public class ResolveSession implements KotlinCodeAnalyzer, LazyClassContext {
     @NotNull
     public Project getProject() {
         return project;
+    }
+
+    public ExtensionContractComponents getContractComponents() {
+        return contractComponents;
     }
 
     @Override

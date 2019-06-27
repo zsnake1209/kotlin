@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.contracts.description
 
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
 import org.jetbrains.kotlin.contracts.interpretation.ContractInterpretationDispatcher
 import org.jetbrains.kotlin.contracts.model.Functor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -37,10 +38,11 @@ import org.jetbrains.kotlin.storage.StorageManager
 open class ContractDescription(
     val effects: List<EffectDeclaration>,
     val ownerFunction: FunctionDescriptor,
-    storageManager: StorageManager
+    storageManager: StorageManager,
+    components: ExtensionContractComponents
 ) {
     private val computeFunctor = storageManager.createNullableLazyValue {
-        ContractInterpretationDispatcher().convertContractDescriptorToFunctor(this)
+        ContractInterpretationDispatcher(components).convertContractDescriptorToFunctor(this)
     }
 
     fun getFunctor(usageModule: ModuleDescriptor): Functor? = computeFunctor.invoke()
@@ -58,4 +60,9 @@ interface EffectDeclaration : ContractDescriptionElement {
 interface BooleanExpression : ContractDescriptionElement {
     override fun <R, D> accept(contractDescriptionVisitor: ContractDescriptionVisitor<R, D>, data: D): R =
         contractDescriptionVisitor.visitBooleanExpression(this, data)
+}
+
+interface ExtensionEffectDeclaration : EffectDeclaration {
+    override fun <R, D> accept(contractDescriptionVisitor: ContractDescriptionVisitor<R, D>, data: D): R =
+        contractDescriptionVisitor.visitExtensionEffect(this, data)
 }

@@ -17,7 +17,7 @@ fun analyzeControlFlow(resolveSession: ResolveSession, resolveElement: KtElement
         trace.bindingContext, "Element control flow resolve", resolveElement, allowSliceRewrite = true
     )
     ControlFlowInformationProvider(
-        resolveElement, controlFlowTrace, resolveElement.languageVersionSettings, resolveSession.platformDiagnosticSuppressor
+        resolveElement, controlFlowTrace, resolveElement.languageVersionSettings, resolveSession.platformDiagnosticSuppressor, resolveSession.contractComponents
     ).checkDeclaration()
     controlFlowTrace.addOwnDataTo(trace, null, false)
 }

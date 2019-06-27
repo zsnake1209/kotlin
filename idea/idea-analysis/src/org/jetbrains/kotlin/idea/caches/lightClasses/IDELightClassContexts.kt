@@ -23,16 +23,19 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import org.jetbrains.kotlin.asJava.builder.LightClassConstructionContext
 import org.jetbrains.kotlin.config.JvmTarget
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.context.ModuleContext
+import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.CompositePackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.extensions.ContractsExtension
 import org.jetbrains.kotlin.frontend.di.configureModule
 import org.jetbrains.kotlin.idea.caches.lightClasses.IDELightClassConstructionContext.Mode.EXACT
 import org.jetbrains.kotlin.idea.caches.lightClasses.IDELightClassConstructionContext.Mode.LIGHT
@@ -310,10 +313,11 @@ internal object IDELightClassContexts {
         val moduleInfo = files.first().getModuleInfo()
         val container = createContainer("LightClassStub", JvmPlatformAnalyzerServices) {
             val jvmTarget = IDELanguageSettingsProvider.getTargetPlatform(moduleInfo, project) as? JvmTarget ?: JvmTarget.DEFAULT
+            val languageVersionSettings = IDELanguageSettingsProvider.getLanguageVersionSettings(moduleInfo, project)
             configureModule(
                 ModuleContext(moduleDescriptor, project, "ad hoc resolve"), JvmPlatforms.jvmPlatformByTargetVersion(jvmTarget),
                 JvmPlatformAnalyzerServices, trace,
-                IDELanguageSettingsProvider.getLanguageVersionSettings(moduleInfo, project)
+                languageVersionSettings
             )
 
             useInstance(GlobalSearchScope.EMPTY_SCOPE)
@@ -332,6 +336,12 @@ internal object IDELightClassContexts {
 
                 private fun errorType() = ErrorUtils.createErrorType("Error type in ad hoc resolve for lighter classes")
             })
+
+            if (languageVersionSettings.supportsFeature(LanguageFeature.ContextualEffects)) {
+                useInstance(ExtensionContractComponents.DEFAULT)
+            } else {
+                useInstance(ExtensionContractComponents(ContractsExtension.getInstances(project)))
+            }
 
             IdeaEnvironment.configure(this)
 

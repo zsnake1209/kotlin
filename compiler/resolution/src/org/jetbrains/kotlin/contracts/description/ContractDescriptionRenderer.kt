@@ -38,6 +38,11 @@ class ContractDescriptionRenderer(private val builder: StringBuilder) : Contract
 
     }
 
+    override fun visitExtensionEffect(extensionEffect: ExtensionEffectDeclaration, data: Unit) {
+        builder.append("ExtensionEffect:")
+        builder.append(extensionEffect.toString())
+    }
+
     override fun visitLogicalOr(logicalOr: LogicalOr, data: Unit) {
         inBracketsIfNecessary(logicalOr, logicalOr.left) { logicalOr.left.accept(this, data) }
         builder.append(" || ")

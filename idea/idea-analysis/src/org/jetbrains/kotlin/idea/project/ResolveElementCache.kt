@@ -22,7 +22,6 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.util.containers.ContainerUtil
-import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.cfg.ControlFlowInformationProvider
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.SimpleGlobalContext
@@ -34,6 +33,7 @@ import org.jetbrains.kotlin.frontend.di.createContainerForBodyResolve
 import org.jetbrains.kotlin.idea.caches.resolve.CodeFragmentAnalyzer
 import org.jetbrains.kotlin.idea.caches.resolve.util.analyzeControlFlow
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.forEachDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.getElementTextWithContext
@@ -574,7 +574,11 @@ class ResolveElementCache(
 
         for (accessor in property.accessors) {
             ControlFlowInformationProvider(
-                accessor, trace, accessor.languageVersionSettings, resolveSession.platformDiagnosticSuppressor
+                accessor,
+                trace,
+                accessor.languageVersionSettings,
+                resolveSession.platformDiagnosticSuppressor,
+                resolveSession.contractComponents
             ).checkDeclaration()
         }
 

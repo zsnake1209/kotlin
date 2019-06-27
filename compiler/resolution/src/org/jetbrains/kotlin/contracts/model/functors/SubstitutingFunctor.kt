@@ -24,9 +24,12 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueDescriptor
 import org.jetbrains.kotlin.utils.addIfNotNull
 
+typealias ExtensionSubstitutor = (ExtensionEffect, Substitutor) -> ESEffect?
+
 class SubstitutingFunctor(
     private val basicEffects: List<ESEffect>,
-    private val ownerFunction: FunctionDescriptor
+    private val ownerFunction: FunctionDescriptor,
+    private val extensionSubstitutors: Collection<ExtensionSubstitutor>
 ) : AbstractFunctor() {
     override fun doInvocation(arguments: List<Computation>, reducer: Reducer): List<ESEffect> {
         if (basicEffects.isEmpty()) return emptyList()
@@ -52,6 +55,11 @@ class SubstitutingFunctor(
                 is ESCalls -> {
                     val substitutionForCallable = substitutions[effect.callable] as? ESValue ?: continue@effectsLoop
                     substitutedClauses += ESCalls(substitutionForCallable, effect.kind)
+                }
+
+                is ExtensionEffect -> {
+                    val extensionsEffects = extensionSubstitutors.mapNotNull { it(effect, substitutor) }
+                    substitutedClauses.addAll(extensionsEffects)
                 }
 
                 else -> substitutedClauses += effect
