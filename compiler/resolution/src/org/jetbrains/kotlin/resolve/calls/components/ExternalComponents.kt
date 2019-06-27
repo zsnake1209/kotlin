@@ -5,14 +5,12 @@
 
 package org.jetbrains.kotlin.resolve.calls.components
 
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.container.DefaultImplementation
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.resolve.calls.inference.components.ConstraintInjector
 import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
 import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.kotlin.resolve.calls.results.SimpleConstraintSystem
@@ -37,9 +35,7 @@ interface KotlinResolutionStatelessCallbacks {
     fun isCoroutineCall(argument: KotlinCallArgument, parameter: ValueParameterDescriptor): Boolean
     fun isApplicableCallForBuilderInference(descriptor: CallableDescriptor, languageVersionSettings: LanguageVersionSettings): Boolean
 
-    fun createConstraintSystemForOverloadResolution(
-        constraintInjector: ConstraintInjector, builtIns: KotlinBuiltIns
-    ): SimpleConstraintSystem
+    fun createConstraintSystemForOverloadResolution(callComponents: KotlinCallComponents): SimpleConstraintSystem
 }
 
 // This components hold state (trace). Work with this carefully.

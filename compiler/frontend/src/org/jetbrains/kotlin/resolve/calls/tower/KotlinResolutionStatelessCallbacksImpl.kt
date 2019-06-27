@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.resolve.calls.tower
 
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
@@ -30,13 +29,9 @@ import org.jetbrains.kotlin.resolve.calls.callResolverUtil.isSuperOrDelegatingCo
 import org.jetbrains.kotlin.resolve.calls.components.KotlinResolutionCallbacks
 import org.jetbrains.kotlin.resolve.calls.components.KotlinResolutionStatelessCallbacks
 import org.jetbrains.kotlin.resolve.calls.inference.ConstraintSystemBuilderImpl
-import org.jetbrains.kotlin.resolve.calls.inference.components.ConstraintInjector
 import org.jetbrains.kotlin.resolve.calls.inference.components.SimpleConstraintSystemImpl
 import org.jetbrains.kotlin.resolve.calls.inference.isCoroutineCallWithAdditionalInference
-import org.jetbrains.kotlin.resolve.calls.model.CallableReferenceKotlinCallArgument
-import org.jetbrains.kotlin.resolve.calls.model.KotlinCall
-import org.jetbrains.kotlin.resolve.calls.model.KotlinCallArgument
-import org.jetbrains.kotlin.resolve.calls.model.SimpleKotlinCallArgument
+import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.kotlin.resolve.calls.results.SimpleConstraintSystem
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationResolver
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
@@ -88,10 +83,10 @@ class KotlinResolutionStatelessCallbacksImpl(
     }
 
     override fun createConstraintSystemForOverloadResolution(
-        constraintInjector: ConstraintInjector, builtIns: KotlinBuiltIns
+        callComponents: KotlinCallComponents
     ): SimpleConstraintSystem {
         return if (languageVersionSettings.getFlag(AnalysisFlags.constraintSystemForOverloadResolution).forNewInference())
-            SimpleConstraintSystemImpl(constraintInjector, builtIns)
+            SimpleConstraintSystemImpl(callComponents)
         else
             ConstraintSystemBuilderImpl.forSpecificity()
     }
