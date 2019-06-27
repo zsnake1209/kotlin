@@ -9,6 +9,7 @@ import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl
 import com.intellij.psi.PsiFile
 import org.jetbrains.kotlin.idea.codeInsight.AbstractLineMarkersTest
 import org.jetbrains.kotlin.idea.multiplatform.setupMppProjectFromDirStructure
+import org.jetbrains.kotlin.idea.project.NewInferenceForIDEAnalysisComponent
 import org.jetbrains.kotlin.idea.stubs.AbstractMultiHighlightingTest
 import org.jetbrains.kotlin.idea.test.PluginTestCaseBase
 import org.jetbrains.kotlin.idea.test.allJavaFiles
@@ -48,6 +49,19 @@ abstract class AbstractMultiPlatformHighlightingTest : AbstractMultiModuleHighli
     }
 
     override fun getTestDataPath() = "${PluginTestCaseBase.getTestDataPathBase()}/multiModuleHighlighting/multiplatform/"
+}
+
+abstract class AbstractMultiPlatformOldInferenceHighlightingTest : AbstractMultiPlatformHighlightingTest() {
+
+    override fun setUp() {
+        super.setUp()
+        NewInferenceForIDEAnalysisComponent.setEnabled(project, false)
+    }
+
+    override fun tearDown() {
+        NewInferenceForIDEAnalysisComponent.setEnabled(project, true)
+        super.tearDown()
+    }
 }
 
 private fun List<PsiFile>.excludeByDirective() = filter { !it.text.contains("// !CHECK_HIGHLIGHTING") }
