@@ -32,9 +32,8 @@ import org.jetbrains.kotlin.fir.symbols.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
+import org.jetbrains.kotlin.fir.types.FirErrorTypeRef
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
-import org.jetbrains.kotlin.fir.types.impl.ConeClassTypeImpl
-import org.jetbrains.kotlin.fir.types.impl.FirErrorTypeRefImpl
 import org.jetbrains.kotlin.fir.types.impl.FirResolvedTypeRefImpl
 import org.jetbrains.kotlin.load.java.JavaClassFinder
 import org.jetbrains.kotlin.load.java.structure.JavaClass
@@ -180,7 +179,7 @@ class KotlinDeserializedJvmSymbolsProvider(
                 session, null, it.constructType(emptyList(), isNullable = false),
                 annotations = emptyList()
             )
-        } ?: FirErrorTypeRefImpl(session, null, "Symbol not found for $classId")
+        } ?: FirErrorTypeRef(session, null, "Symbol not found for $classId")
 
     }
 
