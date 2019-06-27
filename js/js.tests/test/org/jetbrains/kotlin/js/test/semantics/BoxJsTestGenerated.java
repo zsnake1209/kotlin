@@ -6748,6 +6748,11 @@ public class BoxJsTestGenerated extends AbstractBoxJsTest {
             runTest("js/js.translator/testData/box/reflection/kClassToAndFromJsClass.kt");
         }
 
+        @TestMetadata("primitiveKClassOnReifiedType.kt")
+        public void testPrimitiveKClassOnReifiedType() throws Exception {
+            runTest("js/js.translator/testData/box/reflection/primitiveKClassOnReifiedType.kt");
+        }
+
         @TestMetadata("primitives.kt")
         public void testPrimitives() throws Exception {
             runTest("js/js.translator/testData/box/reflection/primitives.kt");
