@@ -63,7 +63,7 @@ fun createJsKlibMetadataPackageFragmentProvider(
         DynamicTypeDeserializer,
         emptyList(),
         notFoundClasses,
-        ContractDeserializerImpl(configuration, storageManager),
+        ContractDeserializerImpl(configuration, storageManager, null, null),
         platformDependentDeclarationFilter = PlatformDependentDeclarationFilter.All,
         extensionRegistryLite = JsKlibMetadataSerializerProtocol.extensionRegistry
     )

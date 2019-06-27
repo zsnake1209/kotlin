@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.contracts
 
+import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.contracts.description.expressions.*
@@ -23,6 +24,7 @@ import org.jetbrains.kotlin.contracts.extensions.ExtensionContractComponents
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
+import org.jetbrains.kotlin.extensions.contractExtensions
 import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.metadata.deserialization.Flags
 import org.jetbrains.kotlin.metadata.deserialization.TypeTable
@@ -36,7 +38,9 @@ import org.jetbrains.kotlin.utils.addIfNotNull
 
 class ContractDeserializerImpl(
     private val configuration: DeserializationConfiguration,
-    private val storageManager: StorageManager
+    private val storageManager: StorageManager,
+    private val contractComponents: ExtensionContractComponents?,
+    private val project: Project?
 ) : ContractDeserializer {
     override fun deserializeContractFromFunction(
         proto: ProtoBuf.Function,
@@ -48,16 +52,18 @@ class ContractDeserializerImpl(
 
         if (!configuration.readDeserializedContracts) return null
 
-        val worker = ContractDeserializationWorker(typeTable, typeDeserializer, ownerFunction, storageManager)
+        val worker = ContractDeserializationWorker(typeTable, typeDeserializer, ownerFunction, storageManager, contractComponents, project)
         val contract = worker.deserializeContract(proto.contract) ?: return null
         return ContractProviderKey to ContractProviderImpl(contract)
     }
 
-    private class ContractDeserializationWorker(
+    class ContractDeserializationWorker(
         private val typeTable: TypeTable,
         private val typeDeserializer: TypeDeserializer,
         private val ownerFunction: FunctionDescriptor,
-        private val storageManager: StorageManager
+        private val storageManager: StorageManager,
+        private val contractComponents: ExtensionContractComponents?,
+        private val project: Project?
     ) {
 
         fun deserializeContract(proto: ProtoBuf.Contract): ContractDescription? {
@@ -66,6 +72,9 @@ class ContractDeserializerImpl(
         }
 
         private fun deserializePossiblyConditionalEffect(proto: ProtoBuf.Effect): EffectDeclaration? {
+            if (proto.hasIsExtensionEffect()) {
+                return deserializeExtensionEffect(proto)
+            }
             if (proto.hasConclusionOfConditionalEffect()) {
                 // conditional effect
                 val conclusion = deserializeExpression(proto.conclusionOfConditionalEffect) ?: return null
@@ -73,6 +82,13 @@ class ContractDeserializerImpl(
                 return ConditionalEffectDeclaration(effect, conclusion)
             }
             return deserializeSimpleEffect(proto)
+        }
+
+        private fun deserializeExtensionEffect(proto: ProtoBuf.Effect): EffectDeclaration? {
+            if (contractComponents == null || project == null) return null
+            val deserializers = contractComponents.contractExtensions
+            val deserializedContracts = deserializers.mapNotNull { it.deserializeExtensionEffect(proto, project, ownerFunction, this) }
+            return deserializedContracts.singleOrNull()
         }
 
         private fun deserializeSimpleEffect(proto: ProtoBuf.Effect): EffectDeclaration? {

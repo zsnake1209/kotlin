@@ -71,11 +71,11 @@ class DeserializerForClassfileDecompiler(
         }
 
         deserializationComponents = DeserializationComponents(
-                storageManager, moduleDescriptor, configuration, classDataFinder, annotationAndConstantLoader,
-                packageFragmentProvider, ResolveEverythingToKotlinAnyLocalClassifierResolver(builtIns), LoggingErrorReporter(LOG),
-                LookupTracker.DO_NOTHING, JavaFlexibleTypeDeserializer, emptyList(), notFoundClasses,
-                ContractDeserializerImpl(configuration, storageManager),
-                extensionRegistryLite = JvmProtoBufUtil.EXTENSION_REGISTRY
+            storageManager, moduleDescriptor, configuration, classDataFinder, annotationAndConstantLoader,
+            packageFragmentProvider, ResolveEverythingToKotlinAnyLocalClassifierResolver(builtIns), LoggingErrorReporter(LOG),
+            LookupTracker.DO_NOTHING, JavaFlexibleTypeDeserializer, emptyList(), notFoundClasses,
+            ContractDeserializerImpl(configuration, storageManager, null, null),
+            extensionRegistryLite = JvmProtoBufUtil.EXTENSION_REGISTRY
         )
     }
 

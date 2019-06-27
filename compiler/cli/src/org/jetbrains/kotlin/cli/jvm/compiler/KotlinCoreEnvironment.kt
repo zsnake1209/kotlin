@@ -111,6 +111,7 @@ import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtens
 import org.jetbrains.kotlin.resolve.jvm.modules.JavaModuleResolver
 import org.jetbrains.kotlin.resolve.lazy.declarations.CliDeclarationProviderFactoryService
 import org.jetbrains.kotlin.resolve.lazy.declarations.DeclarationProviderFactoryService
+import org.jetbrains.kotlin.serialization.ContractSerializerExtension
 import org.jetbrains.kotlin.utils.PathUtil
 import java.io.File
 import java.lang.reflect.Field
@@ -178,6 +179,7 @@ class KotlinCoreEnvironment private constructor(
 
         if (configuration.languageVersionSettings.supportsFeature(LanguageFeature.ContextualEffects)) {
             ContractsExtension.registerExtensionPoint(project)
+            ContractSerializerExtension.registerExtensionPoint(project)
         }
 
         val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)

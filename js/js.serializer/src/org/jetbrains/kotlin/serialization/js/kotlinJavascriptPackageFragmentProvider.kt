@@ -76,7 +76,7 @@ fun createKotlinJavascriptPackageFragmentProvider(
         DynamicTypeDeserializer,
         emptyList(),
         notFoundClasses,
-        ContractDeserializerImpl(configuration, storageManager),
+        ContractDeserializerImpl(configuration, storageManager, null, null),
         platformDependentDeclarationFilter = PlatformDependentDeclarationFilter.NoPlatformDependent,
         extensionRegistryLite = JsSerializerProtocol.extensionRegistry
     )

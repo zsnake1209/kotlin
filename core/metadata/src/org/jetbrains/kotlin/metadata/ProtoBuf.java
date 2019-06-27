@@ -23781,9 +23781,10 @@ public final class ProtoBuf {
     // @@protoc_insertion_point(class_scope:org.jetbrains.kotlin.metadata.Contract)
   }
 
-  public interface EffectOrBuilder extends
+  public interface EffectOrBuilder extends 
       // @@protoc_insertion_point(interface_extends:org.jetbrains.kotlin.metadata.Effect)
-      org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
+       org.jetbrains.kotlin.protobuf.GeneratedMessageLite.
+            ExtendableMessageOrBuilder<Effect> {
 
     /**
      * <code>optional .org.jetbrains.kotlin.metadata.Effect.EffectType effect_type = 1;</code>
@@ -23835,16 +23836,34 @@ public final class ProtoBuf {
      * <code>optional .org.jetbrains.kotlin.metadata.Effect.InvocationKind kind = 4;</code>
      */
     org.jetbrains.kotlin.metadata.ProtoBuf.Effect.InvocationKind getKind();
+
+    /**
+     * <code>optional int32 isExtensionEffect = 5;</code>
+     *
+     * <pre>
+     * If present, then effect is extension
+     * </pre>
+     */
+    boolean hasIsExtensionEffect();
+    /**
+     * <code>optional int32 isExtensionEffect = 5;</code>
+     *
+     * <pre>
+     * If present, then effect is extension
+     * </pre>
+     */
+    int getIsExtensionEffect();
   }
   /**
    * Protobuf type {@code org.jetbrains.kotlin.metadata.Effect}
    */
   public static final class Effect extends
-      org.jetbrains.kotlin.protobuf.GeneratedMessageLite implements
+      org.jetbrains.kotlin.protobuf.GeneratedMessageLite.ExtendableMessage<
+        Effect> implements
       // @@protoc_insertion_point(message_implements:org.jetbrains.kotlin.metadata.Effect)
       EffectOrBuilder {
     // Use Effect.newBuilder() to construct.
-    private Effect(org.jetbrains.kotlin.protobuf.GeneratedMessageLite.Builder builder) {
+    private Effect(org.jetbrains.kotlin.protobuf.GeneratedMessageLite.ExtendableBuilder<org.jetbrains.kotlin.metadata.ProtoBuf.Effect, ?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
@@ -23929,6 +23948,11 @@ public final class ProtoBuf {
                 bitField0_ |= 0x00000004;
                 kind_ = value;
               }
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000008;
+              isExtensionEffect_ = input.readInt32();
               break;
             }
           }
@@ -24222,11 +24246,35 @@ public final class ProtoBuf {
       return kind_;
     }
 
+    public static final int ISEXTENSIONEFFECT_FIELD_NUMBER = 5;
+    private int isExtensionEffect_;
+    /**
+     * <code>optional int32 isExtensionEffect = 5;</code>
+     *
+     * <pre>
+     * If present, then effect is extension
+     * </pre>
+     */
+    public boolean hasIsExtensionEffect() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 isExtensionEffect = 5;</code>
+     *
+     * <pre>
+     * If present, then effect is extension
+     * </pre>
+     */
+    public int getIsExtensionEffect() {
+      return isExtensionEffect_;
+    }
+
     private void initFields() {
       effectType_ = org.jetbrains.kotlin.metadata.ProtoBuf.Effect.EffectType.RETURNS_CONSTANT;
       effectConstructorArgument_ = java.util.Collections.emptyList();
       conclusionOfConditionalEffect_ = org.jetbrains.kotlin.metadata.ProtoBuf.Expression.getDefaultInstance();
       kind_ = org.jetbrains.kotlin.metadata.ProtoBuf.Effect.InvocationKind.AT_MOST_ONCE;
+      isExtensionEffect_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -24246,6 +24294,10 @@ public final class ProtoBuf {
           return false;
         }
       }
+      if (!extensionsAreInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -24253,6 +24305,9 @@ public final class ProtoBuf {
     public void writeTo(org.jetbrains.kotlin.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
+      org.jetbrains.kotlin.protobuf.GeneratedMessageLite
+        .ExtendableMessage<org.jetbrains.kotlin.metadata.ProtoBuf.Effect>.ExtensionWriter extensionWriter =
+          newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeEnum(1, effectType_.getNumber());
       }
@@ -24265,6 +24320,10 @@ public final class ProtoBuf {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeEnum(4, kind_.getNumber());
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(5, isExtensionEffect_);
+      }
+      extensionWriter.writeUntil(200, output);
       output.writeRawBytes(unknownFields);
     }
 
@@ -24290,6 +24349,11 @@ public final class ProtoBuf {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
           .computeEnumSize(4, kind_.getNumber());
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+          .computeInt32Size(5, isExtensionEffect_);
+      }
+      size += extensionsSerializedSize();
       size += unknownFields.size();
       memoizedSerializedSize = size;
       return size;
@@ -24366,9 +24430,8 @@ public final class ProtoBuf {
      * Protobuf type {@code org.jetbrains.kotlin.metadata.Effect}
      */
     public static final class Builder extends
-        org.jetbrains.kotlin.protobuf.GeneratedMessageLite.Builder<
-          org.jetbrains.kotlin.metadata.ProtoBuf.Effect, Builder>
-        implements
+        org.jetbrains.kotlin.protobuf.GeneratedMessageLite.ExtendableBuilder<
+          org.jetbrains.kotlin.metadata.ProtoBuf.Effect, Builder> implements
         // @@protoc_insertion_point(builder_implements:org.jetbrains.kotlin.metadata.Effect)
         org.jetbrains.kotlin.metadata.ProtoBuf.EffectOrBuilder {
       // Construct using org.jetbrains.kotlin.metadata.ProtoBuf.Effect.newBuilder()
@@ -24392,6 +24455,8 @@ public final class ProtoBuf {
         bitField0_ = (bitField0_ & ~0x00000004);
         kind_ = org.jetbrains.kotlin.metadata.ProtoBuf.Effect.InvocationKind.AT_MOST_ONCE;
         bitField0_ = (bitField0_ & ~0x00000008);
+        isExtensionEffect_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -24432,6 +24497,10 @@ public final class ProtoBuf {
           to_bitField0_ |= 0x00000004;
         }
         result.kind_ = kind_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.isExtensionEffect_ = isExtensionEffect_;
         result.bitField0_ = to_bitField0_;
         return result;
       }
@@ -24457,6 +24526,10 @@ public final class ProtoBuf {
         if (other.hasKind()) {
           setKind(other.getKind());
         }
+        if (other.hasIsExtensionEffect()) {
+          setIsExtensionEffect(other.getIsExtensionEffect());
+        }
+        this.mergeExtensionFields(other);
         setUnknownFields(
             getUnknownFields().concat(other.unknownFields));
         return this;
@@ -24474,6 +24547,10 @@ public final class ProtoBuf {
             
             return false;
           }
+        }
+        if (!extensionsAreInitialized()) {
+          
+          return false;
         }
         return true;
       }
@@ -24778,6 +24855,54 @@ public final class ProtoBuf {
       public Builder clearKind() {
         bitField0_ = (bitField0_ & ~0x00000008);
         kind_ = org.jetbrains.kotlin.metadata.ProtoBuf.Effect.InvocationKind.AT_MOST_ONCE;
+        
+        return this;
+      }
+
+      private int isExtensionEffect_ ;
+      /**
+       * <code>optional int32 isExtensionEffect = 5;</code>
+       *
+       * <pre>
+       * If present, then effect is extension
+       * </pre>
+       */
+      public boolean hasIsExtensionEffect() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional int32 isExtensionEffect = 5;</code>
+       *
+       * <pre>
+       * If present, then effect is extension
+       * </pre>
+       */
+      public int getIsExtensionEffect() {
+        return isExtensionEffect_;
+      }
+      /**
+       * <code>optional int32 isExtensionEffect = 5;</code>
+       *
+       * <pre>
+       * If present, then effect is extension
+       * </pre>
+       */
+      public Builder setIsExtensionEffect(int value) {
+        bitField0_ |= 0x00000010;
+        isExtensionEffect_ = value;
+        
+        return this;
+      }
+      /**
+       * <code>optional int32 isExtensionEffect = 5;</code>
+       *
+       * <pre>
+       * If present, then effect is extension
+       * </pre>
+       */
+      public Builder clearIsExtensionEffect() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        isExtensionEffect_ = 0;
         
         return this;
       }
