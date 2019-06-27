@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
-import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.util.DeclarationStubGenerator
 import org.jetbrains.kotlin.ir.util.TypeTranslator
@@ -66,7 +65,7 @@ abstract class IrLazyDeclarationBase(
 
         return when (containingDeclaration) {
             is PackageFragmentDescriptor -> run {
-                val parent = this.takeIf { it !is IrClass }?.let {
+                val parent = this.takeUnless { it is IrClass }?.let {
                     stubGenerator.generateOrGetFacadeClass(descriptor)
                 } ?: stubGenerator.generateOrGetEmptyExternalPackageFragmentStub(containingDeclaration)
                 parent.declarations.add(this)

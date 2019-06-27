@@ -9,23 +9,18 @@ import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.codegen.CompilationErrorHandler
 import org.jetbrains.kotlin.codegen.state.GenerationState
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
-import org.jetbrains.kotlin.ir.builders.declarations.buildValueParameter
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.load.java.descriptors.getImplClassNameForDeserialized
 import org.jetbrains.kotlin.load.kotlin.JvmPackagePartSource
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
 import org.jetbrains.kotlin.psi2ir.PsiSourceManager
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
-import org.jetbrains.kotlin.serialization.deserialization.descriptors.DescriptorWithContainerSource
-import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberDescriptor
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 object JvmBackendFacade {
@@ -35,7 +30,7 @@ object JvmBackendFacade {
         errorHandler: CompilationErrorHandler,
         phaseConfig: PhaseConfig
     ) {
-        val psi2ir = Psi2IrTranslator(state.languageVersionSettings, facadeClassGenerator = ::jvmFacadeClassGenerator)
+        val psi2ir = Psi2IrTranslator(state.languageVersionSettings, facadeClassGenerator = ::facadeClassGenerator)
         val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = JvmGeneratorExtensions)
         val irModuleFragment = psi2ir.generateModuleFragment(psi2irContext, files)
 
@@ -72,7 +67,7 @@ object JvmBackendFacade {
             symbolTable,
             irModuleFragment.irBuiltins,
             JvmGeneratorExtensions.externalDeclarationOrigin,
-            facadeClassGenerator = ::jvmFacadeClassGenerator
+            facadeClassGenerator = ::facadeClassGenerator
         ).generateUnboundSymbolsAsDependencies()
 
         val jvmBackend = JvmBackend(jvmBackendContext)
@@ -94,15 +89,15 @@ object JvmBackendFacade {
             }
         }
     }
-}
 
-fun jvmFacadeClassGenerator(member: DeclarationDescriptor): IrClass? {
-    val jvmPackagePartSource = member.safeAs<DescriptorWithContainerSource>()?.containerSource.safeAs<JvmPackagePartSource>() ?: return null
-    val facadeName = jvmPackagePartSource.facadeClassName ?: jvmPackagePartSource.className
-    return buildClass {
-        origin = IrDeclarationOrigin.FILE_CLASS
-        name = facadeName.fqNameForTopLevelClassMaybeWithDollars.shortName()
-    }.also {
-        it.createParameterDeclarations()
+    internal fun facadeClassGenerator(source: DeserializedContainerSource): IrClass? {
+        val jvmPackagePartSource = source.safeAs<JvmPackagePartSource>() ?: return null
+        val facadeName = jvmPackagePartSource.facadeClassName ?: jvmPackagePartSource.className
+        return buildClass {
+            origin = IrDeclarationOrigin.FILE_CLASS
+            name = facadeName.fqNameForTopLevelClassMaybeWithDollars.shortName()
+        }.also {
+            it.createParameterDeclarations()
+        }
     }
 }

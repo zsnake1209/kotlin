@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 import kotlin.math.min
 
 class ExternalDependenciesGenerator(
@@ -30,7 +31,7 @@ class ExternalDependenciesGenerator(
     val irBuiltIns: IrBuiltIns,
     externalDeclarationOrigin: ((DeclarationDescriptor) -> IrDeclarationOrigin)? = null,
     private val deserializer: IrDeserializer? = null,
-    facadeClassGenerator: (DeclarationDescriptor) -> IrClass? = { null }
+    facadeClassGenerator: (DeserializedContainerSource) -> IrClass? = { null }
 ) {
     private val stubGenerator = DeclarationStubGenerator(
         moduleDescriptor, symbolTable, irBuiltIns.languageVersionSettings, externalDeclarationOrigin, deserializer, facadeClassGenerator
