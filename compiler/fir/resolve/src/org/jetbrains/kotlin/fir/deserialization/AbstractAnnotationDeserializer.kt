@@ -17,8 +17,8 @@ import org.jetbrains.kotlin.fir.resolve.constructType
 import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTagImpl
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
+import org.jetbrains.kotlin.fir.types.FirErrorTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.impl.FirErrorTypeRefImpl
 import org.jetbrains.kotlin.fir.types.impl.FirResolvedTypeRefImpl
 import org.jetbrains.kotlin.ir.expressions.IrConstKind
 import org.jetbrains.kotlin.metadata.ProtoBuf
@@ -95,7 +95,7 @@ abstract class AbstractAnnotationDeserializer(
                 FirResolvedTypeRefImpl(
                     session, null, it.constructType(emptyList(), isNullable = false)
                 )
-            } ?: FirErrorTypeRefImpl(session, null, "Symbol not found for $classId")
+            } ?: FirErrorTypeRef(session, null, "Symbol not found for $classId")
         ).apply {
             this.arguments += arguments
         }

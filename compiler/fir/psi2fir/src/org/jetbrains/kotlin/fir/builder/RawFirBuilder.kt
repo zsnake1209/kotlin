@@ -83,7 +83,7 @@ class RawFirBuilder(val session: FirSession, val stubMode: Boolean) {
             convertSafe() ?: implicitUnitType
 
         private fun KtTypeReference?.toFirOrErrorType(): FirTypeRef =
-            convertSafe() ?: FirErrorTypeRefImpl(session, this, if (this == null) "Incomplete code" else "Conversion failed")
+            convertSafe() ?: FirErrorTypeRef(session, this, if (this == null) "Incomplete code" else "Conversion failed")
 
         // Here we accept lambda as receiver to prevent expression calculation in stub mode
         private fun (() -> KtExpression?).toFirExpression(errorReason: String): FirExpression =
@@ -108,7 +108,7 @@ class RawFirBuilder(val session: FirSession, val stubMode: Boolean) {
             return when (this) {
                 is KtSecondaryConstructor -> toFirConstructor(
                     delegatedSuperType,
-                    delegatedSelfType ?: FirErrorTypeRefImpl(this@RawFirBuilder.session, this, "Constructor in object"),
+                    delegatedSelfType ?: FirErrorTypeRef(this@RawFirBuilder.session, this, "Constructor in object"),
                     owner,
                     hasPrimaryConstructor
                 )
@@ -744,7 +744,7 @@ class RawFirBuilder(val session: FirSession, val stubMode: Boolean) {
             val isThis = isCallToThis || (isImplicit && hasPrimaryConstructor)
             val delegatedType = when {
                 isThis -> delegatedSelfTypeRef
-                else -> delegatedSuperTypeRef ?: FirErrorTypeRefImpl(session, this, "No super type")
+                else -> delegatedSuperTypeRef ?: FirErrorTypeRef(session, this, "No super type")
             }
             return FirDelegatedConstructorCallImpl(
                 session,
@@ -844,7 +844,7 @@ class RawFirBuilder(val session: FirSession, val stubMode: Boolean) {
 
                         userType
                     } else {
-                        FirErrorTypeRefImpl(session, typeReference, "Incomplete user type")
+                        FirErrorTypeRef(session, typeReference, "Incomplete user type")
                     }
                 }
                 is KtFunctionType -> {
@@ -861,7 +861,7 @@ class RawFirBuilder(val session: FirSession, val stubMode: Boolean) {
                     }
                     functionType
                 }
-                null -> FirErrorTypeRefImpl(session, typeReference, "Unwrapped type is null")
+                null -> FirErrorTypeRef(session, typeReference, "Unwrapped type is null")
                 else -> throw AssertionError("Unexpected type element: ${unwrappedElement.text}")
             }
 
