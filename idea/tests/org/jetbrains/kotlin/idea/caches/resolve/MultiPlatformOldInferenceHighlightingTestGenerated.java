@@ -49,6 +49,11 @@ public class MultiPlatformOldInferenceHighlightingTestGenerated extends Abstract
         runTest("idea/testData/multiModuleHighlighting/multiplatform/completionHandlexCoroutines/");
     }
 
+    @TestMetadata("comparatorInference")
+    public void testComparatorInference() throws Exception {
+        runTest("idea/testData/multiModuleHighlighting/multiplatform/comparatorInference/");
+    }
+
     @TestMetadata("contracts")
     public void testContracts() throws Exception {
         runTest("idea/testData/multiModuleHighlighting/multiplatform/contracts/");

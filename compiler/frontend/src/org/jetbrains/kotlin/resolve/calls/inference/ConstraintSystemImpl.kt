@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.isInternalAnnotationForResolv
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.TypeUtils.DONT_CARE
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
+import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
 import java.util.*
 
@@ -37,7 +38,9 @@ internal class ConstraintSystemImpl(
     private val usedInBounds: Map<TypeVariable, MutableList<TypeBounds.Bound>>,
     private val errors: List<ConstraintError>,
     private val initialConstraints: List<ConstraintSystemBuilderImpl.Constraint>,
-    private val typeVariableSubstitutors: Map<CallHandle, TypeSubstitutor>
+    private val typeVariableSubstitutors: Map<CallHandle, TypeSubstitutor>,
+    private val kotlinTypeChecker: KotlinTypeChecker,
+    private val kotlinTypeRefiner: KotlinTypeRefiner
 ) : ConstraintSystem {
     private val localTypeParameterBounds: Map<TypeVariable, TypeBoundsImpl>
         get() = allTypeParameterBounds.filterNot { it.key.isExternal }
@@ -167,14 +170,17 @@ internal class ConstraintSystemImpl(
             } ?: return false
             val resultSuperType = superType.substitute() ?: return false
             when (kind) {
-                SUB_TYPE -> KotlinTypeChecker.DEFAULT.isSubtypeOf(resultSubType, resultSuperType)
-                EQUAL -> KotlinTypeChecker.DEFAULT.equalTypes(resultSubType, resultSuperType)
+                SUB_TYPE -> kotlinTypeChecker.isSubtypeOf(resultSubType, resultSuperType)
+                EQUAL -> kotlinTypeChecker.equalTypes(resultSubType, resultSuperType)
             }
         }
     }
 
     override fun toBuilder(filterConstraintPosition: (ConstraintPosition) -> Boolean): ConstraintSystem.Builder {
-        val result = ConstraintSystemBuilderImpl()
+        val result = ConstraintSystemBuilderImpl(
+            kotlinTypeChecker = kotlinTypeChecker,
+            kotlinTypeRefiner = kotlinTypeRefiner
+        )
         for ((typeParameter, typeBounds) in allTypeParameterBounds) {
             result.allTypeParameterBounds.put(typeParameter, typeBounds.filter(filterConstraintPosition))
         }

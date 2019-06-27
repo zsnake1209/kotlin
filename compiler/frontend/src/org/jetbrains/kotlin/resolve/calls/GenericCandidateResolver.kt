@@ -45,6 +45,8 @@ import org.jetbrains.kotlin.resolve.isFunctionForExpectTypeFromCastFeature
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExpressionReceiver
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.TypeUtils.DONT_CARE
+import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
+import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.types.expressions.ControlStructureTypingUtils.ResolveConstruct
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingUtils
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
@@ -56,13 +58,18 @@ class GenericCandidateResolver(
     private val argumentTypeResolver: ArgumentTypeResolver,
     private val coroutineInferenceSupport: CoroutineInferenceSupport,
     private val languageVersionSettings: LanguageVersionSettings,
-    private val dataFlowValueFactory: DataFlowValueFactory
+    private val dataFlowValueFactory: DataFlowValueFactory,
+    private val kotlinTypeChecker: KotlinTypeChecker,
+    private val kotlinTypeRefiner: KotlinTypeRefiner
 ) {
     fun <D : CallableDescriptor> inferTypeArguments(context: CallCandidateResolutionContext<D>): ResolutionStatus {
         val candidateCall = context.candidateCall
         val candidate = candidateCall.candidateDescriptor
 
-        val builder = ConstraintSystemBuilderImpl()
+        val builder = ConstraintSystemBuilderImpl(
+            kotlinTypeChecker = kotlinTypeChecker,
+            kotlinTypeRefiner = kotlinTypeRefiner
+        )
         builder.registerTypeVariables(candidateCall.call.toHandle(), candidate.typeParameters)
 
         val substituteDontCare = makeConstantSubstitutor(candidate.typeParameters, DONT_CARE)
