@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.fir.resolve.FirTypeResolver
 import org.jetbrains.kotlin.fir.scopes.FirPosition
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.types.*
-import org.jetbrains.kotlin.fir.types.impl.FirResolvedFunctionTypeRefImpl
 import org.jetbrains.kotlin.fir.types.impl.FirResolvedTypeRefImpl
 import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.fir.visitors.compose
@@ -31,7 +30,7 @@ class FirSpecificTypeResolverTransformer(
     override fun transformFunctionTypeRef(functionTypeRef: FirFunctionTypeRef, data: Nothing?): CompositeTransformResult<FirTypeRef> {
         val typeResolver = FirTypeResolver.getInstance(session)
         functionTypeRef.transformChildren(this, data)
-        return FirResolvedFunctionTypeRefImpl(
+        return FirResolvedFunctionTypeRef(
             functionTypeRef.psi,
             session,
             functionTypeRef.isMarkedNullable,
