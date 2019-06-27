@@ -6703,6 +6703,11 @@ public class IrBoxJsTestGenerated extends AbstractIrBoxJsTest {
             runTest("js/js.translator/testData/box/reflection/kClassOnReifiedTypeInLambda.kt");
         }
 
+        @TestMetadata("kClassOnReifiedTypeInLambda-advanced.kt")
+        public void testKClassOnReifiedTypeInLambda_advanced() throws Exception {
+            runTest("js/js.translator/testData/box/reflection/kClassOnReifiedTypeInLambda-advanced.kt");
+        }
+
         @TestMetadata("kClassSimpleName.kt")
         public void testKClassSimpleName() throws Exception {
             runTest("js/js.translator/testData/box/reflection/kClassSimpleName.kt");
