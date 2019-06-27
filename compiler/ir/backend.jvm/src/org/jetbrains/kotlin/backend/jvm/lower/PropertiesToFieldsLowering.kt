@@ -51,9 +51,10 @@ class PropertiesToFieldsLowering(val context: CommonBackendContext) : IrElementT
         val property = simpleFunction.correspondingPropertySymbol?.owner ?: return super.visitCall(expression)
 
         if (shouldSubstituteAccessorWithField(property, simpleFunction)) {
-            when (simpleFunction) {
-                property.getter -> return substituteGetter(property, expression)
-                property.setter -> return substituteSetter(property, expression)
+            // property.getter & property.setter might be erased by the above function.
+            when (simpleFunction.valueParameters.size) {
+                0 -> return substituteGetter(property, expression)
+                1 -> return substituteSetter(property, expression)
             }
         }
 
