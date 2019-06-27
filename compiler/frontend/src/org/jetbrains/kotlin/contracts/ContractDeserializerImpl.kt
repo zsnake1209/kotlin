@@ -175,7 +175,7 @@ class ContractDeserializerImpl(
             return extractVariable(proto)
         }
 
-        private fun extractVariable(proto: ProtoBuf.Expression): VariableReference? {
+        fun extractVariable(proto: ProtoBuf.Expression): VariableReference? {
             if (!proto.hasValueParameterReference()) return null
 
             // TODO: i'm not sure is that absolutely correct
