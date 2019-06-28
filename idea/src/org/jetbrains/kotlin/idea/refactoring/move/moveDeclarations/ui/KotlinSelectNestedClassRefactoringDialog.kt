@@ -22,6 +22,7 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.psi.PsiElement
 import com.intellij.refactoring.RefactoringBundle
 import com.intellij.refactoring.util.RadioUpDownListener
+import org.jetbrains.kotlin.idea.refactoring.move.logMoveEventToFus
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtEnumEntry
@@ -121,5 +122,10 @@ internal class KotlinSelectNestedClassRefactoringDialog private constructor (
             }
             dialog?.show()
         }
+    }
+
+    override fun doOKAction() {
+        logMoveEventToFus()
+        super.doOKAction()
     }
 }

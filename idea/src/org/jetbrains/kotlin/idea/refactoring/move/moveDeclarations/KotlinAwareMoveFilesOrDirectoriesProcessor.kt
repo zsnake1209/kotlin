@@ -28,6 +28,7 @@ import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectori
 import com.intellij.usageView.UsageInfo
 import com.intellij.usageView.UsageViewDescriptor
 import com.intellij.util.containers.MultiMap
+import org.jetbrains.kotlin.idea.refactoring.move.logMoveEventToFus
 import org.jetbrains.kotlin.idea.refactoring.move.moveFilesOrDirectories.allElementsToMove
 import org.jetbrains.kotlin.idea.refactoring.move.moveFilesOrDirectories.shouldFixFqName
 import org.jetbrains.kotlin.psi.KtFile
@@ -55,6 +56,7 @@ class KotlinAwareMoveFilesOrDirectoriesProcessor @JvmOverloads constructor (
 
     override fun findUsages(): Array<UsageInfo> {
         try {
+            logMoveEventToFus()
             markScopeToMove(elementsToMove)
             return if (searchReferences) super.findUsages() else UsageInfo.EMPTY_ARRAY
         }

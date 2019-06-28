@@ -16,20 +16,37 @@
 
 package org.jetbrains.kotlin.idea.refactoring.move.moveClassesOrPackages
 
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPackage
+import com.intellij.refactoring.BaseRefactoringProcessor
 import com.intellij.refactoring.MoveDestination
 import com.intellij.refactoring.move.MoveCallback
 import com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesToNewDirectoryDialog
+import org.jetbrains.kotlin.idea.refactoring.move.logMoveEventToFus
+import org.jetbrains.kotlin.psi.KtClassOrObject
 
 class KotlinAwareMoveClassesOrPackagesToNewDirectoryDialog(
         directory: PsiDirectory,
         elementsToMove: Array<out PsiElement>,
         moveCallback: MoveCallback?
 ) : MoveClassesOrPackagesToNewDirectoryDialog(directory, elementsToMove, moveCallback) {
+
+    lateinit var x: KtClassOrObject
+
+    val logInfo = if (elementsToMove[0] is PsiClass)
+        "MoveClassesToNewDirectory"
+    else
+        "MovePackagesToNewDirectory"
+
     override fun createDestination(aPackage: PsiPackage, directory: PsiDirectory): MoveDestination? {
         val delegate = super.createDestination(aPackage, directory) ?: return null
         return KotlinAwareDelegatingMoveDestination(delegate, aPackage, directory)
+    }
+
+    override fun invokeRefactoring(processor: BaseRefactoringProcessor?) {
+        logMoveEventToFus(logInfo)
+        super.invokeRefactoring(processor)
     }
 }

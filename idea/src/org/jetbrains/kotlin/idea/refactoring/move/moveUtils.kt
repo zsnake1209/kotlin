@@ -17,15 +17,20 @@
 package org.jetbrains.kotlin.idea.refactoring.move
 
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.util.Comparing
 import com.intellij.openapi.util.Key
 import com.intellij.psi.*
+import com.intellij.refactoring.BaseRefactoringProcessor
+import com.intellij.refactoring.move.MoveDialogBase
 import com.intellij.refactoring.move.moveMembers.MockMoveMembersOptions
 import com.intellij.refactoring.move.moveMembers.MoveMemberHandler
 import com.intellij.refactoring.move.moveMembers.MoveMembersProcessor
 import com.intellij.refactoring.util.MoveRenameUsageInfo
 import com.intellij.refactoring.util.NonCodeUsageInfo
 import com.intellij.usageView.UsageInfo
+import com.intellij.usageView.UsageViewDescriptor
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.SmartList
 import com.intellij.util.containers.MultiMap
@@ -43,6 +48,8 @@ import org.jetbrains.kotlin.idea.refactoring.fqName.isImported
 import org.jetbrains.kotlin.idea.references.KtSimpleNameReference
 import org.jetbrains.kotlin.idea.references.KtSimpleNameReference.ShorteningMode
 import org.jetbrains.kotlin.idea.references.mainReference
+import org.jetbrains.kotlin.idea.statistics.FUSEventGroups
+import org.jetbrains.kotlin.idea.statistics.KotlinFUSLogger
 import org.jetbrains.kotlin.load.java.descriptors.JavaCallableMemberDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
@@ -57,6 +64,8 @@ import org.jetbrains.kotlin.resolve.scopes.receivers.ImplicitClassReceiver
 import org.jetbrains.kotlin.resolve.scopes.receivers.ImplicitReceiver
 import org.jetbrains.kotlin.types.expressions.DoubleColonLHS
 import org.jetbrains.kotlin.utils.addIfNotNull
+import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.util.*
 
 sealed class ContainerInfo {
@@ -598,4 +607,12 @@ fun collectOuterInstanceReferences(member: KtNamedDeclaration): List<OuterInstan
     val result = SmartList<OuterInstanceReferenceUsageInfo>()
     traverseOuterInstanceReferences(member, false) { result += it }
     return result
+}
+
+fun BaseRefactoringProcessor.logMoveEventToFus(text: String? = null) {
+    KotlinFUSLogger.log(FUSEventGroups.Refactoring, text ?: this::class.java.name.removeSuffix("Processor"))
+}
+
+fun DialogWrapper.logMoveEventToFus(text: String? = null) {
+    KotlinFUSLogger.log(FUSEventGroups.Refactoring, text ?: this::class.java.name.removeSuffix("Dialog"))
 }

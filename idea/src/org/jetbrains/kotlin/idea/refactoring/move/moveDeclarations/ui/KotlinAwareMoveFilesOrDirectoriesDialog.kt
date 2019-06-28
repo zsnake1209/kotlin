@@ -34,6 +34,7 @@ import com.intellij.util.ui.UIUtil
 import org.jetbrains.kotlin.idea.core.packageMatchesDirectory
 import org.jetbrains.kotlin.idea.core.util.onTextChange
 import org.jetbrains.kotlin.idea.refactoring.isInJavaSourceRoot
+import org.jetbrains.kotlin.idea.refactoring.move.logMoveEventToFus
 import org.jetbrains.kotlin.idea.util.application.executeCommand
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.psi.KtFile
@@ -154,6 +155,7 @@ class KotlinAwareMoveFilesOrDirectoriesDialog(
     }
 
     override fun doOKAction() {
+        logMoveEventToFus()
         PropertiesComponent.getInstance().setValue(MOVE_FILES_OPEN_IN_EDITOR, openInEditorCb.isSelected, false)
         RecentsManager.getInstance(project).registerRecentEntry(RECENT_KEYS, targetDirectoryField.childComponent.text)
 

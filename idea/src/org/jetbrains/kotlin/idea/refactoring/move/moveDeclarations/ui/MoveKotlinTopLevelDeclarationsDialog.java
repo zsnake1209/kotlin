@@ -82,6 +82,7 @@ import java.util.List;
 import java.util.*;
 
 import static java.util.Collections.emptyList;
+import static org.jetbrains.kotlin.idea.refactoring.move.MoveUtilsKt.logMoveEventToFus;
 import static org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.MoveKotlinDeclarationsProcessorKt.MoveSource;
 
 public class MoveKotlinTopLevelDeclarationsDialog extends RefactoringDialog {
@@ -847,5 +848,11 @@ public class MoveKotlinTopLevelDeclarationsDialog extends RefactoringDialog {
 
     private static class MemberInfoModelImpl extends AbstractMemberInfoModel<KtNamedDeclaration, KotlinMemberInfo> {
 
+    }
+
+    @Override
+    protected void invokeRefactoring(BaseRefactoringProcessor processor) {
+        logMoveEventToFus(processor, null);
+        super.invokeRefactoring(processor);
     }
 }

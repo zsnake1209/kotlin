@@ -25,6 +25,7 @@ import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.NullableComputable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.refactoring.BaseRefactoringProcessor;
 import com.intellij.refactoring.HelpID;
 import com.intellij.refactoring.PackageWrapper;
 import com.intellij.refactoring.RefactoringBundle;
@@ -71,6 +72,7 @@ import java.awt.event.ItemListener;
 import java.util.Collections;
 import java.util.List;
 
+import static org.jetbrains.kotlin.idea.refactoring.move.MoveUtilsKt.logMoveEventToFus;
 import static org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.MoveKotlinDeclarationsProcessorKt.MoveSource;
 
 public class MoveKotlinNestedClassesToUpperLevelDialog extends MoveDialogBase {
@@ -429,5 +431,11 @@ public class MoveKotlinNestedClassesToUpperLevelDialog extends MoveDialogBase {
         saveOpenInEditorOption();
 
         invokeRefactoring(new MoveKotlinDeclarationsProcessor(moveDescriptor, Mover.Default.INSTANCE));
+    }
+
+    @Override
+    protected void invokeRefactoring(BaseRefactoringProcessor processor) {
+        logMoveEventToFus(processor, null);
+        super.invokeRefactoring(processor);
     }
 }

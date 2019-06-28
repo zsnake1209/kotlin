@@ -29,6 +29,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.refactoring.BaseRefactoringProcessor;
 import com.intellij.refactoring.RefactoringBundle;
 import com.intellij.refactoring.classMembers.AbstractMemberInfoModel;
 import com.intellij.refactoring.classMembers.MemberInfoChange;
@@ -60,6 +61,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import static org.jetbrains.kotlin.idea.refactoring.move.MoveUtilsKt.logMoveEventToFus;
 import static org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.MoveKotlinDeclarationsProcessorKt.MoveSource;
 
 public class MoveKotlinNestedClassesDialog extends RefactoringDialog {
@@ -285,5 +287,11 @@ public class MoveKotlinNestedClassesDialog extends RefactoringDialog {
 
     private static class MemberInfoModelImpl extends AbstractMemberInfoModel<KtNamedDeclaration, KotlinMemberInfo> {
 
+    }
+
+    @Override
+    protected void invokeRefactoring(BaseRefactoringProcessor processor) {
+        logMoveEventToFus(processor, null);
+        super.invokeRefactoring(processor);
     }
 }
