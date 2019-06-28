@@ -240,6 +240,7 @@ extra["compilerModules"] = arrayOf(
     ":compiler:cli-args-jvm",
     ":compiler:cli-args-js",
     ":compiler:cli-args-metadata",
+    ":compiler:ic:ic-js-base",
     ":compiler:incremental-compilation-impl",
     ":js:js.ast",
     ":js:js.serializer",
