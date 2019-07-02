@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.contains
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.math.max
 
 interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
     override fun TypeConstructorMarker.isDenotable(): Boolean {
@@ -424,7 +425,7 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext {
 
     override fun prepareType(type: KotlinTypeMarker): KotlinTypeMarker {
         require(type is UnwrappedType, type::errorMessage)
-        return NewKotlinTypeChecker.transformToNewType(type)
+        return NewKotlinTypeChecker.Default.transformToNewType(type)
     }
 
     override fun DefinitelyNotNullTypeMarker.original(): SimpleTypeMarker {
