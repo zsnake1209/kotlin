@@ -27,250 +27,276 @@ def includeProject(String projectPath, String customRelativePath = null) {
     }
 }
 
-def flags = BuildPropertiesKt.getKotlinBuildPropertiesForSettings(settings)
+class ProjectLoader {
+    Settings settings
 
-if (flags.includeCidrPlugins) {
-    logger.info("Including CIDR plugins in settings.gradle")
-    includeProject(':kotlin-ultimate:ide:cidr-native')
-    includeProject(':kotlin-ultimate:ide:clion-native')
-    includeProject(':kotlin-ultimate:ide:appcode-native')
-    includeProject(':kotlin-ultimate:prepare:cidr-plugin')
-    includeProject(':kotlin-ultimate:prepare:clion-plugin')
-    includeProject(':kotlin-ultimate:prepare:appcode-plugin')
-} else {
-    logger.info("NOT including CIDR plugins in settings.gradle")
+    LoadedProject load(String projectPath) {
+        settings.include(projectPath)
+        return new LoadedProject(project: settings.project(projectPath))
+    }
+
+    class LoadedProject {
+        ProjectDescriptor project
+
+        void from(String projectDirPath) {
+            project.projectDir = new File(settings.rootDir, projectDirPath)
+        }
+    }
 }
 
-def isTeamcityBuild = hasProperty("teamcity") || System.getenv("TEAMCITY_VERSION") != null
-if (flags.kotlinUltimateExists && (isTeamcityBuild || flags.intellijUltimateEnabled)) {
-    includeProject(':kotlin-ultimate:ultimate')
-    includeProject(':kotlin-ultimate:ultimate:ultimate-runner')
-    logger.info("Including extension for IJ Ultimate in settings.gradle")
-} else {
-    logger.info("NOT including extension for IJ Ultimate in settings.gradle")
+def projects(@DelegatesTo(ProjectLoader) Closure cl) {
+    def loader = new ProjectLoader(settings: this.settings)
+    def code = cl.rehydrate(loader, this, this)
+    code.resolveStrategy = Closure.DELEGATE_FIRST
+    code()
 }
 
-if (flags.inJpsBuildIdeaSync) {
-    includeProject(':kotlin-stdlib:jps-build', 'libraries/stdlib/jps-build')
-} else {
-    // modules that we are currently cannot compile with jps
-    includeProject(':kotlin-idl2k', 'libraries/tools/idl2k')
+projects {
+    def flags = BuildPropertiesKt.getKotlinBuildPropertiesForSettings(settings)
 
-    includeProject(':kotlin-stdlib-common', 'libraries/stdlib/common')
-    includeProject(':kotlin-stdlib', 'libraries/stdlib/jvm')
-    includeProject(':kotlin-stdlib-js', 'libraries/stdlib/js-v1')
-    includeProject(':kotlin-stdlib-js-ir', 'libraries/stdlib/js-ir')
-    includeProject(':kotlin-test:kotlin-test-js-ir', 'libraries/kotlin.test/js-ir')
-    includeProject(':kotlin-stdlib-jdk7', 'libraries/stdlib/jdk7')
-    includeProject(':kotlin-stdlib-jdk8', 'libraries/stdlib/jdk8')
-    includeProject(':kotlin-stdlib:samples', 'libraries/stdlib/samples')
-    includeProject(':kotlin-stdlib:jvm-minimal-for-test', 'libraries/stdlib/jvm-minimal-for-test')
+    if (flags.includeCidrPlugins) {
+        logger.info("Including CIDR plugins in settings.gradle")
+        load ':kotlin-ultimate:ide:cidr-native'
+        load ':kotlin-ultimate:ide:clion-native'
+        load ':kotlin-ultimate:ide:appcode-native'
+        load ':kotlin-ultimate:prepare:cidr-plugin'
+        load ':kotlin-ultimate:prepare:clion-plugin'
+        load ':kotlin-ultimate:prepare:appcode-plugin'
+    } else {
+        logger.info("NOT including CIDR plugins in settings.gradle")
+    }
 
-    includeProject(':tools:binary-compatibility-validator', 'libraries/tools/binary-compatibility-validator')
-    includeProject(':tools:kotlin-stdlib-gen', 'libraries/tools/kotlin-stdlib-gen')
+    def isTeamcityBuild = hasProperty("teamcity") || System.getenv("TEAMCITY_VERSION") != null
+    if (flags.kotlinUltimateExists && (isTeamcityBuild || flags.intellijUltimateEnabled)) {
+        load ':kotlin-ultimate:ultimate'
+        load ':kotlin-ultimate:ultimate:ultimate-runner'
+        logger.info("Including extension for IJ Ultimate in settings.gradle")
+    } else {
+        logger.info("NOT including extension for IJ Ultimate in settings.gradle")
+    }
+
+    if (flags.inJpsBuildIdeaSync) {
+        load ':kotlin-stdlib:jps-build' from 'libraries/stdlib/jps-build'
+    } else {
+        // modules that we are currently cannot compile with jps
+        load ':kotlin-idl2k' from 'libraries/tools/idl2k'
+
+        load ':kotlin-stdlib-common' from 'libraries/stdlib/common'
+        load ':kotlin-stdlib' from 'libraries/stdlib/jvm'
+        load ':kotlin-stdlib-js' from 'libraries/stdlib/js-v1'
+        load ':kotlin-stdlib-js-ir' from 'libraries/stdlib/js-ir'
+        load ':kotlin-test:kotlin-test-js-ir' from 'libraries/kotlin.test/js-ir'
+        load ':kotlin-stdlib-jdk7' from 'libraries/stdlib/jdk7'
+        load ':kotlin-stdlib-jdk8' from 'libraries/stdlib/jdk8'
+        load ':kotlin-stdlib:samples' from 'libraries/stdlib/samples'
+        load ':kotlin-stdlib:jvm-minimal-for-test' from 'libraries/stdlib/jvm-minimal-for-test'
+
+        load ':tools:binary-compatibility-validator' from 'libraries/tools/binary-compatibility-validator'
+        load ':tools:kotlin-stdlib-gen' from 'libraries/tools/kotlin-stdlib-gen'
+    }
+
+    load ':allopen-ide-plugin' from 'plugins/allopen/allopen-ide'
+    load ':compiler'
+    load ':compiler:android-tests'
+    load ':compiler:backend'
+    load ':compiler:backend-common'
+    load ':compiler:backend.js' from 'compiler/ir/backend.js'
+    load ':compiler:backend.jvm' from 'compiler/ir/backend.jvm'
+    load ':compiler:cli'
+    load ':compiler:cli-common' from 'compiler/cli/cli-common'
+    load ':compiler:cli-js' from 'compiler/cli/cli-js'
+    load ':compiler:container'
+    load ':compiler:fir:cones'
+    load ':compiler:fir:dump'
+    load ':compiler:fir:fir2ir'
+    load ':compiler:fir:java'
+    load ':compiler:fir:modularized-tests'
+    load ':compiler:fir:psi2fir'
+    load ':compiler:fir:resolve'
+    load ':compiler:fir:tree'
+    load ':compiler:fir:tree:visitors-generator'
+    load ':compiler:frontend'
+    load ':compiler:frontend.common'
+    load ':compiler:frontend.java'
+    load ':compiler:incremental-compilation-impl'
+    load ':compiler:ir.backend.common' from 'compiler/ir/backend.common'
+    load ':compiler:ir.ir2cfg' from 'compiler/ir/ir.ir2cfg'
+    load ':compiler:ir.psi2ir' from 'compiler/ir/ir.psi2ir'
+    load ':compiler:ir.serialization.common' from 'compiler/ir/serialization.common'
+    load ':compiler:ir.serialization.js' from 'compiler/ir/serialization.js'
+    load ':compiler:ir.tree' from 'compiler/ir/ir.tree'
+    load ':compiler:light-classes'
+    load ':compiler:plugin-api'
+    load ':compiler:psi'
+    load ':compiler:resolution'
+    load ':compiler:serialization'
+    load ':compiler:tests-common'
+    load ':compiler:tests-common-jvm6'
+    load ':compiler:tests-different-jdk'
+    load ':compiler:tests-java8'
+    load ':compiler:tests-spec'
+    load ':compiler:util'
+    load ':core:builtins'
+    load ':core:descriptors'
+    load ':core:descriptors.jvm'
+    load ':core:descriptors.runtime'
+    load ':core:deserialization'
+    load ':core:metadata'
+    load ':core:metadata.jvm'
+    load ':core:type-system'
+    load ':core:util.runtime'
+    load ':daemon-common' from 'compiler/daemon/daemon-common'
+    load ':daemon-common-new' from 'compiler/daemon/daemon-common-new'
+    load ':dependencies:android-sdk'
+    load ':examples:annotation-processor-example' from 'libraries/examples/annotation-processor-example'
+    load ':examples:kotlin-jsr223-daemon-local-eval-example' from 'libraries/examples/kotlin-jsr223-daemon-local-eval-example'
+    load ':examples:kotlin-jsr223-local-example' from 'libraries/examples/kotlin-jsr223-local-example'
+    load ':examples:scripting-jvm-embeddable-host' from 'libraries/examples/scripting/jvm-embeddable-host'
+    load ':examples:scripting-jvm-maven-deps' from 'libraries/examples/scripting/jvm-maven-deps/script'
+    load ':examples:scripting-jvm-maven-deps-host' from 'libraries/examples/scripting/jvm-maven-deps/host'
+    load ':examples:scripting-jvm-simple-script' from 'libraries/examples/scripting/jvm-simple-script/script'
+    load ':examples:scripting-jvm-simple-script-host' from 'libraries/examples/scripting/jvm-simple-script/host'
+    load ':generators'
+    load ':generators:test-generator'
+    load ':idea'
+    load ':idea-runner'
+    load ':idea:fir-view'
+    load ':idea:formatter'
+    load ':idea:ide-common'
+    load ':idea:idea-android'
+    load ':idea:idea-android-output-parser' from 'idea/idea-android/idea-android-output-parser'
+    load ':idea:idea-core'
+    load ':idea:idea-git'
+    load ':idea:idea-gradle'
+    load ':idea:idea-gradle-native'
+    load ':idea:idea-j2k'
+    load ':idea:idea-jps-common'
+    load ':idea:idea-jvm'
+    load ':idea:idea-maven'
+    load ':idea:idea-native'
+    load ':idea:idea-test-framework'
+    load ':idea:jvm-debugger:eval4j'
+    load ':idea:jvm-debugger:jvm-debugger-core'
+    load ':idea:jvm-debugger:jvm-debugger-evaluation'
+    load ':idea:jvm-debugger:jvm-debugger-sequence'
+    load ':idea:jvm-debugger:jvm-debugger-util'
+    load ':idea:kotlin-gradle-tooling'
+    load ':include:kotlin-compiler'
+    load ':include:kotlin-stdlib-common-sources'
+    load ':j2k'
+    load ':jps-plugin'
+    load ':js:js.ast'
+    load ':js:js.dce'
+    load ':js:js.frontend'
+    load ':js:js.parser'
+    load ':js:js.serializer'
+    load ':js:js.tests'
+    load ':js:js.translator'
+    load ':kotlin-allopen' from 'libraries/tools/kotlin-allopen'
+    load ':kotlin-allopen-compiler-plugin' from 'plugins/allopen/allopen-cli'
+    load ':kotlin-allopen:plugin-marker' from 'libraries/tools/kotlin-allopen/plugin-marker'
+    load ':kotlin-android-extensions' from 'prepare/android-extensions-compiler-gradle'
+    load ':kotlin-android-extensions-runtime' from 'plugins/android-extensions/android-extensions-runtime'
+    load ':kotlin-annotation-processing' from 'plugins/kapt3/kapt3-compiler'
+    load ':kotlin-annotation-processing-base' from 'plugins/kapt3/kapt3-base'
+    load ':kotlin-annotation-processing-cli' from 'plugins/kapt3/kapt3-cli'
+    load ':kotlin-annotation-processing-embeddable' from 'prepare/kotlin-annotation-processing-embeddable'
+    load ':kotlin-annotation-processing-gradle' from 'libraries/tools/kotlin-annotation-processing'
+    load ':kotlin-annotation-processing-runtime' from 'plugins/kapt3/kapt3-runtime'
+    load ':kotlin-annotations-android' from 'libraries/tools/kotlin-annotations-android'
+    load ':kotlin-annotations-jvm' from 'libraries/tools/kotlin-annotations-jvm'
+    load ':kotlin-ant' from 'ant'
+    load ':kotlin-build-common' from 'build-common'
+    load ':kotlin-compiler' from 'prepare/compiler'
+    load ':kotlin-compiler-client-embeddable' from 'prepare/compiler-client-embeddable'
+    load ':kotlin-compiler-embeddable' from 'prepare/compiler-embeddable'
+    load ':kotlin-compiler-runner' from 'compiler/compiler-runner'
+    load ':kotlin-daemon' from 'compiler/daemon'
+    load ':kotlin-daemon-client' from 'compiler/daemon/daemon-client'
+    load ':kotlin-daemon-client-new' from 'compiler/daemon/daemon-client-new'
+    load ':kotlin-daemon-embeddable' from 'prepare/kotlin-daemon-embeddable'
+    load ':kotlin-gradle-plugin' from 'libraries/tools/kotlin-gradle-plugin'
+    load ':kotlin-gradle-plugin-api' from 'libraries/tools/kotlin-gradle-plugin-api'
+    load ':kotlin-gradle-plugin-dsl-codegen' from 'libraries/tools/kotlin-gradle-plugin-dsl-codegen'
+    load ':kotlin-gradle-plugin-integration-tests' from 'libraries/tools/kotlin-gradle-plugin-integration-tests'
+    load ':kotlin-gradle-plugin-model' from 'libraries/tools/kotlin-gradle-plugin-model'
+    load ':kotlin-gradle-plugin-test-utils-embeddable' from 'libraries/tools/kotlin-gradle-plugin-test-utils-embeddable'
+    load ':kotlin-gradle-plugin:plugin-marker' from 'libraries/tools/kotlin-gradle-plugin/plugin-marker'
+    load ':kotlin-gradle-subplugin-example' from 'libraries/examples/kotlin-gradle-subplugin-example'
+    load ':kotlin-imports-dumper-compiler-plugin' from 'plugins/imports-dumper'
+    load ':kotlin-jps-plugin' from 'prepare/jps-plugin'
+    load ':kotlin-main-kts' from 'libraries/tools/kotlin-main-kts'
+    load ':kotlin-main-kts-test' from 'libraries/tools/kotlin-main-kts-test'
+    load ':kotlin-native:kotlin-native-library-reader' from 'konan/library-reader'
+    load ':kotlin-native:kotlin-native-utils' from 'konan/utils'
+    load ':kotlin-noarg' from 'libraries/tools/kotlin-noarg'
+    load ':kotlin-noarg-compiler-plugin' from 'plugins/noarg/noarg-cli'
+    load ':kotlin-noarg:plugin-marker' from 'libraries/tools/kotlin-noarg/plugin-marker'
+    load ':kotlin-preloader' from 'compiler/preloader'
+    load ':kotlin-reflect' from 'libraries/reflect'
+    load ':kotlin-reflect-api' from 'libraries/reflect/api'
+    load ':kotlin-runner' from 'compiler/cli/cli-runner'
+    load ':kotlin-sam-with-receiver' from 'libraries/tools/kotlin-sam-with-receiver'
+    load ':kotlin-sam-with-receiver-compiler-plugin' from 'plugins/sam-with-receiver/sam-with-receiver-cli'
+    load ':kotlin-script-runtime' from 'libraries/tools/script-runtime'
+    load ':kotlin-script-util' from 'libraries/tools/kotlin-script-util'
+    load ':kotlin-scripting-common' from 'libraries/scripting/common'
+    load ':kotlin-scripting-compiler' from 'plugins/scripting/scripting-compiler'
+    load ':kotlin-scripting-compiler-embeddable' from 'plugins/scripting/scripting-compiler-embeddable'
+    load ':kotlin-scripting-compiler-impl' from 'plugins/scripting/scripting-compiler-impl'
+    load ':kotlin-scripting-compiler-impl-embeddable' from 'plugins/scripting/scripting-compiler-impl-embeddable'
+    load ':kotlin-scripting-idea' from 'plugins/scripting/scripting-idea'
+    load ':kotlin-scripting-intellij' from 'libraries/scripting/intellij'
+    load ':kotlin-scripting-jsr223' from 'libraries/scripting/jsr223'
+    load ':kotlin-scripting-jsr223-embeddable' from 'libraries/scripting/jsr223-embeddable'
+    load ':kotlin-scripting-jsr223-test' from 'libraries/scripting/jsr223-test'
+    load ':kotlin-scripting-jvm' from 'libraries/scripting/jvm'
+    load ':kotlin-scripting-jvm-host' from 'libraries/scripting/jvm-host'
+    load ':kotlin-scripting-jvm-host-embeddable' from 'libraries/scripting/jvm-host-embeddable'
+    load ':kotlin-scripting-jvm-host-test' from 'libraries/scripting/jvm-host-test'
+    load ':kotlin-serialization' from 'libraries/tools/kotlin-serialization'
+    load ':kotlin-serialization-unshaded' from 'libraries/tools/kotlin-serialization-unshaded'
+    load ':kotlin-serialization:plugin-marker' from 'libraries/tools/kotlin-serialization/plugin-marker'
+    load ':kotlin-source-sections-compiler-plugin' from 'plugins/source-sections/source-sections-compiler'
+    load ':kotlin-test' from 'libraries/kotlin.test'
+    load ':kotlin-test-nodejs-runner' from 'libraries/tools/kotlin-test-nodejs-runner'
+    load ':kotlin-test:kotlin-test-annotations-common' from 'libraries/kotlin.test/annotations-common'
+    load ':kotlin-test:kotlin-test-common' from 'libraries/kotlin.test/common'
+    load ':kotlin-test:kotlin-test-js' from 'libraries/kotlin.test/js'
+    load ':kotlin-test:kotlin-test-js:kotlin-test-js-it'
+    load ':kotlin-test:kotlin-test-js:kotlin-test-js-it' from 'libraries/kotlin.test/js/it'
+    load ':kotlin-test:kotlin-test-junit' from 'libraries/kotlin.test/junit'
+    load ':kotlin-test:kotlin-test-junit5' from 'libraries/kotlin.test/junit5'
+    load ':kotlin-test:kotlin-test-jvm' from 'libraries/kotlin.test/jvm'
+    load ':kotlin-test:kotlin-test-testng' from 'libraries/kotlin.test/testng'
+    load ':kotlin-util-io' from 'compiler/util-io'
+    load ':kotlin-util-klib' from 'compiler/util-klib'
+    load ':kotlinx-metadata' from 'libraries/kotlinx-metadata'
+    load ':kotlinx-metadata-jvm' from 'libraries/kotlinx-metadata/jvm'
+    load ':kotlinx-serialization-compiler-plugin' from 'plugins/kotlin-serialization/kotlin-serialization-compiler'
+    load ':kotlinx-serialization-ide-plugin' from 'plugins/kotlin-serialization/kotlin-serialization-ide'
+    load ':libraries:kotlin-prepush-hook' from 'libraries/tools/kotlin-prepush-hook'
+    load ':libraries:tools:mutability-annotations-compat'
+    load ':nj2k'
+    load ':nj2k:nj2k-services'
+    load ':noarg-ide-plugin' from 'plugins/noarg/noarg-ide'
+    load ':pill:generate-all-tests' from 'plugins/pill/generate-all-tests'
+    load ':plugins:android-extensions-compiler' from 'plugins/android-extensions/android-extensions-compiler'
+    load ':plugins:android-extensions-ide' from 'plugins/android-extensions/android-extensions-idea'
+    load ':plugins:annotation-based-compiler-plugins-ide-support'
+    load ':plugins:jvm-abi-gen'
+    load ':plugins:kapt3-idea' from 'plugins/kapt3/kapt3-idea'
+    load ':plugins:lint'
+    load ':plugins:uast-kotlin'
+    load ':plugins:uast-kotlin-idea'
+    load ':prepare:build.version'
+    load ':prepare:formatter'
+    load ':prepare:ide-lazy-resolver'
+    load ':prepare:idea-plugin'
+    load ':sam-with-receiver-ide-plugin' from 'plugins/sam-with-receiver/sam-with-receiver-ide'
+    load ':test-instrumenter'
+    load ':tools:kotlinp' from 'libraries/tools/kotlinp'
 }
-
-includeProject(':allopen-ide-plugin', 'plugins/allopen/allopen-ide')
-includeProject(':compiler')
-includeProject(':compiler:android-tests')
-includeProject(':compiler:backend')
-includeProject(':compiler:backend-common')
-includeProject(':compiler:backend.js', 'compiler/ir/backend.js')
-includeProject(':compiler:backend.jvm', 'compiler/ir/backend.jvm')
-includeProject(':compiler:cli')
-includeProject(':compiler:cli-common', 'compiler/cli/cli-common')
-includeProject(':compiler:cli-js', 'compiler/cli/cli-js')
-includeProject(':compiler:container')
-includeProject(':compiler:fir:cones')
-includeProject(':compiler:fir:dump')
-includeProject(':compiler:fir:fir2ir')
-includeProject(':compiler:fir:java')
-includeProject(':compiler:fir:modularized-tests')
-includeProject(':compiler:fir:psi2fir')
-includeProject(':compiler:fir:resolve')
-includeProject(':compiler:fir:tree')
-includeProject(':compiler:fir:tree:visitors-generator')
-includeProject(':compiler:frontend')
-includeProject(':compiler:frontend.common')
-includeProject(':compiler:frontend.java')
-includeProject(':compiler:incremental-compilation-impl')
-includeProject(':compiler:ir.backend.common', 'compiler/ir/backend.common')
-includeProject(':compiler:ir.ir2cfg', 'compiler/ir/ir.ir2cfg')
-includeProject(':compiler:ir.psi2ir', 'compiler/ir/ir.psi2ir')
-includeProject(':compiler:ir.serialization.common', 'compiler/ir/serialization.common')
-includeProject(':compiler:ir.serialization.js', 'compiler/ir/serialization.js')
-includeProject(':compiler:ir.tree', 'compiler/ir/ir.tree')
-includeProject(':compiler:light-classes')
-includeProject(':compiler:plugin-api')
-includeProject(':compiler:psi')
-includeProject(':compiler:resolution')
-includeProject(':compiler:serialization')
-includeProject(':compiler:tests-common')
-includeProject(':compiler:tests-common-jvm6')
-includeProject(':compiler:tests-different-jdk')
-includeProject(':compiler:tests-java8')
-includeProject(':compiler:tests-spec')
-includeProject(':compiler:util')
-includeProject(':core:builtins')
-includeProject(':core:descriptors')
-includeProject(':core:descriptors.jvm')
-includeProject(':core:descriptors.runtime')
-includeProject(':core:deserialization')
-includeProject(':core:metadata')
-includeProject(':core:metadata.jvm')
-includeProject(':core:type-system')
-includeProject(':core:util.runtime')
-includeProject(':daemon-common', 'compiler/daemon/daemon-common')
-includeProject(':daemon-common-new', 'compiler/daemon/daemon-common-new')
-includeProject(':dependencies:android-sdk')
-includeProject(':examples:annotation-processor-example', 'libraries/examples/annotation-processor-example')
-includeProject(':examples:kotlin-jsr223-daemon-local-eval-example', 'libraries/examples/kotlin-jsr223-daemon-local-eval-example')
-includeProject(':examples:kotlin-jsr223-local-example', 'libraries/examples/kotlin-jsr223-local-example')
-includeProject(':examples:scripting-jvm-embeddable-host', 'libraries/examples/scripting/jvm-embeddable-host')
-includeProject(':examples:scripting-jvm-maven-deps', 'libraries/examples/scripting/jvm-maven-deps/script')
-includeProject(':examples:scripting-jvm-maven-deps-host', 'libraries/examples/scripting/jvm-maven-deps/host')
-includeProject(':examples:scripting-jvm-simple-script', 'libraries/examples/scripting/jvm-simple-script/script')
-includeProject(':examples:scripting-jvm-simple-script-host', 'libraries/examples/scripting/jvm-simple-script/host')
-includeProject(':generators')
-includeProject(':generators:test-generator')
-includeProject(':idea')
-includeProject(':idea-runner')
-includeProject(':idea:fir-view')
-includeProject(':idea:formatter')
-includeProject(':idea:ide-common')
-includeProject(':idea:idea-android')
-includeProject(':idea:idea-android-output-parser', 'idea/idea-android/idea-android-output-parser')
-includeProject(':idea:idea-core')
-includeProject(':idea:idea-git')
-includeProject(':idea:idea-gradle')
-includeProject(':idea:idea-gradle-native')
-includeProject(':idea:idea-j2k')
-includeProject(':idea:idea-jps-common')
-includeProject(':idea:idea-jvm')
-includeProject(':idea:idea-maven')
-includeProject(':idea:idea-native')
-includeProject(':idea:idea-test-framework')
-includeProject(':idea:jvm-debugger:eval4j')
-includeProject(':idea:jvm-debugger:jvm-debugger-core')
-includeProject(':idea:jvm-debugger:jvm-debugger-evaluation')
-includeProject(':idea:jvm-debugger:jvm-debugger-sequence')
-includeProject(':idea:jvm-debugger:jvm-debugger-util')
-includeProject(':idea:kotlin-gradle-tooling')
-includeProject(':include:kotlin-compiler')
-includeProject(':include:kotlin-stdlib-common-sources')
-includeProject(':j2k')
-includeProject(':jps-plugin')
-includeProject(':js:js.ast')
-includeProject(':js:js.dce')
-includeProject(':js:js.frontend')
-includeProject(':js:js.parser')
-includeProject(':js:js.serializer')
-includeProject(':js:js.tests')
-includeProject(':js:js.translator')
-includeProject(':kotlin-allopen', 'libraries/tools/kotlin-allopen')
-includeProject(':kotlin-allopen-compiler-plugin', 'plugins/allopen/allopen-cli')
-includeProject(':kotlin-allopen:plugin-marker', 'libraries/tools/kotlin-allopen/plugin-marker')
-includeProject(':kotlin-android-extensions', 'prepare/android-extensions-compiler-gradle')
-includeProject(':kotlin-android-extensions-runtime', 'plugins/android-extensions/android-extensions-runtime')
-includeProject(':kotlin-annotation-processing', 'plugins/kapt3/kapt3-compiler')
-includeProject(':kotlin-annotation-processing-base', 'plugins/kapt3/kapt3-base')
-includeProject(':kotlin-annotation-processing-cli', 'plugins/kapt3/kapt3-cli')
-includeProject(':kotlin-annotation-processing-embeddable', 'prepare/kotlin-annotation-processing-embeddable')
-includeProject(':kotlin-annotation-processing-gradle', 'libraries/tools/kotlin-annotation-processing')
-includeProject(':kotlin-annotation-processing-runtime', 'plugins/kapt3/kapt3-runtime')
-includeProject(':kotlin-annotations-android', 'libraries/tools/kotlin-annotations-android')
-includeProject(':kotlin-annotations-jvm', 'libraries/tools/kotlin-annotations-jvm')
-includeProject(':kotlin-ant', 'ant')
-includeProject(':kotlin-build-common', 'build-common')
-includeProject(':kotlin-compiler', 'prepare/compiler')
-includeProject(':kotlin-compiler-client-embeddable', 'prepare/compiler-client-embeddable')
-includeProject(':kotlin-compiler-embeddable', 'prepare/compiler-embeddable')
-includeProject(':kotlin-compiler-runner', 'compiler/compiler-runner')
-includeProject(':kotlin-daemon', 'compiler/daemon')
-includeProject(':kotlin-daemon-client', 'compiler/daemon/daemon-client')
-includeProject(':kotlin-daemon-client-new', 'compiler/daemon/daemon-client-new')
-includeProject(':kotlin-daemon-embeddable', 'prepare/kotlin-daemon-embeddable')
-includeProject(':kotlin-gradle-plugin', 'libraries/tools/kotlin-gradle-plugin')
-includeProject(':kotlin-gradle-plugin-api', 'libraries/tools/kotlin-gradle-plugin-api')
-includeProject(':kotlin-gradle-plugin-dsl-codegen', 'libraries/tools/kotlin-gradle-plugin-dsl-codegen')
-includeProject(':kotlin-gradle-plugin-integration-tests', 'libraries/tools/kotlin-gradle-plugin-integration-tests')
-includeProject(':kotlin-gradle-plugin-model', 'libraries/tools/kotlin-gradle-plugin-model')
-includeProject(':kotlin-gradle-plugin-test-utils-embeddable', 'libraries/tools/kotlin-gradle-plugin-test-utils-embeddable')
-includeProject(':kotlin-gradle-plugin:plugin-marker', 'libraries/tools/kotlin-gradle-plugin/plugin-marker')
-includeProject(':kotlin-gradle-subplugin-example', 'libraries/examples/kotlin-gradle-subplugin-example')
-includeProject(':kotlin-imports-dumper-compiler-plugin', 'plugins/imports-dumper')
-includeProject(':kotlin-jps-plugin', 'prepare/jps-plugin')
-includeProject(':kotlin-main-kts', 'libraries/tools/kotlin-main-kts')
-includeProject(':kotlin-main-kts-test', 'libraries/tools/kotlin-main-kts-test')
-includeProject(':kotlin-native:kotlin-native-library-reader', 'konan/library-reader')
-includeProject(':kotlin-native:kotlin-native-utils', 'konan/utils')
-includeProject(':kotlin-noarg', 'libraries/tools/kotlin-noarg')
-includeProject(':kotlin-noarg-compiler-plugin', 'plugins/noarg/noarg-cli')
-includeProject(':kotlin-noarg:plugin-marker', 'libraries/tools/kotlin-noarg/plugin-marker')
-includeProject(':kotlin-preloader', 'compiler/preloader')
-includeProject(':kotlin-reflect', 'libraries/reflect')
-includeProject(':kotlin-reflect-api', 'libraries/reflect/api')
-includeProject(':kotlin-runner', 'compiler/cli/cli-runner')
-includeProject(':kotlin-sam-with-receiver', 'libraries/tools/kotlin-sam-with-receiver')
-includeProject(':kotlin-sam-with-receiver-compiler-plugin', 'plugins/sam-with-receiver/sam-with-receiver-cli')
-includeProject(':kotlin-script-runtime', 'libraries/tools/script-runtime')
-includeProject(':kotlin-script-util', 'libraries/tools/kotlin-script-util')
-includeProject(':kotlin-scripting-common', 'libraries/scripting/common')
-includeProject(':kotlin-scripting-compiler', 'plugins/scripting/scripting-compiler')
-includeProject(':kotlin-scripting-compiler-embeddable', 'plugins/scripting/scripting-compiler-embeddable')
-includeProject(':kotlin-scripting-compiler-impl', 'plugins/scripting/scripting-compiler-impl')
-includeProject(':kotlin-scripting-compiler-impl-embeddable', 'plugins/scripting/scripting-compiler-impl-embeddable')
-includeProject(':kotlin-scripting-idea', 'plugins/scripting/scripting-idea')
-includeProject(':kotlin-scripting-intellij', 'libraries/scripting/intellij')
-includeProject(':kotlin-scripting-jsr223', 'libraries/scripting/jsr223')
-includeProject(':kotlin-scripting-jsr223-embeddable', 'libraries/scripting/jsr223-embeddable')
-includeProject(':kotlin-scripting-jsr223-test', 'libraries/scripting/jsr223-test')
-includeProject(':kotlin-scripting-jvm', 'libraries/scripting/jvm')
-includeProject(':kotlin-scripting-jvm-host', 'libraries/scripting/jvm-host')
-includeProject(':kotlin-scripting-jvm-host-embeddable', 'libraries/scripting/jvm-host-embeddable')
-includeProject(':kotlin-scripting-jvm-host-test', 'libraries/scripting/jvm-host-test')
-includeProject(':kotlin-serialization', 'libraries/tools/kotlin-serialization')
-includeProject(':kotlin-serialization-unshaded', 'libraries/tools/kotlin-serialization-unshaded')
-includeProject(':kotlin-serialization:plugin-marker', 'libraries/tools/kotlin-serialization/plugin-marker')
-includeProject(':kotlin-source-sections-compiler-plugin', 'plugins/source-sections/source-sections-compiler')
-includeProject(':kotlin-test', 'libraries/kotlin.test')
-includeProject(':kotlin-test-nodejs-runner', 'libraries/tools/kotlin-test-nodejs-runner')
-includeProject(':kotlin-test:kotlin-test-annotations-common', 'libraries/kotlin.test/annotations-common')
-includeProject(':kotlin-test:kotlin-test-common', 'libraries/kotlin.test/common')
-includeProject(':kotlin-test:kotlin-test-js', 'libraries/kotlin.test/js')
-includeProject(':kotlin-test:kotlin-test-js:kotlin-test-js-it')
-includeProject(':kotlin-test:kotlin-test-js:kotlin-test-js-it', 'libraries/kotlin.test/js/it')
-includeProject(':kotlin-test:kotlin-test-junit', 'libraries/kotlin.test/junit')
-includeProject(':kotlin-test:kotlin-test-junit5', 'libraries/kotlin.test/junit5')
-includeProject(':kotlin-test:kotlin-test-jvm', 'libraries/kotlin.test/jvm')
-includeProject(':kotlin-test:kotlin-test-testng', 'libraries/kotlin.test/testng')
-includeProject(':kotlin-util-io', 'compiler/util-io')
-includeProject(':kotlin-util-klib', 'compiler/util-klib')
-includeProject(':kotlinx-metadata', 'libraries/kotlinx-metadata')
-includeProject(':kotlinx-metadata-jvm', 'libraries/kotlinx-metadata/jvm')
-includeProject(':kotlinx-serialization-compiler-plugin', 'plugins/kotlin-serialization/kotlin-serialization-compiler')
-includeProject(':kotlinx-serialization-ide-plugin', 'plugins/kotlin-serialization/kotlin-serialization-ide')
-includeProject(':libraries:kotlin-prepush-hook', 'libraries/tools/kotlin-prepush-hook')
-includeProject(':libraries:tools:mutability-annotations-compat')
-includeProject(':nj2k')
-includeProject(':nj2k:nj2k-services')
-includeProject(':noarg-ide-plugin', 'plugins/noarg/noarg-ide')
-includeProject(':pill:generate-all-tests', 'plugins/pill/generate-all-tests')
-includeProject(':plugins:android-extensions-compiler', 'plugins/android-extensions/android-extensions-compiler')
-includeProject(':plugins:android-extensions-ide', 'plugins/android-extensions/android-extensions-idea')
-includeProject(':plugins:annotation-based-compiler-plugins-ide-support')
-includeProject(':plugins:jvm-abi-gen')
-includeProject(':plugins:kapt3-idea', 'plugins/kapt3/kapt3-idea')
-includeProject(':plugins:lint')
-includeProject(':plugins:uast-kotlin')
-includeProject(':plugins:uast-kotlin-idea')
-includeProject(':prepare:build.version')
-includeProject(':prepare:formatter')
-includeProject(':prepare:ide-lazy-resolver')
-includeProject(':prepare:idea-plugin')
-includeProject(':sam-with-receiver-ide-plugin', 'plugins/sam-with-receiver/sam-with-receiver-ide')
-includeProject(':test-instrumenter')
-includeProject(':tools:kotlinp', 'libraries/tools/kotlinp')
 
 // Uncomment to use locally built protobuf-relocated
 // includeBuild("dependencies/protobuf")
