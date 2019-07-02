@@ -11,4 +11,4 @@ package kotlin.annotations
  */
 @Retention(AnnotationRetention.BINARY)
 @SinceKotlin("1.3")
-annotation class ExtensionContractsDsl
+public annotation class ExtensionContractsDsl

@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.contracts.contextual
 
-import kotlin.annotations.ExtensionContractsDsl
+import kotlin.contracts.ExtensionContractsDsl
 import kotlin.contracts.ContractBuilder
 import kotlin.contracts.ExperimentalContracts
 

@@ -1,0 +1,46 @@
+description = 'Kotlin Test Common'
+
+apply plugin: 'kotlin-platform-common'
+apply plugin: 'pill-configurable'
+apply plugin: 'jps-compatible'
+
+configureDist(project)
+configurePublishing(project)
+
+dependencies {
+//    compile kotlinStdlib()
+//    compile project(":kotlin-stdlib")
+    compile "org.jetbrains.kotlin:kotlin-stdlib:1.3-SNAPSHOT"
+    compile project(":kotlin-contracts-dsl")
+}
+
+pill {
+    importAsLibrary = true
+}
+
+jar {
+    manifestAttributes(manifest, project, 'Test')
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.kotlin
+}
+
+classes.dependsOn.remove("compileJava")
+
+artifacts {
+    archives sourcesJar
+}
+
+javadocJar()
+
+compileKotlinCommon {
+    kotlinOptions {
+        freeCompilerArgs = [
+                "-module-name", project.name,
+                "-Xallow-kotlin-package",
+                "-Xuse-experimental=kotlin.contracts.ExperimentalContracts"
+        ]
+    }
+}

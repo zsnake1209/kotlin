@@ -1,4 +1,5 @@
 apply plugin: 'kotlin'
+apply plugin: 'jps-compatible'
 
 configureJvmProject(project)
 configurePublishing(project)
@@ -18,7 +19,7 @@ dependencies {
     compile project(':kotlin-gradle-plugin-api')
     compile project(':kotlin-gradle-plugin-model')
 
-    compile project(':kotlin-stdlib')
+    compile kotlinStdlib()
     compileOnly project(':compiler')
     compileOnly project(':kotlin-contracts-compiler-subplugins')
 
@@ -26,19 +27,17 @@ dependencies {
 
     testCompile gradleApi()
     testCompile "junit:junit:4.12"
+
+    embedded(project(":kotlin-contracts-compiler-subplugins")) { transitive = false }
 }
 
-evaluationDependsOn(":kotlin-contracts-compiler-subplugins")
-
 tasks.withType(project.compileKotlin.class) {
-    kotlinOptions.languageVersion = "1.2"
-    kotlinOptions.apiVersion = "1.2"
+    kotlinOptions.languageVersion = "1.3"
+    kotlinOptions.apiVersion = "1.3"
     kotlinOptions.freeCompilerArgs += ["-Xskip-metadata-version-check"]
 }
 
 jar {
-    from(project(":kotlin-contracts-compiler-subplugins").sourceSets.main.output.classesDirs)
-    from(project(":kotlin-contracts-compiler-subplugins").sourceSets.main.output.resourcesDir)
     manifestAttributes(manifest, project)
 }
 
@@ -46,7 +45,8 @@ ArtifactsKt.runtimeJar(project, EmbeddableKt.rewriteDepsToShadedCompiler(project
 
 artifacts {
     archives sourcesJar
-    archives javadocJar
 }
+
+javadocJar()
 
 test.executable = "${JDK_18}/bin/java"

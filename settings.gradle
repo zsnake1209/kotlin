@@ -417,9 +417,10 @@ project(':kotlin-serialization:plugin-marker').projectDir = file("$rootDir/libra
 
 // contracts:
 project(':kotlin-contracts-plugin').projectDir = file("$rootDir/plugins/contracts/contracts-plugin")
-project(':kotlin-contracts-dsl').projectDir = "$rootDir/plugins/contracts/contracts-plugin/dsl" as File
-//project(':kotlin-contracts').projectDir = "$rootDir/plugins/contracts/contracts-plugin/shaded-plugin" as File
+project(':kotlin-contracts').projectDir = "$rootDir/plugins/contracts/contracts-plugin/shaded-plugin" as File
 
 project(':kotlin-contracts-compiler-subplugins').projectDir = file("$rootDir/plugins/contracts/contracts-subplugins")
-project(':kotlin-contracts-subplugins-dsl').projectDir = file("$rootDir/plugins/contracts/contracts-subplugins/dsl")
-//project(':kotlin-contracts-subplugins').projectDir = file("$rootDir/plugins/contracts/contracts-subplugins/shaded-plugin")
+project(':kotlin-contracts-subplugins').projectDir = file("$rootDir/plugins/contracts/contracts-subplugins/shaded-plugin")
+
+//project(':kotlin-contracts-subplugins-dsl').projectDir = file("$rootDir/plugins/contracts/contracts-subplugins/dsl")
+//project(':kotlin-contracts-dsl').projectDir = "$rootDir/plugins/contracts/contracts-plugin/dsl" as File
