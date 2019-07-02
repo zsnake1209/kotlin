@@ -1,11 +1,9 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-
 plugins {
     kotlin("jvm")
     id("jps-compatible")
 }
 
-jvmTarget = "1.6"
+jvmTarget = "1.8"
 
 dependencies {
     compile(project(":compiler:frontend"))
