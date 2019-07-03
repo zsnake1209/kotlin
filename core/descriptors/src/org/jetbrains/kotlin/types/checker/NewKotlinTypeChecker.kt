@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker.hasNotNullSupertype
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext.SupertypesPolicy
 import org.jetbrains.kotlin.types.model.CaptureStatus
+import org.jetbrains.kotlin.types.refinement.TypeRefinement
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 
 object SimpleClassicTypeSystemContext : ClassicTypeSystemContext
@@ -56,20 +57,31 @@ object ErrorTypesAreEqualToAnything : KotlinTypeChecker {
 }
 
 interface NewKotlinTypeChecker : KotlinTypeChecker {
+    val kotlinTypeRefiner: KotlinTypeRefiner
+
     fun transformToNewType(type: UnwrappedType): UnwrappedType
 
     companion object {
-        val Default = NewKotlinTypeCheckerImpl()
+        val Default = NewKotlinTypeCheckerImpl(KotlinTypeRefiner.Default)
     }
 }
 
 
-class NewKotlinTypeCheckerImpl() : NewKotlinTypeChecker {
-    override fun isSubtypeOf(subtype: KotlinType, supertype: KotlinType): Boolean =
-        ClassicTypeCheckerContext(true).isSubtypeOf(subtype.unwrap(), supertype.unwrap()) // todo fix flag errorTypeEqualsToAnything
+class NewKotlinTypeCheckerImpl(override val kotlinTypeRefiner: KotlinTypeRefiner) : NewKotlinTypeChecker {
 
+    @UseExperimental(TypeRefinement::class)
+    override fun isSubtypeOf(subtype: KotlinType, supertype: KotlinType): Boolean =
+        ClassicTypeCheckerContext(true).isSubtypeOf(
+            kotlinTypeRefiner.refineType(subtype.unwrap()).unwrap(),
+            kotlinTypeRefiner.refineType(supertype.unwrap()).unwrap()
+        ) // todo fix flag errorTypeEqualsToAnything
+
+    @UseExperimental(TypeRefinement::class)
     override fun equalTypes(a: KotlinType, b: KotlinType): Boolean =
-        ClassicTypeCheckerContext(false).equalTypes(a.unwrap(), b.unwrap())
+        ClassicTypeCheckerContext(false).equalTypes(
+            kotlinTypeRefiner.refineType(a.unwrap()).unwrap(),
+            kotlinTypeRefiner.refineType(b.unwrap()).unwrap()
+        )
 
     fun ClassicTypeCheckerContext.equalTypes(a: UnwrappedType, b: UnwrappedType): Boolean {
         return AbstractTypeChecker.equalTypes(this as AbstractTypeCheckerContext, a, b)
