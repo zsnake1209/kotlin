@@ -370,10 +370,6 @@ allprojects {
         enabled = false
     }
 
-    tasks.withType<Jar> {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
-
     task("listArchives") { listConfigurationContents("archives") }
 
     task("listRuntimeJar") { listConfigurationContents("runtimeJar") }
