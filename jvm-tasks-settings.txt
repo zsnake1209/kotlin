@@ -1,0 +1,1028 @@
+:allopen-ide-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:allopen-ide-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:allopen-ide-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:allopen-ide-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:allopen-ide-plugin:test executable=/home/user/jdk/8/bin/java
+:compiler:android-tests:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:android-tests:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:compiler:android-tests:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:android-tests:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:compiler:android-tests:test executable=/home/user/jdk/8/bin/java
+:compiler:backend-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:backend-common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:backend-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:backend-common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:backend-common:test executable=/home/user/jdk/8/bin/java
+:compiler:backend.js:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:backend.js:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:backend.js:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:backend.js:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:backend.js:test executable=/home/user/jdk/8/bin/java
+:compiler:backend.jvm:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:backend.jvm:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:backend.jvm:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:backend.jvm:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:backend.jvm:test executable=/home/user/jdk/8/bin/java
+:compiler:backend:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:backend:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:backend:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:backend:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:backend:test executable=/home/user/jdk/8/bin/java
+:compiler:cli-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:cli-common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:cli-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:cli-common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:cli-common:test executable=/home/user/jdk/8/bin/java
+:compiler:cli-js:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:cli-js:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:cli-js:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:cli-js:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:cli-js:test executable=/home/user/jdk/8/bin/java
+:compiler:cli:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:cli:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:cli:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:cli:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:cli:test executable=/home/user/jdk/8/bin/java
+:compiler:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:container:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:container:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:container:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:container:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:container:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:cones:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:cones:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:cones:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:cones:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:cones:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:dump:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:dump:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:dump:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:dump:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:dump:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:fir2ir:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:fir2ir:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:fir2ir:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:fir2ir:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:fir2ir:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:java:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:java:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:java:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:java:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:java:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:modularized-tests:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:modularized-tests:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:modularized-tests:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:modularized-tests:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:modularized-tests:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:psi2fir:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:psi2fir:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:psi2fir:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:psi2fir:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:psi2fir:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:resolve:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:resolve:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:resolve:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:resolve:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:resolve:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:tree:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:tree:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:tree:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:tree:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:tree:test executable=/home/user/jdk/8/bin/java
+:compiler:fir:tree:visitors-generator:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:tree:visitors-generator:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:tree:visitors-generator:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:fir:tree:visitors-generator:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:fir:tree:visitors-generator:test executable=/home/user/jdk/8/bin/java
+:compiler:frontend.common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:frontend.common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:frontend.common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:frontend.common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:frontend.common:test executable=/home/user/jdk/8/bin/java
+:compiler:frontend.java:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:frontend.java:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:frontend.java:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:frontend.java:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:frontend.java:test executable=/home/user/jdk/8/bin/java
+:compiler:frontend:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:frontend:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:frontend:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:frontend:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:frontend:test executable=/home/user/jdk/8/bin/java
+:compiler:incremental-compilation-impl:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:incremental-compilation-impl:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:incremental-compilation-impl:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:incremental-compilation-impl:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:incremental-compilation-impl:test executable=/home/user/jdk/8/bin/java
+:compiler:ir.backend.common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.backend.common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.backend.common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.backend.common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.backend.common:test executable=/home/user/jdk/8/bin/java
+:compiler:ir.ir2cfg:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.ir2cfg:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.ir2cfg:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.ir2cfg:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.ir2cfg:test executable=/home/user/jdk/8/bin/java
+:compiler:ir.psi2ir:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.psi2ir:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.psi2ir:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.psi2ir:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.psi2ir:test executable=/home/user/jdk/8/bin/java
+:compiler:ir.serialization.common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.serialization.common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.serialization.common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.serialization.common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.serialization.common:test executable=/home/user/jdk/8/bin/java
+:compiler:ir.serialization.js:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.serialization.js:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.serialization.js:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.serialization.js:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.serialization.js:test executable=/home/user/jdk/8/bin/java
+:compiler:ir.tree:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.tree:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.tree:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:ir.tree:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:ir.tree:test executable=/home/user/jdk/8/bin/java
+:compiler:light-classes:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:light-classes:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:light-classes:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:light-classes:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:light-classes:test executable=/home/user/jdk/8/bin/java
+:compiler:plugin-api:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:plugin-api:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:plugin-api:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:plugin-api:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:plugin-api:test executable=/home/user/jdk/8/bin/java
+:compiler:psi:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:psi:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:psi:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:psi:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:psi:test executable=/home/user/jdk/8/bin/java
+:compiler:resolution:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:resolution:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:resolution:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:resolution:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:resolution:test executable=/home/user/jdk/8/bin/java
+:compiler:serialization:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:serialization:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:serialization:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:serialization:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:serialization:test executable=/home/user/jdk/8/bin/java
+:compiler:test executable=/home/user/jdk/8/bin/java
+:compiler:tests-common-jvm6:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-common-jvm6:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:compiler:tests-common-jvm6:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-common-jvm6:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:compiler:tests-common-jvm6:test executable=/home/user/jdk/8/bin/java
+:compiler:tests-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:tests-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:tests-common:test executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:codegenTarget6Jvm6Test executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:codegenTarget6Jvm9Test executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:codegenTarget6JvmLastTest executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:codegenTarget8Jvm8Test executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:codegenTarget8Jvm9Test executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:codegenTarget8JvmLastTest executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:codegenTarget9Jvm9Test executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:codegenTargetLastJvmLastTest executable=/home/user/jdk/8/bin/java
+:compiler:tests-different-jdk:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-different-jdk:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:tests-different-jdk:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-different-jdk:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:tests-different-jdk:test executable=/home/user/jdk/8/bin/java
+:compiler:tests-java8:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-java8:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:tests-java8:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-java8:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:tests-java8:test executable=/home/user/jdk/8/bin/java
+:compiler:tests-spec:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-spec:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:tests-spec:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:tests-spec:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:tests-spec:remoteRunTests executable=/home/user/jdk/8/bin/java
+:compiler:tests-spec:test executable=/home/user/jdk/8/bin/java
+:compiler:util:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:util:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:util:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:compiler:util:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:compiler:util:test executable=/home/user/jdk/8/bin/java
+:core:descriptors.jvm:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:descriptors.jvm:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:descriptors.jvm:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:descriptors.jvm:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:descriptors.jvm:test executable=/home/user/jdk/6/bin/java
+:core:descriptors.runtime:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/8
+:core:descriptors.runtime:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:descriptors.runtime:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:core:descriptors.runtime:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:core:descriptors.runtime:test executable=/home/user/jdk/8/bin/java
+:core:descriptors:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:descriptors:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:descriptors:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:descriptors:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:descriptors:test executable=/home/user/jdk/6/bin/java
+:core:deserialization:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:deserialization:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:deserialization:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:deserialization:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:deserialization:test executable=/home/user/jdk/6/bin/java
+:core:metadata.jvm:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:metadata.jvm:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:metadata.jvm:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:metadata.jvm:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:metadata.jvm:test executable=/home/user/jdk/6/bin/java
+:core:metadata:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:metadata:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:metadata:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:metadata:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:metadata:test executable=/home/user/jdk/6/bin/java
+:core:type-system:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:type-system:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:type-system:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:type-system:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:type-system:test executable=/home/user/jdk/6/bin/java
+:core:util.runtime:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:util.runtime:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:util.runtime:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:core:util.runtime:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:core:util.runtime:test executable=/home/user/jdk/6/bin/java
+:daemon-common-new:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:daemon-common-new:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:daemon-common-new:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:daemon-common-new:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:daemon-common-new:test executable=/home/user/jdk/8/bin/java
+:daemon-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:daemon-common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:daemon-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:daemon-common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:daemon-common:test executable=/home/user/jdk/8/bin/java
+:examples:annotation-processor-example:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:annotation-processor-example:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:annotation-processor-example:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:annotation-processor-example:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:annotation-processor-example:test executable=/home/user/jdk/8/bin/java
+:examples:kotlin-jsr223-daemon-local-eval-example:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:kotlin-jsr223-daemon-local-eval-example:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:kotlin-jsr223-daemon-local-eval-example:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:kotlin-jsr223-daemon-local-eval-example:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:kotlin-jsr223-daemon-local-eval-example:test executable=/home/user/jdk/8/bin/java
+:examples:kotlin-jsr223-local-example:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:kotlin-jsr223-local-example:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:kotlin-jsr223-local-example:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:kotlin-jsr223-local-example:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:kotlin-jsr223-local-example:test executable=/home/user/jdk/8/bin/java
+:examples:scripting-jvm-embeddable-host:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-embeddable-host:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-embeddable-host:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-embeddable-host:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-embeddable-host:test executable=/home/user/jdk/8/bin/java
+:examples:scripting-jvm-maven-deps-host:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-maven-deps-host:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-maven-deps-host:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-maven-deps-host:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-maven-deps-host:test executable=/home/user/jdk/8/bin/java
+:examples:scripting-jvm-maven-deps:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-maven-deps:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-maven-deps:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-maven-deps:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-maven-deps:test executable=/home/user/jdk/8/bin/java
+:examples:scripting-jvm-simple-script-host:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-simple-script-host:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-simple-script-host:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-simple-script-host:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-simple-script-host:test executable=/home/user/jdk/8/bin/java
+:examples:scripting-jvm-simple-script:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-simple-script:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-simple-script:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:examples:scripting-jvm-simple-script:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:examples:scripting-jvm-simple-script:test executable=/home/user/jdk/8/bin/java
+:generators:compileBuiltinsJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:generators:compileBuiltinsKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:generators:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:generators:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:generators:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:generators:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:generators:test executable=/home/user/jdk/8/bin/java
+:generators:test-generator:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:generators:test-generator:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:generators:test-generator:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:generators:test-generator:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:generators:test-generator:test executable=/home/user/jdk/8/bin/java
+:idea-runner:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea-runner:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea-runner:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea-runner:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea-runner:test executable=/home/user/jdk/8/bin/java
+:idea:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:compilePerformanceTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:compilePerformanceTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:fir-view:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:fir-view:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:fir-view:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:fir-view:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:fir-view:test executable=/home/user/jdk/8/bin/java
+:idea:formatter:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:formatter:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:formatter:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:formatter:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:formatter:test executable=/home/user/jdk/8/bin/java
+:idea:ide-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:ide-common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:ide-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:ide-common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:ide-common:test executable=/home/user/jdk/8/bin/java
+:idea:idea-android-output-parser:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-android-output-parser:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-android-output-parser:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-android-output-parser:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-android-output-parser:test executable=/home/user/jdk/8/bin/java
+:idea:idea-android:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-android:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-android:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-android:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-android:test executable=/home/user/jdk/8/bin/java
+:idea:idea-core:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-core:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-core:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-core:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-core:test executable=/home/user/jdk/8/bin/java
+:idea:idea-git:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-git:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-git:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-git:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-git:test executable=/home/user/jdk/8/bin/java
+:idea:idea-gradle-native:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-gradle-native:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-gradle-native:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-gradle-native:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-gradle-native:test executable=/home/user/jdk/8/bin/java
+:idea:idea-gradle:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-gradle:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-gradle:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-gradle:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-gradle:test executable=/home/user/jdk/8/bin/java
+:idea:idea-j2k:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-j2k:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-j2k:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-j2k:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-j2k:test executable=/home/user/jdk/8/bin/java
+:idea:idea-jps-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-jps-common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-jps-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-jps-common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-jps-common:test executable=/home/user/jdk/8/bin/java
+:idea:idea-jvm:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-jvm:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-jvm:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-jvm:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-jvm:test executable=/home/user/jdk/8/bin/java
+:idea:idea-maven:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-maven:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-maven:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-maven:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-maven:test executable=/home/user/jdk/8/bin/java
+:idea:idea-native:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-native:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-native:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-native:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-native:test executable=/home/user/jdk/8/bin/java
+:idea:idea-test-framework:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-test-framework:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-test-framework:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:idea-test-framework:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:idea-test-framework:test executable=/home/user/jdk/8/bin/java
+:idea:jvm-debugger:eval4j:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:eval4j:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:eval4j:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:eval4j:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:eval4j:test executable=/home/user/jdk/8/bin/java
+:idea:jvm-debugger:jvm-debugger-core:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-core:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-core:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-core:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-core:test executable=/home/user/jdk/8/bin/java
+:idea:jvm-debugger:jvm-debugger-evaluation:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-evaluation:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-evaluation:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-evaluation:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-evaluation:test executable=/home/user/jdk/8/bin/java
+:idea:jvm-debugger:jvm-debugger-sequence:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-sequence:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-sequence:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-sequence:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-sequence:test executable=/home/user/jdk/8/bin/java
+:idea:jvm-debugger:jvm-debugger-util:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-util:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-util:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-util:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:jvm-debugger:jvm-debugger-util:test executable=/home/user/jdk/8/bin/java
+:idea:kotlin-gradle-tooling:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:kotlin-gradle-tooling:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:kotlin-gradle-tooling:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:idea:kotlin-gradle-tooling:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:idea:kotlin-gradle-tooling:test executable=/home/user/jdk/8/bin/java
+:idea:performanceTest executable=/home/user/jdk/8/bin/java
+:idea:test executable=/home/user/jdk/8/bin/java
+:include:kotlin-compiler:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:include:kotlin-compiler:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:include:kotlin-compiler:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:include:kotlin-compiler:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:include:kotlin-compiler:test executable=/home/user/jdk/8/bin/java
+:j2k:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:j2k:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:j2k:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:j2k:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:j2k:test executable=/home/user/jdk/8/bin/java
+:j2k:testForWebDemo executable=/home/user/jdk/8/bin/java
+:jps-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:jps-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:jps-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:jps-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:jps-plugin:test executable=/home/user/jdk/8/bin/java
+:js:js.ast:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.ast:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.ast:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.ast:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.ast:test executable=/home/user/jdk/8/bin/java
+:js:js.dce:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.dce:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.dce:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.dce:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.dce:test executable=/home/user/jdk/8/bin/java
+:js:js.frontend:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.frontend:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.frontend:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.frontend:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.frontend:test executable=/home/user/jdk/8/bin/java
+:js:js.parser:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.parser:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.parser:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.parser:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.parser:test executable=/home/user/jdk/8/bin/java
+:js:js.serializer:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.serializer:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.serializer:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.serializer:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.serializer:test executable=/home/user/jdk/8/bin/java
+:js:js.tests:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.tests:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.tests:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.tests:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.tests:jsIrTest executable=/home/user/jdk/8/bin/java
+:js:js.tests:jsTest executable=/home/user/jdk/8/bin/java
+:js:js.tests:quickTest executable=/home/user/jdk/8/bin/java
+:js:js.tests:test executable=/home/user/jdk/8/bin/java
+:js:js.translator:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.translator:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.translator:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:js:js.translator:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:js:js.translator:test executable=/home/user/jdk/8/bin/java
+:kotlin-allopen-compiler-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-allopen-compiler-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-allopen-compiler-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-allopen-compiler-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-allopen-compiler-plugin:test executable=/home/user/jdk/8/bin/java
+:kotlin-allopen:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-allopen:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-allopen:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-allopen:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-allopen:plugin-marker:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-allopen:plugin-marker:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-allopen:plugin-marker:test executable=/home/user/jdk/8/bin/java
+:kotlin-allopen:test executable=/home/user/jdk/8/bin/java
+:kotlin-android-extensions-runtime:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-android-extensions-runtime:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-android-extensions-runtime:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-android-extensions-runtime:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-android-extensions-runtime:test executable=/home/user/jdk/8/bin/java
+:kotlin-android-extensions:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-android-extensions:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-android-extensions:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-android-extensions:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-android-extensions:test executable=/home/user/jdk/8/bin/java
+:kotlin-annotation-processing-base:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-base:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing-base:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-base:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing-base:test executable=/home/user/jdk/8/bin/java
+:kotlin-annotation-processing-cli:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-cli:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing-cli:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-cli:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing-cli:test executable=/home/user/jdk/8/bin/java
+:kotlin-annotation-processing-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-annotation-processing-gradle:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-gradle:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing-gradle:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-gradle:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing-gradle:test executable=/home/user/jdk/8/bin/java
+:kotlin-annotation-processing-runtime:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-runtime:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing-runtime:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing-runtime:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing-runtime:test executable=/home/user/jdk/8/bin/java
+:kotlin-annotation-processing:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-annotation-processing:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-annotation-processing:test executable=/home/user/jdk/8/bin/java
+:kotlin-annotations-android:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/6
+:kotlin-annotations-android:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-annotations-android:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/6
+:kotlin-annotations-android:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-annotations-android:test executable=/home/user/jdk/6/bin/java
+:kotlin-annotations-jvm:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-annotations-jvm:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-annotations-jvm:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-annotations-jvm:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-annotations-jvm:test executable=/home/user/jdk/6/bin/java
+:kotlin-ant:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-ant:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-ant:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-ant:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-ant:test executable=/home/user/jdk/8/bin/java
+:kotlin-build-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-build-common:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-build-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-build-common:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-build-common:test executable=/home/user/jdk/8/bin/java
+:kotlin-compiler-client-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-compiler-client-embeddable:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-compiler-client-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-compiler-client-embeddable:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-compiler-client-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-compiler-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-compiler-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-compiler-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-compiler-runner:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-compiler-runner:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-compiler-runner:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-compiler-runner:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-compiler-runner:test executable=/home/user/jdk/8/bin/java
+:kotlin-compiler:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-compiler:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-compiler:test executable=/home/user/jdk/8/bin/java
+:kotlin-daemon-client-new:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-daemon-client-new:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-daemon-client-new:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-daemon-client-new:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-daemon-client-new:test executable=/home/user/jdk/8/bin/java
+:kotlin-daemon-client:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-daemon-client:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-daemon-client:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-daemon-client:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-daemon-client:test executable=/home/user/jdk/8/bin/java
+:kotlin-daemon-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-daemon-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-daemon-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-daemon:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-daemon:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-daemon:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-daemon:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-daemon:test executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin-api:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-api:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin-api:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-api:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin-api:test executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin-dsl-codegen:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-dsl-codegen:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin-dsl-codegen:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-dsl-codegen:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin-dsl-codegen:test executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin-integration-tests:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-integration-tests:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin-integration-tests:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-integration-tests:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin-integration-tests:test executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin-integration-tests:testAdvanceGradleVersion executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin-integration-tests:testsFromJps executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin-model:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-model:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin-model:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-model:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin-model:test executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin-test-utils-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-test-utils-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin-test-utils-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-plugin:plugin-marker:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin:plugin-marker:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-plugin:plugin-marker:test executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-plugin:test executable=/home/user/jdk/8/bin/java
+:kotlin-gradle-subplugin-example:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-subplugin-example:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-subplugin-example:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-gradle-subplugin-example:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-gradle-subplugin-example:test executable=/home/user/jdk/8/bin/java
+:kotlin-idl2k:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-idl2k:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-idl2k:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-idl2k:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-idl2k:test executable=/home/user/jdk/8/bin/java
+:kotlin-imports-dumper-compiler-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-imports-dumper-compiler-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-imports-dumper-compiler-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-imports-dumper-compiler-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-imports-dumper-compiler-plugin:test executable=/home/user/jdk/8/bin/java
+:kotlin-jps-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-jps-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-jps-plugin:test executable=/home/user/jdk/8/bin/java
+:kotlin-main-kts-test:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-main-kts-test:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-main-kts-test:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-main-kts-test:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-main-kts-test:test executable=/home/user/jdk/8/bin/java
+:kotlin-main-kts:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-main-kts:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-main-kts:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-main-kts:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-main-kts:test executable=/home/user/jdk/8/bin/java
+:kotlin-native:kotlin-native-library-reader:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-native:kotlin-native-library-reader:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-native:kotlin-native-library-reader:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-native:kotlin-native-library-reader:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-native:kotlin-native-library-reader:test executable=/home/user/jdk/8/bin/java
+:kotlin-native:kotlin-native-utils:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-native:kotlin-native-utils:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-native:kotlin-native-utils:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-native:kotlin-native-utils:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-native:kotlin-native-utils:test executable=/home/user/jdk/8/bin/java
+:kotlin-noarg-compiler-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-noarg-compiler-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-noarg-compiler-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-noarg-compiler-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-noarg-compiler-plugin:test executable=/home/user/jdk/8/bin/java
+:kotlin-noarg:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-noarg:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-noarg:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-noarg:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-noarg:plugin-marker:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-noarg:plugin-marker:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-noarg:plugin-marker:test executable=/home/user/jdk/8/bin/java
+:kotlin-noarg:test executable=/home/user/jdk/8/bin/java
+:kotlin-preloader:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-preloader:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-preloader:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-preloader:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-preloader:test executable=/home/user/jdk/8/bin/java
+:kotlin-reflect-api:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-reflect-api:compileJava9Java source=1.9 target=1.9 javaHome=/home/user/jdk/9
+:kotlin-reflect-api:compileJava9Kotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-reflect-api:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-reflect-api:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-reflect-api:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-reflect-api:test executable=/home/user/jdk/6/bin/java
+:kotlin-reflect:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-reflect:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-reflect:test executable=/home/user/jdk/8/bin/java
+:kotlin-runner:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-runner:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-runner:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-runner:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-runner:test executable=/home/user/jdk/8/bin/java
+:kotlin-sam-with-receiver-compiler-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-sam-with-receiver-compiler-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-sam-with-receiver-compiler-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-sam-with-receiver-compiler-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-sam-with-receiver-compiler-plugin:test executable=/home/user/jdk/8/bin/java
+:kotlin-sam-with-receiver:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-sam-with-receiver:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-sam-with-receiver:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-sam-with-receiver:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-sam-with-receiver:test executable=/home/user/jdk/8/bin/java
+:kotlin-script-runtime:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-script-runtime:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-script-runtime:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-script-runtime:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-script-runtime:test executable=/home/user/jdk/6/bin/java
+:kotlin-script-util:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-script-util:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-script-util:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-script-util:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-script-util:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-common:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-common:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-common:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-compiler-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-compiler-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-compiler-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-compiler-impl-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-compiler-impl-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-compiler-impl-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-compiler-impl:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-compiler-impl:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-scripting-compiler-impl:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-compiler-impl:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-scripting-compiler-impl:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-compiler:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-compiler:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-scripting-compiler:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-compiler:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-scripting-compiler:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-idea:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-idea:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-scripting-idea:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-idea:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-scripting-idea:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-intellij:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-intellij:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-intellij:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-intellij:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-intellij:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jsr223-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jsr223-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jsr223-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jsr223-test:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jsr223-test:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jsr223-test:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jsr223-test:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jsr223-test:embeddableTest executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jsr223-test:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jsr223:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jsr223:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jsr223:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jsr223:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jsr223:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jvm-host-embeddable:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host-embeddable:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host-embeddable:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jvm-host-test:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host-test:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host-test:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host-test:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host-test:embeddableTest executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jvm-host-test:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jvm-host:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jvm-host:test executable=/home/user/jdk/8/bin/java
+:kotlin-scripting-jvm:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jvm:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jvm:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-scripting-jvm:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/8
+:kotlin-scripting-jvm:test executable=/home/user/jdk/8/bin/java
+:kotlin-serialization-unshaded:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-serialization-unshaded:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-serialization-unshaded:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-serialization-unshaded:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-serialization-unshaded:test executable=/home/user/jdk/6/bin/java
+:kotlin-serialization:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-serialization:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-serialization:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-serialization:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-serialization:plugin-marker:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-serialization:plugin-marker:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-serialization:plugin-marker:test executable=/home/user/jdk/8/bin/java
+:kotlin-serialization:test executable=/home/user/jdk/6/bin/java
+:kotlin-source-sections-compiler-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-source-sections-compiler-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-source-sections-compiler-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-source-sections-compiler-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-source-sections-compiler-plugin:test executable=/home/user/jdk/8/bin/java
+:kotlin-stdlib-common:compileCoroutinesExperimentalJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-common:test executable=/home/user/jdk/8/bin/java
+:kotlin-stdlib-jdk7:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/7
+:kotlin-stdlib-jdk7:compileJava9Java source=1.9 target=1.9 javaHome=/home/user/jdk/9
+:kotlin-stdlib-jdk7:compileJava9Kotlin jvmTarget=1.6 jdkHome=/home/user/jdk/7
+:kotlin-stdlib-jdk7:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/7
+:kotlin-stdlib-jdk7:compileNoJdk7TestJava source=1.6 target=1.6 javaHome=/home/user/jdk/7
+:kotlin-stdlib-jdk7:compileNoJdk7TestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/7
+:kotlin-stdlib-jdk7:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/7
+:kotlin-stdlib-jdk7:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/7
+:kotlin-stdlib-jdk7:test executable=/home/user/jdk/7/bin/java
+:kotlin-stdlib-jdk7:testJdk6Tests executable=/home/user/jdk/7/bin/java
+:kotlin-stdlib-jdk7:testNoJdk7 executable=/home/user/jdk/7/bin/java
+:kotlin-stdlib-jdk8:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib-jdk8:compileJava9Java source=1.9 target=1.9 javaHome=/home/user/jdk/9
+:kotlin-stdlib-jdk8:compileJava9Kotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-stdlib-jdk8:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-stdlib-jdk8:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib-jdk8:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-stdlib-jdk8:jdk10Test executable=/home/user/jdk/10/bin/java
+:kotlin-stdlib-jdk8:jdk11Test executable=JDK NOT FOUND/bin/java
+:kotlin-stdlib-jdk8:jdk9Test executable=/home/user/jdk/9/bin/java
+:kotlin-stdlib-jdk8:test executable=/home/user/jdk/8/bin/java
+:kotlin-stdlib-jdk8:testJdk6Tests executable=/home/user/jdk/8/bin/java
+:kotlin-stdlib-js-ir:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-js-ir:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-js-ir:test executable=/home/user/jdk/8/bin/java
+:kotlin-stdlib-js:compileBuiltinsJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-js:compileCoroutinesExperimentalJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-js:compileExperimentalJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-js:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-js:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib-js:test executable=/home/user/jdk/8/bin/java
+:kotlin-stdlib:compileCoroutinesExperimentalJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:compileCoroutinesExperimentalKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:compileCoroutinesExperimentalMigrationTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:compileCoroutinesExperimentalMigrationTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:compileCoroutinesExperimentalTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:compileCoroutinesExperimentalTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:compileExperimentalJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:compileExperimentalKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:compileJava9Java source=1.9 target=1.9 javaHome=/home/user/jdk/9
+:kotlin-stdlib:compileJava9Kotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:compileLongRunningTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:compileLongRunningTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:coroutinesExperimentalMigrationTest executable=/home/user/jdk/6/bin/java
+:kotlin-stdlib:coroutinesExperimentalTest executable=/home/user/jdk/6/bin/java
+:kotlin-stdlib:jvm-minimal-for-test:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:jvm-minimal-for-test:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:jvm-minimal-for-test:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-stdlib:jvm-minimal-for-test:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-stdlib:jvm-minimal-for-test:test executable=/home/user/jdk/6/bin/java
+:kotlin-stdlib:longRunningTest executable=/home/user/jdk/6/bin/java
+:kotlin-stdlib:samples:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib:samples:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-stdlib:samples:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-stdlib:samples:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-stdlib:samples:test executable=/home/user/jdk/8/bin/java
+:kotlin-stdlib:test executable=/home/user/jdk/6/bin/java
+:kotlin-test:kotlin-test-annotations-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-annotations-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-annotations-common:test executable=/home/user/jdk/8/bin/java
+:kotlin-test:kotlin-test-common:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-common:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-common:test executable=/home/user/jdk/8/bin/java
+:kotlin-test:kotlin-test-js-ir:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-js-ir:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-js-ir:test executable=/home/user/jdk/8/bin/java
+:kotlin-test:kotlin-test-js:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-js:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-js:kotlin-test-js-it:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-js:kotlin-test-js-it:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-js:kotlin-test-js-it:test executable=/home/user/jdk/8/bin/java
+:kotlin-test:kotlin-test-js:test executable=/home/user/jdk/8/bin/java
+:kotlin-test:kotlin-test-junit5:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-junit5:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-junit5:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-junit5:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-test:kotlin-test-junit5:test executable=/home/user/jdk/8/bin/java
+:kotlin-test:kotlin-test-junit:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-junit:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-junit:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-junit:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-junit:test executable=/home/user/jdk/6/bin/java
+:kotlin-test:kotlin-test-jvm:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-jvm:compileJava9Java source=1.9 target=1.9 javaHome=/home/user/jdk/9
+:kotlin-test:kotlin-test-jvm:compileJava9Kotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-jvm:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-jvm:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-jvm:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlin-test:kotlin-test-jvm:test executable=/home/user/jdk/6/bin/java
+:kotlin-test:kotlin-test-testng:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/7
+:kotlin-test:kotlin-test-testng:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/7
+:kotlin-test:kotlin-test-testng:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/7
+:kotlin-test:kotlin-test-testng:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/7
+:kotlin-test:kotlin-test-testng:test executable=/home/user/jdk/7/bin/java
+:kotlin-util-io:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-util-io:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-util-io:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-util-io:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-util-io:test executable=/home/user/jdk/8/bin/java
+:kotlin-util-klib:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-util-klib:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-util-klib:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlin-util-klib:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlin-util-klib:test executable=/home/user/jdk/8/bin/java
+:kotlinx-metadata-jvm:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/6
+:kotlinx-metadata-jvm:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlinx-metadata-jvm:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/6
+:kotlinx-metadata-jvm:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlinx-metadata-jvm:test executable=/home/user/jdk/6/bin/java
+:kotlinx-metadata:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/6
+:kotlinx-metadata:compileKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlinx-metadata:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/6
+:kotlinx-metadata:compileTestKotlin jvmTarget=1.6 jdkHome=/home/user/jdk/6
+:kotlinx-metadata:test executable=/home/user/jdk/6/bin/java
+:kotlinx-serialization-compiler-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlinx-serialization-compiler-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlinx-serialization-compiler-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlinx-serialization-compiler-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlinx-serialization-compiler-plugin:test executable=/home/user/jdk/8/bin/java
+:kotlinx-serialization-ide-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlinx-serialization-ide-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlinx-serialization-ide-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:kotlinx-serialization-ide-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:kotlinx-serialization-ide-plugin:test executable=/home/user/jdk/8/bin/java
+:libraries:kotlin-prepush-hook:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:libraries:kotlin-prepush-hook:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:libraries:kotlin-prepush-hook:test executable=/home/user/jdk/8/bin/java
+:libraries:tools:mutability-annotations-compat:compileJava source=1.6 target=1.6 javaHome=/home/user/jdk/8
+:libraries:tools:mutability-annotations-compat:compileTestJava source=1.6 target=1.6 javaHome=/home/user/jdk/8
+:libraries:tools:mutability-annotations-compat:test executable=/home/user/jdk/8/bin/java
+:nj2k:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:nj2k:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:nj2k:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:nj2k:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:nj2k:nj2k-services:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:nj2k:nj2k-services:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:nj2k:nj2k-services:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:nj2k:nj2k-services:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:nj2k:nj2k-services:test executable=/home/user/jdk/8/bin/java
+:nj2k:test executable=/home/user/jdk/8/bin/java
+:noarg-ide-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:noarg-ide-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:noarg-ide-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:noarg-ide-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:noarg-ide-plugin:test executable=/home/user/jdk/8/bin/java
+:pill:generate-all-tests:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:pill:generate-all-tests:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:pill:generate-all-tests:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:pill:generate-all-tests:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:pill:generate-all-tests:test executable=/home/user/jdk/8/bin/java
+:plugins:android-extensions-compiler:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:android-extensions-compiler:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:android-extensions-compiler:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:android-extensions-compiler:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:android-extensions-compiler:test executable=/home/user/jdk/8/bin/java
+:plugins:android-extensions-ide:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:android-extensions-ide:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:android-extensions-ide:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:android-extensions-ide:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:android-extensions-ide:test executable=/home/user/jdk/8/bin/java
+:plugins:annotation-based-compiler-plugins-ide-support:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:annotation-based-compiler-plugins-ide-support:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:annotation-based-compiler-plugins-ide-support:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:annotation-based-compiler-plugins-ide-support:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:annotation-based-compiler-plugins-ide-support:test executable=/home/user/jdk/8/bin/java
+:plugins:jvm-abi-gen:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:jvm-abi-gen:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:jvm-abi-gen:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:jvm-abi-gen:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:jvm-abi-gen:test executable=/home/user/jdk/8/bin/java
+:plugins:kapt3-idea:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:kapt3-idea:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:kapt3-idea:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:kapt3-idea:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:kapt3-idea:test executable=/home/user/jdk/8/bin/java
+:plugins:lint:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:lint:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:lint:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:lint:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:lint:test executable=/home/user/jdk/8/bin/java
+:plugins:uast-kotlin-idea:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:uast-kotlin-idea:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:uast-kotlin-idea:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:uast-kotlin-idea:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:uast-kotlin-idea:test executable=/home/user/jdk/8/bin/java
+:plugins:uast-kotlin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:uast-kotlin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:uast-kotlin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:plugins:uast-kotlin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:plugins:uast-kotlin:test executable=/home/user/jdk/8/bin/java
+:prepare:formatter:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:prepare:formatter:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:prepare:formatter:test executable=/home/user/jdk/8/bin/java
+:prepare:ide-lazy-resolver:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:prepare:ide-lazy-resolver:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:prepare:ide-lazy-resolver:test executable=/home/user/jdk/8/bin/java
+:sam-with-receiver-ide-plugin:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:sam-with-receiver-ide-plugin:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:sam-with-receiver-ide-plugin:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:sam-with-receiver-ide-plugin:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:sam-with-receiver-ide-plugin:test executable=/home/user/jdk/8/bin/java
+:test-instrumenter:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:test-instrumenter:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:test-instrumenter:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:test-instrumenter:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:test-instrumenter:test executable=/home/user/jdk/8/bin/java
+:tools:binary-compatibility-validator:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:tools:binary-compatibility-validator:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:tools:binary-compatibility-validator:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:tools:binary-compatibility-validator:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:tools:binary-compatibility-validator:test executable=/home/user/jdk/8/bin/java
+:tools:kotlin-stdlib-gen:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:tools:kotlin-stdlib-gen:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:tools:kotlin-stdlib-gen:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:tools:kotlin-stdlib-gen:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:tools:kotlin-stdlib-gen:test executable=/home/user/jdk/8/bin/java
+:tools:kotlinp:compileJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:tools:kotlinp:compileKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:tools:kotlinp:compileTestJava source=1.8 target=1.8 javaHome=/home/user/jdk/8
+:tools:kotlinp:compileTestKotlin jvmTarget=1.8 jdkHome=/home/user/jdk/8
+:tools:kotlinp:test executable=/home/user/jdk/8/bin/java

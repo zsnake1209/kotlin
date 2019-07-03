@@ -788,3 +788,24 @@ tasks.create("findShadowJarsInClasspath").doLast {
         project.checkConfig("testCompileClasspath")
     }
 }
+
+tasks.create("dumpJvmTasksSettings").doLast {
+    val lines = ArrayList<String>()
+    for (project in allprojects) {
+        for (task in project.tasks) {
+            when (task) {
+                is JavaCompile -> {
+                    lines.add("${task.path} source=${task.sourceCompatibility} target=${task.targetCompatibility} javaHome=${task.options.forkOptions.javaHome}")
+                }
+                is KotlinCompile -> {
+                    lines.add("${task.path} jvmTarget=${task.kotlinOptions.jvmTarget} jdkHome=${task.kotlinOptions.jdkHome}")
+                }
+                is Test -> {
+                    lines.add("${task.path} executable=${task.executable}")
+                }
+            }
+        }
+    }
+    val text = lines.sorted().joinToString("\n")
+    file("jvm-tasks-settings.txt").writeText(text)
+}
