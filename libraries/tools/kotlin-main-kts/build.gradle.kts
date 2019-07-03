@@ -52,7 +52,7 @@ val mainKtsRelocatedDepsRootPackage = "$mainKtsRootPackage.relocatedDeps"
 
 val packJar by task<ShadowJar> {
     configurations = emptyList()
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.FAIL
     destinationDirectory.set(File(buildDir, "libs"))
     archiveClassifier.set("before-proguard")
 
