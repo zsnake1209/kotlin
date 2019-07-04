@@ -5,13 +5,13 @@
 
 package org.jetbrains.kotlin.config
 
+import org.jetbrains.kotlin.builtins.isFunctionOrSuspendFunctionType
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.StorageManager
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.TypeConstructor
+import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.types.checker.NewCapturedTypeConstructor
 import org.jetbrains.kotlin.types.checker.REFINER_CAPABILITY
@@ -42,10 +42,31 @@ class KotlinTypeRefinerImpl(
     @TypeRefinement
     override fun refineType(type: KotlinType): KotlinType {
         if (isRefinementDisabled) return type
-        return refinedTypeCache.computeIfAbsent(type) {
+        val cached = refinedTypeCache.computeIfAbsent(type) {
             type.refine(this)
         }
+        return updateArgumentsAnnotationsIfNeeded(type, cached)
     }
+
+    private fun updateArgumentsAnnotationsIfNeeded(originalType: KotlinType, cachedType: KotlinType): KotlinType {
+        if (!originalType.isArgumentsAnnotationsUpdateNeeded()) return cachedType
+
+        fun doReplace(original: KotlinType, cached: KotlinType): KotlinType {
+            val newArguments = mutableListOf<TypeProjection>()
+            for ((originalArg, cachedArg) in original.arguments zip cached.arguments) {
+                if (cachedArg.type.isError || TypeUtils.noExpectedType(cachedArg.type)) {
+                    newArguments += cachedArg
+                } else {
+                    newArguments += cachedArg.replaceType(doReplace(originalArg.type, cachedArg.type))
+                }
+            }
+            return cached.replace(newArguments, original.annotations)
+        }
+
+        return doReplace(originalType, cachedType)
+    }
+
+    private fun KotlinType.isArgumentsAnnotationsUpdateNeeded(): Boolean = isFunctionOrSuspendFunctionType
 
     @TypeRefinement
     override fun refineSupertypes(classDescriptor: ClassDescriptor): Collection<KotlinType> {

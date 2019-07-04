@@ -27,4 +27,7 @@ public interface TypeProjection extends TypeArgumentMarker {
     KotlinType getType();
 
     boolean isStarProjection();
+
+    @NotNull
+    TypeProjection replaceType(@NotNull KotlinType newType);
 }

@@ -34,6 +34,10 @@ class StarProjectionImpl(
     }
 
     override fun getType() = _type
+
+    override fun replaceType(newType: KotlinType): TypeProjection {
+        return TypeBasedStarProjectionImpl(newType)
+    }
 }
 
 fun TypeParameterDescriptor.starProjectionType(): KotlinType {
@@ -58,4 +62,8 @@ class TypeBasedStarProjectionImpl(
     override fun getProjectionKind() = Variance.OUT_VARIANCE
 
     override fun getType() = _type
+
+    override fun replaceType(newType: KotlinType): TypeProjection {
+        return TypeBasedStarProjectionImpl(newType)
+    }
 }

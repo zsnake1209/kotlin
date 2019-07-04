@@ -47,4 +47,10 @@ public class TypeProjectionImpl extends TypeProjectionBase {
     public boolean isStarProjection() {
         return false;
     }
+
+    @NotNull
+    @Override
+    public TypeProjection replaceType(@NotNull KotlinType newType) {
+        return new TypeProjectionImpl(projection, newType);
+    }
 }
