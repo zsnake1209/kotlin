@@ -31,10 +31,6 @@ class KotlinTypeRefinerImpl(
     }
 
     private val isRefinementDisabled = !languageVersionSettings.isTypeRefinementEnabled
-    /*
-     * TODO: Dangerous place, because actually we refine only SimpleTypes, but here we cache all kotlin types
-     *   that may greatly increase memory consumption
-     */
     private val refinedTypeCache = storageManager.createCacheWithNotNullValues<KotlinType, KotlinType>()
     private val _isRefinementNeededForTypeConstructor =
         storageManager.createMemoizedFunction<TypeConstructor, Boolean> { it.areThereExpectSupertypesOrTypeArguments() }
@@ -43,10 +39,14 @@ class KotlinTypeRefinerImpl(
     @TypeRefinement
     override fun refineType(type: KotlinType): KotlinType {
         if (isRefinementDisabled) return type
-        val cached = refinedTypeCache.computeIfAbsent(type) {
+        return if (type.hasNotTrivialRefinementFactory) {
+            val cached = refinedTypeCache.computeIfAbsent(type) {
+                type.refine(this)
+            }
+            updateArgumentsAnnotationsIfNeeded(type, cached)
+        } else {
             type.refine(this)
         }
-        return updateArgumentsAnnotationsIfNeeded(type, cached)
     }
 
     private fun updateArgumentsAnnotationsIfNeeded(originalType: KotlinType, cachedType: KotlinType): KotlinType {

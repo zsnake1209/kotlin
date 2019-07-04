@@ -166,6 +166,9 @@ private class SimpleTypeImpl(
     override val memberScope: MemberScope,
     private val scopeFactory: (KotlinTypeRefiner) -> MemberScope
 ) : SimpleType() {
+    @TypeRefinement
+    override val hasNotTrivialRefinementFactory: Boolean get() = true
+
     override val annotations: Annotations get() = Annotations.EMPTY
 
     override fun replaceAnnotations(newAnnotations: Annotations) =

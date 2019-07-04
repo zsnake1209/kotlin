@@ -77,6 +77,9 @@ sealed class KotlinType : Annotated, KotlinTypeMarker {
     @TypeRefinement
     abstract fun refine(kotlinTypeRefiner: KotlinTypeRefiner): KotlinType
 
+    @TypeRefinement
+    open val hasNotTrivialRefinementFactory: Boolean get() = false
+
     /* '0' means "hashCode wasn't computed"
 
      Note #1. We don't use 'null' as a sign of "uncomputed value" to avoid boxing,
