@@ -101,7 +101,11 @@ class KotlinTypeRefinerImpl(
 
     @TypeRefinement
     override fun isRefinementNeededForTypeConstructor(typeConstructor: TypeConstructor): Boolean {
-        return _isRefinementNeededForTypeConstructor.invoke(typeConstructor)
+        return try {
+            _isRefinementNeededForTypeConstructor.invoke(typeConstructor)
+        } catch (e: AssertionError) {
+            false
+        }
     }
 
     @TypeRefinement
