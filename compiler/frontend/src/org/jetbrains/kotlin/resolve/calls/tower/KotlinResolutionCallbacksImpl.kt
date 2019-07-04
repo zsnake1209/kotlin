@@ -44,6 +44,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.expressions.DoubleColonExpressionResolver
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingServices
 import org.jetbrains.kotlin.types.expressions.KotlinTypeInfo
+import org.jetbrains.kotlin.types.refinement.TypeRefinement
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import org.jetbrains.kotlin.utils.addIfNotNull
@@ -133,7 +134,10 @@ class KotlinResolutionCallbacksImpl(
         val expectedType = createFunctionType(
             builtIns, annotations, receiverType, parameters, null,
             lambdaInfo.expectedType, isSuspend
-        )
+        ).let {
+            @UseExperimental(TypeRefinement::class)
+            callComponents.kotlinTypeRefiner.refineType(it) as SimpleType
+        }
 
         val approximatesExpectedType =
             typeApproximator.approximateToSubType(expectedType, TypeApproximatorConfiguration.LocalDeclaration) ?: expectedType
