@@ -24,6 +24,19 @@ class ScopesHolderForClass<T : MemberScope> private constructor(
 
     @UseExperimental(TypeRefinement::class)
     fun getScope(kotlinTypeRefiner: KotlinTypeRefiner): T {
+        /*
+         * That check doesn't break anything, because scopeForOwnerModule _will_ anyway refine supertypes from module of
+         *   class descriptor.
+         *
+         * Without that fastpass there is problem wit recursion types such that:
+         *
+         *   interface A<T : A<T>>
+         *
+         *   interface B : B<T>
+         *
+         * In this case (without check) we start compute default type of class descriptor B, go to isRefinementNeededForTypeConstructor,
+         *   ask for supertypes of B, see A<B>, ask default type of class B and fail with recursion problem
+         */
         if (!kotlinTypeRefiner.isRefinementNeededForModule(classDescriptor.module)) return scopeForOwnerModule
 
         if (!kotlinTypeRefiner.isRefinementNeededForTypeConstructor(classDescriptor.typeConstructor)) return scopeForOwnerModule
