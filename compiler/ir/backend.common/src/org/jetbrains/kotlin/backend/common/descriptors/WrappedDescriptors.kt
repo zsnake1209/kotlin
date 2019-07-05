@@ -464,7 +464,16 @@ open class WrappedSimpleFunctionDescriptor(
 
 class WrappedFunctionDescriptorWithContainerSource(
     override val containerSource: DeserializedContainerSource?
-) : WrappedSimpleFunctionDescriptor(), DescriptorWithContainerSource
+) : WrappedSimpleFunctionDescriptor(), DescriptorWithContainerSource {
+    override fun getContainingDeclaration(): DeclarationDescriptor {
+        val parent = owner.parent
+        return if (parent is IrClass && parent.origin == IrDeclarationOrigin.FILE_CLASS && parent.parent is IrExternalPackageFragment) {
+            return (parent.parent as IrExternalPackageFragment).packageFragmentDescriptor
+        } else {
+            super.getContainingDeclaration()
+        }
+    }
+}
 
 open class WrappedClassConstructorDescriptor(
     annotations: Annotations = Annotations.EMPTY,
