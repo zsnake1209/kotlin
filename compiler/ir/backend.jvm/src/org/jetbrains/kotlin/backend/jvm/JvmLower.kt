@@ -83,6 +83,13 @@ private val defaultArgumentStubPhase = makeIrFilePhase<CommonBackendContext>(
     prerequisite = setOf(localDeclarationsPhase)
 )
 
+private val defaultArgumentInjectorPhase = makeIrFilePhase<CommonBackendContext>(
+    { context -> DefaultParameterInjector(context, skipInline = false, skipExternalMethods = false) },
+    name = "DefaultParameterInjector",
+    description = "Transform calls with default arguments into calls to stubs",
+    prerequisite = setOf(defaultArgumentStubPhase)
+)
+
 private val innerClassesPhase = makeIrFilePhase(
     ::InnerClassesLowering,
     name = "InnerClasses",
@@ -120,10 +127,12 @@ val jvmPhases = namedIrFilePhase<JvmBackendContext>(
             singletonReferencesPhase then
             localDeclarationsPhase then
             defaultArgumentStubPhase then
+            defaultArgumentInjectorPhase then
 
             interfacePhase then
             interfaceDelegationPhase then
             interfaceSuperCallsPhase then
+            interfaceDefaultCallsPhase then
 
             singleAbstractMethodPhase then
             addContinuationPhase then
@@ -139,13 +148,13 @@ val jvmPhases = namedIrFilePhase<JvmBackendContext>(
             enumClassPhase then
             objectClassPhase then
             makeInitializersPhase(JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, true) then
-            syntheticAccessorPhase then
             collectionStubMethodLowering then
             bridgePhase then
             jvmOverloadsAnnotationPhase then
             jvmDefaultConstructorPhase then
             jvmStaticAnnotationPhase then
             staticDefaultFunctionPhase then
+            syntheticAccessorPhase then
 
             toArrayPhase then
             flattenStringConcatenationPhase then

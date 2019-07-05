@@ -987,3 +987,10 @@ open class WrappedFieldDescriptor(
 
     override fun <V : Any?> getUserData(key: CallableDescriptor.UserDataKey<V>?): V? = null
 }
+
+fun wrappedSimpleFunctionDescriptorBasedOn(descriptor: SimpleFunctionDescriptor) =
+    if (descriptor is DescriptorWithContainerSource)
+        // TODO: Do we ever need annotations and source for these?
+        WrappedFunctionDescriptorWithContainerSource(descriptor.containerSource)
+    else
+        WrappedSimpleFunctionDescriptor(descriptor.annotations, descriptor.source)

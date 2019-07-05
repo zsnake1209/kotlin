@@ -519,7 +519,8 @@ fun createStaticFunctionWithReceivers(
         oldFunction.visibility,
         Modality.FINAL,
         oldFunction.returnType,
-        isInline = false, isExternal = false, isTailrec = false, isSuspend = false
+        isInline = oldFunction.isInline,
+        isExternal = false, isTailrec = false, isSuspend = false
     ).apply {
         descriptor.bind(this)
         parent = irParent
@@ -544,15 +545,31 @@ fun createStaticFunctionWithReceivers(
                                        oldFunction.valueParameters.map { it.copyTo(this, index = it.index + offset) }
         )
 
-        val mapping: Map<IrValueParameter, IrValueParameter> =
-            (listOfNotNull(oldFunction.dispatchReceiverParameter, oldFunction.extensionReceiverParameter) + oldFunction.valueParameters)
-                .zip(valueParameters).toMap()
         if (copyBody) {
-            body = oldFunction.body
-                ?.transform(VariableRemapper(mapping), null)
-                ?.patchDeclarationParents(this)
+            copyBodyToStatic(oldFunction, this)
         }
 
         metadata = oldFunction.metadata
     }
+}
+
+fun copyBodyToStatic(oldFunction: IrFunction, staticFunction: IrFunction) {
+    val mapping: Map<IrValueParameter, IrValueParameter> =
+        (listOfNotNull(oldFunction.dispatchReceiverParameter, oldFunction.extensionReceiverParameter) + oldFunction.valueParameters)
+            .zip(staticFunction.valueParameters).toMap()
+    staticFunction.body = oldFunction.body
+            ?.transform(VariableRemapper(mapping), null)
+            ?.patchDeclarationParents(staticFunction)
+}
+
+fun IrDeclaration.adoptIfNeeded() {
+    val parent = parent // Tell the compiler that nobody is changing the var.
+    if (parent is IrDeclarationContainer && getPackageFragment() is IrExternalPackageFragment && this !in parent.declarations) {
+        parent.declarations.add(this)
+    }
+}
+
+fun IrClass.underlyingType(): IrType {
+    require(isInline)
+    return constructors.single { it.isPrimary }.valueParameters[0].type
 }
