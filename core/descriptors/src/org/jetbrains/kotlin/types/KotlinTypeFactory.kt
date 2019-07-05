@@ -82,7 +82,7 @@ object KotlinTypeFactory {
             val expandedTypeOrRefinedConstructor = refineConstructor(constructor, refiner, refinedArguments) ?: return@f null
             expandedTypeOrRefinedConstructor.expandedType?.let { return@f it }
 
-            simpleType(annotations, expandedTypeOrRefinedConstructor.refinedConstructor!!, refinedArguments, nullable, kotlinTypeRefiner)
+            simpleType(annotations, expandedTypeOrRefinedConstructor.refinedConstructor!!, refinedArguments, nullable, refiner)
         }
     }
 
