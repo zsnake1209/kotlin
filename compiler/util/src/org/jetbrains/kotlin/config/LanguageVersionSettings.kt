@@ -5,10 +5,13 @@
 
 package org.jetbrains.kotlin.config
 
+import com.google.common.collect.Maps
 import org.jetbrains.kotlin.config.LanguageFeature.Kind.*
 import org.jetbrains.kotlin.config.LanguageVersion.*
 import org.jetbrains.kotlin.utils.DescriptionAware
+import java.lang.ref.Reference
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 enum class LanguageFeature(
     val sinceVersion: LanguageVersion?,
@@ -223,8 +226,7 @@ enum class LanguageVersion(val major: Int, val minor: Int) : DescriptionAware {
     val isStable: Boolean
         get() = this <= LATEST_STABLE
 
-    val versionString: String
-        get() = "$major.$minor"
+    val versionString: String = "$major.$minor"
 
     override val description: String
         get() = if (isStable) versionString else "$versionString (EXPERIMENTAL)"
@@ -232,12 +234,20 @@ enum class LanguageVersion(val major: Int, val minor: Int) : DescriptionAware {
     override fun toString() = versionString
 
     companion object {
-        @JvmStatic
-        fun fromVersionString(str: String?) = values().find { it.versionString == str }
+        private val VERSION_CACHE_STRING_CACHE = ConcurrentHashMap<String, Optional<LanguageVersion>>()
 
         @JvmStatic
-        fun fromFullVersionString(str: String) =
-            str.split(".", "-").let { if (it.size >= 2) fromVersionString("${it[0]}.${it[1]}") else null }
+        fun fromVersionString(str: String?): LanguageVersion? =
+            VERSION_CACHE_STRING_CACHE.getOrPut(str) {
+                Optional.ofNullable(values().find { it.versionString == str })
+            }.get()
+
+        @JvmStatic
+        fun fromFullVersionString(str: String): LanguageVersion? =
+            VERSION_CACHE_STRING_CACHE.getOrPut(str) {
+                val version = str.split(".", "-").let { if (it.size >= 2) fromVersionString("${it[0]}.${it[1]}") else null }
+                Optional.ofNullable(version)
+            }.get()
 
         @JvmField
         val FIRST_SUPPORTED = KOTLIN_1_2
