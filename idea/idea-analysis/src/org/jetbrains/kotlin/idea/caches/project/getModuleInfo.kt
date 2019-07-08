@@ -34,7 +34,16 @@ import org.jetbrains.kotlin.utils.yieldIfNotNull
 
 var PsiFile.forcedModuleInfo: ModuleInfo? by UserDataProperty(Key.create("FORCED_MODULE_INFO"))
 
-fun PsiElement.getModuleInfo(): IdeaModuleInfo = this.collectInfos(ModuleInfoCollector.NotNullTakeFirst)
+fun PsiElement.getModuleInfo(): IdeaModuleInfo {
+    val ideaModuleInfo = this.collectInfos(ModuleInfoCollector.NotNullTakeFirst)
+
+    val file = containingFile
+    if (file != null && file.forcedModuleInfo == null) {
+        file.forcedModuleInfo = ideaModuleInfo
+    }
+
+    return ideaModuleInfo
+}
 
 fun PsiElement.getNullableModuleInfo(): IdeaModuleInfo? = this.collectInfos(ModuleInfoCollector.NullableTakeFirst)
 
@@ -181,11 +190,12 @@ private fun <T> PsiElement.collectInfos(c: ModuleInfoCollector<T>): T {
         }
     }
 
-    return c.virtualFileProcessor(
+    val virtualFileProcessor = c.virtualFileProcessor(
         project,
         virtualFile,
         (containingFile as? KtFile)?.isCompiled ?: false
     )
+    return virtualFileProcessor
 }
 
 private fun <T> KtLightElement<*, *>.processLightElement(c: ModuleInfoCollector<T>): T {

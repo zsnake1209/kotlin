@@ -237,17 +237,20 @@ enum class LanguageVersion(val major: Int, val minor: Int) : DescriptionAware {
         private val VERSION_CACHE_STRING_CACHE = ConcurrentHashMap<String, Optional<LanguageVersion>>()
 
         @JvmStatic
-        fun fromVersionString(str: String?): LanguageVersion? =
-            VERSION_CACHE_STRING_CACHE.getOrPut(str) {
+        fun fromVersionString(str: String?): LanguageVersion? {
+            if (str == null) return null
+
+            return VERSION_CACHE_STRING_CACHE.getOrPut(str) {
                 Optional.ofNullable(values().find { it.versionString == str })
-            }.get()
+            }.orElse(null)
+        }
 
         @JvmStatic
         fun fromFullVersionString(str: String): LanguageVersion? =
             VERSION_CACHE_STRING_CACHE.getOrPut(str) {
                 val version = str.split(".", "-").let { if (it.size >= 2) fromVersionString("${it[0]}.${it[1]}") else null }
                 Optional.ofNullable(version)
-            }.get()
+            }.orElse(null)
 
         @JvmField
         val FIRST_SUPPORTED = KOTLIN_1_2

@@ -192,10 +192,13 @@ sealed class ModuleSourceInfoWithExpectedBy(private val forProduction: Boolean) 
 data class ModuleProductionSourceInfo internal constructor(
     override val module: Module
 ) : ModuleSourceInfoWithExpectedBy(forProduction = true) {
+    init {
+//        println(module.name)
+    }
 
-    override val name = Name.special("<production sources for module ${module.name}>")
+    override val name get() = Name.special("<production sources for module ${module.name}>")
 
-    override val stableName: Name = module.getStableName()
+    override val stableName: Name get() = module.getStableName()
 
     override fun contentScope(): GlobalSearchScope {
         return enlargedSearchScope(ModuleProductionSourceScope(module), module, isTestScope = false)
