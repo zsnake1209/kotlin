@@ -54,12 +54,24 @@
                 text="Report as incompatible API">
         </action>
 
+
+<!--        <action id="Kotlin.XDebugger.ToggleKotlinVariableView"-->
+<!--                class="org.jetbrains.kotlin.idea.debugger.ToggleKotlinVariablesView"-->
+<!--                text="Show Kotlin Variables Only">-->
+<!--            <add-to-group group-id="XDebugger.Settings" relative-to-action="XDebugger.Inline" anchor="after"/>-->
+<!--        </action>-->
+
         <group id="Kotlin.XDebugger.Actions">
             <action id="Kotlin.XDebugger.ToggleKotlinVariableView"
                     class="org.jetbrains.kotlin.idea.debugger.ToggleKotlinVariablesView"
                     icon="/org/jetbrains/kotlin/idea/icons/kotlin.png"
                     text="Show Kotlin variables only"
             />
+<!--            TODO(design)-->
+            <action id="Kotlin.XDebugger.CoroutinesDump"
+                class="org.jetbrains.kotlin.idea.debugger.coroutines.CoroutineDumpAction"
+            text="Get Coroutines Dump"
+            icon="/org/jetbrains/kotlin/idea/icons/kotlin.png"/>
         </group>
 
         <group id="Kotlin.XDebugger.Watches.Tree.Toolbar">
@@ -110,6 +122,7 @@
         <debugger.javaBreakpointHandlerFactory implementation="org.jetbrains.kotlin.idea.debugger.breakpoints.KotlinFunctionBreakpointHandlerFactory"/>
         <debugger.jvmSteppingCommandProvider implementation="org.jetbrains.kotlin.idea.debugger.stepping.KotlinSteppingCommandProvider"/>
         <debugger.simplePropertyGetterProvider implementation="org.jetbrains.kotlin.idea.debugger.stepping.KotlinSimpleGetterProvider"/>
+        <runConfigurationExtension implementation="org.jetbrains.kotlin.idea.debugger.coroutines.CoroutinesDebugConfigurationExtension"/>
 
         <framework.type implementation="org.jetbrains.kotlin.idea.framework.JavaFrameworkType"/>
         <projectTemplatesFactory implementation="org.jetbrains.kotlin.idea.framework.KotlinTemplatesFactory" />
@@ -185,6 +198,10 @@
 
       <registryKey key="kotlin.jps.instrument.bytecode"
                    description="Enable bytecode instrumentation for Kotlin classes"
+                   defaultValue="false"
+                   restartRequired="false"/>
+      <registryKey key="kotlin.debugger.coroutines"
+                   description="Enable debugging for coroutines in Kotlin/JVM"
                    defaultValue="false"
                    restartRequired="false"/>
     </extensions>

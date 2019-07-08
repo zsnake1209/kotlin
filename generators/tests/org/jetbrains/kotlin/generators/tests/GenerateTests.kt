@@ -162,6 +162,74 @@ import org.jetbrains.kotlinx.serialization.AbstractSerializationPluginDiagnostic
 fun main(args: Array<String>) {
     System.setProperty("java.awt.headless", "true")
 
+    testGroup("idea/jvm-debugger/jvm-debugger-test/test", "idea/jvm-debugger/jvm-debugger-test/testData") {
+        testClass<AbstractKotlinSteppingTest> {
+            model(
+                "stepping/stepIntoAndSmartStepInto",
+                pattern = KT_WITHOUT_DOTS_IN_NAME,
+                testMethod = "doStepIntoTest",
+                testClassName = "StepInto"
+            )
+            model(
+                "stepping/stepIntoAndSmartStepInto",
+                pattern = KT_WITHOUT_DOTS_IN_NAME,
+                testMethod = "doSmartStepIntoTest",
+                testClassName = "SmartStepInto"
+            )
+            model(
+                "stepping/stepInto",
+                pattern = KT_WITHOUT_DOTS_IN_NAME,
+                testMethod = "doStepIntoTest",
+                testClassName = "StepIntoOnly"
+            )
+            model("stepping/stepOut", pattern = KT_WITHOUT_DOTS_IN_NAME, testMethod = "doStepOutTest")
+            model("stepping/stepOver", pattern = KT_WITHOUT_DOTS_IN_NAME, testMethod = "doStepOverTest")
+            model("stepping/stepOverForce", pattern = KT_WITHOUT_DOTS_IN_NAME, testMethod = "doStepOverForceTest")
+            model("stepping/filters", pattern = KT_WITHOUT_DOTS_IN_NAME, testMethod = "doStepIntoTest")
+            model("stepping/custom", pattern = KT_WITHOUT_DOTS_IN_NAME, testMethod = "doCustomTest")
+        }
+
+        testClass<AbstractKotlinEvaluateExpressionTest> {
+            model("evaluation/singleBreakpoint", testMethod = "doSingleBreakpointTest")
+            model("evaluation/multipleBreakpoints", testMethod = "doMultipleBreakpointsTest")
+        }
+
+        testClass<AbstractSelectExpressionForDebuggerTest> {
+            model("selectExpression", recursive = false)
+            model("selectExpression/disallowMethodCalls", testMethod = "doTestWoMethodCalls")
+        }
+
+        testClass<AbstractPositionManagerTest> {
+            model("positionManager", recursive = false, extension = "kt", testClassName = "SingleFile")
+            model("positionManager", recursive = false, extension = null, testClassName = "MultiFile")
+        }
+
+        testClass<AbstractSmartStepIntoTest> {
+            model("smartStepInto")
+        }
+
+        testClass<AbstractBreakpointApplicabilityTest> {
+            model("breakpointApplicability")
+        }
+
+        testClass<AbstractFileRankingTest> {
+            model("fileRanking")
+        }
+
+        testClass<AbstractAsyncStackTraceTest> {
+            model("asyncStackTrace")
+        }
+
+        testClass<AbstractCoroutineDumpTest> {
+            model("coroutines")
+        }
+
+        testClass<AbstractSequenceTraceTestCase> {
+            // TODO: implement mapping logic for terminal operations
+            model("sequence/streams/sequence", excludeDirs = listOf("terminal"))
+        }
+    }
+
     testGroup("idea/tests", "idea/testData") {
         testClass<AbstractAdditionalResolveDescriptorRendererTest> {
             model("resolve/additionalLazyResolve")
