@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstKind
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.types.isNullable
+import org.jetbrains.kotlin.ir.types.isNullableString
 import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
@@ -35,6 +37,7 @@ class StringTrimLowering(val context: CommonBackendContext) : FileLoweringPass, 
         return when {
             trimIndentMatcher(expression) -> maybeComputeTrimIndent(expression)
             trimMarginMatcher(expression) -> maybeComputeTrimMargin(expression)
+            trimMarginDefaultMatcher(expression) -> maybeComputeTrimMargin(expression)
             else -> super.visitCall(expression)
         }
     }
@@ -49,7 +52,7 @@ class StringTrimLowering(val context: CommonBackendContext) : FileLoweringPass, 
         val receiverString = call.extensionReceiver!!.getConstantString() ?: return call
 
         val prefixArgument = call.getValueArgument(0)
-        val newString = if (prefixArgument != null) {
+        val newString = if (prefixArgument != null && !prefixArgument.type.isNullable()) { // Will be null for a default call
             val prefixString = prefixArgument.getConstantString() ?: return call
             receiverString.trimMargin(prefixString)
         } else {
@@ -80,7 +83,15 @@ class StringTrimLowering(val context: CommonBackendContext) : FileLoweringPass, 
             parameter(0) { it.type.isString() }
         }
 
+        private val trimMarginDefaultMatcher = SimpleCalleeMatcher {
+            extensionReceiver { it != null && it.type.isString() }
+            fqName { it == TRIM_MARGIN_DEFAULT_FQ_NAME }
+            parameterCount { it == 3 }
+            parameter(0) { it.type.isNullableString() }
+        }
+
         private val TRIM_MARGIN_FQ_NAME = FqName.fromSegments(listOf("kotlin", "text", "trimMargin"))
+        private val TRIM_MARGIN_DEFAULT_FQ_NAME = FqName.fromSegments(listOf("kotlin", "text", "trimMargin\$default"))
         private val TRIM_INDENT_FQ_NAME = FqName.fromSegments(listOf("kotlin", "text", "trimIndent"))
     }
 }
