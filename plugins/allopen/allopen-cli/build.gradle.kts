@@ -18,9 +18,9 @@ dependencies {
     }
 
     testRuntimeOnly(project(":kotlin-compiler"))
-    Platform[192].orHigher {
-        testRuntimeOnly(intellijDep()) { includeJars("platform-concurrency") }
-    }
+//    Platform[192].orHigher {
+//        testRuntimeOnly(intellijDep()) { includeJars("platform-concurrency") }
+//    }
 
     testCompile(project(":compiler:backend"))
     testCompile(project(":compiler:cli"))

@@ -375,7 +375,7 @@ public abstract class KtUsefulTestCase extends TestCase {
         if (!shouldRunTest()) return;
 
         if (runInDispatchThread()) {
-            TestRunnerUtil.replaceIdeEventQueueSafely();
+            //TestRunnerUtil.replaceIdeEventQueueSafely();
             com.intellij.testFramework.EdtTestUtil.runInEdtAndWait(this::defaultRunBare);
         }
         else {
