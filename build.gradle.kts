@@ -315,9 +315,10 @@ gradle.taskGraph.whenReady {
     if (nonConfiguredJvmProjects.isNotEmpty()) {
         val msg = buildString {
             appendln("The following JVM projects are not configured properly:")
-            nonConfiguredJvmProjects.forEach { appendln("  ${it.path}") }
+            nonConfiguredJvmProjects.forEach { appendln("  ${it.path} (${it.buildFile.relativeTo(rootDir)})") }
             appendln("Call 'JvmProject.configure(TARGET_JVM_VERSION)' in the scripts to fix the issue")
         }
+
         throw GradleException(msg)
     }
 }
@@ -385,7 +386,10 @@ allprojects {
     task("listDistJar") { listConfigurationContents("distJar") }
 
     afterEvaluate {
-        if (plugins.hasPlugin("java") && !JvmProject.isConfigured(this)) {
+        val isJavaProject = (plugins.hasPlugin("java") || plugins.hasPlugin("java-library"))
+                && !plugins.hasPlugin("kotlin-platform-js")
+                && !plugins.hasPlugin("kotlin-platform-common")
+        if (isJavaProject && !JvmProject.isConfigured(this)) {
             nonConfiguredJvmProjects.add(this)
         }
 
