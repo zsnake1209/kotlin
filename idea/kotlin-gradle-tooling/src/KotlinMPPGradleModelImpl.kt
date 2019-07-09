@@ -128,6 +128,7 @@ data class KotlinTargetImpl(
     override val disambiguationClassifier: String?,
     override val platform: KotlinPlatform,
     override val compilations: Collection<KotlinCompilation>,
+    override val testTasks: Collection<KotlinTestTask>,
     override val jar: KotlinTargetJar?
 ) : KotlinTarget {
     override fun toString() = name
@@ -142,9 +143,18 @@ data class KotlinTargetImpl(
                 cloningCache[initialCompilation] = it
             }
         }.toList(),
+        target.testTasks.map { initialTestTask ->
+            (cloningCache[initialTestTask] as? KotlinTestTask) ?: KotlinTestTaskImpl(initialTestTask.taskName).also {
+                cloningCache[initialTestTask] = it
+            }
+        },
         KotlinTargetJarImpl(target.jar?.archiveFile)
     )
 }
+
+data class KotlinTestTaskImpl(
+    override val taskName: String
+) : KotlinTestTask
 
 data class ExtraFeaturesImpl(
     override val coroutinesState: String?,
