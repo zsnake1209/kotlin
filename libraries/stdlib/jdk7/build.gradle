@@ -64,12 +64,10 @@ task modularJar(type: Jar) {
 
 
 artifacts {
-    archives sourcesJar
-    sources sourcesJar
-
     archives modularJar
 }
 
+sourcesJar()
 javadocJar()
 
 compileKotlin {

@@ -307,8 +307,8 @@ task mergedJar(type: Jar, dependsOn: compileJs) {
     exclude "${experimentalJsModuleName}.*"
 }
 
-task sourcesJar(type: Jar, dependsOn: compileJs) {
-    classifier = 'sources'
+sourcesJar {
+    dependsOn(compileJs)
     includeEmptyDirs false
     duplicatesStrategy = DuplicatesStrategy.FAIL
     from(sourceSets.builtins.allSource) {
@@ -332,11 +332,13 @@ task sourcesJar(type: Jar, dependsOn: compileJs) {
 }
 
 task distSourcesJar(type: Jar) {
+    def sourcesJar = tasks.named("sourcesJar")
+
     dependsOn(sourcesJar, configurations.commonSources)
     destinationDirectory = file("$buildDir/lib/dist")
     archiveClassifier = 'sources'
     duplicatesStrategy = DuplicatesStrategy.FAIL
-    from zipTree(sourcesJar.outputs.files.singleFile)
+    from zipTree(sourcesJar.map { outputs.files.singleFile })
 
     from(zipTree(configurations.commonSources.singleFile)) {
         it.includeEmptyDirs = false
@@ -354,8 +356,6 @@ task distSourcesJar(type: Jar) {
 artifacts {
     runtime mergedJar
     archives mergedJar
-    archives sourcesJar
-    sources sourcesJar
     distSources distSourcesJar
 
     compileJs.outputs.files.forEach { artifact ->

@@ -50,19 +50,12 @@ compileTestKotlin2Js {
     }
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from(sourceSets.main.allSource)
-}
+sourcesJar()
 
 archivesBaseName = 'kotlin-test-js-ir'
 
 jar {
     manifestAttributes(manifest, project, 'Test')
-}
-
-artifacts {
-    archives sourcesJar
 }
 
 if (project.findProperty("kotlin.stdlib.js.ir.publish")?.toBoolean() == true) {

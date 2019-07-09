@@ -146,16 +146,9 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+sourcesJar {
     duplicatesStrategy = DuplicatesStrategy.FAIL
-    from (sourceSets.main.allSource)
 }
-
-artifacts {
-    archives sourcesJar
-}
-
 
 if (project.findProperty("kotlin.stdlib.js.ir.publish")?.toBoolean() == true) {
     configurePublishing(project)

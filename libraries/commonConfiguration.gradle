@@ -149,7 +149,8 @@ allprojects { project ->
     }
 
     project.ext.sourcesJar = { lambda = {} ->
-        ArtifactsKt.sourcesJar(project, lambda)
+        def provider = ArtifactsKt.sourcesJar(project, {})
+        provider.configure(lambda)
     }
 
     dependencies.ext.kotlinStdlib = { suffix ->

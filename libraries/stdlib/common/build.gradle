@@ -91,21 +91,9 @@ jar {
     from sourceSets.coroutinesExperimental.output
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.kotlin
+sourcesJar {
     from sourceSets.coroutinesExperimental.kotlin
 }
-
-configurations {
-    sources
-}
-
-artifacts {
-    archives sourcesJar
-    sources sourcesJar
-}
-
 javadocJar()
 
 classes.setDependsOn(classes.dependsOn.findAll { it != "compileJava" })
