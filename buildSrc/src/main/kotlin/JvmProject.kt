@@ -12,6 +12,7 @@ object JvmProject {
     fun isConfigured(project: Project): Boolean =
         project.extra.properties[isConfiguredProperty] as? Boolean ?: false
 
+    @JvmStatic
     fun configure(project: Project, targetJvmVersion: String) {
         val impl = project.configureJvmProjectImpl
         project.impl(targetJvmVersion)
