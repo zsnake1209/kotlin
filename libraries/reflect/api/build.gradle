@@ -2,7 +2,7 @@ description = ''
 
 apply plugin: 'kotlin'
 
-configureJvm6Project(project)
+JvmProject.configure(project, "1.6")
 
 def includeJava9 = BuildPropertiesKt.getKotlinBuildProperties(project).includeJava9
 

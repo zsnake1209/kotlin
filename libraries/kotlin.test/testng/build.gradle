@@ -2,9 +2,8 @@ description = 'Kotlin Test TestNG'
 
 apply plugin: 'kotlin-platform-jvm'
 
-configureJvm6Project(project)
+JvmProject.configure(project, "1.7")
 configurePublishing(project)
-ext.javaHome = JDK_17
 
 dependencies {
     expectedBy project(':kotlin-test:kotlin-test-annotations-common')

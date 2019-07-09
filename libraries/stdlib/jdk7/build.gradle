@@ -3,9 +3,8 @@ description = 'Kotlin Standard Library JDK 7 extension'
 apply plugin: 'kotlin'
 apply plugin: 'pill-configurable'
 
-configureJvm6Project(project)
+JvmProject.configure(project, "1.7")
 configurePublishing(project)
-ext.javaHome = JDK_17
 
 pill {
     importAsLibrary = true
@@ -73,10 +72,6 @@ artifacts {
 
 javadocJar()
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-    kotlinOptions.jdkHome = JDK_17
-}
-
 compileKotlin {
     kotlinOptions.freeCompilerArgs = [
             "-Xallow-kotlin-package",
@@ -97,10 +92,6 @@ compileTestKotlin {
 }
 
 compileJava9Sources(project, 'kotlin.stdlib.jdk7')
-
-test {
-    executable = "$JDK_17/bin/java"
-}
 
 task testJdk6Tests(type: Test) {
     dependsOn(':kotlin-stdlib:testClasses')

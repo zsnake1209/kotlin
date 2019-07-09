@@ -5,7 +5,7 @@ apply plugin: 'pill-configurable'
 
 archivesBaseName = 'kotlin-stdlib'
 
-configureJvm6Project(project)
+JvmProject.configure(project, "1.6")
 configurePublishing(project)
 
 configurations {
