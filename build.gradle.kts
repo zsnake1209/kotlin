@@ -318,6 +318,7 @@ gradle.taskGraph.whenReady {
             nonConfiguredJvmProjects.forEach { appendln("  ${it.path}") }
             appendln("Call 'JvmProject.configure(TARGET_JVM_VERSION)' in the scripts to fix the issue")
         }
+        throw GradleException(msg)
     }
 }
 
