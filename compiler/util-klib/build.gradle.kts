@@ -5,6 +5,8 @@ plugins {
 
 description = "Common klib reader and writer"
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile(kotlinStdlib())
     compile(project(":kotlin-util-io"))

@@ -6,6 +6,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 val robolectricClasspath by configurations.creating
 val androidExtensionsRuntimeForTests by configurations.creating
 

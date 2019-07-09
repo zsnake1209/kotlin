@@ -8,6 +8,8 @@ plugins {
     `java`
 }
 
+JvmProject.configure(project, "1.8")
+
 val packedJars by configurations.creating
 
 dependencies {

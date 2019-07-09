@@ -6,6 +6,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compileOnly(project(":compiler:plugin-api"))
     compileOnly(project(":compiler:frontend"))

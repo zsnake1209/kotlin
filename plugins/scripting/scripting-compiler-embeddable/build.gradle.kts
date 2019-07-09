@@ -4,6 +4,8 @@ plugins { java }
 
 description = "Kotlin Scripting Compiler Plugin for embeddable compiler"
 
+JvmProject.configure(project, "1.8")
+
 val packedJars by configurations.creating
 dependencies {
     packedJars(project(":kotlin-scripting-compiler")) { isTransitive = false }

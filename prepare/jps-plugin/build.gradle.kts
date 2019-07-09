@@ -5,6 +5,8 @@ plugins {
     id("pill-configurable")
 }
 
+JvmProject.configure(project, "1.8")
+
 val projectsToShadow = listOf(
     ":core:type-system",
     ":kotlin-build-common",

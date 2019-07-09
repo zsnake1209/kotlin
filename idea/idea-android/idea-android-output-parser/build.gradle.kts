@@ -1,8 +1,9 @@
 plugins {
     kotlin("jvm")
+    `jps-compatible`
 }
 
-apply { plugin("jps-compatible") }
+JvmProject.configure(project, "1.8")
 
 dependencies {
     compile(project(":compiler:util"))

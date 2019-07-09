@@ -3,6 +3,8 @@ plugins {
     kotlin("jvm")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile(project(":examples:scripting-jvm-simple-script"))
     compileOnly(project(":kotlin-scripting-jvm-host"))

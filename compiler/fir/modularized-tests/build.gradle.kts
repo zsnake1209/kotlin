@@ -8,6 +8,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     testCompileOnly(intellijDep()) {
         includeJars("openapi", "extensions", "idea", "idea_rt", "util", "asm-all", rootProject = rootProject)

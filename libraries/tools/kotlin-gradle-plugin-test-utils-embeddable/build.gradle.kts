@@ -11,6 +11,8 @@ description = "Shaded test jars from compiler for Gradle integration tests"
 
 plugins { `java` }
 
+JvmProject.configure(project, "1.8")
+
 val packedJars by configurations.creating
 
 val projectsToInclude = listOf(":compiler:tests-common",

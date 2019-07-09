@@ -5,6 +5,8 @@ plugins {
     java
 }
 
+JvmProject.configure(project, "1.8")
+
 runtimeJar {
     archiveName = "kotlin-formatter.jar"
     dependsOn(":idea:formatter:classes")

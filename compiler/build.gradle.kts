@@ -7,6 +7,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 val compilerModules: Array<String> by rootProject.extra
 val otherCompilerModules = compilerModules.filter { it != path }
 

@@ -8,6 +8,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile(project(":kotlin-build-common"))
     compileOnly(project(":compiler:cli-common"))

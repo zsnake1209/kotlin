@@ -2,6 +2,8 @@ apply plugin: 'kotlin'
 apply plugin: 'maven'
 apply plugin: 'jps-compatible'
 
+JvmProject.configure(project, "1.8")
+
 repositories {
     mavenLocal()
     jcenter()

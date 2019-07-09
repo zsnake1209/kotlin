@@ -4,6 +4,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile(project(":compiler:frontend.common"))
     compile(project(":compiler:frontend.java"))

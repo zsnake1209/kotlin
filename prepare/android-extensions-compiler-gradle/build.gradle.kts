@@ -7,6 +7,8 @@ plugins {
     kotlin("jvm")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compileOnly(project(":compiler:util"))
     compileOnly(project(":compiler:plugin-api"))

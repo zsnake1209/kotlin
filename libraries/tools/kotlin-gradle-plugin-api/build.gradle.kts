@@ -7,8 +7,9 @@ plugins {
     id("jps-compatible")
 }
 
-publish()
+JvmProject.configure(project, "1.8")
 
+publish()
 standardPublicJars()
 
 dependencies {

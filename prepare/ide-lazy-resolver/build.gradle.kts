@@ -6,6 +6,8 @@ plugins {
     java
 }
 
+JvmProject.configure(project, "1.8")
+
 val versions by configurations.creating
 val versionFilePath = "$rootDir/dependencies/dependencies.properties"
 val ideaVersion = findProperty("versions.intellijSdk").toString()

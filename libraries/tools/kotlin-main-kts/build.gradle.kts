@@ -8,6 +8,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 val jarBaseName = property("archivesBaseName") as String
 
 val proguardLibraryJars by configurations.creating

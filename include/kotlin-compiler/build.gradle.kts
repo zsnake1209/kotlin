@@ -3,6 +3,8 @@ plugins {
     kotlin("jvm")
 }
 
+JvmProject.configure(project, "1.8")
+
 val compile by configurations
 val fatJarContents by configurations.creating
 val fatJarContentsStripMetadata by configurations.creating

@@ -4,6 +4,8 @@ plugins {
     kotlin("jvm")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile(gradleApi())
     compile(project(":kotlin-gradle-plugin-api"))

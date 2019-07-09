@@ -8,6 +8,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compileOnly(project(":core:descriptors"))
     compileOnly(project(":compiler:fir:cones"))

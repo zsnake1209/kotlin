@@ -4,6 +4,8 @@ description = "Kotlin Scripting JVM host (for using with embeddable compiler)"
 
 plugins { java }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     embedded(project(":kotlin-scripting-jvm-host")) { isTransitive = false }
     runtime(project(":kotlin-script-runtime"))

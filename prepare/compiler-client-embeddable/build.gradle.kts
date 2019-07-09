@@ -5,6 +5,8 @@ plugins {
     kotlin("jvm")
 }
 
+JvmProject.configure(project, "1.8")
+
 val testRuntimeCompilerJar by configurations.creating
 val testStdlibJar by configurations.creating
 val testScriptRuntimeJar by configurations.creating

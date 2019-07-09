@@ -3,15 +3,14 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
+plugins {
+    kotlin("jvm")
+    `jps-compatible`
+}
 
-apply { plugin("kotlin") }
-apply { plugin("jps-compatible") }
+JvmProject.configure(project, "1.8")
 
 dependencies {
-    val compile by configurations
-    val compileOnly by configurations
-
-
     compile(kotlinStdlib())
     compileOnly(project(":kotlin-reflect-api"))
     compile(project(":core:descriptors"))

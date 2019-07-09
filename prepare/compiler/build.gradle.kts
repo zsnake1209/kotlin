@@ -12,6 +12,8 @@ plugins {
     java
 }
 
+JvmProject.configure(project, "1.8")
+
 val fatJarContents by configurations.creating
 val fatJarContentsStripMetadata by configurations.creating
 val fatJarContentsStripServices by configurations.creating

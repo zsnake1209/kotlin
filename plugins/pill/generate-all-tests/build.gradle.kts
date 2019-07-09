@@ -4,6 +4,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 val depenencyProjects = arrayOf(
     ":generators", ":compiler", ":js:js.tests", ":compiler:tests-java8"
 )

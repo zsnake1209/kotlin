@@ -3,6 +3,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 repositories {
     maven("https://jetbrains.bintray.com/markdown")
 }

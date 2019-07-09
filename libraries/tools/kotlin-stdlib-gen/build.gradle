@@ -1,5 +1,7 @@
 apply plugin: 'kotlin'
 
+JvmProject.configure(project, "1.8")
+
 sourceSets {
     main {
         kotlin.srcDir 'src'

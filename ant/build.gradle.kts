@@ -5,6 +5,8 @@ plugins {
     kotlin("jvm")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile(commonDep("org.apache.ant", "ant"))
     compile(project(":kotlin-preloader"))

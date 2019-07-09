@@ -1,8 +1,12 @@
 import org.gradle.api.Project
 import java.io.File
 
-apply { plugin("java") }
-apply { plugin("jps-compatible") }
+plugins {
+    `java`
+    id("jps-compatible")
+}
+
+JvmProject.configure(project, "1.8")
 
 sourceSets {
     "main" { projectDefault() }

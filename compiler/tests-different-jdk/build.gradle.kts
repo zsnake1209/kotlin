@@ -5,6 +5,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 val testJvm6ServerRuntime by configurations.creating
 
 dependencies {

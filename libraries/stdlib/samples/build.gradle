@@ -1,5 +1,7 @@
 apply plugin: 'kotlin'
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile project(':kotlin-stdlib-jdk8')
     testCompile project(':kotlin-test:kotlin-test-junit')

@@ -5,6 +5,8 @@ plugins {
     kotlin("jvm")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     testCompile(project(":kotlin-main-kts"))
     testCompile(project(":kotlin-scripting-jvm-host-embeddable"))

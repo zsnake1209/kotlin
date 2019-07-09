@@ -6,6 +6,8 @@ plugins {
     `java`
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     embedded(project(":kotlin-annotation-processing")) { isTransitive = false }
 }

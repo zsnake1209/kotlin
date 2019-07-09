@@ -6,6 +6,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compileOnly(project(":kotlin-scripting-compiler"))
     compile(project(":kotlin-scripting-compiler-impl"))

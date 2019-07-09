@@ -6,6 +6,8 @@ description = "Kotlin Scripting JSR-223 support"
 
 plugins { java }
 
+JvmProject.configure(project, "1.8")
+
 val packedJars by configurations.creating
 
 dependencies {

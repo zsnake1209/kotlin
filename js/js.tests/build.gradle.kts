@@ -8,6 +8,8 @@ plugins {
     id("com.moowork.node").version("1.2.0")
 }
 
+JvmProject.configure(project, "1.8")
+
 node {
     download = true
 }

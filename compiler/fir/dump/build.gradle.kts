@@ -8,6 +8,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 repositories {
     maven { setUrl("https://dl.bintray.com/kotlin/kotlinx.html/") }
 }

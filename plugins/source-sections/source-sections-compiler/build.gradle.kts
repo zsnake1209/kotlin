@@ -7,6 +7,8 @@ plugins {
 }
 
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compileOnly(project(":compiler:frontend"))
     compileOnly(project(":compiler:plugin-api"))

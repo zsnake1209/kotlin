@@ -6,6 +6,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 val mavenCompileScope by configurations.creating {
     the<MavenPluginConvention>()
         .conf2ScopeMappings

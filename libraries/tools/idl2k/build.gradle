@@ -5,6 +5,8 @@ buildscript {
 apply plugin: "antlr"
 apply plugin: "kotlin"
 
+JvmProject.configure(project, "1.8")
+
 if (project.findProperty("idl2k.deploy")?.toBoolean()) {
     configurePublishing(project)
 }

@@ -7,6 +7,8 @@ description = 'Kotlin Standard Library for JS IR'
 apply plugin: 'kotlin-platform-js'
 apply plugin: 'idea'
 
+JvmProject.configure(project, "1.8")
+
 def originalBuiltinsDir = "${rootDir}/core/builtins"
 def builtinsSrcDir = "${buildDir}/builtin-sources"
 def nativeBuiltinsSrcDir = "${buildDir}/native-builtin-sources"

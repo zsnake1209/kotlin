@@ -10,6 +10,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 val runtimeOnly by configurations
 val compileOnly by configurations
 runtimeOnly.extendsFrom(compileOnly)

@@ -13,6 +13,8 @@ ext.pluginMarkerProject = { String pluginProjectId ->
 
     apply plugin: 'java'
 
+    JvmProject.configure(project, "1.8")
+
     dependencies {
         compile project(path: pluginProject.path, configuration: 'runtimeJar')
     }

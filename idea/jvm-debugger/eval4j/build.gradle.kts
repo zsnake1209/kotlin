@@ -3,6 +3,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile(kotlinStdlib())
     compile(project(":compiler:backend"))

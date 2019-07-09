@@ -4,6 +4,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     testCompile(intellijDep()) { includeJars("util") }
     testCompile(project(":core:util.runtime"))

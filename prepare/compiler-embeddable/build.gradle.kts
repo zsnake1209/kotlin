@@ -5,6 +5,8 @@ plugins {
     `java`
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     runtime(kotlinStdlib())
     runtime(project(":kotlin-script-runtime"))

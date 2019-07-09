@@ -3,6 +3,8 @@ plugins {
     id("jps-compatible")
 }
 
+JvmProject.configure(project, "1.8")
+
 dependencies {
     compile(project(":core:util.runtime"))
     compile(commonDep("javax.inject"))
