@@ -750,6 +750,11 @@ configureJvmProjectImpl = fun Project.(jvmTargetVersion: String) {
     }
 
     tasks.withType<KotlinCompile> {
+        // KotlinCompile does not use source/target compatibility (they are inherited from AbstractCompile, KotlinCompile uses kotlinOptions.jvmTarget)
+        // Gradle still checks the properties and sets them to current JDK version, so changing Gradle JDK might cause unnecessary rebuilds
+        sourceCompatibility = jvmTargetVersion
+        targetCompatibility = jvmTargetVersion
+
         kotlinOptions.jdkHome = jvmTargetHomePath
         kotlinOptions.jvmTarget = jvmTargetVersion
         kotlinOptions.freeCompilerArgs += "-Xjvm-default=compatibility"
