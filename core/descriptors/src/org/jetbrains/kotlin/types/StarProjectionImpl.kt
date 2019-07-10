@@ -16,13 +16,14 @@
 
 package org.jetbrains.kotlin.types
 
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptorWithTypeParameters
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
+import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
+import org.jetbrains.kotlin.types.refinement.TypeRefinement
 
 class StarProjectionImpl(
-        private val typeParameter: TypeParameterDescriptor
+    private val typeParameter: TypeParameterDescriptor
 ) : TypeProjectionBase() {
     override fun isStarProjection() = true
 
@@ -38,6 +39,11 @@ class StarProjectionImpl(
     override fun replaceType(newType: KotlinType): TypeProjection {
         return TypeBasedStarProjectionImpl(newType)
     }
+
+    @TypeRefinement
+    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeProjection =
+        TypeBasedStarProjectionImpl(kotlinTypeRefiner.refineType(type))
+
 }
 
 fun TypeParameterDescriptor.starProjectionType(): KotlinType {
@@ -66,4 +72,8 @@ class TypeBasedStarProjectionImpl(
     override fun replaceType(newType: KotlinType): TypeProjection {
         return TypeBasedStarProjectionImpl(newType)
     }
+
+    @TypeRefinement
+    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeProjection =
+        TypeBasedStarProjectionImpl(kotlinTypeRefiner.refineType(_type))
 }

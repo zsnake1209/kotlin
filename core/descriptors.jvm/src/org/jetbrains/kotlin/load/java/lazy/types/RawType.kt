@@ -24,9 +24,12 @@ import org.jetbrains.kotlin.load.java.components.TypeUsage
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.DescriptorRendererOptions
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
+import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
+import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
+import org.jetbrains.kotlin.types.refinement.TypeRefinement
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 
 class RawTypeImpl(lowerBound: SimpleType, upperBound: SimpleType) : FlexibleType(lowerBound, upperBound), RawType {
@@ -79,6 +82,12 @@ class RawTypeImpl(lowerBound: SimpleType, upperBound: SimpleType) : FlexibleType
         val newLower = lowerRendered.replaceArgs(newArgs)
         if (newLower == newUpper) return newLower
         return renderer.renderFlexibleType(newLower, newUpper, builtIns)
+    }
+
+    @TypeRefinement
+    @UseExperimental(TypeRefinement::class)
+    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): FlexibleType {
+        return RawTypeImpl(kotlinTypeRefiner.refineType(lowerBound) as SimpleType, kotlinTypeRefiner.refineType(upperBound) as SimpleType)
     }
 }
 
