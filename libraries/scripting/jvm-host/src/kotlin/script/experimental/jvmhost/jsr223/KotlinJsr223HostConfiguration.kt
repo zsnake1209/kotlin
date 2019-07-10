@@ -22,6 +22,8 @@ val ScriptingHostConfigurationKeys.jsr223 get() = Jsr223HostConfigurationBuilder
 
 val Jsr223HostConfigurationKeys.getScriptContext by PropertiesCollection.key<() -> ScriptContext?>()
 
+val Jsr223HostConfigurationKeys.captureIo by PropertiesCollection.key<Boolean>(false)
+
 
 interface Jsr223CompilationConfigurationKeys
 

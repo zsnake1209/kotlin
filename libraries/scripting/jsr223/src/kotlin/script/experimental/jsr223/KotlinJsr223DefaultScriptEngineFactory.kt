@@ -9,14 +9,18 @@ import org.jetbrains.kotlin.cli.common.repl.KotlinJsr223JvmScriptEngineFactoryBa
 import java.io.File
 import javax.script.ScriptEngine
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
+import kotlin.script.experimental.api.with
+import kotlin.script.experimental.host.with
 import kotlin.script.experimental.jvm.JvmScriptCompilationConfigurationBuilder
-import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
+import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvm.updateClasspath
 import kotlin.script.experimental.jvm.util.scriptCompilationClasspathFromContext
 import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromTemplate
 import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 import kotlin.script.experimental.jvmhost.jsr223.KotlinJsr223ScriptEngineImpl
+import kotlin.script.experimental.jvmhost.jsr223.captureIo
+import kotlin.script.experimental.jvmhost.jsr223.jsr223
 
 class KotlinJsr223DefaultScriptEngineFactory : KotlinJsr223JvmScriptEngineFactoryBase() {
 
@@ -44,7 +48,12 @@ class KotlinJsr223DefaultScriptEngineFactory : KotlinJsr223JvmScriptEngineFactor
     override fun getScriptEngine(): ScriptEngine =
         KotlinJsr223ScriptEngineImpl(
             this,
-            ScriptCompilationConfiguration(compilationConfiguration) {
+            defaultJvmScriptingHostConfiguration.with {
+                jsr223 {
+                    captureIo(true)
+                }
+            },
+            compilationConfiguration.with {
                 jvm {
                     dependenciesFromCurrentContext()
                 }

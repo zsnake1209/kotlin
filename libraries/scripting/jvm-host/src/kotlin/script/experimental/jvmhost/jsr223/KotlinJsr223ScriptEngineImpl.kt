@@ -7,7 +7,6 @@ package kotlin.script.experimental.jvmhost.jsr223
 
 import org.jetbrains.kotlin.cli.common.repl.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import javax.script.Bindings
 import javax.script.ScriptContext
 import javax.script.ScriptEngineFactory
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
@@ -25,6 +24,7 @@ import kotlin.script.experimental.jvmhost.repl.JvmReplEvaluatorState
 
 class KotlinJsr223ScriptEngineImpl(
     factory: ScriptEngineFactory,
+    baseScriptingHostConfiguration: ScriptingHostConfiguration,
     baseCompilationConfiguration: ScriptCompilationConfiguration,
     baseEvaluationConfiguration: ScriptEvaluationConfiguration
 ) : KotlinJsr223JvmScriptEngineBase(factory), KotlinJsr223InvocableScriptEngine {
@@ -32,7 +32,11 @@ class KotlinJsr223ScriptEngineImpl(
     @Volatile
     private var lastScriptContext: ScriptContext? = null
 
-    val jsr223HostConfiguration = ScriptingHostConfiguration(defaultJvmScriptingHostConfiguration) {
+    override fun getInvokeWrapper(context: ScriptContext): InvokeWrapper? =
+        if (jsr223HostConfiguration[ScriptingHostConfiguration.jsr223.captureIo] != true) null
+        else makeBestIoTrappingInvoker(context)
+
+    val jsr223HostConfiguration = ScriptingHostConfiguration(baseScriptingHostConfiguration) {
         jsr223 {
             getScriptContext { lastScriptContext ?: getContext() }
         }
@@ -68,7 +72,7 @@ class KotlinJsr223ScriptEngineImpl(
         ScriptArgsWithTypes(arrayOf(context.getBindings(ScriptContext.ENGINE_SCOPE).orEmpty()), arrayOf(Bindings::class))
 
     override val invokeWrapper: InvokeWrapper?
-        get() = null
+        get() = getInvokeWrapper(context)
 
     override val backwardInstancesHistory: Sequence<Any>
         get() = getCurrentState(getContext()).asState(JvmReplEvaluatorState::class.java).history.asReversed().asSequence().map { it.item }
