@@ -25,13 +25,19 @@ import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.DescriptorUtils
-import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
+import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtensionProperty
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
+import org.jetbrains.kotlin.types.refinement.TypeRefinement
 
-class JsNameClashChecker(private val nameSuggestion: NameSuggestion) : DeclarationChecker {
+class JsNameClashChecker(
+    private val nameSuggestion: NameSuggestion,
+    private val moduleDescriptor: ModuleDescriptor,
+    private val kotlinTypeRefiner: KotlinTypeRefiner
+) : DeclarationChecker {
     companion object {
         private val COMMON_DIAGNOSTICS = setOf(
                 Errors.REDECLARATION,
@@ -146,7 +152,11 @@ class JsNameClashChecker(private val nameSuggestion: NameSuggestion) : Declarati
                         .flatMap { module.getPackage(it).fragments }
                         .forEach { collect(it, scope)  }
             }
-            is ClassDescriptor -> collect(descriptor.defaultType.memberScope, scope)
+            is ClassDescriptor -> collect(
+                @UseExperimental(TypeRefinement::class)
+                kotlinTypeRefiner.refineType(descriptor.defaultType).memberScope,
+                scope
+            )
         }
         scope
     }
