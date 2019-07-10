@@ -201,7 +201,10 @@ public class TypeUtils {
     }
 
     @NotNull
-    public static SimpleType makeUnsubstitutedType(ClassifierDescriptor classifierDescriptor, MemberScope unsubstitutedMemberScope) {
+    public static SimpleType makeUnsubstitutedType(
+            ClassifierDescriptor classifierDescriptor, MemberScope unsubstitutedMemberScope,
+            Function1<KotlinTypeRefiner, MemberScope> scopeFactory
+    ) {
         if (ErrorUtils.isError(classifierDescriptor)) {
             return ErrorUtils.createErrorType("Unsubstituted type for " + classifierDescriptor);
         }
@@ -212,7 +215,8 @@ public class TypeUtils {
                 typeConstructor,
                 arguments,
                 false,
-                unsubstitutedMemberScope
+                unsubstitutedMemberScope,
+                scopeFactory
         );
     }
 

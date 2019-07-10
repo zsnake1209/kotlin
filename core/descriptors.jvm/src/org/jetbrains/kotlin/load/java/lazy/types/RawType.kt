@@ -133,13 +133,20 @@ internal object RawSubstitution : TypeSubstitution() {
 
         if (type.isError) return ErrorUtils.createErrorType("Raw error type: ${type.constructor}") to false
 
+        val memberScope = declaration.getMemberScope(RawSubstitution)
         return KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(
             type.annotations, type.constructor,
             type.constructor.parameters.map { parameter ->
                 computeProjection(parameter, attr)
             },
-            type.isMarkedNullable, declaration.getMemberScope(RawSubstitution)
-        ) to true
+            type.isMarkedNullable, memberScope
+        ) factory@{ kotlinTypeRefiner ->
+            val classId = (declaration as? ClassDescriptor)?.classId ?: return@factory memberScope
+
+            kotlinTypeRefiner
+                .findClassAcrossModuleDependencies(classId)
+                ?.getRefinedMemberScopeIfPossible(RawSubstitution, moduleDescriptor) ?: memberScope
+        } to true
     }
 
     fun computeProjection(
@@ -159,13 +166,13 @@ internal object RawSubstitution : TypeSubstitution() {
         )
         JavaTypeFlexibility.FLEXIBLE_UPPER_BOUND, JavaTypeFlexibility.INFLEXIBLE -> {
             if (!parameter.variance.allowsOutPosition)
-                // in T -> Comparable<Nothing>
+            // in T -> Comparable<Nothing>
                 TypeProjectionImpl(Variance.INVARIANT, parameter.builtIns.nothingType)
             else if (erasedUpperBound.constructor.parameters.isNotEmpty())
-                // T : Enum<E> -> out Enum<*>
+            // T : Enum<E> -> out Enum<*>
                 TypeProjectionImpl(Variance.OUT_VARIANCE, erasedUpperBound)
             else
-                // T : String -> *
+            // T : String -> *
                 makeStarProjection(parameter, attr)
         }
     }
