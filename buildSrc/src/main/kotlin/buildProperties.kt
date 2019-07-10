@@ -61,6 +61,8 @@ class KotlinBuildProperties(
 
     val isTeamcityBuild: Boolean = getBoolean("teamcity") || System.getenv("TEAMCITY_VERSION") != null
 
+    val isDistProvided: Boolean = getBoolean("distProvided")
+
     val intellijUltimateEnabled: Boolean
         get() {
             val explicitlyEnabled = getBoolean("intellijUltimateEnabled")

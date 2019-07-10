@@ -431,7 +431,9 @@ val dist = tasks.register("dist") {
 }
 
 val copyCompilerToIdeaPlugin by task<Copy> {
-    dependsOn(dist)
+    if (!isDistProvided) {
+        dependsOn(dist)
+    }
     into(ideaPluginDir)
     from(distDir) { include("kotlinc/**") }
 }
