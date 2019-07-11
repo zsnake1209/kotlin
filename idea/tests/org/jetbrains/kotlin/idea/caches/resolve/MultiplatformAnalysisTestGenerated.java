@@ -74,6 +74,11 @@ public class MultiplatformAnalysisTestGenerated extends AbstractMultiplatformAna
             runTest("idea/testData/multiplatformTypeRefinement/callableReferences/");
         }
 
+        @TestMetadata("constructorsOfExpect")
+        public void testConstructorsOfExpect() throws Exception {
+            runTest("idea/testData/multiplatformTypeRefinement/constructorsOfExpect/");
+        }
+
         @TestMetadata("diamondModuleDependency1")
         public void testDiamondModuleDependency1() throws Exception {
             runTest("idea/testData/multiplatformTypeRefinement/diamondModuleDependency1/");
@@ -84,14 +89,14 @@ public class MultiplatformAnalysisTestGenerated extends AbstractMultiplatformAna
             runTest("idea/testData/multiplatformTypeRefinement/diamondModuleDependency2/");
         }
 
-        @TestMetadata("lambdas")
-        public void testLambdas() throws Exception {
-            runTest("idea/testData/multiplatformTypeRefinement/lambdas/");
-        }
-
         @TestMetadata("jsNameClash")
         public void testJsNameClash() throws Exception {
             runTest("idea/testData/multiplatformTypeRefinement/jsNameClash/");
+        }
+
+        @TestMetadata("lambdas")
+        public void testLambdas() throws Exception {
+            runTest("idea/testData/multiplatformTypeRefinement/lambdas/");
         }
 
         @TestMetadata("languageConstructions")
@@ -104,6 +109,11 @@ public class MultiplatformAnalysisTestGenerated extends AbstractMultiplatformAna
             runTest("idea/testData/multiplatformTypeRefinement/multilevelParents/");
         }
 
+        @TestMetadata("recursiveTypes")
+        public void testRecursiveTypes() throws Exception {
+            runTest("idea/testData/multiplatformTypeRefinement/recursiveTypes/");
+        }
+
         @TestMetadata("simple")
         public void testSimple() throws Exception {
             runTest("idea/testData/multiplatformTypeRefinement/simple/");
@@ -112,6 +122,11 @@ public class MultiplatformAnalysisTestGenerated extends AbstractMultiplatformAna
         @TestMetadata("supertypes")
         public void testSupertypes() throws Exception {
             runTest("idea/testData/multiplatformTypeRefinement/supertypes/");
+        }
+
+        @TestMetadata("typeAliasToExpectClassExplicitReference")
+        public void testTypeAliasToExpectClassExplicitReference() throws Exception {
+            runTest("idea/testData/multiplatformTypeRefinement/typeAliasToExpectClassExplicitReference/");
         }
 
         @TestMetadata("typeAliases")

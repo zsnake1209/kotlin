@@ -103,6 +103,7 @@ object KotlinTypeFactory {
         val descriptor = basicDescriptor?.let { kotlinTypeRefiner.refineDescriptor(it) } ?: return null
 
         if (descriptor is TypeAliasDescriptor) {
+            // TODO: '.getAbbrevation()' looks veeery suspicious and even incorect. Why it is needed?d
             return ExpandedTypeOrRefinedConstructor(descriptor.computeExpandedType(arguments).getAbbreviation(), null)
         }
 

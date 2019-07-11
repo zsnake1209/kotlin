@@ -44,14 +44,14 @@ public class MultiPlatformOldInferenceHighlightingTestGenerated extends Abstract
         runTest("idea/testData/multiModuleHighlighting/multiplatform/catchHeaderExceptionInPlatformModule/");
     }
 
-    @TestMetadata("completionHandlexCoroutines")
-    public void testCompletionHandlexCoroutines() throws Exception {
-        runTest("idea/testData/multiModuleHighlighting/multiplatform/completionHandlexCoroutines/");
-    }
-
     @TestMetadata("comparatorInference")
     public void testComparatorInference() throws Exception {
         runTest("idea/testData/multiModuleHighlighting/multiplatform/comparatorInference/");
+    }
+
+    @TestMetadata("completionHandlexCoroutines")
+    public void testCompletionHandlexCoroutines() throws Exception {
+        runTest("idea/testData/multiModuleHighlighting/multiplatform/completionHandlexCoroutines/");
     }
 
     @TestMetadata("contracts")
@@ -202,6 +202,11 @@ public class MultiPlatformOldInferenceHighlightingTestGenerated extends Abstract
     @TestMetadata("usePlatformSpecificMember")
     public void testUsePlatformSpecificMember() throws Exception {
         runTest("idea/testData/multiModuleHighlighting/multiplatform/usePlatformSpecificMember/");
+    }
+
+    @TestMetadata("weaklyIncompatibleActualInCommon")
+    public void testWeaklyIncompatibleActualInCommon() throws Exception {
+        runTest("idea/testData/multiModuleHighlighting/multiplatform/weaklyIncompatibleActualInCommon/");
     }
 
     @TestMetadata("withOverrides")

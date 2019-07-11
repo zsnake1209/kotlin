@@ -204,6 +204,11 @@ public class MultiPlatformHighlightingTestGenerated extends AbstractMultiPlatfor
         runTest("idea/testData/multiModuleHighlighting/multiplatform/usePlatformSpecificMember/");
     }
 
+    @TestMetadata("weaklyIncompatibleActualInCommon")
+    public void testWeaklyIncompatibleActualInCommon() throws Exception {
+        runTest("idea/testData/multiModuleHighlighting/multiplatform/weaklyIncompatibleActualInCommon/");
+    }
+
     @TestMetadata("withOverrides")
     public void testWithOverrides() throws Exception {
         runTest("idea/testData/multiModuleHighlighting/multiplatform/withOverrides/");
