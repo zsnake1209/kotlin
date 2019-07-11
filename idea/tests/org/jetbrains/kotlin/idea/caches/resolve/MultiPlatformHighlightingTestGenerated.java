@@ -44,14 +44,14 @@ public class MultiPlatformHighlightingTestGenerated extends AbstractMultiPlatfor
         runTest("idea/testData/multiModuleHighlighting/multiplatform/catchHeaderExceptionInPlatformModule/");
     }
 
-    @TestMetadata("completionHandlexCoroutines")
-    public void testCompletionHandlexCoroutines() throws Exception {
-        runTest("idea/testData/multiModuleHighlighting/multiplatform/completionHandlexCoroutines/");
-    }
-
     @TestMetadata("comparatorInference")
     public void testComparatorInference() throws Exception {
         runTest("idea/testData/multiModuleHighlighting/multiplatform/comparatorInference/");
+    }
+
+    @TestMetadata("completionHandlexCoroutines")
+    public void testCompletionHandlexCoroutines() throws Exception {
+        runTest("idea/testData/multiModuleHighlighting/multiplatform/completionHandlexCoroutines/");
     }
 
     @TestMetadata("contracts")
