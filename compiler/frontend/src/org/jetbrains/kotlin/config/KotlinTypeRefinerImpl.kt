@@ -87,11 +87,6 @@ class KotlinTypeRefinerImpl(
     }
 
     @TypeRefinement
-    override fun refineTypeAliasTypeConstructor(typeAliasDescriptor: TypeAliasDescriptor): TypeConstructor? {
-        return typeAliasDescriptor.classId?.let { moduleDescriptor.findClassifierAcrossModuleDependencies(it) }?.typeConstructor
-    }
-
-    @TypeRefinement
     override fun findClassAcrossModuleDependencies(classId: ClassId): ClassDescriptor? {
         return moduleDescriptor.findClassAcrossModuleDependencies(classId)
     }

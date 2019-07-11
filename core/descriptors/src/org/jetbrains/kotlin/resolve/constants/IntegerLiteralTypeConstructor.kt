@@ -167,7 +167,7 @@ class IntegerLiteralTypeConstructor : TypeConstructor {
     override fun getBuiltIns(): KotlinBuiltIns = module.builtIns
 
     @TypeRefinement
-    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor? = null
+    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor = this
 
     override fun toString(): String {
         return "IntegerLiteralType${valueToString()}"

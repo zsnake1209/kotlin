@@ -94,7 +94,7 @@ class IntegerValueTypeConstructor(
     }
 
     @TypeRefinement
-    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor? = null
+    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor = this
 
     override fun toString() = "IntegerValueType($value)"
 }

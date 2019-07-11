@@ -24,9 +24,6 @@ abstract class KotlinTypeRefiner {
     abstract fun refineDescriptor(descriptor: DeclarationDescriptor): ClassifierDescriptor?
 
     @TypeRefinement
-    abstract fun refineTypeAliasTypeConstructor(typeAliasDescriptor: TypeAliasDescriptor): TypeConstructor?
-
-    @TypeRefinement
     abstract fun findClassAcrossModuleDependencies(classId: ClassId): ClassDescriptor?
 
     @TypeRefinement
@@ -49,11 +46,6 @@ abstract class KotlinTypeRefiner {
 
         @TypeRefinement
         override fun refineDescriptor(descriptor: DeclarationDescriptor): ClassDescriptor? {
-            return null
-        }
-
-        @TypeRefinement
-        override fun refineTypeAliasTypeConstructor(typeAliasDescriptor: TypeAliasDescriptor): TypeConstructor? {
             return null
         }
 

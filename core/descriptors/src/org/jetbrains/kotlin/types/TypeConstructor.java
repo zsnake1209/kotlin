@@ -67,6 +67,7 @@ public interface TypeConstructor extends TypeConstructorMarker {
      * Contract:
      * - returned TypeConstructor has refined supertypes, i.e. it has correct supertypes resolved as if
      *   we were looking at them from refiner's module
+     * - IT DOES NOT ADD PLATFORM DECLARED SUPERTYPES!!!!!!!!
      * - all other similar sources of KotlinTypes/Descriptors should return refined instances as well
      *
      * Implementation notice:
@@ -76,7 +77,6 @@ public interface TypeConstructor extends TypeConstructorMarker {
      *   types/descriptors (e.g. IntersectionTypeConstructor) -- they refine their content manually by recursing using refiner
      * - finally, most special typeConstructors have no meaningful refinement and return null (i.e. UninferredTypeParameterConstructor)
      */
-    @Nullable
     @TypeRefinement
     TypeConstructor refine(@NotNull KotlinTypeRefiner kotlinTypeRefiner);
 }

@@ -75,5 +75,5 @@ class FunctionPlaceholderTypeConstructor(
     }
 
     @TypeRefinement
-    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor? = null
+    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor = this
 }

@@ -122,7 +122,6 @@ abstract class AbstractTypeAliasDescriptor(
         // There must be @TypeRefinement, but there is a bug with anonymous objects and experimental annotations
         // See KT-31728
         @UseExperimental(TypeRefinement::class, TypeRefinement::class)
-        override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor? =
-            kotlinTypeRefiner.refineTypeAliasTypeConstructor(this@AbstractTypeAliasDescriptor)
+        override fun refine(kotlinTypeRefiner: KotlinTypeRefiner): TypeConstructor = this
     }
 }

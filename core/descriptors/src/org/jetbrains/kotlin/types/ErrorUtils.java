@@ -524,11 +524,10 @@ public class ErrorUtils {
                 return debugName;
             }
 
-            @Nullable
             @TypeRefinement
             @Override
             public TypeConstructor refine(@NotNull KotlinTypeRefiner kotlinTypeRefiner) {
-                return null;
+                return this;
             }
         };
     }
