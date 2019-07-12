@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrReturn
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.util.irCall
+import org.jetbrains.kotlin.ir.util.resolveFakeOverride
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -62,14 +63,15 @@ private class StaticDefaultFunctionLowering(val context: JvmBackendContext) : Ir
         irClass.accept(this, null)
     }
 
-    override fun visitFunction(declaration: IrFunction): IrStatement {
-        return if (declaration.origin == IrDeclarationOrigin.FUNCTION_FOR_DEFAULT_PARAMETER && declaration.dispatchReceiverParameter != null) {
+    override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
+        val resolved = declaration.safeAs<IrSimpleFunction>()?.resolveFakeOverride() ?: declaration
+        return if (resolved.origin == IrDeclarationOrigin.FUNCTION_FOR_DEFAULT_PARAMETER && declaration.dispatchReceiverParameter != null) {
             context.getStaticFunctionWithReceivers(declaration).also {
                 copyBodyToStatic(declaration, it)
                 super.visitFunction(it)
             }
         } else {
-            super.visitFunction(declaration)
+            super.visitSimpleFunction(declaration)
         }
     }
 
@@ -96,7 +98,10 @@ private class StaticDefaultCallLowering(
 
     override fun visitCall(expression: IrCall): IrExpression {
         val callee = expression.symbol.owner
-        if (callee.origin !== IrDeclarationOrigin.FUNCTION_FOR_DEFAULT_PARAMETER || callee.dispatchReceiverParameter == null) {
+        if (callee !is IrSimpleFunction ||
+            callee.origin !== IrDeclarationOrigin.FUNCTION_FOR_DEFAULT_PARAMETER ||
+            callee.dispatchReceiverParameter == null
+        ) {
             return super.visitCall(expression)
         }
 
@@ -108,8 +113,12 @@ private class StaticDefaultCallLowering(
     }
 }
 
-private fun JvmBackendContext.getStaticFunctionWithReceivers(function: IrFunction) =
+private fun JvmBackendContext.getStaticFunctionWithReceivers(function: IrSimpleFunction): IrSimpleFunction =
     staticDefaultStubs.getOrPut(function.symbol) {
-        createStaticFunctionWithReceivers(function.parent, function.name, function, copyBody = false)
+        createStaticFunctionWithReceivers(function.parent, function.name, function, copyBody = false).also { staticFunction ->
+            staticFunction.overriddenSymbols.addAll(function.overriddenSymbols.map {
+                getStaticFunctionWithReceivers(it.owner).symbol
+            })
+        }
     }
 

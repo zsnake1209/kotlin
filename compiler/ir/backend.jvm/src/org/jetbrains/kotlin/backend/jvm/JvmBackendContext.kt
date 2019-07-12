@@ -12,21 +12,17 @@ import org.jetbrains.kotlin.backend.jvm.descriptors.JvmDeclarationFactory
 import org.jetbrains.kotlin.backend.jvm.descriptors.JvmSharedVariablesManager
 import org.jetbrains.kotlin.backend.jvm.intrinsics.IrIntrinsicMethods
 import org.jetbrains.kotlin.codegen.ClassBuilder
-import org.jetbrains.kotlin.codegen.coroutines.coroutinesJvmInternalPackageFqName
 import org.jetbrains.kotlin.codegen.state.GenerationState
-import org.jetbrains.kotlin.config.coroutinesPackageFqName
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi2ir.PsiSourceManager
 
 class JvmBackendContext(
@@ -58,7 +54,7 @@ class JvmBackendContext(
     val continuationClassBuilders = mutableMapOf<IrClass, ClassBuilder>()
 
     /* used in StaticDefaultFunctionLowering */
-    val staticDefaultStubs = mutableMapOf<IrFunctionSymbol, IrFunction>()
+    val staticDefaultStubs = mutableMapOf<IrSimpleFunctionSymbol, IrSimpleFunction>()
 
     internal fun getTopLevelClass(fqName: FqName): IrClassSymbol {
         val descriptor = state.module.getPackage(fqName.parent()).memberScope.getContributedClassifier(
