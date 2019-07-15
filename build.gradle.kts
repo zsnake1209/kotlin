@@ -175,6 +175,7 @@ if (!project.hasProperty("versions.kotlin-native")) {
 }
 
 val isTeamcityBuild = project.kotlinBuildProperties.isTeamcityBuild
+val isDistProvided = project.kotlinBuildProperties.isDistProvided
 val intellijUltimateEnabled by extra(project.kotlinBuildProperties.intellijUltimateEnabled)
 val effectSystemEnabled by extra(project.getBooleanProperty("kotlin.compiler.effectSystemEnabled") ?: false)
 val newInferenceEnabled by extra(project.getBooleanProperty("kotlin.compiler.newInferenceEnabled") ?: false)
