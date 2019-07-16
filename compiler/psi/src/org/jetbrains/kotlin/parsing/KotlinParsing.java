@@ -528,12 +528,12 @@ public class KotlinParsing extends AbstractKotlinParsing {
             if (at(AT) && annotationParsingMode.allowAnnotations) {
                 beforeAnnotationMarker = mark();
 
-                parseAnnotationOrList(annotationParsingMode);
+                boolean isAnnotationParsed = parseAnnotationOrList(annotationParsingMode);
 
-                if (annotationParsingMode.withSignificantWhitespaceBeforeArguments) {
+                if (!annotationParsingMode.withSignificantWhitespaceBeforeArguments && !isAnnotationParsed) {
                     beforeAnnotationMarker.rollbackTo();
                     // try parse again, but with significant whitespace
-                    doParseModifierListBody(tokenConsumer, modifierKeywords, annotationParsingMode, noModifiersBefore);
+                    doParseModifierListBody(tokenConsumer, modifierKeywords, WITH_SIGNIFICANT_WHITESPACE_BEFORE_ARGUMENTS, noModifiersBefore);
                     empty = false;
                     break;
                 } else {
@@ -844,11 +844,9 @@ public class KotlinParsing extends AbstractKotlinParsing {
              * A marker is set here which means that we must to rollback.
              */
             if (mode.typeContext && (getLastToken() != RPAR || at(ARROW))) {
-                mode.withSignificantWhitespaceBeforeArguments = true;
+                annotation.done(ANNOTATION_ENTRY);
+                return false;
             }
-        } else if (mode.withSignificantWhitespaceBeforeArguments) {
-            // Reset the rollback necessary marker after potential parsing in `withSignificantWhitespaceBeforeArguments` mode.
-            mode.withSignificantWhitespaceBeforeArguments = false;
         }
         annotation.done(ANNOTATION_ENTRY);
 
@@ -2474,11 +2472,12 @@ public class KotlinParsing extends AbstractKotlinParsing {
     }
 
     enum AnnotationParsingMode {
-        DEFAULT(false, true, false),
-        FILE_ANNOTATIONS_BEFORE_PACKAGE(true, true, false),
-        FILE_ANNOTATIONS_WHEN_PACKAGE_OMITTED(true, true, false),
-        TYPE_CONTEXT(false, true, true),
-        NO_ANNOTATIONS(false, false, false);
+        DEFAULT(false, true, false, false),
+        FILE_ANNOTATIONS_BEFORE_PACKAGE(true, true, false, false),
+        FILE_ANNOTATIONS_WHEN_PACKAGE_OMITTED(true, true, false, false),
+        TYPE_CONTEXT(false, true, true, false),
+        WITH_SIGNIFICANT_WHITESPACE_BEFORE_ARGUMENTS(false, true, true, true),
+        NO_ANNOTATIONS(false, false, false, false);
 
         boolean isFileAnnotationParsingMode;
         boolean allowAnnotations;
@@ -2488,12 +2487,13 @@ public class KotlinParsing extends AbstractKotlinParsing {
         AnnotationParsingMode(
                 boolean isFileAnnotationParsingMode,
                 boolean allowAnnotations,
-                boolean typeContext
+                boolean typeContext,
+                boolean withSignificantWhitespaceBeforeArguments
         ) {
             this.isFileAnnotationParsingMode = isFileAnnotationParsingMode;
             this.allowAnnotations = allowAnnotations;
             this.typeContext = typeContext;
-            this.withSignificantWhitespaceBeforeArguments = false;
+            this.withSignificantWhitespaceBeforeArguments = withSignificantWhitespaceBeforeArguments;
         }
     }
 }
