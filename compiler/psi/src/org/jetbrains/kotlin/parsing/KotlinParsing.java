@@ -530,7 +530,7 @@ public class KotlinParsing extends AbstractKotlinParsing {
 
                 boolean isAnnotationParsed = parseAnnotationOrList(annotationParsingMode);
 
-                if (!annotationParsingMode.withSignificantWhitespaceBeforeArguments && !isAnnotationParsed) {
+                if (!isAnnotationParsed && !annotationParsingMode.withSignificantWhitespaceBeforeArguments) {
                     beforeAnnotationMarker.rollbackTo();
                     // try parse again, but with significant whitespace
                     doParseModifierListBody(tokenConsumer, modifierKeywords, WITH_SIGNIFICANT_WHITESPACE_BEFORE_ARGUMENTS, noModifiersBefore);
@@ -828,8 +828,9 @@ public class KotlinParsing extends AbstractKotlinParsing {
         parseTypeArgumentList();
 
         boolean whitespaceAfterAnnotation = WHITE_SPACE_OR_COMMENT_BIT_SET.contains(myBuilder.rawLookup(-1));
+        boolean shouldBeParsedNextAsFunctionalType = at(LPAR) && whitespaceAfterAnnotation && mode.withSignificantWhitespaceBeforeArguments;
 
-        if ((!mode.withSignificantWhitespaceBeforeArguments || !whitespaceAfterAnnotation) && at(LPAR)) {
+        if (at(LPAR) && !shouldBeParsedNextAsFunctionalType) {
             myExpressionParsing.parseValueArgumentList();
 
             /*
