@@ -27,12 +27,28 @@ message StatementsAndExpressionsTable {
   repeated XStatementOrExpression statemens_and_expressions = 1;
 }
 
+message ExternalReference {
+  required int64 id = 1;
+  required int32 index = 2; /* index into the modules table of ExternalRefs */
+}
+
+message JvmExternalPackage {
+  required common.serialization.proto.FqName fq_name = 1;
+  required common.serialization.proto.IrDeclarationContainer declaration_container = 2;
+}
+
+message ExternalRefs {
+  repeated JvmExternalPackage packages = 1;
+  repeated ExternalReference references = 2;
+}
+
 message AuxTables {
   required common.serialization.proto.IrSymbolTable symbol_table = 1;
   required common.serialization.proto.IrTypeTable type_table = 2;
   required common.serialization.proto.StringTable string_table = 3;
   required StatementsAndExpressionsTable statements_and_expressions_table = 4;
-  required UniqIdTable uniq_id_table = 5;
+  required ExternalRefs external_refs = 5;
+  required UniqIdTable uniq_id_table = 6;
 }
 
 message JvmIrFile {
@@ -45,5 +61,3 @@ message JvmIrClass {
   required common.serialization.proto.IrClass ir_class = 1;
   required AuxTables aux_tables = 2;
 }
-
-
