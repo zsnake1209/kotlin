@@ -14,6 +14,7 @@ dependencies {
     testCompileOnly(project(":compiler:frontend"))
     testCompileOnly(project(":compiler:cli"))
     testCompileOnly(project(":compiler:util"))
+    testCompileOnly(intellijCoreDep()) { includeJars("intellij-core") }
 }
 
 sourceSets {

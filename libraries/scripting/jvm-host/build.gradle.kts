@@ -18,6 +18,7 @@ dependencies {
     runtime(project(":kotlin-scripting-compiler"))
     runtime(project(":kotlin-reflect"))
     runtime(commonDep("org.jetbrains.intellij.deps", "trove4j"))
+    compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
 }
 
 sourceSets {
