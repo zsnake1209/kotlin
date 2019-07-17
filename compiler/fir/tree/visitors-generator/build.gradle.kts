@@ -19,6 +19,10 @@ dependencies {
         isTransitive = false
     }
     compile(intellijDep()) { includeJars("guava", rootProject = rootProject) }
+
+    Platform[192].orHigher {
+        runtimeOnly(intellijCoreDep()) { includeJars("jdom") }
+    }
 }
 
 val writeCopyright by task<WriteCopyrightToFile> {
