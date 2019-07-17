@@ -9,11 +9,13 @@ import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import org.junit.Assert
 import org.junit.Test
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
+import java.io.*
 import javax.script.*
+import kotlin.concurrent.thread
+import kotlin.script.experimental.jvmhost.jsr223.IoFriendlyScriptContext
 import kotlin.script.experimental.jvmhost.jsr223.KotlinJsr223ScriptEngineImpl
+import kotlin.script.experimental.jvmhost.jsr223.MarkedFriendlyInputStreamReader
+import kotlin.script.experimental.jvmhost.jsr223.MarkedFriendlyPrintWriter
 
 class KotlinJsr223ScriptEngineIT {
 
@@ -201,31 +203,85 @@ obj
         Assert.assertEquals(111, result2)
     }
 
-    @Test
-    fun testEvalWithIoCapture() {
-        val outStream = ByteArrayOutputStream()
-        val errStream = ByteArrayOutputStream()
-        val inStream = ByteArrayInputStream("foo\n".toByteArray())
-        val (actualOut, actualErr, _) = captureOutErrRet {
-            val engine = ScriptEngineManager().getEngineByExtension("kts")!!
-            val context = SimpleScriptContext().apply {
-                reader = inStream.bufferedReader()
-                writer = outStream.bufferedWriter()
-                errorWriter = errStream.bufferedWriter()
-            }
-
-            // TODO: find out why the output is empty without first println() call
-            engine.eval("val x = readLine(); println(); println(\"1\$x\"); System.err.println(\"2\$x\")", context)
-
-            engine.eval("println(\"bar\")")
+    private fun captureTestBody(
+        inStream: InputStream, outStream: OutputStream, errStream: OutputStream,
+        capturedScript: String,
+        notCapturedScript: String,
+        friendlyIo: Boolean
+    ): Any? {
+        val engine = ScriptEngineManager().getEngineByExtension("kts")!!
+        val context = SimpleScriptContext().apply {
+            reader = if (friendlyIo) MarkedFriendlyInputStreamReader(inStream) else inStream.bufferedReader()
+            writer = if (friendlyIo) MarkedFriendlyPrintWriter(outStream) else outStream.bufferedWriter()
+            errorWriter = if (friendlyIo) MarkedFriendlyPrintWriter(errStream) else errStream.bufferedWriter()
         }
+
+        engine.eval(capturedScript, context)
+
         outStream.flush()
         errStream.flush()
-        Assert.assertEquals("1foo", outStream.toString().trim())
-        Assert.assertEquals("2foo", errStream.toString().trim())
+
+        return engine.eval(notCapturedScript)
+    }
+
+    // TODO: find out why the output is empty without first println() call
+    private fun getSimpleCapturedIoScript(prefix: String = "") = "val x = readLine(); println(); println(\"${prefix}out:\$x\"); System.err.println(\"${prefix}err:\$x\")"
+
+    private fun evalWithIoCaptureTestImpl(friendlyIo: Boolean) {
+        val outStream = ByteArrayOutputStream()
+        val errStream = ByteArrayOutputStream()
+        val (actualOut, actualErr, _) = captureOutErrRet {
+            captureTestBody(
+                ByteArrayInputStream("foo\n".toByteArray()), outStream, errStream,
+                getSimpleCapturedIoScript(),
+                "println(\"bar\")",
+                friendlyIo
+            )
+        }
+        Assert.assertEquals("out:foo", outStream.toString().trim())
+        Assert.assertEquals("err:foo", errStream.toString().trim())
 
         Assert.assertEquals("bar", actualOut.trim())
-        Assert.assertTrue(actualErr.isBlank())
+        Assert.assertTrue("Expecting empty stderr, got:\n$actualErr", actualErr.isBlank())
+    }
+
+    @Test
+    fun testEvalWithIoCapture() {
+        evalWithIoCaptureTestImpl(true)
+    }
+
+    @Test
+    fun testEvalWithFallbackIoCapture() {
+        evalWithIoCaptureTestImpl(false)
+    }
+
+    @Test
+    fun testEvalWithThreadedIoCapture() {
+        val outStream1 = ByteArrayOutputStream()
+        val outStream2 = ByteArrayOutputStream()
+        val errStream1 = ByteArrayOutputStream()
+        val errStream2 = ByteArrayOutputStream()
+        val (_, actualErr, _) = captureOutErrRet {
+            val t1 = thread {
+                captureTestBody(
+                    ByteArrayInputStream("foo\n".toByteArray()), outStream1, errStream1,
+                    getSimpleCapturedIoScript("t1"), "", true
+                )
+            }
+            val t2 = thread {
+                captureTestBody(
+                    ByteArrayInputStream("baz\n".toByteArray()), outStream2, errStream2,
+                    getSimpleCapturedIoScript("t2"), "", true
+                )
+            }
+            t1.join()
+            t2.join()
+        }
+        Assert.assertTrue("Expecting empty stderr, got:\n$actualErr", actualErr.isBlank())
+        Assert.assertEquals("t1out:foo", outStream1.toString().trim())
+        Assert.assertEquals("t1err:foo", errStream1.toString().trim())
+        Assert.assertEquals("t2out:baz", outStream2.toString().trim())
+        Assert.assertEquals("t2err:baz", errStream2.toString().trim())
     }
 
     @Test
