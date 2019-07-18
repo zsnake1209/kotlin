@@ -138,22 +138,20 @@ class TypeResolver(
     // TODO: remove this method and its usages in 1.4
     private fun checkNonParenthesizedAnnotationsOnFunctionalType(
         typeElement: KtFunctionType,
-        annotationEntries: List<KtAnnotationEntry>,
+        modifierList: KtModifierList,
         trace: BindingTrace
     ) {
-        val lastAnnotationEntry = annotationEntries.lastOrNull()
+        val lastAnnotationEntry = modifierList.annotationEntries.lastOrNull()
         val isAnnotationsGroupedUsingBrackets =
             lastAnnotationEntry?.getNextSiblingIgnoringWhitespaceAndComments()?.node?.elementType == KtTokens.RBRACKET
         val hasAnnotationParentheses = lastAnnotationEntry?.valueArgumentList != null
-        val isFunctionalTypeStartingWithParentheses = typeElement.firstChild is KtParameterList
-        val hasSuspendModifierBeforeParentheses =
-            typeElement.getPrevSiblingIgnoringWhitespaceAndComments().run { this is KtDeclarationModifierList && hasSuspendModifier() }
+        val isFunctionalTypeStartingWithParentheses = typeElement.receiver == null
 
         if (lastAnnotationEntry != null &&
             isFunctionalTypeStartingWithParentheses &&
             !hasAnnotationParentheses &&
             !isAnnotationsGroupedUsingBrackets &&
-            !hasSuspendModifierBeforeParentheses
+            !modifierList.hasSuspendModifier()
         ) {
             trace.report(Errors.NON_PARENTHESIZED_ANNOTATIONS_ON_FUNCTIONAL_TYPES.on(lastAnnotationEntry))
         }
@@ -171,14 +169,14 @@ class TypeResolver(
                 is KtTypeReference -> modifierListsOwner.typeElement
                 else -> null
             }
-            val annotationEntries = when (modifierListsOwner) {
-                is KtNullableType -> modifierListsOwner.modifierList?.annotationEntries
-                is KtTypeReference -> modifierListsOwner.annotationEntries
+            val modifierList = when (modifierListsOwner) {
+                is KtNullableType -> modifierListsOwner.modifierList
+                is KtTypeReference -> modifierListsOwner.modifierList
                 else -> null
             }
 
-            if (targetType is KtFunctionType && annotationEntries != null) {
-                checkNonParenthesizedAnnotationsOnFunctionalType(targetType, annotationEntries, c.trace)
+            if (targetType is KtFunctionType && modifierList != null) {
+                checkNonParenthesizedAnnotationsOnFunctionalType(targetType, modifierList, c.trace)
             }
         }
 
