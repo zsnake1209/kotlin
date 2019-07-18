@@ -31,6 +31,7 @@ fun IrType.isFunction() = this.isNameInPackage("Function", kotlinPackageFqn)
 fun IrType.isKClass() = this.isNameInPackage("KClass", kotlinReflectionPackageFqn)
 fun IrType.isKFunction() = this.isNameInPackage("KFunction", kotlinReflectionPackageFqn)
 fun IrType.isSuspendFunction() = this.isNameInPackage("SuspendFunction", kotlinCoroutinesPackageFqn)
+fun IrType.isKSuspendFunction() = this.isNameInPackage("KSuspendFunction", kotlinReflectionPackageFqn)
 
 fun IrType.isKotlinResult(): Boolean = isNameInPackage("Result", kotlinPackageFqn)
 fun IrType.isContinuation(): Boolean = isNameInPackage("Continuation", kotlinCoroutinesPackageFqn)
