@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.codegen.isInlineFunctionCall
 import org.jetbrains.kotlin.backend.jvm.codegen.isInlineIrExpression
+import org.jetbrains.kotlin.backend.jvm.localDeclarationsPhase
 import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor
 import org.jetbrains.kotlin.codegen.PropertyReferenceCodegen
 import org.jetbrains.kotlin.descriptors.Visibilities
@@ -63,7 +64,8 @@ class CrIrType(val type: Type) : IrType {
 internal val callableReferencePhase = makeIrFilePhase(
     ::CallableReferenceLowering,
     name = "CallableReference",
-    description = "Handle callable references"
+    description = "Handle callable references",
+    prerequisite = setOf(singleAbstractMethodPhase, localDeclarationsPhase)
 )
 
 //Originally was copied from K/Native
@@ -360,15 +362,6 @@ internal class CallableReferenceLowering(val context: JvmBackendContext) : FileL
                         }
                     }
                     +irReturn(delegation)
-                }.apply {
-                    // FIXME: `shiftMaskForExtraArgs` depends on the relative order of this lowering
-                    // and `innerClassConstructorCallPhase`.
-                    insertCallsToDefaultArgumentStubs(
-                        context,
-                        skipInline = false,
-                        skipExternalMethods = false,
-                        shiftMaskForExtraArgs = false
-                    )
                 }
             }
 

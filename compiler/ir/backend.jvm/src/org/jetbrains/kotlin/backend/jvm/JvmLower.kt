@@ -64,7 +64,7 @@ private val propertiesPhase = makeIrFilePhase<CommonBackendContext>(
     stickyPostconditions = setOf((PropertiesLowering)::checkNoProperties)
 )
 
-private val localDeclarationsPhase = makeIrFilePhase<CommonBackendContext>(
+internal val localDeclarationsPhase = makeIrFilePhase<CommonBackendContext>(
     { context ->
         LocalDeclarationsLowering(context, object : LocalNameProvider {
             override fun localName(declaration: IrDeclarationWithName): String =
@@ -87,7 +87,7 @@ private val defaultArgumentInjectorPhase = makeIrFilePhase<CommonBackendContext>
     { context -> DefaultParameterInjector(context, skipInline = false, skipExternalMethods = false) },
     name = "DefaultParameterInjector",
     description = "Transform calls with default arguments into calls to stubs",
-    prerequisite = setOf(defaultArgumentStubPhase)
+    prerequisite = setOf(defaultArgumentStubPhase, callableReferencePhase)
 )
 
 private val innerClassesPhase = makeIrFilePhase(
@@ -128,6 +128,11 @@ val jvmPhases = namedIrFilePhase<JvmBackendContext>(
             enumWhenPhase then
             singletonReferencesPhase then
             localDeclarationsPhase then
+
+            singleAbstractMethodPhase then
+            callableReferencePhase then
+            functionNVarargInvokePhase then
+
             defaultArgumentStubPhase then
             defaultArgumentInjectorPhase then
 
@@ -136,10 +141,7 @@ val jvmPhases = namedIrFilePhase<JvmBackendContext>(
             interfaceSuperCallsPhase then
             interfaceDefaultCallsPhase then
 
-            singleAbstractMethodPhase then
             addContinuationPhase then
-            callableReferencePhase then
-            functionNVarargInvokePhase then
 
             innerClassesPhase then
             innerClassConstructorCallsPhase then
