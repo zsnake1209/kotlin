@@ -123,6 +123,8 @@ val jvmPhases = namedIrFilePhase<JvmBackendContext>(
 
             makePatchParentsPhase(1) then
 
+            computeStringTrimPhase then
+
             enumWhenPhase then
             singletonReferencesPhase then
             localDeclarationsPhase then
@@ -159,7 +161,6 @@ val jvmPhases = namedIrFilePhase<JvmBackendContext>(
             toArrayPhase then
             flattenStringConcatenationPhase then
             foldConstantLoweringPhase then
-            computeStringTrimPhase then
             jvmBuiltinOptimizationLoweringPhase then
             additionalClassAnnotationPhase then
 
