@@ -57,7 +57,6 @@ class JvmBackendContext(
     val suspendLambdaToOriginalFunctionMap = mutableMapOf<IrClass, IrFunction>()
     val continuationClassBuilders = mutableMapOf<IrClass, ClassBuilder>()
 
-    /* used in StaticDefaultFunctionLowering */
     val staticDefaultStubs = mutableMapOf<IrFunctionSymbol, IrFunction>()
 
     internal fun getTopLevelClass(fqName: FqName): IrClassSymbol {
