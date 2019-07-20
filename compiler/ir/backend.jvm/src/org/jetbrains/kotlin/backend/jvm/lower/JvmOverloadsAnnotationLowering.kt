@@ -18,10 +18,7 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
+import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.impl.IrConstructorSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.util.deepCopyWithSymbols
@@ -104,9 +101,13 @@ private class JvmOverloadsAnnotationLowering(val context: JvmBackendContext) : C
 
         }
 
-        wrapperIrFunction.body = IrExpressionBodyImpl(
-            UNDEFINED_OFFSET, UNDEFINED_OFFSET, call
-        ).apply { insertCallsToDefaultArgumentStubs(context, shiftMaskForExtraArgs = true) }
+        wrapperIrFunction.body = if (target is IrConstructor) {
+            IrBlockBodyImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, listOf(call))
+        } else {
+            IrExpressionBodyImpl(
+                UNDEFINED_OFFSET, UNDEFINED_OFFSET, call
+            )
+        }
 
         return wrapperIrFunction
     }

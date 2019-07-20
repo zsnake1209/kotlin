@@ -49,7 +49,7 @@ private class JvmDefaultConstructorLowering(val context: JvmBackendContext) : Cl
                     passTypeArgumentsFrom(irClass)
                     passTypeArgumentsFrom(primaryConstructor, irClass.typeParameters.size)
                 }
-            }.apply { insertCallsToDefaultArgumentStubs(context, shiftMaskForExtraArgs = true) }
+            }
         }
     }
 }

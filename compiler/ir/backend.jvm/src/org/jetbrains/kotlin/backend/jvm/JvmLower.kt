@@ -133,6 +133,9 @@ val jvmPhases = namedIrFilePhase<JvmBackendContext>(
             callableReferencePhase then
             functionNVarargInvokePhase then
 
+            jvmOverloadsAnnotationPhase then
+            jvmDefaultConstructorPhase then
+
             defaultArgumentStubPhase then
             defaultArgumentInjectorPhase then
 
@@ -154,8 +157,6 @@ val jvmPhases = namedIrFilePhase<JvmBackendContext>(
             makeInitializersPhase(JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER, true) then
             collectionStubMethodLowering then
             bridgePhase then
-            jvmOverloadsAnnotationPhase then
-            jvmDefaultConstructorPhase then
             jvmStaticAnnotationPhase then
             staticDefaultFunctionPhase then
             syntheticAccessorPhase then
