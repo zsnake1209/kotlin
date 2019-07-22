@@ -62,10 +62,7 @@ class InventNamesForLocalClasses(private val context: JvmBackendContext) : FileL
                 return
             }
 
-            val internalName = inventName(declaration.name, data)
-            context.putLocalClassInfo(declaration, JvmBackendContext.LocalClassInfo(internalName))
-
-            val newData = data.withName(internalName)
+            val newData = createInfoWithNewNameAndRecord(declaration, data)
 
             // Old backend doesn't add the anonymous object name to the stack when traversing its super constructor arguments.
             // E.g. a lambda in the super call of an object literal "foo$1" will get the name "foo$2", not "foo$1$1".
@@ -77,9 +74,23 @@ class InventNamesForLocalClasses(private val context: JvmBackendContext) : FileL
             }
         }
 
+        private fun createInfoWithNewNameAndRecord(
+            attributeContainer: IrAttributeContainer,
+            data: Data
+        ): Data {
+            val internalName = inventName((attributeContainer as? IrClass)?.name, data)
+            context.putLocalClassInfo(attributeContainer, JvmBackendContext.LocalClassInfo(internalName))
+            return data.withName(internalName)
+        }
+
         override fun visitConstructor(declaration: IrConstructor, data: Data) {
             // Constructor is a special case because its name "<init>" doesn't participate when creating names for local classes inside.
             declaration.acceptChildren(this, data.makeLocal())
+        }
+
+        override fun visitFunctionExpression(expression: IrFunctionExpression, data: Data) {
+            val newData = createInfoWithNewNameAndRecord(expression, data)
+            expression.function.acceptChildren(this, newData)
         }
 
         override fun visitDeclaration(declaration: IrDeclaration, data: Data) {

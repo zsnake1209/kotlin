@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.common.lower
 
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.declarations.copyAttributes
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
@@ -39,7 +40,7 @@ class ProvisionalFunctionExpressionLowering :
                     startOffset, endOffset, type,
                     function.symbol, function.descriptor, 0,
                     origin
-                )
+                ).copyAttributes(expression)
             )
         )
     }
