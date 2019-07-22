@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2000-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -96,15 +96,14 @@ class ShortenReferences(val options: (KtElement) -> Options = { Options.DEFAULT 
                 else -> return false
             }
             val fallbackTarget = element.getCopyableUserData(TARGET_ELEMENT_KEY)
-            val targetDescriptor: DeclarationDescriptor? = nameRef.getReferenceTarget(bindingContext, fallbackTarget)
-            when (targetDescriptor) {
+            when (val targetDescriptor: DeclarationDescriptor? = nameRef.getReferenceTarget(bindingContext, fallbackTarget)) {
                 is ClassDescriptor -> {
                     if (targetDescriptor.kind != ClassKind.OBJECT) return true
                     // for object receiver we should additionally check that it's dispatch receiver (that is the member is inside the object) or not a receiver at all
                     val resolvedCall =
-                        element.getResolvedCall(bindingContext) ?:
-                        return element.getQualifiedElementSelector()?.mainReference?.resolveToDescriptors(bindingContext) != null ||
-                                fallbackTarget != null
+                        element.getResolvedCall(bindingContext)
+                            ?: return element.getQualifiedElementSelector()?.mainReference?.resolveToDescriptors(bindingContext) != null ||
+                                    fallbackTarget != null
                     val receiverKind = resolvedCall.explicitReceiverKind
                     return receiverKind == ExplicitReceiverKind.DISPATCH_RECEIVER || receiverKind == ExplicitReceiverKind.NO_EXPLICIT_RECEIVER
                 }
@@ -117,7 +116,10 @@ class ShortenReferences(val options: (KtElement) -> Options = { Options.DEFAULT 
 
         private fun DeclarationDescriptor.asString() = DescriptorRenderer.FQ_NAMES_IN_TYPES.render(this)
 
-        private fun KtReferenceExpression.targets(context: BindingContext, fallback: PsiElement? = null): Collection<DeclarationDescriptor> {
+        private fun KtReferenceExpression.targets(
+            context: BindingContext,
+            fallback: PsiElement? = null
+        ): Collection<DeclarationDescriptor> {
             return getImportableTargets(context, fallback)
         }
 
@@ -135,9 +137,7 @@ class ShortenReferences(val options: (KtElement) -> Options = { Options.DEFAULT 
     fun process(file: KtFile, startOffset: Int, endOffset: Int) {
         val documentManager = PsiDocumentManager.getInstance(file.project)
         val document = file.viewProvider.document!!
-        if (!documentManager.isCommitted(document)) {
-            throw IllegalStateException("Document should be committed to shorten references in range")
-        }
+        check(documentManager.isCommitted(document)) { "Document should be committed to shorten references in range" }
 
         val rangeMarker = document.createRangeMarker(startOffset, endOffset)
         rangeMarker.isGreedyToLeft = true
