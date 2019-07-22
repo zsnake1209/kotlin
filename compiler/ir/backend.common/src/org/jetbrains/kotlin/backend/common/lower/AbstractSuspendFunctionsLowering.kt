@@ -101,10 +101,6 @@ abstract class AbstractSuspendFunctionsLowering<C : CommonBackendContext>(val co
                 expression.acceptChildrenVoid(this)
 
                 if (expression.isSuspend) {
-                    assert(expression.type.isSuspendFunction()) {
-                        "At this point only function references to suspend lambdas are allowed, " +
-                                "not ${expression.type.render()}"
-                    }
                     suspendLambdas[expression.symbol.owner] = expression
                 }
             }
