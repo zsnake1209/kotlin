@@ -36,15 +36,13 @@ class ArrayConstructorLowering(val context: CommonBackendContext) : IrElementTra
         }
 
     private fun IrExpression.asSingleArgumentLambda(): IrSimpleFunction? {
-        // A lambda is represented as a block with a function declaration and a reference to it.
-        if (this !is IrBlock || statements.size != 2)
+        // A lambda is represented as a IrFunctionExpression
+        if (this !is IrFunctionExpression)
             return null
-        val (function, reference) = statements
-        if (function !is IrSimpleFunction || reference !is IrFunctionReference || function.symbol != reference.symbol)
-            return null
+        val function = this.function
         // Only match the one that has exactly one non-vararg argument, as the code below
         // does not handle defaults or varargs.
-        if (function.valueParameters.size != 1 || function.valueParameters[0].isVararg || reference.getValueArgument(0) != null)
+        if (function.valueParameters.size != 1 || function.valueParameters[0].isVararg)
             return null
         return function
     }

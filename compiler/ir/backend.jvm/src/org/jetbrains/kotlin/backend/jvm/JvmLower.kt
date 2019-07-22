@@ -100,9 +100,9 @@ private val innerClassesPhase = makeIrFilePhase(
 
 private val jvmFilePhases =
         inventNamesForLocalClassesPhase then
-        provisionalFunctionExpressionPhase then
         kCallableNamePropertyPhase then
         arrayConstructorPhase then
+        provisionalFunctionExpressionPhase then
 
         lateinitPhase then
 
