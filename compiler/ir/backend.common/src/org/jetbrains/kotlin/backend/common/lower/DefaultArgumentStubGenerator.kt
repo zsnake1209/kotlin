@@ -201,7 +201,7 @@ private fun markerParameterDeclaration(function: IrFunction) =
 val DEFAULT_DISPATCH_CALL = object : IrStatementOriginImpl("DEFAULT_DISPATCH_CALL") {}
 
 open class DefaultParameterInjector(
-    val context: CommonBackendContext,
+    open val context: CommonBackendContext,
     private val skipInline: Boolean = true,
     private val skipExternalMethods: Boolean = false
 ) : IrElementTransformerVoid(), BodyLoweringPass, FileLoweringPass {
@@ -396,19 +396,6 @@ open class DefaultParameterInjector(
         type.isShort() -> IrConstImpl.short(expression.startOffset, expression.endOffset, type, 0)
         type.isInt() -> IrConstImpl.int(expression.startOffset, expression.endOffset, type, 0)
         type.isLong() -> IrConstImpl.long(expression.startOffset, expression.endOffset, type, 0)
-        type.classOrNull?.owner?.isInline == true -> run {
-            val simpleType = type as IrSimpleType
-            val symbol = simpleType.classifier.safeAs<IrClassSymbol>()!!.constructors.single { it.owner.isPrimary }
-            IrConstructorCallImpl(
-                expression.startOffset, expression.endOffset,
-                simpleType,
-                symbol, symbol.descriptor,
-                typeArgumentsCount = /* TODO */ 0, constructorTypeArgumentsCount = 0,
-                valueArgumentsCount = 1
-            ).apply {
-                putValueArgument(0, nullConst(expression, simpleType.classOrNull!!.owner.underlyingType()))
-            }
-        }
         else -> IrConstImpl.constNull(expression.startOffset, expression.endOffset, context.irBuiltIns.nothingNType)
     }
 
@@ -571,9 +558,7 @@ private fun parameterMaskName(number: Int) = "mask$number".synthesizedName
 
 private fun IrValueParameter.copyMaybeNullableTo(irFunction: IrFunction, irBuiltIns: IrBuiltIns): IrValueParameter {
     if (defaultValue == null) return copyTo(irFunction)
-    val underlyingType = if (type.classOrNull?.owner?.isInline == true)
-        type.classOrNull!!.owner.underlyingType()
-    else type
+    val underlyingType = type.classOrNull?.owner?.underlyingType() ?: type
     if (underlyingType in irBuiltIns.primitiveIrTypes) return copyTo(irFunction)
 
     val newType = type.remapTypeParameters(

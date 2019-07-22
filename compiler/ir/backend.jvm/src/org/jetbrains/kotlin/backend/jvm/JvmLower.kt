@@ -83,8 +83,8 @@ private val defaultArgumentStubPhase = makeIrFilePhase<CommonBackendContext>(
     prerequisite = setOf(localDeclarationsPhase)
 )
 
-private val defaultArgumentInjectorPhase = makeIrFilePhase<CommonBackendContext>(
-    { context -> DefaultParameterInjector(context, skipInline = false, skipExternalMethods = false) },
+private val defaultArgumentInjectorPhase = makeIrFilePhase(
+    ::JvmDefaultParameterInjector,
     name = "DefaultParameterInjector",
     description = "Transform calls with default arguments into calls to stubs",
     prerequisite = setOf(defaultArgumentStubPhase, callableReferencePhase)

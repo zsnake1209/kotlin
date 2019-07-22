@@ -569,7 +569,6 @@ fun IrDeclaration.adoptIfNeeded() {
     }
 }
 
-fun IrClass.underlyingType(): IrType {
-    require(isInline)
-    return constructors.single { it.isPrimary }.valueParameters[0].type
-}
+fun IrClass.underlyingType() = if (isInline)
+    constructors.single { it.isPrimary }.valueParameters[0].type
+else defaultType
