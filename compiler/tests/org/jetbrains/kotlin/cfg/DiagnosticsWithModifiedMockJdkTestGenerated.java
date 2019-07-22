@@ -29,6 +29,11 @@ public class DiagnosticsWithModifiedMockJdkTestGenerated extends AbstractDiagnos
         KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/testWithModifiedMockJdk"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
     }
 
+    @TestMetadata("conflictingWithExtensions.kt")
+    public void testConflictingWithExtensions() throws Exception {
+        runTest("compiler/testData/diagnostics/testWithModifiedMockJdk/conflictingWithExtensions.kt");
+    }
+
     @TestMetadata("newStringMethods.kt")
     public void testNewStringMethods() throws Exception {
         runTest("compiler/testData/diagnostics/testWithModifiedMockJdk/newStringMethods.kt");

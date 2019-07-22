@@ -17,8 +17,6 @@
 package org.jetbrains.kotlin.synthetic
 
 import com.intellij.util.SmartList
-import org.jetbrains.kotlin.config.LanguageFeature
-import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
@@ -39,6 +37,7 @@ import org.jetbrains.kotlin.load.java.sam.SingleAbstractMethodUtils
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.inference.wrapWithCapturingSubstitution
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationResolver
+import org.jetbrains.kotlin.resolve.descriptorUtil.LOW_PRIORITY_RESOLUTION_KEY
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.ResolutionScope
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
@@ -298,6 +297,10 @@ class SamAdapterFunctionsScope(
 
                 descriptor.isOperator = sourceFunction.isOperator
                 descriptor.isInfix = sourceFunction.isInfix
+
+                if (sourceFunction.getUserData(LOW_PRIORITY_RESOLUTION_KEY) != null) {
+                    descriptor.putInUserDataMap(LOW_PRIORITY_RESOLUTION_KEY, Unit)
+                }
 
                 return descriptor
             }

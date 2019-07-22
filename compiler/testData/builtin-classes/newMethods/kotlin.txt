@@ -741,13 +741,19 @@ public final class String : kotlin.Comparable<kotlin.String>, kotlin.CharSequenc
     /*primary*/ public constructor String()
     public open override /*1*/ val length: kotlin.Int
         public open override /*1*/ fun <get-length>(): kotlin.Int
+    public open fun chars(): java.util.stream.IntStream!
+    public open fun codePoints(): java.util.stream.IntStream!
     public open override /*1*/ fun compareTo(/*0*/ other: kotlin.String): kotlin.Int
+    @kotlin.Deprecated(level = DeprecationLevel.WARNING, message = "This member is not fully supported by Kotlin compiler, so it may be absent or have different signature in next major version", replaceWith = kotlin.ReplaceWith(expression = "", imports = {})) public open fun describeConstable(): java.util.Optional!
     public open override /*1*/ fun get(/*0*/ index: kotlin.Int): kotlin.Char
+    @kotlin.Deprecated(level = DeprecationLevel.WARNING, message = "This member is not fully supported by Kotlin compiler, so it may be absent or have different signature in next major version", replaceWith = kotlin.ReplaceWith(expression = "", imports = {})) public open fun indent(/*0*/ n: kotlin.Int): kotlin.String!
     public final operator fun plus(/*0*/ other: kotlin.Any?): kotlin.String
+    @kotlin.Deprecated(level = DeprecationLevel.WARNING, message = "This member is not fully supported by Kotlin compiler, so it may be absent or have different signature in next major version", replaceWith = kotlin.ReplaceWith(expression = "", imports = {})) public open fun resolveConstantDesc(/*0*/ lookup: java.lang.invoke.MethodHandles.Lookup!): kotlin.String!
     @kotlin.Deprecated(level = DeprecationLevel.WARNING, message = "This member is not fully supported by Kotlin compiler, so it may be absent or have different signature in next major version", replaceWith = kotlin.ReplaceWith(expression = "", imports = {})) public open fun strip(): kotlin.String!
     @kotlin.Deprecated(level = DeprecationLevel.WARNING, message = "This member is not fully supported by Kotlin compiler, so it may be absent or have different signature in next major version", replaceWith = kotlin.ReplaceWith(expression = "", imports = {})) public open fun stripLeading(): kotlin.String!
     @kotlin.Deprecated(level = DeprecationLevel.WARNING, message = "This member is not fully supported by Kotlin compiler, so it may be absent or have different signature in next major version", replaceWith = kotlin.ReplaceWith(expression = "", imports = {})) public open fun stripTrailing(): kotlin.String!
     public open override /*1*/ fun subSequence(/*0*/ startIndex: kotlin.Int, /*1*/ endIndex: kotlin.Int): kotlin.CharSequence
+    @kotlin.Deprecated(level = DeprecationLevel.WARNING, message = "This member is not fully supported by Kotlin compiler, so it may be absent or have different signature in next major version", replaceWith = kotlin.ReplaceWith(expression = "", imports = {})) public open fun </*0*/ R : kotlin.Any!> transform(/*0*/ f: java.util.function.Function<in kotlin.String!, out R!>!): R!
 
     public companion object Companion {
         /*primary*/ private constructor Companion()

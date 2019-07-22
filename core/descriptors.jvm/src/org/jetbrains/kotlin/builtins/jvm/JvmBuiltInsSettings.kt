@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.FqNameUnsafe
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.OverridingUtil
+import org.jetbrains.kotlin.resolve.descriptorUtil.LOW_PRIORITY_RESOLUTION_KEY
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType
@@ -139,6 +140,7 @@ open class JvmBuiltInsSettings(
 
                     JDKMemberStatus.NOT_CONSIDERED -> {
                         setAdditionalAnnotations(notConsideredDeprecation)
+                        putUserData(LOW_PRIORITY_RESOLUTION_KEY, Unit)
                     }
 
                     JDKMemberStatus.DROP -> return@mapNotNull null
