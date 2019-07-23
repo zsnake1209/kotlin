@@ -55,12 +55,12 @@ import org.jetbrains.kotlin.load.java.sam.SamConstructorDescriptor
 import org.jetbrains.kotlin.load.java.sam.SamConstructorDescriptorKindExclude
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.renderer.render
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.*
-import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindExclude
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
@@ -106,11 +106,10 @@ class BasicCompletionSession(
 
     private fun detectCompletionKind(): CompletionKind {
         if (nameExpression == null) {
-            return when {
-                (position.parent as? KtNamedDeclaration)?.nameIdentifier == position -> DECLARATION_NAME
-
-                else -> KEYWORDS_ONLY
-            }
+            return if ((position.parent as? KtNamedDeclaration)?.nameIdentifier == position)
+                DECLARATION_NAME
+            else
+                KEYWORDS_ONLY
         }
 
         if (OPERATOR_NAME.isApplicable())
@@ -462,7 +461,7 @@ class BasicCompletionSession(
                                     if (file != null) {
                                         val receiverInFile =
                                             file.findElementAt(receiver.startOffset)?.getParentOfType<KtSimpleNameExpression>(false)
-                                                    ?: return
+                                                ?: return
                                         receiverInFile.mainReference.bindToFqName(fqNameToImport, FORCED_SHORTENING)
                                     }
                                 }
@@ -505,8 +504,7 @@ class BasicCompletionSession(
             if (userType.qualifier != null) return null
             val typeRef = userType.parent as? KtTypeReference ?: return null
             if (userType != typeRef.typeElement) return null
-            val parent = typeRef.parent
-            return when (parent) {
+            return when (val parent = typeRef.parent) {
                 is KtNamedFunction -> parent.takeIf { typeRef == it.receiverTypeReference }
                 is KtProperty -> parent.takeIf { typeRef == it.receiverTypeReference }
                 else -> null
@@ -561,7 +559,7 @@ class BasicCompletionSession(
                 if (keyword in keywordsToSkip) return@complete
 
                 when (keyword) {
-                // if "this" is parsed correctly in the current context - insert it and all this@xxx items
+                    // if "this" is parsed correctly in the current context - insert it and all this@xxx items
                     "this" -> {
                         if (expression != null) {
                             collector.addElements(
@@ -577,7 +575,7 @@ class BasicCompletionSession(
                         }
                     }
 
-                // if "return" is parsed correctly in the current context - insert it and all return@xxx items
+                    // if "return" is parsed correctly in the current context - insert it and all return@xxx items
                     "return" -> {
                         if (expression != null) {
                             collector.addElements(returnExpressionItems(bindingContext, expression))
@@ -723,8 +721,7 @@ class BasicCompletionSession(
         private fun shouldCompleteParameterNameAndType(): Boolean {
             val parameter = declaration() as? KtParameter ?: return false
             val list = parameter.parent as? KtParameterList ?: return false
-            val owner = list.parent
-            return when (owner) {
+            return when (val owner = list.parent) {
                 is KtCatchClause, is KtPropertyAccessor, is KtFunctionLiteral -> false
                 is KtNamedFunction -> owner.nameIdentifier != null
                 is KtPrimaryConstructor -> !owner.getContainingClassOrObject().isAnnotation()
@@ -766,26 +763,23 @@ class BasicCompletionSession(
         }
     }
 
-    private fun referenceScope(declaration: KtNamedDeclaration): KtElement? {
-        val parent = declaration.parent
-        return when (parent) {
-            is KtParameterList -> parent.parent as KtElement
+    private fun referenceScope(declaration: KtNamedDeclaration): KtElement? = when (val parent = declaration.parent) {
+        is KtParameterList -> parent.parent as KtElement
 
-            is KtClassBody -> {
-                val classOrObject = parent.parent as KtClassOrObject
-                if (classOrObject is KtObjectDeclaration && classOrObject.isCompanion()) {
-                    classOrObject.containingClassOrObject
-                } else {
-                    classOrObject
-                }
+        is KtClassBody -> {
+            val classOrObject = parent.parent as KtClassOrObject
+            if (classOrObject is KtObjectDeclaration && classOrObject.isCompanion()) {
+                classOrObject.containingClassOrObject
+            } else {
+                classOrObject
             }
-
-            is KtFile -> parent
-
-            is KtBlockExpression -> parent
-
-            else -> null
         }
+
+        is KtFile -> parent
+
+        is KtBlockExpression -> parent
+
+        else -> null
     }
 
     private fun addClassesFromIndex(kindFilter: (ClassKind) -> Boolean, includeTypeAliases: Boolean, prefixMatcher: PrefixMatcher) {
