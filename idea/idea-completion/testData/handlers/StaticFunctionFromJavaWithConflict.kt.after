@@ -1,0 +1,6 @@
+import java.util.Arrays
+
+fun buildTemplates() {
+    val java = 42
+    Arrays.binarySearch()
+}

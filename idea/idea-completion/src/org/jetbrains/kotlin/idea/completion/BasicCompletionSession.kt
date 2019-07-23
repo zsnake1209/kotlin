@@ -49,6 +49,7 @@ import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.idea.stubindex.PackageIndexUtil
 import org.jetbrains.kotlin.idea.util.CallTypeAndReceiver
 import org.jetbrains.kotlin.idea.util.getResolutionScope
+import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.load.java.descriptors.JavaClassDescriptor
 import org.jetbrains.kotlin.load.java.sam.SamConstructorDescriptor
@@ -448,7 +449,8 @@ class BasicCompletionSession(
                                 return@copy lookupElement
                             }
 
-                            val fqNameToImport = lookupDescriptor.containingDeclaration.importableFqName ?: return@copy lookupElement
+                            val containingDeclarationDescriptor = lookupDescriptor.containingDeclaration
+                            val fqNameToImport = containingDeclarationDescriptor.importableFqName ?: return@copy lookupElement
 
                             object : LookupElementDecorator<LookupElement>(lookupElement) {
                                 val name = fqNameToImport.shortName()
@@ -457,13 +459,17 @@ class BasicCompletionSession(
                                 override fun handleInsert(context: InsertionContext) {
                                     super.handleInsert(context)
                                     context.commitDocument()
-                                    val file = context.file as? KtFile
-                                    if (file != null) {
-                                        val receiverInFile =
-                                            file.findElementAt(receiver.startOffset)?.getParentOfType<KtSimpleNameExpression>(false)
-                                                ?: return
-                                        receiverInFile.mainReference.bindToFqName(fqNameToImport, FORCED_SHORTENING)
-                                    }
+                                    val file = context.file as? KtFile ?: return
+                                    val receiverInFile = file
+                                        .findElementAt(receiver.startOffset)
+                                        ?.getParentOfType<KtSimpleNameExpression>(false)
+                                        ?: return
+
+                                    receiverInFile.mainReference.bindToFqName(
+                                        fqNameToImport,
+                                        FORCED_SHORTENING,
+                                        containingDeclarationDescriptor.findPsi()
+                                    )
                                 }
 
                                 override fun renderElement(presentation: LookupElementPresentation?) {
