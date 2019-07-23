@@ -1,4 +1,4 @@
-import java.util.*
+import java.util.Collections
 
 fun buildTemplates() {
     val java = 1123

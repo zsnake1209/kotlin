@@ -121,6 +121,8 @@ class BasicCompletionHandlerTest : CompletionHandlerTestBase(){
     fun testEnumMember1() = doTest(1, "A", null, '\n')
     fun testClassFromClassObject() = doTest(1, "Some", null, '\n')
     fun testClassFromClassObjectInPackage() = doTest(1, "Some", null, '\n')
+    fun testClassNameForMethodWithPackageConflict() = doTest(1, "binarySearch", "(a: IntArray!, key: Int) (java.util)", '\n')
+    fun testClassNameWithPackageConflict() = doTest(1, "Collections", " (java.util)", '\n')
 
     fun testParameterType() = doTest(1, "StringBuilder", " (kotlin.text)", '\n')
 
