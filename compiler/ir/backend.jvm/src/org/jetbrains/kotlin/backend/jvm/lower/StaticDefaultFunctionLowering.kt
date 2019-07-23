@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.backend.jvm.lower
 
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
-import org.jetbrains.kotlin.backend.common.ir.adoptIfNeeded
 import org.jetbrains.kotlin.backend.common.ir.copyBodyToStatic
 import org.jetbrains.kotlin.backend.common.ir.createStaticFunctionWithReceivers
 import org.jetbrains.kotlin.backend.common.phaser.SameTypeNamedPhaseWrapper
@@ -33,7 +32,6 @@ import org.jetbrains.kotlin.ir.expressions.IrReturn
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.util.irCall
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 private val functionDefinitionLoweringPhase = makeIrFilePhase(
     ::StaticDefaultFunctionLowering,
@@ -101,7 +99,6 @@ private class StaticDefaultCallLowering(
         }
 
         val newCallee = context.getStaticFunctionWithReceivers(callee)
-        newCallee.adoptIfNeeded()
         val newCall = irCall(expression, newCallee, receiversAsArguments = true)
 
         return super.visitCall(newCall)

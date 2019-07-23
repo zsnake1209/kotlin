@@ -562,13 +562,6 @@ fun copyBodyToStatic(oldFunction: IrFunction, staticFunction: IrFunction) {
             ?.patchDeclarationParents(staticFunction)
 }
 
-fun IrDeclaration.adoptIfNeeded() {
-    val parent = parent // Tell the compiler that nobody is changing the var.
-    if (parent is IrDeclarationContainer && getPackageFragment() is IrExternalPackageFragment && this !in parent.declarations) {
-        parent.declarations.add(this)
-    }
-}
-
 fun IrClass.underlyingType() = if (isInline)
     constructors.single { it.isPrimary }.valueParameters[0].type
 else defaultType
