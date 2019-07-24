@@ -10,8 +10,8 @@ fun A.bar() {
 
 Resolved call:
 
-Resulting descriptor: fun A.foo(): Unit defined in root package
+Resulting descriptor: fun A.foo(): Unit defined in root package in file dummy.kt
 
 Explicit receiver kind = NO_EXPLICIT_RECEIVER
 Dispatch receiver = NO_RECEIVER
-Extension receiver = AExt{fun A.bar(): Unit defined in root package}
+Extension receiver = AExt{fun A.bar(): Unit defined in root package in file dummy.kt}

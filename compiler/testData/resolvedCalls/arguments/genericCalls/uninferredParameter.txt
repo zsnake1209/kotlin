@@ -9,7 +9,7 @@ fun test(ls: MutableList<String>) {
 
 Resolved call:
 
-Candidate descriptor: fun <T> foo(t: T, l: MutableList<T>): Unit defined in root package
+Candidate descriptor: fun <T> foo(t: T, l: MutableList<T>): Unit defined in root package in file dummy.kt
 Resulting descriptor: fun <T> foo(t: ???, l: MutableList<???>): Unit defined in root package
 
 Explicit receiver kind = NO_EXPLICIT_RECEIVER

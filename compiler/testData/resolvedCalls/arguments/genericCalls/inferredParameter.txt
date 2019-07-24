@@ -9,7 +9,7 @@ fun test(a: Any, ls: List<String>) {
 
 Resolved call:
 
-Candidate descriptor: fun <T> foo(t: T, l: List<T>): Unit defined in root package
+Candidate descriptor: fun <T> foo(t: T, l: List<T>): Unit defined in root package in file dummy.kt
 Resulting descriptor: fun <T> foo(t: Any, l: List<Any>): Unit defined in root package
 
 Explicit receiver kind = NO_EXPLICIT_RECEIVER

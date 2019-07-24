@@ -10,7 +10,7 @@ fun bar() {
 
 Resolved call:
 
-Candidate descriptor: fun <T> doSmth(l: List<T>): Unit defined in root package
+Candidate descriptor: fun <T> doSmth(l: List<T>): Unit defined in root package in file dummy.kt
 Resulting descriptor: fun <T> doSmth(l: List<???>): Unit defined in root package
 
 Explicit receiver kind = NO_EXPLICIT_RECEIVER

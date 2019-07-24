@@ -16,18 +16,18 @@ class A3 {
     }
 }
 
-//public object A1 defined in root package
+//public object A1 defined in root package in file dummy.kt
 //private constructor A1() defined in A1
 //private constructor A1(x: kotlin.Int = ..., y: kotlin.Int) defined in A1
 //value-parameter x: kotlin.Int = ... defined in A1.<init>
 //value-parameter y: kotlin.Int defined in A1.<init>
-//public object A2 defined in root package
+//public object A2 defined in root package in file dummy.kt
 //public constructor A2(prop: kotlin.Int) defined in A2
 //value-parameter prop: kotlin.Int defined in A2.<init>
 //private constructor A2(x: kotlin.Int = ..., y: kotlin.Int) defined in A2
 //value-parameter x: kotlin.Int = ... defined in A2.<init>
 //value-parameter y: kotlin.Int defined in A2.<init>
-//public final class A3 defined in root package
+//public final class A3 defined in root package in file dummy.kt
 //public constructor A3() defined in A3
 //public companion object B defined in A3
 //private constructor B(prop: kotlin.Int) defined in A3.B

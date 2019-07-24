@@ -1,3 +1,3 @@
 val a: E = 0
 
-//public val a: [ERROR : E] defined in root package
+//public val a: [ERROR : E] defined in root package in file dummy.kt

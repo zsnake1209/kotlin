@@ -35,11 +35,11 @@ public class WithReified<reified A, reified out B>
 public interface TwoUpperBounds<T> where T : Number, T : Any
 
 //package rendererTest
-//public final annotation class TheAnnotation : kotlin.Annotation defined in rendererTest
+//public final annotation class TheAnnotation : kotlin.Annotation defined in rendererTest in file dummy.kt
 //public constructor TheAnnotation() defined in rendererTest.TheAnnotation
-//public final annotation class AnotherAnnotation : kotlin.Annotation defined in rendererTest
+//public final annotation class AnotherAnnotation : kotlin.Annotation defined in rendererTest in file dummy.kt
 //public constructor AnotherAnnotation() defined in rendererTest.AnotherAnnotation
-//@rendererTest.TheAnnotation public open class TheClass<out T : kotlin.Int, X> defined in rendererTest
+//@rendererTest.TheAnnotation public open class TheClass<out T : kotlin.Int, X> defined in rendererTest in file dummy.kt
 //<out T : kotlin.Int> defined in rendererTest.TheClass
 //<X> defined in rendererTest.TheClass
 //@rendererTest.AnotherAnnotation public constructor TheClass<out T : kotlin.Int, X>() defined in rendererTest.TheClass
@@ -54,16 +54,16 @@ public interface TwoUpperBounds<T> where T : Number, T : Any
 //@rendererTest.TheAnnotation private constructor TheClass<out T : kotlin.Int, X>() defined in rendererTest.TheClass
 //private final class Inner defined in rendererTest.TheClass
 //public constructor Inner() defined in rendererTest.TheClass.Inner
-//internal final class InternalClass defined in rendererTest
+//internal final class InternalClass defined in rendererTest in file dummy.kt
 //public constructor InternalClass() defined in rendererTest.InternalClass
-//public interface TheTrait defined in rendererTest
+//public interface TheTrait defined in rendererTest in file dummy.kt
 //public abstract fun abstractFun(): kotlin.Unit defined in rendererTest.TheTrait
 //public companion object : rendererTest.TheClass<kotlin.Int, kotlin.Int> defined in rendererTest.TheTrait
 //private constructor Companion() defined in rendererTest.TheTrait.Companion
 //public final fun classObjectFunction(): kotlin.Int defined in rendererTest.TheTrait.Companion
-//public final class WithReified<reified A, reified out B> defined in rendererTest
+//public final class WithReified<reified A, reified out B> defined in rendererTest in file dummy.kt
 //public constructor WithReified<reified A, reified out B>() defined in rendererTest.WithReified
 //<reified A> defined in rendererTest.WithReified
 //<reified out B> defined in rendererTest.WithReified
-//public interface TwoUpperBounds<T : kotlin.Number> where T : kotlin.Any defined in rendererTest
+//public interface TwoUpperBounds<T : kotlin.Number> where T : kotlin.Any defined in rendererTest in file dummy.kt
 //<T : kotlin.Number & kotlin.Any> defined in rendererTest.TwoUpperBounds

@@ -26,17 +26,17 @@ fun <T> (T.(Int) -> Unit).f8() {
 
 val Function0<(() -> Unit) -> (() -> Unit)>.p: Unit = Unit
 //package test
-//public fun (() -> kotlin.Unit).f1(f: () -> kotlin.Unit): () -> kotlin.Int defined in test
+//public fun (() -> kotlin.Unit).f1(f: () -> kotlin.Unit): () -> kotlin.Int defined in test in file dummy.kt
 //value-parameter f: () -> kotlin.Unit defined in test.f1
-//public fun (() -> kotlin.Unit).f2(f: () -> kotlin.Unit): () -> kotlin.Int defined in test
+//public fun (() -> kotlin.Unit).f2(f: () -> kotlin.Unit): () -> kotlin.Int defined in test in file dummy.kt
 //value-parameter f: () -> kotlin.Unit defined in test.f2
-//public fun ((() -> kotlin.Unit) -> kotlin.Unit).f3(f: () -> () -> kotlin.Unit): () -> () -> kotlin.Int defined in test
+//public fun ((() -> kotlin.Unit) -> kotlin.Unit).f3(f: () -> () -> kotlin.Unit): () -> () -> kotlin.Int defined in test in file dummy.kt
 //value-parameter f: () -> () -> kotlin.Unit defined in test.f3
-//public fun (() -> () -> kotlin.Unit).f4(f: (() -> kotlin.Unit, () -> kotlin.Unit) -> kotlin.Unit): (() -> kotlin.Unit) -> () -> kotlin.Unit defined in test
+//public fun (() -> () -> kotlin.Unit).f4(f: (() -> kotlin.Unit, () -> kotlin.Unit) -> kotlin.Unit): (() -> kotlin.Unit) -> () -> kotlin.Unit defined in test in file dummy.kt
 //value-parameter f: (() -> kotlin.Unit, () -> kotlin.Unit) -> kotlin.Unit defined in test.f4
-//public fun (() -> (() -> kotlin.Unit) -> () -> kotlin.Unit).f5(): kotlin.Unit defined in test
-//public fun (() -> (() -> kotlin.Unit) -> () -> kotlin.Unit)?.f6(): kotlin.Unit defined in test
-//public fun ((p: kotlin.Int) -> kotlin.Unit)?.f7(): kotlin.Unit defined in test
-//public fun <T> (T.(kotlin.Int) -> kotlin.Unit).f8(): kotlin.Unit defined in test
+//public fun (() -> (() -> kotlin.Unit) -> () -> kotlin.Unit).f5(): kotlin.Unit defined in test in file dummy.kt
+//public fun (() -> (() -> kotlin.Unit) -> () -> kotlin.Unit)?.f6(): kotlin.Unit defined in test in file dummy.kt
+//public fun ((p: kotlin.Int) -> kotlin.Unit)?.f7(): kotlin.Unit defined in test in file dummy.kt
+//public fun <T> (T.(kotlin.Int) -> kotlin.Unit).f8(): kotlin.Unit defined in test in file dummy.kt
 //<T> defined in test.f8
-//public val (() -> (() -> kotlin.Unit) -> () -> kotlin.Unit).p: kotlin.Unit defined in test
+//public val (() -> (() -> kotlin.Unit) -> () -> kotlin.Unit).p: kotlin.Unit defined in test in file dummy.kt

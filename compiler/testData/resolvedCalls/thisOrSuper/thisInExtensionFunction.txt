@@ -7,7 +7,7 @@ fun A.bar() = <caret>this.foo()
 
 Resolved call:
 
-Resulting descriptor: AExt{fun A.bar(): Unit defined in root package}::this
+Resulting descriptor: AExt{fun A.bar(): Unit defined in root package in file dummy.kt}::this
 
 Explicit receiver kind = NO_EXPLICIT_RECEIVER
 Dispatch receiver = NO_RECEIVER

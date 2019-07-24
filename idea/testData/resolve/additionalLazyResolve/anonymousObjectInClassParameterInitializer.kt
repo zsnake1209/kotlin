@@ -9,9 +9,9 @@ class MyClass(
 )
 
 //package test
-//public open class A defined in test
+//public open class A defined in test in file dummy.kt
 //public constructor A() defined in test.A
-//public final class MyClass defined in test
+//public final class MyClass defined in test in file dummy.kt
 //public constructor MyClass(a: test.A = ...) defined in test.MyClass
 //value-parameter a: test.A = ... defined in test.MyClass.<init>
 //local final class <no name provided> : test.A defined in test.MyClass.<init>

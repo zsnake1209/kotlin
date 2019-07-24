@@ -11,7 +11,7 @@ fun bar() {
 
 Resolved call:
 
-Candidate descriptor: fun <T> foo(t: T): Unit defined in root package
+Candidate descriptor: fun <T> foo(t: T): Unit defined in root package in file dummy.kt
 Resulting descriptor: fun <T> foo(t: ???): Unit defined in root package
 
 Explicit receiver kind = NO_EXPLICIT_RECEIVER

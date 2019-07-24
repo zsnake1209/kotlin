@@ -7,7 +7,7 @@ fun test() {
 
 Resolved call:
 
-Candidate descriptor: fun <T> foo(f: (T) -> String): Unit defined in root package
+Candidate descriptor: fun <T> foo(f: (T) -> String): Unit defined in root package in file dummy.kt
 Resulting descriptor: fun <T> foo(f: (???) -> String): Unit defined in root package
 
 Explicit receiver kind = NO_EXPLICIT_RECEIVER

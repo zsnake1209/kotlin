@@ -5,7 +5,7 @@ private enum class TheEnum(val rgb: Int) {
 }
 
 //package rendererTest
-//private final enum class TheEnum : kotlin.Enum<rendererTest.TheEnum> defined in rendererTest
+//private final enum class TheEnum : kotlin.Enum<rendererTest.TheEnum> defined in rendererTest in file dummy.kt
 //private constructor TheEnum(rgb: kotlin.Int) defined in rendererTest.TheEnum
 //value-parameter rgb: kotlin.Int defined in rendererTest.TheEnum.<init>
 //enum entry VAL1 defined in rendererTest.TheEnum
