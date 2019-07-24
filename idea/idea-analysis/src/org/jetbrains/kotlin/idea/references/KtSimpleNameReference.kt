@@ -5,11 +5,13 @@
 
 package org.jetbrains.kotlin.idea.references
 
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.SmartList
@@ -41,9 +43,16 @@ import org.jetbrains.kotlin.types.expressions.OperatorConventions
 
 val TARGET_ELEMENT_KEY = Key.create<PsiElement>("target.element.key")
 
+fun PsiElement.notHaveReceiver(): Boolean = when (this) {
+    is KtClassOrObject -> true
+    is KtCallableDeclaration -> receiverTypeReference == null
+    is PsiMember -> hasModifier(JvmModifier.STATIC) || this is PsiMethod && isConstructor
+    else -> false
+}
+
 tailrec fun putTargetToUserDataRecursively(elementToShorten: PsiElement, targetElement: PsiElement) {
     elementToShorten.putCopyableUserData(TARGET_ELEMENT_KEY, targetElement)
-    if (elementToShorten is KtQualifiedExpression) {
+    if (elementToShorten is KtQualifiedExpression && targetElement.notHaveReceiver()) {
         val receiver = elementToShorten.receiverExpression
         when (targetElement) {
             is PsiMember -> {
@@ -200,15 +209,6 @@ class KtSimpleNameReference(expression: KtSimpleNameExpression) : KtSimpleRefere
         }
 
         if (targetElement != null) putTargetToUserDataRecursively(newQualifiedElement, targetElement)
-        if (newQualifiedElement is KtQualifiedExpression) {
-            val receiverExpression = newQualifiedElement.receiverExpression
-            when (targetElement) {
-                is KtDeclaration -> {
-                    val containingClassOrObject = targetElement.containingClassOrObject
-                    if (containingClassOrObject != null) receiverExpression.putCopyableUserData(TARGET_ELEMENT_KEY, containingClassOrObject)
-                }
-            }
-        }
         return if (shorteningMode == ShorteningMode.FORCED_SHORTENING) {
             ShortenReferences.DEFAULT.process(newQualifiedElement)
         } else {
