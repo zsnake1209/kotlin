@@ -5,6 +5,7 @@ import org.gradle.api.publish.ivy.internal.publication.DefaultIvyConfiguration
 import org.gradle.api.publish.ivy.internal.publication.DefaultIvyPublicationIdentity
 import org.gradle.api.publish.ivy.internal.publisher.IvyDescriptorFileGenerator
 import org.gradle.internal.os.OperatingSystem
+import java.net.URI
 
 val cacheRedirectorEnabled = findProperty("cacheRedirectorEnabled")?.toString()?.toBoolean() == true
 val verifyDependencyOutput: Boolean by rootProject.extra
@@ -74,6 +75,17 @@ repositories {
                 artifact()
             }
         }
+
+        ivy {
+            artifactPattern("https://dl.bintray.com/kotlin/as/[artifact]-[revision]-$androidStudioOs.zip")
+            credentials {
+                username = System.getenv("AS_BINTRAY_USER_NAME")
+                password = System.getenv("AS_BINTRAY_API_KEY")
+            }
+            metadataSources {
+                artifact()
+            }
+        }
     }
 
     ivy {
@@ -123,7 +135,8 @@ val androidDxRepoModuleDir = File(repoDir, "$androidDxModuleName/$androidDxRevis
 
 dependencies {
     if (androidStudioRelease != null) {
-        val extension = if (androidStudioOs == "linux" && androidStudioRelease.startsWith("3.5"))
+        val extension = if (androidStudioOs == "linux" &&
+            (androidStudioRelease.startsWith("3.5") || androidStudioRelease.startsWith("3.6")))
             "tar.gz"
         else
             "zip"
