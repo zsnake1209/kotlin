@@ -12,16 +12,18 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 class JvmDefaultParameterInjector(override val context: JvmBackendContext) :
     DefaultParameterInjector(context, skipInline = false, skipExternalMethods = false) {
 
     override fun nullConst(expression: IrElement, type: IrType): IrExpression {
-        val underlyingType = when {
-            type is IrSimpleType && !type.hasQuestionMark -> type.classOrNull?.owner?.underlyingType() ?: type
-            else -> type
+        if (type !is IrSimpleType ||
+            type.hasQuestionMark ||
+            type.classOrNull?.owner?.isInline != true
+        ) {
+            return super.nullConst(expression, type)
         }
+        val underlyingType = type.classOrNull!!.owner.underlyingType()
         return IrCallImpl(
             expression.startOffset, expression.endOffset,
             type,
