@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * This class shouldn't be used. It's temporary solution for JSP only and should be removed
- * after updating Intellij SDK version
+ * after updating Intellij SDK version to 193
  */
 @Deprecated
 public class JpsPersistentHashMap<Key, Value> extends PersistentEnumeratorDelegate<Key> implements PersistentMap<Key, Value> {
@@ -358,7 +358,7 @@ public class JpsPersistentHashMap<Key, Value> extends PersistentEnumeratorDelega
             appenderStream.setOut(bytes);
             myValueExternalizer.save(appenderStream, value);
             appenderStream.setOut(null);
-            newValueOffset = myValueStorage.appendBytes(bytes.toByteArraySequence(), 0);
+            newValueOffset = myValueStorage.appendBytes(bytes.getInternalBuffer(), 0, bytes.size(), 0);
         }
 
         myEnumerator.lockStorage();
@@ -458,7 +458,7 @@ public class JpsPersistentHashMap<Key, Value> extends PersistentEnumeratorDelega
                 previousRecord = readValueId(id);
             }
 
-            long headerRecord = myValueStorage.appendBytes(bytes.toByteArraySequence(), previousRecord);
+            long headerRecord = myValueStorage.appendBytes(bytes.getInternalBuffer(), 0, bytes.size(), previousRecord);
 
             if (myDirectlyStoreLongFileOffsetMode) {
                 ((PersistentBTreeEnumerator<Key>)myEnumerator).putNonNegativeValue(key, headerRecord);
