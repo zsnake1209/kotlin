@@ -1,15 +1,14 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the LICENSE file.
+ * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
-package org.jetbrains.kotlin.serialization.konan
 
-import org.jetbrains.kotlin.backend.common.serialization.metadata.SourceFileMap
+package org.jetbrains.kotlin.backend.common.serialization.metadata
+
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.konan.library.KonanLibrary
-import org.jetbrains.kotlin.konan.library.resolver.PackageAccessedHandler
-import org.jetbrains.kotlin.metadata.deserialization.NameResolverImpl
+import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
+import org.jetbrains.kotlin.metadata.deserialization.NameResolverImpl
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.DeserializationComponents
@@ -19,30 +18,18 @@ import org.jetbrains.kotlin.serialization.deserialization.getClassId
 import org.jetbrains.kotlin.serialization.deserialization.getName
 import org.jetbrains.kotlin.storage.StorageManager
 
-
-private val KonanLibrary.fileSources: SourceFileMap
-    get() {
-    val result = SourceFileMap()
-    val proto = parseModuleHeader(moduleHeaderData)
-    proto.fileList.forEachIndexed { index, it ->
-        result.provide(it, index, this)
-    }
-    return result
+interface PackageAccessedHandler {
+    fun markPackageAccessed(fqName: String)
 }
 
-
-class KonanPackageFragment(
-        fqName: FqName,
-        private val library: KonanLibrary,
-        private val packageAccessedHandler: PackageAccessedHandler?,
-        storageManager: StorageManager,
-        module: ModuleDescriptor,
-        partName: String
+class KlibMetadataPackageFragment(
+    fqName: FqName,
+    private val library: KotlinLibrary,
+    private val packageAccessedHandler: PackageAccessedHandler?,
+    storageManager: StorageManager,
+    module: ModuleDescriptor,
+    partName: String
 ) : DeserializedPackageFragment(fqName, storageManager, module) {
-
-    val sourceFileMap: SourceFileMap by lazy {
-        library.fileSources
-    }
 
     lateinit var components: DeserializationComponents
 
@@ -53,29 +40,32 @@ class KonanPackageFragment(
     // The proto field is lazy so that we can load only needed
     // packages from the library.
     private val protoForNames: KlibMetadataProtoBuf.LinkDataPackageFragment by lazy {
-        parsePackageFragment(library.packageMetadata(fqName.asString(), partName))
+        library.packageMetadata(fqName.asString(), partName)
     }
 
     val proto: KlibMetadataProtoBuf.LinkDataPackageFragment
-        get() = protoForNames.also { packageAccessedHandler?.markPackageAccessed(fqName.asString()) }
+        get() = protoForNames.also { packageAccessedHandler?.markPackageAccessed(fqName) }
 
     private val nameResolver by lazy {
         NameResolverImpl(protoForNames.stringTable, protoForNames.nameTable)
     }
 
     override val classDataFinder by lazy {
-        KonanClassDataFinder(proto, nameResolver)
+        KlibMetadataClassDataFinder(proto, nameResolver)
     }
 
     private val _memberScope by lazy {
         /* TODO: we fake proto binary versioning for now. */
         DeserializedPackageMemberScope(
-                this,
-                proto.getPackage(),
-                nameResolver,
-                KonanMetadataVersion.INSTANCE,
-                /* containerSource = */ null,
-                components) { loadClassNames() }
+            this,
+            proto.getPackage(),
+            nameResolver,
+            KlibMetadataVersion.INSTANCE,
+            /* containerSource = */ null,
+            components
+        ) {
+            loadClassNames()
+        }
     }
 
     override fun getMemberScope(): DeserializedPackageMemberScope = _memberScope

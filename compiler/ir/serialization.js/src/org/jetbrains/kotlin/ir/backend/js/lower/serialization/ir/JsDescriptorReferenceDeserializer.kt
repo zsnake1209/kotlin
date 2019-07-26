@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir
 
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorReferenceDeserializer
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorUniqIdAware
+import org.jetbrains.kotlin.backend.common.serialization.DeserializedDescriptorUniqIdAware
 import org.jetbrains.kotlin.backend.common.serialization.UniqIdKey
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -19,7 +20,7 @@ class JsDescriptorReferenceDeserializer(
     val builtIns: IrBuiltIns,
     val FUNCTION_INDEX_START: Long) :
         DescriptorReferenceDeserializer(currentModule, mutableMapOf<UniqIdKey, UniqIdKey>()),
-        DescriptorUniqIdAware by JsDescriptorUniqIdAware {
+        DescriptorUniqIdAware by DeserializedDescriptorUniqIdAware {
 
     override fun resolveSpecialDescriptor(fqn: FqName) = builtIns.builtIns.getBuiltInClassByFqName(fqn)
 

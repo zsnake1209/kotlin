@@ -8,6 +8,9 @@ package org.jetbrains.kotlin.ir.backend.js
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
+import org.jetbrains.kotlin.backend.common.serialization.metadata.JsKlibMetadataParts
+import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataSerializationUtil
+import org.jetbrains.kotlin.backend.common.serialization.metadata.createJsKlibMetadataPackageFragmentProvider
 import org.jetbrains.kotlin.library.impl.buildKoltinLibrary
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.functions.functionInterfacePackageFragmentProvider
@@ -22,7 +25,6 @@ import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsDeclarationTable
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrLinker
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrModuleSerializer
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.newJsDescriptorUniqId
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata.*
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
@@ -183,11 +185,12 @@ private fun loadKlibMetadata(
         capabilities = mapOf(JS_KLIBRARY_CAPABILITY to moduleId)
     )
     if (isBuiltIn) builtIns.builtInsModule = md
-    val currentModuleFragmentProvider = createJsKlibMetadataPackageFragmentProvider(
-        storageManager, md, parts.header, parts.body, metadataVersion,
-        CompilerDeserializationConfiguration(languageVersionSettings),
-        lookupTracker
-    )
+    val currentModuleFragmentProvider =
+        createJsKlibMetadataPackageFragmentProvider(
+            storageManager, md, parts.header, parts.body, metadataVersion,
+            CompilerDeserializationConfiguration(languageVersionSettings),
+            lookupTracker
+        )
 
     val packageFragmentProvider = if (isBuiltIn) {
         val functionFragmentProvider = functionInterfacePackageFragmentProvider(storageManager, md)
@@ -215,8 +218,9 @@ private class ModulesStructure(
         allDependencies.find { it.moduleName == name } ?: error("Module is not found: $name")
 
     val moduleDependencies: Map<KotlinLibrary, List<KotlinLibrary>> =
-        deserializedModuleParts.mapValues { (_, parts) ->
-            parts.importedModules.map(::findModuleByName)
+        deserializedModuleParts.mapValues { (klib, _) ->
+            //parts.importedModules.map(::findModuleByName)
+            klib.unresolvedDependencies.map { findModuleByName(it.path) }
         }
 
     val builtInsDep = allDependencies.find { it.isBuiltIns }
@@ -283,22 +287,16 @@ fun serializeModuleIntoKlib(
     moduleFragment: IrModuleFragment,
     nopack: Boolean
 ) {
+
     val declarationTable = JsDeclarationTable(moduleFragment.irBuiltins, DescriptorTable())
 
     val serializedIr = JsIrModuleSerializer(emptyLoggingContext, declarationTable).serializedIrModule(moduleFragment)
-    val serializer = JsKlibMetadataSerializationUtil
 
-    val moduleDescription =
-        JsKlibMetadataModuleDescriptor(moduleName, dependencies.map { it.moduleName }, moduleFragment.descriptor)
-    val serializedMetadata = serializer.serializeMetadata(
-        bindingContext,
-        moduleDescription,
+    val serializer = KlibMetadataSerializationUtil(
         languageVersionSettings,
-        metadataVersion
-    ) { declarationDescriptor ->
-        val index = declarationTable.descriptorTable.get(declarationDescriptor)
-        index?.let { newJsDescriptorUniqId(it) }
-    }
+        metadataVersion,
+        declarationTable)
+    val serializedMetadata = serializer.serializeModule(moduleFragment.descriptor)
 
     val abiVersion = KotlinAbiVersion.CURRENT
     val compilerVersion = KonanVersionImpl(MetaVersion.DEV, 1, 3, 0, -1)

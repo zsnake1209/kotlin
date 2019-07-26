@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata
+package org.jetbrains.kotlin.backend.common.serialization.metadata
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
 import org.jetbrains.kotlin.serialization.StringTableImpl
 
-class JsKlibMetadataStringTable : StringTableImpl() {
+class KlibMetadataStringTable : StringTableImpl() {
     override fun getLocalClassIdReplacement(descriptor: ClassifierDescriptorWithTypeParameters): ClassId? {
         return if (descriptor.containingDeclaration is CallableMemberDescriptor) {
             val superClassifiers = descriptor.getAllSuperClassifiers()

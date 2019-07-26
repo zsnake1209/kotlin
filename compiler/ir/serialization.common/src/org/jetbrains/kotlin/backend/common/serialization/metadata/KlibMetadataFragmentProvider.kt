@@ -3,13 +3,14 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata
+package org.jetbrains.kotlin.backend.common.serialization.metadata
 
 import org.jetbrains.kotlin.contracts.ContractDeserializerImpl
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.deserialization.PlatformDependentDeclarationFilter
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
+import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
 import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.metadata.deserialization.NameResolverImpl
 import org.jetbrains.kotlin.name.FqName
@@ -20,7 +21,7 @@ import org.jetbrains.kotlin.storage.StorageManager
 fun createJsKlibMetadataPackageFragmentProvider(
     storageManager: StorageManager,
     module: ModuleDescriptor,
-    header: JsKlibMetadataProtoBuf.Header,
+    header: KlibMetadataProtoBuf.Header,
     packageFragmentProtos: List<ProtoBuf.PackageFragment>,
     metadataVersion: JsKlibMetadataVersion,
     configuration: DeserializationConfiguration,
@@ -28,7 +29,7 @@ fun createJsKlibMetadataPackageFragmentProvider(
 ): PackageFragmentProvider {
     val packageFragments: MutableList<PackageFragmentDescriptor> = packageFragmentProtos.mapNotNullTo(mutableListOf()) { proto ->
         proto.fqName?.let { fqName ->
-            JsKlibMetadataPackageFragment(fqName, storageManager, module, proto, header, metadataVersion, configuration)
+            KlibMetadataPackageFragment(fqName, storageManager, module, proto, header, metadataVersion, configuration)
         }
     }
 
@@ -55,7 +56,9 @@ fun createJsKlibMetadataPackageFragmentProvider(
         module,
         configuration,
         DeserializedClassDataFinder(provider),
-        AnnotationAndConstantLoaderImpl(module, notFoundClasses, JsKlibMetadataSerializerProtocol),
+        AnnotationAndConstantLoaderImpl(module, notFoundClasses,
+            KlibMetadataSerializerProtocol
+        ),
         provider,
         LocalClassifierTypeSettings.Default,
         ErrorReporter.DO_NOTHING,
@@ -65,7 +68,7 @@ fun createJsKlibMetadataPackageFragmentProvider(
         notFoundClasses,
         ContractDeserializerImpl(configuration, storageManager),
         platformDependentDeclarationFilter = PlatformDependentDeclarationFilter.All,
-        extensionRegistryLite = JsKlibMetadataSerializerProtocol.extensionRegistry
+        extensionRegistryLite = KlibMetadataSerializerProtocol.extensionRegistry
     )
 
     for (packageFragment in packageFragments.filterIsInstance<JsKlibMetadataPackageFragment>()) {
@@ -79,7 +82,7 @@ private val ProtoBuf.PackageFragment.fqName: FqName?
     get() {
         val nameResolver = NameResolverImpl(strings, qualifiedNames)
         return when {
-            hasPackage() -> FqName(nameResolver.getPackageFqName(`package`.getExtension(JsKlibMetadataProtoBuf.packageFqName)))
+            hasPackage() -> FqName(nameResolver.getPackageFqName(`package`.getExtension(KlibMetadataProtoBuf.packageFqName)))
             class_Count > 0 -> nameResolver.getClassId(class_OrBuilderList.first().fqName).packageFqName
             else -> null
         }
