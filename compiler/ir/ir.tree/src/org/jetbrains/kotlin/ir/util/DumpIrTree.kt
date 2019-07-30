@@ -364,21 +364,22 @@ class DumpTreeFromSourceLineVisitor(
 
 internal fun IrMemberAccessExpression.getValueParameterNamesForDebug(): List<String> {
     val expectedCount = valueArgumentsCount
-    return if (this is IrDeclarationReference && symbol.isBound) {
-        val owner = symbol.owner
-        if (owner is IrFunction) {
-            (0 until expectedCount).map {
-                if (it < owner.valueParameters.size)
-                    owner.valueParameters[it].name.asString()
-                else
-                    "${it + 1}"
-            }
-        } else {
-            getPlaceholderParameterNames(expectedCount)
-        }
-    } else
-        getPlaceholderParameterNames(expectedCount)
+    val owner = referencedDeclarationIfBound as? IrFunction
+        ?: return getPlaceholderParameterNames(expectedCount)
+    return (0 until expectedCount).map {
+        if (it < owner.valueParameters.size)
+            owner.valueParameters[it].name.asString()
+        else
+            "${it + 1}"
+    }
 }
+
+private val IrMemberAccessExpression.referencedDeclarationIfBound: IrDeclaration?
+    get() =
+        if (this is IrDeclarationReference && symbol.isBound)
+            symbol.owner as IrDeclaration
+        else
+            null
 
 internal fun getPlaceholderParameterNames(expectedCount: Int) =
     (1..expectedCount).map { "$it" }

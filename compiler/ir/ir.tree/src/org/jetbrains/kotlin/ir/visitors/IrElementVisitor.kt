@@ -76,6 +76,9 @@ interface IrElementVisitor<out R, in D> {
     fun visitConstructorCall(expression: IrConstructorCall, data: D) = visitFunctionAccess(expression, data)
     fun visitDelegatingConstructorCall(expression: IrDelegatingConstructorCall, data: D) = visitFunctionAccess(expression, data)
     fun visitEnumConstructorCall(expression: IrEnumConstructorCall, data: D) = visitFunctionAccess(expression, data)
+    fun visitPropertyAccess(expression: IrPropertyAccessExpression, data: D) = visitMemberAccess(expression, data)
+    fun visitGetProperty(expression: IrGetProperty, data: D) = visitPropertyAccess(expression, data)
+    fun visitSetProperty(expression: IrSetProperty, data: D) = visitPropertyAccess(expression, data)
     fun visitGetClass(expression: IrGetClass, data: D) = visitExpression(expression, data)
 
     fun visitCallableReference(expression: IrCallableReference, data: D) = visitMemberAccess(expression, data)

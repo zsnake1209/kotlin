@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.ir.builders.irTemporary
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrDynamicOperatorExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
-import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
@@ -297,7 +296,6 @@ class AssignmentGenerator(statementGenerator: StatementGenerator) : StatementGen
 
                 val superQualifier = getSuperQualifier(resolvedCall)
 
-                // TODO property imported from an object
                 createPropertyLValue(ktLeft, descriptor, propertyReceiver, getTypeArguments(resolvedCall), origin, superQualifier)
             }
         }
@@ -316,44 +314,60 @@ class AssignmentGenerator(statementGenerator: StatementGenerator) : StatementGen
         origin: IrStatementOrigin?,
         superQualifier: ClassDescriptor?
     ): PropertyLValueBase {
+        val startOffset = ktExpression.startOffsetSkippingComments
+        val endOffset = ktExpression.endOffset
+
         val superQualifierSymbol = superQualifier?.let { context.symbolTable.referenceClass(it) }
 
         val unwrappedPropertyDescriptor = descriptor.unwrapPropertyDescriptor()
         val getterDescriptor = unwrappedPropertyDescriptor.unwrappedGetMethod
         val setterDescriptor = unwrappedPropertyDescriptor.unwrappedSetMethod
 
-        val getterSymbol = getterDescriptor?.let { context.symbolTable.referenceFunction(it.original) }
-        val setterSymbol = setterDescriptor?.let { context.symbolTable.referenceFunction(it.original) }
+        val getterSymbol = getterDescriptor?.let { context.symbolTable.referenceSimpleFunction(it.original) }
+        val setterSymbol = setterDescriptor?.let { context.symbolTable.referenceSimpleFunction(it.original) }
 
         val propertyIrType = descriptor.type.toIrType()
-        return if (getterSymbol != null || setterSymbol != null) {
-            val typeArgumentsList =
-                typeArgumentsMap?.let { typeArguments ->
-                    descriptor.original.typeParameters.map { typeArguments[it]!!.toIrType() }
-                }
-            AccessorPropertyLValue(
-                context,
-                scope,
-                ktExpression.startOffsetSkippingComments, ktExpression.endOffset, origin,
-                propertyIrType,
-                getterSymbol,
-                getterDescriptor,
-                setterSymbol,
-                setterDescriptor,
-                typeArgumentsList,
-                propertyReceiver,
-                superQualifierSymbol
-            )
-        } else
+        return if (getterSymbol == null && setterSymbol == null)
             FieldPropertyLValue(
                 context,
                 scope,
-                ktExpression.startOffsetSkippingComments, ktExpression.endOffset, origin,
+                startOffset, endOffset,
+                origin,
                 context.symbolTable.referenceField(unwrappedPropertyDescriptor.original),
                 propertyIrType,
                 propertyReceiver,
                 superQualifierSymbol
             )
+        else {
+            val typeArgumentsList =
+                typeArgumentsMap?.let { typeArguments ->
+                    descriptor.original.typeParameters.map { typeArguments[it]!!.toIrType() }
+                }
+            if (unwrappedPropertyDescriptor is SyntheticPropertyDescriptor)
+                SyntheticPropertyLValue(
+                    context,
+                    scope,
+                    startOffset, endOffset,
+                    origin,
+                    propertyIrType,
+                    getterSymbol, getterDescriptor, setterSymbol, setterDescriptor,
+                    typeArgumentsList,
+                    propertyReceiver,
+                    superQualifierSymbol
+                )
+            else
+                AccessorPropertyLValue(
+                    context,
+                    scope,
+                    startOffset, endOffset,
+                    origin,
+                    propertyIrType,
+                    getterSymbol, getterDescriptor, setterSymbol, setterDescriptor,
+                    typeArgumentsList,
+                    propertyReceiver,
+                    superQualifierSymbol
+                )
+        }
     }
 
     private fun isValInitializationInConstructor(descriptor: PropertyDescriptor, resolvedCall: ResolvedCall<*>): Boolean =
@@ -362,14 +376,12 @@ class AssignmentGenerator(statementGenerator: StatementGenerator) : StatementGen
                 statementGenerator.scopeOwner.let { it is ConstructorDescriptor || it is ClassDescriptor } &&
                 resolvedCall.dispatchReceiver is ThisClassReceiver
 
-    private fun getThisClass(): ClassDescriptor {
-        val scopeOwner = statementGenerator.scopeOwner
-        return when (scopeOwner) {
+    private fun getThisClass(): ClassDescriptor =
+        when (val scopeOwner = statementGenerator.scopeOwner) {
             is ClassConstructorDescriptor -> scopeOwner.containingDeclaration
             is ClassDescriptor -> scopeOwner
             else -> scopeOwner.containingDeclaration as ClassDescriptor
         }
-    }
 
     private fun generateArrayAccessAssignmentReceiver(
         ktLeft: KtArrayAccessExpression,

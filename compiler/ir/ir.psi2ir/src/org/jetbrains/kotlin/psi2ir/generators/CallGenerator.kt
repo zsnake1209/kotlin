@@ -21,9 +21,9 @@ import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor
 import org.jetbrains.kotlin.descriptors.impl.SyntheticFieldDescriptor
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.IrDynamicType
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classifierOrFail
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.psi.KtElement
@@ -200,17 +200,30 @@ class CallGenerator(statementGenerator: StatementGenerator) : StatementGenerator
                         dispatchReceiver
                     )
                 } else {
-                    val getterSymbol = context.symbolTable.referenceFunction(getMethodDescriptor.original)
-                    IrCallImpl(
-                        startOffset, endOffset,
-                        irType,
-                        getterSymbol,
-                        getMethodDescriptor,
-                        descriptor.typeParametersCount,
-                        0,
-                        IrStatementOrigin.GET_PROPERTY,
-                        superQualifierSymbol
-                    ).apply {
+                    val getterSymbol = context.symbolTable.referenceFunction(getMethodDescriptor.original) as IrSimpleFunctionSymbol
+                    val irGetterCall =
+                        if (descriptor is SyntheticPropertyDescriptor)
+                            IrCallImpl(
+                                startOffset, endOffset,
+                                irType,
+                                getterSymbol,
+                                getMethodDescriptor,
+                                descriptor.typeParametersCount,
+                                0,
+                                IrStatementOrigin.GET_PROPERTY,
+                                superQualifierSymbol
+                            )
+                        else
+                            IrGetPropertyImpl(
+                                startOffset, endOffset,
+                                irType,
+                                getterSymbol,
+                                getMethodDescriptor,
+                                descriptor.typeParametersCount,
+                                IrStatementOrigin.GET_PROPERTY,
+                                superQualifierSymbol
+                            )
+                    irGetterCall.apply {
                         putTypeArguments(call.typeArguments) { it.toIrType() }
                         dispatchReceiver = dispatchReceiverValue?.load()
                         extensionReceiver = extensionReceiverValue?.load()

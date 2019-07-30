@@ -25,7 +25,7 @@ FILE fqName:<root> fileName:/smartCastOnReceiverOfGenericType.kt
       TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
         TYPE_OP type=kotlin.String origin=CAST typeOperand=kotlin.String
           GET_VAR 'b: kotlin.Any declared in <root>.testProperty' type=kotlin.Any origin=null
-      CALL 'public final fun <set-value> (<set-?>: T of <root>.Cell): kotlin.Unit declared in <root>.Cell' type=kotlin.Unit origin=EQ
+      SET_PROPERTY 'public final fun <set-value> (<set-?>: T of <root>.Cell): kotlin.Unit declared in <root>.Cell' type=kotlin.Unit origin=EQ
         $this: TYPE_OP type=<root>.Cell<kotlin.String> origin=IMPLICIT_CAST typeOperand=<root>.Cell<kotlin.String>
           GET_VAR 'a: kotlin.Any declared in <root>.testProperty' type=kotlin.Any origin=null
         <set-?>: TYPE_OP type=kotlin.String origin=IMPLICIT_CAST typeOperand=kotlin.String

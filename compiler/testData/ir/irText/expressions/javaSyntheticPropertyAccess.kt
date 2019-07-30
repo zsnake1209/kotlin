@@ -1,9 +1,13 @@
 // FILE: javaSyntheticPropertyAccess.kt
-fun test(j: J) {
-    j.foo
-    j.foo = 1
+class K : J()
+
+fun test(j: J, k: K) {
+    j.foo = k.foo
     j.foo++
     j.foo += 1
+    k.foo = j.foo
+    k.foo++
+    k.foo += 1
 }
 
 // FILE: J.java

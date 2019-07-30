@@ -59,7 +59,7 @@ FILE fqName:<root> fileName:/delegatedPropertyAccessorsWithAnnotations.kt
       VALUE_PARAMETER name:kProp index:1 type:kotlin.Any?
       BLOCK_BODY
         RETURN type=kotlin.Nothing from='public final fun getValue (thisRef: kotlin.Any?, kProp: kotlin.Any?): kotlin.Int declared in <root>.Cell'
-          CALL 'public final fun <get-value> (): kotlin.Int declared in <root>.Cell' type=kotlin.Int origin=GET_PROPERTY
+          GET_PROPERTY 'public final fun <get-value> (): kotlin.Int declared in <root>.Cell' type=kotlin.Int origin=GET_PROPERTY
             $this: GET_VAR '<this>: <root>.Cell declared in <root>.Cell.getValue' type=<root>.Cell origin=null
     FUN name:setValue visibility:public modality:FINAL <> ($this:<root>.Cell, thisRef:kotlin.Any?, kProp:kotlin.Any?, newValue:kotlin.Int) returnType:kotlin.Unit
       $this: VALUE_PARAMETER name:<this> type:<root>.Cell
@@ -67,7 +67,7 @@ FILE fqName:<root> fileName:/delegatedPropertyAccessorsWithAnnotations.kt
       VALUE_PARAMETER name:kProp index:1 type:kotlin.Any?
       VALUE_PARAMETER name:newValue index:2 type:kotlin.Int
       BLOCK_BODY
-        CALL 'public final fun <set-value> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.Cell' type=kotlin.Unit origin=EQ
+        SET_PROPERTY 'public final fun <set-value> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.Cell' type=kotlin.Unit origin=EQ
           $this: GET_VAR '<this>: <root>.Cell declared in <root>.Cell.setValue' type=<root>.Cell origin=null
           <set-?>: GET_VAR 'newValue: kotlin.Int declared in <root>.Cell.setValue' type=kotlin.Int origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean

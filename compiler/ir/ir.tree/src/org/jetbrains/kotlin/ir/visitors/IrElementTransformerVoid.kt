@@ -179,6 +179,15 @@ abstract class IrElementTransformerVoid : IrElementTransformer<Nothing?> {
     open fun visitGetClass(expression: IrGetClass) = visitExpression(expression)
     final override fun visitGetClass(expression: IrGetClass, data: Nothing?) = visitGetClass(expression)
 
+    open fun visitPropertyAccess(expression: IrPropertyAccessExpression) = visitMemberAccess(expression)
+    final override fun visitPropertyAccess(expression: IrPropertyAccessExpression, data: Nothing?) = visitPropertyAccess(expression)
+
+    open fun visitGetProperty(expression: IrGetProperty) = visitPropertyAccess(expression)
+    final override fun visitGetProperty(expression: IrGetProperty, data: Nothing?) = visitGetProperty(expression)
+
+    open fun visitSetProperty(expression: IrSetProperty) = visitPropertyAccess(expression)
+    final override fun visitSetProperty(expression: IrSetProperty, data: Nothing?) = visitSetProperty(expression)
+
     open fun visitCallableReference(expression: IrCallableReference) = visitMemberAccess(expression)
     final override fun visitCallableReference(expression: IrCallableReference, data: Nothing?) = visitCallableReference(expression)
 

@@ -83,7 +83,7 @@ FILE fqName:<root> fileName:/elvis.kt
       RETURN type=kotlin.Nothing from='public final fun test4 (x: kotlin.Any): kotlin.Any declared in <root>'
         BLOCK type=kotlin.Any origin=ELVIS
           VAR IR_TEMPORARY_VARIABLE name:tmp0_elvis_lhs type:kotlin.Any? [val]
-            CALL 'public final fun <get-p> (): kotlin.Any? declared in <root>' type=kotlin.Any? origin=GET_PROPERTY
+            GET_PROPERTY 'public final fun <get-p> (): kotlin.Any? declared in <root>' type=kotlin.Any? origin=GET_PROPERTY
           WHEN type=kotlin.Any origin=null
             BRANCH
               if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ

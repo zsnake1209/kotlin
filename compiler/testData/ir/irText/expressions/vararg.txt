@@ -31,9 +31,9 @@ FILE fqName:<root> fileName:/vararg.kt
           elements: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
             CONST String type=kotlin.String value="0"
             SPREAD_ELEMENT
-              CALL 'public final fun <get-test2> (): kotlin.Array<kotlin.String> declared in <root>' type=kotlin.Array<kotlin.String> origin=GET_PROPERTY
+              GET_PROPERTY 'public final fun <get-test2> (): kotlin.Array<kotlin.String> declared in <root>' type=kotlin.Array<kotlin.String> origin=GET_PROPERTY
             SPREAD_ELEMENT
-              CALL 'public final fun <get-test1> (): kotlin.Array<kotlin.String> declared in <root>' type=kotlin.Array<kotlin.String> origin=GET_PROPERTY
+              GET_PROPERTY 'public final fun <get-test1> (): kotlin.Array<kotlin.String> declared in <root>' type=kotlin.Array<kotlin.String> origin=GET_PROPERTY
             CONST String type=kotlin.String value="4"
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Array<kotlin.String>
       correspondingProperty: PROPERTY name:test3 visibility:public modality:FINAL [val]

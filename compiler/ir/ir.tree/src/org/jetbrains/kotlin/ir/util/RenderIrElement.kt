@@ -517,7 +517,12 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
         "CALL '${expression.symbol.renderReference()}' ${expression.renderSuperQualifier()}" +
                 "type=${expression.type.render()} origin=${expression.origin}"
 
+    // TODO drop
     private fun IrCall.renderSuperQualifier(): String =
+        superQualifierSymbol?.let { "superQualifier='${it.renderReference()}' " } ?: ""
+
+    // TODO drop
+    private fun IrPropertyAccessExpression.renderSuperQualifier(): String =
         superQualifierSymbol?.let { "superQualifier='${it.renderReference()}' " } ?: ""
 
     override fun visitConstructorCall(expression: IrConstructorCall, data: Nothing?): String =
@@ -528,6 +533,16 @@ class RenderIrElementVisitor : IrElementVisitor<String, Nothing?> {
 
     override fun visitEnumConstructorCall(expression: IrEnumConstructorCall, data: Nothing?): String =
         "ENUM_CONSTRUCTOR_CALL '${expression.symbol.renderReference()}'"
+
+    override fun visitGetProperty(expression: IrGetProperty, data: Nothing?): String =
+        "GET_PROPERTY '${expression.symbol.renderReference()}' " +
+                expression.renderSuperQualifier() +
+                "type=${expression.type.render()} origin=${expression.origin}"
+
+    override fun visitSetProperty(expression: IrSetProperty, data: Nothing?): String =
+        "SET_PROPERTY '${expression.symbol.renderReference()}' " +
+                expression.renderSuperQualifier() +
+                "type=${expression.type.render()} origin=${expression.origin}"
 
     override fun visitInstanceInitializerCall(expression: IrInstanceInitializerCall, data: Nothing?): String =
         "INSTANCE_INITIALIZER_CALL classDescriptor='${expression.classSymbol.renderReference()}'"

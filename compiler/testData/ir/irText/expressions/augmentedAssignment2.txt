@@ -70,21 +70,21 @@ FILE fqName:<root> fileName:/augmentedAssignment2.kt
     BLOCK_BODY
       BLOCK type=kotlin.Unit origin=PLUSEQ
         CALL 'public final fun plusAssign (s: kotlin.String): kotlin.Unit declared in <root>' type=kotlin.Unit origin=PLUSEQ
-          $receiver: CALL 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=PLUSEQ
+          $receiver: GET_PROPERTY 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=PLUSEQ
           s: CONST String type=kotlin.String value="+="
       BLOCK type=kotlin.Unit origin=MINUSEQ
         CALL 'public final fun minusAssign (s: kotlin.String): kotlin.Unit declared in <root>' type=kotlin.Unit origin=MINUSEQ
-          $receiver: CALL 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=MINUSEQ
+          $receiver: GET_PROPERTY 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=MINUSEQ
           s: CONST String type=kotlin.String value="-="
       BLOCK type=kotlin.Unit origin=MULTEQ
         CALL 'public final fun timesAssign (s: kotlin.String): kotlin.Unit declared in <root>' type=kotlin.Unit origin=MULTEQ
-          $receiver: CALL 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=MULTEQ
+          $receiver: GET_PROPERTY 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=MULTEQ
           s: CONST String type=kotlin.String value="*="
       BLOCK type=kotlin.Unit origin=DIVEQ
         CALL 'public final fun divAssign (s: kotlin.String): kotlin.Unit declared in <root>' type=kotlin.Unit origin=DIVEQ
-          $receiver: CALL 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=DIVEQ
+          $receiver: GET_PROPERTY 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=DIVEQ
           s: CONST String type=kotlin.String value="/="
       BLOCK type=kotlin.Unit origin=PERCEQ
         CALL 'public final fun remAssign (s: kotlin.String): kotlin.Unit declared in <root>' type=kotlin.Unit origin=PERCEQ
-          $receiver: CALL 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=PERCEQ
+          $receiver: GET_PROPERTY 'public final fun <get-p> (): <root>.A declared in <root>' type=<root>.A origin=PERCEQ
           s: CONST String type=kotlin.String value="%="

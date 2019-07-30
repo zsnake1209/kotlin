@@ -23,9 +23,10 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.expressions.value
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
-import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.IrType
 
 abstract class PropertyLValueBase(
@@ -116,23 +117,19 @@ class FieldPropertyLValue(
         )
 }
 
-class AccessorPropertyLValue(
+abstract class AccessorPropertyLValueBase(
     context: IrGeneratorContext,
     scope: Scope,
     startOffset: Int,
     endOffset: Int,
     origin: IrStatementOrigin?,
     type: IrType,
-    val getter: IrFunctionSymbol?,
-    val getterDescriptor: FunctionDescriptor?,
-    val setter: IrFunctionSymbol?,
-    val setterDescriptor: FunctionDescriptor?,
-    val typeArguments: List<IrType>?,
+    protected val getterDescriptor: FunctionDescriptor?,
+    protected val setterDescriptor: FunctionDescriptor?,
+    protected val typeArguments: List<IrType>?,
     callReceiver: CallReceiver,
     superQualifier: IrClassSymbol?
 ) : PropertyLValueBase(context, scope, startOffset, endOffset, origin, type, callReceiver, superQualifier) {
-
-    private val typeArgumentsCount = typeArguments?.size ?: 0
 
     private fun IrMemberAccessExpression.putTypeArguments() {
         typeArguments?.forEachIndexed { index, irType ->
@@ -140,17 +137,12 @@ class AccessorPropertyLValue(
         }
     }
 
+    protected abstract fun getProperty(): IrMemberAccessExpression
+    protected abstract fun setProperty(value: IrExpression): IrMemberAccessExpression
+
     override fun load(): IrExpression =
         callReceiver.adjustForCallee(getterDescriptor!!).call { dispatchReceiverValue, extensionReceiverValue ->
-            IrCallImpl(
-                startOffset, endOffset,
-                type,
-                getter!!, getterDescriptor,
-                typeArgumentsCount,
-                0,
-                origin,
-                superQualifier
-            ).apply {
+            getProperty().apply {
                 putTypeArguments()
                 dispatchReceiver = dispatchReceiverValue?.load()
                 extensionReceiver = extensionReceiverValue?.load()
@@ -159,24 +151,133 @@ class AccessorPropertyLValue(
 
     override fun store(irExpression: IrExpression) =
         callReceiver.adjustForCallee(setterDescriptor!!).call { dispatchReceiverValue, extensionReceiverValue ->
-            IrCallImpl(
-                startOffset, endOffset,
-                context.irBuiltIns.unitType,
-                setter!!, setterDescriptor,
-                typeArgumentsCount,
-                1,
-                origin,
-                superQualifier
-            ).apply {
+            setProperty(irExpression).apply {
                 putTypeArguments()
                 dispatchReceiver = dispatchReceiverValue?.load()
                 extensionReceiver = extensionReceiverValue?.load()
-                putValueArgument(0, irExpression)
             }
+        }
+}
+
+class AccessorPropertyLValue(
+    context: IrGeneratorContext,
+    scope: Scope,
+    startOffset: Int,
+    endOffset: Int,
+    origin: IrStatementOrigin?,
+    type: IrType,
+    private val getter: IrSimpleFunctionSymbol?,
+    getterDescriptor: FunctionDescriptor?,
+    private val setter: IrSimpleFunctionSymbol?,
+    setterDescriptor: FunctionDescriptor?,
+    typeArguments: List<IrType>?,
+    callReceiver: CallReceiver,
+    superQualifier: IrClassSymbol?
+) :
+    AccessorPropertyLValueBase(
+        context,
+        scope,
+        startOffset,
+        endOffset,
+        origin,
+        type,
+        getterDescriptor,
+        setterDescriptor,
+        typeArguments,
+        callReceiver,
+        superQualifier
+    ) {
+
+    private val typeArgumentsCount = typeArguments?.size ?: 0
+
+    override fun getProperty(): IrMemberAccessExpression =
+        IrGetPropertyImpl(
+            startOffset, endOffset,
+            type,
+            getter!!, getterDescriptor!!,
+            typeArgumentsCount,
+            origin,
+            superQualifier
+        )
+
+    override fun setProperty(value: IrExpression): IrMemberAccessExpression =
+        IrSetPropertyImpl(
+            startOffset, endOffset,
+            context.irBuiltIns.unitType,
+            setter!!, setterDescriptor!!,
+            typeArgumentsCount,
+            origin,
+            superQualifier
+        ).apply {
+            this.value = value
         }
 
     override fun withReceiver(dispatchReceiver: VariableLValue?, extensionReceiver: VariableLValue?): PropertyLValueBase =
         AccessorPropertyLValue(
+            context, scope,
+            startOffset, endOffset, origin,
+            type, getter, getterDescriptor, setter, setterDescriptor,
+            typeArguments,
+            SimpleCallReceiver(dispatchReceiver, extensionReceiver),
+            superQualifier
+        )
+}
+
+class SyntheticPropertyLValue(
+    context: IrGeneratorContext,
+    scope: Scope,
+    startOffset: Int,
+    endOffset: Int,
+    origin: IrStatementOrigin?,
+    type: IrType,
+    private val getter: IrSimpleFunctionSymbol?,
+    getterDescriptor: FunctionDescriptor?,
+    private val setter: IrSimpleFunctionSymbol?,
+    setterDescriptor: FunctionDescriptor?,
+    typeArguments: List<IrType>?,
+    callReceiver: CallReceiver,
+    superQualifier: IrClassSymbol?
+) :
+    AccessorPropertyLValueBase(
+        context,
+        scope,
+        startOffset,
+        endOffset,
+        origin,
+        type,
+        getterDescriptor,
+        setterDescriptor,
+        typeArguments,
+        callReceiver,
+        superQualifier
+    ) {
+
+    private val typeArgumentsCount = typeArguments?.size ?: 0
+
+    override fun getProperty(): IrMemberAccessExpression =
+        IrCallImpl(
+            startOffset, endOffset,
+            type,
+            getter!!, getterDescriptor!!,
+            typeArgumentsCount, 0,
+            origin,
+            superQualifier
+        )
+
+    override fun setProperty(value: IrExpression): IrMemberAccessExpression =
+        IrCallImpl(
+            startOffset, endOffset,
+            context.irBuiltIns.unitType,
+            setter!!, setterDescriptor!!,
+            typeArgumentsCount, 1,
+            origin,
+            superQualifier
+        ).apply {
+            putValueArgument(0, value)
+        }
+
+    override fun withReceiver(dispatchReceiver: VariableLValue?, extensionReceiver: VariableLValue?): PropertyLValueBase =
+        SyntheticPropertyLValue(
             context, scope,
             startOffset, endOffset, origin,
             type, getter, getterDescriptor, setter, setterDescriptor,

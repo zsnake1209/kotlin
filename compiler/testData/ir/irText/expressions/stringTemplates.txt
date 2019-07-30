@@ -61,7 +61,7 @@ FILE fqName:<root> fileName:/stringTemplates.kt
     FIELD PROPERTY_BACKING_FIELD name:test6 type:kotlin.String visibility:public [final,static]
       EXPRESSION_BODY
         STRING_CONCATENATION type=kotlin.String
-          CALL 'public final fun <get-test1> (): kotlin.String declared in <root>' type=kotlin.String origin=GET_PROPERTY
+          GET_PROPERTY 'public final fun <get-test1> (): kotlin.String declared in <root>' type=kotlin.String origin=GET_PROPERTY
           CONST String type=kotlin.String value=" "
           CALL 'public final fun foo (): kotlin.String declared in <root>' type=kotlin.String origin=null
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test6> visibility:public modality:FINAL <> () returnType:kotlin.String
@@ -73,7 +73,7 @@ FILE fqName:<root> fileName:/stringTemplates.kt
     FIELD PROPERTY_BACKING_FIELD name:test7 type:kotlin.String visibility:public [final,static]
       EXPRESSION_BODY
         STRING_CONCATENATION type=kotlin.String
-          CALL 'public final fun <get-test1> (): kotlin.String declared in <root>' type=kotlin.String origin=GET_PROPERTY
+          GET_PROPERTY 'public final fun <get-test1> (): kotlin.String declared in <root>' type=kotlin.String origin=GET_PROPERTY
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test7> visibility:public modality:FINAL <> () returnType:kotlin.String
       correspondingProperty: PROPERTY name:test7 visibility:public modality:FINAL [val]
       BLOCK_BODY
@@ -93,7 +93,7 @@ FILE fqName:<root> fileName:/stringTemplates.kt
     FIELD PROPERTY_BACKING_FIELD name:test9 type:kotlin.String visibility:public [final,static]
       EXPRESSION_BODY
         STRING_CONCATENATION type=kotlin.String
-          CALL 'public final fun <get-x> (): kotlin.Int declared in <root>' type=kotlin.Int origin=GET_PROPERTY
+          GET_PROPERTY 'public final fun <get-x> (): kotlin.Int declared in <root>' type=kotlin.Int origin=GET_PROPERTY
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test9> visibility:public modality:FINAL <> () returnType:kotlin.String
       correspondingProperty: PROPERTY name:test9 visibility:public modality:FINAL [val]
       BLOCK_BODY

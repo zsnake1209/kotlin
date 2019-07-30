@@ -78,9 +78,9 @@ FILE fqName:test fileName:/safeCallWithIncrementDecrement.kt
                   GET_VAR 'val tmp0_safe_receiver: test.C? [val] declared in test.testProperty' type=test.C? origin=null
                 BLOCK type=kotlin.Int origin=POSTFIX_INCR
                   VAR IR_TEMPORARY_VARIABLE name:tmp2 type:kotlin.Int [val]
-                    CALL 'public final fun <get-p> (): kotlin.Int declared in test' type=kotlin.Int origin=POSTFIX_INCR
+                    GET_PROPERTY 'public final fun <get-p> (): kotlin.Int declared in test' type=kotlin.Int origin=POSTFIX_INCR
                       $receiver: GET_VAR 'val tmp1_receiver: test.C? [val] declared in test.testProperty' type=test.C? origin=null
-                  CALL 'public final fun <set-p> (value: kotlin.Int): kotlin.Unit declared in test' type=kotlin.Unit origin=POSTFIX_INCR
+                  SET_PROPERTY 'public final fun <set-p> (value: kotlin.Int): kotlin.Unit declared in test' type=kotlin.Unit origin=POSTFIX_INCR
                     $receiver: GET_VAR 'val tmp1_receiver: test.C? [val] declared in test.testProperty' type=test.C? origin=null
                     value: CALL 'public final fun inc (): kotlin.Int? declared in test' type=kotlin.Int? origin=POSTFIX_INCR
                       $receiver: GET_VAR 'val tmp2: kotlin.Int [val] declared in test.testProperty' type=kotlin.Int origin=null
@@ -102,7 +102,7 @@ FILE fqName:test fileName:/safeCallWithIncrementDecrement.kt
                   then: CONST Null type=kotlin.Nothing? value=null
                 BRANCH
                   if: CONST Boolean type=kotlin.Boolean value=true
-                  then: CALL 'public final fun <get-p> (): kotlin.Int declared in test' type=kotlin.Int origin=GET_PROPERTY
+                  then: GET_PROPERTY 'public final fun <get-p> (): kotlin.Int declared in test' type=kotlin.Int origin=GET_PROPERTY
                     $receiver: GET_VAR 'val tmp0_safe_receiver: test.C? [val] declared in test.testArrayAccess' type=test.C? origin=null
           VAR IR_TEMPORARY_VARIABLE name:tmp2_index0 type:kotlin.Int [val]
             CONST Int type=kotlin.Int value=0

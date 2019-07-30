@@ -72,7 +72,7 @@ FILE fqName:<root> fileName:/forWithImplicitReceivers.kt
       BLOCK_BODY
         RETURN type=kotlin.Nothing from='public open fun hasNext (): kotlin.Boolean declared in <root>.IReceiver'
           CALL 'public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
-            arg0: CALL 'public final fun <get-value> (): kotlin.Int declared in <root>.IntCell' type=kotlin.Int origin=GET_PROPERTY
+            arg0: GET_PROPERTY 'public final fun <get-value> (): kotlin.Int declared in <root>.IntCell' type=kotlin.Int origin=GET_PROPERTY
               $this: GET_VAR '<this>: <root>.IntCell declared in <root>.IReceiver.hasNext' type=<root>.IntCell origin=null
             arg1: CONST Int type=kotlin.Int value=0
     FUN name:next visibility:public modality:OPEN <> ($this:<root>.IReceiver, $receiver:<root>.IntCell) returnType:kotlin.Int
@@ -85,9 +85,9 @@ FILE fqName:<root> fileName:/forWithImplicitReceivers.kt
               GET_VAR '<this>: <root>.IntCell declared in <root>.IReceiver.next' type=<root>.IntCell origin=null
             BLOCK type=kotlin.Int origin=POSTFIX_DECR
               VAR IR_TEMPORARY_VARIABLE name:tmp1 type:kotlin.Int [val]
-                CALL 'public final fun <get-value> (): kotlin.Int declared in <root>.IntCell' type=kotlin.Int origin=POSTFIX_DECR
+                GET_PROPERTY 'public final fun <get-value> (): kotlin.Int declared in <root>.IntCell' type=kotlin.Int origin=POSTFIX_DECR
                   $this: GET_VAR 'val tmp0_this: <root>.IntCell [val] declared in <root>.IReceiver.next' type=<root>.IntCell origin=null
-              CALL 'public final fun <set-value> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IntCell' type=kotlin.Unit origin=POSTFIX_DECR
+              SET_PROPERTY 'public final fun <set-value> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.IntCell' type=kotlin.Unit origin=POSTFIX_DECR
                 $this: GET_VAR 'val tmp0_this: <root>.IntCell [val] declared in <root>.IReceiver.next' type=<root>.IntCell origin=null
                 <set-?>: CALL 'public final fun dec (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_DECR
                   $this: GET_VAR 'val tmp1: kotlin.Int [val] declared in <root>.IReceiver.next' type=kotlin.Int origin=null

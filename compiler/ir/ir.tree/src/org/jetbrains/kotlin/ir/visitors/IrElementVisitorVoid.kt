@@ -171,6 +171,15 @@ interface IrElementVisitorVoid : IrElementVisitor<Unit, Nothing?> {
     fun visitGetClass(expression: IrGetClass) = visitExpression(expression)
     override fun visitGetClass(expression: IrGetClass, data: Nothing?) = visitGetClass(expression)
 
+    fun visitPropertyAccess(expression: IrPropertyAccessExpression) = visitMemberAccess(expression)
+    override fun visitPropertyAccess(expression: IrPropertyAccessExpression, data: Nothing?) = visitPropertyAccess(expression) 
+    
+    fun visitGetProperty(expression: IrGetProperty) = visitPropertyAccess(expression)
+    override fun visitGetProperty(expression: IrGetProperty, data: Nothing?) = visitGetProperty(expression)
+
+    fun visitSetProperty(expression: IrSetProperty) = visitPropertyAccess(expression)
+    override fun visitSetProperty(expression: IrSetProperty, data: Nothing?) = visitSetProperty(expression)
+    
     fun visitCallableReference(expression: IrCallableReference) = visitMemberAccess(expression)
     override fun visitCallableReference(expression: IrCallableReference, data: Nothing?) = visitCallableReference(expression)
 

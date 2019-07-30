@@ -475,6 +475,38 @@ open class DeepCopyIrTreeWithSymbols(
         }
     }
 
+    override fun visitGetProperty(expression: IrGetProperty): IrGetProperty {
+        val getterSymbol = symbolRemapper.getReferencedFunction(expression.symbol) as IrSimpleFunctionSymbol
+        return IrGetPropertyImpl(
+            expression.startOffset, expression.endOffset,
+            expression.type.remapType(),
+            getterSymbol,
+            getterSymbol.descriptor,
+            expression.typeArgumentsCount,
+            mapStatementOrigin(expression.origin),
+            symbolRemapper.getReferencedClassOrNull(expression.superQualifierSymbol)
+        ).apply {
+            copyRemappedTypeArgumentsFrom(expression)
+            transformValueArguments(expression)
+        }
+    }
+
+    override fun visitSetProperty(expression: IrSetProperty): IrExpression {
+        val setterSymbol = symbolRemapper.getReferencedFunction(expression.symbol) as IrSimpleFunctionSymbol
+        return IrSetPropertyImpl(
+            expression.startOffset, expression.endOffset,
+            expression.type.remapType(),
+            setterSymbol,
+            setterSymbol.descriptor,
+            expression.typeArgumentsCount,
+            mapStatementOrigin(expression.origin),
+            symbolRemapper.getReferencedClassOrNull(expression.superQualifierSymbol)
+        ).apply {
+            copyRemappedTypeArgumentsFrom(expression)
+            transformValueArguments(expression)
+        }
+    }
+
     private fun IrMemberAccessExpression.copyRemappedTypeArgumentsFrom(other: IrMemberAccessExpression) {
         assert(typeArgumentsCount == other.typeArgumentsCount) {
             "Mismatching type arguments: $typeArgumentsCount vs ${other.typeArgumentsCount} "
