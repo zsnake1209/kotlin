@@ -24,9 +24,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.library.SerializedIr
-import org.jetbrains.kotlin.library.impl.CombinedIrFileWriter
-import org.jetbrains.kotlin.library.impl.DeclarationId
-import org.jetbrains.kotlin.library.impl.SimpleIrTableFileWriter
+import org.jetbrains.kotlin.library.impl.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.backend.common.serialization.proto.Annotations as ProtoAnnotations
@@ -1214,7 +1212,7 @@ open class IrModuleSerializer(
     open fun backendSpecificExplicitRoot(declaration: IrFunction) = false
     open fun backendSpecificExplicitRoot(declaration: IrClass) = false
 
-    fun serializeIrFile(file: IrFile): ProtoFile {
+    fun serializeIrFile(file: IrFile, topLevelDeclarations: MutableList<SerializedDeclaration>): ProtoFile {
         val proto = ProtoFile.newBuilder()
             .setFileEntry(serializeFileEntry(file.fileEntry))
             .setFqName(serializeString(file.fqName.toString()))
@@ -1222,13 +1220,13 @@ open class IrModuleSerializer(
 
         file.declarations.forEach {
             if (it.descriptor.isExpectMember && !it.descriptor.isSerializableExpectClass) {
-                writer.skipDeclaration()
+                topLevelDeclarations.add(SkippedDeclaration)
                 return@forEach
             }
 
             val byteArray = serializeDeclaration(it).toByteArray()
             val uniqId = declarationTable.uniqIdByDeclaration(it)
-            writer.addDeclaration(DeclarationId(uniqId.index, uniqId.isLocal), byteArray)
+            topLevelDeclarations.add(TopLevelDeclaration(uniqId.index, uniqId.isLocal, byteArray))
             proto.addDeclarationId(protoUniqId(uniqId))
         }
 
@@ -1265,43 +1263,24 @@ open class IrModuleSerializer(
         return proto.build()
     }
 
-    lateinit var writer: CombinedIrFileWriter
-    lateinit var symbolTableWriter: SimpleIrTableFileWriter
-    lateinit var typeTableWriter: SimpleIrTableFileWriter
-    lateinit var stringTableWriter: SimpleIrTableFileWriter
-
-    fun serializeModule(module: IrModuleFragment): ProtoModule {
+    fun serializedIrModule(module: IrModuleFragment): SerializedIr {
         val proto = ProtoModule.newBuilder()
             .setName(serializeName(module.name))
 
-        val topLevelDeclarationsCount = module.files.sumBy { it.declarations.size }
-
-        writer = CombinedIrFileWriter(topLevelDeclarationsCount)
+        val topLevelDeclarations = mutableListOf<SerializedDeclaration>()
 
         module.files.forEach {
-            proto.addFile(serializeIrFile(it))
+            proto.addFile(serializeIrFile(it, topLevelDeclarations))
         }
 
-        symbolTableWriter = SimpleIrTableFileWriter("symbols", protoSymbolArray.size)
-        for (protoSymbol in protoSymbolArray)
-            symbolTableWriter.addItem(protoSymbol.toByteArray())
+        assert(module.files.sumBy { it.declarations.size } == topLevelDeclarations.size)
 
-        typeTableWriter = SimpleIrTableFileWriter("types", protoTypeArray.size)
-        for (protoSymbol in protoTypeArray)
-            typeTableWriter.addItem(protoSymbol.toByteArray())
+        val symbols = protoSymbolArray.map { it.toByteArray() }
+        val types = protoTypeArray.map { it.toByteArray() }
+        val strings = protoStringArray.map { it.toByteArray() }
 
-        stringTableWriter = SimpleIrTableFileWriter("strings", protoStringArray.size)
-        for (protoSymbol in protoStringArray)
-            stringTableWriter.addItem(protoSymbol.toByteArray())
+        val moduleBytes = proto.build().toByteArray()
 
-        return proto.build()
-    }
-
-    fun serializedIrModule(module: IrModuleFragment): SerializedIr {
-        val moduleHeader = serializeModule(module).toByteArray()
-        return SerializedIr(moduleHeader, symbolTableWriter.finishWriting().absolutePath,
-                            typeTableWriter.finishWriting().absolutePath,
-                            stringTableWriter.finishWriting().absolutePath,
-                            writer.finishWriting().absolutePath)
+        return SerializedIr(moduleBytes, symbols, types, strings, topLevelDeclarations)
     }
 }
