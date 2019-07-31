@@ -14,12 +14,19 @@ class ClockMarkTest {
     fun adjustment() {
         val clock = TestClock(unit = DurationUnit.NANOSECONDS)
 
-        val mark = clock.mark()
-        val markFuture1 = mark + 1.milliseconds
-        val markFuture2 = mark - (-1).milliseconds
+        fun ClockMark.assertIsInFuture(inFuture: Boolean) {
+            assertEquals(inFuture, this.isInFuture(), "Expected mark in future value")
+            assertEquals(!inFuture, this.isInPast(), "Expected mark in past value")
 
-        val markPast1 = mark - 1.milliseconds
-        val markPast2 = markFuture1 + (-2).milliseconds
+            assertEquals(inFuture, this.elapsed() < Duration.ZERO, "Mark elapsed: ${this.elapsed()}")
+        }
+
+        val mark = clock.mark()
+        val markFuture1 = (mark + 1.milliseconds).apply { assertIsInFuture(true) }
+        val markFuture2 = (mark - (-1).milliseconds).apply { assertIsInFuture(true) }
+
+        val markPast1 = (mark - 1.milliseconds).apply { assertIsInFuture(false) }
+        val markPast2 = (markFuture1 + (-2).milliseconds).apply { assertIsInFuture(false) }
 
         clock.reading = 500_000L
 
@@ -33,5 +40,14 @@ class ClockMarkTest {
 
         assertEquals(elapsedFromPast, markPast1.elapsed())
         assertEquals(elapsedFromPast, markPast2.elapsed())
+
+        markFuture1.assertIsInFuture(true)
+        markPast1.assertIsInFuture(false)
+
+        clock.reading = 1500_000L
+
+        markFuture1.assertIsInFuture(false)
+        markPast1.assertIsInFuture(false)
+
     }
 }

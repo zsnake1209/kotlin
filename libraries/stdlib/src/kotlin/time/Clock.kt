@@ -34,6 +34,8 @@ public interface Clock {
 public abstract class ClockMark {
     /**
      * Returns the amount of time passed from this clock mark on the clock from which this mark was taken.
+     *
+     * Note that the value returned by this function can change on subsequent invocations.
      */
     public abstract fun elapsed(): Duration
 
@@ -50,6 +52,23 @@ public abstract class ClockMark {
      * The returned clock mark is more _early_ when the [duration] is positive, and more _late_ when the [duration] is negative.
      */
     public open operator fun minus(duration: Duration): ClockMark = plus(-duration)
+
+
+    /**
+     * Returns true if this clock mark is in the past according to the clock from which this mark was taken.
+     *
+     * Note that the value returned by this function can change on subsequent invocations.
+     * If the clock is monotonic, it can change only from `false` to `true`, namely, when the clock mark becomes behind the current point of the clock.
+     */
+    public fun isInPast(): Boolean = elapsed().isPositive()
+
+    /**
+     * Returns false if this clock mark is in the future according to the clock from which this mark was taken.
+     *
+     * Note that the value returned by this function can change on subsequent invocations.
+     * If the clock is monotonic, it can change only from `true` to `false`, namely, when the clock mark becomes behind the current point of the clock.
+     */
+    public fun isInFuture(): Boolean = elapsed().isNegative()
 }
 
 @ExperimentalTime
