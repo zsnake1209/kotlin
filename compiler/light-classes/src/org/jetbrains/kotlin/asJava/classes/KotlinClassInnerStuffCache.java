@@ -2,7 +2,6 @@
  * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
-
 package org.jetbrains.kotlin.asJava.classes;
 
 import com.intellij.openapi.diagnostic.Logger;
@@ -26,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,17 +53,17 @@ public class KotlinClassInnerStuffCache {
 
     @NotNull
     public PsiField[] getFields() {
-        return copy(CachedValuesManager.getCachedValue(myClass, () -> makeResult(getAllFields())));
+        return copy(CachedValuesManager.getCachedValue(myClass, () -> makeResult(calcFields())));
     }
 
     @NotNull
     public PsiMethod[] getMethods() {
-        return copy(CachedValuesManager.getCachedValue(myClass, () -> makeResult(getAllMethods())));
+        return copy(CachedValuesManager.getCachedValue(myClass, () -> makeResult(calcMethods())));
     }
 
     @NotNull
     public PsiClass[] getInnerClasses() {
-        return copy(CachedValuesManager.getCachedValue(myClass, () -> makeResult(getAllInnerClasses())));
+        return copy(CachedValuesManager.getCachedValue(myClass, () -> makeResult(calcInnerClasses())));
     }
 
     @Nullable
@@ -82,7 +82,8 @@ public class KotlinClassInnerStuffCache {
             return PsiClassImplUtil.findMethodsByName(myClass, name, true);
         }
         else {
-            return copy(notNull(CachedValuesManager.getCachedValue(myClass, () -> makeResult(getMethodsMap())).get(name), PsiMethod.EMPTY_ARRAY));
+            return copy(notNull(CachedValuesManager.getCachedValue(myClass, () -> makeResult(getMethodsMap())).get(name),
+                                PsiMethod.EMPTY_ARRAY));
         }
     }
 
@@ -98,12 +99,14 @@ public class KotlinClassInnerStuffCache {
 
     @Nullable
     public PsiMethod getValuesMethod() {
-        return myClass.isEnum() && myClass.getName() != null ? CachedValuesManager.getCachedValue(myClass, () -> makeResult(makeValuesMethod())) : null;
+        return myClass.isEnum() && myClass.getName() != null ? CachedValuesManager
+                .getCachedValue(myClass, () -> makeResult(makeValuesMethod())) : null;
     }
 
     @Nullable
     public PsiMethod getValueOfMethod() {
-        return myClass.isEnum() && myClass.getName() != null ? CachedValuesManager.getCachedValue(myClass, () -> makeResult(makeValueOfMethod())) : null;
+        return myClass.isEnum() && myClass.getName() != null ? CachedValuesManager
+                .getCachedValue(myClass, () -> makeResult(makeValueOfMethod())) : null;
     }
 
     private static <T> T[] copy(T[] value) {
@@ -116,21 +119,21 @@ public class KotlinClassInnerStuffCache {
     }
 
     @NotNull
-    private PsiField[] getAllFields() {
+    private PsiField[] calcFields() {
         List<PsiField> own = myClass.getOwnFields();
         List<PsiField> ext = PsiAugmentProvider.collectAugments(myClass, PsiField.class);
         return ArrayUtil.mergeCollections(own, ext, PsiField.ARRAY_FACTORY);
     }
 
     @NotNull
-    private PsiMethod[] getAllMethods() {
+    private PsiMethod[] calcMethods() {
         List<PsiMethod> own = myClass.getOwnMethods();
         List<PsiMethod> ext = PsiAugmentProvider.collectAugments(myClass, PsiMethod.class);
         return ArrayUtil.mergeCollections(own, ext, PsiMethod.ARRAY_FACTORY);
     }
 
     @NotNull
-    private PsiClass[] getAllInnerClasses() {
+    private PsiClass[] calcInnerClasses() {
         List<PsiClass> own = myClass.getOwnInnerClasses();
         List<PsiClass> ext = PsiAugmentProvider.collectAugments(myClass, PsiClass.class);
         return ArrayUtil.mergeCollections(own, ext, PsiClass.ARRAY_FACTORY);
@@ -156,7 +159,7 @@ public class KotlinClassInnerStuffCache {
         PsiMethod[] methods = getMethods();
         if (methods.length == 0) return Collections.emptyMap();
 
-        Map<String, List<PsiMethod>> collectedMethods = ContainerUtil.newHashMap();
+        Map<String, List<PsiMethod>> collectedMethods = new HashMap<>();
         for (PsiMethod method : methods) {
             List<PsiMethod> list = collectedMethods.get(method.getName());
             if (list == null) {
@@ -165,7 +168,7 @@ public class KotlinClassInnerStuffCache {
             list.add(method);
         }
 
-        Map<String, PsiMethod[]> cachedMethods = ContainerUtil.newTroveMap();
+        Map<String, PsiMethod[]> cachedMethods = new THashMap<>();
         for (Map.Entry<String, List<PsiMethod>> entry : collectedMethods.entrySet()) {
             List<PsiMethod> list = entry.getValue();
             cachedMethods.put(entry.getKey(), list.toArray(PsiMethod.EMPTY_ARRAY));
@@ -196,7 +199,8 @@ public class KotlinClassInnerStuffCache {
     }
 
     private PsiMethod makeValueOfMethod() {
-        return getSyntheticMethod("public static " + myClass.getName() + " valueOf(java.lang.String name) throws java.lang.IllegalArgumentException { }");
+        return getSyntheticMethod(
+                "public static " + myClass.getName() + " valueOf(java.lang.String name) throws java.lang.IllegalArgumentException { }");
     }
 
     private PsiMethod getSyntheticMethod(String text) {
@@ -218,9 +222,11 @@ public class KotlinClassInnerStuffCache {
     private static final String VALUE_OF_METHOD = "valueOf";
 
     // Copy of PsiClassImplUtil.processDeclarationsInEnum for own cache class
-    public static boolean processDeclarationsInEnum(@NotNull PsiScopeProcessor processor,
+    public static boolean processDeclarationsInEnum(
+            @NotNull PsiScopeProcessor processor,
             @NotNull ResolveState state,
-            @NotNull KotlinClassInnerStuffCache innerStuffCache) {
+            @NotNull KotlinClassInnerStuffCache innerStuffCache
+    ) {
         ElementClassHint classHint = processor.getHint(ElementClassHint.KEY);
         if (classHint == null || classHint.shouldProcess(ElementClassHint.DeclarationKind.METHOD)) {
             NameHint nameHint = processor.getHint(NameHint.KEY);
