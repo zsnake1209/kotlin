@@ -61,7 +61,7 @@ internal actual inline fun <T> List<T>.optimizeReadOnlyList(): List<T> = when {
 internal fun <T> List<T>.optimizeReadOnlyListImpl(): List<T> = when (size) {
     0 -> emptyList()
     1 -> listOf(this[0])
-    else -> this
+    else -> java.util.Collections.unmodifiableList(this)
 }
 
 @PublishedApi
