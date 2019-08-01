@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.ir.backend.js.lower
 
 import org.jetbrains.kotlin.backend.common.DeclarationContainerLoweringPass
 import org.jetbrains.kotlin.backend.common.ir.isElseBranch
+import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
@@ -60,7 +61,7 @@ class BlockDecomposerLowering(context: JsIrBackendContext) : DeclarationContaine
                 irField.name.asString() + "\$init\$",
                 expression.type,
                 container,
-                irField.visibility
+                Visibilities.PRIVATE
             )
 
             val newBody = toBlockBody(initFunction)
