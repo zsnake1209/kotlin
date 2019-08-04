@@ -142,7 +142,7 @@ object CodegenUtil {
             classDescriptor.unsubstitutedMemberScope.getContributedFunctions(Name.identifier(name), NoLookupLocation.FROM_BACKEND)
                     .singleOrNull { function ->
                         function.kind.let { kind -> kind == CallableMemberDescriptor.Kind.SYNTHESIZED || kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE } &&
-                        function.modality != Modality.FINAL &&
+                        (function.modality != Modality.FINAL || function.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE) &&
                         areParametersOk(function.valueParameters) &&
                         function.returnType != null &&
                         isReturnTypeOk(function.returnType!!)
