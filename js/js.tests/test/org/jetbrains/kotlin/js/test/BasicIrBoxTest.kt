@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.js.facade.MainCallParameters
 import org.jetbrains.kotlin.js.facade.TranslationUnit
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.test.TargetBackend
+import org.jetbrains.kotlin.utils.fileUtils.withReplacedExtensionOrNull
 import java.io.File
 
 private val fullRuntimeKlib = loadKlib("compiler/ir/serialization.js/build/fullRuntime/klib")
@@ -38,6 +39,7 @@ abstract class BasicIrBoxTest(
     generateNodeJsRunner = generateNodeJsRunner,
     targetBackend = TargetBackend.JS_IR
 ) {
+    open val generateDts = false
 
     override val skipMinification = true
 
@@ -102,7 +104,7 @@ abstract class BasicIrBoxTest(
                 PhaseConfig(jsPhases)
             }
 
-            val jsCode = compile(
+            val compilerdModule = compile(
                 project = config.project,
                 files = filesToCompile,
                 configuration = config.configuration,
@@ -113,8 +115,13 @@ abstract class BasicIrBoxTest(
                 exportedDeclarations = setOf(FqName.fromSegments(listOfNotNull(testPackage, testFunction)))
             )
 
-            val wrappedCode = wrapWithModuleEmulationMarkers(jsCode, moduleId = config.moduleId, moduleKind = config.moduleKind)
+            val wrappedCode = wrapWithModuleEmulationMarkers(compilerdModule.jsCode, moduleId = config.moduleId, moduleKind = config.moduleKind)
             outputFile.write(wrappedCode)
+
+            if (generateDts) {
+                val dtsFile = outputFile.withReplacedExtensionOrNull("_v5.js", ".d.ts")
+                dtsFile?.write(compilerdModule.tsDefinitions ?: error("No ts definitions"))
+            }
 
         } else {
             generateKLib(
@@ -142,7 +149,7 @@ abstract class BasicIrBoxTest(
         // TODO: should we do anything special for module systems?
         // TODO: return list of js from translateFiles and provide then to this function with other js files
 
-        testChecker.check(jsFiles, testModuleName, null, testFunction, expectedResult, withModuleSystem)
+        testChecker.check(jsFiles, testModuleName, testPackage, testFunction, expectedResult, withModuleSystem)
     }
 }
 
