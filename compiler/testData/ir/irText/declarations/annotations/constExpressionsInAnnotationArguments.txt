@@ -6,7 +6,7 @@ FILE fqName:<root> fileName:/constExpressionsInAnnotationArguments.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ONE> visibility:public modality:FINAL <> () returnType:kotlin.Int
       correspondingProperty: PROPERTY name:ONE visibility:public modality:FINAL [const,val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-ONE> (): kotlin.Int declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-ONE> (): kotlin.Int declared in <root>.ONE'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:ONE type:kotlin.Int visibility:public [final,static]' type=kotlin.Int origin=null
   CLASS ANNOTATION_CLASS name:A modality:FINAL visibility:public superTypes:[kotlin.Annotation]
     $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.A
@@ -20,9 +20,9 @@ FILE fqName:<root> fileName:/constExpressionsInAnnotationArguments.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.A
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.A'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.A.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.<get-x>' type=<root>.A origin=null
+              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.x.<get-x>' type=<root>.A origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation

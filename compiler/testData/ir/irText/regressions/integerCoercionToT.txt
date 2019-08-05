@@ -41,18 +41,17 @@ FILE fqName:<root> fileName:/integerCoercionToT.kt
         public open fun toString (): kotlin.String declared in <root>.CPointed
       $this: VALUE_PARAMETER name:<this> type:kotlin.Any
   PROPERTY name:value visibility:public modality:FINAL [var]
-    FUN name:<get-value> visibility:public modality:FINAL <T_INT> ($receiver:<root>.CInt32VarX<T_INT of <root>.<get-value>>) returnType:T_INT of <root>.<get-value>
+    TYPE_PARAMETER name:T_INT index:0 variance: superTypes:[kotlin.Int]
+    FUN name:<get-value> visibility:public modality:FINAL <> ($receiver:<root>.CInt32VarX<T_INT of <root>.value>) returnType:T_INT of <root>.value
       correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [var]
-      TYPE_PARAMETER name:T_INT index:0 variance: superTypes:[kotlin.Int]
-      $receiver: VALUE_PARAMETER name:<this> type:<root>.CInt32VarX<T_INT of <root>.<get-value>>
+      $receiver: VALUE_PARAMETER name:<this> type:<root>.CInt32VarX<T_INT of <root>.value>
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-value> <T_INT> (): T_INT of <root>.<get-value> declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-value> (): T_INT of <root>.value declared in <root>.value'
           CALL 'public final fun TODO (): kotlin.Nothing [inline] declared in kotlin' type=kotlin.Nothing origin=null
-    FUN name:<set-value> visibility:public modality:FINAL <T_INT> ($receiver:<root>.CInt32VarX<T_INT of <root>.<set-value>>, value:T_INT of <root>.<set-value>) returnType:kotlin.Unit
+    FUN name:<set-value> visibility:public modality:FINAL <> ($receiver:<root>.CInt32VarX<T_INT of <root>.value>, value:T_INT of <root>.value) returnType:kotlin.Unit
       correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [var]
-      TYPE_PARAMETER name:T_INT index:0 variance: superTypes:[kotlin.Int]
-      $receiver: VALUE_PARAMETER name:<this> type:<root>.CInt32VarX<T_INT of <root>.<set-value>>
-      VALUE_PARAMETER name:value index:0 type:T_INT of <root>.<set-value>
+      $receiver: VALUE_PARAMETER name:<this> type:<root>.CInt32VarX<T_INT of <root>.value>
+      VALUE_PARAMETER name:value index:0 type:T_INT of <root>.value
       BLOCK_BODY
   CLASS CLASS name:IdType modality:FINAL visibility:public superTypes:[<root>.CPointed]
     $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.IdType
@@ -69,9 +68,9 @@ FILE fqName:<root> fileName:/integerCoercionToT.kt
         correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.IdType
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-value> (): kotlin.Int declared in <root>.IdType'
+          RETURN type=kotlin.Nothing from='public final fun <get-value> (): kotlin.Int declared in <root>.IdType.value'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.IdType declared in <root>.IdType.<get-value>' type=<root>.IdType origin=null
+              receiver: GET_VAR '<this>: <root>.IdType declared in <root>.IdType.value.<get-value>' type=<root>.IdType origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.CPointed
@@ -89,8 +88,8 @@ FILE fqName:<root> fileName:/integerCoercionToT.kt
     VALUE_PARAMETER name:value index:0 type:<root>.IdType
     VALUE_PARAMETER name:cv index:1 type:<root>.CInt32VarX<kotlin.Int>
     BLOCK_BODY
-      SET_PROPERTY 'public final fun <set-value> <T_INT> (value: T_INT of <root>.<set-value>): kotlin.Unit declared in <root>' type=kotlin.Unit origin=EQ
-        <T_INT>: kotlin.Int
+      SET_PROPERTY 'public final fun <set-value> (value: T_INT of <root>.value): kotlin.Unit declared in <root>.value' type=kotlin.Unit origin=EQ
+        <1>: kotlin.Int
         $receiver: GET_VAR 'cv: <root>.CInt32VarX<kotlin.Int> declared in <root>.foo' type=<root>.CInt32VarX<kotlin.Int> origin=null
-        value: GET_PROPERTY 'public final fun <get-value> (): kotlin.Int declared in <root>.IdType' type=kotlin.Int origin=GET_PROPERTY
+        value: GET_PROPERTY 'public final fun <get-value> (): kotlin.Int declared in <root>.IdType.value' type=kotlin.Int origin=GET_PROPERTY
           $this: GET_VAR 'value: <root>.IdType declared in <root>.foo' type=<root>.IdType origin=null

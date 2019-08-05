@@ -11,9 +11,9 @@ FILE fqName:<root> fileName:/propertyAccessorsWithAnnotations.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestAnn
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.String declared in <root>.TestAnn'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.String declared in <root>.TestAnn.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.TestAnn declared in <root>.TestAnn.<get-x>' type=<root>.TestAnn origin=null
+              receiver: GET_VAR '<this>: <root>.TestAnn declared in <root>.TestAnn.x.<get-x>' type=<root>.TestAnn origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
@@ -33,7 +33,7 @@ FILE fqName:<root> fileName:/propertyAccessorsWithAnnotations.kt
         TestAnn(x = 'test1.get')
       correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.String declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.String declared in <root>.test1'
           CONST String type=kotlin.String value=""
   PROPERTY name:test2 visibility:public modality:FINAL [var]
     FUN name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.String
@@ -41,7 +41,7 @@ FILE fqName:<root> fileName:/propertyAccessorsWithAnnotations.kt
         TestAnn(x = 'test2.get')
       correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [var]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.String declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.String declared in <root>.test2'
           CONST String type=kotlin.String value=""
     FUN name:<set-test2> visibility:public modality:FINAL <> (value:kotlin.String) returnType:kotlin.Unit
       annotations:
@@ -58,7 +58,7 @@ FILE fqName:<root> fileName:/propertyAccessorsWithAnnotations.kt
         TestAnn(x = 'test3.get')
       correspondingProperty: PROPERTY name:test3 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.String declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.String declared in <root>.test3'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.String visibility:public [final,static]' type=kotlin.String origin=null
   PROPERTY name:test4 visibility:public modality:FINAL [var]
     FIELD PROPERTY_BACKING_FIELD name:test4 type:kotlin.String visibility:public [static]
@@ -69,7 +69,7 @@ FILE fqName:<root> fileName:/propertyAccessorsWithAnnotations.kt
         TestAnn(x = 'test4.get')
       correspondingProperty: PROPERTY name:test4 visibility:public modality:FINAL [var]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test4> (): kotlin.String declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test4> (): kotlin.String declared in <root>.test4'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test4 type:kotlin.String visibility:public [static]' type=kotlin.String origin=null
     FUN DEFAULT_PROPERTY_ACCESSOR name:<set-test4> visibility:public modality:FINAL <> (<set-?>:kotlin.String) returnType:kotlin.Unit
       annotations:
@@ -78,4 +78,4 @@ FILE fqName:<root> fileName:/propertyAccessorsWithAnnotations.kt
       VALUE_PARAMETER name:<set-?> index:0 type:kotlin.String
       BLOCK_BODY
         SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test4 type:kotlin.String visibility:public [static]' type=kotlin.Unit origin=null
-          value: GET_VAR '<set-?>: kotlin.String declared in <root>.<set-test4>' type=kotlin.String origin=null
+          value: GET_VAR '<set-?>: kotlin.String declared in <root>.test4.<set-test4>' type=kotlin.String origin=null

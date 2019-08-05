@@ -269,6 +269,16 @@ public class IrTextTestCaseGenerated extends AbstractIrTextTestCase {
             runTest("compiler/testData/ir/irText/declarations/fileWithTypeAliasesOnly.kt");
         }
 
+        @TestMetadata("genericDelegatedProperties.kt")
+        public void testGenericDelegatedProperties() throws Exception {
+            runTest("compiler/testData/ir/irText/declarations/genericDelegatedProperties.kt");
+        }
+
+        @TestMetadata("genericProperties.kt")
+        public void testGenericProperties() throws Exception {
+            runTest("compiler/testData/ir/irText/declarations/genericProperties.kt");
+        }
+
         @TestMetadata("interfaceProperties.kt")
         public void testInterfaceProperties() throws Exception {
             runTest("compiler/testData/ir/irText/declarations/interfaceProperties.kt");

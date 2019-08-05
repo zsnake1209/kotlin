@@ -22,10 +22,13 @@ import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrPropertySymbolImpl
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.util.transform
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyExternal
+import org.jetbrains.kotlin.utils.SmartList
 
 @Suppress("DEPRECATION_ERROR")
 class IrPropertyImpl(
@@ -41,7 +44,8 @@ class IrPropertyImpl(
     override val isLateinit: Boolean = symbol.descriptor.isLateInit,
     @Suppress("DEPRECATION") override val isDelegated: Boolean = symbol.descriptor.isDelegated,
     override val isExternal: Boolean = symbol.descriptor.isEffectivelyExternal()
-) : IrDeclarationBase(startOffset, endOffset, origin),
+) :
+    IrDeclarationBase(startOffset, endOffset, origin),
     IrProperty {
 
     @Deprecated(message = "Don't use descriptor-based API for IrProperty", level = DeprecationLevel.WARNING)
@@ -129,6 +133,15 @@ class IrPropertyImpl(
         symbol.bind(this)
     }
 
+    override val typeParameters: MutableList<IrTypeParameter> = SmartList()
+
+    private var type_: IrType? = null
+    override var type: IrType
+        get() = type_ ?: throw AssertionError("Property type not initialized")
+        set(value) {
+            type_ = value
+        }
+
     override val descriptor: PropertyDescriptor = symbol.descriptor
 
     override var backingField: IrField? = null
@@ -140,6 +153,7 @@ class IrPropertyImpl(
     }
 
     override fun <D> acceptChildren(visitor: IrElementVisitor<Unit, D>, data: D) {
+        typeParameters.forEach { it.accept(visitor, data) }
         backingField?.accept(visitor, data)
         getter?.accept(visitor, data)
         setter?.accept(visitor, data)
@@ -148,6 +162,7 @@ class IrPropertyImpl(
     override var metadata: MetadataSource? = null
 
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
+        typeParameters.transform { it.transform(transformer, data) }
         backingField = backingField?.transform(transformer, data) as? IrField
         getter = getter?.run { transform(transformer, data) as IrSimpleFunction }
         setter = setter?.run { transform(transformer, data) as IrSimpleFunction }

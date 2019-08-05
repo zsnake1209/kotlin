@@ -25,5 +25,5 @@ FILE fqName:<root> fileName:/contructorCall.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test> visibility:public modality:FINAL <> () returnType:<root>.A
       correspondingProperty: PROPERTY name:test visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test> (): <root>.A declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test> (): <root>.A declared in <root>.test'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test type:<root>.A visibility:public [final,static]' type=<root>.A origin=null

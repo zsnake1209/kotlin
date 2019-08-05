@@ -19,10 +19,10 @@ FILE fqName:<root> fileName:/objectLiteralExpressions.kt
   PROPERTY name:test1 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Any visibility:public [final,static]
       EXPRESSION_BODY
-        BLOCK type=<root>.test1.<no name provided> origin=OBJECT_LITERAL
+        BLOCK type=<root>.test1.test1.<no name provided> origin=OBJECT_LITERAL
           CLASS CLASS name:<no name provided> modality:FINAL visibility:local superTypes:[kotlin.Any]
-            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.test1.<no name provided>
-            CONSTRUCTOR visibility:public <> () returnType:<root>.test1.<no name provided> [primary]
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.test1.test1.<no name provided>
+            CONSTRUCTOR visibility:public <> () returnType:<root>.test1.test1.<no name provided> [primary]
               BLOCK_BODY
                 DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
                 INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:<no name provided> modality:FINAL visibility:local superTypes:[kotlin.Any]'
@@ -39,26 +39,26 @@ FILE fqName:<root> fileName:/objectLiteralExpressions.kt
               overridden:
                 public open fun toString (): kotlin.String declared in kotlin.Any
               $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-          CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in <root>.test1.<no name provided>' type=<root>.test1.<no name provided> origin=OBJECT_LITERAL
+          CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in <root>.test1.test1.<no name provided>' type=<root>.test1.test1.<no name provided> origin=OBJECT_LITERAL
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Any
       correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Any declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Any declared in <root>.test1'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Any visibility:public [final,static]' type=kotlin.Any origin=null
   PROPERTY name:test2 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test2 type:<root>.IFoo visibility:public [final,static]
       EXPRESSION_BODY
-        BLOCK type=<root>.test2.<no name provided> origin=OBJECT_LITERAL
+        BLOCK type=<root>.test2.test2.<no name provided> origin=OBJECT_LITERAL
           CLASS CLASS name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.IFoo]
-            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.test2.<no name provided>
-            CONSTRUCTOR visibility:public <> () returnType:<root>.test2.<no name provided> [primary]
+            $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.test2.test2.<no name provided>
+            CONSTRUCTOR visibility:public <> () returnType:<root>.test2.test2.<no name provided> [primary]
               BLOCK_BODY
                 DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
                 INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:<no name provided> modality:FINAL visibility:local superTypes:[<root>.IFoo]'
-            FUN name:foo visibility:public modality:OPEN <> ($this:<root>.test2.<no name provided>) returnType:kotlin.Unit
+            FUN name:foo visibility:public modality:OPEN <> ($this:<root>.test2.test2.<no name provided>) returnType:kotlin.Unit
               overridden:
                 public abstract fun foo (): kotlin.Unit declared in <root>.IFoo
-              $this: VALUE_PARAMETER name:<this> type:<root>.test2.<no name provided>
+              $this: VALUE_PARAMETER name:<this> type:<root>.test2.test2.<no name provided>
               BLOCK_BODY
                 CALL 'public final fun println (message: kotlin.Any?): kotlin.Unit [inline] declared in kotlin.io' type=kotlin.Unit origin=null
                   message: CONST String type=kotlin.String value="foo"
@@ -75,11 +75,11 @@ FILE fqName:<root> fileName:/objectLiteralExpressions.kt
               overridden:
                 public open fun toString (): kotlin.String declared in <root>.IFoo
               $this: VALUE_PARAMETER name:<this> type:kotlin.Any
-          CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in <root>.test2.<no name provided>' type=<root>.test2.<no name provided> origin=OBJECT_LITERAL
+          CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in <root>.test2.test2.<no name provided>' type=<root>.test2.test2.<no name provided> origin=OBJECT_LITERAL
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:<root>.IFoo
       correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): <root>.IFoo declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): <root>.IFoo declared in <root>.test2'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test2 type:<root>.IFoo visibility:public [final,static]' type=<root>.IFoo origin=null
   CLASS CLASS name:Outer modality:FINAL visibility:public superTypes:[kotlin.Any]
     $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Outer

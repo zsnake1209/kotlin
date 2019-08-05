@@ -12,9 +12,9 @@ FILE fqName:<root> fileName:/temporaryInInitBlock.kt
         correspondingProperty: PROPERTY name:s visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-s> (): kotlin.String? declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public final fun <get-s> (): kotlin.String? declared in <root>.C.s'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.String? visibility:public [final]' type=kotlin.String? origin=null
-              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.<get-s>' type=<root>.C origin=null
+              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.s.<get-s>' type=<root>.C origin=null
     ANONYMOUS_INITIALIZER isStatic=false
       BLOCK_BODY
         SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.String? visibility:public [final]' type=kotlin.Unit origin=null

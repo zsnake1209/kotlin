@@ -14,9 +14,9 @@ FILE fqName:<root> fileName:/initVal.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitValFromParameter
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitValFromParameter'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitValFromParameter.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitValFromParameter declared in <root>.TestInitValFromParameter.<get-x>' type=<root>.TestInitValFromParameter origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitValFromParameter declared in <root>.TestInitValFromParameter.x.<get-x>' type=<root>.TestInitValFromParameter origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -44,9 +44,9 @@ FILE fqName:<root> fileName:/initVal.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitValInClass
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitValInClass'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitValInClass.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitValInClass declared in <root>.TestInitValInClass.<get-x>' type=<root>.TestInitValInClass origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitValInClass declared in <root>.TestInitValInClass.x.<get-x>' type=<root>.TestInitValInClass origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -72,9 +72,9 @@ FILE fqName:<root> fileName:/initVal.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitValInInitBlock
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitValInInitBlock'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitValInInitBlock.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitValInInitBlock declared in <root>.TestInitValInInitBlock.<get-x>' type=<root>.TestInitValInInitBlock origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitValInInitBlock declared in <root>.TestInitValInInitBlock.x.<get-x>' type=<root>.TestInitValInInitBlock origin=null
     ANONYMOUS_INITIALIZER isStatic=false
       BLOCK_BODY
         SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Unit origin=null

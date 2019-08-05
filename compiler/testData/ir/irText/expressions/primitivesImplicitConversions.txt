@@ -6,7 +6,7 @@ FILE fqName:<root> fileName:/primitivesImplicitConversions.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Long
       correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Long declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Long declared in <root>.test1'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Long visibility:public [final,static]' type=kotlin.Long origin=null
   PROPERTY name:test2 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Short visibility:public [final,static]
@@ -15,7 +15,7 @@ FILE fqName:<root> fileName:/primitivesImplicitConversions.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Short
       correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Short declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Short declared in <root>.test2'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Short visibility:public [final,static]' type=kotlin.Short origin=null
   PROPERTY name:test3 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Byte visibility:public [final,static]
@@ -24,7 +24,7 @@ FILE fqName:<root> fileName:/primitivesImplicitConversions.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Byte
       correspondingProperty: PROPERTY name:test3 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.Byte declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.Byte declared in <root>.test3'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Byte visibility:public [final,static]' type=kotlin.Byte origin=null
   PROPERTY name:test4 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test4 type:kotlin.Long visibility:public [final,static]
@@ -35,7 +35,7 @@ FILE fqName:<root> fileName:/primitivesImplicitConversions.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test4> visibility:public modality:FINAL <> () returnType:kotlin.Long
       correspondingProperty: PROPERTY name:test4 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test4> (): kotlin.Long declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test4> (): kotlin.Long declared in <root>.test4'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test4 type:kotlin.Long visibility:public [final,static]' type=kotlin.Long origin=null
   PROPERTY name:test5 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test5 type:kotlin.Short visibility:public [final,static]
@@ -46,7 +46,7 @@ FILE fqName:<root> fileName:/primitivesImplicitConversions.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test5> visibility:public modality:FINAL <> () returnType:kotlin.Short
       correspondingProperty: PROPERTY name:test5 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test5> (): kotlin.Short declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test5> (): kotlin.Short declared in <root>.test5'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test5 type:kotlin.Short visibility:public [final,static]' type=kotlin.Short origin=null
   PROPERTY name:test6 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test6 type:kotlin.Byte visibility:public [final,static]
@@ -57,7 +57,7 @@ FILE fqName:<root> fileName:/primitivesImplicitConversions.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test6> visibility:public modality:FINAL <> () returnType:kotlin.Byte
       correspondingProperty: PROPERTY name:test6 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test6> (): kotlin.Byte declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test6> (): kotlin.Byte declared in <root>.test6'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test6 type:kotlin.Byte visibility:public [final,static]' type=kotlin.Byte origin=null
   FUN name:test visibility:public modality:FINAL <> () returnType:kotlin.Unit
     BLOCK_BODY
@@ -107,9 +107,9 @@ FILE fqName:<root> fileName:/primitivesImplicitConversions.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestImplicitArguments
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Long declared in <root>.TestImplicitArguments'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Long declared in <root>.TestImplicitArguments.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Long visibility:public [final]' type=kotlin.Long origin=null
-              receiver: GET_VAR '<this>: <root>.TestImplicitArguments declared in <root>.TestImplicitArguments.<get-x>' type=<root>.TestImplicitArguments origin=null
+              receiver: GET_VAR '<this>: <root>.TestImplicitArguments declared in <root>.TestImplicitArguments.x.<get-x>' type=<root>.TestImplicitArguments origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any

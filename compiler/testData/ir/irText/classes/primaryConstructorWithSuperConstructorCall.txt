@@ -72,9 +72,9 @@ FILE fqName:<root> fileName:/primaryConstructorWithSuperConstructorCall.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestWithDelegatingConstructor
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestWithDelegatingConstructor'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestWithDelegatingConstructor.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestWithDelegatingConstructor declared in <root>.TestWithDelegatingConstructor.<get-x>' type=<root>.TestWithDelegatingConstructor origin=null
+              receiver: GET_VAR '<this>: <root>.TestWithDelegatingConstructor declared in <root>.TestWithDelegatingConstructor.x.<get-x>' type=<root>.TestWithDelegatingConstructor origin=null
     PROPERTY name:y visibility:public modality:FINAL [val]
       FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public [final]
         EXPRESSION_BODY
@@ -83,9 +83,9 @@ FILE fqName:<root> fileName:/primaryConstructorWithSuperConstructorCall.kt
         correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestWithDelegatingConstructor
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.Int declared in <root>.TestWithDelegatingConstructor'
+          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.Int declared in <root>.TestWithDelegatingConstructor.y'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestWithDelegatingConstructor declared in <root>.TestWithDelegatingConstructor.<get-y>' type=<root>.TestWithDelegatingConstructor origin=null
+              receiver: GET_VAR '<this>: <root>.TestWithDelegatingConstructor declared in <root>.TestWithDelegatingConstructor.y.<get-y>' type=<root>.TestWithDelegatingConstructor origin=null
     CONSTRUCTOR visibility:public <> (x:kotlin.Int) returnType:<root>.TestWithDelegatingConstructor
       VALUE_PARAMETER name:x index:0 type:kotlin.Int
       BLOCK_BODY

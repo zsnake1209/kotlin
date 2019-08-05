@@ -11,9 +11,9 @@ FILE fqName:<root> fileName:/propertiesWithAnnotations.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestAnn
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.String declared in <root>.TestAnn'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.String declared in <root>.TestAnn.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.String visibility:public [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.TestAnn declared in <root>.TestAnn.<get-x>' type=<root>.TestAnn origin=null
+              receiver: GET_VAR '<this>: <root>.TestAnn declared in <root>.TestAnn.x.<get-x>' type=<root>.TestAnn origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
@@ -36,5 +36,5 @@ FILE fqName:<root> fileName:/propertiesWithAnnotations.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-testVal> visibility:public modality:FINAL <> () returnType:kotlin.String
       correspondingProperty: PROPERTY name:testVal visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-testVal> (): kotlin.String declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-testVal> (): kotlin.String declared in <root>.testVal'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:testVal type:kotlin.String visibility:public [final,static]' type=kotlin.String origin=null

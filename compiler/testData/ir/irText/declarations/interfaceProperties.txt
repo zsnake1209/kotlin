@@ -10,7 +10,7 @@ FILE fqName:<root> fileName:/interfaceProperties.kt
         correspondingProperty: PROPERTY name:test2 visibility:public modality:OPEN [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-test2> (): kotlin.Int declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public open fun <get-test2> (): kotlin.Int declared in <root>.C.test2'
             CONST Int type=kotlin.Int value=0
     PROPERTY name:test3 visibility:public modality:ABSTRACT [var]
       FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:ABSTRACT <> ($this:<root>.C) returnType:kotlin.Int
@@ -25,7 +25,7 @@ FILE fqName:<root> fileName:/interfaceProperties.kt
         correspondingProperty: PROPERTY name:test4 visibility:public modality:OPEN [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-test4> (): kotlin.Int declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public open fun <get-test4> (): kotlin.Int declared in <root>.C.test4'
             CONST Int type=kotlin.Int value=0
       FUN name:<set-test4> visibility:public modality:OPEN <> ($this:<root>.C, value:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:test4 visibility:public modality:OPEN [var]

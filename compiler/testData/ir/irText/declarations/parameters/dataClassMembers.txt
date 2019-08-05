@@ -18,9 +18,9 @@ FILE fqName:<root> fileName:/dataClassMembers.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test<T of <root>.Test>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): T of <root>.Test declared in <root>.Test'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): T of <root>.Test declared in <root>.Test.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:T of <root>.Test visibility:public [final]' type=T of <root>.Test origin=null
-              receiver: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.<get-x>' type=<root>.Test<T of <root>.Test> origin=null
+              receiver: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.x.<get-x>' type=<root>.Test<T of <root>.Test> origin=null
     PROPERTY name:y visibility:public modality:FINAL [val]
       FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.String visibility:public [final]
         EXPRESSION_BODY
@@ -29,30 +29,30 @@ FILE fqName:<root> fileName:/dataClassMembers.kt
         correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test<T of <root>.Test>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.String declared in <root>.Test'
+          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.String declared in <root>.Test.y'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.String visibility:public [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.<get-y>' type=<root>.Test<T of <root>.Test> origin=null
+              receiver: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.y.<get-y>' type=<root>.Test<T of <root>.Test> origin=null
     FUN GENERATED_DATA_CLASS_MEMBER name:component1 visibility:public modality:FINAL <> ($this:<root>.Test<T of <root>.Test>) returnType:T of <root>.Test
       $this: VALUE_PARAMETER name:<this> type:<root>.Test<T of <root>.Test>
       BLOCK_BODY
         RETURN type=kotlin.Nothing from='public final fun component1 (): T of <root>.Test declared in <root>.Test'
-          CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test' type=T of <root>.Test origin=GET_PROPERTY
+          CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test.x' type=T of <root>.Test origin=GET_PROPERTY
             $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.component1' type=<root>.Test<T of <root>.Test> origin=null
     FUN GENERATED_DATA_CLASS_MEMBER name:component2 visibility:public modality:FINAL <> ($this:<root>.Test<T of <root>.Test>) returnType:kotlin.String
       $this: VALUE_PARAMETER name:<this> type:<root>.Test<T of <root>.Test>
       BLOCK_BODY
         RETURN type=kotlin.Nothing from='public final fun component2 (): kotlin.String declared in <root>.Test'
-          CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test' type=kotlin.String origin=GET_PROPERTY
+          CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test.y' type=kotlin.String origin=GET_PROPERTY
             $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.component2' type=<root>.Test<T of <root>.Test> origin=null
     FUN GENERATED_DATA_CLASS_MEMBER name:copy visibility:public modality:FINAL <> ($this:<root>.Test<T of <root>.Test>, x:T of <root>.Test, y:kotlin.String) returnType:<root>.Test<T of <root>.Test>
       $this: VALUE_PARAMETER name:<this> type:<root>.Test<T of <root>.Test>
       VALUE_PARAMETER name:x index:0 type:T of <root>.Test
         EXPRESSION_BODY
-          CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test' type=T of <root>.Test origin=GET_PROPERTY
+          CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test.x' type=T of <root>.Test origin=GET_PROPERTY
             $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.copy' type=<root>.Test<T of <root>.Test> origin=null
       VALUE_PARAMETER name:y index:1 type:kotlin.String
         EXPRESSION_BODY
-          CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test' type=kotlin.String origin=GET_PROPERTY
+          CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test.y' type=kotlin.String origin=GET_PROPERTY
             $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.copy' type=<root>.Test<T of <root>.Test> origin=null
       BLOCK_BODY
         RETURN type=kotlin.Nothing from='public final fun copy (x: T of <root>.Test, y: kotlin.String): <root>.Test<T of <root>.Test> declared in <root>.Test'
@@ -69,11 +69,11 @@ FILE fqName:<root> fileName:/dataClassMembers.kt
           STRING_CONCATENATION type=kotlin.String
             CONST String type=kotlin.String value="Test("
             CONST String type=kotlin.String value="x="
-            CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test' type=T of <root>.Test origin=GET_PROPERTY
+            CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test.x' type=T of <root>.Test origin=GET_PROPERTY
               $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.toString' type=<root>.Test<T of <root>.Test> origin=null
             CONST String type=kotlin.String value=", "
             CONST String type=kotlin.String value="y="
-            CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test' type=kotlin.String origin=GET_PROPERTY
+            CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test.y' type=kotlin.String origin=GET_PROPERTY
               $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.toString' type=<root>.Test<T of <root>.Test> origin=null
             CONST String type=kotlin.String value=")"
     FUN GENERATED_DATA_CLASS_MEMBER name:hashCode visibility:public modality:OPEN <> ($this:<root>.Test<T of <root>.Test>) returnType:kotlin.Int
@@ -86,7 +86,7 @@ FILE fqName:<root> fileName:/dataClassMembers.kt
         SET_VAR 'var tmp0_result: kotlin.Int [var] declared in <root>.Test.hashCode' type=kotlin.Unit origin=EQ
           BLOCK type=kotlin.Int origin=null
             VAR IR_TEMPORARY_VARIABLE name:tmp1 type:T of <root>.Test [val]
-              CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test' type=T of <root>.Test origin=GET_PROPERTY
+              CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test.x' type=T of <root>.Test origin=GET_PROPERTY
                 $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.hashCode' type=<root>.Test<T of <root>.Test> origin=null
             WHEN type=kotlin.Int origin=null
               BRANCH
@@ -104,7 +104,7 @@ FILE fqName:<root> fileName:/dataClassMembers.kt
               $this: GET_VAR 'var tmp0_result: kotlin.Int [var] declared in <root>.Test.hashCode' type=kotlin.Int origin=null
               other: CONST Int type=kotlin.Int value=31
             other: CALL 'public open fun hashCode (): kotlin.Int declared in kotlin.String' type=kotlin.Int origin=null
-              $this: CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test' type=kotlin.String origin=GET_PROPERTY
+              $this: CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test.y' type=kotlin.String origin=GET_PROPERTY
                 $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.hashCode' type=<root>.Test<T of <root>.Test> origin=null
         RETURN type=kotlin.Nothing from='public open fun hashCode (): kotlin.Int declared in <root>.Test'
           GET_VAR 'var tmp0_result: kotlin.Int [var] declared in <root>.Test.hashCode' type=kotlin.Int origin=null
@@ -134,9 +134,9 @@ FILE fqName:<root> fileName:/dataClassMembers.kt
           BRANCH
             if: CALL 'public final fun not (): kotlin.Boolean declared in kotlin.Boolean' type=kotlin.Boolean origin=EXCLEQ
               $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EXCLEQ
-                arg0: CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test' type=T of <root>.Test origin=GET_PROPERTY
+                arg0: CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test.x' type=T of <root>.Test origin=GET_PROPERTY
                   $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.equals' type=<root>.Test<T of <root>.Test> origin=null
-                arg1: CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test' type=T of <root>.Test origin=GET_PROPERTY
+                arg1: CALL 'public final fun <get-x> (): T of <root>.Test declared in <root>.Test.x' type=T of <root>.Test origin=GET_PROPERTY
                   $this: GET_VAR 'val tmp0_other_with_cast: <root>.Test<T of <root>.Test> [val] declared in <root>.Test.equals' type=<root>.Test<T of <root>.Test> origin=null
             then: RETURN type=kotlin.Nothing from='public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.Test'
               CONST Boolean type=kotlin.Boolean value=false
@@ -144,9 +144,9 @@ FILE fqName:<root> fileName:/dataClassMembers.kt
           BRANCH
             if: CALL 'public final fun not (): kotlin.Boolean declared in kotlin.Boolean' type=kotlin.Boolean origin=EXCLEQ
               $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EXCLEQ
-                arg0: CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test' type=kotlin.String origin=GET_PROPERTY
+                arg0: CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test.y' type=kotlin.String origin=GET_PROPERTY
                   $this: GET_VAR '<this>: <root>.Test<T of <root>.Test> declared in <root>.Test.equals' type=<root>.Test<T of <root>.Test> origin=null
-                arg1: CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test' type=kotlin.String origin=GET_PROPERTY
+                arg1: CALL 'public final fun <get-y> (): kotlin.String declared in <root>.Test.y' type=kotlin.String origin=GET_PROPERTY
                   $this: GET_VAR 'val tmp0_other_with_cast: <root>.Test<T of <root>.Test> [val] declared in <root>.Test.equals' type=<root>.Test<T of <root>.Test> origin=null
             then: RETURN type=kotlin.Nothing from='public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.Test'
               CONST Boolean type=kotlin.Boolean value=false

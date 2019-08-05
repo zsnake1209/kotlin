@@ -17,9 +17,9 @@ FILE fqName:<root> fileName:/constructor.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): T1 of <root>.Test1 declared in <root>.Test1'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): T1 of <root>.Test1 declared in <root>.Test1.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:T1 of <root>.Test1 visibility:public [final]' type=T1 of <root>.Test1 origin=null
-              receiver: GET_VAR '<this>: <root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1> declared in <root>.Test1.<get-x>' type=<root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1> origin=null
+              receiver: GET_VAR '<this>: <root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1> declared in <root>.Test1.x.<get-x>' type=<root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1> origin=null
     PROPERTY name:y visibility:public modality:FINAL [val]
       FIELD PROPERTY_BACKING_FIELD name:y type:T2 of <root>.Test1 visibility:public [final]
         EXPRESSION_BODY
@@ -28,9 +28,9 @@ FILE fqName:<root> fileName:/constructor.kt
         correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-y> (): T2 of <root>.Test1 declared in <root>.Test1'
+          RETURN type=kotlin.Nothing from='public final fun <get-y> (): T2 of <root>.Test1 declared in <root>.Test1.y'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:T2 of <root>.Test1 visibility:public [final]' type=T2 of <root>.Test1 origin=null
-              receiver: GET_VAR '<this>: <root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1> declared in <root>.Test1.<get-y>' type=<root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1> origin=null
+              receiver: GET_VAR '<this>: <root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1> declared in <root>.Test1.y.<get-y>' type=<root>.Test1<T1 of <root>.Test1, T2 of <root>.Test1> origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -60,9 +60,9 @@ FILE fqName:<root> fileName:/constructor.kt
         correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test2
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.String declared in <root>.Test2'
+          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.String declared in <root>.Test2.y'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.String visibility:public [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<get-y>' type=<root>.Test2 origin=null
+              receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.y.<get-y>' type=<root>.Test2 origin=null
     CLASS CLASS name:TestInner modality:FINAL visibility:public [inner] superTypes:[kotlin.Any]
       $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Test2.TestInner<Z of <root>.Test2.TestInner>
       TYPE_PARAMETER name:Z index:0 variance: superTypes:[kotlin.Any?]
@@ -80,9 +80,9 @@ FILE fqName:<root> fileName:/constructor.kt
           correspondingProperty: PROPERTY name:z visibility:public modality:FINAL [val]
           $this: VALUE_PARAMETER name:<this> type:<root>.Test2.TestInner<Z of <root>.Test2.TestInner>
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-z> (): Z of <root>.Test2.TestInner declared in <root>.Test2.TestInner'
+            RETURN type=kotlin.Nothing from='public final fun <get-z> (): Z of <root>.Test2.TestInner declared in <root>.Test2.TestInner.z'
               GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:z type:Z of <root>.Test2.TestInner visibility:public [final]' type=Z of <root>.Test2.TestInner origin=null
-                receiver: GET_VAR '<this>: <root>.Test2.TestInner<Z of <root>.Test2.TestInner> declared in <root>.Test2.TestInner.<get-z>' type=<root>.Test2.TestInner<Z of <root>.Test2.TestInner> origin=null
+                receiver: GET_VAR '<this>: <root>.Test2.TestInner<Z of <root>.Test2.TestInner> declared in <root>.Test2.TestInner.z.<get-z>' type=<root>.Test2.TestInner<Z of <root>.Test2.TestInner> origin=null
       CONSTRUCTOR visibility:public <> ($this:<root>.Test2, z:Z of <root>.Test2.TestInner, i:kotlin.Int) returnType:<root>.Test2.TestInner<Z of <root>.Test2.TestInner>
         $outer: VALUE_PARAMETER name:<this> type:<root>.Test2
         VALUE_PARAMETER name:z index:0 type:Z of <root>.Test2.TestInner
@@ -136,9 +136,9 @@ FILE fqName:<root> fileName:/constructor.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test3
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Test3'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Test3.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.Test3 declared in <root>.Test3.<get-x>' type=<root>.Test3 origin=null
+              receiver: GET_VAR '<this>: <root>.Test3 declared in <root>.Test3.x.<get-x>' type=<root>.Test3 origin=null
     PROPERTY name:y visibility:public modality:FINAL [val]
       FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.String visibility:public [final]
         EXPRESSION_BODY
@@ -147,9 +147,9 @@ FILE fqName:<root> fileName:/constructor.kt
         correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test3
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.String declared in <root>.Test3'
+          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.String declared in <root>.Test3.y'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.String visibility:public [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.Test3 declared in <root>.Test3.<get-y>' type=<root>.Test3 origin=null
+              receiver: GET_VAR '<this>: <root>.Test3 declared in <root>.Test3.y.<get-y>' type=<root>.Test3 origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -179,9 +179,9 @@ FILE fqName:<root> fileName:/constructor.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test4<T of <root>.Test4>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Test4'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Test4.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.Test4<T of <root>.Test4> declared in <root>.Test4.<get-x>' type=<root>.Test4<T of <root>.Test4> origin=null
+              receiver: GET_VAR '<this>: <root>.Test4<T of <root>.Test4> declared in <root>.Test4.x.<get-x>' type=<root>.Test4<T of <root>.Test4> origin=null
     CONSTRUCTOR visibility:public <> (x:kotlin.Int, y:kotlin.Int) returnType:<root>.Test4<T of <root>.Test4>
       VALUE_PARAMETER name:x index:0 type:kotlin.Int
       VALUE_PARAMETER name:y index:1 type:kotlin.Int

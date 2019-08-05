@@ -10,5 +10,5 @@ FILE fqName:<root> fileName:/fileWithAnnotations.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-bar> visibility:public modality:FINAL <> () returnType:kotlin.Int
       correspondingProperty: PROPERTY name:bar visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-bar> (): kotlin.Int declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-bar> (): kotlin.Int declared in <root>.bar'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:bar type:kotlin.Int visibility:public [final,static]' type=kotlin.Int origin=null

@@ -26,9 +26,9 @@ FILE fqName:<root> fileName:/arrayAugmentedAssignment1.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.IntArray declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.IntArray declared in <root>.C.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.IntArray visibility:public [final]' type=kotlin.IntArray origin=null
-              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.<get-x>' type=<root>.C origin=null
+              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.x.<get-x>' type=<root>.C origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -80,7 +80,7 @@ FILE fqName:<root> fileName:/arrayAugmentedAssignment1.kt
       TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
         BLOCK type=kotlin.Int origin=POSTFIX_INCR
           VAR IR_TEMPORARY_VARIABLE name:tmp0_array type:kotlin.IntArray [val]
-            GET_PROPERTY 'public final fun <get-x> (): kotlin.IntArray declared in <root>.C' type=kotlin.IntArray origin=GET_PROPERTY
+            GET_PROPERTY 'public final fun <get-x> (): kotlin.IntArray declared in <root>.C.x' type=kotlin.IntArray origin=GET_PROPERTY
               $this: GET_VAR 'c: <root>.C declared in <root>.testMember' type=<root>.C origin=null
           VAR IR_TEMPORARY_VARIABLE name:tmp1_index0 type:kotlin.Int [val]
             CONST Int type=kotlin.Int value=0

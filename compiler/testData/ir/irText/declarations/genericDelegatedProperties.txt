@@ -1,0 +1,187 @@
+FILE fqName:<root> fileName:/genericDelegatedProperties.kt
+  FUN name:getValue visibility:public modality:FINAL <> ($receiver:kotlin.Int, thisRef:kotlin.Any?, kProp:kotlin.Any?) returnType:kotlin.Int
+    $receiver: VALUE_PARAMETER name:<this> type:kotlin.Int
+    VALUE_PARAMETER name:thisRef index:0 type:kotlin.Any?
+    VALUE_PARAMETER name:kProp index:1 type:kotlin.Any?
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='public final fun getValue (thisRef: kotlin.Any?, kProp: kotlin.Any?): kotlin.Int declared in <root>'
+        GET_VAR '<this>: kotlin.Int declared in <root>.getValue' type=kotlin.Int origin=null
+  FUN name:setValue visibility:public modality:FINAL <> ($receiver:kotlin.Int, thisRef:kotlin.Any?, kProp:kotlin.Any?, newValue:kotlin.Int) returnType:kotlin.Unit
+    $receiver: VALUE_PARAMETER name:<this> type:kotlin.Int
+    VALUE_PARAMETER name:thisRef index:0 type:kotlin.Any?
+    VALUE_PARAMETER name:kProp index:1 type:kotlin.Any?
+    VALUE_PARAMETER name:newValue index:2 type:kotlin.Int
+    BLOCK_BODY
+  PROPERTY name:testTopLevelVal visibility:public modality:FINAL [delegated,val]
+    FIELD DELEGATE name:testTopLevelVal$delegate type:kotlin.Int visibility:private [final,static]
+      EXPRESSION_BODY
+        CONST Int type=kotlin.Int value=1
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testTopLevelVal> visibility:public modality:FINAL <> ($receiver:T of <root>.testTopLevelVal.<get-testTopLevelVal>) returnType:kotlin.Int
+      correspondingProperty: PROPERTY name:testTopLevelVal visibility:public modality:FINAL [delegated,val]
+      $receiver: VALUE_PARAMETER name:<this> type:T of <root>.testTopLevelVal.<get-testTopLevelVal>
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <get-testTopLevelVal> (): kotlin.Int declared in <root>.testTopLevelVal'
+          CALL 'public final fun getValue (thisRef: kotlin.Any?, kProp: kotlin.Any?): kotlin.Int declared in <root>' type=kotlin.Int origin=null
+            $receiver: GET_FIELD 'FIELD DELEGATE name:testTopLevelVal$delegate type:kotlin.Int visibility:private [final,static]' type=kotlin.Int origin=null
+            thisRef: GET_VAR '<this>: T of <root>.testTopLevelVal.<get-testTopLevelVal> declared in <root>.testTopLevelVal.<get-testTopLevelVal>' type=T of <root>.testTopLevelVal.<get-testTopLevelVal> origin=null
+            kProp: PROPERTY_REFERENCE 'public final testTopLevelVal: kotlin.Int [delegated,val]' field=null getter='public final fun <get-testTopLevelVal> (): kotlin.Int declared in <root>.testTopLevelVal' setter=null type=kotlin.reflect.KProperty1<T of <root>.testTopLevelVal.<get-testTopLevelVal>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+              <1>: <none>
+  PROPERTY name:testTopLevelVar visibility:public modality:FINAL [delegated,var]
+    FIELD DELEGATE name:testTopLevelVar$delegate type:kotlin.Int visibility:private [final,static]
+      EXPRESSION_BODY
+        CONST Int type=kotlin.Int value=1
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testTopLevelVar> visibility:public modality:FINAL <> ($receiver:T of <root>.testTopLevelVar.<get-testTopLevelVar>) returnType:kotlin.Int
+      correspondingProperty: PROPERTY name:testTopLevelVar visibility:public modality:FINAL [delegated,var]
+      $receiver: VALUE_PARAMETER name:<this> type:T of <root>.testTopLevelVar.<get-testTopLevelVar>
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <get-testTopLevelVar> (): kotlin.Int declared in <root>.testTopLevelVar'
+          CALL 'public final fun getValue (thisRef: kotlin.Any?, kProp: kotlin.Any?): kotlin.Int declared in <root>' type=kotlin.Int origin=null
+            $receiver: GET_FIELD 'FIELD DELEGATE name:testTopLevelVar$delegate type:kotlin.Int visibility:private [final,static]' type=kotlin.Int origin=null
+            thisRef: GET_VAR '<this>: T of <root>.testTopLevelVar.<get-testTopLevelVar> declared in <root>.testTopLevelVar.<get-testTopLevelVar>' type=T of <root>.testTopLevelVar.<get-testTopLevelVar> origin=null
+            kProp: PROPERTY_REFERENCE 'public final testTopLevelVar: kotlin.Int [delegated,var]' field=null getter='public final fun <get-testTopLevelVar> (): kotlin.Int declared in <root>.testTopLevelVar' setter='public final fun <set-testTopLevelVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.testTopLevelVar' type=kotlin.reflect.KMutableProperty1<T of <root>.testTopLevelVar.<get-testTopLevelVar>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+              <1>: <none>
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<set-testTopLevelVar> visibility:public modality:FINAL <> ($receiver:T of <root>.testTopLevelVar.<get-testTopLevelVar>, <set-?>:kotlin.Int) returnType:kotlin.Unit
+      correspondingProperty: PROPERTY name:testTopLevelVar visibility:public modality:FINAL [delegated,var]
+      $receiver: VALUE_PARAMETER name:<this> type:T of <root>.testTopLevelVar.<get-testTopLevelVar>
+      VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <set-testTopLevelVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.testTopLevelVar'
+          CALL 'public final fun setValue (thisRef: kotlin.Any?, kProp: kotlin.Any?, newValue: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=null
+            $receiver: GET_FIELD 'FIELD DELEGATE name:testTopLevelVar$delegate type:kotlin.Int visibility:private [final,static]' type=kotlin.Int origin=null
+            thisRef: GET_VAR '<this>: T of <root>.testTopLevelVar.<get-testTopLevelVar> declared in <root>.testTopLevelVar.<set-testTopLevelVar>' type=T of <root>.testTopLevelVar.<get-testTopLevelVar> origin=null
+            kProp: PROPERTY_REFERENCE 'public final testTopLevelVar: kotlin.Int [delegated,var]' field=null getter='public final fun <get-testTopLevelVar> (): kotlin.Int declared in <root>.testTopLevelVar' setter='public final fun <set-testTopLevelVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.testTopLevelVar' type=kotlin.reflect.KMutableProperty1<T of <root>.testTopLevelVar.<get-testTopLevelVar>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+              <1>: <none>
+            newValue: GET_VAR '<set-?>: kotlin.Int declared in <root>.testTopLevelVar.<set-testTopLevelVar>' type=kotlin.Int origin=null
+  CLASS CLASS name:C modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.C<X of <root>.C>
+    TYPE_PARAMETER name:X index:0 variance: superTypes:[kotlin.Any?]
+    CONSTRUCTOR visibility:public <> () returnType:<root>.C<X of <root>.C> [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:C modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    PROPERTY name:testClassVal visibility:public modality:FINAL [delegated,val]
+      FIELD DELEGATE name:testClassVal$delegate type:kotlin.Int visibility:private [final]
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=1
+      FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testClassVal> visibility:public modality:FINAL <> ($this:<root>.C<X of <root>.C>, $receiver:T of <root>.C.testClassVal.<get-testClassVal>) returnType:kotlin.Int
+        correspondingProperty: PROPERTY name:testClassVal visibility:public modality:FINAL [delegated,val]
+        $this: VALUE_PARAMETER name:<this> type:<root>.C<X of <root>.C>
+        $receiver: VALUE_PARAMETER name:<this> type:T of <root>.C.testClassVal.<get-testClassVal>
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun <get-testClassVal> (): kotlin.Int declared in <root>.C.testClassVal'
+            CALL 'public final fun getValue (thisRef: kotlin.Any?, kProp: kotlin.Any?): kotlin.Int declared in <root>' type=kotlin.Int origin=null
+              $receiver: GET_FIELD 'FIELD DELEGATE name:testClassVal$delegate type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
+                receiver: GET_VAR '<this>: <root>.C<X of <root>.C> declared in <root>.C.testClassVal.<get-testClassVal>' type=<root>.C<X of <root>.C> origin=null
+              thisRef: GET_VAR '<this>: T of <root>.C.testClassVal.<get-testClassVal> declared in <root>.C.testClassVal.<get-testClassVal>' type=T of <root>.C.testClassVal.<get-testClassVal> origin=null
+              kProp: PROPERTY_REFERENCE 'public final testClassVal: kotlin.Int [delegated,val]' field=null getter='public final fun <get-testClassVal> (): kotlin.Int declared in <root>.C.testClassVal' setter=null type=kotlin.reflect.KProperty2<T of <root>.C.testClassVal.<get-testClassVal>, <root>.C<X of <root>.C>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                <1>: <none>
+    PROPERTY name:testClassVar visibility:public modality:FINAL [delegated,var]
+      FIELD DELEGATE name:testClassVar$delegate type:kotlin.Int visibility:private [final]
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=1
+      FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testClassVar> visibility:public modality:FINAL <> ($this:<root>.C<X of <root>.C>, $receiver:T of <root>.C.testClassVar.<get-testClassVar>) returnType:kotlin.Int
+        correspondingProperty: PROPERTY name:testClassVar visibility:public modality:FINAL [delegated,var]
+        $this: VALUE_PARAMETER name:<this> type:<root>.C<X of <root>.C>
+        $receiver: VALUE_PARAMETER name:<this> type:T of <root>.C.testClassVar.<get-testClassVar>
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun <get-testClassVar> (): kotlin.Int declared in <root>.C.testClassVar'
+            CALL 'public final fun getValue (thisRef: kotlin.Any?, kProp: kotlin.Any?): kotlin.Int declared in <root>' type=kotlin.Int origin=null
+              $receiver: GET_FIELD 'FIELD DELEGATE name:testClassVar$delegate type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
+                receiver: GET_VAR '<this>: <root>.C<X of <root>.C> declared in <root>.C.testClassVar.<get-testClassVar>' type=<root>.C<X of <root>.C> origin=null
+              thisRef: GET_VAR '<this>: T of <root>.C.testClassVar.<get-testClassVar> declared in <root>.C.testClassVar.<get-testClassVar>' type=T of <root>.C.testClassVar.<get-testClassVar> origin=null
+              kProp: PROPERTY_REFERENCE 'public final testClassVar: kotlin.Int [delegated,var]' field=null getter='public final fun <get-testClassVar> (): kotlin.Int declared in <root>.C.testClassVar' setter='public final fun <set-testClassVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.C.testClassVar' type=kotlin.reflect.KMutableProperty2<T of <root>.C.testClassVar.<get-testClassVar>, <root>.C<X of <root>.C>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                <1>: <none>
+      FUN DELEGATED_PROPERTY_ACCESSOR name:<set-testClassVar> visibility:public modality:FINAL <> ($this:<root>.C<X of <root>.C>, $receiver:T of <root>.C.testClassVar.<get-testClassVar>, <set-?>:kotlin.Int) returnType:kotlin.Unit
+        correspondingProperty: PROPERTY name:testClassVar visibility:public modality:FINAL [delegated,var]
+        $this: VALUE_PARAMETER name:<this> type:<root>.C<X of <root>.C>
+        $receiver: VALUE_PARAMETER name:<this> type:T of <root>.C.testClassVar.<get-testClassVar>
+        VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun <set-testClassVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.C.testClassVar'
+            CALL 'public final fun setValue (thisRef: kotlin.Any?, kProp: kotlin.Any?, newValue: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=null
+              $receiver: GET_FIELD 'FIELD DELEGATE name:testClassVar$delegate type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
+                receiver: GET_VAR '<this>: <root>.C<X of <root>.C> declared in <root>.C.testClassVar.<set-testClassVar>' type=<root>.C<X of <root>.C> origin=null
+              thisRef: GET_VAR '<this>: T of <root>.C.testClassVar.<get-testClassVar> declared in <root>.C.testClassVar.<set-testClassVar>' type=T of <root>.C.testClassVar.<get-testClassVar> origin=null
+              kProp: PROPERTY_REFERENCE 'public final testClassVar: kotlin.Int [delegated,var]' field=null getter='public final fun <get-testClassVar> (): kotlin.Int declared in <root>.C.testClassVar' setter='public final fun <set-testClassVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.C.testClassVar' type=kotlin.reflect.KMutableProperty2<T of <root>.C.testClassVar.<get-testClassVar>, <root>.C<X of <root>.C>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                <1>: <none>
+              newValue: GET_VAR '<set-?>: kotlin.Int declared in <root>.C.testClassVar.<set-testClassVar>' type=kotlin.Int origin=null
+    CLASS CLASS name:D modality:FINAL visibility:public [inner] superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.C.D<Y of <root>.C.D, X of <root>.C>
+      TYPE_PARAMETER name:Y index:0 variance: superTypes:[kotlin.Any?]
+      CONSTRUCTOR visibility:public <> ($this:<root>.C<X of <root>.C>) returnType:<root>.C.D<Y of <root>.C.D, X of <root>.C> [primary]
+        $outer: VALUE_PARAMETER name:<this> type:<root>.C<X of <root>.C>
+        BLOCK_BODY
+          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:D modality:FINAL visibility:public [inner] superTypes:[kotlin.Any]'
+      PROPERTY name:testInnerClassVal visibility:public modality:FINAL [delegated,val]
+        FIELD DELEGATE name:testInnerClassVal$delegate type:kotlin.Int visibility:private [final]
+          EXPRESSION_BODY
+            CONST Int type=kotlin.Int value=1
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testInnerClassVal> visibility:public modality:FINAL <> ($this:<root>.C.D<Y of <root>.C.D, X of <root>.C>, $receiver:T of <root>.C.D.testInnerClassVal.<get-testInnerClassVal>) returnType:kotlin.Int
+          correspondingProperty: PROPERTY name:testInnerClassVal visibility:public modality:FINAL [delegated,val]
+          $this: VALUE_PARAMETER name:<this> type:<root>.C.D<Y of <root>.C.D, X of <root>.C>
+          $receiver: VALUE_PARAMETER name:<this> type:T of <root>.C.D.testInnerClassVal.<get-testInnerClassVal>
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun <get-testInnerClassVal> (): kotlin.Int declared in <root>.C.D.testInnerClassVal'
+              CALL 'public final fun getValue (thisRef: kotlin.Any?, kProp: kotlin.Any?): kotlin.Int declared in <root>' type=kotlin.Int origin=null
+                $receiver: GET_FIELD 'FIELD DELEGATE name:testInnerClassVal$delegate type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
+                  receiver: GET_VAR '<this>: <root>.C.D<Y of <root>.C.D, X of <root>.C> declared in <root>.C.D.testInnerClassVal.<get-testInnerClassVal>' type=<root>.C.D<Y of <root>.C.D, X of <root>.C> origin=null
+                thisRef: GET_VAR '<this>: T of <root>.C.D.testInnerClassVal.<get-testInnerClassVal> declared in <root>.C.D.testInnerClassVal.<get-testInnerClassVal>' type=T of <root>.C.D.testInnerClassVal.<get-testInnerClassVal> origin=null
+                kProp: PROPERTY_REFERENCE 'public final testInnerClassVal: kotlin.Int [delegated,val]' field=null getter='public final fun <get-testInnerClassVal> (): kotlin.Int declared in <root>.C.D.testInnerClassVal' setter=null type=kotlin.reflect.KProperty2<T of <root>.C.D.testInnerClassVal.<get-testInnerClassVal>, <root>.C.D<Y of <root>.C.D, X of <root>.C>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                  <1>: <none>
+      PROPERTY name:testInnerClassVar visibility:public modality:FINAL [delegated,var]
+        FIELD DELEGATE name:testInnerClassVar$delegate type:kotlin.Int visibility:private [final]
+          EXPRESSION_BODY
+            CONST Int type=kotlin.Int value=1
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testInnerClassVar> visibility:public modality:FINAL <> ($this:<root>.C.D<Y of <root>.C.D, X of <root>.C>, $receiver:T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar>) returnType:kotlin.Int
+          correspondingProperty: PROPERTY name:testInnerClassVar visibility:public modality:FINAL [delegated,var]
+          $this: VALUE_PARAMETER name:<this> type:<root>.C.D<Y of <root>.C.D, X of <root>.C>
+          $receiver: VALUE_PARAMETER name:<this> type:T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar>
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun <get-testInnerClassVar> (): kotlin.Int declared in <root>.C.D.testInnerClassVar'
+              CALL 'public final fun getValue (thisRef: kotlin.Any?, kProp: kotlin.Any?): kotlin.Int declared in <root>' type=kotlin.Int origin=null
+                $receiver: GET_FIELD 'FIELD DELEGATE name:testInnerClassVar$delegate type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
+                  receiver: GET_VAR '<this>: <root>.C.D<Y of <root>.C.D, X of <root>.C> declared in <root>.C.D.testInnerClassVar.<get-testInnerClassVar>' type=<root>.C.D<Y of <root>.C.D, X of <root>.C> origin=null
+                thisRef: GET_VAR '<this>: T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar> declared in <root>.C.D.testInnerClassVar.<get-testInnerClassVar>' type=T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar> origin=null
+                kProp: PROPERTY_REFERENCE 'public final testInnerClassVar: kotlin.Int [delegated,var]' field=null getter='public final fun <get-testInnerClassVar> (): kotlin.Int declared in <root>.C.D.testInnerClassVar' setter='public final fun <set-testInnerClassVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.C.D.testInnerClassVar' type=kotlin.reflect.KMutableProperty2<T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar>, <root>.C.D<Y of <root>.C.D, X of <root>.C>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                  <1>: <none>
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<set-testInnerClassVar> visibility:public modality:FINAL <> ($this:<root>.C.D<Y of <root>.C.D, X of <root>.C>, $receiver:T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar>, <set-?>:kotlin.Int) returnType:kotlin.Unit
+          correspondingProperty: PROPERTY name:testInnerClassVar visibility:public modality:FINAL [delegated,var]
+          $this: VALUE_PARAMETER name:<this> type:<root>.C.D<Y of <root>.C.D, X of <root>.C>
+          $receiver: VALUE_PARAMETER name:<this> type:T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar>
+          VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun <set-testInnerClassVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.C.D.testInnerClassVar'
+              CALL 'public final fun setValue (thisRef: kotlin.Any?, kProp: kotlin.Any?, newValue: kotlin.Int): kotlin.Unit declared in <root>' type=kotlin.Unit origin=null
+                $receiver: GET_FIELD 'FIELD DELEGATE name:testInnerClassVar$delegate type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
+                  receiver: GET_VAR '<this>: <root>.C.D<Y of <root>.C.D, X of <root>.C> declared in <root>.C.D.testInnerClassVar.<set-testInnerClassVar>' type=<root>.C.D<Y of <root>.C.D, X of <root>.C> origin=null
+                thisRef: GET_VAR '<this>: T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar> declared in <root>.C.D.testInnerClassVar.<set-testInnerClassVar>' type=T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar> origin=null
+                kProp: PROPERTY_REFERENCE 'public final testInnerClassVar: kotlin.Int [delegated,var]' field=null getter='public final fun <get-testInnerClassVar> (): kotlin.Int declared in <root>.C.D.testInnerClassVar' setter='public final fun <set-testInnerClassVar> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.C.D.testInnerClassVar' type=kotlin.reflect.KMutableProperty2<T of <root>.C.D.testInnerClassVar.<get-testInnerClassVar>, <root>.C.D<Y of <root>.C.D, X of <root>.C>, kotlin.Int> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                  <1>: <none>
+                newValue: GET_VAR '<set-?>: kotlin.Int declared in <root>.C.D.testInnerClassVar.<set-testInnerClassVar>' type=kotlin.Int origin=null
+      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+        overridden:
+          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+        overridden:
+          public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+        overridden:
+          public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any

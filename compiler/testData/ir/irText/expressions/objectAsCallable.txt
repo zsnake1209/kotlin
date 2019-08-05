@@ -95,7 +95,7 @@ FILE fqName:<root> fileName:/objectAsCallable.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Int
       correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Int declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Int declared in <root>.test1'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Int visibility:public [final,static]' type=kotlin.Int origin=null
   PROPERTY name:test2 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Int visibility:public [final,static]
@@ -106,5 +106,5 @@ FILE fqName:<root> fileName:/objectAsCallable.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Int
       correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Int declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Int declared in <root>.test2'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Int visibility:public [final,static]' type=kotlin.Int origin=null

@@ -11,9 +11,9 @@ FILE fqName:<root> fileName:/annotationsInAnnotationArguments.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.A1
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.A1'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.A1.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.A1 declared in <root>.A1.<get-x>' type=<root>.A1 origin=null
+              receiver: GET_VAR '<this>: <root>.A1 declared in <root>.A1.x.<get-x>' type=<root>.A1 origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
@@ -39,9 +39,9 @@ FILE fqName:<root> fileName:/annotationsInAnnotationArguments.kt
         correspondingProperty: PROPERTY name:a visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.A2
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-a> (): <root>.A1 declared in <root>.A2'
+          RETURN type=kotlin.Nothing from='public final fun <get-a> (): <root>.A1 declared in <root>.A2.a'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:a type:<root>.A1 visibility:public [final]' type=<root>.A1 origin=null
-              receiver: GET_VAR '<this>: <root>.A2 declared in <root>.A2.<get-a>' type=<root>.A2 origin=null
+              receiver: GET_VAR '<this>: <root>.A2 declared in <root>.A2.a.<get-a>' type=<root>.A2 origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
@@ -67,9 +67,9 @@ FILE fqName:<root> fileName:/annotationsInAnnotationArguments.kt
         correspondingProperty: PROPERTY name:xs visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.AA
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-xs> (): kotlin.Array<<root>.A1> declared in <root>.AA'
+          RETURN type=kotlin.Nothing from='public final fun <get-xs> (): kotlin.Array<<root>.A1> declared in <root>.AA.xs'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:xs type:kotlin.Array<<root>.A1> visibility:public [final]' type=kotlin.Array<<root>.A1> origin=null
-              receiver: GET_VAR '<this>: <root>.AA declared in <root>.AA.<get-xs>' type=<root>.AA origin=null
+              receiver: GET_VAR '<this>: <root>.AA declared in <root>.AA.xs.<get-xs>' type=<root>.AA origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation

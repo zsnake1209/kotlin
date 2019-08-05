@@ -11,9 +11,9 @@ FILE fqName:<root> fileName:/arrayInAnnotationArguments.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestAnnWithIntArray
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.IntArray declared in <root>.TestAnnWithIntArray'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.IntArray declared in <root>.TestAnnWithIntArray.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.IntArray visibility:public [final]' type=kotlin.IntArray origin=null
-              receiver: GET_VAR '<this>: <root>.TestAnnWithIntArray declared in <root>.TestAnnWithIntArray.<get-x>' type=<root>.TestAnnWithIntArray origin=null
+              receiver: GET_VAR '<this>: <root>.TestAnnWithIntArray declared in <root>.TestAnnWithIntArray.x.<get-x>' type=<root>.TestAnnWithIntArray origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
@@ -39,9 +39,9 @@ FILE fqName:<root> fileName:/arrayInAnnotationArguments.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestAnnWithStringArray
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Array<kotlin.String> declared in <root>.TestAnnWithStringArray'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Array<kotlin.String> declared in <root>.TestAnnWithStringArray.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Array<kotlin.String> visibility:public [final]' type=kotlin.Array<kotlin.String> origin=null
-              receiver: GET_VAR '<this>: <root>.TestAnnWithStringArray declared in <root>.TestAnnWithStringArray.<get-x>' type=<root>.TestAnnWithStringArray origin=null
+              receiver: GET_VAR '<this>: <root>.TestAnnWithStringArray declared in <root>.TestAnnWithStringArray.x.<get-x>' type=<root>.TestAnnWithStringArray origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation

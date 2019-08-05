@@ -16,9 +16,9 @@ FILE fqName:<root> fileName:/superCalls.kt
         correspondingProperty: PROPERTY name:bar visibility:public modality:OPEN [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.String declared in <root>.Base'
+          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.String declared in <root>.Base.bar'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:bar type:kotlin.String visibility:public [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.Base declared in <root>.Base.<get-bar>' type=<root>.Base origin=null
+              receiver: GET_VAR '<this>: <root>.Base declared in <root>.Base.bar.<get-bar>' type=<root>.Base origin=null
     FUN name:hashCode visibility:public modality:OPEN <> ($this:<root>.Base) returnType:kotlin.Int
       overridden:
         public open fun hashCode (): kotlin.Int declared in kotlin.Any
@@ -53,12 +53,12 @@ FILE fqName:<root> fileName:/superCalls.kt
       FUN name:<get-bar> visibility:public modality:OPEN <> ($this:<root>.Derived) returnType:kotlin.String
         correspondingProperty: PROPERTY name:bar visibility:public modality:OPEN [val]
         overridden:
-          public open fun <get-bar> (): kotlin.String declared in <root>.Base
+          public open fun <get-bar> (): kotlin.String declared in <root>.Base.bar
         $this: VALUE_PARAMETER name:<this> type:<root>.Derived
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.String declared in <root>.Derived'
-            GET_PROPERTY 'public open fun <get-bar> (): kotlin.String declared in <root>.Base' superQualifier='CLASS CLASS name:Base modality:OPEN visibility:public superTypes:[kotlin.Any]' type=kotlin.String origin=GET_PROPERTY
-              $this: GET_VAR '<this>: <root>.Derived declared in <root>.Derived.<get-bar>' type=<root>.Derived origin=null
+          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.String declared in <root>.Derived.bar'
+            GET_PROPERTY 'public open fun <get-bar> (): kotlin.String declared in <root>.Base.bar' superQualifier='CLASS CLASS name:Base modality:OPEN visibility:public superTypes:[kotlin.Any]' type=kotlin.String origin=GET_PROPERTY
+              $this: GET_VAR '<this>: <root>.Derived declared in <root>.Derived.bar.<get-bar>' type=<root>.Derived origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.Base

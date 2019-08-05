@@ -39,7 +39,7 @@ FILE fqName:<root> fileName:/callableReferenceTypeArguments.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test1> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.Int, kotlin.Unit>
       correspondingProperty: PROPERTY name:test1 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Function1<kotlin.Int, kotlin.Unit> declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test1> (): kotlin.Function1<kotlin.Int, kotlin.Unit> declared in <root>.test1'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test1 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static]' type=kotlin.Function1<kotlin.Int, kotlin.Unit> origin=null
   PROPERTY name:test2 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> visibility:public [final,static]
@@ -49,7 +49,7 @@ FILE fqName:<root> fileName:/callableReferenceTypeArguments.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test2> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit>
       correspondingProperty: PROPERTY name:test2 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test2> (): kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> declared in <root>.test2'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test2 type:kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> visibility:public [final,static]' type=kotlin.Function1<kotlin.collections.List<kotlin.String>, kotlin.Unit> origin=null
   PROPERTY name:test3 visibility:public modality:FINAL [val]
     FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static]
@@ -60,5 +60,5 @@ FILE fqName:<root> fileName:/callableReferenceTypeArguments.kt
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-test3> visibility:public modality:FINAL <> () returnType:kotlin.Function1<kotlin.Int, kotlin.Unit>
       correspondingProperty: PROPERTY name:test3 visibility:public modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.Function1<kotlin.Int, kotlin.Unit> declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-test3> (): kotlin.Function1<kotlin.Int, kotlin.Unit> declared in <root>.test3'
           GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test3 type:kotlin.Function1<kotlin.Int, kotlin.Unit> visibility:public [final,static]' type=kotlin.Function1<kotlin.Int, kotlin.Unit> origin=null

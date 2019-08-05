@@ -19,14 +19,18 @@ package org.jetbrains.kotlin.ir.declarations
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
+import org.jetbrains.kotlin.ir.types.IrType
 
 interface IrProperty :
     IrDeclarationWithName,
     IrDeclarationWithVisibility,
-    IrSymbolOwner {
+    IrSymbolOwner,
+    IrTypeParametersContainer {
 
     override val descriptor: PropertyDescriptor
     override val symbol: IrPropertySymbol
+
+    var type: IrType
 
     val modality: Modality
     val isVar: Boolean

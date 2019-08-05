@@ -20,9 +20,9 @@ FILE fqName:<root> fileName:/sealedClasses.kt
           correspondingProperty: PROPERTY name:number visibility:public modality:FINAL [val]
           $this: VALUE_PARAMETER name:<this> type:<root>.Expr.Const
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-number> (): kotlin.Double declared in <root>.Expr.Const'
+            RETURN type=kotlin.Nothing from='public final fun <get-number> (): kotlin.Double declared in <root>.Expr.Const.number'
               GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:number type:kotlin.Double visibility:public [final]' type=kotlin.Double origin=null
-                receiver: GET_VAR '<this>: <root>.Expr.Const declared in <root>.Expr.Const.<get-number>' type=<root>.Expr.Const origin=null
+                receiver: GET_VAR '<this>: <root>.Expr.Const declared in <root>.Expr.Const.number.<get-number>' type=<root>.Expr.Const origin=null
       FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
         overridden:
           public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.Expr
@@ -52,9 +52,9 @@ FILE fqName:<root> fileName:/sealedClasses.kt
           correspondingProperty: PROPERTY name:e1 visibility:public modality:FINAL [val]
           $this: VALUE_PARAMETER name:<this> type:<root>.Expr.Sum
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-e1> (): <root>.Expr declared in <root>.Expr.Sum'
+            RETURN type=kotlin.Nothing from='public final fun <get-e1> (): <root>.Expr declared in <root>.Expr.Sum.e1'
               GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:e1 type:<root>.Expr visibility:public [final]' type=<root>.Expr origin=null
-                receiver: GET_VAR '<this>: <root>.Expr.Sum declared in <root>.Expr.Sum.<get-e1>' type=<root>.Expr.Sum origin=null
+                receiver: GET_VAR '<this>: <root>.Expr.Sum declared in <root>.Expr.Sum.e1.<get-e1>' type=<root>.Expr.Sum origin=null
       PROPERTY name:e2 visibility:public modality:FINAL [val]
         FIELD PROPERTY_BACKING_FIELD name:e2 type:<root>.Expr visibility:public [final]
           EXPRESSION_BODY
@@ -63,9 +63,9 @@ FILE fqName:<root> fileName:/sealedClasses.kt
           correspondingProperty: PROPERTY name:e2 visibility:public modality:FINAL [val]
           $this: VALUE_PARAMETER name:<this> type:<root>.Expr.Sum
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-e2> (): <root>.Expr declared in <root>.Expr.Sum'
+            RETURN type=kotlin.Nothing from='public final fun <get-e2> (): <root>.Expr declared in <root>.Expr.Sum.e2'
               GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:e2 type:<root>.Expr visibility:public [final]' type=<root>.Expr origin=null
-                receiver: GET_VAR '<this>: <root>.Expr.Sum declared in <root>.Expr.Sum.<get-e2>' type=<root>.Expr.Sum origin=null
+                receiver: GET_VAR '<this>: <root>.Expr.Sum declared in <root>.Expr.Sum.e2.<get-e2>' type=<root>.Expr.Sum origin=null
       FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
         overridden:
           public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.Expr

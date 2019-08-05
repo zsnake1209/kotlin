@@ -11,7 +11,7 @@ FILE fqName:<root> fileName:/jvmStaticFieldReference.kt
         CALL 'public open fun println (x: kotlin.String?): kotlin.Unit declared in java.io.PrintStream' type=kotlin.Unit origin=null
           $this: GET_FIELD 'FIELD IR_EXTERNAL_JAVA_DECLARATION_STUB name:out type:java.io.PrintStream? visibility:public [final,static]' type=java.io.PrintStream? origin=GET_PROPERTY
           x: CONST String type=kotlin.String value="testProp/get"
-        RETURN type=kotlin.Nothing from='public final fun <get-testProp> (): kotlin.Any declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-testProp> (): kotlin.Any declared in <root>.testProp'
           CONST Int type=kotlin.Int value=42
     FUN name:<set-testProp> visibility:public modality:FINAL <> (value:kotlin.Any) returnType:kotlin.Unit
       correspondingProperty: PROPERTY name:testProp visibility:public modality:FINAL [var]
@@ -41,9 +41,9 @@ FILE fqName:<root> fileName:/jvmStaticFieldReference.kt
         correspondingProperty: PROPERTY name:test visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestClass
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-test> (): kotlin.Int declared in <root>.TestClass'
+          RETURN type=kotlin.Nothing from='public final fun <get-test> (): kotlin.Int declared in <root>.TestClass.test'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestClass declared in <root>.TestClass.<get-test>' type=<root>.TestClass origin=null
+              receiver: GET_VAR '<this>: <root>.TestClass declared in <root>.TestClass.test.<get-test>' type=<root>.TestClass origin=null
     ANONYMOUS_INITIALIZER isStatic=false
       BLOCK_BODY
         CALL 'public open fun println (x: kotlin.String?): kotlin.Unit declared in java.io.PrintStream' type=kotlin.Unit origin=null

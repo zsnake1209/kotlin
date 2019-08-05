@@ -37,7 +37,7 @@ FILE fqName:<root> fileName:/receiverParameterWithAnnotations.kt
           annotations:
             Ann
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-p> (): kotlin.String declared in <root>.A'
+          RETURN type=kotlin.Nothing from='public final fun <get-p> (): kotlin.String declared in <root>.A.p'
             CONST String type=kotlin.String value=""
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
@@ -66,5 +66,5 @@ FILE fqName:<root> fileName:/receiverParameterWithAnnotations.kt
         annotations:
           Ann
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-topLevelP> (): kotlin.String declared in <root>'
+        RETURN type=kotlin.Nothing from='public final fun <get-topLevelP> (): kotlin.String declared in <root>.topLevelP'
           CONST String type=kotlin.String value=""

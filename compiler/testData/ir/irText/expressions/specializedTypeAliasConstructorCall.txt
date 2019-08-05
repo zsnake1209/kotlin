@@ -15,9 +15,9 @@ FILE fqName:<root> fileName:/specializedTypeAliasConstructorCall.kt
         correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Cell<T of <root>.Cell>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-value> (): T of <root>.Cell declared in <root>.Cell'
+          RETURN type=kotlin.Nothing from='public final fun <get-value> (): T of <root>.Cell declared in <root>.Cell.value'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:T of <root>.Cell visibility:public [final]' type=T of <root>.Cell origin=null
-              receiver: GET_VAR '<this>: <root>.Cell<T of <root>.Cell> declared in <root>.Cell.<get-value>' type=<root>.Cell<T of <root>.Cell> origin=null
+              receiver: GET_VAR '<this>: <root>.Cell<T of <root>.Cell> declared in <root>.Cell.value.<get-value>' type=<root>.Cell<T of <root>.Cell> origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any

@@ -8,18 +8,18 @@ package org.jetbrains.kotlin.ir.declarations.lazy
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.Visibility
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.ir.declarations.IrProperty
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.DeclarationStubGenerator
 import org.jetbrains.kotlin.ir.util.TypeTranslator
+import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyExternal
+import org.jetbrains.kotlin.resolve.descriptorUtil.propertyIfAccessor
 import org.jetbrains.kotlin.resolve.hasBackingField
 
 class IrLazyProperty(
@@ -66,6 +66,29 @@ class IrLazyProperty(
 
     init {
         symbol.bind(this)
+    }
+
+    override var type: IrType by lazyVar {
+        typeTranslator.buildWithScope(this) {
+            descriptor.returnType!!.toIrType()
+        }
+    }
+
+    override val typeParameters: MutableList<IrTypeParameter> by lazy {
+        typeTranslator.buildWithScope(this) {
+            stubGenerator.symbolTable.withScope(descriptor) {
+                val propertyIfAccessor = descriptor.propertyIfAccessor
+                propertyIfAccessor.typeParameters.mapTo(arrayListOf()) { typeParameterDescriptor ->
+                    if (descriptor != propertyIfAccessor) {
+                        stubGenerator.generateOrGetScopedTypeParameterStub(typeParameterDescriptor).also {
+                            it.parent = this@IrLazyProperty
+                        }
+                    } else {
+                        stubGenerator.generateOrGetTypeParameterStub(typeParameterDescriptor)
+                    }
+                }
+            }
+        }
     }
 
     override val descriptor: PropertyDescriptor

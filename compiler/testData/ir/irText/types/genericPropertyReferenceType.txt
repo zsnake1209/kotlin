@@ -15,17 +15,17 @@ FILE fqName:<root> fileName:/genericPropertyReferenceType.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.C<T of <root>.C>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): T of <root>.C declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): T of <root>.C declared in <root>.C.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:T of <root>.C visibility:public' type=T of <root>.C origin=null
-              receiver: GET_VAR '<this>: <root>.C<T of <root>.C> declared in <root>.C.<get-x>' type=<root>.C<T of <root>.C> origin=null
+              receiver: GET_VAR '<this>: <root>.C<T of <root>.C> declared in <root>.C.x.<get-x>' type=<root>.C<T of <root>.C> origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<set-x> visibility:public modality:FINAL <> ($this:<root>.C<T of <root>.C>, <set-?>:T of <root>.C) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.C<T of <root>.C>
         VALUE_PARAMETER name:<set-?> index:0 type:T of <root>.C
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:T of <root>.C visibility:public' type=kotlin.Unit origin=null
-            receiver: GET_VAR '<this>: <root>.C<T of <root>.C> declared in <root>.C.<set-x>' type=<root>.C<T of <root>.C> origin=null
-            value: GET_VAR '<set-?>: T of <root>.C declared in <root>.C.<set-x>' type=T of <root>.C origin=null
+            receiver: GET_VAR '<this>: <root>.C<T of <root>.C> declared in <root>.C.x.<set-x>' type=<root>.C<T of <root>.C> origin=null
+            value: GET_VAR '<set-?>: T of <root>.C declared in <root>.C.x.<set-x>' type=T of <root>.C origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -40,31 +40,30 @@ FILE fqName:<root> fileName:/genericPropertyReferenceType.kt
         public open fun toString (): kotlin.String declared in kotlin.Any
       $this: VALUE_PARAMETER name:<this> type:kotlin.Any
   PROPERTY name:y visibility:public modality:FINAL [var]
-    FUN name:<get-y> visibility:public modality:FINAL <T> ($receiver:<root>.C<T of <root>.<get-y>>) returnType:T of <root>.<get-y>
+    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
+    FUN name:<get-y> visibility:public modality:FINAL <> ($receiver:<root>.C<T of <root>.y>) returnType:T of <root>.y
       correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [var]
-      TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
-      $receiver: VALUE_PARAMETER name:<this> type:<root>.C<T of <root>.<get-y>>
+      $receiver: VALUE_PARAMETER name:<this> type:<root>.C<T of <root>.y>
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-y> <T> (): T of <root>.<get-y> declared in <root>'
-          GET_PROPERTY 'public final fun <get-x> (): T of <root>.C declared in <root>.C' type=T of <root>.<get-y> origin=GET_PROPERTY
-            $this: GET_VAR '<this>: <root>.C<T of <root>.<get-y>> declared in <root>.<get-y>' type=<root>.C<T of <root>.<get-y>> origin=null
-    FUN name:<set-y> visibility:public modality:FINAL <T> ($receiver:<root>.C<T of <root>.<set-y>>, v:T of <root>.<set-y>) returnType:kotlin.Unit
+        RETURN type=kotlin.Nothing from='public final fun <get-y> (): T of <root>.y declared in <root>.y'
+          GET_PROPERTY 'public final fun <get-x> (): T of <root>.C declared in <root>.C.x' type=T of <root>.y origin=GET_PROPERTY
+            $this: GET_VAR '<this>: <root>.C<T of <root>.y> declared in <root>.y.<get-y>' type=<root>.C<T of <root>.y> origin=null
+    FUN name:<set-y> visibility:public modality:FINAL <> ($receiver:<root>.C<T of <root>.y>, v:T of <root>.y) returnType:kotlin.Unit
       correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [var]
-      TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
-      $receiver: VALUE_PARAMETER name:<this> type:<root>.C<T of <root>.<set-y>>
-      VALUE_PARAMETER name:v index:0 type:T of <root>.<set-y>
+      $receiver: VALUE_PARAMETER name:<this> type:<root>.C<T of <root>.y>
+      VALUE_PARAMETER name:v index:0 type:T of <root>.y
       BLOCK_BODY
-        SET_PROPERTY 'public final fun <set-x> (<set-?>: T of <root>.C): kotlin.Unit declared in <root>.C' type=kotlin.Unit origin=EQ
-          $this: GET_VAR '<this>: <root>.C<T of <root>.<set-y>> declared in <root>.<set-y>' type=<root>.C<T of <root>.<set-y>> origin=null
-          <set-?>: GET_VAR 'v: T of <root>.<set-y> declared in <root>.<set-y>' type=T of <root>.<set-y> origin=null
+        SET_PROPERTY 'public final fun <set-x> (<set-?>: T of <root>.C): kotlin.Unit declared in <root>.C.x' type=kotlin.Unit origin=EQ
+          $this: GET_VAR '<this>: <root>.C<T of <root>.y> declared in <root>.y.<set-y>' type=<root>.C<T of <root>.y> origin=null
+          <set-?>: GET_VAR 'v: T of <root>.y declared in <root>.y.<set-y>' type=T of <root>.y origin=null
   FUN name:use visibility:public modality:FINAL <> (p:kotlin.reflect.KMutableProperty<kotlin.String>) returnType:kotlin.Unit
     VALUE_PARAMETER name:p index:0 type:kotlin.reflect.KMutableProperty<kotlin.String>
     BLOCK_BODY
   FUN name:test1 visibility:public modality:FINAL <> () returnType:kotlin.Unit
     BLOCK_BODY
       CALL 'public final fun use (p: kotlin.reflect.KMutableProperty<kotlin.String>): kotlin.Unit declared in <root>' type=kotlin.Unit origin=null
-        p: PROPERTY_REFERENCE 'public final y: T of <root>.<get-y> [var]' field=null getter='public final fun <get-y> <T> (): T of <root>.<get-y> declared in <root>' setter='public final fun <set-y> <T> (v: T of <root>.<set-y>): kotlin.Unit declared in <root>' type=kotlin.reflect.KMutableProperty0<kotlin.String> origin=null
-          <1>: kotlin.String
+        p: PROPERTY_REFERENCE 'public final y: T of <root>.y [var]' field=null getter='public final fun <get-y> (): T of <root>.y declared in <root>.y' setter='public final fun <set-y> (v: T of <root>.y): kotlin.Unit declared in <root>.y' type=kotlin.reflect.KMutableProperty0<kotlin.String> origin=null
+          <T>: kotlin.String
           $receiver: CONSTRUCTOR_CALL 'public constructor <init> (x: T of <root>.C) [primary] declared in <root>.C' type=<root>.C<kotlin.String> origin=null
             <class: T>: kotlin.String
             x: CONST String type=kotlin.String value="abc"
@@ -75,7 +74,7 @@ FILE fqName:<root> fileName:/genericPropertyReferenceType.kt
         TYPE_OP type=<root>.C<kotlin.String> origin=CAST typeOperand=<root>.C<kotlin.String>
           GET_VAR 'a: kotlin.Any declared in <root>.test2' type=kotlin.Any origin=null
       CALL 'public final fun use (p: kotlin.reflect.KMutableProperty<kotlin.String>): kotlin.Unit declared in <root>' type=kotlin.Unit origin=null
-        p: PROPERTY_REFERENCE 'public final y: T of <root>.<get-y> [var]' field=null getter='public final fun <get-y> <T> (): T of <root>.<get-y> declared in <root>' setter='public final fun <set-y> <T> (v: T of <root>.<set-y>): kotlin.Unit declared in <root>' type=kotlin.reflect.KMutableProperty0<kotlin.String> origin=null
-          <1>: kotlin.String
+        p: PROPERTY_REFERENCE 'public final y: T of <root>.y [var]' field=null getter='public final fun <get-y> (): T of <root>.y declared in <root>.y' setter='public final fun <set-y> (v: T of <root>.y): kotlin.Unit declared in <root>.y' type=kotlin.reflect.KMutableProperty0<kotlin.String> origin=null
+          <T>: kotlin.String
           $receiver: TYPE_OP type=<root>.C<kotlin.String> origin=IMPLICIT_CAST typeOperand=<root>.C<kotlin.String>
             GET_VAR 'a: kotlin.Any declared in <root>.test2' type=kotlin.Any origin=null

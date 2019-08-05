@@ -13,17 +13,17 @@ FILE fqName:<root> fileName:/complexAugmentedAssignment.kt
         correspondingProperty: PROPERTY name:x1 visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.X1
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x1> (): kotlin.Int declared in <root>.X1'
+          RETURN type=kotlin.Nothing from='public final fun <get-x1> (): kotlin.Int declared in <root>.X1.x1'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x1 type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.X1 declared in <root>.X1.<get-x1>' type=<root>.X1 origin=null
+              receiver: GET_VAR '<this>: <root>.X1 declared in <root>.X1.x1.<get-x1>' type=<root>.X1 origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<set-x1> visibility:public modality:FINAL <> ($this:<root>.X1, <set-?>:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:x1 visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.X1
         VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x1 type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-            receiver: GET_VAR '<this>: <root>.X1 declared in <root>.X1.<set-x1>' type=<root>.X1 origin=null
-            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.X1.<set-x1>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.X1 declared in <root>.X1.x1.<set-x1>' type=<root>.X1 origin=null
+            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.X1.x1.<set-x1>' type=kotlin.Int origin=null
     CLASS OBJECT name:X2 modality:FINAL visibility:public superTypes:[kotlin.Any]
       $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.X1.X2
       CONSTRUCTOR visibility:private <> () returnType:<root>.X1.X2 [primary]
@@ -38,17 +38,17 @@ FILE fqName:<root> fileName:/complexAugmentedAssignment.kt
           correspondingProperty: PROPERTY name:x2 visibility:public modality:FINAL [var]
           $this: VALUE_PARAMETER name:<this> type:<root>.X1.X2
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-x2> (): kotlin.Int declared in <root>.X1.X2'
+            RETURN type=kotlin.Nothing from='public final fun <get-x2> (): kotlin.Int declared in <root>.X1.X2.x2'
               GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x2 type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-                receiver: GET_VAR '<this>: <root>.X1.X2 declared in <root>.X1.X2.<get-x2>' type=<root>.X1.X2 origin=null
+                receiver: GET_VAR '<this>: <root>.X1.X2 declared in <root>.X1.X2.x2.<get-x2>' type=<root>.X1.X2 origin=null
         FUN DEFAULT_PROPERTY_ACCESSOR name:<set-x2> visibility:public modality:FINAL <> ($this:<root>.X1.X2, <set-?>:kotlin.Int) returnType:kotlin.Unit
           correspondingProperty: PROPERTY name:x2 visibility:public modality:FINAL [var]
           $this: VALUE_PARAMETER name:<this> type:<root>.X1.X2
           VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
           BLOCK_BODY
             SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x2 type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-              receiver: GET_VAR '<this>: <root>.X1.X2 declared in <root>.X1.X2.<set-x2>' type=<root>.X1.X2 origin=null
-              value: GET_VAR '<set-?>: kotlin.Int declared in <root>.X1.X2.<set-x2>' type=kotlin.Int origin=null
+              receiver: GET_VAR '<this>: <root>.X1.X2 declared in <root>.X1.X2.x2.<set-x2>' type=<root>.X1.X2 origin=null
+              value: GET_VAR '<set-?>: kotlin.Int declared in <root>.X1.X2.x2.<set-x2>' type=kotlin.Int origin=null
       CLASS OBJECT name:X3 modality:FINAL visibility:public superTypes:[kotlin.Any]
         $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.X1.X2.X3
         CONSTRUCTOR visibility:private <> () returnType:<root>.X1.X2.X3 [primary]
@@ -63,17 +63,17 @@ FILE fqName:<root> fileName:/complexAugmentedAssignment.kt
             correspondingProperty: PROPERTY name:x3 visibility:public modality:FINAL [var]
             $this: VALUE_PARAMETER name:<this> type:<root>.X1.X2.X3
             BLOCK_BODY
-              RETURN type=kotlin.Nothing from='public final fun <get-x3> (): kotlin.Int declared in <root>.X1.X2.X3'
+              RETURN type=kotlin.Nothing from='public final fun <get-x3> (): kotlin.Int declared in <root>.X1.X2.X3.x3'
                 GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x3 type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-                  receiver: GET_VAR '<this>: <root>.X1.X2.X3 declared in <root>.X1.X2.X3.<get-x3>' type=<root>.X1.X2.X3 origin=null
+                  receiver: GET_VAR '<this>: <root>.X1.X2.X3 declared in <root>.X1.X2.X3.x3.<get-x3>' type=<root>.X1.X2.X3 origin=null
           FUN DEFAULT_PROPERTY_ACCESSOR name:<set-x3> visibility:public modality:FINAL <> ($this:<root>.X1.X2.X3, <set-?>:kotlin.Int) returnType:kotlin.Unit
             correspondingProperty: PROPERTY name:x3 visibility:public modality:FINAL [var]
             $this: VALUE_PARAMETER name:<this> type:<root>.X1.X2.X3
             VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
             BLOCK_BODY
               SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x3 type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-                receiver: GET_VAR '<this>: <root>.X1.X2.X3 declared in <root>.X1.X2.X3.<set-x3>' type=<root>.X1.X2.X3 origin=null
-                value: GET_VAR '<set-?>: kotlin.Int declared in <root>.X1.X2.X3.<set-x3>' type=kotlin.Int origin=null
+                receiver: GET_VAR '<this>: <root>.X1.X2.X3 declared in <root>.X1.X2.X3.x3.<set-x3>' type=<root>.X1.X2.X3 origin=null
+                value: GET_VAR '<set-?>: kotlin.Int declared in <root>.X1.X2.X3.x3.<set-x3>' type=kotlin.Int origin=null
         FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
           overridden:
             public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -148,9 +148,9 @@ FILE fqName:<root> fileName:/complexAugmentedAssignment.kt
             GET_OBJECT 'CLASS OBJECT name:X1 modality:FINAL visibility:public superTypes:[kotlin.Any]' type=<root>.X1
           BLOCK type=kotlin.Int origin=POSTFIX_INCR
             VAR IR_TEMPORARY_VARIABLE name:tmp1 type:kotlin.Int [val]
-              GET_PROPERTY 'public final fun <get-x1> (): kotlin.Int declared in <root>.X1' type=kotlin.Int origin=POSTFIX_INCR
+              GET_PROPERTY 'public final fun <get-x1> (): kotlin.Int declared in <root>.X1.x1' type=kotlin.Int origin=POSTFIX_INCR
                 $this: GET_VAR 'val tmp0_this: <root>.X1 [val] declared in <root>.test2' type=<root>.X1 origin=null
-            SET_PROPERTY 'public final fun <set-x1> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.X1' type=kotlin.Unit origin=POSTFIX_INCR
+            SET_PROPERTY 'public final fun <set-x1> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.X1.x1' type=kotlin.Unit origin=POSTFIX_INCR
               $this: GET_VAR 'val tmp0_this: <root>.X1 [val] declared in <root>.test2' type=<root>.X1 origin=null
               <set-?>: CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
                 $this: GET_VAR 'val tmp1: kotlin.Int [val] declared in <root>.test2' type=kotlin.Int origin=null
@@ -161,9 +161,9 @@ FILE fqName:<root> fileName:/complexAugmentedAssignment.kt
             GET_OBJECT 'CLASS OBJECT name:X2 modality:FINAL visibility:public superTypes:[kotlin.Any]' type=<root>.X1.X2
           BLOCK type=kotlin.Int origin=POSTFIX_INCR
             VAR IR_TEMPORARY_VARIABLE name:tmp3 type:kotlin.Int [val]
-              GET_PROPERTY 'public final fun <get-x2> (): kotlin.Int declared in <root>.X1.X2' type=kotlin.Int origin=POSTFIX_INCR
+              GET_PROPERTY 'public final fun <get-x2> (): kotlin.Int declared in <root>.X1.X2.x2' type=kotlin.Int origin=POSTFIX_INCR
                 $this: GET_VAR 'val tmp2_this: <root>.X1.X2 [val] declared in <root>.test2' type=<root>.X1.X2 origin=null
-            SET_PROPERTY 'public final fun <set-x2> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.X1.X2' type=kotlin.Unit origin=POSTFIX_INCR
+            SET_PROPERTY 'public final fun <set-x2> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.X1.X2.x2' type=kotlin.Unit origin=POSTFIX_INCR
               $this: GET_VAR 'val tmp2_this: <root>.X1.X2 [val] declared in <root>.test2' type=<root>.X1.X2 origin=null
               <set-?>: CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
                 $this: GET_VAR 'val tmp3: kotlin.Int [val] declared in <root>.test2' type=kotlin.Int origin=null
@@ -174,9 +174,9 @@ FILE fqName:<root> fileName:/complexAugmentedAssignment.kt
             GET_OBJECT 'CLASS OBJECT name:X3 modality:FINAL visibility:public superTypes:[kotlin.Any]' type=<root>.X1.X2.X3
           BLOCK type=kotlin.Int origin=POSTFIX_INCR
             VAR IR_TEMPORARY_VARIABLE name:tmp5 type:kotlin.Int [val]
-              GET_PROPERTY 'public final fun <get-x3> (): kotlin.Int declared in <root>.X1.X2.X3' type=kotlin.Int origin=POSTFIX_INCR
+              GET_PROPERTY 'public final fun <get-x3> (): kotlin.Int declared in <root>.X1.X2.X3.x3' type=kotlin.Int origin=POSTFIX_INCR
                 $this: GET_VAR 'val tmp4_this: <root>.X1.X2.X3 [val] declared in <root>.test2' type=<root>.X1.X2.X3 origin=null
-            SET_PROPERTY 'public final fun <set-x3> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.X1.X2.X3' type=kotlin.Unit origin=POSTFIX_INCR
+            SET_PROPERTY 'public final fun <set-x3> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.X1.X2.X3.x3' type=kotlin.Unit origin=POSTFIX_INCR
               $this: GET_VAR 'val tmp4_this: <root>.X1.X2.X3 [val] declared in <root>.test2' type=<root>.X1.X2.X3 origin=null
               <set-?>: CALL 'public final fun inc (): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=POSTFIX_INCR
                 $this: GET_VAR 'val tmp5: kotlin.Int [val] declared in <root>.test2' type=kotlin.Int origin=null
@@ -198,17 +198,17 @@ FILE fqName:<root> fileName:/complexAugmentedAssignment.kt
         correspondingProperty: PROPERTY name:s visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.B
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-s> (): kotlin.Int declared in <root>.B'
+          RETURN type=kotlin.Nothing from='public final fun <get-s> (): kotlin.Int declared in <root>.B.s'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.B declared in <root>.B.<get-s>' type=<root>.B origin=null
+              receiver: GET_VAR '<this>: <root>.B declared in <root>.B.s.<get-s>' type=<root>.B origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<set-s> visibility:public modality:FINAL <> ($this:<root>.B, <set-?>:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:s visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.B
         VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:s type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-            receiver: GET_VAR '<this>: <root>.B declared in <root>.B.<set-s>' type=<root>.B origin=null
-            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.B.<set-s>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.B declared in <root>.B.s.<set-s>' type=<root>.B origin=null
+            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.B.s.<set-s>' type=kotlin.Int origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -236,12 +236,12 @@ FILE fqName:<root> fileName:/complexAugmentedAssignment.kt
         BLOCK type=kotlin.Unit origin=PLUSEQ
           VAR IR_TEMPORARY_VARIABLE name:tmp0_this type:<root>.B [val]
             GET_VAR '<this>: <root>.B declared in <root>.Host.plusAssign' type=<root>.B origin=null
-          SET_PROPERTY 'public final fun <set-s> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.B' type=kotlin.Unit origin=PLUSEQ
+          SET_PROPERTY 'public final fun <set-s> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.B.s' type=kotlin.Unit origin=PLUSEQ
             $this: GET_VAR 'val tmp0_this: <root>.B [val] declared in <root>.Host.plusAssign' type=<root>.B origin=null
             <set-?>: CALL 'public final fun plus (other: kotlin.Int): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PLUSEQ
-              $this: GET_PROPERTY 'public final fun <get-s> (): kotlin.Int declared in <root>.B' type=kotlin.Int origin=PLUSEQ
+              $this: GET_PROPERTY 'public final fun <get-s> (): kotlin.Int declared in <root>.B.s' type=kotlin.Int origin=PLUSEQ
                 $this: GET_VAR 'val tmp0_this: <root>.B [val] declared in <root>.Host.plusAssign' type=<root>.B origin=null
-              other: GET_PROPERTY 'public final fun <get-s> (): kotlin.Int declared in <root>.B' type=kotlin.Int origin=GET_PROPERTY
+              other: GET_PROPERTY 'public final fun <get-s> (): kotlin.Int declared in <root>.B.s' type=kotlin.Int origin=GET_PROPERTY
                 $this: GET_VAR 'b: <root>.B declared in <root>.Host.plusAssign' type=<root>.B origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:

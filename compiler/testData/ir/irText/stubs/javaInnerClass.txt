@@ -14,9 +14,9 @@ FILE fqName:<root> fileName:/javaInnerClass.kt
         correspondingProperty: PROPERTY name:test visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test1
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-test> (): <root>.J.JInner declared in <root>.Test1'
+          RETURN type=kotlin.Nothing from='public final fun <get-test> (): <root>.J.JInner declared in <root>.Test1.test'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:test type:<root>.J.JInner visibility:public [final]' type=<root>.J.JInner origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-test>' type=<root>.Test1 origin=null
+              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.test.<get-test>' type=<root>.Test1 origin=null
     PROPERTY FAKE_OVERRIDE name:x visibility:public modality:FINAL [var]
       FIELD FAKE_OVERRIDE name:x type:kotlin.Int visibility:public
         overridden:

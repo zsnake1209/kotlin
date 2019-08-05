@@ -30,18 +30,18 @@ FILE fqName:<root> fileName:/implicitCastToTypeParameter.kt
         public open fun toString (): kotlin.String declared in kotlin.Any
       $this: VALUE_PARAMETER name:<this> type:kotlin.Any
   PROPERTY name:asT visibility:public modality:FINAL [val]
-    FUN name:<get-asT> visibility:public modality:FINAL <T> ($receiver:<root>.Foo<T of <root>.<get-asT>>) returnType:T of <root>.<get-asT>? [inline]
+    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any]
+    FUN name:<get-asT> visibility:public modality:FINAL <> ($receiver:<root>.Foo<T of <root>.asT>) returnType:T of <root>.asT? [inline]
       correspondingProperty: PROPERTY name:asT visibility:public modality:FINAL [val]
-      TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any]
-      $receiver: VALUE_PARAMETER name:<this> type:<root>.Foo<T of <root>.<get-asT>>
+      $receiver: VALUE_PARAMETER name:<this> type:<root>.Foo<T of <root>.asT>
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun <get-asT> <T> (): T of <root>.<get-asT>? [inline] declared in <root>'
-          WHEN type=T of <root>.<get-asT>? origin=IF
+        RETURN type=kotlin.Nothing from='public final fun <get-asT> (): T of <root>.asT? [inline] declared in <root>.asT'
+          WHEN type=T of <root>.asT? origin=IF
             BRANCH
-              if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=T of <root>.<get-asT>
-                GET_VAR '<this>: <root>.Foo<T of <root>.<get-asT>> declared in <root>.<get-asT>' type=<root>.Foo<T of <root>.<get-asT>> origin=null
-              then: TYPE_OP type=T of <root>.<get-asT> origin=IMPLICIT_CAST typeOperand=T of <root>.<get-asT>
-                GET_VAR '<this>: <root>.Foo<T of <root>.<get-asT>> declared in <root>.<get-asT>' type=<root>.Foo<T of <root>.<get-asT>> origin=null
+              if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=T of <root>.asT
+                GET_VAR '<this>: <root>.Foo<T of <root>.asT> declared in <root>.asT.<get-asT>' type=<root>.Foo<T of <root>.asT> origin=null
+              then: TYPE_OP type=T of <root>.asT.<get-asT> origin=IMPLICIT_CAST typeOperand=T of <root>.asT.<get-asT>
+                GET_VAR '<this>: <root>.Foo<T of <root>.asT> declared in <root>.asT.<get-asT>' type=<root>.Foo<T of <root>.asT> origin=null
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CONST Null type=kotlin.Nothing? value=null

@@ -14,9 +14,9 @@ FILE fqName:<root> fileName:/localDifferentReceivers.kt
         correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.MyClass
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-value> (): kotlin.String declared in <root>.MyClass'
+          RETURN type=kotlin.Nothing from='public final fun <get-value> (): kotlin.String declared in <root>.MyClass.value'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:kotlin.String visibility:public [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.MyClass declared in <root>.MyClass.<get-value>' type=<root>.MyClass origin=null
+              receiver: GET_VAR '<this>: <root>.MyClass declared in <root>.MyClass.value.<get-value>' type=<root>.MyClass origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -36,7 +36,7 @@ FILE fqName:<root> fileName:/localDifferentReceivers.kt
     VALUE_PARAMETER name:p index:1 type:kotlin.Any
     BLOCK_BODY
       RETURN type=kotlin.Nothing from='public final fun provideDelegate (host: kotlin.Any?, p: kotlin.Any): kotlin.String declared in <root>'
-        GET_PROPERTY 'public final fun <get-value> (): kotlin.String declared in <root>.MyClass' type=kotlin.String origin=GET_PROPERTY
+        GET_PROPERTY 'public final fun <get-value> (): kotlin.String declared in <root>.MyClass.value' type=kotlin.String origin=GET_PROPERTY
           $this: GET_VAR '<this>: <root>.MyClass declared in <root>.provideDelegate' type=<root>.MyClass origin=null
   FUN name:getValue visibility:public modality:FINAL <> ($receiver:kotlin.String, receiver:kotlin.Any?, p:kotlin.Any) returnType:kotlin.String
     $receiver: VALUE_PARAMETER name:<this> type:kotlin.String

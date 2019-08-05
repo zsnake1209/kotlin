@@ -66,13 +66,13 @@ FILE fqName:<root> fileName:/delegatedMembers.kt
       FUN DELEGATED_MEMBER name:<get-bar> visibility:public modality:OPEN <> ($this:<root>.Test<TT of <root>.Test>) returnType:kotlin.Int
         correspondingProperty: PROPERTY DELEGATED_MEMBER name:bar visibility:public modality:OPEN [val]
         overridden:
-          public abstract fun <get-bar> (): kotlin.Int declared in <root>.IBase
+          public abstract fun <get-bar> (): kotlin.Int declared in <root>.IBase.bar
         $this: VALUE_PARAMETER name:<this> type:<root>.Test<TT of <root>.Test>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.Int declared in <root>.Test'
-            CALL 'public abstract fun <get-bar> (): kotlin.Int declared in <root>.IBase' type=kotlin.Int origin=null
+          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.Int declared in <root>.Test.bar'
+            CALL 'public abstract fun <get-bar> (): kotlin.Int declared in <root>.IBase.bar' type=kotlin.Int origin=null
               $this: GET_FIELD 'FIELD DELEGATE name:Test$IBase$delegate type:<root>.IBase<TT of <root>.Test> visibility:private [final]' type=<root>.IBase<TT of <root>.Test> origin=null
-                receiver: GET_VAR '<this>: <root>.Test<TT of <root>.Test> declared in <root>.Test.<get-bar>' type=<root>.Test<TT of <root>.Test> origin=null
+                receiver: GET_VAR '<this>: <root>.Test<TT of <root>.Test> declared in <root>.Test.bar.<get-bar>' type=<root>.Test<TT of <root>.Test> origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.IBase

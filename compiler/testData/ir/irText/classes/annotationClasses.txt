@@ -11,9 +11,9 @@ FILE fqName:<root> fileName:/annotationClasses.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test1
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Test1'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Test1.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.<get-x>' type=<root>.Test1 origin=null
+              receiver: GET_VAR '<this>: <root>.Test1 declared in <root>.Test1.x.<get-x>' type=<root>.Test1 origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
@@ -41,9 +41,9 @@ FILE fqName:<root> fileName:/annotationClasses.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test2
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Test2'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Test2.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.<get-x>' type=<root>.Test2 origin=null
+              receiver: GET_VAR '<this>: <root>.Test2 declared in <root>.Test2.x.<get-x>' type=<root>.Test2 origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
@@ -69,9 +69,9 @@ FILE fqName:<root> fileName:/annotationClasses.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test3
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): <root>.Test1 declared in <root>.Test3'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): <root>.Test1 declared in <root>.Test3.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:<root>.Test1 visibility:public [final]' type=<root>.Test1 origin=null
-              receiver: GET_VAR '<this>: <root>.Test3 declared in <root>.Test3.<get-x>' type=<root>.Test3 origin=null
+              receiver: GET_VAR '<this>: <root>.Test3 declared in <root>.Test3.x.<get-x>' type=<root>.Test3 origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation
@@ -97,9 +97,9 @@ FILE fqName:<root> fileName:/annotationClasses.kt
         correspondingProperty: PROPERTY name:xs visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Test4
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-xs> (): kotlin.IntArray declared in <root>.Test4'
+          RETURN type=kotlin.Nothing from='public final fun <get-xs> (): kotlin.IntArray declared in <root>.Test4.xs'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:xs type:kotlin.IntArray visibility:public [final]' type=kotlin.IntArray origin=null
-              receiver: GET_VAR '<this>: <root>.Test4 declared in <root>.Test4.<get-xs>' type=<root>.Test4 origin=null
+              receiver: GET_VAR '<this>: <root>.Test4 declared in <root>.Test4.xs.<get-xs>' type=<root>.Test4 origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Annotation

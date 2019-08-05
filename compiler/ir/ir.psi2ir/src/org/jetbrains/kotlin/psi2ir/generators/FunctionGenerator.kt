@@ -99,8 +99,13 @@ class FunctionGenerator(declarationGenerator: DeclarationGenerator) : Declaratio
         ktParameterOwner: KtPureElement?,
         ktReceiverParameterElement: KtElement?
     ) {
-        declarationGenerator.generateScopedTypeParameterDeclarations(irFunction, irFunction.descriptor.propertyIfAccessor.typeParameters)
-        irFunction.returnType = irFunction.descriptor.returnType!!.toIrType()
+        // TODO property accessors don't have type parameters under the new property design.
+        // For now, keep it as is (descriptor-based).
+        val functionDescriptor = irFunction.descriptor
+        if (functionDescriptor !is PropertyAccessorDescriptor) {
+            declarationGenerator.generateScopedTypeParameterDeclarations(irFunction, functionDescriptor.propertyIfAccessor.typeParameters)
+        }
+        irFunction.returnType = functionDescriptor.returnType!!.toIrType()
         generateValueParameterDeclarations(irFunction, ktParameterOwner, ktReceiverParameterElement)
     }
 
@@ -114,7 +119,7 @@ class FunctionGenerator(declarationGenerator: DeclarationGenerator) : Declaratio
             ktAccessor ?: ktProperty,
             if (ktAccessor != null) IrDeclarationOrigin.DEFINED else IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
         ).buildWithScope { irAccessor ->
-            declarationGenerator.generateScopedTypeParameterDeclarations(irAccessor, descriptor.correspondingProperty.typeParameters)
+            // declarationGenerator.generateScopedTypeParameterDeclarations(irAccessor, descriptor.correspondingProperty.typeParameters)
             irAccessor.returnType = irAccessor.descriptor.returnType!!.toIrType()
             generateValueParameterDeclarations(irAccessor, ktAccessor ?: ktProperty, ktProperty.receiverTypeReference)
             val ktBodyExpression = ktAccessor?.bodyExpression

@@ -9,7 +9,7 @@ FILE fqName:<root> fileName:/qualifiedSuperCalls.kt
         correspondingProperty: PROPERTY name:bar visibility:public modality:OPEN [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.ILeft
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.Int declared in <root>.ILeft'
+          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.Int declared in <root>.ILeft.bar'
             CONST Int type=kotlin.Int value=1
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
@@ -34,7 +34,7 @@ FILE fqName:<root> fileName:/qualifiedSuperCalls.kt
         correspondingProperty: PROPERTY name:bar visibility:public modality:OPEN [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.IRight
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.Int declared in <root>.IRight'
+          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.Int declared in <root>.IRight.bar'
             CONST Int type=kotlin.Int value=2
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
@@ -69,16 +69,16 @@ FILE fqName:<root> fileName:/qualifiedSuperCalls.kt
       FUN name:<get-bar> visibility:public modality:OPEN <> ($this:<root>.CBoth) returnType:kotlin.Int
         correspondingProperty: PROPERTY name:bar visibility:public modality:OPEN [val]
         overridden:
-          public open fun <get-bar> (): kotlin.Int declared in <root>.ILeft
-          public open fun <get-bar> (): kotlin.Int declared in <root>.IRight
+          public open fun <get-bar> (): kotlin.Int declared in <root>.ILeft.bar
+          public open fun <get-bar> (): kotlin.Int declared in <root>.IRight.bar
         $this: VALUE_PARAMETER name:<this> type:<root>.CBoth
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.Int declared in <root>.CBoth'
+          RETURN type=kotlin.Nothing from='public open fun <get-bar> (): kotlin.Int declared in <root>.CBoth.bar'
             CALL 'public final fun plus (other: kotlin.Int): kotlin.Int declared in kotlin.Int' type=kotlin.Int origin=PLUS
-              $this: GET_PROPERTY 'public open fun <get-bar> (): kotlin.Int declared in <root>.ILeft' superQualifier='CLASS INTERFACE name:ILeft modality:ABSTRACT visibility:public superTypes:[kotlin.Any]' type=kotlin.Int origin=GET_PROPERTY
-                $this: GET_VAR '<this>: <root>.CBoth declared in <root>.CBoth.<get-bar>' type=<root>.CBoth origin=null
-              other: GET_PROPERTY 'public open fun <get-bar> (): kotlin.Int declared in <root>.IRight' superQualifier='CLASS INTERFACE name:IRight modality:ABSTRACT visibility:public superTypes:[kotlin.Any]' type=kotlin.Int origin=GET_PROPERTY
-                $this: GET_VAR '<this>: <root>.CBoth declared in <root>.CBoth.<get-bar>' type=<root>.CBoth origin=null
+              $this: GET_PROPERTY 'public open fun <get-bar> (): kotlin.Int declared in <root>.ILeft.bar' superQualifier='CLASS INTERFACE name:ILeft modality:ABSTRACT visibility:public superTypes:[kotlin.Any]' type=kotlin.Int origin=GET_PROPERTY
+                $this: GET_VAR '<this>: <root>.CBoth declared in <root>.CBoth.bar.<get-bar>' type=<root>.CBoth origin=null
+              other: GET_PROPERTY 'public open fun <get-bar> (): kotlin.Int declared in <root>.IRight.bar' superQualifier='CLASS INTERFACE name:IRight modality:ABSTRACT visibility:public superTypes:[kotlin.Any]' type=kotlin.Int origin=GET_PROPERTY
+                $this: GET_VAR '<this>: <root>.CBoth declared in <root>.CBoth.bar.<get-bar>' type=<root>.CBoth origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in <root>.ILeft

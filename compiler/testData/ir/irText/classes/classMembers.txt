@@ -18,9 +18,9 @@ FILE fqName:<root> fileName:/classMembers.kt
         correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.Int declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.Int declared in <root>.C.y'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.<get-y>' type=<root>.C origin=null
+              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.y.<get-y>' type=<root>.C origin=null
     PROPERTY name:z visibility:public modality:FINAL [var]
       FIELD PROPERTY_BACKING_FIELD name:z type:kotlin.Int visibility:public
         EXPRESSION_BODY
@@ -29,17 +29,17 @@ FILE fqName:<root> fileName:/classMembers.kt
         correspondingProperty: PROPERTY name:z visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-z> (): kotlin.Int declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public final fun <get-z> (): kotlin.Int declared in <root>.C.z'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:z type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.<get-z>' type=<root>.C origin=null
+              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.z.<get-z>' type=<root>.C origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<set-z> visibility:public modality:FINAL <> ($this:<root>.C, <set-?>:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:z visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:z type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-            receiver: GET_VAR '<this>: <root>.C declared in <root>.C.<set-z>' type=<root>.C origin=null
-            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.C.<set-z>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.C declared in <root>.C.z.<set-z>' type=<root>.C origin=null
+            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.C.z.<set-z>' type=kotlin.Int origin=null
     CONSTRUCTOR visibility:public <> () returnType:<root>.C
       BLOCK_BODY
         DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> (x: kotlin.Int, y: kotlin.Int, z: kotlin.Int) [primary] declared in <root>.C'
@@ -54,32 +54,32 @@ FILE fqName:<root> fileName:/classMembers.kt
         correspondingProperty: PROPERTY name:property visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-property> (): kotlin.Int declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public final fun <get-property> (): kotlin.Int declared in <root>.C.property'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:property type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.<get-property>' type=<root>.C origin=null
+              receiver: GET_VAR '<this>: <root>.C declared in <root>.C.property.<get-property>' type=<root>.C origin=null
     PROPERTY name:propertyWithGet visibility:public modality:FINAL [val]
       FUN name:<get-propertyWithGet> visibility:public modality:FINAL <> ($this:<root>.C) returnType:kotlin.Int
         correspondingProperty: PROPERTY name:propertyWithGet visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-propertyWithGet> (): kotlin.Int declared in <root>.C'
+          RETURN type=kotlin.Nothing from='public final fun <get-propertyWithGet> (): kotlin.Int declared in <root>.C.propertyWithGet'
             CONST Int type=kotlin.Int value=42
     PROPERTY name:propertyWithGetAndSet visibility:public modality:FINAL [var]
       FUN name:<get-propertyWithGetAndSet> visibility:public modality:FINAL <> ($this:<root>.C) returnType:kotlin.Int
         correspondingProperty: PROPERTY name:propertyWithGetAndSet visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-propertyWithGetAndSet> (): kotlin.Int declared in <root>.C'
-            GET_PROPERTY 'public final fun <get-z> (): kotlin.Int declared in <root>.C' type=kotlin.Int origin=GET_PROPERTY
-              $this: GET_VAR '<this>: <root>.C declared in <root>.C.<get-propertyWithGetAndSet>' type=<root>.C origin=null
+          RETURN type=kotlin.Nothing from='public final fun <get-propertyWithGetAndSet> (): kotlin.Int declared in <root>.C.propertyWithGetAndSet'
+            GET_PROPERTY 'public final fun <get-z> (): kotlin.Int declared in <root>.C.z' type=kotlin.Int origin=GET_PROPERTY
+              $this: GET_VAR '<this>: <root>.C declared in <root>.C.propertyWithGetAndSet.<get-propertyWithGetAndSet>' type=<root>.C origin=null
       FUN name:<set-propertyWithGetAndSet> visibility:public modality:FINAL <> ($this:<root>.C, value:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:propertyWithGetAndSet visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.C
         VALUE_PARAMETER name:value index:0 type:kotlin.Int
         BLOCK_BODY
-          SET_PROPERTY 'public final fun <set-z> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.C' type=kotlin.Unit origin=EQ
-            $this: GET_VAR '<this>: <root>.C declared in <root>.C.<set-propertyWithGetAndSet>' type=<root>.C origin=null
-            <set-?>: GET_VAR 'value: kotlin.Int declared in <root>.C.<set-propertyWithGetAndSet>' type=kotlin.Int origin=null
+          SET_PROPERTY 'public final fun <set-z> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.C.z' type=kotlin.Unit origin=EQ
+            $this: GET_VAR '<this>: <root>.C declared in <root>.C.propertyWithGetAndSet.<set-propertyWithGetAndSet>' type=<root>.C origin=null
+            <set-?>: GET_VAR 'value: kotlin.Int declared in <root>.C.propertyWithGetAndSet.<set-propertyWithGetAndSet>' type=kotlin.Int origin=null
     FUN name:function visibility:public modality:FINAL <> ($this:<root>.C) returnType:kotlin.Unit
       $this: VALUE_PARAMETER name:<this> type:<root>.C
       BLOCK_BODY

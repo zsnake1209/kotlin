@@ -13,23 +13,23 @@ FILE fqName:<root> fileName:/objectReferenceInFieldInitializer.kt
         correspondingProperty: PROPERTY name:a visibility:private modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.A
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='private final fun <get-a> (): kotlin.String declared in <root>.A'
+          RETURN type=kotlin.Nothing from='private final fun <get-a> (): kotlin.String declared in <root>.A.a'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:a type:kotlin.String visibility:private [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.<get-a>' type=<root>.A origin=null
+              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.a.<get-a>' type=<root>.A origin=null
     PROPERTY name:b visibility:private modality:FINAL [val]
       FIELD PROPERTY_BACKING_FIELD name:b type:kotlin.String visibility:private [final]
         EXPRESSION_BODY
           STRING_CONCATENATION type=kotlin.String
             CONST String type=kotlin.String value="1234"
-            GET_PROPERTY 'private final fun <get-a> (): kotlin.String declared in <root>.A' type=kotlin.String origin=GET_PROPERTY
+            GET_PROPERTY 'private final fun <get-a> (): kotlin.String declared in <root>.A.a' type=kotlin.String origin=GET_PROPERTY
               $this: GET_VAR '<this>: <root>.A declared in <root>.A' type=<root>.A origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<get-b> visibility:private modality:FINAL <> ($this:<root>.A) returnType:kotlin.String
         correspondingProperty: PROPERTY name:b visibility:private modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.A
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='private final fun <get-b> (): kotlin.String declared in <root>.A'
+          RETURN type=kotlin.Nothing from='private final fun <get-b> (): kotlin.String declared in <root>.A.b'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:b type:kotlin.String visibility:private [final]' type=kotlin.String origin=null
-              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.<get-b>' type=<root>.A origin=null
+              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.b.<get-b>' type=<root>.A origin=null
     PROPERTY name:c visibility:private modality:FINAL [val]
       FIELD PROPERTY_BACKING_FIELD name:c type:kotlin.Int visibility:private [final]
         EXPRESSION_BODY
@@ -38,9 +38,9 @@ FILE fqName:<root> fileName:/objectReferenceInFieldInitializer.kt
         correspondingProperty: PROPERTY name:c visibility:private modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.A
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='private final fun <get-c> (): kotlin.Int declared in <root>.A'
+          RETURN type=kotlin.Nothing from='private final fun <get-c> (): kotlin.Int declared in <root>.A.c'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:c type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.<get-c>' type=<root>.A origin=null
+              receiver: GET_VAR '<this>: <root>.A declared in <root>.A.c.<get-c>' type=<root>.A origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any

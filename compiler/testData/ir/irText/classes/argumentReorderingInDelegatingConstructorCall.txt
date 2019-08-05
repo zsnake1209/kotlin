@@ -15,9 +15,9 @@ FILE fqName:<root> fileName:/argumentReorderingInDelegatingConstructorCall.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Base'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Base.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.Base declared in <root>.Base.<get-x>' type=<root>.Base origin=null
+              receiver: GET_VAR '<this>: <root>.Base declared in <root>.Base.x.<get-x>' type=<root>.Base origin=null
     PROPERTY name:y visibility:public modality:FINAL [val]
       FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public [final]
         EXPRESSION_BODY
@@ -26,9 +26,9 @@ FILE fqName:<root> fileName:/argumentReorderingInDelegatingConstructorCall.kt
         correspondingProperty: PROPERTY name:y visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.Int declared in <root>.Base'
+          RETURN type=kotlin.Nothing from='public final fun <get-y> (): kotlin.Int declared in <root>.Base.y'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:y type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.Base declared in <root>.Base.<get-y>' type=<root>.Base origin=null
+              receiver: GET_VAR '<this>: <root>.Base declared in <root>.Base.y.<get-y>' type=<root>.Base origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -64,7 +64,7 @@ FILE fqName:<root> fileName:/argumentReorderingInDelegatingConstructorCall.kt
       FUN FAKE_OVERRIDE name:<get-x> visibility:public modality:FINAL <> ($this:<root>.Base) returnType:kotlin.Int
         correspondingProperty: PROPERTY FAKE_OVERRIDE name:x visibility:public modality:FINAL [val]
         overridden:
-          public final fun <get-x> (): kotlin.Int declared in <root>.Base
+          public final fun <get-x> (): kotlin.Int declared in <root>.Base.x
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
     PROPERTY FAKE_OVERRIDE name:y visibility:public modality:FINAL [val]
       FIELD FAKE_OVERRIDE name:y type:kotlin.Int visibility:public [final]
@@ -73,7 +73,7 @@ FILE fqName:<root> fileName:/argumentReorderingInDelegatingConstructorCall.kt
       FUN FAKE_OVERRIDE name:<get-y> visibility:public modality:FINAL <> ($this:<root>.Base) returnType:kotlin.Int
         correspondingProperty: PROPERTY FAKE_OVERRIDE name:y visibility:public modality:FINAL [val]
         overridden:
-          public final fun <get-y> (): kotlin.Int declared in <root>.Base
+          public final fun <get-y> (): kotlin.Int declared in <root>.Base.y
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
@@ -123,7 +123,7 @@ FILE fqName:<root> fileName:/argumentReorderingInDelegatingConstructorCall.kt
       FUN FAKE_OVERRIDE name:<get-x> visibility:public modality:FINAL <> ($this:<root>.Base) returnType:kotlin.Int
         correspondingProperty: PROPERTY FAKE_OVERRIDE name:x visibility:public modality:FINAL [val]
         overridden:
-          public final fun <get-x> (): kotlin.Int declared in <root>.Base
+          public final fun <get-x> (): kotlin.Int declared in <root>.Base.x
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
     PROPERTY FAKE_OVERRIDE name:y visibility:public modality:FINAL [val]
       FIELD FAKE_OVERRIDE name:y type:kotlin.Int visibility:public [final]
@@ -132,7 +132,7 @@ FILE fqName:<root> fileName:/argumentReorderingInDelegatingConstructorCall.kt
       FUN FAKE_OVERRIDE name:<get-y> visibility:public modality:FINAL <> ($this:<root>.Base) returnType:kotlin.Int
         correspondingProperty: PROPERTY FAKE_OVERRIDE name:y visibility:public modality:FINAL [val]
         overridden:
-          public final fun <get-y> (): kotlin.Int declared in <root>.Base
+          public final fun <get-y> (): kotlin.Int declared in <root>.Base.y
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:

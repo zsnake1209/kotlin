@@ -14,17 +14,17 @@ FILE fqName:<root> fileName:/initVar.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarFromParameter
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarFromParameter'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarFromParameter.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitVarFromParameter declared in <root>.TestInitVarFromParameter.<get-x>' type=<root>.TestInitVarFromParameter origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitVarFromParameter declared in <root>.TestInitVarFromParameter.x.<get-x>' type=<root>.TestInitVarFromParameter origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<set-x> visibility:public modality:FINAL <> ($this:<root>.TestInitVarFromParameter, <set-?>:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarFromParameter
         VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-            receiver: GET_VAR '<this>: <root>.TestInitVarFromParameter declared in <root>.TestInitVarFromParameter.<set-x>' type=<root>.TestInitVarFromParameter origin=null
-            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.TestInitVarFromParameter.<set-x>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.TestInitVarFromParameter declared in <root>.TestInitVarFromParameter.x.<set-x>' type=<root>.TestInitVarFromParameter origin=null
+            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.TestInitVarFromParameter.x.<set-x>' type=kotlin.Int origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -52,17 +52,17 @@ FILE fqName:<root> fileName:/initVar.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarInClass
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarInClass'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarInClass.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitVarInClass declared in <root>.TestInitVarInClass.<get-x>' type=<root>.TestInitVarInClass origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitVarInClass declared in <root>.TestInitVarInClass.x.<get-x>' type=<root>.TestInitVarInClass origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<set-x> visibility:public modality:FINAL <> ($this:<root>.TestInitVarInClass, <set-?>:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarInClass
         VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-            receiver: GET_VAR '<this>: <root>.TestInitVarInClass declared in <root>.TestInitVarInClass.<set-x>' type=<root>.TestInitVarInClass origin=null
-            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.TestInitVarInClass.<set-x>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.TestInitVarInClass declared in <root>.TestInitVarInClass.x.<set-x>' type=<root>.TestInitVarInClass origin=null
+            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.TestInitVarInClass.x.<set-x>' type=kotlin.Int origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -88,20 +88,20 @@ FILE fqName:<root> fileName:/initVar.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarInInitBlock
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarInInitBlock'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarInInitBlock.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitVarInInitBlock declared in <root>.TestInitVarInInitBlock.<get-x>' type=<root>.TestInitVarInInitBlock origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitVarInInitBlock declared in <root>.TestInitVarInInitBlock.x.<get-x>' type=<root>.TestInitVarInInitBlock origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<set-x> visibility:public modality:FINAL <> ($this:<root>.TestInitVarInInitBlock, <set-?>:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarInInitBlock
         VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-            receiver: GET_VAR '<this>: <root>.TestInitVarInInitBlock declared in <root>.TestInitVarInInitBlock.<set-x>' type=<root>.TestInitVarInInitBlock origin=null
-            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.TestInitVarInInitBlock.<set-x>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.TestInitVarInInitBlock declared in <root>.TestInitVarInInitBlock.x.<set-x>' type=<root>.TestInitVarInInitBlock origin=null
+            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.TestInitVarInInitBlock.x.<set-x>' type=kotlin.Int origin=null
     ANONYMOUS_INITIALIZER isStatic=false
       BLOCK_BODY
-        SET_PROPERTY 'public final fun <set-x> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.TestInitVarInInitBlock' type=kotlin.Unit origin=EQ
+        SET_PROPERTY 'public final fun <set-x> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.TestInitVarInInitBlock.x' type=kotlin.Unit origin=EQ
           $this: GET_VAR '<this>: <root>.TestInitVarInInitBlock declared in <root>.TestInitVarInInitBlock' type=<root>.TestInitVarInInitBlock origin=null
           <set-?>: CONST Int type=kotlin.Int value=0
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
@@ -131,17 +131,17 @@ FILE fqName:<root> fileName:/initVar.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarWithCustomSetter
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarWithCustomSetter'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarWithCustomSetter.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetter declared in <root>.TestInitVarWithCustomSetter.<get-x>' type=<root>.TestInitVarWithCustomSetter origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetter declared in <root>.TestInitVarWithCustomSetter.x.<get-x>' type=<root>.TestInitVarWithCustomSetter origin=null
       FUN name:<set-x> visibility:public modality:FINAL <> ($this:<root>.TestInitVarWithCustomSetter, value:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarWithCustomSetter
         VALUE_PARAMETER name:value index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Unit origin=EQ
-            receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetter declared in <root>.TestInitVarWithCustomSetter.<set-x>' type=<root>.TestInitVarWithCustomSetter origin=null
-            value: GET_VAR 'value: kotlin.Int declared in <root>.TestInitVarWithCustomSetter.<set-x>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetter declared in <root>.TestInitVarWithCustomSetter.x.<set-x>' type=<root>.TestInitVarWithCustomSetter origin=null
+            value: GET_VAR 'value: kotlin.Int declared in <root>.TestInitVarWithCustomSetter.x.<set-x>' type=kotlin.Int origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -163,20 +163,20 @@ FILE fqName:<root> fileName:/initVar.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarWithCustomSetterWithExplicitCtor
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterWithExplicitCtor declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor.<get-x>' type=<root>.TestInitVarWithCustomSetterWithExplicitCtor origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterWithExplicitCtor declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor.x.<get-x>' type=<root>.TestInitVarWithCustomSetterWithExplicitCtor origin=null
       FUN name:<set-x> visibility:public modality:FINAL <> ($this:<root>.TestInitVarWithCustomSetterWithExplicitCtor, value:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarWithCustomSetterWithExplicitCtor
         VALUE_PARAMETER name:value index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Unit origin=EQ
-            receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterWithExplicitCtor declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor.<set-x>' type=<root>.TestInitVarWithCustomSetterWithExplicitCtor origin=null
-            value: GET_VAR 'value: kotlin.Int declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor.<set-x>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterWithExplicitCtor declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor.x.<set-x>' type=<root>.TestInitVarWithCustomSetterWithExplicitCtor origin=null
+            value: GET_VAR 'value: kotlin.Int declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor.x.<set-x>' type=kotlin.Int origin=null
     ANONYMOUS_INITIALIZER isStatic=false
       BLOCK_BODY
-        SET_PROPERTY 'public final fun <set-x> (value: kotlin.Int): kotlin.Unit declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor' type=kotlin.Unit origin=EQ
+        SET_PROPERTY 'public final fun <set-x> (value: kotlin.Int): kotlin.Unit declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor.x' type=kotlin.Unit origin=EQ
           $this: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterWithExplicitCtor declared in <root>.TestInitVarWithCustomSetterWithExplicitCtor' type=<root>.TestInitVarWithCustomSetterWithExplicitCtor origin=null
           value: CONST Int type=kotlin.Int value=0
     CONSTRUCTOR visibility:public <> () returnType:<root>.TestInitVarWithCustomSetterWithExplicitCtor
@@ -204,22 +204,22 @@ FILE fqName:<root> fileName:/initVar.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarWithCustomSetterInCtor
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarWithCustomSetterInCtor'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitVarWithCustomSetterInCtor.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterInCtor declared in <root>.TestInitVarWithCustomSetterInCtor.<get-x>' type=<root>.TestInitVarWithCustomSetterInCtor origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterInCtor declared in <root>.TestInitVarWithCustomSetterInCtor.x.<get-x>' type=<root>.TestInitVarWithCustomSetterInCtor origin=null
       FUN name:<set-x> visibility:public modality:FINAL <> ($this:<root>.TestInitVarWithCustomSetterInCtor, value:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitVarWithCustomSetterInCtor
         VALUE_PARAMETER name:value index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public' type=kotlin.Unit origin=EQ
-            receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterInCtor declared in <root>.TestInitVarWithCustomSetterInCtor.<set-x>' type=<root>.TestInitVarWithCustomSetterInCtor origin=null
-            value: GET_VAR 'value: kotlin.Int declared in <root>.TestInitVarWithCustomSetterInCtor.<set-x>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterInCtor declared in <root>.TestInitVarWithCustomSetterInCtor.x.<set-x>' type=<root>.TestInitVarWithCustomSetterInCtor origin=null
+            value: GET_VAR 'value: kotlin.Int declared in <root>.TestInitVarWithCustomSetterInCtor.x.<set-x>' type=kotlin.Int origin=null
     CONSTRUCTOR visibility:public <> () returnType:<root>.TestInitVarWithCustomSetterInCtor
       BLOCK_BODY
         DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
         INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:TestInitVarWithCustomSetterInCtor modality:FINAL visibility:public superTypes:[kotlin.Any]'
-        SET_PROPERTY 'public final fun <set-x> (value: kotlin.Int): kotlin.Unit declared in <root>.TestInitVarWithCustomSetterInCtor' type=kotlin.Unit origin=EQ
+        SET_PROPERTY 'public final fun <set-x> (value: kotlin.Int): kotlin.Unit declared in <root>.TestInitVarWithCustomSetterInCtor.x' type=kotlin.Unit origin=EQ
           $this: GET_VAR '<this>: <root>.TestInitVarWithCustomSetterInCtor declared in <root>.TestInitVarWithCustomSetterInCtor' type=<root>.TestInitVarWithCustomSetterInCtor origin=null
           value: CONST Int type=kotlin.Int value=42
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean

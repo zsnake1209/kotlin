@@ -28,9 +28,9 @@ FILE fqName:<root> fileName:/secondaryConstructorWithInitializersFromClassBody.k
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestProperty
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestProperty'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestProperty.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestProperty declared in <root>.TestProperty.<get-x>' type=<root>.TestProperty origin=null
+              receiver: GET_VAR '<this>: <root>.TestProperty declared in <root>.TestProperty.x.<get-x>' type=<root>.TestProperty origin=null
     CONSTRUCTOR visibility:public <> () returnType:<root>.TestProperty
       BLOCK_BODY
         DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in <root>.Base'
@@ -56,9 +56,9 @@ FILE fqName:<root> fileName:/secondaryConstructorWithInitializersFromClassBody.k
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.TestInitBlock
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitBlock'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.TestInitBlock.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.TestInitBlock declared in <root>.TestInitBlock.<get-x>' type=<root>.TestInitBlock origin=null
+              receiver: GET_VAR '<this>: <root>.TestInitBlock declared in <root>.TestInitBlock.x.<get-x>' type=<root>.TestInitBlock origin=null
     ANONYMOUS_INITIALIZER isStatic=false
       BLOCK_BODY
         SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Unit origin=null

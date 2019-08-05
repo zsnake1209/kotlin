@@ -21,9 +21,9 @@ FILE fqName:<root> fileName:/innerClassWithDelegatingConstructor.kt
           correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
           $this: VALUE_PARAMETER name:<this> type:<root>.Outer.Inner
           BLOCK_BODY
-            RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Outer.Inner'
+            RETURN type=kotlin.Nothing from='public final fun <get-x> (): kotlin.Int declared in <root>.Outer.Inner.x'
               GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:kotlin.Int visibility:public [final]' type=kotlin.Int origin=null
-                receiver: GET_VAR '<this>: <root>.Outer.Inner declared in <root>.Outer.Inner.<get-x>' type=<root>.Outer.Inner origin=null
+                receiver: GET_VAR '<this>: <root>.Outer.Inner declared in <root>.Outer.Inner.x.<get-x>' type=<root>.Outer.Inner origin=null
       CONSTRUCTOR visibility:public <> ($this:<root>.Outer) returnType:<root>.Outer.Inner
         $outer: VALUE_PARAMETER name:<this> type:<root>.Outer
         BLOCK_BODY

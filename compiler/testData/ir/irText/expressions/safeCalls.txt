@@ -14,17 +14,17 @@ FILE fqName:<root> fileName:/safeCalls.kt
         correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.Ref
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-value> (): kotlin.Int declared in <root>.Ref'
+          RETURN type=kotlin.Nothing from='public final fun <get-value> (): kotlin.Int declared in <root>.Ref.value'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:kotlin.Int visibility:public' type=kotlin.Int origin=null
-              receiver: GET_VAR '<this>: <root>.Ref declared in <root>.Ref.<get-value>' type=<root>.Ref origin=null
+              receiver: GET_VAR '<this>: <root>.Ref declared in <root>.Ref.value.<get-value>' type=<root>.Ref origin=null
       FUN DEFAULT_PROPERTY_ACCESSOR name:<set-value> visibility:public modality:FINAL <> ($this:<root>.Ref, <set-?>:kotlin.Int) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:value visibility:public modality:FINAL [var]
         $this: VALUE_PARAMETER name:<this> type:<root>.Ref
         VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
         BLOCK_BODY
           SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:kotlin.Int visibility:public' type=kotlin.Unit origin=null
-            receiver: GET_VAR '<this>: <root>.Ref declared in <root>.Ref.<set-value>' type=<root>.Ref origin=null
-            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.Ref.<set-value>' type=kotlin.Int origin=null
+            receiver: GET_VAR '<this>: <root>.Ref declared in <root>.Ref.value.<set-value>' type=<root>.Ref origin=null
+            value: GET_VAR '<set-?>: kotlin.Int declared in <root>.Ref.value.<set-value>' type=kotlin.Int origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -128,7 +128,7 @@ FILE fqName:<root> fileName:/safeCalls.kt
               CONST Null type=kotlin.Nothing? value=null
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
-            then: SET_PROPERTY 'public final fun <set-value> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.Ref' type=kotlin.Unit origin=EQ
+            then: SET_PROPERTY 'public final fun <set-value> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>.Ref.value' type=kotlin.Unit origin=EQ
               $this: GET_VAR 'val tmp0_safe_receiver: <root>.Ref? [val] declared in <root>.test4' type=<root>.Ref? origin=null
               <set-?>: CONST Int type=kotlin.Int value=0
   FUN name:test5 visibility:public modality:FINAL <> ($receiver:<root>.IHost, s:kotlin.String?) returnType:kotlin.Int?

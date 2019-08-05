@@ -14,9 +14,9 @@ FILE fqName:<root> fileName:/objectReferenceInClosureInSuperConstructorCall.kt
         correspondingProperty: PROPERTY name:lambda visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-lambda> (): kotlin.Function0<kotlin.Any> declared in <root>.Base'
+          RETURN type=kotlin.Nothing from='public final fun <get-lambda> (): kotlin.Function0<kotlin.Any> declared in <root>.Base.lambda'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:lambda type:kotlin.Function0<kotlin.Any> visibility:public [final]' type=kotlin.Function0<kotlin.Any> origin=null
-              receiver: GET_VAR '<this>: <root>.Base declared in <root>.Base.<get-lambda>' type=<root>.Base origin=null
+              receiver: GET_VAR '<this>: <root>.Base declared in <root>.Base.lambda.<get-lambda>' type=<root>.Base origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
@@ -48,7 +48,7 @@ FILE fqName:<root> fileName:/objectReferenceInClosureInSuperConstructorCall.kt
       FUN FAKE_OVERRIDE name:<get-lambda> visibility:public modality:FINAL <> ($this:<root>.Base) returnType:kotlin.Function0<kotlin.Any>
         correspondingProperty: PROPERTY FAKE_OVERRIDE name:lambda visibility:public modality:FINAL [val]
         overridden:
-          public final fun <get-lambda> (): kotlin.Function0<kotlin.Any> declared in <root>.Base
+          public final fun <get-lambda> (): kotlin.Function0<kotlin.Any> declared in <root>.Base.lambda
         $this: VALUE_PARAMETER name:<this> type:<root>.Base
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:

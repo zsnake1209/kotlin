@@ -44,6 +44,7 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.types.KotlinType
 
 class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : DeclarationGeneratorExtension(declarationGenerator) {
+
     constructor(context: GeneratorContext) : this(DeclarationGenerator(context))
 
     fun generateDelegatedProperty(

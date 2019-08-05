@@ -208,6 +208,7 @@ open class DeepCopyIrTreeWithSymbols(
             declaration.isExternal
         ).apply {
             transformAnnotations(declaration)
+            copyTypeParametersFrom(declaration)
             this.backingField = declaration.backingField?.transform()
             this.getter = declaration.getter?.transform()
             this.setter = declaration.setter?.transform()

@@ -15,9 +15,9 @@ FILE fqName:<root> fileName:/genericClassInDifferentModule_m1.kt
         correspondingProperty: PROPERTY name:x visibility:public modality:FINAL [val]
         $this: VALUE_PARAMETER name:<this> type:<root>.Base<T of <root>.Base>
         BLOCK_BODY
-          RETURN type=kotlin.Nothing from='public final fun <get-x> (): T of <root>.Base declared in <root>.Base'
+          RETURN type=kotlin.Nothing from='public final fun <get-x> (): T of <root>.Base declared in <root>.Base.x'
             GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:x type:T of <root>.Base visibility:public [final]' type=T of <root>.Base origin=null
-              receiver: GET_VAR '<this>: <root>.Base<T of <root>.Base> declared in <root>.Base.<get-x>' type=<root>.Base<T of <root>.Base> origin=null
+              receiver: GET_VAR '<this>: <root>.Base<T of <root>.Base> declared in <root>.Base.x.<get-x>' type=<root>.Base<T of <root>.Base> origin=null
     FUN name:foo visibility:public modality:ABSTRACT <Y> ($this:<root>.Base<T of <root>.Base>, y:Y of <root>.Base.foo) returnType:T of <root>.Base
       TYPE_PARAMETER name:Y index:0 variance: superTypes:[kotlin.Any?]
       $this: VALUE_PARAMETER name:<this> type:<root>.Base<T of <root>.Base>
@@ -31,16 +31,15 @@ FILE fqName:<root> fileName:/genericClassInDifferentModule_m1.kt
         $this: VALUE_PARAMETER name:<this> type:<root>.Base<T of <root>.Base>
         VALUE_PARAMETER name:<set-?> index:0 type:T of <root>.Base
     PROPERTY name:exn visibility:public modality:ABSTRACT [var]
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-exn> visibility:public modality:ABSTRACT <Z> ($this:<root>.Base<T of <root>.Base>, $receiver:Z of <root>.Base.<get-exn>) returnType:T of <root>.Base
+      TYPE_PARAMETER name:Z index:0 variance: superTypes:[kotlin.Any?]
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-exn> visibility:public modality:ABSTRACT <> ($this:<root>.Base<T of <root>.Base>, $receiver:Z of <root>.Base.exn) returnType:T of <root>.Base
         correspondingProperty: PROPERTY name:exn visibility:public modality:ABSTRACT [var]
-        TYPE_PARAMETER name:Z index:0 variance: superTypes:[kotlin.Any?]
         $this: VALUE_PARAMETER name:<this> type:<root>.Base<T of <root>.Base>
-        $receiver: VALUE_PARAMETER name:<this> type:Z of <root>.Base.<get-exn>
-      FUN DEFAULT_PROPERTY_ACCESSOR name:<set-exn> visibility:public modality:ABSTRACT <Z> ($this:<root>.Base<T of <root>.Base>, $receiver:Z of <root>.Base.<set-exn>, <set-?>:T of <root>.Base) returnType:kotlin.Unit
+        $receiver: VALUE_PARAMETER name:<this> type:Z of <root>.Base.exn
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<set-exn> visibility:public modality:ABSTRACT <> ($this:<root>.Base<T of <root>.Base>, $receiver:Z of <root>.Base.exn, <set-?>:T of <root>.Base) returnType:kotlin.Unit
         correspondingProperty: PROPERTY name:exn visibility:public modality:ABSTRACT [var]
-        TYPE_PARAMETER name:Z index:0 variance: superTypes:[kotlin.Any?]
         $this: VALUE_PARAMETER name:<this> type:<root>.Base<T of <root>.Base>
-        $receiver: VALUE_PARAMETER name:<this> type:Z of <root>.Base.<set-exn>
+        $receiver: VALUE_PARAMETER name:<this> type:Z of <root>.Base.exn
         VALUE_PARAMETER name:<set-?> index:0 type:T of <root>.Base
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
       overridden:
