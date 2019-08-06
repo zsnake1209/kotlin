@@ -56,6 +56,11 @@ public class ForeignJava8AnnotationsNoAnnotationInClasspathWithFastClassReadingT
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/foreignAnnotationsJava8/tests/codeanalysis"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
         }
 
+        @TestMetadata("defaults.kt")
+        public void testDefaults() throws Exception {
+            runTest("compiler/testData/foreignAnnotationsJava8/tests/codeanalysis/defaults.kt");
+        }
+
         @TestMetadata("simple.kt")
         public void testSimple() throws Exception {
             runTest("compiler/testData/foreignAnnotationsJava8/tests/codeanalysis/simple.kt");
