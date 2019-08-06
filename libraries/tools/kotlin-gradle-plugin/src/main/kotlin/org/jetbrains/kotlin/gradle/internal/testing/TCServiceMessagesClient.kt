@@ -79,7 +79,14 @@ internal open class TCServiceMessagesClient(
     protected open fun getSuiteName(message: BaseTestSuiteMessage) = message.suiteName
 
     override fun regularText(text: String) {
-        val actualText = if (afterMessage && settings.ignoreLineEndingAfterMessage) text.removePrefix("\n") else text
+        val actualText = if (afterMessage && settings.ignoreLineEndingAfterMessage) run {
+            when {
+                text.startsWith("\r\n") -> text.removePrefix("\r\n")
+                text.startsWith("\n") -> text.removePrefix("\n")
+                else -> text
+            }
+        } else text
+
         if (actualText.isNotEmpty()) {
             log.kotlinDebug { "TCSM stdout captured: $actualText" }
 
