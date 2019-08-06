@@ -10,7 +10,6 @@ import org.gradle.api.Task
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.jetbrains.kotlin.gradle.plugin.TaskHolder
 import org.jetbrains.kotlin.gradle.tasks.createOrRegisterTask
 import org.jetbrains.kotlin.gradle.tasks.locateTask
 
@@ -19,21 +18,19 @@ import org.jetbrains.kotlin.gradle.tasks.locateTask
  * See [KotlinTestReport] for more details about aggregated test tasks.
  */
 class KotlinTestsRegistry(val project: Project, val allTestsTaskName: String = "allTests") {
-    val allTestsTask: TaskHolder<KotlinTestReport>
+    val allTestsTask: TaskProvider<KotlinTestReport>
         get() = doGetOrCreateAggregatedTestTask(
             name = allTestsTaskName,
             description = "Runs the tests for all targets and create aggregated report"
         ) {
             project.tasks.maybeCreate(LifecycleBasePlugin.CHECK_TASK_NAME)
-                .dependsOn(it.getTaskOrProvider())
+                .dependsOn(it)
         }
 
     fun registerTestTask(
         taskHolder: TaskHolder<AbstractTestTask>,
         aggregate: KotlinTestReport = allTestsTask.doGetTask()
     ) {
-        val project = taskHolder.project
-
         project.tasks.getByName(LifecycleBasePlugin.CHECK_TASK_NAME).dependsOn(taskHolder.name)
         project.cleanAllTestTask.dependsOn(cleanTaskName(taskHolder.name))
         aggregate.dependsOn(taskHolder.name)
@@ -47,25 +44,25 @@ class KotlinTestsRegistry(val project: Project, val allTestsTaskName: String = "
     fun getOrCreateAggregatedTestTask(
         name: String,
         description: String,
-        parent: TaskHolder<KotlinTestReport>? = allTestsTask
-    ): TaskHolder<KotlinTestReport> {
+        parent: TaskProvider<KotlinTestReport>? = allTestsTask
+    ): TaskProvider<KotlinTestReport> {
         if (name == parent?.name) return parent
 
-        return doGetOrCreateAggregatedTestTask(name, description, parent?.doGetTask())
+        return doGetOrCreateAggregatedTestTask(name, description, parent)
     }
 
     private fun doGetOrCreateAggregatedTestTask(
         name: String,
         description: String,
-        parent: KotlinTestReport? = null,
-        configure: (TaskHolder<KotlinTestReport>) -> Unit = {}
-    ): TaskHolder<KotlinTestReport> {
+        parent: TaskProvider<KotlinTestReport>? = null,
+        configure: (TaskProvider<KotlinTestReport>) -> Unit = {}
+    ): TaskProvider<KotlinTestReport> {
         val existed = project.locateTask<KotlinTestReport>(name)
         if (existed != null) return existed
 
         val reportName = name
 
-        val aggregate: TaskHolder<KotlinTestReport> = project.createOrRegisterTask(name) { aggregate ->
+        val aggregate: TaskProvider<KotlinTestReport> = project.createOrRegisterTask(name) { aggregate ->
             aggregate.description = description
             aggregate.group = JavaBasePlugin.VERIFICATION_GROUP
 
@@ -78,11 +75,12 @@ class KotlinTestsRegistry(val project: Project, val allTestsTaskName: String = "
             project.gradle.taskGraph.whenReady { graph ->
                 aggregate.maybeOverrideReporting(graph)
             }
-
-            parent?.addChild(aggregate)
         }
 
-        parent?.dependsOn(aggregate.getTaskOrProvider())
+        parent?.configure {
+            it.addChild(aggregate)
+            it.dependsOn(aggregate)
+        }
 
         configure(aggregate)
 

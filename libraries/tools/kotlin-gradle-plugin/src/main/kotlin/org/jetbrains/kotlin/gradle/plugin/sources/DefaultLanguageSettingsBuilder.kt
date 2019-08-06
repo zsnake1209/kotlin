@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.gradle.plugin.sources
 
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.AbstractCompile
 import org.jetbrains.kotlin.config.ApiVersion
 import org.jetbrains.kotlin.config.LanguageFeature
@@ -88,21 +89,23 @@ internal class DefaultLanguageSettingsBuilder : LanguageSettingsBuilder {
 
 internal fun applyLanguageSettingsToKotlinTask(
     languageSettingsBuilder: LanguageSettingsBuilder,
-    kotlinTask: org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>
-) = with(kotlinTask.kotlinOptions) {
-    languageVersion = languageVersion ?: languageSettingsBuilder.languageVersion
-    apiVersion = apiVersion ?: languageSettingsBuilder.apiVersion
+    kotlinTaskProvider: TaskProvider<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>
+) = kotlinTaskProvider.configure {
+    with(it.kotlinOptions) {
+        languageVersion = languageVersion ?: languageSettingsBuilder.languageVersion
+        apiVersion = apiVersion ?: languageSettingsBuilder.apiVersion
 
-    if (languageSettingsBuilder.progressiveMode) {
-        freeCompilerArgs += "-progressive"
-    }
+        if (languageSettingsBuilder.progressiveMode) {
+            freeCompilerArgs += "-progressive"
+        }
 
-    languageSettingsBuilder.enabledLanguageFeatures.forEach { featureName ->
-        freeCompilerArgs += "-XXLanguage:+$featureName"
-    }
+        languageSettingsBuilder.enabledLanguageFeatures.forEach { featureName ->
+            freeCompilerArgs += "-XXLanguage:+$featureName"
+        }
 
-    languageSettingsBuilder.experimentalAnnotationsInUse.forEach { annotationName ->
-        freeCompilerArgs += "-Xuse-experimental=$annotationName"
+        languageSettingsBuilder.experimentalAnnotationsInUse.forEach { annotationName ->
+            freeCompilerArgs += "-Xuse-experimental=$annotationName"
+        }
     }
 }
 

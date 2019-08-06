@@ -51,7 +51,7 @@ class KotlinMetadataTargetPreset(
 
             project.afterEvaluate {
                 // Since there's no default source set, apply language settings from commonMain:
-                val compileKotlinMetadata = project.tasks.getByName(mainCompilation.compileKotlinTaskName) as KotlinCompile<*>
+                val compileKotlinMetadata = project.tasks.withType(KotlinCompile::class.java).named(mainCompilation.compileKotlinTaskName)
                 applyLanguageSettingsToKotlinTask(commonMainSourceSet.languageSettings, compileKotlinMetadata)
             }
         }

@@ -161,10 +161,6 @@ class KotlinMultiplatformPlugin(
             SingleWarningPerBuild.show(project, GRADLE_NO_METADATA_WARNING)
         }
 
-        if (!isGradleVersionAtLeast(4, 8) && project.multiplatformExtension.isGradleMetadataAvailable) {
-            SingleWarningPerBuild.show(project, GRADLE_OLD_METADATA_WARNING)
-        }
-
         val targets = project.multiplatformExtension.targets
         val kotlinSoftwareComponent = project.multiplatformExtension.rootSoftwareComponent
 

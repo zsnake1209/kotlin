@@ -16,7 +16,7 @@ open class Kapt3Android32IT : Kapt3AndroidIT() {
         get() = AGPVersion.v3_2_0
 
     override val defaultGradleVersion: GradleVersionRequired
-        get() = GradleVersionRequired.AtLeast("4.6")
+        get() = GradleVersionRequired.None
 }
 
 open class Kapt3Android33IT : Kapt3AndroidIT() {

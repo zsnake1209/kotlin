@@ -109,9 +109,10 @@ abstract class KotlinJsSubTarget(
         }
 
         @Suppress("UNCHECKED_CAST")
-        testRun.testTask = testJs.getTaskOrProvider() as TaskProvider<KotlinJsTest>
+        testRun.testTask = testJs
 
         target.project.kotlinTestRegistry.registerTestTask(
+            project,
             testJs,
             target.testRuns.maybeCreate(testRun.name).testTask.get() // FIXME eager task instantiation
         )
