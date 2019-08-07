@@ -1,15 +1,18 @@
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.npm.NpmTask
+import de.undercouch.gradle.tasks.download.Download
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
     kotlin("jvm")
     id("jps-compatible")
     id("com.moowork.node").version("1.2.0")
+    id("de.undercouch.download")
 }
 
 node {
     download = true
+    version = "10.16.2"
 }
 
 val antLauncherJar by configurations.creating
@@ -27,6 +30,7 @@ dependencies {
     testCompileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     testCompileOnly(intellijDep()) { includeJars("openapi", "idea", "idea_rt", "util") }
     testCompile(project(":compiler:backend.js"))
+    testCompile(project(":compiler:backend.wasm"))
     testCompile(projectTests(":compiler:ir.serialization.js"))
     testCompile(project(":js:js.translator"))
     testCompile(project(":js:js.serializer"))
@@ -65,7 +69,7 @@ sourceSets {
 }
 
 
-fun Test.setUpBoxTests(jsEnabled: Boolean, jsIrEnabled: Boolean) {
+fun Test.setUpBoxTests(jsEnabled: Boolean, jsIrEnabled: Boolean, wasmEnabled: Boolean = false) {
     dependsOn(":dist")
     if (jsEnabled) dependsOn(testJsRuntime)
     if (jsIrEnabled) {
@@ -73,9 +77,21 @@ fun Test.setUpBoxTests(jsEnabled: Boolean, jsIrEnabled: Boolean) {
         dependsOn(":compiler:ir.serialization.js:generateReducedRuntimeKLib")
         dependsOn(":compiler:ir.serialization.js:generateKotlinTestKLib")
     }
+    if (wasmEnabled) {
+        dependsOn(":compiler:ir.serialization.js:generateWasmRuntimeKLib")
+    }
 
-    if (jsEnabled && !jsIrEnabled) exclude("org/jetbrains/kotlin/js/test/ir/semantics/*")
-    if (!jsEnabled && jsIrEnabled) include("org/jetbrains/kotlin/js/test/ir/semantics/*")
+    if (jsEnabled && !jsIrEnabled) {
+        exclude("org/jetbrains/kotlin/js/test/ir/semantics/*")
+        exclude("org/jetbrains/kotlin/js/test/wasm/semantics/*")
+
+    }
+    if (!jsEnabled && jsIrEnabled) {
+        include("org/jetbrains/kotlin/js/test/ir/semantics/*")
+    }
+    if (wasmEnabled) {
+        include("org/jetbrains/kotlin/js/test/wasm/semantics/*")
+    }
 
     jvmArgs("-da:jdk.nashorn.internal.runtime.RecompilableScriptFunctionData") // Disable assertion which fails due to a bug in nashorn (KT-23637)
     workingDir = rootDir
@@ -135,4 +151,56 @@ val runMocha by task<NpmTask> {
 
     val check by tasks
     check.dependsOn(this)
+}
+
+enum class OsName { WINDOWS, MAC, LINUX, UNKNOWN }
+enum class OsArch { X86_32, X86_64, UNKNOWN }
+data class OsType(val name: OsName, val arch: OsArch)
+val currentOsType = run {
+    val gradleOs = OperatingSystem.current()
+    val osName = when {
+        gradleOs.isMacOsX -> OsName.MAC
+        gradleOs.isWindows -> OsName.WINDOWS
+        gradleOs.isLinux -> OsName.LINUX
+        else -> OsName.UNKNOWN
+    }
+
+    val osArch = when (System.getProperty("sun.arch.data.model")) {
+        "32" -> OsArch.X86_32
+        "64" -> OsArch.X86_64
+        else -> OsArch.UNKNOWN
+    }
+
+    OsType(osName, osArch)
+}
+
+val jsShellDirectory = "https://archive.mozilla.org/pub/firefox/nightly/2019/08/2019-08-11-09-56-40-mozilla-central"
+val jsShellSuffix = when (currentOsType) {
+    OsType(OsName.LINUX, OsArch.X86_32) -> "linux-i686"
+    OsType(OsName.LINUX, OsArch.X86_64) -> "linux-x86_64"
+    OsType(OsName.MAC, OsArch.X86_64) -> "mac"
+    OsType(OsName.WINDOWS, OsArch.X86_32) -> "win32"
+    OsType(OsName.WINDOWS, OsArch.X86_64) -> "win64"
+    else -> error("unsupported os type $currentOsType")
+}
+val jsShellLocation = "$jsShellDirectory/jsshell-$jsShellSuffix.zip"
+
+val downloadedTools = File(buildDir, "tools")
+
+val downloadJsShell by task<Download> {
+    src(jsShellLocation)
+    dest(File(downloadedTools, "jsshell-$jsShellSuffix.zip"))
+}
+
+val unzipJsShell by task<Copy> {
+    dependsOn(downloadJsShell)
+    from(zipTree(downloadJsShell.dest))
+    val unpackedDir = File(downloadedTools, "jsshell-$jsShellSuffix")
+    into(unpackedDir)
+}
+
+projectTest("wasmTest", true) {
+    dependsOn(unzipJsShell)
+    setUpBoxTests(jsEnabled = false, jsIrEnabled = false, wasmEnabled = true)
+    systemProperty("javascript.engine.path.SpiderMonkey", File(unzipJsShell.destinationDir, "js").absolutePath)
 }

@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.js.test.semantics
 
 import org.jetbrains.kotlin.js.test.BasicBoxTest
-import org.jetbrains.kotlin.js.test.BasicIrBoxTest
 
 abstract class BorrowedInlineTest(relativePath: String) : BasicBoxTest(
         "compiler/testData/codegen/boxInline/$relativePath",

@@ -23,7 +23,7 @@ fun ScriptEngine.runTestFunction(
     testPackageName: String?,
     testFunctionName: String,
     withModuleSystem: Boolean
-): String? {
+): Any? {
     var script = when {
         withModuleSystem -> BasicBoxTest.KOTLIN_TEST_INTERNAL + ".require('" + testModuleName!! + "')"
         testModuleName === null -> "this"
@@ -35,7 +35,7 @@ fun ScriptEngine.runTestFunction(
     }
 
     val testPackage = eval<Any>(script)
-    return callMethod<String?>(testPackage, testFunctionName).also {
+    return callMethod<Any>(testPackage, testFunctionName).also {
         releaseObject(testPackage)
     }
 }
@@ -46,7 +46,7 @@ abstract class AbstractJsTestChecker {
         testModuleName: String?,
         testPackageName: String?,
         testFunctionName: String,
-        expectedResult: String,
+        expectedResult: Any,
         withModuleSystem: Boolean
     ) {
         val actualResult = run(files, testModuleName, testPackageName, testFunctionName, withModuleSystem)

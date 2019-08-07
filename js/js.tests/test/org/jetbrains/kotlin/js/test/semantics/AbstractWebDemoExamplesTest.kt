@@ -9,7 +9,7 @@ import com.eclipsesource.v8.V8ScriptException
 import com.google.common.collect.Lists
 import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.kotlin.js.facade.MainCallParameters
-import org.jetbrains.kotlin.js.test.*
+import org.jetbrains.kotlin.js.test.BasicBoxTest
 import java.io.File
 import javax.script.ScriptException
 
@@ -23,10 +23,10 @@ abstract class AbstractWebDemoExamplesTest(relativePath: String) : BasicBoxTest(
         testModuleName: String?,
         testPackage: String?,
         testFunction: String,
-        expectedResult: String,
+        expectedResult: Any,
         withModuleSystem: Boolean
     ) {
-        testChecker.checkStdout(jsFiles, expectedResult)
+        testChecker.checkStdout(jsFiles, expectedResult as String)
     }
 
     @Throws(ScriptException::class, V8ScriptException::class)

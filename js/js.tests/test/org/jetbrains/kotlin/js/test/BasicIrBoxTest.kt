@@ -7,10 +7,10 @@ package org.jetbrains.kotlin.js.test
 
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.toPhaseMap
-import org.jetbrains.kotlin.ir.backend.js.loadKlib
 import org.jetbrains.kotlin.ir.backend.js.compile
 import org.jetbrains.kotlin.ir.backend.js.generateKLib
 import org.jetbrains.kotlin.ir.backend.js.jsPhases
+import org.jetbrains.kotlin.ir.backend.js.loadKlib
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.js.facade.MainCallParameters
@@ -28,7 +28,8 @@ abstract class BasicIrBoxTest(
     testGroupOutputDirPrefix: String,
     pathToRootOutputDir: String = BasicBoxTest.TEST_DATA_DIR_PATH,
     generateSourceMap: Boolean = false,
-    generateNodeJsRunner: Boolean = false
+    generateNodeJsRunner: Boolean = false,
+    defaultExpectedResult: Any = "OK"
 ) : BasicBoxTest(
     pathToTestDir,
     testGroupOutputDirPrefix,
@@ -36,7 +37,8 @@ abstract class BasicIrBoxTest(
     typedArraysEnabled = true,
     generateSourceMap = generateSourceMap,
     generateNodeJsRunner = generateNodeJsRunner,
-    targetBackend = TargetBackend.JS_IR
+    targetBackend = TargetBackend.JS_IR,
+    defaultExpectedResult = defaultExpectedResult
 ) {
 
     override val skipMinification = true
@@ -46,7 +48,7 @@ abstract class BasicIrBoxTest(
 
     private val compilationCache = mutableMapOf<String, String>()
 
-    override fun doTest(filePath: String, expectedResult: String, mainCallParameters: MainCallParameters, coroutinesPackage: String) {
+    override fun doTest(filePath: String, expectedResult: Any, mainCallParameters: MainCallParameters, coroutinesPackage: String) {
         compilationCache.clear()
         super.doTest(filePath, expectedResult, mainCallParameters, coroutinesPackage)
     }
@@ -136,7 +138,7 @@ abstract class BasicIrBoxTest(
         testModuleName: String?,
         testPackage: String?,
         testFunction: String,
-        expectedResult: String,
+        expectedResult: Any,
         withModuleSystem: Boolean
     ) {
         // TODO: should we do anything special for module systems?

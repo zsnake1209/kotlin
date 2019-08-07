@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.cli.common.output.writeAllTo
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.*
-import org.jetbrains.kotlin.daemon.common.PackageMetadata
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.incremental.js.IncrementalDataProviderImpl
 import org.jetbrains.kotlin.incremental.js.IncrementalResultsConsumerImpl
@@ -49,7 +48,6 @@ import org.jetbrains.kotlin.js.test.interop.ScriptEngineV8Lazy
 import org.jetbrains.kotlin.js.test.utils.*
 import org.jetbrains.kotlin.js.util.TextOutputImpl
 import org.jetbrains.kotlin.metadata.DebugProtoBuf
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPsiFactory
@@ -66,7 +64,10 @@ import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.JsMetadataVersion
 import org.jetbrains.kotlin.utils.KotlinJavascriptMetadata
 import org.jetbrains.kotlin.utils.KotlinJavascriptMetadataUtils
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.Closeable
+import java.io.File
+import java.io.PrintStream
 import java.lang.Boolean.getBoolean
 import java.nio.charset.Charset
 import java.util.regex.Pattern
@@ -78,7 +79,8 @@ abstract class BasicBoxTest(
         private val typedArraysEnabled: Boolean = true,
         private val generateSourceMap: Boolean = false,
         private val generateNodeJsRunner: Boolean = true,
-        private val targetBackend: TargetBackend = TargetBackend.JS
+        private val targetBackend: TargetBackend = TargetBackend.JS,
+        private val defaultExpectedResult: Any = "OK"
 ) : KotlinTestWithEnvironment() {
     val additionalCommonFileDirectories = mutableListOf<String>()
 
@@ -96,14 +98,14 @@ abstract class BasicBoxTest(
     protected open val testChecker get() = if (runTestInNashorn) NashornJsTestChecker else V8JsTestChecker
 
     fun doTest(filePath: String) {
-        doTest(filePath, "OK", MainCallParameters.noCall())
+        doTest(filePath, defaultExpectedResult, MainCallParameters.noCall())
     }
 
     fun doTestWithCoroutinesPackageReplacement(filePath: String, coroutinesPackage: String) {
-        doTest(filePath, "OK", MainCallParameters.noCall(), coroutinesPackage)
+        doTest(filePath, defaultExpectedResult, MainCallParameters.noCall(), coroutinesPackage)
     }
 
-    open fun doTest(filePath: String, expectedResult: String, mainCallParameters: MainCallParameters, coroutinesPackage: String = "") {
+    open fun doTest(filePath: String, expectedResult: Any, mainCallParameters: MainCallParameters, coroutinesPackage: String = "") {
         val file = File(filePath)
         val outputDir = getOutputDir(file)
         var fileContent = KotlinTestUtils.doLoadFile(file)
@@ -270,7 +272,7 @@ abstract class BasicBoxTest(
         testModuleName: String?,
         testPackage: String?,
         testFunction: String,
-        expectedResult: String,
+        expectedResult: Any,
         withModuleSystem: Boolean
     ) {
         testChecker.check(jsFiles, testModuleName, testPackage, testFunction, expectedResult, withModuleSystem)
@@ -666,7 +668,7 @@ abstract class BasicBoxTest(
 
     private fun minifyAndRun(
             workDir: File, allJsFiles: List<String>, generatedJsFiles: List<Pair<String, TestModule>>,
-            expectedResult: String, testModuleName: String?, testPackage: String?, testFunction: String, withModuleSystem: Boolean,
+            expectedResult: Any, testModuleName: String?, testPackage: String?, testFunction: String, withModuleSystem: Boolean,
             minificationThresholdChecker: (Int) -> Unit
     ) {
         val kotlinJsLib = DIST_DIR_JS_PATH + "kotlin.js"
