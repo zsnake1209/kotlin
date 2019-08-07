@@ -180,8 +180,6 @@ val generateReducedRuntimeKLib by task<NoDebugJavaExec> {
 }
 
 val generateWasmRuntimeKLib by task<NoDebugJavaExec> {
-    dependsOn(reducedRuntimeSources)
-
     buildKLib(sources = listOf("$rootDir/libraries/stdlib/wasm"),
               dependencies = emptyList(),
               outPath = "$buildDir/wasmRuntime/klib",
