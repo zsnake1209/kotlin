@@ -180,7 +180,7 @@ private fun LazyJavaResolverContext.extractDefaultNullabilityQualifier(
     val nullabilityQualifier =
         components
             .signatureEnhancement
-            .extractNullability(typeQualifier)
+            .extractNullability(typeQualifier, onlyForCodeAnalysis = false)
             ?.copy(isForWarningOnly = jsr305State.isWarning)
             ?: return null
 
@@ -203,7 +203,8 @@ private fun LazyJavaResolverContext.child(
     delegateForTypeQualifiers: Lazy<JavaTypeQualifiersByElementType?>
 ) = LazyJavaResolverContext(
     components,
-    typeParameterOwner?.let { LazyJavaTypeParameterResolver(this, containingDeclaration, it, typeParametersIndexOffset) }
+    typeParameterOwner?.let {
+        LazyJavaTypeParameterResolver(this, containingDeclaration, it, typeParametersIndexOffset) }
         ?: typeParameterResolver,
     delegateForTypeQualifiers
 )

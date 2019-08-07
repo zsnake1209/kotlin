@@ -65,6 +65,11 @@ public class ForeignJava8AnnotationsNoAnnotationInClasspathWithFastClassReadingT
         public void testSimple() throws Exception {
             runTest("compiler/testData/foreignAnnotationsJava8/tests/codeanalysis/simple.kt");
         }
+
+        @TestMetadata("typeParameterBounds.kt")
+        public void testTypeParameterBounds() throws Exception {
+            runTest("compiler/testData/foreignAnnotationsJava8/tests/codeanalysis/typeParameterBounds.kt");
+        }
     }
 
     @TestMetadata("compiler/testData/foreignAnnotationsJava8/tests/jsr305")
