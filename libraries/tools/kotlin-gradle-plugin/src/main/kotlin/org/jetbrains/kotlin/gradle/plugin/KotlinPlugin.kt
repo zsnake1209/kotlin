@@ -974,13 +974,9 @@ internal fun configureJavaTask(kotlinTask: KotlinCompile, javaTask: AbstractComp
 
     // Make Gradle check if the javaTask is up-to-date based on the Kotlin classes
     javaTask.inputsCompatible.run {
-        if (isBuildCacheSupported()) {
-            dir(kotlinTask.destinationDir)
-                .withNormalizer(CompileClasspathNormalizer::class.java)
-                .withPropertyName("${kotlinTask.name}OutputClasses")
-        } else {
-            dirCompatible(kotlinTask.destinationDir)
-        }
+        dir(kotlinTask.destinationDir)
+            .withNormalizer(CompileClasspathNormalizer::class.java)
+            .withPropertyName("${kotlinTask.name}OutputClasses")
     }
     // Also, use kapt1 annotations file for up-to-date check since annotation processing is done with javac
     javaTask.dependsOn(kotlinTask)
