@@ -11,16 +11,14 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinJsSubTarget
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import org.jetbrains.kotlin.gradle.testing.KotlinTestTaskTestRun
+import org.jetbrains.kotlin.gradle.testing.requireCompilationOfTarget
 
 open class KotlinJsSubtargetTestRun(testRunName: String, subtarget: KotlinJsSubTarget) :
     KotlinTestTaskTestRun<KotlinJsTest>(testRunName, subtarget.target),
     KotlinCompilationTestRun<KotlinJsCompilation> {
 
     override fun setTestSourceFromCompilation(compilation: KotlinJsCompilation) {
-        require(compilation.target === target) {
-            "Expected a compilation of target ${target.name}, " +
-                    "got the compilation ${compilation.name} of target ${compilation.target.name}"
-        }
+        requireCompilationOfTarget(compilation, target)
 
         testTask.configure {
             it.compilation = compilation

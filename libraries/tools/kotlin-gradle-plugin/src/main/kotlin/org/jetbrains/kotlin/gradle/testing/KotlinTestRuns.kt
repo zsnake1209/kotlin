@@ -9,10 +9,7 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.TestFilter
-import org.jetbrains.kotlin.gradle.plugin.AbstractKotlinTargetConfigurator
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
-import org.jetbrains.kotlin.gradle.plugin.KotlinTargetTestRun
-import org.jetbrains.kotlin.gradle.plugin.KotlinTestRun
+import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
 
 interface KotlinTestRunWithTask<T : Task> : KotlinTestRun {
@@ -41,3 +38,10 @@ internal val KotlinTargetTestRun.testTaskName: String
         name.takeIf { it != KotlinTestRun.DEFAULT_TEST_RUN_NAME },
         AbstractKotlinTargetConfigurator.testTaskNameSuffix
     )
+
+internal fun requireCompilationOfTarget(compilation: KotlinCompilation<*>, target: KotlinTarget) {
+    require(compilation.target === target) {
+        "Expected a compilation of target ${target.name}, " +
+                "got the compilation ${compilation.name} of target ${compilation.target.name}"
+    }
+}

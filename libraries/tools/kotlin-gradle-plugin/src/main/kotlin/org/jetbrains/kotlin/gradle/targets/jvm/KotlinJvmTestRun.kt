@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmCompilation
 import org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmTest
 import org.jetbrains.kotlin.gradle.testing.KotlinTestTaskTestRun
+import org.jetbrains.kotlin.gradle.testing.requireCompilationOfTarget
 import java.util.concurrent.Callable
 
 open class KotlinJvmTestRun(testRunName: String, target: KotlinTarget) :
@@ -60,12 +61,5 @@ open class KotlinJvmTestRun(testRunName: String, target: KotlinTarget) :
             project.files(Callable { compilation.runtimeDependencyFiles }),
             compilation.output.allOutputs
         )
-    }
-
-    private fun requireCompilationOfTarget(compilation: KotlinJvmCompilation, target: KotlinTarget) {
-        require(compilation.target === target) {
-            "Expected a compilation of target ${target.name}, " +
-                    "got the compilation ${compilation.name} of target ${compilation.target.name}"
-        }
     }
 }

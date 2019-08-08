@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.gradle.targets.js.subtargets
 
 import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.AbstractKotlinTargetConfigurator
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
@@ -62,13 +61,13 @@ abstract class KotlinJsSubTarget(
 
     protected open fun configureTestRunDefaults(testRun: KotlinJsSubtargetTestRun) {
         target.compilations.matching { it.name == KotlinCompilation.TEST_COMPILATION_NAME }.all { compilation ->
-            configureTests(testRun, compilation)
+            configureTestsRun(testRun, compilation)
         }
     }
 
     abstract val testTaskDescription: String
 
-    private fun configureTests(testRun: KotlinJsSubtargetTestRun, compilation: KotlinJsCompilation) {
+    private fun configureTestsRun(testRun: KotlinJsSubtargetTestRun, compilation: KotlinJsCompilation) {
         fun KotlinJsSubtargetTestRun.subtargetTestTaskName(): String = disambiguateCamelCased(
             lowerCamelCaseName(
                 name.takeIf { it != KotlinTestRun.DEFAULT_TEST_RUN_NAME },
@@ -96,7 +95,6 @@ abstract class KotlinJsSubTarget(
             testJs.configureConventions()
         }
 
-        @Suppress("UNCHECKED_CAST")
         testRun.testTask = testJs
 
         target.project.kotlinTestRegistry.registerTestTask(
