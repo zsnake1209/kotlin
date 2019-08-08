@@ -28,7 +28,7 @@ class ClockMarkTest {
         val markPast1 = (mark - 1.milliseconds).apply { assertIsInFuture(false) }
         val markPast2 = (markFuture1 + (-2).milliseconds).apply { assertIsInFuture(false) }
 
-        clock.reading = 500_000L
+        clock += 500_000.nanoseconds
 
         val elapsed = mark.elapsed()
         val elapsedFromFuture = elapsed - 1.milliseconds
@@ -44,7 +44,7 @@ class ClockMarkTest {
         markFuture1.assertIsInFuture(true)
         markPast1.assertIsInFuture(false)
 
-        clock.reading = 1500_000L
+        clock += 1.milliseconds
 
         markFuture1.assertIsInFuture(false)
         markPast1.assertIsInFuture(false)

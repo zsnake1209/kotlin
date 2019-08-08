@@ -77,6 +77,20 @@ public class TestClock(
     unit: DurationUnit = DurationUnit.NANOSECONDS
 ) : AbstractLongClock(unit) {
     override fun read(): Long = reading
+
+    /**
+     * Advances the [reading] value of this clock by the specified [duration].
+     *
+     * [duration] value is converted to a [Long] number of time units in which readings of this clock are expressed and
+     * added to the current [reading] value.
+     *
+     * In case if the unit of this clock is not granular enough, the converted duration value may rounded down towards zero. For example,
+     * if the unit is [DurationUnit.SECONDS] and the duration being added is `5.milliseconds`, the clock reading won't advance because
+     * the duration value will be rounded to zero seconds.
+     */
+    public operator fun plusAssign(duration: Duration) {
+        reading += duration.toLong(unit)
+    }
 }
 
 /*

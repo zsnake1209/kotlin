@@ -51,7 +51,7 @@ class MeasureTimeTest {
         val clock = TestClock(unit = DurationUnit.NANOSECONDS)
         val expectedNs = Random.nextLong(1_000_000_000L)
         val elapsed = clock.measureTime {
-            clock.reading += expectedNs
+            clock += expectedNs.nanoseconds
         }
 
         assertEquals(expectedNs.nanoseconds, elapsed)
