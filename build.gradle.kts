@@ -396,6 +396,18 @@ allprojects {
             configurations.findByName("kotlinCompilerClasspath")?.let {
                 dependencies.add(it.name, files(bootstrapCompilerClasspath))
             }
+
+            configurations.findByName("kotlinCompilerPluginClasspath")?.let {
+                it.resolutionStrategy {
+                    componentSelection {
+                        all {
+                            if (candidate.group == "org.jetbrains.kotlin" && candidate.version == kotlinVersion) {
+                                reject("Shouldn't substitute bootstrap version with project module")
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // Aggregate task for build related checks
