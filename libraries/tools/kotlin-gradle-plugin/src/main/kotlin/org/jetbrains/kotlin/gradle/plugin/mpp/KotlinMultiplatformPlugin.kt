@@ -174,7 +174,7 @@ class KotlinMultiplatformPlugin(
             }
 
             // Publish the root publication only if Gradle metadata publishing is enabled:
-            project.tasks.withType(AbstractPublishToMaven::class.java).all { publishTask ->
+            project.tasks.withType(AbstractPublishToMaven::class.java).configureEach { publishTask ->
                 publishTask.onlyIf { publishTask.publication != rootPublication || project.multiplatformExtension.isGradleMetadataAvailable }
             }
 
