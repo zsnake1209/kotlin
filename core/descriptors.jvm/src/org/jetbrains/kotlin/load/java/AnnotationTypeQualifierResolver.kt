@@ -19,7 +19,7 @@ package org.jetbrains.kotlin.load.java
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
-import org.jetbrains.kotlin.load.java.lazy.NullabilityQualifierWithApplicability
+import org.jetbrains.kotlin.load.java.lazy.JavaDefaultQualifiers
 import org.jetbrains.kotlin.load.java.typeEnhancement.NullabilityQualifier
 import org.jetbrains.kotlin.load.java.typeEnhancement.NullabilityQualifierWithMigrationStatus
 import org.jetbrains.kotlin.name.FqName
@@ -49,25 +49,25 @@ val DEFAULT_CODE_ANALYSIS_APPLICABILITY = listOf(
 
 val BUILT_IN_TYPE_QUALIFIER_DEFAULT_ANNOTATIONS = mapOf(
     FqName("javax.annotation.ParametersAreNullableByDefault") to
-            NullabilityQualifierWithApplicability(
+            JavaDefaultQualifiers(
                 NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NULLABLE),
                 listOf(AnnotationTypeQualifierResolver.QualifierApplicabilityType.VALUE_PARAMETER)
             ),
     FqName("javax.annotation.ParametersAreNonnullByDefault") to
-            NullabilityQualifierWithApplicability(
+            JavaDefaultQualifiers(
                 NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NOT_NULL),
                 listOf(AnnotationTypeQualifierResolver.QualifierApplicabilityType.VALUE_PARAMETER)
             ),
 
-    CODE_ANALYSIS_DEFAULT_NULLABLE to NullabilityQualifierWithApplicability(
+    CODE_ANALYSIS_DEFAULT_NULLABLE to JavaDefaultQualifiers(
         NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NULLABLE),
         DEFAULT_CODE_ANALYSIS_APPLICABILITY
     ),
-    CODE_ANALYSIS_DEFAULT_NOT_NULL to NullabilityQualifierWithApplicability(
+    CODE_ANALYSIS_DEFAULT_NOT_NULL to JavaDefaultQualifiers(
         NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NOT_NULL),
         DEFAULT_CODE_ANALYSIS_APPLICABILITY
     ),
-    CODE_ANALYSIS_DEFAULT_NULLNESS_UNKNOWN to NullabilityQualifierWithApplicability(
+    CODE_ANALYSIS_DEFAULT_NULLNESS_UNKNOWN to JavaDefaultQualifiers(
         NullabilityQualifierWithMigrationStatus(NullabilityQualifier.FORCE_FLEXIBILITY),
         DEFAULT_CODE_ANALYSIS_APPLICABILITY
     )
@@ -125,14 +125,16 @@ class AnnotationTypeQualifierResolver(storageManager: StorageManager, private va
         return resolveTypeQualifierNickname(annotationClass)
     }
 
-    fun resolveQualifierBuiltInDefaultAnnotation(annotationDescriptor: AnnotationDescriptor): NullabilityQualifierWithApplicability? {
+    fun resolveQualifierBuiltInDefaultAnnotation(annotationDescriptor: AnnotationDescriptor): JavaDefaultQualifiers? {
         if (jsr305State.disabled) {
             return null
         }
 
-        return BUILT_IN_TYPE_QUALIFIER_DEFAULT_ANNOTATIONS[annotationDescriptor.fqName]?.let { (qualifier, applicability) ->
+        return BUILT_IN_TYPE_QUALIFIER_DEFAULT_ANNOTATIONS[annotationDescriptor.fqName]?.let { qualifierForDefaultingAnnotation ->
             val state = resolveJsr305AnnotationState(annotationDescriptor).takeIf { it != ReportLevel.IGNORE } ?: return null
-            return NullabilityQualifierWithApplicability(qualifier.copy(isForWarningOnly = state.isWarning), applicability)
+            return qualifierForDefaultingAnnotation.copy(
+                nullabilityQualifier = qualifierForDefaultingAnnotation.nullabilityQualifier.copy(isForWarningOnly = state.isWarning)
+            )
         }
     }
 
