@@ -54,15 +54,21 @@ class ScriptsCompilationConfigurationUpdater(
     private val scriptsQueue = Alarm(Alarm.ThreadToUse.SWING_THREAD, project)
     private val scriptChangesListenerDelay = 1400
 
+    private val syncLoader = SyncScriptDependenciesLoader(project)
+    private val asyncLoader = AsyncScriptDependenciesLoader(project)
     private val loaders = arrayListOf(
         FromFileAttributeScriptDependenciesLoader(project),
         OutsiderFileDependenciesLoader(project),
-        AsyncScriptDependenciesLoader(project),
-        SyncScriptDependenciesLoader(project)
+        asyncLoader,
+        syncLoader
     )
 
     init {
         listenForChangesInScripts()
+    }
+
+    fun accept(file: VirtualFile, configuration: ScriptCompilationConfigurationResult) {
+        asyncLoader.accept(file, configuration)
     }
 
     fun getCurrentCompilationConfiguration(file: VirtualFile): ScriptCompilationConfigurationResult? {

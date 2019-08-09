@@ -42,8 +42,7 @@ abstract class ScriptDependenciesLoader(protected val project: Project) {
         val oldResult = cache[file]
 
         if (oldResult == null) {
-            save(result, file)
-            attachReportsIfChanged(result, file)
+            accept(file, result)
             return
         }
 
@@ -64,8 +63,7 @@ abstract class ScriptDependenciesLoader(protected val project: Project) {
                 debug(file) {
                     "dependencies changed, new dependencies are applied automatically: old = $oldResult, new = $result"
                 }
-                save(result, file)
-                attachReportsIfChanged(result, file)
+                accept(file, result)
             }
         } else {
             attachReportsIfChanged(result, file)
@@ -74,6 +72,14 @@ abstract class ScriptDependenciesLoader(protected val project: Project) {
                 file.removeScriptDependenciesNotificationPanel(project)
             }
         }
+    }
+
+    internal fun accept(
+        file: VirtualFile,
+        result: ScriptCompilationConfigurationResult
+    ) {
+        save(result, file)
+        attachReportsIfChanged(result, file)
     }
 
     private fun attachReportsIfChanged(result: ResultWithDiagnostics<*>, file: VirtualFile) {
