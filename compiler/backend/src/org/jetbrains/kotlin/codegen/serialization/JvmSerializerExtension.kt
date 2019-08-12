@@ -166,6 +166,12 @@ class JvmSerializerExtension @JvmOverloads constructor(
         }
     }
 
+    override fun serializeTypeAlias(typeAlias: TypeAliasDescriptor, proto: ProtoBuf.TypeAlias.Builder) {
+        uniqIdProvider(typeAlias)?.let {
+            proto.setExtension(JvmProtoBuf.typeAliasUniqId, it)
+        }
+    }
+
     override fun serializeConstructor(
         descriptor: ConstructorDescriptor, proto: ProtoBuf.Constructor.Builder, childSerializer: DescriptorSerializer
     ) {
