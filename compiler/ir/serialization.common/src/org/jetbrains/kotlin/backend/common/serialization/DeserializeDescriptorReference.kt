@@ -97,7 +97,7 @@ abstract class DescriptorReferenceDeserializer(
         isGetter: Boolean = false,
         isSetter: Boolean = false,
         isTypeParameter: Boolean = false
-    ): DeclarationDescriptor {
+    ): DeclarationDescriptor? {
 
         val protoIndex = index
 
@@ -174,7 +174,6 @@ abstract class DescriptorReferenceDeserializer(
                     }
                 }
             }
-        } ?:
-        error("Could not find serialized descriptor for index: ${index} ${packageFqName},${classFqName},${name}")
+        }
     }
 }

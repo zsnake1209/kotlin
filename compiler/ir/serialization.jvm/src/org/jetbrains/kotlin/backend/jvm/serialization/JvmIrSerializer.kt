@@ -8,10 +8,10 @@ package org.jetbrains.kotlin.backend.jvm.serialization
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.ir.ir2string
 import org.jetbrains.kotlin.backend.common.serialization.*
-import org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolTable as ProtoSymbolTable
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeTable as ProtoTypeTable
 import org.jetbrains.kotlin.backend.common.serialization.proto.StringTable as ProtoStringTable
+import org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr
 import org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.StatementsAndExpressionsTable
 import org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression as ProtoStatementOrExpression
 import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil
@@ -40,7 +40,10 @@ class JvmIrSerializer(
         proto.declarationContainer = serializeIrDeclarationContainer(irFile.declarations.filter { it !is IrClass })
         proto.annotations = serializeAnnotations(irFile.annotations)
 
-        val idCollector = UniqIdCollector(irFile.facadeFqName())
+        val facadeFqName = irFile.facadeFqName()
+        proto.facadeFqName = serializeFqName(facadeFqName)
+
+        val idCollector = UniqIdCollector(facadeFqName)
         for (declaration in irFile.declarations) {
             if (declaration !is IrClass) {
                 idCollector.collectUniqIds(declaration)

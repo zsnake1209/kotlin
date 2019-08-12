@@ -135,7 +135,7 @@ abstract class IrFileDeserializer(
 
     abstract fun deserializeIrSymbol(proto: ProtoSymbolIndex): IrSymbol
     abstract fun deserializeIrType(proto: ProtoTypeIndex): IrType
-    abstract fun deserializeDescriptorReference(proto: ProtoDescriptorReference): DeclarationDescriptor
+    abstract fun deserializeDescriptorReference(proto: ProtoDescriptorReference): DeclarationDescriptor?
     abstract fun deserializeString(proto: ProtoStringIndex): String
     abstract fun deserializeExpressionBody(proto: ProtoBodyIndex): IrExpression
     abstract fun deserializeStatementBody(proto: ProtoBodyIndex): IrElement
@@ -966,7 +966,10 @@ abstract class IrFileDeserializer(
             }
         }
 
-    fun deserializeIrClass(proto: ProtoClass) =
+    fun deserializeIrClass(proto: ProtoClass, parent: IrDeclarationParent) =
+        usingParent(parent) { deserializeIrClass(proto) }
+
+    private fun deserializeIrClass(proto: ProtoClass) =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
             val modality = deserializeModality(proto.modality)
 

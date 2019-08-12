@@ -2086,7 +2086,7 @@ public final class JvmIr {
      * <code>required int32 index = 2;</code>
      *
      * <pre>
-     * index into the modules table of ExternalRefs 
+     * index into the table of packages in ExternalRefs 
      * </pre>
      */
     boolean hasIndex();
@@ -2094,7 +2094,7 @@ public final class JvmIr {
      * <code>required int32 index = 2;</code>
      *
      * <pre>
-     * index into the modules table of ExternalRefs 
+     * index into the table of packages in ExternalRefs 
      * </pre>
      */
     int getIndex();
@@ -2214,7 +2214,7 @@ public final class JvmIr {
      * <code>required int32 index = 2;</code>
      *
      * <pre>
-     * index into the modules table of ExternalRefs 
+     * index into the table of packages in ExternalRefs 
      * </pre>
      */
     public boolean hasIndex() {
@@ -2224,7 +2224,7 @@ public final class JvmIr {
      * <code>required int32 index = 2;</code>
      *
      * <pre>
-     * index into the modules table of ExternalRefs 
+     * index into the table of packages in ExternalRefs 
      * </pre>
      */
     public int getIndex() {
@@ -2493,7 +2493,7 @@ public final class JvmIr {
        * <code>required int32 index = 2;</code>
        *
        * <pre>
-       * index into the modules table of ExternalRefs 
+       * index into the table of packages in ExternalRefs 
        * </pre>
        */
       public boolean hasIndex() {
@@ -2503,7 +2503,7 @@ public final class JvmIr {
        * <code>required int32 index = 2;</code>
        *
        * <pre>
-       * index into the modules table of ExternalRefs 
+       * index into the table of packages in ExternalRefs 
        * </pre>
        */
       public int getIndex() {
@@ -2513,7 +2513,7 @@ public final class JvmIr {
        * <code>required int32 index = 2;</code>
        *
        * <pre>
-       * index into the modules table of ExternalRefs 
+       * index into the table of packages in ExternalRefs 
        * </pre>
        */
       public Builder setIndex(int value) {
@@ -2526,7 +2526,7 @@ public final class JvmIr {
        * <code>required int32 index = 2;</code>
        *
        * <pre>
-       * index into the modules table of ExternalRefs 
+       * index into the table of packages in ExternalRefs 
        * </pre>
        */
       public Builder clearIndex() {
@@ -4865,11 +4865,20 @@ public final class JvmIr {
     org.jetbrains.kotlin.backend.common.serialization.proto.Annotations getAnnotations();
 
     /**
-     * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
+     */
+    boolean hasFacadeFqName();
+    /**
+     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
+     */
+    org.jetbrains.kotlin.backend.common.serialization.proto.FqName getFacadeFqName();
+
+    /**
+     * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
      */
     boolean hasAuxTables();
     /**
-     * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+     * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
      */
     org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables getAuxTables();
   }
@@ -4950,8 +4959,21 @@ public final class JvmIr {
               break;
             }
             case 26: {
-              org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.Builder subBuilder = null;
+              org.jetbrains.kotlin.backend.common.serialization.proto.FqName.Builder subBuilder = null;
               if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                subBuilder = facadeFqName_.toBuilder();
+              }
+              facadeFqName_ = input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.FqName.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(facadeFqName_);
+                facadeFqName_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000004;
+              break;
+            }
+            case 34: {
+              org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000008) == 0x00000008)) {
                 subBuilder = auxTables_.toBuilder();
               }
               auxTables_ = input.readMessage(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.PARSER, extensionRegistry);
@@ -4959,7 +4981,7 @@ public final class JvmIr {
                 subBuilder.mergeFrom(auxTables_);
                 auxTables_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000004;
+              bitField0_ |= 0x00000008;
               break;
             }
           }
@@ -5026,16 +5048,31 @@ public final class JvmIr {
       return annotations_;
     }
 
-    public static final int AUX_TABLES_FIELD_NUMBER = 3;
-    private org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables auxTables_;
+    public static final int FACADE_FQ_NAME_FIELD_NUMBER = 3;
+    private org.jetbrains.kotlin.backend.common.serialization.proto.FqName facadeFqName_;
     /**
-     * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
      */
-    public boolean hasAuxTables() {
+    public boolean hasFacadeFqName() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
+     */
+    public org.jetbrains.kotlin.backend.common.serialization.proto.FqName getFacadeFqName() {
+      return facadeFqName_;
+    }
+
+    public static final int AUX_TABLES_FIELD_NUMBER = 4;
+    private org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables auxTables_;
+    /**
+     * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
+     */
+    public boolean hasAuxTables() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
      */
     public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables getAuxTables() {
       return auxTables_;
@@ -5044,6 +5081,7 @@ public final class JvmIr {
     private void initFields() {
       declarationContainer_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationContainer.getDefaultInstance();
       annotations_ = org.jetbrains.kotlin.backend.common.serialization.proto.Annotations.getDefaultInstance();
+      facadeFqName_ = org.jetbrains.kotlin.backend.common.serialization.proto.FqName.getDefaultInstance();
       auxTables_ = org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
@@ -5060,6 +5098,10 @@ public final class JvmIr {
         memoizedIsInitialized = 0;
         return false;
       }
+      if (!hasFacadeFqName()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       if (!hasAuxTables()) {
         memoizedIsInitialized = 0;
         return false;
@@ -5069,6 +5111,10 @@ public final class JvmIr {
         return false;
       }
       if (!getAnnotations().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getFacadeFqName().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -5090,7 +5136,10 @@ public final class JvmIr {
         output.writeMessage(2, annotations_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, auxTables_);
+        output.writeMessage(3, facadeFqName_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeMessage(4, auxTables_);
       }
       output.writeRawBytes(unknownFields);
     }
@@ -5111,7 +5160,11 @@ public final class JvmIr {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeMessageSize(3, auxTables_);
+          .computeMessageSize(3, facadeFqName_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+          .computeMessageSize(4, auxTables_);
       }
       size += unknownFields.size();
       memoizedSerializedSize = size;
@@ -5211,8 +5264,10 @@ public final class JvmIr {
         bitField0_ = (bitField0_ & ~0x00000001);
         annotations_ = org.jetbrains.kotlin.backend.common.serialization.proto.Annotations.getDefaultInstance();
         bitField0_ = (bitField0_ & ~0x00000002);
-        auxTables_ = org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.getDefaultInstance();
+        facadeFqName_ = org.jetbrains.kotlin.backend.common.serialization.proto.FqName.getDefaultInstance();
         bitField0_ = (bitField0_ & ~0x00000004);
+        auxTables_ = org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.getDefaultInstance();
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -5247,6 +5302,10 @@ public final class JvmIr {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
+        result.facadeFqName_ = facadeFqName_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
         result.auxTables_ = auxTables_;
         result.bitField0_ = to_bitField0_;
         return result;
@@ -5259,6 +5318,9 @@ public final class JvmIr {
         }
         if (other.hasAnnotations()) {
           mergeAnnotations(other.getAnnotations());
+        }
+        if (other.hasFacadeFqName()) {
+          mergeFacadeFqName(other.getFacadeFqName());
         }
         if (other.hasAuxTables()) {
           mergeAuxTables(other.getAuxTables());
@@ -5277,6 +5339,10 @@ public final class JvmIr {
           
           return false;
         }
+        if (!hasFacadeFqName()) {
+          
+          return false;
+        }
         if (!hasAuxTables()) {
           
           return false;
@@ -5286,6 +5352,10 @@ public final class JvmIr {
           return false;
         }
         if (!getAnnotations().isInitialized()) {
+          
+          return false;
+        }
+        if (!getFacadeFqName().isInitialized()) {
           
           return false;
         }
@@ -5435,21 +5505,81 @@ public final class JvmIr {
         return this;
       }
 
-      private org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables auxTables_ = org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.getDefaultInstance();
+      private org.jetbrains.kotlin.backend.common.serialization.proto.FqName facadeFqName_ = org.jetbrains.kotlin.backend.common.serialization.proto.FqName.getDefaultInstance();
       /**
-       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+       * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
        */
-      public boolean hasAuxTables() {
+      public boolean hasFacadeFqName() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+       * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
+       */
+      public org.jetbrains.kotlin.backend.common.serialization.proto.FqName getFacadeFqName() {
+        return facadeFqName_;
+      }
+      /**
+       * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
+       */
+      public Builder setFacadeFqName(org.jetbrains.kotlin.backend.common.serialization.proto.FqName value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        facadeFqName_ = value;
+
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
+       */
+      public Builder setFacadeFqName(
+          org.jetbrains.kotlin.backend.common.serialization.proto.FqName.Builder builderForValue) {
+        facadeFqName_ = builderForValue.build();
+
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
+       */
+      public Builder mergeFacadeFqName(org.jetbrains.kotlin.backend.common.serialization.proto.FqName value) {
+        if (((bitField0_ & 0x00000004) == 0x00000004) &&
+            facadeFqName_ != org.jetbrains.kotlin.backend.common.serialization.proto.FqName.getDefaultInstance()) {
+          facadeFqName_ =
+            org.jetbrains.kotlin.backend.common.serialization.proto.FqName.newBuilder(facadeFqName_).mergeFrom(value).buildPartial();
+        } else {
+          facadeFqName_ = value;
+        }
+
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FqName facade_fq_name = 3;</code>
+       */
+      public Builder clearFacadeFqName() {
+        facadeFqName_ = org.jetbrains.kotlin.backend.common.serialization.proto.FqName.getDefaultInstance();
+
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      private org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables auxTables_ = org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.getDefaultInstance();
+      /**
+       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
+       */
+      public boolean hasAuxTables() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
        */
       public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables getAuxTables() {
         return auxTables_;
       }
       /**
-       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
        */
       public Builder setAuxTables(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables value) {
         if (value == null) {
@@ -5457,24 +5587,24 @@ public final class JvmIr {
         }
         auxTables_ = value;
 
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
-       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
        */
       public Builder setAuxTables(
           org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.Builder builderForValue) {
         auxTables_ = builderForValue.build();
 
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
-       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
        */
       public Builder mergeAuxTables(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables value) {
-        if (((bitField0_ & 0x00000004) == 0x00000004) &&
+        if (((bitField0_ & 0x00000008) == 0x00000008) &&
             auxTables_ != org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.getDefaultInstance()) {
           auxTables_ =
             org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.newBuilder(auxTables_).mergeFrom(value).buildPartial();
@@ -5482,16 +5612,16 @@ public final class JvmIr {
           auxTables_ = value;
         }
 
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
-       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 3;</code>
+       * <code>required .org.jetbrains.kotlin.backend.jvm.serialization.proto.AuxTables aux_tables = 4;</code>
        */
       public Builder clearAuxTables() {
         auxTables_ = org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.AuxTables.getDefaultInstance();
 
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
