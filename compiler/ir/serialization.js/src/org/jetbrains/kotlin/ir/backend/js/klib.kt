@@ -297,7 +297,8 @@ fun serializeModuleIntoKlib(
 ) {
     val descriptorTable = DescriptorTable()
 
-    val serializedIr = JsIrModuleSerializer(emptyLoggingContext, moduleFragment.irBuiltins, descriptorTable).serializedIrModule(moduleFragment)
+    val serializedIr =
+        JsIrModuleSerializer(emptyLoggingContext, moduleFragment.irBuiltins, descriptorTable).serializedIrModule(moduleFragment)
     val serializer = JsKlibMetadataSerializationUtil
 
     val moduleDescription =
@@ -308,8 +309,8 @@ fun serializeModuleIntoKlib(
         languageVersionSettings,
         metadataVersion
     ) { declarationDescriptor ->
-        val index = descriptorTable.get(declarationDescriptor)
-        index?.let { newJsDescriptorUniqId(it) }
+        val index = descriptorTable.get(declarationDescriptor) ?: error("No descriptor ID found for $declarationDescriptor")
+        newJsDescriptorUniqId(index)
     }
 
     val abiVersion = KotlinAbiVersion.CURRENT
