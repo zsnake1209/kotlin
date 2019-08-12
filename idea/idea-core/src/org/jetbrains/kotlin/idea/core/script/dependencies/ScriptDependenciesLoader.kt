@@ -86,7 +86,10 @@ abstract class ScriptDependenciesLoader(protected val project: Project) {
         reporter.attachReports(file, result.reports)
     }
 
-    private fun save(compilationConfigurationResult: ScriptCompilationConfigurationResult?, file: VirtualFile) {
+    private fun save(
+        compilationConfigurationResult: ScriptCompilationConfigurationResult?,
+        file: VirtualFile
+    ) {
         if (shouldShowNotification()) {
             file.removeScriptDependenciesNotificationPanel(project)
         }
@@ -96,10 +99,14 @@ abstract class ScriptDependenciesLoader(protected val project: Project) {
     }
 
     protected fun saveToCache(
-        file: VirtualFile, compilationConfigurationResult: ScriptCompilationConfigurationResult, skipSaveToAttributes: Boolean = false
+        file: VirtualFile,
+        compilationConfigurationResult: ScriptCompilationConfigurationResult,
+        skipSaveToAttributes: Boolean = false,
+        forceSaveToAttributes: Boolean = false
     ) {
         val rootsChanged = compilationConfigurationResult.valueOrNull()?.let { cache.hasNotCachedRoots(it) } ?: false
-        if (cache.save(file, compilationConfigurationResult)
+        val changedInCache = cache.save(file, compilationConfigurationResult)
+        if ((forceSaveToAttributes || changedInCache)
             && !skipSaveToAttributes
             && compilationConfigurationResult is ResultWithDiagnostics.Success
         ) {

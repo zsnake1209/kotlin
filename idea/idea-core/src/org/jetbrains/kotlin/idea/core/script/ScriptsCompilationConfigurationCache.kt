@@ -38,6 +38,7 @@ class ScriptsCompilationConfigurationCache(private val project: Project) {
 
     companion object {
         const val MAX_SCRIPTS_CACHED = 50
+        const val MAX_SCRIPTS_TIME_STAMPS_CACHED = 1000
     }
 
     init {
@@ -52,7 +53,7 @@ class ScriptsCompilationConfigurationCache(private val project: Project) {
     private val cacheLock = ReentrantReadWriteLock()
 
     private val scriptDependenciesCache = SLRUCacheWithLock<ScriptCompilationConfigurationResult>()
-    private val scriptsModificationStampsCache = SLRUCacheWithLock<Long>()
+    private val scriptsModificationStampsCache = SLRUCacheWithLock<Long>(MAX_SCRIPTS_TIME_STAMPS_CACHED)
 
     operator fun get(virtualFile: VirtualFile): ScriptCompilationConfigurationResult? = scriptDependenciesCache.get(virtualFile)
 
@@ -227,13 +228,10 @@ private class ClearableLazyValue<in R, out T : Any>(
 }
 
 
-private class SLRUCacheWithLock<T> {
+private class SLRUCacheWithLock<T>(size: Int = ScriptsCompilationConfigurationCache.MAX_SCRIPTS_CACHED) {
     private val lock = ReentrantReadWriteLock()
 
-    val cache = SLRUMap<VirtualFile, T>(
-        ScriptsCompilationConfigurationCache.MAX_SCRIPTS_CACHED,
-        ScriptsCompilationConfigurationCache.MAX_SCRIPTS_CACHED
-    )
+    val cache = SLRUMap<VirtualFile, T>(size, size)
 
     fun get(value: VirtualFile): T? = lock.write {
         cache[value]

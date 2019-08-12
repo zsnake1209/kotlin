@@ -68,6 +68,7 @@ class ScriptsCompilationConfigurationUpdater(
     }
 
     fun accept(file: VirtualFile, configuration: ScriptCompilationConfigurationResult) {
+        cache.shouldRunDependenciesUpdate(file) // update timestamps
         asyncLoader.accept(file, configuration)
     }
 
