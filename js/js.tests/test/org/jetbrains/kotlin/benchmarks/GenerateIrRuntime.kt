@@ -13,13 +13,18 @@ import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.invokeToplevel
+import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
+import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.backend.js.*
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsDeclarationTable
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrLinker
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrModuleSerializer
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsMangler
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata.JsKlibMetadataVersion
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -28,7 +33,10 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
 import org.jetbrains.kotlin.js.backend.ast.JsProgram
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
-import org.jetbrains.kotlin.library.KotlinLibrary
+import org.jetbrains.kotlin.konan.KonanVersionImpl
+import org.jetbrains.kotlin.konan.MetaVersion
+import org.jetbrains.kotlin.library.*
+import org.jetbrains.kotlin.library.impl.KotlinLibraryOnlyIrWritter
 import org.jetbrains.kotlin.library.impl.createKotlinLibrary
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
 import org.jetbrains.kotlin.psi.KtFile
@@ -51,7 +59,7 @@ class GenerateIrRuntime {
         override fun log(message: () -> String) {}
     }
 
-    fun loadKlib(klibPath: String) = createKotlinLibrary(KonanFile("$klibPath.klib"))
+    fun loadKlib(klibPath: String, isPacked: Boolean) = createKotlinLibrary(KonanFile("$klibPath${if (isPacked) ".klib" else ""}"))
 
     private fun buildConfiguration(environment: KotlinCoreEnvironment): CompilerConfiguration {
         val runtimeConfiguration = environment.configuration.copy()
@@ -154,9 +162,90 @@ class GenerateIrRuntime {
         }
     }
 
+    enum class MeasureUnits(val delimeter: Long, private val suffix: String) {
+        NANOSECUNDS(1L, "ns"),
+        MICROSECUNDS(1000L, "mcs"),
+        MILISECUNDS(1000L * 1000L, "ms");
+
+        fun convert(nanos: Long): String = "${(nanos / delimeter)}$suffix"
+    }
+
+    @Test
+    fun runIrDeserialization() {
+        val files = fullRuntimeSourceSet
+        val analysisResult = doFrontEnd(files)
+        val rawModuleFragment = doPsi2Ir(files, analysisResult)
+        val modulePath = doSerializeModule(rawModuleFragment, analysisResult.bindingContext)
+        val moduleRef = loadKlib(modulePath, false)
+        val moduleDescriptor = doDeserializeModuleMetadata(moduleRef)
+
+        runBenchWithWarmup("Ir Deserialization", 10, 30, MeasureUnits.MILISECUNDS, System::gc) {
+            doDeserializeIrModule(moduleDescriptor)
+        }
+    }
+
+    @Test
+    fun runIrSerialization() {
+        val files = fullRuntimeSourceSet
+        val analysisResult = doFrontEnd(files)
+        val rawModuleFragment = doPsi2Ir(files, analysisResult)
+
+        runBenchWithWarmup("Ir Serialization", 10, 30, MeasureUnits.MILISECUNDS) {
+            doSerializeIrModule(rawModuleFragment)
+        }
+    }
+
+    @Test
+    fun runDiskWriting() {
+        val abiVersion = KotlinAbiVersion.CURRENT
+        val compilerVersion = KonanVersionImpl(MetaVersion.DEV, 1, 3, 0, -1)
+        val libraryVersion = "JSIR"
+
+        val versions = KonanLibraryVersioning(abiVersion = abiVersion, libraryVersion = libraryVersion, compilerVersion = compilerVersion)
+        val file = createTempFile()
+        val writer = KotlinLibraryOnlyIrWritter(file.absolutePath, "", versions)
+        val files = fullRuntimeSourceSet
+        val analysisResult = doFrontEnd(files)
+        val rawModuleFragment = doPsi2Ir(files, analysisResult)
+        val serializedIr = doSerializeIrModule(rawModuleFragment)
+
+        runBenchWithWarmup("Disk Writting", 10, 30, MeasureUnits.MILISECUNDS, writer::invalidate) {
+            doWriteIrModuleToStorage(serializedIr, writer)
+        }
+    }
+
+    private fun runBenchWithWarmup(name: String, W: Int, N: Int, measurer: MeasureUnits, pre: () -> Unit = {}, bench: () -> Unit) {
+
+        println("Run $name benchmark")
+
+        println("Warmup: $W times...")
+
+        repeat(W) {
+            println("W: ${it + 1} out of $W")
+            pre()
+            bench()
+        }
+
+        var total = 0L
+
+        println("Run bench: $N times...")
+
+        repeat(N) {
+            print("R: ${it + 1} out of $N ")
+            pre()
+            val start = System.nanoTime()
+            bench()
+            val iter = System.nanoTime() - start
+            println("takes ${measurer.convert(iter)}")
+            total += iter
+        }
+
+        println("$name takes ${measurer.convert(total / N)}")
+    }
+
     @Test
     fun runDeserialization() {
-        val files = reducedRuntimeSourceSet
+        val files = fullRuntimeSourceSet
         val analysisResult = doFrontEnd(files)
         val rawModuleFragment = doPsi2Ir(files, analysisResult)
         val modulePath = doSerializeModule(rawModuleFragment, analysisResult.bindingContext)
@@ -219,7 +308,7 @@ class GenerateIrRuntime {
             tmpKlibDir.path,
             emptyList(),
             moduleFragment,
-            false
+            true
         )
 
         return tmpKlibDir.path
@@ -245,10 +334,19 @@ class GenerateIrRuntime {
 
     private data class DeserializedModuleInfo(val module: IrModuleFragment, val symbolTable: SymbolTable, val irBuiltIns: IrBuiltIns)
 
-    private fun doDeserializeModule(modulePath: String): DeserializedModuleInfo {
-        val moduleRef = loadKlib(modulePath)
-        val moduleDescriptor = doDeserializeModuleMetadata(moduleRef)
 
+    private fun doSerializeIrModule(module: IrModuleFragment): SerializedIr {
+        val descriptorTable = DescriptorTable()
+        val declarationTable = JsDeclarationTable(module.irBuiltins, descriptorTable)
+        val serializedIr = JsIrModuleSerializer(logger, declarationTable).serializedIrModule(module)
+        return serializedIr
+    }
+
+    private fun doWriteIrModuleToStorage(serializedIrModule: SerializedIr, writter: KotlinLibraryOnlyIrWritter) {
+        writter.writeIr(serializedIrModule)
+    }
+
+    private fun doDeserializeIrModule(moduleDescriptor: ModuleDescriptorImpl): DeserializedModuleInfo {
         val symbolTable = SymbolTable()
         val typeTranslator = TypeTranslator(symbolTable, languageVersionSettings, moduleDescriptor.builtIns).also {
             it.constantValueGenerator = ConstantValueGenerator(moduleDescriptor, symbolTable)
@@ -256,7 +354,7 @@ class GenerateIrRuntime {
 
         val irBuiltIns = IrBuiltIns(moduleDescriptor.builtIns, typeTranslator, symbolTable)
 
-        val jsLinker = JsIrLinker(moduleDescriptor, logger, irBuiltIns, symbolTable)
+        val jsLinker = JsIrLinker(moduleDescriptor, JsMangler, logger, irBuiltIns, symbolTable)
 
         val moduleFragment = jsLinker.deserializeFullModule(moduleDescriptor)
         // Create stubs
@@ -272,14 +370,43 @@ class GenerateIrRuntime {
         return DeserializedModuleInfo(moduleFragment, symbolTable, irBuiltIns)
     }
 
-    private fun doBackEnd(module: IrModuleFragment, symbolTable: SymbolTable, irBuiltIns: IrBuiltIns): JsProgram {
+    private fun doDeserializeModule(modulePath: String): DeserializedModuleInfo {
+        val moduleRef = loadKlib(modulePath, false)
+        val moduleDescriptor = doDeserializeModuleMetadata(moduleRef)
+
+        val symbolTable = SymbolTable()
+        val typeTranslator = TypeTranslator(symbolTable, languageVersionSettings, moduleDescriptor.builtIns).also {
+            it.constantValueGenerator = ConstantValueGenerator(moduleDescriptor, symbolTable)
+        }
+
+        val irBuiltIns = IrBuiltIns(moduleDescriptor.builtIns, typeTranslator, symbolTable)
+
+        val jsLinker = JsIrLinker(moduleDescriptor, JsMangler, logger, irBuiltIns, symbolTable)
+
+        val moduleFragment = jsLinker.deserializeFullModule(moduleDescriptor)
+        // Create stubs
+        ExternalDependenciesGenerator(
+            moduleDescriptor = moduleDescriptor,
+            symbolTable = symbolTable,
+            irBuiltIns = irBuiltIns,
+            deserializer = jsLinker
+        ).generateUnboundSymbolsAsDependencies()
+
+        moduleFragment.patchDeclarationParents()
+
+        return DeserializedModuleInfo(moduleFragment, symbolTable, irBuiltIns)
+    }
+
+    private fun doBackEnd(module: IrModuleFragment, symbolTable: SymbolTable, irBuiltIns: IrBuiltIns): CompilerResult {
         val context = JsIrBackendContext(module.descriptor, irBuiltIns, symbolTable, module, emptySet(), configuration)
 
         ExternalDependenciesGenerator(module.descriptor, symbolTable, irBuiltIns).generateUnboundSymbolsAsDependencies()
 
         jsPhases.invokeToplevel(phaseConfig, context, module)
 
-        return module.accept(IrModuleToJsTransformer(context, null, null), null) as JsProgram
+        val transformer = IrModuleToJsTransformer(context, null, null)
+
+        return transformer.generateModule(module)
     }
 
     fun compile(files: List<KtFile>): String {

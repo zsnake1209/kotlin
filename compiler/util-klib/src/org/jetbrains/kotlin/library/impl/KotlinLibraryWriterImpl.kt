@@ -110,3 +110,18 @@ fun buildKoltinLibrary(
     library.commit()
     return library.layout
 }
+
+class KotlinLibraryOnlyIrWritter(output: String, moduleName: String, versions: KonanLibraryVersioning) {
+    val outputDir = File(output)
+    val library = KoltinLibraryWriterImpl(outputDir, moduleName, versions, true)
+
+    fun invalidate() {
+        outputDir.deleteRecursively()
+        library.layout.irDir.mkdirs()
+        library.layout.irTablesDir.mkdirs()
+    }
+
+    fun writeIr(serializedIrModule: SerializedIr) {
+        library.addIr(serializedIrModule)
+    }
+}
