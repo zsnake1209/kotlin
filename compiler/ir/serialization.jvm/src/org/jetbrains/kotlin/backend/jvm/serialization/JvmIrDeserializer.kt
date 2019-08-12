@@ -13,9 +13,12 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrLoopBase
+import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrAnonymousInitializerSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
@@ -49,6 +52,8 @@ class JvmIrDeserializer(
 
     private val deserializedSymbols = mutableMapOf<UniqId, IrSymbol>()
 
+    private val externalReferences = mutableMapOf<Long, JvmIr.JvmExternalPackage>()
+
     override fun getDeclaration(symbol: IrSymbol, backoff: (IrSymbol) -> IrDeclaration): IrDeclaration {
         if (symbol.isBound) return symbol.owner as IrDeclaration
         val descriptor =
@@ -64,8 +69,9 @@ class JvmIrDeserializer(
             if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return backoff(symbol)
 
             val irProto = JvmIr.JvmIrClass.parseFrom(classHeader.serializedIr)
-            val moduleDeserializer = FileDeserializer(moduleDescriptor, irProto.auxTables, backoff)
+            val moduleDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
             consumeUniqIdTable(irProto.auxTables.uniqIdTable, moduleDeserializer)
+            consumeExternalRefsTable(irProto.auxTables.externalRefs)
             val deserializedToplevel = moduleDeserializer.deserializeIrClass(irProto.irClass)
             deserializedToplevel.patchDeclarationParents(packageFragment) // TODO: toplevel's parent should be the module
             assert(symbol.isBound)
@@ -77,8 +83,9 @@ class JvmIrDeserializer(
 
             val irProto = JvmIr.JvmIrFile.parseFrom(classHeader.serializedIr)
 
-            val moduleDeserializer = FileDeserializer(moduleDescriptor, irProto.auxTables, backoff)
+            val moduleDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
             consumeUniqIdTable(irProto.auxTables.uniqIdTable, moduleDeserializer)
+            consumeExternalRefsTable(irProto.auxTables.externalRefs)
 
             for (declaration in irProto.declarationContainer.declarationList) {
                 val member = moduleDeserializer.deserializeDeclaration(declaration, packageFragment)
@@ -100,12 +107,19 @@ class JvmIrDeserializer(
         }
     }
 
+    /* External references are deserialized lazily, as the last resource for when there is no descriptor available for a given symbol ref */
+    private fun consumeExternalRefsTable(table: JvmIr.ExternalRefs) {
+        for (reference in table.referencesList) {
+            externalReferences[reference.id] = table.packagesList[reference.index]
+        }
+    }
+
     private tailrec fun DeclarationDescriptor.toToplevel(): DeclarationDescriptor =
         if (containingDeclaration is PackageFragmentDescriptor) this else containingDeclaration!!.toToplevel()
 
     override fun declareForwardDeclarations() {}
 
-    inner class FileDeserializer(val moduleDescriptor: ModuleDescriptor, private val auxTables: JvmIr.AuxTables, backoff: (IrSymbol) -> IrDeclaration) :
+    abstract inner class FileDeserializer(val moduleDescriptor: ModuleDescriptor, private val auxTables: JvmIr.AuxTables, backoff: (IrSymbol) -> IrDeclaration) :
         IrFileDeserializer(logger, builtIns, symbolTable) {
 
         val uniqIdAware = JvmDescriptorUniqIdAware(symbolTable, backoff)
@@ -114,10 +128,12 @@ class JvmIrDeserializer(
 
         private var moduleLoops = mutableMapOf<Int, IrLoopBase>()
 
-        private fun referenceDeserializedSymbol(
+        abstract protected fun referenceDeserializedSymbol(proto: ProtoSymbolData, descriptor: DeclarationDescriptor?): IrSymbol
+
+        protected fun referenceDeserializedSymbolBare(
             proto: ProtoSymbolData,
             descriptor: DeclarationDescriptor?
-        ): IrSymbol = when (proto.kind) {
+        ) = when (proto.kind) {
             ProtoSymbolKind.ANONYMOUS_INIT_SYMBOL ->
                 IrAnonymousInitializerSymbolImpl(
                     descriptor as ClassDescriptor?
@@ -240,6 +256,59 @@ class JvmIrDeserializer(
             "protected_and_package" -> JavaVisibilities.PROTECTED_AND_PACKAGE
             else -> super.deserializeVisibility(value)
         }
+    }
 
+    inner class FileDeserializerWithoutReferenceLookup(
+        moduleDescriptor: ModuleDescriptor,
+        auxTables: JvmIr.AuxTables,
+        backoff: (IrSymbol) -> IrDeclaration
+    ) : FileDeserializer(moduleDescriptor, auxTables, backoff) {
+        override fun referenceDeserializedSymbol(proto: ProtoSymbolData, descriptor: DeclarationDescriptor?): IrSymbol {
+            return referenceDeserializedSymbolBare(proto, descriptor)
+        }
+    }
+    inner class FileDeserializerWithReferenceLookup(
+        moduleDescriptor: ModuleDescriptor,
+        private val auxTables: JvmIr.AuxTables,
+        private val backoff: (IrSymbol) -> IrDeclaration
+    ) : FileDeserializer(moduleDescriptor, auxTables, backoff) {
+        override fun referenceDeserializedSymbol(
+            proto: ProtoSymbolData,
+            descriptor: DeclarationDescriptor?
+        ): IrSymbol = if (descriptor == null && !proto.uniqId.isLocal) {
+            val uniqIdKey = proto.uniqId.uniqId()
+            deserializedSymbols[uniqIdKey] ?: run {
+                val externalPackageProto = externalReferences[proto.uniqId.index]
+                    ?: error("External reference absent from external references table: ${deserializeFqName(proto.fqname)}")
+                val packageFragment = IrExternalPackageFragmentImpl(
+                    DescriptorlessExternalPackageFragmentSymbol(),
+                    deserializeFqName(externalPackageProto.fqName)
+                )
+                for (memberProto in externalPackageProto.declarationContainer.declarationList) {
+                    val toplevel = FileDeserializerWithoutReferenceLookup(moduleDescriptor, auxTables, backoff)
+                        .deserializeDeclaration(memberProto, packageFragment)
+                    packageFragment.declarations.add(toplevel)
+                }
+                deserializedSymbols[uniqIdKey] ?: error("Symbol unbound even after deserializing external reference")
+            }
+        } else {
+            referenceDeserializedSymbolBare(proto, descriptor)
+        }
+
+    }
+}
+
+// Copied from MoveBodilessDeclarationToSeparatePlace.kt
+private class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFragmentSymbol {
+    override val descriptor: PackageFragmentDescriptor
+        get() = error("Operation is unsupported")
+
+    private var _owner: IrExternalPackageFragment? = null
+    override val owner get() = _owner!!
+
+    override val isBound get() = _owner != null
+
+    override fun bind(owner: IrExternalPackageFragment) {
+        _owner = owner
     }
 }

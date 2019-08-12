@@ -135,7 +135,7 @@ abstract class IrFileDeserializer(
 
     abstract fun deserializeIrSymbol(proto: ProtoSymbolIndex): IrSymbol
     abstract fun deserializeIrType(proto: ProtoTypeIndex): IrType
-    abstract fun deserializeDescriptorReference(proto: ProtoDescriptorReference): DeclarationDescriptor
+    abstract fun deserializeDescriptorReference(proto: ProtoDescriptorReference): DeclarationDescriptor?
     abstract fun deserializeString(proto: ProtoStringIndex): String
     abstract fun deserializeExpressionBody(proto: ProtoBodyIndex): IrExpression
     abstract fun deserializeStatementBody(proto: ProtoBodyIndex): IrElement
