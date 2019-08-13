@@ -8,18 +8,26 @@ package org.jetbrains.kotlin.library.impl
 import org.jetbrains.kotlin.library.*
 
 abstract class IrWriterImpl(val irLayout: IrKotlinLibraryLayout) : IrWriter {
-    init {
-        irLayout.irDir.mkdirs()
-    }
+//    init {
+//        irLayout.irDir.mkdirs()
+//    }
 
     override fun addDataFlowGraph(dataFlowGraph: ByteArray) {
         irLayout.dataFlowGraphFile.writeBytes(dataFlowGraph)
     }
 }
 
-class IrMonoliticWriterImpl(irLayout: IrKotlinLibraryLayout) : IrWriterImpl(irLayout) {
+class IrMonoliticWriterImpl(_irLayout: IrKotlinLibraryLayout) : IrWriterImpl(_irLayout) {
+
+//    init {
+//        irLayout.libDir.mkdirs()
+//        irLayout.irDir.mkdirs()
+//    }
 
     override fun addIr(ir: SerializedIrModule) {
+        irLayout.irDir.mkdirs()
+        assert(irLayout.irDir.exists)
+
         with(ir.files.sortedBy { it.path }) {
             IrArrayWriter(map { it.fileData }).writeIntoFile(irLayout.irFiles.absolutePath)
             IrArrayWriter(map { it.declarations }).writeIntoFile(irLayout.irDeclarations.absolutePath)
@@ -31,8 +39,15 @@ class IrMonoliticWriterImpl(irLayout: IrKotlinLibraryLayout) : IrWriterImpl(irLa
     }
 }
 
-class IrPerFileWriterImpl(irLayout: IrKotlinLibraryLayout) : IrWriterImpl(irLayout) {
+class IrPerFileWriterImpl(_irLayout: IrKotlinLibraryLayout) : IrWriterImpl(_irLayout) {
+//    init {
+//        irLayout.irDir.mkdirs()
+//    }
+
     override fun addIr(ir: SerializedIrModule) {
+        irLayout.irDir.mkdirs()
+
+        assert(irLayout.irDir.exists)
         ir.files.forEach {
             serializeFile(it)
         }

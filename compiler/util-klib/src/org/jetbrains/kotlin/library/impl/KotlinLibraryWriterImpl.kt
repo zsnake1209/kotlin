@@ -94,11 +94,15 @@ fun buildKoltinLibrary(
     output: String,
     moduleName: String,
     nopack: Boolean,
+    perFile: Boolean,
     manifestProperties: Properties?,
     dataFlowGraph: ByteArray?
 ): KotlinLibraryLayout {
 
-    val library = KoltinLibraryWriterImpl(File(output), moduleName, versions, nopack)
+    val klibDirectory = File(output)
+    val layout = KotlinLibraryLayoutForWriter(klibDirectory)
+    val irWriter = if (perFile) IrPerFileWriterImpl(layout) else IrMonoliticWriterImpl(layout)
+    val library = KoltinLibraryWriterImpl(klibDirectory, moduleName, versions, nopack, layout, ir = irWriter)
 
     library.addMetadata(metadata)
     library.addIr(ir)
@@ -111,17 +115,27 @@ fun buildKoltinLibrary(
     return library.layout
 }
 
-class KotlinLibraryOnlyIrWritter(output: String, moduleName: String, versions: KonanLibraryVersioning) {
+class KotlinLibraryOnlyIrWriter(output: String, moduleName: String, versions: KonanLibraryVersioning, perFile: Boolean) {
     val outputDir = File(output)
-    val library = KoltinLibraryWriterImpl(outputDir, moduleName, versions, true)
+    val library = createLibrary(perFile, moduleName, versions, outputDir)
+
+    private fun createLibrary(
+        perFile: Boolean,
+        moduleName: String,
+        versions: KonanLibraryVersioning,
+        directory: File
+    ): KoltinLibraryWriterImpl {
+        val layout = KotlinLibraryLayoutForWriter(directory)
+        val irWriter = if (perFile) IrPerFileWriterImpl(layout) else IrMonoliticWriterImpl(layout)
+        return KoltinLibraryWriterImpl(directory, moduleName, versions, true, layout, ir = irWriter)
+    }
 
     fun invalidate() {
         outputDir.deleteRecursively()
         library.layout.irDir.mkdirs()
-        library.layout.irTablesDir.mkdirs()
     }
 
-    fun writeIr(serializedIrModule: SerializedIr) {
+    fun writeIr(serializedIrModule: SerializedIrModule) {
         library.addIr(serializedIrModule)
     }
 }

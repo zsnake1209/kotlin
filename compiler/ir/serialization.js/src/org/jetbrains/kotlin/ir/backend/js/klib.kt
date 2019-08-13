@@ -139,7 +139,8 @@ fun generateKLib(
         allDependencies,
         moduleFragment,
         icData,
-        nopack
+        nopack,
+        false
     )
 }
 
@@ -334,7 +335,8 @@ fun serializeModuleIntoKlib(
     dependencies: List<KotlinLibrary>,
     moduleFragment: IrModuleFragment,
     cleanFiles: List<KotlinFileSerializedData>,
-    nopack: Boolean
+    nopack: Boolean,
+    perFile: Boolean
 ) {
     assert(files.size == moduleFragment.files.size)
 
@@ -423,6 +425,7 @@ fun serializeModuleIntoKlib(
         manifestProperties = null,
         moduleName = moduleName,
         nopack = nopack,
+        perFile = perFile,
         output = klibPath,
         versions = versions
     )

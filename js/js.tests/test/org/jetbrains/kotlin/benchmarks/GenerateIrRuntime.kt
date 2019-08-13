@@ -204,7 +204,7 @@ class GenerateIrRuntime {
         val analysisResult = doFrontEnd(files)
         val rawModuleFragment = doPsi2Ir(files, analysisResult)
 
-        runBenchWithWarmup("Ir Serialization", 10, 30, MeasureUnits.MILISECUNDS, System::gc) {
+        runBenchWithWarmup("Ir Serialization", 40, 10, MeasureUnits.MILISECUNDS, System::gc) {
             doSerializeIrModule(rawModuleFragment)
         }
     }
