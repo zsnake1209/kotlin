@@ -38,6 +38,7 @@ import org.jetbrains.kotlin.types.model.KotlinTypeMarker
 import org.jetbrains.kotlin.types.refinement.TypeRefinement
 import org.jetbrains.kotlin.types.typeUtil.createProjection
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
+import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
 
 // The index in the lambda is the position of the type component:
 // Example: for `A<B, C<D, E>>`, indices go as follows: `0 - A<...>, 1 - B, 2 - C<D, E>, 3 - D, 4 - E`,
@@ -113,8 +114,15 @@ private fun SimpleType.enhanceInflexible(
     var wereChanges = enhancedMutabilityAnnotations != null
     val enhancedArguments = arguments.mapIndexed { localArgIndex, arg ->
         if (arg.isStarProjection) {
+            val qualifiersForStarProjection = qualifiers(globalArgIndex)
             globalArgIndex++
-            TypeUtils.makeStarProjection(enhancedClassifier.typeConstructor.parameters[localArgIndex])
+
+            if (qualifiersForStarProjection.nullability == NOT_NULL) {
+                val enhanced = arg.type.unwrap().makeNotNullable()
+                createProjection(enhanced, arg.projectionKind, typeParameterDescriptor = typeConstructor.parameters[localArgIndex])
+            } else {
+                TypeUtils.makeStarProjection(enhancedClassifier.typeConstructor.parameters[localArgIndex])
+            }
         } else {
             val enhanced = arg.type.unwrap().enhancePossiblyFlexible(qualifiers, globalArgIndex)
             wereChanges = wereChanges || enhanced.wereChanges
