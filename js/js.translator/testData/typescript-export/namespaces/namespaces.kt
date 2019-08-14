@@ -6,7 +6,6 @@
 
 package foo.bar.baz
 
-// import a.*
 import a.b.*
 import C3
 
@@ -24,7 +23,6 @@ fun f(x1: C1, x2: C2, x3: C3): String {
 
 package a.b
 
-// import a.*
 import foo.bar.baz.*
 import C3
 

@@ -27,7 +27,7 @@ private val kotlinTestKLib = loadKlib("compiler/ir/serialization.js/build/kotlin
 abstract class BasicIrBoxTest(
     pathToTestDir: String,
     testGroupOutputDirPrefix: String,
-    pathToRootOutputDir: String = BasicBoxTest.TEST_DATA_DIR_PATH,
+    pathToRootOutputDir: String = TEST_DATA_DIR_PATH,
     generateSourceMap: Boolean = false,
     generateNodeJsRunner: Boolean = false
 ) : BasicBoxTest(
@@ -55,6 +55,7 @@ abstract class BasicIrBoxTest(
 
     override val testChecker get() = if (runTestInNashorn) NashornIrJsTestChecker() else V8IrJsTestChecker
 
+    @Suppress("ConstantConditionIf")
     override fun translateFiles(
         units: List<TranslationUnit>,
         outputFile: File,
@@ -72,7 +73,7 @@ abstract class BasicIrBoxTest(
         val filesToCompile = units
             .map { (it as TranslationUnit.SourceFile).file }
             // TODO: split input files to some parts (global common, local common, test)
-            .filterNot { it.virtualFilePath.contains(BasicBoxTest.COMMON_FILES_DIR_PATH) }
+            .filterNot { it.virtualFilePath.contains(COMMON_FILES_DIR_PATH) }
 
         val runtimeKlibs = if (needsFullIrRuntime) listOf(fullRuntimeKlib, kotlinTestKLib) else listOf(defaultRuntimeKlib)
 
@@ -104,7 +105,7 @@ abstract class BasicIrBoxTest(
                 PhaseConfig(jsPhases)
             }
 
-            val compilerdModule = compile(
+            val compiledModule = compile(
                 project = config.project,
                 files = filesToCompile,
                 configuration = config.configuration,
@@ -115,12 +116,12 @@ abstract class BasicIrBoxTest(
                 exportedDeclarations = setOf(FqName.fromSegments(listOfNotNull(testPackage, testFunction)))
             )
 
-            val wrappedCode = wrapWithModuleEmulationMarkers(compilerdModule.jsCode, moduleId = config.moduleId, moduleKind = config.moduleKind)
+            val wrappedCode = wrapWithModuleEmulationMarkers(compiledModule.jsCode, moduleId = config.moduleId, moduleKind = config.moduleKind)
             outputFile.write(wrappedCode)
 
             if (generateDts) {
                 val dtsFile = outputFile.withReplacedExtensionOrNull("_v5.js", ".d.ts")
-                dtsFile?.write(compilerdModule.tsDefinitions ?: error("No ts definitions"))
+                dtsFile?.write(compiledModule.tsDefinitions ?: error("No ts definitions"))
             }
 
         } else {

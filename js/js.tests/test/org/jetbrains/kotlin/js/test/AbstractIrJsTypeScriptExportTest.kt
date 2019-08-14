@@ -8,13 +8,14 @@ package org.jetbrains.kotlin.js.test
 import org.jetbrains.kotlin.utils.fileUtils.withReplacedExtensionOrNull
 import java.io.File
 
+@Suppress("ConstantConditionIf")
 abstract class AbstractIrJsTypeScriptExportTest : BasicIrBoxTest(
     pathToTestDir = TEST_DATA_DIR_PATH + "typescript-export/",
     testGroupOutputDirPrefix = "typescript-export/",
     pathToRootOutputDir = TEST_DATA_DIR_PATH
 ) {
     override val generateDts = true
-    private val updateReferenceDtsFiles = true
+    private val updateReferenceDtsFiles = false
 
     override fun performAdditionalChecks(inputFile: File, outputFile: File) {
         val referenceDtsFile = inputFile.withReplacedExtensionOrNull(".kt", ".d.ts")

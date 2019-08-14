@@ -89,7 +89,7 @@ fun ExportedType.toTypeScript(): String = when (this) {
     is ExportedType.Function -> "(" + parameterTypes
         .withIndex()
         .joinToString(", ") { (index, type) ->
-            "arg$index: ${type.toTypeScript()}"
+            "p$index: ${type.toTypeScript()}"
         } + ") => " + returnType.toTypeScript()
 
     is ExportedType.ClassType ->
