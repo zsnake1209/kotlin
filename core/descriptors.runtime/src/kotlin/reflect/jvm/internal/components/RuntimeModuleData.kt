@@ -44,7 +44,7 @@ import org.jetbrains.kotlin.serialization.deserialization.DeserializationCompone
 import org.jetbrains.kotlin.serialization.deserialization.DeserializationConfiguration
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.checker.NewKotlinTypeChecker
-import org.jetbrains.kotlin.utils.Jsr305State
+import org.jetbrains.kotlin.utils.JavaTypeEnhancementState
 
 class RuntimeModuleData private constructor(
     val deserialization: DeserializationComponents,
@@ -63,14 +63,14 @@ class RuntimeModuleData private constructor(
             val deserializedDescriptorResolver = DeserializedDescriptorResolver()
             val singleModuleClassResolver = SingleModuleClassResolver()
             val notFoundClasses = NotFoundClasses(storageManager, module)
-            val annotationTypeQualifierResolver = AnnotationTypeQualifierResolver(storageManager, Jsr305State.DISABLED)
+            val annotationTypeQualifierResolver = AnnotationTypeQualifierResolver(storageManager, JavaTypeEnhancementState.DISABLED_JSR_305)
             val javaResolverComponents = JavaResolverComponents(
                 storageManager, ReflectJavaClassFinder(classLoader), reflectKotlinClassFinder, deserializedDescriptorResolver,
                 SignaturePropagator.DO_NOTHING, RuntimeErrorReporter, JavaResolverCache.EMPTY,
                 JavaPropertyInitializerEvaluator.DoNothing, SamConversionResolver.Empty, RuntimeSourceElementFactory,
                 singleModuleClassResolver, PackagePartProvider.Empty, SupertypeLoopChecker.EMPTY, LookupTracker.DO_NOTHING, module,
                 ReflectionTypes(module, notFoundClasses), annotationTypeQualifierResolver,
-                SignatureEnhancement(annotationTypeQualifierResolver, Jsr305State.DISABLED),
+                SignatureEnhancement(annotationTypeQualifierResolver, JavaTypeEnhancementState.DISABLED_JSR_305),
                 JavaClassesTracker.Default, JavaResolverSettings.Default, NewKotlinTypeChecker.Default
             )
 
