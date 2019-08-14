@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.config
 
-import org.jetbrains.kotlin.utils.Jsr305State
+import org.jetbrains.kotlin.utils.JavaTypeEnhancementState
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -31,7 +31,7 @@ class AnalysisFlag<out T> internal constructor(
         }
 
         object Jsr305StateWarnByDefault {
-            operator fun provideDelegate(instance: Any?, property: KProperty<*>) = Delegate(property.name, Jsr305State.DEFAULT)
+            operator fun provideDelegate(instance: Any?, property: KProperty<*>) = Delegate(property.name, JavaTypeEnhancementState.DEFAULT)
         }
 
         object JvmDefaultModeDisabledByDefault {

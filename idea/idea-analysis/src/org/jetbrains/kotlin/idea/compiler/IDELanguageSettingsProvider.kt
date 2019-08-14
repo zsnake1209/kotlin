@@ -40,7 +40,7 @@ import org.jetbrains.kotlin.platform.TargetPlatformVersion
 import org.jetbrains.kotlin.platform.jvm.JdkPlatform
 import org.jetbrains.kotlin.platform.subplatformOfType
 import org.jetbrains.kotlin.scripting.definitions.ScriptDefinition
-import org.jetbrains.kotlin.utils.Jsr305State
+import org.jetbrains.kotlin.utils.JavaTypeEnhancementState
 
 object IDELanguageSettingsProvider : LanguageSettingsProvider {
     override fun getLanguageVersionSettings(
@@ -51,7 +51,7 @@ object IDELanguageSettingsProvider : LanguageSettingsProvider {
         when (moduleInfo) {
             is ModuleSourceInfo -> moduleInfo.module.languageVersionSettings
             is LibraryInfo -> project.getLanguageVersionSettings(
-                jsr305State = computeJsr305State(project), isReleaseCoroutines = isReleaseCoroutines
+                javaTypeEnhancementState = computeJsr305State(project), isReleaseCoroutines = isReleaseCoroutines
             )
             is ScriptModuleInfo -> getLanguageSettingsForScripts(project, moduleInfo.scriptDefinition).languageVersionSettings
             is ScriptDependenciesInfo.ForFile -> getLanguageSettingsForScripts(project, moduleInfo.scriptDefinition).languageVersionSettings
