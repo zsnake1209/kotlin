@@ -63,15 +63,17 @@ class RuntimeModuleData private constructor(
             val deserializedDescriptorResolver = DeserializedDescriptorResolver()
             val singleModuleClassResolver = SingleModuleClassResolver()
             val notFoundClasses = NotFoundClasses(storageManager, module)
-            val annotationTypeQualifierResolver = AnnotationTypeQualifierResolver(storageManager, JavaTypeEnhancementState.DISABLED_JSR_305)
+            val javaTypeEnhancementState = JavaTypeEnhancementState.DISABLED_JSR_305
+            val annotationTypeQualifierResolver = AnnotationTypeQualifierResolver(storageManager, javaTypeEnhancementState)
             val javaResolverComponents = JavaResolverComponents(
                 storageManager, ReflectJavaClassFinder(classLoader), reflectKotlinClassFinder, deserializedDescriptorResolver,
                 SignaturePropagator.DO_NOTHING, RuntimeErrorReporter, JavaResolverCache.EMPTY,
                 JavaPropertyInitializerEvaluator.DoNothing, SamConversionResolver.Empty, RuntimeSourceElementFactory,
                 singleModuleClassResolver, PackagePartProvider.Empty, SupertypeLoopChecker.EMPTY, LookupTracker.DO_NOTHING, module,
                 ReflectionTypes(module, notFoundClasses), annotationTypeQualifierResolver,
-                SignatureEnhancement(annotationTypeQualifierResolver, JavaTypeEnhancementState.DISABLED_JSR_305),
-                JavaClassesTracker.Default, JavaResolverSettings.Default, NewKotlinTypeChecker.Default
+                SignatureEnhancement(annotationTypeQualifierResolver, javaTypeEnhancementState),
+                JavaClassesTracker.Default, JavaResolverSettings.Default, NewKotlinTypeChecker.Default,
+                javaTypeEnhancementState
             )
 
             val lazyJavaPackageFragmentProvider = LazyJavaPackageFragmentProvider(javaResolverComponents)

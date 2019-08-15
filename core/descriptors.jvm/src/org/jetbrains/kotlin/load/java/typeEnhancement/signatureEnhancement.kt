@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.utils.JavaTypeEnhancementState
+import org.jetbrains.kotlin.utils.ReportLevel
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -105,11 +106,16 @@ class SignatureEnhancement(
 
     private fun codeAnalysisMigrationStatus(
         annotationFqName: FqName
-    ): NullabilityQualifierWithMigrationStatus? = when (annotationFqName) {
-        CODE_ANALYSIS_NOT_NULL -> NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NOT_NULL)
-        CODE_ANALYSIS_NULLABLE -> NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NULLABLE)
-        CODE_ANALYSIS_NULLNESS_UNKNOWN -> NullabilityQualifierWithMigrationStatus(NullabilityQualifier.FORCE_FLEXIBILITY)
-        else -> null
+    ): NullabilityQualifierWithMigrationStatus? {
+        if (javaTypeEnhancementState.codeAnalysisReportLevel == ReportLevel.IGNORE) return null
+        val isForWarningOnly = javaTypeEnhancementState.codeAnalysisReportLevel == ReportLevel.WARN
+        return when (annotationFqName) {
+            CODE_ANALYSIS_NOT_NULL -> NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NOT_NULL, isForWarningOnly)
+            CODE_ANALYSIS_NULLABLE -> NullabilityQualifierWithMigrationStatus(NullabilityQualifier.NULLABLE, isForWarningOnly)
+            CODE_ANALYSIS_NULLNESS_UNKNOWN ->
+                NullabilityQualifierWithMigrationStatus(NullabilityQualifier.FORCE_FLEXIBILITY, isForWarningOnly)
+            else -> null
+        }
     }
 
     private fun commonMigrationStatus(
