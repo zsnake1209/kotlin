@@ -17,14 +17,17 @@
 package org.jetbrains.kotlin.load.java
 
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 
-val CODE_ANALYSIS_NULLABLE = FqName("codeanalysis.annotations.Nullable")
-val CODE_ANALYSIS_NOT_NULL = FqName("codeanalysis.annotations.NotNull")
-val CODE_ANALYSIS_NULLNESS_UNKNOWN = FqName("codeanalysis.annotations.NullnessUnknown")
+val CODE_ANALYSIS_ANNOTATIONS_PACKAGE = FqName("codeanalysis.experimental.annotations")
 
-val CODE_ANALYSIS_DEFAULT_NULLABLE = FqName("codeanalysis.annotations.DefaultNullable")
-val CODE_ANALYSIS_DEFAULT_NOT_NULL = FqName("codeanalysis.annotations.DefaultNotNull")
-val CODE_ANALYSIS_DEFAULT_NULLNESS_UNKNOWN = FqName("codeanalysis.annotations.DefaultNullnessUnknown")
+val CODE_ANALYSIS_NULLABLE = CODE_ANALYSIS_ANNOTATIONS_PACKAGE.child(Name.identifier("Nullable"))
+val CODE_ANALYSIS_NOT_NULL = CODE_ANALYSIS_ANNOTATIONS_PACKAGE.child(Name.identifier("NotNull"))
+val CODE_ANALYSIS_NULLNESS_UNKNOWN = CODE_ANALYSIS_ANNOTATIONS_PACKAGE.child(Name.identifier("NullnessUnknown"))
+
+val CODE_ANALYSIS_DEFAULT_NULLABLE = CODE_ANALYSIS_ANNOTATIONS_PACKAGE.child(Name.identifier("DefaultNullable"))
+val CODE_ANALYSIS_DEFAULT_NOT_NULL = CODE_ANALYSIS_ANNOTATIONS_PACKAGE.child(Name.identifier("DefaultNotNull"))
+val CODE_ANALYSIS_DEFAULT_NULLNESS_UNKNOWN = CODE_ANALYSIS_ANNOTATIONS_PACKAGE.child(Name.identifier("DefaultNullnessUnknown"))
 
 val NULLABLE_ANNOTATIONS = listOf(
     JvmAnnotationNames.JETBRAINS_NULLABLE_ANNOTATION,
