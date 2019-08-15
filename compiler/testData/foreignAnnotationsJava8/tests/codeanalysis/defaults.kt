@@ -1,7 +1,7 @@
 // !DIAGNOSTICS: -UNUSED_VARIABLE -UNUSED_PARAMETER
 // FILE: A.java
 
-import codeanalysis.annotations.*;
+import codeanalysis.experimental.annotations.*;
 
 @DefaultNotNull
 public class A {
