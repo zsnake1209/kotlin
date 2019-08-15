@@ -231,6 +231,14 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
     var supportCompatqualCheckerFrameworkAnnotations: String? by NullableStringFreezableVar(null)
 
     @Argument(
+        value = "-Xcodeanalysis-annotations",
+        valueDescription = "ignore|strict|warn",
+        description = "Specify behavior for Codeanalysis annotations.\n" +
+                "Default value is 'warn'"
+    )
+    val codeAnalysisState: String? by FreezableVar(null)
+
+    @Argument(
         value = "-Xno-exception-on-explicit-equals-for-boxed-null",
         description = "Do not throw NPE on explicit 'equals' call for null receiver of platform boxed primitive type"
     )
@@ -286,7 +294,8 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
         result[JvmAnalysisFlags.strictMetadataVersionSemantics] = strictMetadataVersionSemantics
         result[JvmAnalysisFlags.javaTypeEnhancementState] = JavaTypeEnhancementStateParser(collector).parse(
             jsr305,
-            supportCompatqualCheckerFrameworkAnnotations
+            supportCompatqualCheckerFrameworkAnnotations,
+            codeAnalysisState
         )
         result[AnalysisFlags.ignoreDataFlowInAssert] = JVMAssertionsMode.fromString(assertionsMode) != JVMAssertionsMode.LEGACY
         JvmDefaultMode.fromStringOrNull(jvmDefault)?.let { result[JvmAnalysisFlags.jvmDefaultMode] = it }

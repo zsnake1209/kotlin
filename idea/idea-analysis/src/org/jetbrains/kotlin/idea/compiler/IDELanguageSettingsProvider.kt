@@ -67,7 +67,8 @@ object IDELanguageSettingsProvider : LanguageSettingsProvider {
 
             result = JavaTypeEnhancementStateParser(MessageCollector.NONE).parse(
                 compilerArguments.jsr305,
-                compilerArguments.supportCompatqualCheckerFrameworkAnnotations
+                compilerArguments.supportCompatqualCheckerFrameworkAnnotations,
+                compilerArguments.codeAnalysisState
             )
 
         }
