@@ -2,12 +2,12 @@ public final class AnnotationParametersKt {
     @RequiresPermission(anyOf = intArrayOf(1, 2, 3))
     @IntRange(from = 10, to = 0)
     @WithDefaultValue
-    @SuppressLint(value = "Lorem")
+    @SuppressLint(null = "Lorem")
     public static final fun foo() : int {
         return 5
     }
-    @IntRange(from = 0, to = 100)
-    @SuppressLint(value = <noref>("Lorem", "Ipsum", "Dolor"))
+    @IntRange(null = 0, null = 100)
+    @SuppressLint(null = "Lorem", null = "Ipsum", null = "Dolor")
     public static final fun bar() : void {
         return Unit
     }

@@ -23,11 +23,13 @@ import org.jetbrains.uast.*
 import org.jetbrains.uast.kotlin.internal.DelegatedMultiResolve
 
 class KotlinUNamedExpression private constructor(
-    override val name: String?,
+    private val nameProvider: () -> String?,
     override val sourcePsi: PsiElement?,
     givenParent: UElement?,
     expressionProducer: (UElement) -> UExpression
 ) : KotlinAbstractUElement(givenParent), UNamedExpression {
+
+    override val name: String? by lz { nameProvider() }
 
     override val expression: UExpression by lz { expressionProducer(this) }
 
@@ -38,21 +40,11 @@ class KotlinUNamedExpression private constructor(
     override val javaPsi: PsiElement? = null
 
     companion object {
-        internal fun create(name: String?, valueArgument: ValueArgument, uastParent: UElement?): UNamedExpression {
+        internal fun create(name: () -> String?, valueArgument: ValueArgument, uastParent: UElement?): UNamedExpression {
             val expression = valueArgument.getArgumentExpression()
             return KotlinUNamedExpression(name, valueArgument.asElement(), uastParent) { expressionParent ->
                 expression?.let { expressionParent.getLanguagePlugin().convertOpt<UExpression>(it, expressionParent) }
                     ?: UastEmptyExpression(expressionParent)
-            }
-        }
-
-        internal fun create(
-            name: String?,
-            valueArguments: List<ValueArgument>,
-            uastParent: UElement?
-        ): UNamedExpression {
-            return KotlinUNamedExpression(name, null, uastParent) { expressionParent ->
-                KotlinUVarargExpression(valueArguments, expressionParent)
             }
         }
     }

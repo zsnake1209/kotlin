@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.name.FqNameUnsafe
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
-import org.jetbrains.kotlin.resolve.calls.model.ArgumentMatch
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
@@ -46,18 +45,23 @@ abstract class KotlinUAnnotationBase<T : KtCallElement>(
             ?.toString()
     }
 
-    override val attributeValues: List<UNamedExpression> by lz {
-        resolvedCall?.valueArguments?.entries?.mapNotNull {
+    private val attributeValuesResolved: List<UNamedExpression> by lz {
+        resolvedCall?.valueArguments?.entries?.flatMap {
             val arguments = it.value.arguments
             val name = it.key.name.asString()
-            when {
-                arguments.size == 1 ->
-                    KotlinUNamedExpression.create(name, arguments.first(), this)
-                arguments.size > 1 ->
-                    KotlinUNamedExpression.create(name, arguments, this)
-                else -> null
-            }
+            arguments.map { KotlinUNamedExpression.create({ name }, it, this) }
         } ?: emptyList()
+    }
+
+    override val attributeValues: List<UNamedExpression> by lz {
+        sourcePsi.valueArguments.map { va ->
+            KotlinUNamedExpression.create(
+                {
+                    va.getArgumentName()?.asName?.asString()
+                },
+                va, this
+            )
+        }
     }
 
     protected abstract fun computeClassDescriptor(): ClassDescriptor?
@@ -68,15 +72,18 @@ abstract class KotlinUAnnotationBase<T : KtCallElement>(
         findDeclaredAttributeValue(name) ?: findAttributeDefaultValue(name ?: "value")
 
     fun findAttributeValueExpression(arg: ValueArgument): UExpression? {
-        val mapping = resolvedCall?.getArgumentMapping(arg)
-        return (mapping as? ArgumentMatch)?.let { match ->
-            val namedExpression = attributeValues.find { it.name == match.valueParameter.name.asString() }
-            namedExpression?.expression as? KotlinUVarargExpression ?: namedExpression
+        return sourcePsi.valueArguments.firstOrNull { it == arg }?.let { va ->
+            KotlinUNamedExpression.create(
+                {
+                    va.getArgumentName()?.asName?.asString()
+                },
+                va, this
+            )
         }
     }
 
     override fun findDeclaredAttributeValue(name: String?): UExpression? {
-        return attributeValues.find {
+        return attributeValuesResolved.find {
             it.name == name ||
                     (name == null && it.name == "value") ||
                     (name == "value" && it.name == null)

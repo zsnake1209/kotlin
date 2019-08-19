@@ -136,7 +136,7 @@ abstract class KotlinAbstractUElement(private val givenParent: UElement?) : Kotl
 fun doConvertParent(element: UElement, parent: PsiElement?): UElement? {
     val parentUnwrapped = KotlinConverter.unwrapElements(parent) ?: return null
     if (parent is KtValueArgument && parentUnwrapped is KtAnnotationEntry) {
-        return (KotlinUastLanguagePlugin().convertElementWithParent(parentUnwrapped, null) as? KotlinUAnnotation)
+        return (KotlinUastLanguagePlugin().convertElementWithParent(parentUnwrapped, UAnnotation::class.java) as? KotlinUAnnotation)
             ?.findAttributeValueExpression(parent)
     }
 
