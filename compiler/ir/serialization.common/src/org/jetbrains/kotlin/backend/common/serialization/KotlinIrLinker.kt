@@ -330,10 +330,13 @@ abstract class KotlinIrLinker(
             }
 
             override fun deserializeDescriptorReference(proto: ProtoDescriptorReference) = with(proto) {
+                val deserializedPackageFqName = deserializeFqName(packageFqName)
+                val deserializedClassFqName = deserializeFqName(classFqName)
+                val deserializedName = deserializeString(name)
                 descriptorReferenceDeserializer.deserializeDescriptorReference(
-                    deserializeFqName(packageFqName),
-                    deserializeFqName(classFqName),
-                    deserializeString(name),
+                    deserializedPackageFqName,
+                    deserializedClassFqName,
+                    deserializedName,
                     if (hasUniqId()) uniqId.index else null,
                     isEnumEntry = isEnumEntry,
                     isEnumSpecial = isEnumSpecial,
@@ -342,7 +345,7 @@ abstract class KotlinIrLinker(
                     isGetter = isGetter,
                     isSetter = isSetter,
                     isTypeParameter = isTypeParameter
-                ) ?: error("Could not find serialized descriptor for index: ${uniqId.index} ${packageFqName},${classFqName},${name}")
+                ) ?: error("Could not find serialized descriptor for index: ${uniqId.index} ${deserializedPackageFqName},${deserializedClassFqName},${deserializedName}")
             }
 
             override fun deserializeIrSymbol(proto: ProtoSymbolIndex): IrSymbol {
