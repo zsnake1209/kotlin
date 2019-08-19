@@ -1,6 +1,6 @@
 //FILE: 1.kt
 // IGNORE_BACKEND: JVM_IR
-// IGNORE_BACKEND_MULTI_MODULE: JVM_IR
+// IGNORE_BACKEND_MULTI_MODULE: JVM_IR, JVM_IR_SERIALIZE
 package test
 inline fun annotatedWith2(crossinline predicate: () -> Boolean) =
         { any { predicate() } }()
