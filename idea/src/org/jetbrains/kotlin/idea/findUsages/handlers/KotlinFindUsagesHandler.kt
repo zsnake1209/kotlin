@@ -27,6 +27,7 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.usageView.UsageInfo
 import com.intellij.util.CommonProcessors
 import com.intellij.util.Processor
+import org.jetbrains.kotlin.idea.debugger.readAction
 import org.jetbrains.kotlin.idea.findUsages.KotlinFindUsagesHandlerFactory
 import org.jetbrains.kotlin.idea.findUsages.KotlinReferencePreservingUsageInfo
 import org.jetbrains.kotlin.idea.findUsages.KotlinReferenceUsageInfo
@@ -76,7 +77,7 @@ abstract class KotlinFindUsagesHandler<T : PsiElement>(
 
     private fun searchReferences(element: PsiElement, processor: Processor<UsageInfo>, options: FindUsagesOptions): Boolean {
         val searcher = createSearcher(element, processor, options)
-        if (!project.runReadActionInSmartMode { searcher.buildTaskList() }) return false
+        if (!readAction { project }.runReadActionInSmartMode { searcher.buildTaskList() }) return false
         return searcher.executeTasks()
     }
 
