@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.codegen.inline.ReifiedTypeParametersUsages
 import org.jetbrains.kotlin.codegen.inline.SourceMapper
 import org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings
 import org.jetbrains.kotlin.codegen.serialization.JvmSerializerExtension
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
@@ -167,8 +168,10 @@ open class ClassCodegen protected constructor(
                 val kind = if (facadeClassName != null) KotlinClassHeader.Kind.MULTIFILE_CLASS_PART else KotlinClassHeader.Kind.FILE_FACADE
                 writeKotlinMetadata(visitor, state, kind, 0) { av ->
                     AsmUtil.writeAnnotationData(av, serializer, packageProto.build())
-                    val serializedIr = metadata.serializedIr ?: error("File facade should have serialized IR")
-                    storeSerializedIr(av, serializedIr)
+                    if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR)) {
+                        val serializedIr = metadata.serializedIr ?: error("File facade should have serialized IR")
+                        storeSerializedIr(av, serializedIr)
+                    }
 
                     if (facadeClassName != null) {
                         av.visit(JvmAnnotationNames.METADATA_MULTIFILE_CLASS_NAME_FIELD_NAME, facadeClassName.internalName)

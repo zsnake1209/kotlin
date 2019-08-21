@@ -1,4 +1,5 @@
 // TARGET_BACKEND: JVM
+// IGNORE_BACKEND: JVM_IR
 // FILE: A.kt
 
 open class A(@JvmField public val publicField: String = "1",

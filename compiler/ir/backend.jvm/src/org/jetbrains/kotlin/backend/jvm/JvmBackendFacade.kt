@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.backend.jvm.serialization.JvmIrDeserializer
 //import org.jetbrains.kotlin.backend.jvm.serialization.JvmIrDeserializer
 import org.jetbrains.kotlin.codegen.CompilationErrorHandler
 import org.jetbrains.kotlin.codegen.state.GenerationState
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -84,9 +85,12 @@ object JvmBackendFacade {
         ).generateUnboundSymbolsAsDependencies()
 
         for (irFile in irModuleFragment.files) {
-            irFile.metadata?.serializedIr = serializeIrFile(context, irFile)
-            for (irClass in irFile.declarations.filterIsInstance<IrClass>()) {
-                (irClass.metadata as? MetadataSource.Class)?.serializedIr = serializeToplevelIrClass(context, irClass)
+            if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR)) {
+                irFile.metadata?.serializedIr = serializeIrFile(context, irFile)
+
+                for (irClass in irFile.declarations.filterIsInstance<IrClass>()) {
+                    (irClass.metadata as? MetadataSource.Class)?.serializedIr = serializeToplevelIrClass(context, irClass)
+                }
             }
         }
 

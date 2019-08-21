@@ -1,6 +1,6 @@
 // !LANGUAGE: +MultiPlatformProjects
 // !USE_EXPERIMENTAL: kotlin.ExperimentalMultiplatform
-// IGNORE_BACKEND: JVM_IR
+// IGNORE_BACKEND: JVM_IR, JVM_IR_SERIALIZE
 // TARGET_BACKEND: JVM
 // FULL_JDK
 // FILE: A.kt
