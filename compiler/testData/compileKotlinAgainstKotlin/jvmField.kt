@@ -1,5 +1,6 @@
 // IGNORE_BACKEND: JVM_IR
 // TARGET_BACKEND: JVM
+// IGNORE_BACKEND: JVM_IR
 // FILE: A.kt
 
 open class A {

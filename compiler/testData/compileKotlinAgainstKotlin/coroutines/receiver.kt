@@ -1,7 +1,7 @@
 // FILE: A.kt
 // !LANGUAGE: -ReleaseCoroutines
 // TODO: Unmute when automatic conversion experimental <-> release will be implemented
-// IGNORE_BACKEND: JS, NATIVE, JVM_IR, JS_IR
+// IGNORE_BACKEND: JS, NATIVE, JVM_IR, JS_IR, JVM_IR_SERIALIZE
 
 import kotlin.coroutines.experimental.*
 

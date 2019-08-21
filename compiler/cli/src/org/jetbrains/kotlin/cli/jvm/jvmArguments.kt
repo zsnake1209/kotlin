@@ -152,6 +152,7 @@ fun CompilerConfiguration.configureAdvancedJvmOptions(arguments: K2JVMCompilerAr
         arguments.noExceptionOnExplicitEqualsForBoxedNull
     )
     put(JVMConfigurationKeys.DISABLE_OPTIMIZATION, arguments.noOptimize)
+    put(JVMConfigurationKeys.SERIALIZE_IR, arguments.serializeIr)
 
     if (!JVMConstructorCallNormalizationMode.isSupportedValue(arguments.constructorCallNormalizationMode)) {
         getNotNull(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY).report(

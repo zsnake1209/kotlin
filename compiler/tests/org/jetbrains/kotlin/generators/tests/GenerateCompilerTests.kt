@@ -371,6 +371,10 @@ fun main(args: Array<String>) {
             model("compileKotlinAgainstKotlin", targetBackend = TargetBackend.JVM_IR)
         }
 
+        testClass<AbstractIrSerializeCompileKotlinAgainstKotlinTest> {
+            model("compileKotlinAgainstKotlin", targetBackend = TargetBackend.JVM_IR_SERIALIZE)
+        }
+
         testClass<AbstractIrCheckLocalVariablesTableTest> {
             model("checkLocalVariablesTable", targetBackend = TargetBackend.JVM_IR)
         }
@@ -438,6 +442,9 @@ fun main(args: Array<String>) {
         }
         testClass<AbstractIrCompileKotlinAgainstInlineKotlinTest> {
             model("codegen/boxInline", targetBackend = TargetBackend.JVM_IR)
+        }
+        testClass<AbstractIrSerializeCompileKotlinAgainstInlineKotlinTest> {
+            model("codegen/boxInline", targetBackend = TargetBackend.JVM_IR_SERIALIZE)
         }
     }
 
