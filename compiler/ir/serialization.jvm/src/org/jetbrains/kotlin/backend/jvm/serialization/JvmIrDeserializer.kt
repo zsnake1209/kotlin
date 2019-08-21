@@ -265,7 +265,10 @@ class JvmIrDeserializer(
         override fun referenceDeserializedSymbol(
             proto: ProtoSymbolData,
             descriptor: DeclarationDescriptor?
-        ): IrSymbol = if (descriptor == null && !proto.uniqId.isLocal) {
+        ): IrSymbol = if (
+            descriptor == null && !proto.uniqId.isLocal &&
+            proto.kind != ProtoSymbolKind.TYPE_PARAMETER_SYMBOL  // TODO: Type parameters are only considered global due to a bug in old inference
+        ) {
             val uniqIdKey = UniqIdKey(null, proto.uniqId.uniqId())
             deserializedSymbols[uniqIdKey] ?: run {
                 val externalPackageProto = externalReferences[proto.uniqId.index]
