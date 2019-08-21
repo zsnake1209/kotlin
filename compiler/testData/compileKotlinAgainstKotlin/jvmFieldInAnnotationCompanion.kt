@@ -1,5 +1,5 @@
 // !LANGUAGE: +JvmFieldInInterface +NestedClassesInAnnotations
-// IGNORE_BACKEND: JVM_IR
+// IGNORE_BACKEND: JVM_IR, JVM_IR_SERIALIZE
 // TARGET_BACKEND: JVM
 
 // WITH_RUNTIME
