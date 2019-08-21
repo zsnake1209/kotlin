@@ -154,7 +154,7 @@ class KotlinCopyPasteReferenceProcessor : CopyPastePostProcessor<KotlinReference
         if (PsiTreeUtil.getNonStrictParentOfType(element, *IGNORE_REFERENCES_INSIDE) != null) return
 
         element.forEachDescendantOfType<KtElement>(canGoInside = { it::class.java as Class<*> !in IGNORE_REFERENCES_INSIDE }) { ktElement ->
-            val reference = ktElement.mainReference ?: return@forEachDescendantOfType
+            val reference = allowResolveInWriteAction { ktElement.mainReference } ?: return@forEachDescendantOfType
 
             val descriptors = resolveReference(reference, bindingContext)
             //check whether this reference is unambiguous
