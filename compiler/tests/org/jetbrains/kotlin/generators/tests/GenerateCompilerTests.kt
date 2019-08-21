@@ -176,6 +176,14 @@ fun main(args: Array<String>) {
             model("codegen/boxInline", targetBackend = TargetBackend.JVM)
         }
 
+        testClass<AbstractIrCompileKotlinAgainstInlineKotlinTest> {
+            model("codegen/boxInline", targetBackend = TargetBackend.JVM_IR)
+        }
+
+        testClass<AbstractIrSerializeCompileKotlinAgainstInlineKotlinTest> {
+            model("codegen/boxInline", targetBackend = TargetBackend.JVM_IR_SERIALIZE)
+        }
+
         testClass<AbstractBlackBoxAgainstJavaCodegenTest> {
             model("codegen/boxAgainstJava")
         }
@@ -374,6 +382,10 @@ fun main(args: Array<String>) {
 
         testClass<AbstractIrCompileKotlinAgainstKotlinTest> {
             model("compileKotlinAgainstKotlin", targetBackend = TargetBackend.JVM_IR)
+        }
+
+        testClass<AbstractIrSerializeCompileKotlinAgainstKotlinTest> {
+            model("compileKotlinAgainstKotlin", targetBackend = TargetBackend.JVM_IR_SERIALIZE)
         }
 
         testClass<AbstractIrCheckLocalVariablesTableTest> {
