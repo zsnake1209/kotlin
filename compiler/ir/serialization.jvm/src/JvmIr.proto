@@ -9,7 +9,7 @@ option optimize_for = LITE_RUNTIME;
 
 message UniqIdInfo {
   required int64 id = 1;
-  required common.serialization.String toplevel_fq_name = 2;
+  required common.serialization.proto.String toplevel_fq_name = 2;
 }
 
 message UniqIdTable {
@@ -23,7 +23,7 @@ message ExternalReference {
 
 message JvmExternalPackage {
   required string fq_name = 1;
-  required common.serialization.IrDeclarationContainer declaration_container = 2;
+  required common.serialization.proto.IrDeclarationContainer declaration_container = 2;
 }
 
 message ExternalRefs {
@@ -32,20 +32,21 @@ message ExternalRefs {
 }
 
 message AuxTables {
-  required common.serialization.IrSymbolTable symbol_table = 1;
-  required common.serialization.IrTypeTable type_table = 2;
-  required common.serialization.StringTable string_table = 3;
+  required common.serialization.proto.IrSymbolTable symbol_table = 1;
+  required common.serialization.proto.IrTypeTable type_table = 2;
+  required common.serialization.proto.StringTable string_table = 3;
   required ExternalRefs external_refs = 4;
   required UniqIdTable uniq_id_table = 5;
 }
 
 message JvmIrFile {
-  required common.serialization.IrDeclarationContainer declaration_container = 1;
-  required common.serialization.Annotations annotations = 2;
-  required AuxTables aux_tables = 3;
+  required common.serialization.proto.IrDeclarationContainer declaration_container = 1;
+  required common.serialization.proto.Annotations annotations = 2;
+  required string facade_fq_name = 3;
+  required AuxTables aux_tables = 4;
 }
 
 message JvmIrClass {
-  required common.serialization.IrClass ir_class = 1;
+  required common.serialization.proto.IrClass ir_class = 1;
   required AuxTables aux_tables = 2;
 }
