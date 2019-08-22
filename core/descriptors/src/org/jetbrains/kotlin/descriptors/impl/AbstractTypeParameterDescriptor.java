@@ -134,6 +134,11 @@ public abstract class AbstractTypeParameterDescriptor extends DeclarationDescrip
         return (TypeParameterDescriptor) super.getOriginal();
     }
 
+    @NotNull
+    protected List<KotlinType> processBoundsWithoutCycles(@NotNull List<KotlinType> bounds) {
+        return bounds;
+    }
+
     @Override
     public <R, D> R accept(DeclarationDescriptorVisitor<R, D> visitor, D data) {
         return visitor.visitTypeParameterDescriptor(this, data);
@@ -196,6 +201,12 @@ public abstract class AbstractTypeParameterDescriptor extends DeclarationDescrip
         @Override
         protected void reportSupertypeLoopError(@NotNull KotlinType type) {
             AbstractTypeParameterDescriptor.this.reportSupertypeLoopError(type);
+        }
+
+        @NotNull
+        @Override
+        protected List<KotlinType> processSupertypesWithoutCycles(@NotNull List<KotlinType> supertypes) {
+            return processBoundsWithoutCycles(supertypes);
         }
 
         @Nullable

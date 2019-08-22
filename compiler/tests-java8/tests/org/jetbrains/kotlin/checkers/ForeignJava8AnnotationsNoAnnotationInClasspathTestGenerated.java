@@ -76,6 +76,11 @@ public class ForeignJava8AnnotationsNoAnnotationInClasspathTestGenerated extends
             runTest("compiler/testData/foreignAnnotationsJava8/tests/codeanalysis/nonPlatformTypeParameter.kt");
         }
 
+        @TestMetadata("selfType.kt")
+        public void testSelfType() throws Exception {
+            runTest("compiler/testData/foreignAnnotationsJava8/tests/codeanalysis/selfType.kt");
+        }
+
         @TestMetadata("simple.kt")
         public void testSimple() throws Exception {
             runTest("compiler/testData/foreignAnnotationsJava8/tests/codeanalysis/simple.kt");
