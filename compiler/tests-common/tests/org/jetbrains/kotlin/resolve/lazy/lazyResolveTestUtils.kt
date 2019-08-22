@@ -20,11 +20,20 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.analyzer.*
+import org.jetbrains.kotlin.analyzer.common.CommonAnalysisParameters
+import org.jetbrains.kotlin.analyzer.common.CommonResolverForModuleFactory
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.ProjectContext
+import org.jetbrains.kotlin.context.withModule
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.load.kotlin.PackagePartProvider
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.platform.CommonPlatforms
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.psi.KtFile
@@ -35,9 +44,9 @@ import org.jetbrains.kotlin.resolve.jvm.JvmResolverForModuleFactory
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatformAnalyzerServices
 
 fun createResolveSessionForFiles(
-        project: Project,
-        syntheticFiles: Collection<KtFile>,
-        addBuiltIns: Boolean
+    project: Project,
+    syntheticFiles: Collection<KtFile>,
+    addBuiltIns: Boolean
 ): ResolveSession {
     val projectContext = ProjectContext(project, "lazy resolve test utils")
     val testModule =
@@ -46,18 +55,41 @@ fun createResolveSessionForFiles(
         packagePartProviderFactory = { PackagePartProvider.Empty },
         moduleByJavaClass = { testModule }
     )
-    val resolverForProject = ResolverForProjectImpl(
-        "test",
-        projectContext, listOf(testModule),
-        { ModuleContent(it, syntheticFiles, GlobalSearchScope.allScope(project)) },
-        invalidateOnOOCB = false,
-        moduleLanguageSettingsProvider = LanguageSettingsProvider.Default,
-        resolverForModuleFactoryByPlatform = {
-            JvmResolverForModuleFactory(platformParameters, CompilerEnvironment, JvmPlatforms.defaultJvmPlatform)
-        },
-        builtInsProvider = { DefaultBuiltIns.Instance },
-        sdkDependency = { null }
-    )
+
+    val moduleDescriptorsFactory = object : AbstractModuleDescriptorsFactory<TestModule>(
+        "lazyResolveTestUtils",
+        delegateModuleDescriptorsFactory = null,
+        storageManager = projectContext.storageManager,
+        fallbackTracker = null,
+        packageOracleFactory = PackageOracleFactory.OptimisticFactory,
+        modules = listOf(testModule)
+    ) {
+        override fun sdkDependency(module: TestModule): TestModule? = null
+
+        override fun modulesContent(module: TestModule): ModuleContent<TestModule> =
+            ModuleContent(module, syntheticFiles, GlobalSearchScope.allScope(project))
+
+        override fun builtInsForModule(module: TestModule): KotlinBuiltIns = DefaultBuiltIns.Instance
+    }
+
+    val resolverForProject = object : AbstractResolverForProject<TestModule>(
+        moduleDescriptorsFactory,
+        projectContext,
+        delegateResolver = EmptyResolverForProject(),
+        name = "lazyResolveTestUtils"
+    ) {
+        override fun createResolverForModule(descriptor: ModuleDescriptor, moduleInfo: TestModule): ResolverForModule {
+            return JvmResolverForModuleFactory(platformParameters, CompilerEnvironment, JvmPlatforms.defaultJvmPlatform)
+                .createResolverForModule(
+                    descriptor as ModuleDescriptorImpl,
+                    projectContext.withModule(descriptor),
+                    ModuleContent(moduleInfo, syntheticFiles, GlobalSearchScope.allScope(project)),
+                    this,
+                    LanguageVersionSettingsImpl.DEFAULT
+                )
+        }
+    }
+
     return resolverForProject.resolverForModule(testModule).componentProvider.get<ResolveSession>()
 }
 

@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.analyzer.*
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.container.StorageComponentContainer
@@ -29,6 +30,7 @@ import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.context.ModuleContext
 import org.jetbrains.kotlin.context.ProjectContext
+import org.jetbrains.kotlin.context.withModule
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.impl.CompositePackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
@@ -117,6 +119,7 @@ class CommonResolverForModuleFactory(
         ): AnalysisResult {
             val moduleInfo = SourceModuleInfo(moduleName, capabilities, dependOnBuiltIns)
             val project = files.firstOrNull()?.project ?: throw AssertionError("No files to analyze")
+            val projectContext = ProjectContext(project, "metadata serializer")
 
             val multiplatformLanguageSettings = object : LanguageVersionSettings by languageVersionSettings {
                 override fun getFeatureSupport(feature: LanguageFeature): LanguageFeature.State =
@@ -124,36 +127,47 @@ class CommonResolverForModuleFactory(
                     else languageVersionSettings.getFeatureSupport(feature)
             }
 
-            @Suppress("NAME_SHADOWING")
-            val resolver = ResolverForProjectImpl(
+            val moduleDescriptorsFactory = object : AbstractModuleDescriptorsFactory<ModuleInfo>(
                 "sources for metadata serializer",
-                ProjectContext(project, "metadata serializer"),
-                listOf(moduleInfo),
-                invalidateOnOOCB = false,
-                modulesContent = { ModuleContent(it, files, GlobalSearchScope.allScope(project)) },
-                moduleLanguageSettingsProvider = object : LanguageSettingsProvider {
-                    override fun getLanguageVersionSettings(
-                        moduleInfo: ModuleInfo,
-                        project: Project,
-                        isReleaseCoroutines: Boolean?
-                    ) = multiplatformLanguageSettings
+                delegateModuleDescriptorsFactory = null,
+                storageManager = projectContext.storageManager,
+                fallbackTracker = null,
+                packageOracleFactory = PackageOracleFactory.OptimisticFactory,
+                modules = listOf(moduleInfo)
+            ) {
+                override fun sdkDependency(module: ModuleInfo): ModuleInfo? = null
 
-                    override fun getTargetPlatform(
-                        moduleInfo: ModuleInfo,
-                        project: Project
-                    ) = TargetPlatformVersion.NoVersion
-                },
-                resolverForModuleFactoryByPlatform = {
-                    CommonResolverForModuleFactory(
+                override fun modulesContent(module: ModuleInfo): ModuleContent<ModuleInfo> {
+                    val moduleContent = ModuleContent(module, files, GlobalSearchScope.allScope(project))
+                    return moduleContent
+                }
+
+                override fun builtInsForModule(module: ModuleInfo): KotlinBuiltIns = DefaultBuiltIns.Instance
+            }
+
+            val resolver = object : AbstractResolverForProject<ModuleInfo>(
+                moduleDescriptorsFactory,
+                projectContext,
+                delegateResolver = EmptyResolverForProject(),
+                name = "sources for metadata serializer"
+            ) {
+                override fun createResolverForModule(descriptor: ModuleDescriptor, moduleInfo: ModuleInfo): ResolverForModule {
+                    return CommonResolverForModuleFactory(
                         CommonAnalysisParameters(metadataPartProviderFactory),
                         CompilerEnvironment,
                         CommonPlatforms.defaultCommonPlatform,
                         shouldCheckExpectActual = false
+                    ).createResolverForModule(
+                        descriptor as ModuleDescriptorImpl,
+                        projectContext.withModule(descriptor),
+                        ModuleContent(moduleInfo, files, GlobalSearchScope.allScope(project)),
+                        this,
+                        multiplatformLanguageSettings
                     )
-                },
-                builtInsProvider = { DefaultBuiltIns.Instance },
-                sdkDependency = { null }
-            )
+                }
+            }
+
+            moduleDescriptorsFactory.resolverForProject = resolver
 
             val moduleDescriptor = resolver.descriptorForModule(moduleInfo)
             val container = resolver.resolverForModule(moduleInfo).componentProvider
