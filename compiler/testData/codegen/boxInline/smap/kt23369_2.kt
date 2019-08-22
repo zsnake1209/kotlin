@@ -1,4 +1,3 @@
-// IGNORE_BACKEND: JVM_IR, JVM_IR_SERIALIZE
 // FILE: 1+ a.kt
 
 package test
