@@ -32,8 +32,10 @@ import org.jetbrains.kotlin.caches.resolve.CompositeResolverForModuleFactory
 import org.jetbrains.kotlin.caches.resolve.resolution
 import org.jetbrains.kotlin.context.GlobalContextImpl
 import org.jetbrains.kotlin.context.ProjectContext
+import org.jetbrains.kotlin.context.withModule
 import org.jetbrains.kotlin.context.withProject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.idea.caches.project.*
 import org.jetbrains.kotlin.idea.caches.project.IdeaModuleInfo
 import org.jetbrains.kotlin.idea.caches.project.getNullableModuleInfo
@@ -52,7 +54,6 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.CompositeBindingContext
 import org.jetbrains.kotlin.resolve.jvm.JvmPlatformParameters
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
-import org.jetbrains.kotlin.platform.DefaultIdeTargetPlatformKindProvider
 import org.jetbrains.kotlin.platform.toTargetPlatform
 
 internal class ProjectResolutionFacade(
@@ -119,62 +120,27 @@ internal class ProjectResolutionFacade(
 
         val modulesToCreateResolversFor = allModuleInfos.filter(moduleFilter)
 
-        val modulesContentFactory = { module: IdeaModuleInfo ->
-            ModuleContent(module, syntheticFilesByModule[module] ?: listOf(), module.contentScope())
-        }
-
-        val jvmPlatformParameters = JvmPlatformParameters(
-            packagePartProviderFactory = { IDEPackagePartProvider(it.moduleContentScope) },
-            moduleByJavaClass = { javaClass: JavaClass ->
-                val psiClass = (javaClass as JavaClassImpl).psi
-                psiClass.getPlatformModuleInfo(JvmPlatforms.unspecifiedJvmPlatform)?.platformModule ?: psiClass.getNullableModuleInfo()
-            }
-        )
-
-        val commonPlatformParameters = CommonAnalysisParameters(
-            metadataPartProviderFactory = { IDEPackagePartProvider(it.moduleContentScope) }
-        )
-
-        val resolverForProject = ResolverForProjectImpl(
+        val moduleDescriptorsFactory = IdeaModuleDescriptorsFactory(
+            syntheticFilesByModule,
+            builtInsCache,
             resolverDebugName,
-            projectContext,
-            modulesToCreateResolversFor,
-            modulesContentFactory,
-            moduleLanguageSettingsProvider = IDELanguageSettingsProvider,
-            resolverForModuleFactoryByPlatform = { modulePlatform ->
-                val platform = modulePlatform ?: DefaultIdeTargetPlatformKindProvider.defaultPlatform
-                val parameters = when {
-                    platform.isJvm() -> jvmPlatformParameters
-                    platform.isCommon() -> commonPlatformParameters
-                    else -> PlatformAnalysisParameters.Empty
-                }
-
-                if (!project.useCompositeAnalysis)
-                    platform.idePlatformKind.resolution.createResolverForModuleFactory(parameters, IdeaEnvironment, platform)
-                else
-                    CompositeResolverForModuleFactory(
-                        commonPlatformParameters,
-                        jvmPlatformParameters,
-                        modulePlatform!!,
-                        CompositeAnalyzerServices(modulePlatform.componentPlatforms.map { it.toTargetPlatform().findAnalyzerServices })
-                    )
-            },
-            builtInsProvider = { module ->
-                require(module in modulesToCreateResolversFor)
-                val key = module.platform.idePlatformKind.resolution.getKeyForBuiltIns(module)
-                builtInsCache.getOrPut(key) { throw IllegalStateException("Can't find builtIns by key $key for module $module") }
-            },
-            delegateResolver = delegateResolverForProject,
-            sdkDependency = { module ->
-                if (settings is PlatformAnalysisSettingsImpl)
-                    settings.sdk?.let { SdkInfo(project, it) }
-                else
-                    module.findSdkAcrossDependencies()
-            },
-            packageOracleFactory = ServiceManager.getService(project, IdePackageOracleFactory::class.java),
-            invalidateOnOOCB = invalidateOnOOCB,
-            isReleaseCoroutines = settings.isReleaseCoroutines
+            (delegateResolverForProject as? IdeaResolverForProject)?.moduleDescriptorsFactory,
+            projectContext.storageManager,
+            if (invalidateOnOOCB) KotlinModificationTrackerService.getInstance(project).outOfBlockModificationTracker else null,
+            ServiceManager.getService(project, IdePackageOracleFactory::class.java),
+            modulesToCreateResolversFor
         )
+
+        val resolverForProject = IdeaResolverForProject(
+            syntheticFilesByModule,
+            settings.isReleaseCoroutines,
+            moduleDescriptorsFactory,
+            projectContext,
+            delegateResolverForProject,
+            resolverDebugName
+        )
+
+        moduleDescriptorsFactory.resolverForProject = resolverForProject
 
         // Fill builtInsCache
         modulesToCreateResolversFor.forEach {
@@ -206,8 +172,8 @@ internal class ProjectResolutionFacade(
     internal fun resolverForElement(element: PsiElement): ResolverForModule {
         val infos = element.getModuleInfos()
         return infos.asIterable().firstNotNullResult { cachedResolverForProject.tryGetResolverForModule(it) }
-                ?: cachedResolverForProject.tryGetResolverForModule(NotUnderContentRootModuleInfo)
-                ?: cachedResolverForProject.diagnoseUnknownModuleInfo(infos.toList())
+            ?: cachedResolverForProject.tryGetResolverForModule(NotUnderContentRootModuleInfo)
+            ?: DiagnoseUnknownModuleInfoReporter.report(cachedResolverForProject.name, infos.toList())
     }
 
     internal fun resolverForDescriptor(moduleDescriptor: ModuleDescriptor) =
