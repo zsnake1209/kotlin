@@ -44,56 +44,32 @@ class KotlinGradleBuildScriptsModelBuilder : ModelBuilderService {
         modelName == GradleKotlinBuildScriptsModel::class.java.name
 
     override fun buildAll(modelName: String, project: Project): GradleKotlinBuildScriptsModel {
-        return GradleKotlinBuildScriptsModelImpl(visitProject(project))
+        val start = System.currentTimeMillis()
+        val result = GradleKotlinBuildScriptsModelImpl(visitProject(project))
+        val duration = System.currentTimeMillis() - start
+        println("Duration of visit project $modelName project=$project [$duration]")
+        return result
     }
 
     private fun visitProject(project: Project): List<GradleKotlinBuildScriptModel> {
         val buildScripts = mutableListOf<GradleKotlinBuildScriptModel>()
 
-        project.projectDir.walkTopDown()
-            .filter { it.isFile && it.endsWith(".gradle.kts") }
-            .forEach {
-                visitScript(project, it, buildScripts)
-            }
-
-        val buildGradleKtsFile = project.projectDir.resolve("build.gradle.kts")
-        if (buildGradleKtsFile.exists()) {
-            visitScript(project, buildGradleKtsFile, buildScripts)
+        val fileNames = arrayOf("build.gradle.kts", "init.gradle.kts", "settings.gradle.kts")
+        fileNames.map { File(project.projectDir, it) }.filter { it.exists() && it.isFile }.forEach { gradleKtsFile ->
+            visitScript(project, gradleKtsFile, buildScripts)
         }
-
         return buildScripts
     }
+
+
 
     private fun visitScript(
         project: Project,
         buildGradleKtsFile: File,
         buildScripts: MutableList<GradleKotlinBuildScriptModel>
     ) {
-        val classLoader = javaClass.classLoader
-        val builderClass = classLoader.loadClass("org.gradle.kotlin.dsl.tooling.builders.KotlinBuildScriptModelBuilder")
-        val builder = builderClass.kotlin.objectInstance
-
-        val pClass = classLoader.loadClass("org.gradle.kotlin.dsl.tooling.builders.KotlinBuildScriptModelParameter")
-        val pConstructor = pClass.kotlin.constructors
-            .first()
-            .also { it.isAccessible = true }
-        val parameters =
-            if (pConstructor.parameters.size == 1) pConstructor.call(buildGradleKtsFile.canonicalPath)
-            else pConstructor.call(buildGradleKtsFile.canonicalPath, System.currentTimeMillis().toString())
-
-        // fun org.gradle.kotlin.dsl.tooling.builders.KotlinBuildScriptModelBuilder.scriptModelBuilderFor(org.gradle.api.internal.project.ProjectInternal, org.gradle.kotlin.dsl.tooling.builders.KotlinBuildScriptModelParameter): org.gradle.kotlin.dsl.tooling.builders.KotlinScriptTargetModelBuilder
-        val modelBuilder = builderClass.declaredMethods
-            .find { it.name == "scriptModelBuilderFor" }!!
-            .also { it.isAccessible = true }
-            .invoke(builder, project, parameters)
-
-        val model = modelBuilder::class.declaredFunctions
-            .find { it.name == "buildModel" }!!
-            .also { it.isAccessible = true }
-            .call(modelBuilder)!!
-
+        val model = getDependencyModel(buildGradleKtsFile, project)
         val modelClass = model.javaClass
-
         buildScripts.add(
             GradleKotlinBuildScriptModelImpl(
                 buildGradleKtsFile.absolutePath,
@@ -104,9 +80,44 @@ class KotlinGradleBuildScriptsModelBuilder : ModelBuilderService {
         )
     }
 
+    var modelBuilder: Any? = null
+
+    private fun getDependencyModel(buildGradleKtsFile: File, project: Project): Any {
+        val classLoader = javaClass.classLoader
+        if (modelBuilder == null) {
+            val builderClass = classLoader.loadClass("org.gradle.kotlin.dsl.tooling.builders.KotlinBuildScriptModelBuilder")
+            val builder = builderClass.kotlin.objectInstance
+
+            val pClass = classLoader.loadClass("org.gradle.kotlin.dsl.tooling.builders.KotlinBuildScriptModelParameter")
+            val pConstructor = pClass.kotlin.constructors
+                .first()
+                .also { it.isAccessible = true }
+            val parameters =
+                if (pConstructor.parameters.size == 1) pConstructor.call(buildGradleKtsFile.canonicalPath)
+                else pConstructor.call(buildGradleKtsFile.canonicalPath, System.currentTimeMillis().toString())
+
+            modelBuilder = builderClass.declaredMethods
+                .find { it.name == "scriptModelBuilderFor" }!!
+                .also { it.isAccessible = true }
+                .invoke(builder, project, parameters)
+
+        }
+
+        val model = modelBuilder!!::class.declaredFunctions
+            .find { it.name == "buildModel" }!!
+            .also {
+                if (!it.isAccessible) {
+                    it.isAccessible = true
+                }}
+            .call(modelBuilder)!!
+        return model
+    }
+
     private fun <T> loadList(modelClass: Class<Any>, model: Any, getter: String): List<T> {
         return (modelClass.declaredMethods.find { it.name == getter }!!.also {
-            it.isAccessible = true
+            if (!it.isAccessible) {
+                it.isAccessible = true
+            }
         }.invoke(model) as List<Any>).map {
             cast(it) as T
         }
