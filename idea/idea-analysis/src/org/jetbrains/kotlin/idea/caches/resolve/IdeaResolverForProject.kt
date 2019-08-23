@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.resolve.jvm.JvmPlatformParameters
 class IdeaResolverForProject(
     private val syntheticFilesByModule: Map<IdeaModuleInfo, Collection<KtFile>>,
     private val isReleaseCoroutines: Boolean,
-    moduleDescriptorsFactory: ModuleDescriptorsFactory<IdeaModuleInfo>,
+    override val moduleDescriptorsFactory: IdeaModuleDescriptorsFactory,
     projectContext: ProjectContext,
     delegateResolver: ResolverForProject<IdeaModuleInfo>,
     name: String

@@ -91,7 +91,7 @@ class EmptyResolverForProject<M : ModuleInfo> : ResolverForProject<M>() {
 }
 
 abstract class AbstractResolverForProject<M : ModuleInfo>(
-    val moduleDescriptorsFactory: ModuleDescriptorsFactory<M>,
+    open val moduleDescriptorsFactory: ModuleDescriptorsFactory<M>,
     protected val projectContext: ProjectContext,
     protected val delegateResolver: ResolverForProject<M>,
     override val name: String

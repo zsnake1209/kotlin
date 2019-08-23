@@ -24,8 +24,8 @@ interface ModuleDescriptorsFactory<M : ModuleInfo> {
 
 abstract class AbstractModuleDescriptorsFactory<M : ModuleInfo>(
     private val name: String,
-    private val delegateModuleDescriptorsFactory: ModuleDescriptorsFactory<M>?,
-    private val storageManager: StorageManager,
+    protected val delegateModuleDescriptorsFactory: ModuleDescriptorsFactory<M>?,
+    protected val storageManager: StorageManager,
     private val fallbackTracker: ModificationTracker?,
     private val packageOracleFactory: PackageOracleFactory,
     modules: Collection<M>
@@ -84,6 +84,7 @@ abstract class AbstractModuleDescriptorsFactory<M : ModuleInfo>(
         }
     }
 
+    // Protected by ("projectContext.storageManager.lock")
     private fun recreateModuleDescriptor(module: M): ModuleData {
         val oldDescriptor = descriptorByModule[module]?.moduleDescriptor
         if (oldDescriptor != null) {
@@ -97,6 +98,7 @@ abstract class AbstractModuleDescriptorsFactory<M : ModuleInfo>(
         return moduleData
     }
 
+    // Protected by ("projectContext.storageManager.lock")
     private fun createModuleDescriptor(module: M): ModuleData {
         val moduleDescriptor = ModuleDescriptorImpl(
             module.name,

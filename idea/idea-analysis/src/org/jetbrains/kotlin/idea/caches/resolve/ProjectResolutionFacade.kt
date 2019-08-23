@@ -66,7 +66,6 @@ internal class ProjectResolutionFacade(
     val moduleFilter: (IdeaModuleInfo) -> Boolean,
     dependencies: List<Any>,
     private val invalidateOnOOCB: Boolean,
-    val builtInsCache: BuiltInsCache,
     val syntheticFiles: Collection<KtFile> = listOf(),
     val allModules: Collection<IdeaModuleInfo>? = null // null means create resolvers for modules from idea model
 ) {
@@ -102,7 +101,6 @@ internal class ProjectResolutionFacade(
 
     private fun computeModuleResolverProvider(): ResolverForProject<IdeaModuleInfo> {
         val delegateResolverForProject: ResolverForProject<IdeaModuleInfo>
-        val delegateBuiltIns: KotlinBuiltIns?
 
         if (reuseDataFrom != null) {
             delegateResolverForProject = reuseDataFrom.cachedResolverForProject
@@ -122,16 +120,17 @@ internal class ProjectResolutionFacade(
 
         val moduleDescriptorsFactory = IdeaModuleDescriptorsFactory(
             syntheticFilesByModule,
-            builtInsCache,
+            projectContext,
             resolverDebugName,
             (delegateResolverForProject as? IdeaResolverForProject)?.moduleDescriptorsFactory,
-            projectContext.storageManager,
             if (invalidateOnOOCB) KotlinModificationTrackerService.getInstance(project).outOfBlockModificationTracker else null,
             ServiceManager.getService(project, IdePackageOracleFactory::class.java),
             modulesToCreateResolversFor
         )
 
-        val resolverForProject = IdeaResolverForProject(
+        val resolverForProject: IdeaResolverForProject
+
+        resolverForProject = IdeaResolverForProject(
             syntheticFilesByModule,
             settings.isReleaseCoroutines,
             moduleDescriptorsFactory,
@@ -141,28 +140,6 @@ internal class ProjectResolutionFacade(
         )
 
         moduleDescriptorsFactory.resolverForProject = resolverForProject
-
-        // Fill builtInsCache
-        modulesToCreateResolversFor.forEach {
-            val key = it.platform.idePlatformKind.resolution.getKeyForBuiltIns(it)
-            val cachedBuiltIns = builtInsCache[key]
-            if (cachedBuiltIns == null) {
-                // Note that we can't use .getOrPut, because we have to put builtIns into map *before*
-                // initialization
-                val builtIns = it.platform.idePlatformKind.resolution.createBuiltIns(it, projectContext)
-                builtInsCache[key] = builtIns
-
-                if (builtIns is JvmBuiltIns) {
-                    // SDK should be present, otherwise we wouldn't have created JvmBuiltIns in createBuiltIns
-                    val sdk = it.findSdkAcrossDependencies()!!
-                    val sdkDescriptor = resolverForProject.descriptorForModule(sdk)
-
-                    val isAdditionalBuiltInsFeaturesSupported = it.supportsAdditionalBuiltInsMembers(project)
-
-                    builtIns.initialize(sdkDescriptor, isAdditionalBuiltInsFeaturesSupported)
-                }
-            }
-        }
 
         return resolverForProject
     }
