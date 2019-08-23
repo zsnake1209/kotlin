@@ -1,0 +1,45 @@
+// KJS_WITH_FULL_RUNTIME
+
+// MODULE: AT
+// FILE: at.kt
+package foo
+
+internal fun qqq() = "Fail AT"
+
+// MODULE: A(AT)
+// FILE: a.kt
+package bar
+
+import foo.*
+
+internal fun qqq() = "O"
+
+fun o(): String = qqq()
+
+// MODULE: BT
+// FILE: bt.kt
+package foo
+
+internal fun qqq() = "K"
+
+fun ik() = qqq()
+
+// MODULE: B(BT)
+// FILE: b.kt
+package bar
+
+import foo.*
+
+internal fun qqq() = "Fail B"
+
+fun k(): String = ik()
+
+// MODULE: main(A, B)
+// FILE: main.kt
+package main
+
+import bar.*
+
+fun box(): String {
+    return o() + k()
+}
