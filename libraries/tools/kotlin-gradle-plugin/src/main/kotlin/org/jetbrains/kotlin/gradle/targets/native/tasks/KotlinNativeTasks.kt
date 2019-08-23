@@ -121,7 +121,7 @@ abstract class AbstractKotlinNativeCompile : AbstractCompile(), KotlinCompile<Ko
         @InputFiles get() = compilation.compileDependencyFiles.filterOutPublishableInteropLibs(project)
 
     private val friendModule: FileCollection?
-        get() = compilation.friendCompilation?.output?.allOutputs
+        get() = project.files(project.provider { compilation.friendCompilations.map { it.output.allOutputs } })
 
     override fun getClasspath(): FileCollection = libraries
     override fun setClasspath(configuration: FileCollection?) {

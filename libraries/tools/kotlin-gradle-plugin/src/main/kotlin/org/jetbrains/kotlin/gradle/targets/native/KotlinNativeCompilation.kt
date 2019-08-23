@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilationWithResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.gradle.utils.SingleWarningPerBuild
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
 import java.util.concurrent.Callable
 
@@ -44,11 +45,24 @@ class KotlinNativeCompilation(
     // TODO: Move into the compilation task when the linking task does klib linking instead of compilation.
     internal val commonSources: ConfigurableFileCollection = project.files()
 
+    @Deprecated("Use associateWith(...) to add a friend compilation and associateWith to get all of them.")
     var friendCompilationName: String? = null
+        set(value) {
+            SingleWarningPerBuild.show(
+                project,
+                "Property `friendCompilationName` of `KotlinNativeCompilation` has been deprecated and will be removed. " +
+                        "Use `associateWith(...)` instead."
+            )
+            field = value
+        }
 
-    internal val friendCompilation: KotlinNativeCompilation?
-        get() = friendCompilationName?.let {
-            target.compilations.getByName(it)
+    internal val friendCompilations: List<KotlinNativeCompilation>
+        get() = mutableListOf<KotlinNativeCompilation>().apply {
+            @Suppress("DEPRECATION")
+            friendCompilationName?.let {
+                add(target.compilations.getByName(it))
+            }
+            addAll(associateWithTransitiveClosure.filterIsInstance<KotlinNativeCompilation>())
         }
 
     // Native-specific DSL.
