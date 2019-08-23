@@ -12,11 +12,8 @@ abstract class AbstractIncrementalJsKlibCompilerRunnerTest : AbstractIncremental
             sourceMap = true
             irBackend = true
             irProduceOnly = "klib"
+            irLegacyGradlePluginCompatibility = true // Don't zip klib since file's date affect final checksum
         }
-
-    override fun rebuildAndCompareOutput(sourceRoots: List<File>, testDir: File, buildLogSteps: List<BuildStep>, outDir: File) {
-        // todo fix
-    }
 
     override val buildLogFinder: BuildLogFinder
         get() = super.buildLogFinder.copy(isJsIrEnabled = true)
