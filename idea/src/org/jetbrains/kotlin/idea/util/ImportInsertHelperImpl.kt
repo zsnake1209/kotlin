@@ -111,7 +111,10 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
             return when (target) {
                 is ClassifierDescriptorWithTypeParameters -> {
                     val classifier = topLevelScope.findClassifier(name, NoLookupLocation.FROM_IDE)
-                    classifier?.importableFqName == targetFqName
+                    if (classifier?.importableFqName == targetFqName) true
+                    else if (classifier is TypeAliasDescriptor) {
+                        classifier.classDescriptor?.importableFqName == targetFqName
+                    } else false
                 }
 
                 is FunctionDescriptor ->
