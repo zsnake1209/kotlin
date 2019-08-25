@@ -12,7 +12,7 @@ package kotlin.collections
  * There is no speed advantage to pre-allocating array sizes in JavaScript, so this implementation does not include any of the
  * capacity and "growth increment" concepts.
  */
-public actual open class ArrayList<E> internal constructor(private var array: Array<Any?>) : AbstractMutableList<E>(), MutableList<E>, RandomAccess {
+public actual open class ArrayList<E> internal constructor(private var array: Array<E>) : AbstractMutableList<E>(), MutableList<E>, RandomAccess {
 
     /**
      * Creates an empty [ArrayList].
@@ -29,7 +29,7 @@ public actual open class ArrayList<E> internal constructor(private var array: Ar
     /**
      * Creates an [ArrayList] filled from the [elements] collection.
      */
-    public actual constructor(elements: Collection<E>) : this(elements.toTypedArray<Any?>()) {}
+    public actual constructor(elements: Collection<E>) : this(elements.toTypedArray<E>()) {}
 
     /** Does nothing in this ArrayList implementation. */
     public actual fun trimToSize() {}
@@ -38,12 +38,10 @@ public actual open class ArrayList<E> internal constructor(private var array: Ar
     public actual fun ensureCapacity(minCapacity: Int) {}
 
     actual override val size: Int get() = array.size
-    @Suppress("UNCHECKED_CAST")
-    actual override fun get(index: Int): E = array[rangeCheck(index)] as E
+    actual override fun get(index: Int): E = array[rangeCheck(index)]
     actual override fun set(index: Int, element: E): E {
         rangeCheck(index)
-        @Suppress("UNCHECKED_CAST")
-        return array[index].apply { array[index] = element } as E
+        return array[index].apply { array[index] = element }
     }
 
     actual override fun add(element: E): Boolean {
@@ -60,7 +58,7 @@ public actual open class ArrayList<E> internal constructor(private var array: Ar
     actual override fun addAll(elements: Collection<E>): Boolean {
         if (elements.isEmpty()) return false
 
-        array += elements.toTypedArray<Any?>()
+        array += elements.toTypedArray<E>()
         modCount++
         return true
     }
@@ -72,8 +70,8 @@ public actual open class ArrayList<E> internal constructor(private var array: Ar
         if (elements.isEmpty()) return false
         when (index) {
             size -> return addAll(elements)
-            0 -> array = elements.toTypedArray<Any?>() + array
-            else -> array = array.copyOfRange(0, index).asDynamic().concat(elements.toTypedArray<Any?>(), array.copyOfRange(index, size))
+            0 -> array = elements.toTypedArray<E>() + array
+            else -> array = array.copyOfRange(0, index).asDynamic().concat(elements.toTypedArray<E>(), array.copyOfRange(index, size))
         }
 
         modCount++

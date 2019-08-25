@@ -101,7 +101,7 @@ public actual fun CharArray.elementAt(index: Int): Char {
  * Returns a [List] that wraps the original array.
  */
 public actual fun <T> Array<out T>.asList(): List<T> {
-    return ArrayList<T>(this.unsafeCast<Array<Any?>>())
+    return ArrayList<T>(this.unsafeCast<Array<T>>())
 }
 
 /**
