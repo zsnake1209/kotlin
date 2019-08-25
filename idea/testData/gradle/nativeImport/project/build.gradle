@@ -1,0 +1,40 @@
+plugins {
+    id 'org.jetbrains.kotlin.multiplatform' version '1.3.50'
+}
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-dev' }
+}
+kotlin {
+    linuxX64("linux") {
+        binaries {
+            executable {
+                entryPoint = 'sample.main'
+            }
+        }
+    }
+    macosX64("macos") {
+        binaries {
+            executable { }
+        }
+    }
+    mingwX64("mingw") {
+        binaries {
+            executable {
+                // Change to specify fully qualified name of your application's entry point:
+                entryPoint = 'sample.main'
+                // Specify command-line arguments, if necessary:
+                runTask?.args('')
+            }
+        }
+    }
+    sourceSets {
+        linuxMain { }
+        linuxTest { }
+        macosMain { }
+        macosTest { }
+        mingwMain { }
+        mingwTest { }
+    }
+}
