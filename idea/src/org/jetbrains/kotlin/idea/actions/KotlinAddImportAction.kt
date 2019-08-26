@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.KotlinDescriptorIconProvider
+import org.jetbrains.kotlin.idea.caches.resolve.allowResolveInWriteAction
 import org.jetbrains.kotlin.idea.caches.resolve.resolveImportReference
 import org.jetbrains.kotlin.idea.codeInsight.DescriptorToSourceUtilsIde
 import org.jetbrains.kotlin.idea.core.ImportableFqNameClassifier
@@ -233,7 +234,10 @@ class KotlinAddImportAction internal constructor(
 
             variant.declarationToImport(project)?.let {
                 val location = ProximityLocation(element, ModuleUtilCore.findModuleForPsiElement(element))
-                StatisticsManager.getInstance().incUseCount(PsiProximityComparator.STATISTICS_KEY, it, location)
+                val statisticsManager = StatisticsManager.getInstance()
+                allowResolveInWriteAction {
+                    statisticsManager.incUseCount(PsiProximityComparator.STATISTICS_KEY, it, location)
+                }
             }
 
             variant.descriptorsToImport.forEach { descriptor ->
