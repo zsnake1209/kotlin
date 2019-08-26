@@ -135,7 +135,7 @@ abstract class SelfTargetingRangeIntention<TElement : PsiElement>(
     abstract fun applicabilityRange(element: TElement): TextRange?
 
     override final fun isApplicableTo(element: TElement, caretOffset: Int): Boolean {
-        val range = allowResolveInWriteAction { applicabilityRange(element) } ?: return false
+        val range = applicabilityRange(element) ?: return false
         return range.containsOffset(caretOffset)
     }
 }

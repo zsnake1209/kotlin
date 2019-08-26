@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.idea.analysis.analyzeInContext
-import org.jetbrains.kotlin.idea.caches.resolve.allowResolveInWriteAction
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.configuration.ui.NotPropertyListPanel
 import org.jetbrains.kotlin.idea.core.NotPropertiesService
@@ -128,7 +127,7 @@ class NotPropertiesServiceImpl(private val project: Project) : NotPropertiesServ
 class UsePropertyAccessSyntaxIntention :
     SelfTargetingOffsetIndependentIntention<KtCallExpression>(KtCallExpression::class.java, "Use property access syntax") {
     override fun isApplicableTo(element: KtCallExpression): Boolean {
-        return allowResolveInWriteAction { detectPropertyNameToUse(element) } != null
+        return detectPropertyNameToUse(element) != null
     }
 
     override fun applyTo(element: KtCallExpression, editor: Editor?) {
