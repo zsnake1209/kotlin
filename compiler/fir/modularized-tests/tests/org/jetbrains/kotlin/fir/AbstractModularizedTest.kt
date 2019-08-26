@@ -85,7 +85,6 @@ abstract class AbstractModularizedTest : KtUsefulTestCase() {
     protected abstract fun processModule(moduleData: ModuleData): ProcessorAction
 
     protected fun runTestOnce(pass: Int) {
-        println("Pass $pass")
         beforePass()
         val testDataPath = System.getProperty("fir.bench.jps.dir")?.toString() ?: "/Users/jetbrains/jps"
         val root = File(testDataPath)
