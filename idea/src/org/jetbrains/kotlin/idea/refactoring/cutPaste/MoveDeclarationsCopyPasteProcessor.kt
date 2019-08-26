@@ -29,6 +29,7 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiModificationTracker
+import org.jetbrains.kotlin.idea.caches.resolve.allowResolveInWriteAction
 import org.jetbrains.kotlin.idea.caches.resolve.unsafeResolveToDescriptor
 import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtFile
@@ -75,7 +76,8 @@ class MoveDeclarationsCopyPasteProcessor : CopyPastePostProcessor<MoveDeclaratio
         if (declarations.any { it.name == null }) return emptyList()
         val declarationNames = declarations.asSequence().map { it.name!! }.toSet()
 
-        val stubTexts = declarations.map { MoveDeclarationsTransferableData.STUB_RENDERER.render(it.unsafeResolveToDescriptor()) }
+        val stubTexts =
+            declarations.map { MoveDeclarationsTransferableData.STUB_RENDERER.render(allowResolveInWriteAction { it.unsafeResolveToDescriptor() }) }
         return listOf(MoveDeclarationsTransferableData(file.virtualFile.url, sourceObjectFqName, stubTexts, declarationNames))
     }
 
