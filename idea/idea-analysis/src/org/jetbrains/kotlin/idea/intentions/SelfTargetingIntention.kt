@@ -27,6 +27,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
+import org.jetbrains.kotlin.idea.caches.resolve.allowResolveInWriteAction
 import org.jetbrains.kotlin.idea.inspections.IntentionBasedInspection
 import org.jetbrains.kotlin.psi.CREATE_BY_PATTERN_MAY_NOT_REFORMAT
 import org.jetbrains.kotlin.psi.KtBlockExpression
@@ -134,7 +135,7 @@ abstract class SelfTargetingRangeIntention<TElement : PsiElement>(
     abstract fun applicabilityRange(element: TElement): TextRange?
 
     override final fun isApplicableTo(element: TElement, caretOffset: Int): Boolean {
-        val range = applicabilityRange(element) ?: return false
+        val range = allowResolveInWriteAction { applicabilityRange(element) } ?: return false
         return range.containsOffset(caretOffset)
     }
 }
