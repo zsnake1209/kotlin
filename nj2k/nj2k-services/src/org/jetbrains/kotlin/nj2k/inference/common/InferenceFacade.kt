@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.nj2k.inference.common
 
+import org.jetbrains.kotlin.idea.caches.resolve.allowResolveInWriteAction
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtPsiFactory
@@ -18,7 +19,7 @@ class InferenceFacade(
     private val printDebugConstraints: Boolean = false
 ) {
     fun runOn(elements: List<KtElement>) {
-        val inferenceContext = typeVariablesCollector.collectTypeVariables(elements)
+        val inferenceContext = allowResolveInWriteAction { typeVariablesCollector.collectTypeVariables(elements) }
         val constraints = constraintsCollectorAggregator.collectConstraints(boundTypeCalculator, inferenceContext, elements)
 
         val initialConstraints = if (renderDebugTypes) constraints.map { it.copy() } else null
