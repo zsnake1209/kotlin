@@ -8,9 +8,7 @@ internal fun qqq() = "Fail AT"
 
 // MODULE: A(AT)
 // FILE: a.kt
-package bar
-
-import foo.*
+package foo
 
 internal fun qqq() = "O"
 
@@ -26,9 +24,7 @@ fun ik() = qqq()
 
 // MODULE: B(BT)
 // FILE: b.kt
-package bar
-
-import foo.*
+package foo
 
 internal fun qqq() = "Fail B"
 
@@ -38,7 +34,7 @@ fun k(): String = ik()
 // FILE: main.kt
 package main
 
-import bar.*
+import foo.*
 
 fun box(): String {
     return o() + k()
