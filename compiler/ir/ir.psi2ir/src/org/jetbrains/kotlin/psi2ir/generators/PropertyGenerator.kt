@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
-import org.jetbrains.kotlin.ir.util.declareFieldWithOverrides
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffsetSkippingComments
@@ -136,17 +135,7 @@ class PropertyGenerator(declarationGenerator: DeclarationGenerator) : Declaratio
         val startOffset = ktElement.pureStartOffsetOrUndefined
         val endOffset = ktElement.pureEndOffsetOrUndefined
 
-        val backingField =
-            if (propertyDescriptor.hasBackingField(context.bindingContext))
-                context.symbolTable.declareFieldWithOverrides(
-                    startOffset, endOffset, IrDeclarationOrigin.FAKE_OVERRIDE,
-                    propertyDescriptor, propertyDescriptor.type.toIrType()
-                ) { it.hasBackingField(context.bindingContext) }
-            else
-                null
-
         return context.symbolTable.declareProperty(startOffset, endOffset, IrDeclarationOrigin.FAKE_OVERRIDE, propertyDescriptor).apply {
-            this.backingField = backingField
             this.getter = propertyDescriptor.getter?.let {
                 FunctionGenerator(declarationGenerator).generateFakeOverrideFunction(it, ktElement)
             }

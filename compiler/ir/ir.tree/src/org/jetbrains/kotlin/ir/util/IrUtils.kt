@@ -287,16 +287,6 @@ fun IrSimpleFunction.findInterfaceImplementation(): IrSimpleFunction? {
     return resolveFakeOverride()?.run { if (parentAsClass.isInterface) this else null }
 }
 
-fun IrField.resolveFakeOverride(): IrField? {
-    var toVisit = setOf(this)
-    val nonOverridden = mutableSetOf<IrField>()
-    while (toVisit.isNotEmpty()) {
-        nonOverridden += toVisit.filter { it.overriddenSymbols.isEmpty() }
-        toVisit = toVisit.flatMap { it.overriddenSymbols }.map { it.owner }.toSet()
-    }
-    return nonOverridden.singleOrNull()
-}
-
 val IrClass.isAnnotationClass get() = kind == ClassKind.ANNOTATION_CLASS
 val IrClass.isEnumClass get() = kind == ClassKind.ENUM_CLASS
 val IrClass.isEnumEntry get() = kind == ClassKind.ENUM_ENTRY

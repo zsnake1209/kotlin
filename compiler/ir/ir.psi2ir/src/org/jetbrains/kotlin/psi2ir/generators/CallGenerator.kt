@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.types.IrDynamicType
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classifierOrFail
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.psi.KtElement
@@ -36,6 +35,7 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedValueArgument
 import org.jetbrains.kotlin.resolve.calls.tasks.isDynamic
 import org.jetbrains.kotlin.resolve.calls.util.FakeCallableDescriptorForObject
 import org.jetbrains.kotlin.resolve.descriptorUtil.classValueType
+import org.jetbrains.kotlin.resolve.descriptorUtil.overriddenTreeAsSequence
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
 
@@ -178,7 +178,7 @@ class CallGenerator(statementGenerator: StatementGenerator) : StatementGenerator
 
         return if (getMethodDescriptor == null) {
             call.callReceiver.call { dispatchReceiverValue, _ ->
-                val fieldSymbol = context.symbolTable.referenceField(descriptor.original)
+                val fieldSymbol = context.symbolTable.referenceField(descriptor.resolveFakeOverride())
                 IrGetFieldImpl(
                     startOffset, endOffset,
                     fieldSymbol,
@@ -393,6 +393,9 @@ class CallGenerator(statementGenerator: StatementGenerator) : StatementGenerator
 
         return irBlock
     }
+
+    private fun PropertyDescriptor.resolveFakeOverride() =
+        overriddenTreeAsSequence(useOriginal = true).last { it.containingDeclaration is ClassDescriptor } as PropertyDescriptor
 }
 
 fun CallGenerator.generateCall(ktElement: KtElement, call: CallBuilder, origin: IrStatementOrigin? = null) =

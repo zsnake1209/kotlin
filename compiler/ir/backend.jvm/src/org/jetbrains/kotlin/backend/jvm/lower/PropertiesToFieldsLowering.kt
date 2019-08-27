@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.ir.expressions.IrFieldAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.util.hasAnnotation
+import org.jetbrains.kotlin.ir.util.resolveFakeOverride
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.java.JvmAbi.JVM_FIELD_ANNOTATION_FQ_NAME
@@ -36,10 +37,10 @@ class PropertiesToFieldsLowering(val context: CommonBackendContext) : IrElementT
     }
 
     override fun visitProperty(declaration: IrProperty): IrStatement {
-        if (declaration.isConst || shouldSubstituteAccessorWithField(declaration, declaration.getter)) {
+        if (declaration.isConst || shouldSubstituteAccessorWithField(declaration.getter)) {
             declaration.getter = null
         }
-        if (declaration.isConst || shouldSubstituteAccessorWithField(declaration, declaration.setter)) {
+        if (declaration.isConst || shouldSubstituteAccessorWithField(declaration.setter)) {
             declaration.setter = null
         }
         return super.visitProperty(declaration)
@@ -47,9 +48,9 @@ class PropertiesToFieldsLowering(val context: CommonBackendContext) : IrElementT
 
     override fun visitCall(expression: IrCall): IrExpression {
         val simpleFunction = (expression.symbol.owner as? IrSimpleFunction) ?: return super.visitCall(expression)
-        val property = simpleFunction.correspondingPropertySymbol?.owner ?: return super.visitCall(expression)
+        val property = simpleFunction.resolveFakeOverride()?.correspondingPropertySymbol?.owner ?: return super.visitCall(expression)
 
-        if (shouldSubstituteAccessorWithField(property, simpleFunction)) {
+        if (shouldSubstituteAccessorWithField(simpleFunction)) {
             // property.getter & property.setter might be erased by the above function.
             when (simpleFunction.valueParameters.size) {
                 0 -> return substituteGetter(property, expression)
@@ -60,8 +61,10 @@ class PropertiesToFieldsLowering(val context: CommonBackendContext) : IrElementT
         return super.visitCall(expression)
     }
 
-    private fun shouldSubstituteAccessorWithField(property: IrProperty, accessor: IrSimpleFunction?): Boolean {
+    private fun shouldSubstituteAccessorWithField(accessor: IrSimpleFunction?): Boolean {
         if (accessor == null) return false
+
+        val property = accessor.resolveFakeOverride()?.correspondingPropertySymbol?.owner ?: return false
 
         // In contrast to the old backend, we do generate getters for lateinit properties, which fixes KT-28331
         if (property.isLateinit) return false

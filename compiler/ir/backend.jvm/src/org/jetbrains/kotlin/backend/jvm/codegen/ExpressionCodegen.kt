@@ -456,10 +456,10 @@ class ExpressionCodegen(
             return defaultValue(expression.type)
         }
 
-        val realField = expression.symbol.owner.resolveFakeOverride()!!
-        val fieldType = typeMapper.mapType(realField.type)
+        val field = expression.symbol.owner
+        val fieldType = typeMapper.mapType(field.type)
         val ownerType = methodSignatureMapper.mapImplementationOwner(expression.symbol.owner).internalName
-        val fieldName = realField.name.asString()
+        val fieldName = field.name.asString()
         val isStatic = expression.receiver == null
         expression.markLineNumber(startOffset = true)
         expression.receiver?.accept(this, data)?.materialize()
