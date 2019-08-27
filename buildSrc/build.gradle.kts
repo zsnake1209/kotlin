@@ -39,7 +39,7 @@ apply {
 }
 
 plugins {
-    `kotlin-dsl`
+    `kotlin-dsl` version "1.2.9"
     `java-gradle-plugin`
 }
 
