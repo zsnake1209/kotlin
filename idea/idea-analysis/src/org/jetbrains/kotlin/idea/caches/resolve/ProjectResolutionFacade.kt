@@ -117,7 +117,7 @@ internal class ProjectResolutionFacade(
             resolverDebugName
         )
 
-        moduleDescriptorsFactory.resolverForProject = resolverForProject
+        moduleDescriptorsFactory.initialize(resolverForProject)
 
         return resolverForProject
     }

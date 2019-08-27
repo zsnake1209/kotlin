@@ -223,7 +223,7 @@ class ResolverForProjectWithSingleModule<M : ModuleInfo> private constructor(
                 languageVersionSettings
             )
 
-            factoryForSingleModule.resolverForProject = resolverForSingleModule
+            factoryForSingleModule.initialize(resolverForSingleModule)
 
             return resolverForSingleModule
         }
@@ -276,20 +276,20 @@ class LazyModuleDependencies<M : ModuleInfo>(
     storageManager: StorageManager,
     private val module: M,
     firstDependency: M? = null,
-    private val resolverForProject: ResolverForProject<M>
+    private val moduleDescriptorsFactory: ModuleDescriptorsFactory<M>
 ) : ModuleDependencies {
     private val dependencies = storageManager.createLazyValue {
-        val moduleDescriptor = resolverForProject.descriptorForModule(module)
+        val moduleDescriptor = moduleDescriptorsFactory.descriptorForModule(module)
         sequence {
             if (firstDependency != null) {
-                yield(resolverForProject.descriptorForModule(firstDependency) as ModuleDescriptorImpl)
+                yield(moduleDescriptorsFactory.descriptorForModule(firstDependency) as ModuleDescriptorImpl)
             }
             if (module.dependencyOnBuiltIns() == ModuleInfo.DependencyOnBuiltIns.AFTER_SDK) {
                 yield(moduleDescriptor.builtIns.builtInsModule)
             }
             for (dependency in module.dependencies()) {
                 @Suppress("UNCHECKED_CAST")
-                yield(resolverForProject.descriptorForModule(dependency as M) as ModuleDescriptorImpl)
+                yield(moduleDescriptorsFactory.descriptorForModule(dependency as M) as ModuleDescriptorImpl)
             }
             if (module.dependencyOnBuiltIns() == ModuleInfo.DependencyOnBuiltIns.LAST) {
                 yield(moduleDescriptor.builtIns.builtInsModule)
@@ -302,7 +302,7 @@ class LazyModuleDependencies<M : ModuleInfo>(
     override val expectedByDependencies by storageManager.createLazyValue {
         module.expectedBy.map {
             @Suppress("UNCHECKED_CAST")
-            resolverForProject.descriptorForModule(it as M) as ModuleDescriptorImpl
+            moduleDescriptorsFactory.descriptorForModule(it as M) as ModuleDescriptorImpl
         }
     }
 
@@ -310,7 +310,7 @@ class LazyModuleDependencies<M : ModuleInfo>(
         get() =
             module.modulesWhoseInternalsAreVisible().mapTo(LinkedHashSet()) {
                 @Suppress("UNCHECKED_CAST")
-                resolverForProject.descriptorForModule(it as M) as ModuleDescriptorImpl
+                moduleDescriptorsFactory.descriptorForModule(it as M) as ModuleDescriptorImpl
             }
 
 }

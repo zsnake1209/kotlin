@@ -76,7 +76,7 @@ class IdeaModuleDescriptorsFactory(
             if (newBuiltIns is JvmBuiltIns) {
                 // SDK should be present, otherwise we wouldn't have created JvmBuiltIns in createBuiltIns
                 val sdk = module.findSdkAcrossDependencies()!!
-                val sdkDescriptor = resolverForProject.descriptorForModule(sdk)
+                val sdkDescriptor = descriptorForModule(sdk)
 
                 val isAdditionalBuiltInsFeaturesSupported = module.supportsAdditionalBuiltInsMembers(projectContext.project)
 

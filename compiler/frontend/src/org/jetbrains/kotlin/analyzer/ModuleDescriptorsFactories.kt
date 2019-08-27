@@ -30,7 +30,7 @@ abstract class AbstractModuleDescriptorsFactory<M : ModuleInfo>(
     private val packageOracleFactory: PackageOracleFactory,
     modules: Collection<M>
 ) : ModuleDescriptorsFactory<M> {
-    lateinit var resolverForProject: ResolverForProject<M>
+    private lateinit var resolverForProject: ResolverForProject<M>
 
     // Protected by ("projectContext.storageManager.lock")
     private val descriptorByModule = mutableMapOf<M, ModuleData>()
@@ -66,6 +66,10 @@ abstract class AbstractModuleDescriptorsFactory<M : ModuleInfo>(
 
     override fun moduleForDescriptor(descriptor: ModuleDescriptor): M? {
         return moduleInfoByDescriptor[descriptor]
+    }
+
+    fun initialize(resolverForProject: ResolverForProject<M>) {
+        this.resolverForProject = resolverForProject
     }
 
     private fun doGetDescriptorForModule(module: M): ModuleDescriptorImpl {
@@ -120,7 +124,7 @@ abstract class AbstractModuleDescriptorsFactory<M : ModuleInfo>(
                 storageManager,
                 module,
                 sdkDependency(module),
-                resolverForProject
+                this
             )
         )
 
