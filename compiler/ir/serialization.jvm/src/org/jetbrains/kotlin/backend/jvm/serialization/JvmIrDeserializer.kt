@@ -7,11 +7,13 @@ package org.jetbrains.kotlin.backend.jvm.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.descriptors.*
+import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrElement
+import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
@@ -76,19 +78,24 @@ class JvmIrDeserializer(
             assert(symbol.isBound)
             return symbol.owner as IrDeclaration
         } else {
-            val jvmPackagePartSource = (descriptor as DeserializedMemberDescriptor).containerSource as? JvmPackagePartSource ?: return backoff(symbol)
+            val jvmPackagePartSource = (toplevelDescriptor as DeserializedMemberDescriptor).containerSource as? JvmPackagePartSource ?: return backoff(symbol)
             val classHeader = jvmPackagePartSource.knownJvmBinaryClass?.classHeader ?: return backoff(symbol)
             if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return backoff(symbol)
 
             val irProto = JvmIr.JvmIrFile.parseFrom(classHeader.serializedIr)
 
             val moduleDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
+            val facadeClass = buildFacadeClass(moduleDeserializer, irProto).also {
+                it.parent = packageFragment
+                packageFragment.declarations.add(it)
+            }
+
             consumeUniqIdTable(irProto.auxTables.uniqIdTable, moduleDeserializer)
             consumeExternalRefsTable(irProto.auxTables.externalRefs)
 
             for (declaration in irProto.declarationContainer.declarationList) {
-                val member = moduleDeserializer.deserializeDeclaration(declaration, parent = packageFragment)
-                packageFragment.declarations.add(member)
+                val member = moduleDeserializer.deserializeDeclaration(declaration, parent = facadeClass)
+                facadeClass.declarations.add(member)
             }
             assert(symbol.isBound)
             return symbol.owner as IrDeclaration
@@ -104,6 +111,15 @@ class JvmIrDeserializer(
             knownToplevelFqNames[id] = toplevelFqName
         }
     }
+
+    private fun buildFacadeClass(fileDeserializer: IrFileDeserializer, proto: JvmIr.JvmIrFile): IrClass = buildClass {
+        origin = IrDeclarationOrigin.FILE_CLASS
+        name = fileDeserializer.deserializeFqName(proto.facadeFqName).shortName()
+    }.apply {
+        createParameterDeclarations()
+        // TODO: annotations
+    }
+
 
     /* External references are deserialized lazily, as the last resource for when there is no descriptor available for a given symbol ref */
     private fun consumeExternalRefsTable(table: JvmIr.ExternalRefs) {

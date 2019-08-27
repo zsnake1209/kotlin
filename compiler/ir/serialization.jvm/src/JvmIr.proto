@@ -54,7 +54,8 @@ message AuxTables {
 message JvmIrFile {
   required common.serialization.proto.IrDeclarationContainer declaration_container = 1;
   required common.serialization.proto.Annotations annotations = 2;
-  required AuxTables aux_tables = 3;
+  required common.serialization.proto.FqName facade_fq_name = 3;
+  required AuxTables aux_tables = 4;
 }
 
 message JvmIrClass {
