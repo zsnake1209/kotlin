@@ -88,7 +88,6 @@ abstract class IrMultiTableReader<K>(file: File, private val keyReader: ByteBuff
     private val buffer = file.map(FileChannel.MapMode.READ_ONLY)
     private val indexToOffset: IntArray
     private val indexToIndexMap = mutableMapOf<Int, Map<K, Pair<Int, Int>>>()
-//    private val indexToMap = mutableMapOf<K, Pair<Int, Int>>()
 
     private fun readOffsets(position: Int): IntArray {
         buffer.position(position)
@@ -106,19 +105,6 @@ abstract class IrMultiTableReader<K>(file: File, private val keyReader: ByteBuff
     init {
         indexToOffset = readOffsets(0)
     }
-
-//    init {
-//        val count = buffer.int
-//
-////        for (i in 0 until count) {
-////            val key = keyReader(buffer)
-////            val offset = buffer.int
-////            val size = buffer.int
-////
-////            indexToMap[key] = offset to size
-////        }
-//    }
-
 
     private fun readIndexMap(position: Int): Map<K, Pair<Int, Int>> {
         buffer.position(position)
@@ -153,16 +139,6 @@ abstract class IrMultiTableReader<K>(file: File, private val keyReader: ByteBuff
         buffer.get(result, 0, size)
         return result
     }
-
-//    fun tableItemBytes(id: K): ByteArray {
-//        val coordinates = indexToMap[id] ?: error("No coordinates found for $id")
-//        val offset = coordinates.first
-//        val size = coordinates.second
-//        val result = ByteArray(size)
-//        buffer.position(offset)
-//        buffer.get(result, 0, size)
-//        return result
-//    }
 }
 
 abstract class IrTableReader<K>(file: File, keyReader: ByteBuffer.() -> K) {

@@ -382,6 +382,10 @@ fun serializeModuleIntoKlib(
 
     val additionalFiles = mutableListOf<KotlinFileSerializedData>()
 
+    assert(files.zip(serializedIr.files).all { (kt, ir) -> VfsUtilCore.virtualToIoFile(kt.virtualFile).path == ir.path }) {
+        "The Kt and Ir files are put in different order"
+    }
+
     // TODO: Is the order of Kt and Ir files the same?
     for ((ktFile, binaryFile) in files.zip(serializedIr.files)) {
         val memberScope = ktFile.declarations.map { getDescriptorForElement(bindingContext, it) }

@@ -12,7 +12,8 @@ abstract class AbstractIncrementalJsKlibCompilerRunnerTest : AbstractIncremental
             sourceMap = true
             irBackend = true
             irProduceOnly = "klib"
-            irLegacyGradlePluginCompatibility = true // Don't zip klib since file's date affect final checksum
+            // Don't zip klib content since date on files affect the md5 checksum we compute to check whether output files identical
+            irLegacyGradlePluginCompatibility = true
         }
 
     override val buildLogFinder: BuildLogFinder
