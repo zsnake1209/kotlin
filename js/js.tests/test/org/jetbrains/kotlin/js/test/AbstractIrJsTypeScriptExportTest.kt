@@ -5,8 +5,10 @@
 
 package org.jetbrains.kotlin.js.test
 
+import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.utils.fileUtils.withReplacedExtensionOrNull
 import java.io.File
+import java.lang.Boolean.getBoolean
 
 @Suppress("ConstantConditionIf")
 abstract class AbstractIrJsTypeScriptExportTest : BasicIrBoxTest(
@@ -15,7 +17,7 @@ abstract class AbstractIrJsTypeScriptExportTest : BasicIrBoxTest(
     pathToRootOutputDir = TEST_DATA_DIR_PATH
 ) {
     override val generateDts = true
-    private val updateReferenceDtsFiles = false
+    private val updateReferenceDtsFiles = getBoolean("kotlin.js.updateReferenceDtsFiles")
 
     override fun performAdditionalChecks(inputFile: File, outputFile: File) {
         val referenceDtsFile = inputFile.withReplacedExtensionOrNull(".kt", ".d.ts")
@@ -23,12 +25,11 @@ abstract class AbstractIrJsTypeScriptExportTest : BasicIrBoxTest(
         val generatedDtsFile = outputFile.withReplacedExtensionOrNull("_v5", ".d.ts")
             ?: error("Can't find generated .d.ts file")
 
-        val referenceDts = referenceDtsFile.readText()
         val generatedDts = generatedDtsFile.readText()
 
         if (updateReferenceDtsFiles)
             referenceDtsFile.writeText(generatedDts)
         else
-            assertEquals(referenceDts, generatedDts)
+            KotlinTestUtils.assertEqualsToFile(referenceDtsFile, generatedDts)
     }
 }

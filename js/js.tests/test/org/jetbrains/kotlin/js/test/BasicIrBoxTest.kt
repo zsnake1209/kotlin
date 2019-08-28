@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.test.TargetBackend
 import org.jetbrains.kotlin.utils.fileUtils.withReplacedExtensionOrNull
 import java.io.File
+import java.lang.Boolean.getBoolean
 
 private val fullRuntimeKlib = loadKlib("compiler/ir/serialization.js/build/fullRuntime/klib")
 private val defaultRuntimeKlib = loadKlib("compiler/ir/serialization.js/build/reducedRuntime/klib")
@@ -88,7 +89,7 @@ abstract class BasicIrBoxTest(
         }
 
         if (isMainModule) {
-            val debugMode = false
+            val debugMode = getBoolean("kotlin.js.debugMode")
 
             val phaseConfig = if (debugMode) {
                 val allPhasesSet = jsPhases.toPhaseMap().values.toSet()

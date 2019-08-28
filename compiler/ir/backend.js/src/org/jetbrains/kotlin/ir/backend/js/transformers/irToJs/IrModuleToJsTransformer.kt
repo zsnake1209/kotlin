@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.ir.backend.js.CompilerResult
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.export.ExportModelGenerator
+import org.jetbrains.kotlin.ir.backend.js.export.ExportModelToJsStatements
 import org.jetbrains.kotlin.ir.backend.js.lower.StaticMembersLowering
 import org.jetbrains.kotlin.ir.backend.js.export.toTypeScript
 import org.jetbrains.kotlin.ir.backend.js.utils.*
@@ -96,7 +97,7 @@ class IrModuleToJsTransformer(
             )
 
         val moduleBody = generateModuleBody(module, rootContext)
-        val exportStatements = org.jetbrains.kotlin.ir.backend.js.export.ExportModelToJsStatements(internalModuleName, namer)
+        val exportStatements = ExportModelToJsStatements(internalModuleName, namer)
             .generateModuleExport(exportedModule)
 
         with(rootFunction) {
