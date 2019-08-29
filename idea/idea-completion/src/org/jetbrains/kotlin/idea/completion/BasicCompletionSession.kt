@@ -195,6 +195,8 @@ class BasicCompletionSession(
         }
 
         override fun doComplete() {
+            KEYWORDS_ONLY.doComplete(onlyKeywords = listOf("null")) // we need to ask it before nullsFirst completion to avoid order freeze
+
             val declaration = isStartOfExtensionReceiverFor()
             if (declaration != null) {
                 completeDeclarationNameFromUnresolvedOrOverride(declaration)
@@ -262,7 +264,7 @@ class BasicCompletionSession(
                 referenceVariantsCollector!!.collectingFinished()
             }
 
-            KEYWORDS_ONLY.doComplete()
+            KEYWORDS_ONLY.doComplete(skipKeywords = listOf("null")) // we already added null completion
 
             // getting root packages from scope is very slow so we do this in alternative way
             if (callTypeAndReceiver.receiver == null && callTypeAndReceiver.callType.descriptorKindFilter.kindMask.and(DescriptorKindFilter.PACKAGES_MASK) != 0) {
@@ -522,7 +524,15 @@ class BasicCompletionSession(
             get() = null
 
         override fun doComplete() {
+            doComplete(emptyList(), emptyList())
+        }
+
+        fun doComplete(onlyKeywords: List<String> = emptyList(), skipKeywords: List<String> = emptyList()) {
             val keywordsToSkip = HashSet<String>()
+
+            fun isSkipped(keyword: String): Boolean {
+                return keyword in skipKeywords || (onlyKeywords.isNotEmpty() && !onlyKeywords.contains(keyword))
+            }
 
             val keywordValueConsumer = object : KeywordValues.Consumer {
                 override fun consume(
@@ -531,6 +541,7 @@ class BasicCompletionSession(
                     priority: SmartCompletionItemPriority,
                     factory: () -> LookupElement
                 ) {
+                    if (isSkipped(lookupString)) return
                     keywordsToSkip.add(lookupString)
                     val lookupElement = factory()
                     val matched = expectedInfos.any {
@@ -554,10 +565,10 @@ class BasicCompletionSession(
                 isJvmModule
             )
 
-            val keywordsPrefix = prefix.substringBefore('@') // if there is '@' in the prefix - use shorter prefix to not loose 'this' etc
             val isUseSiteAnnotationTarget = position.prevLeaf()?.node?.elementType == KtTokens.AT
             KeywordCompletion.complete(expression ?: parameters.position, resultSet.prefixMatcher, isJvmModule) { lookupElement ->
                 val keyword = lookupElement.lookupString
+                if (isSkipped(keyword)) return@complete
                 if (keyword in keywordsToSkip) return@complete
 
                 when (keyword) {

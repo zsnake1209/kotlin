@@ -116,6 +116,7 @@ object SmartCompletionPriorityWeigher : LookupElementWeigher("kotlin.smartComple
 object KindWeigher : LookupElementWeigher("kotlin.kind") {
     private enum class Weight {
         enumMember,
+        nullKeyword,
         callable,
         keyword,
         default,
@@ -137,7 +138,9 @@ object KindWeigher : LookupElementWeigher("kotlin.kind") {
                 }
             }
 
-            is KeywordLookupObject -> Weight.keyword
+            is KeywordLookupObject ->
+                if (element.lookupString == "null") Weight.nullKeyword
+                else Weight.keyword
 
             else -> Weight.default
         }
