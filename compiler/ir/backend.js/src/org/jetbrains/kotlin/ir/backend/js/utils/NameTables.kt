@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
 class NameTable<T>(
-    val parent: NameTable<T>? = null,
+    val parent: NameTable<*>? = null,
     private val reserved: MutableSet<String> = mutableSetOf()
 ) {
     var finished = false
@@ -35,6 +35,8 @@ class NameTable<T>(
     }
 
     fun declareStableName(declaration: T, name: String) {
+        if (parent != null) assert(parent.finished)
+        assert(!finished)
         names[declaration] = name
         reserved.add(name)
     }
@@ -132,9 +134,9 @@ fun functionSignature(declaration: IrFunction): Signature {
 }
 
 class NameTables(packages: List<IrPackageFragment>) {
-    val globalNames: NameTable<Any>
+    val globalNames: NameTable<IrDeclaration>
     private val memberNames: NameTable<Signature>
-    private val localNames = mutableMapOf<IrDeclaration, NameTable<Any>>()
+    private val localNames = mutableMapOf<IrDeclaration, NameTable<IrDeclaration>>()
     private val loopNames = mutableMapOf<IrLoop, String>()
 
     init {
@@ -149,6 +151,8 @@ class NameTables(packages: List<IrPackageFragment>) {
                 generateNamesForTopLevelDecl(declaration)
             }
         }
+
+        globalNames.finished = true
 
         for (p in packages) {
             for (declaration in p.declarations) {
@@ -221,6 +225,17 @@ class NameTables(packages: List<IrPackageFragment>) {
         }
     }
 
+    @Suppress("unused")
+    fun dump(): String {
+        val local = localNames.toList().joinToString("\n") { (decl, table) ->
+            val declRef = (decl as? IrDeclarationWithName)?.fqNameWhenAvailable ?: decl
+            "\nLocal names for $declRef:\n${table.dump()}\n"
+        }
+        return "Global names:\n${globalNames.dump()}" +
+                //   "\nMember names:\n${memberNames.dump()}" +
+                "\nLocal names:\n$local\n"
+    }
+
     fun getNameForStaticDeclaration(declaration: IrDeclarationWithName): String {
         val global: String? = globalNames.names[declaration]
         if (global != null) return global
@@ -281,7 +296,7 @@ class NameTables(packages: List<IrPackageFragment>) {
     }
 
     inner class LocalNameGenerator(parentDeclaration: IrDeclaration) : IrElementVisitorVoid {
-        val table = NameTable(globalNames)
+        val table = NameTable<IrDeclaration>(globalNames)
 
         init {
             localNames[parentDeclaration] = table

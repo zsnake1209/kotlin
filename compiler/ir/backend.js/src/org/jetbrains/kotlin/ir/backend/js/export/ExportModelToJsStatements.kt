@@ -17,7 +17,7 @@ class ExportModelToJsStatements(
     private val nameTables: NameTables
 ) {
     private val namespaceToRefMap = mutableMapOf<String, JsNameRef>()
-    private val globalNames = nameTables.globalNames
+    private val globalNames = NameTable<String>(nameTables.globalNames)
 
     fun generateModuleExport(module: ExportedModule): List<JsStatement> {
         return module.declarations.flatMap { generateDeclarationExport(it, JsNameRef(internalModuleName)) }
