@@ -120,6 +120,7 @@ class ExportModelGenerator(val context: JsIrBackendContext) {
 
     private fun exportProperty(property: IrProperty): ExportedDeclaration? {
         for (accessor in listOfNotNull(property.getter, property.setter)) {
+            // TODO: Report a frontend error
             if (accessor.extensionReceiverParameter != null)
                 return null
             if (accessor.isFakeOverride) {
@@ -188,6 +189,9 @@ class ExportModelGenerator(val context: JsIrBackendContext) {
                     statics.addIfNotNull(exportClass(candidate))
 
                 is IrField -> {
+                    assert(candidate.correspondingPropertySymbol != null) {
+                        "Properties without fields are not supported ${candidate.fqNameWhenAvailable}"
+                    }
                 }
 
                 else -> error("Can't export member declaration $declaration")
@@ -254,6 +258,7 @@ class ExportModelGenerator(val context: JsIrBackendContext) {
             nonNullType.isFloatArray() -> ExportedType.Primitive.FloatArray
             nonNullType.isDoubleArray() -> ExportedType.Primitive.DoubleArray
 
+            // TODO: Cover these in frontend
             nonNullType.isBooleanArray() -> ExportedType.ErrorType("BooleanArray")
             nonNullType.isLongArray() -> ExportedType.ErrorType("LongArray")
             nonNullType.isCharArray() -> ExportedType.ErrorType("CharArray")
@@ -325,12 +330,13 @@ class ExportModelGenerator(val context: JsIrBackendContext) {
             return Exportability.NotNeeded
         }
 
-        if (function.isMethodOfAny())
+        if (function.isFakeOverriddenFromAny())
             return Exportability.NotNeeded
         if (function.name.asString().endsWith("-impl"))
             return Exportability.NotNeeded
 
         val name = function.getExportedIdentifier()
+        // TODO: Use [] syntax instead of prohibiting
         if (name in allReservedWords)
             return Exportability.Prohibited("Name is a reserved word")
 
@@ -347,7 +353,7 @@ sealed class Exportability {
 private val IrClassifierSymbol.isInterface
     get() = (owner as? IrClass)?.isInterface == true
 
-val reservedWords = setOf(
+private val reservedWords = setOf(
     "break",
     "case",
     "catch",
@@ -399,4 +405,4 @@ val strictModeReservedWords = setOf(
     "yield"
 )
 
-val allReservedWords = reservedWords + strictModeReservedWords
+private val allReservedWords = reservedWords + strictModeReservedWords

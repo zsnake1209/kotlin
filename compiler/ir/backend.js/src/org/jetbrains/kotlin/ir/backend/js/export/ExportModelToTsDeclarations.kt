@@ -13,14 +13,14 @@ fun ExportedModule.toTypeScript(): String {
     return "declare namespace $name {\n$prefix$body\n}\n"
 }
 
-fun List<ExportedDeclaration>.toTypeScript(ident: String): String =
-    joinToString("") { it.toTypeScript(ident) + "\n" }
+fun List<ExportedDeclaration>.toTypeScript(indent: String): String =
+    joinToString("") { it.toTypeScript(indent) + "\n" }
 
-fun ExportedDeclaration.toTypeScript(ident: String): String = ident + when (this) {
-    is ErrorDeclaration -> "namespace _Error_ { /* $message */ }"
+fun ExportedDeclaration.toTypeScript(indent: String): String = indent + when (this) {
+    is ErrorDeclaration -> "/* ErrorDeclaration: $message */"
 
     is ExportedNamespace ->
-        "namespace $name {\n" + declarations.toTypeScript("$ident    ") + "$ident}"
+        "namespace $name {\n" + declarations.toTypeScript("$indent    ") + "$indent}"
 
     is ExportedFunction -> {
         val keyword: String = when {
@@ -64,7 +64,7 @@ fun ExportedDeclaration.toTypeScript(ident: String): String = ident + when (this
             " $superInterfacesKeyword " + superInterfaces.joinToString(", ") { it.toTypeScript() }
         } else ""
 
-        val membersString = members.joinToString("") { it.toTypeScript("$ident    ") + "\n" }
+        val membersString = members.joinToString("") { it.toTypeScript("$indent    ") + "\n" }
 
         val renderedTypeParameters =
             if (typeParameters.isNotEmpty())
@@ -74,8 +74,8 @@ fun ExportedDeclaration.toTypeScript(ident: String): String = ident + when (this
 
         val modifiers = if (isAbstract && !isInterface) "abstract " else ""
 
-        val klassExport = "$modifiers$keyword $name$renderedTypeParameters$superClassClause$superInterfacesClause {\n$membersString$ident}"
-        val staticsExport = if (statics.isNotEmpty()) "\n" + ExportedNamespace(name, statics).toTypeScript(ident) else ""
+        val klassExport = "$modifiers$keyword $name$renderedTypeParameters$superClassClause$superInterfacesClause {\n$membersString$indent}"
+        val staticsExport = if (statics.isNotEmpty()) "\n" + ExportedNamespace(name, statics).toTypeScript(indent) else ""
         klassExport + staticsExport
     }
 }
