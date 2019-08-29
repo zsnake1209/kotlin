@@ -17,6 +17,9 @@ import A = JS_TESTS.foo.A;
 import A1 = JS_TESTS.foo.A1;
 import A2 = JS_TESTS.foo.A2;
 import A3 = JS_TESTS.foo.A3;
+import _valCustom = JS_TESTS.foo._valCustom;
+import _valCustomWithField = JS_TESTS.foo._valCustomWithField;
+import A4 = JS_TESTS.foo.A4;
 
 function assert(condition: boolean) {
     if (!condition) {
@@ -54,11 +57,34 @@ function box(): string {
     assert(_const_val === 1);
     assert(_val === 1);
     assert(_var === 1);
+    foo._var = 1000;
+    assert(foo._var === 1000);
+
+    assert(foo._valCustom === 1);
+    assert(foo._valCustomWithField === 2);
+    assert(foo._varCustom === 1);
+    foo._varCustom = 20;
+    assert(foo._varCustom === 1);
+    assert(foo._varCustomWithField === 10);
+    foo._varCustomWithField = 10;
+    assert(foo._varCustomWithField === 1000);
 
     new A();
     assert(new A1(10).x === 10);
     assert(new A2("10", true).x === "10");
     assert(new A3().x === 100);
+
+
+    const a4 = new A4();
+
+    assert(a4._valCustom === 1);
+    assert(a4._valCustomWithField === 2);
+    assert(a4._varCustom === 1);
+    a4._varCustom = 20;
+    assert(a4._varCustom === 1);
+    assert(a4._varCustomWithField === 10);
+    a4._varCustomWithField = 10;
+    assert(a4._varCustomWithField === 1000);
 
     return "OK";
 }

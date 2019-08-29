@@ -10,11 +10,15 @@ declare namespace JS_TESTS {
         function defaultParameters(x: number, y: string): string
         function generic1<T>(x: T): T
         function generic2<T>(x: Nullable<T>): boolean
-        function generic3<A, B, C, D, E>(a: A, b: B, c: C, d: C): Nullable<E>
+        function generic3<A, B, C, D, E>(a: A, b: B, c: C, d: D): Nullable<E>
         function inlineFun(x: number, callback: (p0: number) => void): void
         const _const_val: number;
         const _val: number;
         let _var: number;
+        const _valCustom: number;
+        const _valCustomWithField: number;
+        let _varCustom: number;
+        let _varCustomWithField: number;
         class A {
             constructor()
         }
@@ -30,6 +34,13 @@ declare namespace JS_TESTS {
         class A3 {
             constructor()
             readonly x: number;
+        }
+        class A4 {
+            constructor()
+            readonly _valCustom: number;
+            readonly _valCustomWithField: number;
+            _varCustom: number;
+            _varCustomWithField: number;
         }
     }
 }
