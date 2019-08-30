@@ -310,6 +310,10 @@ open class SerializerIrGenerator(val irClass: IrClass, final override val compil
     }
 
     override fun generateLoad(function: FunctionDescriptor) = irClass.contributeFunction(function, fromStubs = true) { loadFunc ->
+        if (serializableDescriptor.modality == Modality.ABSTRACT || serializableDescriptor.modality == Modality.SEALED) {
+            error("This method should never be called for abstract or sealed classes")
+        }
+
         fun irThis(): IrExpression =
             IrGetValueImpl(startOffset, endOffset, loadFunc.dispatchReceiverParameter!!.symbol)
 
@@ -358,7 +362,6 @@ open class SerializerIrGenerator(val irClass: IrClass, final override val compil
                 +irSetVar(indexVar.symbol, irInvoke(localInput.get(), readElementF, localSerialDesc.get()))
                 +irWhen {
                     // if index == -2 (READ_ALL) todo...
-//                    +IrBranchImpl(irEquals(indexVar.get(), irInt(-2)), ) // TODO throw proper exception
 
                     // if index == -1 (READ_DONE) break loop
                     +IrBranchImpl(irEquals(indexVar.get(), irInt(-1)), irSetVar(flagVar.symbol, irBoolean(false)))
@@ -438,12 +441,7 @@ open class SerializerIrGenerator(val irClass: IrClass, final override val compil
             compilerContext.externalSymbols.referenceConstructor(serializableDescriptor.unsubstitutedPrimaryConstructor!!)
         }
 
-        // todo: throw UnsupportedOperationException when feature branch with `open SerializerGenerator` (enums) will be merged
-        if (serializableDescriptor.modality != Modality.ABSTRACT && serializableDescriptor.modality != Modality.SEALED) {
-            +irReturn(irInvoke(null, ctor, typeArgs, args))
-        } else {
-//            +irThrowIse() // TODO throw proper exception
-        }
+        +irReturn(irInvoke(null, ctor, typeArgs, args))
     }
 
     companion object {
