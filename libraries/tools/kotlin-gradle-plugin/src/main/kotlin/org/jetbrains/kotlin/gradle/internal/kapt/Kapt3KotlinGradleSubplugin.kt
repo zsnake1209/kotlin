@@ -396,7 +396,7 @@ class Kapt3KotlinGradleSubplugin : KotlinGradleSubplugin<KotlinCompile> {
 
             maybeRegisterTransform(project)
             val classStructure = project.configurations.create("_classStructure${taskName}")
-            project.dependencies.add(classStructure.name, kotlinCompile.classpath)
+            project.dependencies.add(classStructure.name, project.files(project.provider { kotlinCompile.classpath }))
             kaptTask.classpathStructure = classStructure.incoming.artifactView { viewConfig ->
                 viewConfig.attributes.attribute(artifactType, CLASS_STRUCTURE_ARTIFACT_TYPE)
             }.files
