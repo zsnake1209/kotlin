@@ -76,7 +76,7 @@ class PreviewOutputBlocksManager(editor: Editor) {
     private val markupModel: MarkupModel = editor.markupModel
 
     private val blocks: NavigableMap<ScratchExpression, OutputBlock> = TreeMap(Comparator.comparingInt { it.lineStart })
-    private val blockHighlights: MutableMap<OutputBlock, RangeHighlighter> = mutableMapOf()
+    private var activeBlockHighlight: RangeHighlighter? = null
 
     fun computeSourceToPreviewAlignments(): List<Pair<Int, Int>> = blocks.values.map { it.sourceExpression.lineStart to it.lineStart }
 
@@ -98,8 +98,8 @@ class PreviewOutputBlocksManager(editor: Editor) {
     }
 
     fun clearAllHighlights() {
-        blockHighlights.values.forEach(markupModel::removeHighlighter)
-        blockHighlights.clear()
+        activeBlockHighlight?.let(markupModel::removeHighlighter)
+        activeBlockHighlight = null
     }
 
     inner class OutputBlock(val sourceExpression: ScratchExpression) {
@@ -124,17 +124,13 @@ class PreviewOutputBlocksManager(editor: Editor) {
         }
 
         fun addHighlight(color: Color) {
-            clearHighlight()
-            blockHighlights[this] = markupModel.highlightLines(
+            clearAllHighlights()
+            activeBlockHighlight = markupModel.highlightLines(
                 lineStart,
                 lineEnd,
                 TextAttributes().apply { backgroundColor = color },
                 targetArea = HighlighterTargetArea.LINES_IN_RANGE
             )
-        }
-
-        private fun clearHighlight() {
-            blockHighlights.remove(this)?.let(markupModel::removeHighlighter)
         }
 
         /**

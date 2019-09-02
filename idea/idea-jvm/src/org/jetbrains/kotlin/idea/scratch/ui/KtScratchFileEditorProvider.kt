@@ -410,12 +410,12 @@ private class LayoutDependantOutputHandler(
 }
 
 private class ScratchSourceEditorHighlighter(private val sourceEditor: Editor) {
-    private val highlights = mutableMapOf<ScratchExpression, RangeHighlighter>()
+    private var activeHighlight: RangeHighlighter? = null
 
     fun highlightSourceExpression(sourceExpression: ScratchExpression, highlightColor: Color) {
-        highlights[sourceExpression]?.let(sourceEditor.markupModel::removeHighlighter)
+        clearAllHighlights()
         val range = sourceExpression.element.textRange
-        highlights[sourceExpression] = sourceEditor.markupModel.addRangeHighlighter(
+        activeHighlight = sourceEditor.markupModel.addRangeHighlighter(
             range.startOffset,
             range.endOffset,
             HighlighterLayer.CARET_ROW,
@@ -425,8 +425,8 @@ private class ScratchSourceEditorHighlighter(private val sourceEditor: Editor) {
     }
 
     fun clearAllHighlights() {
-        highlights.values.forEach(sourceEditor.markupModel::removeHighlighter)
-        highlights.clear()
+        activeHighlight?.let(sourceEditor.markupModel::removeHighlighter)
+        activeHighlight = null
     }
 }
 
