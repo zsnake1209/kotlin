@@ -1,0 +1,10 @@
+// "Flip ','" "true"
+// SHOULD_BE_AVAILABLE_AFTER_EXECUTION
+
+expect open class A() {
+    open fun c(b: String,<caret> a: Int)
+}
+
+class C : A() {
+    override fun c(b: String, a: Int) {}
+}

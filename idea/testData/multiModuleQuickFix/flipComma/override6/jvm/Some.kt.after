@@ -1,0 +1,18 @@
+// "Flip ','" "true"
+// SHOULD_BE_AVAILABLE_AFTER_EXECUTION
+
+actual open class A {
+    actual open fun c(b: String, a: Int) {}
+}
+
+open class B : A() {
+    override fun c(b: String,<caret> a: Int) {}
+}
+
+open class D : B() {
+    override fun c(b: String, a: Int) {}
+}
+
+fun test(a: Int, b: String) {
+    A().c(b, a)
+}

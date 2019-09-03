@@ -1,0 +1,6 @@
+// "Flip ','" "true"
+// SHOULD_BE_AVAILABLE_AFTER_EXECUTION
+
+expect class A {
+    fun c(b: String,<caret> a: Int)
+}

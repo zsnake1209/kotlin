@@ -558,6 +558,59 @@ public class QuickFixMultiModuleTestGenerated extends AbstractQuickFixMultiModul
         }
     }
 
+    @TestMetadata("idea/testData/multiModuleQuickFix/flipComma")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class FlipComma extends AbstractQuickFixMultiModuleTest {
+        private void runTest(String testDataFilePath) throws Exception {
+            KotlinTestUtils.runTest(this::doTest, TargetBackend.ANY, testDataFilePath);
+        }
+
+        @TestMetadata("actual")
+        public void testActual() throws Exception {
+            runTest("idea/testData/multiModuleQuickFix/flipComma/actual/");
+        }
+
+        public void testAllFilesPresentInFlipComma() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/testData/multiModuleQuickFix/flipComma"), Pattern.compile("^([^\\.]+)$"), TargetBackend.ANY, true);
+        }
+
+        @TestMetadata("expect")
+        public void testExpect() throws Exception {
+            runTest("idea/testData/multiModuleQuickFix/flipComma/expect/");
+        }
+
+        @TestMetadata("override")
+        public void testOverride() throws Exception {
+            runTest("idea/testData/multiModuleQuickFix/flipComma/override/");
+        }
+
+        @TestMetadata("override2")
+        public void testOverride2() throws Exception {
+            runTest("idea/testData/multiModuleQuickFix/flipComma/override2/");
+        }
+
+        @TestMetadata("override3")
+        public void testOverride3() throws Exception {
+            runTest("idea/testData/multiModuleQuickFix/flipComma/override3/");
+        }
+
+        @TestMetadata("override4")
+        public void testOverride4() throws Exception {
+            runTest("idea/testData/multiModuleQuickFix/flipComma/override4/");
+        }
+
+        @TestMetadata("override5")
+        public void testOverride5() throws Exception {
+            runTest("idea/testData/multiModuleQuickFix/flipComma/override5/");
+        }
+
+        @TestMetadata("override6")
+        public void testOverride6() throws Exception {
+            runTest("idea/testData/multiModuleQuickFix/flipComma/override6/");
+        }
+    }
+
     @TestMetadata("idea/testData/multiModuleQuickFix/other")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

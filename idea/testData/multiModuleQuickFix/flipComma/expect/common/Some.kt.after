@@ -1,0 +1,4 @@
+// "Flip ','" "true"
+// SHOULD_BE_AVAILABLE_AFTER_EXECUTION
+
+expect fun f1(s: String<caret>, i: Int)

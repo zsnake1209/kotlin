@@ -1,0 +1,1 @@
+actual fun f1(s: String, i: Int) {}
