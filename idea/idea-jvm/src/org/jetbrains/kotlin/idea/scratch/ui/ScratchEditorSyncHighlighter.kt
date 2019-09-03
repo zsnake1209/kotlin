@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.idea.scratch.ui
 
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.event.CaretEvent
@@ -20,157 +19,195 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.psi.PsiDocumentManager
 import org.jetbrains.kotlin.idea.scratch.output.highlightLines
 
-abstract class ScratchEditorSyncHighlighter(private val sourceEditor: EditorEx, private val previewEditor: EditorEx) : Disposable {
-    private val sourceHighlighter = EditorLinesHighlighter(sourceEditor)
-    private val previewEditorHighlighter = EditorLinesHighlighter(previewEditor)
+interface ScratchEditorLinesTranslator {
+    fun previewLineToSourceLines(previewLine: Int): Pair<Int, Int>?
+    fun sourceLineToPreviewLines(sourceLine: Int): Pair<Int, Int>?
+}
+
+fun configureSyncHighlighting(sourceEditor: EditorEx, previewEditor: EditorEx, translator: ScratchEditorLinesTranslator) {
+    configureExclusiveCaretRowHighlighting(sourceEditor, previewEditor)
+    configureSourceAndPreviewHighlighting(sourceEditor, previewEditor, translator)
+}
+
+private fun configureSourceAndPreviewHighlighting(
+    sourceEditor: EditorEx,
+    previewEditor: EditorEx,
+    translator: ScratchEditorLinesTranslator
+) {
+    val syncHighlighter = ScratchEditorSyncHighlighter.create(sourceEditor, previewEditor, translator)
+
+    configureHighlightUpdateOnDocumentChange(sourceEditor, previewEditor, syncHighlighter)
+    configureSourceToPreviewHighlighting(sourceEditor, syncHighlighter)
+    configurePreviewToSourceHighlighting(previewEditor, syncHighlighter)
+}
+
+/**
+ * Configures editors such that only one of them have caret row highlighting enabled.
+ */
+private fun configureExclusiveCaretRowHighlighting(sourceEditor: EditorEx, previewEditor: EditorEx) {
+    val exclusiveCaretHighlightingListener = object : FocusChangeListener {
+        override fun focusLost(editor: Editor) {}
+
+        override fun focusGained(editor: Editor) {
+            sourceEditor.settings.isCaretRowShown = false
+            previewEditor.settings.isCaretRowShown = false
+
+            editor.settings.isCaretRowShown = true
+        }
+    }
+
+    sourceEditor.addFocusListener(exclusiveCaretHighlightingListener)
+    previewEditor.addFocusListener(exclusiveCaretHighlightingListener)
+}
+
+/**
+ * When source or preview documents change, we need to update highlighting, because
+ * expression output may become bigger.
+ *
+ * We can do that only when document is fully committed, so [ScratchFile.getExpressions] will return correct expressions
+ * with correct PSIs.
+ */
+private fun configureHighlightUpdateOnDocumentChange(
+    sourceEditor: EditorEx,
+    previewEditor: EditorEx,
+    highlighter: ScratchEditorSyncHighlighter
+) {
+    val updateHighlightOnDocumentChangeListener = object : DocumentListener {
+        override fun documentChanged(event: DocumentEvent) {
+            PsiDocumentManager.getInstance(sourceEditor.project!!).performWhenAllCommitted {
+                highlighter.highlightByCurrentlyFocusedEditor()
+            }
+        }
+    }
+
+    previewEditor.document.addDocumentListener(updateHighlightOnDocumentChangeListener)
+    sourceEditor.document.addDocumentListener(updateHighlightOnDocumentChangeListener)
+}
+
+/**
+ * When caret in [sourceEditor] is moved, highlight is recalculated.
+ *
+ * When focus is switched to the [sourceEditor], highlight is recalculated,
+ * because it is possible to switch focus without changing cursor position,
+ * which would lead to the outdated highlighting.
+ */
+private fun configureSourceToPreviewHighlighting(sourceEditor: EditorEx, highlighter: ScratchEditorSyncHighlighter) {
+    sourceEditor.caretModel.addCaretListener(object : CaretListener {
+        override fun caretPositionChanged(event: CaretEvent) {
+            highlighter.highlightPreviewBySource()
+        }
+    })
+
+    sourceEditor.addFocusListener(object : FocusChangeListener {
+        override fun focusLost(editor: Editor) {}
+
+        override fun focusGained(editor: Editor) {
+            highlighter.highlightPreviewBySource()
+        }
+    })
+}
+
+/**
+ * When caret in [previewEditor] is moved, highlight is recalculated.
+ *
+ * When focus is switched to the [previewEditor], highlight is recalculated,
+ * because it is possible to switch focus without changing cursor position,
+ * which would lead to the outdated highlighting.
+ */
+private fun configurePreviewToSourceHighlighting(previewEditor: EditorEx, highlighter: ScratchEditorSyncHighlighter) {
+    previewEditor.caretModel.addCaretListener(object : CaretListener {
+        override fun caretPositionChanged(event: CaretEvent) {
+            highlighter.highlightSourceByPreview()
+        }
+    })
+
+    previewEditor.addFocusListener(object : FocusChangeListener {
+        override fun focusLost(editor: Editor) {}
+
+        override fun focusGained(editor: Editor) {
+            highlighter.highlightSourceByPreview()
+        }
+    })
+}
+
+private class ScratchEditorsState(private val sourceEditor: EditorEx, private val previewEditor: EditorEx) : FocusChangeListener {
+    private var lastFocusedEditor: Editor = sourceEditor
+
+    enum class FocusedEditor {
+        SOURCE, PREVIEW
+    }
 
     init {
-        configureExclusiveCaretRowHighlighting()
-        configureHighlightUpdateOnDocumentChange()
-        configureSourceToPreviewHighlighting()
-        configurePreviewToSourceHighlighting()
+        sourceEditor.addFocusListener(this)
+        previewEditor.addFocusListener(this)
     }
 
-    override fun dispose() {}
+    val sourceEditorCaretLine: Int? get() = sourceEditor.caretModel.allCarets.singleOrNull()?.logicalPosition?.line
+    val previewEditorCaretLine: Int? get() = previewEditor.caretModel.allCarets.singleOrNull()?.logicalPosition?.line
+    val focusedEditor: FocusedEditor get() = if (lastFocusedEditor === sourceEditor) FocusedEditor.SOURCE else FocusedEditor.PREVIEW
 
-    abstract fun translatePreviewLineToSourceLines(line: Int): Pair<Int, Int>?
-    abstract fun translateSourceLineToPreviewLines(line: Int): Pair<Int, Int>?
+    override fun focusLost(editor: Editor) {}
 
-    /**
-     * Configures editors such that only one of them have caret row highlighting enabled.
-     */
-    private fun configureExclusiveCaretRowHighlighting() {
-        val exclusiveCaretHighlightingListener = object : FocusChangeListener {
-            override fun focusLost(editor: Editor) {}
+    override fun focusGained(editor: Editor) {
+        lastFocusedEditor = editor
+    }
+}
 
-            override fun focusGained(editor: Editor) {
-                sourceEditor.settings.isCaretRowShown = false
-                previewEditor.settings.isCaretRowShown = false
+private class ScratchEditorSyncHighlighter private constructor(
+    private val state: ScratchEditorsState,
+    private val sourceHighlighter: EditorLinesHighlighter,
+    private val previewHighlighter: EditorLinesHighlighter,
+    private val translator: ScratchEditorLinesTranslator
+) {
+    fun highlightSourceByPreview() {
+        clearAllHighlights()
 
-                editor.settings.isCaretRowShown = true
-            }
+        state.previewEditorCaretLine?.let(::highlightSourceByPreviewLine)
+    }
+
+    fun highlightPreviewBySource() {
+        clearAllHighlights()
+
+        state.sourceEditorCaretLine?.let(::highlightPreviewBySourceLine)
+    }
+
+    fun highlightByCurrentlyFocusedEditor() {
+        when (state.focusedEditor) {
+            ScratchEditorsState.FocusedEditor.SOURCE -> highlightPreviewBySource()
+            ScratchEditorsState.FocusedEditor.PREVIEW -> highlightSourceByPreview()
         }
-
-        sourceEditor.addFocusListener(exclusiveCaretHighlightingListener, this)
-        previewEditor.addFocusListener(exclusiveCaretHighlightingListener, this)
-    }
-
-    /**
-     * When source or preview documents change, we need to update highlighting, because
-     * expression output may become bigger.
-     *
-     * We can do that only when document is fully committed, so [ScratchFile.getExpressions] will return correct expressions
-     * with correct PSIs.
-     */
-    private fun configureHighlightUpdateOnDocumentChange() {
-        val focusedEditorKeeper = object : FocusChangeListener {
-            /**
-             * Read and write only from EDT, no synchronization or volatile is needed.
-             */
-            var lastFocusedEditor: Editor = sourceEditor
-
-            override fun focusLost(editor: Editor) {}
-
-            override fun focusGained(editor: Editor) {
-                lastFocusedEditor = editor
-            }
-        }
-
-        sourceEditor.addFocusListener(focusedEditorKeeper, this)
-        previewEditor.addFocusListener(focusedEditorKeeper, this)
-
-        val updateHighlightOnDocumentChangeListener = object : DocumentListener {
-            override fun documentChanged(event: DocumentEvent) {
-                clearAllHighlights()
-
-                val lastFocusedEditor = focusedEditorKeeper.lastFocusedEditor
-                val singleCaret = lastFocusedEditor.caretModel.allCarets.singleOrNull() ?: return
-
-                PsiDocumentManager.getInstance(sourceEditor.project!!).performWhenAllCommitted {
-                    if (lastFocusedEditor === sourceEditor) {
-                        highlightPreviewBySourceLine(singleCaret.logicalPosition.line)
-                    } else {
-                        highlightSourceByPreviewLine(singleCaret.logicalPosition.line)
-                    }
-                }
-            }
-        }
-
-        previewEditor.document.addDocumentListener(updateHighlightOnDocumentChangeListener, this)
-        sourceEditor.document.addDocumentListener(updateHighlightOnDocumentChangeListener, this)
-    }
-
-    /**
-     * When caret in [sourceEditor] is moved, highlight is recalculated.
-     *
-     * When focus is switched to the [sourceEditor], highlight is recalculated,
-     * because it is possible to switch focus without changing cursor position,
-     * which would lead to the outdated highlighting.
-     */
-    private fun configureSourceToPreviewHighlighting() {
-        sourceEditor.caretModel.addCaretListener(object : CaretListener {
-            override fun caretPositionChanged(event: CaretEvent) {
-                clearAllHighlights()
-
-                highlightPreviewBySourceLine(event.newPosition.line)
-            }
-        }, this)
-
-        sourceEditor.addFocusListener(object : FocusChangeListener {
-            override fun focusLost(editor: Editor) {}
-
-            override fun focusGained(editor: Editor) {
-                clearAllHighlights()
-
-                val singleCaret = sourceEditor.caretModel.allCarets.singleOrNull() ?: return
-                highlightPreviewBySourceLine(singleCaret.logicalPosition.line)
-            }
-        }, this)
-    }
-
-    /**
-     * When caret in [previewEditor] is moved, highlight is recalculated.
-     *
-     * When focus is switched to the [previewEditor], highlight is recalculated,
-     * because it is possible to switch focus without changing cursor position,
-     * which would lead to the outdated highlighting.
-     */
-    private fun configurePreviewToSourceHighlighting() {
-        previewEditor.caretModel.addCaretListener(object : CaretListener {
-            override fun caretPositionChanged(event: CaretEvent) {
-                clearAllHighlights()
-
-                highlightSourceByPreviewLine(event.newPosition.line)
-            }
-        }, this)
-
-        previewEditor.addFocusListener(object : FocusChangeListener {
-            override fun focusLost(editor: Editor) {}
-
-            override fun focusGained(editor: Editor) {
-                clearAllHighlights()
-
-                val singleCaret = previewEditor.caretModel.allCarets.singleOrNull() ?: return
-                highlightSourceByPreviewLine(singleCaret.logicalPosition.line)
-            }
-        }, this)
     }
 
     private fun highlightSourceByPreviewLine(selectedPreviewLine: Int) {
-        val (from, to) = translateSourceLineToPreviewLines(selectedPreviewLine) ?: return
+        val (from, to) = translator.sourceLineToPreviewLines(selectedPreviewLine) ?: return
 
         sourceHighlighter.highlightLines(from, to)
     }
 
     private fun highlightPreviewBySourceLine(selectedSourceLine: Int) {
-        val (from, to) = translatePreviewLineToSourceLines(selectedSourceLine) ?: return
+        val (from, to) = translator.previewLineToSourceLines(selectedSourceLine) ?: return
 
-        previewEditorHighlighter.highlightLines(from, to)
+        previewHighlighter.highlightLines(from, to)
     }
 
     private fun clearAllHighlights() {
         sourceHighlighter.clearHighlights()
-        previewEditorHighlighter.clearHighlights()
+        previewHighlighter.clearHighlights()
+    }
+
+    companion object {
+        fun create(
+            sourceEditor: EditorEx,
+            previewEditor: EditorEx,
+            translator: ScratchEditorLinesTranslator
+        ): ScratchEditorSyncHighlighter {
+            return ScratchEditorSyncHighlighter(
+                state = ScratchEditorsState(sourceEditor, previewEditor),
+                sourceHighlighter = EditorLinesHighlighter(sourceEditor),
+                previewHighlighter = EditorLinesHighlighter(previewEditor),
+                translator = translator
+            )
+        }
     }
 }
 

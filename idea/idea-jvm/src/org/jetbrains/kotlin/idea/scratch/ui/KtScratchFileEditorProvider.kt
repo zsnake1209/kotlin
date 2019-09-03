@@ -59,27 +59,10 @@ class KtScratchFileEditorWithPreview private constructor(
     val scratchFile: ScratchFile,
     sourceTextEditor: TextEditor,
     private val previewTextEditor: TextEditor
-) : TextEditorWithPreview(sourceTextEditor, previewTextEditor), TextEditor {
+) : TextEditorWithPreview(sourceTextEditor, previewTextEditor), TextEditor, ScratchEditorLinesTranslator {
 
     private val sourceEditor = sourceTextEditor.editor as EditorEx
     private val previewEditor = previewTextEditor.editor as EditorEx
-
-    private val syncHighlighter = object : ScratchEditorSyncHighlighter(sourceEditor, previewEditor) {
-        override fun translatePreviewLineToSourceLines(line: Int): Pair<Int, Int>? {
-            val expressionUnderCaret = scratchFile.getExpressionAtLine(line) ?: return null
-            val outputBlock = previewOutputManager.getBlock(expressionUnderCaret) ?: return null
-
-            return outputBlock.lineStart to outputBlock.lineEnd
-        }
-
-        override fun translateSourceLineToPreviewLines(line: Int): Pair<Int, Int>? {
-            val block = previewOutputManager.getBlockAtLine(line) ?: return null
-            if (!block.sourceExpression.linesInformationIsCorrect()) return null
-
-            return block.sourceExpression.lineStart to block.sourceExpression.lineEnd
-        }
-    }
-
     private val previewOutputManager: PreviewOutputBlocksManager = PreviewOutputBlocksManager(previewEditor)
 
     private val toolWindowHandler: ScratchOutputHandler = requestToolWindowHandler()
@@ -104,8 +87,23 @@ class KtScratchFileEditorWithPreview private constructor(
         scratchFile.replScratchExecutor?.addOutputHandler(commonPreviewOutputHandler)
 
         configureSyncScrollForSourceAndPreview()
+        configureSyncHighlighting(sourceEditor, previewEditor, translator = this)
 
         ScratchFileAutoRunner.addListener(scratchFile.project, sourceTextEditor)
+    }
+
+    override fun previewLineToSourceLines(previewLine: Int): Pair<Int, Int>? {
+        val expressionUnderCaret = scratchFile.getExpressionAtLine(previewLine) ?: return null
+        val outputBlock = previewOutputManager.getBlock(expressionUnderCaret) ?: return null
+
+        return outputBlock.lineStart to outputBlock.lineEnd
+    }
+
+    override fun sourceLineToPreviewLines(sourceLine: Int): Pair<Int, Int>? {
+        val block = previewOutputManager.getBlockAtLine(sourceLine) ?: return null
+        if (!block.sourceExpression.linesInformationIsCorrect()) return null
+
+        return block.sourceExpression.lineStart to block.sourceExpression.lineEnd
     }
 
     private fun configureSyncScrollForSourceAndPreview() {
@@ -134,7 +132,6 @@ class KtScratchFileEditorWithPreview private constructor(
     }
 
     override fun dispose() {
-        Disposer.dispose(syncHighlighter)
         scratchFile.replScratchExecutor?.stop()
         scratchFile.compilingScratchExecutor?.stop()
         releaseToolWindowHandler(toolWindowHandler)
