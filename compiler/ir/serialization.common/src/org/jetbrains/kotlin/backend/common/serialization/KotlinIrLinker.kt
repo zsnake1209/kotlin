@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.descriptors.*
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoBodyIndex
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.IrElement
@@ -40,12 +39,9 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.Annotations as Pr
 import org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference as ProtoDescriptorReference
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclaration as ProtoDeclaration
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrFile as ProtoFile
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoSymbolIndex
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolData as ProtoSymbolData
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind as ProtoSymbolKind
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrType as ProtoType
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoTypeIndex
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoStringIndex
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement as ProtoStatement
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression as ProtoExpression
 
@@ -345,25 +341,25 @@ abstract class KotlinIrLinker(
                     isTypeParameter = proto.isTypeParameter
                 )
 
-            override fun deserializeIrSymbol(proto: ProtoSymbolIndex): IrSymbol {
-                val symbolData = loadSymbolProto(proto.index)
+            override fun deserializeIrSymbol(index: Int): IrSymbol {
+                val symbolData = loadSymbolProto(index)
                 return deserializeIrSymbolData(symbolData)
             }
 
-            override fun deserializeIrType(proto: ProtoTypeIndex): IrType {
-                val typeData = loadTypeProto(proto.index)
+            override fun deserializeIrType(index: Int): IrType {
+                val typeData = loadTypeProto(index)
                 return deserializeIrTypeData(typeData)
             }
 
-            override fun deserializeString(proto: ProtoStringIndex): String =
-                loadStringProto(proto.index)
+            override fun deserializeString(index: Int): String =
+                loadStringProto(index)
 
             override fun deserializeLoopHeader(loopIndex: Int, loopBuilder: () -> IrLoopBase) =
                 fileLoops.getOrPut(loopIndex, loopBuilder)
 
-            override fun deserializeExpressionBody(proto: ProtoBodyIndex): IrExpression {
+            override fun deserializeExpressionBody(index: Int): IrExpression {
                 if (deserializeBodies) {
-                    val bodyData = loadExpressionBodyProto(proto.index)
+                    val bodyData = loadExpressionBodyProto(index)
                     return deserializeExpression(bodyData)
                 } else {
                     val errorType = IrErrorTypeImpl(null, emptyList(), Variance.INVARIANT)
@@ -371,9 +367,9 @@ abstract class KotlinIrLinker(
                 }
             }
 
-            override fun deserializeStatementBody(proto: ProtoBodyIndex): IrElement {
+            override fun deserializeStatementBody(index: Int): IrElement {
                 if (deserializeBodies) {
-                    val bodyData = loadStatementBodyProto(proto.index)
+                    val bodyData = loadStatementBodyProto(index)
                     return deserializeStatement(bodyData)
                 } else {
                     val errorType = IrErrorTypeImpl(null, emptyList(), Variance.INVARIANT)
@@ -427,7 +423,7 @@ abstract class KotlinIrLinker(
                 when {
                     theWholeWorld -> fileProto.declarationIdList
                     explicitlyExported -> fileProto.explicitlyExportedToCompilerList.map {
-                        fileDeserializer.loadSymbolData(it.index).topLevelUniqId
+                        fileDeserializer.loadSymbolData(it).topLevelUniqId
                     }
                     else -> emptyList()
                 }
