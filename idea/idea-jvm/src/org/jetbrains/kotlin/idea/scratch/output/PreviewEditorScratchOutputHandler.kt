@@ -17,7 +17,6 @@ import com.intellij.openapi.editor.markup.*
 import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.kotlin.idea.scratch.ScratchExpression
 import org.jetbrains.kotlin.idea.scratch.ScratchFile
-import java.awt.Color
 import java.util.*
 import kotlin.math.max
 
@@ -70,19 +69,25 @@ class PreviewEditorScratchOutputHandler(
 
 private val ScratchExpression.height: Int get() = lineEnd - lineStart + 1
 
+interface ScratchOutputBlock {
+    val sourceExpression: ScratchExpression
+    val lineStart: Int
+    val lineEnd: Int
+    fun addOutput(output: ScratchOutput)
+}
+
 class PreviewOutputBlocksManager(editor: Editor) {
     private val targetDocument: Document = editor.document
     private val foldingModel: FoldingModel = editor.foldingModel
     private val markupModel: MarkupModel = editor.markupModel
 
     private val blocks: NavigableMap<ScratchExpression, OutputBlock> = TreeMap(Comparator.comparingInt { it.lineStart })
-    private var activeBlockHighlight: RangeHighlighter? = null
 
     fun computeSourceToPreviewAlignments(): List<Pair<Int, Int>> = blocks.values.map { it.sourceExpression.lineStart to it.lineStart }
 
-    fun getBlock(expression: ScratchExpression): OutputBlock? = blocks[expression]
+    fun getBlock(expression: ScratchExpression): ScratchOutputBlock? = blocks[expression]
 
-    fun addBlockToTheEnd(expression: ScratchExpression): OutputBlock = OutputBlock(expression).also {
+    fun addBlockToTheEnd(expression: ScratchExpression): ScratchOutputBlock = OutputBlock(expression).also {
         if (blocks.putIfAbsent(expression, it) != null) {
             error("There is already a cell for $expression!")
         }
@@ -97,23 +102,18 @@ class PreviewOutputBlocksManager(editor: Editor) {
         }
     }
 
-    fun clearAllHighlights() {
-        activeBlockHighlight?.let(markupModel::removeHighlighter)
-        activeBlockHighlight = null
-    }
-
-    inner class OutputBlock(val sourceExpression: ScratchExpression) {
+    private inner class OutputBlock(override val sourceExpression: ScratchExpression) : ScratchOutputBlock {
         private val outputs: MutableList<ScratchOutput> = mutableListOf()
 
-        var lineStart: Int = computeCellLineStart(sourceExpression)
+        override var lineStart: Int = computeCellLineStart(sourceExpression)
             private set
 
-        val lineEnd: Int get() = lineStart + countNewLines(outputs)
-        val height: Int get() = lineEnd - lineStart + 1
+        override val lineEnd: Int get() = lineStart + countNewLines(outputs)
 
+        val height: Int get() = lineEnd - lineStart + 1
         private var foldRegion: FoldRegion? = null
 
-        fun addOutput(output: ScratchOutput) {
+        override fun addOutput(output: ScratchOutput) {
             printAndSaveOutput(output)
 
             blocks.lowerEntry(sourceExpression)?.value?.updateFolding()
@@ -121,16 +121,6 @@ class PreviewOutputBlocksManager(editor: Editor) {
                 it.recalculatePosition()
                 it.updateFolding()
             }
-        }
-
-        fun addHighlight(color: Color) {
-            clearAllHighlights()
-            activeBlockHighlight = markupModel.highlightLines(
-                lineStart,
-                lineEnd,
-                TextAttributes().apply { backgroundColor = color },
-                targetArea = HighlighterTargetArea.LINES_IN_RANGE
-            )
         }
 
         /**
@@ -191,7 +181,7 @@ class PreviewOutputBlocksManager(editor: Editor) {
         return previous.lineEnd + compensation + distanceBetweenSources
     }
 
-    fun getBlockAtLine(line: Int): OutputBlock? = blocks.values.find { line in it.lineStart..it.lineEnd }
+    fun getBlockAtLine(line: Int): ScratchOutputBlock? = blocks.values.find { line in it.lineStart..it.lineEnd }
 }
 
 private fun countNewLines(list: List<ScratchOutput>) = list.sumBy { StringUtil.countNewLines(it.text) } + max(list.size - 1, 0)
@@ -208,7 +198,7 @@ private fun Document.insertStringAtLine(lineNumber: Int, text: String) {
     }
 }
 
-private fun MarkupModel.highlightLines(
+fun MarkupModel.highlightLines(
     from: Int,
     to: Int,
     attributes: TextAttributes,

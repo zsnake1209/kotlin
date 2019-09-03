@@ -18,7 +18,6 @@ import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.event.*
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
-import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
@@ -40,7 +39,6 @@ import org.jetbrains.kotlin.idea.core.util.getLineNumber
 import org.jetbrains.kotlin.idea.scratch.*
 import org.jetbrains.kotlin.idea.scratch.output.*
 import org.jetbrains.kotlin.psi.UserDataProperty
-import java.awt.Color
 
 private const val KTS_SCRATCH_EDITOR_PROVIDER: String = "KtsScratchFileEditorProvider"
 
@@ -72,7 +70,14 @@ class KtScratchFileEditorWithPreview private constructor(
     private val sourceEditor = sourceTextEditor.editor as EditorEx
     private val previewEditor = previewTextEditor.editor as EditorEx
 
-    private val sourceHighlighter: ScratchSourceEditorHighlighter = ScratchSourceEditorHighlighter(sourceEditor)
+    private val sourceHighlighter = EditorEntryHighlighter<ScratchExpression>(sourceEditor) { expr ->
+        expr.lineStart to expr.lineEnd
+    }
+
+    private val previewEditorHighlighter = EditorEntryHighlighter<ScratchOutputBlock>(previewEditor) { block ->
+        block.lineStart to block.lineEnd
+    }
+
     private val previewOutputManager: PreviewOutputBlocksManager = PreviewOutputBlocksManager(previewEditor)
 
     private val toolWindowHandler: ScratchOutputHandler = requestToolWindowHandler()
@@ -256,26 +261,22 @@ class KtScratchFileEditorWithPreview private constructor(
     }
 
     private fun highlightSourceByPreviewLine(selectedPreviewLine: Int) {
-        val highlightColor = previewEditor.colorsScheme.getColor(EditorColors.CARET_ROW_COLOR) ?: return
-
         val block = previewOutputManager.getBlockAtLine(selectedPreviewLine) ?: return
         if (!block.sourceExpression.linesInformationIsCorrect()) return
 
-        sourceHighlighter.highlightSourceExpression(block.sourceExpression, highlightColor)
+        sourceHighlighter.highlightEntry(block.sourceExpression)
     }
 
     private fun highlightPreviewBySourceLine(selectedSourceLine: Int) {
-        val highlightColor = previewEditor.colorsScheme.getColor(EditorColors.CARET_ROW_COLOR) ?: return
-
         val expressionUnderCaret = scratchFile.getExpressionAtLine(selectedSourceLine) ?: return
         val outputBlock = previewOutputManager.getBlock(expressionUnderCaret) ?: return
 
-        outputBlock.addHighlight(highlightColor)
+        previewEditorHighlighter.highlightEntry(outputBlock)
     }
 
     private fun clearAllHighlights() {
         sourceHighlighter.clearAllHighlights()
-        previewOutputManager.clearAllHighlights()
+        previewEditorHighlighter.clearAllHighlights()
     }
 
     override fun dispose() {
@@ -409,25 +410,28 @@ private class LayoutDependantOutputHandler(
         }
 }
 
-private class ScratchSourceEditorHighlighter(private val sourceEditor: Editor) {
+private class EditorEntryHighlighter<T>(private val targetEditor: Editor, private val positionExtractor: (T) -> Pair<Int, Int>) {
     private var activeHighlight: RangeHighlighter? = null
 
-    fun highlightSourceExpression(sourceExpression: ScratchExpression, highlightColor: Color) {
+    fun clearAllHighlights() {
+        activeHighlight?.let(targetEditor.markupModel::removeHighlighter)
+        activeHighlight = null
+    }
+
+    fun highlightEntry(entry: T) {
         clearAllHighlights()
-        val range = sourceExpression.element.textRange
-        activeHighlight = sourceEditor.markupModel.addRangeHighlighter(
-            range.startOffset,
-            range.endOffset,
-            HighlighterLayer.CARET_ROW,
+
+        val highlightColor = targetEditor.colorsScheme.getColor(EditorColors.CARET_ROW_COLOR) ?: return
+        val (lineStart, lineEnd) = positionExtractor(entry)
+
+        activeHighlight = targetEditor.markupModel.highlightLines(
+            lineStart,
+            lineEnd,
             TextAttributes().apply { backgroundColor = highlightColor },
             HighlighterTargetArea.LINES_IN_RANGE
         )
     }
 
-    fun clearAllHighlights() {
-        activeHighlight?.let(sourceEditor.markupModel::removeHighlighter)
-        activeHighlight = null
-    }
 }
 
 /**
