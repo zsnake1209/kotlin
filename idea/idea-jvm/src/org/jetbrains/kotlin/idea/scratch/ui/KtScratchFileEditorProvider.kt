@@ -14,13 +14,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.EditorKind
-import com.intellij.openapi.editor.colors.EditorColors
-import com.intellij.openapi.editor.event.*
+import com.intellij.openapi.editor.event.VisibleAreaListener
 import com.intellij.openapi.editor.ex.EditorEx
-import com.intellij.openapi.editor.ex.FocusChangeListener
-import com.intellij.openapi.editor.markup.HighlighterTargetArea
-import com.intellij.openapi.editor.markup.RangeHighlighter
-import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorPolicy
 import com.intellij.openapi.fileEditor.FileEditorProvider
@@ -32,7 +27,6 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.pom.Navigatable
-import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiManager
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.idea.core.util.getLineNumber
@@ -70,12 +64,20 @@ class KtScratchFileEditorWithPreview private constructor(
     private val sourceEditor = sourceTextEditor.editor as EditorEx
     private val previewEditor = previewTextEditor.editor as EditorEx
 
-    private val sourceHighlighter = EditorEntryHighlighter<ScratchExpression>(sourceEditor) { expr ->
-        expr.lineStart to expr.lineEnd
-    }
+    private val syncHighlighter = object : ScratchEditorSyncHighlighter(sourceEditor, previewEditor) {
+        override fun translatePreviewLineToSourceLines(line: Int): Pair<Int, Int>? {
+            val expressionUnderCaret = scratchFile.getExpressionAtLine(line) ?: return null
+            val outputBlock = previewOutputManager.getBlock(expressionUnderCaret) ?: return null
 
-    private val previewEditorHighlighter = EditorEntryHighlighter<ScratchOutputBlock>(previewEditor) { block ->
-        block.lineStart to block.lineEnd
+            return outputBlock.lineStart to outputBlock.lineEnd
+        }
+
+        override fun translateSourceLineToPreviewLines(line: Int): Pair<Int, Int>? {
+            val block = previewOutputManager.getBlockAtLine(line) ?: return null
+            if (!block.sourceExpression.linesInformationIsCorrect()) return null
+
+            return block.sourceExpression.lineStart to block.sourceExpression.lineEnd
+        }
     }
 
     private val previewOutputManager: PreviewOutputBlocksManager = PreviewOutputBlocksManager(previewEditor)
@@ -102,8 +104,6 @@ class KtScratchFileEditorWithPreview private constructor(
         scratchFile.replScratchExecutor?.addOutputHandler(commonPreviewOutputHandler)
 
         configureSyncScrollForSourceAndPreview()
-
-        configureSyncHighlighting()
 
         ScratchFileAutoRunner.addListener(scratchFile.project, sourceTextEditor)
     }
@@ -133,153 +133,8 @@ class KtScratchFileEditorWithPreview private constructor(
         previewEditor.scrollingModel.addVisibleAreaListener(listener)
     }
 
-    private fun configureSyncHighlighting() {
-        configureExclusiveCaretRowHighlighting()
-        configureHighlightUpdateOnDocumentChange()
-        configureSourceToPreviewHighlighting()
-        configurePreviewToSourceHighlighting()
-    }
-
-    /**
-     * Configures editors such that only one of them have caret row highlighting enabled.
-     */
-    private fun configureExclusiveCaretRowHighlighting() {
-        val exclusiveCaretHighlightingListener = object : FocusChangeListener {
-            override fun focusLost(editor: Editor) {}
-
-            override fun focusGained(editor: Editor) {
-                sourceEditor.settings.isCaretRowShown = false
-                previewEditor.settings.isCaretRowShown = false
-
-                editor.settings.isCaretRowShown = true
-            }
-        }
-
-        sourceEditor.addFocusListener(exclusiveCaretHighlightingListener)
-        previewEditor.addFocusListener(exclusiveCaretHighlightingListener)
-    }
-
-    /**
-     * When source or preview documents change, we need to update highlighting, because
-     * expression output may become bigger.
-     *
-     * We can do that only when document is fully committed, so [ScratchFile.getExpressions] will return correct expressions
-     * with correct PSIs.
-     */
-    private fun configureHighlightUpdateOnDocumentChange() {
-        val focusedEditorKeeper = object : FocusChangeListener {
-            /**
-             * Read and write only from EDT, no synchronization or volatile is needed.
-             */
-            var lastFocusedEditor: Editor = sourceEditor
-
-            override fun focusLost(editor: Editor) {}
-
-            override fun focusGained(editor: Editor) {
-                lastFocusedEditor = editor
-            }
-        }
-
-        sourceEditor.addFocusListener(focusedEditorKeeper)
-        previewEditor.addFocusListener(focusedEditorKeeper)
-
-        val updateHighlightOnDocumentChangeListener = object : DocumentListener {
-            override fun documentChanged(event: DocumentEvent) {
-                clearAllHighlights()
-
-                val lastFocusedEditor = focusedEditorKeeper.lastFocusedEditor
-                val singleCaret = lastFocusedEditor.caretModel.allCarets.singleOrNull() ?: return
-
-                PsiDocumentManager.getInstance(scratchFile.project).performWhenAllCommitted {
-                    if (lastFocusedEditor === sourceEditor) {
-                        highlightPreviewBySourceLine(singleCaret.logicalPosition.line)
-                    } else {
-                        highlightSourceByPreviewLine(singleCaret.logicalPosition.line)
-                    }
-                }
-            }
-        }
-
-        previewEditor.document.addDocumentListener(updateHighlightOnDocumentChangeListener)
-        sourceEditor.document.addDocumentListener(updateHighlightOnDocumentChangeListener)
-    }
-
-    /**
-     * When caret in [sourceEditor] is moved, highlight is recalculated.
-     *
-     * When focus is switched to the [sourceEditor], highlight is recalculated,
-     * because it is possible to switch focus without changing cursor position,
-     * which would lead to the outdated highlighting.
-     */
-    private fun configureSourceToPreviewHighlighting() {
-        sourceEditor.caretModel.addCaretListener(object : CaretListener {
-            override fun caretPositionChanged(event: CaretEvent) {
-                clearAllHighlights()
-
-                highlightPreviewBySourceLine(event.newPosition.line)
-            }
-        })
-
-        sourceEditor.addFocusListener(object : FocusChangeListener {
-            override fun focusLost(editor: Editor) {}
-
-            override fun focusGained(editor: Editor) {
-                clearAllHighlights()
-
-                val singleCaret = sourceEditor.caretModel.allCarets.singleOrNull() ?: return
-                highlightPreviewBySourceLine(singleCaret.logicalPosition.line)
-            }
-        })
-    }
-
-    /**
-     * When caret in [previewEditor] is moved, highlight is recalculated.
-     *
-     * When focus is switched to the [previewEditor], highlight is recalculated,
-     * because it is possible to switch focus without changing cursor position,
-     * which would lead to the outdated highlighting.
-     */
-    private fun configurePreviewToSourceHighlighting() {
-        previewEditor.caretModel.addCaretListener(object : CaretListener {
-            override fun caretPositionChanged(event: CaretEvent) {
-                clearAllHighlights()
-
-                highlightSourceByPreviewLine(event.newPosition.line)
-            }
-        })
-
-        previewEditor.addFocusListener(object : FocusChangeListener {
-            override fun focusLost(editor: Editor) {}
-
-            override fun focusGained(editor: Editor) {
-                clearAllHighlights()
-
-                val singleCaret = previewEditor.caretModel.allCarets.singleOrNull() ?: return
-                highlightSourceByPreviewLine(singleCaret.logicalPosition.line)
-            }
-        })
-    }
-
-    private fun highlightSourceByPreviewLine(selectedPreviewLine: Int) {
-        val block = previewOutputManager.getBlockAtLine(selectedPreviewLine) ?: return
-        if (!block.sourceExpression.linesInformationIsCorrect()) return
-
-        sourceHighlighter.highlightEntry(block.sourceExpression)
-    }
-
-    private fun highlightPreviewBySourceLine(selectedSourceLine: Int) {
-        val expressionUnderCaret = scratchFile.getExpressionAtLine(selectedSourceLine) ?: return
-        val outputBlock = previewOutputManager.getBlock(expressionUnderCaret) ?: return
-
-        previewEditorHighlighter.highlightEntry(outputBlock)
-    }
-
-    private fun clearAllHighlights() {
-        sourceHighlighter.clearAllHighlights()
-        previewEditorHighlighter.clearAllHighlights()
-    }
-
     override fun dispose() {
+        Disposer.dispose(syncHighlighter)
         scratchFile.replScratchExecutor?.stop()
         scratchFile.compilingScratchExecutor?.stop()
         releaseToolWindowHandler(toolWindowHandler)
@@ -408,30 +263,6 @@ private class LayoutDependantOutputHandler(
             TextEditorWithPreview.Layout.SHOW_EDITOR -> noPreviewOutputHandler
             else -> previewOutputHandler
         }
-}
-
-private class EditorEntryHighlighter<T>(private val targetEditor: Editor, private val positionExtractor: (T) -> Pair<Int, Int>) {
-    private var activeHighlight: RangeHighlighter? = null
-
-    fun clearAllHighlights() {
-        activeHighlight?.let(targetEditor.markupModel::removeHighlighter)
-        activeHighlight = null
-    }
-
-    fun highlightEntry(entry: T) {
-        clearAllHighlights()
-
-        val highlightColor = targetEditor.colorsScheme.getColor(EditorColors.CARET_ROW_COLOR) ?: return
-        val (lineStart, lineEnd) = positionExtractor(entry)
-
-        activeHighlight = targetEditor.markupModel.highlightLines(
-            lineStart,
-            lineEnd,
-            TextAttributes().apply { backgroundColor = highlightColor },
-            HighlighterTargetArea.LINES_IN_RANGE
-        )
-    }
-
 }
 
 /**
