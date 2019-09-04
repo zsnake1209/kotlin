@@ -1,0 +1,60 @@
+{
+  "2": {
+    "neg": {
+      "1": [
+        {
+          "specVersion": "0.1-155",
+          "casesNumber": 0,
+          "description": "When type disjunctions",
+          "path": "compiler/testData/diagnostics/tests/when/WhenTypeDisjunctions.kt",
+          "unexpectedBehaviour": false
+        },
+        {
+          "specVersion": "0.1-155",
+          "casesNumber": 0,
+          "description": "Exhaustive break continue",
+          "path": "compiler/testData/diagnostics/tests/when/ExhaustiveBreakContinue.kt",
+          "unexpectedBehaviour": false
+        }
+      ]
+    },
+    "pos": {
+      "1": [
+        {
+          "specVersion": "0.1-155",
+          "casesNumber": 0,
+          "description": "Exhaustive return throw",
+          "path": "compiler/testData/diagnostics/tests/when/ExhaustiveReturnThrow.kt",
+          "unexpectedBehaviour": false
+        },
+        {
+          "specVersion": "0.1-155",
+          "casesNumber": 0,
+          "description": "Exhaustive return",
+          "path": "compiler/testData/diagnostics/tests/when/ExhaustiveReturn.kt",
+          "unexpectedBehaviour": false
+        }
+      ]
+    }
+  },
+  "1": {
+    "pos": {
+      "1": [
+        {
+          "specVersion": "0.1-155",
+          "casesNumber": 0,
+          "description": "Exhaustive with nullability check before",
+          "path": "compiler/testData/diagnostics/tests/when/ExhaustiveWithNullabilityCheckBefore.kt",
+          "unexpectedBehaviour": false
+        },
+        {
+          "specVersion": "0.1-155",
+          "casesNumber": 0,
+          "description": "Exhaustive with nullability check else",
+          "path": "compiler/testData/diagnostics/tests/when/ExhaustiveWithNullabilityCheckElse.kt",
+          "unexpectedBehaviour": false
+        }
+      ]
+    }
+  }
+}
