@@ -196,6 +196,13 @@ class CodeFragmentParameterAnalyzer(
                         evaluationStatus.error(EvaluationError.SuspendCall)
                         throw EvaluateExceptionUtil.createEvaluateException("Evaluation of 'suspend' calls is not supported")
                     }
+                    val type = descriptor.containingDeclaration
+                    val typeName = if (type is TypeAliasDescriptor)
+                        type.classDescriptor?.fqNameSafe?.asString() // get root class (transitive for any amount of re-aliased aliases)
+                    else type.fqNameSafe.asString()
+                    if (descriptor is ConstructorDescriptor && typeName == "kotlin.Nothing") {
+                        throw EvaluateExceptionUtil.createEvaluateException("Type 'Nothing' can't be instantiated")
+                    }
                 }
 
                 return super.visitCallExpression(expression, data)
