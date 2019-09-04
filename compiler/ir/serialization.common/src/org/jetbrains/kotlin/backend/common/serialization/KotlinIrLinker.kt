@@ -32,10 +32,10 @@ import org.jetbrains.kotlin.ir.util.NaiveSourceBasedFileEntryImpl
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.protobuf.ExtensionRegistryLite.newInstance
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.serialization.deserialization.ProtoContainer
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 import org.jetbrains.kotlin.types.Variance
-import org.jetbrains.kotlin.backend.common.serialization.proto.Annotations as ProtoAnnotations
 import org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference as ProtoDescriptorReference
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclaration as ProtoDeclaration
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrFile as ProtoFile
@@ -44,6 +44,7 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind as P
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrType as ProtoType
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement as ProtoStatement
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression as ProtoExpression
+import org.jetbrains.kotlin.backend.common.serialization.proto.IrConstructorCall as ProtoConstructorCall
 
 abstract class KotlinIrLinker(
     val logger: LoggingContext,
@@ -131,7 +132,7 @@ abstract class KotlinIrLinker(
         // This is a heavy initializer
         val module = deserializeIrModuleHeader()
 
-        inner class IrDeserializerForFile(private var annotationsProto: ProtoAnnotations?, private val fileIndex: Int, onlyHeaders: Boolean) :
+        inner class IrDeserializerForFile(private var annotations: List<ProtoConstructorCall>?, private val fileIndex: Int, onlyHeaders: Boolean) :
             IrFileDeserializer(logger, builtIns, symbolTable) {
 
             private var fileLoops = mutableMapOf<Int, IrLoopBase>()
@@ -380,9 +381,9 @@ abstract class KotlinIrLinker(
             }
 
             fun deserializeFileAnnotationsIfFirstUse() {
-                annotationsProto?.let {
+                annotations?.let {
                     file.annotations.addAll(deserializeAnnotations(it))
-                    annotationsProto = null
+                    annotations = null
                 }
             }
 
@@ -403,7 +404,7 @@ abstract class KotlinIrLinker(
 
             val fileEntry = NaiveSourceBasedFileEntryImpl(fileName, fileProto.fileEntry.lineStartOffsetsList.toIntArray())
 
-            val fileDeserializer = IrDeserializerForFile(fileProto.annotations, fileIndex, !deserializationStrategy.needBodies)
+            val fileDeserializer = IrDeserializerForFile(fileProto.annotationList, fileIndex, !deserializationStrategy.needBodies)
 
             val fqName = fileDeserializer.deserializeFqName(fileProto.fqNameList)
 

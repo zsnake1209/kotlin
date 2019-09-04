@@ -30,12 +30,10 @@ import org.jetbrains.kotlin.library.impl.IrMemoryDeclarationWriter
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
-import org.jetbrains.kotlin.backend.common.serialization.proto.Annotations as ProtoAnnotations
 import org.jetbrains.kotlin.backend.common.serialization.proto.ClassKind as ProtoClassKind
 import org.jetbrains.kotlin.backend.common.serialization.proto.Coordinates as ProtoCoordinates
 import org.jetbrains.kotlin.backend.common.serialization.proto.FieldAccessCommon as ProtoFieldAccessCommon
 import org.jetbrains.kotlin.backend.common.serialization.proto.FileEntry as ProtoFileEntry
-//import org.jetbrains.kotlin.backend.common.serialization.proto.FqName as ProtoFqName
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnonymousInit as ProtoAnonymousInit
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlock as ProtoBlock
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlockBody as ProtoBlockBody
@@ -310,12 +308,13 @@ open class IrFileSerializer(
         Variance.INVARIANT -> ProtoTypeVariance.INV
     }
 
-    private fun serializeAnnotations(annotations: List<IrConstructorCall>): ProtoAnnotations {
-        val proto = ProtoAnnotations.newBuilder()
-        annotations.forEach {
-            proto.addAnnotation(serializeConstructorCall(it))
-        }
-        return proto.build()
+    private fun serializeAnnotations(annotations: List<IrConstructorCall>): List<ProtoConstructorCall> {
+//        val proto = ProtoAnnotations.newBuilder()
+//        annotations.forEach {
+//            proto.addAnnotation(serializeConstructorCall(it))
+//        }
+//        return proto.build()
+        return annotations.map { serializeConstructorCall(it) }
     }
 
     private fun serializeFqName(fqName: FqName): List<Int> {
@@ -349,7 +348,7 @@ open class IrFileSerializer(
 
     private fun serializeSimpleType(type: IrSimpleType): ProtoSimpleType {
         val proto = ProtoSimpleType.newBuilder()
-            .setAnnotations(serializeAnnotations(type.annotations))
+            .addAllAnnotation(serializeAnnotations(type.annotations))
             .setClassifier(serializeIrSymbol(type.classifier))
             .setHasQuestionMark(type.hasQuestionMark)
         type.abbreviation?.let {
@@ -363,7 +362,7 @@ open class IrFileSerializer(
 
     private fun serializeIrTypeAbbreviation(typeAbbreviation: IrTypeAbbreviation): ProtoTypeAbbreviation {
         val proto = ProtoTypeAbbreviation.newBuilder()
-            .setAnnotations(serializeAnnotations(typeAbbreviation.annotations))
+            .addAllAnnotation(serializeAnnotations(typeAbbreviation.annotations))
             .setTypeAlias(serializeIrSymbol(typeAbbreviation.typeAlias))
             .setHasQuestionMark(typeAbbreviation.hasQuestionMark)
         typeAbbreviation.arguments.forEach {
@@ -373,11 +372,11 @@ open class IrFileSerializer(
     }
 
     private fun serializeDynamicType(type: IrDynamicType): ProtoDynamicType = ProtoDynamicType.newBuilder()
-        .setAnnotations(serializeAnnotations(type.annotations))
+        .addAllAnnotation(serializeAnnotations(type.annotations))
         .build()
 
     private fun serializeErrorType(type: IrErrorType): ProtoErrorType = ProtoErrorType.newBuilder()
-        .setAnnotations(serializeAnnotations(type.annotations))
+        .addAllAnnotation(serializeAnnotations(type.annotations))
         .build()
 
     private fun serializeIrTypeData(type: IrType): ProtoType {
@@ -1023,7 +1022,7 @@ open class IrFileSerializer(
         ProtoDeclarationBase.newBuilder()
             .setSymbol(serializeIrSymbol((declaration as IrSymbolOwner).symbol))
             .setCoordinates(serializeCoordinates(declaration.startOffset, declaration.endOffset))
-            .setAnnotations(serializeAnnotations(declaration.annotations))
+            .addAllAnnotation(serializeAnnotations(declaration.annotations))
             .setOrigin(serializeIrDeclarationOrigin(declaration.origin))
             .build()
 
@@ -1304,7 +1303,7 @@ open class IrFileSerializer(
         val proto = ProtoFile.newBuilder()
             .setFileEntry(serializeFileEntry(file.fileEntry))
             .addAllFqName(serializeFqName(file.fqName))
-            .setAnnotations(serializeAnnotations(file.annotations))
+            .addAllAnnotation(serializeAnnotations(file.annotations))
 
         file.declarations.forEach {
             if (it.descriptor.isExpectMember && !it.descriptor.isSerializableExpectClass) {
