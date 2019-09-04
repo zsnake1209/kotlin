@@ -100,17 +100,9 @@ public final class DescriptorReference extends
             name_ = input.readInt32();
             break;
           }
-          case 34: {
-            org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.Builder subBuilder = null;
-            if (((bitField0_ & 0x00000002) == 0x00000002)) {
-              subBuilder = uniqId_.toBuilder();
-            }
-            uniqId_ = input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.PARSER, extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(uniqId_);
-              uniqId_ = subBuilder.buildPartial();
-            }
+          case 32: {
             bitField0_ |= 0x00000002;
+            uniqIdIndex_ = input.readInt64();
             break;
           }
           case 40: {
@@ -241,40 +233,30 @@ public final class DescriptorReference extends
   private int name_;
   /**
    * <code>required int32 name = 3;</code>
-   *
-   * <pre>
-   *  required FqName package_fq_name = 1;
-   *  required FqName class_fq_name = 2;
-   * </pre>
    */
   public boolean hasName() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
    * <code>required int32 name = 3;</code>
-   *
-   * <pre>
-   *  required FqName package_fq_name = 1;
-   *  required FqName class_fq_name = 2;
-   * </pre>
    */
   public int getName() {
     return name_;
   }
 
-  public static final int UNIQ_ID_FIELD_NUMBER = 4;
-  private org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniqId_;
+  public static final int UNIQ_ID_INDEX_FIELD_NUMBER = 4;
+  private long uniqIdIndex_;
   /**
-   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
+   * <code>optional int64 uniq_id_index = 4;</code>
    */
-  public boolean hasUniqId() {
+  public boolean hasUniqIdIndex() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
-   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
+   * <code>optional int64 uniq_id_index = 4;</code>
    */
-  public org.jetbrains.kotlin.backend.common.serialization.proto.UniqId getUniqId() {
-    return uniqId_;
+  public long getUniqIdIndex() {
+    return uniqIdIndex_;
   }
 
   public static final int IS_GETTER_FIELD_NUMBER = 5;
@@ -401,7 +383,7 @@ public final class DescriptorReference extends
     packageFqName_ = java.util.Collections.emptyList();
     classFqName_ = java.util.Collections.emptyList();
     name_ = 0;
-    uniqId_ = org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.getDefaultInstance();
+    uniqIdIndex_ = 0L;
     isGetter_ = false;
     isSetter_ = false;
     isBackingField_ = false;
@@ -421,12 +403,6 @@ public final class DescriptorReference extends
       memoizedIsInitialized = 0;
       return false;
     }
-    if (hasUniqId()) {
-      if (!getUniqId().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -444,7 +420,7 @@ public final class DescriptorReference extends
       output.writeInt32(3, name_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeMessage(4, uniqId_);
+      output.writeInt64(4, uniqIdIndex_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       output.writeBool(5, isGetter_);
@@ -503,7 +479,7 @@ public final class DescriptorReference extends
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeMessageSize(4, uniqId_);
+        .computeInt64Size(4, uniqIdIndex_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -637,7 +613,7 @@ public final class DescriptorReference extends
       bitField0_ = (bitField0_ & ~0x00000002);
       name_ = 0;
       bitField0_ = (bitField0_ & ~0x00000004);
-      uniqId_ = org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.getDefaultInstance();
+      uniqIdIndex_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000008);
       isGetter_ = false;
       bitField0_ = (bitField0_ & ~0x00000010);
@@ -695,7 +671,7 @@ public final class DescriptorReference extends
       if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
         to_bitField0_ |= 0x00000002;
       }
-      result.uniqId_ = uniqId_;
+      result.uniqIdIndex_ = uniqIdIndex_;
       if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
         to_bitField0_ |= 0x00000004;
       }
@@ -757,8 +733,8 @@ public final class DescriptorReference extends
       if (other.hasName()) {
         setName(other.getName());
       }
-      if (other.hasUniqId()) {
-        mergeUniqId(other.getUniqId());
+      if (other.hasUniqIdIndex()) {
+        setUniqIdIndex(other.getUniqIdIndex());
       }
       if (other.hasIsGetter()) {
         setIsGetter(other.getIsGetter());
@@ -793,12 +769,6 @@ public final class DescriptorReference extends
       if (!hasName()) {
         
         return false;
-      }
-      if (hasUniqId()) {
-        if (!getUniqId().isInitialized()) {
-          
-          return false;
-        }
       }
       return true;
     }
@@ -957,33 +927,18 @@ public final class DescriptorReference extends
     private int name_ ;
     /**
      * <code>required int32 name = 3;</code>
-     *
-     * <pre>
-     *  required FqName package_fq_name = 1;
-     *  required FqName class_fq_name = 2;
-     * </pre>
      */
     public boolean hasName() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>required int32 name = 3;</code>
-     *
-     * <pre>
-     *  required FqName package_fq_name = 1;
-     *  required FqName class_fq_name = 2;
-     * </pre>
      */
     public int getName() {
       return name_;
     }
     /**
      * <code>required int32 name = 3;</code>
-     *
-     * <pre>
-     *  required FqName package_fq_name = 1;
-     *  required FqName class_fq_name = 2;
-     * </pre>
      */
     public Builder setName(int value) {
       bitField0_ |= 0x00000004;
@@ -993,11 +948,6 @@ public final class DescriptorReference extends
     }
     /**
      * <code>required int32 name = 3;</code>
-     *
-     * <pre>
-     *  required FqName package_fq_name = 1;
-     *  required FqName class_fq_name = 2;
-     * </pre>
      */
     public Builder clearName() {
       bitField0_ = (bitField0_ & ~0x00000004);
@@ -1006,63 +956,35 @@ public final class DescriptorReference extends
       return this;
     }
 
-    private org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniqId_ = org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.getDefaultInstance();
+    private long uniqIdIndex_ ;
     /**
-     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
+     * <code>optional int64 uniq_id_index = 4;</code>
      */
-    public boolean hasUniqId() {
+    public boolean hasUniqIdIndex() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
+     * <code>optional int64 uniq_id_index = 4;</code>
      */
-    public org.jetbrains.kotlin.backend.common.serialization.proto.UniqId getUniqId() {
-      return uniqId_;
+    public long getUniqIdIndex() {
+      return uniqIdIndex_;
     }
     /**
-     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
+     * <code>optional int64 uniq_id_index = 4;</code>
      */
-    public Builder setUniqId(org.jetbrains.kotlin.backend.common.serialization.proto.UniqId value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      uniqId_ = value;
-
+    public Builder setUniqIdIndex(long value) {
       bitField0_ |= 0x00000008;
+      uniqIdIndex_ = value;
+      
       return this;
     }
     /**
-     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
+     * <code>optional int64 uniq_id_index = 4;</code>
      */
-    public Builder setUniqId(
-        org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.Builder builderForValue) {
-      uniqId_ = builderForValue.build();
-
-      bitField0_ |= 0x00000008;
-      return this;
-    }
-    /**
-     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
-     */
-    public Builder mergeUniqId(org.jetbrains.kotlin.backend.common.serialization.proto.UniqId value) {
-      if (((bitField0_ & 0x00000008) == 0x00000008) &&
-          uniqId_ != org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.getDefaultInstance()) {
-        uniqId_ =
-          org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.newBuilder(uniqId_).mergeFrom(value).buildPartial();
-      } else {
-        uniqId_ = value;
-      }
-
-      bitField0_ |= 0x00000008;
-      return this;
-    }
-    /**
-     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
-     */
-    public Builder clearUniqId() {
-      uniqId_ = org.jetbrains.kotlin.backend.common.serialization.proto.UniqId.getDefaultInstance();
-
+    public Builder clearUniqIdIndex() {
       bitField0_ = (bitField0_ & ~0x00000008);
+      uniqIdIndex_ = 0L;
+      
       return this;
     }
 

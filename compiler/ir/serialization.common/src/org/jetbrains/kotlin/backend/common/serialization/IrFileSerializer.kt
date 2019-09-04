@@ -264,11 +264,16 @@ open class IrFileSerializer(
 
         val uniqId =
             declarationTable.uniqIdByDeclaration(declaration)
-        proto.setUniqId(protoUniqId(uniqId))
+        proto.uniqIdIndex = uniqId.index
+        proto.uniqIdLocality = uniqId.isLocal
+//        proto.setUniqId(protoUniqId(uniqId))
 
         val topLevelUniqId =
             declarationTable.uniqIdByDeclaration((declaration).findTopLevelDeclaration())
-        proto.setTopLevelUniqId(protoUniqId(topLevelUniqId))
+
+        proto.topLevelUniqIdIndex = topLevelUniqId.index
+        proto.topLevelUniqIdLocality = topLevelUniqId.isLocal
+//        proto.setTopLevelUniqId(protoUniqId(topLevelUniqId))
 
         descriptorReferenceSerializer.serializeDescriptorReference(declaration)?.let {
             proto.setDescriptorReference(it)
@@ -1311,7 +1316,7 @@ open class IrFileSerializer(
             val uniqId = declarationTable.uniqIdByDeclaration(it)
             topLevelDeclarations.add(TopLevelDeclaration(uniqId.index, uniqId.isLocal, it.descriptor.toString(), byteArray))
             if (uniqId.isPublic) {
-                proto.addDeclarationId(protoUniqId(uniqId))
+                proto.addDeclarationId(uniqId.index)
             }
         }
 

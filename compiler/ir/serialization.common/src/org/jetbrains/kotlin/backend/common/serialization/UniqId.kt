@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.backend.common.serialization
 import org.jetbrains.kotlin.descriptors.*
 //import org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata.JsKlibMetadataProtoBuf
 import org.jetbrains.kotlin.protobuf.GeneratedMessageLite
-import org.jetbrains.kotlin.backend.common.serialization.proto.UniqId as ProtoUniqId
 
 // This is an abstract uniqIdIndex any serialized IR declarations gets.
 // It is either isLocal and then just gets and ordinary number within its module.
@@ -19,14 +18,6 @@ data class UniqId(
 ) {
     val isPublic: Boolean get() = !isLocal
 }
-
-fun protoUniqId(uniqId: UniqId): ProtoUniqId =
-    ProtoUniqId.newBuilder()
-        .setIndex(uniqId.index)
-        .setIsLocal(uniqId.isLocal)
-        .build()
-
-fun ProtoUniqId.uniqId(): UniqId = UniqId(this.index, this.isLocal)
 
 fun <T, M : GeneratedMessageLite.ExtendableMessage<M>> M.tryGetExtension(extension: GeneratedMessageLite.GeneratedExtension<M, T>) =
     if (this.hasExtension(extension)) this.getExtension<T>(extension) else null

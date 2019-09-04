@@ -35,31 +35,21 @@ public interface DescriptorReferenceOrBuilder extends
 
   /**
    * <code>required int32 name = 3;</code>
-   *
-   * <pre>
-   *  required FqName package_fq_name = 1;
-   *  required FqName class_fq_name = 2;
-   * </pre>
    */
   boolean hasName();
   /**
    * <code>required int32 name = 3;</code>
-   *
-   * <pre>
-   *  required FqName package_fq_name = 1;
-   *  required FqName class_fq_name = 2;
-   * </pre>
    */
   int getName();
 
   /**
-   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
+   * <code>optional int64 uniq_id_index = 4;</code>
    */
-  boolean hasUniqId();
+  boolean hasUniqIdIndex();
   /**
-   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.UniqId uniq_id = 4;</code>
+   * <code>optional int64 uniq_id_index = 4;</code>
    */
-  org.jetbrains.kotlin.backend.common.serialization.proto.UniqId getUniqId();
+  long getUniqIdIndex();
 
   /**
    * <code>optional bool is_getter = 5 [default = false];</code>

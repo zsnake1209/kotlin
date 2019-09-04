@@ -288,8 +288,10 @@ abstract class KotlinIrLinker(
             }
 
             private fun deserializeIrSymbolData(proto: ProtoSymbolData): IrSymbol {
-                val key = proto.uniqId.uniqId()
-                val topLevelKey = proto.topLevelUniqId.uniqId()
+//                val key = proto.uniqId.uniqId()
+                val key = UniqId(proto.uniqIdIndex, proto.uniqIdLocality)
+                val topLevelKey = UniqId(proto.topLevelUniqIdIndex, proto.topLevelUniqIdLocality)
+//                val topLevelKey = proto.topLevelUniqId.uniqId()
 
                 val topLevelDeserializationState = getStateForID(topLevelKey)
 
@@ -331,7 +333,7 @@ abstract class KotlinIrLinker(
                     deserializeFqName(proto.packageFqNameList),
                     deserializeFqName(proto.classFqNameList),
                     deserializeString(proto.name),
-                    if (proto.hasUniqId()) proto.uniqId.index else null,
+                    if (proto.hasUniqIdIndex()) proto.uniqIdIndex else null,
                     isEnumEntry = proto.isEnumEntry,
                     isEnumSpecial = proto.isEnumSpecial,
                     isDefaultConstructor = proto.isDefaultConstructor,
@@ -414,22 +416,23 @@ abstract class KotlinIrLinker(
             fileToDeserializerMap[file] = fileDeserializer
 
             fileProto.declarationIdList.forEach {
-                val uniqId = it.uniqId()
-                assert(uniqId.isPublic)
+                val uniqId = UniqId(it, false)
                 moduleReversedFileIndex.getOrPut(uniqId) { fileDeserializer }
             }
 
             val forceLoadedIds = deserializationStrategy.run {
                 when {
-                    theWholeWorld -> fileProto.declarationIdList
+                    theWholeWorld -> fileProto.declarationIdList.map { UniqId(it, false) }
                     explicitlyExported -> fileProto.explicitlyExportedToCompilerList.map {
-                        fileDeserializer.loadSymbolData(it).topLevelUniqId
+                        fileDeserializer.loadSymbolData(it).run {
+                            UniqId(topLevelUniqIdIndex, topLevelUniqIdLocality)
+                        }
                     }
                     else -> emptyList()
                 }
             }
 
-            forceLoadedIds.forEach { moduleDeserializationState.addUniqID(it.uniqId().also { i -> assert(i.isPublic) }) }
+            forceLoadedIds.forEach { moduleDeserializationState.addUniqID(it.also { i -> assert(i.isPublic) }) }
 
             return file
         }
@@ -442,7 +445,6 @@ abstract class KotlinIrLinker(
             for (i in 0 until fileCount) {
                 files.add(deserializeIrFile(ProtoFile.parseFrom(readFile(moduleDescriptor, i), newInstance()), i))
             }
-
 
             return IrModuleFragmentImpl(moduleDescriptor, builtIns, files)
         }

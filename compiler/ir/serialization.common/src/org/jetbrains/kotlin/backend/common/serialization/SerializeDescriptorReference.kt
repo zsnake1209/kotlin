@@ -115,7 +115,7 @@ open class DescriptorReferenceSerializer(
             .addAllClassFqName(serializeFqName(classFqName))
             .setName(serializeString(nameString))
 
-        if (uniqId != null) proto.setUniqId(protoUniqId(uniqId))
+        if (uniqId != null) proto.uniqIdIndex = uniqId.index
 
         if (isFakeOverride) {
             proto.setIsFakeOverride(true)

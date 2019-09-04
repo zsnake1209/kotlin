@@ -9,7 +9,7 @@ message DescriptorReference {
   repeated int32 package_fq_name = 1;
   repeated int32 class_fq_name = 2;
   required int32 name = 3;
-  optional UniqId uniq_id = 4;
+  optional int64 uniq_id_index = 4;
   optional bool is_getter = 5 [default = false];
   optional bool is_setter = 6 [default = false];
   optional bool is_backing_field = 7 [default = false];
@@ -18,11 +18,6 @@ message DescriptorReference {
   optional bool is_enum_entry = 10 [default = false];
   optional bool is_enum_special = 11 [default = false];
   optional bool is_type_parameter = 12 [default = false];
-}
-
-message UniqId {
-  required uint64 index = 1;
-  required bool isLocal = 2;
 }
 
 message Coordinates {
@@ -88,7 +83,8 @@ message FileEntry {
 }
 
 message IrFile {
-  repeated UniqId declaration_id = 1;
+//  repeated UniqId declaration_id = 1;
+  repeated int64 declaration_id = 1;
   required FileEntry file_entry = 2;
   repeated int32 fq_name = 3;
   required Annotations annotations = 4;
@@ -117,10 +113,14 @@ enum IrSymbolKind {
 
 message IrSymbolData {
   required IrSymbolKind kind = 1;
-  required UniqId uniq_id = 2;
-  required UniqId top_level_uniq_id = 3;
-  repeated int32 fq_name = 4;
-  optional DescriptorReference descriptor_reference = 5;
+
+  required int64 uniq_id_index = 4;
+  required bool uniq_id_locality = 5;
+  required int64 top_level_uniq_id_index = 6;
+  required bool top_level_uniq_id_locality = 7;
+
+  repeated int32 fq_name = 8;
+  optional DescriptorReference descriptor_reference = 9;
 }
 
 message IrSymbolTable {
