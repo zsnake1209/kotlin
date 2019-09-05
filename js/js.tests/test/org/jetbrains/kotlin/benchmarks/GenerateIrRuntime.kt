@@ -7,18 +7,27 @@ package org.jetbrains.kotlin.benchmarks
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.vfs.StandardFileSystems
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiManager
+import com.intellij.util.toArray
+import com.sun.org.apache.xpath.internal.operations.Bool
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.invokeToplevel
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
+import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.incremental.*
 import org.jetbrains.kotlin.incremental.components.LookupTracker
+import org.jetbrains.kotlin.incremental.js.*
+import org.jetbrains.kotlin.incremental.multiproject.EmptyModulesApiHistory
+import org.jetbrains.kotlin.incremental.storage.FileToCanonicalPathConverter
 import org.jetbrains.kotlin.ir.backend.js.*
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrLinker
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrModuleSerializer
@@ -95,17 +104,17 @@ class GenerateIrRuntime {
     private val moduleName = configuration[CommonConfigurationKeys.MODULE_NAME]!!
 
 
-    private fun isCommonSource(path: String) = listOf("common", "src", "unsigned").map {
-        "fullRuntime/src/libraries/stdlib/$it"
+    private fun isCommonSource(path: String, prefix: String) = listOf("common", "src", "unsigned").map {
+        "$prefix/src/libraries/stdlib/$it"
     }.any { path.contains(it) }
 
-    fun createPsiFile(fileName: String): KtFile {
+    fun createPsiFile(fileName: String, isCommonCheck: (String) -> Boolean): KtFile {
         val psiManager = PsiManager.getInstance(environment.project)
         val fileSystem = VirtualFileManager.getInstance().getFileSystem(StandardFileSystems.FILE_PROTOCOL)
 
         val file = fileSystem.findFileByPath(fileName) ?: error("File not found: $fileName")
 
-        return (psiManager.findFile(file) as KtFile).apply { isCommonSource = isCommonSource(fileName) }
+        return (psiManager.findFile(file) as KtFile).apply { isCommonSource = isCommonCheck(fileName) }
     }
 
     private fun File.listAllFiles(): List<File> {
@@ -113,10 +122,15 @@ class GenerateIrRuntime {
         else listOf(this)
     }
 
-    private fun createPsiFileFromDir(path: String): List<KtFile> = File(path).listAllFiles().map { createPsiFile(it.path) }
 
-    private val fullRuntimeSourceSet = createPsiFileFromDir("compiler/ir/serialization.js/build/fullRuntime/src")
-    private val reducedRuntimeSourceSet = createPsiFileFromDir("compiler/ir/serialization.js/build/reducedRuntime/src")
+    private fun createPsiFileFromDir(path: String, prefix: String): List<KtFile> = File(path).listAllFiles().map {
+        createPsiFile(it.path) {
+            isCommonSource(it, prefix)
+        }
+    }
+
+    private val fullRuntimeSourceSet = createPsiFileFromDir("compiler/ir/serialization.js/build/fullRuntime/src", "fullRuntime")
+    private val reducedRuntimeSourceSet = createPsiFileFromDir("compiler/ir/serialization.js/build/reducedRuntime/src", "reducedRuntime")
 
     @Test
     fun runFullPipeline() {
@@ -247,6 +261,106 @@ class GenerateIrRuntime {
         runBenchWithWarmup("Per-file Disk Writing of $fileCount files", 10, 30, MeasureUnits.MILISECUNDS, writer::invalidate) {
             doWriteIrModuleToStorage(serializedIr, writer)
         }
+    }
+
+    @Test
+    fun runIncrementalKlibGeneratation() {
+
+        val klibDirectory = createTempFile()
+
+//        val filesToCompile = fullRuntimeSourceSet
+        val filesToCompile = reducedRuntimeSourceSet
+
+        val args = K2JSCompilerArguments().apply {
+            libraries = ""
+            outputFile = klibDirectory.path
+            sourceMap = false
+            irBackend = true
+            irProduceOnly = "klib"
+            // Don't zip klib content since date on files affect the md5 checksum we compute to check whether output files identical
+            irLegacyGradlePluginCompatibility = true
+            allowKotlinPackage = true
+            useExperimental = arrayOf("kotlin.contracts.ExperimentalContracts", "kotlin.Experimental", "kotlin.ExperimentalMultiplatform")
+            allowResultReturnType = true
+            multiPlatform = true
+            languageVersion = "1.4"
+            commonSources = filesToCompile.filter { it.isCommonSource == true }.map { it.virtualFilePath }.toTypedArray()
+        }
+
+        val cachesDir = createTempDir()
+//        val buildHistoryFile = File(cachesDir, "build-history.bin")
+        val allFiles = filesToCompile.map { VfsUtilCore.virtualToIoFile(it.virtualFile) }
+        val dirtyFiles = allFiles.filter { it.name.contains("oreRuntime") }
+
+
+
+        val update = {
+            dirtyFiles.forEach { it.setLastModified(it.lastModified() + 1000) }
+            System.gc()
+        }
+
+        val buildHistoryFile = File(cachesDir, "build-history.bin")
+        val compiler = IncrementalJsCompilerRunner(
+            cachesDir, EmptyICReporter,
+            buildHistoryFile = buildHistoryFile,
+            modulesApiHistory = EmptyModulesApiHistory)
+
+        val allKotlinFiles = allFiles
+
+        withJsIC {
+            compiler.compile(allKotlinFiles, args, MessageCollector.NONE, providedChangedFiles = null)
+        }
+//
+        val changedFiles = ChangedFiles.Known(dirtyFiles, emptyList())
+
+//        makeJsIncrementally(cachesDir, allFiles, args)
+
+        runBenchWithWarmup("Incremental recompilation of ${dirtyFiles.count()} files", 40, 10, MeasureUnits.MILISECUNDS, update) {
+            withJsIC {
+                compiler.compile(allKotlinFiles, args, MessageCollector.NONE, changedFiles)
+//            makeJsIncrementally(cachesDir, allFiles, args)
+            }
+        }
+
+//        val compiler = IncrementalJsCompilerRunner(
+//            cachesDir, reporter,
+//            buildHistoryFile = buildHistoryFile,
+//            modulesApiHistory = EmptyModulesApiHistory
+//        )
+//        compiler.compile(allKotlinFiles, args, messageCollector, providedChangedFiles = null)
+
+//        val abiVersion = KotlinAbiVersion.CURRENT
+//        val compilerVersion = KonanVersionImpl(MetaVersion.DEV, 1, 3, 0, -1)
+//        val libraryVersion = "JSIR"
+//
+//        val versions = KonanLibraryVersioning(abiVersion = abiVersion, libraryVersion = libraryVersion, compilerVersion = compilerVersion)
+//        val klibDirectory = createTempFile()
+//        val writer = KotlinLibraryOnlyIrWriter(klibDirectory.absolutePath, "", versions, true)
+//        val files = fullRuntimeSourceSet
+//
+//        val incrementalCacheDir = createTempDir()
+//        val incrementalCache = IncrementalJsCache(incrementalCacheDir, FileToCanonicalPathConverter)
+//
+//        val incrementalResultsConsumer = IncrementalResultsConsumerImpl()
+//        val incrementalDataProvider = IncrementalDataProviderFromCache(incrementalCache)
+//
+//        configuration.put(JSConfigurationKeys.INCREMENTAL_RESULTS_CONSUMER, incrementalResultsConsumer)
+//        configuration.put(JSConfigurationKeys.INCREMENTAL_DATA_PROVIDER, incrementalDataProvider)
+//
+//        val analysisResult = doFrontEnd(files)
+//        val rawModuleFragment = doPsi2Ir(files, analysisResult)
+//        val fileCount = rawModuleFragment.files.size
+//        val serializedIr = doSerializeIrModule(rawModuleFragment)
+//
+//        serializeModuleIntoKlib("<runtime>", configuration, analysisResult.bindingContext, files, klibDirectory.path, emptyList(), rawModuleFragment, emptyList(), true, false)
+//
+//        val dirtyFiles = fullRuntimeSourceSet.filter { it.name.contains("Coroutine") }
+//
+//
+//
+//        runBenchWithWarmup("Incremental recompilation of ${dirtyFiles.count()} files", 10, 30, MeasureUnits.MILISECUNDS, writer::invalidate) {
+//            doWriteIrModuleToStorage(serializedIr, writer)
+//        }
     }
 
     private fun runBenchWithWarmup(name: String, W: Int, N: Int, measurer: MeasureUnits, pre: () -> Unit = {}, bench: () -> Unit) {
