@@ -24,14 +24,12 @@ import com.intellij.codeInsight.hint.QuestionAction
 import com.intellij.ide.util.DefaultPsiElementCellRenderer
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.statistics.StatisticsManager
-import com.intellij.psi.util.ProximityLocation
 import com.intellij.psi.util.proximity.PsiProximityComparator
 import com.intellij.ui.popup.list.ListPopupImpl
 import com.intellij.ui.popup.list.PopupListElementRenderer
@@ -41,9 +39,9 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.KotlinDescriptorIconProvider
-import org.jetbrains.kotlin.idea.caches.resolve.allowResolveInWriteAction
 import org.jetbrains.kotlin.idea.caches.resolve.resolveImportReference
 import org.jetbrains.kotlin.idea.codeInsight.DescriptorToSourceUtilsIde
+import org.jetbrains.kotlin.idea.completion.KotlinStatisticsInfo
 import org.jetbrains.kotlin.idea.core.ImportableFqNameClassifier
 import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.references.KtSimpleNameReference
@@ -232,15 +230,12 @@ class KotlinAddImportAction internal constructor(
 
             val file = element.containingKtFile
 
-            variant.declarationToImport(project)?.let {
-                val location = ProximityLocation(element, ModuleUtilCore.findModuleForPsiElement(element))
-                val statisticsManager = StatisticsManager.getInstance()
-                allowResolveInWriteAction {
-                    statisticsManager.incUseCount(PsiProximityComparator.STATISTICS_KEY, it, location)
-                }
-            }
+            val statisticsManager = StatisticsManager.getInstance()
 
             variant.descriptorsToImport.forEach { descriptor ->
+                val statisticsInfo = KotlinStatisticsInfo.forDescriptor(descriptor)
+                statisticsManager.incUseCount(statisticsInfo)
+
                 // for class or package we use ShortenReferences because we not necessary insert an import but may want to
                 // insert partly qualified name
 
