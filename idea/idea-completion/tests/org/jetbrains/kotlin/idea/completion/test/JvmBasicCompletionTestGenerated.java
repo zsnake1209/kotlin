@@ -1165,6 +1165,11 @@ public class JvmBasicCompletionTestGenerated extends AbstractJvmBasicCompletionT
                 runTest("idea/idea-completion/testData/basic/common/dslMarker/container.kt");
             }
 
+            @TestMetadata("noDslCompletionForNonDslReciever.kt")
+            public void testNoDslCompletionForNonDslReciever() throws Exception {
+                runTest("idea/idea-completion/testData/basic/common/dslMarker/noDslCompletionForNonDslReciever.kt");
+            }
+
             @TestMetadata("root.kt")
             public void testRoot() throws Exception {
                 runTest("idea/idea-completion/testData/basic/common/dslMarker/root.kt");

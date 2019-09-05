@@ -21,7 +21,14 @@ class DslMembersCompletion(
     private val indicesHelper: KotlinIndicesHelper,
     private val callTypeAndReceiver: CallTypeAndReceiver<*, *>
 ) {
-    private val nearestReceiver = receiverTypes?.firstOrNull()
+    /**
+     * It is stated that `two implicit receivers of the same DSL are not accessible in the same scope`,
+     * that's why we need only the last one of the receivers to provide the completion (see [DslMarker]).
+     *
+     * When the last receiver is not a part of DSL, [nearestReceiverMarkers] will be empty, and dsl
+     * members would not be suggested in the autocompletion (see KT-30996).
+     */
+    private val nearestReceiver = receiverTypes?.lastOrNull()
     private val nearestReceiverMarkers = nearestReceiver?.takeIf { it.implicit }?.extractDslMarkers().orEmpty()
 
     fun completeDslFunctions() {
