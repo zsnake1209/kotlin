@@ -71,10 +71,10 @@ class JvmIrDeserializer(
             if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return backoff(symbol)
 
             val irProto = JvmIr.JvmIrClass.parseFrom(classHeader.serializedIr)
-            val moduleDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
-            consumeUniqIdTable(irProto.auxTables.uniqIdTable, moduleDeserializer)
+            val fileDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
+            consumeUniqIdTable(irProto.auxTables.uniqIdTable, fileDeserializer)
             consumeExternalRefsTable(irProto.auxTables.externalRefs)
-            moduleDeserializer.deserializeIrClass(irProto.irClass, parent = packageFragment)
+            fileDeserializer.deserializeIrClass(irProto.irClass, parent = packageFragment)
             assert(symbol.isBound)
             return symbol.owner as IrDeclaration
         } else {
@@ -84,17 +84,17 @@ class JvmIrDeserializer(
 
             val irProto = JvmIr.JvmIrFile.parseFrom(classHeader.serializedIr)
 
-            val moduleDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
-            val facadeClass = buildFacadeClass(moduleDeserializer, irProto).also {
+            val fileDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
+            val facadeClass = buildFacadeClass(fileDeserializer, irProto).also {
                 it.parent = packageFragment
                 packageFragment.declarations.add(it)
             }
 
-            consumeUniqIdTable(irProto.auxTables.uniqIdTable, moduleDeserializer)
+            consumeUniqIdTable(irProto.auxTables.uniqIdTable, fileDeserializer)
             consumeExternalRefsTable(irProto.auxTables.externalRefs)
 
             for (declaration in irProto.declarationContainer.declarationList) {
-                val member = moduleDeserializer.deserializeDeclaration(declaration, parent = facadeClass)
+                val member = fileDeserializer.deserializeDeclaration(declaration, parent = facadeClass)
                 facadeClass.declarations.add(member)
             }
             assert(symbol.isBound)
