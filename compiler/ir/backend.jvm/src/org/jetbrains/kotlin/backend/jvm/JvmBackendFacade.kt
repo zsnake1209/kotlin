@@ -84,8 +84,8 @@ object JvmBackendFacade {
             facadeClassGenerator = ::facadeClassGenerator
         ).generateUnboundSymbolsAsDependencies()
 
-        for (irFile in irModuleFragment.files) {
-            if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR)) {
+        if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR)) {
+            for (irFile in irModuleFragment.files) {
                 irFile.metadata?.serializedIr = serializeIrFile(context, irFile)
 
                 for (irClass in irFile.declarations.filterIsInstance<IrClass>()) {
