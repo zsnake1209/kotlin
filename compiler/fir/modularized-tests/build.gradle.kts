@@ -47,6 +47,13 @@ projectTest {
     jvmArgs!!.removeIf { it.contains("-Xmx") }
     maxHeapSize = "8g"
     dependsOn(":dist")
+
+    run {
+        project.findProperty("fir.modularized.jvm.args")?.let {
+            val paramRegex = "([^\"]\\S*|\".+?\")\\s*".toRegex()
+            jvmArgs(paramRegex.findAll(it).map { it.groupValues[1] }.toList())
+        }
+    }
 }
 
 testsJar()
