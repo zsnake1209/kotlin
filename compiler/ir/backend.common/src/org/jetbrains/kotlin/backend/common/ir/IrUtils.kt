@@ -291,7 +291,7 @@ fun IrType.remapTypeParameters(source: IrTypeParametersContainer, target: IrType
             val classifier = classifier.owner
             when {
                 classifier is IrTypeParameter && classifier.parent == source ->
-                    target.typeParameters[classifier.index + shift].defaultType
+                    target.typeParameters[classifier.index + shift].defaultType.withHasQuestionMark(hasQuestionMark)
 
                 classifier is IrClass ->
                     IrSimpleTypeImpl(
