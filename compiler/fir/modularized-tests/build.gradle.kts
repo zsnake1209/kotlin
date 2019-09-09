@@ -49,9 +49,10 @@ projectTest {
     dependsOn(":dist")
 
     run {
-        project.findProperty("fir.modularized.jvm.args")?.let {
+        val argsExt = project.findProperty("fir.modularized.jvm.args") as? String
+        if (argsExt != null) {
             val paramRegex = "([^\"]\\S*|\".+?\")\\s*".toRegex()
-            jvmArgs(paramRegex.findAll(it).map { it.groupValues[1] }.toList())
+            jvmArgs(paramRegex.findAll(argsExt).map { it.groupValues[1] }.toList())
         }
     }
 }
