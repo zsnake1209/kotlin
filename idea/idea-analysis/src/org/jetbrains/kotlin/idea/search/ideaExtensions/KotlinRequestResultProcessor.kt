@@ -16,19 +16,21 @@
 
 package org.jetbrains.kotlin.idea.search.ideaExtensions
 
+import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceService
-import com.intellij.psi.ReferenceRange
+import com.intellij.psi.*
+import com.intellij.psi.impl.search.LowLevelSearchUtil
 import com.intellij.psi.search.RequestResultProcessor
 import com.intellij.util.Processor
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.idea.references.KtDestructuringDeclarationReference
 import org.jetbrains.kotlin.idea.search.usagesSearch.isCallableOverrideUsage
 import org.jetbrains.kotlin.idea.search.usagesSearch.isExtensionOfDeclarationClassUsage
 import org.jetbrains.kotlin.idea.search.usagesSearch.isUsageInContainingDeclaration
+import org.jetbrains.kotlin.idea.search.usagesSearch.toDescriptor
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
+import org.jetbrains.kotlin.psi.KtParameter
 
 class KotlinRequestResultProcessor(
     private val unwrappedElement: PsiElement,
@@ -37,8 +39,14 @@ class KotlinRequestResultProcessor(
     private val options: KotlinReferencesSearchOptions = KotlinReferencesSearchOptions.Empty
 ) : RequestResultProcessor(unwrappedElement, originalElement, filter, options) {
     private val referenceService = PsiReferenceService.getService()
+    private val descriptor: CallableDescriptor? by lazy {
+        if (originalElement is KtNamedDeclaration) toDescriptor(originalElement) else null
+    }
 
     override fun processTextOccurrence(element: PsiElement, offsetInElement: Int, consumer: Processor<in PsiReference>): Boolean {
+        if ((unwrappedElement is KtParameter || unwrappedElement is PsiParameter) && element.language == JavaLanguage.INSTANCE) {
+            return true
+        }
         val references = if (element is KtDestructuringDeclaration)
             element.entries.flatMap { referenceService.getReferences(it, PsiReferenceService.Hints.NO_HINTS) }
         else
@@ -64,7 +72,7 @@ class KotlinRequestResultProcessor(
             return true
         }
         if (originalElement is KtNamedDeclaration) {
-            if (options.acceptCallableOverrides && isCallableOverrideUsage(originalElement)) {
+            if (options.acceptCallableOverrides && isCallableOverrideUsage(originalElement, descriptor)) {
                 return true
             }
             if (options.acceptOverloads && isUsageInContainingDeclaration(originalElement)) {

@@ -249,19 +249,17 @@ fun PsiReference.isUsageInContainingDeclaration(declaration: KtNamedDeclaration)
     }
 }
 
-fun PsiReference.isCallableOverrideUsage(declaration: KtNamedDeclaration): Boolean {
-    val toDescriptor: (KtDeclaration) -> CallableDescriptor? = { sourceDeclaration ->
-        if (sourceDeclaration is KtParameter) {
-            // we don't treat parameters in overriding method as "override" here (overriding parameters usages are searched optionally and via searching of overriding methods first)
-            if (sourceDeclaration.hasValOrVar()) sourceDeclaration.propertyDescriptor else null
-        } else {
-            sourceDeclaration.descriptor as? CallableDescriptor
-        }
+fun toDescriptor(sourceDeclaration: KtDeclaration): CallableDescriptor? {
+    return if (sourceDeclaration is KtParameter) {
+        // we don't treat parameters in overriding method as "override" here (overriding parameters usages are searched optionally and via searching of overriding methods first)
+        if (sourceDeclaration.hasValOrVar()) sourceDeclaration.propertyDescriptor else null
+    } else {
+        sourceDeclaration.descriptor as? CallableDescriptor
     }
+}
 
-    val targetDescriptor = toDescriptor(declaration) ?: return false
-
-    return unwrappedTargets.any {
+fun PsiReference.isCallableOverrideUsage(declaration: KtNamedDeclaration, targetDescriptor: CallableDescriptor?): Boolean {
+    return targetDescriptor != null && unwrappedTargets.any {
         when (it) {
             is KtDeclaration -> {
                 val usageDescriptor = toDescriptor(it)
