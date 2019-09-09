@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.idea.highlighter
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import java.nio.file.Paths
 
 object OutsidersPsiFileSupportUtils {
@@ -17,8 +16,7 @@ object OutsidersPsiFileSupportUtils {
 
         val originalFilePath = OutsidersPsiFileSupportWrapper.getOriginalFilePath(virtualFile) ?: return null
 
-        val findFile: VirtualFile? = runWriteAction { VfsUtil.findFile(Paths.get(originalFilePath), true) }
-        return generateSequence(findFile) {
+        return generateSequence(VfsUtil.findFile(Paths.get(originalFilePath), false)) {
             if (it == project.baseDir) null else it.parent
         }.filter { it.exists() }.firstOrNull()
     }
