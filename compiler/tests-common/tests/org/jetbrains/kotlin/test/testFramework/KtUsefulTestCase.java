@@ -304,11 +304,16 @@ public abstract class KtUsefulTestCase extends TestCase {
         //    runnable.run();
         //}
         //else {
+        if (runInDispatchThread()) {
             EdtTestUtilKt.runInEdtAndWait(() -> {
                 runnable.run();
                 return null;
             });
-        //}
+            //}
+        }
+        else {
+            runnable.run();
+        }
     }
 
     private void defaultRunBare() throws Throwable {
@@ -388,7 +393,7 @@ public abstract class KtUsefulTestCase extends TestCase {
         //if (policy != null) {
         //    return policy.runInDispatchThread();
         //}
-        return true;
+        return false;
     }
 
     @NotNull
