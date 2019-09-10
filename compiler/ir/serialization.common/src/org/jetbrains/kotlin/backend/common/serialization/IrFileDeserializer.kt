@@ -919,6 +919,8 @@ abstract class IrFileDeserializer(
 
     private fun deserializeIrTypeParameter(proto: ProtoTypeParameter) =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrTypeParameter
+
             val name = deserializeName(proto.name)
             val variance = deserializeIrTypeVariance(proto.variance)
 
@@ -946,8 +948,9 @@ abstract class IrFileDeserializer(
         ProtoClassKind.OBJECT -> ClassKind.OBJECT
     }
 
-    private fun deserializeIrValueParameter(proto: ProtoValueParameter) =
+    private fun deserializeIrValueParameter(proto: ProtoValueParameter): IrValueParameter =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrValueParameter
             IrValueParameterImpl(
                 startOffset, endOffset, origin,
                 symbol as IrValueParameterSymbol,
@@ -971,6 +974,14 @@ abstract class IrFileDeserializer(
 
     private fun deserializeIrClass(proto: ProtoClass) =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) {
+                val result = symbol.owner as IrClass
+                val newDeclarations = proto.declarationContainer.declarationList.map { deserializeDeclaration(it) }
+                    .filter { it !in result.declarations }
+                result.addAll(newDeclarations)
+                return result
+            }
+
             val modality = deserializeModality(proto.modality)
 
             symbolTable.declareClass(
@@ -1005,6 +1016,7 @@ abstract class IrFileDeserializer(
 
     private fun deserializeIrTypeAlias(proto: ProtoTypeAlias) =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrTypeAlias
             symbolTable.declareTypeAlias((symbol as IrTypeAliasSymbol).descriptor) {
                 IrTypeAliasImpl(
                     startOffset, endOffset,
@@ -1028,6 +1040,7 @@ abstract class IrFileDeserializer(
         proto: ProtoFunctionBase,
         block: (IrFunctionSymbol, Int, Int, IrDeclarationOrigin) -> T
     ) = withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+        if (symbol.isBound) return symbol.owner as T
         block(symbol as IrFunctionSymbol, startOffset, endOffset, origin).usingParent {
             proto.typeParameters.typeParameterList.mapTo(typeParameters) { deserializeIrTypeParameter(it) }
             proto.valueParameterList.mapTo(valueParameters) { deserializeIrValueParameter(it) }
@@ -1044,6 +1057,8 @@ abstract class IrFileDeserializer(
     private fun deserializeIrFunction(proto: ProtoFunction) =
         withDeserializedIrFunctionBase(proto.base) { symbol, startOffset, endOffset, origin ->
             logger.log { "### deserializing IrFunction ${proto.base.name}" }
+
+            if (symbol.isBound) return symbol.owner as IrSimpleFunction
 
             symbolTable.declareSimpleFunction(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin,
@@ -1068,8 +1083,9 @@ abstract class IrFileDeserializer(
             }
         }
 
-    private fun deserializeIrVariable(proto: ProtoVariable) =
+    private fun deserializeIrVariable(proto: ProtoVariable): IrVariable =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrVariable
             IrVariableImpl(
                 startOffset, endOffset, origin,
                 symbol as IrVariableSymbol,
@@ -1088,6 +1104,7 @@ abstract class IrFileDeserializer(
 
     private fun deserializeIrEnumEntry(proto: ProtoEnumEntry): IrEnumEntry =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrEnumEntry
             symbolTable.declareEnumEntry(
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
@@ -1130,6 +1147,7 @@ abstract class IrFileDeserializer(
 
     private fun deserializeIrConstructor(proto: ProtoConstructor) =
         withDeserializedIrFunctionBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrConstructor
             symbolTable.declareConstructor(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin,
                 (symbol as IrConstructorSymbol).descriptor
@@ -1151,6 +1169,8 @@ abstract class IrFileDeserializer(
 
     private fun deserializeIrField(proto: ProtoField) =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrField
+
             val type = deserializeIrType(proto.type)
 
             symbolTable.declareField(
@@ -1183,8 +1203,9 @@ abstract class IrFileDeserializer(
         ProtoModalityKind.ABSTRACT_MODALITY -> Modality.ABSTRACT
     }
 
-    private fun deserializeIrLocalDelegatedProperty(proto: ProtoLocalDelegatedProperty) =
+    private fun deserializeIrLocalDelegatedProperty(proto: ProtoLocalDelegatedProperty): IrLocalDelegatedProperty =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrLocalDelegatedProperty
             IrLocalDelegatedPropertyImpl(
                 startOffset, endOffset, origin,
                 symbol as IrLocalDelegatedPropertySymbol,
@@ -1203,6 +1224,7 @@ abstract class IrFileDeserializer(
 
     private fun deserializeIrProperty(proto: ProtoProperty) =
         withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+            if (symbol.isBound) return symbol.owner as IrProperty
             symbolTable.declareProperty(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin,
                 (symbol as IrPropertySymbol).descriptor, proto.isDelegated
