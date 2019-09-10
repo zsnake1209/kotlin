@@ -1079,7 +1079,7 @@ open class IrFileSerializer(
         function.valueParameters.forEach {
             proto.addValueParameter(serializeIrValueParameter(it))
         }
-        if (!externallyVisibleOnly || function.isInline) {
+        if (!externallyVisibleOnly || function.isInline || function.origin == IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA) {
             function.body?.let { proto.body = serializeIrStatementBody(it) }
         }
         return proto.build()
