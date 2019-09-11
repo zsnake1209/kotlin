@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrLoopBase
 import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrAnonymousInitializerSymbolImpl
+import org.jetbrains.kotlin.ir.symbols.impl.IrLocalDelegatedPropertySymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrVariableSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
@@ -207,6 +208,10 @@ class JvmIrDeserializer(
             ProtoSymbolKind.TYPEALIAS_SYMBOL ->
                 symbolTable.referenceTypeAlias(
                     descriptor as TypeAliasDescriptor? ?: WrappedTypeAliasDescriptor()
+                )
+            ProtoSymbolKind.LOCAL_DELEGATED_PROPERTY_SYMBOL ->
+                IrLocalDelegatedPropertySymbolImpl(
+                    descriptor as? VariableDescriptorWithAccessors ?: WrappedVariableDescriptorWithAccessor()
                 )
             else -> TODO("Unexpected classifier symbol kind: ${proto.kind}")
         }
