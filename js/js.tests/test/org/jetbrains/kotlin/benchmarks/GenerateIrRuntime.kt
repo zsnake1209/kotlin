@@ -280,8 +280,7 @@ class GenerateIrRuntime {
 
     @Test
     fun runIncrementalKlibGeneratation() {
-
-        val klibDirectory = createTempFile()
+        val klibDirectory = workingDir.resolve("output/klib")
 
 //        val filesToCompile = fullRuntimeSourceSet
         val filesToCompile = reducedRuntimeSourceSet
@@ -302,7 +301,7 @@ class GenerateIrRuntime {
             commonSources = filesToCompile.filter { it.isCommonSource == true }.map { it.virtualFilePath }.toTypedArray()
         }
 
-        val cachesDir = createTempDir()
+        val cachesDir = workingDir.resolve("caches")
 //        val buildHistoryFile = File(cachesDir, "build-history.bin")
         val allFiles = filesToCompile.map { VfsUtilCore.virtualToIoFile(it.virtualFile) }
         val dirtyFiles = allFiles.filter { it.name.contains("oreRuntime") }
