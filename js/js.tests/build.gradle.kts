@@ -35,6 +35,7 @@ dependencies {
     testCompile(project(":js:js.translator"))
     testCompile(project(":js:js.serializer"))
     testCompile(project(":js:js.dce"))
+    testCompile(project(":compiler:incremental-compilation-impl"))
     testCompile(commonDep("junit:junit"))
     testCompile(projectTests(":kotlin-build-common"))
     testCompile(projectTests(":generators:test-generator"))
