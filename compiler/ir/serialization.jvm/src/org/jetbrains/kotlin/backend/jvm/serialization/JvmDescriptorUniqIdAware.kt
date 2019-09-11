@@ -59,7 +59,15 @@ class JvmDescriptorUniqIdAware(val symbolTable: SymbolTable, val fallback: (IrSy
         var currentDescriptor = original
         var current = result
         while (true) {
-            val nextDescriptor = currentDescriptor.containingDeclaration!!
+            val nextDescriptor = when {
+                currentDescriptor is TypeParameterDescriptor && currentDescriptor.containingDeclaration is PropertyDescriptor -> {
+                    val property = currentDescriptor.containingDeclaration as PropertyDescriptor
+                    // No way to choose between getter and setter by descriptor alone :(
+                    property.getter ?: property.setter!!
+                }
+                else ->
+                    currentDescriptor.containingDeclaration!!
+            }
             if (nextDescriptor is PackageFragmentDescriptor) {
                 current.parent = symbolTable.findOrDeclareExternalPackageFragment(nextDescriptor)
                 break
