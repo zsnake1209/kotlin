@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.IrPropertyReference
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.symbols.impl.*
-import org.jetbrains.kotlin.ir.types.IrErrorType
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -58,6 +58,46 @@ class ExternalReferencesCollectingVisitor(private val collection: ExternalRefere
         collection.getCopy(expression.symbol.owner)
         super.visitPropertyReference(expression)
     }
+
+    // TODO: check accessibility of declarations
+    override fun visitClass(declaration: IrClass) {
+        if (declaration.isExported()) {
+            declaration.superTypes.forEach { it.handleType() }
+        }
+        super.visitClass(declaration)
+    }
+
+    override fun visitFunction(declaration: IrFunction) {
+        if (declaration.isExported()) {
+            declaration.returnType.handleType()
+            declaration.dispatchReceiverParameter?.type?.handleType()
+            declaration.extensionReceiverParameter?.type?.handleType()
+            for (valueParam in declaration.valueParameters) {
+                valueParam.type.handleType()
+            }
+        }
+        super.visitFunction(declaration)
+    }
+
+    override fun visitTypeParameter(declaration: IrTypeParameter) {
+        for (superType in declaration.superTypes) {
+            superType.handleType()
+        }
+        super.visitTypeParameter(declaration)
+    }
+
+    fun IrType.handleType() {
+        if (this !is IrSimpleType) return
+        this.classOrNull?.let {
+            if (!it.owner.isExported()) return
+            collection.getCopy(it.owner)
+        }
+        for (arg in arguments) {
+            arg.safeAs<IrTypeProjection>()?.type?.handleType()
+        }
+    }
+
+    private fun IrDeclaration.isExported() = with(JvmMangler) { isExported() }
 }
 
 class ExternalReferenceCollection(
