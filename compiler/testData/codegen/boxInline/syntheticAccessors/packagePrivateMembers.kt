@@ -1,3 +1,4 @@
+// IGNORE_BACKEND_MULTI_MODULE: JVM_IR_SERIALIZE
 // FILE: 1.kt
 
 package test
