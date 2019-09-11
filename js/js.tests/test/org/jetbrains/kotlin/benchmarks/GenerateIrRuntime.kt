@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.benchmarks
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -57,6 +58,8 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.multiplatform.isCommonSource
 import org.jetbrains.kotlin.serialization.js.ModuleKind
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import java.io.File
 import org.jetbrains.kotlin.konan.file.File as KonanFile
@@ -131,6 +134,18 @@ class GenerateIrRuntime {
 
     private val fullRuntimeSourceSet = createPsiFileFromDir("compiler/ir/serialization.js/build/fullRuntime/src", "fullRuntime")
     private val reducedRuntimeSourceSet = createPsiFileFromDir("compiler/ir/serialization.js/build/reducedRuntime/src", "reducedRuntime")
+
+    protected lateinit var workingDir: File
+
+    @Before
+    fun setUp() {
+        workingDir = FileUtil.createTempDirectory("irTest", null, false)
+    }
+
+    @After
+    fun tearDown() {
+        workingDir.deleteRecursively()
+    }
 
     @Test
     fun runFullPipeline() {
@@ -230,7 +245,7 @@ class GenerateIrRuntime {
         val libraryVersion = "JSIR"
 
         val versions = KonanLibraryVersioning(abiVersion = abiVersion, libraryVersion = libraryVersion, compilerVersion = compilerVersion)
-        val file = createTempFile()
+        val file = createTempFile(directory = workingDir)
         val writer = KotlinLibraryOnlyIrWriter(file.absolutePath, "", versions, false)
         val files = fullRuntimeSourceSet
         val analysisResult = doFrontEnd(files)
@@ -250,7 +265,7 @@ class GenerateIrRuntime {
         val libraryVersion = "JSIR"
 
         val versions = KonanLibraryVersioning(abiVersion = abiVersion, libraryVersion = libraryVersion, compilerVersion = compilerVersion)
-        val file = createTempFile()
+        val file = createTempFile(directory = workingDir)
         val writer = KotlinLibraryOnlyIrWriter(file.absolutePath, "", versions, true)
         val files = fullRuntimeSourceSet
         val analysisResult = doFrontEnd(files)
