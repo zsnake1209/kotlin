@@ -24,7 +24,10 @@ val <T : IrDeclaration> T.original get() = this
 val IrDeclarationParent.fqNameForIrSerialization: FqName
     get() = when (this) {
         is IrPackageFragment -> this.fqName
-        is IrDeclaration -> this.parent.fqNameForIrSerialization.child(this.nameForIrSerialization)
+        is IrDeclaration -> if (this.origin == IrDeclarationOrigin.FILE_CLASS)
+            this.parent.fqNameForIrSerialization
+        else
+            this.parent.fqNameForIrSerialization.child(this.nameForIrSerialization)
         else -> error(this)
     }
 
