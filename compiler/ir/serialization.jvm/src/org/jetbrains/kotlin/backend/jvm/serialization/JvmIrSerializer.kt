@@ -26,6 +26,8 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi2ir.PsiSourceManager
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberDescriptor
 
+// TODO: to support friend modules, we need to serialize everything that is accessible from internal inline functions.
+
 class JvmIrSerializer(
     logger: LoggingContext,
     declarationTable: DeclarationTable,
