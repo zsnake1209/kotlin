@@ -119,7 +119,7 @@ class MoveDeclarationsProcessor(
         }
 
         val tmpRangeAndDeclarations = insertStubDeclarations(commandName, commandGroupId, sourceDeclarationsText)
-        assert(tmpRangeAndDeclarations.second.size == pastedDeclarations.size) //TODO: can they ever differ?
+        assert(tmpRangeAndDeclarations.second.size == pastedDeclarations.size)
 
         val stubTexts = tmpRangeAndDeclarations.second.map { STUB_RENDERER.render(it.unsafeResolveToDescriptor()) }
 
@@ -130,7 +130,7 @@ class MoveDeclarationsProcessor(
 
         val stubRangeAndDeclarations = insertStubDeclarations(commandName, commandGroupId, stubTexts)
         val stubDeclarations = stubRangeAndDeclarations.second
-        assert(stubDeclarations.size == pastedDeclarations.size) //TODO: can they ever differ?
+        assert(stubDeclarations.size == pastedDeclarations.size)
 
         importsSubstitution?.let {
             project.executeWriteCommand(commandName, commandGroupId) {
@@ -183,7 +183,6 @@ class MoveDeclarationsProcessor(
         values: List<String>
     ): Pair<RangeMarker, List<KtNamedDeclaration>> {
         val insertedRange = project.executeWriteCommand(commandName, commandGroupId) {
-            //TODO: can stub declarations interfere with pasted declarations? I could not find such cases
             val insertionOffset = sourceContainer.declarations.firstOrNull()?.startOffset
                 ?: when (sourceContainer) {
                     is KtFile -> sourceContainer.textLength
