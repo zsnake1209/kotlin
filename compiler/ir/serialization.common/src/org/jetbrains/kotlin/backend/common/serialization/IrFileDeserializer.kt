@@ -1189,6 +1189,8 @@ abstract class IrFileDeserializer(
                     proto.isStatic
                 )
             }.usingParent {
+                proto.overriddenList.mapTo(overriddenSymbols) { deserializeIrSymbol(it) as IrFieldSymbol }
+
                 if (proto.hasInitializer())
                     initializer = IrExpressionBodyImpl(deserializeExpressionBody(proto.initializer))
 

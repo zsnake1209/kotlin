@@ -1178,6 +1178,11 @@ open class IrFileSerializer(
         ) {
             proto.initializer = serializeIrExpressionBody(initializer)
         }
+
+        field.overriddenSymbols.forEach {
+            proto.addOverridden(serializeIrSymbol(it))
+        }
+
         return proto.build()
     }
 

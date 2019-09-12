@@ -580,6 +580,7 @@ message IrField {
   required bool is_external = 6;
   required bool is_static = 7;
   required IrDataIndex type = 8;
+  repeated IrDataIndex overridden = 9;
 }
 
 message IrLocalDelegatedProperty {

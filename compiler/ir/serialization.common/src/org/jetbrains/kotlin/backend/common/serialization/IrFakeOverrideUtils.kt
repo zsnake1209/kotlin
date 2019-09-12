@@ -75,8 +75,9 @@ fun IrSimpleFunction.resolveFakeOverride(allowAbstract: Boolean = false): IrSimp
 internal fun IrSimpleFunction.resolveFakeOverrideMaybeAbstract() = this.resolveFakeOverride(allowAbstract = true)
 
 internal fun IrProperty.resolveFakeOverrideMaybeAbstract(): IrProperty =
-    this.getter?.resolveFakeOverrideMaybeAbstract()?.correspondingPropertySymbol?.owner ?:
-    this.backingField!!.resolveFakeOverride()!!.correspondingPropertySymbol!!.owner
+    this.getter?.resolveFakeOverrideMaybeAbstract()?.correspondingPropertySymbol?.owner
+        ?: this.setter?.resolveFakeOverrideMaybeAbstract()?.correspondingPropertySymbol?.owner
+        ?: this.backingField!!.resolveFakeOverride()!!.correspondingPropertySymbol!!.owner
 
 /**
  * TODO: This method can be simplified if the "overriddenSymbols" list of an IrField always includes only one element.
