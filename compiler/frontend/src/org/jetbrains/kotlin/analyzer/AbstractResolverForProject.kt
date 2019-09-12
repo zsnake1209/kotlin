@@ -8,15 +8,12 @@ package org.jetbrains.kotlin.analyzer
 import com.intellij.openapi.util.ModificationTracker
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.context.ProjectContext
-import org.jetbrains.kotlin.context.withModule
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.platform.TargetPlatform
-import org.jetbrains.kotlin.psi.KtFile
 
 abstract class AbstractResolverForProject<M : ModuleInfo>(
     private val debugName: String,
@@ -227,12 +224,9 @@ private object DiagnoseUnknownModuleInfoReporter {
                 }
             }
             name.contains(ResolverForProject.resolverForScriptDependenciesName) -> errorInScriptDependenciesInfoResolver(message)
-            name.contains(ResolverForProject.resolverForSpecialInfoName) -> {
-                when {
-                    name.contains("ScriptModuleInfo") -> errorInScriptModuleInfoResolver(message)
-                    else -> errorInSpecialModuleInfoResolver(message)
-                }
-            }
+            name.contains(ResolverForProject.resolverForScriptDependenciesSourcesName) -> errorInScriptDependenciesSourceInfoResolver(message)
+            name.contains(ResolverForProject.resolverForScriptsName) -> errorInScriptModuleInfoResolver(message)
+            name.contains(ResolverForProject.resolverForSpecialInfoName) -> errorInSpecialModuleInfoResolver(message)
             else -> otherError(message)
         }
     }
@@ -248,6 +242,7 @@ private object DiagnoseUnknownModuleInfoReporter {
     private fun errorInModulesResolverWithLibraryInfo(message: String): Nothing = throw AssertionError(message)
 
     private fun errorInScriptDependenciesInfoResolver(message: String): Nothing = throw AssertionError(message)
+    private fun errorInScriptDependenciesSourceInfoResolver(message: String): Nothing = throw AssertionError(message)
     private fun errorInScriptModuleInfoResolver(message: String): Nothing = throw AssertionError(message)
     private fun errorInSpecialModuleInfoResolver(message: String): Nothing = throw AssertionError(message)
 

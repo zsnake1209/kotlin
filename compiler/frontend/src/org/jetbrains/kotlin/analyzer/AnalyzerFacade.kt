@@ -57,6 +57,8 @@ abstract class ResolverForProject<M : ModuleInfo> {
         const val resolverForLibrariesName = "project libraries"
         const val resolverForModulesName = "project source roots and libraries"
         const val resolverForScriptDependenciesName = "dependencies of scripts"
+        const val resolverForScriptDependenciesSourcesName = "dependencies sources of scripts"
+        const val resolverForScriptsName = "script files"
 
         const val resolverForSpecialInfoName = "completion/highlighting in "
     }
