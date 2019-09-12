@@ -78,4 +78,18 @@ public interface IrFieldOrBuilder extends
    * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex type = 8;</code>
    */
   org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex getType();
+
+  /**
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex overridden = 9;</code>
+   */
+  java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex> 
+      getOverriddenList();
+  /**
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex overridden = 9;</code>
+   */
+  org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex getOverridden(int index);
+  /**
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex overridden = 9;</code>
+   */
+  int getOverriddenCount();
 }
