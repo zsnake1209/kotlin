@@ -11,7 +11,9 @@ import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.util.containers.SLRUCache
-import org.jetbrains.kotlin.analyzer.ResolverForProject
+import org.jetbrains.kotlin.analyzer.ResolverForProject.Companion.resolverForScriptDependenciesName
+import org.jetbrains.kotlin.analyzer.ResolverForProject.Companion.resolverForScriptDependenciesSourcesName
+import org.jetbrains.kotlin.analyzer.ResolverForProject.Companion.resolverForScriptsName
 import org.jetbrains.kotlin.idea.caches.project.*
 import org.jetbrains.kotlin.idea.caches.project.IdeaModuleInfo
 import org.jetbrains.kotlin.idea.caches.resolve.util.contextWithCompositeExceptionTracker
@@ -42,7 +44,7 @@ internal class KotlinCacheServiceForScripts(
                 }
                 val projectFacade = wrapWitSyntheticFiles(
                     getOrBuildScriptsGlobalFacade().facadeForDependencies,
-                    ResolverForProject.resolverForScriptDependenciesName,
+                    resolverForScriptDependenciesName,
                     files.toSet(),
                     listOf(filesModificationTracker)
                 )
@@ -84,11 +86,11 @@ internal class KotlinCacheServiceForScripts(
 
     private inner class ScriptsGlobalFacade(settings: PlatformAnalysisSettings) {
         private val dependenciesContext = facadeForSdk(settings).globalContext
-            .contextWithCompositeExceptionTracker(project, ResolverForProject.resolverForScriptDependenciesName)
+            .contextWithCompositeExceptionTracker(project, resolverForScriptDependenciesName)
 
         val facadeForDependencies = ProjectResolutionFacade(
             debugString = "facade for script dependencies",
-            resolverDebugName = "${ResolverForProject.resolverForScriptDependenciesName} with settings=${settings}",
+            resolverDebugName = "$resolverForScriptDependenciesName with settings=${settings}",
             project = project,
             globalContext = dependenciesContext,
             settings = settings,
@@ -100,11 +102,11 @@ internal class KotlinCacheServiceForScripts(
         )
 
         private val sourcesContext = dependenciesContext
-            .contextWithCompositeExceptionTracker(project, ResolverForProject.resolverForScriptDependenciesSourcesName)
+            .contextWithCompositeExceptionTracker(project, resolverForScriptDependenciesSourcesName)
 
         val facadeForSources = ProjectResolutionFacade(
             debugString = "facade for script dependencies sources",
-            resolverDebugName = "${ResolverForProject.resolverForScriptDependenciesSourcesName} with settings=${settings}",
+            resolverDebugName = "$resolverForScriptDependenciesSourcesName with settings=${settings}",
             project = project,
             globalContext = sourcesContext,
             settings = settings,
@@ -130,7 +132,7 @@ internal class KotlinCacheServiceForScripts(
         val globalContext = globalFacade.globalContext.contextWithCompositeExceptionTracker(project, "facadeForScriptDependencies")
         return ProjectResolutionFacade(
             "facadeForScriptDependencies",
-            ResolverForProject.resolverForScriptDependenciesName,
+            resolverForScriptDependenciesName,
             project, globalContext, settings,
             reuseDataFrom = globalFacade,
             allModules = moduleInfo.dependencies(),
@@ -182,7 +184,7 @@ internal class KotlinCacheServiceForScripts(
             val dependentModules = scriptModuleInfo.getDependentModules()
             return wrapWitSyntheticFiles(
                 facadeForModules(settings),
-                ResolverForProject.resolverForScriptsName,
+                resolverForScriptsName,
                 files,
                 listOf(filesModificationTracker)
             ) {
@@ -200,7 +202,7 @@ internal class KotlinCacheServiceForScripts(
 
         return wrapWitSyntheticFiles(
             facadeForScriptDependencies,
-            ResolverForProject.resolverForScriptsName,
+            resolverForScriptsName,
             files,
             listOf(filesModificationTracker)
         ) {
