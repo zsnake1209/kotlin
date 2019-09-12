@@ -545,6 +545,7 @@ message IrField {
   required bool is_static = 7;
   required int32 type = 8;
   required bool is_fake_override = 9;
+  repeated int32 overridden = 10;
 }
 
 message IrLocalDelegatedProperty {

@@ -1193,6 +1193,8 @@ abstract class IrFileDeserializer(
                     isFakeOverride = proto.isFakeOverride
                 )
             }.usingParent {
+                proto.overriddenList.mapTo(overriddenSymbols) { deserializeIrSymbol(it) as IrFieldSymbol }
+
                 if (proto.hasInitializer())
                     initializer = IrExpressionBodyImpl(deserializeExpressionBody(proto.initializer))
 
