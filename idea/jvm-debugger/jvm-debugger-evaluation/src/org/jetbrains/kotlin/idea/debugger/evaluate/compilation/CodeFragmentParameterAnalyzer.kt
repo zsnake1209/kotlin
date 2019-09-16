@@ -185,6 +185,15 @@ class CodeFragmentParameterAnalyzer(
                     Smart(Dumb(Kind.DISPATCH_RECEIVER, "", "super@$name"), type, descriptor)
                 }
 
+                var parent = expression.parent
+                while (parent != null) {
+                    if (parent is KtLambdaExpression)
+                        throw EvaluateExceptionUtil.createEvaluateException(
+                            "Evaluation of 'super' calls inside lambdas is not supported"
+                        )
+                    parent = parent.parent
+                }
+
                 return null
             }
 
