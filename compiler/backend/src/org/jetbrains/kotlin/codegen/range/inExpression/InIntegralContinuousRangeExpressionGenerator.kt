@@ -19,11 +19,12 @@ package org.jetbrains.kotlin.codegen.range.inExpression
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.range.BoundedValue
+import org.jetbrains.kotlin.codegen.range.coerceUnsignedToUInt
+import org.jetbrains.kotlin.codegen.range.coerceUnsignedToULong
 import org.jetbrains.kotlin.codegen.range.comparison.ComparisonGenerator
 import org.jetbrains.kotlin.codegen.range.comparison.RangeContainsTypeInfo
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
-import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.org.objectweb.asm.Label
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
@@ -137,65 +138,16 @@ class InIntegralContinuousRangeExpressionGenerator(
                 val argumentKotlinType = rangeContainsTypeInfo.valueParameterType
                 val rangeElementKotlinType = rangeContainsTypeInfo.rangeElementType
 
-                when {
-                    KotlinBuiltIns.isUInt(rangeElementKotlinType) -> coerceArgToUInt(v, argumentKotlinType)
-                    KotlinBuiltIns.isULong(rangeElementKotlinType) -> coerceArgToULong(v, argumentKotlinType)
-                    else -> arg1.put(operandType, v)
+                val coercedValue = when {
+                    KotlinBuiltIns.isUInt(rangeElementKotlinType) ->
+                        coerceUnsignedToUInt(arg1, argumentKotlinType, rangeElementKotlinType)
+                    KotlinBuiltIns.isULong(rangeElementKotlinType) ->
+                        coerceUnsignedToULong(arg1, argumentKotlinType, rangeElementKotlinType)
+                    else ->
+                        arg1
                 }
-            }
 
-            private fun coerceArgToUInt(v: InstructionAdapter, argumentKotlinType: KotlinType) {
-                arg1.put(arg1.type, v)
-                when {
-                    KotlinBuiltIns.isUByte(argumentKotlinType) -> {
-                        v.iconst(0xFF)
-                        v.visitInsn(Opcodes.IAND)
-                    }
-
-                    KotlinBuiltIns.isUShort(argumentKotlinType) -> {
-                        v.iconst(0xFFFF)
-                        v.visitInsn(Opcodes.IAND)
-                    }
-
-                    KotlinBuiltIns.isUInt(argumentKotlinType) -> {
-                        // nop
-                    }
-
-                    KotlinBuiltIns.isULong(argumentKotlinType) -> {
-                        v.visitInsn(Opcodes.L2I)
-                    }
-
-                    else -> throw AssertionError("Unexpected argument type: $argumentKotlinType")
-                }
-            }
-
-            private fun coerceArgToULong(v: InstructionAdapter, argumentKotlinType: KotlinType) {
-                arg1.put(arg1.type, v)
-                when {
-                    KotlinBuiltIns.isUByte(argumentKotlinType) -> {
-                        v.visitInsn(Opcodes.I2L)
-                        v.lconst(0xFF)
-                        v.visitInsn(Opcodes.LAND)
-                    }
-
-                    KotlinBuiltIns.isUShort(argumentKotlinType) -> {
-                        v.visitInsn(Opcodes.I2L)
-                        v.lconst(0xFFFF)
-                        v.visitInsn(Opcodes.LAND)
-                    }
-
-                    KotlinBuiltIns.isUInt(argumentKotlinType) -> {
-                        v.visitInsn(Opcodes.I2L)
-                        v.lconst(0xFFFF_FFFF)
-                        v.visitInsn(Opcodes.LAND)
-                    }
-
-                    KotlinBuiltIns.isULong(argumentKotlinType) -> {
-                        // nop
-                    }
-
-                    else -> throw AssertionError("Unexpected argument type: $argumentKotlinType")
-                }
+                coercedValue.put(operandType, v)
             }
         }
 }
