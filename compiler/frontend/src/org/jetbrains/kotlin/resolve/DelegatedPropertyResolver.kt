@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.resolve
 
-import com.google.common.collect.Lists
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
@@ -21,6 +20,7 @@ import org.jetbrains.kotlin.resolve.calls.checkers.OperatorCallChecker
 import org.jetbrains.kotlin.resolve.calls.components.InferenceSession
 import org.jetbrains.kotlin.resolve.calls.components.PostponedArgumentsAnalyzer
 import org.jetbrains.kotlin.resolve.calls.context.ContextDependency
+import org.jetbrains.kotlin.resolve.calls.context.TemporaryTraceAndCache
 import org.jetbrains.kotlin.resolve.calls.inference.ConstraintSystem
 import org.jetbrains.kotlin.resolve.calls.inference.ConstraintSystemCompleter
 import org.jetbrains.kotlin.resolve.calls.inference.components.KotlinConstraintSystemCompleter
@@ -166,9 +166,11 @@ class DelegatedPropertyResolver(
         )
     }
 
-    private fun KtPsiFactory.createExpressionForProperty(): KtExpression {
-        return createExpression("null as ${KotlinBuiltIns.FQ_NAMES.kPropertyFqName.asString()}<*>")
-    }
+    private fun KtPsiFactory.createExpressionForThisReference(hasThis: Boolean) =
+        createExpression(if (hasThis) "this" else "null")
+
+    private fun KtPsiFactory.createExpressionForProperty(): KtExpression =
+        createExpression("null as ${KotlinBuiltIns.FQ_NAMES.kPropertyFqName.asString()}<*>")
 
     /* Resolve getValue() or setValue() methods from delegate */
     private fun resolveGetSetValueMethod(
@@ -316,6 +318,22 @@ class DelegatedPropertyResolver(
         trace.record(PROVIDE_DELEGATE_RESOLVED_CALL, propertyDescriptor, resultingCall)
     }
 
+    private class AccessOperatorResolutionResult(
+        val call: Call,
+        val overloadResolutionResults: OverloadResolutionResults<FunctionDescriptor>,
+        private val temporaryTraceAndCache: TemporaryTraceAndCache,
+        private val trace: BindingTrace,
+        private val accessor: VariableAccessorDescriptor
+    ) {
+        val isSuccess get() = overloadResolutionResults.isSuccess
+        val resultingDescriptor get() = overloadResolutionResults.resultingDescriptor
+
+        fun commit() {
+            temporaryTraceAndCache.commit()
+            trace.record(DELEGATED_PROPERTY_CALL, accessor, call)
+        }
+    }
+
     private fun getGetSetValueMethod(
         propertyDescriptor: VariableDescriptorWithAccessors,
         delegateExpression: KtExpression,
@@ -338,38 +356,74 @@ class DelegatedPropertyResolver(
         else
             NO_EXPECTED_TYPE
 
-        val context =
-            knownContext ?: ExpressionTypingContext.newContext(
+        val context = knownContext
+            ?: ExpressionTypingContext.newContext(
                 trace, delegateFunctionsScope, dataFlowInfo, expectedType, languageVersionSettings, dataFlowValueFactory
             )
 
         val hasThis = propertyDescriptor.extensionReceiverParameter != null || propertyDescriptor.dispatchReceiverParameter != null
 
-        val arguments = Lists.newArrayList<KtExpression>()
-        val psiFactory = KtPsiFactory(delegateExpression, markGenerated = false)
-        arguments.add(psiFactory.createExpression(if (hasThis) "this" else "null"))
-        arguments.add(psiFactory.createExpressionForProperty())
-
-        if (!isGet) {
-            val fakeArgument = createFakeExpressionOfType(
-                delegateExpression.project, trace,
-                "fakeArgument${arguments.size}",
-                propertyDescriptor.type
-            ) as KtReferenceExpression
-            arguments.add(fakeArgument)
-            val valueParameters = accessor.valueParameters
-            trace.record(REFERENCE_TARGET, fakeArgument, valueParameters[0])
-        }
-
         val functionName = if (isGet) OperatorNameConventions.GET_VALUE else OperatorNameConventions.SET_VALUE
         val receiver = knownReceiver ?: ExpressionReceiver.create(delegateExpression, delegateType, trace.bindingContext)
 
-        val resolutionResult =
-            fakeCallResolver.makeAndResolveFakeCallInContext(receiver, context, arguments, functionName, delegateExpression)
+        fun tryResolveFakeCallWithInitialArguments(initialArguments: List<KtExpression>): AccessOperatorResolutionResult {
+            val temporaryTraceAndCache =
+                TemporaryTraceAndCache.create(context, "trace to resolve delegated property operator", delegateExpression)
+            val contextWithTemporaryTrace = context.replaceTraceAndCache(temporaryTraceAndCache)
 
-        trace.record(DELEGATED_PROPERTY_CALL, accessor, resolutionResult.first)
+            val arguments = ArrayList(initialArguments)
+            if (!isGet) {
+                val fakeArgument = createFakeExpressionOfType(
+                    delegateExpression.project, contextWithTemporaryTrace.trace,
+                    "fakeArgumentNewValue",
+                    propertyDescriptor.type
+                ) as KtReferenceExpression
+                val valueParameters = accessor.valueParameters
+                contextWithTemporaryTrace.trace.record(REFERENCE_TARGET, fakeArgument, valueParameters[0])
+                arguments.add(fakeArgument)
+            }
 
-        return resolutionResult.second
+            val (fakeCall, resolutionResult) =
+                fakeCallResolver.makeAndResolveFakeCallInContext(
+                    receiver, contextWithTemporaryTrace, arguments, functionName, delegateExpression
+                )
+            return AccessOperatorResolutionResult(fakeCall, resolutionResult, temporaryTraceAndCache, trace, accessor)
+        }
+
+        val psiFactory = KtPsiFactory(delegateExpression, markGenerated = false)
+
+        if (context.languageVersionSettings.supportsFeature(LanguageFeature.FlexibleDelegatedPropertyConvention)) {
+            tryResolveFakeCallWithInitialArguments(
+                emptyList()
+            ).let {
+                if (it.isSuccess && it.resultingDescriptor.isOperator) {
+                    it.commit()
+                    return it.overloadResolutionResults
+                }
+            }
+
+            tryResolveFakeCallWithInitialArguments(
+                listOf(
+                    psiFactory.createExpressionForThisReference(hasThis)
+                )
+            ).let {
+                if (it.isSuccess && it.resultingDescriptor.isOperator) {
+                    it.commit()
+                    return it.overloadResolutionResults
+                }
+            }
+        }
+
+        tryResolveFakeCallWithInitialArguments(
+            listOf(
+                psiFactory.createExpressionForThisReference(hasThis),
+                psiFactory.createExpressionForProperty()
+            )
+        ).let {
+            it.commit()
+            return it.overloadResolutionResults
+        }
+
     }
 
     private fun createReceiverForGetSetValueMethods(
