@@ -90,6 +90,14 @@ sealed class ValueParameterCountCheck(override val description: String) : Check 
         override fun check(functionDescriptor: FunctionDescriptor) = functionDescriptor.valueParameters.size >= n
     }
 
+    class AtMost(val n: Int) : ValueParameterCountCheck("must have at most $n value parameter" + (if (n > 1) "s" else "")) {
+        override fun check(functionDescriptor: FunctionDescriptor) = functionDescriptor.valueParameters.size <= n
+    }
+
+    class InRange(val min: Int, val max: Int) : ValueParameterCountCheck("must have at least $min and at most $max value parameters") {
+        override fun check(functionDescriptor: FunctionDescriptor) = functionDescriptor.valueParameters.size in min..max
+    }
+
     class Equals(val n: Int) : ValueParameterCountCheck("must have exactly $n value parameters") {
         override fun check(functionDescriptor: FunctionDescriptor) = functionDescriptor.valueParameters.size == n
     }
@@ -184,9 +192,12 @@ object OperatorChecks : AbstractModifierChecks() {
                 valueParameters.lastOrNull()?.let { !it.declaresOrInheritsDefaultValue() && it.varargElementType == null } == true
             ensure(lastIsOk) { "last parameter should not have a default value or be a vararg" }
         },
-        Checks(GET_VALUE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.AtLeast(2), IsKPropertyCheck),
-        Checks(SET_VALUE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.AtLeast(3), IsKPropertyCheck),
-        Checks(PROVIDE_DELEGATE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.Equals(2), IsKPropertyCheck),
+
+        // TODO checks for getValue/setValue/provideDelegate should depend on language version
+        Checks(GET_VALUE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.AtMost(2)),
+        Checks(SET_VALUE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.InRange(1, 3)),
+        Checks(PROVIDE_DELEGATE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.AtMost(2)),
+
         Checks(INVOKE, MemberOrExtension),
         Checks(CONTAINS, MemberOrExtension, SingleValueParameter, NoDefaultAndVarargsCheck, ReturnsBoolean),
         Checks(ITERATOR, MemberOrExtension, NoValueParameters),
