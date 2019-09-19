@@ -72,7 +72,7 @@ class JvmIrDeserializer(
             if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return backoff(symbol)
 
             val irProto = JvmIr.JvmIrClass.parseFrom(classHeader.serializedIr)
-            val fileDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
+            val fileDeserializer = FileDeserializerWithReferenceLookup(toplevelDescriptor.module, irProto.auxTables, backoff)
             consumeUniqIdTable(irProto.auxTables.uniqIdTable, fileDeserializer)
             consumeExternalRefsTable(irProto.auxTables.externalRefs)
             fileDeserializer.deserializeIrClass(irProto.irClass, parent = packageFragment)
@@ -85,7 +85,7 @@ class JvmIrDeserializer(
 
             val irProto = JvmIr.JvmIrFile.parseFrom(classHeader.serializedIr)
 
-            val fileDeserializer = FileDeserializerWithReferenceLookup(moduleDescriptor, irProto.auxTables, backoff)
+            val fileDeserializer = FileDeserializerWithReferenceLookup(toplevelDescriptor.module, irProto.auxTables, backoff)
             val facadeClass = buildFacadeClass(fileDeserializer, irProto).also {
                 it.parent = packageFragment
                 packageFragment.declarations.add(it)
