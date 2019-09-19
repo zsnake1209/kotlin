@@ -5766,6 +5766,39 @@ public class DiagnosticsUsingJavacTestGenerated extends AbstractDiagnosticsUsing
                 runTest("compiler/testData/diagnostics/tests/delegatedProperty/wrongSetterReturnType.kt");
             }
 
+            @TestMetadata("compiler/testData/diagnostics/tests/delegatedProperty/flexibleConvention")
+            @TestDataPath("$PROJECT_ROOT")
+            @RunWith(JUnit3RunnerWithInners.class)
+            public static class FlexibleConvention extends AbstractDiagnosticsUsingJavacTest {
+                private void runTest(String testDataFilePath) throws Exception {
+                    KotlinTestUtils.runTest(this::doTest, TargetBackend.ANY, testDataFilePath);
+                }
+
+                public void testAllFilesPresentInFlexibleConvention() throws Exception {
+                    KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/tests/delegatedProperty/flexibleConvention"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+                }
+
+                @TestMetadata("delegatedPropertiesWithReceivers.kt")
+                public void testDelegatedPropertiesWithReceivers() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/delegatedProperty/flexibleConvention/delegatedPropertiesWithReceivers.kt");
+                }
+
+                @TestMetadata("missingOperatorModifier.kt")
+                public void testMissingOperatorModifier() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/delegatedProperty/flexibleConvention/missingOperatorModifier.kt");
+                }
+
+                @TestMetadata("mixedArgumentsDepegatedProperties.kt")
+                public void testMixedArgumentsDepegatedProperties() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/delegatedProperty/flexibleConvention/mixedArgumentsDepegatedProperties.kt");
+                }
+
+                @TestMetadata("simpleDelegatedProperties.kt")
+                public void testSimpleDelegatedProperties() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/delegatedProperty/flexibleConvention/simpleDelegatedProperties.kt");
+                }
+            }
+
             @TestMetadata("compiler/testData/diagnostics/tests/delegatedProperty/inference")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)

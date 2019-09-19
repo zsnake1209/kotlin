@@ -1,0 +1,12 @@
+package
+
+public val test: kotlin.Int
+
+public final class DelegateWithMixedArguments {
+    public constructor DelegateWithMixedArguments()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public final operator fun getValue(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public final operator fun setValue(/*0*/ host: kotlin.Any?, /*1*/ newValue: kotlin.Int): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
