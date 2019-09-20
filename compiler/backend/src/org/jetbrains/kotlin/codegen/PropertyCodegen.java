@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature;
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedPropertyDescriptor;
 import org.jetbrains.kotlin.types.ErrorUtils;
 import org.jetbrains.kotlin.types.KotlinType;
+import org.jetbrains.kotlin.util.OperatorNameConventions;
 import org.jetbrains.org.objectweb.asm.FieldVisitor;
 import org.jetbrains.org.objectweb.asm.MethodVisitor;
 import org.jetbrains.org.objectweb.asm.Opcodes;
@@ -53,6 +54,7 @@ import static org.jetbrains.kotlin.codegen.binding.CodegenBinding.DELEGATED_PROP
 import static org.jetbrains.kotlin.codegen.binding.CodegenBinding.DELEGATED_PROPERTY_METADATA_OWNER;
 import static org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings.*;
 import static org.jetbrains.kotlin.diagnostics.Errors.EXPECTED_FUNCTION_SOURCE_WITH_DEFAULT_ARGUMENTS_NOT_FOUND;
+import static org.jetbrains.kotlin.resolve.BindingContext.DELEGATED_PROPERTY_RESOLVED_CALL;
 import static org.jetbrains.kotlin.resolve.DescriptorUtils.isCompanionObject;
 import static org.jetbrains.kotlin.resolve.DescriptorUtils.isInterface;
 import static org.jetbrains.kotlin.resolve.jvm.AsmTypes.K_PROPERTY_TYPE;
@@ -556,21 +558,52 @@ public class PropertyCodegen {
             @NotNull StackValue receiver,
             @NotNull PropertyDescriptor propertyDescriptor
     ) {
-        codegen.tempVariables.put(
-                resolvedCall.getCall().getValueArguments().get(1).asElement(),
-                getDelegatedPropertyMetadata(propertyDescriptor, codegen.getBindingContext())
-        );
+        StackValue propertyMetadata = getDelegatedPropertyMetadata(propertyDescriptor, codegen.getBindingContext());
+        if (propertyMetadata != null) {
+            codegen.tempVariables.put(
+                    resolvedCall.getCall().getValueArguments().get(1).asElement(),
+                    propertyMetadata
+            );
+        }
 
         return codegen.invokeFunction(resolvedCall, receiver);
     }
 
-    @NotNull
+    private static boolean requiresPropertyMetadataArgument(@NotNull ResolvedCall<FunctionDescriptor> call) {
+        FunctionDescriptor descriptor = call.getResultingDescriptor();
+        assert descriptor.getValueParameters().stream().allMatch(
+                valueParameter ->
+                        !valueParameter.declaresDefaultValue() &&
+                        valueParameter.getVarargElementType() == null
+        ) : "Delegated property operator " + descriptor + " should have no vararg parameters or parameters with default values";
+
+        return descriptor.getName().equals(OperatorNameConventions.GET_VALUE) && descriptor.getValueParameters().size() == 2 ||
+               descriptor.getName().equals(OperatorNameConventions.SET_VALUE) && descriptor.getValueParameters().size() == 3;
+    }
+
+    public static boolean requiresPropertyMetadataForDelegatedProperty(
+            @NotNull BindingContext bindingContext,
+            @NotNull VariableDescriptorWithAccessors descriptor
+    ) {
+        VariableAccessorDescriptor getterDescriptor = descriptor.getGetter();
+        ResolvedCall<FunctionDescriptor> getterResolvedCall =
+                getterDescriptor == null ? null : bindingContext.get(DELEGATED_PROPERTY_RESOLVED_CALL, getterDescriptor);
+
+        VariableAccessorDescriptor setterDescriptor = descriptor.getSetter();
+        ResolvedCall<FunctionDescriptor> setterResolvedCall =
+                setterDescriptor == null ? null : bindingContext.get(DELEGATED_PROPERTY_RESOLVED_CALL, setterDescriptor);
+
+        return getterResolvedCall != null && requiresPropertyMetadataArgument(getterResolvedCall) ||
+               setterResolvedCall != null && requiresPropertyMetadataArgument(setterResolvedCall);
+    }
+
+    @Nullable
     public static StackValue getDelegatedPropertyMetadata(
             @NotNull VariableDescriptorWithAccessors descriptor,
             @NotNull BindingContext bindingContext
     ) {
         Type owner = bindingContext.get(DELEGATED_PROPERTY_METADATA_OWNER, descriptor);
-        assert owner != null : "Delegated property owner not found: " + descriptor;
+        if (owner == null) return null;
 
         List<VariableDescriptorWithAccessors> allDelegatedProperties = bindingContext.get(DELEGATED_PROPERTIES, owner);
         int index = allDelegatedProperties == null ? -1 : allDelegatedProperties.indexOf(descriptor);

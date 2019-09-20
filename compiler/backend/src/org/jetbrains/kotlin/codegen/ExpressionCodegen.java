@@ -4359,7 +4359,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         Type resultType = initializer.type;
         KotlinType resultKotlinType = initializer.kotlinType;
 
-        if (isDelegatedLocalVariable(variableDescriptor)) {
+        if (isDelegatedLocalVariable(variableDescriptor) &&
+            PropertyCodegen.requiresPropertyMetadataForDelegatedProperty(bindingContext, variableDescriptor)
+        ) {
             StackValue metadataValue = getVariableMetadataValue(variableDescriptor);
             initializePropertyMetadata((KtProperty) variableDeclaration, variableDescriptor, metadataValue);
 
@@ -4470,6 +4472,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         StackValue value = context.getFunctionDescriptor().isInline()
                            ? generatePropertyReference(variable.getDelegate(), variableDescriptor, variableDescriptor, null)
                            : PropertyCodegen.getDelegatedPropertyMetadata(variableDescriptor, bindingContext);
+        assert value != null : "Local delegated property " + variableDescriptor + " should not require metadata";
         value.put(K_PROPERTY_TYPE, null, v);
         metadataVar.storeSelector(K_PROPERTY_TYPE, null, v);
     }

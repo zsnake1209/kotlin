@@ -501,7 +501,10 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
         }
 
         KtPropertyDelegate delegate = property.getDelegate();
-        if (delegate != null && descriptor instanceof VariableDescriptorWithAccessors) {
+        if (delegate != null &&
+            descriptor instanceof VariableDescriptorWithAccessors &&
+            PropertyCodegen.requiresPropertyMetadataForDelegatedProperty(bindingContext, (VariableDescriptorWithAccessors) descriptor)
+        ) {
             VariableDescriptorWithAccessors variableDescriptor = (VariableDescriptorWithAccessors) descriptor;
             String name = inventAnonymousClassName();
             KotlinType supertype =

@@ -8395,6 +8395,39 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
             runTest("compiler/testData/codegen/box/delegatedProperty/varInInnerClass.kt");
         }
 
+        @TestMetadata("compiler/testData/codegen/box/delegatedProperty/flexibleDelegatedProperties")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class FlexibleDelegatedProperties extends AbstractIrBlackBoxCodegenTest {
+            private void runTest(String testDataFilePath) throws Exception {
+                KotlinTestUtils.runTest(this::doTest, TargetBackend.JVM_IR, testDataFilePath);
+            }
+
+            public void testAllFilesPresentInFlexibleDelegatedProperties() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty/flexibleDelegatedProperties"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JVM_IR, true);
+            }
+
+            @TestMetadata("lazy.kt")
+            public void testLazy() throws Exception {
+                runTest("compiler/testData/codegen/box/delegatedProperty/flexibleDelegatedProperties/lazy.kt");
+            }
+
+            @TestMetadata("noArguments.kt")
+            public void testNoArguments() throws Exception {
+                runTest("compiler/testData/codegen/box/delegatedProperty/flexibleDelegatedProperties/noArguments.kt");
+            }
+
+            @TestMetadata("noArgumentsInLocalDelegatedProperties.kt")
+            public void testNoArgumentsInLocalDelegatedProperties() throws Exception {
+                runTest("compiler/testData/codegen/box/delegatedProperty/flexibleDelegatedProperties/noArgumentsInLocalDelegatedProperties.kt");
+            }
+
+            @TestMetadata("thisReferenceArgumentOnly.kt")
+            public void testThisReferenceArgumentOnly() throws Exception {
+                runTest("compiler/testData/codegen/box/delegatedProperty/flexibleDelegatedProperties/thisReferenceArgumentOnly.kt");
+            }
+        }
+
         @TestMetadata("compiler/testData/codegen/box/delegatedProperty/local")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)

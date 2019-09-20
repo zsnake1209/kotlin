@@ -3382,6 +3382,16 @@ public class IrBytecodeTextTestGenerated extends AbstractIrBytecodeTextTest {
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/bytecodeText/properties"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JVM_IR, true);
         }
 
+        @TestMetadata("noUnneededDelegatedPropertiesArrayForFlexibleDelegatedProperties.kt")
+        public void testNoUnneededDelegatedPropertiesArrayForFlexibleDelegatedProperties() throws Exception {
+            runTest("compiler/testData/codegen/bytecodeText/properties/noUnneededDelegatedPropertiesArrayForFlexibleDelegatedProperties.kt");
+        }
+
+        @TestMetadata("noUnneededKPropertyForFlexibleDelegatedProperties.kt")
+        public void testNoUnneededKPropertyForFlexibleDelegatedProperties() throws Exception {
+            runTest("compiler/testData/codegen/bytecodeText/properties/noUnneededKPropertyForFlexibleDelegatedProperties.kt");
+        }
+
         @TestMetadata("compiler/testData/codegen/bytecodeText/properties/lateinit")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)

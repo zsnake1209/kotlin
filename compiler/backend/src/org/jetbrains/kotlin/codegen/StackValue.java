@@ -1099,34 +1099,54 @@ public abstract class StackValue {
         public void putSelector(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
             ResolvedCall<FunctionDescriptor> resolvedCall = getResolvedCall(true);
             List<? extends ValueArgument> arguments = resolvedCall.getCall().getValueArguments();
-            assert arguments.size() == 2 : "Resolved call for 'getValue' should have 2 arguments, but was " +
-                                           arguments.size() + ": " + resolvedCall;
+            int argumentsCount = arguments.size();
+            assert argumentsCount <= 2 :
+                    "Resolved call for 'getValue' should have no more than 2 arguments, but was " + argumentsCount + ": " + resolvedCall;
 
-            codegen.tempVariables.put(arguments.get(0).asElement(), StackValue.constant(null, OBJECT_TYPE));
-            codegen.tempVariables.put(arguments.get(1).asElement(), metadataValue);
+            if (argumentsCount >= 1) {
+                codegen.tempVariables.put(arguments.get(0).asElement(), StackValue.constant(null, OBJECT_TYPE));
+            }
+            if (argumentsCount >= 2) {
+                codegen.tempVariables.put(arguments.get(1).asElement(), metadataValue);
+            }
             StackValue lastValue = codegen.invokeFunction(resolvedCall, delegateValue);
             lastValue.put(type, kotlinType, v);
 
-            codegen.tempVariables.remove(arguments.get(0).asElement());
-            codegen.tempVariables.remove(arguments.get(1).asElement());
+            if (argumentsCount >= 1) {
+                codegen.tempVariables.remove(arguments.get(0).asElement());
+            }
+            if (argumentsCount >= 2) {
+                codegen.tempVariables.remove(arguments.get(1).asElement());
+            }
         }
 
         @Override
         public void store(@NotNull StackValue rightSide, @NotNull InstructionAdapter v, boolean skipReceiver) {
             ResolvedCall<FunctionDescriptor> resolvedCall = getResolvedCall(false);
             List<? extends ValueArgument> arguments = resolvedCall.getCall().getValueArguments();
-            assert arguments.size() == 3 : "Resolved call for 'setValue' should have 3 arguments, but was " +
-                                           arguments.size() + ": " + resolvedCall;
+            int argumentsCount = arguments.size();
+            assert argumentsCount >= 1 :
+                    "Resolved call for 'setValue' should have at least 1 argument, but was " + argumentsCount + ": " + resolvedCall;
+            assert argumentsCount <= 3 :
+                    "Resolved call for 'setValue' should have no more than 3 arguments, but was " + argumentsCount + ": " + resolvedCall;
 
-            codegen.tempVariables.put(arguments.get(0).asElement(), StackValue.constant(null, OBJECT_TYPE));
-            codegen.tempVariables.put(arguments.get(1).asElement(), metadataValue);
-            codegen.tempVariables.put(arguments.get(2).asElement(), rightSide);
+            if (argumentsCount >= 2) {
+                codegen.tempVariables.put(arguments.get(0).asElement(), StackValue.constant(null, OBJECT_TYPE));
+            }
+            if (argumentsCount >= 3) {
+                codegen.tempVariables.put(arguments.get(1).asElement(), metadataValue);
+            }
+            codegen.tempVariables.put(arguments.get(argumentsCount - 1).asElement(), rightSide);
             StackValue lastValue = codegen.invokeFunction(resolvedCall, delegateValue);
             lastValue.put(Type.VOID_TYPE, null, v);
 
-            codegen.tempVariables.remove(arguments.get(0).asElement());
-            codegen.tempVariables.remove(arguments.get(1).asElement());
-            codegen.tempVariables.remove(arguments.get(2).asElement());
+            if (argumentsCount >= 2) {
+                codegen.tempVariables.remove(arguments.get(0).asElement());
+            }
+            if (argumentsCount >= 3) {
+                codegen.tempVariables.remove(arguments.get(1).asElement());
+            }
+            codegen.tempVariables.remove(arguments.get(argumentsCount - 1).asElement());
         }
     }
 
