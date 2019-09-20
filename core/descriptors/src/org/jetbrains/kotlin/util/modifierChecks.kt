@@ -112,8 +112,23 @@ private object NoDefaultAndVarargsCheck : Check {
 private object IsKPropertyCheck : Check {
     override val description = "second parameter must be of type KProperty<*> or its supertype"
     override fun check(functionDescriptor: FunctionDescriptor): Boolean {
-        val secondParameter = functionDescriptor.valueParameters[1]
-        return ReflectionTypes.createKPropertyStarType(secondParameter.module)?.isSubtypeOf(secondParameter.type.makeNotNullable()) ?: false
+        val valueParameters = functionDescriptor.valueParameters
+        val kPropertyParameter = when (functionDescriptor.name) {
+            PROVIDE_DELEGATE, GET_VALUE ->
+                if (valueParameters.size == 2)
+                    valueParameters[1]
+                else
+                    return true
+            SET_VALUE ->
+                if (valueParameters.size == 3)
+                    valueParameters[1]
+                else
+                    return true
+            else ->
+                return true
+        }
+        val kPropertyType = ReflectionTypes.createKPropertyStarType(functionDescriptor.module) ?: return false
+        return kPropertyType.isSubtypeOf(kPropertyParameter.type.makeNotNullable())
     }
 }
 
@@ -193,10 +208,11 @@ object OperatorChecks : AbstractModifierChecks() {
             ensure(lastIsOk) { "last parameter should not have a default value or be a vararg" }
         },
 
-        // TODO checks for getValue/setValue/provideDelegate should depend on language version
-        Checks(GET_VALUE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.AtMost(2)),
-        Checks(SET_VALUE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.InRange(1, 3)),
-        Checks(PROVIDE_DELEGATE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.AtMost(2)),
+        // TODO checks for getValue/setValue/provideDelegate should depend on language version settings
+        // TODO see KT-33931, we check value parameters count for getValue/setValue incorrectly
+        Checks(GET_VALUE, MemberOrExtension, NoDefaultAndVarargsCheck, IsKPropertyCheck),
+        Checks(SET_VALUE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.AtLeast(1), IsKPropertyCheck),
+        Checks(PROVIDE_DELEGATE, MemberOrExtension, NoDefaultAndVarargsCheck, ValueParameterCountCheck.AtMost(2), IsKPropertyCheck),
 
         Checks(INVOKE, MemberOrExtension),
         Checks(CONTAINS, MemberOrExtension, SingleValueParameter, NoDefaultAndVarargsCheck, ReturnsBoolean),
