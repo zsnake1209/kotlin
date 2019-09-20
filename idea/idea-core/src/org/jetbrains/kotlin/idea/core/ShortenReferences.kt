@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.idea.caches.resolve.allowResolveInWriteAction
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.imports.canBeReferencedViaImport
 import org.jetbrains.kotlin.idea.imports.getImportableTargets
+import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.idea.util.*
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
@@ -388,40 +389,40 @@ class ShortenReferences(val options: (KtElement) -> Options = { Options.DEFAULT 
                 }
             }
 
-        override fun analyzeQualifiedElement(element: KtUserType, bindingContext: BindingContext): AnalyzeQualifiedElementResult =
-            mainAnalyzeQualifiedElement(element, bindingContext).let {
-                if (it is AnalyzeQualifiedElementResult.Skip && element.qualifier?.text == ROOT_PREFIX_FOR_IDE_RESOLUTION_MODE)
-                    AnalyzeQualifiedElementResult.ShortenNow
-                else
-                    it
+        override fun analyzeQualifiedElement(element: KtUserType, bindingContext: BindingContext): AnalyzeQualifiedElementResult {
+            fun eval(element: KtUserType, bindingContext: BindingContext): AnalyzeQualifiedElementResult {
+                if (element.qualifier == null) return AnalyzeQualifiedElementResult.Skip
+                val referenceExpression = element.referenceExpression ?: return AnalyzeQualifiedElementResult.Skip
+
+                val target = referenceExpression.targets(bindingContext).singleOrNull()
+                    ?: return AnalyzeQualifiedElementResult.Skip
+
+                val scope = element.getResolutionScope(bindingContext, resolutionFacade)
+                val name = target.name
+
+                val targetByName: DeclarationDescriptor?
+                val isDeprecated: Boolean
+
+                if (target is ClassifierDescriptor) {
+                    val classifierWithDeprecation = scope.findFirstClassifierWithDeprecationStatus(name, NoLookupLocation.FROM_IDE)
+                    targetByName = classifierWithDeprecation?.descriptor
+                    isDeprecated = classifierWithDeprecation?.isDeprecated ?: false
+                } else {
+                    targetByName = scope.findPackage(name)
+                    isDeprecated = false
+                }
+
+                val canShortenNow = targetByName?.asString() == target.asString() && !isDeprecated
+                return if (canShortenNow) AnalyzeQualifiedElementResult.ShortenNow else AnalyzeQualifiedElementResult.ImportDescriptors(
+                    listOfNotNull(target)
+                )
             }
 
-        private fun mainAnalyzeQualifiedElement(element: KtUserType, bindingContext: BindingContext): AnalyzeQualifiedElementResult {
-            if (element.qualifier == null) return AnalyzeQualifiedElementResult.Skip
-            val referenceExpression = element.referenceExpression ?: return AnalyzeQualifiedElementResult.Skip
+            val result = eval(element, bindingContext)
+            if (result is AnalyzeQualifiedElementResult.Skip &&
+                element.qualifier?.text == ROOT_PREFIX_FOR_IDE_RESOLUTION_MODE) return AnalyzeQualifiedElementResult.ShortenNow
 
-            val target = referenceExpression.targets(bindingContext).singleOrNull()
-                ?: return AnalyzeQualifiedElementResult.Skip
-
-            val scope = element.getResolutionScope(bindingContext, resolutionFacade)
-            val name = target.name
-
-            val targetByName: DeclarationDescriptor?
-            val isDeprecated: Boolean
-
-            if (target is ClassifierDescriptor) {
-                val classifierWithDeprecation = scope.findFirstClassifierWithDeprecationStatus(name, NoLookupLocation.FROM_IDE)
-                targetByName = classifierWithDeprecation?.descriptor
-                isDeprecated = classifierWithDeprecation?.isDeprecated ?: false
-            } else {
-                targetByName = scope.findPackage(name)
-                isDeprecated = false
-            }
-
-            val canShortenNow = targetByName?.asString() == target.asString() && !isDeprecated
-            return if (canShortenNow) AnalyzeQualifiedElementResult.ShortenNow else AnalyzeQualifiedElementResult.ImportDescriptors(
-                listOfNotNull(target)
-            )
+            return result
         }
 
         override fun shortenElement(element: KtUserType, options: Options): KtElement {
@@ -481,15 +482,9 @@ class ShortenReferences(val options: (KtElement) -> Options = { Options.DEFAULT 
         override fun analyzeQualifiedElement(
             element: KtDotQualifiedExpression,
             bindingContext: BindingContext
-        ): AnalyzeQualifiedElementResult = if (element.receiverExpression.text == ROOT_PREFIX_FOR_IDE_RESOLUTION_MODE)
-            AnalyzeQualifiedElementResult.ShortenNow
-        else
-            mainAnalyzeQualifiedElement(element, bindingContext)
-
-        private fun mainAnalyzeQualifiedElement(
-            element: KtDotQualifiedExpression,
-            bindingContext: BindingContext
         ): AnalyzeQualifiedElementResult {
+            if (element.receiverExpression.text == ROOT_PREFIX_FOR_IDE_RESOLUTION_MODE) return AnalyzeQualifiedElementResult.ShortenNow
+
             if (PsiTreeUtil.getParentOfType(
                     element,
                     KtImportDirective::class.java, KtPackageDirective::class.java
@@ -529,7 +524,9 @@ class ShortenReferences(val options: (KtElement) -> Options = { Options.DEFAULT 
             // targetMatch == false, but shorten still can be preformed
             // TODO: Add possibility to check if descriptor from completion can't be resolved after shorten and not preform shorten than
             val resolvedCallsMatch = if (resolvedCall != null && resolvedCallWhenShort != null) {
-                resolvedCall.resultingDescriptor.original == resolvedCallWhenShort.resultingDescriptor.original
+                val resolvedCallFqName = resolvedCall.resultingDescriptor.original.importableFqName
+                val resolvedCallWhenShortFqName = resolvedCallWhenShort.resultingDescriptor.original.importableFqName
+                resolvedCallFqName != null && resolvedCallFqName == resolvedCallWhenShortFqName
             } else {
                 val resolvedCalls = selector.getCall(bindingContext)?.resolveCandidates(bindingContext, resolutionFacade) ?: emptyList()
                 val callWhenShort = selectorAfterShortening.getCall(newContext)
@@ -537,11 +534,11 @@ class ShortenReferences(val options: (KtElement) -> Options = { Options.DEFAULT 
                     selectorAfterShortening.getCall(newContext)?.resolveCandidates(newContext, resolutionFacade) ?: emptyList()
 
                 val descriptorsOfResolvedCallsWhenShort = resolvedCallsWhenShort.map { it.resultingDescriptor.original }
-                val descriptorsOfResolvedCalls = resolvedCalls.mapTo(mutableSetOf()) { it.resultingDescriptor.original }
+                val descriptorsOfResolvedCalls = resolvedCalls.mapTo(mutableSetOf()) { it.resultingDescriptor.original }.mapNotNull { it.importableFqName }
 
                 val filter =
                     ShadowedDeclarationsFilter(newContext, resolutionFacade, newCallee, callWhenShort?.explicitReceiver as? ReceiverValue)
-                val availableDescriptorsWhenShort = filter.filter(descriptorsOfResolvedCallsWhenShort)
+                val availableDescriptorsWhenShort = filter.filter(descriptorsOfResolvedCallsWhenShort).mapNotNull { it.importableFqName }
 
                 availableDescriptorsWhenShort.any { it in descriptorsOfResolvedCalls }
             }
