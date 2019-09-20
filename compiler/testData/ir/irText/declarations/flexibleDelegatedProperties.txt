@@ -1,0 +1,248 @@
+FILE fqName:<root> fileName:/flexibleDelegatedProperties.kt
+  CLASS CLASS name:Immutable modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Immutable<T of <root>.Immutable>
+    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
+    CONSTRUCTOR visibility:public <> (value:T of <root>.Immutable) returnType:<root>.Immutable<T of <root>.Immutable> [primary]
+      VALUE_PARAMETER name:value index:0 type:T of <root>.Immutable
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Immutable modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    PROPERTY name:value visibility:private modality:FINAL [val]
+      FIELD PROPERTY_BACKING_FIELD name:value type:T of <root>.Immutable visibility:private [final]
+        EXPRESSION_BODY
+          GET_VAR 'value: T of <root>.Immutable declared in <root>.Immutable.<init>' type=T of <root>.Immutable origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-value> visibility:private modality:FINAL <> ($this:<root>.Immutable<T of <root>.Immutable>) returnType:T of <root>.Immutable
+        correspondingProperty: PROPERTY name:value visibility:private modality:FINAL [val]
+        $this: VALUE_PARAMETER name:<this> type:<root>.Immutable<T of <root>.Immutable>
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='private final fun <get-value> (): T of <root>.Immutable declared in <root>.Immutable'
+            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:T of <root>.Immutable visibility:private [final]' type=T of <root>.Immutable origin=null
+              receiver: GET_VAR '<this>: <root>.Immutable<T of <root>.Immutable> declared in <root>.Immutable.<get-value>' type=<root>.Immutable<T of <root>.Immutable> origin=null
+    FUN name:getValue visibility:public modality:FINAL <> ($this:<root>.Immutable<T of <root>.Immutable>) returnType:T of <root>.Immutable
+      $this: VALUE_PARAMETER name:<this> type:<root>.Immutable<T of <root>.Immutable>
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun getValue (): T of <root>.Immutable declared in <root>.Immutable'
+          CALL 'private final fun <get-value> (): T of <root>.Immutable declared in <root>.Immutable' type=T of <root>.Immutable origin=GET_PROPERTY
+            $this: GET_VAR '<this>: <root>.Immutable<T of <root>.Immutable> declared in <root>.Immutable.getValue' type=<root>.Immutable<T of <root>.Immutable> origin=null
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  CLASS CLASS name:Mutable modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.Mutable<T of <root>.Mutable>
+    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?]
+    CONSTRUCTOR visibility:public <> (value:T of <root>.Mutable) returnType:<root>.Mutable<T of <root>.Mutable> [primary]
+      VALUE_PARAMETER name:value index:0 type:T of <root>.Mutable
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:Mutable modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    PROPERTY name:value visibility:private modality:FINAL [var]
+      FIELD PROPERTY_BACKING_FIELD name:value type:T of <root>.Mutable visibility:private
+        EXPRESSION_BODY
+          GET_VAR 'value: T of <root>.Mutable declared in <root>.Mutable.<init>' type=T of <root>.Mutable origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-value> visibility:private modality:FINAL <> ($this:<root>.Mutable<T of <root>.Mutable>) returnType:T of <root>.Mutable
+        correspondingProperty: PROPERTY name:value visibility:private modality:FINAL [var]
+        $this: VALUE_PARAMETER name:<this> type:<root>.Mutable<T of <root>.Mutable>
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='private final fun <get-value> (): T of <root>.Mutable declared in <root>.Mutable'
+            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:T of <root>.Mutable visibility:private' type=T of <root>.Mutable origin=null
+              receiver: GET_VAR '<this>: <root>.Mutable<T of <root>.Mutable> declared in <root>.Mutable.<get-value>' type=<root>.Mutable<T of <root>.Mutable> origin=null
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<set-value> visibility:private modality:FINAL <> ($this:<root>.Mutable<T of <root>.Mutable>, <set-?>:T of <root>.Mutable) returnType:kotlin.Unit
+        correspondingProperty: PROPERTY name:value visibility:private modality:FINAL [var]
+        $this: VALUE_PARAMETER name:<this> type:<root>.Mutable<T of <root>.Mutable>
+        VALUE_PARAMETER name:<set-?> index:0 type:T of <root>.Mutable
+        BLOCK_BODY
+          SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:value type:T of <root>.Mutable visibility:private' type=kotlin.Unit origin=null
+            receiver: GET_VAR '<this>: <root>.Mutable<T of <root>.Mutable> declared in <root>.Mutable.<set-value>' type=<root>.Mutable<T of <root>.Mutable> origin=null
+            value: GET_VAR '<set-?>: T of <root>.Mutable declared in <root>.Mutable.<set-value>' type=T of <root>.Mutable origin=null
+    FUN name:getValue visibility:public modality:FINAL <> ($this:<root>.Mutable<T of <root>.Mutable>) returnType:T of <root>.Mutable
+      $this: VALUE_PARAMETER name:<this> type:<root>.Mutable<T of <root>.Mutable>
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun getValue (): T of <root>.Mutable declared in <root>.Mutable'
+          CALL 'private final fun <get-value> (): T of <root>.Mutable declared in <root>.Mutable' type=T of <root>.Mutable origin=GET_PROPERTY
+            $this: GET_VAR '<this>: <root>.Mutable<T of <root>.Mutable> declared in <root>.Mutable.getValue' type=<root>.Mutable<T of <root>.Mutable> origin=null
+    FUN name:setValue visibility:public modality:FINAL <> ($this:<root>.Mutable<T of <root>.Mutable>, newValue:T of <root>.Mutable) returnType:kotlin.Unit
+      $this: VALUE_PARAMETER name:<this> type:<root>.Mutable<T of <root>.Mutable>
+      VALUE_PARAMETER name:newValue index:0 type:T of <root>.Mutable
+      BLOCK_BODY
+        CALL 'private final fun <set-value> (<set-?>: T of <root>.Mutable): kotlin.Unit declared in <root>.Mutable' type=kotlin.Unit origin=EQ
+          $this: GET_VAR '<this>: <root>.Mutable<T of <root>.Mutable> declared in <root>.Mutable.setValue' type=<root>.Mutable<T of <root>.Mutable> origin=null
+          <set-?>: GET_VAR 'newValue: T of <root>.Mutable declared in <root>.Mutable.setValue' type=T of <root>.Mutable origin=null
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  PROPERTY name:testTopLevelValByImmutable visibility:public modality:FINAL [delegated,val]
+    FIELD DELEGATE name:testTopLevelValByImmutable$delegate type:<root>.Immutable<kotlin.Int> visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> (value: T of <root>.Immutable) [primary] declared in <root>.Immutable' type=<root>.Immutable<kotlin.Int> origin=null
+          <class: T>: kotlin.Int
+          value: CONST Int type=kotlin.Int value=42
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testTopLevelValByImmutable> visibility:public modality:FINAL <> () returnType:kotlin.Int
+      correspondingProperty: PROPERTY name:testTopLevelValByImmutable visibility:public modality:FINAL [delegated,val]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <get-testTopLevelValByImmutable> (): kotlin.Int declared in <root>'
+          CALL 'public final fun getValue (): T of <root>.Immutable declared in <root>.Immutable' type=kotlin.Int origin=null
+            $this: GET_FIELD 'FIELD DELEGATE name:testTopLevelValByImmutable$delegate type:<root>.Immutable<kotlin.Int> visibility:private [final,static]' type=<root>.Immutable<kotlin.Int> origin=null
+  PROPERTY name:testTopLevelValByMutable visibility:public modality:FINAL [delegated,val]
+    FIELD DELEGATE name:testTopLevelValByMutable$delegate type:<root>.Mutable<kotlin.Int> visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> (value: T of <root>.Mutable) [primary] declared in <root>.Mutable' type=<root>.Mutable<kotlin.Int> origin=null
+          <class: T>: kotlin.Int
+          value: CONST Int type=kotlin.Int value=42
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testTopLevelValByMutable> visibility:public modality:FINAL <> () returnType:kotlin.Int
+      correspondingProperty: PROPERTY name:testTopLevelValByMutable visibility:public modality:FINAL [delegated,val]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <get-testTopLevelValByMutable> (): kotlin.Int declared in <root>'
+          CALL 'public final fun getValue (): T of <root>.Mutable declared in <root>.Mutable' type=kotlin.Int origin=null
+            $this: GET_FIELD 'FIELD DELEGATE name:testTopLevelValByMutable$delegate type:<root>.Mutable<kotlin.Int> visibility:private [final,static]' type=<root>.Mutable<kotlin.Int> origin=null
+  PROPERTY name:testTopLevelVarByMutable visibility:public modality:FINAL [delegated,var]
+    FIELD DELEGATE name:testTopLevelVarByMutable$delegate type:<root>.Mutable<kotlin.Int> visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> (value: T of <root>.Mutable) [primary] declared in <root>.Mutable' type=<root>.Mutable<kotlin.Int> origin=null
+          <class: T>: kotlin.Int
+          value: CONST Int type=kotlin.Int value=42
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testTopLevelVarByMutable> visibility:public modality:FINAL <> () returnType:kotlin.Int
+      correspondingProperty: PROPERTY name:testTopLevelVarByMutable visibility:public modality:FINAL [delegated,var]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <get-testTopLevelVarByMutable> (): kotlin.Int declared in <root>'
+          CALL 'public final fun getValue (): T of <root>.Mutable declared in <root>.Mutable' type=kotlin.Int origin=null
+            $this: GET_FIELD 'FIELD DELEGATE name:testTopLevelVarByMutable$delegate type:<root>.Mutable<kotlin.Int> visibility:private [final,static]' type=<root>.Mutable<kotlin.Int> origin=null
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<set-testTopLevelVarByMutable> visibility:public modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit
+      correspondingProperty: PROPERTY name:testTopLevelVarByMutable visibility:public modality:FINAL [delegated,var]
+      VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <set-testTopLevelVarByMutable> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>'
+          CALL 'public final fun setValue (newValue: T of <root>.Mutable): kotlin.Unit declared in <root>.Mutable' type=kotlin.Unit origin=null
+            $this: GET_FIELD 'FIELD DELEGATE name:testTopLevelVarByMutable$delegate type:<root>.Mutable<kotlin.Int> visibility:private [final,static]' type=<root>.Mutable<kotlin.Int> origin=null
+            newValue: GET_VAR '<set-?>: kotlin.Int declared in <root>.<set-testTopLevelVarByMutable>' type=kotlin.Int origin=null
+  CLASS CLASS name:NthElement modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:<root>.NthElement
+    CONSTRUCTOR visibility:public <> (index:kotlin.Int) returnType:<root>.NthElement [primary]
+      VALUE_PARAMETER name:index index:0 type:kotlin.Int
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:NthElement modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    PROPERTY name:index visibility:private modality:FINAL [val]
+      FIELD PROPERTY_BACKING_FIELD name:index type:kotlin.Int visibility:private [final]
+        EXPRESSION_BODY
+          GET_VAR 'index: kotlin.Int declared in <root>.NthElement.<init>' type=kotlin.Int origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-index> visibility:private modality:FINAL <> ($this:<root>.NthElement) returnType:kotlin.Int
+        correspondingProperty: PROPERTY name:index visibility:private modality:FINAL [val]
+        $this: VALUE_PARAMETER name:<this> type:<root>.NthElement
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='private final fun <get-index> (): kotlin.Int declared in <root>.NthElement'
+            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:index type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
+              receiver: GET_VAR '<this>: <root>.NthElement declared in <root>.NthElement.<get-index>' type=<root>.NthElement origin=null
+    FUN name:getValue visibility:public modality:FINAL <> ($this:<root>.NthElement, array:kotlin.IntArray) returnType:kotlin.Int
+      $this: VALUE_PARAMETER name:<this> type:<root>.NthElement
+      VALUE_PARAMETER name:array index:0 type:kotlin.IntArray
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun getValue (array: kotlin.IntArray): kotlin.Int declared in <root>.NthElement'
+          CALL 'public final fun get (index: kotlin.Int): kotlin.Int declared in kotlin.IntArray' type=kotlin.Int origin=GET_ARRAY_ELEMENT
+            $this: GET_VAR 'array: kotlin.IntArray declared in <root>.NthElement.getValue' type=kotlin.IntArray origin=null
+            index: CALL 'private final fun <get-index> (): kotlin.Int declared in <root>.NthElement' type=kotlin.Int origin=GET_PROPERTY
+              $this: GET_VAR '<this>: <root>.NthElement declared in <root>.NthElement.getValue' type=<root>.NthElement origin=null
+    FUN name:setValue visibility:public modality:FINAL <> ($this:<root>.NthElement, array:kotlin.IntArray, newValue:kotlin.Int) returnType:kotlin.Unit
+      $this: VALUE_PARAMETER name:<this> type:<root>.NthElement
+      VALUE_PARAMETER name:array index:0 type:kotlin.IntArray
+      VALUE_PARAMETER name:newValue index:1 type:kotlin.Int
+      BLOCK_BODY
+        CALL 'public final fun set (index: kotlin.Int, value: kotlin.Int): kotlin.Unit declared in kotlin.IntArray' type=kotlin.Unit origin=EQ
+          $this: GET_VAR 'array: kotlin.IntArray declared in <root>.NthElement.setValue' type=kotlin.IntArray origin=null
+          index: CALL 'private final fun <get-index> (): kotlin.Int declared in <root>.NthElement' type=kotlin.Int origin=GET_PROPERTY
+            $this: GET_VAR '<this>: <root>.NthElement declared in <root>.NthElement.setValue' type=<root>.NthElement origin=null
+          value: GET_VAR 'newValue: kotlin.Int declared in <root>.NthElement.setValue' type=kotlin.Int origin=null
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  PROPERTY name:topLevelExtension visibility:public modality:FINAL [delegated,var]
+    FIELD DELEGATE name:topLevelExtension$delegate type:<root>.NthElement visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> (index: kotlin.Int) [primary] declared in <root>.NthElement' type=<root>.NthElement origin=null
+          index: CONST Int type=kotlin.Int value=0
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<get-topLevelExtension> visibility:public modality:FINAL <> ($receiver:kotlin.IntArray) returnType:kotlin.Int
+      correspondingProperty: PROPERTY name:topLevelExtension visibility:public modality:FINAL [delegated,var]
+      $receiver: VALUE_PARAMETER name:<this> type:kotlin.IntArray
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <get-topLevelExtension> (): kotlin.Int declared in <root>'
+          CALL 'public final fun getValue (array: kotlin.IntArray): kotlin.Int declared in <root>.NthElement' type=kotlin.Int origin=null
+            $this: GET_FIELD 'FIELD DELEGATE name:topLevelExtension$delegate type:<root>.NthElement visibility:private [final,static]' type=<root>.NthElement origin=null
+            array: GET_VAR '<this>: kotlin.IntArray declared in <root>.<get-topLevelExtension>' type=kotlin.IntArray origin=null
+    FUN DELEGATED_PROPERTY_ACCESSOR name:<set-topLevelExtension> visibility:public modality:FINAL <> ($receiver:kotlin.IntArray, <set-?>:kotlin.Int) returnType:kotlin.Unit
+      correspondingProperty: PROPERTY name:topLevelExtension visibility:public modality:FINAL [delegated,var]
+      $receiver: VALUE_PARAMETER name:<this> type:kotlin.IntArray
+      VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <set-topLevelExtension> (<set-?>: kotlin.Int): kotlin.Unit declared in <root>'
+          CALL 'public final fun setValue (array: kotlin.IntArray, newValue: kotlin.Int): kotlin.Unit declared in <root>.NthElement' type=kotlin.Unit origin=null
+            $this: GET_FIELD 'FIELD DELEGATE name:topLevelExtension$delegate type:<root>.NthElement visibility:private [final,static]' type=<root>.NthElement origin=null
+            array: GET_VAR '<this>: kotlin.IntArray declared in <root>.<set-topLevelExtension>' type=kotlin.IntArray origin=null
+            newValue: GET_VAR '<set-?>: kotlin.Int declared in <root>.<set-topLevelExtension>' type=kotlin.Int origin=null
+  FUN name:host visibility:public modality:FINAL <> () returnType:kotlin.Unit
+    BLOCK_BODY
+      LOCAL_DELEGATED_PROPERTY name:testLocalValByImmutable type:kotlin.Int flags:val
+        VAR DELEGATE name:testLocalValByImmutable$delegate type:<root>.Immutable<kotlin.Int> [val]
+          CONSTRUCTOR_CALL 'public constructor <init> (value: T of <root>.Immutable) [primary] declared in <root>.Immutable' type=<root>.Immutable<kotlin.Int> origin=null
+            <class: T>: kotlin.Int
+            value: CONST Int type=kotlin.Int value=42
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testLocalValByImmutable> visibility:local modality:FINAL <> () returnType:kotlin.Int
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <get-testLocalValByImmutable> (): kotlin.Int declared in <root>.host'
+              CALL 'public final fun getValue (): T of <root>.Immutable declared in <root>.Immutable' type=kotlin.Int origin=null
+                $this: GET_VAR 'val testLocalValByImmutable$delegate: <root>.Immutable<kotlin.Int> [val] declared in <root>.host' type=<root>.Immutable<kotlin.Int> origin=null
+      LOCAL_DELEGATED_PROPERTY name:testLocalValByMutable type:kotlin.Int flags:val
+        VAR DELEGATE name:testLocalValByMutable$delegate type:<root>.Mutable<kotlin.Int> [val]
+          CONSTRUCTOR_CALL 'public constructor <init> (value: T of <root>.Mutable) [primary] declared in <root>.Mutable' type=<root>.Mutable<kotlin.Int> origin=null
+            <class: T>: kotlin.Int
+            value: CONST Int type=kotlin.Int value=42
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testLocalValByMutable> visibility:local modality:FINAL <> () returnType:kotlin.Int
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <get-testLocalValByMutable> (): kotlin.Int declared in <root>.host'
+              CALL 'public final fun getValue (): T of <root>.Mutable declared in <root>.Mutable' type=kotlin.Int origin=null
+                $this: GET_VAR 'val testLocalValByMutable$delegate: <root>.Mutable<kotlin.Int> [val] declared in <root>.host' type=<root>.Mutable<kotlin.Int> origin=null
+      LOCAL_DELEGATED_PROPERTY name:testLucalVarByMutable type:kotlin.Int flags:var
+        VAR DELEGATE name:testLucalVarByMutable$delegate type:<root>.Mutable<kotlin.Int> [val]
+          CONSTRUCTOR_CALL 'public constructor <init> (value: T of <root>.Mutable) [primary] declared in <root>.Mutable' type=<root>.Mutable<kotlin.Int> origin=null
+            <class: T>: kotlin.Int
+            value: CONST Int type=kotlin.Int value=42
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-testLucalVarByMutable> visibility:local modality:FINAL <> () returnType:kotlin.Int
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <get-testLucalVarByMutable> (): kotlin.Int declared in <root>.host'
+              CALL 'public final fun getValue (): T of <root>.Mutable declared in <root>.Mutable' type=kotlin.Int origin=null
+                $this: GET_VAR 'val testLucalVarByMutable$delegate: <root>.Mutable<kotlin.Int> [val] declared in <root>.host' type=<root>.Mutable<kotlin.Int> origin=null
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<set-testLucalVarByMutable> visibility:local modality:FINAL <> (value:kotlin.Int) returnType:kotlin.Unit
+          VALUE_PARAMETER name:value index:0 type:kotlin.Int
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <set-testLucalVarByMutable> (value: kotlin.Int): kotlin.Unit declared in <root>.host'
+              CALL 'public final fun setValue (newValue: T of <root>.Mutable): kotlin.Unit declared in <root>.Mutable' type=kotlin.Unit origin=null
+                $this: GET_VAR 'val testLucalVarByMutable$delegate: <root>.Mutable<kotlin.Int> [val] declared in <root>.host' type=<root>.Mutable<kotlin.Int> origin=null
+                newValue: GET_VAR 'value: kotlin.Int declared in <root>.host.<set-testLucalVarByMutable>' type=kotlin.Int origin=null

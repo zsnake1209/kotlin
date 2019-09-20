@@ -390,7 +390,9 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
                 val conventionMethodResolvedCall = getOrFail(BindingContext.DELEGATED_PROPERTY_RESOLVED_CALL, getterDescriptor)
                 val conventionMethodCall = statementGenerator.pregenerateCall(conventionMethodResolvedCall)
                 conventionMethodCall.setExplicitReceiverValue(delegateReceiverValue)
-                conventionMethodCall.irValueArgumentsByIndex[1] = irPropertyReference
+                if (conventionMethodCall.valueParametersCount >= 2) {
+                    conventionMethodCall.irValueArgumentsByIndex[1] = irPropertyReference
+                }
                 +irReturn(
                     CallGenerator(statementGenerator).generateCall(
                         startOffset,
@@ -415,9 +417,12 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
             val conventionMethodResolvedCall = getOrFail(BindingContext.DELEGATED_PROPERTY_RESOLVED_CALL, setterDescriptor)
             val conventionMethodCall = statementGenerator.pregenerateCall(conventionMethodResolvedCall)
             conventionMethodCall.setExplicitReceiverValue(delegateReceiverValue)
-            conventionMethodCall.irValueArgumentsByIndex[1] = irPropertyReference
+            if (conventionMethodCall.valueParametersCount >= 3) {
+                conventionMethodCall.irValueArgumentsByIndex[1] = irPropertyReference
+            }
             val irSetterParameter = irSetter.valueParameters[0]
-            conventionMethodCall.irValueArgumentsByIndex[2] = irGet(irSetterParameter.type, irSetterParameter.symbol)
+            conventionMethodCall.irValueArgumentsByIndex[conventionMethodCall.valueParametersCount - 1] =
+                irGet(irSetterParameter.type, irSetterParameter.symbol)
             +irReturn(CallGenerator(statementGenerator).generateCall(startOffset, endOffset, conventionMethodCall))
         }
     }

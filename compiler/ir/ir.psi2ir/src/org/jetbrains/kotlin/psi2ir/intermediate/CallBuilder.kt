@@ -34,8 +34,10 @@ class CallBuilder(
 
     private val parametersOffset = if (isExtensionInvokeCall) 1 else 0
 
-    val irValueArgumentsByIndex = arrayOfNulls<IrExpression>(descriptor.valueParameters.size)
+    val valueParametersCount = descriptor.valueParameters.size
 
+    val irValueArgumentsByIndex = arrayOfNulls<IrExpression>(valueParametersCount)
+    
     fun getValueArgument(valueParameterDescriptor: ValueParameterDescriptor) =
         irValueArgumentsByIndex[valueParameterDescriptor.index + parametersOffset]
 }
