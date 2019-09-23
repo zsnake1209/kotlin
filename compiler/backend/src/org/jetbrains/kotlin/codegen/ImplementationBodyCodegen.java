@@ -116,9 +116,7 @@ public class ImplementationBodyCodegen extends ClassBodyCodegen {
                 new DelegationFieldsInfo(classAsmType, descriptor, state, bindingContext)
                         .getDelegationFieldsInfo(myClass.getSuperTypeListEntries());
 
-        JvmSerializerExtension extension = new JvmSerializerExtension(
-                v.getSerializationBindings(), state, state.getTypeMapper(), (descriptor) -> null
-        );
+        JvmSerializerExtension extension = new JvmSerializerExtension(v.getSerializationBindings(), state);
         this.serializer = DescriptorSerializer.create(
                 descriptor, extension,
                 parentCodegen instanceof ImplementationBodyCodegen
