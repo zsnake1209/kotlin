@@ -38,6 +38,7 @@ import org.jetbrains.kotlin.js.translate.utils.TranslationUtils.*
 import org.jetbrains.kotlin.js.translate.utils.finalElement
 import org.jetbrains.kotlin.js.translate.utils.jsAstUtils.addParameter
 import org.jetbrains.kotlin.js.translate.utils.jsAstUtils.addStatement
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -45,6 +46,8 @@ import org.jetbrains.kotlin.resolve.calls.model.ExpressionValueArgument
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.source.getPsi
+import org.jetbrains.kotlin.util.OperatorNameConventions
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 /**
  * Translates single property /w accessors.
@@ -200,20 +203,28 @@ fun TranslationContext.contextWithPropertyMetadataCreationIntrinsified(
     delegatedCall: ResolvedCall<FunctionDescriptor>,
     property: VariableDescriptorWithAccessors,
     host: JsExpression
-): TranslationContext {
-    // 0th argument is instance, 1st is KProperty, 2nd (for setter) is value
-    val hostExpression =
-        (delegatedCall.valueArgumentsByIndex!![0] as ExpressionValueArgument).valueArgument!!.getArgumentExpression()
-    val fakeArgumentExpression =
-        (delegatedCall.valueArgumentsByIndex!![1] as ExpressionValueArgument).valueArgument!!.getArgumentExpression()
-    val metadataRef = pureFqn(getVariableForPropertyMetadata(property), null).apply { synthetic = true }
-    return innerContextWithAliasesForExpressions(
-        mapOf(
-            hostExpression to host,
-            fakeArgumentExpression to metadataRef
-        )
+): TranslationContext =
+    innerContextWithAliasesForExpressions(
+        HashMap<KtExpression, JsExpression>().also { knownArgumentsMap ->
+            val hasNewValueArgument = delegatedCall.resultingDescriptor.name == OperatorNameConventions.SET_VALUE
+            val valueArgumentsCount = delegatedCall.valueArgumentsByIndex!!.size
+
+            // 0th argument is instance, 1st is KProperty, 2nd (for setter) is value
+            if (!hasNewValueArgument && valueArgumentsCount >= 1 || hasNewValueArgument && valueArgumentsCount >= 2) {
+                val hostExpression = delegatedCall.getNthArgumentExpression(0)
+                knownArgumentsMap[hostExpression] = host
+            }
+
+            if (!hasNewValueArgument && valueArgumentsCount >= 2 || hasNewValueArgument && valueArgumentsCount >= 3) {
+                val fakeArgumentExpression = delegatedCall.getNthArgumentExpression(1)
+                val metadataRef = pureFqn(getVariableForPropertyMetadata(property), null).apply { synthetic = true }
+                knownArgumentsMap[fakeArgumentExpression] = metadataRef
+            }
+        }
     )
-}
+
+private fun ResolvedCall<FunctionDescriptor>.getNthArgumentExpression(index: Int) =
+    valueArgumentsByIndex!![index].cast<ExpressionValueArgument>().valueArgument!!.getArgumentExpression()!!
 
 fun KtProperty.hasCustomGetter() = getter?.hasBody() ?: false
 

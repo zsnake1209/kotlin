@@ -102,7 +102,7 @@ object DefaultVariableAccessCase : VariableAccessCase() {
                 delegatedCall, localVariableDescriptor!!, JsNullLiteral()
             )
             val delegateContextWithArgs = if (!isGetAccess()) {
-                val valueArg = delegatedCall.valueArgumentsByIndex!![2].arguments[0].getArgumentExpression()
+                val valueArg = delegatedCall.valueArgumentsByIndex!!.last().arguments[0].getArgumentExpression()
                 delegateContext.innerContextWithAliasesForExpressions(mapOf(valueArg to value!!))
             } else {
                 delegateContext
