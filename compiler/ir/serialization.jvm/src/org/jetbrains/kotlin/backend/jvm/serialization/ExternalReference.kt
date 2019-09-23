@@ -110,7 +110,7 @@ class ExternalReferenceCollection(
         referenceToPackageFragmentMap.values.toSet().toList()
 
     fun <T> getCopy(symbolOwner: T): T  where T : IrDeclaration, T : IrSymbolOwner = getCopyInternal(symbolOwner).also {
-        referenceToPackageFragmentMap[it] = (it as IrDeclaration).findPackageFragment()
+        referenceToPackageFragmentMap[it] = (it as IrDeclaration).getPackageFragment()!!
     }
 
     // Make a copy, preserving only the information needed to reference the object from a different serialization unit.
@@ -306,8 +306,6 @@ private fun <T : IrElement> T.deepCopyWithExternalReferences(
     return transform(DeepCopyIrTreeWithSymbols(symbolRemapper, typeRemapper), null).patchDeclarationParents(initialParent) as T
 }
 
-// Copied from MoveBodilessDeclarationsToSeparatePlace.kt
-
 private class CopiedExternalPackageFragmentSymbol(val originalDescriptor: PackageFragmentDescriptor) : IrExternalPackageFragmentSymbol {
     // This is only used in serializeDescriptorReference() to make sure that this is not a class descriptor
     override val descriptor: PackageFragmentDescriptor = originalDescriptor
@@ -321,6 +319,4 @@ private class CopiedExternalPackageFragmentSymbol(val originalDescriptor: Packag
         _owner = owner
     }
 }
-
-private fun IrDeclaration.findPackageFragment() = findTopLevelDeclaration().parent as IrPackageFragment
 

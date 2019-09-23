@@ -21,9 +21,7 @@ import org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings
 import org.jetbrains.kotlin.codegen.serialization.JvmSerializerExtension
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.LanguageFeature
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.Modality
-import org.jetbrains.kotlin.descriptors.Visibility
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
@@ -87,10 +85,8 @@ open class ClassCodegen protected constructor(
 
     private var sourceMapper: DefaultSourceMapper? = null
 
-    private fun uniqIdProvider(descriptor: DeclarationDescriptor): Long? {
-        val index = context.declarationTable.descriptorTable.get(descriptor)
-        return index
-    }
+    private fun uniqIdProvider(descriptor: DeclarationDescriptor): Long? =
+        context.declarationTable.descriptorTable.get(descriptor)
 
     private val serializerExtension = JvmSerializerExtension(visitor.serializationBindings, state, typeMapper, ::uniqIdProvider)
     private val serializer: DescriptorSerializer? =
@@ -221,7 +217,10 @@ open class ClassCodegen protected constructor(
                 val classProto = serializer!!.classProto(metadata.descriptor).build()
                 writeKotlinMetadata(visitor, state, KotlinClassHeader.Kind.CLASS, 0) { av ->
                     AsmUtil.writeAnnotationData(av, serializer, classProto)
-                    metadata.serializedIr?.let { storeSerializedIr(av, it) }
+                    if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR)) {
+                        metadata.serializedIr?.let { storeSerializedIr(av, it) }
+                            ?: assert(metadata.descriptor.containingDeclaration !is PackageFragmentDescriptor) { "Toplevel class should have serialized IR" }
+                    }
                 }
             }
             is MetadataSource.File -> {

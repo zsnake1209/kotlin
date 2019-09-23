@@ -76,7 +76,6 @@ internal fun IrSimpleFunction.resolveFakeOverrideMaybeAbstract() = this.resolveF
 
 internal fun IrProperty.resolveFakeOverrideMaybeAbstract(): IrProperty =
     this.getter?.resolveFakeOverrideMaybeAbstract()?.correspondingPropertySymbol?.owner
-        ?: this.setter?.resolveFakeOverrideMaybeAbstract()?.correspondingPropertySymbol?.owner
         ?: this.backingField!!.resolveFakeOverride()!!.correspondingPropertySymbol!!.owner
 
 /**

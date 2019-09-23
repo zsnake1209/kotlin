@@ -51,8 +51,10 @@ public abstract class AbstractCompileKotlinAgainstKotlinTest extends CodegenTest
 
     @NotNull
     protected List<ClassFileFactory> doMultiFileTest(@NotNull List<TestFile> files, boolean reportProblems) {
-        //// Note that it may be beneficial to improve this test to handle many files, compiling them successively against all previous
-        //assert files.size() == 2 || (files.size() == 3 && files.get(2).name.equals("CoroutineUtil.kt")) : "There should be exactly two files in this test";
+        // The test compiles each file as a separate module, and each module is compiled _only_ against the one that comes
+        // immediately before it (so we can check that transitive dependencies are correctly handled).
+        // Special case: If there are exactly three files, and the third one is called "CoroutineUtil.kt", then this file is considered
+        // part of the _first_ module (historically, when only two modules were supported, this was the way to include coroutine utilities).
 
         dirs = new File[files.size()];
         for (int i = 0; i < files.size(); i++) {

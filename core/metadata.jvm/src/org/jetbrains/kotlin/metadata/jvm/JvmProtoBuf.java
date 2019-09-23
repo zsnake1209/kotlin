@@ -3828,7 +3828,7 @@ public final class JvmProtoBuf {
         null,
         null,
         101,
-        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.INT64,
+        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.FIXED64,
         java.lang.Long.class);
   public static final int METHOD_SIGNATURE_FIELD_NUMBER = 100;
   /**
@@ -3881,7 +3881,7 @@ public final class JvmProtoBuf {
         null,
         null,
         102,
-        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.INT64,
+        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.FIXED64,
         java.lang.Long.class);
   public static final int PROPERTY_SIGNATURE_FIELD_NUMBER = 100;
   /**
@@ -3934,7 +3934,7 @@ public final class JvmProtoBuf {
         null,
         null,
         102,
-        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.INT64,
+        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.FIXED64,
         java.lang.Long.class);
   public static final int ENUM_ENTRY_UNIQ_ID_FIELD_NUMBER = 100;
   /**
@@ -3950,7 +3950,7 @@ public final class JvmProtoBuf {
         null,
         null,
         100,
-        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.INT64,
+        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.FIXED64,
         java.lang.Long.class);
   public static final int VALUE_PARAM_UNIQ_ID_FIELD_NUMBER = 100;
   /**
@@ -3966,7 +3966,7 @@ public final class JvmProtoBuf {
         null,
         null,
         100,
-        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.INT64,
+        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.FIXED64,
         java.lang.Long.class);
   public static final int TYPE_ALIAS_UNIQ_ID_FIELD_NUMBER = 100;
   /**
@@ -3982,7 +3982,7 @@ public final class JvmProtoBuf {
         null,
         null,
         100,
-        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.INT64,
+        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.FIXED64,
         java.lang.Long.class);
   public static final int TYPE_ANNOTATION_FIELD_NUMBER = 100;
   /**
@@ -4046,7 +4046,7 @@ public final class JvmProtoBuf {
         null,
         null,
         101,
-        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.INT64,
+        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.FIXED64,
         java.lang.Long.class);
   public static final int CLASS_MODULE_NAME_FIELD_NUMBER = 101;
   /**
@@ -4119,7 +4119,7 @@ public final class JvmProtoBuf {
         null,
         null,
         104,
-        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.INT64,
+        org.jetbrains.kotlin.protobuf.WireFormat.FieldType.FIXED64,
         java.lang.Long.class);
   public static final int PACKAGE_MODULE_NAME_FIELD_NUMBER = 101;
   /**
