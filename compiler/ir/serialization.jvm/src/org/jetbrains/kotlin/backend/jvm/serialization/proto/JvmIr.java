@@ -13,11 +13,11 @@ public final class JvmIr {
       org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
     /**
-     * <code>required int64 id = 1;</code>
+     * <code>required fixed64 id = 1;</code>
      */
     boolean hasId();
     /**
-     * <code>required int64 id = 1;</code>
+     * <code>required fixed64 id = 1;</code>
      */
     long getId();
 
@@ -80,9 +80,9 @@ public final class JvmIr {
               }
               break;
             }
-            case 8: {
+            case 9: {
               bitField0_ |= 0x00000001;
-              id_ = input.readInt64();
+              id_ = input.readFixed64();
               break;
             }
             case 18: {
@@ -135,13 +135,13 @@ public final class JvmIr {
     public static final int ID_FIELD_NUMBER = 1;
     private long id_;
     /**
-     * <code>required int64 id = 1;</code>
+     * <code>required fixed64 id = 1;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int64 id = 1;</code>
+     * <code>required fixed64 id = 1;</code>
      */
     public long getId() {
       return id_;
@@ -192,7 +192,7 @@ public final class JvmIr {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt64(1, id_);
+        output.writeFixed64(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeMessage(2, toplevelFqName_);
@@ -208,7 +208,7 @@ public final class JvmIr {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeInt64Size(1, id_);
+          .computeFixed64Size(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -397,19 +397,19 @@ public final class JvmIr {
 
       private long id_ ;
       /**
-       * <code>required int64 id = 1;</code>
+       * <code>required fixed64 id = 1;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int64 id = 1;</code>
+       * <code>required fixed64 id = 1;</code>
        */
       public long getId() {
         return id_;
       }
       /**
-       * <code>required int64 id = 1;</code>
+       * <code>required fixed64 id = 1;</code>
        */
       public Builder setId(long value) {
         bitField0_ |= 0x00000001;
@@ -418,7 +418,7 @@ public final class JvmIr {
         return this;
       }
       /**
-       * <code>required int64 id = 1;</code>
+       * <code>required fixed64 id = 1;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -1581,18 +1581,18 @@ public final class JvmIr {
       org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
      */
     java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> 
-        getStatemensAndExpressionsList();
+        getStatementOrExpressionList();
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
      */
-    org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression getStatemensAndExpressions(int index);
+    org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression getStatementOrExpression(int index);
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
      */
-    int getStatemensAndExpressionsCount();
+    int getStatementOrExpressionCount();
   }
   /**
    * Protobuf type {@code org.jetbrains.kotlin.backend.jvm.serialization.proto.StatementsAndExpressionsTable}
@@ -1646,10 +1646,10 @@ public final class JvmIr {
             }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                statemensAndExpressions_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression>();
+                statementOrExpression_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              statemensAndExpressions_.add(input.readMessage(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression.PARSER, extensionRegistry));
+              statementOrExpression_.add(input.readMessage(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression.PARSER, extensionRegistry));
               break;
             }
           }
@@ -1661,7 +1661,7 @@ public final class JvmIr {
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-          statemensAndExpressions_ = java.util.Collections.unmodifiableList(statemensAndExpressions_);
+          statementOrExpression_ = java.util.Collections.unmodifiableList(statementOrExpression_);
         }
         try {
           unknownFieldsCodedOutput.flush();
@@ -1688,43 +1688,43 @@ public final class JvmIr {
       return PARSER;
     }
 
-    public static final int STATEMENS_AND_EXPRESSIONS_FIELD_NUMBER = 1;
-    private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> statemensAndExpressions_;
+    public static final int STATEMENT_OR_EXPRESSION_FIELD_NUMBER = 1;
+    private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> statementOrExpression_;
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
      */
-    public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> getStatemensAndExpressionsList() {
-      return statemensAndExpressions_;
+    public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> getStatementOrExpressionList() {
+      return statementOrExpression_;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
      */
     public java.util.List<? extends org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpressionOrBuilder> 
-        getStatemensAndExpressionsOrBuilderList() {
-      return statemensAndExpressions_;
+        getStatementOrExpressionOrBuilderList() {
+      return statementOrExpression_;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
      */
-    public int getStatemensAndExpressionsCount() {
-      return statemensAndExpressions_.size();
+    public int getStatementOrExpressionCount() {
+      return statementOrExpression_.size();
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
      */
-    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression getStatemensAndExpressions(int index) {
-      return statemensAndExpressions_.get(index);
+    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression getStatementOrExpression(int index) {
+      return statementOrExpression_.get(index);
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
      */
-    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpressionOrBuilder getStatemensAndExpressionsOrBuilder(
+    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpressionOrBuilder getStatementOrExpressionOrBuilder(
         int index) {
-      return statemensAndExpressions_.get(index);
+      return statementOrExpression_.get(index);
     }
 
     private void initFields() {
-      statemensAndExpressions_ = java.util.Collections.emptyList();
+      statementOrExpression_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1732,8 +1732,8 @@ public final class JvmIr {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      for (int i = 0; i < getStatemensAndExpressionsCount(); i++) {
-        if (!getStatemensAndExpressions(i).isInitialized()) {
+      for (int i = 0; i < getStatementOrExpressionCount(); i++) {
+        if (!getStatementOrExpression(i).isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -1745,8 +1745,8 @@ public final class JvmIr {
     public void writeTo(org.jetbrains.kotlin.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      for (int i = 0; i < statemensAndExpressions_.size(); i++) {
-        output.writeMessage(1, statemensAndExpressions_.get(i));
+      for (int i = 0; i < statementOrExpression_.size(); i++) {
+        output.writeMessage(1, statementOrExpression_.get(i));
       }
       output.writeRawBytes(unknownFields);
     }
@@ -1757,9 +1757,9 @@ public final class JvmIr {
       if (size != -1) return size;
 
       size = 0;
-      for (int i = 0; i < statemensAndExpressions_.size(); i++) {
+      for (int i = 0; i < statementOrExpression_.size(); i++) {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeMessageSize(1, statemensAndExpressions_.get(i));
+          .computeMessageSize(1, statementOrExpression_.get(i));
       }
       size += unknownFields.size();
       memoizedSerializedSize = size;
@@ -1855,7 +1855,7 @@ public final class JvmIr {
 
       public Builder clear() {
         super.clear();
-        statemensAndExpressions_ = java.util.Collections.emptyList();
+        statementOrExpression_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
@@ -1880,22 +1880,22 @@ public final class JvmIr {
         org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.StatementsAndExpressionsTable result = new org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.StatementsAndExpressionsTable(this);
         int from_bitField0_ = bitField0_;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          statemensAndExpressions_ = java.util.Collections.unmodifiableList(statemensAndExpressions_);
+          statementOrExpression_ = java.util.Collections.unmodifiableList(statementOrExpression_);
           bitField0_ = (bitField0_ & ~0x00000001);
         }
-        result.statemensAndExpressions_ = statemensAndExpressions_;
+        result.statementOrExpression_ = statementOrExpression_;
         return result;
       }
 
       public Builder mergeFrom(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.StatementsAndExpressionsTable other) {
         if (other == org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.StatementsAndExpressionsTable.getDefaultInstance()) return this;
-        if (!other.statemensAndExpressions_.isEmpty()) {
-          if (statemensAndExpressions_.isEmpty()) {
-            statemensAndExpressions_ = other.statemensAndExpressions_;
+        if (!other.statementOrExpression_.isEmpty()) {
+          if (statementOrExpression_.isEmpty()) {
+            statementOrExpression_ = other.statementOrExpression_;
             bitField0_ = (bitField0_ & ~0x00000001);
           } else {
-            ensureStatemensAndExpressionsIsMutable();
-            statemensAndExpressions_.addAll(other.statemensAndExpressions_);
+            ensureStatementOrExpressionIsMutable();
+            statementOrExpression_.addAll(other.statementOrExpression_);
           }
           
         }
@@ -1905,8 +1905,8 @@ public final class JvmIr {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getStatemensAndExpressionsCount(); i++) {
-          if (!getStatemensAndExpressions(i).isInitialized()) {
+        for (int i = 0; i < getStatementOrExpressionCount(); i++) {
+          if (!getStatementOrExpression(i).isInitialized()) {
             
             return false;
           }
@@ -1933,127 +1933,127 @@ public final class JvmIr {
       }
       private int bitField0_;
 
-      private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> statemensAndExpressions_ =
+      private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> statementOrExpression_ =
         java.util.Collections.emptyList();
-      private void ensureStatemensAndExpressionsIsMutable() {
+      private void ensureStatementOrExpressionIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          statemensAndExpressions_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression>(statemensAndExpressions_);
+          statementOrExpression_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression>(statementOrExpression_);
           bitField0_ |= 0x00000001;
          }
       }
 
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> getStatemensAndExpressionsList() {
-        return java.util.Collections.unmodifiableList(statemensAndExpressions_);
+      public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> getStatementOrExpressionList() {
+        return java.util.Collections.unmodifiableList(statementOrExpression_);
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public int getStatemensAndExpressionsCount() {
-        return statemensAndExpressions_.size();
+      public int getStatementOrExpressionCount() {
+        return statementOrExpression_.size();
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression getStatemensAndExpressions(int index) {
-        return statemensAndExpressions_.get(index);
+      public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression getStatementOrExpression(int index) {
+        return statementOrExpression_.get(index);
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder setStatemensAndExpressions(
+      public Builder setStatementOrExpression(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureStatemensAndExpressionsIsMutable();
-        statemensAndExpressions_.set(index, value);
+        ensureStatementOrExpressionIsMutable();
+        statementOrExpression_.set(index, value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder setStatemensAndExpressions(
+      public Builder setStatementOrExpression(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression.Builder builderForValue) {
-        ensureStatemensAndExpressionsIsMutable();
-        statemensAndExpressions_.set(index, builderForValue.build());
+        ensureStatementOrExpressionIsMutable();
+        statementOrExpression_.set(index, builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder addStatemensAndExpressions(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression value) {
+      public Builder addStatementOrExpression(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureStatemensAndExpressionsIsMutable();
-        statemensAndExpressions_.add(value);
+        ensureStatementOrExpressionIsMutable();
+        statementOrExpression_.add(value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder addStatemensAndExpressions(
+      public Builder addStatementOrExpression(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureStatemensAndExpressionsIsMutable();
-        statemensAndExpressions_.add(index, value);
+        ensureStatementOrExpressionIsMutable();
+        statementOrExpression_.add(index, value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder addStatemensAndExpressions(
+      public Builder addStatementOrExpression(
           org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression.Builder builderForValue) {
-        ensureStatemensAndExpressionsIsMutable();
-        statemensAndExpressions_.add(builderForValue.build());
+        ensureStatementOrExpressionIsMutable();
+        statementOrExpression_.add(builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder addStatemensAndExpressions(
+      public Builder addStatementOrExpression(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression.Builder builderForValue) {
-        ensureStatemensAndExpressionsIsMutable();
-        statemensAndExpressions_.add(index, builderForValue.build());
+        ensureStatementOrExpressionIsMutable();
+        statementOrExpression_.add(index, builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder addAllStatemensAndExpressions(
+      public Builder addAllStatementOrExpression(
           java.lang.Iterable<? extends org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression> values) {
-        ensureStatemensAndExpressionsIsMutable();
+        ensureStatementOrExpressionIsMutable();
         org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
-            values, statemensAndExpressions_);
+            values, statementOrExpression_);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder clearStatemensAndExpressions() {
-        statemensAndExpressions_ = java.util.Collections.emptyList();
+      public Builder clearStatementOrExpression() {
+        statementOrExpression_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statemens_and_expressions = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.XStatementOrExpression statement_or_expression = 1;</code>
        */
-      public Builder removeStatemensAndExpressions(int index) {
-        ensureStatemensAndExpressionsIsMutable();
-        statemensAndExpressions_.remove(index);
+      public Builder removeStatementOrExpression(int index) {
+        ensureStatementOrExpressionIsMutable();
+        statementOrExpression_.remove(index);
 
         return this;
       }
@@ -2074,11 +2074,11 @@ public final class JvmIr {
       org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
     /**
-     * <code>required int64 id = 1;</code>
+     * <code>required fixed64 id = 1;</code>
      */
     boolean hasId();
     /**
-     * <code>required int64 id = 1;</code>
+     * <code>required fixed64 id = 1;</code>
      */
     long getId();
 
@@ -2149,9 +2149,9 @@ public final class JvmIr {
               }
               break;
             }
-            case 8: {
+            case 9: {
               bitField0_ |= 0x00000001;
-              id_ = input.readInt64();
+              id_ = input.readFixed64();
               break;
             }
             case 16: {
@@ -2196,13 +2196,13 @@ public final class JvmIr {
     public static final int ID_FIELD_NUMBER = 1;
     private long id_;
     /**
-     * <code>required int64 id = 1;</code>
+     * <code>required fixed64 id = 1;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int64 id = 1;</code>
+     * <code>required fixed64 id = 1;</code>
      */
     public long getId() {
       return id_;
@@ -2257,7 +2257,7 @@ public final class JvmIr {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt64(1, id_);
+        output.writeFixed64(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, index_);
@@ -2273,7 +2273,7 @@ public final class JvmIr {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeInt64Size(1, id_);
+          .computeFixed64Size(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -2458,19 +2458,19 @@ public final class JvmIr {
 
       private long id_ ;
       /**
-       * <code>required int64 id = 1;</code>
+       * <code>required fixed64 id = 1;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int64 id = 1;</code>
+       * <code>required fixed64 id = 1;</code>
        */
       public long getId() {
         return id_;
       }
       /**
-       * <code>required int64 id = 1;</code>
+       * <code>required fixed64 id = 1;</code>
        */
       public Builder setId(long value) {
         bitField0_ |= 0x00000001;
@@ -2479,7 +2479,7 @@ public final class JvmIr {
         return this;
       }
       /**
-       * <code>required int64 id = 1;</code>
+       * <code>required fixed64 id = 1;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -3086,32 +3086,32 @@ public final class JvmIr {
       org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
      */
     java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> 
-        getPackagesList();
+        getPackageList();
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
      */
-    org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage getPackages(int index);
+    org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage getPackage(int index);
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
      */
-    int getPackagesCount();
+    int getPackageCount();
 
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
      */
     java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> 
-        getReferencesList();
+        getReferenceList();
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
      */
-    org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference getReferences(int index);
+    org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference getReference(int index);
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
      */
-    int getReferencesCount();
+    int getReferenceCount();
   }
   /**
    * Protobuf type {@code org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalRefs}
@@ -3165,18 +3165,18 @@ public final class JvmIr {
             }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                packages_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage>();
+                package_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              packages_.add(input.readMessage(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage.PARSER, extensionRegistry));
+              package_.add(input.readMessage(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage.PARSER, extensionRegistry));
               break;
             }
             case 18: {
               if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                references_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference>();
+                reference_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference>();
                 mutable_bitField0_ |= 0x00000002;
               }
-              references_.add(input.readMessage(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference.PARSER, extensionRegistry));
+              reference_.add(input.readMessage(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference.PARSER, extensionRegistry));
               break;
             }
           }
@@ -3188,10 +3188,10 @@ public final class JvmIr {
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-          packages_ = java.util.Collections.unmodifiableList(packages_);
+          package_ = java.util.Collections.unmodifiableList(package_);
         }
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-          references_ = java.util.Collections.unmodifiableList(references_);
+          reference_ = java.util.Collections.unmodifiableList(reference_);
         }
         try {
           unknownFieldsCodedOutput.flush();
@@ -3218,79 +3218,79 @@ public final class JvmIr {
       return PARSER;
     }
 
-    public static final int PACKAGES_FIELD_NUMBER = 1;
-    private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> packages_;
+    public static final int PACKAGE_FIELD_NUMBER = 1;
+    private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> package_;
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
      */
-    public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> getPackagesList() {
-      return packages_;
+    public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> getPackageList() {
+      return package_;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
      */
     public java.util.List<? extends org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackageOrBuilder> 
-        getPackagesOrBuilderList() {
-      return packages_;
+        getPackageOrBuilderList() {
+      return package_;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
      */
-    public int getPackagesCount() {
-      return packages_.size();
+    public int getPackageCount() {
+      return package_.size();
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
      */
-    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage getPackages(int index) {
-      return packages_.get(index);
+    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage getPackage(int index) {
+      return package_.get(index);
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
      */
-    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackageOrBuilder getPackagesOrBuilder(
+    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackageOrBuilder getPackageOrBuilder(
         int index) {
-      return packages_.get(index);
+      return package_.get(index);
     }
 
-    public static final int REFERENCES_FIELD_NUMBER = 2;
-    private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> references_;
+    public static final int REFERENCE_FIELD_NUMBER = 2;
+    private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> reference_;
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
      */
-    public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> getReferencesList() {
-      return references_;
+    public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> getReferenceList() {
+      return reference_;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
      */
     public java.util.List<? extends org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReferenceOrBuilder> 
-        getReferencesOrBuilderList() {
-      return references_;
+        getReferenceOrBuilderList() {
+      return reference_;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
      */
-    public int getReferencesCount() {
-      return references_.size();
+    public int getReferenceCount() {
+      return reference_.size();
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
      */
-    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference getReferences(int index) {
-      return references_.get(index);
+    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference getReference(int index) {
+      return reference_.get(index);
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
      */
-    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReferenceOrBuilder getReferencesOrBuilder(
+    public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReferenceOrBuilder getReferenceOrBuilder(
         int index) {
-      return references_.get(index);
+      return reference_.get(index);
     }
 
     private void initFields() {
-      packages_ = java.util.Collections.emptyList();
-      references_ = java.util.Collections.emptyList();
+      package_ = java.util.Collections.emptyList();
+      reference_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3298,14 +3298,14 @@ public final class JvmIr {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      for (int i = 0; i < getPackagesCount(); i++) {
-        if (!getPackages(i).isInitialized()) {
+      for (int i = 0; i < getPackageCount(); i++) {
+        if (!getPackage(i).isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
       }
-      for (int i = 0; i < getReferencesCount(); i++) {
-        if (!getReferences(i).isInitialized()) {
+      for (int i = 0; i < getReferenceCount(); i++) {
+        if (!getReference(i).isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -3317,11 +3317,11 @@ public final class JvmIr {
     public void writeTo(org.jetbrains.kotlin.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      for (int i = 0; i < packages_.size(); i++) {
-        output.writeMessage(1, packages_.get(i));
+      for (int i = 0; i < package_.size(); i++) {
+        output.writeMessage(1, package_.get(i));
       }
-      for (int i = 0; i < references_.size(); i++) {
-        output.writeMessage(2, references_.get(i));
+      for (int i = 0; i < reference_.size(); i++) {
+        output.writeMessage(2, reference_.get(i));
       }
       output.writeRawBytes(unknownFields);
     }
@@ -3332,13 +3332,13 @@ public final class JvmIr {
       if (size != -1) return size;
 
       size = 0;
-      for (int i = 0; i < packages_.size(); i++) {
+      for (int i = 0; i < package_.size(); i++) {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeMessageSize(1, packages_.get(i));
+          .computeMessageSize(1, package_.get(i));
       }
-      for (int i = 0; i < references_.size(); i++) {
+      for (int i = 0; i < reference_.size(); i++) {
         size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeMessageSize(2, references_.get(i));
+          .computeMessageSize(2, reference_.get(i));
       }
       size += unknownFields.size();
       memoizedSerializedSize = size;
@@ -3434,9 +3434,9 @@ public final class JvmIr {
 
       public Builder clear() {
         super.clear();
-        packages_ = java.util.Collections.emptyList();
+        package_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
-        references_ = java.util.Collections.emptyList();
+        reference_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
@@ -3461,37 +3461,37 @@ public final class JvmIr {
         org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalRefs result = new org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalRefs(this);
         int from_bitField0_ = bitField0_;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          packages_ = java.util.Collections.unmodifiableList(packages_);
+          package_ = java.util.Collections.unmodifiableList(package_);
           bitField0_ = (bitField0_ & ~0x00000001);
         }
-        result.packages_ = packages_;
+        result.package_ = package_;
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          references_ = java.util.Collections.unmodifiableList(references_);
+          reference_ = java.util.Collections.unmodifiableList(reference_);
           bitField0_ = (bitField0_ & ~0x00000002);
         }
-        result.references_ = references_;
+        result.reference_ = reference_;
         return result;
       }
 
       public Builder mergeFrom(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalRefs other) {
         if (other == org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalRefs.getDefaultInstance()) return this;
-        if (!other.packages_.isEmpty()) {
-          if (packages_.isEmpty()) {
-            packages_ = other.packages_;
+        if (!other.package_.isEmpty()) {
+          if (package_.isEmpty()) {
+            package_ = other.package_;
             bitField0_ = (bitField0_ & ~0x00000001);
           } else {
-            ensurePackagesIsMutable();
-            packages_.addAll(other.packages_);
+            ensurePackageIsMutable();
+            package_.addAll(other.package_);
           }
           
         }
-        if (!other.references_.isEmpty()) {
-          if (references_.isEmpty()) {
-            references_ = other.references_;
+        if (!other.reference_.isEmpty()) {
+          if (reference_.isEmpty()) {
+            reference_ = other.reference_;
             bitField0_ = (bitField0_ & ~0x00000002);
           } else {
-            ensureReferencesIsMutable();
-            references_.addAll(other.references_);
+            ensureReferenceIsMutable();
+            reference_.addAll(other.reference_);
           }
           
         }
@@ -3501,14 +3501,14 @@ public final class JvmIr {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getPackagesCount(); i++) {
-          if (!getPackages(i).isInitialized()) {
+        for (int i = 0; i < getPackageCount(); i++) {
+          if (!getPackage(i).isInitialized()) {
             
             return false;
           }
         }
-        for (int i = 0; i < getReferencesCount(); i++) {
-          if (!getReferences(i).isInitialized()) {
+        for (int i = 0; i < getReferenceCount(); i++) {
+          if (!getReference(i).isInitialized()) {
             
             return false;
           }
@@ -3535,252 +3535,252 @@ public final class JvmIr {
       }
       private int bitField0_;
 
-      private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> packages_ =
+      private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> package_ =
         java.util.Collections.emptyList();
-      private void ensurePackagesIsMutable() {
+      private void ensurePackageIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          packages_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage>(packages_);
+          package_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage>(package_);
           bitField0_ |= 0x00000001;
          }
       }
 
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> getPackagesList() {
-        return java.util.Collections.unmodifiableList(packages_);
+      public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> getPackageList() {
+        return java.util.Collections.unmodifiableList(package_);
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public int getPackagesCount() {
-        return packages_.size();
+      public int getPackageCount() {
+        return package_.size();
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage getPackages(int index) {
-        return packages_.get(index);
+      public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage getPackage(int index) {
+        return package_.get(index);
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder setPackages(
+      public Builder setPackage(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePackagesIsMutable();
-        packages_.set(index, value);
+        ensurePackageIsMutable();
+        package_.set(index, value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder setPackages(
+      public Builder setPackage(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage.Builder builderForValue) {
-        ensurePackagesIsMutable();
-        packages_.set(index, builderForValue.build());
+        ensurePackageIsMutable();
+        package_.set(index, builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder addPackages(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage value) {
+      public Builder addPackage(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePackagesIsMutable();
-        packages_.add(value);
+        ensurePackageIsMutable();
+        package_.add(value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder addPackages(
+      public Builder addPackage(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensurePackagesIsMutable();
-        packages_.add(index, value);
+        ensurePackageIsMutable();
+        package_.add(index, value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder addPackages(
+      public Builder addPackage(
           org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage.Builder builderForValue) {
-        ensurePackagesIsMutable();
-        packages_.add(builderForValue.build());
+        ensurePackageIsMutable();
+        package_.add(builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder addPackages(
+      public Builder addPackage(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage.Builder builderForValue) {
-        ensurePackagesIsMutable();
-        packages_.add(index, builderForValue.build());
+        ensurePackageIsMutable();
+        package_.add(index, builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder addAllPackages(
+      public Builder addAllPackage(
           java.lang.Iterable<? extends org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.JvmExternalPackage> values) {
-        ensurePackagesIsMutable();
+        ensurePackageIsMutable();
         org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
-            values, packages_);
+            values, package_);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder clearPackages() {
-        packages_ = java.util.Collections.emptyList();
+      public Builder clearPackage() {
+        package_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage packages = 1;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmExternalPackage package = 1;</code>
        */
-      public Builder removePackages(int index) {
-        ensurePackagesIsMutable();
-        packages_.remove(index);
+      public Builder removePackage(int index) {
+        ensurePackageIsMutable();
+        package_.remove(index);
 
         return this;
       }
 
-      private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> references_ =
+      private java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> reference_ =
         java.util.Collections.emptyList();
-      private void ensureReferencesIsMutable() {
+      private void ensureReferenceIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          references_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference>(references_);
+          reference_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference>(reference_);
           bitField0_ |= 0x00000002;
          }
       }
 
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> getReferencesList() {
-        return java.util.Collections.unmodifiableList(references_);
+      public java.util.List<org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> getReferenceList() {
+        return java.util.Collections.unmodifiableList(reference_);
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public int getReferencesCount() {
-        return references_.size();
+      public int getReferenceCount() {
+        return reference_.size();
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference getReferences(int index) {
-        return references_.get(index);
+      public org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference getReference(int index) {
+        return reference_.get(index);
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder setReferences(
+      public Builder setReference(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureReferencesIsMutable();
-        references_.set(index, value);
+        ensureReferenceIsMutable();
+        reference_.set(index, value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder setReferences(
+      public Builder setReference(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference.Builder builderForValue) {
-        ensureReferencesIsMutable();
-        references_.set(index, builderForValue.build());
+        ensureReferenceIsMutable();
+        reference_.set(index, builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder addReferences(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference value) {
+      public Builder addReference(org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureReferencesIsMutable();
-        references_.add(value);
+        ensureReferenceIsMutable();
+        reference_.add(value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder addReferences(
+      public Builder addReference(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureReferencesIsMutable();
-        references_.add(index, value);
+        ensureReferenceIsMutable();
+        reference_.add(index, value);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder addReferences(
+      public Builder addReference(
           org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference.Builder builderForValue) {
-        ensureReferencesIsMutable();
-        references_.add(builderForValue.build());
+        ensureReferenceIsMutable();
+        reference_.add(builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder addReferences(
+      public Builder addReference(
           int index, org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference.Builder builderForValue) {
-        ensureReferencesIsMutable();
-        references_.add(index, builderForValue.build());
+        ensureReferenceIsMutable();
+        reference_.add(index, builderForValue.build());
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder addAllReferences(
+      public Builder addAllReference(
           java.lang.Iterable<? extends org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.ExternalReference> values) {
-        ensureReferencesIsMutable();
+        ensureReferenceIsMutable();
         org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
-            values, references_);
+            values, reference_);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder clearReferences() {
-        references_ = java.util.Collections.emptyList();
+      public Builder clearReference() {
+        reference_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
 
         return this;
       }
       /**
-       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference references = 2;</code>
+       * <code>repeated .org.jetbrains.kotlin.backend.jvm.serialization.proto.ExternalReference reference = 2;</code>
        */
-      public Builder removeReferences(int index) {
-        ensureReferencesIsMutable();
-        references_.remove(index);
+      public Builder removeReference(int index) {
+        ensureReferenceIsMutable();
+        reference_.remove(index);
 
         return this;
       }

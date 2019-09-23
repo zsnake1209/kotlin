@@ -51,7 +51,7 @@ class JvmIrDeserializer(
     val languageVersionSettings: LanguageVersionSettings
 ) : IrDeserializer {
 
-    val knownToplevelFqNames = mutableMapOf<Long, FqName>()
+    private val knownToplevelFqNames = mutableMapOf<Long, FqName>()
 
     private val deserializedSymbols = mutableMapOf<UniqId, IrSymbol>()
 
@@ -62,13 +62,14 @@ class JvmIrDeserializer(
         val descriptor =
             symbol.descriptor as? DeserializedMemberDescriptor ?: symbol.descriptor as? DeserializedClassDescriptor
             ?: return backoff(symbol)
-        val moduleDescriptor = descriptor.module
 
         val toplevelDescriptor = descriptor.toToplevel()
-        val packageFragment = symbolTable.findOrDeclareExternalPackageFragment(toplevelDescriptor.containingDeclaration as PackageFragmentDescriptor)
+        val packageFragment =
+            symbolTable.findOrDeclareExternalPackageFragment(toplevelDescriptor.containingDeclaration as PackageFragmentDescriptor)
 
         if (toplevelDescriptor is ClassDescriptor) {
-            val classHeader = (toplevelDescriptor.source as? KotlinJvmBinarySourceElement)?.binaryClass?.classHeader ?: return backoff(symbol)
+            val classHeader =
+                (toplevelDescriptor.source as? KotlinJvmBinarySourceElement)?.binaryClass?.classHeader ?: return backoff(symbol)
             if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return backoff(symbol)
 
             val irProto = JvmIr.JvmIrClass.parseFrom(classHeader.serializedIr)
@@ -79,7 +80,8 @@ class JvmIrDeserializer(
             assert(symbol.isBound)
             return symbol.owner as IrDeclaration
         } else {
-            val jvmPackagePartSource = (toplevelDescriptor as DeserializedMemberDescriptor).containerSource as? JvmPackagePartSource ?: return backoff(symbol)
+            val jvmPackagePartSource =
+                (toplevelDescriptor as DeserializedMemberDescriptor).containerSource as? JvmPackagePartSource ?: return backoff(symbol)
             val classHeader = jvmPackagePartSource.knownJvmBinaryClass?.classHeader ?: return backoff(symbol)
             if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return backoff(symbol)
 
@@ -124,8 +126,8 @@ class JvmIrDeserializer(
 
     /* External references are deserialized lazily, as the last resource for when there is no descriptor available for a given symbol ref */
     private fun consumeExternalRefsTable(table: JvmIr.ExternalRefs) {
-        for (reference in table.referencesList) {
-            externalReferences[reference.id] = table.packagesList[reference.index]
+        for (reference in table.referenceList) {
+            externalReferences[reference.id] = table.packageList[reference.index]
         }
     }
 
@@ -134,16 +136,20 @@ class JvmIrDeserializer(
 
     override fun declareForwardDeclarations() {}
 
-    abstract inner class FileDeserializer(val moduleDescriptor: ModuleDescriptor, private val auxTables: JvmIr.AuxTables, backoff: (IrSymbol) -> IrDeclaration) :
+    abstract inner class FileDeserializer(
+        val moduleDescriptor: ModuleDescriptor,
+        private val auxTables: JvmIr.AuxTables,
+        backoff: (IrSymbol) -> IrDeclaration
+    ) :
         IrFileDeserializer(logger, builtIns, symbolTable) {
 
-        val uniqIdAware = JvmDescriptorUniqIdAware(symbolTable, backoff)
+        private val uniqIdAware = JvmDescriptorUniqIdAware(symbolTable, backoff)
 
-        val descriptorReferenceDeserializer = JvmDescriptorReferenceDeserializer(moduleDescriptor, uniqIdAware)
+        private val descriptorReferenceDeserializer = JvmDescriptorReferenceDeserializer(moduleDescriptor, uniqIdAware)
 
         private var moduleLoops = mutableMapOf<Int, IrLoopBase>()
 
-        abstract protected fun referenceDeserializedSymbol(proto: ProtoSymbolData, descriptor: DeclarationDescriptor?): IrSymbol
+        protected abstract fun referenceDeserializedSymbol(proto: ProtoSymbolData, descriptor: DeclarationDescriptor?): IrSymbol
 
         protected fun referenceDeserializedSymbolBare(
             proto: ProtoSymbolData,
@@ -262,13 +268,13 @@ class JvmIrDeserializer(
             moduleLoops.getOrPut(loopIndex, loopBuilder)
 
         override fun deserializeExpressionBody(proto: org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex): IrExpression {
-            val bodyData = auxTables.statementsAndExpressionsTable.getStatemensAndExpressions(proto.index)
+            val bodyData = auxTables.statementsAndExpressionsTable.getStatementOrExpression(proto.index)
             require(bodyData.hasExpression())
             return deserializeExpression(bodyData.expression)
         }
 
         override fun deserializeStatementBody(proto: org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex): IrElement {
-            val bodyData = auxTables.statementsAndExpressionsTable.getStatemensAndExpressions(proto.index)
+            val bodyData = auxTables.statementsAndExpressionsTable.getStatementOrExpression(proto.index)
             require(bodyData.hasStatement())
             return deserializeStatement(bodyData.statement)
         }
@@ -290,6 +296,7 @@ class JvmIrDeserializer(
             return referenceDeserializedSymbolBare(proto, descriptor)
         }
     }
+
     inner class FileDeserializerWithReferenceLookup(
         moduleDescriptor: ModuleDescriptor,
         private val auxTables: JvmIr.AuxTables,

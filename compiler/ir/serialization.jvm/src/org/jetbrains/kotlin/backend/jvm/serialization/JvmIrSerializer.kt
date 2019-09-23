@@ -92,7 +92,7 @@ class JvmIrSerializer(
             .addAllStrings(protoStringArray)
             .build()
         proto.statementsAndExpressionsTable = StatementsAndExpressionsTable.newBuilder()
-            .addAllStatemensAndExpressions(
+            .addAllStatementOrExpression(
                 protoBodyArray.asIterable().map {
                     when (it) {
                         is XStatementOrExpression.XStatement -> ProtoStatementOrExpression.newBuilder()
@@ -111,7 +111,7 @@ class JvmIrSerializer(
     private fun serializeExternalReferences(externalReferencesInfo: ExternalReferencesInfo): JvmIr.ExternalRefs {
         val proto = JvmIr.ExternalRefs.newBuilder()
         externalReferencesInfo.packageFragments.forEach { packageFragment ->
-            proto.addPackages(
+            proto.addPackage(
                 JvmIr.JvmExternalPackage.newBuilder()
                     .setFqName(serializeFqName(packageFragment.fqName))
                     .setDeclarationContainer(
@@ -121,7 +121,7 @@ class JvmIrSerializer(
             )
         }
         for ((reference, extPackageIndex) in externalReferencesInfo.references) {
-            proto.addReferences(
+            proto.addReference(
                 JvmIr.ExternalReference.newBuilder()
                     .setId(reference.uniqId)
                     .setIndex(extPackageIndex)

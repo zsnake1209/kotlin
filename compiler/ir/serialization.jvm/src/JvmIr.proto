@@ -8,7 +8,7 @@ option optimize_for = LITE_RUNTIME;
 /* Stored in JVM .class annotations */
 
 message UniqIdInfo {
-  required int64 id = 1;
+  required fixed64 id = 1;
   required common.serialization.proto.FqName toplevel_fq_name = 2;
 }
 
@@ -24,11 +24,11 @@ message XStatementOrExpression {
 }
 
 message StatementsAndExpressionsTable {
-  repeated XStatementOrExpression statemens_and_expressions = 1;
+  repeated XStatementOrExpression statement_or_expression = 1;
 }
 
 message ExternalReference {
-  required int64 id = 1;
+  required fixed64 id = 1;
   required int32 index = 2; /* index into the table of packages in ExternalRefs */
 }
 
@@ -38,8 +38,8 @@ message JvmExternalPackage {
 }
 
 message ExternalRefs {
-  repeated JvmExternalPackage packages = 1;
-  repeated ExternalReference references = 2;
+  repeated JvmExternalPackage package = 1;
+  repeated ExternalReference reference = 2;
 }
 
 message AuxTables {
