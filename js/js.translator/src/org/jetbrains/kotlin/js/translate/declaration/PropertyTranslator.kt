@@ -34,7 +34,6 @@ import org.jetbrains.kotlin.js.translate.general.Translation
 import org.jetbrains.kotlin.js.translate.utils.BindingUtils
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils.pureFqn
 import org.jetbrains.kotlin.js.translate.utils.JsDescriptorUtils
-import org.jetbrains.kotlin.js.translate.utils.TranslationUtils
 import org.jetbrains.kotlin.js.translate.utils.TranslationUtils.*
 import org.jetbrains.kotlin.js.translate.utils.finalElement
 import org.jetbrains.kotlin.js.translate.utils.jsAstUtils.addParameter
@@ -52,29 +51,30 @@ import org.jetbrains.kotlin.resolve.source.getPsi
  */
 
 fun translateAccessors(
-        descriptor: VariableDescriptorWithAccessors,
-        declaration: KtProperty?,
-        result: MutableList<JsPropertyInitializer>,
-        context: TranslationContext
+    descriptor: VariableDescriptorWithAccessors,
+    declaration: KtProperty?,
+    result: MutableList<JsPropertyInitializer>,
+    context: TranslationContext
 ) {
     if (descriptor is PropertyDescriptor
-        && (descriptor.modality == Modality.ABSTRACT || JsDescriptorUtils.isSimpleFinalProperty(descriptor))) return
+        && (descriptor.modality == Modality.ABSTRACT || JsDescriptorUtils.isSimpleFinalProperty(descriptor))
+    ) return
 
     PropertyTranslator(descriptor, declaration, context).translate(result)
 }
 
 fun translateAccessors(
-        descriptor: VariableDescriptorWithAccessors,
-        result: MutableList<JsPropertyInitializer>,
-        context: TranslationContext
+    descriptor: VariableDescriptorWithAccessors,
+    result: MutableList<JsPropertyInitializer>,
+    context: TranslationContext
 ) {
     translateAccessors(descriptor, null, result, context)
 }
 
 fun MutableList<JsPropertyInitializer>.addGetterAndSetter(
-        descriptor: VariableDescriptorWithAccessors,
-        generateGetter: () -> JsPropertyInitializer,
-        generateSetter: () -> JsPropertyInitializer
+    descriptor: VariableDescriptorWithAccessors,
+    generateGetter: () -> JsPropertyInitializer,
+    generateSetter: () -> JsPropertyInitializer
 ) {
     add(generateGetter())
     if (descriptor.isVar) {
@@ -83,9 +83,9 @@ fun MutableList<JsPropertyInitializer>.addGetterAndSetter(
 }
 
 class DefaultPropertyTranslator(
-        val descriptor: VariableDescriptorWithAccessors,
-        context: TranslationContext,
-        val delegateReference: JsExpression
+    private val descriptor: VariableDescriptorWithAccessors,
+    context: TranslationContext,
+    private val delegateReference: JsExpression
 ) : AbstractTranslator(context) {
     fun generateDefaultGetterFunction(getterDescriptor: VariableAccessorDescriptor, function: JsFunction) {
         val delegatedCall = bindingContext()[BindingContext.DELEGATED_PROPERTY_RESOLVED_CALL, getterDescriptor]
@@ -99,23 +99,29 @@ class DefaultPropertyTranslator(
         var result: JsExpression = backingFieldReference(context(), descriptor as PropertyDescriptor)
         if (getterDescriptor is PropertyAccessorDescriptor && getterDescriptor.correspondingProperty.isLateInit) {
             val throwFunction = context().getReferenceToIntrinsic(Namer.THROW_UNINITIALIZED_PROPERTY_ACCESS_EXCEPTION)
-            function.body.statements += JsIf(JsBinaryOperation(JsBinaryOperator.EQ, result, JsNullLiteral()),
-                                             JsReturn(JsInvocation(throwFunction,
-                                                                   JsStringLiteral(getterDescriptor.correspondingProperty.name.asString()))))
+            function.body.statements += JsIf(
+                JsBinaryOperation(JsBinaryOperator.EQ, result, JsNullLiteral()),
+                JsReturn(
+                    JsInvocation(
+                        throwFunction,
+                        JsStringLiteral(getterDescriptor.correspondingProperty.name.asString())
+                    )
+                )
+            )
         }
-        result = TranslationUtils.coerce(context(), result, TranslationUtils.getReturnTypeForCoercion(getterDescriptor))
+        result = coerce(context(), result, getReturnTypeForCoercion(getterDescriptor))
         function.body.statements += JsReturn(result).apply { source = descriptor.source.getPsi() }
     }
 
     private fun generateDelegatedGetterFunction(
-            getterDescriptor: VariableAccessorDescriptor,
-            delegatedCall: ResolvedCall<FunctionDescriptor>,
-            function: JsFunction
+        getterDescriptor: VariableAccessorDescriptor,
+        delegatedCall: ResolvedCall<FunctionDescriptor>,
+        function: JsFunction
     ) {
         val host = translateHost(getterDescriptor, function)
         val delegateContext = context()
-                .newDeclarationIfNecessary(getterDescriptor, function)
-                .contextWithPropertyMetadataCreationIntrinsified(delegatedCall, descriptor, host)
+            .newDeclarationIfNecessary(getterDescriptor, function)
+            .contextWithPropertyMetadataCreationIntrinsified(delegatedCall, descriptor, host)
 
         val delegatedJsCall = CallTranslator.translate(delegateContext, delegatedCall, delegateReference).apply {
             source = getterDescriptor.source.getPsi()
@@ -136,34 +142,33 @@ class DefaultPropertyTranslator(
         if (delegatedCall != null) {
             val host = translateHost(setterDescriptor, function)
             val delegateContext = withAliased
-                    .newDeclarationIfNecessary(setterDescriptor, function)
-                    .contextWithPropertyMetadataCreationIntrinsified(delegatedCall, descriptor, host)
+                .newDeclarationIfNecessary(setterDescriptor, function)
+                .contextWithPropertyMetadataCreationIntrinsified(delegatedCall, descriptor, host)
             val delegatedJsCall = CallTranslator.translate(delegateContext, delegatedCall, delegateReference).apply {
                 source = setterDescriptor.source.getPsi()
             }
             function.addStatement(delegatedJsCall.makeStmt())
-        }
-        else {
+        } else {
             assert(!descriptor.isExtension) { "Unexpected extension property $descriptor}" }
             assert(descriptor is PropertyDescriptor) { "Property descriptor expected: $descriptor" }
             var value: JsExpression = valueParameter.makeRef().apply {
-                type = TranslationUtils.getReturnTypeForCoercion(setterDescriptor.correspondingVariable)
+                type = getReturnTypeForCoercion(setterDescriptor.correspondingVariable)
             }
-            value = TranslationUtils.coerce(
-                    context(), value, TranslationUtils.getReturnTypeForCoercion(setterDescriptor.correspondingVariable, true))
+            value = coerce(
+                context(), value, getReturnTypeForCoercion(setterDescriptor.correspondingVariable, true)
+            )
             val assignment = assignmentToBackingField(withAliased, descriptor as PropertyDescriptor, value)
             function.addStatement(assignment.apply { source = descriptor.source.getPsi() }.makeStmt())
         }
     }
 
     private fun TranslationContext.newDeclarationIfNecessary(
-            descriptor: VariableAccessorDescriptor,
-            function: JsFunction
+        descriptor: VariableAccessorDescriptor,
+        function: JsFunction
     ): TranslationContext {
         return if (descriptor.correspondingVariable !is LocalVariableDescriptor) {
             newDeclaration(descriptor)
-        }
-        else {
+        } else {
             innerBlock(function.body)
         }
     }
@@ -171,8 +176,7 @@ class DefaultPropertyTranslator(
     private fun translateHost(accessorDescriptor: VariableAccessorDescriptor, function: JsFunction): JsExpression {
         return if (accessorDescriptor.isExtension) {
             function.addParameter(getReceiverParameterName(), 0).name.makeRef()
-        }
-        else {
+        } else {
             JsThisRef()
         }
     }
@@ -187,27 +191,28 @@ fun TranslationContext.translateDelegateOrInitializerExpression(expression: KtPr
     return if (provideDelegateCall != null) {
         val innerContext = this.contextWithPropertyMetadataCreationIntrinsified(provideDelegateCall, propertyDescriptor, JsThisRef())
         CallTranslator.translate(innerContext, provideDelegateCall, initializer)
-    }
-    else {
-        TranslationUtils.coerce(this, initializer, propertyDescriptor.type)
+    } else {
+        coerce(this, initializer, propertyDescriptor.type)
     }
 }
 
 fun TranslationContext.contextWithPropertyMetadataCreationIntrinsified(
-        delegatedCall: ResolvedCall<FunctionDescriptor>,
-        property: VariableDescriptorWithAccessors,
-        host: JsExpression
+    delegatedCall: ResolvedCall<FunctionDescriptor>,
+    property: VariableDescriptorWithAccessors,
+    host: JsExpression
 ): TranslationContext {
     // 0th argument is instance, 1st is KProperty, 2nd (for setter) is value
     val hostExpression =
-            (delegatedCall.valueArgumentsByIndex!![0] as ExpressionValueArgument).valueArgument!!.getArgumentExpression()
+        (delegatedCall.valueArgumentsByIndex!![0] as ExpressionValueArgument).valueArgument!!.getArgumentExpression()
     val fakeArgumentExpression =
-            (delegatedCall.valueArgumentsByIndex!![1] as ExpressionValueArgument).valueArgument!!.getArgumentExpression()
+        (delegatedCall.valueArgumentsByIndex!![1] as ExpressionValueArgument).valueArgument!!.getArgumentExpression()
     val metadataRef = pureFqn(getVariableForPropertyMetadata(property), null).apply { synthetic = true }
-    return innerContextWithAliasesForExpressions(mapOf(
+    return innerContextWithAliasesForExpressions(
+        mapOf(
             hostExpression to host,
             fakeArgumentExpression to metadataRef
-    ))
+        )
+    )
 }
 
 fun KtProperty.hasCustomGetter() = getter?.hasBody() ?: false
@@ -215,9 +220,9 @@ fun KtProperty.hasCustomGetter() = getter?.hasBody() ?: false
 fun KtProperty.hasCustomSetter() = setter?.hasBody() ?: false
 
 private class PropertyTranslator(
-        val descriptor: VariableDescriptorWithAccessors,
-        val declaration: KtProperty?,
-        context: TranslationContext
+    val descriptor: VariableDescriptorWithAccessors,
+    val declaration: KtProperty?,
+    context: TranslationContext
 ) : AbstractTranslator(context) {
 
     fun translate(result: MutableList<JsPropertyInitializer>) {
@@ -225,18 +230,18 @@ private class PropertyTranslator(
     }
 
     private fun generateGetter(): JsPropertyInitializer =
-            if (declaration?.hasCustomGetter() ?: false) translateCustomAccessor(getCustomGetterDeclaration()) else generateDefaultGetter()
+        if (declaration?.hasCustomGetter() == true) translateCustomAccessor(getCustomGetterDeclaration()) else generateDefaultGetter()
 
     private fun generateSetter(): JsPropertyInitializer =
-            if (declaration?.hasCustomSetter() ?: false) translateCustomAccessor(getCustomSetterDeclaration()) else generateDefaultSetter()
+        if (declaration?.hasCustomSetter() == true) translateCustomAccessor(getCustomSetterDeclaration()) else generateDefaultSetter()
 
     private fun getCustomGetterDeclaration(): KtPropertyAccessor =
-            declaration?.getter ?:
-            throw IllegalStateException("declaration and getter should not be null descriptor=$descriptor declaration=$declaration")
+        declaration?.getter
+            ?: throw IllegalStateException("declaration and getter should not be null descriptor=$descriptor declaration=$declaration")
 
     private fun getCustomSetterDeclaration(): KtPropertyAccessor =
-            declaration?.setter ?:
-            throw IllegalStateException("declaration and setter should not be null descriptor=$descriptor declaration=$declaration")
+        declaration?.setter
+            ?: throw IllegalStateException("declaration and setter should not be null descriptor=$descriptor declaration=$declaration")
 
     private fun generateDefaultGetter(): JsPropertyInitializer {
         val getterDescriptor = descriptor.getter ?: throw IllegalStateException("Getter descriptor should not be null")
@@ -257,7 +262,7 @@ private class PropertyTranslator(
     }
 
     private fun generateDefaultAccessor(accessorDescriptor: VariableAccessorDescriptor, function: JsFunction): JsPropertyInitializer =
-            translateFunctionAsEcma5PropertyDescriptor(function, accessorDescriptor, context())
+        translateFunctionAsEcma5PropertyDescriptor(function, accessorDescriptor, context())
 
     private fun translateCustomAccessor(expression: KtPropertyAccessor): JsPropertyInitializer {
         val descriptor = BindingUtils.getFunctionDescriptor(bindingContext(), expression)
@@ -278,14 +283,14 @@ private class PropertyTranslator(
 
     private fun accessorDescription(accessorDescriptor: VariableAccessorDescriptor): String {
         val accessorType =
-                when (accessorDescriptor) {
-                    is PropertyGetterDescriptor, is LocalVariableAccessorDescriptor.Getter ->
-                        "getter"
-                    is PropertySetterDescriptor, is LocalVariableAccessorDescriptor.Setter ->
-                        "setter"
-                    else ->
-                        throw IllegalArgumentException("Unknown accessor type ${accessorDescriptor::class.java}")
-                }
+            when (accessorDescriptor) {
+                is PropertyGetterDescriptor, is LocalVariableAccessorDescriptor.Getter ->
+                    "getter"
+                is PropertySetterDescriptor, is LocalVariableAccessorDescriptor.Setter ->
+                    "setter"
+                else ->
+                    throw IllegalArgumentException("Unknown accessor type ${accessorDescriptor::class.java}")
+            }
 
         val name = accessorDescriptor.name.asString()
         return "$accessorType for $name"
