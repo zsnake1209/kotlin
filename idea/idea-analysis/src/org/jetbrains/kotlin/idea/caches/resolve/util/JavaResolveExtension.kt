@@ -151,19 +151,10 @@ private fun <T : DeclarationDescriptorWithSource> Collection<T>.findByJavaElemen
 
 fun PsiElement.hasJavaResolutionFacade(): Boolean = this.originalElement.containingFile != null
 
-fun PsiElement.javaResolutionFacade() =
-    KotlinCacheService.getInstance(project).getResolutionFacadeByFile(
-        this.originalElement.containingFile ?: reportCouldNotCreateJavaFacade(),
+fun PsiElement.javaResolutionFacade(): ResolutionFacade? {
+    val file = originalElement.containingFile ?: return null
+    return KotlinCacheService.getInstance(project).getResolutionFacadeByFile(
+        file,
         JvmPlatforms.unspecifiedJvmPlatform
     )
-
-private fun PsiElement.reportCouldNotCreateJavaFacade(): Nothing =
-    runReadAction {
-        error(
-            "Could not get javaResolutionFacade for element:\n" +
-                    "same as originalElement = ${this === this.originalElement}" +
-                    "class = ${javaClass.name}, text = $text, containingFile = ${containingFile?.name}\n" +
-                    "originalElement.class = ${originalElement.javaClass.name}, originalElement.text = ${originalElement.text}), " +
-                    "originalElement.containingFile = ${originalElement.containingFile?.name}"
-        )
-    }
+}
