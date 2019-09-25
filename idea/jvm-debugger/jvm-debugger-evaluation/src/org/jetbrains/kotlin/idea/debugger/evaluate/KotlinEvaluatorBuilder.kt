@@ -16,12 +16,14 @@
 
 package org.jetbrains.kotlin.idea.debugger.evaluate
 
+import com.intellij.debugger.PositionManager
 import com.intellij.debugger.SourcePosition
 import com.intellij.debugger.engine.DebugProcessImpl
 import com.intellij.debugger.engine.evaluation.EvaluateException
 import com.intellij.debugger.engine.evaluation.EvaluateExceptionUtil
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
 import com.intellij.debugger.engine.evaluation.expression.*
+import com.intellij.debugger.jdi.StackFrameProxyImpl
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.Logger
@@ -68,6 +70,10 @@ import org.jetbrains.kotlin.idea.debugger.evaluate.EvaluationStatus.EvaluationCo
 import org.jetbrains.kotlin.idea.debugger.evaluate.compilingEvaluator.ClassLoadingResult
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
+import org.jetbrains.kotlin.psi.psiUtil.endOffset
+import org.jetbrains.kotlin.psi.psiUtil.startOffset
+import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
+import org.jetbrains.org.objectweb.asm.Type
 import java.util.*
 
 internal val LOG = Logger.getInstance(KotlinEvaluator::class.java)
@@ -387,7 +393,7 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
         val args = valueParameters.zip(asmValueParameters)
 
         return args.map { (parameter, asmType) ->
-            val result = variableFinder.find(parameter, asmType)
+            var result = variableFinder.find(parameter, asmType)
 
             if (result == null) {
                 val name = parameter.debugString
@@ -402,8 +408,12 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
                     status.error(EvaluationError.CoroutineContextUnavailable)
                     evaluationException("'coroutineContext' is not available")
                 } else if (parameter in compiledData.crossingBounds) {
-                    status.error(EvaluationError.ParameterNotCaptured)
-                    evaluationException("'$name' is not captured")
+                    // look through the previous frames in the stack for closure
+                    result = findCrossingBoundsVariable(variableFinder.context, parameter, asmType)
+                    if (result == null) {
+                        status.error(EvaluationError.ParameterNotCaptured)
+                        evaluationException("'$name' is not captured")
+                    }
                 } else if (parameter.kind == CodeFragmentParameter.Kind.FIELD_VAR) {
                     status.error(EvaluationError.BackingFieldNotFound)
                     evaluationException("Cannot find the backing field '${parameter.name}'")
@@ -418,6 +428,37 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
 
             result.value
         }
+    }
+
+    private fun findCrossingBoundsVariable(
+        context: ExecutionContext,
+        parameter: CodeFragmentParameter,
+        asmType: Type
+    ): VariableFinder.Result? {
+        val thread = context.frameProxy.threadProxy()
+        val currentFramePsi = context.debugProcess.positionManager
+            .getSourcePosition(context.frameProxy.location())?.elementAt ?: return null // compute once
+        val frameToVar = thread.forceFrames().firstNotNullResult {
+            val variable = it.safeVisibleVariableByName(parameter.name)
+            if (variable == null || variable.type.name() != asmType.className
+                || !isContainingFrame(context.debugProcess.positionManager, currentFramePsi, it)
+            )
+                null
+            else    // variable is found and it has same type and is from closure
+                it to variable
+        }
+        return frameToVar?.let { VariableFinder.Result(it.first.getValue(it.second)) }
+    }
+
+    private fun isContainingFrame(manager: PositionManager, innerPsi: PsiElement, outer: StackFrameProxyImpl) = runReadAction {
+        var outerPsi: PsiElement? = manager.getSourcePosition(outer.location())?.elementAt?.context
+        while (outerPsi != null) {
+            if (outerPsi is KtLambdaExpression || outerPsi is KtNamedFunction) break
+            outerPsi = outerPsi.context
+        }       // find lambda or fun from the frame and check whether it contains declaration of our lambda
+        outerPsi != null && innerPsi.containingFile == outerPsi.containingFile &&
+                innerPsi.startOffset >= outerPsi.startOffset
+                && innerPsi.endOffset <= outerPsi.endOffset
     }
 
     override fun getModifier() = null

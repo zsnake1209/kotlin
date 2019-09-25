@@ -58,22 +58,22 @@ private inline fun inlineBlock(block: () -> Unit) {
 // RESULT: 6: I
 
 // EXPRESSION: c
-// RESULT: 'c' is not captured
+// RESULT: 7: I
 
 // EXPRESSION: d
 // RESULT: 8: I
 
 // EXPRESSION: e
-// RESULT: 'e' is not captured
+// RESULT: 9: I
 
 // EXPRESSION: f
-// RESULT: 'f' is not captured
+// RESULT: 10: I
 
 // EXPRESSION: e
-// RESULT: 'e' is not captured
+// RESULT: 9: I
 
 // EXPRESSION: d
-// RESULT: 'd' is not captured
+// RESULT: 8: I
 
 // EXPRESSION: c
-// RESULT: 'c' is not captured
+// RESULT: 7: I
