@@ -2160,50 +2160,30 @@ class IrProtoReaderMimic(private val source: ByteArray) {
         return result
     }
 
-    private fun readVarint32(): Int {
-        var result = 0
+    fun readInt32(): Int = readVarint64().toInt()
 
-        var shift = 0
-        while (true) {
-            val b = nextByte().toInt()
+    fun readInt64(): Long = readVarint64()
 
-            result = result or ((b and 0x7F) shl shift)
-            shift += 7
+    fun readBool(): Boolean = readVarint64() != 0L
 
-            if ((b and 0x80) == 0) break
-        }
-
-        if (shift > 70) {
-            error("int32 overflow $shift")
-        }
-
-        return result
-    }
-
-    private fun readInt32(): Int = readVarint32()
-
-    private fun readInt64(): Long = readVarint64()
-
-    private fun readBool(): Boolean = readVarint32() != 0
-
-    private fun readFloat(): Float {
+    fun readFloat(): Float {
         var bits = nextByte().toInt()
-        bits = (bits shl 8) or nextByte().toInt()
-        bits = (bits shl 8) or nextByte().toInt()
-        bits = (bits shl 8) or nextByte().toInt()
+        bits = bits or (nextByte().toInt() shl 8)
+        bits = bits or (nextByte().toInt() shl 16)
+        bits = bits or (nextByte().toInt() shl 24)
 
         return Float.fromBits(bits)
     }
 
-    private fun readDouble(): Double {
+    fun readDouble(): Double {
         var bits = nextByte().toLong()
-        bits = (bits shl 8) or nextByte().toLong()
-        bits = (bits shl 8) or nextByte().toLong()
-        bits = (bits shl 8) or nextByte().toLong()
-        bits = (bits shl 8) or nextByte().toLong()
-        bits = (bits shl 8) or nextByte().toLong()
-        bits = (bits shl 8) or nextByte().toLong()
-        bits = (bits shl 8) or nextByte().toLong()
+        bits = bits or (nextByte().toLong() shl 8)
+        bits = bits or (nextByte().toLong() shl 16)
+        bits = bits or (nextByte().toLong() shl 24)
+        bits = bits or (nextByte().toLong() shl 32)
+        bits = bits or (nextByte().toLong() shl 40)
+        bits = bits or (nextByte().toLong() shl 48)
+        bits = bits or (nextByte().toLong() shl 56)
 
         return Double.fromBits(bits)
     }
