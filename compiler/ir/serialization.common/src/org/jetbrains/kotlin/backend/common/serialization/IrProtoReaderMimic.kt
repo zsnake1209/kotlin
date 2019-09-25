@@ -2167,23 +2167,23 @@ class IrProtoReaderMimic(private val source: ByteArray) {
     fun readBool(): Boolean = readVarint64() != 0L
 
     fun readFloat(): Float {
-        var bits = nextByte().toInt()
-        bits = bits or (nextByte().toInt() shl 8)
-        bits = bits or (nextByte().toInt() shl 16)
-        bits = bits or (nextByte().toInt() shl 24)
+        var bits = nextByte().toInt() and 0xFF
+        bits = bits or ((nextByte().toInt() and 0xFF) shl 8)
+        bits = bits or ((nextByte().toInt() and 0xFF) shl 16)
+        bits = bits or ((nextByte().toInt() and 0xFF) shl 24)
 
         return Float.fromBits(bits)
     }
 
     fun readDouble(): Double {
-        var bits = nextByte().toLong()
-        bits = bits or (nextByte().toLong() shl 8)
-        bits = bits or (nextByte().toLong() shl 16)
-        bits = bits or (nextByte().toLong() shl 24)
-        bits = bits or (nextByte().toLong() shl 32)
-        bits = bits or (nextByte().toLong() shl 40)
-        bits = bits or (nextByte().toLong() shl 48)
-        bits = bits or (nextByte().toLong() shl 56)
+        var bits = nextByte().toLong() and 0xFF
+        bits = bits or ((nextByte().toLong() and 0xFF) shl 8)
+        bits = bits or ((nextByte().toLong() and 0xFF) shl 16)
+        bits = bits or ((nextByte().toLong() and 0xFF) shl 24)
+        bits = bits or ((nextByte().toLong() and 0xFF) shl 32)
+        bits = bits or ((nextByte().toLong() and 0xFF) shl 40)
+        bits = bits or ((nextByte().toLong() and 0xFF) shl 48)
+        bits = bits or ((nextByte().toLong() and 0xFF) shl 56)
 
         return Double.fromBits(bits)
     }
