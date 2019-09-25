@@ -53,7 +53,7 @@ class AstGenerationResult(
                 val inlineData = JsAstProtoBuf.InlineData.parseFrom(CodedInputStream.newInstance(unit.inlineData))
 
                 DeserializedFileTranslationResult(
-                    deserializer.deserialize(ByteArrayInputStream(unit.data)),
+                    deserializer.deserialize(unit.data),
                     HashSet(inlineData.inlineFunctionTagsList)
                 )
             }

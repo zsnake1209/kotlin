@@ -21,13 +21,15 @@ import org.jetbrains.kotlin.js.backend.ast.JsImportedModule
 import org.jetbrains.kotlin.js.backend.ast.metadata.*
 import org.jetbrains.kotlin.js.backend.ast.metadata.LocalAlias
 import org.jetbrains.kotlin.js.backend.ast.metadata.SpecialFunction
-import org.jetbrains.kotlin.protobuf.CodedInputStream
-import org.jetbrains.kotlin.serialization.js.ast.JsAstProtoBuf.*
-import org.jetbrains.kotlin.serialization.js.ast.JsAstProtoBuf.Expression.ExpressionCase
-import org.jetbrains.kotlin.serialization.js.ast.JsAstProtoBuf.Statement.StatementCase
+import org.jetbrains.kotlin.serialization.js.ast.protoMimic.*
+import org.jetbrains.kotlin.serialization.js.ast.protoMimic.JsImportedModule as ProtoImportedModule
+import org.jetbrains.kotlin.serialization.js.ast.protoMimic.LocalAlias as ProtoLocalAlias
+import org.jetbrains.kotlin.serialization.js.ast.protoMimic.SpecialFunction as ProtoSpecialFunction
+import org.jetbrains.kotlin.serialization.js.ast.protoMimic.Expression.ExpressionCase
+import org.jetbrains.kotlin.serialization.js.ast.protoMimic.Statement.StatementCase
+
 import java.io.File
 import java.io.FileInputStream
-import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.*
 import org.jetbrains.kotlin.resolve.inline.InlineStrategy as KotlinInlineStrategy
@@ -39,8 +41,8 @@ class JsAstDeserializer(program: JsProgram, private val sourceRoots: Iterable<Fi
     private val nameCache = mutableListOf<JsName?>()
     private val fileStack: Deque<String> = ArrayDeque()
 
-    fun deserialize(input: InputStream): JsProgramFragment {
-        return deserialize(Chunk.parseFrom(CodedInputStream.newInstance(input).apply { setRecursionLimit(4096) }))
+    fun deserialize(input: ByteArray): JsProgramFragment {
+        return deserialize(JsAstProtoReaderMimic(input).readChunk())
     }
 
     fun deserialize(proto: Chunk): JsProgramFragment {
@@ -291,7 +293,7 @@ class JsAstDeserializer(program: JsProgram, private val sourceRoots: Iterable<Fi
         return expression
     }
 
-    private fun deserializeJsImportedModule(proto: JsAstProtoBuf.JsImportedModule): JsImportedModule {
+    private fun deserializeJsImportedModule(proto: ProtoImportedModule): JsImportedModule {
         return JsImportedModule(deserializeString(proto.externalName), deserializeName(proto.internalName), if (proto.hasPlainReference()) deserialize(proto.plainReference!!) else null)
     }
 
@@ -476,7 +478,7 @@ class JsAstDeserializer(program: JsProgram, private val sourceRoots: Iterable<Fi
         }
     }
 
-    private fun deserializeLocalAlias(localNameId: JsAstProtoBuf.LocalAlias): LocalAlias {
+    private fun deserializeLocalAlias(localNameId: ProtoLocalAlias): LocalAlias {
         return LocalAlias(deserializeName(localNameId.localNameId),
                           if (localNameId.hasTag()) deserializeString(localNameId.tag) else null)
     }
@@ -547,18 +549,18 @@ class JsAstDeserializer(program: JsProgram, private val sourceRoots: Iterable<Fi
         InlineStrategy.NOT_INLINE -> KotlinInlineStrategy.NOT_INLINE
     }
 
-    private fun map(specialFunction: JsAstProtoBuf.SpecialFunction) = when(specialFunction) {
-        JsAstProtoBuf.SpecialFunction.DEFINE_INLINE_FUNCTION -> SpecialFunction.DEFINE_INLINE_FUNCTION
-        JsAstProtoBuf.SpecialFunction.WRAP_FUNCTION -> SpecialFunction.WRAP_FUNCTION
-        JsAstProtoBuf.SpecialFunction.TO_BOXED_CHAR -> SpecialFunction.TO_BOXED_CHAR
-        JsAstProtoBuf.SpecialFunction.UNBOX_CHAR -> SpecialFunction.UNBOX_CHAR
-        JsAstProtoBuf.SpecialFunction.SUSPEND_CALL -> SpecialFunction.SUSPEND_CALL
-        JsAstProtoBuf.SpecialFunction.COROUTINE_RESULT -> SpecialFunction.COROUTINE_RESULT
-        JsAstProtoBuf.SpecialFunction.COROUTINE_CONTROLLER -> SpecialFunction.COROUTINE_CONTROLLER
-        JsAstProtoBuf.SpecialFunction.COROUTINE_RECEIVER -> SpecialFunction.COROUTINE_RECEIVER
-        JsAstProtoBuf.SpecialFunction.SET_COROUTINE_RESULT -> SpecialFunction.SET_COROUTINE_RESULT
-        JsAstProtoBuf.SpecialFunction.GET_KCLASS -> SpecialFunction.GET_KCLASS
-        JsAstProtoBuf.SpecialFunction.GET_REIFIED_TYPE_PARAMETER_KTYPE -> SpecialFunction.GET_REIFIED_TYPE_PARAMETER_KTYPE
+    private fun map(specialFunction: ProtoSpecialFunction) = when(specialFunction) {
+        ProtoSpecialFunction.DEFINE_INLINE_FUNCTION -> SpecialFunction.DEFINE_INLINE_FUNCTION
+        ProtoSpecialFunction.WRAP_FUNCTION -> SpecialFunction.WRAP_FUNCTION
+        ProtoSpecialFunction.TO_BOXED_CHAR -> SpecialFunction.TO_BOXED_CHAR
+        ProtoSpecialFunction.UNBOX_CHAR -> SpecialFunction.UNBOX_CHAR
+        ProtoSpecialFunction.SUSPEND_CALL -> SpecialFunction.SUSPEND_CALL
+        ProtoSpecialFunction.COROUTINE_RESULT -> SpecialFunction.COROUTINE_RESULT
+        ProtoSpecialFunction.COROUTINE_CONTROLLER -> SpecialFunction.COROUTINE_CONTROLLER
+        ProtoSpecialFunction.COROUTINE_RECEIVER -> SpecialFunction.COROUTINE_RECEIVER
+        ProtoSpecialFunction.SET_COROUTINE_RESULT -> SpecialFunction.SET_COROUTINE_RESULT
+        ProtoSpecialFunction.GET_KCLASS -> SpecialFunction.GET_KCLASS
+        ProtoSpecialFunction.GET_REIFIED_TYPE_PARAMETER_KTYPE -> SpecialFunction.GET_REIFIED_TYPE_PARAMETER_KTYPE
     }
 
     private fun <T : JsNode> withLocation(fileId: Int?, location: Location?, action: () -> T): T {
