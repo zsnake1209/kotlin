@@ -15,5 +15,7 @@ fun box(): String {
     assertEquals("bar", bar())
     assertEquals("foobar", foo())
 
+    assertEquals("bar", js("require('custom/key').bar()"))
+
     return "OK"
 }

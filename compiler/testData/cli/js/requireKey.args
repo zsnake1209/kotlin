@@ -1,7 +1,6 @@
 $TESTDATA_DIR$/separateModules/sepModule1.kt
 -meta-info
--require-key
-custom/key
+-Xrequire-key=custom/key
 -module-kind
 commonjs
 -output

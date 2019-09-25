@@ -717,6 +717,7 @@ public final class StaticContext {
 
         String requireKey = config.getRequireKey(module);
         if (requireKey == null) {
+            // Workaround for <builtin> module
             requireKey = moduleName;
         }
 
