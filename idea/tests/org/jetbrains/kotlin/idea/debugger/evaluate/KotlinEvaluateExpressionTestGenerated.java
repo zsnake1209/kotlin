@@ -820,9 +820,19 @@ public class KotlinEvaluateExpressionTestGenerated extends AbstractKotlinEvaluat
                 runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/frame/frameLambda.kt");
             }
 
+            @TestMetadata("frameLambdaNotAccessible.kt")
+            public void testFrameLambdaNotAccessible() throws Exception {
+                runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/frame/frameLambdaNotAccessible.kt");
+            }
+
             @TestMetadata("frameLambdaNotUsed.kt")
             public void testFrameLambdaNotUsed() throws Exception {
                 runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/frame/frameLambdaNotUsed.kt");
+            }
+
+            @TestMetadata("frameLambdaVariableFromCorrectFrame.kt")
+            public void testFrameLambdaVariableFromCorrectFrame() throws Exception {
+                runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/frame/frameLambdaVariableFromCorrectFrame.kt");
             }
 
             @TestMetadata("frameLocalVariable.kt")

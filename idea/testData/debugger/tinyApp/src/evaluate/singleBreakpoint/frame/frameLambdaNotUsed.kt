@@ -15,4 +15,4 @@ fun foo(f: () -> Unit) {
 // PRINT_FRAME
 
 // EXPRESSION: val1
-// RESULT: 'val1' is not captured
+// RESULT: 1: I
