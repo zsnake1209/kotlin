@@ -121,6 +121,7 @@ class K2JSTranslator @JvmOverloads constructor(
         val bindingContext = bindingTrace.bindingContext
 
         checkCanceled()
+        if (hasError(diagnostics)) return TranslationResult.Fail(diagnostics)
 
         updateMetadataMap(bindingTrace.bindingContext, moduleDescriptor, packageMetadata)
         trySaveIncrementalData(files, pathResolver, bindingTrace, moduleDescriptor) { sourceFile ->
@@ -129,19 +130,15 @@ class K2JSTranslator @JvmOverloads constructor(
             })
         }
 
-        return if (hasError(diagnostics)) {
-            TranslationResult.Fail(diagnostics)
-        } else {
-            TranslationResult.SuccessNoCode(
-                config,
-                files,
-                diagnostics,
-                emptyList(),
-                moduleDescriptor,
-                bindingTrace.bindingContext,
-                packageMetadata
-            )
-        }
+        return TranslationResult.SuccessNoCode(
+            config,
+            files,
+            diagnostics,
+            emptyList(),
+            moduleDescriptor,
+            bindingTrace.bindingContext,
+            packageMetadata
+        )
     }
 
     @Throws(TranslationException::class)
