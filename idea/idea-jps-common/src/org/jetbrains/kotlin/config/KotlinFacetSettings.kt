@@ -58,7 +58,7 @@ sealed class TargetPlatformKind<out Version : TargetPlatformVersion>(
 object CoroutineSupport {
     @JvmStatic
     fun byCompilerArguments(arguments: CommonCompilerArguments?): LanguageFeature.State =
-            byCompilerArgumentsOrNull(arguments) ?: LanguageFeature.Coroutines.defaultState
+        byCompilerArgumentsOrNull(arguments) ?: LanguageFeature.Coroutines.defaultState
 
     fun byCompilerArgumentsOrNull(arguments: CommonCompilerArguments?): LanguageFeature.State? = when (arguments?.coroutinesState) {
         CommonCompilerArguments.ENABLE -> LanguageFeature.State.ENABLED
@@ -68,7 +68,7 @@ object CoroutineSupport {
     }
 
     fun byCompilerArgument(argument: String): LanguageFeature.State =
-            LanguageFeature.State.values().find { getCompilerArgument(it).equals(argument, ignoreCase = true) }
+        LanguageFeature.State.values().find { getCompilerArgument(it).equals(argument, ignoreCase = true) }
             ?: LanguageFeature.Coroutines.defaultState
 
     fun getCompilerArgument(state: LanguageFeature.State): String = when (state) {
@@ -190,8 +190,7 @@ class KotlinFacetSettings {
                     parseCommandLineArguments(compilerSettings.additionalArgumentsAsList, this)
                 }
             }
-        }
-        else null
+        } else null
     }
 
     var compilerArguments: CommonCompilerArguments? = null
@@ -209,13 +208,17 @@ class KotlinFacetSettings {
     var languageLevel: LanguageVersion?
         get() = compilerArguments?.languageVersion?.let { LanguageVersion.fromFullVersionString(it) }
         set(value) {
-            compilerArguments!!.languageVersion = value?.versionString
+            compilerArguments?.let {
+                it.languageVersion = value?.versionString
+            }
         }
 
     var apiLevel: LanguageVersion?
         get() = compilerArguments?.apiVersion?.let { LanguageVersion.fromFullVersionString(it) }
         set(value) {
-            compilerArguments!!.apiVersion = value?.versionString
+            compilerArguments?.let {
+                it.apiVersion = value?.versionString
+            }
         }
 
     var targetPlatform: TargetPlatform? = null
