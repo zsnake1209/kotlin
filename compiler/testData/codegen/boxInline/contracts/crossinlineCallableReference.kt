@@ -1,6 +1,6 @@
 // !LANGUAGE: +AllowContractsForCustomFunctions +UseCallsInPlaceEffect +ReadDeserializedContracts
 // !USE_EXPERIMENTAL: kotlin.contracts.ExperimentalContracts
-// IGNORE_BACKEND: JVM_IR, NATIVE, JS_IR
+// IGNORE_BACKEND: JVM_IR, NATIVE
 // IGNORE_BACKEND_MULTI_MODULE: JVM_IR
 // NO_CHECK_LAMBDA_INLINING
 // FILE: 1.kt
@@ -27,7 +27,7 @@ inline fun vBox(
     contract {
         callsInPlace(action, InvocationKind.EXACTLY_ONCE)
     }
-    return action()
+    return { action() }()
 }
 
 @ExperimentalContracts

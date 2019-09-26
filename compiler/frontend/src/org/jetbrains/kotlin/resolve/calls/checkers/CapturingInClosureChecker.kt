@@ -65,8 +65,9 @@ class CapturingInClosureChecker : CallChecker {
         val scopeDeclaration = DescriptorToSourceUtils.descriptorToDeclaration(scopeContainer)
         if (!InlineUtil.canBeInlineArgument(scopeDeclaration)) return CaptureKind.NOT_INLINE
 
-        val isCrossinline = isCrossinlineParameter(context, scopeDeclaration as KtFunction)
-        if (InlineUtil.isInlinedArgument(scopeDeclaration, context, false) && !isCrossinline) {
+        if (InlineUtil.isInlinedArgument(scopeDeclaration as KtFunction, context, false) &&
+            !isCrossinlineParameter(context, scopeDeclaration)
+        ) {
             val scopeContainerParent = scopeContainer.containingDeclaration ?: error("parent is null for $scopeContainer")
             return if (
                 !isCapturedVariable(variableParent, scopeContainerParent) ||
