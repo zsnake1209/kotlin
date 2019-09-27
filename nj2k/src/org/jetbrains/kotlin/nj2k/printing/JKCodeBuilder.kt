@@ -3,76 +3,31 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.nj2k
+package org.jetbrains.kotlin.nj2k.printing
 
-import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.j2k.ast.Nullability
-import org.jetbrains.kotlin.nj2k.symbols.JKSymbol
+import org.jetbrains.kotlin.nj2k.*
 import org.jetbrains.kotlin.nj2k.symbols.getDisplayFqName
 import org.jetbrains.kotlin.nj2k.tree.*
 import org.jetbrains.kotlin.nj2k.tree.visitors.JKVisitorWithCommentsPrinting
-import org.jetbrains.kotlin.nj2k.types.*
+import org.jetbrains.kotlin.nj2k.types.JKContextType
+import org.jetbrains.kotlin.nj2k.types.isInterface
+import org.jetbrains.kotlin.nj2k.types.updateNullability
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 
-class NewCodeBuilder(context: NewJ2kConverterContext) {
+internal class JKCodeBuilder(context: NewJ2kConverterContext) {
     private val elementInfoStorage = context.elementsInfoStorage
     private val printer = JKPrinter(context.project, context.importStorage, elementInfoStorage)
-
-    private fun classKindString(kind: JKClass.ClassKind): String = when (kind) {
-        JKClass.ClassKind.ANNOTATION -> "annotation class"
-        JKClass.ClassKind.CLASS -> "class"
-        JKClass.ClassKind.ENUM -> "enum class"
-        JKClass.ClassKind.INTERFACE -> "interface"
-        JKClass.ClassKind.OBJECT -> "object"
-        JKClass.ClassKind.COMPANION -> "companion object"
-    }
+    private val commentPrinter = JKCommentPrinter(printer)
 
     inner class Visitor : JKVisitorWithCommentsPrinting() {
-        private val printedTokens = mutableSetOf<JKComment>()
-
-        //TODO move to ast transformation phase
-        private fun JKComment.shouldBeDropped(): Boolean =
-            text.startsWith("//noinspection")
-
-        private fun JKComment.createText() =
-            if (this !in printedTokens) {
-                printedTokens += this
-                text
-            } else null
-
-
-        private fun List<JKComment>.createText(): String = buildString {
-            var needNewLine = false
-            for (comment in this@createText) {
-                if (comment.shouldBeDropped()) continue
-                val text = comment.createText() ?: continue
-                if (needNewLine) appendln() else append(' ')
-                append(text)
-                needNewLine = text.startsWith("//") || '\n' in text
-            }
-        }
-
-        private fun String.hasNoLineBreakAfterSingleLineComment() = lastIndexOf('\n') < lastIndexOf("//")
-
         override fun printLeftNonCodeElements(element: JKFormattingOwner) {
-            val text = element.trailingComments.createText()
-            printer.print(text)
-
-            val addNewLine = element.hasTrailingLineBreak
-                    || element is JKDeclaration && element.trailingComments.isNotEmpty() // add new line between comment & declaration
-                    || text.hasNoLineBreakAfterSingleLineComment()
-
-            if (addNewLine) printer.println()
+            commentPrinter.printTrailingComments(element)
         }
-
 
         override fun printRightNonCodeElements(element: JKFormattingOwner) {
-            val text = element.leadingComments.createText()
-            printer.print(text)
-
-            val addNewLine = element.hasLeadingLineBreak || text.hasNoLineBreakAfterSingleLineComment()
-            if (addNewLine) printer.println()
+            commentPrinter.printLeadingComments(element)
         }
 
         private fun renderTokenElement(tokenElement: JKTokenElement) {
@@ -222,7 +177,7 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
             }
             renderModifiersList(klass)
             printer.print(" ")
-            printer.print(classKindString(klass.classKind))
+            printer.print(klass.classKind.text)
             printer.print(" ")
             klass.name.accept(this)
             klass.typeParameterList.accept(this)
@@ -431,7 +386,7 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
 
         override fun visitTypeParameterListRaw(typeParameterList: JKTypeParameterList) {
             if (typeParameterList.typeParameters.isNotEmpty()) {
-                printer.par(ParenthesisKind.ANGLE) {
+                printer.par(JKPrinter.ParenthesisKind.ANGLE) {
                     printer.renderList(typeParameterList.typeParameters) {
                         it.accept(this)
                     }
@@ -472,9 +427,7 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
             printer.print(" ")
         }
 
-        override fun visitLabelEmptyRaw(labelEmpty: JKLabelEmpty) {
-
-        }
+        override fun visitLabelEmptyRaw(labelEmpty: JKLabelEmpty) {}
 
         override fun visitLabelTextRaw(labelText: JKLabelText) {
             printer.print("@")
@@ -530,7 +483,7 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
 
         override fun visitTypeArgumentListRaw(typeArgumentList: JKTypeArgumentList) {
             if (typeArgumentList.typeArguments.isNotEmpty()) {
-                printer.par(ParenthesisKind.ANGLE) {
+                printer.par(JKPrinter.ParenthesisKind.ANGLE) {
                     printer.renderList(typeArgumentList.typeArguments) {
                         it.accept(this)
                     }
@@ -584,11 +537,9 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
             }
         }
 
-        override fun visitEmptyStatementRaw(emptyStatement: JKEmptyStatement) {
-        }
+        override fun visitEmptyStatementRaw(emptyStatement: JKEmptyStatement) {}
 
-        override fun visitStubExpressionRaw(stubExpression: JKStubExpression) {
-        }
+        override fun visitStubExpressionRaw(stubExpression: JKStubExpression) {}
 
         override fun visitKtConvertedFromForLoopSyntheticWhileStatementRaw(
             ktConvertedFromForLoopSyntheticWhileStatement: JKKtConvertedFromForLoopSyntheticWhileStatement
@@ -605,7 +556,7 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
             printer.renderSymbol(newExpression.classSymbol, newExpression)
             newExpression.typeArgumentList.accept(this)
             if (!newExpression.classSymbol.isInterface() || newExpression.arguments.arguments.isNotEmpty()) {
-                printer.par(ParenthesisKind.ROUND) {
+                printer.par(JKPrinter.ParenthesisKind.ROUND) {
                     newExpression.arguments.accept(this)
                 }
             }
@@ -706,7 +657,7 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
         }
 
         private fun renderParameterList(parameters: List<JKParameter>) {
-            printer.par(ParenthesisKind.ROUND) {
+            printer.par(JKPrinter.ParenthesisKind.ROUND) {
                 printer.renderList(parameters) {
                     it.accept(this)
                 }
@@ -743,7 +694,7 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
 
         override fun visitLambdaExpressionRaw(lambdaExpression: JKLambdaExpression) {
             val printLambda = {
-                printer.par(ParenthesisKind.CURVED) {
+                printer.par(JKPrinter.ParenthesisKind.CURVED) {
                     if (lambdaExpression.statement.statements.size > 1)
                         printer.println()
                     lambdaExpression.parameters.firstOrNull()?.accept(this)
@@ -765,7 +716,7 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
             if (lambdaExpression.functionalType.present()) {
                 printer.renderType(lambdaExpression.functionalType.type, lambdaExpression)
                 printer.print(" ")
-                printer.par(ParenthesisKind.ROUND, printLambda)
+                printer.par(JKPrinter.ParenthesisKind.ROUND, printLambda)
             } else {
                 printLambda()
             }
@@ -869,147 +820,8 @@ class NewCodeBuilder(context: NewJ2kConverterContext) {
         }
     }
 
-
     fun printCodeOut(root: JKTreeElement): String {
         Visitor().also { root.accept(it) }
         return printer.toString().replace("\r\n", "\n")
     }
-}
-
-enum class ParenthesisKind(val open: String, val close: String) {
-    ROUND("(", ")"),
-    CURVED("{", "}"),
-    ANGLE("<", ">")
-}
-
-
-private class JKPrinter(
-    project: Project,
-    importStorage: JKImportStorage,
-    private val elementInfoStorage: JKElementInfoStorage
-) {
-    val symbolRenderer = JKSymbolRenderer(importStorage, project)
-    private val stringBuilder: StringBuilder = StringBuilder()
-    private var currentIndent = 0;
-    private val indentSymbol = " ".repeat(4)
-
-    private var lastSymbolIsLineBreak = false
-
-    override fun toString(): String = stringBuilder.toString()
-
-    fun print(value: String) {
-        if (value.isNotEmpty()) {
-            lastSymbolIsLineBreak = false
-        }
-        stringBuilder.append(value)
-    }
-
-    fun println() {
-        if (lastSymbolIsLineBreak) return
-        stringBuilder.append('\n')
-        repeat(currentIndent) {
-            stringBuilder.append(indentSymbol)
-        }
-        lastSymbolIsLineBreak = true
-    }
-
-
-    inline fun indented(block: () -> Unit) {
-        currentIndent++
-        block()
-        currentIndent--
-    }
-
-    inline fun block(crossinline body: () -> Unit) {
-        par(ParenthesisKind.CURVED) {
-            indented(body)
-        }
-    }
-
-    inline fun par(kind: ParenthesisKind = ParenthesisKind.ROUND, body: () -> Unit) {
-        print(kind.open)
-        body()
-        print(kind.close)
-    }
-
-
-    private fun JKType.renderTypeInfo() {
-        this@JKPrinter.print(elementInfoStorage.getOrCreateInfoForElement(this).render())
-    }
-
-    fun renderType(type: JKType, owner: JKTreeElement?) {
-        if (type is JKNoType) return
-        if (type is JKCapturedType) {
-            when (val wildcard = type.wildcardType) {
-                is JKVarianceTypeParameterType -> {
-                    renderType(wildcard.boundType, owner)
-                }
-                is JKStarProjectionType -> {
-                    type.renderTypeInfo()
-                    this.print("Any?")
-                }
-            }
-            return
-        }
-        type.renderTypeInfo()
-        when (type) {
-            is JKClassType -> {
-                renderSymbol(type.classReference, owner)
-            }
-            is JKContextType -> return
-            is JKStarProjectionType ->
-                this.print("*")
-            is JKTypeParameterType ->
-                this.print(type.identifier.name)
-            is JKVarianceTypeParameterType -> {
-                when (type.variance) {
-                    JKVarianceTypeParameterType.Variance.IN -> this.print("in ")
-                    JKVarianceTypeParameterType.Variance.OUT -> this.print("out ")
-                }
-                renderType(type.boundType, null)
-            }
-            else -> this.print("Unit /* TODO: ${type::class} */")
-        }
-        if (type is JKParametrizedType && type.parameters.isNotEmpty()) {
-            par(ParenthesisKind.ANGLE) {
-                renderList(type.parameters, renderElement = { renderType(it, null) })
-            }
-        }
-        // we print undefined types as nullable because we need smartcast to work in nullability inference in post-processing
-        if (type !is JKWildCardType
-            && (type.nullability == Nullability.Default
-                    && owner?.safeAs<JKLambdaExpression>()?.functionalType?.type != type
-                    || type.nullability == Nullability.Nullable)
-        ) {
-            this.print("?")
-        }
-    }
-
-    fun renderSymbol(symbol: JKSymbol, owner: JKTreeElement?) {
-        print(symbolRenderer.renderSymbol(symbol, owner))
-    }
-
-    inline fun <T> renderList(list: List<T>, separator: String = ", ", renderElement: (T) -> Unit) =
-        renderList(list, { this.print(separator) }, renderElement)
-
-    inline fun <T> renderList(list: List<T>, separator: () -> Unit, renderElement: (T) -> Unit) {
-        val (head, tail) = list.headTail()
-        head?.let(renderElement) ?: return
-        tail?.forEach {
-            separator()
-            renderElement(it)
-        }
-    }
-}
-
-
-fun String.escapedAsQualifiedName(): String =
-    split('.')
-        .map { it.escaped() }
-        .joinToString(".") { it }
-
-private fun <T> List<T>.headTail(): Pair<T?, List<T>?> {
-    val head = this.firstOrNull()
-    val tail = if (size <= 1) null else subList(1, size)
-    return head to tail
 }
