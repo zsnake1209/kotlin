@@ -23,9 +23,9 @@ import org.jetbrains.kotlin.utils.fileUtils.withReplacedExtensionOrNull
 import java.io.File
 import java.lang.Boolean.getBoolean
 
-private val fullRuntimeKlib = "libraries/stdlib/js-ir/build//fullRuntime/klib"
-private val defaultRuntimeKlib = "libraries/stdlib/js-ir/build//reducedRuntime/klib"
-private val kotlinTestKLib = "libraries/stdlib/js-ir/build//kotlin.test/klib"
+private val fullRuntimeKlib = "libraries/stdlib/js-ir/build/fullRuntime/klib"
+private val defaultRuntimeKlib = "libraries/stdlib/js-ir/build/reducedRuntime/klib"
+private val kotlinTestKLib = "libraries/stdlib/js-ir/build/kotlin.test/klib"
 
 abstract class BasicIrBoxTest(
     pathToTestDir: String,
@@ -81,7 +81,7 @@ abstract class BasicIrBoxTest(
             // TODO: split input files to some parts (global common, local common, test)
             .filterNot { it.virtualFilePath.contains(COMMON_FILES_DIR_PATH) }
 
-        val runtimeKlibs = if (needsFullIrRuntime) listOf(fullRuntimeKlib, kotlinTestKLib) else listOf(defaultRuntimeKlib)
+        val runtimeKlibs = listOf(fullRuntimeKlib, kotlinTestKLib) // if (needsFullIrRuntime) listOf(fullRuntimeKlib, kotlinTestKLib) else listOf(defaultRuntimeKlib)
 
         val transitiveLibraries = config.configuration[JSConfigurationKeys.TRANSITIVE_LIBRARIES]!!.map { File(it).name }
 

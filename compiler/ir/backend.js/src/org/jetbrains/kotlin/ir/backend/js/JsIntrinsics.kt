@@ -15,17 +15,20 @@ import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrExternalPackageFragmentSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.isLong
+import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.findDeclaration
 import org.jetbrains.kotlin.ir.util.kotlinPackageFqn
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi2ir.findSingleFunction
-import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import java.util.*
 
@@ -234,6 +237,14 @@ class JsIntrinsics(private val irBuiltIns: IrBuiltIns, val context: JsIrBackendC
             PrimitiveType.DOUBLE to "Float64"
         )
     )
+
+    val createKType = getInternalWithoutPackage("createKType")
+    val createDynamicKType = getInternalWithoutPackage("createDynamicKType")
+    val createKTypeParameter = getInternalWithoutPackage("createKTypeParameter")
+    val getStarKTypeProjection = getInternalWithoutPackage("getStarKTypeProjection")
+    val createCovariantKTypeProjection = getInternalWithoutPackage("createCovariantKTypeProjection")
+    val createInvariantKTypeProjection = getInternalWithoutPackage("createInvariantKTypeProjection")
+    val createContravariantKTypeProjection = getInternalWithoutPackage("createContravariantKTypeProjection")
 
     val primitiveToSizeConstructor =
         PrimitiveType.values().associate { type ->
