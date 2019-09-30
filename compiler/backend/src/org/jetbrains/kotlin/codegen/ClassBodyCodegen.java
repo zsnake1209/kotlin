@@ -65,7 +65,8 @@ public abstract class ClassBodyCodegen extends MemberCodegen<KtPureClassOrObject
     @Override
     protected void generateBody() {
         List<KtObjectDeclaration> companions = new ArrayList<>();
-        if (kind != OwnerKind.DEFAULT_IMPLS && kind != OwnerKind.ERASED_INLINE_CLASS) {
+        boolean shouldGenerateNestedClassesAndObjects = kind != OwnerKind.DEFAULT_IMPLS && kind != OwnerKind.ERASED_INLINE_CLASS;
+        if (shouldGenerateNestedClassesAndObjects) {
             //generate nested classes first and only then generate class body. It necessary to access to nested CodegenContexts
             for (KtDeclaration declaration : myClass.getDeclarations()) {
                 if (shouldProcessFirst(declaration)) {
@@ -103,12 +104,14 @@ public abstract class ClassBodyCodegen extends MemberCodegen<KtPureClassOrObject
         }
 
         // Generate synthetic nested classes
-        Collection<DeclarationDescriptor> classifiers = descriptor
-                .getUnsubstitutedMemberScope()
-                .getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS, MemberScope.Companion.getALL_NAME_FILTER());
-        for (DeclarationDescriptor memberDescriptor : classifiers) {
-            if (memberDescriptor instanceof SyntheticClassOrObjectDescriptor) {
-                genSyntheticClassOrObject((SyntheticClassOrObjectDescriptor) memberDescriptor);
+        if (shouldGenerateNestedClassesAndObjects) {
+            Collection<DeclarationDescriptor> classifiers = descriptor
+                    .getUnsubstitutedMemberScope()
+                    .getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS, MemberScope.Companion.getALL_NAME_FILTER());
+            for (DeclarationDescriptor memberDescriptor : classifiers) {
+                if (memberDescriptor instanceof SyntheticClassOrObjectDescriptor) {
+                    genSyntheticClassOrObject((SyntheticClassOrObjectDescriptor) memberDescriptor);
+                }
             }
         }
 

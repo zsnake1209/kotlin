@@ -16,13 +16,16 @@
 
 package org.jetbrains.kotlinx.serialization.compiler.backend.jvm
 
-import org.jetbrains.kotlin.codegen.*
+import org.jetbrains.kotlin.codegen.CompilationException
+import org.jetbrains.kotlin.codegen.ExpressionCodegen
+import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
+import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotated
 import org.jetbrains.kotlin.psi.ValueArgument
-import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.OtherOrigin
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.SerializerCodegen
+import org.jetbrains.kotlinx.serialization.compiler.backend.common.findTypeSerializerOrContext
 import org.jetbrains.kotlinx.serialization.compiler.resolve.*
 import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.typeArgPrefix
 import org.jetbrains.org.objectweb.asm.Label
@@ -205,7 +208,7 @@ open class SerializerCodegenImpl(
                 iconst(i) // index
                 val prop = serializableProperties[i]
                 assert(
-                    stackValueSerializerInstanceFromSerializerWithoutSti(
+                    findAndStackValueSerializerInstanceFromSerializer(
                         codegen,
                         prop,
                         this@SerializerCodegenImpl
@@ -361,75 +364,26 @@ open class SerializerCodegenImpl(
             store(readAllVar, Type.BOOLEAN_TYPE)
             // loop for all properties
             propVar = propsStartVar
-            var labelNum = 0
+
             for ((index, property) in serializableProperties.withIndex()) {
-                val propertyType = codegen.typeMapper.mapType(property.type)
-                if (!property.transient) {
-                    // labelI:
-                    visitLabel(labels[labelNum + 2])
-                    // propX := input.readXxxValue(value)
-                    load(inputVar, kInputType)
-                    load(descVar, descType)
-                    iconst(labelNum)
+                check(!property.transient)
+                val propertyAddressInBitMask = bitMaskOff(index)
 
-                    val sti = getSerialTypeInfo(property, propertyType)
-                    val useSerializer = stackValueSerializerInstanceFromSerializer(codegen, sti, this@SerializerCodegenImpl)
-                    val unknownSer = (!useSerializer && sti.elementMethodPrefix.isEmpty())
-                    if (unknownSer) {
-                        aconst(codegen.typeMapper.mapType(property.type))
-                        AsmUtil.wrapJavaClassIntoKClass(this)
-                    }
+                // labelI:
+                visitLabel(labels[index + 2])
+                val propertyType = callReadProperty(property, inputVar, descVar, index, propertyAddressInBitMask, propVar)
 
-                    fun produceCall(update: Boolean) {
-                        invokeinterface(
-                            kInputType.internalName,
-                            (if (update) CallingConventions.update else CallingConventions.decode) + sti.elementMethodPrefix + (if (useSerializer) "Serializable" else "") + CallingConventions.elementPostfix,
-                            "(" + descType.descriptor + "I" +
-                                    (if (useSerializer) kSerialLoaderType.descriptor else "")
-                                    + (if (unknownSer) AsmTypes.K_CLASS_TYPE.descriptor else "")
-                                    + (if (update) sti.type.descriptor else "")
-                                    + ")" + (if (sti.unit) "V" else sti.type.descriptor)
-                        )
-                    }
+                // mark read bit in mask
+                // bitMask = bitMask | 1 << index
+                load(propertyAddressInBitMask, OPT_MASK_TYPE)
+                iconst(1 shl (index % OPT_MASK_BITS))
+                or(OPT_MASK_TYPE)
+                store(propertyAddressInBitMask, OPT_MASK_TYPE)
+                // if (readAll == false) goto readElement
+                load(readAllVar, Type.BOOLEAN_TYPE)
+                iconst(0)
+                ificmpeq(readElementLabel)
 
-                    if (useSerializer) {
-                        // we can choose either it is read or update
-                        val readLabel = Label()
-                        val endL = Label()
-                        genValidateProperty(index, bitMaskOff)
-                        ificmpeq(readLabel)
-                        load(propVar, propertyType)
-                        StackValue.coerce(propertyType, sti.type, this)
-                        produceCall(true)
-                        goTo(endL)
-                        visitLabel(readLabel)
-                        produceCall(false)
-                        visitLabel(endL)
-                    } else {
-                        // update not supported for primitive types
-                        produceCall(false)
-                    }
-
-                    if (sti.unit) {
-                        StackValue.putUnitInstance(this)
-                    } else {
-                        StackValue.coerce(sti.type, propertyType, this)
-                    }
-                    store(propVar, propertyType)
-
-                    // mark read bit in mask
-                    // bitMask = bitMask | 1 << index
-                    val addr = bitMaskOff(index)
-                    load(addr, OPT_MASK_TYPE)
-                    iconst(1 shl (index % OPT_MASK_BITS))
-                    or(OPT_MASK_TYPE)
-                    store(addr, OPT_MASK_TYPE)
-                    // if (readAll == false) goto readElement
-                    load(readAllVar, Type.BOOLEAN_TYPE)
-                    iconst(0)
-                    ificmpeq(readElementLabel)
-                    labelNum++
-                }
                 // next
                 propVar += propertyType.size
             }
@@ -456,7 +410,7 @@ open class SerializerCodegenImpl(
                                 null
                             )
                     } else {
-                        genValidateProperty(i, bitMaskOff)
+                        genValidateProperty(i, bitMaskOff(i))
                         // todo: print name of each variable?
                         ificmpeq(throwLabel)
                     }
@@ -499,6 +453,94 @@ open class SerializerCodegenImpl(
         }
     }
 
+    private fun InstructionAdapter.callReadProperty(
+        property: SerializableProperty,
+        inputVar: Int,
+        descVar: Int,
+        index: Int,
+        propertyAddressInBitMask: Int,
+        propVar: Int
+    ): Type {
+        // propX := input.readXxxValue(value)
+        load(inputVar, kInputType)
+        load(descVar, descType)
+        iconst(index)
+
+        val sti = getSerialTypeInfo(property, property.type) { codegen.typeMapper.mapType(it) }
+
+        val type = sti.kotlinType
+        val propertyJvmType = codegen.typeMapper.mapType(property.type)
+
+        if (sti.wasInlined) {
+            stackValueSerializerInstanceFromSerializer(
+                codegen,
+                sti,
+                this@SerializerCodegenImpl,
+                serializer = findTypeSerializerOrContext(property.module, property.type)
+            )
+            invokeinterface(kSerializerType.internalName, SerialEntityNames.SERIAL_DESC_FIELD_GETTER, "()${descType.descriptor}")
+            invokeinterface(
+                kInputType.internalName,
+                CallingConventions.decodeInlineElement,
+                "(${descType.descriptor}I${descType.descriptor})${decoderType.descriptor}"
+            )
+        }
+        val useSerializer = stackValueSerializerInstanceFromSerializer(codegen, sti, this@SerializerCodegenImpl, type, sti.serializer)
+        val unknownSer = (!useSerializer && sti.elementMethodPrefix.isEmpty())
+        check(!unknownSer) { "Serializer can't be found for $property" }
+
+
+        fun produceCall(update: Boolean) {
+            var nameString = (if (update) CallingConventions.update else CallingConventions.decode) + sti.elementMethodPrefix
+            nameString += if (sti.wasInlined) {
+                (if (useSerializer) "SerializableValue" else "")
+            } else {
+                (if (useSerializer) "Serializable" else "") + CallingConventions.elementPostfix
+            }
+
+            var descriptorString = (if (useSerializer) kSerialLoaderType.descriptor else "") +
+                    (if (update) sti.type.descriptor else "") + ")" +
+                    (if (sti.unit) "V" else sti.type.descriptor)
+            descriptorString = if (sti.wasInlined) {
+                "("
+            } else {
+                "(" + descType.descriptor + "I"
+            } + descriptorString
+
+            invokeinterface(
+                if (sti.wasInlined) decoderType.internalName else kInputType.internalName,
+                nameString,
+                descriptorString
+            )
+        }
+
+        if (useSerializer) {
+            // we can choose either it is read or update
+            val readLabel = Label()
+            val endL = Label()
+            genValidateProperty(index, propertyAddressInBitMask)
+            ificmpeq(readLabel)
+            load(propVar, propertyJvmType)
+            StackValue.coerce(propertyJvmType, sti.type, this)
+            produceCall(true)
+            goTo(endL)
+            visitLabel(readLabel)
+            produceCall(false)
+            visitLabel(endL)
+        } else {
+            // update not supported for primitive types
+            produceCall(false)
+        }
+
+        if (sti.unit) {
+            StackValue.putUnitInstance(this)
+        } else {
+            StackValue.coerce(sti.type, propertyJvmType, this)
+        }
+        store(propVar, propertyJvmType)
+        return propertyJvmType
+    }
+
     private fun InstructionAdapter.buildExternalConstructorDesc(propsStartVar: Int, bitMaskBase: Int): String {
         val constructorDesc = StringBuilder("(")
         var propVar = propsStartVar
@@ -532,7 +574,7 @@ open class SerializerCodegenImpl(
             //check if property has been seen and should be set
             val nextLabel = Label()
             // seen = bitMask & 1 << pos != 0
-            genValidateProperty(i, bitMaskPos)
+            genValidateProperty(i, bitMaskPos(i))
             if (property.optional) {
                 // if (seen)
                 //    set

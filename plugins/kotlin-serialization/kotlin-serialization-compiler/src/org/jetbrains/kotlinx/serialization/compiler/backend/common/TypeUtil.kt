@@ -179,6 +179,7 @@ fun findStandardKotlinTypeSerializer(module: ModuleDescriptor, kType: KotlinType
         "F", "kotlin.Float" -> "FloatSerializer"
         "D", "kotlin.Double" -> "DoubleSerializer"
         "C", "kotlin.Char" -> "CharSerializer"
+        "kotlin.UInt" -> "UIntSerializer"
         "kotlin.String" -> "StringSerializer"
         "kotlin.Pair" -> "PairSerializer"
         "kotlin.Triple" -> "TripleSerializer"

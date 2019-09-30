@@ -865,7 +865,7 @@ public class ImplementationBodyCodegen extends ClassBodyCodegen {
             }
         }
         else if (isClassCompanionWithBackingFieldsInOuter || isInterfaceCompanionWithBackingFieldsInOuter) {
-            ImplementationBodyCodegen parentCodegen = (ImplementationBodyCodegen) getParentCodegen();
+            ClassBodyCodegen parentCodegen = (ClassBodyCodegen) getParentCodegen();
             ExpressionCodegen parentClInitCodegen = parentCodegen.createOrGetClInitCodegen();
             InstructionAdapter parentVisitor = parentClInitCodegen.v;
 

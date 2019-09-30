@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.types.typeUtil.representativeUpperBound
 
 fun shouldHideConstructorDueToInlineClassTypeValueParameters(descriptor: CallableMemberDescriptor): Boolean {
     val constructorDescriptor = descriptor as? ClassConstructorDescriptor ?: return false
+    if (constructorDescriptor.kind == CallableMemberDescriptor.Kind.SYNTHESIZED) return false // todo: ask about this
     if (Visibilities.isPrivate(constructorDescriptor.visibility)) return false
     if (constructorDescriptor.constructedClass.isInline) return false
     if (DescriptorUtils.isSealedClass(constructorDescriptor.constructedClass)) return false

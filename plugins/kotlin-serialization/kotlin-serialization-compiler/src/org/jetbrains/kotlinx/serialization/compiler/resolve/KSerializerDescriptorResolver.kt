@@ -31,10 +31,13 @@ import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.isInlineClassType
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyClassDescriptor
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.resolve.substitutedUnderlyingType
+import org.jetbrains.kotlin.resolve.unsubstitutedUnderlyingType
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.TypeProjectionImpl
@@ -308,9 +311,10 @@ object KSerializerDescriptorResolver {
             )
         }
         for (prop in parameterDescsAsProps) {
+            val actualType = if (prop.type.isInlineClassType() && !prop.type.isMarkedNullable) prop.type.substitutedUnderlyingType()!! else prop.type
             consParams.add(
                 ValueParameterDescriptorImpl(
-                    functionDescriptor, null, i++, prop.annotations, prop.name, prop.type.makeNullableIfNotPrimitive(), false, false,
+                    functionDescriptor, null, i++, prop.annotations, prop.name, actualType.makeNullableIfNotPrimitive(), false, false,
                     false, null, functionDescriptor.source
                 )
             )

@@ -22,7 +22,9 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.psi.KtDeclarationWithInitializer
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.ValueArgument
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.isInlineClassType
 import org.jetbrains.kotlin.resolve.source.getPsi
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.analyzeSpecialSerializers
 
@@ -40,6 +42,12 @@ class SerializableProperty(
     val transient = descriptor.annotations.serialTransient || !hasBackingField
     val annotationsWithArguments: List<Triple<ClassDescriptor, List<ValueArgument>, List<ValueParameterDescriptor>>> =
         descriptor.annotationsWithArguments()
+
+    val canBeInlined: Boolean = type.isInlineClassType() && !type.isMarkedNullable
+
+    override fun toString(): String {
+        return "Property $name : $type in ${descriptor.containingDeclaration.fqNameOrNull() ?: "UNKNOWN"}"
+    }
 }
 
 val PropertyDescriptor.declaresDefaultValue: Boolean

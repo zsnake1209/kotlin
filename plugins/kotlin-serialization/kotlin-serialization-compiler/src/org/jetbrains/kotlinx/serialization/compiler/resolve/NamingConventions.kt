@@ -29,6 +29,8 @@ object SerializationAnnotations {
 object SerialEntityNames {
     const val KSERIALIZER_CLASS = "KSerializer"
     const val SERIAL_DESC_FIELD = "descriptor"
+    const val SERIAL_DESC_FIELD_GETTER = "getDescriptor"
+
     const val SAVE = "serialize"
     const val LOAD = "deserialize"
     const val SERIALIZER_CLASS = "\$serializer"
@@ -97,6 +99,9 @@ object CallingConventions {
     const val decodeElementIndex = "decodeElementIndex"
     const val elementPostfix = "Element"
     const val shouldEncodeDefault = "shouldEncodeElementDefault"
+
+    const val decodeInlineElement = "decodeInlineElement"
+    const val encodeInlineElement = "encodeInlineElement"
 
     const val addElement = "addElement"
     const val addAnnotation = "pushAnnotation"
