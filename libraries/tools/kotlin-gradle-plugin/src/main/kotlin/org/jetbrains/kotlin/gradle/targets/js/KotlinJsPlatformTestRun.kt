@@ -6,12 +6,13 @@
 package org.jetbrains.kotlin.gradle.targets.js
 
 import org.jetbrains.kotlin.gradle.execution.KotlinAggregateExecutionSource
-import org.jetbrains.kotlin.gradle.execution.KotlinAggregatingExecution
 import org.jetbrains.kotlin.gradle.plugin.CompilationExecutionSource
 import org.jetbrains.kotlin.gradle.plugin.CompilationExecutionSourceSupport
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetTestRun
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
+import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsPlatformSupport
 import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinJsSubTarget
+import org.jetbrains.kotlin.gradle.targets.js.subtargets.kotlinJsTarget
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import org.jetbrains.kotlin.gradle.testing.KotlinReportAggregatingTestRun
 import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
@@ -21,8 +22,8 @@ import kotlin.properties.Delegates
 class JsCompilationExecutionSource(override val compilation: KotlinJsCompilation) :
     CompilationExecutionSource<KotlinJsCompilation>
 
-open class KotlinJsPlatformTestRun(testRunName: String, subtarget: KotlinJsSubTarget) :
-    KotlinTaskTestRun<JsCompilationExecutionSource, KotlinJsTest>(testRunName, subtarget.target),
+open class KotlinJsPlatformTestRun(testRunName: String, subtarget: KotlinJsPlatformSupport) :
+    KotlinTaskTestRun<JsCompilationExecutionSource, KotlinJsTest>(testRunName, subtarget.kotlinJsTarget),
     CompilationExecutionSourceSupport<KotlinJsCompilation> {
 
     private var _executionSource: JsCompilationExecutionSource by Delegates.notNull()

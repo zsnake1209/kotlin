@@ -27,7 +27,7 @@ import javax.inject.Inject
 open class KotlinJvmTarget @Inject constructor(
     project: Project
 ) : KotlinOnlyTarget<KotlinJvmCompilation>(project, KotlinPlatformType.jvm),
-    KotlinTargetWithTests<JvmClasspathTestRunSource, KotlinJvmTestRun> {
+    KotlinTargetWithTests<KotlinJvmTestRun> {
 
     override lateinit var testRuns: NamedDomainObjectContainer<KotlinJvmTestRun>
 

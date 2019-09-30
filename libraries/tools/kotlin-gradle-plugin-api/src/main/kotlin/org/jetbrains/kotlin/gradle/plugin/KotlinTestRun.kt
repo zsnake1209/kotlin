@@ -6,9 +6,11 @@
 package org.jetbrains.kotlin.gradle.plugin
 
 import groovy.lang.Closure
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.testing.TestFilter
 import org.gradle.util.ConfigureUtil
+import org.jetbrains.kotlin.gradle.plugin.KotlinTargetWithTests.Companion.DEFAULT_TEST_RUN_NAME
 
 interface KotlinTestRun<out SourceType : KotlinExecution.ExecutionSource> : KotlinExecution<SourceType> {
     fun filter(configureFilter: TestFilter.() -> Unit)
@@ -34,4 +36,14 @@ interface ClasspathTestRunSourceSupport {
      * This overrides other [KotlinExecution.executionSource] selection options.
      */
     fun setExecutionSourceFrom(classpath: FileCollection, testClassesDirs: FileCollection)
+}
+
+interface KotlinTestable<T : KotlinTestRun<*>> {
+    /** The container with the test run executions.
+     * It may by default contain a test run by the name [DEFAULT_TEST_RUN_NAME]. */
+    val testRuns: NamedDomainObjectContainer<T>
+
+    companion object {
+        const val DEFAULT_TEST_RUN_NAME = "test"
+    }
 }

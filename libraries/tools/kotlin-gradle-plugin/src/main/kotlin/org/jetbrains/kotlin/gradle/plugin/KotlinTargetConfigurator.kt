@@ -383,42 +383,48 @@ abstract class KotlinOnlyTargetConfigurator<KotlinCompilationType : KotlinCompil
     }
 }
 
-internal interface KotlinTargetWithTestsConfigurator<R : KotlinTargetTestRun<*>, T : KotlinTargetWithTests<*, R>>
-    : KotlinTargetConfigurator<T> {
-
-    override fun configureTarget(target: T) {
-        super.configureTarget(target)
-        configureTest(target)
-    }
-
+internal interface KotlinTestsConfigurator<R : KotlinTestRun<*>, in T : KotlinTestable<R>> {
     val testRunClass: Class<R>
 
-    fun createTestRun(name: String, target: T): R
+    fun createTestRun(name: String, testable: T): R
 
-    fun configureTest(target: T) {
-        initializeTestRuns(target)
-        target.testRuns.create(KotlinTargetWithTests.DEFAULT_TEST_RUN_NAME)
+    fun T.getProject(): Project
+
+    fun configureTest(testable: T) {
+        initializeTestRuns(testable)
+        testable.testRuns.create(KotlinTargetWithTests.DEFAULT_TEST_RUN_NAME)
     }
 
     private fun initializeTestRuns(target: T) {
-        val project = target.project
+        val project = target.getProject()
 
-        val testRunsPropertyName = KotlinTargetWithTests<*, *>::testRuns.name
+        val testRunsPropertyName = KotlinTestable<*>::testRuns.name
         val mutableProperty =
             target::class.memberProperties
                 .find { it.name == testRunsPropertyName } as? KMutableProperty1<*, *>
                 ?: error(
-                    "The ${this::class.qualifiedName} implementation of ${KotlinTargetWithTests::class.qualifiedName} must " +
+                    "The ${this::class.qualifiedName} implementation of ${KotlinTestable::class.qualifiedName} must " +
                             "override the $testRunsPropertyName property with a var."
                 )
 
         val testRunsContainer = project.container(testRunClass) { testRunName -> createTestRun(testRunName, target) }
 
         @Suppress("UNCHECKED_CAST")
-        (mutableProperty as KMutableProperty1<KotlinTargetWithTests<*, R>, NamedDomainObjectContainer<R>>)
+        (mutableProperty as KMutableProperty1<KotlinTestable<R>, NamedDomainObjectContainer<R>>)
             .set(target, testRunsContainer)
 
         (target as ExtensionAware).extensions.add(target::testRuns.name, testRunsContainer)
+    }
+}
+
+internal interface KotlinTargetWithTestsConfigurator<R : KotlinTargetTestRun<*>, T : KotlinTargetWithTests<R>>
+    : KotlinTargetConfigurator<T>, KotlinTestsConfigurator<R, T> {
+
+    override fun T.getProject(): Project = project
+
+    override fun configureTarget(target: T) {
+        super.configureTarget(target)
+        configureTest(target)
     }
 }
 

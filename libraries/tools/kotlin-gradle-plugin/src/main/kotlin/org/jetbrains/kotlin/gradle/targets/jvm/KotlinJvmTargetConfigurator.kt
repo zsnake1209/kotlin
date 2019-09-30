@@ -45,20 +45,20 @@ class KotlinJvmTargetConfigurator(kotlinPluginVersion: String) :
 
     override fun createTestRun(
         name: String,
-        target: KotlinJvmTarget
-    ): KotlinJvmTestRun = KotlinJvmTestRun(name, target).apply {
-        val testTaskOrProvider = target.project.registerTask<KotlinJvmTest>(testTaskName) { testTask ->
-            testTask.targetName = target.disambiguationClassifier
+        testable: KotlinJvmTarget
+    ): KotlinJvmTestRun = KotlinJvmTestRun(name, testable).apply {
+        val testTaskOrProvider = testable.project.registerTask<KotlinJvmTest>(testTaskName) { testTask ->
+            testTask.targetName = testable.disambiguationClassifier
             testTask.project.tasks.findByName(JavaBasePlugin.CHECK_TASK_NAME)?.dependsOn(testTask)
         }
 
         executionTask = testTaskOrProvider
 
-        val testCompilation = target.compilations.getByName(KotlinCompilation.TEST_COMPILATION_NAME)
+        val testCompilation = testable.compilations.getByName(KotlinCompilation.TEST_COMPILATION_NAME)
 
         setExecutionSourceFrom(testCompilation)
 
-        target.project.whenEvaluated {
+        testable.project.whenEvaluated {
             // use afterEvaluate to override the JavaPlugin defaults for Test tasks
             testTaskOrProvider.configure { testTask ->
                 testTask.description = "Runs the tests of the $name test run."
@@ -66,7 +66,7 @@ class KotlinJvmTargetConfigurator(kotlinPluginVersion: String) :
             }
         }
 
-        target.project.kotlinTestRegistry.registerTestTask(testTaskOrProvider)
+        testable.project.kotlinTestRegistry.registerTestTask(testTaskOrProvider)
     }
 
     override fun buildCompilationProcessor(compilation: KotlinJvmCompilation): KotlinSourceSetProcessor<*> {

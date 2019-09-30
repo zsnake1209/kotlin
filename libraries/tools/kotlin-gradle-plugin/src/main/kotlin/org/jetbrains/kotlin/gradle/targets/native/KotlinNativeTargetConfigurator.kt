@@ -395,16 +395,16 @@ class KotlinNativeTargetWithTestsConfigurator(kotlinPluginVersion: String) :
     override val testRunClass: Class<KotlinNativeBinaryTestRun>
         get() = KotlinNativeBinaryTestRun::class.java
 
-    override fun createTestRun(name: String, target: KotlinNativeTargetWithTests): KotlinNativeBinaryTestRun =
-        DefaultKotlinNativeTestRun(name, target).apply {
-            val project = target.project
+    override fun createTestRun(name: String, testable: KotlinNativeTargetWithTests): KotlinNativeBinaryTestRun =
+        DefaultKotlinNativeTestRun(name, testable).apply {
+            val project = testable.project
 
             val testTaskOrProvider = project.registerTask<KotlinNativeTest>(testTaskName) { testTask ->
                 testTask.group = LifecycleBasePlugin.VERIFICATION_GROUP
-                testTask.description = "Executes Kotlin/Native unit tests for target ${target.name}."
-                testTask.targetName = target.name
+                testTask.description = "Executes Kotlin/Native unit tests for target ${testable.name}."
+                testTask.targetName = testable.name
 
-                testTask.enabled = target.konanTarget.isCurrentHost
+                testTask.enabled = testable.konanTarget.isCurrentHost
 
                 testTask.workingDir = project.projectDir.absolutePath
 
@@ -413,7 +413,7 @@ class KotlinNativeTargetWithTestsConfigurator(kotlinPluginVersion: String) :
 
             executionTask = testTaskOrProvider
 
-            setExecutionSourceFrom(target.binaries.getTest(NativeBuildType.DEBUG))
+            setExecutionSourceFrom(testable.binaries.getTest(NativeBuildType.DEBUG))
 
             project.kotlinTestRegistry.registerTestTask(testTaskOrProvider)
         }

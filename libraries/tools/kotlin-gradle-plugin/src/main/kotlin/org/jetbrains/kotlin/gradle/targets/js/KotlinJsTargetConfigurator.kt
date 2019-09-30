@@ -5,52 +5,22 @@
 
 package org.jetbrains.kotlin.gradle.targets.js
 
-import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.kotlin.gradle.plugin.Kotlin2JsSourceSetProcessor
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetProcessor
-import org.jetbrains.kotlin.gradle.plugin.KotlinOnlyTargetConfigurator
-import org.jetbrains.kotlin.gradle.plugin.KotlinTargetWithTestsConfigurator
+import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
+import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsPlatformSupport
+import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinJsPlatformConfigurator
 import org.jetbrains.kotlin.gradle.tasks.KotlinTasksProvider
-import org.jetbrains.kotlin.gradle.testing.internal.KotlinTestReport
 import org.jetbrains.kotlin.gradle.testing.internal.kotlinTestRegistry
 import org.jetbrains.kotlin.gradle.testing.testTaskName
 
-open class KotlinJsTargetConfigurator(kotlinPluginVersion: String) :
-    KotlinOnlyTargetConfigurator<KotlinJsCompilation, KotlinJsTarget>(true, true, kotlinPluginVersion),
-    KotlinTargetWithTestsConfigurator<KotlinJsReportAggregatingTestRun, KotlinJsTarget> {
+abstract class AbstractKotlinJsTargetConfigurator<TargetType : AbstractKotlinJsTarget<TestRunType>, TestRunType>(
+    kotlinPluginVersion: String
+) :
+    KotlinOnlyTargetConfigurator<KotlinJsCompilation, TargetType>(true, true, kotlinPluginVersion),
+    KotlinTargetWithTestsConfigurator<TestRunType, TargetType>
+        where TestRunType : KotlinTargetTestRun<*>, TestRunType : ExecutionTaskHolder<*> {
 
-    override val testRunClass: Class<KotlinJsReportAggregatingTestRun> get() = KotlinJsReportAggregatingTestRun::class.java
-
-    override fun createTestRun(
-        name: String,
-        target: KotlinJsTarget
-    ): KotlinJsReportAggregatingTestRun {
-        val result = KotlinJsReportAggregatingTestRun(name, target)
-
-        val testTask = target.project.kotlinTestRegistry.getOrCreateAggregatedTestTask(
-            name = result.testTaskName,
-            description = "Run JS tests for all platforms"
-        )
-
-        // workaround to avoid the infinite recursion in item factories of the target and the subtargets:
-        target.testRuns.matching { it.name == name }.whenObjectAdded {
-            it.configureAllExecutions {
-                // do not do anything with the aggregated test run, but ensure that they are created
-            }
-        }
-
-        result.executionTask = testTask
-
-        return result
-    }
-
-    override fun buildCompilationProcessor(compilation: KotlinJsCompilation): KotlinSourceSetProcessor<*> {
-        val tasksProvider = KotlinTasksProvider(compilation.target.targetName)
-        return Kotlin2JsSourceSetProcessor(compilation.target.project, tasksProvider, compilation, kotlinPluginVersion)
-    }
-
-    override fun configureCompilations(target: KotlinJsTarget) {
+    override fun configureCompilations(target: TargetType) {
         super.configureCompilations(target)
 
         target.compilations.all {
@@ -60,5 +30,58 @@ open class KotlinJsTargetConfigurator(kotlinPluginVersion: String) :
                 sourceMapEmbedSources = null
             }
         }
+    }
+
+    override fun buildCompilationProcessor(compilation: KotlinJsCompilation): KotlinSourceSetProcessor<*> {
+        val tasksProvider = KotlinTasksProvider(compilation.target.targetName)
+        return Kotlin2JsSourceSetProcessor(compilation.target.project, tasksProvider, compilation, kotlinPluginVersion)
+    }
+}
+
+open class KotlinJsTargetConfigurator(kotlinPluginVersion: String) :
+    AbstractKotlinJsTargetConfigurator<KotlinJsTarget, KotlinJsReportAggregatingTestRun>(kotlinPluginVersion) {
+
+    override val testRunClass: Class<KotlinJsReportAggregatingTestRun> get() = KotlinJsReportAggregatingTestRun::class.java
+
+    override fun createTestRun(
+        name: String,
+        testable: KotlinJsTarget
+    ): KotlinJsReportAggregatingTestRun {
+        val result = KotlinJsReportAggregatingTestRun(name, testable)
+
+        val testTask = testable.project.kotlinTestRegistry.getOrCreateAggregatedTestTask(
+            name = result.testTaskName,
+            description = "Run JS tests for all platforms"
+        )
+
+        // workaround to avoid the infinite recursion in item factories of the target and the subtargets:
+        testable.testRuns.matching { it.name == name }.whenObjectAdded {
+            it.configureAllExecutions {
+                // do not do anything with the aggregated test run, but ensure that they are created
+            }
+        }
+
+        result.executionTask = testTask
+
+        return result
+    }
+}
+
+internal open class KotlinJsPlatformTargetConfigurator<TargetType>(
+    kotlinPluginVersion: String,
+    private val platformConfigurator: KotlinJsPlatformConfigurator<TargetType>
+) : AbstractKotlinJsTargetConfigurator<TargetType, KotlinJsPlatformTestRun>(kotlinPluginVersion),
+    KotlinTestsConfigurator<KotlinJsPlatformTestRun, TargetType>
+        where TargetType : AbstractKotlinJsTarget<KotlinJsPlatformTestRun>, TargetType : KotlinJsPlatformSupport {
+
+    override val testRunClass: Class<KotlinJsPlatformTestRun>
+        get() = platformConfigurator.testRunClass
+
+    override fun createTestRun(name: String, testable: TargetType): KotlinJsPlatformTestRun =
+        platformConfigurator.createTestRun(name, testable)
+
+    override fun configurePlatformSpecificModel(target: TargetType) {
+        super.configurePlatformSpecificModel(target)
+        platformConfigurator.configurePlatformSpecificModel(target)
     }
 }

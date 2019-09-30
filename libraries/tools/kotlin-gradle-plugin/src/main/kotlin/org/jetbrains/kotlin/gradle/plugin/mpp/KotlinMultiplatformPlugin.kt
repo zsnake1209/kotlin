@@ -134,7 +134,11 @@ class KotlinMultiplatformPlugin(
     fun setupDefaultPresets(project: Project) {
         with(project.multiplatformExtension.presets) {
             add(KotlinJvmTargetPreset(project, kotlinPluginVersion))
+
             add(KotlinJsTargetPreset(project, kotlinPluginVersion))
+            add(KotlinNodeJsTargetPreset(project, kotlinPluginVersion))
+            add(KotlinBrowserJsTargetPreset(project, kotlinPluginVersion))
+
             add(KotlinAndroidTargetPreset(project, kotlinPluginVersion))
             add(KotlinJvmWithJavaTargetPreset(project, kotlinPluginVersion))
 

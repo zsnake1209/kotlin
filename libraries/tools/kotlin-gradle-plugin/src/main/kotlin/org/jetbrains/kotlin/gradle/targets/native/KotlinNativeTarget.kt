@@ -68,7 +68,7 @@ open class KotlinNativeTarget @Inject constructor(
 open class KotlinNativeTargetWithTests @Inject constructor(
     project: Project,
     konanTarget: KonanTarget
-) : KotlinNativeTarget(project, konanTarget), KotlinTargetWithTests<NativeBinaryTestRunSource, KotlinNativeBinaryTestRun> {
+) : KotlinNativeTarget(project, konanTarget), KotlinTargetWithTests<KotlinNativeBinaryTestRun> {
 
     override lateinit var testRuns: NamedDomainObjectContainer<KotlinNativeBinaryTestRun>
         internal set

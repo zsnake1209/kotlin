@@ -21,7 +21,7 @@ open class KotlinMultiplatformExtension : KotlinProjectExtension(), KotlinTarget
         internal set
 
     @Suppress("unused") // DSL
-    val testableTargets: NamedDomainObjectCollection<KotlinTargetWithTests<*, *>>
+    val testableTargets: NamedDomainObjectCollection<KotlinTargetWithTests<*>>
         get() = targets.withType(KotlinTargetWithTests::class.java)
 
     internal var isGradleMetadataAvailable: Boolean = false
