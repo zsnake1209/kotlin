@@ -16,6 +16,9 @@ internal fun File.isJavaFile() =
 internal fun File.isKotlinFile(sourceFilesExtensions: List<String>): Boolean =
     !isJavaFile() && sourceFilesExtensions.any { it.equals(extension, ignoreCase = true) }
 
+internal fun File.relativeOrCanonicalFile(base: File): File =
+    relativeToOrNull(base) ?: canonicalFile
+
 internal fun File.relativeOrCanonical(base: File): String =
     relativeToOrNull(base)?.path ?: canonicalPath
 
@@ -43,3 +46,6 @@ internal fun File.isParentOf(childCandidate: File, strict: Boolean = false): Boo
         childCandidatePath.startsWith(parentPath)
     }
 }
+
+internal val File.systemIndependentPath: String
+    get() = path.replace('\\', '/')

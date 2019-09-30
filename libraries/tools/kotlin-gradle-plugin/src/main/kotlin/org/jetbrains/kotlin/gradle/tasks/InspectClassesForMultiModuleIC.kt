@@ -9,11 +9,12 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.*
-import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.KotlinSingleJavaTargetExtension
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
+import org.jetbrains.kotlin.gradle.utils.*
 import org.jetbrains.kotlin.gradle.utils.archivePathCompatible
+import org.jetbrains.kotlin.gradle.utils.relativeOrCanonicalFile
 import java.io.File
 
 internal open class InspectClassesForMultiModuleIC : DefaultTask() {
@@ -30,6 +31,7 @@ internal open class InspectClassesForMultiModuleIC : DefaultTask() {
 
     @Suppress("MemberVisibilityCanBePrivate")
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     internal val classFiles: FileCollection
         get() {
             val convention = project.convention.findPlugin(JavaPluginConvention::class.java)
@@ -39,9 +41,11 @@ internal open class InspectClassesForMultiModuleIC : DefaultTask() {
             return project.files(fileTrees)
         }
 
+    // used as task input
+    @Suppress("unused")
     @get:Input
     internal val archivePath: String
-        get() = jarTask.archivePathCompatible.canonicalPath
+        get() = jarTask.archivePathCompatible.relativeOrCanonicalFile(project.rootDir).systemIndependentPath
 
     @TaskAction
     fun run() {
@@ -49,7 +53,4 @@ internal open class InspectClassesForMultiModuleIC : DefaultTask() {
         val text = classFiles.map { it.absolutePath }.sorted().joinToString(File.pathSeparator)
         classesListFile.writeText(text)
     }
-
-    private fun sanitizeFileName(candidate: String): String =
-        candidate.filter { it.isLetterOrDigit() }
 }
