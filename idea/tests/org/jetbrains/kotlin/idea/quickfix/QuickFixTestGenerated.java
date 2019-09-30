@@ -1766,6 +1766,16 @@ public class QuickFixTestGenerated extends AbstractQuickFixTest {
             runTest("idea/testData/quickfix/autoImports/checkNoStackOverflowInImportInnerClassInCurrentFile.kt");
         }
 
+        @TestMetadata("companionObjectMemberExtensionFunctionImportWhenExplicitReceiverPresent.kt")
+        public void testCompanionObjectMemberExtensionFunctionImportWhenExplicitReceiverPresent() throws Exception {
+            runTest("idea/testData/quickfix/autoImports/companionObjectMemberExtensionFunctionImportWhenExplicitReceiverPresent.kt");
+        }
+
+        @TestMetadata("companionObjectMemberExtensionPropertyImportWhenExplicitReceiverPresent.kt")
+        public void testCompanionObjectMemberExtensionPropertyImportWhenExplicitReceiverPresent() throws Exception {
+            runTest("idea/testData/quickfix/autoImports/companionObjectMemberExtensionPropertyImportWhenExplicitReceiverPresent.kt");
+        }
+
         @TestMetadata("conflictWithClassIdentifier.kt")
         public void testConflictWithClassIdentifier() throws Exception {
             runTest("idea/testData/quickfix/autoImports/conflictWithClassIdentifier.kt");
