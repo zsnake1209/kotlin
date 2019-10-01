@@ -54,18 +54,42 @@ class OrdinaryClassLoadingAdapter : ClassLoadingAdapter {
                     super.visit(version, access, name, signature, newSuperName, interfaces)
                 }
             }
-            val reader = ClassReader(bytes)
-            reader.accept(classVisitor, 0)
-            // create toString() for generated Lambda subtype
-            if (reader.superName == "kotlin/jvm/internal/Lambda")
+            ClassReader(bytes).apply {
+                accept(classVisitor, 0)
+                if (superName == "kotlin/jvm/internal/Lambda")
+                    addCustomToString(classVisitor, funSignature)
+            }
+            return classWriter.toByteArray()
+        }
+
+        // create toString() for generated Lambda subtype
+        private fun addCustomToString(classVisitor: ClassVisitor, sig: String?) {
+            if (sig != null)
                 classVisitor.visitMethod(Opcodes.ACC_PUBLIC, "toString", "()Ljava/lang/String;", null, null).apply {
                     visitCode()
-                    visitLdcInsn(funSignature?.substringAfter("Lkotlin/jvm/internal/Lambda;Lkotlin/jvm/functions/"))
+                    visitLdcInsn(transformSignature(sig))
                     visitInsn(Opcodes.ARETURN)
                     visitMaxs(1, 1)
                     visitEnd()
                 }
-            return classWriter.toByteArray()
+        }
+
+        private fun transformSignature(sig: String): String {
+            val descriptorPos = sig.indexOf("Lkotlin/jvm/functions/Function")
+            return if (descriptorPos < 0)
+                "Function"
+            else
+                Type.getType(sig.substring(descriptorPos)).className.replace(Regex("(<L|;L|;>|;-L|;\\+L|<-L|<\\+L)")) {
+                    when (it.value) {
+                        "<L" -> "<"
+                        ";>" -> ">"
+                        ";-L" -> ", in "
+                        ";+L" -> ", out "
+                        "<-L" -> "<in "
+                        "<+L" -> "<out "
+                        else -> ", "
+                    }
+                }
         }
 
         fun useMagicAccessor(context: ExecutionContext): Boolean {
