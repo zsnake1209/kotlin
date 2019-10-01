@@ -370,7 +370,7 @@ internal class ImportFix(expression: KtSimpleNameExpression) : OrdinaryImportFix
         val dispatcherReceiver = dispatchReceiverParameter.takeIf { checkDispatchReceiver }
 
         return if (dispatcherReceiver == null) {
-            actualReceivers.explicitReceivers.isNotEmpty()
+            actualReceivers.explicitReceivers.isEmpty()
         } else {
             val typesToCheck = with(actualReceivers) { explicitReceivers.ifEmpty { allReceivers } }
             typesToCheck.any { it.isSubtypeOf(dispatcherReceiver.type) }
