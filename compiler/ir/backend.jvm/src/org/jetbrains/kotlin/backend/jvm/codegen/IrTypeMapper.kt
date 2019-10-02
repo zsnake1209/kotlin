@@ -157,7 +157,7 @@ class IrTypeMapper(private val context: JvmBackendContext) : KotlinTypeMapperBas
                 prefix + className
             }
             is IrClass -> {
-                computeInternalName(parent) + "$" + className
+                classInternalName(parent) + "$" + className
             }
             else -> error(
                 "Local class should have its name computed in InventNamesForLocalClasses: ${klass.fqNameWhenAvailable}\n" +
