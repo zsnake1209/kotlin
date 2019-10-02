@@ -147,9 +147,8 @@ class KotlinUnusedImportInspection : AbstractKotlinInspection() {
         val progress = generateSequence(ProgressManager.getInstance().progressIndicator) {
             (it as? ProgressWrapper)?.originalProgressIndicator
         }.last() as DaemonProgressIndicator
-        val highlightingSession = HighlightingSessionImpl.getHighlightingSession(file, progress)
 
-        val project = highlightingSession.project
+        val project = file.project
 
         val modificationCount = PsiModificationTracker.SERVICE.getInstance(project).modificationCount
         val invokeFixLater = Disposable {
