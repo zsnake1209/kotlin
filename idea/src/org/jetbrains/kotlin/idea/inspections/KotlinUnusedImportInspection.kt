@@ -22,7 +22,6 @@ import com.intellij.codeInsight.daemon.QuickFixBundle
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx
 import com.intellij.codeInsight.daemon.impl.DaemonListeners
 import com.intellij.codeInsight.daemon.impl.DaemonProgressIndicator
-import com.intellij.codeInsight.daemon.impl.HighlightingSessionImpl
 import com.intellij.codeInsight.intention.LowPriorityAction
 import com.intellij.codeInspection.*
 import com.intellij.lang.annotation.HighlightSeverity
