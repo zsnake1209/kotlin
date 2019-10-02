@@ -22,10 +22,8 @@ class DebuggerFieldExpressionCodegenExtension : ExpressionCodegenExtension {
         val propertyDescriptor = resolvedCall.resultingDescriptor as? PropertyDescriptor ?: return null
 
         if (propertyDescriptor is DebuggerFieldPropertyDescriptor) {
-            val isStatic = with(propertyDescriptor.containingDeclaration) {
-                this is LazyClassDescriptor && isCompanionObject
-                // companion object's properties are static fields in containing class
-            }
+            // companion object's properties are static fields in containing class
+            val isStatic = (propertyDescriptor.containingDeclaration as? LazyClassDescriptor)?.isCompanionObject ?: false
             return StackValue.StackValueWithSimpleReceiver.field(
                 c.typeMapper.mapType(propertyDescriptor.type),
                 propertyDescriptor.ownerType(c.codegen.state),
