@@ -37,7 +37,7 @@ class JsEvaluationState(lock: ReentrantReadWriteLock, val engine: ScriptEngine) 
     }
 }
 
-class CompiledToJsScript(
+class JsCompiledScript(
     val jsCode: String,
     override val compilationConfiguration: ScriptCompilationConfiguration
 ) : CompiledScript<Any> {

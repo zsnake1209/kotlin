@@ -27,7 +27,7 @@ class JsScriptCompiler(environment: KotlinCoreEnvironment) : ScriptCompiler {
         val compileResult = compiler.compile(makeReplCodeLine(0, script.text))
         return when (compileResult) {
             is CompiledClasses -> ResultWithDiagnostics.Success(
-                CompiledToJsScript(compileResult.data as String, scriptCompilationConfiguration)
+                JsCompiledScript(compileResult.data as String, scriptCompilationConfiguration)
             )
             is Incomplete -> ResultWithDiagnostics.Failure(
                 ScriptDiagnostic("Incomplete code")

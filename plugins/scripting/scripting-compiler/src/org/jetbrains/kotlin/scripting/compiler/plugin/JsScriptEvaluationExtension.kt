@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.scripting.configuration.ScriptingConfigurationKeys
 import org.jetbrains.kotlin.scripting.definitions.ScriptDefinition
 import org.jetbrains.kotlin.scripting.definitions.platform
-import org.jetbrains.kotlin.scripting.repl.js.CompiledToJsScript
+import org.jetbrains.kotlin.scripting.repl.js.JsCompiledScript
 import org.jetbrains.kotlin.scripting.repl.js.JsScriptCompiler
 import org.jetbrains.kotlin.scripting.repl.js.JsScriptDependencyCompiler
 import org.jetbrains.kotlin.scripting.repl.js.JsScriptEvaluator
@@ -73,10 +73,10 @@ class JsScriptEvaluationExtension : AbstractScriptEvaluationExtension() {
         this.environment = environment
 
         return scriptCompiler.invoke(script, scriptCompilationConfiguration).onSuccess {
-            val compiledResult = it as CompiledToJsScript
+            val compiledResult = it as JsCompiledScript
             val actualResult = dependencyJsCode?.let { d ->
                 dependencyJsCode = null
-                CompiledToJsScript(d + "\n" + compiledResult.jsCode, compiledResult.compilationConfiguration)
+                JsCompiledScript(d + "\n" + compiledResult.jsCode, compiledResult.compilationConfiguration)
             } ?: compiledResult
 
             ResultWithDiagnostics.Success(actualResult)
