@@ -83,8 +83,6 @@ abstract class AbstractScriptEvaluationExtension : ScriptEvaluationExtension {
         }
         val scriptCompilationConfiguration = definition.compilationConfiguration
 
-        val scriptEvaluator = createScriptEvaluator()
-
         return runBlocking {
             val compiledScript = compilerInvoke(
                 environment,
@@ -97,7 +95,7 @@ abstract class AbstractScriptEvaluationExtension : ScriptEvaluationExtension {
                 return@runBlocking ExitCode.COMPILATION_ERROR
             }
 
-            val evalResult = scriptEvaluator.invoke(compiledScript, evaluationConfiguration).valueOr {
+            val evalResult = createScriptEvaluator().invoke(compiledScript, evaluationConfiguration).valueOr {
                 for (report in it.reports) {
                     messageCollector.report(report.severity.toCompilerMessageSeverity(), report.render(withSeverity = false))
                 }
