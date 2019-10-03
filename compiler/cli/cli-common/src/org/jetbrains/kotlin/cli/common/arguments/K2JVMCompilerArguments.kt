@@ -251,9 +251,6 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
     )
     var jvmDefault: String by FreezableVar(JvmDefaultMode.DEFAULT.description)
 
-    @Argument(value = "-Xdisable-default-scripting-plugin", description = "Do not enable scripting plugin by default")
-    var disableDefaultScriptingPlugin: Boolean by FreezableVar(false)
-
     @Argument(value = "-Xdisable-standard-script", description = "Disable standard kotlin script support")
     var disableStandardScript: Boolean by FreezableVar(false)
 

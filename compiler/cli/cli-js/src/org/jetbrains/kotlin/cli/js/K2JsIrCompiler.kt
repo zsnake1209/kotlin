@@ -67,9 +67,7 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
     ): ExitCode {
         val messageCollector = configuration.getNotNull(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
 
-        val pluginClasspaths: Iterable<String> = arguments.pluginClasspaths?.asIterable() ?: emptyList()
-        val pluginOptions = arguments.pluginOptions?.toMutableList() ?: ArrayList()
-        val pluginLoadResult = loadPlugins(configuration, paths, pluginClasspaths, pluginOptions)
+        val pluginLoadResult = loadPlugins(paths, arguments, configuration)
         if (pluginLoadResult != ExitCode.OK) return pluginLoadResult
 
         //TODO: add to configuration everything that may come in handy at script compiler and use it there
@@ -319,15 +317,7 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
         return JsMetadataVersion(*versionArray)
     }
 
-    private fun loadPlugins(
-        configuration: CompilerConfiguration,
-        paths: KotlinPaths? = null,
-        passedPluginClasspaths: Iterable<String> = emptyList(),
-        pluginOptions: MutableList<String> = mutableListOf()
-    ): ExitCode {
-        val pluginClasspaths: Iterable<String> = commonLoadPlugins(configuration, paths, passedPluginClasspaths)
-        return PluginCliParser.loadPluginsSafe(pluginClasspaths, pluginOptions, configuration)
-    }
+    override fun MutableList<String>.addPlatformOptions(arguments: K2JSCompilerArguments) {}
 
     companion object {
         private val moduleKindMap = mapOf(

@@ -307,6 +307,9 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
     )
     var useFir: Boolean by FreezableVar(false)
 
+    @Argument(value = "-Xdisable-default-scripting-plugin", description = "Do not enable scripting plugin by default")
+    var disableDefaultScriptingPlugin: Boolean by FreezableVar(false)
+
     open fun configureAnalysisFlags(collector: MessageCollector): MutableMap<AnalysisFlag<*>, Any> {
         return HashMap<AnalysisFlag<*>, Any>().apply {
             put(AnalysisFlags.skipMetadataVersionCheck, skipMetadataVersionCheck)

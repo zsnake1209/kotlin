@@ -198,26 +198,17 @@ class K2JVMCompiler : CLICompiler<K2JVMCompilerArguments>() {
         }
     }
 
-    private fun loadPlugins(paths: KotlinPaths?, arguments: K2JVMCompilerArguments, configuration: CompilerConfiguration): ExitCode {
-        var pluginClasspaths: Iterable<String> = arguments.pluginClasspaths?.asIterable() ?: emptyList()
-        val pluginOptions = arguments.pluginOptions?.toMutableList() ?: ArrayList()
-
-        if (!arguments.disableDefaultScriptingPlugin) {
-            pluginClasspaths = commonLoadPlugins(configuration, paths, pluginClasspaths)
-            if (arguments.scriptTemplates?.isNotEmpty() == true) {
-                pluginOptions.add("plugin:kotlin.scripting:script-templates=${arguments.scriptTemplates!!.joinToString(",")}")
-            }
-            if (arguments.scriptResolverEnvironment?.isNotEmpty() == true) {
-                pluginOptions.add(
-                    "plugin:kotlin.scripting:script-resolver-environment=${arguments.scriptResolverEnvironment!!.joinToString(
-                        ","
-                    )}"
-                )
-            }
-        } else {
-            pluginOptions.add("plugin:kotlin.scripting:disable=true")
+    override fun MutableList<String>.addPlatformOptions(arguments: K2JVMCompilerArguments) {
+        if (arguments.scriptTemplates?.isNotEmpty() == true) {
+            add("plugin:kotlin.scripting:script-templates=${arguments.scriptTemplates!!.joinToString(",")}")
         }
-        return PluginCliParser.loadPluginsSafe(pluginClasspaths, pluginOptions, configuration)
+        if (arguments.scriptResolverEnvironment?.isNotEmpty() == true) {
+            add(
+                "plugin:kotlin.scripting:script-resolver-environment=${arguments.scriptResolverEnvironment!!.joinToString(
+                    ","
+                )}"
+            )
+        }
     }
 
     private fun createCoreEnvironment(

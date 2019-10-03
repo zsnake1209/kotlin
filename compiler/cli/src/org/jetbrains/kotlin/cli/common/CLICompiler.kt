@@ -38,6 +38,7 @@ import org.jetbrains.kotlin.utils.KotlinPaths
 import org.jetbrains.kotlin.utils.PathUtil
 import java.io.File
 import java.io.PrintStream
+import java.util.ArrayList
 
 abstract class CLICompiler<A : CommonCompilerArguments> : CLITool<A>() {
 
@@ -135,34 +136,36 @@ abstract class CLICompiler<A : CommonCompilerArguments> : CLITool<A>() {
         paths: KotlinPaths?
     ): ExitCode
 
-    protected fun commonLoadPlugins(
-        configuration: CompilerConfiguration,
-        paths: KotlinPaths? = null,
-        passedPluginClasspaths: Iterable<String> = emptyList()
-    ): Iterable<String> {
-        var pluginClasspaths: Iterable<String> = passedPluginClasspaths
-        val explicitOrLoadedScriptingPlugin =
-            pluginClasspaths.any { File(it).name.startsWith(PathUtil.KOTLIN_SCRIPTING_COMPILER_PLUGIN_NAME) } ||
-                    tryLoadScriptingPluginFromCurrentClassLoader(configuration)
-        // if scripting plugin is not enabled explicitly (probably from another path) and not in the classpath already,
-        // try to find and enable it implicitly
-        if (!explicitOrLoadedScriptingPlugin) {
-            val kotlinPaths = paths ?: PathUtil.kotlinPathsForCompiler
-            val libPath = kotlinPaths.libPath.takeIf { it.exists() && it.isDirectory } ?: File(".")
-            val (jars, missingJars) =
-                PathUtil.KOTLIN_SCRIPTING_PLUGIN_CLASSPATH_JARS.map { File(libPath, it) }.partition { it.exists() }
-            if (missingJars.isEmpty()) {
-                pluginClasspaths = jars.map { it.canonicalPath } + pluginClasspaths
-            } else {
-                val messageCollector = configuration.getNotNull(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
-                messageCollector.report(
-                    CompilerMessageSeverity.LOGGING,
-                    "Scripting plugin will not be loaded: not all required jars are present in the classpath (missing files: $missingJars)"
-                )
-            }
-        }
+    protected abstract fun MutableList<String>.addPlatformOptions(arguments: A)
 
-        return pluginClasspaths
+    protected fun loadPlugins(paths: KotlinPaths?, arguments: A, configuration: CompilerConfiguration): ExitCode {
+        var pluginClasspaths: Iterable<String> = arguments.pluginClasspaths?.asIterable() ?: emptyList()
+        val pluginOptions = arguments.pluginOptions?.toMutableList() ?: ArrayList()
+
+        if (!arguments.disableDefaultScriptingPlugin) {
+            val explicitOrLoadedScriptingPlugin =
+                pluginClasspaths.any { File(it).name.startsWith(PathUtil.KOTLIN_SCRIPTING_COMPILER_PLUGIN_NAME) } ||
+                        tryLoadScriptingPluginFromCurrentClassLoader(configuration)
+            if (!explicitOrLoadedScriptingPlugin) {
+                val kotlinPaths = paths ?: PathUtil.kotlinPathsForCompiler
+                val libPath = kotlinPaths.libPath.takeIf { it.exists() && it.isDirectory } ?: File(".")
+                val (jars, missingJars) =
+                    PathUtil.KOTLIN_SCRIPTING_PLUGIN_CLASSPATH_JARS.map { File(libPath, it) }.partition { it.exists() }
+                if (missingJars.isEmpty()) {
+                    pluginClasspaths = jars.map { it.canonicalPath } + pluginClasspaths
+                } else {
+                    val messageCollector = configuration.getNotNull(MESSAGE_COLLECTOR_KEY)
+                    messageCollector.report(
+                        CompilerMessageSeverity.LOGGING,
+                        "Scripting plugin will not be loaded: not all required jars are present in the classpath (missing files: $missingJars)"
+                    )
+                }
+            }
+            pluginOptions.addPlatformOptions(arguments)
+        } else {
+            pluginOptions.add("plugin:kotlin.scripting:disable=true")
+        }
+        return PluginCliParser.loadPluginsSafe(pluginClasspaths, pluginOptions, configuration)
     }
 
     private fun tryLoadScriptingPluginFromCurrentClassLoader(configuration: CompilerConfiguration): Boolean = try {
