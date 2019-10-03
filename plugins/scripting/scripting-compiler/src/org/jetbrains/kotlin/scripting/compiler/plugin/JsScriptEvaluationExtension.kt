@@ -22,6 +22,8 @@ import kotlin.script.experimental.api.*
 import kotlin.script.experimental.host.ScriptingHostConfiguration
 import kotlin.script.experimental.jvm.JsDependency
 
+// TODO: the code below has to be considered as temporary hack and removed ASAP.
+// Actual ScriptCompilationConfiguration should be set up from CompilerConfiguration.
 fun loadScriptConfiguration(configuration: CompilerConfiguration) {
     val scriptConfiguration = ScriptCompilationConfiguration {
         baseClass("kotlin.Any")
