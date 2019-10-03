@@ -30,11 +30,11 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.runInEdtAndWait
 import com.sun.jdi.*
 import com.sun.jdi.Value
 import org.jetbrains.eval4j.*
-import org.jetbrains.eval4j.Value as Eval4JValue
 import org.jetbrains.eval4j.jdi.JDIEval
 import org.jetbrains.eval4j.jdi.asJdiValue
 import org.jetbrains.eval4j.jdi.asValue
@@ -49,32 +49,35 @@ import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.idea.core.util.attachmentByPsiFile
 import org.jetbrains.kotlin.idea.core.util.mergeAttachments
 import org.jetbrains.kotlin.idea.core.util.runInReadActionWithWriteActionPriorityWithPCE
-import org.jetbrains.kotlin.idea.debugger.*
+import org.jetbrains.kotlin.idea.debugger.DebuggerUtils
+import org.jetbrains.kotlin.idea.debugger.evaluate.EvaluationStatus.EvaluationContextLanguage
 import org.jetbrains.kotlin.idea.debugger.evaluate.KotlinDebuggerCaches.Companion.compileCodeFragmentCacheAware
 import org.jetbrains.kotlin.idea.debugger.evaluate.classLoading.GENERATED_CLASS_NAME
 import org.jetbrains.kotlin.idea.debugger.evaluate.classLoading.GENERATED_FUNCTION_NAME
 import org.jetbrains.kotlin.idea.debugger.evaluate.compilation.*
+import org.jetbrains.kotlin.idea.debugger.evaluate.compilingEvaluator.ClassLoadingResult
 import org.jetbrains.kotlin.idea.debugger.evaluate.compilingEvaluator.loadClassesSafely
 import org.jetbrains.kotlin.idea.debugger.evaluate.variables.EvaluatorValueConverter
 import org.jetbrains.kotlin.idea.debugger.evaluate.variables.VariableFinder
+import org.jetbrains.kotlin.idea.debugger.safeLocation
+import org.jetbrains.kotlin.idea.debugger.safeMethod
+import org.jetbrains.kotlin.idea.debugger.safeVisibleVariableByName
+import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
 import org.jetbrains.kotlin.idea.util.application.runReadAction
+import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.psiUtil.isAncestor
 import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.isInlineClassType
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
-import org.jetbrains.org.objectweb.asm.*
-import org.jetbrains.org.objectweb.asm.tree.ClassNode
-import org.jetbrains.kotlin.idea.debugger.evaluate.EvaluationStatus.EvaluationContextLanguage
-import org.jetbrains.kotlin.idea.debugger.evaluate.compilingEvaluator.ClassLoadingResult
-import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
-import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
-import org.jetbrains.kotlin.psi.psiUtil.endOffset
-import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
+import org.jetbrains.org.objectweb.asm.ClassReader
 import org.jetbrains.org.objectweb.asm.Type
+import org.jetbrains.org.objectweb.asm.tree.ClassNode
 import java.util.*
+import org.jetbrains.eval4j.Value as Eval4JValue
 
 internal val LOG = Logger.getInstance(KotlinEvaluator::class.java)
 
@@ -437,28 +440,33 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
     ): VariableFinder.Result? {
         val thread = context.frameProxy.threadProxy()
         val currentFramePsi = context.debugProcess.positionManager
-            .getSourcePosition(context.frameProxy.location())?.elementAt ?: return null // compute once
-        val frameToVar = thread.forceFrames().firstNotNullResult {
-            val variable = it.safeVisibleVariableByName(parameter.name)
-            if (variable == null || variable.type.name() != asmType.className
-                || !isContainingFrame(context.debugProcess.positionManager, currentFramePsi, it)
-            )
-                null
-            else    // variable is found and it has same type and is from closure
-                it to variable
+            .getSourcePosition(context.frameProxy.safeLocation())?.elementAt ?: return null // compute once
+        return try {
+            thread.forceFrames().firstNotNullResult { frameProxy ->
+                val variable = frameProxy.safeVisibleVariableByName(parameter.name)
+                if (variable == null || variable.type.name() != asmType.className
+                    || !isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
+                ) {
+                    return@firstNotNullResult null
+                } else {
+                    // variable is found and it has same type and is from closure
+                    return@firstNotNullResult VariableFinder.Result(frameProxy.getValue(variable))
+                }
+            }
+        } catch (e: Throwable) {
+            null
         }
-        return frameToVar?.let { VariableFinder.Result(it.first.getValue(it.second)) }
     }
 
-    private fun isContainingFrame(manager: PositionManager, innerPsi: PsiElement, outer: StackFrameProxyImpl) = runReadAction {
-        var outerPsi: PsiElement? = manager.getSourcePosition(outer.location())?.elementAt?.context
-        while (outerPsi != null) {
-            if (outerPsi is KtLambdaExpression || outerPsi is KtNamedFunction) break
-            outerPsi = outerPsi.context
-        }       // find lambda or fun from the frame and check whether it contains declaration of our lambda
-        outerPsi != null && innerPsi.containingFile == outerPsi.containingFile &&
-                innerPsi.startOffset >= outerPsi.startOffset
-                && innerPsi.endOffset <= outerPsi.endOffset
+    private fun isContainingFrame(manager: PositionManager, innerPsi: PsiElement, outer: StackFrameProxyImpl): Boolean = runReadAction {
+        var outerPsi: PsiElement? = manager.getSourcePosition(outer.location())?.elementAt // current line
+        outerPsi = PsiTreeUtil.getParentOfType(
+            outerPsi, KtLambdaExpression::class.java,
+            KtFunction::class.java,
+            KtPropertyAccessor::class.java,
+            KtClassInitializer::class.java
+        ) // the containing fun
+        outerPsi != null && outerPsi.isAncestor(innerPsi)
     }
 
     override fun getModifier() = null
