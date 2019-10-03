@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
 import org.jetbrains.kotlin.backend.common.lower.irBlock
 import org.jetbrains.kotlin.backend.common.phaser.makeIrFilePhase
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
+import org.jetbrains.kotlin.backend.jvm.ir.isPropertyReference
 import org.jetbrains.kotlin.backend.jvm.localDeclarationsPhase
 import org.jetbrains.kotlin.codegen.SamWrapperCodegen
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -157,8 +158,12 @@ class SingleAbstractMethodLowering(val context: CommonBackendContext) : FileLowe
             dispatchReceiverParameter = subclass.thisReceiver!!.copyTo(this)
             superMethod.valueParameters.mapTo(valueParameters) { it.copyTo(this) }
             val invokableClass = invokableType.classifierOrFail.owner as IrClass
+            val callee = when {
+                invokableClass.isPropertyReference() -> invokableClass.functions.single { it.name == OperatorNameConventions.GET }
+                else -> invokableClass.functions.single { it.name == OperatorNameConventions.INVOKE }
+            }
             body = context.createIrBuilder(symbol).run {
-                irExprBody(irCall(invokableClass.functions.single { it.name == OperatorNameConventions.INVOKE }).apply {
+                irExprBody(irCall(callee).apply {
                     dispatchReceiver = irGetField(irGet(dispatchReceiverParameter!!), field)
                     valueParameters.forEachIndexed { i, parameter -> putValueArgument(i, irGet(parameter)) }
                 })
