@@ -161,12 +161,18 @@ public annotation class JsNonModule
 @Target(AnnotationTarget.FILE)
 public annotation class JsQualifier(val value: String)
 
+@Experimental(level = Experimental.Level.WARNING)
+@SinceKotlin("1.3")
+public annotation class ExperimentalJsExport
+
 /**
  * Exports top-level declaration.
  *
  * Used in future IR-based backend.
  * Has no effect in current JS backend.
  */
+@ExperimentalJsExport
+@SinceKotlin("1.3")
 @Retention(AnnotationRetention.BINARY)
 @Target(CLASS, PROPERTY, FUNCTION, FILE)
 public annotation class JsExport
