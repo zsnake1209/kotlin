@@ -21,10 +21,6 @@ import kotlin.script.experimental.jvm.jvm
 
 class JvmCliScriptEvaluationExtension : AbstractScriptEvaluationExtension() {
 
-    override fun getSourcePath(arguments: CommonCompilerArguments): String {
-        return arguments.freeArgs.first()
-    }
-
     override fun ScriptEvaluationConfiguration.Builder.platformEvaluationConfiguration() {
         jvm {
             baseClassLoader(null)

@@ -45,9 +45,6 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
     @Argument(value = "-no-reflect", description = "Don't include kotlin-reflect.jar into classpath")
     var noReflect: Boolean by FreezableVar(false)
 
-    @Argument(value = "-script", description = "Evaluate the script file")
-    var script: Boolean by FreezableVar(false)
-
     @Argument(
         value = "-script-templates",
         valueDescription = "<fully qualified class name[,]>",

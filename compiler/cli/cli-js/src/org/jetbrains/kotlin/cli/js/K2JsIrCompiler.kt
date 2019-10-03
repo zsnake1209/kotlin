@@ -9,8 +9,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.kotlin.cli.common.*
-import org.jetbrains.kotlin.cli.common.ExitCode.COMPILATION_ERROR
-import org.jetbrains.kotlin.cli.common.ExitCode.OK
+import org.jetbrains.kotlin.cli.common.ExitCode.*
 import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.common.arguments.K2JsArgumentConstants
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
@@ -74,7 +73,13 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
         if (pluginLoadResult != ExitCode.OK) return pluginLoadResult
 
         //TODO: add to configuration everything that may come in handy at script compiler and use it there
-        if (arguments.scriptPath != null) {
+        if (arguments.script) {
+
+            if (!arguments.enableJsScripting) {
+                messageCollector.report(ERROR, "Script for K/JS should be enabled explicitly, see --enable-js-scripting")
+                return COMPILATION_ERROR
+            }
+
             configuration.put(CommonConfigurationKeys.MODULE_NAME, "repl.kts")
 
             val environment = KotlinCoreEnvironment.getOrCreateApplicationEnvironmentForProduction(rootDisposable, configuration)

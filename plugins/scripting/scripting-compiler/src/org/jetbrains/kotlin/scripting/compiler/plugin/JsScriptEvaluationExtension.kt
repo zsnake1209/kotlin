@@ -36,10 +36,6 @@ fun loadScriptConfiguration(configuration: CompilerConfiguration) {
 
 class JsScriptEvaluationExtension : AbstractScriptEvaluationExtension() {
 
-    override fun getSourcePath(arguments: CommonCompilerArguments): String {
-        return (arguments as K2JSCompilerArguments).scriptPath!!
-    }
-
     override fun setupScriptConfiguration(configuration: CompilerConfiguration, sourcePath: String) {
         loadScriptConfiguration(configuration)
     }

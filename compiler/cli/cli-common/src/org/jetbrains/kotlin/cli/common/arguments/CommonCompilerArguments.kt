@@ -76,6 +76,9 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
     )
     var progressiveMode by FreezableVar(false)
 
+    @Argument(value = "-script", description = "Evaluate the script file")
+    var script: Boolean by FreezableVar(false)
+
     @Argument(value = "-P", valueDescription = PLUGIN_OPTION_FORMAT, description = "Pass an option to a plugin")
     var pluginOptions: Array<String>? by FreezableVar(null)
 

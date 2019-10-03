@@ -23,8 +23,6 @@ import kotlin.script.experimental.host.toScriptSource
 
 abstract class AbstractScriptEvaluationExtension : ScriptEvaluationExtension {
 
-    abstract fun getSourcePath(arguments: CommonCompilerArguments): String
-
     abstract fun setupScriptConfiguration(configuration: CompilerConfiguration, sourcePath: String)
 
     abstract fun createEnvironment(
@@ -53,7 +51,7 @@ abstract class AbstractScriptEvaluationExtension : ScriptEvaluationExtension {
             messageCollector.report(CompilerMessageSeverity.ERROR, "Unable to process the script, scripting plugin is not configured")
             return ExitCode.COMPILATION_ERROR
         }
-        val sourcePath = getSourcePath(arguments)
+        val sourcePath = arguments.freeArgs.first()
 
         setupScriptConfiguration(configuration, sourcePath)
 
