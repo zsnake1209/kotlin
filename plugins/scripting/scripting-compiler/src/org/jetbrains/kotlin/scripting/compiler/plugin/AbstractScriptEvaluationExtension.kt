@@ -31,12 +31,7 @@ abstract class AbstractScriptEvaluationExtension : ScriptEvaluationExtension {
     ): KotlinCoreEnvironment
 
     abstract fun createScriptEvaluator(): ScriptEvaluator
-
-    abstract suspend fun compilerInvoke(
-        environment: KotlinCoreEnvironment,
-        script: SourceCode,
-        scriptCompilationConfiguration: ScriptCompilationConfiguration
-    ): ResultWithDiagnostics<CompiledScript<*>>
+    abstract fun createScriptCompiler(environment: KotlinCoreEnvironment): ScriptCompilerProxy
 
     protected abstract fun ScriptEvaluationConfiguration.Builder.platformEvaluationConfiguration()
 
@@ -82,13 +77,10 @@ abstract class AbstractScriptEvaluationExtension : ScriptEvaluationExtension {
 
         }
         val scriptCompilationConfiguration = definition.compilationConfiguration
+        val scriptCompiler = createScriptCompiler(environment)
 
         return runBlocking {
-            val compiledScript = compilerInvoke(
-                environment,
-                script,
-                scriptCompilationConfiguration
-            ).valueOr {
+            val compiledScript = scriptCompiler.compile(script, scriptCompilationConfiguration).valueOr {
                 for (report in it.reports) {
                     messageCollector.report(report.severity.toCompilerMessageSeverity(), report.render(withSeverity = false))
                 }
