@@ -140,8 +140,8 @@ interface ParcelableSyntheticComponent {
     }
 }
 
-val PARCELIZE_CLASS_FQNAME: FqName = FqName(Parcelize::class.java.canonicalName)
-internal val PARCELER_FQNAME: FqName = FqName(Parceler::class.java.canonicalName)
+val PARCELIZE_CLASS_FQNAME: FqName = FqName("kotlinx.android.parcel.Parcelize")
+internal val PARCELER_FQNAME: FqName = FqName("kotlinx.android.parcel.Parceler")
 
 val ClassDescriptor.isParcelize: Boolean
     get() = this.annotations.hasAnnotation(PARCELIZE_CLASS_FQNAME)

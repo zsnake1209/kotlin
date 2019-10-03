@@ -43,9 +43,9 @@ import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 class ParcelableAnnotationChecker : CallChecker {
     companion object {
-        val TYPE_PARCELER_FQNAME = FqName(TypeParceler::class.java.name)
-        val WRITE_WITH_FQNAME = FqName(WriteWith::class.java.name)
-        val IGNORED_ON_PARCEL_FQNAME = FqName(IgnoredOnParcel::class.java.name)
+        val TYPE_PARCELER_FQNAME = FqName("kotlinx.android.parcel.TypeParceler")
+        val WRITE_WITH_FQNAME = FqName("kotlinx.android.parcel.WriteWith")
+        val IGNORED_ON_PARCEL_FQNAME = FqName("kotlinx.android.parcel.IgnoredOnParcel")
     }
 
     override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {

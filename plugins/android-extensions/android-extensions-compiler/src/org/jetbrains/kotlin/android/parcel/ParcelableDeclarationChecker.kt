@@ -40,7 +40,7 @@ val ANDROID_PARCEL_CLASS_FQNAME = FqName("android.os.Parcel")
 class ParcelableDeclarationChecker : DeclarationChecker {
 
     private companion object {
-        private val IGNORED_ON_PARCEL_FQNAME = FqName(IgnoredOnParcel::class.java.canonicalName)
+        private val IGNORED_ON_PARCEL_FQNAME = FqName("kotlinx.android.parcel.IgnoredOnParcel")
     }
 
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {

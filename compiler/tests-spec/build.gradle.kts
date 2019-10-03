@@ -10,6 +10,7 @@ dependencies {
         testRuntimeOnly(intellijPluginDep("java"))
     }
     compile("org.jsoup:jsoup:1.10.3")
+    testRuntimeOnly(files("${rootProject.projectDir}/dist/kotlinc/lib/kotlin-reflect.jar"))
 }
 
 sourceSets {

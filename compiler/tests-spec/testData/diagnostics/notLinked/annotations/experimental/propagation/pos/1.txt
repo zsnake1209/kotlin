@@ -1,0 +1,21 @@
+package
+
+public fun foo(/*0*/ x: A, /*1*/ y: A): kotlin.Unit
+
+public final class A {
+    public constructor A()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    @ExperimentalAPI public final operator fun minus(/*0*/ x: A): kotlin.Unit
+    @ExperimentalAPI public final operator fun minusAssign(/*0*/ x: A): kotlin.Unit
+    @ExperimentalAPI public final operator fun plus(/*0*/ x: A): kotlin.Unit
+    @ExperimentalAPI public final operator fun plusAssign(/*0*/ x: A): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+@kotlin.Experimental(level = Level.WARNING) @kotlin.annotation.Target(allowedTargets = {AnnotationTarget.CLASS, AnnotationTarget.FUNCTION}) public final annotation class ExperimentalAPI : kotlin.Annotation {
+    public constructor ExperimentalAPI()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
