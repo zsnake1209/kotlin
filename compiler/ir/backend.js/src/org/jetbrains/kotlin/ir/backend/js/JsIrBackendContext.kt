@@ -60,24 +60,7 @@ class JsIrBackendContext(
 
     val internalPackageFragmentDescriptor = EmptyPackageFragmentDescriptor(builtIns.builtInsModule, FqName("kotlin.js.internal"))
     val implicitDeclarationFile by lazy {
-        IrFileImpl(object : SourceManager.FileEntry {
-            override val name = "<implicitDeclarations>"
-            override val maxOffset = UNDEFINED_OFFSET
-
-            override fun getSourceRangeInfo(beginOffset: Int, endOffset: Int) =
-                SourceRangeInfo(
-                    "",
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET
-                )
-
-            override fun getLineNumber(offset: Int) = UNDEFINED_OFFSET
-            override fun getColumnNumber(offset: Int) = UNDEFINED_OFFSET
-        }, internalPackageFragmentDescriptor).also {
+        IrFileImpl(createFileEntryWithName("<implicitDeclarations>"), internalPackageFragmentDescriptor).also {
             irModuleFragment.files += it
         }
     }
@@ -282,6 +265,7 @@ class JsIrBackendContext(
     private val workerPackage = module.getPackage(WORKER_PACKAGE_FQNAME)
     val postMessage = symbolTable.referenceSimpleFunction(getFunctions(FqName("kotlin.js.worker.postMessage")).single())
     val terminateMessage = symbolTable.referenceSimpleFunction(getFunctions(FqName("kotlin.js.worker.terminateWorkers")).single())
+    val workerThreadsObject = symbolTable.referenceClassifier(getClass(FqName("kotlin.js.worker.WorkerThreads")))
     val workerClass = symbolTable.referenceClass(findClass(workerPackage.memberScope, Name.identifier("WebWorker")))
 
     private fun referenceOperators(): Map<Name, MutableMap<IrClassifierSymbol, IrSimpleFunctionSymbol>> {
@@ -332,4 +316,23 @@ class JsIrBackendContext(
         /*TODO*/
         print(message)
     }
+}
+
+internal fun createFileEntryWithName(name: String): SourceManager.FileEntry = object : SourceManager.FileEntry {
+    override val name = name
+    override val maxOffset = UNDEFINED_OFFSET
+
+    override fun getSourceRangeInfo(beginOffset: Int, endOffset: Int) =
+        SourceRangeInfo(
+            "",
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET
+        )
+
+    override fun getLineNumber(offset: Int) = UNDEFINED_OFFSET
+    override fun getColumnNumber(offset: Int) = UNDEFINED_OFFSET
 }

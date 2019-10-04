@@ -10,10 +10,9 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.isTopLevelInPackage
 import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.SourceManager
-import org.jetbrains.kotlin.ir.SourceRangeInfo
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
+import org.jetbrains.kotlin.ir.backend.js.createFileEntryWithName
 import org.jetbrains.kotlin.ir.backend.js.ir.JsIrBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.addValueParameter
 import org.jetbrains.kotlin.ir.declarations.IrFile
@@ -38,19 +37,19 @@ class WorkerFileWithIndex(val irFile: IrFile, val index: Int) {
     val functionName = WORKER_FUNCTION_NAME_PREFIX + index
 }
 
-fun prepareFilePrefixForWorkers(): String = "var wt = require('worker_threads');\n"
+fun prepareFilePrefixForWorkers(): String = "var WorkerThreads = require('worker_threads');\n"
 
 fun prepareFileSuffixForWorkers(moduleName: String, workerFileWithIndices: List<WorkerFileWithIndex>): String {
     val res = StringBuffer(
         """
-if (!wt.isMainThread) {
-    switch (wt.workerData.id) {"""
+if (!WorkerThreads.isMainThread) {
+    switch (WorkerThreads.workerData.id) {"""
     )
     for (workerFileWithIndex in workerFileWithIndices) {
         res.append(
             """
         case ${workerFileWithIndex.index}:
-            wt.parentPort.on('message', $moduleName.${workerFileWithIndex.functionName});
+            WorkerThreads.parentPort.on('message', $moduleName.${workerFileWithIndex.functionName});
             break;
 """
         )
@@ -93,26 +92,7 @@ private fun moveToSeparateFile(
     context: JsIrBackendContext,
     fileName: String
 ): IrFile {
-    val newFile = IrFileImpl(
-        object : SourceManager.FileEntry {
-            override val name = fileName
-            override val maxOffset = UNDEFINED_OFFSET
-
-            override fun getSourceRangeInfo(beginOffset: Int, endOffset: Int) =
-                SourceRangeInfo(
-                    "",
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET,
-                    UNDEFINED_OFFSET
-                )
-
-            override fun getLineNumber(offset: Int) = UNDEFINED_OFFSET
-            override fun getColumnNumber(offset: Int) = UNDEFINED_OFFSET
-        }, context.workersPackageFragmentDescriptor
-    )
+    val newFile = IrFileImpl(createFileEntryWithName(fileName), context.workersPackageFragmentDescriptor)
     val function = JsIrBuilder.buildFunction(fileName, context.irBuiltIns.unitType, newFile).also {
         it.body = workerLambda.body
         it.copyValueParametersAndUpdateGetValues(workerLambda)
@@ -157,7 +137,7 @@ private fun replaceWorkerIntrinsicCalls(
                 putValueArgument(
                     0, newCallWithUndefinedOffsets(
                         symbol = context.jsCodeSymbol,
-                        arguments = listOf(context.string("new wt.Worker(__filename, { workerData: { id: ${info.index} } })"))
+                        arguments = listOf(context.string("new WorkerThreads.Worker(__filename, { workerData: { id: ${info.index} } })"))
                     )
                 )
                 putValueArgument(

@@ -67,9 +67,6 @@ class PatchDeclarationParentsVisitor() : IrElementVisitorVoid {
     }
 
     private fun patchParent(declaration: IrDeclaration) {
-        if (declarationParentsStack.isEmpty()) {
-            declaration.parent = declaration.parent
-        }
         declaration.parent = declarationParentsStack.peekFirst()
     }
 }

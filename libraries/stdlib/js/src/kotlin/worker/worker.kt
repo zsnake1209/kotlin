@@ -27,8 +27,7 @@ class WebWorker<T>(private val worker: dynamic, initialMessage: dynamic) {
     }
 }
 
-// TODO: this shall be internal and exported from module
-fun terminateWorkers() {
+internal fun terminateWorkers() {
     WebWorker.terminateWorkers()
 }
 
@@ -40,5 +39,9 @@ fun <T> worker(c: () -> T): WebWorker<T> {
 }
 
 fun postMessage(message: dynamic) {
-    js("wt.parentPort.postMessage(message)")
+    WorkerThreads.parentPort.postMessage(message)
+}
+
+internal external object WorkerThreads {
+    val parentPort: dynamic
 }
