@@ -57,11 +57,11 @@ class JvmIrDeserializer(
 
     private val externalReferences = mutableMapOf<Long, JvmIr.JvmExternalPackage>()
 
-    override fun getDeclaration(symbol: IrSymbol, backoff: (IrSymbol) -> IrDeclaration): IrDeclaration {
+    override fun getDeclaration(symbol: IrSymbol, fallback: (IrSymbol) -> IrDeclaration): IrDeclaration {
         if (symbol.isBound) return symbol.owner as IrDeclaration
         val descriptor =
             symbol.descriptor as? DeserializedMemberDescriptor ?: symbol.descriptor as? DeserializedClassDescriptor
-            ?: return backoff(symbol)
+            ?: return fallback(symbol)
 
         val toplevelDescriptor = descriptor.toToplevel()
         val packageFragment =
@@ -69,11 +69,11 @@ class JvmIrDeserializer(
 
         if (toplevelDescriptor is ClassDescriptor) {
             val classHeader =
-                (toplevelDescriptor.source as? KotlinJvmBinarySourceElement)?.binaryClass?.classHeader ?: return backoff(symbol)
-            if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return backoff(symbol)
+                (toplevelDescriptor.source as? KotlinJvmBinarySourceElement)?.binaryClass?.classHeader ?: return fallback(symbol)
+            if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return fallback(symbol)
 
             val irProto = JvmIr.JvmIrClass.parseFrom(classHeader.serializedIr)
-            val fileDeserializer = FileDeserializerWithReferenceLookup(toplevelDescriptor.module, irProto.auxTables, backoff)
+            val fileDeserializer = FileDeserializerWithReferenceLookup(toplevelDescriptor.module, irProto.auxTables, fallback)
             consumeUniqIdTable(irProto.auxTables.uniqIdTable, fileDeserializer)
             consumeExternalRefsTable(irProto.auxTables.externalRefs)
             fileDeserializer.deserializeIrClass(irProto.irClass, parent = packageFragment)
@@ -81,13 +81,13 @@ class JvmIrDeserializer(
             return symbol.owner as IrDeclaration
         } else {
             val jvmPackagePartSource =
-                (toplevelDescriptor as DeserializedMemberDescriptor).containerSource as? JvmPackagePartSource ?: return backoff(symbol)
-            val classHeader = jvmPackagePartSource.knownJvmBinaryClass?.classHeader ?: return backoff(symbol)
-            if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return backoff(symbol)
+                (toplevelDescriptor as DeserializedMemberDescriptor).containerSource as? JvmPackagePartSource ?: return fallback(symbol)
+            val classHeader = jvmPackagePartSource.knownJvmBinaryClass?.classHeader ?: return fallback(symbol)
+            if (classHeader.serializedIr == null || classHeader.serializedIr!!.isEmpty()) return fallback(symbol)
 
             val irProto = JvmIr.JvmIrFile.parseFrom(classHeader.serializedIr)
 
-            val fileDeserializer = FileDeserializerWithReferenceLookup(toplevelDescriptor.module, irProto.auxTables, backoff)
+            val fileDeserializer = FileDeserializerWithReferenceLookup(toplevelDescriptor.module, irProto.auxTables, fallback)
             val facadeClass = buildFacadeClass(fileDeserializer, irProto).also {
                 it.parent = packageFragment
                 packageFragment.declarations.add(it)
@@ -139,11 +139,11 @@ class JvmIrDeserializer(
     abstract inner class FileDeserializer(
         val moduleDescriptor: ModuleDescriptor,
         private val auxTables: JvmIr.AuxTables,
-        backoff: (IrSymbol) -> IrDeclaration
+        fallback: (IrSymbol) -> IrDeclaration
     ) :
         IrFileDeserializer(logger, builtIns, symbolTable) {
 
-        private val uniqIdAware = JvmDescriptorUniqIdAware(symbolTable, backoff)
+        private val uniqIdAware = JvmDescriptorUniqIdAware(symbolTable, fallback)
 
         private val descriptorReferenceDeserializer = JvmDescriptorReferenceDeserializer(moduleDescriptor, uniqIdAware)
 
@@ -290,8 +290,8 @@ class JvmIrDeserializer(
     inner class FileDeserializerWithoutReferenceLookup(
         moduleDescriptor: ModuleDescriptor,
         auxTables: JvmIr.AuxTables,
-        backoff: (IrSymbol) -> IrDeclaration
-    ) : FileDeserializer(moduleDescriptor, auxTables, backoff) {
+        fallback: (IrSymbol) -> IrDeclaration
+    ) : FileDeserializer(moduleDescriptor, auxTables, fallback) {
         override fun referenceDeserializedSymbol(proto: ProtoSymbolData, descriptor: DeclarationDescriptor?): IrSymbol {
             return referenceDeserializedSymbolBare(proto, descriptor)
         }
@@ -300,8 +300,8 @@ class JvmIrDeserializer(
     inner class FileDeserializerWithReferenceLookup(
         moduleDescriptor: ModuleDescriptor,
         private val auxTables: JvmIr.AuxTables,
-        private val backoff: (IrSymbol) -> IrDeclaration
-    ) : FileDeserializer(moduleDescriptor, auxTables, backoff) {
+        private val fallback: (IrSymbol) -> IrDeclaration
+    ) : FileDeserializer(moduleDescriptor, auxTables, fallback) {
         override fun referenceDeserializedSymbol(
             proto: ProtoSymbolData,
             descriptor: DeclarationDescriptor?
@@ -318,7 +318,7 @@ class JvmIrDeserializer(
                     deserializeFqName(externalPackageProto.fqName)
                 )
                 for (memberProto in externalPackageProto.declarationContainer.declarationList) {
-                    val toplevel = FileDeserializerWithoutReferenceLookup(moduleDescriptor, auxTables, backoff)
+                    val toplevel = FileDeserializerWithoutReferenceLookup(moduleDescriptor, auxTables, fallback)
                         .deserializeDeclaration(memberProto, packageFragment)
                     packageFragment.declarations.add(toplevel)
                 }

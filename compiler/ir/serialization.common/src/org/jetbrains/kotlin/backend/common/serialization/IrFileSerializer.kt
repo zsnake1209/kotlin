@@ -1079,7 +1079,11 @@ open class IrFileSerializer(
         function.valueParameters.forEach {
             proto.addValueParameter(serializeIrValueParameter(it))
         }
-        if (!externallyVisibleOnly || function.isInline || function.origin == IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA) {
+        if (!externallyVisibleOnly ||
+            function.isInline ||
+            function.origin == IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA ||
+            function.inLocalDeclaration
+        ) {
             function.body?.let { proto.body = serializeIrStatementBody(it) }
         }
         return proto.build()
@@ -1169,11 +1173,14 @@ open class IrFileSerializer(
             .setIsExternal(field.isExternal)
             .setIsStatic(field.isStatic)
             .setType(serializeIrType(field.type))
-        val inLocalClass = field.parents.any { it is IrFunction }
         val initializer = field.initializer?.expression
+        /*
+            When serializing only externally visible declarations, we still need to fully preserve local classes in inline functions,
+            as well as constant initializers that are going to be inlined.
+         */
         if (initializer != null && (
                     !externallyVisibleOnly ||
-                            inLocalClass ||
+                            field.inLocalDeclaration ||
                             field.correspondingPropertySymbol?.owner?.isConst == true)
         ) {
             proto.initializer = serializeIrExpressionBody(initializer)
@@ -1202,7 +1209,13 @@ open class IrFileSerializer(
         val proto = ProtoDeclarationContainer.newBuilder()
         declarations.forEach {
             //if (it is IrDeclarationWithVisibility && it.visibility == Visibilities.INVISIBLE_FAKE) return@forEach
-            if (externallyVisibleOnly && it is IrDeclarationWithVisibility && isPrivate(it.visibility)) return@forEach
+            if (externallyVisibleOnly &&
+                it is IrDeclarationWithVisibility &&
+                isPrivate(it.visibility) &&
+                !it.inLocalDeclaration
+            ) {
+                return@forEach
+            }
             proto.addDeclaration(serializeDeclaration(it))
         }
         return proto.build()
@@ -1254,7 +1267,7 @@ open class IrFileSerializer(
             .setBase(serializeIrDeclarationBase(enumEntry))
             .setName(serializeName(enumEntry.name))
 
-        if (!externallyVisibleOnly) {
+        if (!externallyVisibleOnly || enumEntry.inLocalDeclaration) {
             enumEntry.initializerExpression?.let {
                 proto.initializer = serializeIrExpressionBody(it)
             }
@@ -1376,4 +1389,8 @@ open class IrFileSerializer(
             IrMemoryDeclarationWriter(topLevelDeclarations).writeIntoMemory()
         )
     }
+
+    // with `externallyVisibleOnly, the only way a function body  will be processed is if it is an inline function.
+    val IrDeclaration.inLocalDeclaration
+            get() = parents.any { it is IrFunction }
 }

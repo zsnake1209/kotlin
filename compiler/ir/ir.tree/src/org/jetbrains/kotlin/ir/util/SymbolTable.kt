@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.impl.IrUninitializedType
 
 interface IrProvider {
-    fun getDeclaration(symbol: IrSymbol, backoff: (IrSymbol) -> IrDeclaration): IrDeclaration
+    fun getDeclaration(symbol: IrSymbol, fallback: (IrSymbol) -> IrDeclaration): IrDeclaration
 }
 
 interface IrDeserializer : IrProvider {

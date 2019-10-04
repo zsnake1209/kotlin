@@ -66,17 +66,17 @@ private val SymbolTable.allUnbound
         unboundClasses + unboundConstructors + unboundEnumEntries + unboundFields +
                 unboundSimpleFunctions + unboundProperties + unboundTypeParameters + unboundTypeAliases
 
-fun List<IrProvider>.getDeclaration(symbol: IrSymbol, backoff: (IrSymbol) -> IrDeclaration): IrDeclaration =
+fun List<IrProvider>.getDeclaration(symbol: IrSymbol, fallback: (IrSymbol) -> IrDeclaration): IrDeclaration =
     if (isEmpty())
-        backoff(symbol)
+        fallback(symbol)
     else
         this[0].getDeclaration(symbol) {
-            drop(1).getDeclaration(it, backoff)
+            drop(1).getDeclaration(it, fallback)
         }
 
 
 object EmptyDeserializer : IrDeserializer {
-    override fun getDeclaration(symbol: IrSymbol, backoff: (IrSymbol) -> IrDeclaration): IrDeclaration = backoff(symbol)
+    override fun getDeclaration(symbol: IrSymbol, fallback: (IrSymbol) -> IrDeclaration): IrDeclaration = fallback(symbol)
 
     override fun declareForwardDeclarations() {}
 }
