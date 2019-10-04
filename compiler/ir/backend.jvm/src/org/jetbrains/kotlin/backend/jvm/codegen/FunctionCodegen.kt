@@ -207,8 +207,6 @@ open class FunctionCodegen(
                 } else {
                     frameMap.enterTemp(parameter.asmType)
                 }
-            } else if (parameter.kind != JvmMethodParameterKind.VALUE) {
-                frameMap.enterTemp(parameter.asmType)
             }
         }
 
@@ -247,15 +245,12 @@ fun generateParameterAnnotations(
 
     kotlinParameterTypes.forEachIndexed { i, parameterSignature ->
         val kind = parameterSignature.kind
-        if (kind.isSkippedInGenericSignature) return@forEachIndexed
-
         val annotated = when (kind) {
-            JvmMethodParameterKind.VALUE -> iterator.next()
             JvmMethodParameterKind.RECEIVER -> irFunction.extensionReceiverParameter
-            else -> null
+            else -> iterator.next()
         }
 
-        if (annotated != null) {
+        if (!kind.isSkippedInGenericSignature) {
             AnnotationCodegen(innerClassConsumer, context) { descriptor, visible ->
                 mv.visitParameterAnnotation(
                     if (AsmUtil.IS_BUILT_WITH_ASM6) i else i - syntheticParameterCount,
