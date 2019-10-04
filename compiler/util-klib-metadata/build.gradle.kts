@@ -7,9 +7,9 @@ description = "Common klib metadata reader and writer"
 
 dependencies {
     compile(kotlinStdlib())
-    compile(project(":compiler:frontend"))
-    compile(project(":core:deserialization"))
-    compile(project(":compiler:serialization"))
+    compileOnly(project(":compiler:frontend"))
+    compileOnly(project(":core:deserialization"))
+    compileOnly(project(":compiler:serialization"))
     compile(project(":kotlin-util-io"))
     compile(project(":kotlin-util-klib"))
 }
