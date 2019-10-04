@@ -14,11 +14,16 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.common.repl.*
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.idea.KotlinLanguage
-import org.jetbrains.kotlin.ir.backend.js.loadKlib
 import org.jetbrains.kotlin.ir.backend.js.getModuleDescriptorByLibrary
 import org.jetbrains.kotlin.ir.backend.js.utils.NameTables
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.library.KotlinLibrary
+import org.jetbrains.kotlin.library.KotlinLibrarySearchPathResolver
+import org.jetbrains.kotlin.library.resolver.TopologicalLibraryOrder
+import org.jetbrains.kotlin.library.resolver.impl.libraryResolver
+import org.jetbrains.kotlin.library.toUnresolvedLibraries
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtScript
 import org.jetbrains.kotlin.scripting.compiler.plugin.repl.ReplCodeAnalyzer
@@ -96,10 +101,24 @@ class ReplMessageCollector : MessageCollector {
 }
 
 fun readLibrariesFromConfiguration(configuration: CompilerConfiguration): List<ModuleDescriptor> {
+    // TODO: Reimplement this code once we get proper klib dependency resolver
     val scriptConfig = configuration[ScriptingConfigurationKeys.SCRIPT_DEFINITIONS]!!
     val scriptCompilationConfig = scriptConfig.find { (it).platform == "JS" }!!.compilationConfiguration
     val scriptDependencies = scriptCompilationConfig[ScriptCompilationConfiguration.dependencies]!!
-    return scriptDependencies.map { loadKlib((it as JsDependency).path) }.map { getModuleDescriptorByLibrary(it) }
+    val descriptorMap = mutableMapOf<String, ModuleDescriptorImpl>()
+    val libraries = scriptDependencies.map { (it as JsDependency).path }
+    val unresolvedLibraries = libraries.toUnresolvedLibraries
+    // Configure resolver to only understands absolute path libraries.
+    val libraryResolver = KotlinLibrarySearchPathResolver<KotlinLibrary>(
+        repositories = emptyList(),
+        directLibs = libraries,
+        distributionKlib = null,
+        localKotlinDir = null,
+        skipCurrentDir = false
+        // TODO: pass logger attached to message collector here.
+    ).libraryResolver()
+    val resolvedLibraries = libraryResolver.resolveWithDependencies(unresolvedLibraries, true, true, true)
+    return resolvedLibraries.getFullList(TopologicalLibraryOrder).map { descriptorMap.getOrPut(it.libraryName) { getModuleDescriptorByLibrary(it, descriptorMap) } }
 }
 
 fun createCompileResult(code: String) = createCompileResult(LineId(ReplCodeLine(0, 0, "")), code)
@@ -118,6 +137,7 @@ fun createCompileResult(lineId: LineId, code: String): ReplCompileResult.Compile
 }
 
 class DependencyLoader {
+    // TODO: this should be taken from CompilerConfiguration
     private val commonPath = "compiler/ir/serialization.js/build/fullRuntime/klib"
     private val mappedNamesPath = "$commonPath/mappedNames.txt"
     private val scriptDependencyBinaryPath = "$commonPath/scriptDependencyBinary.js"
