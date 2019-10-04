@@ -38,4 +38,9 @@ public class IrJsWebWorkersTestsGenerated extends AbstractIrJsWebWorkersTests {
     public void testPostMessage() throws Exception {
         runTest("js/js.translator/testData/webworkers/postMessage.kt");
     }
+
+    @TestMetadata("twoWorkers.kt")
+    public void testTwoWorkers() throws Exception {
+        runTest("js/js.translator/testData/webworkers/twoWorkers.kt");
+    }
 }
