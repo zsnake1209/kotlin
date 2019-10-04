@@ -31,6 +31,11 @@ public class CliTestGenerated extends AbstractCliTest {
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/cli/jvm"), Pattern.compile("^(.+)\\.args$"), TargetBackend.ANY, false);
         }
 
+        @TestMetadata("allowExpectWithoutActual.args")
+        public void testAllowExpectWithoutActual() throws Exception {
+            runTest("compiler/testData/cli/jvm/allowExpectWithoutActual.args");
+        }
+
         @TestMetadata("apiVersion.args")
         public void testApiVersion() throws Exception {
             runTest("compiler/testData/cli/jvm/apiVersion.args");
@@ -722,6 +727,11 @@ public class CliTestGenerated extends AbstractCliTest {
 
         public void testAllFilesPresentInJs() throws Exception {
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/cli/js"), Pattern.compile("^(.+)\\.args$"), TargetBackend.ANY, false);
+        }
+
+        @TestMetadata("allowExpectWithoutActual.args")
+        public void testAllowExpectWithoutActual() throws Exception {
+            runTest("compiler/testData/cli/js/allowExpectWithoutActual.args");
         }
 
         @TestMetadata("createMetadata.args")
