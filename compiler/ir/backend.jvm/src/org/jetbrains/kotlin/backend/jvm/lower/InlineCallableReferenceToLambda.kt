@@ -150,10 +150,10 @@ internal class InlineCallableReferenceToLambdaPhase(val context: JvmBackendConte
         val expectedType = expression.type
         var expectedNumValueParameters: Int
         if (expectedType.isFunctionOrKFunction() || expectedType.isSuspendFunction() || expectedType.isKSuspendFunction()) { // TODO: handle subtypes
-            expectedNumValueParameters = (expectedType as IrSimpleType).arguments.size - 1
-            if (referencedFunction.dispatchReceiverParameter != null) expectedNumValueParameters--
-            if (referencedFunction.extensionReceiverParameter != null) expectedNumValueParameters--
-            if (boundReceiver != null) expectedNumValueParameters++
+            expectedNumValueParameters = (expectedType as IrSimpleType).arguments.size - 1  // In ...Function classes, the last argument is return type
+            referencedFunction.dispatchReceiverParameter?.let { expectedNumValueParameters-- }
+            referencedFunction.extensionReceiverParameter?.let { expectedNumValueParameters-- }
+            boundReceiver?.let { expectedNumValueParameters++ }
             assert(referencedFunction.valueParameters.subList(expectedNumValueParameters, referencedFunction.valueParameters.size).all {
                 it.defaultValue != null
             })
