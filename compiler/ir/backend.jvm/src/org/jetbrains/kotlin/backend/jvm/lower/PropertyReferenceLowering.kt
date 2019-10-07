@@ -112,6 +112,19 @@ internal class PropertyReferenceLowering(val context: JvmBackendContext) : Class
             }
         }
 
+    private fun IrClass.addFakeOverride(method: IrSimpleFunction) =
+        addFunction {
+            name = method.name
+            returnType = method.returnType
+            visibility = method.visibility
+            origin = IrDeclarationOrigin.FAKE_OVERRIDE
+        }.apply {
+            overriddenSymbols.add(method.symbol)
+            dispatchReceiverParameter = thisReceiver!!.copyTo(this)
+            for (parameter in method.valueParameters)
+                valueParameters.add(parameter.copyTo(this))
+        }
+
     private class PropertyReferenceKind(
         val interfaceSymbol: IrClassSymbol,
         val reflectedSymbol: IrClassSymbol,
@@ -245,6 +258,7 @@ internal class PropertyReferenceLowering(val context: JvmBackendContext) : Class
                 val getSignature = superClass.functions.single { it.name.asString() == "getSignature" }
                 val get = superClass.functions.find { it.name.asString() == "get" }
                 val set = superClass.functions.find { it.name.asString() == "set" }
+                val invoke = superClass.functions.find { it.name.asString() == "invoke" }
 
                 referenceClass.addSimpleDelegatingConstructor(superConstructor, context.irBuiltIns, isPrimary = true)
                 referenceClass.addOverride(getName) { irString(expression.descriptor.name.asString()) }
@@ -276,6 +290,7 @@ internal class PropertyReferenceLowering(val context: JvmBackendContext) : Class
                                 setCallArguments(this, arguments)
                             }
                         }
+                        referenceClass.addFakeOverride(invoke!!)
                     }
 
                     expression.setter?.owner?.let { setter ->
