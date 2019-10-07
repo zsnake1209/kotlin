@@ -127,31 +127,34 @@ KtFile: FunctionsWithoutName_ERR.kt
         PsiElement(IDENTIFIER)('T')
       PsiElement(COMMA)(',')
       PsiWhiteSpace(' ')
-      PsiErrorElement:Expecting type parameter declaration
-        PsiElement(COMMA)(',')
-      PsiWhiteSpace(' ')
       TYPE_PARAMETER
+        PsiErrorElement:Type parameter name expected
+          PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:Missing '>'
         PsiElement(IDENTIFIER)('T')
-      PsiElement(GT)('>')
-    VALUE_PARAMETER_LIST
-      PsiElement(LPAR)('(')
-      VALUE_PARAMETER
-        PsiElement(IDENTIFIER)('a')
-        PsiWhiteSpace(' ')
-        PsiElement(COLON)(':')
-        PsiWhiteSpace(' ')
-        TYPE_REFERENCE
-          USER_TYPE
-            REFERENCE_EXPRESSION
-              PsiElement(IDENTIFIER)('foo')
-      PsiElement(RPAR)(')')
-    PsiWhiteSpace(' ')
+    PsiErrorElement:Expecting '('
+      <empty list>
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(GT)('>')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(LPAR)('(')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(IDENTIFIER)('a')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
     PsiElement(COLON)(':')
-    PsiWhiteSpace(' ')
-    TYPE_REFERENCE
-      USER_TYPE
-        REFERENCE_EXPRESSION
-          PsiElement(IDENTIFIER)('bar')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(IDENTIFIER)('foo')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(RPAR)(')')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(COLON)(':')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(IDENTIFIER)('bar')
   PsiWhiteSpace('\n')
   FUN
     PsiElement(fun)('fun')
@@ -178,38 +181,42 @@ KtFile: FunctionsWithoutName_ERR.kt
     PsiElement(DOT)('.')
     TYPE_PARAMETER_LIST
       PsiElement(LT)('<')
-      PsiErrorElement:Expecting type parameter declaration
-        PsiElement(COMMA)(',')
-      PsiWhiteSpace(' ')
       TYPE_PARAMETER
-        PsiElement(IDENTIFIER)('T')
-      PsiElement(COMMA)(',')
+        PsiErrorElement:Type parameter name expected
+          PsiElement(COMMA)(',')
       PsiWhiteSpace(' ')
-      PsiErrorElement:Expecting type parameter declaration
-        PsiElement(COMMA)(',')
-      PsiWhiteSpace(' ')
-      TYPE_PARAMETER
+      PsiErrorElement:Missing '>'
         PsiElement(IDENTIFIER)('T')
-      PsiElement(GT)('>')
-    VALUE_PARAMETER_LIST
-      PsiElement(LPAR)('(')
-      VALUE_PARAMETER
-        PsiElement(IDENTIFIER)('a')
-        PsiWhiteSpace(' ')
-        PsiElement(COLON)(':')
-        PsiWhiteSpace(' ')
-        TYPE_REFERENCE
-          USER_TYPE
-            REFERENCE_EXPRESSION
-              PsiElement(IDENTIFIER)('foo')
-      PsiElement(RPAR)(')')
-    PsiWhiteSpace(' ')
+    PsiErrorElement:Expecting '('
+      <empty list>
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(COMMA)(',')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(COMMA)(',')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(IDENTIFIER)('T')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(GT)('>')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(LPAR)('(')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(IDENTIFIER)('a')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
     PsiElement(COLON)(':')
-    PsiWhiteSpace(' ')
-    TYPE_REFERENCE
-      USER_TYPE
-        REFERENCE_EXPRESSION
-          PsiElement(IDENTIFIER)('bar')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(IDENTIFIER)('foo')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(RPAR)(')')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(COLON)(':')
+  PsiWhiteSpace(' ')
+  PsiErrorElement:Expecting a top level declaration
+    PsiElement(IDENTIFIER)('bar')
   PsiWhiteSpace('\n')
   FUN
     PsiElement(fun)('fun')

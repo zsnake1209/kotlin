@@ -929,10 +929,12 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
      */
     private void parseWhenEntryNotElse() {
         while (true) {
-            while (at(COMMA)) errorAndAdvance("Expecting a when-condition");
             parseWhenCondition();
             if (!at(COMMA)) break;
             advance(); // COMMA
+            if (at(ARROW)) {
+                break;
+            }
         }
 
         expect(ARROW, "Expecting '->'", WHEN_CONDITION_RECOVERY_SET);
@@ -1032,21 +1034,12 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
     }
 
     private void parseInnerExpressions(String missingElementErrorMessage) {
-        boolean firstElement = true;
         while (true) {
             if (at(COMMA)) errorAndAdvance(missingElementErrorMessage);
             if (at(RBRACKET)) {
-                if (firstElement) {
-                    break;
-                }
-                else {
-                    error(missingElementErrorMessage);
-                }
                 break;
             }
             parseExpression();
-
-            firstElement = false;
 
             if (!at(COMMA)) break;
             advance(); // COMMA
@@ -1211,6 +1204,10 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
                 PsiBuilder.Marker destructuringDeclaration = mark();
                 myKotlinParsing.parseMultiDeclarationName(TOKEN_SET_TO_FOLLOW_AFTER_DESTRUCTURING_DECLARATION_IN_LAMBDA);
                 destructuringDeclaration.done(DESTRUCTURING_DECLARATION);
+            }
+            else if (at(ARROW)) {
+                parameter.drop();
+                break;
             }
             else {
                 expect(IDENTIFIER, "Expecting parameter name", TokenSet.create(ARROW));
@@ -1796,6 +1793,9 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
         if (expect(LPAR, "Expecting an argument list", EXPRESSION_FOLLOW)) {
             if (!at(RPAR)) {
+                if (at(COMMA)) {
+                    advance();
+                }
                 while (true) {
                     while (at(COMMA)) errorAndAdvance("Expecting an argument");
                     parseValueArgument();
@@ -1813,7 +1813,7 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
                     }
                     advance(); // COMMA
                     if (at(RPAR)) {
-                        error("Expecting an argument");
+                        //error("Expecting an argument");
                         break;
                     }
                 }

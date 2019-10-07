@@ -29,6 +29,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
         KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS, true);
     }
 
+    @TestMetadata("trailingCommaNoDisambiguation.kt")
+    public void testTrailingCommaNoDisambiguation() throws Exception {
+        runTest("compiler/testData/codegen/box/trailingCommaNoDisambiguation.kt");
+    }
+
     @TestMetadata("compiler/testData/codegen/box/annotations")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

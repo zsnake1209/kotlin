@@ -199,46 +199,48 @@ KtFile: FunctionExpressions_ERR.kt
     PsiWhiteSpace(' ')
     PsiElement(EQ)('=')
     PsiWhiteSpace(' ')
-    FUN
-      PsiElement(fun)('fun')
-      PsiWhiteSpace(' ')
-      TYPE_REFERENCE
-        USER_TYPE
-          REFERENCE_EXPRESSION
+    BINARY_EXPRESSION
+      FUN
+        PsiElement(fun)('fun')
+        PsiWhiteSpace(' ')
+        TYPE_REFERENCE
+          USER_TYPE
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('T')
+        PsiElement(DOT)('.')
+        PsiElement(IDENTIFIER)('foo')
+        TYPE_PARAMETER_LIST
+          PsiElement(LT)('<')
+          TYPE_PARAMETER
             PsiElement(IDENTIFIER)('T')
-      PsiElement(DOT)('.')
-      PsiElement(IDENTIFIER)('foo')
-      TYPE_PARAMETER_LIST
-        PsiElement(LT)('<')
-        TYPE_PARAMETER
-          PsiElement(IDENTIFIER)('T')
-        PsiElement(COMMA)(',')
-        PsiWhiteSpace(' ')
-        PsiErrorElement:Expecting type parameter declaration
           PsiElement(COMMA)(',')
-        PsiWhiteSpace(' ')
-        TYPE_PARAMETER
-          PsiElement(IDENTIFIER)('T')
+          PsiWhiteSpace(' ')
+          TYPE_PARAMETER
+            PsiErrorElement:Type parameter name expected
+              PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          PsiErrorElement:Missing '>'
+            PsiElement(IDENTIFIER)('T')
+        PsiErrorElement:Expecting '('
+          <empty list>
+      OPERATION_REFERENCE
         PsiElement(GT)('>')
-      VALUE_PARAMETER_LIST
+      PARENTHESIZED
         PsiElement(LPAR)('(')
-        VALUE_PARAMETER
+        REFERENCE_EXPRESSION
           PsiElement(IDENTIFIER)('a')
-          PsiWhiteSpace(' ')
-          PsiElement(COLON)(':')
-          PsiWhiteSpace(' ')
-          TYPE_REFERENCE
-            USER_TYPE
-              REFERENCE_EXPRESSION
-                PsiElement(IDENTIFIER)('foo')
-        PsiElement(RPAR)(')')
+        PsiErrorElement:Expecting ')'
+          <empty list>
+    PsiWhiteSpace(' ')
+    PsiErrorElement:Property getter or setter expected
+      PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('foo')
+      PsiElement(RPAR)(')')
       PsiWhiteSpace(' ')
       PsiElement(COLON)(':')
       PsiWhiteSpace(' ')
-      TYPE_REFERENCE
-        USER_TYPE
-          REFERENCE_EXPRESSION
-            PsiElement(IDENTIFIER)('bar')
+      PsiElement(IDENTIFIER)('bar')
   PsiWhiteSpace('\n')
   PROPERTY
     PsiElement(val)('val')
@@ -258,38 +260,32 @@ KtFile: FunctionExpressions_ERR.kt
       PsiElement(IDENTIFIER)('foo')
       TYPE_PARAMETER_LIST
         PsiElement(LT)('<')
-        PsiErrorElement:Expecting type parameter declaration
-          PsiElement(COMMA)(',')
-        PsiWhiteSpace(' ')
         TYPE_PARAMETER
-          PsiElement(IDENTIFIER)('T')
-        PsiElement(COMMA)(',')
+          PsiErrorElement:Type parameter name expected
+            PsiElement(COMMA)(',')
         PsiWhiteSpace(' ')
-        PsiErrorElement:Expecting type parameter declaration
-          PsiElement(COMMA)(',')
-        PsiWhiteSpace(' ')
-        TYPE_PARAMETER
+        PsiErrorElement:Missing '>'
           PsiElement(IDENTIFIER)('T')
-        PsiElement(GT)('>')
-      VALUE_PARAMETER_LIST
-        PsiElement(LPAR)('(')
-        VALUE_PARAMETER
-          PsiElement(IDENTIFIER)('a')
-          PsiWhiteSpace(' ')
-          PsiElement(COLON)(':')
-          PsiWhiteSpace(' ')
-          TYPE_REFERENCE
-            USER_TYPE
-              REFERENCE_EXPRESSION
-                PsiElement(IDENTIFIER)('foo')
-        PsiElement(RPAR)(')')
+      PsiErrorElement:Expecting '('
+        <empty list>
+    PsiErrorElement:Property getter or setter expected
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('T')
+      PsiElement(GT)('>')
+      PsiElement(LPAR)('(')
+      PsiElement(IDENTIFIER)('a')
       PsiWhiteSpace(' ')
       PsiElement(COLON)(':')
       PsiWhiteSpace(' ')
-      TYPE_REFERENCE
-        USER_TYPE
-          REFERENCE_EXPRESSION
-            PsiElement(IDENTIFIER)('bar')
+      PsiElement(IDENTIFIER)('foo')
+      PsiElement(RPAR)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('bar')
   PsiWhiteSpace('\n')
   PROPERTY
     PsiElement(val)('val')
