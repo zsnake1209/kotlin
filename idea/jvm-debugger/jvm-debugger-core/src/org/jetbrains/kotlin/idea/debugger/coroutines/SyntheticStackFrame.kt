@@ -32,6 +32,9 @@ class SyntheticStackFrame(
         return position
     }
 
+    // non-symmetric equals to avoid exceptions from frames view,
+    // when it tries to find this frame in frames view after selecting it in coroutines view
+    // (API trouble)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
 

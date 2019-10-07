@@ -188,14 +188,11 @@ class CodeFragmentParameterAnalyzer(
                     Smart(Dumb(Kind.DISPATCH_RECEIVER, "", "super@$name"), type, descriptor)
                 }
 
-                var parent = expression.parent
-                while (parent != null) {
-                    if (parent is KtLambdaExpression || parent is KtFunction)
-                        throw EvaluateExceptionUtil.createEvaluateException(
-                            "Evaluation of 'super' calls inside lambdas and functions is not supported"
-                        )
-                    parent = parent.parent
-                }
+                val parent = PsiTreeUtil.getParentOfType(expression.parent, KtFunction::class.java)
+                if (parent != null)
+                    throw EvaluateExceptionUtil.createEvaluateException(
+                        "Evaluation of 'super' calls inside lambdas and functions is not supported"
+                    )
 
                 return null
             }
