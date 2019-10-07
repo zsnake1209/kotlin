@@ -950,6 +950,11 @@ public class KotlinEvaluateExpressionTestGenerated extends AbstractKotlinEvaluat
                 runTest("idea/jvm-debugger/jvm-debugger-test/testData/evaluation/singleBreakpoint/frame/nestedInlineFun2.kt");
             }
 
+            @TestMetadata("nonCapturedThisInLambda.kt")
+            public void testNonCapturedThisInLambda() throws Exception {
+                runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/frame/nonCapturedThisInLambda.kt");
+            }
+
             @TestMetadata("remapThis.kt")
             public void testRemapThis() throws Exception {
                 runTest("idea/jvm-debugger/jvm-debugger-test/testData/evaluation/singleBreakpoint/frame/remapThis.kt");

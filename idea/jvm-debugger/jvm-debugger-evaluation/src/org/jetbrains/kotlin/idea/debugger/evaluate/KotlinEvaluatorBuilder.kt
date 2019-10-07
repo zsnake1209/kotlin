@@ -442,15 +442,27 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
         val currentFramePsi = context.debugProcess.positionManager
             .getSourcePosition(context.frameProxy.safeLocation())?.elementAt ?: return null // compute once
         return try {
+            // let parameter name be null if we are looking for 'this'
+            val name = if (parameter.debugString.startsWith("this@")) null else parameter.name
             thread.forceFrames().firstNotNullResult { frameProxy ->
-                val variable = frameProxy.safeVisibleVariableByName(parameter.name)
-                if (variable == null || variable.type.name() != asmType.className
-                    || !isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
-                ) {
-                    return@firstNotNullResult null
+                if (name == null) { // if it's 'this', then check className
+                    val thisObject = frameProxy.thisObject()
+                    if (thisObject?.type()?.name() == asmType.className &&
+                        isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
+                    )
+                        return@firstNotNullResult VariableFinder.Result(thisObject)
+                    else
+                        return@firstNotNullResult null
                 } else {
-                    // variable is found and it has same type and is from closure
-                    return@firstNotNullResult VariableFinder.Result(frameProxy.getValue(variable))
+                    val variable = frameProxy.safeVisibleVariableByName(name)
+                    if (variable == null || variable.type.name() != asmType.className
+                        || !isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
+                    ) {
+                        return@firstNotNullResult null
+                    } else {
+                        // variable is found and it has same type and is from closure
+                        return@firstNotNullResult VariableFinder.Result(frameProxy.getValue(variable))
+                    }
                 }
             }
         } catch (e: Throwable) {
