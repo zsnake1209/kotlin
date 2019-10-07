@@ -29,6 +29,11 @@ public class IrJsWebWorkersTestsGenerated extends AbstractIrJsWebWorkersTests {
         KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("js/js.translator/testData/webworkers"), Pattern.compile("^([^_](.+))\\.kt$"), TargetBackend.JS_IR, true);
     }
 
+    @TestMetadata("capture.kt")
+    public void testCapture() throws Exception {
+        runTest("js/js.translator/testData/webworkers/capture.kt");
+    }
+
     @TestMetadata("empty.kt")
     public void testEmpty() throws Exception {
         runTest("js/js.translator/testData/webworkers/empty.kt");

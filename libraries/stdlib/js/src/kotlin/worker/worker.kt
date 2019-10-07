@@ -7,10 +7,10 @@ package kotlin.js.worker
 
 import kotlin.js.Promise
 
-class WebWorker<T>(private val worker: dynamic, initialMessage: dynamic) {
+class WebWorker<T>(private val worker: dynamic) {
     init {
         aliveWorkers.add(WorkerWrapper(worker))
-        worker.postMessage(initialMessage)
+        worker.postMessage("") // calling worker intrinsic by default runs the worker. TODO: differentiate 'create' and 'start', as in coroutines?
     }
 
     fun waitForReply(): Promise<T> {
