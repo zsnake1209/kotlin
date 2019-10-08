@@ -116,8 +116,7 @@ internal class InlineCallableReferenceToLambdaPhase(val context: JvmBackendConte
 
                     +IrFunctionReferenceImpl(
                         expression.startOffset, expression.endOffset, field.type,
-                        newLambda.symbol, newLambda.symbol.descriptor, 0,
-                        IrStatementOrigin.LAMBDA
+                        newLambda.symbol, 0, IrStatementOrigin.LAMBDA
                     )
                 }
             }
@@ -207,8 +206,7 @@ internal class InlineCallableReferenceToLambdaPhase(val context: JvmBackendConte
 
             +IrFunctionReferenceImpl(
                 expression.startOffset, expression.endOffset, referencedFunction.returnType,
-                newLambda.symbol, newLambda.symbol.descriptor, referencedFunction.typeParameters.size,
-                IrStatementOrigin.LAMBDA
+                newLambda.symbol, referencedFunction.typeParameters.size, IrStatementOrigin.LAMBDA
             )
         }
     }

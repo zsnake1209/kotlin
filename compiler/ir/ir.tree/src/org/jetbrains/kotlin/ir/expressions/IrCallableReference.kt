@@ -25,8 +25,8 @@ interface IrCallableReference : IrMemberAccessExpression {
 }
 
 interface IrFunctionReference : IrCallableReference {
-    override val descriptor: FunctionDescriptor
     override val symbol: IrFunctionSymbol
+    override val descriptor: FunctionDescriptor
 }
 
 interface IrPropertyReference : IrCallableReference {

@@ -47,12 +47,15 @@ class LocalClassGenerator(statementGenerator: StatementGenerator) : StatementGen
             "Object literal constructor should have no value parameters: $objectConstructor"
         }
 
+        val symbol = context.symbolTable.referenceConstructor(objectConstructor)
         irBlock.statements.add(
             IrConstructorCallImpl.fromSymbolDescriptor(
                 startOffset, endOffset, objectLiteralType,
-                context.symbolTable.referenceConstructor(objectConstructor),
+                symbol,
                 IrStatementOrigin.OBJECT_LITERAL
-            )
+            ).apply {
+                context.callToSubstitutedDescriptorMap[this] = symbol.descriptor
+            }
         )
 
         return irBlock

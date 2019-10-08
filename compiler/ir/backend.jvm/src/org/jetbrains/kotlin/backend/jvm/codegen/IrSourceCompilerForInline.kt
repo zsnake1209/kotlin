@@ -52,7 +52,7 @@ class IrSourceCompilerForInline(
         get() = codegen.context.psiSourceManager.getKtFile(codegen.irFunction.fileParent)
 
     override val contextKind: OwnerKind
-        get() = OwnerKind.getMemberOwnerKind(callElement.descriptor.containingDeclaration)
+        get() = OwnerKind.getMemberOwnerKind(callElement.symbol.descriptor.containingDeclaration!!)
 
     override val inlineCallSiteInfo: InlineCallSiteInfo
         get() {
@@ -94,7 +94,7 @@ class IrSourceCompilerForInline(
         callDefault: Boolean,
         asmMethod: Method
     ): SMAPAndMethodNode {
-        assert(callableDescriptor == callElement.descriptor.original) { "Expected $callableDescriptor got ${callElement.descriptor.original}" }
+        assert(callableDescriptor == callElement.symbol.descriptor.original) { "Expected $callableDescriptor got ${callElement.descriptor.original}" }
         assert(codegen.lastLineNumber >= 0) { "lastLineNumber shall be not negative, but is ${codegen.lastLineNumber}" }
 
         val irFunction = getFunctionToInline(callElement as IrCall, jvmSignature, callDefault)

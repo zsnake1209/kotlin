@@ -16,16 +16,15 @@
 
 package org.jetbrains.kotlin.psi2ir.intermediate
 
-import org.jetbrains.kotlin.ir.builders.IrGeneratorContext
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 
 class DelegatedLocalPropertyLValue(
-    private val context: IrGeneratorContext,
+    private val context: GeneratorContext,
     val startOffset: Int,
     val endOffset: Int,
     override val type: IrType,
@@ -37,10 +36,13 @@ class DelegatedLocalPropertyLValue(
     AssignmentReceiver {
 
     override fun load(): IrExpression =
-        IrCallImpl(startOffset, endOffset, type, getterSymbol!!, getterSymbol.descriptor, origin)
+        IrCallImpl(startOffset, endOffset, type, getterSymbol!!, origin).apply {
+            context.callToSubstitutedDescriptorMap[this] = getterSymbol.descriptor
+        }
 
     override fun store(irExpression: IrExpression): IrExpression =
-        IrCallImpl(startOffset, endOffset, context.irBuiltIns.unitType, setterSymbol!!, setterSymbol.descriptor, origin).apply {
+        IrCallImpl(startOffset, endOffset, context.irBuiltIns.unitType, setterSymbol!!, origin).apply {
+            context.callToSubstitutedDescriptorMap[this] = setterSymbol.descriptor
             putValueArgument(0, irExpression)
         }
 

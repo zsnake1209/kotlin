@@ -145,8 +145,7 @@ private class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElem
         IrDelegatingConstructorCallImpl(
             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             context.irBuiltIns.unitType,
-            targetSymbol, targetSymbol.descriptor,
-            targetSymbol.owner.parentAsClass.typeParameters.size + targetSymbol.owner.typeParameters.size
+            targetSymbol, targetSymbol.owner.parentAsClass.typeParameters.size + targetSymbol.owner.typeParameters.size
         ).also {
             copyAllParamsToArgs(it, accessor)
         }
@@ -212,8 +211,7 @@ private class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElem
         IrCallImpl(
             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             accessor.returnType,
-            targetSymbol, targetSymbol.descriptor,
-            targetSymbol.owner.typeParameters.size,
+            targetSymbol, targetSymbol.owner.typeParameters.size,
             superQualifierSymbol = superQualifierSymbol
         ).also {
             copyAllParamsToArgs(it, accessor)
@@ -306,15 +304,13 @@ private class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElem
             is IrCall -> IrCallImpl(
                 oldExpression.startOffset, oldExpression.endOffset,
                 oldExpression.type,
-                accessorSymbol, accessorSymbol.descriptor,
-                oldExpression.typeArgumentsCount,
+                accessorSymbol, oldExpression.typeArgumentsCount,
                 oldExpression.origin
             )
             is IrDelegatingConstructorCall -> IrDelegatingConstructorCallImpl(
                 oldExpression.startOffset, oldExpression.endOffset,
                 context.irBuiltIns.unitType,
-                accessorSymbol as IrConstructorSymbol, accessorSymbol.descriptor,
-                oldExpression.typeArgumentsCount
+                accessorSymbol as IrConstructorSymbol, oldExpression.typeArgumentsCount
             )
             is IrConstructorCall ->
                 IrConstructorCallImpl.fromSymbolDescriptor(
@@ -350,8 +346,7 @@ private class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElem
         val call = IrCallImpl(
             oldExpression.startOffset, oldExpression.endOffset,
             oldExpression.type,
-            accessorSymbol, accessorSymbol.descriptor,
-            0,
+            accessorSymbol, 0,
             oldExpression.origin
         )
         oldExpression.receiver?.let {
@@ -367,8 +362,7 @@ private class SyntheticAccessorLowering(val context: JvmBackendContext) : IrElem
         val call = IrCallImpl(
             oldExpression.startOffset, oldExpression.endOffset,
             oldExpression.type,
-            accessorSymbol, accessorSymbol.descriptor,
-            0,
+            accessorSymbol, 0,
             oldExpression.origin
         )
         oldExpression.receiver?.let {

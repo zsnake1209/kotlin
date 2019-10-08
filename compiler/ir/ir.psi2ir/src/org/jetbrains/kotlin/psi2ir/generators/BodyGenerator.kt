@@ -264,9 +264,10 @@ class BodyGenerator(
             IrDelegatingConstructorCallImpl(
                 ktElement.pureStartOffset, ktElement.pureEndOffset,
                 context.irBuiltIns.unitType,
-                context.symbolTable.referenceConstructor(anyConstructor),
-                anyConstructor
-            )
+                context.symbolTable.referenceConstructor(anyConstructor)
+            ).apply {
+                context.callToSubstitutedDescriptorMap[this] = anyConstructor
+            }
         )
     }
 
@@ -283,6 +284,7 @@ class BodyGenerator(
                 context.symbolTable.referenceConstructor(enumConstructor),
                 1 // kotlin.Enum<T> has a single type parameter
             ).apply {
+                context.callToSubstitutedDescriptorMap[this] = enumConstructor
                 putTypeArgument(0, classDescriptor.defaultType.toIrType())
             }
         )
@@ -300,7 +302,9 @@ class BodyGenerator(
                 context.irBuiltIns.unitType,
                 context.symbolTable.referenceConstructor(enumEntryConstructor),
                 0 // enums can't be generic
-            )
+            ).apply {
+                context.callToSubstitutedDescriptorMap[this] = enumEntryConstructor
+            }
         }
 
         return generateEnumConstructorCallOrSuperCall(ktEnumEntry, enumEntryDescriptor.containingDeclaration as ClassDescriptor)
