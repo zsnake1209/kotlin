@@ -28,6 +28,8 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrInstanceInitializerCallImpl
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrConstructorSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
@@ -556,3 +558,6 @@ fun copyBodyToStatic(oldFunction: IrFunction, staticFunction: IrFunction) {
             ?.transform(VariableRemapper(mapping), null)
             ?.patchDeclarationParents(staticFunction)
 }
+
+val IrSymbol.isSuspend: Boolean
+    get() = this is IrSimpleFunctionSymbol && owner.isSuspend
