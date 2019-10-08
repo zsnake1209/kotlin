@@ -110,9 +110,6 @@ abstract class KotlinGradleAbstractMultiplatformModuleBuilder(
                 }
             }
             createProjectSkeleton(rootDir)
-            if (externalProjectSettings.distributionType == DistributionType.DEFAULT_WRAPPED) {
-                setGradleWrapperToUseVersion(rootDir, "5.5.1")
-            }
 
             if (notImportedCommonSourceSets) GradlePropertiesFileFacade.forProject(module.project).addNotImportedCommonSourceSetsProperty()
             // Ensure project root path is set
@@ -134,22 +131,6 @@ abstract class KotlinGradleAbstractMultiplatformModuleBuilder(
             }
         } finally {
             flushSettingsGradleCopy(module)
-        }
-    }
-
-    private fun setGradleWrapperToUseVersion(rootDir: VirtualFile, version: String) {
-        val wrapperDir = rootDir.createChildDirectory(null, "gradle").createChildDirectory(null, "wrapper")
-        val wrapperProperties = wrapperDir.createChildData(null, "gradle-wrapper.properties").bufferedWriter()
-        wrapperProperties.use {
-            it.write(
-                """
-    distributionBase=GRADLE_USER_HOME
-    distributionPath=wrapper/dists
-    distributionUrl=https\://services.gradle.org/distributions/gradle-$version-bin.zip
-    zipStoreBase=GRADLE_USER_HOME
-    zipStorePath=wrapper/dists
-                """.trimIndent()
-            )
         }
     }
 
