@@ -7,18 +7,19 @@ package kotlin.js.worker
 
 import kotlin.js.Promise
 
-class WebWorker<T>(private val worker: dynamic) {
+class WebWorker<I, O>(private val worker: dynamic) {
     init {
         aliveWorkers.add(WorkerWrapper(worker))
-        worker.postMessage("") // calling worker intrinsic by default runs the worker. TODO: differentiate 'create' and 'start', as in coroutines?
     }
 
-    fun waitForReply(): Promise<T> {
+    fun send(a: I): Promise<O> {
+        worker.postMessage(a)
         return Promise { resolve, reject -> worker.on("message") { e -> resolve(e) }}
     }
 
     companion object {
         private val aliveWorkers = arrayListOf<WorkerWrapper>()
+        internal var captured: dynamic = null
         fun terminateWorkers() {
             for (worker in aliveWorkers) {
                 worker.worker.terminate()
@@ -27,18 +28,29 @@ class WebWorker<T>(private val worker: dynamic) {
     }
 }
 
+fun <O> WebWorker<Unit, O>.start(): Promise<O> {
+    return send(Unit)
+}
+
 internal fun terminateWorkers() {
     WebWorker.terminateWorkers()
 }
 
 private class WorkerWrapper(val worker: dynamic)
 
+internal fun getCapturedVariable(s: String): dynamic {
+    return WebWorker.captured[s]
+}
 
-fun <T> worker(c: () -> T): WebWorker<T> {
+internal fun setCapturedVariables(c: dynamic) {
+    WebWorker.captured = c
+}
+
+fun <I, O> worker(c: (I) -> O): WebWorker<I, O> {
     throw UnsupportedOperationException("Implemented as intrinsic")
 }
 
-fun postMessage(message: dynamic) {
+internal fun postMessage(message: dynamic) {
     WorkerThreads.parentPort.postMessage(message)
 }
 

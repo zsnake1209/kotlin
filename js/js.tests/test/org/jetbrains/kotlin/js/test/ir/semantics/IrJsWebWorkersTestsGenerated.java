@@ -39,6 +39,11 @@ public class IrJsWebWorkersTestsGenerated extends AbstractIrJsWebWorkersTests {
         runTest("js/js.translator/testData/webworkers/empty.kt");
     }
 
+    @TestMetadata("pingPong.kt")
+    public void testPingPong() throws Exception {
+        runTest("js/js.translator/testData/webworkers/pingPong.kt");
+    }
+
     @TestMetadata("postMessage.kt")
     public void testPostMessage() throws Exception {
         runTest("js/js.translator/testData/webworkers/postMessage.kt");

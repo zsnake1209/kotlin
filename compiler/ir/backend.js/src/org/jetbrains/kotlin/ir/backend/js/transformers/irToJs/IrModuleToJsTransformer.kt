@@ -10,14 +10,16 @@ import org.jetbrains.kotlin.ir.backend.js.CompilerResult
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.export.ExportModelGenerator
 import org.jetbrains.kotlin.ir.backend.js.export.ExportModelToJsStatements
-import org.jetbrains.kotlin.ir.backend.js.lower.StaticMembersLowering
 import org.jetbrains.kotlin.ir.backend.js.export.toTypeScript
+import org.jetbrains.kotlin.ir.backend.js.lower.StaticMembersLowering
 import org.jetbrains.kotlin.ir.backend.js.utils.*
-import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.backend.js.webWorkers.WorkerFileWithIndex
 import org.jetbrains.kotlin.ir.backend.js.webWorkers.prepareFilePrefixForWorkers
 import org.jetbrains.kotlin.ir.backend.js.webWorkers.prepareFileSuffixForWorkers
-import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
+import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.js.backend.ast.*
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
@@ -103,7 +105,11 @@ class IrModuleToJsTransformer(
             .generateModuleExport(exportedModule) +
                 workerFilesWithIndices.map {
                     jsAssignment(JsNameRef(it.functionName, "_"), JsNameRef(it.functionName)).makeStmt()
-                } + listOf(jsAssignment(JsNameRef("terminateWorkers", "_"), JsNameRef("terminateWorkers")).makeStmt())
+                } +
+                if (workerFilesWithIndices.isNotEmpty()) listOf(
+                    jsAssignment(JsNameRef("terminateWorkers", "_"), JsNameRef("terminateWorkers")).makeStmt(),
+                    jsAssignment(JsNameRef("setCapturedVariables", "_"), JsNameRef("setCapturedVariables")).makeStmt()
+                ) else emptyList()
 
         with(rootFunction) {
             parameters += JsParameter(internalModuleName)

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.ir.backend.js.webWorkers
 
+import org.jetbrains.kotlin.backend.common.ir.copyTo
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
@@ -23,6 +24,7 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.types.createType
 import org.jetbrains.kotlin.ir.util.constructors
@@ -50,7 +52,7 @@ if (!WorkerThreads.isMainThread) {
         res.append(
             """
         case ${workerFileWithIndex.index}:
-            global.${WORKER_FUNCTION_NAME_PREFIX}capturedVariables = WorkerThreads.workerData.capturedVariables;
+            $moduleName.setCapturedVariables(WorkerThreads.workerData.capturedVariables);
             WorkerThreads.parentPort.on('message', $moduleName.${workerFileWithIndex.functionName});
             break;
 """
@@ -100,9 +102,11 @@ private fun moveToSeparateFile(
 ): Pair<IrFile, List<IrVariable>> {
     val newFile = IrFileImpl(createFileEntryWithName(fileName), context.workersPackageFragmentDescriptor)
     val function = JsIrBuilder.buildFunction(fileName, context.irBuiltIns.unitType, newFile)
+    workerLambda.valueParameters[0].copyTo(function)
     function.body = workerLambda.body
     val capturedVariables = function.copyValueParametersAndUpdateGetValues(context, workerLambda)
     newFile.declarations.add(function)
+    function.body?.transformReturns { IrReturnImpl(it.startOffset, it.endOffset, it.type, function.symbol, it.value) }
     return newFile to capturedVariables
 }
 
@@ -113,15 +117,15 @@ fun IrFunction.copyValueParametersAndUpdateGetValues(context: JsIrBackendContext
     val capturedVariables = arrayListOf<IrVariable>()
     body?.transformChildrenVoid(object : IrElementTransformerVoid() {
         override fun visitGetValue(expression: IrGetValue): IrExpression {
-            original.valueParameters.singleOrNull { it.symbol == expression.symbol.owner }?.index?.let {
+            original.valueParameters.singleOrNull { it.symbol == expression.symbol }?.index?.let {
                 return IrGetValueImpl(expression.startOffset, expression.endOffset, valueParameters[it].symbol)
             }
             // It is captured
             val capturedVariable = expression.symbol.owner as IrVariable
             capturedVariables += capturedVariable
             return newCallWithUndefinedOffsets(
-                symbol = context.jsCodeSymbol,
-                arguments = listOf(context.string("global.${WORKER_FUNCTION_NAME_PREFIX}capturedVariables.${capturedVariable.name}"))
+                symbol = context.getCapturedVariable,
+                arguments = listOf(context.string(capturedVariable.name.asString()))
             )
         }
     })
@@ -130,9 +134,10 @@ fun IrFunction.copyValueParametersAndUpdateGetValues(context: JsIrBackendContext
 
 private fun replaceReturnsWithPostMessage(workerLambda: IrFunction, context: JsIrBackendContext) {
     workerLambda.body.sure { "worker lambda $workerLambda shall have body" }.transformReturns {
-        IrCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.irBuiltIns.unitType, context.postMessage).apply {
-            putValueArgument(0, it.value)
-        }
+        IrReturnImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.irBuiltIns.unitType, workerLambda.symbol,
+                     IrCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.irBuiltIns.unitType, context.postMessage).apply {
+                         putValueArgument(0, it.value)
+                     })
     }
 }
 

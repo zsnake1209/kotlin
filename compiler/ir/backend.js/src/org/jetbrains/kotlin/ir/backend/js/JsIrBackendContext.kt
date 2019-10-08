@@ -263,8 +263,11 @@ class JsIrBackendContext(
 
     // web worker specific stuff
     private val workerPackage = module.getPackage(WORKER_PACKAGE_FQNAME)
+    // TODO: Cannot make them lazy because of IR validation failing
     val postMessage = symbolTable.referenceSimpleFunction(getFunctions(FqName("kotlin.js.worker.postMessage")).single())
-    val terminateMessage = symbolTable.referenceSimpleFunction(getFunctions(FqName("kotlin.js.worker.terminateWorkers")).single())
+    val terminateWorkers = symbolTable.referenceSimpleFunction(getFunctions(FqName("kotlin.js.worker.terminateWorkers")).single())
+    val getCapturedVariable = symbolTable.referenceSimpleFunction(getFunctions(FqName("kotlin.js.worker.getCapturedVariable")).single())
+    val setCapturedVariables = symbolTable.referenceSimpleFunction(getFunctions(FqName("kotlin.js.worker.setCapturedVariables")).single())
     val workerThreadsObject = symbolTable.referenceClassifier(getClass(FqName("kotlin.js.worker.WorkerThreads")))
     val workerClass = symbolTable.referenceClass(findClass(workerPackage.memberScope, Name.identifier("WebWorker")))
 

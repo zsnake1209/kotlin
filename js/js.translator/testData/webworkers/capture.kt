@@ -1,12 +1,12 @@
 // KJS_WITH_FULL_RUNTIME
-// IGNORE_BACKEND: JS_IR
+// IGNORE_BACKENDa: JS_IR
 
 import kotlin.js.worker.*
 import kotlin.js.Promise
 
 fun box(): Promise<String> {
     val res = "OK"
-    return worker {
+    return worker<Unit, String> {
         res
-    }.waitForReply()
+    }.start()
 }
