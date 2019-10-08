@@ -161,6 +161,15 @@ public annotation class JsNonModule
 @Target(AnnotationTarget.FILE)
 public annotation class JsQualifier(val value: String)
 
+/**
+ * Marks experimental JS export annotations.
+ *
+ * Note that behaviour of these annotations will likely be changed in the future.
+ *
+ * Usages of such annotations will be reported as warnings unless an explicit opt-in with
+ * the [UseExperimental] annotation, e.g. `@UseExperimental(ExperimentalJsExport::class)`,
+ * or with the `-Xuse-experimental=kotlin.js.ExperimentalJsExport` compiler option is given.
+ */
 @Experimental(level = Experimental.Level.WARNING)
 @SinceKotlin("1.3")
 public annotation class ExperimentalJsExport
