@@ -33,7 +33,7 @@ import kotlin.system.exitProcess
 // * You can also download source and build it yourself (https://code.google.com/p/protobuf/downloads/list)
 //
 // You may need to provide custom path to protoc executable, just modify this constant:
-private const val PROTOC_EXE = "protoc"
+private const val PROTOC_EXE = "/home/ab/opt/protoc-2.6.1-linux-x86_64.exe"
 
 class ProtoPath(val file: String, val generateDebug: Boolean = true) {
     val outPath: String = File(file).parent
@@ -151,7 +151,7 @@ private fun renamePackagesInSingleFile(javaFile: File) {
         javaFile.readLines().joinToString(LineSeparator.getSystemLineSeparator().separatorString) { line ->
             line.replace("com.google.protobuf", "org.jetbrains.kotlin.protobuf")
                 // Memory footprint optimizations: do not allocate too big bytes buffers that effectively remain unused
-                .replace("              unknownFieldsOutput);", "              unknownFieldsOutput, 1);")
+                .replace("            unknownFieldsOutput);", "            unknownFieldsOutput, 1);")
         }
     )
 }
