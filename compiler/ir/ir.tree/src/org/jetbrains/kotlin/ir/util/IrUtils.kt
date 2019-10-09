@@ -334,11 +334,10 @@ fun IrClass.isLocalClass(): Boolean {
 
 tailrec fun IrElement.getPackageFragment(): IrPackageFragment? {
     if (this is IrPackageFragment) return this
-    val vParent = (this as? IrDeclaration)?.parent
+    val vParent = (this as? IrDeclaration)?.parent ?: return null
     return when (vParent) {
         is IrPackageFragment -> vParent
-        is IrClass -> vParent.getPackageFragment()
-        else -> null
+        else -> vParent.getPackageFragment()
     }
 }
 

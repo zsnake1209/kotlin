@@ -17,9 +17,7 @@ import org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings
 import org.jetbrains.kotlin.codegen.serialization.JvmSerializerExtension
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.LanguageFeature
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.Modality
-import org.jetbrains.kotlin.descriptors.Visibility
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.IrSimpleType
@@ -155,6 +153,7 @@ open class ClassCodegen protected constructor(
                     AsmUtil.writeAnnotationData(av, serializer, classProto)
                     if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR)) {
                         metadata.serializedIr?.let { storeSerializedIr(av, it) }
+                            ?: assert(metadata.descriptor.containingDeclaration !is PackageFragmentDescriptor) { "Toplevel class should have serialized IR" }
                     }
                 }
             }

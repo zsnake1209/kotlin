@@ -36,13 +36,7 @@ class JvmDescriptorUniqIdAware(val symbolTable: SymbolTable, val fallback: (IrSy
                 ?: referenceAndHash(this)
             is DeserializedTypeAliasDescriptor -> this.proto.tryGetExtension(JvmProtoBuf.typeAliasUniqId)
                 ?: referenceAndHash(this)
-            is JavaClassDescriptor,
-            is JavaClassConstructorDescriptor,
-            is JavaMethodDescriptor,
-            is JavaPropertyDescriptor,
-            is FunctionClassDescriptor,
-            is FunctionInvokeDescriptor -> referenceAndHash(this)
-            else -> null
+            else -> referenceAndHash(this)
         }
 
     private fun referenceAndHash(descriptor: DeclarationDescriptor): Long? =

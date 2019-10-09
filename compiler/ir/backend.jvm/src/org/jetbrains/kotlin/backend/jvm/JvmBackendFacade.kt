@@ -20,11 +20,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.MetadataSource
-import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
-import org.jetbrains.kotlin.ir.util.IrDeserializer
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.render
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.load.kotlin.JvmPackagePartSource
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
@@ -42,7 +38,10 @@ object JvmBackendFacade {
     ) {
         val psi2ir = Psi2IrTranslator(state.languageVersionSettings, facadeClassGenerator = ::facadeClassGenerator)
         val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = JvmGeneratorExtensions)
-        val deserializer = JvmIrDeserializer(state.module, EmptyLoggingContext, psi2irContext.irBuiltIns, psi2irContext.symbolTable, state.languageVersionSettings)
+        val deserializer = if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR))
+            JvmIrDeserializer(state.module, EmptyLoggingContext, psi2irContext.irBuiltIns, psi2irContext.symbolTable, state.languageVersionSettings)
+        else
+            EmptyDeserializer
         val irModuleFragment = psi2ir.generateModuleFragment(psi2irContext, files, deserializer)
 
         doGenerateFilesInternal(state, errorHandler, irModuleFragment, psi2irContext, phaseConfig, deserializer)

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.ir.backend.js.lower
 
 import org.jetbrains.kotlin.backend.common.ir.addChild
+import org.jetbrains.kotlin.backend.common.serialization.DescriptorlessExternalPackageFragmentSymbol
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.utils.getJsModule
@@ -41,20 +42,6 @@ private val BODILESS_BUILTIN_CLASSES = listOf(
     "kotlin.Double",
     "kotlin.Function"
 ).map { FqName(it) }.toSet()
-
-private class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFragmentSymbol {
-    override val descriptor: PackageFragmentDescriptor
-        get() = error("Operation is unsupported")
-
-    private var _owner: IrExternalPackageFragment? = null
-    override val owner get() = _owner!!
-
-    override val isBound get() = _owner != null
-
-    override fun bind(owner: IrExternalPackageFragment) {
-        _owner = owner
-    }
-}
 
 private class DescriptorlessIrFileSymbol : IrFileSymbol {
     override fun bind(owner: IrFile) {

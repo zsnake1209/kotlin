@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrLoopBase
-import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrAnonymousInitializerSymbolImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrLocalDelegatedPropertySymbolImpl
@@ -63,7 +62,7 @@ class JvmIrDeserializer(
             symbol.descriptor as? DeserializedMemberDescriptor ?: symbol.descriptor as? DeserializedClassDescriptor
             ?: return fallback(symbol)
 
-        val toplevelDescriptor = descriptor.toToplevel()
+        val toplevelDescriptor = descriptor.findTopLevelDescriptor()
         val packageFragment =
             symbolTable.findOrDeclareExternalPackageFragment(toplevelDescriptor.containingDeclaration as PackageFragmentDescriptor)
 
@@ -130,9 +129,6 @@ class JvmIrDeserializer(
             externalReferences[reference.id] = table.packageList[reference.index]
         }
     }
-
-    private tailrec fun DeclarationDescriptor.toToplevel(): DeclarationDescriptor =
-        if (containingDeclaration is PackageFragmentDescriptor) this else containingDeclaration!!.toToplevel()
 
     override fun declareForwardDeclarations() {}
 
@@ -328,20 +324,5 @@ class JvmIrDeserializer(
             referenceDeserializedSymbolBare(proto, descriptor)
         }
 
-    }
-}
-
-// Copied from MoveBodilessDeclarationToSeparatePlace.kt
-private class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFragmentSymbol {
-    override val descriptor: PackageFragmentDescriptor
-        get() = error("Operation is unsupported")
-
-    private var _owner: IrExternalPackageFragment? = null
-    override val owner get() = _owner!!
-
-    override val isBound get() = _owner != null
-
-    override fun bind(owner: IrExternalPackageFragment) {
-        _owner = owner
     }
 }
