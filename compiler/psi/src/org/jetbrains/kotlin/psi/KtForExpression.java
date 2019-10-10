@@ -33,7 +33,7 @@ public class KtForExpression extends KtLoopExpression {
         return visitor.visitForExpression(this, data);
     }
 
-    @Nullable @IfNotParsed
+    @Nullable
     public KtParameter getLoopParameter() {
         return (KtParameter) findChildByType(KtNodeTypes.VALUE_PARAMETER);
     }
@@ -45,12 +45,12 @@ public class KtForExpression extends KtLoopExpression {
         return loopParameter.getDestructuringDeclaration();
     }
 
-    @Nullable @IfNotParsed
+    @Nullable
     public KtExpression getLoopRange() {
         return findExpressionUnder(KtNodeTypes.LOOP_RANGE);
     }
 
-    @Nullable @IfNotParsed
+    @Nullable
     public PsiElement getInKeyword() {
         return findChildByType(KtTokens.IN_KEYWORD);
     }
@@ -58,5 +58,9 @@ public class KtForExpression extends KtLoopExpression {
     @NotNull
     public PsiElement getForKeyword() {
         return findChildByType(KtTokens.FOR_KEYWORD);
+    }
+
+    public boolean isInfiniteLoop() {
+        return findChildByType(KtTokens.LPAR) == null;
     }
 }
