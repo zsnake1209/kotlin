@@ -436,6 +436,11 @@ public class ParsingTestGenerated extends AbstractParsingTest {
             runTest("compiler/testData/psi/IncompleteFunctionLiteral.kt");
         }
 
+        @TestMetadata("InfiniteFor.kt")
+        public void testInfiniteFor() throws Exception {
+            runTest("compiler/testData/psi/InfiniteFor.kt");
+        }
+
         @TestMetadata("Inner.kt")
         public void testInner() throws Exception {
             runTest("compiler/testData/psi/Inner.kt");

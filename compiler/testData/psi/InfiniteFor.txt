@@ -1,0 +1,164 @@
+KtFile: InfiniteFor.kt
+  PACKAGE_DIRECTIVE
+    <empty list>
+  IMPORT_LIST
+    <empty list>
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('test')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
+          <empty list>
+        PsiWhiteSpace('\n    ')
+        BODY
+          FOR
+            PsiElement(for)('for')
+            PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
+              PsiElement(SEMICOLON)(';')
+            PsiWhiteSpace('\n    ')
+            BODY
+              FOR
+                PsiElement(for)('for')
+                PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
+                  <empty list>
+                PsiWhiteSpace(' ')
+                BODY
+                  REFERENCE_EXPRESSION
+                    PsiElement(IDENTIFIER)('foo')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
+          <empty list>
+        PsiWhiteSpace(' ')
+        BODY
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('foo')
+      PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
+          <empty list>
+        PsiWhiteSpace(' ')
+        BODY
+          CALL_EXPRESSION
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('foo')
+            VALUE_ARGUMENT_LIST
+              PsiElement(LPAR)('(')
+              PsiElement(RPAR)(')')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
+          <empty list>
+        PsiWhiteSpace(' ')
+        BODY
+          CALL_EXPRESSION
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('foo')
+            VALUE_ARGUMENT_LIST
+              PsiElement(LPAR)('(')
+              PsiElement(RPAR)(')')
+      PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
+          <empty list>
+        PsiWhiteSpace(' ')
+        BODY
+          BINARY_EXPRESSION
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('x')
+            PsiWhiteSpace(' ')
+            OPERATION_REFERENCE
+              PsiElement(in)('in')
+            PsiWhiteSpace(' ')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('xs')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
+          <empty list>
+        PsiWhiteSpace(' ')
+        BODY
+          BINARY_EXPRESSION
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('x')
+            PsiWhiteSpace(' ')
+            OPERATION_REFERENCE
+              PsiElement(in)('in')
+            PsiWhiteSpace(' ')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('xs')
+      PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiWhiteSpace(' ')
+        PsiElement(LPAR)('(')
+        VALUE_PARAMETER
+          PsiElement(IDENTIFIER)('x')
+        PsiWhiteSpace(' ')
+        PsiElement(in)('in')
+        PsiWhiteSpace(' ')
+        LOOP_RANGE
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('xs')
+        PsiElement(RPAR)(')')
+        PsiWhiteSpace('\n    ')
+        BODY
+          FOR
+            PsiElement(for)('for')
+            PsiWhiteSpace(' ')
+            PsiElement(LPAR)('(')
+            VALUE_PARAMETER
+              PsiElement(IDENTIFIER)('x')
+            PsiWhiteSpace(' ')
+            PsiElement(in)('in')
+            PsiWhiteSpace(' ')
+            LOOP_RANGE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('xs')
+            PsiElement(RPAR)(')')
+            BODY
+              <empty list>
+      PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiWhiteSpace(' ')
+        BODY
+          BLOCK
+            PsiElement(LBRACE)('{')
+            PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n    ')
+      FOR
+        PsiElement(for)('for')
+        PsiWhiteSpace(' ')
+        BODY
+          BLOCK
+            PsiElement(LBRACE)('{')
+            PsiWhiteSpace(' ')
+            CALL_EXPRESSION
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('foo')
+              VALUE_ARGUMENT_LIST
+                PsiElement(LPAR)('(')
+                PsiElement(RPAR)(')')
+            PsiWhiteSpace(' ')
+            PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
