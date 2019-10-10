@@ -38,10 +38,14 @@ internal class KotlinCacheServiceForScripts(
                 ModuleResolutionFacadeImpl(projectFacade, moduleInfo).createdFor(files, moduleInfo)
             }
             isScriptDependencies(moduleInfo) -> {
+                val filesModificationTracker = ModificationTracker {
+                    files.sumByLong { it.outOfBlockModificationCount + it.modificationStamp }
+                }
                 val projectFacade = wrapWitSyntheticFiles(
                     facadeForScriptDependenciesForProject,
                     ResolverForProject.resolverForScriptDependenciesName,
-                    files.toSet()
+                    files.toSet(),
+                    listOf(filesModificationTracker)
                 )
                 ModuleResolutionFacadeImpl(projectFacade, moduleInfo).createdFor(files, moduleInfo)
             }
@@ -102,26 +106,14 @@ internal class KotlinCacheServiceForScripts(
         reuseDataFrom: ProjectResolutionFacade,
         debugNamePrefix: String,
         files: Set<KtFile>,
+        dependencies: List<ModificationTracker>,
         moduleFilter: (IdeaModuleInfo) -> Boolean = reuseDataFrom.moduleFilter
     ): ProjectResolutionFacade {
         val debugName = debugNamePrefix + " with synthetic files ${files.joinToString { it.name }}"
         val globalContext = reuseDataFrom.globalContext.contextWithCompositeExceptionTracker(project, debugName)
 
-        val filesModificationTracker = if (files.all { it.originalFile != it }) {
-            ModificationTracker {
-                files.sumByLong { it.outOfBlockModificationCount }
-            }
-        } else {
-            ModificationTracker {
-                files.sumByLong { it.outOfBlockModificationCount + it.modificationStamp }
-            }
-        }
-
-        val dependenciesForSyntheticFileCache =
-            listOf(
-                KotlinCodeBlockModificationListener.getInstance(project).kotlinOutOfCodeBlockTracker,
-                filesModificationTracker
-            )
+        val dependenciesForSyntheticFileCache = dependencies +
+                KotlinCodeBlockModificationListener.getInstance(project).kotlinOutOfCodeBlockTracker
 
         return ProjectResolutionFacade(
             debugString = "facade for $debugNamePrefix",
@@ -143,9 +135,18 @@ internal class KotlinCacheServiceForScripts(
         val platform = scriptModuleInfo.platform
         val settings = scriptModuleInfo.platformSettings(project, platform)
 
+        val filesModificationTracker = ModificationTracker {
+            files.sumByLong { it.outOfBlockModificationCount }
+        }
+
         if (scriptModuleInfo is ModuleSourceInfo) {
             val dependentModules = scriptModuleInfo.getDependentModules()
-            return wrapWitSyntheticFiles(facadeForModules(settings), ResolverForProject.resolverForScriptsName, files) {
+            return wrapWitSyntheticFiles(
+                facadeForModules(settings),
+                ResolverForProject.resolverForScriptsName,
+                files,
+                listOf(filesModificationTracker)
+            ) {
                 it in dependentModules
             }
         }
@@ -158,7 +159,12 @@ internal class KotlinCacheServiceForScripts(
             ScriptDependenciesInfo.ForFile(project, scriptModuleInfo.scriptFile, scriptModuleInfo.scriptDefinition)
         )
 
-        return wrapWitSyntheticFiles(facadeForScriptDependencies, ResolverForProject.resolverForScriptsName, files) {
+        return wrapWitSyntheticFiles(
+            facadeForScriptDependencies,
+            ResolverForProject.resolverForScriptsName,
+            files,
+            listOf(filesModificationTracker)
+        ) {
             it == scriptModuleInfo
         }
     }
