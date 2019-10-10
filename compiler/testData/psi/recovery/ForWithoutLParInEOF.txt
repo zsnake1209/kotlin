@@ -15,7 +15,7 @@ KtFile: ForWithoutLParInEOF.kt
     PsiWhiteSpace(' ')
     FOR
       PsiElement(for)('for')
-      PsiErrorElement:Expecting '(' to open a loop range
+      PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
         <empty list>
       BODY
         PsiErrorElement:Expecting an expression

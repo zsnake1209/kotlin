@@ -1422,7 +1422,9 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
         advance(); // FOR_KEYWORD
 
-        if (expect(LPAR, "Expecting '(' to open a loop range", EXPRESSION_FIRST)) {
+        if (_at(LPAR)) {
+            advance(); // LPAR
+
             myBuilder.disableNewlines();
 
             if (!at(RPAR)) {
@@ -1461,6 +1463,12 @@ public class KotlinExpressionParsing extends AbstractKotlinParsing {
 
             expectNoAdvance(RPAR, "Expecting ')'");
             myBuilder.restoreNewlinesState();
+        }
+        else if (_at(LBRACE)) {
+            // Infinite 'for { ... }', fall-through to loop body.
+        }
+        else {
+            errorWithRecovery("Expecting '(' to open a loop range or '{' to start an infinite loop body", EXPRESSION_FIRST);
         }
 
         parseLoopBody();

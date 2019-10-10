@@ -22,7 +22,7 @@ KtFile: ForWithoutLPar.kt
       PsiWhiteSpace('\n    ')
       FOR
         PsiElement(for)('for')
-        PsiErrorElement:Expecting '(' to open a loop range
+        PsiErrorElement:Expecting '(' to open a loop range or '{' to start an infinite loop body
           <empty list>
         PsiWhiteSpace('\n\n    ')
         BODY
