@@ -26,7 +26,7 @@ public class IrJsTextTestCaseGenerated extends AbstractIrJsTextTestCase {
     }
 
     public void testAllFilesPresentInIrJsText() throws Exception {
-        KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/ir/irJsText"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+        KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/ir/irJsText"), Pattern.compile("^(.+)\\.kt(s)?$"), TargetBackend.ANY, true);
     }
 
     @TestMetadata("compiler/testData/ir/irJsText/dynamic")
@@ -38,7 +38,7 @@ public class IrJsTextTestCaseGenerated extends AbstractIrJsTextTestCase {
         }
 
         public void testAllFilesPresentInDynamic() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/ir/irJsText/dynamic"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/ir/irJsText/dynamic"), Pattern.compile("^(.+)\\.kt(s)?$"), TargetBackend.ANY, true);
         }
 
         @TestMetadata("dynamicAndMembersOfAny.kt")
@@ -161,7 +161,7 @@ public class IrJsTextTestCaseGenerated extends AbstractIrJsTextTestCase {
         }
 
         public void testAllFilesPresentInNative() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/ir/irJsText/native"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/ir/irJsText/native"), Pattern.compile("^(.+)\\.kt(s)?$"), TargetBackend.ANY, true);
         }
 
         @TestMetadata("nativeNativeKotlin.kt")
@@ -179,7 +179,7 @@ public class IrJsTextTestCaseGenerated extends AbstractIrJsTextTestCase {
         }
 
         public void testAllFilesPresentInScripting() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/ir/irJsText/scripting"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/ir/irJsText/scripting"), Pattern.compile("^(.+)\\.kt(s)?$"), TargetBackend.ANY, true);
         }
 
         @TestMetadata("arrayAssignment.kts")
