@@ -296,9 +296,16 @@ inline fun <reified T : KtElement, R> flatMapDescendantsOfTypeVisitor(
 
 // ----------- Contracts -------------------------------------------------------------------------------------------------------------------
 
+private val KtNamedFunction.isTopLevelOrInClass: Boolean
+    get() {
+        // isTopLevel works faster for stubs
+        if (isTopLevel) return true
+        return !isLocal
+    }
+
 fun KtNamedFunction.isContractPresentPsiCheck(): Boolean {
     val contractAllowedHere =
-        isTopLevel &&
+        isTopLevelOrInClass &&
                 hasBlockBody() &&
                 !hasModifier(KtTokens.OPERATOR_KEYWORD)
     if (!contractAllowedHere) return false

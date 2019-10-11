@@ -1,0 +1,11 @@
+package test
+
+public final class Foo {
+    /*primary*/ public constructor Foo()
+    public final inline fun bar(/*0*/ block: () -> kotlin.Unit): kotlin.Unit
+        CallsInPlace(block, EXACTLY_ONCE)
+
+    public final fun foo(/*0*/ b: kotlin.Boolean): kotlin.Unit
+        Returns(WILDCARD) -> b
+
+}

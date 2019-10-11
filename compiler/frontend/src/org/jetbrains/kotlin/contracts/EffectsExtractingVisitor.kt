@@ -196,7 +196,11 @@ class EffectsExtractingVisitor(
         )
     }
 
+    private val FunctionDescriptor.hasOverriddenDescriptors: Boolean
+        get() = overriddenDescriptors.isNotEmpty()
+
     private fun FunctionDescriptor.getFunctor(): Functor? {
+        if (hasOverriddenDescriptors) return null
         val contractDescription = getUserData(ContractProviderKey)?.getContractDescription() ?: return null
         return contractDescription.getFunctor(moduleDescriptor)
     }

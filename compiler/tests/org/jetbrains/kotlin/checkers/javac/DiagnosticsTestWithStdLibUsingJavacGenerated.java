@@ -1189,9 +1189,14 @@ public class DiagnosticsTestWithStdLibUsingJavacGenerated extends AbstractDiagno
                     runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/dsl/errors/callInContractDescription.kt");
                 }
 
-                @TestMetadata("contractCallSites.kt")
-                public void testContractCallSites() throws Exception {
-                    runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/dsl/errors/contractCallSites.kt");
+                @TestMetadata("contractCallSites_after.kt")
+                public void testContractCallSites_after() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/dsl/errors/contractCallSites_after.kt");
+                }
+
+                @TestMetadata("contractCallSites_before.kt")
+                public void testContractCallSites_before() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/dsl/errors/contractCallSites_before.kt");
                 }
 
                 @TestMetadata("emptyContract.kt")
@@ -1234,9 +1239,14 @@ public class DiagnosticsTestWithStdLibUsingJavacGenerated extends AbstractDiagno
                     runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/dsl/errors/recursiveContractCustomContractFunction.kt");
                 }
 
-                @TestMetadata("referenceToProperty.kt")
-                public void testReferenceToProperty() throws Exception {
-                    runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/dsl/errors/referenceToProperty.kt");
+                @TestMetadata("referenceToProperty_after.kt")
+                public void testReferenceToProperty_after() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/dsl/errors/referenceToProperty_after.kt");
+                }
+
+                @TestMetadata("referenceToProperty_before.kt")
+                public void testReferenceToProperty_before() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/dsl/errors/referenceToProperty_before.kt");
                 }
 
                 @TestMetadata("typeReferences.kt")
@@ -1354,6 +1364,11 @@ public class DiagnosticsTestWithStdLibUsingJavacGenerated extends AbstractDiagno
             @TestMetadata("intersectionTypes.kt")
             public void testIntersectionTypes() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/intersectionTypes.kt");
+            }
+
+            @TestMetadata("memberWithContract.kt")
+            public void testMemberWithContract() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/memberWithContract.kt");
             }
 
             @TestMetadata("nullabilitySmartcastWhenNullability.kt")

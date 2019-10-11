@@ -6,11 +6,9 @@
 package org.jetbrains.kotlin.resolve.calls.checkers
 
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.contracts.parsing.isContractCallDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
-import org.jetbrains.kotlin.descriptors.isOverridable
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.psiUtil.isFirstStatement
@@ -40,7 +38,18 @@ object ContractNotAllowedCallChecker : CallChecker {
             contractNotAllowed("Contracts are allowed only for functions")
 
         var inFunctionBodyBlock = true
-        if (scope.ownerDescriptor.containingDeclaration !is PackageFragmentDescriptor
+
+        val newContractsPermissionEnabled = context.languageVersionSettings.supportsFeature(LanguageFeature.NewPermissionsForContractsDeclaration)
+
+        val containingDeclaration = scope.ownerDescriptor.containingDeclaration
+
+        val containingDeclarationAcceptable = if (newContractsPermissionEnabled) {
+            containingDeclaration is PackageFragmentDescriptor || containingDeclaration is ClassDescriptor
+        } else {
+            containingDeclaration is PackageFragmentDescriptor
+        }
+
+        if (!containingDeclarationAcceptable
             || scope.kind != LexicalScopeKind.CODE_BLOCK
             || (scope.parent as? LexicalScope)?.kind != LexicalScopeKind.FUNCTION_INNER_SCOPE
         ) {
@@ -48,13 +57,23 @@ object ContractNotAllowedCallChecker : CallChecker {
                 contractNotAllowed("Contracts are allowed only in function body block")
                 inFunctionBodyBlock = false
             } else {
-                contractNotAllowed("Contracts are allowed only for top-level functions")
+                if (newContractsPermissionEnabled) {
+                    contractNotAllowed("Contracts are allowed only for top-level functions and final not override member functions")
+                } else {
+                    contractNotAllowed("Contracts are allowed only for top-level functions")
+                }
             }
         }
 
         if (functionDescriptor?.isOperator == true) contractNotAllowed("Contracts are not allowed for operator functions")
 
-        if (functionDescriptor?.isOverridable == true) contractNotAllowed("Contracts are not allowed for open functions")
+        val modalityAcceptable = if (newContractsPermissionEnabled) {
+            functionDescriptor?.isOverridableOrOverrides == false
+        } else {
+            functionDescriptor?.isOverridable == false
+        }
+
+        if (!modalityAcceptable) contractNotAllowed("Contracts are not allowed for open functions or override functions")
 
         if (!callElement.isFirstStatement() && inFunctionBodyBlock) {
             contractNotAllowed("Contract should be the first statement")

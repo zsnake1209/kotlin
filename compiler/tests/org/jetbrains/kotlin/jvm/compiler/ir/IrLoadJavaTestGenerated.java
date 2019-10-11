@@ -4646,6 +4646,11 @@ public class IrLoadJavaTestGenerated extends AbstractIrLoadJavaTest {
                 runTest("compiler/testData/loadJava/compiledKotlinWithStdlib/contracts/callsEffect.kt");
             }
 
+            @TestMetadata("contractInMember.kt")
+            public void testContractInMember() throws Exception {
+                runTest("compiler/testData/loadJava/compiledKotlinWithStdlib/contracts/contractInMember.kt");
+            }
+
             @TestMetadata("deeplyNestedExpression.kt")
             public void testDeeplyNestedExpression() throws Exception {
                 runTest("compiler/testData/loadJava/compiledKotlinWithStdlib/contracts/deeplyNestedExpression.kt");
