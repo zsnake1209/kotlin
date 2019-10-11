@@ -155,9 +155,5 @@ class JvmBackendContext(
         override fun shouldGenerateHandlerParameterForDefaultBodyFun() = true
     }
 
-    val declarationTable = DeclarationTable(
-        DescriptorTable(),
-        JvmGlobalDeclarationTable(),
-        JvmGlobalDeclarationTable.PUBLIC_LOCAL_UNIQ_ID_EDGE
-    )
+    val declarationTable = DeclarationTable(DescriptorTable(), JvmGlobalDeclarationTable(), 0)
 }

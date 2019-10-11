@@ -30,6 +30,17 @@ class ExternalReferencesInfo(
     val references: Map<IrDeclaration, Int>
 )
 
+fun ExternalReferencesInfo.dump(): String {
+    var result = ""
+    packageFragments.forEachIndexed { index, irPackageFragment ->
+        result += "$index ->  ${irPackageFragment.fqName}\n"
+    }
+    result += "\n"
+    for ((declaration, ix) in references) {
+        result += "${declaration.dump()} -> $ix\n"
+    }
+    return result
+}
 
 fun collectExternalReferences(toplevel: IrDeclarationContainer): ExternalReferencesInfo {
     val collection = ExternalReferenceCollection(toplevel)

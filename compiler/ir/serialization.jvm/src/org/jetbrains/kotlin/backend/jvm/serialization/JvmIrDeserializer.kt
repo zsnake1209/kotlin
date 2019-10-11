@@ -35,11 +35,8 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedMemberDescriptor
 import org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference as ProtoDescriptorReference
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoSymbolIndex
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolData as ProtoSymbolData
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind as ProtoSymbolKind
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoTypeIndex
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoString
 import org.jetbrains.kotlin.backend.common.serialization.proto.Visibility as ProtoVisibility
 
 class JvmIrDeserializer(
@@ -107,7 +104,7 @@ class JvmIrDeserializer(
     private fun consumeUniqIdTable(table: JvmIr.UniqIdTable, fileDeserializer: FileDeserializer) {
         for (entry in table.infosList) {
             val id = entry.id
-            val toplevelFqName = fileDeserializer.deserializeFqName(entry.toplevelFqName)
+            val toplevelFqName = fileDeserializer.deserializeFqName(entry.toplevelFqNameList)
             val oldFqName = knownToplevelFqNames[id]
             assert(oldFqName == null || oldFqName == toplevelFqName) { "FqName table clash: $oldFqName vs $toplevelFqName" }
             knownToplevelFqNames[id] = toplevelFqName
@@ -116,7 +113,7 @@ class JvmIrDeserializer(
 
     private fun buildFacadeClass(fileDeserializer: IrFileDeserializer, proto: JvmIr.JvmIrFile): IrClass = buildClass {
         origin = IrDeclarationOrigin.FILE_CLASS
-        name = fileDeserializer.deserializeFqName(proto.facadeFqName).shortName()
+        name = fileDeserializer.deserializeFqName(proto.facadeFqNameList).shortName()
     }.apply {
         createParameterDeclarations()
         // TODO: annotations
@@ -218,23 +215,23 @@ class JvmIrDeserializer(
             else -> TODO("Unexpected classifier symbol kind: ${proto.kind}")
         }
 
-        override fun deserializeString(proto: ProtoString): String {
-            return auxTables.stringTable.getStrings(proto.index)
+        override fun deserializeString(index: Int): String {
+            return auxTables.stringTable.getString(index)
         }
 
-        override fun deserializeIrType(proto: ProtoTypeIndex): IrType {
-            val typeData = auxTables.typeTable.getTypes(proto.index)
+        override fun deserializeIrType(index: Int): IrType {
+            val typeData = auxTables.typeTable.getTypes(index)
             return deserializeIrTypeData(typeData)
         }
 
-        override fun deserializeIrSymbol(proto: ProtoSymbolIndex): IrSymbol {
-            val symbolData = auxTables.symbolTable.getSymbols(proto.index)
+        override fun deserializeIrSymbol(index: Int): IrSymbol {
+            val symbolData = auxTables.symbolTable.getSymbol(index)
             return deserializeIrSymbolData(symbolData)
         }
 
         private fun deserializeIrSymbolData(proto: ProtoSymbolData): IrSymbol {
-            val key = proto.uniqId.uniqId()
-            return deserializedSymbols.getOrPut(key) {
+            val key = proto.uniqIdIndex
+            return deserializedSymbols.getOrPut(UniqId(key)) {
                 val descriptor = if (proto.hasDescriptorReference()) {
                     deserializeDescriptorReference(proto.descriptorReference)
                 } else {
@@ -247,30 +244,24 @@ class JvmIrDeserializer(
 
         override fun deserializeDescriptorReference(proto: ProtoDescriptorReference) =
             descriptorReferenceDeserializer.deserializeDescriptorReference(
-                deserializeFqName(proto.packageFqName),
-                deserializeFqName(proto.classFqName),
+                deserializeFqName(proto.packageFqNameList),
+                deserializeFqName(proto.classFqNameList),
                 deserializeString(proto.name),
-                if (proto.hasUniqId()) proto.uniqId.index else null,
-                isEnumEntry = proto.isEnumEntry,
-                isEnumSpecial = proto.isEnumSpecial,
-                isDefaultConstructor = proto.isDefaultConstructor,
-                isFakeOverride = proto.isFakeOverride,
-                isGetter = proto.isGetter,
-                isSetter = proto.isSetter,
-                isTypeParameter = proto.isTypeParameter
+                proto.flags,
+                if (proto.hasUniqIdIndex()) proto.uniqIdIndex else null
             )
 
         override fun deserializeLoopHeader(loopIndex: Int, loopBuilder: () -> IrLoopBase) =
             moduleLoops.getOrPut(loopIndex, loopBuilder)
 
-        override fun deserializeExpressionBody(proto: org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex): IrExpression {
-            val bodyData = auxTables.statementsAndExpressionsTable.getStatementOrExpression(proto.index)
+        override fun deserializeExpressionBody(index: Int): IrExpression {
+            val bodyData = auxTables.statementsAndExpressionsTable.getStatementOrExpression(index)
             require(bodyData.hasExpression())
             return deserializeExpression(bodyData.expression)
         }
 
-        override fun deserializeStatementBody(proto: org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex): IrElement {
-            val bodyData = auxTables.statementsAndExpressionsTable.getStatementOrExpression(proto.index)
+        override fun deserializeStatementBody(index: Int): IrElement {
+            val bodyData = auxTables.statementsAndExpressionsTable.getStatementOrExpression(index)
             require(bodyData.hasStatement())
             return deserializeStatement(bodyData.statement)
         }
@@ -302,16 +293,16 @@ class JvmIrDeserializer(
             proto: ProtoSymbolData,
             descriptor: DeclarationDescriptor?
         ): IrSymbol = if (
-            descriptor == null && !proto.uniqId.isLocal &&
+            descriptor == null && !UniqId(proto.uniqIdIndex).isLocal &&
             proto.kind != ProtoSymbolKind.TYPE_PARAMETER_SYMBOL  // TODO: Type parameters are only considered global due to a bug in old inference
         ) {
-            val uniqIdKey = proto.uniqId.uniqId()
+            val uniqIdKey = UniqId(proto.uniqIdIndex)
             deserializedSymbols[uniqIdKey] ?: run {
-                val externalPackageProto = externalReferences[proto.uniqId.index]
-                    ?: error("External reference absent from external references table: ${deserializeFqName(proto.fqname)}")
+                val externalPackageProto = externalReferences[proto.uniqIdIndex]
+                    ?: error("External reference absent from external references table: ${deserializeFqName(proto.fqNameList)}")
                 val packageFragment = IrExternalPackageFragmentImpl(
                     DescriptorlessExternalPackageFragmentSymbol(),
-                    deserializeFqName(externalPackageProto.fqName)
+                    deserializeFqName(externalPackageProto.fqNameList)
                 )
                 for (memberProto in externalPackageProto.declarationContainer.declarationList) {
                     val toplevel = FileDeserializerWithoutReferenceLookup(moduleDescriptor, auxTables, fallback)

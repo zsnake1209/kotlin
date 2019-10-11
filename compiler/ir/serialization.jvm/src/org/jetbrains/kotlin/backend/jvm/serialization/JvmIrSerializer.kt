@@ -8,9 +8,7 @@ package org.jetbrains.kotlin.backend.jvm.serialization
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.ir.ir2string
 import org.jetbrains.kotlin.backend.common.serialization.*
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolTable as ProtoSymbolTable
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeTable as ProtoTypeTable
-import org.jetbrains.kotlin.backend.common.serialization.proto.StringTable as ProtoStringTable
 import org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr
 import org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.StatementsAndExpressionsTable
 import org.jetbrains.kotlin.backend.jvm.serialization.proto.JvmIr.XStatementOrExpression as ProtoStatementOrExpression
@@ -40,10 +38,10 @@ class JvmIrSerializer(
     fun serializeJvmIrFile(irFile: IrFile): JvmIr.JvmIrFile {
         val proto = JvmIr.JvmIrFile.newBuilder()
         proto.declarationContainer = serializeIrDeclarationContainer(irFile.declarations.filter { it !is IrClass })
-        proto.annotations = serializeAnnotations(irFile.annotations)
+        proto.addAllAnnotation(serializeAnnotations(irFile.annotations))
 
         val facadeFqName = irFile.facadeFqName()
-        proto.facadeFqName = serializeFqName(facadeFqName)
+        proto.addAllFacadeFqName(serializeFqName(facadeFqName))
 
         val idCollector = UniqIdCollector(facadeFqName)
         for (declaration in irFile.declarations) {
@@ -77,19 +75,19 @@ class JvmIrSerializer(
             .addAllInfos(idMap.toList().map { (id, fqName) ->
                 JvmIr.UniqIdInfo.newBuilder()
                     .setId(id)
-                    .setToplevelFqName(serializeFqName(fqName))
+                    .addAllToplevelFqName(serializeFqName(fqName))
                     .build()
             })
             .build()
         proto.externalRefs = serializeExternalReferences(copiedExternalReferences)
-        proto.symbolTable = ProtoSymbolTable.newBuilder()
-            .addAllSymbols(protoSymbolArray)
+        proto.symbolTable = JvmIr.SymbolTable.newBuilder()
+            .addAllSymbol(protoSymbolArray)
             .build()
         proto.typeTable = ProtoTypeTable.newBuilder()
             .addAllTypes(protoTypeArray)
             .build()
-        proto.stringTable = ProtoStringTable.newBuilder()
-            .addAllStrings(protoStringArray)
+        proto.stringTable = JvmIr.StringTable.newBuilder()
+            .addAllString(protoStringArray)
             .build()
         proto.statementsAndExpressionsTable = StatementsAndExpressionsTable.newBuilder()
             .addAllStatementOrExpression(
@@ -113,7 +111,7 @@ class JvmIrSerializer(
         externalReferencesInfo.packageFragments.forEach { packageFragment ->
             proto.addPackage(
                 JvmIr.JvmExternalPackage.newBuilder()
-                    .setFqName(serializeFqName(packageFragment.fqName))
+                    .addAllFqName(serializeFqName(packageFragment.fqName))
                     .setDeclarationContainer(
                         serializeIrDeclarationContainer(packageFragment.declarations)
                     )

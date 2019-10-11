@@ -4832,26 +4832,26 @@ public final class DebugJvmProtoBuf {
       "nstructor\030d \001(\01325.org.jetbrains.kotlin.m" +
       "etadata.jvm.JvmMethodSignature:G\n\023constr" +
       "uctor_uniq_id\022*.org.jetbrains.kotlin.met",
-      "adata.Constructor\030e \001(\003:x\n\020method_signat" +
+      "adata.Constructor\030e \001(\006:x\n\020method_signat" +
       "ure\022\'.org.jetbrains.kotlin.metadata.Func" +
       "tion\030d \001(\01325.org.jetbrains.kotlin.metada" +
       "ta.jvm.JvmMethodSignature:O\n\030lambda_clas" +
       "s_origin_name\022\'.org.jetbrains.kotlin.met" +
       "adata.Function\030e \001(\005B\004\230\265\030\001:A\n\020function_u" +
       "niq_id\022\'.org.jetbrains.kotlin.metadata.F" +
-      "unction\030f \001(\003:|\n\022property_signature\022\'.or" +
+      "unction\030f \001(\006:|\n\022property_signature\022\'.or" +
       "g.jetbrains.kotlin.metadata.Property\030d \001" +
       "(\01327.org.jetbrains.kotlin.metadata.jvm.J",
       "vmPropertySignature:9\n\005flags\022\'.org.jetbr" +
       "ains.kotlin.metadata.Property\030e \001(\005:\0010:A" +
       "\n\020property_uniq_id\022\'.org.jetbrains.kotli" +
-      "n.metadata.Property\030f \001(\003:D\n\022enum_entry_" +
+      "n.metadata.Property\030f \001(\006:D\n\022enum_entry_" +
       "uniq_id\022(.org.jetbrains.kotlin.metadata." +
-      "EnumEntry\030d \001(\003:J\n\023value_param_uniq_id\022-" +
+      "EnumEntry\030d \001(\006:J\n\023value_param_uniq_id\022-" +
       ".org.jetbrains.kotlin.metadata.ValuePara" +
-      "meter\030d \001(\003:D\n\022type_alias_uniq_id\022(.org." +
+      "meter\030d \001(\006:D\n\022type_alias_uniq_id\022(.org." +
       "jetbrains.kotlin.metadata.TypeAlias\030d \001(" +
-      "\003:g\n\017type_annotation\022#.org.jetbrains.kot",
+      "\006:g\n\017type_annotation\022#.org.jetbrains.kot",
       "lin.metadata.Type\030d \003(\0132).org.jetbrains." +
       "kotlin.metadata.Annotation:3\n\006is_raw\022#.o" +
       "rg.jetbrains.kotlin.metadata.Type\030e \001(\010:" +
@@ -4859,7 +4859,7 @@ public final class DebugJvmProtoBuf {
       "ains.kotlin.metadata.TypeParameter\030d \003(\013" +
       "2).org.jetbrains.kotlin.metadata.Annotat" +
       "ion:H\n\022type_param_uniq_id\022,.org.jetbrain" +
-      "s.kotlin.metadata.TypeParameter\030e \001(\003:E\n" +
+      "s.kotlin.metadata.TypeParameter\030e \001(\006:E\n" +
       "\021class_module_name\022$.org.jetbrains.kotli" +
       "n.metadata.Class\030e \001(\005B\004\230\265\030\001:k\n\024class_lo",
       "cal_variable\022$.org.jetbrains.kotlin.meta" +
@@ -4867,7 +4867,7 @@ public final class DebugJvmProtoBuf {
       "metadata.Property:P\n\034anonymous_object_or" +
       "igin_name\022$.org.jetbrains.kotlin.metadat" +
       "a.Class\030g \001(\005B\004\230\265\030\001:;\n\rclass_uniq_id\022$.o" +
-      "rg.jetbrains.kotlin.metadata.Class\030h \001(\003" +
+      "rg.jetbrains.kotlin.metadata.Class\030h \001(\006" +
       ":I\n\023package_module_name\022&.org.jetbrains." +
       "kotlin.metadata.Package\030e \001(\005B\004\230\265\030\001:o\n\026p" +
       "ackage_local_variable\022&.org.jetbrains.ko" +

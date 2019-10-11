@@ -7,8 +7,4 @@ package org.jetbrains.kotlin.backend.jvm.serialization
 
 import org.jetbrains.kotlin.backend.common.serialization.GlobalDeclarationTable
 
-class JvmGlobalDeclarationTable : GlobalDeclarationTable(JvmMangler) {
-    companion object {
-        const val PUBLIC_LOCAL_UNIQ_ID_EDGE = 0x7FFF_FFFF_FFFF_FFFFL + 1L
-    }
-}
+class JvmGlobalDeclarationTable : GlobalDeclarationTable(JvmMangler)
