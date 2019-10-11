@@ -13,7 +13,7 @@
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 annotation class ExperimentalAPI
 
-class A {
+open class A {
     @ExperimentalAPI
     operator fun plus(x: A) = x
     @ExperimentalAPI
@@ -27,29 +27,29 @@ open class D<out T>(val a: T)
 
 open class E<T> {
     @ExperimentalAPI
-    operator fun plus(x: B<Int>): T = x as T
+    operator fun plus(x: B): T = x <!UNCHECKED_CAST!>as T<!>
 }
 
 // TESTCASE NUMBER: 1
-fun case_1(x: A) = ((x.run { this.let { it } })) + y
+fun case_1(x: A) = ((x.run { this.let { it } })) <!EXPERIMENTAL_API_USAGE!>+<!> B()
 
 // TESTCASE NUMBER: 2
-fun case_2(x: A) = (when (x) {
-        is A -> x
+fun case_2(x: Any, y: C) = (when (x) {
+        is A -> <!DEBUG_INFO_SMARTCAST!>x<!>
         else -> x as A
-    }) + y
+    }) <!EXPERIMENTAL_API_USAGE!>+<!> y
 
 // TESTCASE NUMBER: 3
-fun case_3(x: Any?) = (when (x) {
-        is C -> x
+fun case_3(x: Any?, y: A) = (when (x) {
+        is C -> <!DEBUG_INFO_SMARTCAST!>x<!>
         else -> x as B
-    }) + y
+    }) <!EXPERIMENTAL_API_USAGE!>+<!> y
 
 // TESTCASE NUMBER: 4
-fun case_4(x: Any?) = (when (x) {
-        is C -> x
+fun case_4(x: Any?, y: C) = (when (x) {
+        is C -> <!DEBUG_INFO_SMARTCAST!>x<!>
         else -> x as? B
-    })!! + y
+    })!! <!EXPERIMENTAL_API_USAGE!>+<!> y
 
 // TESTCASE NUMBER: 5
-fun case_5(x: A<B<*>>?, y: B<Int>) = x?.run { a }!! + y
+fun case_5(x: A?, y: B) = x?.run { this }!! <!EXPERIMENTAL_API_USAGE!>+<!> y

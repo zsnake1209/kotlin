@@ -1,0 +1,57 @@
+package
+
+public fun case_1(/*0*/ x: A): A
+public fun case_2(/*0*/ x: kotlin.Any, /*1*/ y: C): A
+public fun case_3(/*0*/ x: kotlin.Any?, /*1*/ y: A): A
+public fun case_4(/*0*/ x: kotlin.Any?, /*1*/ y: C): A
+public fun case_5(/*0*/ x: A?, /*1*/ y: B): A
+
+public open class A {
+    public constructor A()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    @ExperimentalAPI public final operator fun minus(/*0*/ x: A): A
+    @ExperimentalAPI public final operator fun plus(/*0*/ x: A): A
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class B : A {
+    public constructor B()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    @ExperimentalAPI public final override /*1*/ /*fake_override*/ fun minus(/*0*/ x: A): A
+    @ExperimentalAPI public final override /*1*/ /*fake_override*/ fun plus(/*0*/ x: A): A
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class C : A {
+    public constructor C()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    @ExperimentalAPI public final override /*1*/ /*fake_override*/ fun minus(/*0*/ x: A): A
+    @ExperimentalAPI public final override /*1*/ /*fake_override*/ fun plus(/*0*/ x: A): A
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public open class D</*0*/ out T> {
+    public constructor D</*0*/ out T>(/*0*/ a: T)
+    public final val a: T
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public open class E</*0*/ T> {
+    public constructor E</*0*/ T>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    @ExperimentalAPI public final operator fun plus(/*0*/ x: B): T
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+@kotlin.Experimental(level = Level.WARNING) @kotlin.annotation.Target(allowedTargets = {AnnotationTarget.CLASS, AnnotationTarget.FUNCTION}) public final annotation class ExperimentalAPI : kotlin.Annotation {
+    public constructor ExperimentalAPI()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}

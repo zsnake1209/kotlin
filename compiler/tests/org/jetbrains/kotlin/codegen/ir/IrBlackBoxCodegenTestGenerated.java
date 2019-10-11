@@ -15331,6 +15331,16 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/multiplatform"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JVM_IR, true);
         }
 
+        @TestMetadata("choiceBetweenExpectAndGenericFunction.kt")
+        public void testChoiceBetweenExpectAndGenericFunction() throws Exception {
+            runTest("compiler/testData/codegen/box/multiplatform/choiceBetweenExpectAndGenericFunction.kt");
+        }
+
+        @TestMetadata("choiceBetweenExpectAndVarargFunction.kt")
+        public void testChoiceBetweenExpectAndVarargFunction() throws Exception {
+            runTest("compiler/testData/codegen/box/multiplatform/choiceBetweenExpectAndVarargFunction.kt");
+        }
+
         @TestMetadata("expectClassInJvmMultifileFacade.kt")
         public void testExpectClassInJvmMultifileFacade() throws Exception {
             runTest("compiler/testData/codegen/box/multiplatform/expectClassInJvmMultifileFacade.kt");

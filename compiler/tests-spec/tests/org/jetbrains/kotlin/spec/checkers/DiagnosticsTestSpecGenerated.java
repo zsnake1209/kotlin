@@ -1540,6 +1540,21 @@ public class DiagnosticsTestSpecGenerated extends AbstractDiagnosticsTestSpec {
                             runTest("compiler/tests-spec/testData/diagnostics/notLinked/annotations/experimental/propagation/pos/3.kt");
                         }
 
+                        @TestMetadata("4.kt")
+                        public void test4() throws Exception {
+                            runTest("compiler/tests-spec/testData/diagnostics/notLinked/annotations/experimental/propagation/pos/4.kt");
+                        }
+
+                        @TestMetadata("5.kt")
+                        public void test5() throws Exception {
+                            runTest("compiler/tests-spec/testData/diagnostics/notLinked/annotations/experimental/propagation/pos/5.kt");
+                        }
+
+                        @TestMetadata("6.kt")
+                        public void test6() throws Exception {
+                            runTest("compiler/tests-spec/testData/diagnostics/notLinked/annotations/experimental/propagation/pos/6.kt");
+                        }
+
                         public void testAllFilesPresentInPos() throws Exception {
                             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/tests-spec/testData/diagnostics/notLinked/annotations/experimental/propagation/pos"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
                         }
