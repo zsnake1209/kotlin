@@ -18,7 +18,7 @@ task("downloadIDL", JavaExec::class) {
     dependsOn(":dukat:build")
 }
 
-task("launchDukat", JavaExec::class) {
+task("generateStdlibFromIDL", JavaExec::class) {
     main = "org.jetbrains.kotlin.tools.dukat.LaunchKt"
     classpath = sourceSets["main"].runtimeClasspath
     dependsOn(":dukat:build")
