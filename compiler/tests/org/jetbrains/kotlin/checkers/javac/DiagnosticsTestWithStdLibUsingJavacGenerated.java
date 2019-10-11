@@ -1306,6 +1306,16 @@ public class DiagnosticsTestWithStdLibUsingJavacGenerated extends AbstractDiagno
                 KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
             }
 
+            @TestMetadata("boundSmartcasts_after.kt")
+            public void testBoundSmartcasts_after() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/boundSmartcasts_after.kt");
+            }
+
+            @TestMetadata("boundSmartcasts_before.kt")
+            public void testBoundSmartcasts_before() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/boundSmartcasts_before.kt");
+            }
+
             @TestMetadata("callWithDefaultValue.kt")
             public void testCallWithDefaultValue() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/callWithDefaultValue.kt");

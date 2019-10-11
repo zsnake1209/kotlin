@@ -130,6 +130,9 @@ class EffectsExtractingVisitor(
     override fun visitSafeQualifiedExpression(expression: KtSafeQualifiedExpression, data: Unit?): Computation {
         val computation = super.visitSafeQualifiedExpression(expression, data)
         if (computation === UNKNOWN_COMPUTATION) return computation
+        if (computation is ESVariableWithDataFlowValue && languageVersionSettings.supportsFeature(LanguageFeature.BoundSmartcastsInContracts)) {
+            return computation
+        }
 
         // For safecall any clauses of form 'returns(null) -> ...' are incorrect, because safecall can return
         // null bypassing function's contract, so we have to filter them out
