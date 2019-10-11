@@ -22,4 +22,5 @@ task("generateStdlibFromIDL", JavaExec::class) {
     main = "org.jetbrains.kotlin.tools.dukat.LaunchKt"
     classpath = sourceSets["main"].runtimeClasspath
     dependsOn(":dukat:build")
+    systemProperty("line.separator", "\n")
 }

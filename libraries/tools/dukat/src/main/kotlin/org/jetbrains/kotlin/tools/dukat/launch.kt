@@ -44,7 +44,9 @@ fun main() {
 
     org.jetbrains.dukat.cli.main("-d", outputDirectory, input)
 
-    for (file in File(outputDirectory).listFiles().orEmpty()) {
+    for (file in File(outputDirectory).listFiles { name ->
+        name.extension == "kt"
+    }.orEmpty()) {
         file.writeBytes((getHeader() + file.readText()).toByteArray())
     }
 }
