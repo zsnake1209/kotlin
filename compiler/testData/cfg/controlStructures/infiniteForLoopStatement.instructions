@@ -1,0 +1,254 @@
+== use ==
+fun use(x: Int) = x
+---------------------
+L0:
+  1 <START>
+    v(x: Int)
+    magic[FAKE_INITIALIZER](x: Int) -> <v0>
+    w(x|<v0>)
+    r(x) -> <v1>
+    ret(*|<v1>) L1
+L1:
+    <END>                                      NEXT:[<SINK>]
+error:
+    <ERROR>                                    PREV:[]
+sink:
+    <SINK>                                     PREV:[<ERROR>, <END>]
+=====================
+== testInfinite ==
+fun testInfinite() {
+    var x = 0
+    for {
+        ++x
+    }
+    use(x)
+}
+---------------------
+L0:
+  1 <START>
+  2 mark({ var x = 0 for { ++x } use(x) })
+    v(var x = 0)
+    r(0) -> <v0>
+    w(x|<v0>)
+L2 [loop entry point]:
+L6 [condition entry point]:
+  3 mark(for { ++x })                         PREV:[w(x|<v0>), jmp(L2)]
+L4 [body entry point]:
+  4 mark({ ++x })
+    r(x) -> <v1>
+    mark(++x)
+    call(++x, inc|<v1>) -> <v2>
+    w(x|<v2>)
+  3 jmp(L2)                                   NEXT:[mark(for { ++x })]
+L3 [loop exit point]:
+L5 [body exit point]:
+-   read (Unit)                               PREV:[]
+- 2 r(x) -> <v3>                              PREV:[]
+-   mark(use(x))                              PREV:[]
+-   call(use(x), use|<v3>) -> <v4>            PREV:[]
+L1:
+  1 <END>                                     NEXT:[<SINK>]                                    PREV:[]
+error:
+    <ERROR>                                   PREV:[]
+sink:
+    <SINK>                                    PREV:[<ERROR>, <END>]
+=====================
+== testBreak ==
+fun testBreak() {
+    var x = 0
+    for {
+        if (++x > 10) break
+        ++x
+    }
+    use(x)
+}
+---------------------
+L0:
+  1 <START>
+  2 mark({ var x = 0 for { if (++x > 10) break ++x } use(x) })
+    v(var x = 0)
+    r(0) -> <v0>
+    w(x|<v0>)
+L2 [loop entry point]:
+L6 [condition entry point]:
+  3 mark(for { if (++x > 10) break ++x })                         PREV:[w(x|<v0>), jmp(L2)]
+L4 [body entry point]:
+  4 mark({ if (++x > 10) break ++x })
+    mark(if (++x > 10) break)
+    r(x) -> <v1>
+    mark(++x)
+    call(++x, inc|<v1>) -> <v2>
+    w(x|<v2>)
+    r(10) -> <v3>
+    mark(++x > 10)
+    call(++x > 10, compareTo|<v2>, <v3>) -> <v4>
+    jf(L7|<v4>)                                                   NEXT:[read (Unit), jmp(L3)]
+    jmp(L3)                                                       NEXT:[read (Unit)]
+-   jmp(L8)                                                       NEXT:[merge(if (++x > 10) break|!<v5>) -> <v6>]                      PREV:[]
+L7 [else branch]:
+    read (Unit)                                                   PREV:[jf(L7|<v4>)]
+L8 ['if' expression result]:
+    merge(if (++x > 10) break|!<v5>) -> <v6>
+    r(x) -> <v7>
+    mark(++x)
+    call(++x, inc|<v7>) -> <v8>
+    w(x|<v8>)
+  3 jmp(L2)                                                       NEXT:[mark(for { if (++x > 10) break ++x })]
+L3 [loop exit point]:
+L5 [body exit point]:
+    read (Unit)                                                   PREV:[jmp(L3)]
+  2 r(x) -> <v9>
+    mark(use(x))
+    call(use(x), use|<v9>) -> <v10>
+L1:
+  1 <END>                                                         NEXT:[<SINK>]
+error:
+    <ERROR>                                                       PREV:[]
+sink:
+    <SINK>                                                        PREV:[<ERROR>, <END>]
+=====================
+== testContinue ==
+fun testContinue() {
+    var x = 0
+    for {
+        if (++x > 10) continue
+        use(x)
+    }
+}
+---------------------
+L0:
+  1 <START>
+  2 mark({ var x = 0 for { if (++x > 10) continue use(x) } })
+    v(var x = 0)
+    r(0) -> <v0>
+    w(x|<v0>)
+L2 [loop entry point]:
+L6 [condition entry point]:
+  3 mark(for { if (++x > 10) continue use(x) })                  PREV:[w(x|<v0>), jmp(L6), jmp(L2)]
+L4 [body entry point]:
+  4 mark({ if (++x > 10) continue use(x) })
+    mark(if (++x > 10) continue)
+    r(x) -> <v1>
+    mark(++x)
+    call(++x, inc|<v1>) -> <v2>
+    w(x|<v2>)
+    r(10) -> <v3>
+    mark(++x > 10)
+    call(++x > 10, compareTo|<v2>, <v3>) -> <v4>
+    jf(L7|<v4>)                                                  NEXT:[read (Unit), jmp(L6)]
+    jmp(L6)                                                      NEXT:[mark(for { if (++x > 10) continue use(x) })]
+-   jmp(L8)                                                      NEXT:[merge(if (++x > 10) continue|!<v5>) -> <v6>]                  PREV:[]
+L7 [else branch]:
+    read (Unit)                                                  PREV:[jf(L7|<v4>)]
+L8 ['if' expression result]:
+    merge(if (++x > 10) continue|!<v5>) -> <v6>
+    r(x) -> <v7>
+    mark(use(x))
+    call(use(x), use|<v7>) -> <v8>
+  3 jmp(L2)                                                      NEXT:[mark(for { if (++x > 10) continue use(x) })]
+L3 [loop exit point]:
+L5 [body exit point]:
+-   read (Unit)                                                  PREV:[]
+L1:
+  1 <END>                                                        NEXT:[<SINK>]                                                       PREV:[]
+error:
+    <ERROR>                                                      PREV:[]
+sink:
+    <SINK>                                                       PREV:[<ERROR>, <END>]
+=====================
+== testBreakWithLabel ==
+fun testBreakWithLabel() {
+    var x = 0
+    L1@for {
+        L2@for {
+            break@L1
+        }
+    }
+    use(x)
+}
+---------------------
+L0:
+  1 <START>
+  2 mark({ var x = 0 L1@for { L2@for { break@L1 } } use(x) })
+    v(var x = 0)
+    r(0) -> <v0>
+    w(x|<v0>)
+    mark(L1@for { L2@for { break@L1 } })
+L2 [loop entry point]:
+L6 [condition entry point]:
+  3 mark(for { L2@for { break@L1 } })
+L4 [body entry point]:
+  4 mark({ L2@for { break@L1 } })
+    mark(L2@for { break@L1 })
+L7 [loop entry point]:
+L11 [condition entry point]:
+  5 mark(for { break@L1 })
+L9 [body entry point]:
+  6 mark({ break@L1 })
+    jmp(L3)                                                      NEXT:[read (Unit)]
+- 5 jmp(L7)                                                      NEXT:[mark(for { break@L1 })]                                       PREV:[]
+L8 [loop exit point]:
+L10 [body exit point]:
+-   read (Unit)                                                  PREV:[]
+- 3 jmp(L2)                                                      NEXT:[mark(for { L2@for { break@L1 } })]                            PREV:[]
+L3 [loop exit point]:
+L5 [body exit point]:
+    read (Unit)                                                  PREV:[jmp(L3)]
+  2 r(x) -> <v4>
+    mark(use(x))
+    call(use(x), use|<v4>) -> <v5>
+L1:
+  1 <END>                                                        NEXT:[<SINK>]
+error:
+    <ERROR>                                                      PREV:[]
+sink:
+    <SINK>                                                       PREV:[<ERROR>, <END>]
+=====================
+== testContinueWithLabel ==
+fun testContinueWithLabel() {
+    var x = 0
+    L1@for {
+        L2@for {
+            continue@L1
+        }
+    }
+    use(x)
+}
+---------------------
+L0:
+  1 <START>
+  2 mark({ var x = 0 L1@for { L2@for { continue@L1 } } use(x) })
+    v(var x = 0)
+    r(0) -> <v0>
+    w(x|<v0>)
+    mark(L1@for { L2@for { continue@L1 } })
+L2 [loop entry point]:
+L6 [condition entry point]:
+  3 mark(for { L2@for { continue@L1 } })                            PREV:[mark(L1@for { L2@for { continue@L1 } }), jmp(L6)]
+L4 [body entry point]:
+  4 mark({ L2@for { continue@L1 } })
+    mark(L2@for { continue@L1 })
+L7 [loop entry point]:
+L11 [condition entry point]:
+  5 mark(for { continue@L1 })
+L9 [body entry point]:
+  6 mark({ continue@L1 })
+    jmp(L6)                                                         NEXT:[mark(for { L2@for { continue@L1 } })]
+- 5 jmp(L7)                                                         NEXT:[mark(for { continue@L1 })]                                       PREV:[]
+L8 [loop exit point]:
+L10 [body exit point]:
+-   read (Unit)                                                     PREV:[]
+- 3 jmp(L2)                                                         NEXT:[mark(for { L2@for { continue@L1 } })]                            PREV:[]
+L3 [loop exit point]:
+L5 [body exit point]:
+-   read (Unit)                                                     PREV:[]
+- 2 r(x) -> <v4>                                                    PREV:[]
+-   mark(use(x))                                                    PREV:[]
+-   call(use(x), use|<v4>) -> <v5>                                  PREV:[]
+L1:
+  1 <END>                                                           NEXT:[<SINK>]                                                          PREV:[]
+error:
+    <ERROR>                                                         PREV:[]
+sink:
+    <SINK>                                                          PREV:[<ERROR>, <END>]
+=====================

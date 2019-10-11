@@ -4361,6 +4361,11 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                 runTest("compiler/testData/diagnostics/tests/controlStructures/improperElseInExpression.kt");
             }
 
+            @TestMetadata("infiniteForLoopStatement.kt")
+            public void testInfiniteForLoopStatement() throws Exception {
+                runTest("compiler/testData/diagnostics/tests/controlStructures/infiniteForLoopStatement.kt");
+            }
+
             @TestMetadata("jumpAcrossFunctionBoundary.kt")
             public void testJumpAcrossFunctionBoundary() throws Exception {
                 runTest("compiler/testData/diagnostics/tests/controlStructures/jumpAcrossFunctionBoundary.kt");

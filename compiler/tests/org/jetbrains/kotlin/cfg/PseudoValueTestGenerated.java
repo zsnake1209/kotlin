@@ -232,6 +232,11 @@ public class PseudoValueTestGenerated extends AbstractPseudoValueTest {
                 runTest("compiler/testData/cfg/controlStructures/incorrectIndex_Before.kt");
             }
 
+            @TestMetadata("infiniteForLoopStatement.kt")
+            public void testInfiniteForLoopStatement() throws Exception {
+                runTest("compiler/testData/cfg/controlStructures/infiniteForLoopStatement.kt");
+            }
+
             @TestMetadata("InfiniteLoops.kt")
             public void testInfiniteLoops() throws Exception {
                 runTest("compiler/testData/cfg/controlStructures/InfiniteLoops.kt");

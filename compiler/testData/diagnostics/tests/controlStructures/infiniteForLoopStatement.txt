@@ -1,0 +1,7 @@
+package
+
+public fun testBreak(): kotlin.Unit
+public fun testContinue(): kotlin.Unit
+public fun testInfinite(): kotlin.Unit
+public fun testInfiniteForInExpressionPosition(): [ERROR : Error function type]
+public fun use(/*0*/ x: kotlin.Int): kotlin.Int

@@ -51,6 +51,7 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.CompileTimeConstantUtils
 import org.jetbrains.kotlin.resolve.bindingContextUtil.getEnclosingFunctionDescriptor
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
+import org.jetbrains.kotlin.resolve.calls.components.extractInputOutputTypesFromCallableReferenceExpectedType
 import org.jetbrains.kotlin.resolve.calls.model.ArgumentMatch
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.calls.model.VariableAsFunctionResolvedCall
@@ -765,7 +766,11 @@ class ControlFlowProcessor(
 
             builder.bindLabel(loopInfo.conditionEntryPoint)
             generateLoopConventionCall(loopRange, BindingContext.LOOP_RANGE_HAS_NEXT_RESOLVED_CALL)
-            builder.nondeterministicJump(loopInfo.exitPoint, expression, null)
+
+            if (!expression.isInfiniteLoop) {
+                builder.nondeterministicJump(loopInfo.exitPoint, expression, null)
+            }
+
             generateLoopConventionCall(loopRange, BindingContext.LOOP_RANGE_NEXT_RESOLVED_CALL)
 
             writeLoopParameterAssignment(expression)
@@ -803,7 +808,7 @@ class ControlFlowProcessor(
         }
 
         private fun writeLoopParameterAssignment(expression: KtForExpression) {
-            val loopParameter = expression.loopParameter
+            val loopParameter = expression.loopParameter ?: return
             val loopRange = expression.loopRange
 
             val value = builder.magic(

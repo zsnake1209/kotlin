@@ -1,0 +1,115 @@
+== use ==
+fun use(x: Int) = x
+---------------------
+    <v0>: Int   NEW: magic[FAKE_INITIALIZER](x: Int) -> <v0>
+x   <v1>: Int   NEW: r(x) -> <v1>
+=====================
+== testInfinite ==
+fun testInfinite() {
+    var x = 0
+    for {
+        ++x
+    }
+    use(x)
+}
+---------------------
+0                                  <v0>: Int   NEW: r(0) -> <v0>
+x                                  <v1>: Int   NEW: r(x) -> <v1>
+++x                                <v2>: Int   NEW: call(++x, inc|<v1>) -> <v2>
+{ ++x }                            <v2>: Int   COPY
+x                                  <v3>: Int   NEW: r(x) -> <v3>
+use(x)                             <v4>: *     NEW: call(use(x), use|<v3>) -> <v4>
+{ var x = 0 for { ++x } use(x) }   <v4>: *     COPY
+=====================
+== testBreak ==
+fun testBreak() {
+    var x = 0
+    for {
+        if (++x > 10) break
+        ++x
+    }
+    use(x)
+}
+---------------------
+0                                                      <v0>: Int                              NEW: r(0) -> <v0>
+x                                                      <v1>: Int                              NEW: r(x) -> <v1>
+++x                                                    <v2>: AND{Int, {<: Comparable<Int>}}   NEW: call(++x, inc|<v1>) -> <v2>
+10                                                     <v3>: Int                              NEW: r(10) -> <v3>
+++x > 10                                               <v4>: Boolean                          NEW: call(++x > 10, compareTo|<v2>, <v3>) -> <v4>
+break                                                  !<v5>: *
+if (++x > 10) break                                    <v6>: *                                NEW: merge(if (++x > 10) break|!<v5>) -> <v6>
+x                                                      <v7>: Int                              NEW: r(x) -> <v7>
+++x                                                    <v8>: Int                              NEW: call(++x, inc|<v7>) -> <v8>
+{ if (++x > 10) break ++x }                            <v8>: Int                              COPY
+x                                                      <v9>: Int                              NEW: r(x) -> <v9>
+use(x)                                                 <v10>: *                               NEW: call(use(x), use|<v9>) -> <v10>
+{ var x = 0 for { if (++x > 10) break ++x } use(x) }   <v10>: *                               COPY
+=====================
+== testContinue ==
+fun testContinue() {
+    var x = 0
+    for {
+        if (++x > 10) continue
+        use(x)
+    }
+}
+---------------------
+0                                                     <v0>: Int                              NEW: r(0) -> <v0>
+x                                                     <v1>: Int                              NEW: r(x) -> <v1>
+++x                                                   <v2>: AND{Int, {<: Comparable<Int>}}   NEW: call(++x, inc|<v1>) -> <v2>
+10                                                    <v3>: Int                              NEW: r(10) -> <v3>
+++x > 10                                              <v4>: Boolean                          NEW: call(++x > 10, compareTo|<v2>, <v3>) -> <v4>
+continue                                              !<v5>: *
+if (++x > 10) continue                                <v6>: *                                NEW: merge(if (++x > 10) continue|!<v5>) -> <v6>
+x                                                     <v7>: Int                              NEW: r(x) -> <v7>
+use(x)                                                <v8>: *                                NEW: call(use(x), use|<v7>) -> <v8>
+{ if (++x > 10) continue use(x) }                     <v8>: *                                COPY
+for { if (++x > 10) continue use(x) }                 !<v9>: *
+{ var x = 0 for { if (++x > 10) continue use(x) } }   !<v9>: *                               COPY
+=====================
+== testBreakWithLabel ==
+fun testBreakWithLabel() {
+    var x = 0
+    L1@for {
+        L2@for {
+            break@L1
+        }
+    }
+    use(x)
+}
+---------------------
+0                                                     <v0>: Int   NEW: r(0) -> <v0>
+break@L1                                              !<v1>: *
+{ break@L1 }                                          !<v1>: *    COPY
+for { break@L1 }                                      !<v2>: *
+L2@for { break@L1 }                                   !<v2>: *    COPY
+{ L2@for { break@L1 } }                               !<v2>: *    COPY
+for { L2@for { break@L1 } }                           !<v3>: *
+L1@for { L2@for { break@L1 } }                        !<v3>: *    COPY
+x                                                     <v4>: Int   NEW: r(x) -> <v4>
+use(x)                                                <v5>: *     NEW: call(use(x), use|<v4>) -> <v5>
+{ var x = 0 L1@for { L2@for { break@L1 } } use(x) }   <v5>: *     COPY
+=====================
+== testContinueWithLabel ==
+fun testContinueWithLabel() {
+    var x = 0
+    L1@for {
+        L2@for {
+            continue@L1
+        }
+    }
+    use(x)
+}
+---------------------
+0                                                        <v0>: Int   NEW: r(0) -> <v0>
+continue@L1                                              !<v1>: *
+{ continue@L1 }                                          !<v1>: *    COPY
+for { continue@L1 }                                      !<v2>: *
+L2@for { continue@L1 }                                   !<v2>: *    COPY
+{ L2@for { continue@L1 } }                               !<v2>: *    COPY
+for { L2@for { continue@L1 } }                           !<v3>: *
+L1@for { L2@for { continue@L1 } }                        !<v3>: *    COPY
+x                                                        <v4>: Int   NEW: r(x) -> <v4>
+use(x)                                                   <v5>: *     NEW: call(use(x), use|<v4>) -> <v5>
+{ var x = 0 L1@for { L2@for { continue@L1 } } use(x) }   <v5>: *     COPY
+=====================
