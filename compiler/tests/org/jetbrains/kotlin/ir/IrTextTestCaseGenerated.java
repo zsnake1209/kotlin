@@ -957,6 +957,11 @@ public class IrTextTestCaseGenerated extends AbstractIrTextTestCase {
             runTest("compiler/testData/ir/irText/expressions/incrementDecrement.kt");
         }
 
+        @TestMetadata("infiniteForStatement.kt")
+        public void testInfiniteForStatement() throws Exception {
+            runTest("compiler/testData/ir/irText/expressions/infiniteForStatement.kt");
+        }
+
         @TestMetadata("interfaceThisRef.kt")
         public void testInterfaceThisRef() throws Exception {
             runTest("compiler/testData/ir/irText/expressions/interfaceThisRef.kt");

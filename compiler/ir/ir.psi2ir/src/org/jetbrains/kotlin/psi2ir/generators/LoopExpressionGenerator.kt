@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.psi2ir.generators
 
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
+import org.jetbrains.kotlin.ir.expressions.IrConstKind
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrLoop
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
@@ -44,7 +45,7 @@ class LoopExpressionGenerator(statementGenerator: StatementGenerator) : Statemen
 
         irLoop.body = ktWhile.body?.let { ktLoopBody ->
             if (ktLoopBody is KtBlockExpression)
-                generateWhileLoopBody(ktLoopBody)
+                generateLoopBlockBody(ktLoopBody)
             else
                 ktLoopBody.genExpr()
         }
@@ -64,7 +65,7 @@ class LoopExpressionGenerator(statementGenerator: StatementGenerator) : Statemen
 
         irLoop.body = ktDoWhile.body?.let { ktLoopBody ->
             if (ktLoopBody is KtBlockExpression)
-                generateDoWhileLoopBody(ktLoopBody)
+                generateLoopCompositeBody(ktLoopBody)
             else
                 ktLoopBody.genExpr()
         }
@@ -76,14 +77,14 @@ class LoopExpressionGenerator(statementGenerator: StatementGenerator) : Statemen
         }
     }
 
-    private fun generateWhileLoopBody(ktLoopBody: KtBlockExpression): IrExpression =
+    private fun generateLoopBlockBody(ktLoopBody: KtBlockExpression): IrExpression =
         IrBlockImpl(
             ktLoopBody.startOffsetSkippingComments, ktLoopBody.endOffset, context.irBuiltIns.unitType, null,
             ktLoopBody.statements.map { it.genStmt() }
         )
 
 
-    private fun generateDoWhileLoopBody(ktLoopBody: KtBlockExpression): IrExpression =
+    private fun generateLoopCompositeBody(ktLoopBody: KtBlockExpression): IrExpression =
         IrCompositeImpl(
             ktLoopBody.startOffsetSkippingComments, ktLoopBody.endOffset, context.irBuiltIns.unitType, null,
             ktLoopBody.statements.map { it.genStmt() }
@@ -147,6 +148,10 @@ class LoopExpressionGenerator(statementGenerator: StatementGenerator) : Statemen
     }
 
     fun generateForLoop(ktFor: KtForExpression): IrExpression {
+        if (ktFor.isInfiniteLoop) {
+            return generateInfiniteForLoop(ktFor)
+        }
+
         val ktLoopParameter = ktFor.loopParameter
         val ktLoopDestructuringDeclaration = ktFor.destructuringDeclaration
         if (ktLoopParameter == null && ktLoopDestructuringDeclaration == null) {
@@ -214,5 +219,29 @@ class LoopExpressionGenerator(statementGenerator: StatementGenerator) : Statemen
         }
 
         return irForBlock
+    }
+
+    private fun generateInfiniteForLoop(ktFor: KtForExpression): IrExpression {
+        val startOffset = ktFor.startOffsetSkippingComments
+        val endOffset = ktFor.endOffset
+
+        val irWhile = IrWhileLoopImpl(
+            startOffset,
+            endOffset,
+            context.irBuiltIns.unitType,
+            IrStatementOrigin.FOR_LOOP
+        )
+        irWhile.label = getLoopLabel(ktFor)
+        irWhile.condition = IrConstImpl(startOffset, endOffset, context.irBuiltIns.booleanType, IrConstKind.Boolean, true)
+
+        irWhile.body = ktFor.body?.let { ktForBody ->
+            val ktBlockBody = ktForBody as? KtBlockExpression
+                ?: throw AssertionError("Infinite 'for' should have a block body: ${ktFor.text}")
+
+            statementGenerator.bodyGenerator.putLoop(ktFor, irWhile)
+            generateLoopBlockBody(ktBlockBody)
+        }
+
+        return irWhile
     }
 }
