@@ -4571,6 +4571,39 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             }
         }
 
+        @TestMetadata("compiler/testData/codegen/box/controlStructures/infiniteForStatement")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class InfiniteForStatement extends AbstractJsCodegenBoxTest {
+            private void runTest(String testDataFilePath) throws Exception {
+                KotlinTestUtils.runTest0(this::doTest, TargetBackend.JS, testDataFilePath);
+            }
+
+            public void testAllFilesPresentInInfiniteForStatement() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/infiniteForStatement"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS, true);
+            }
+
+            @TestMetadata("infiniteForStatement.kt")
+            public void testInfiniteForStatement() throws Exception {
+                runTest("compiler/testData/codegen/box/controlStructures/infiniteForStatement/infiniteForStatement.kt");
+            }
+
+            @TestMetadata("infiniteForWithBreak.kt")
+            public void testInfiniteForWithBreak() throws Exception {
+                runTest("compiler/testData/codegen/box/controlStructures/infiniteForStatement/infiniteForWithBreak.kt");
+            }
+
+            @TestMetadata("infiniteForWithBreakAndContinue.kt")
+            public void testInfiniteForWithBreakAndContinue() throws Exception {
+                runTest("compiler/testData/codegen/box/controlStructures/infiniteForStatement/infiniteForWithBreakAndContinue.kt");
+            }
+
+            @TestMetadata("infiniteForWithReturnAndTryFinally.kt")
+            public void testInfiniteForWithReturnAndTryFinally() throws Exception {
+                runTest("compiler/testData/codegen/box/controlStructures/infiniteForStatement/infiniteForWithReturnAndTryFinally.kt");
+            }
+        }
+
         @TestMetadata("compiler/testData/codegen/box/controlStructures/returnsNothing")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)

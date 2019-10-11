@@ -629,6 +629,26 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         blockStackElements.pop();
     }
 
+    private void generateInfiniteForLoop(@NotNull KtForExpression forExpression) {
+        Label loopExit = new Label();
+        Label loopEntry = new Label();
+        blockStackElements.push(new LoopBlockStackElement(loopExit, loopEntry, targetLabel(forExpression)));
+
+        // In debugger 'for { ... }' should behave like 'while (true) { ... }':
+        // breakpoint set at the line of 'for {' should be hit on each loop entrance.
+        markStartLineNumber(forExpression);
+        v.mark(loopEntry);
+        v.nop();
+
+        PseudoInsnsKt.fakeAlwaysFalseIfeq(v, loopExit);
+
+        generateLoopBody(forExpression.getBody());
+        v.goTo(loopEntry);
+
+        v.mark(loopExit);
+        blockStackElements.pop();
+    }
+
     @Override
     public StackValue visitForExpression(@NotNull KtForExpression forExpression, StackValue receiver) {
         return StackValue.operation(Type.VOID_TYPE, adapter -> {
@@ -638,6 +658,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
     }
 
     private void generateFor(@NotNull KtForExpression forExpression) {
+        if (forExpression.isInfiniteLoop()) {
+            generateInfiniteForLoop(forExpression);
+            return;
+        }
+
         KtExpression range = forExpression.getLoopRange();
         assert range != null : "No loop range in for expression";
         RangeValue rangeValue = RangeValuesKt.createRangeValueForExpression(this, range);
