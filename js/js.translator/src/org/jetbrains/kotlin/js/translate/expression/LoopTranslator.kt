@@ -82,6 +82,21 @@ fun createWhile(doWhile: Boolean, expression: KtWhileExpressionBase, context: Tr
     return result.source(expression)
 }
 
+fun translateInfiniteForExpression(expression: KtForExpression, context: TranslationContext): JsStatement =
+    JsWhile().apply {
+        // kt: 'for { <BODY> }' =>
+        //      js: 'while(true) { <BODY> }'
+        condition = JsBooleanLiteral(true)
+
+        val ktBody = expression.body
+        body = if (ktBody != null)
+            Translation.translateAsStatementAndMergeInBlockIfNeeded(ktBody, context)
+        else
+            JsEmpty
+
+        source = expression
+    }
+
 private val rangeToFunctionName = FqName("kotlin.Int.rangeTo")
 private val untilFunctionName = FqName("kotlin.ranges.until")
 private val downToFunctionName = FqName("kotlin.ranges.downTo")
@@ -96,6 +111,10 @@ private val indicesFqName = FqName("kotlin.collections.indices")
 private val sequenceFqName = FqName("kotlin.sequences.Sequence")
 
 fun translateForExpression(expression: KtForExpression, context: TranslationContext): JsStatement {
+    if (expression.isInfiniteLoop) {
+        return translateInfiniteForExpression(expression, context)
+    }
+
     val loopRange = getLoopRange(expression).let {
         val deparenthesized = KtPsiUtil.deparenthesize(it)!!
         if (deparenthesized is KtStringTemplateExpression) it else deparenthesized
