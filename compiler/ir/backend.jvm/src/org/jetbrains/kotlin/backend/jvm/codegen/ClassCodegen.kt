@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.codegen.serialization.JvmSerializationBindings
 import org.jetbrains.kotlin.codegen.serialization.JvmSerializerExtension
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.VariableDescriptorWithAccessors
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
@@ -151,7 +152,13 @@ open class ClassCodegen protected constructor(
     private fun generateKotlinMetadataAnnotation() {
         val localDelegatedProperties = (irClass.attributeOwnerId as? IrClass)?.let(context.localDelegatedProperties::get)
         if (localDelegatedProperties != null && localDelegatedProperties.isNotEmpty()) {
-            state.bindingTrace.record(CodegenBinding.DELEGATED_PROPERTIES_WITH_METADATA, type, localDelegatedProperties.map { it.descriptor })
+            // Remove the old value check once CodegenAnnotatingVisitor is no longer used in JVM IR
+            val descriptors = localDelegatedProperties.map { it.descriptor }
+            val oldValue = state.bindingContext.get(CodegenBinding.DELEGATED_PROPERTIES_WITH_METADATA, type)
+                ?: mutableListOf<VariableDescriptorWithAccessors>().also {
+                    state.bindingTrace.record(CodegenBinding.DELEGATED_PROPERTIES_WITH_METADATA, type, it)
+                }
+            oldValue.addAll(descriptors)
         }
 
         when (val metadata = irClass.metadata) {
