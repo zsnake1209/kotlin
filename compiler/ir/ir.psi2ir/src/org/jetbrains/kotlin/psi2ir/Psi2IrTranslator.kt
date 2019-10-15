@@ -20,12 +20,11 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.util.EmptyDeserializer
-import org.jetbrains.kotlin.ir.util.IrDeserializer
-import org.jetbrains.kotlin.ir.util.IrProvider
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.patchDeclarationParents
+import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.generators.AnnotationGenerator
@@ -40,7 +39,8 @@ import org.jetbrains.kotlin.utils.SmartList
 class Psi2IrTranslator(
     val languageVersionSettings: LanguageVersionSettings,
     val configuration: Psi2IrConfiguration = Psi2IrConfiguration(),
-    val facadeClassGenerator: (DeserializedContainerSource) -> IrClass? = { null }
+    val facadeClassGenerator: (DeserializedContainerSource) -> IrClass? = { null },
+    val mangler: KotlinMangler? = null
 ) {
     interface PostprocessingStep {
         fun postprocess(context: GeneratorContext, irElement: IrElement)
@@ -65,7 +65,7 @@ class Psi2IrTranslator(
     fun createGeneratorContext(
         moduleDescriptor: ModuleDescriptor,
         bindingContext: BindingContext,
-        symbolTable: SymbolTable = SymbolTable(),
+        symbolTable: SymbolTable = SymbolTable(mangler),
         extensions: GeneratorExtensions = GeneratorExtensions()
     ): GeneratorContext =
         GeneratorContext(configuration, moduleDescriptor, bindingContext, languageVersionSettings, symbolTable, extensions)
@@ -84,6 +84,8 @@ class Psi2IrTranslator(
         irModule.patchDeclarationParents()
 
         postprocess(context, irModule)
+        irModule.acceptVoid(ComputeUniqIdVisitor(context.symbolTable))
+
         moduleGenerator.generateUnboundSymbolsAsDependencies(irModule, deserializer, irProviders, facadeClassGenerator)
         return irModule
     }
@@ -100,5 +102,16 @@ class Psi2IrTranslator(
     private fun generateAnnotationsForDeclarations(context: GeneratorContext, irElement: IrElement) {
         val annotationGenerator = AnnotationGenerator(context)
         irElement.acceptVoid(annotationGenerator)
+    }
+
+    private class ComputeUniqIdVisitor(val symbolTable: SymbolTable) : IrElementVisitorVoid {
+        override fun visitElement(element: IrElement) {
+            element.acceptChildrenVoid(this)
+        }
+
+        override fun visitDeclaration(declaration: IrDeclaration) {
+            symbolTable.computeUniqId(declaration)
+            super.visitDeclaration(declaration)
+        }
     }
 }

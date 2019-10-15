@@ -8,10 +8,15 @@ package org.jetbrains.kotlin.backend.common.serialization
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrExternalPackageFragment
 import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
+import org.jetbrains.kotlin.ir.util.UniqId
 
 class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFragmentSymbol {
     override val descriptor: PackageFragmentDescriptor
         get() = error("Operation is unsupported")
+
+    override var uniqId: UniqId
+        get() = error("Operation is unsupported")
+        set(value) { error("Operation is unsupported") }
 
     private var _owner: IrExternalPackageFragment? = null
     override val owner get() = _owner!!

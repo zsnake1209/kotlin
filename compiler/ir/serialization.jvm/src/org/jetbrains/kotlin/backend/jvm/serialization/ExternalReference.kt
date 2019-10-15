@@ -320,6 +320,9 @@ private fun <T : IrElement> T.deepCopyWithExternalReferences(
 private class CopiedExternalPackageFragmentSymbol(val originalDescriptor: PackageFragmentDescriptor) : IrExternalPackageFragmentSymbol {
     // This is only used in serializeDescriptorReference() to make sure that this is not a class descriptor
     override val descriptor: PackageFragmentDescriptor = originalDescriptor
+    override var uniqId: UniqId
+        get() = error("Unsupported operation")
+        set(value) { error("Unsupported operation") }
 
     private var _owner: IrExternalPackageFragment? = null
     override val owner get() = _owner!!

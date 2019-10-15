@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFileSymbol
+import org.jetbrains.kotlin.ir.util.UniqId
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
 import org.jetbrains.kotlin.ir.util.transformFlat
@@ -50,6 +51,10 @@ private class DescriptorlessIrFileSymbol : IrFileSymbol {
 
     override val descriptor: PackageFragmentDescriptor
         get() = error("Operation is unsupported")
+
+    override var uniqId: UniqId
+        get() = error("Operation is unsupported")
+        set(value) { error("Operation is unsupported") }
 
     private var _owner: IrFile? = null
     override val owner get() = _owner!!

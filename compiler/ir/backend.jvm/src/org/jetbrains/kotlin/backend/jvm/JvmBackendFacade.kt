@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen
 import org.jetbrains.kotlin.backend.jvm.lower.MultifileFacadeFileEntry
 import org.jetbrains.kotlin.backend.jvm.serialization.JvmIrDeserializer
+import org.jetbrains.kotlin.backend.jvm.serialization.JvmMangler
 import org.jetbrains.kotlin.codegen.CompilationErrorHandler
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
@@ -36,7 +37,7 @@ object JvmBackendFacade {
         errorHandler: CompilationErrorHandler,
         phaseConfig: PhaseConfig
     ) {
-        val psi2ir = Psi2IrTranslator(state.languageVersionSettings, facadeClassGenerator = ::facadeClassGenerator)
+        val psi2ir = Psi2IrTranslator(state.languageVersionSettings, mangler = JvmMangler, facadeClassGenerator = ::facadeClassGenerator)
         val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = JvmGeneratorExtensions)
         val deserializer = if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR))
             JvmIrDeserializer(state.module, EmptyLoggingContext, psi2irContext.irBuiltIns, psi2irContext.symbolTable, state.languageVersionSettings)
