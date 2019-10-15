@@ -21,7 +21,6 @@ import com.intellij.debugger.ui.impl.watch.StackFrameDescriptorImpl
 import com.intellij.debugger.ui.tree.render.DescriptorLabelListener
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
-import com.intellij.util.ui.EmptyIcon
 import com.sun.jdi.ClassType
 import com.sun.jdi.ObjectReference
 import javaslang.control.Either
@@ -162,10 +161,6 @@ class SuspendStackFrameDescriptor(
 
     override fun getName(): String {
         return frame.methodName
-    }
-
-    override fun getIcon(): Icon {
-        return EmptyIcon.create(6)
     }
 }
 
