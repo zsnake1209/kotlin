@@ -397,7 +397,11 @@ fun LookupElement.decorateAsStaticMember(
             val psiDocumentManager = PsiDocumentManager.getInstance(context.project)
             val file = context.file as KtFile
 
-            val addMemberImport = descriptorIsCallableExtension || importFromSameParentIsPresent(file)
+            fun importFromSameParentIsPresent() = file.importDirectives.any {
+                !it.isAllUnder && it.importPath?.fqName?.parent() == containerFqName
+            }
+
+            val addMemberImport = descriptorIsCallableExtension || importFromSameParentIsPresent()
 
             if (addMemberImport) {
                 psiDocumentManager.commitAllDocuments()
@@ -406,10 +410,6 @@ fun LookupElement.decorateAsStaticMember(
             }
 
             super.handleInsert(context)
-        }
-
-        private fun importFromSameParentIsPresent(file: KtFile) = file.importDirectives.any {
-            !it.isAllUnder && it.importPath?.fqName?.parent() == containerFqName
         }
     }
 }
