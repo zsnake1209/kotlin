@@ -298,17 +298,17 @@ public class KotlinEvaluateExpressionTestGenerated extends AbstractKotlinEvaluat
 
         @TestMetadata("kt32691.kt")
         public void testKt32691() throws Exception {
-            runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/kt32691.kt");
+            runTest("idea/jvm-debugger/jvm-debugger-test/testData/evaluation/singleBreakpoint/kt32691.kt");
         }
 
         @TestMetadata("kt33093.kt")
         public void testKt33093() throws Exception {
-            runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/kt33093.kt");
+            runTest("idea/jvm-debugger/jvm-debugger-test/testData/evaluation/singleBreakpoint/kt33093.kt");
         }
 
         @TestMetadata("kt33181.kt")
         public void testKt33181() throws Exception {
-            runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/kt33181.kt");
+            runTest("idea/jvm-debugger/jvm-debugger-test/testData/evaluation/singleBreakpoint/kt33181.kt");
         }
 
         @TestMetadata("kt5554OnlyIntsShouldBeCoerced.kt")
@@ -837,7 +837,7 @@ public class KotlinEvaluateExpressionTestGenerated extends AbstractKotlinEvaluat
 
             @TestMetadata("frameLambdaNotAccessible.kt")
             public void testFrameLambdaNotAccessible() throws Exception {
-                runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/frame/frameLambdaNotAccessible.kt");
+                runTest("idea/jvm-debugger/jvm-debugger-test/testData/evaluation/singleBreakpoint/frame/frameLambdaNotAccessible.kt");
             }
 
             @TestMetadata("frameLambdaNotUsed.kt")
@@ -847,7 +847,7 @@ public class KotlinEvaluateExpressionTestGenerated extends AbstractKotlinEvaluat
 
             @TestMetadata("frameLambdaVariableFromCorrectFrame.kt")
             public void testFrameLambdaVariableFromCorrectFrame() throws Exception {
-                runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/frame/frameLambdaVariableFromCorrectFrame.kt");
+                runTest("idea/jvm-debugger/jvm-debugger-test/testData/evaluation/singleBreakpoint/frame/frameLambdaVariableFromCorrectFrame.kt");
             }
 
             @TestMetadata("frameLocalVariable.kt")
@@ -952,7 +952,7 @@ public class KotlinEvaluateExpressionTestGenerated extends AbstractKotlinEvaluat
 
             @TestMetadata("nonCapturedThisInLambda.kt")
             public void testNonCapturedThisInLambda() throws Exception {
-                runTest("idea/testData/debugger/tinyApp/src/evaluate/singleBreakpoint/frame/nonCapturedThisInLambda.kt");
+                runTest("idea/jvm-debugger/jvm-debugger-test/testData/evaluation/singleBreakpoint/frame/nonCapturedThisInLambda.kt");
             }
 
             @TestMetadata("remapThis.kt")
