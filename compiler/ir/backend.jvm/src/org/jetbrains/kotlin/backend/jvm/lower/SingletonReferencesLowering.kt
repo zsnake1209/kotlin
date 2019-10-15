@@ -61,10 +61,8 @@ private class SingletonReferencesLowering(val context: JvmBackendContext) : File
         if (declaration == null) return null
         for (scope in allScopes.reversed()) {
             when (val element = scope.irElement) {
-                is IrFunction -> {
+                is IrFunction ->
                     element.dispatchReceiverParameter?.let { if (it.type.classOrNull == declaration.symbol) return it }
-                    element.extensionReceiverParameter?.let { if (it.type.classOrNull == declaration.symbol) return it }
-                }
                 is IrClass -> if (element == declaration) return element.thisReceiver
             }
         }

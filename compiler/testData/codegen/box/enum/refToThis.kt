@@ -1,9 +1,12 @@
-enum class ProgressionDirection {
-    UNKNOWN {
-        override fun asReversed() = UNKNOWN
+enum class Enum {
+    ENUM_VALUE {
+        override fun test() = ENUM_VALUE
     };
 
-    abstract fun asReversed(): ProgressionDirection
+    abstract fun test(): Enum
 }
 
-fun box() = "OK"
+fun box(): String {
+    if (Enum.ENUM_VALUE.test() != Enum.ENUM_VALUE) return "fail"
+    return "OK"
+}
