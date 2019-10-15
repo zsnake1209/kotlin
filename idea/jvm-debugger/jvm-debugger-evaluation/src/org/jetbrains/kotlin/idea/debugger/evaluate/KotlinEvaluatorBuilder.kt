@@ -444,7 +444,8 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
         return try {
             // let parameter name be null if we are looking for 'this'
             val name = if (parameter.debugString.startsWith("this@")) null else parameter.name
-            thread.forceFrames().firstNotNullResult { frameProxy ->
+            val frames = thread.forceFrames()
+            frames.firstNotNullResult { frameProxy ->
                 if (name == null) { // if it's 'this', then check className
                     val thisObject = frameProxy.thisObject()
                     if (thisObject?.type()?.name() == asmType.className &&
@@ -455,19 +456,26 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
                         return@firstNotNullResult null
                 } else {
                     val variable = frameProxy.safeVisibleVariableByName(name)
-                    if (variable == null || variable.type.name() != asmType.className
-                        || !isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
+                    if (variable != null
+                        && variable.type.name() == asmType.className
+                        && isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
                     ) {
-                        return@firstNotNullResult null
-                    } else {
+                        // recursive calls may cause incorrect result
+                        if (isRecursiveCall(frames, frameProxy)) throw NullPointerException()
                         // variable is found and it has same type and is from closure
                         return@firstNotNullResult VariableFinder.Result(frameProxy.getValue(variable))
+                    } else {
+                        return@firstNotNullResult null
                     }
                 }
             }
         } catch (e: Throwable) {
             null
         }
+    }
+
+    private fun isRecursiveCall(frames: List<StackFrameProxyImpl>, frameProxy: StackFrameProxyImpl): Boolean {
+        return frames.count { it.location().method() == frameProxy.location().method() } > 1
     }
 
     private fun isContainingFrame(manager: PositionManager, innerPsi: PsiElement, outer: StackFrameProxyImpl): Boolean = runReadAction {

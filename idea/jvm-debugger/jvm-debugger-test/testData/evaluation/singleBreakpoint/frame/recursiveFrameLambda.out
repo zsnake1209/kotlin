@@ -1,7 +1,8 @@
-LineBreakpoint created at noCoroutines.kt:5
+LineBreakpoint created at recursiveFrameLambda.kt:15
 Run Java
 Connected to the target VM
-noCoroutines.kt:5
+recursiveFrameLambda.kt:15
+Compile bytecode for l
 Disconnected from the target VM
 
 Process finished with exit code 0
