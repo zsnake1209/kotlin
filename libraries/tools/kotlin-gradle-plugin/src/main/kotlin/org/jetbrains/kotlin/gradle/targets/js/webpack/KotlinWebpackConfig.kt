@@ -31,7 +31,8 @@ data class KotlinWebpackConfig(
     val sourceMaps: Boolean = false,
     val export: Boolean = true,
     val progressReporter: Boolean = false,
-    val progressReporterPathFilter: String? = null
+    val progressReporterPathFilter: String? = null,
+    val resolveFromModulesFirst: Boolean = false
 ) {
     fun getRequiredDependencies(versions: NpmVersions) =
         mutableListOf<RequiredKotlinJsDependency>().also {
@@ -110,6 +111,7 @@ data class KotlinWebpackConfig(
             )
 
             appendEntry()
+            appendResolveModules()
             appendSourceMaps()
             appendDevServer()
             appendReport()
@@ -205,16 +207,37 @@ data class KotlinWebpackConfig(
     private fun Appendable.appendEntry() {
         if (entry == null || outputPath == null) return
 
+        val multiEntryOutput = "${outputFileName!!.removeSuffix(".js")}-[name].js"
+
         //language=JavaScript 1.8
         appendln(
             """
                 // entry
-                if (!config.entry) config.entry = [];
-                config.entry.push(${entry.canonicalPath.jsQuoted()});
+                config.entry = {
+                    main: [${entry.canonicalPath.jsQuoted()}]
+                };
+                
                 config.output = {
                     path: ${outputPath.canonicalPath.jsQuoted()},
-                    filename: ${outputFileName!!.jsQuoted()}
+                    filename: (chunkData) => {
+                        return chunkData.chunk.name === 'main'
+                            ? ${outputFileName.jsQuoted()}
+                            : ${multiEntryOutput.jsQuoted()};
+                    }
                 };
+                
+            """.trimIndent()
+        )
+    }
+
+    private fun Appendable.appendResolveModules() {
+        if (!resolveFromModulesFirst || entry == null || entry.parent == null) return
+
+        //language=JavaScript 1.8
+        appendln(
+            """
+                // resolve modules
+                config.resolve.modules.unshift(${entry.parent.jsQuoted()})
                 
             """.trimIndent()
         )

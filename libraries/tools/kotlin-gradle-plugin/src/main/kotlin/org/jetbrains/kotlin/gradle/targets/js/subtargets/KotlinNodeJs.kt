@@ -15,9 +15,10 @@ import javax.inject.Inject
 open class KotlinNodeJs @Inject constructor(target: KotlinJsTarget) :
     KotlinJsSubTarget(target, "node"),
     KotlinJsNodeDsl {
-
     override val testTaskDescription: String
         get() = "Run all ${target.name} tests inside nodejs using the builtin test framework"
+
+    private val runTaskName = disambiguateCamelCased("run")
 
     override fun runTask(body: NodeJsExec.() -> Unit) {
         (project.tasks.getByName(runTaskName) as NodeJsExec).body()
@@ -27,8 +28,17 @@ open class KotlinNodeJs @Inject constructor(target: KotlinJsTarget) :
         it.useMocha { }
     }
 
-    override fun configureRun(compilation: KotlinJsCompilation) {
-        val runTaskHolder = NodeJsExec.create(compilation, disambiguateCamelCased("run"))
+    override fun configureMain(compilation: KotlinJsCompilation) {
+        configureRun(compilation)
+    }
+
+    private fun configureRun(
+        compilation: KotlinJsCompilation
+    ) {
+        val runTaskHolder = NodeJsExec.create(compilation, disambiguateCamelCased(RUN_TASK_NAME))
         target.runTask.dependsOn(runTaskHolder)
+    }
+
+    override fun configureBuildVariants() {
     }
 }
