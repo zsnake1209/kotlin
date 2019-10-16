@@ -6,6 +6,8 @@ plugins {
 dependencies {
     testRuntime(intellijDep())
 
+    if (System.getProperty("idea.active") != null) testRuntimeOnly(files("${rootProject.projectDir}/dist/kotlinc/lib/kotlin-reflect.jar"))
+
     compileOnly(project(":idea"))
     compileOnly(project(":idea:idea-jvm"))
     compileOnly(project(":idea:idea-native")) { isTransitive = false }

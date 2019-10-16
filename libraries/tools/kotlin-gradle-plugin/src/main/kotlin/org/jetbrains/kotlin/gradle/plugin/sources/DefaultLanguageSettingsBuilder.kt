@@ -9,6 +9,7 @@ import org.gradle.api.InvalidUserDataException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.AbstractCompile
+import org.jetbrains.kotlin.cli.common.arguments.enablingCompilerFlag
 import org.jetbrains.kotlin.config.ApiVersion
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersion
@@ -99,7 +100,7 @@ internal fun applyLanguageSettingsToKotlinTask(
     }
 
     languageSettingsBuilder.enabledLanguageFeatures.forEach { featureName ->
-        freeCompilerArgs += "-XXLanguage:+$featureName"
+        freeCompilerArgs += LanguageFeature.valueOf(featureName).enablingCompilerFlag
     }
 
     languageSettingsBuilder.experimentalAnnotationsInUse.forEach { annotationName ->

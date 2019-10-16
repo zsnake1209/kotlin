@@ -17,6 +17,9 @@
 package org.jetbrains.kotlin.cli.common.arguments
 
 import com.intellij.util.text.VersionComparatorUtil
+import org.jetbrains.kotlin.config.LanguageFeature
+import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
@@ -111,3 +114,15 @@ fun CommonCompilerArguments.setApiVersionToLanguageVersionIfNeeded() {
     }
 }
 
+val LanguageFeature.compilerXFlag
+    get() = when (this) {
+        LanguageFeature.InlineClasses ->
+            CommonCompilerArguments::inlineClasses to KotlinVersion(1, 3, 50)
+        LanguageFeature.PolymorphicSignature ->
+            CommonCompilerArguments::polymorphicSignature to KotlinVersion(1, 3, 50)
+        else -> null
+    }?.let { (variable, sinceVersion) ->
+        variable.annotations.firstOrNull { it is Argument }?.safeAs<Argument>()?.value?.to(sinceVersion)
+    }
+
+val LanguageFeature.enablingCompilerFlag get() = compilerXFlag?.first ?: "$LANGUAGE_FEATURE_FLAG_PREFIX+$name"

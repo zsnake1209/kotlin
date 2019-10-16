@@ -34,8 +34,9 @@ annotation class Argument(
 val Argument.isAdvanced: Boolean
     get() = value.startsWith(ADVANCED_ARGUMENT_PREFIX) && value.length > ADVANCED_ARGUMENT_PREFIX.length
 
-private const val ADVANCED_ARGUMENT_PREFIX = "-X"
 private const val FREE_ARGS_DELIMITER = "--"
+const val ADVANCED_ARGUMENT_PREFIX = "-X"
+const val LANGUAGE_FEATURE_FLAG_PREFIX = "-XXLanguage:"
 
 data class ArgumentParseErrors(
     val unknownArgs: MutableList<String> = SmartList(),

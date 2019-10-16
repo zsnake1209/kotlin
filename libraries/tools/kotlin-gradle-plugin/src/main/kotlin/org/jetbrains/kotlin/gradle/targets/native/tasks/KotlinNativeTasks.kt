@@ -15,10 +15,12 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.compile.AbstractCompile
+import org.jetbrains.kotlin.cli.common.arguments.enablingCompilerFlag
 import org.jetbrains.kotlin.compilerRunner.KonanCompilerRunner
 import org.jetbrains.kotlin.compilerRunner.KonanInteropRunner
 import org.jetbrains.kotlin.compilerRunner.konanHome
 import org.jetbrains.kotlin.compilerRunner.konanVersion
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonToolOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
@@ -343,7 +345,7 @@ open class KotlinNativeCompile : AbstractKotlinNativeCompile<KotlinCommonOptions
         addArgIfNotNull("-language-version", languageVersion)
         addArgIfNotNull("-api-version", apiVersion)
         enabledLanguageFeatures.forEach { featureName ->
-            add("-XXLanguage:+$featureName")
+            add(LanguageFeature.valueOf(featureName).enablingCompilerFlag)
         }
         experimentalAnnotationsInUse.forEach { annotationName ->
             add("-Xuse-experimental=$annotationName")
@@ -528,7 +530,7 @@ open class KotlinNativeLink : AbstractKotlinNativeCompile<KotlinCommonToolOption
                 addArgIfNotNull("-language-version", it.languageVersion)
                 addArgIfNotNull("-api-version", it.apiVersion)
                 it.enabledLanguageFeatures.forEach { featureName ->
-                    add("-XXLanguage:+$featureName")
+                    add(LanguageFeature.valueOf(featureName).enablingCompilerFlag)
                 }
                 it.experimentalAnnotationsInUse.forEach { annotationName ->
                     add("-Xuse-experimental=$annotationName")

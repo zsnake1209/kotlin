@@ -5,20 +5,10 @@
 
 package org.jetbrains.kotlin.cli.common.arguments
 
-import com.intellij.openapi.util.text.StringUtil.compareVersionNumbers
 import org.jetbrains.kotlin.config.LanguageFeature
 
 object CliArgumentStringBuilder {
-    private const val LANGUAGE_FEATURE_FLAG_PREFIX = "-XXLanguage:"
-    private const val LANGUAGE_FEATURE_DEDICATED_FLAG_PREFIX = "-X"
-
     private val versionRegex = Regex("""^(\d+)\.(\d+)\.(\d+)""")
-
-    private val LanguageFeature.dedicatedFlagInfo
-        get() = when (this) {
-            LanguageFeature.InlineClasses -> Pair("inline-classes", KotlinVersion(1, 3, 50))
-            else -> null
-        }
 
     private val LanguageFeature.State.sign: String
         get() = when (this) {
@@ -30,31 +20,25 @@ object CliArgumentStringBuilder {
 
     private fun LanguageFeature.getFeatureMentionInCompilerArgsRegex(): Regex {
         val basePattern = "$LANGUAGE_FEATURE_FLAG_PREFIX(?:-|\\+)$name"
-        val fullPattern =
-            if (dedicatedFlagInfo != null) "(?:$basePattern)|$LANGUAGE_FEATURE_DEDICATED_FLAG_PREFIX${dedicatedFlagInfo!!.first}" else basePattern
+        val fullPattern = compilerXFlag?.let { (xFlag, _) -> "(?:$basePattern)|$xFlag" } ?: basePattern
 
         return Regex(fullPattern)
     }
 
     fun LanguageFeature.buildArgumentString(state: LanguageFeature.State, kotlinVersion: String?): String {
         val shouldBeFeatureEnabled = state == LanguageFeature.State.ENABLED || state == LanguageFeature.State.ENABLED_WITH_WARNING
-        val dedicatedFlag = dedicatedFlagInfo?.run {
-            val (xFlag, xFlagSinceVersion) = this
 
-            // TODO: replace to returning xFlag in 1.4 (behaviour for fallback)
-            if (kotlinVersion == null) return@run null
-
-            val isAtLeastSpecifiedVersion = versionRegex.find(kotlinVersion)?.destructured?.let { (major, minor, patch) ->
-                KotlinVersion(major.toInt(), minor.toInt(), patch.toInt()) >= xFlagSinceVersion
-            } == true
+        // TODO: drop null check for kotlinVersion in 1.4 (fallback behaviour will be use -X flags)
+        val dedicatedFlag = if (kotlinVersion != null && compilerXFlag != null) {
+            val (xFlag, sinceVersion) = compilerXFlag!!
+            val isAtLeastSpecifiedVersion =
+                versionRegex.find(kotlinVersion)?.destructured?.let { (major, minor, patch) ->
+                    KotlinVersion(major.toInt(), minor.toInt(), patch.toInt()) >= sinceVersion
+                } == true
             if (isAtLeastSpecifiedVersion) xFlag else null
-        }
+        } else null
 
-        return if (shouldBeFeatureEnabled && dedicatedFlag != null) {
-            LANGUAGE_FEATURE_DEDICATED_FLAG_PREFIX + dedicatedFlag
-        } else {
-            "$LANGUAGE_FEATURE_FLAG_PREFIX${state.sign}$name"
-        }
+        return if (shouldBeFeatureEnabled && dedicatedFlag != null) dedicatedFlag else "$LANGUAGE_FEATURE_FLAG_PREFIX${state.sign}$name"
     }
 
     fun String.replaceLanguageFeature(
