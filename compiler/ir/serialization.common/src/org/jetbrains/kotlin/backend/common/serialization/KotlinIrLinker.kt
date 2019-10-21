@@ -62,7 +62,7 @@ abstract class KotlinIrLinker(
         operator fun get(key: UniqId): IrSymbol = deserializedSymbols[key] ?: error("No deserialized symbol found for $key")
 
         abstract fun addUniqID(key: UniqId)
-        abstract fun processPendingDeclaration(processor: (T) -> Unit)
+        abstract fun processPendingDeclarations(processor: (T) -> Unit)
 
         class ModuleDeserializationState(val module: IrModuleDeserializer): DeserializationState<IrModuleDeserializer.IrDeserializerForFile>() {
             private val filesWithPendingTopLevels = mutableSetOf<IrModuleDeserializer.IrDeserializerForFile>()
@@ -79,7 +79,7 @@ abstract class KotlinIrLinker(
                 enqueueFile(fileDeserializer)
             }
 
-            override fun processPendingDeclaration(processor: (IrModuleDeserializer.IrDeserializerForFile) -> Unit) {
+            override fun processPendingDeclarations(processor: (IrModuleDeserializer.IrDeserializerForFile) -> Unit) {
                 while (filesWithPendingTopLevels.isNotEmpty()) {
                     val pendingDeserializer = filesWithPendingTopLevels.first()
 
@@ -97,16 +97,13 @@ abstract class KotlinIrLinker(
                 reachableTopLevels.add(key)
             }
 
-            override fun processPendingDeclaration(processor: (UniqId) -> Unit) {
+            override fun processPendingDeclarations(processor: (UniqId) -> Unit) {
                 while (reachableTopLevels.isNotEmpty()) {
                     val reachableKey = reachableTopLevels.first()
 
-                    if (deserializedSymbols[reachableKey]?.isBound == true) {
-                        reachableTopLevels.remove(reachableKey)
-                        continue
+                    if (deserializedSymbols[reachableKey]?.isBound != true) {
+                        processor(reachableKey)
                     }
-
-                    processor(reachableKey)
 
                     reachableTopLevels.remove(reachableKey)
                 }
@@ -143,7 +140,7 @@ abstract class KotlinIrLinker(
         // This is a heavy initializer
         val module = deserializeIrModuleHeader()
 
-        inner class IrDeserializerForFile(private var annotations: List<ProtoConstructorCall>?, private var fordcedDeclarations: List<UniqId>?, private val fileIndex: Int, onlyHeaders: Boolean) :
+        inner class IrDeserializerForFile(private var annotations: List<ProtoConstructorCall>?, private var forcedDeclarations: List<UniqId>?, private val fileIndex: Int, onlyHeaders: Boolean) :
             IrFileDeserializer(logger, builtIns, symbolTable) {
 
             private var fileLoops = mutableMapOf<Int, IrLoopBase>()
@@ -388,14 +385,14 @@ abstract class KotlinIrLinker(
                     file.annotations.addAll(deserializeAnnotations(it))
                     annotations = null
                 }
-                fordcedDeclarations?.let {
+                forcedDeclarations?.let {
                     it.forEach { fileLocalDeserializationState.addUniqID(it) }
-                    fordcedDeclarations = null
+                    forcedDeclarations = null
                 }
             }
 
             fun deserializeAllFileReachableTopLevel() {
-                fileLocalDeserializationState.processPendingDeclaration {
+                fileLocalDeserializationState.processPendingDeclarations {
                     val declaration = deserializeDeclaration(it)
                     file.declarations.add(declaration)
                 }
@@ -458,7 +455,7 @@ abstract class KotlinIrLinker(
         }
 
         fun deserializeAllModuleReachableTopLevels() {
-            moduleDeserializationState.processPendingDeclaration { fileDeserializer ->
+            moduleDeserializationState.processPendingDeclarations { fileDeserializer ->
                 fileDeserializer.deserializeFileImplicitDataIfFirstUse()
                 fileDeserializer.deserializeAllFileReachableTopLevel()
             }
