@@ -127,7 +127,9 @@ open class ClassCodegen protected constructor(
             val shortName = File(fileEntry.name).name
             visitor.visitSource(shortName, null)
         }
-
+        if (irClass in context.suspendFunctionContinuations.values) {
+            context.continuationClassBuilders[irClass] = visitor
+        }
         for (declaration in irClass.declarations) {
             generateDeclaration(declaration)
         }
