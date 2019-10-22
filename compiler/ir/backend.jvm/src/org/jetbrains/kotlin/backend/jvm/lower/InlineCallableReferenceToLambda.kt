@@ -106,7 +106,6 @@ internal class InlineCallableReferenceToLambdaPhase(val context: JvmBackendConte
                 expression.endOffset,
                 field.type,
                 function.symbol,
-                function.symbol.descriptor,
                 typeArgumentsCount = 0,
                 origin = IrStatementOrigin.LAMBDA
             ).apply {
@@ -176,7 +175,6 @@ internal class InlineCallableReferenceToLambdaPhase(val context: JvmBackendConte
                 expression.endOffset,
                 referencedFunction.returnType,
                 function.symbol,
-                function.symbol.descriptor,
                 referencedFunction.typeParameters.size,
                 IrStatementOrigin.LAMBDA
             ).apply {
