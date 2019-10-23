@@ -5,6 +5,8 @@ asyncSimple.kt:7
 Async stack trace:
     asyncSimple.AsyncSimpleKt:5
         a = 5
+        Kotlin variables:
+            a = 5
 Disconnected from the target VM
 
 Process finished with exit code 0

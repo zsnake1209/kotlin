@@ -1,0 +1,16 @@
+LineBreakpoint created at asyncInlineFunctionsWithThis.kt:12
+Run Java
+Connected to the target VM
+asyncInlineFunctionsWithThis.kt:12
+Async stack trace:
+    asyncInlineFunctionsWithThis.A:29
+        this = instance of asyncInlineFunctionsWithThis.A(id=486)
+        s = 1
+        this_$iv = instance of asyncInlineFunctionsWithThis.A(id=491)
+        k$iv = 0
+        Kotlin variables:
+            this = instance of asyncInlineFunctionsWithThis.A(id=491)
+            k = 0
+Disconnected from the target VM
+
+Process finished with exit code 0

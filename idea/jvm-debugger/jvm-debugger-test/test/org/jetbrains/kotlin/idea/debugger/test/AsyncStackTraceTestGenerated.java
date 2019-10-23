@@ -34,9 +34,24 @@ public class AsyncStackTraceTestGenerated extends AbstractAsyncStackTraceTest {
         runTest("idea/jvm-debugger/jvm-debugger-test/testData/asyncStackTrace/asyncFunctions.kt");
     }
 
+    @TestMetadata("asyncInlineFunctions.kt")
+    public void testAsyncInlineFunctions() throws Exception {
+        runTest("idea/jvm-debugger/jvm-debugger-test/testData/asyncStackTrace/asyncInlineFunctions.kt");
+    }
+
+    @TestMetadata("asyncInlineFunctionsWithThis.kt")
+    public void testAsyncInlineFunctionsWithThis() throws Exception {
+        runTest("idea/jvm-debugger/jvm-debugger-test/testData/asyncStackTrace/asyncInlineFunctionsWithThis.kt");
+    }
+
     @TestMetadata("asyncLambdas.kt")
     public void testAsyncLambdas() throws Exception {
         runTest("idea/jvm-debugger/jvm-debugger-test/testData/asyncStackTrace/asyncLambdas.kt");
+    }
+
+    @TestMetadata("asyncOutsideInlineFunction.kt")
+    public void testAsyncOutsideInlineFunction() throws Exception {
+        runTest("idea/jvm-debugger/jvm-debugger-test/testData/asyncStackTrace/asyncOutsideInlineFunction.kt");
     }
 
     @TestMetadata("asyncSimple.kt")

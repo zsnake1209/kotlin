@@ -15,11 +15,10 @@ import com.intellij.debugger.jdi.GeneratedLocation
 import com.intellij.debugger.jdi.StackFrameProxyImpl
 import com.intellij.debugger.memory.utils.StackFrameItem
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.xdebugger.frame.XNamedValue
 import com.sun.jdi.*
 import org.jetbrains.kotlin.codegen.coroutines.CONTINUATION_VARIABLE_NAME
 import org.jetbrains.kotlin.idea.debugger.evaluate.ExecutionContext
+import org.jetbrains.kotlin.idea.debugger.stackFrame.KotlinStackFrameItem
 
 class KotlinCoroutinesAsyncStackTraceProvider : KotlinCoroutinesAsyncStackTraceProviderBase {
     private companion object {
@@ -103,7 +102,7 @@ class KotlinCoroutinesAsyncStackTraceProvider : KotlinCoroutinesAsyncStackTraceP
         val spilledVariables = getSpilledVariables(continuation) ?: emptyList()
 
         if (location != null) {
-            consumer += StackFrameItem(location, spilledVariables)
+            consumer += KotlinStackFrameItem(location, spilledVariables)
         }
 
         val completionField = baseContinuationSupertype.fieldByName("completion") ?: return
@@ -140,7 +139,7 @@ class KotlinCoroutinesAsyncStackTraceProvider : KotlinCoroutinesAsyncStackTraceP
         return GeneratedLocation(context.debugProcess, locationClass, methodName, lineNumber)
     }
 
-    fun AsyncStackTraceContext.getSpilledVariables(continuation: ObjectReference): List<XNamedValue>? {
+    fun AsyncStackTraceContext.getSpilledVariables(continuation: ObjectReference): List<JavaValue>? {
         val getSpilledVariableFieldMappingMethod = debugMetadataKtType.methodsByName(
             "getSpilledVariableFieldMapping",
             "(Lkotlin/coroutines/jvm/internal/BaseContinuationImpl;)[Ljava/lang/String;"
@@ -154,7 +153,7 @@ class KotlinCoroutinesAsyncStackTraceProvider : KotlinCoroutinesAsyncStackTraceP
         context.keepReference(rawSpilledVariables)
 
         val length = rawSpilledVariables.length() / 2
-        val spilledVariables = ArrayList<XNamedValue>(length)
+        val spilledVariables = ArrayList<JavaValue>(length)
 
         for (index in 0 until length) {
             val fieldName = (rawSpilledVariables.getValue(2 * index) as? StringReference)?.value() ?: continue

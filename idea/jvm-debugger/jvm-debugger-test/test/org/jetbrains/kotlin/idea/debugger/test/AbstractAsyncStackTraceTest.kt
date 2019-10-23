@@ -6,17 +6,25 @@
 package org.jetbrains.kotlin.idea.debugger.test
 
 import com.intellij.debugger.engine.AsyncStackTraceProvider
+import com.intellij.debugger.engine.DebugProcessImpl
 import com.intellij.debugger.engine.JavaValue
 import com.intellij.debugger.memory.utils.StackFrameItem
 import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.openapi.extensions.Extensions
+import com.intellij.ui.SimpleTextAttributes
+import com.intellij.xdebugger.frame.XCompositeNode
+import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink
+import com.intellij.xdebugger.frame.XValue
+import com.intellij.xdebugger.frame.XValueChildrenList
 import org.jetbrains.kotlin.idea.debugger.KotlinCoroutinesAsyncStackTraceProvider
+import org.jetbrains.kotlin.idea.debugger.ToggleKotlinVariablesState
 import org.jetbrains.kotlin.idea.debugger.test.preference.DebuggerPreferences
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import org.jetbrains.kotlin.utils.getSafe
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.lang.reflect.Modifier
+import javax.swing.Icon
 
 abstract class AbstractAsyncStackTraceTest : KotlinDescriptorTestCaseWithStepping() {
     private companion object {
@@ -32,12 +40,14 @@ abstract class AbstractAsyncStackTraceTest : KotlinDescriptorTestCaseWithSteppin
         }
 
         doOnBreakpoint {
+            val kotlinVariableViewService = ToggleKotlinVariablesState.getService()
+            kotlinVariableViewService.kotlinVariableView = true
             val frameProxy = this.frameProxy
             if (frameProxy != null) {
                 try {
                     val stackTrace = asyncStackTraceProvider.getAsyncStackTraceSafe(frameProxy, this)
                     if (stackTrace != null && stackTrace.isNotEmpty()) {
-                        print(renderAsyncStackTrace(stackTrace), ProcessOutputTypes.SYSTEM)
+                        print(renderAsyncStackTrace(stackTrace, debugProcess), ProcessOutputTypes.SYSTEM)
                     } else {
                         println("No async stack trace available", ProcessOutputTypes.SYSTEM)
                     }
@@ -77,7 +87,7 @@ abstract class AbstractAsyncStackTraceTest : KotlinDescriptorTestCaseWithSteppin
         return writer.toString()
     }
 
-    private fun renderAsyncStackTrace(trace: List<StackFrameItem>) = buildString {
+    private fun renderAsyncStackTrace(trace: List<StackFrameItem>, debugProcess: DebugProcessImpl) = buildString {
         appendln("Async stack trace:")
         for (item in trace) {
             append(MARGIN).appendln(item.toString())
@@ -98,6 +108,35 @@ abstract class AbstractAsyncStackTraceTest : KotlinDescriptorTestCaseWithSteppin
                     append(MARGIN).append(MARGIN).append(name).append(" = ").appendln(value)
                 }
             }
+
+            val frame = item.createFrame(debugProcess)
+            val node = Node()
+            frame.computeChildren(node)
+
+            append(MARGIN).append(MARGIN).appendln("Kotlin variables:")
+            for (variable in node.childrenList) {
+                val descriptor = (variable as JavaValue).descriptor
+                val name = variable.toString()
+                val value = descriptor.calcValue(evaluationContext)
+
+                append(MARGIN).append(MARGIN).append(MARGIN).append(name).append(" = ").appendln(value)
+            }
         }
+    }
+
+    private class Node : XCompositeNode {
+        val childrenList = mutableListOf<XValue>()
+        override fun setAlreadySorted(alreadySorted: Boolean) {}
+        override fun tooManyChildren(remaining: Int) {}
+        override fun setErrorMessage(errorMessage: String) {}
+        override fun setErrorMessage(errorMessage: String, link: XDebuggerTreeNodeHyperlink?) {}
+        override fun setMessage(message: String, icon: Icon?, attributes: SimpleTextAttributes, link: XDebuggerTreeNodeHyperlink?) {}
+
+        override fun addChildren(children: XValueChildrenList, last: Boolean) {
+            for (i in 0 until children.size()) {
+                childrenList.add(children.getValue(i))
+            }
+        }
+
     }
 }
