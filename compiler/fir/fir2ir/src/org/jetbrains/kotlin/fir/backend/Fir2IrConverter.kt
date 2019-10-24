@@ -53,6 +53,7 @@ object Fir2IrConverter {
         symbolTable: SymbolTable,
         builtIns: IrBuiltIns
     ) {
-        ExternalDependenciesGenerator(irModule.descriptor, symbolTable, builtIns).generateUnboundSymbolsAsDependencies()
+        ExternalDependenciesGenerator(symbolTable, generateTypicalIrProviderList(irModule.descriptor, builtIns, symbolTable))
+            .generateUnboundSymbolsAsDependencies()
     }
 }

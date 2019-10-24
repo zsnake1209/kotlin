@@ -16,15 +16,11 @@
 
 package org.jetbrains.kotlin.backend.jvm
 
-import org.jetbrains.kotlin.backend.common.EmptyLoggingContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
-import org.jetbrains.kotlin.backend.jvm.serialization.JvmIrDeserializer
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.state.GenerationState
-import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.util.EmptyDeserializer
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
@@ -43,12 +39,9 @@ class JvmIrCodegenFactory(private val phaseConfig: PhaseConfig) : CodegenFactory
         symbolTable: SymbolTable,
         sourceManager: PsiSourceManager
     ) {
-        val deserializer = if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR))
-            JvmIrDeserializer(state.module, EmptyLoggingContext, irModuleFragment.irBuiltins, symbolTable, state.languageVersionSettings)
-        else
-            EmptyDeserializer
+        val irProviders = JvmBackendFacade.generateIrProviderList(state, irModuleFragment.irBuiltins, symbolTable)
         JvmBackendFacade.doGenerateFilesInternal(
-            state, errorHandler, irModuleFragment, symbolTable, sourceManager, phaseConfig, deserializer, firMode = true
+            state, errorHandler, irModuleFragment, symbolTable, sourceManager, phaseConfig, irProviders, firMode = true
         )
     }
 

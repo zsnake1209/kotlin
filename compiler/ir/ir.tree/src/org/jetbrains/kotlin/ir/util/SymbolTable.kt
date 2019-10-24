@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.impl.IrUninitializedType
 
 interface IrProvider {
-    fun getDeclaration(symbol: IrSymbol, fallback: (IrSymbol) -> IrDeclaration): IrDeclaration
+    fun getDeclaration(symbol: IrSymbol): IrDeclaration?
 }
 
 interface IrDeserializer : IrProvider {
@@ -151,9 +151,10 @@ open class SymbolTable(val mangler: KotlinMangler? = null) : ReferenceSymbolTabl
             return get(uid) ?: run {
                 val new = orElse()
                 assert(unboundSymbols.add(new)) {
-                    "Symbol for ${new.descriptor} was already referenced"
+                    "Symbol for ${new.uniqId} was already referenced"
                 }
                 set(uid, new)
+                set(new.descriptor, new)
                 new
             }
         }

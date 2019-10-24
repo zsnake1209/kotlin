@@ -24,32 +24,21 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
+import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 
-class ExternalDependenciesGenerator(
-    moduleDescriptor: ModuleDescriptor,
-    val symbolTable: SymbolTable,
-    val irBuiltIns: IrBuiltIns,
-    externalDeclarationOrigin: ((DeclarationDescriptor) -> IrDeclarationOrigin)? = null,
-    private val deserializer: IrDeserializer = EmptyDeserializer,
-    private val irProviders: List<IrProvider> = emptyList(),
-    facadeClassGenerator: (DeserializedContainerSource) -> IrClass? = { null }
-) {
-    private val stubGenerator = DeclarationStubGenerator(
-        moduleDescriptor, symbolTable, irBuiltIns.languageVersionSettings, externalDeclarationOrigin,
-            listOfNotNull(deserializer) + irProviders, facadeClassGenerator
-    )
-
+class ExternalDependenciesGenerator(val symbolTable: SymbolTable, private val irProviders: List<IrProvider>) {
     fun generateUnboundSymbolsAsDependencies() {
-        stubGenerator.unboundSymbolGeneration = true
-
+        // There should be exactly one DeclarationStubGenerator
+        irProviders.filterIsInstance<DeclarationStubGenerator>().forEach { it.unboundSymbolGeneration = true }
         /*
             Deserializing a reference may lead to new unbound references, so we loop until none are left.
          */
         var unbound = symbolTable.allUnbound
         while (unbound.isNotEmpty()) {
             for (symbol in unbound) {
-                deserializer.getDeclaration(symbol) {
-                    irProviders.getDeclaration(it, stubGenerator::generateStubBySymbol)
+                // Symbol could get bound as a side effect of deserializing other symbols.
+                if (!symbol.isBound) {
+                    irProviders.getDeclaration(symbol)
                 }
                 assert(symbol.isBound) { "$symbol unbound even after deserialization attempt" }
             }
@@ -57,7 +46,7 @@ class ExternalDependenciesGenerator(
             unbound = symbolTable.allUnbound
         }
 
-        deserializer.declareForwardDeclarations()
+        irProviders.forEach { (it as? IrDeserializer)?.declareForwardDeclarations() }
     }
 }
 
@@ -66,17 +55,24 @@ private val SymbolTable.allUnbound
         unboundClasses + unboundConstructors + unboundEnumEntries + unboundFields +
                 unboundSimpleFunctions + unboundProperties + unboundTypeParameters + unboundTypeAliases
 
-fun List<IrProvider>.getDeclaration(symbol: IrSymbol, fallback: (IrSymbol) -> IrDeclaration): IrDeclaration =
-    if (isEmpty())
-        fallback(symbol)
-    else
-        this[0].getDeclaration(symbol) {
-            drop(1).getDeclaration(it, fallback)
-        }
+fun List<IrProvider>.getDeclaration(symbol: IrSymbol): IrDeclaration =
+    firstNotNullResult { provider ->
+        provider.getDeclaration(symbol)
+    } ?: error("Couldnot find declaration for unbound symbol $symbol")
 
-
-object EmptyDeserializer : IrDeserializer {
-    override fun getDeclaration(symbol: IrSymbol, fallback: (IrSymbol) -> IrDeclaration): IrDeclaration = fallback(symbol)
-
-    override fun declareForwardDeclarations() {}
+// In most cases, IrProviders list consist of an optional deserializer and a DeclarationStubGenerator.
+fun generateTypicalIrProviderList(
+    moduleDescriptor: ModuleDescriptor,
+    irBuiltins: IrBuiltIns,
+    symbolTable: SymbolTable,
+    deserializer: IrDeserializer? = null,
+    externalDeclarationOrigin: ((DeclarationDescriptor) -> IrDeclarationOrigin)? = null,
+    facadeClassGenerator: (DeserializedContainerSource) -> IrClass? = { null }
+): List<IrProvider> {
+    val stubGenerator = DeclarationStubGenerator(
+        moduleDescriptor, symbolTable, irBuiltins.languageVersionSettings, externalDeclarationOrigin, facadeClassGenerator
+    )
+    return listOfNotNull(deserializer, stubGenerator).also {
+        stubGenerator.irProviders = it
+    }
 }

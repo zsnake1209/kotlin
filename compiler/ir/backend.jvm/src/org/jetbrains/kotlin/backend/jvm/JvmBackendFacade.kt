@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.MetadataSource
+import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.load.kotlin.JvmPackagePartSource
 import org.jetbrains.kotlin.psi.KtFile
@@ -39,13 +40,10 @@ object JvmBackendFacade {
     ) {
         val psi2ir = Psi2IrTranslator(state.languageVersionSettings, mangler = JvmMangler, facadeClassGenerator = ::facadeClassGenerator)
         val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = JvmGeneratorExtensions)
-        val deserializer = if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR))
-            JvmIrDeserializer(state.module, EmptyLoggingContext, psi2irContext.irBuiltIns, psi2irContext.symbolTable, state.languageVersionSettings)
-        else
-            EmptyDeserializer
-        val irModuleFragment = psi2ir.generateModuleFragment(psi2irContext, files, deserializer)
+        val irProviders = generateIrProviderList(state, psi2irContext.irBuiltIns, psi2irContext.symbolTable)
+        val irModuleFragment = psi2ir.generateModuleFragment(psi2irContext, files, irProviders = irProviders)
 
-        doGenerateFilesInternal(state, errorHandler, irModuleFragment, psi2irContext, phaseConfig, deserializer)
+        doGenerateFilesInternal(state, errorHandler, irModuleFragment, psi2irContext, phaseConfig, irProviders)
     }
 
     internal fun doGenerateFilesInternal(
@@ -54,10 +52,10 @@ object JvmBackendFacade {
         irModuleFragment: IrModuleFragment,
         psi2irContext: GeneratorContext,
         phaseConfig: PhaseConfig,
-        deserializer: IrDeserializer
+        irProviders: List<IrProvider>
     ) {
         doGenerateFilesInternal(
-            state, errorHandler, irModuleFragment, psi2irContext.symbolTable, psi2irContext.sourceManager, phaseConfig, deserializer
+            state, errorHandler, irModuleFragment, psi2irContext.symbolTable, psi2irContext.sourceManager, phaseConfig, irProviders
         )
     }
 
@@ -68,7 +66,7 @@ object JvmBackendFacade {
         symbolTable: SymbolTable,
         sourceManager: PsiSourceManager,
         phaseConfig: PhaseConfig,
-        deserializer: IrDeserializer,
+        irProviders: List<IrProvider>,
         firMode: Boolean = false
     ) {
         val context = JvmBackendContext(
@@ -81,14 +79,7 @@ object JvmBackendFacade {
             context.typeMapper.mapType(context.referenceClass(descriptor).owner.defaultType)
         }
         //TODO
-        ExternalDependenciesGenerator(
-            irModuleFragment.descriptor,
-            symbolTable,
-            irModuleFragment.irBuiltins,
-            JvmGeneratorExtensions.externalDeclarationOrigin,
-            deserializer,
-            facadeClassGenerator = ::facadeClassGenerator
-        ).generateUnboundSymbolsAsDependencies()
+        ExternalDependenciesGenerator(symbolTable, irProviders).generateUnboundSymbolsAsDependencies()
 
         if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR)) {
             for (irFile in irModuleFragment.files) {
@@ -133,6 +124,20 @@ object JvmBackendFacade {
                     errorHandler.reportException(e, null) // TODO ktFile.virtualFile.url
                 }
             }
+        }
+    }
+
+    fun generateIrProviderList(state: GenerationState, irBuiltIns: IrBuiltIns, symbolTable: SymbolTable): List<IrProvider> {
+        val stubGenerator = DeclarationStubGenerator(
+            state.module, symbolTable, state.languageVersionSettings,
+            JvmGeneratorExtensions.externalDeclarationOrigin,
+            ::facadeClassGenerator
+        )
+        if (state.configuration.getBoolean(JVMConfigurationKeys.SERIALIZE_IR)) {
+            val jvmDeserializer = JvmIrDeserializer(EmptyLoggingContext, irBuiltIns, symbolTable, stubGenerator)
+            return listOf(jvmDeserializer, stubGenerator, jvmDeserializer.externalReferenceProvider)
+        } else {
+            return listOf(stubGenerator)
         }
     }
 

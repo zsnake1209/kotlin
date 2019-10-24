@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.ir.util
 
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedDeclarationDescriptor
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedPropertyDescriptor
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -40,9 +42,8 @@ class DeclarationStubGenerator(
     val symbolTable: SymbolTable,
     languageVersionSettings: LanguageVersionSettings,
     private val externalDeclarationOrigin: ((DeclarationDescriptor) -> IrDeclarationOrigin)? = null,
-    private val irProviders: List<IrProvider> = emptyList(),
     private val facadeClassGenerator: (DeserializedContainerSource) -> IrClass? = { null }
-) {
+) : IrProvider {
     private val lazyTable = symbolTable.lazyWrapper
 
     internal var unboundSymbolGeneration: Boolean
@@ -50,6 +51,8 @@ class DeclarationStubGenerator(
         set(value) {
             lazyTable.stubGenerator = if (value) this else null
         }
+
+    var irProviders: List<IrProvider> = listOf(this)
 
     private val typeTranslator =
         TypeTranslator(lazyTable, languageVersionSettings, moduleDescriptor.builtIns, LazyScopedTypeParametersResolver(lazyTable), true)
@@ -60,6 +63,14 @@ class DeclarationStubGenerator(
     init {
         typeTranslator.constantValueGenerator = constantValueGenerator
         constantValueGenerator.typeTranslator = typeTranslator
+    }
+
+    override fun getDeclaration(symbol: IrSymbol): IrDeclaration? = when {
+        // Special case: generating field for an already generated property.
+        symbol is IrFieldSymbol && (symbol.descriptor as? WrappedPropertyDescriptor)?.isBound() == true ->
+            generateStubBySymbol(symbol)
+        symbol.descriptor is WrappedDeclarationDescriptor<*> ->  null
+        else -> generateStubBySymbol(symbol)
     }
 
     fun generateOrGetEmptyExternalPackageFragmentStub(descriptor: PackageFragmentDescriptor): IrExternalPackageFragment {
@@ -157,12 +168,12 @@ class DeclarationStubGenerator(
 
         if (createPropertyIfNeeded && descriptor is PropertyGetterDescriptor) {
             val propertySymbol = symbolTable.referenceProperty(descriptor.correspondingProperty)
-            val property = irProviders.getDeclaration(propertySymbol, ::generateStubBySymbol) as IrProperty
+            val property = irProviders.getDeclaration(propertySymbol) as IrProperty
             return property.getter!!
         }
         if (createPropertyIfNeeded && descriptor is PropertySetterDescriptor) {
             val propertySymbol = symbolTable.referenceProperty(descriptor.correspondingProperty)
-            val property = irProviders.getDeclaration(propertySymbol, ::generateStubBySymbol) as IrProperty
+            val property = irProviders.getDeclaration(propertySymbol) as IrProperty
             return property.setter!!
         }
 

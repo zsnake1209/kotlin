@@ -59,7 +59,13 @@ class Psi2IrTranslator(
         generatorExtensions: GeneratorExtensions
     ): IrModuleFragment {
         val context = createGeneratorContext(moduleDescriptor, bindingContext, extensions = generatorExtensions)
-        return generateModuleFragment(context, ktFiles)
+        return generateModuleFragment(
+            context, ktFiles,
+            irProviders = generateTypicalIrProviderList(
+                moduleDescriptor, context.irBuiltIns, context.symbolTable,
+                externalDeclarationOrigin = context.extensions.externalDeclarationOrigin
+            )
+        )
     }
 
     fun createGeneratorContext(
@@ -73,20 +79,26 @@ class Psi2IrTranslator(
     fun generateModuleFragment(
         context: GeneratorContext,
         ktFiles: Collection<KtFile>,
-        deserializer: IrDeserializer = EmptyDeserializer,
-        irProviders: List<IrProvider> = emptyList()
+        deserializer: IrDeserializer? = null,
+        irProviders: List<IrProvider>? = null
     ): IrModuleFragment {
         val moduleGenerator = ModuleGenerator(context)
         val irModule = moduleGenerator.generateModuleFragmentWithoutDependencies(ktFiles)
 
+        val realIrProviders = irProviders ?: generateTypicalIrProviderList(
+            irModule.descriptor, context.irBuiltIns, context.symbolTable, deserializer,
+            context.extensions.externalDeclarationOrigin,
+            facadeClassGenerator
+        )
+
         // This is required for implicit casts insertion on IrTypes (work-in-progress).
-        moduleGenerator.generateUnboundSymbolsAsDependencies(irModule, deserializer, irProviders, facadeClassGenerator)
+        moduleGenerator.generateUnboundSymbolsAsDependencies(realIrProviders)
         irModule.patchDeclarationParents()
 
         postprocess(context, irModule)
         irModule.acceptVoid(ComputeUniqIdVisitor(context.symbolTable))
 
-        moduleGenerator.generateUnboundSymbolsAsDependencies(irModule, deserializer, irProviders, facadeClassGenerator)
+        moduleGenerator.generateUnboundSymbolsAsDependencies(realIrProviders)
         return irModule
     }
 

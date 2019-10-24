@@ -7,21 +7,14 @@ package org.jetbrains.kotlin.backend.jvm.serialization
 
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorUniqIdAware
 import org.jetbrains.kotlin.backend.common.serialization.tryGetExtension
-import org.jetbrains.kotlin.builtins.functions.FunctionClassDescriptor
-import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
-import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.load.java.descriptors.JavaClassConstructorDescriptor
-import org.jetbrains.kotlin.load.java.descriptors.JavaClassDescriptor
-import org.jetbrains.kotlin.load.java.descriptors.JavaMethodDescriptor
-import org.jetbrains.kotlin.load.java.descriptors.JavaPropertyDescriptor
 import org.jetbrains.kotlin.metadata.jvm.JvmProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.*
 
-class JvmDescriptorUniqIdAware(val symbolTable: SymbolTable, val fallback: (IrSymbol) -> IrDeclaration) : DescriptorUniqIdAware {
+class JvmDescriptorUniqIdAware(val symbolTable: SymbolTable, val stubGenerator: DeclarationStubGenerator) : DescriptorUniqIdAware {
     override fun DeclarationDescriptor.getUniqId(): Long? =
         when (this) {
             is DeserializedClassDescriptor -> this.classProto.tryGetExtension(JvmProtoBuf.classUniqId)
@@ -78,7 +71,7 @@ class JvmDescriptorUniqIdAware(val symbolTable: SymbolTable, val fallback: (IrSy
     private fun referenceOrDeclare(descriptor: DeclarationDescriptor): IrDeclaration =
         symbolTable.referenceMember(descriptor).also {
             if (!it.isBound) {
-                fallback(it)
+                stubGenerator.getDeclaration(it)
             }
         }.owner as IrDeclaration
 }
