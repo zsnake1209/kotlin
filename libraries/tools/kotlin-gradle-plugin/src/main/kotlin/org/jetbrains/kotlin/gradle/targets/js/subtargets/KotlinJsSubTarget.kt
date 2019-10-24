@@ -8,7 +8,9 @@ package org.jetbrains.kotlin.gradle.targets.js.subtargets
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.AbstractKotlinTargetConfigurator
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinTargetWithTests
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.whenEvaluated
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsPlatformTestRun
@@ -94,6 +96,8 @@ abstract class KotlinJsSubTarget(
                 ?.joinToString()
 
             testJs.configureConventions()
+
+            configureTestTaskDependencies(testJs)
         }
 
         testRun.executionTask = testJs
@@ -113,6 +117,8 @@ abstract class KotlinJsSubTarget(
             }
         }
     }
+
+    protected abstract fun configureTestTaskDependencies(testTask: KotlinJsTest)
 
     protected abstract fun configureDefaultTestFramework(it: KotlinJsTest)
 

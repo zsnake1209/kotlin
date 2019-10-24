@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.gradle.targets.js.jsQuoted
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import org.jetbrains.kotlin.gradle.targets.js.testing.*
+import org.jetbrains.kotlin.gradle.targets.js.testing.chromium.chromium
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.testing.internal.reportsDir
 import org.slf4j.Logger
@@ -31,6 +32,7 @@ import java.io.File
 class KotlinKarma(override val compilation: KotlinJsCompilation) : KotlinJsTestFramework {
     private val project: Project = compilation.target.project
     private val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+    private val chromium = project.chromium
     private val versions = nodeJs.versions
 
     private val config: KarmaConfig = KarmaConfig()
@@ -87,17 +89,17 @@ class KotlinKarma(override val compilation: KotlinJsCompilation) : KotlinJsTestF
         configDirectory = dir
     }
 
-    fun useChrome() = useChromeWithPuppeteer(
+    fun useChrome() = useChromium(
         id = "Chrome",
         envVar = CHROME_BIN
     )
 
-    fun useChromeCanary() = useChromeWithPuppeteer(
+    fun useChromeCanary() = useChromium(
         id = "ChromeCanary",
         envVar = CHROME_CANARY_BIN
     )
 
-    fun useChromeHeadless() = useChromeWithPuppeteer(
+    fun useChromeHeadless() = useChromium(
         id = "ChromeHeadless",
         envVar = CHROME_BIN
     )
@@ -117,19 +119,15 @@ class KotlinKarma(override val compilation: KotlinJsCompilation) : KotlinJsTestF
         requiredDependencies.add(dependency)
     }
 
-    private fun useChromeWithPuppeteer(
+    private fun useChromium(
         id: String,
         envVar: String
     ) {
-        usePuppeteer(envVar)
+        chromium.environment.executable?.let {
+            envJsCollector[envVar] = it.jsQuoted()
+        }
+
         useBrowser(id, versions.karmaChromeLauncher)
-    }
-
-    private fun usePuppeteer(envVar: String) {
-        requiredDependencies.add(versions.puppeteer)
-
-        //language=JavaScript 1.8
-        envJsCollector[envVar] = "require('puppeteer').executablePath()"
     }
 
     private fun useMocha() {

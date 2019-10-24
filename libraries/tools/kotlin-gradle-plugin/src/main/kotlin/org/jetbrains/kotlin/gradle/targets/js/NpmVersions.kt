@@ -43,8 +43,6 @@ class NpmVersions {
 
     val karmaSourceMapLoader = NpmPackageVersion("karma-sourcemap-loader", "0.3.7")
 
-    val puppeteer = NpmPackageVersion("puppeteer", "1.20.0")
-
     val kotlinJsTestRunner = KotlinGradleNpmPackage("test-js-runner")
 }
 

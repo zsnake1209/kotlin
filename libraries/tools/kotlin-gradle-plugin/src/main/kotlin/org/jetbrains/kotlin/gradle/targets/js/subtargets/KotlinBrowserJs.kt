@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.gradle.targets.js.KotlinJsTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsBrowserDsl
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
+import org.jetbrains.kotlin.gradle.targets.js.testing.chromium.chromium
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.registerTask
@@ -19,6 +20,8 @@ import javax.inject.Inject
 open class KotlinBrowserJs @Inject constructor(target: KotlinJsTarget) :
     KotlinJsSubTarget(target, "browser"),
     KotlinJsBrowserDsl {
+
+    private val chromium = project.chromium
 
     override val testTaskDescription: String
         get() = "Run all ${target.name} tests inside browser using karma and webpack"
@@ -77,5 +80,9 @@ open class KotlinBrowserJs @Inject constructor(target: KotlinJsTarget) :
         }
 
         target.runTask.dependsOn(run)
+    }
+
+    override fun configureTestTaskDependencies(testTask: KotlinJsTest) {
+        testTask.dependsOn(chromium.chromiumSetupTask)
     }
 }
