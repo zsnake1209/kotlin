@@ -8,10 +8,6 @@ package org.jetbrains.kotlin.gradle.targets.js.testing.chromium
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.logging.kotlinInfo
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlatform
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlatform.DARWIN
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlatform.LINUX
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlatform.WIN
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlatform.X64
 import java.io.File
 
 open class ChromiumRootExtension(val project: Project) {
@@ -23,7 +19,7 @@ open class ChromiumRootExtension(val project: Project) {
         project.logger.kotlinInfo("Storing cached files in $it")
     }
 
-    var installationDir = gradleHome.resolve("chrome")
+    var installationDir = gradleHome.resolve("chromium")
 
     var download = true
     var downloadBaseUrl = "https://storage.googleapis.com"
@@ -37,28 +33,20 @@ open class ChromiumRootExtension(val project: Project) {
 
     internal val environment: ChromiumEnv
         get() {
-            val isWindows = NodeJsPlatform.name == NodeJsPlatform.WIN
-
             val dir = installationDir.resolve(revision)
 
-            val platform = NodeJsPlatform.name
-            val architecture = NodeJsPlatform.architecture
+            val (
+                _,
+                _,
+                system,
+                archiveName,
+                command
+            ) = ChromiumPlatform(
+                platform = NodeJsPlatform.name,
+                architecture = NodeJsPlatform.architecture
+            )
 
-            val system: String = when (platform) {
-                WIN, LINUX -> platform + if (architecture == X64) "_$X64" else ""
-                DARWIN -> "mac"
-                else -> throw IllegalArgumentException("Unsupported system: $platform-$architecture")
-            }.capitalize()
-
-            val archiveName: String = "chrome-" + when (platform) {
-                LINUX -> platform
-                DARWIN -> "mac"
-                WIN -> "$platform${if (architecture == X64) "" else "32"}"
-                else -> throw IllegalArgumentException("Unsupported system: $platform-$architecture")
-            }
-
-            val finalCommand = "Chromium${if (isWindows) ".exe" else ""}"
-            val executable = if (download) File(dir, finalCommand).absolutePath else null
+            val executable = if (download) File(dir, command).absolutePath else null
 
             return ChromiumEnv(
                 home = dir,
