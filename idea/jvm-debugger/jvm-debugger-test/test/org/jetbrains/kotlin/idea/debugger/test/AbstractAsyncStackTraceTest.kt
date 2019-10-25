@@ -41,6 +41,7 @@ abstract class AbstractAsyncStackTraceTest : KotlinDescriptorTestCaseWithSteppin
 
         doOnBreakpoint {
             val kotlinVariableViewService = ToggleKotlinVariablesState.getService()
+            val kotlinVariableView = kotlinVariableViewService.kotlinVariableView
             kotlinVariableViewService.kotlinVariableView = true
             val frameProxy = this.frameProxy
             if (frameProxy != null) {
@@ -60,6 +61,7 @@ abstract class AbstractAsyncStackTraceTest : KotlinDescriptorTestCaseWithSteppin
                 println("FrameProxy is 'null', can't calculate async stack trace", ProcessOutputTypes.SYSTEM)
             }
 
+            kotlinVariableViewService.kotlinVariableView = kotlinVariableView
             resume(this)
         }
     }
@@ -105,7 +107,8 @@ abstract class AbstractAsyncStackTraceTest : KotlinDescriptorTestCaseWithSteppin
                     val name = descriptor.calcValueName()
                     val value = descriptor.calcValue(evaluationContext)
 
-                    append(MARGIN).append(MARGIN).append(name).append(" = ").appendln(value)
+                    append(MARGIN).append(MARGIN).append(name)
+                        .append(" = ").appendln(value.toString().replace(Regex("\\(id=\\d+\\)"), "(id=ID)"))
                 }
             }
 
@@ -119,7 +122,8 @@ abstract class AbstractAsyncStackTraceTest : KotlinDescriptorTestCaseWithSteppin
                 val name = variable.toString()
                 val value = descriptor.calcValue(evaluationContext)
 
-                append(MARGIN).append(MARGIN).append(MARGIN).append(name).append(" = ").appendln(value)
+                append(MARGIN).append(MARGIN).append(MARGIN).append(name)
+                    .append(" = ").appendln(value.toString().replace(Regex("\\(id=\\d+\\)"), "(id=ID)"))
             }
         }
     }

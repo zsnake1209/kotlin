@@ -7,7 +7,11 @@ package org.jetbrains.kotlin.idea.debugger
 
 import com.intellij.debugger.jdi.LocalVariableProxyImpl
 import org.jetbrains.kotlin.codegen.AsmUtil
+import org.jetbrains.kotlin.codegen.DESTRUCTURED_LAMBDA_ARGUMENT_VARIABLE_PREFIX
+import org.jetbrains.kotlin.codegen.coroutines.CONTINUATION_VARIABLE_NAME
+import org.jetbrains.kotlin.codegen.coroutines.SUSPEND_FUNCTION_COMPLETION_PARAMETER_NAME
 import org.jetbrains.kotlin.codegen.inline.INLINE_FUN_VAR_SUFFIX
+import org.jetbrains.kotlin.codegen.inline.isFakeLocalVariableForInline
 import org.jetbrains.kotlin.load.java.JvmAbi.LOCAL_VARIABLE_NAME_PREFIX_INLINE_ARGUMENT
 import org.jetbrains.kotlin.load.java.JvmAbi.LOCAL_VARIABLE_NAME_PREFIX_INLINE_FUNCTION
 
@@ -27,6 +31,15 @@ fun getInlineDepth(variables: List<LocalVariableProxyImpl>): Int {
     }
 
     return rawInlineFunDepth
+}
+
+fun isHidden(name: String, inlineDepth: Int): Boolean {
+    return isFakeLocalVariableForInline(name)
+            || name.startsWith(DESTRUCTURED_LAMBDA_ARGUMENT_VARIABLE_PREFIX)
+            || name.startsWith(AsmUtil.LOCAL_FUNCTION_VARIABLE_PREFIX)
+            || getInlineDepth(name) != inlineDepth
+            || name == CONTINUATION_VARIABLE_NAME
+            || name == SUSPEND_FUNCTION_COMPLETION_PARAMETER_NAME
 }
 
 fun getInlineDepth(variableName: String): Int {

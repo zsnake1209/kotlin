@@ -9,30 +9,23 @@ import com.intellij.debugger.engine.JavaValue
 import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XValueChildrenList
 import org.jetbrains.kotlin.codegen.AsmUtil
-import org.jetbrains.kotlin.codegen.DESTRUCTURED_LAMBDA_ARGUMENT_VARIABLE_PREFIX
-import org.jetbrains.kotlin.codegen.coroutines.CONTINUATION_VARIABLE_NAME
-import org.jetbrains.kotlin.codegen.coroutines.SUSPEND_FUNCTION_COMPLETION_PARAMETER_NAME
-import org.jetbrains.kotlin.codegen.inline.isFakeLocalVariableForInline
-import org.jetbrains.kotlin.idea.debugger.INLINED_THIS_REGEX
-import org.jetbrains.kotlin.idea.debugger.ToggleKotlinVariablesState
-import org.jetbrains.kotlin.idea.debugger.dropInlineSuffix
-import org.jetbrains.kotlin.idea.debugger.getInlineDepth
+import org.jetbrains.kotlin.idea.debugger.*
 
 // methods are copied from KotlinStackFrame and changed for JavaValue
-object KotlinVariablesFilter {
+internal object KotlinVariablesFilter {
     private val kotlinVariableViewService = ToggleKotlinVariablesState.getService()
 
-    fun computeVariables(node: XCompositeNode, vars: List<JavaValue>, insideInline: Boolean) {
+    fun computeVariables(node: XCompositeNode, vars: List<JavaValue>, isInline: IsInline) {
         if (!kotlinVariableViewService.kotlinVariableView) { // show raw
             val list = XValueChildrenList()
             vars.forEach { list.add(it) }
             node.addChildren(list, true)
             return
         }
-        val inlineDepth = if (insideInline) getInlineDepth(vars) else 0
+        val inlineDepth = isInline.getInlineDepth(vars)
 
         val (thisVariables, otherVariables) = vars.asSequence()
-            .filter { !isHidden(it, inlineDepth) }
+            .filter { inlineDepth < 0 || !isHidden(it.name, inlineDepth) }
             .partition {
                 it.name == AsmUtil.THIS
                         || it.name == AsmUtil.THIS_IN_DEFAULT_IMPLS
@@ -53,31 +46,9 @@ object KotlinVariablesFilter {
         node.addChildren(children, true)
     }
 
-    private fun getInlineDepth(vars: List<JavaValue>): Int {
-        for (variable in vars.reversed()) {
-            val name = variable.name
-            val depth = getInlineDepth(name)
-            if (depth > 0)
-                return depth
-        }
-
-        return 0
-    }
-
-    private fun isHidden(variable: JavaValue, inlineDepth: Int): Boolean {
-        val name = variable.name
-        return isFakeLocalVariableForInline(name)
-                || name.startsWith(DESTRUCTURED_LAMBDA_ARGUMENT_VARIABLE_PREFIX)
-                || name.startsWith(AsmUtil.LOCAL_FUNCTION_VARIABLE_PREFIX)
-                || name == CONTINUATION_VARIABLE_NAME
-                || getInlineDepth(variable.name) != inlineDepth
-                || name == SUSPEND_FUNCTION_COMPLETION_PARAMETER_NAME
-    }
-
     private fun JavaValue.remapThisVariableIfNeeded(customName: String? = null): JavaValue {
         val name = dropInlineSuffix(this.name)
 
-        @Suppress("ConvertToStringTemplate")
         return when {
             isLabeledThisReference() -> {
                 val label = name.drop(AsmUtil.LABELED_THIS_PARAMETER.length)
@@ -99,6 +70,38 @@ object KotlinVariablesFilter {
         return object : JavaValue(null, descriptor, evaluationContext, nodeManager, false) {
             override fun toString(): String {
                 return name
+            }
+        }
+    }
+}
+
+enum class IsInline {
+    TRUE {
+        override fun getInlineDepth(vars: List<JavaValue>): Int {
+            for (variable in vars.reversed()) {
+                val name = variable.name
+                val depth = getInlineDepth(name)
+                if (depth > 0)
+                    return depth
+            }
+            return 0
+        }
+    },
+    FALSE {
+        override fun getInlineDepth(vars: List<JavaValue>) = 0
+    },
+    UNSURE {
+        override fun getInlineDepth(vars: List<JavaValue>) = -1
+    };
+
+    abstract fun getInlineDepth(vars: List<JavaValue>): Int
+
+    companion object {
+        fun valueOf(boolean: Boolean?): IsInline {
+            return when (boolean) {
+                true -> TRUE
+                false -> FALSE
+                else -> UNSURE
             }
         }
     }

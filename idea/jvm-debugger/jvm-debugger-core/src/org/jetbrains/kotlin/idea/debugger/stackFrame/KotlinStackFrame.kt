@@ -16,9 +16,6 @@ import com.intellij.xdebugger.frame.XValueChildrenList
 import com.sun.jdi.*
 import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.codegen.AsmUtil.THIS
-import org.jetbrains.kotlin.codegen.DESTRUCTURED_LAMBDA_ARGUMENT_VARIABLE_PREFIX
-import org.jetbrains.kotlin.codegen.coroutines.CONTINUATION_VARIABLE_NAME
-import org.jetbrains.kotlin.codegen.coroutines.SUSPEND_FUNCTION_COMPLETION_PARAMETER_NAME
 import org.jetbrains.kotlin.codegen.inline.INLINE_FUN_VAR_SUFFIX
 import org.jetbrains.kotlin.codegen.inline.isFakeLocalVariableForInline
 import org.jetbrains.kotlin.idea.debugger.*
@@ -156,7 +153,7 @@ class KotlinStackFrame(frame: StackFrameProxyImpl) : JavaStackFrame(StackFrameDe
         val inlineDepth = getInlineDepth(allVisibleVariables)
 
         val (thisVariables, otherVariables) = allVisibleVariables.asSequence()
-            .filter { !isHidden(it, inlineDepth) }
+            .filter { !isHidden(it.name(), inlineDepth) }
             .partition {
                 it.name() == THIS
                         || it.name() == AsmUtil.THIS_IN_DEFAULT_IMPLS
@@ -171,16 +168,6 @@ class KotlinStackFrame(frame: StackFrameProxyImpl) : JavaStackFrame(StackFrameDe
         val remappedMainThis = mainThis?.remapThisVariableIfNeeded(THIS)
         val remappedOther = (otherThis + otherVariables).map { it.remapThisVariableIfNeeded() }
         return (listOfNotNull(remappedMainThis) + remappedOther).sortedBy { it.variable }
-    }
-
-    private fun isHidden(variable: LocalVariableProxyImpl, inlineDepth: Int): Boolean {
-        val name = variable.name()
-        return isFakeLocalVariableForInline(name)
-                || name.startsWith(DESTRUCTURED_LAMBDA_ARGUMENT_VARIABLE_PREFIX)
-                || name.startsWith(AsmUtil.LOCAL_FUNCTION_VARIABLE_PREFIX)
-                || getInlineDepth(variable.name()) != inlineDepth
-                || name == CONTINUATION_VARIABLE_NAME
-                || name == SUSPEND_FUNCTION_COMPLETION_PARAMETER_NAME
     }
 
     private fun LocalVariableProxyImpl.remapThisVariableIfNeeded(customName: String? = null): LocalVariableProxyImpl {

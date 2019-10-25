@@ -72,7 +72,6 @@ import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.isInlineClassType
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
-import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 import org.jetbrains.org.objectweb.asm.ClassReader
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.tree.ClassNode
@@ -441,37 +440,30 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
         val thread = context.frameProxy.threadProxy()
         val currentFramePsi = context.debugProcess.positionManager
             .getSourcePosition(context.frameProxy.safeLocation())?.elementAt ?: return null // compute once
-        return try {
-            // let parameter name be null if we are looking for 'this'
-            val name = if (parameter.debugString.startsWith("this@")) null else parameter.name
-            val frames = thread.forceFrames()
-            frames.firstNotNullResult { frameProxy ->
-                if (name == null) { // if it's 'this', then check className
-                    val thisObject = frameProxy.thisObject()
-                    if (thisObject?.type()?.name() == asmType.className &&
-                        isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
-                    )
-                        return@firstNotNullResult VariableFinder.Result(thisObject)
-                    else
-                        return@firstNotNullResult null
-                } else {
-                    val variable = frameProxy.safeVisibleVariableByName(name)
-                    if (variable != null
-                        && variable.type.name() == asmType.className
-                        && isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
-                    ) {
-                        // recursive calls may cause incorrect result
-                        if (isRecursiveCall(frames, frameProxy)) throw NullPointerException()
-                        // variable is found and it has same type and is from closure
-                        return@firstNotNullResult VariableFinder.Result(frameProxy.getValue(variable))
-                    } else {
-                        return@firstNotNullResult null
-                    }
+        if (parameter.kind == CodeFragmentParameter.Kind.EXTENSION_RECEIVER) return null
+        // let parameter name be null if we are looking for 'this'
+        val name = if (parameter.kind == CodeFragmentParameter.Kind.DISPATCH_RECEIVER) null else parameter.name
+        val frames = runCatching { thread.forceFrames() }.getOrNull() ?: return null
+        val converter = EvaluatorValueConverter(context)
+        for (frameProxy in frames) {
+            if (name == null) { // if it's 'this', then check className
+                val thisObject = frameProxy.thisObject()
+                if (converter.typeMatches(asmType, thisObject?.type())
+                    && isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
+                )
+                    return VariableFinder.Result(thisObject)
+            } else {
+                val variable = frameProxy.safeVisibleVariableByName(name)
+                if (variable != null
+                    && variable.type.name() == asmType.className
+                    && isContainingFrame(context.debugProcess.positionManager, currentFramePsi, frameProxy)
+                ) {
+                    if (isRecursiveCall(frames, frameProxy)) break // recursive calls may cause incorrect result
+                    return VariableFinder.Result(frameProxy.getValue(variable)) // variable is found and it has same type and is from closure
                 }
             }
-        } catch (e: Throwable) {
-            null
         }
+        return null
     }
 
     private fun isRecursiveCall(frames: List<StackFrameProxyImpl>, frameProxy: StackFrameProxyImpl): Boolean {
@@ -479,9 +471,9 @@ class KotlinEvaluator(val codeFragment: KtCodeFragment, private val sourcePositi
     }
 
     private fun isContainingFrame(manager: PositionManager, innerPsi: PsiElement, outer: StackFrameProxyImpl): Boolean = runReadAction {
-        var outerPsi: PsiElement? = manager.getSourcePosition(outer.location())?.elementAt // current line
-        outerPsi = PsiTreeUtil.getParentOfType(
-            outerPsi, KtLambdaExpression::class.java,
+        val currentLine: PsiElement? = manager.getSourcePosition(outer.location())?.elementAt // current line
+        val outerPsi = PsiTreeUtil.getParentOfType(
+            currentLine, KtLambdaExpression::class.java,
             KtFunction::class.java,
             KtPropertyAccessor::class.java,
             KtClassInitializer::class.java

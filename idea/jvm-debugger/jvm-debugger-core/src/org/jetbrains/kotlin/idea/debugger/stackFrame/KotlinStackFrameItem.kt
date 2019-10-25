@@ -24,7 +24,7 @@ class KotlinStackFrameItem(private val location: Location, private val variables
         override fun computeChildren(node: XCompositeNode) {
             // if line is not inside class - it's inline fun
             val insideInline = item.location.declaringType().locationsOfLine(item.line()).isEmpty()
-            KotlinVariablesFilter.computeVariables(node, item.variables, insideInline)
+            KotlinVariablesFilter.computeVariables(node, item.variables, IsInline.valueOf(insideInline))
         }
 
         override fun getCaptionAboveOf() = "Coroutine stack trace"

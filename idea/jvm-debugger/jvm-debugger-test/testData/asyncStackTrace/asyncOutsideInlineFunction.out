@@ -4,13 +4,13 @@ Connected to the target VM
 asyncOutsideInlineFunction.kt:21
 Async stack trace:
     asyncOutsideInlineFunction.A:19
-        this = instance of asyncOutsideInlineFunction.A(id=486)
+        this = instance of asyncOutsideInlineFunction.A(id=ID)
         s = 1
-        this_$iv = instance of asyncOutsideInlineFunction.A(id=491)
+        this_$iv = instance of asyncOutsideInlineFunction.A(id=ID)
         k$iv = 0
         zzz = 2
         Kotlin variables:
-            this = instance of asyncOutsideInlineFunction.A(id=486)
+            this = instance of asyncOutsideInlineFunction.A(id=ID)
             s = 1
             zzz = 2
 Disconnected from the target VM

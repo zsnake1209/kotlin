@@ -188,11 +188,12 @@ class CodeFragmentParameterAnalyzer(
                     Smart(Dumb(Kind.DISPATCH_RECEIVER, "", "super@$name"), type, descriptor)
                 }
 
-                val parent = PsiTreeUtil.getParentOfType(expression.parent, KtFunction::class.java)
-                if (parent != null)
+                val parent = PsiTreeUtil.getParentOfType(expression.parent, KtFunction::class.java, KtClassOrObject::class.java)
+                if (parent != null) {
                     throw EvaluateExceptionUtil.createEvaluateException(
                         "Evaluation of 'super' calls inside lambdas and functions is not supported"
                     )
+                }
 
                 return null
             }

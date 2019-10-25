@@ -8,13 +8,12 @@ package org.jetbrains.kotlin.idea.debugger.coroutines
 import com.intellij.debugger.engine.JavaStackFrame
 import com.intellij.debugger.engine.JavaValue
 import com.intellij.debugger.ui.impl.watch.StackFrameDescriptorImpl
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.frame.XCompositeNode
 import org.jetbrains.kotlin.idea.core.util.getLineCount
+import org.jetbrains.kotlin.idea.core.util.toPsiFile
+import org.jetbrains.kotlin.idea.debugger.stackFrame.IsInline
 import org.jetbrains.kotlin.idea.debugger.stackFrame.KotlinVariablesFilter
-import org.jetbrains.kotlin.idea.stubindex.KotlinFileFacadeFqNameIndex
-import org.jetbrains.kotlin.idea.stubindex.KotlinFullClassNameIndex
 
 /**
  * Puts the frameProxy into JavaStackFrame just to instantiate. SyntheticStackFrame provides it's own data for variables view.
@@ -31,27 +30,11 @@ class SyntheticStackFrame(
         KotlinVariablesFilter.computeVariables(node, vars, isInsideInlineFun())
     }
 
-    private fun isInsideInlineFun(): Boolean {
-        val stackTraceElement = (descriptor as? SuspendStackFrameDescriptor)?.frame
-        val outerClassOrFile = stackTraceElement?.className?.substringBefore('$') ?: return true
+    private fun isInsideInlineFun(): IsInline {
         val project = descriptor.debugProcess.project
-        val scope = GlobalSearchScope.allScope(project)
-        // copied from JKResolver
-        val classesPsi = KotlinFullClassNameIndex.getInstance()[outerClassOrFile, project, scope]
-        val psiClass = classesPsi.firstOrNull()
-        val sourceFile = if (psiClass != null) {
-            psiClass.containingKtFile
-        } else {
-            val ktFiles = KotlinFileFacadeFqNameIndex.getInstance()[outerClassOrFile, project, scope]
-            ktFiles.asSequence().minWith(Comparator { o1, o2 ->
-                GlobalSearchScope.allScope(project).compare(o1.containingFile.virtualFile, o2.containingFile.virtualFile)
-            })
-        }
+        val sourceFile = position.file.toPsiFile(project)
 
-        return if (sourceFile != null)
-            sourceFile.getLineCount() < stackTraceElement.lineNumber
-        else
-            true // if it's not inside inline, it still will calculate 0 depth
+        return IsInline.valueOf(sourceFile?.let { sourceFile.getLineCount() < position.line })
     }
 
     override fun getSourcePosition(): XSourcePosition? {

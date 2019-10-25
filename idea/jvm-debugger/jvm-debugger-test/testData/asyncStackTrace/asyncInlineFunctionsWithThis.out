@@ -4,12 +4,12 @@ Connected to the target VM
 asyncInlineFunctionsWithThis.kt:12
 Async stack trace:
     asyncInlineFunctionsWithThis.A:29
-        this = instance of asyncInlineFunctionsWithThis.A(id=486)
+        this = instance of asyncInlineFunctionsWithThis.A(id=ID)
         s = 1
-        this_$iv = instance of asyncInlineFunctionsWithThis.A(id=491)
+        this_$iv = instance of asyncInlineFunctionsWithThis.A(id=ID)
         k$iv = 0
         Kotlin variables:
-            this = instance of asyncInlineFunctionsWithThis.A(id=491)
+            this = instance of asyncInlineFunctionsWithThis.A(id=ID)
             k = 0
 Disconnected from the target VM
 
