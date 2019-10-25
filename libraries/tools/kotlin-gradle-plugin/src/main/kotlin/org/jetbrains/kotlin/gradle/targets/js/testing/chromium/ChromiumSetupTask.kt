@@ -23,6 +23,8 @@ open class ChromiumSetupTask : DefaultTask() {
         @Input get() = env.downloadUrl
 
     init {
+        description = "Download and install a local chromium revision"
+
         onlyIf {
             settings.download && !env.home.isDirectory
         }

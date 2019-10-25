@@ -398,10 +398,33 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
     }
 
     @Test
-    fun testKotlinJsKarmaDownloadChrome() = with(Project("kotlin-js-karma-download-chrome", GradleVersionRequired.AtLeast("4.10.2"))) {
+    fun testChromiumSetup() = with(Project("chromium-setup", GradleVersionRequired.AtLeast("4.10.2"))) {
         setupWorkingDir()
         gradleBuildScript().modify(::transformBuildScriptWithPluginsDsl)
         gradleSettingsScript().modify(::transformBuildScriptWithPluginsDsl)
+
+        build("chromiumFolderRemove") {
+            assertSuccessful()
+        }
+
+        gradleBuildScript().appendText("\nchromium.download = false")
+
+        build("kotlinChromiumSetup") {
+            assertSuccessful()
+
+            assertTasksSkipped(":kotlinChromiumSetup")
+        }
+
+        gradleBuildScript().appendText("\nchromium.download = true")
+
+        build("kotlinChromiumSetup", "chromiumFolderCheck") {
+            assertSuccessful()
+
+            assertTasksExecuted(
+                ":kotlinChromiumSetup",
+                ":chromiumFolderCheck"
+            )
+        }
 
         build("test") {
             assertTasksExecuted(
@@ -410,7 +433,19 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
                 ":compileTestKotlinJs"
             )
 
-            assertFileExists("build/js/node_modules/puppeteer/.local-chromium")
+            assertTasksSkipped(":kotlinChromiumSetup")
+        }
+
+        // from puppeteer 1.19.0
+        gradleBuildScript().appendText("\nchromium.revision = \"674921\"")
+
+        build("chromiumConcreteVersionFolderChecker") {
+            assertSuccessful()
+
+            assertTasksExecuted(
+                ":kotlinChromiumSetup",
+                ":chromiumConcreteVersionFolderChecker"
+            )
         }
     }
 
@@ -441,6 +476,22 @@ class Kotlin2JsGradlePluginIT : BaseGradleIT() {
             assertTasksExecuted(
                 ":kotlinYarnSetup",
                 ":yarnConcreteVersionFolderChecker"
+            )
+        }
+
+        gradleBuildScript().appendText("\nyarn.version = \"1.9.2\"")
+
+        build("kotlinYarnSetup") {
+            assertSuccessful()
+        }
+
+        gradleBuildScript().appendText("\nyarn.version = \"1.9.3\"")
+
+        build("kotlinYarnSetup") {
+            assertSuccessful()
+
+            assertTasksSkipped(
+                ":kotlinYarnSetup"
             )
         }
     }
