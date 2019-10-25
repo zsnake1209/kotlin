@@ -24,7 +24,7 @@ open class ChromiumSetupTask : DefaultTask() {
 
     init {
         onlyIf {
-            settings.download
+            settings.download && !env.home.isDirectory
         }
     }
 
