@@ -1,4 +1,3 @@
-
 // TARGET_BACKEND: JVM
 // WITH_RUNTIME
 // WITH_COROUTINES
@@ -28,14 +27,14 @@ fun box(): String {
         withLineBreak()
         return "FAIL 0"
     } catch (e: RuntimeException) {
-        if (e.stackTrace[0].lineNumber != 19) return "FAIL 1 ${e.stackTrace[0].lineNumber}"
+        if (e.stackTrace[0].lineNumber != 18) return "FAIL 1 ${e.stackTrace[0].lineNumber}"
     }
 
     try {
         withoutLineBreak()
         return "FAIL 2"
     } catch (e: RuntimeException) {
-        if (e.stackTrace[0].lineNumber != 23) return "FAIL 3 ${e.stackTrace[0].lineNumber}"
+        if (e.stackTrace[0].lineNumber != 22) return "FAIL 3 ${e.stackTrace[0].lineNumber}"
     }
 
     return "OK"
