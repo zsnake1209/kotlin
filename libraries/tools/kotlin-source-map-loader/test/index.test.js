@@ -186,7 +186,7 @@ describe("source-map-loader", function() {
 		});
 	});
 
-	xit("should warn on missing source file", function (done) {
+	it("should warn on missing source file", function (done) {
 		execLoader(path.join(fixturesPath, "missing-source-map2.js"), function(err, res, map, deps, warns) {
 			should.equal(err, null);
 			warns.should.be.eql([
