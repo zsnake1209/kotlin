@@ -206,6 +206,7 @@ class JvmDeclarationFactory(
                     parent = irClass
                     overriddenSymbols.addAll(fakeOverride.overriddenSymbols)
                     copyParameterDeclarationsFrom(fakeOverride)
+                    annotations.addAll(fakeOverride.annotations)
                     fakeOverride.correspondingPropertySymbol?.owner?.let { fakeOverrideProperty ->
                         // NB: property is only generated for the sake of the type mapper.
                         // If both setter and getter are present, original property will be duplicated.

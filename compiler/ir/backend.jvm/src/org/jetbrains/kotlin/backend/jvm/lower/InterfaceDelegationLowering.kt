@@ -111,7 +111,6 @@ private class InterfaceDelegationLowering(val context: JvmBackendContext) : IrEl
                     }
                 )
             }
-            irFunction.annotations.addAll(defaultImplFun.annotations.map { it.deepCopyWithSymbols() })
         }
 
         return irFunction
