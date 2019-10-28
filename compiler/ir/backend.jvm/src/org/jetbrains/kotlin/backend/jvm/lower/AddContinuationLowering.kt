@@ -194,7 +194,7 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
 
                     override fun visitReturn(expression: IrReturn): IrExpression {
                         val ret = super.visitReturn(expression) as IrReturn
-                        return IrReturnImpl(ret.startOffset, ret.endOffset, context.irBuiltIns.anyType, function.symbol, ret.value)
+                        return IrReturnImpl(ret.startOffset, ret.endOffset, ret.type, function.symbol, ret.value)
                     }
                 })
                 (irFunction.parent as IrDeclarationContainer).declarations.remove(irFunction)
@@ -439,8 +439,10 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
                     if (irFunction.dispatchReceiverParameter != null) {
                         it.dispatchReceiver = capturedThisValue
                     }
-                    if (irFunction.extensionReceiverParameter != null) {
-                        it.extensionReceiver = irNull()
+                    irFunction.extensionReceiverParameter?.let { extensionReceiverParameter ->
+                        it.extensionReceiver = IrConstImpl.defaultValueForType(
+                            UNDEFINED_OFFSET, UNDEFINED_OFFSET, extensionReceiverParameter.type
+                        )
                     }
                     for ((i, parameter) in irFunction.valueParameters.withIndex()) {
                         val defaultValueForParameter = IrConstImpl.defaultValueForType(
