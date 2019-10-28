@@ -164,7 +164,8 @@ class LateinitLowering(val context: CommonBackendContext) : FileLoweringPass {
 
                 val receiver = expression.extensionReceiver as IrPropertyReference
 
-                val property = receiver.getter?.owner?.resolveFakeOverride()?.correspondingProperty!!.also { assert(it.isLateinit) }
+                val property =
+                    receiver.getter?.owner?.resolveFakeOverride()?.correspondingPropertySymbol!!.owner.also { assert(it.isLateinit) }
 
                 return expression.run { context.createIrBuilder(symbol, startOffset, endOffset) }.run {
                     irNotEquals(irGetField(receiver.dispatchReceiver, property.backingField!!), irNull())

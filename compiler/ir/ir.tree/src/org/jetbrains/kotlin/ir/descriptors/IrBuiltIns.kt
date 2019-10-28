@@ -59,9 +59,6 @@ class IrBuiltIns(
         override val modality get() = Modality.FINAL
         override val isTailrec get() = false
         override val isSuspend get() = false
-        override var correspondingProperty: IrProperty?
-            get() = null
-            set(_) {}
         override var correspondingPropertySymbol: IrPropertySymbol?
             get() = null
             set(_) {}
