@@ -28,10 +28,20 @@ abstract class YarnBasics : NpmApi {
         val yarnEnv = YarnPlugin.apply(project).environment
 
         project.execWithProgress(description) { exec ->
-            exec.executable = nodeJsEnv.nodeExecutable
-            exec.args = listOf(yarnEnv.home.resolve("bin/yarn.js").absolutePath) +
-                    args +
-                    if (project.logger.isDebugEnabled) "--verbose" else ""
+            if (yarnEnv.executable.endsWith(".js")) {
+                exec.executable = nodeJsEnv.nodeExecutable
+                exec.args = listOf(yarnEnv.executable)
+            } else {
+                exec.executable = yarnEnv.executable
+            }
+
+            val additionalArgs = args.toMutableList().also {
+                if (project.logger.isDebugEnabled) it.add("--verbose")
+            }
+
+            exec.args.addAll(
+                additionalArgs
+            )
             exec.workingDir = dir
         }
     }
