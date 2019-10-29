@@ -23,7 +23,6 @@ import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.IrStarProjectionImpl
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.resolve.jvm.annotations.JVM_DEFAULT_FQ_NAME
-import org.jetbrains.kotlin.utils.DFS
 
 /**
  * Perform as much type erasure as is significant for JVM signature generation.
@@ -122,10 +121,3 @@ fun JvmBackendContext.createJvmIrBuilder(
 
 fun IrDeclaration.isInCurrentModule(): Boolean =
     getPackageFragment() is IrFile
-
-fun IrClass.isPropertyReference(): Boolean =
-    DFS.ifAny(
-        listOf(this),
-        { it.superTypes.mapNotNull { (it as? IrSimpleType)?.classOrNull?.owner } },
-        { it.fqNameWhenAvailable?.asString()?.startsWith("kotlin.jvm.internal.PropertyReference") == true }
-    )
