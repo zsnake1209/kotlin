@@ -69,14 +69,15 @@ object GenerationUtils {
             JvmResolveUtil.analyzeAndCheckForErrors(files.first().project, files, configuration, packagePartProvider, trace)
         analysisResult.throwIfError()
 
+        val isIrBackend = classBuilderFactory.classBuilderMode == ClassBuilderMode.FULL && configuration.getBoolean(JVMConfigurationKeys.IR)
         val state = GenerationState.Builder(
             files.first().project, classBuilderFactory, analysisResult.moduleDescriptor, analysisResult.bindingContext,
             files, configuration
         ).codegenFactory(
-            if (configuration.getBoolean(JVMConfigurationKeys.IR))
+            if (isIrBackend)
                 JvmIrCodegenFactory(configuration.get(CLIConfigurationKeys.PHASE_CONFIG) ?: PhaseConfig(jvmPhases))
             else DefaultCodegenFactory
-        ).build()
+        ).isIrBackend(isIrBackend).build()
         if (analysisResult.shouldGenerateCode) {
             KotlinCodegenFacade.compileCorrectFiles(state, CompilationErrorHandler.THROW_EXCEPTION)
         }
