@@ -183,8 +183,9 @@ class AsyncStackFrameDescriptor(val state: CoroutineState, val frame: StackFrame
 /**
  * For the case when no data inside frame is available
  */
-class EmptyStackFrameDescriptor(val frame: StackTraceElement, proxy: StackFrameProxyImpl) :
-    StackFrameDescriptorImpl(proxy, MethodsTracker()) {
+class EmptyStackFrameDescriptor(val frame: StackTraceElement, proxy: StackFrameProxyImpl, tracker: MethodsTracker = MethodsTracker()) :
+    StackFrameDescriptorImpl(proxy, tracker) {
+
     override fun calcRepresentation(context: EvaluationContextImpl?, labelListener: DescriptorLabelListener?): String {
         return with(frame) {
             val pack = className.substringBeforeLast(".", "")
@@ -192,7 +193,7 @@ class EmptyStackFrameDescriptor(val frame: StackTraceElement, proxy: StackFrameP
         }
     }
 
-    override fun getName() = null
+    override fun getName(): String = frame.methodName
     override fun isExpandable() = false
 }
 

@@ -15,10 +15,7 @@ import com.intellij.debugger.impl.DebuggerStateManager
 import com.intellij.debugger.ui.impl.DebuggerTreePanel
 import com.intellij.debugger.ui.impl.watch.DebuggerTree
 import com.intellij.debugger.ui.impl.watch.DebuggerTreeNodeImpl
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.ActionPopupMenu
-import com.intellij.openapi.actionSystem.EmptyActionGroup
-import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
@@ -141,8 +138,9 @@ class CoroutinesPanel(project: Project, stateManager: DebuggerStateManager) : De
     }
 
     override fun createPopupMenu(): ActionPopupMenu {
-        val group = EmptyActionGroup()
-        return ActionManager.getInstance().createActionPopupMenu("Debugger.CoroutinesPanelPopup", group)
+        val actionManager = ActionManager.getInstance()
+        val group = actionManager.getAction("Kotlin.XDebugger.CoroutinesPanelPopup") as DefaultActionGroup
+        return actionManager.createActionPopupMenu("Kotlin.XDebugger.CoroutinesPanelPopup", group)
     }
 
     override fun getData(dataId: String): Any? {

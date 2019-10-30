@@ -64,6 +64,11 @@
                 class="org.jetbrains.kotlin.idea.debugger.coroutines.CoroutineDumpAction"
                 text="Get Coroutines Dump"
                 icon="/org/jetbrains/kotlin/idea/icons/kotlin.png"/>
+        <group id="Kotlin.XDebugger.CoroutinesPanelPopup">
+            <action id="Kotlin.XDebugger.Coroutines.ShowCreation"
+                    class="org.jetbrains.kotlin.idea.debugger.coroutines.ShowCreationStackTraceAction"
+                    text="Show Coroutine Creation StackTrace"/>
+        </group>
 
         <action id="InspectBreakpointApplicability" class="org.jetbrains.kotlin.idea.debugger.breakpoints.InspectBreakpointApplicabilityAction"
                 text="Inspect Breakpoint Applicability" internal="true">
@@ -86,6 +91,7 @@
         <projectService serviceImplementation="org.jetbrains.kotlin.idea.versions.SuppressNotificationState"/>
 
         <applicationService serviceImplementation="org.jetbrains.kotlin.idea.debugger.ToggleKotlinVariablesState"/>
+        <applicationService serviceImplementation="org.jetbrains.kotlin.idea.debugger.coroutines.CoroutinesViewPopupSettings"/>
 
         <debugger.asyncStackTraceProvider implementation="org.jetbrains.kotlin.idea.debugger.KotlinCoroutinesAsyncStackTraceProvider"/>
         <debugger.jvmSmartStepIntoHandler implementation="org.jetbrains.kotlin.idea.debugger.stepping.smartStepInto.KotlinSmartStepIntoHandler"/>

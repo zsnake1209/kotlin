@@ -43,6 +43,7 @@ import org.jetbrains.kotlin.idea.debugger.KotlinCoroutinesAsyncStackTraceProvide
 import org.jetbrains.kotlin.idea.debugger.evaluate.ExecutionContext
 import java.awt.event.MouseEvent
 import java.lang.ref.WeakReference
+import java.util.*
 import javax.swing.event.TreeModelEvent
 import javax.swing.event.TreeModelListener
 
@@ -52,6 +53,8 @@ import javax.swing.event.TreeModelListener
 class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
     private val logger = Logger.getInstance(this::class.java)
     private var lastSuspendContextCache: Cache? = null
+    private val settings = CoroutinesViewPopupSettings.getInstance()
+    private val cachedChildren = WeakHashMap<CoroutineState, List<DebuggerTreeNodeImpl>>()
 
     override fun createNodeManager(project: Project): NodeManagerImpl {
         return object : NodeManagerImpl(project, this) {
@@ -67,13 +70,11 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
     init {
         val model = object : TreeBuilder(this) {
             override fun buildChildren(node: TreeBuilderNode) {
-                val debuggerTreeNode = node as DebuggerTreeNodeImpl
-                if (debuggerTreeNode.descriptor is DefaultNodeDescriptor) {
-                    return
+                if ((node as? DebuggerTreeNodeImpl) != null) {
+                    if (node.descriptor is DefaultNodeDescriptor) return
+                    node.add(myNodeManager.createMessageNode(MessageDescriptor.EVALUATING))
+                    buildNode(node)
                 }
-
-                node.add(myNodeManager.createMessageNode(MessageDescriptor.EVALUATING))
-                buildNode(debuggerTreeNode)
             }
 
             override fun isExpandable(builderNode: TreeBuilderNode): Boolean {
@@ -82,7 +83,6 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
         }
         model.setRoot(nodeFactory.defaultNode)
         model.addTreeModelListener(createListener())
-
         setModel(model)
         emptyText.text = "Coroutines are not available"
     }
@@ -96,18 +96,23 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
         debugProcess?.managerThread?.schedule(object : SuspendContextCommandImpl(context.suspendContext) {
             override fun contextAction(suspendContext: SuspendContextImpl) {
                 val evalContext = debuggerContext.createEvaluationContext() ?: return
-                if (node.descriptor is CoroutineDescriptorImpl || node.descriptor is CreationFramesDescriptor) {
-                    val children = mutableListOf<DebuggerTreeNodeImpl>()
-                    try {
-                        addChildren(children, debugProcess, node.descriptor, evalContext)
+                val descriptor = node.descriptor
+                if (descriptor is CoroutineDescriptorImpl) {
+                    val children = cachedChildren[descriptor.state] ?: try {
+                        mutableListOf<DebuggerTreeNodeImpl>().apply {
+                            addChildren(this, debugProcess, node.descriptor, evalContext)
+                            cachedChildren[descriptor.state] = this
+                        }
                     } catch (e: EvaluateException) {
-                        children.clear()
-                        children.add(myNodeManager.createMessageNode(e.message))
                         logger.debug(e)
+                        listOf(myNodeManager.createMessageNode(e.message))
                     }
                     DebuggerInvocationUtil.swingInvokeLater(project) {
                         node.removeAllChildren()
                         for (debuggerTreeNode in children) {
+                            if (!settings.showCoroutineCreationStackTrace
+                                && debuggerTreeNode.descriptor is MessageDescriptor
+                            ) break
                             node.add(debuggerTreeNode)
                         }
                         node.childrenChanged(true)
@@ -208,7 +213,6 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
     }
 
     private fun getPosition(frame: StackTraceElement): XSourcePosition? {
-
         val psiFacade = JavaPsiFacade.getInstance(project)
         val psiClass = psiFacade.findClass(
             frame.className.substringBefore("$"), // find outer class, for which psi exists TODO
@@ -257,16 +261,7 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
         evalContext: EvaluationContextImpl
     ) {
         val creationStackTraceSeparator = "\b\b\b" // the "\b\b\b" is used for creation stacktrace separator in kotlinx.coroutines
-        if (descriptor !is CoroutineDescriptorImpl) {
-            if (descriptor is CreationFramesDescriptor) {
-                val threadProxy = debuggerContext.suspendContext?.thread ?: return
-                val proxy = threadProxy.forceFrames().first()
-                descriptor.frames.forEach {
-                    children.add(myNodeManager.createNode(EmptyStackFrameDescriptor(it, proxy), evalContext))
-                }
-            }
-            return
-        }
+        if (descriptor !is CoroutineDescriptorImpl) return
         when (descriptor.state.state) {
             CoroutineState.State.RUNNING -> {
                 if (descriptor.state.thread == null) {
@@ -289,7 +284,16 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
                         JavaStackFrame(StackFrameDescriptorImpl(frames[i - 1], MethodsTracker()), true),
                         evalContext.suspendContext
                     )
-                    async?.forEach { children.add(createAsyncFrameDescriptor(descriptor, evalContext, it, frames[0])) }
+                    async?.forEach {
+                        children.add(
+                            createAsyncFrameDescriptor(
+                                descriptor,
+                                evalContext,
+                                it,
+                                frames[0]
+                            )
+                        )
+                    }
                 }
                 for (frame in i + 2..frames.lastIndex) {
                     children.add(createFrameDescriptor(descriptor, evalContext, frames[frame]))
@@ -297,7 +301,7 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
             }
             CoroutineState.State.SUSPENDED -> {
                 val threadProxy = debuggerContext.suspendContext?.thread ?: return
-                val proxy = threadProxy.forceFrames().first()
+                val proxy = threadProxy.frame(0)
                 // the thread is paused on breakpoint - it has at least one frame
                 for (it in descriptor.state.stackTrace) {
                     if (it.className.startsWith(creationStackTraceSeparator)) break
@@ -309,9 +313,13 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
         }
         val trace = descriptor.state.stackTrace
         val index = trace.indexOfFirst { it.className.startsWith(creationStackTraceSeparator) }
-        children.add(myNodeManager.createNode(CreationFramesDescriptor(trace.subList(index + 1, trace.size)), evalContext))
+        children.add(myNodeManager.createMessageNode("Coroutine creation stack trace"))
+        val threadProxy = debuggerContext.suspendContext?.thread ?: return
+        val proxy = threadProxy.frame(0)
+        for (i in index + 1 until trace.size) {
+            children.add(myNodeManager.createNode(EmptyStackFrameDescriptor(trace[i], proxy), evalContext))
+        }
     }
-
 
     private fun createFrameDescriptor(
         descriptor: NodeDescriptorImpl,
@@ -385,7 +393,7 @@ class CoroutinesDebuggerTree(project: Project) : DebuggerTree(project) {
             || state == DebuggerSession.State.PAUSED
         ) {
             showMessage(MessageDescriptor.EVALUATING)
-            context.debugProcess!!.managerThread.schedule(command)
+            context.debugProcess?.managerThread?.schedule(command)
         } else {
             showMessage(if (session != null) session.stateDescription else DebuggerBundle.message("status.debug.stopped"))
         }

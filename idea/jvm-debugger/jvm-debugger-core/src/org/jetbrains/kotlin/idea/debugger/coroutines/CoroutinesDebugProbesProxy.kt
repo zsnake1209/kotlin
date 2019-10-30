@@ -19,19 +19,21 @@ object CoroutinesDebugProbesProxy {
     @Synchronized
     @Suppress("unused")
     fun install(context: ExecutionContext) {
-        val debugProbes = context.findClass("$DEBUG_PACKAGE.DebugProbes") as ClassType
-        val instance = with(debugProbes) { getValue(fieldByName("INSTANCE")) as ObjectReference }
-        val install = debugProbes.concreteMethodByName("install", "()V")
-        context.invokeMethod(instance, install, emptyList())
+        setInstall(context, true)
     }
 
     @Synchronized
     @Suppress("unused")
     fun uninstall(context: ExecutionContext) {
+        setInstall(context, false)
+    }
+
+    private fun setInstall(context: ExecutionContext, install: Boolean) {
         val debugProbes = context.findClass("$DEBUG_PACKAGE.DebugProbes") as ClassType
         val instance = with(debugProbes) { getValue(fieldByName("INSTANCE")) as ObjectReference }
-        val uninstall = debugProbes.concreteMethodByName("uninstall", "()V")
-        context.invokeMethod(instance, uninstall, emptyList())
+        val methodName = if (install) "install" else "uninstall"
+        val method = debugProbes.concreteMethodByName(methodName, "()V")
+        context.invokeMethod(instance, method, emptyList())
     }
 
     /**
