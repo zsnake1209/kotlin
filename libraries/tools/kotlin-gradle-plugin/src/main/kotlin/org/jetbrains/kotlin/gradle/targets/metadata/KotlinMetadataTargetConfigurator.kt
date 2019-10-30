@@ -289,43 +289,29 @@ class KotlinMetadataTargetConfigurator(kotlinPluginVersion: String) :
         project: Project,
         transformationTaskHolders: Set<TaskProvider<TransformKotlinGranularMetadata>>
     ): FileCollection {
-        return project.files(Callable {
-            val allResolutionsByArtifactFile: Map<File, Iterable<MetadataDependencyResolution>> =
-                mutableMapOf<File, MutableList<MetadataDependencyResolution>>().apply {
-                    transformationTaskHolders.forEach {
-                        val resolutions = it.get().metadataDependencyResolutions
+        val transformedFilesByOriginalFiles = project.provider {
+            transformationTaskHolders
+                .flatMap { it.get().filesByOriginalFiles.toList() }
+                .groupBy({ it.first }, valueTransform = { it.second })
+        }
 
-                        resolutions.forEach { resolution ->
-                            val artifacts = resolution.dependency.moduleArtifacts.map { it.file }
+        val builtBySet = mutableSetOf<FileCollection>()
+        val resultFiles = project.files(Callable {
+            val originalFiles = fromFiles.toSet()
+            val filesToAdd = mutableSetOf<File>()
+            val filesToExclude = mutableSetOf<File>()
 
-                            artifacts.forEach { artifactFile ->
-                                getOrPut(artifactFile) { mutableListOf() }.add(resolution)
-                            }
-                        }
-                    }
-                }
-
-            val transformedFilesByResolution: Map<MetadataDependencyResolution, FileCollection> =
-                transformationTaskHolders.flatMap { it.get().filesByResolution.toList() }.toMap()
-
-            mutableSetOf<Any /* File | FileCollection */>().apply {
-                fromFiles.forEach { file ->
-                    val resolutions = allResolutionsByArtifactFile[file]
-                    if (resolutions == null) {
-                        add(file)
-                    } else {
-                        val chooseVisibleSourceSets =
-                            resolutions.filterIsInstance<MetadataDependencyResolution.ChooseVisibleSourceSets>()
-
-                        if (chooseVisibleSourceSets.isNotEmpty()) {
-                            add(chooseVisibleSourceSets.map { transformedFilesByResolution.getValue(it) })
-                        } else if (resolutions.any { it is MetadataDependencyResolution.KeepOriginalDependency }) {
-                            add(file)
-                        } // else: all dependency transformations exclude this dependency as unrequested; don't add any files
-                    }
+            transformedFilesByOriginalFiles.get().forEach { (original, replacement) ->
+                if (original.all { it in originalFiles }) {
+                    builtBySet.addAll(replacement)
+                    filesToAdd += replacement.flatMap { it.files }
+                    filesToExclude += original
                 }
             }
-        }).builtBy(transformationTaskHolders)
+
+            originalFiles - filesToExclude + filesToAdd
+        })
+        return resultFiles.builtBy(builtBySet)
     }
 
     private fun getPublishedCommonSourceSets(project: Project): Set<KotlinSourceSet> {

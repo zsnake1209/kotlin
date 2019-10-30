@@ -12,12 +12,14 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.provider.Property
 import org.gradle.util.ConfigureUtil
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilationWithResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.gradle.utils.*
 import org.jetbrains.kotlin.gradle.utils.SingleWarningPerBuild
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -73,7 +75,7 @@ class KotlinNativeCompilation(
         "The compilation.extraOpts method used in this build is deprecated. Use compilation.kotlinOptions.freeCompilerArgs instead."
     )
 
-    internal var extraOptsNoWarn: MutableList<String> = mutableListOf()
+    internal var extraOptsNoWarn: MutableList<String> by project.newProperty { mutableListOf<String>() }
 
     @Deprecated("Use kotlinOptions.freeCompilerArgs instead", ReplaceWith("kotlinOptions.freeCompilerArgs"))
     var extraOpts: MutableList<String>
