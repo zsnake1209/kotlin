@@ -90,6 +90,8 @@ class KotlinGradleProjectResolverExtension : AbstractProjectResolverExtension() 
         return resolverCtx.isResolveModulePerSourceSet
     }
 
+    private var has_12_multiplatformModules = false
+
     private fun getDependencyByFiles(
         files: Collection<File>,
         outputToSourceSet: Map<String, com.intellij.openapi.util.Pair<String, ExternalSystemSourceType>>?,
@@ -224,7 +226,9 @@ class KotlinGradleProjectResolverExtension : AbstractProjectResolverExtension() 
             super.populateModuleDependencies(gradleModule, ideModule, ideProject)
         }
 
-        addTransitiveDependenciesOnImplementedModules(gradleModule, ideModule, ideProject)
+        if (has_12_multiplatformModules) {
+            addTransitiveDependenciesOnImplementedModules(gradleModule, ideModule, ideProject)
+        }
 
         ideModule.isResolved = true
         ideModule.hasKotlinPlugin = gradleModel.hasKotlinPlugin
@@ -288,6 +292,14 @@ class KotlinGradleProjectResolverExtension : AbstractProjectResolverExtension() 
 
         @Suppress("UNCHECKED_CAST")
         return ideProject.children.find { (it.data as? ModuleData)?.id == fullModuleId } as DataNode<ModuleData>?
+    }
+
+    override fun createModule(gradleModule: IdeaModule, projectDataNode: DataNode<ProjectData>): DataNode<ModuleData> {
+        has_12_multiplatformModules = has_12_multiplatformModules || resolverCtx.getExtraProject(
+            gradleModule,
+            KotlinGradleModel::class.java
+        )?.has12MultiplatformPlugin ?: false
+        return super.createModule(gradleModule, projectDataNode)
     }
 
     override fun populateModuleContentRoots(gradleModule: IdeaModule, ideModule: DataNode<ModuleData>) {

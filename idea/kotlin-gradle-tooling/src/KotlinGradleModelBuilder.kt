@@ -27,6 +27,7 @@ import java.io.Serializable
 import java.lang.Exception
 import java.lang.reflect.InvocationTargetException
 import java.util.*
+import org.jetbrains.kotlin.gradle.KotlinMPPGradleModelBuilder.Companion.getTargets
 
 interface ArgsInfo : Serializable {
     val currentArguments: List<String>
@@ -60,6 +61,7 @@ fun CompilerArgumentsBySourceSet.deepCopy(): CompilerArgumentsBySourceSet {
 
 interface KotlinGradleModel : Serializable {
     val hasKotlinPlugin: Boolean
+    val has12MultiplatformPlugin: Boolean
     val compilerArgumentsBySourceSet: CompilerArgumentsBySourceSet
     val coroutines: String?
     val platformPluginId: String?
@@ -70,6 +72,7 @@ interface KotlinGradleModel : Serializable {
 
 data class KotlinGradleModelImpl(
     override val hasKotlinPlugin: Boolean,
+    override val has12MultiplatformPlugin: Boolean,
     override val compilerArgumentsBySourceSet: CompilerArgumentsBySourceSet,
     override val coroutines: String?,
     override val platformPluginId: String?,
@@ -174,7 +177,7 @@ class KotlinGradleModelBuilder : AbstractKotlinGradleModelBuilder() {
         }
     }
 
-    override fun buildAll(modelName: String?, project: Project): KotlinGradleModelImpl {
+    override fun buildAll(modelName: String?, project: Project): KotlinGradleModelImpl? {
         val kotlinPluginId = kotlinPluginIds.singleOrNull { project.plugins.findPlugin(it) != null }
         val platformPluginId = platformPluginIds.singleOrNull { project.plugins.findPlugin(it) != null }
         val targets = project.getTargets(includeSinglePlatform = true)
@@ -211,6 +214,7 @@ class KotlinGradleModelBuilder : AbstractKotlinGradleModelBuilder() {
 
         return KotlinGradleModelImpl(
             kotlinPluginId != null || platformPluginId != null,
+            platformPluginId != null,
             compilerArgumentsBySourceSet,
             getCoroutines(project),
             platform,
