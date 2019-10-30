@@ -142,10 +142,10 @@ class IrBuiltIns(
             descriptor.bind(operator)
 
             valueParameterTypes.mapIndexedTo(operator.valueParameters) { i, t ->
-                val vpd = WrappedValueParameterDescriptor()
-                val vps = IrValueParameterSymbolImpl(vpd)
-                IrBuiltInOperatorValueParameter(vps, i, t).apply {
-                    vpd.bind(this)
+                val valueParameterDescriptor = WrappedValueParameterDescriptor()
+                val valueParameterSymbol = IrValueParameterSymbolImpl(valueParameterDescriptor)
+                IrBuiltInOperatorValueParameter(valueParameterSymbol, i, t).apply {
+                    valueParameterDescriptor.bind(this)
                     parent = operator
                 }
             }
@@ -160,8 +160,8 @@ class IrBuiltIns(
 
     private fun defineEnumValueOfOperator(): IrSimpleFunctionSymbol {
         val name = Name.identifier("enumValueOf")
-        val tpd: TypeParameterDescriptor
-        val vpd: ValueParameterDescriptor
+        val typeParameterDescriptor: TypeParameterDescriptor
+        val valueParameterDescriptor: ValueParameterDescriptor
         val descriptor = SimpleFunctionDescriptorImpl.create(
             packageFragmentDescriptor,
             Annotations.EMPTY,
@@ -169,28 +169,28 @@ class IrBuiltIns(
             CallableMemberDescriptor.Kind.SYNTHESIZED,
             SourceElement.NO_SOURCE
         ).apply {
-            tpd = TypeParameterDescriptorImpl.createWithDefaultBound(
+            typeParameterDescriptor = TypeParameterDescriptorImpl.createWithDefaultBound(
                 this, Annotations.EMPTY, true, Variance.INVARIANT, Name.identifier("T0"), 0
             )
 
-            vpd = ValueParameterDescriptorImpl(
+            valueParameterDescriptor = ValueParameterDescriptorImpl(
                 this, null, 0, Annotations.EMPTY, Name.identifier("arg0"), string,
                 false, false, false, null, SourceElement.NO_SOURCE
             )
 
-            val returnType = tpd.typeConstructor.makeNonNullType()
+            val returnType = typeParameterDescriptor.typeConstructor.makeNonNullType()
 
-            initialize(null, null, listOf(tpd), listOf(vpd), returnType, Modality.FINAL, Visibilities.PUBLIC)
+            initialize(null, null, listOf(typeParameterDescriptor), listOf(valueParameterDescriptor), returnType, Modality.FINAL, Visibilities.PUBLIC)
         }
 
         val returnKotlinType = descriptor.returnType
-        val tps = IrTypeParameterSymbolImpl(tpd)
-        val typeParameter = IrBuiltInOperatorTypeParameter(tps, Variance.INVARIANT, 0, true).apply {
+        val typeParameterSymbol = IrTypeParameterSymbolImpl(typeParameterDescriptor)
+        val typeParameter = IrBuiltInOperatorTypeParameter(typeParameterSymbol, Variance.INVARIANT, 0, true).apply {
             superTypes += anyNType
         }
 
         val returnIrType = IrSimpleTypeBuilder().run {
-            classifier = tps
+            classifier = typeParameterSymbol
             kotlinType = returnKotlinType
             buildSimpleType()
         }
@@ -200,8 +200,8 @@ class IrBuiltIns(
             operator.parent = packageFragment
             packageFragment.declarations += operator
 
-            val vps = IrValueParameterSymbolImpl(vpd)
-            val valueParameter = IrBuiltInOperatorValueParameter(vps, 0, stringType)
+            val valueParameterSymbol = IrValueParameterSymbolImpl(valueParameterDescriptor)
+            val valueParameter = IrBuiltInOperatorValueParameter(valueParameterSymbol, 0, stringType)
 
             valueParameter.parent = operator
             typeParameter.parent = operator
@@ -217,8 +217,8 @@ class IrBuiltIns(
 
     private fun defineCheckNotNullOperator(): IrSimpleFunctionSymbol {
         val name = Name.identifier("CHECK_NOT_NULL")
-        val tpd: TypeParameterDescriptor
-        val vpd: ValueParameterDescriptor
+        val typeParameterDescriptor: TypeParameterDescriptor
+        val valueParameterDescriptor: ValueParameterDescriptor
 
         val returnKotlinType: SimpleType
         val valueKotlinType: SimpleType
@@ -231,39 +231,39 @@ class IrBuiltIns(
             CallableMemberDescriptor.Kind.SYNTHESIZED,
             SourceElement.NO_SOURCE
         ).apply {
-            tpd = TypeParameterDescriptorImpl.createForFurtherModification(
+            typeParameterDescriptor = TypeParameterDescriptorImpl.createForFurtherModification(
                 this, Annotations.EMPTY, false, Variance.INVARIANT, Name.identifier("T0"), 0, SourceElement.NO_SOURCE
             ).apply {
                 addUpperBound(any)
                 setInitialized()
             }
 
-            valueKotlinType = tpd.typeConstructor.makeNullableType()
+            valueKotlinType = typeParameterDescriptor.typeConstructor.makeNullableType()
 
-            vpd = ValueParameterDescriptorImpl(
+            valueParameterDescriptor = ValueParameterDescriptorImpl(
                 this, null, 0, Annotations.EMPTY, Name.identifier("arg0"), valueKotlinType,
                 false, false, false, null, SourceElement.NO_SOURCE
             )
 
-            returnKotlinType = tpd.typeConstructor.makeNonNullType()
+            returnKotlinType = typeParameterDescriptor.typeConstructor.makeNonNullType()
 
-            initialize(null, null, listOf(tpd), listOf(vpd), returnKotlinType, Modality.FINAL, Visibilities.PUBLIC)
+            initialize(null, null, listOf(typeParameterDescriptor), listOf(valueParameterDescriptor), returnKotlinType, Modality.FINAL, Visibilities.PUBLIC)
         }
 
-        val tps = IrTypeParameterSymbolImpl(tpd)
-        val typeParameter = IrBuiltInOperatorTypeParameter(tps, Variance.INVARIANT, 0, true).apply {
+        val typeParameterSymbol = IrTypeParameterSymbolImpl(typeParameterDescriptor)
+        val typeParameter = IrBuiltInOperatorTypeParameter(typeParameterSymbol, Variance.INVARIANT, 0, true).apply {
             superTypes += anyType
         }
 
         val returnIrType = IrSimpleTypeBuilder().run {
-            classifier = tps
+            classifier = typeParameterSymbol
             kotlinType = returnKotlinType
             hasQuestionMark = false
             buildSimpleType()
         }
 
         val valueIrType = IrSimpleTypeBuilder().run {
-            classifier = tps
+            classifier = typeParameterSymbol
             kotlinType = valueKotlinType
             hasQuestionMark = true
             buildSimpleType()
@@ -274,8 +274,8 @@ class IrBuiltIns(
             operator.parent = packageFragment
             packageFragment.declarations += operator
 
-            val vps = IrValueParameterSymbolImpl(vpd)
-            val valueParameter = IrBuiltInOperatorValueParameter(vps, 0, valueIrType)
+            val valueParameterSymbol = IrValueParameterSymbolImpl(valueParameterDescriptor)
+            val valueParameter = IrBuiltInOperatorValueParameter(valueParameterSymbol, 0, valueIrType)
 
             valueParameter.parent = operator
             typeParameter.parent = operator
