@@ -27,6 +27,10 @@ abstract class FirScope {
         // NB: it'd be great to write FirVariableSymbol<*> here, but there is FirAccessorSymbol :(
         processor: (FirCallableSymbol<*>) -> ProcessorAction
     ): ProcessorAction = NEXT
+
+    object Empty : FirScope() {
+        override fun toString() = "Empty scope"
+    }
 }
 
 enum class ProcessorAction {
