@@ -68,6 +68,9 @@
             <action id="Kotlin.XDebugger.Coroutines.ShowCreation"
                     class="org.jetbrains.kotlin.idea.debugger.coroutines.ShowCreationStackTraceAction"
                     text="Show Coroutine Creation StackTrace"/>
+            <action id="Kotlin.XDebugger.Coroutines.ShowIntrinsic"
+                    class="org.jetbrains.kotlin.idea.debugger.coroutines.ShowIntrinsicCoroutineFrames"
+                    text="Show Intrinsic Coroutine Frames"/>
         </group>
 
         <action id="InspectBreakpointApplicability" class="org.jetbrains.kotlin.idea.debugger.breakpoints.InspectBreakpointApplicabilityAction"

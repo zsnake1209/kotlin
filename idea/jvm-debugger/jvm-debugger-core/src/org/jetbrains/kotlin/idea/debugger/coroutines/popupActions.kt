@@ -11,8 +11,18 @@ import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.xdebugger.impl.XDebuggerUtilImpl
 
+private val settings = CoroutinesViewPopupSettings.getInstance()
+
+private fun updateViews() {
+    for (project in ProjectManager.getInstance().openProjects) {
+        for (session in DebuggerManagerEx.getInstanceEx(project).sessions) {
+            session.refresh(false)
+        }
+        XDebuggerUtilImpl.rebuildAllSessionsViews(project)
+    }
+}
+
 class ShowCreationStackTraceAction : ToggleAction() {
-    private val settings = CoroutinesViewPopupSettings.getInstance()
 
     override fun isSelected(e: AnActionEvent): Boolean {
         return settings.showCoroutineCreationStackTrace
@@ -21,13 +31,19 @@ class ShowCreationStackTraceAction : ToggleAction() {
     override fun setSelected(e: AnActionEvent, state: Boolean) {
         val changed = settings.showCoroutineCreationStackTrace != state
         settings.showCoroutineCreationStackTrace = state
-        if (changed) {
-            for (project in ProjectManager.getInstance().openProjects) {
-                for (session in DebuggerManagerEx.getInstanceEx(project).sessions) {
-                    session.refresh(false)
-                }
-                XDebuggerUtilImpl.rebuildAllSessionsViews(project)
-            }
-        }
+        if (changed) updateViews()
+    }
+}
+
+class ShowIntrinsicCoroutineFrames : ToggleAction() {
+
+    override fun isSelected(e: AnActionEvent): Boolean {
+        return settings.showIntrinsicFrames
+    }
+
+    override fun setSelected(e: AnActionEvent, state: Boolean) {
+        val changed = settings.showIntrinsicFrames != state
+        settings.showIntrinsicFrames = state
+        if (changed) updateViews()
     }
 }

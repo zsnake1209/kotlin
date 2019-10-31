@@ -35,8 +35,7 @@ class CoroutinesPanel(project: Project, stateManager: DebuggerStateManager) : De
     private val myUpdateLabelsAlarm = Alarm(Alarm.ThreadToUse.SWING_THREAD)
 
     init {
-        val disposable = getCoroutinesTree().installAction()
-        registerDisposable(disposable)
+        registerDisposable(getCoroutinesTree().installDoubleClickListener())
         getCoroutinesTree().addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent) {
                 if (e.keyCode == KeyEvent.VK_ENTER && getCoroutinesTree().selectionCount == 1) {

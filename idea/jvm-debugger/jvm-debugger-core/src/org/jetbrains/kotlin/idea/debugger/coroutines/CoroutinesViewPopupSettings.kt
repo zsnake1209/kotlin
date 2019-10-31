@@ -18,6 +18,9 @@ class CoroutinesViewPopupSettings : PersistentStateComponent<CoroutinesViewPopup
     @JvmField
     var showCoroutineCreationStackTrace: Boolean = false
 
+    @JvmField
+    var showIntrinsicFrames: Boolean = false
+
     override fun getState(): CoroutinesViewPopupSettings? = this
 
     override fun loadState(state: CoroutinesViewPopupSettings) {
