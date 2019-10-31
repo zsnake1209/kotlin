@@ -91,6 +91,7 @@ fun createSpacingBuilder(settings: CodeStyleSettings, builderUtil: KotlinSpacing
             inPosition(right = EOL_COMMENT).spacing(commentSpacing(1))
 
             inPosition(left = CLASS, right = CLASS).emptyLinesIfLineBreakInLeft(1)
+            inPosition(left = LABEL_QUALIFIER, right = PROPERTY).spacing(createSpacing(1, 1))
             inPosition(left = CLASS, right = OBJECT_DECLARATION).emptyLinesIfLineBreakInLeft(1)
             inPosition(left = OBJECT_DECLARATION, right = OBJECT_DECLARATION).emptyLinesIfLineBreakInLeft(1)
             inPosition(left = OBJECT_DECLARATION, right = CLASS).emptyLinesIfLineBreakInLeft(1)
