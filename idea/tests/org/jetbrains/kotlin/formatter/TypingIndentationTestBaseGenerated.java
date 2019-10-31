@@ -105,6 +105,26 @@ public class TypingIndentationTestBaseGenerated extends AbstractTypingIndentatio
             runTest("idea/testData/indentationOnNewline/EmptyParameters.after.kt");
         }
 
+        @TestMetadata("ExtensionProperty.after.kt")
+        public void testExtensionProperty() throws Exception {
+            runTest("idea/testData/indentationOnNewline/ExtensionProperty.after.kt");
+        }
+
+        @TestMetadata("ExtensionProperty2.after.kt")
+        public void testExtensionProperty2() throws Exception {
+            runTest("idea/testData/indentationOnNewline/ExtensionProperty2.after.kt");
+        }
+
+        @TestMetadata("ExtensionProperty3.after.kt")
+        public void testExtensionProperty3() throws Exception {
+            runTest("idea/testData/indentationOnNewline/ExtensionProperty3.after.kt");
+        }
+
+        @TestMetadata("ExtensionProperty4.after.kt")
+        public void testExtensionProperty4() throws Exception {
+            runTest("idea/testData/indentationOnNewline/ExtensionProperty4.after.kt");
+        }
+
         @TestMetadata("For.after.kt")
         public void testFor() throws Exception {
             runTest("idea/testData/indentationOnNewline/For.after.kt");
@@ -253,6 +273,11 @@ public class TypingIndentationTestBaseGenerated extends AbstractTypingIndentatio
         @TestMetadata("NotFirstParameter.after.kt")
         public void testNotFirstParameter() throws Exception {
             runTest("idea/testData/indentationOnNewline/NotFirstParameter.after.kt");
+        }
+
+        @TestMetadata("Property.after.kt")
+        public void testProperty() throws Exception {
+            runTest("idea/testData/indentationOnNewline/Property.after.kt");
         }
 
         @TestMetadata("PropertyWithInference.after.kt")
