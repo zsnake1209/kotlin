@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.resolve.descriptorUtil.isPublishedApi
 
 class JsIrLinker(
@@ -28,31 +29,24 @@ class JsIrLinker(
     override val descriptorReferenceDeserializer =
         JsDescriptorReferenceDeserializer(currentModule, mangler, builtIns)
 
-    override fun reader(moduleDescriptor: ModuleDescriptor, fileIndex: Int, uniqId: UniqId) =
-        moduleDescriptor.kotlinLibrary.irDeclaration(uniqId.index, fileIndex)
+    override fun reader(klib: KotlinLibrary, fileIndex: Int, uniqId: UniqId) = klib.irDeclaration(uniqId.index, fileIndex)
 
-    override fun readSymbol(moduleDescriptor: ModuleDescriptor, fileIndex: Int, symbolIndex: Int) =
-        moduleDescriptor.kotlinLibrary.symbol(symbolIndex, fileIndex)
+    override fun readSymbol(klib: KotlinLibrary, fileIndex: Int, symbolIndex: Int) = klib.symbol(symbolIndex, fileIndex)
 
-    override fun readType(moduleDescriptor: ModuleDescriptor, fileIndex: Int, typeIndex: Int) =
-        moduleDescriptor.kotlinLibrary.type(typeIndex, fileIndex)
+    override fun readType(klib: KotlinLibrary, fileIndex: Int, typeIndex: Int) = klib.type(typeIndex, fileIndex)
 
-    override fun readString(moduleDescriptor: ModuleDescriptor, fileIndex: Int, stringIndex: Int) =
-        moduleDescriptor.kotlinLibrary.string(stringIndex, fileIndex)
+    override fun readString(klib: KotlinLibrary, fileIndex: Int, stringIndex: Int) = klib.string(stringIndex, fileIndex)
 
-    override fun readBody(moduleDescriptor: ModuleDescriptor, fileIndex: Int, bodyIndex: Int) =
-        moduleDescriptor.kotlinLibrary.body(bodyIndex, fileIndex)
+    override fun readBody(klib: KotlinLibrary, fileIndex: Int, bodyIndex: Int) = klib.body(bodyIndex, fileIndex)
 
-    override fun readFile(moduleDescriptor: ModuleDescriptor, fileIndex: Int) =
-        moduleDescriptor.kotlinLibrary.file(fileIndex)
+    override fun readFile(klib: KotlinLibrary, fileIndex: Int) = klib.file(fileIndex)
 
-    override fun readFileCount(moduleDescriptor: ModuleDescriptor) =
-        moduleDescriptor.kotlinLibrary.fileCount()
+    override fun readFileCount(klib: KotlinLibrary) = klib.fileCount()
 
     override fun checkAccessibility(declarationDescriptor: DeclarationDescriptor): Boolean {
         require(declarationDescriptor is DeclarationDescriptorWithVisibility)
         return declarationDescriptor.isPublishedApi() || declarationDescriptor.visibility.let { it.isPublicAPI || it == Visibilities.INTERNAL }
     }
 
-    private val ModuleDescriptor.userName get() = kotlinLibrary.libraryFile.absolutePath
+    override fun descriptorToKotlinLibrary(moduleDescriptor: ModuleDescriptor) = moduleDescriptor.kotlinLibrary
 }

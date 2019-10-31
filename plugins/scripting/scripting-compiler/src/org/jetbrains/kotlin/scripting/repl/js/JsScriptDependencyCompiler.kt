@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
+import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.generateJsCode
 import org.jetbrains.kotlin.ir.backend.js.emptyLoggingContext
@@ -49,7 +50,7 @@ class JsScriptDependencyCompiler(
         val jsLinker = JsIrLinker(moduleDescriptor, JsMangler, emptyLoggingContext, irBuiltIns, symbolTable)
 
         val moduleFragment = IrModuleFragmentImpl(moduleDescriptor, irBuiltIns)
-        val irDependencies = dependencies.map { jsLinker.deserializeFullModule(it) }
+        val irDependencies = dependencies.map { jsLinker.deserializeFullModule(it, it.kotlinLibrary) }
 
         ExternalDependenciesGenerator(
             moduleDescriptor = moduleDescriptor,

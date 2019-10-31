@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.ir.types.impl.IrErrorTypeImpl
 import org.jetbrains.kotlin.ir.util.IrDeserializer
 import org.jetbrains.kotlin.ir.util.NaiveSourceBasedFileEntryImpl
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.protobuf.ExtensionRegistryLite.newInstance
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor
@@ -124,6 +125,7 @@ abstract class KotlinIrLinker(
 
     inner class IrModuleDeserializer(
         private val moduleDescriptor: ModuleDescriptor,
+        private val kotlinLibrary: KotlinLibrary,
         private val deserializationStrategy: DeserializationStrategy
     ) {
 
@@ -162,32 +164,32 @@ abstract class KotlinIrLinker(
             }
 
             private fun loadTopLevelDeclarationProto(uniqId: UniqId): ProtoDeclaration {
-                val stream = reader(moduleDescriptor, fileIndex, uniqId).codedInputStream
+                val stream = reader(kotlinLibrary, fileIndex, uniqId).codedInputStream
                 return ProtoDeclaration.parseFrom(stream, newInstance())
             }
 
             private fun loadSymbolProto(index: Int): ProtoSymbolData {
-                val stream = readSymbol(moduleDescriptor, fileIndex, index).codedInputStream
+                val stream = readSymbol(kotlinLibrary, fileIndex, index).codedInputStream
                 return ProtoSymbolData.parseFrom(stream, newInstance())
             }
 
             private fun loadTypeProto(index: Int): ProtoType {
-                val stream = readType(moduleDescriptor, fileIndex, index).codedInputStream
+                val stream = readType(kotlinLibrary, fileIndex, index).codedInputStream
                 return ProtoType.parseFrom(stream, newInstance())
             }
 
             private fun loadStatementBodyProto(index: Int): ProtoStatement {
-                val stream = readBody(moduleDescriptor, fileIndex, index).codedInputStream
+                val stream = readBody(kotlinLibrary, fileIndex, index).codedInputStream
                 return ProtoStatement.parseFrom(stream, newInstance())
             }
 
             private fun loadExpressionBodyProto(index: Int): ProtoExpression {
-                val stream = readBody(moduleDescriptor, fileIndex, index).codedInputStream
+                val stream = readBody(kotlinLibrary, fileIndex, index).codedInputStream
                 return ProtoExpression.parseFrom(stream, newInstance())
             }
 
             private fun loadStringProto(index: Int): String {
-                return String(readString(moduleDescriptor, fileIndex, index))
+                return String(readString(kotlinLibrary, fileIndex, index))
             }
 
             private fun referenceDeserializedSymbol(
@@ -443,12 +445,12 @@ abstract class KotlinIrLinker(
         }
 
         private fun deserializeIrModuleHeader(): IrModuleFragment {
-            val fileCount = readFileCount(moduleDescriptor)
+            val fileCount = readFileCount(kotlinLibrary)
 
             val files = mutableListOf<IrFile>()
 
             for (i in 0 until fileCount) {
-                files.add(deserializeIrFile(ProtoFile.parseFrom(readFile(moduleDescriptor, i), newInstance()), i))
+                files.add(deserializeIrFile(ProtoFile.parseFrom(readFile(kotlinLibrary, i), newInstance()), i))
             }
 
             return IrModuleFragmentImpl(moduleDescriptor, builtIns, files)
@@ -493,15 +495,18 @@ abstract class KotlinIrLinker(
             return codedInputStream
         }
 
-    protected abstract fun reader(moduleDescriptor: ModuleDescriptor, fileIndex: Int, uniqId: UniqId): ByteArray
-    protected abstract fun readSymbol(moduleDescriptor: ModuleDescriptor, fileIndex: Int, symbolIndex: Int): ByteArray
-    protected abstract fun readType(moduleDescriptor: ModuleDescriptor, fileIndex: Int, typeIndex: Int): ByteArray
-    protected abstract fun readString(moduleDescriptor: ModuleDescriptor, fileIndex: Int, stringIndex: Int): ByteArray
-    protected abstract fun readBody(moduleDescriptor: ModuleDescriptor, fileIndex: Int, bodyIndex: Int): ByteArray
-    protected abstract fun readFile(moduleDescriptor: ModuleDescriptor, fileIndex: Int): ByteArray
-    protected abstract fun readFileCount(moduleDescriptor: ModuleDescriptor): Int
+    protected abstract fun reader(klib: KotlinLibrary, fileIndex: Int, uniqId: UniqId): ByteArray
+    protected abstract fun readSymbol(klib: KotlinLibrary, fileIndex: Int, symbolIndex: Int): ByteArray
+    protected abstract fun readType(klib: KotlinLibrary, fileIndex: Int, typeIndex: Int): ByteArray
+    protected abstract fun readString(klib: KotlinLibrary, fileIndex: Int, stringIndex: Int): ByteArray
+    protected abstract fun readBody(klib: KotlinLibrary, fileIndex: Int, bodyIndex: Int): ByteArray
+    protected abstract fun readFile(klib: KotlinLibrary, fileIndex: Int): ByteArray
+    protected abstract fun readFileCount(klib: KotlinLibrary): Int
 
     protected abstract fun checkAccessibility(declarationDescriptor: DeclarationDescriptor): Boolean
+
+    protected abstract fun descriptorToKotlinLibrary(moduleDescriptor: ModuleDescriptor): KotlinLibrary
+
     protected open fun handleNoModuleDeserializerFound(key: UniqId): DeserializationState<*> {
         error("Deserializer for declaration $key is not found")
     }
@@ -593,16 +598,17 @@ abstract class KotlinIrLinker(
 
     fun deserializeIrModuleHeader(
         moduleDescriptor: ModuleDescriptor,
+        kotlinLibrary: KotlinLibrary,
         deserializationStrategy: DeserializationStrategy = DeserializationStrategy.ONLY_REFERENCED
     ): IrModuleFragment {
         val deserializerForModule = deserializersForModules.getOrPut(moduleDescriptor) {
-            IrModuleDeserializer(moduleDescriptor, deserializationStrategy)
+            IrModuleDeserializer(moduleDescriptor, kotlinLibrary, deserializationStrategy)
         }
         // The IrModule and its IrFiles have been created during module initialization.
         return deserializerForModule.module
     }
 
-    fun deserializeIrModuleHeader(moduleDescriptor: ModuleDescriptor): IrModuleFragment? {
+    fun deserializeIrModuleHeader(moduleDescriptor: ModuleDescriptor, klib: KotlinLibrary): IrModuleFragment? {
         // TODO: consider skip deserializing explicitly exported declarations for libraries.
         // Now it's not valid because of all dependencies that must be computed.
         val deserializationStrategy =
@@ -611,14 +617,14 @@ abstract class KotlinIrLinker(
             } else {
                 DeserializationStrategy.EXPLICITLY_EXPORTED
             }
-        return deserializeIrModuleHeader(moduleDescriptor, deserializationStrategy)
+        return deserializeIrModuleHeader(moduleDescriptor, klib, deserializationStrategy)
     }
 
-    fun deserializeFullModule(moduleDescriptor: ModuleDescriptor): IrModuleFragment =
-        deserializeIrModuleHeader(moduleDescriptor, DeserializationStrategy.ALL)
+    fun deserializeFullModule(moduleDescriptor: ModuleDescriptor, klib: KotlinLibrary): IrModuleFragment =
+        deserializeIrModuleHeader(moduleDescriptor, klib, DeserializationStrategy.ALL)
 
-    fun deserializeOnlyHeaderModule(moduleDescriptor: ModuleDescriptor): IrModuleFragment =
-        deserializeIrModuleHeader(moduleDescriptor, DeserializationStrategy.ONLY_DECLARATION_HEADERS)
+    fun deserializeOnlyHeaderModule(moduleDescriptor: ModuleDescriptor, klib: KotlinLibrary): IrModuleFragment =
+        deserializeIrModuleHeader(moduleDescriptor, klib, DeserializationStrategy.ONLY_DECLARATION_HEADERS)
 }
 
 enum class DeserializationStrategy(val needBodies: Boolean, val explicitlyExported: Boolean, val theWholeWorld: Boolean) {

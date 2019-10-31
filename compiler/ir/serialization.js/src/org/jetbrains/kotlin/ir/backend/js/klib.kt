@@ -39,7 +39,6 @@ import org.jetbrains.kotlin.library.impl.buildKoltinLibrary
 import org.jetbrains.kotlin.library.impl.createKotlinLibrary
 import org.jetbrains.kotlin.library.resolver.KotlinLibraryResolveResult
 import org.jetbrains.kotlin.library.resolver.TopologicalLibraryOrder
-import org.jetbrains.kotlin.library.resolver.impl.libraryResolver
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
 import org.jetbrains.kotlin.psi.KtFile
@@ -50,7 +49,6 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingContextUtils
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.StorageManager
-import org.jetbrains.kotlin.util.Logger
 import org.jetbrains.kotlin.utils.DFS
 import java.io.File
 import org.jetbrains.kotlin.konan.file.File as KFile
@@ -176,7 +174,7 @@ fun loadIr(
     val deserializer = JsIrLinker(moduleDescriptor, JsMangler, emptyLoggingContext, irBuiltIns, symbolTable)
 
     val deserializedModuleFragments = sortDependencies(allDependencies.getFullList(), depsDescriptors.descriptors).map {
-        deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!
+        deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it), it)!!
     }
 
     val moduleFragment = psi2IrContext.generateModuleFragment(files, deserializer)
