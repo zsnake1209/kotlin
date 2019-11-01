@@ -62,7 +62,7 @@ class NewMultiplatformIT : BaseGradleIT() {
 
     override fun defaultBuildOptions(): BuildOptions {
         return super.defaultBuildOptions().copy(
-            freeCommandLineArgs = listOf("-Porg.gradle.jvmargs=-Xmx1024m")
+            freeCommandLineArgs = listOf("-Porg.gradle.jvmargs=-XX:MaxMetaspaceSize=512m")
         )
     }
 
