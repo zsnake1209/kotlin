@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.descriptors.*
 import org.jetbrains.kotlin.backend.common.ir.copyParameterDeclarationsFrom
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
+import org.jetbrains.kotlin.backend.common.ir.isExpect
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
@@ -210,7 +211,7 @@ class ExternalReferenceCollection(
             IrClassImpl(
                 startOffset, endOffset, origin,
                 IrClassSymbolImpl(descriptor),
-                name, kind, visibility, modality, isCompanion, isInner, isData, isExternal, isInline
+                name, kind, visibility, modality, isCompanion, isInner, isData, isExternal, isInline, isExpect
             ).apply {
                 descriptor.bind(this)
                 parent = newParent
@@ -223,7 +224,7 @@ class ExternalReferenceCollection(
             IrConstructorImpl(
                 startOffset, endOffset, origin,
                 IrConstructorSymbolImpl(descriptor),
-                name, visibility, returnType, isInline, isExternal, isPrimary
+                name, visibility, returnType, isInline, isExternal, isPrimary, isExpect
             ).apply {
                 descriptor.bind(this)
                 parent = newParent
@@ -235,7 +236,7 @@ class ExternalReferenceCollection(
             IrFunctionImpl(
                 startOffset, endOffset, origin,
                 IrSimpleFunctionSymbolImpl(descriptor),
-                name, visibility, modality, returnType, isInline, isExternal, isTailrec, isSuspend
+                name, visibility, modality, returnType, isInline, isExternal, isTailrec, isSuspend, isExpect, isFakeOverride
             ).apply {
                 descriptor.bind(this)
                 parent = newParent
@@ -262,7 +263,7 @@ class ExternalReferenceCollection(
             IrFieldImpl(
                 startOffset, endOffset, origin,
                 IrFieldSymbolImpl(descriptor),
-                name, type, visibility, isFinal, isExternal, isStatic
+                name, type, visibility, isFinal, isExternal, isStatic, isExpect
             ).apply {
                 descriptor.bind(this)
                 parent = newParent

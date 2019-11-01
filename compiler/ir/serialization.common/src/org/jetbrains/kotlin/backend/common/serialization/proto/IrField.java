@@ -114,6 +114,27 @@ public final class IrField extends
             isFakeOverride_ = input.readBool();
             break;
           }
+          case 80: {
+            if (!((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
+              overridden_ = new java.util.ArrayList<java.lang.Integer>();
+              mutable_bitField0_ |= 0x00000200;
+            }
+            overridden_.add(input.readInt32());
+            break;
+          }
+          case 82: {
+            int length = input.readRawVarint32();
+            int limit = input.pushLimit(length);
+            if (!((mutable_bitField0_ & 0x00000200) == 0x00000200) && input.getBytesUntilLimit() > 0) {
+              overridden_ = new java.util.ArrayList<java.lang.Integer>();
+              mutable_bitField0_ |= 0x00000200;
+            }
+            while (input.getBytesUntilLimit() > 0) {
+              overridden_.add(input.readInt32());
+            }
+            input.popLimit(limit);
+            break;
+          }
         }
       }
     } catch (org.jetbrains.kotlin.protobuf.InvalidProtocolBufferException e) {
@@ -122,6 +143,9 @@ public final class IrField extends
       throw new org.jetbrains.kotlin.protobuf.InvalidProtocolBufferException(
           e.getMessage()).setUnfinishedMessage(this);
     } finally {
+      if (((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
+        overridden_ = java.util.Collections.unmodifiableList(overridden_);
+      }
       try {
         unknownFieldsCodedOutput.flush();
       } catch (java.io.IOException e) {
@@ -283,6 +307,28 @@ public final class IrField extends
     return isFakeOverride_;
   }
 
+  public static final int OVERRIDDEN_FIELD_NUMBER = 10;
+  private java.util.List<java.lang.Integer> overridden_;
+  /**
+   * <code>repeated int32 overridden = 10;</code>
+   */
+  public java.util.List<java.lang.Integer>
+      getOverriddenList() {
+    return overridden_;
+  }
+  /**
+   * <code>repeated int32 overridden = 10;</code>
+   */
+  public int getOverriddenCount() {
+    return overridden_.size();
+  }
+  /**
+   * <code>repeated int32 overridden = 10;</code>
+   */
+  public int getOverridden(int index) {
+    return overridden_.get(index);
+  }
+
   private void initFields() {
     base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
     initializer_ = 0;
@@ -293,6 +339,7 @@ public final class IrField extends
     isStatic_ = false;
     type_ = 0;
     isFakeOverride_ = false;
+    overridden_ = java.util.Collections.emptyList();
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -374,6 +421,9 @@ public final class IrField extends
     if (((bitField0_ & 0x00000100) == 0x00000100)) {
       output.writeBool(9, isFakeOverride_);
     }
+    for (int i = 0; i < overridden_.size(); i++) {
+      output.writeInt32(10, overridden_.get(i));
+    }
     output.writeRawBytes(unknownFields);
   }
 
@@ -418,6 +468,15 @@ public final class IrField extends
     if (((bitField0_ & 0x00000100) == 0x00000100)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeBoolSize(9, isFakeOverride_);
+    }
+    {
+      int dataSize = 0;
+      for (int i = 0; i < overridden_.size(); i++) {
+        dataSize += org.jetbrains.kotlin.protobuf.CodedOutputStream
+          .computeInt32SizeNoTag(overridden_.get(i));
+      }
+      size += dataSize;
+      size += 1 * getOverriddenList().size();
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -531,6 +590,8 @@ public final class IrField extends
       bitField0_ = (bitField0_ & ~0x00000080);
       isFakeOverride_ = false;
       bitField0_ = (bitField0_ & ~0x00000100);
+      overridden_ = java.util.Collections.emptyList();
+      bitField0_ = (bitField0_ & ~0x00000200);
       return this;
     }
 
@@ -590,6 +651,11 @@ public final class IrField extends
         to_bitField0_ |= 0x00000100;
       }
       result.isFakeOverride_ = isFakeOverride_;
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        overridden_ = java.util.Collections.unmodifiableList(overridden_);
+        bitField0_ = (bitField0_ & ~0x00000200);
+      }
+      result.overridden_ = overridden_;
       result.bitField0_ = to_bitField0_;
       return result;
     }
@@ -622,6 +688,16 @@ public final class IrField extends
       }
       if (other.hasIsFakeOverride()) {
         setIsFakeOverride(other.getIsFakeOverride());
+      }
+      if (!other.overridden_.isEmpty()) {
+        if (overridden_.isEmpty()) {
+          overridden_ = other.overridden_;
+          bitField0_ = (bitField0_ & ~0x00000200);
+        } else {
+          ensureOverriddenIsMutable();
+          overridden_.addAll(other.overridden_);
+        }
+        
       }
       setUnknownFields(
           getUnknownFields().concat(other.unknownFields));
@@ -1031,6 +1107,72 @@ public final class IrField extends
     public Builder clearIsFakeOverride() {
       bitField0_ = (bitField0_ & ~0x00000100);
       isFakeOverride_ = false;
+      
+      return this;
+    }
+
+    private java.util.List<java.lang.Integer> overridden_ = java.util.Collections.emptyList();
+    private void ensureOverriddenIsMutable() {
+      if (!((bitField0_ & 0x00000200) == 0x00000200)) {
+        overridden_ = new java.util.ArrayList<java.lang.Integer>(overridden_);
+        bitField0_ |= 0x00000200;
+       }
+    }
+    /**
+     * <code>repeated int32 overridden = 10;</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getOverriddenList() {
+      return java.util.Collections.unmodifiableList(overridden_);
+    }
+    /**
+     * <code>repeated int32 overridden = 10;</code>
+     */
+    public int getOverriddenCount() {
+      return overridden_.size();
+    }
+    /**
+     * <code>repeated int32 overridden = 10;</code>
+     */
+    public int getOverridden(int index) {
+      return overridden_.get(index);
+    }
+    /**
+     * <code>repeated int32 overridden = 10;</code>
+     */
+    public Builder setOverridden(
+        int index, int value) {
+      ensureOverriddenIsMutable();
+      overridden_.set(index, value);
+      
+      return this;
+    }
+    /**
+     * <code>repeated int32 overridden = 10;</code>
+     */
+    public Builder addOverridden(int value) {
+      ensureOverriddenIsMutable();
+      overridden_.add(value);
+      
+      return this;
+    }
+    /**
+     * <code>repeated int32 overridden = 10;</code>
+     */
+    public Builder addAllOverridden(
+        java.lang.Iterable<? extends java.lang.Integer> values) {
+      ensureOverriddenIsMutable();
+      org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
+          values, overridden_);
+      
+      return this;
+    }
+    /**
+     * <code>repeated int32 overridden = 10;</code>
+     */
+    public Builder clearOverridden() {
+      overridden_ = java.util.Collections.emptyList();
+      bitField0_ = (bitField0_ & ~0x00000200);
       
       return this;
     }

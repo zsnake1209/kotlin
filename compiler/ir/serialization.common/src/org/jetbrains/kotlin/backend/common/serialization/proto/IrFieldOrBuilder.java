@@ -87,4 +87,17 @@ public interface IrFieldOrBuilder extends
    * <code>required bool is_fake_override = 9;</code>
    */
   boolean getIsFakeOverride();
+
+  /**
+   * <code>repeated int32 overridden = 10;</code>
+   */
+  java.util.List<java.lang.Integer> getOverriddenList();
+  /**
+   * <code>repeated int32 overridden = 10;</code>
+   */
+  int getOverriddenCount();
+  /**
+   * <code>repeated int32 overridden = 10;</code>
+   */
+  int getOverridden(int index);
 }

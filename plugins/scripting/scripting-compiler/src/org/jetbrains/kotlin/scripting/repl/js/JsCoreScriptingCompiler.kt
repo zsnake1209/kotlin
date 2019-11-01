@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.ir.backend.js.generateModuleFragment
 import org.jetbrains.kotlin.ir.backend.js.utils.NameTables
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.generateTypicalIrProviderList
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
 import org.jetbrains.kotlin.scripting.compiler.plugin.repl.ReplCodeAnalyzer
@@ -74,9 +75,12 @@ class JsCoreScriptingCompiler(
         )
 
         ExternalDependenciesGenerator(
-            irModuleFragment.descriptor,
             psi2irContext.symbolTable,
-            psi2irContext.irBuiltIns
+            generateTypicalIrProviderList(
+                irModuleFragment.descriptor,
+                psi2irContext.irBuiltIns,
+                psi2irContext.symbolTable
+            )
         ).generateUnboundSymbolsAsDependencies()
 
         environment.configuration.put(JSConfigurationKeys.MODULE_KIND, ModuleKind.PLAIN)
