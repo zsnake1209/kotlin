@@ -57,7 +57,7 @@ suspend fun <R> KCallable<R>.callSuspend(vararg args: Any?): R {
     // see comment above replaceReturnsUnitMarkersWithPushingUnitOnStack for explanation.
     // In this case, return Unit manually.
     @Suppress("UNCHECKED_CAST")
-    if (returnType == Unit::class.createType()) return (Unit as R)
+    if (returnType.classifier == Unit::class && !returnType.isMarkedNullable) return (Unit as R)
     return result
 }
 
@@ -75,6 +75,6 @@ suspend fun <R> KCallable<R>.callSuspendBy(args: Map<KParameter, Any?>): R {
     // see comment above replaceReturnsUnitMarkersWithPushingUnitOnStack for explanation.
     // In this case, return Unit manually.
     @Suppress("UNCHECKED_CAST")
-    if (returnType == Unit::class.createType()) return (Unit as R)
+    if (returnType.classifier == Unit::class && !returnType.isMarkedNullable) return (Unit as R)
     return result
 }
