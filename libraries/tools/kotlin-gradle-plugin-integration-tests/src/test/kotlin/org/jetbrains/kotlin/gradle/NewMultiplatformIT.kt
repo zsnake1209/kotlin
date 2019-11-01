@@ -60,6 +60,12 @@ class NewMultiplatformIT : BaseGradleIT() {
     val supportedNativeTargets = configure().supported
     val unsupportedNativeTargets = configure().unsupported
 
+    override fun defaultBuildOptions(): BuildOptions {
+        return super.defaultBuildOptions().copy(
+            freeCommandLineArgs = listOf("-Porg.gradle.jvmargs=-Xmx1024m")
+        )
+    }
+
     private fun Project.targetClassesDir(targetName: String, sourceSetName: String = "main") =
         classesDir(sourceSet = "$targetName/$sourceSetName")
 
