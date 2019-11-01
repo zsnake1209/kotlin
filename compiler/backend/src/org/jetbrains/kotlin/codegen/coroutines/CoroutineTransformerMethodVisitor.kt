@@ -250,7 +250,7 @@ class CoroutineTransformerMethodVisitor(
      *   1. `unit` is not a tail-call function.
      *   2. `unit` is a tail-call function.
      *
-     * When `unit` is a tail-call function, calling `resumeWith` on its continuation will resume `unit`,
+     * When `unit` is a not tail-call function, calling `resumeWith` on its continuation will resume `unit`,
      * it will hit { GETSTATIC Unit; ARETURN } and this Unit will be the result of the suspend call. `unit`'s continuation will then call
      * `main` continuation's `resumeWith`, passing the Unit instance. The continuation in turn will resume `main` and the Unit will be
      * the result of `unit()` call. This result will then printed.
