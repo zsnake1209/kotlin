@@ -549,11 +549,9 @@ class AnonymousObjectTransformer(
                             alreadyAdded.put(key, recapturedParamInfo)
                         }
                     }
-                }
-            }
 
-            for (info in capturedLambdas) {
-                capturedLambdasToInline[info.lambdaClassType.internalName] = info
+                    capturedLambdasToInline[info.lambdaClassType.internalName] = info
+                }
             }
         }
 
