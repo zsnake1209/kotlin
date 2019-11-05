@@ -496,57 +496,61 @@ class AnonymousObjectTransformer(
         //TODO: some of such parameters could be skipped - we should perform additional analysis
         val capturedLambdasToInline = HashMap<String, LambdaInfo>() //captured var of inlined parameter
         val allRecapturedParameters = ArrayList<CapturedParamDesc>()
-        val addCapturedNotAddOuter =
-            parentFieldRemapper.isRoot || parentFieldRemapper is InlinedLambdaRemapper && parentFieldRemapper.parent!!.isRoot
-        val alreadyAdded = HashMap<String, CapturedParamInfo>()
-        for (info in capturedLambdas) {
-            if (addCapturedNotAddOuter) {
-                for (desc in info.capturedVars) {
-                    val key = desc.fieldName + "$$$" + desc.type.className
-                    val alreadyAddedParam = alreadyAdded[key]
+        if (capturedLambdas.isNotEmpty()) {
+            val addCapturedNotAddOuter =
+                parentFieldRemapper.isRoot || parentFieldRemapper is InlinedLambdaRemapper && parentFieldRemapper.parent!!.isRoot
+            val alreadyAdded = HashMap<String, CapturedParamInfo>()
+            for (info in capturedLambdas) {
+                if (addCapturedNotAddOuter) {
+                    for (desc in info.capturedVars) {
+                        val key = desc.fieldName + "$$$" + desc.type.className
+                        val alreadyAddedParam = alreadyAdded[key]
 
-                    val recapturedParamInfo = capturedParamBuilder.addCapturedParam(
-                        desc,
-                        alreadyAddedParam?.newFieldName ?: getNewFieldName(desc.fieldName, false),
-                        alreadyAddedParam != null
-                    )
-                    if (info is PsiExpressionLambda && info.closure.captureVariables.any { it.value.fieldName == desc.fieldName }) {
-                        recapturedParamInfo.functionalArgument = NonInlineableArgumentForInlineableParameterCalledInSuspend(
-                            isCapturedSuspendLambda(info.closure, desc.fieldName, inliningContext.state.bindingContext)
+                        val recapturedParamInfo = capturedParamBuilder.addCapturedParam(
+                            desc,
+                            alreadyAddedParam?.newFieldName ?: getNewFieldName(desc.fieldName, false),
+                            alreadyAddedParam != null
                         )
-                    }
-                    val composed = StackValue.field(
-                        desc.type,
-                        oldObjectType, /*TODO owner type*/
-                        recapturedParamInfo.newFieldName,
-                        false,
-                        StackValue.LOCAL_0
-                    )
-                    recapturedParamInfo.remapValue = composed
-                    allRecapturedParameters.add(desc)
+                        if (info is PsiExpressionLambda && info.closure.captureVariables.any { it.value.fieldName == desc.fieldName }) {
+                            recapturedParamInfo.functionalArgument = NonInlineableArgumentForInlineableParameterCalledInSuspend(
+                                isCapturedSuspendLambda(info.closure, desc.fieldName, inliningContext.state.bindingContext)
+                            )
+                        }
+                        val composed = StackValue.field(
+                            desc.type,
+                            oldObjectType, /*TODO owner type*/
+                            recapturedParamInfo.newFieldName,
+                            false,
+                            StackValue.LOCAL_0
+                        )
+                        recapturedParamInfo.remapValue = composed
+                        allRecapturedParameters.add(desc)
 
-                    constructorParamBuilder.addCapturedParam(recapturedParamInfo, recapturedParamInfo.newFieldName).remapValue = composed
+                        constructorParamBuilder.addCapturedParam(recapturedParamInfo, recapturedParamInfo.newFieldName).remapValue =
+                            composed
 
-                    if (isThis0(desc.fieldName)) {
-                        alreadyAdded.put(key, recapturedParamInfo)
+                        if (isThis0(desc.fieldName)) {
+                            alreadyAdded.put(key, recapturedParamInfo)
+                        }
                     }
                 }
+                capturedLambdasToInline.put(info.lambdaClassType.internalName, info)
             }
-            capturedLambdasToInline.put(info.lambdaClassType.internalName, info)
-        }
 
-        if (parentFieldRemapper is InlinedLambdaRemapper && !capturedLambdas.isEmpty() && !addCapturedNotAddOuter) {
-            //lambda with non InlinedLambdaRemapper already have outer
-            val parent = parentFieldRemapper.parent as? RegeneratedLambdaFieldRemapper
-                ?: throw AssertionError("Expecting RegeneratedLambdaFieldRemapper, but ${parentFieldRemapper.parent}")
-            val ownerType = Type.getObjectType(parent.originalLambdaInternalName)
-            val desc = CapturedParamDesc(ownerType, AsmUtil.THIS, ownerType)
-            val recapturedParamInfo = capturedParamBuilder.addCapturedParam(desc, AsmUtil.CAPTURED_THIS_FIELD/*outer lambda/object*/, false)
-            val composed = StackValue.LOCAL_0
-            recapturedParamInfo.remapValue = composed
-            allRecapturedParameters.add(desc)
+            if (parentFieldRemapper is InlinedLambdaRemapper && !addCapturedNotAddOuter) {
+                //lambda with non InlinedLambdaRemapper already have outer
+                val parent = parentFieldRemapper.parent as? RegeneratedLambdaFieldRemapper
+                    ?: throw AssertionError("Expecting RegeneratedLambdaFieldRemapper, but ${parentFieldRemapper.parent}")
+                val ownerType = Type.getObjectType(parent.originalLambdaInternalName)
+                val desc = CapturedParamDesc(ownerType, AsmUtil.THIS, ownerType)
+                val recapturedParamInfo =
+                    capturedParamBuilder.addCapturedParam(desc, AsmUtil.CAPTURED_THIS_FIELD/*outer lambda/object*/, false)
+                val composed = StackValue.LOCAL_0
+                recapturedParamInfo.remapValue = composed
+                allRecapturedParameters.add(desc)
 
-            constructorParamBuilder.addCapturedParam(recapturedParamInfo, recapturedParamInfo.newFieldName).remapValue = composed
+                constructorParamBuilder.addCapturedParam(recapturedParamInfo, recapturedParamInfo.newFieldName).remapValue = composed
+            }
         }
 
         transformationInfo.allRecapturedParameters = allRecapturedParameters
