@@ -497,11 +497,27 @@ class AnonymousObjectTransformer(
         val capturedLambdasToInline = HashMap<String, LambdaInfo>() //captured var of inlined parameter
         val allRecapturedParameters = ArrayList<CapturedParamDesc>()
         if (capturedLambdas.isNotEmpty()) {
-            val addCapturedNotAddOuter =
-                parentFieldRemapper.isRoot || parentFieldRemapper is InlinedLambdaRemapper && parentFieldRemapper.parent!!.isRoot
-            val alreadyAdded = HashMap<String, CapturedParamInfo>()
-            for (info in capturedLambdas) {
-                if (addCapturedNotAddOuter) {
+            if (parentFieldRemapper is InlinedLambdaRemapper && !parentFieldRemapper.parent!!.isRoot) {
+                // Add outer to top level anonymous object inside inline lambda inlined into anonymous object in inline function.
+                // All captured parameters would be obtained through it (this.[this$0]+.$capturedField).
+                // (non-top level object inside inline lambda or
+                // inside named inline function (non InlinedLambdaRemapper) already have outer if they capture anything)
+                val parent = parentFieldRemapper.parent as? RegeneratedLambdaFieldRemapper
+                    ?: throw AssertionError("Expecting RegeneratedLambdaFieldRemapper, but ${parentFieldRemapper.parent}")
+                val ownerType = Type.getObjectType(parent.originalLambdaInternalName)
+                val desc = CapturedParamDesc(ownerType, AsmUtil.THIS, ownerType)
+                val recapturedParamInfo =
+                    capturedParamBuilder.addCapturedParam(desc, AsmUtil.CAPTURED_THIS_FIELD/*outer lambda/object*/, false)
+                val composed = StackValue.LOCAL_0
+                recapturedParamInfo.remapValue = composed
+                allRecapturedParameters.add(desc)
+
+                constructorParamBuilder.addCapturedParam(recapturedParamInfo, recapturedParamInfo.newFieldName).remapValue = composed
+            } else if (parentFieldRemapper.isRoot || parentFieldRemapper is InlinedLambdaRemapper) {
+                // Pass all captured by inline lambda parameters to top level anonymous object inside inline function or
+                // inside inline lambda if it's inlined directly in inline function without any additional objects
+                val alreadyAdded = HashMap<String, CapturedParamInfo>()
+                for (info in capturedLambdas) {
                     for (desc in info.capturedVars) {
                         val key = desc.fieldName + "$$$" + desc.type.className
                         val alreadyAddedParam = alreadyAdded[key]
@@ -534,22 +550,10 @@ class AnonymousObjectTransformer(
                         }
                     }
                 }
-                capturedLambdasToInline.put(info.lambdaClassType.internalName, info)
             }
 
-            if (parentFieldRemapper is InlinedLambdaRemapper && !addCapturedNotAddOuter) {
-                //lambda with non InlinedLambdaRemapper already have outer
-                val parent = parentFieldRemapper.parent as? RegeneratedLambdaFieldRemapper
-                    ?: throw AssertionError("Expecting RegeneratedLambdaFieldRemapper, but ${parentFieldRemapper.parent}")
-                val ownerType = Type.getObjectType(parent.originalLambdaInternalName)
-                val desc = CapturedParamDesc(ownerType, AsmUtil.THIS, ownerType)
-                val recapturedParamInfo =
-                    capturedParamBuilder.addCapturedParam(desc, AsmUtil.CAPTURED_THIS_FIELD/*outer lambda/object*/, false)
-                val composed = StackValue.LOCAL_0
-                recapturedParamInfo.remapValue = composed
-                allRecapturedParameters.add(desc)
-
-                constructorParamBuilder.addCapturedParam(recapturedParamInfo, recapturedParamInfo.newFieldName).remapValue = composed
+            for (info in capturedLambdas) {
+                capturedLambdasToInline[info.lambdaClassType.internalName] = info
             }
         }
 

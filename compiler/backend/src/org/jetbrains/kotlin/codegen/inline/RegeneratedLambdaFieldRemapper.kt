@@ -27,10 +27,10 @@ class RegeneratedLambdaFieldRemapper(
     originalLambdaInternalName: String,
     override val newLambdaInternalName: String,
     parameters: Parameters,
-    val recapturedLambdas: Map<String, LambdaInfo>,
-    remapper: FieldRemapper,
+    private val recapturedLambdas: Map<String, LambdaInfo>,
+    parent: FieldRemapper,
     private val isConstructor: Boolean
-) : FieldRemapper(originalLambdaInternalName, remapper, parameters) {
+) : FieldRemapper(originalLambdaInternalName, parent, parameters) {
 
     public override fun canProcess(fieldOwner: String, fieldName: String, isFolding: Boolean) =
         super.canProcess(fieldOwner, fieldName, isFolding) || isRecapturedLambdaType(fieldOwner, isFolding)
