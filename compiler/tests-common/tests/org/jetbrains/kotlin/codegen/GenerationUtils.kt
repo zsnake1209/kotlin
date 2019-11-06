@@ -69,6 +69,7 @@ object GenerationUtils {
             JvmResolveUtil.analyzeAndCheckForErrors(files.first().project, files, configuration, packagePartProvider, trace)
         analysisResult.throwIfError()
 
+        /* Currently Kapt3 only works with the old JVM backend, so disable IR for everything except actual bytecode generation. */
         val isIrBackend = classBuilderFactory.classBuilderMode == ClassBuilderMode.FULL && configuration.getBoolean(JVMConfigurationKeys.IR)
         val state = GenerationState.Builder(
             files.first().project, classBuilderFactory, analysisResult.moduleDescriptor, analysisResult.bindingContext,
