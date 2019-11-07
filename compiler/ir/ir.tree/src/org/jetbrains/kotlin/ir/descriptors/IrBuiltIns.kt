@@ -432,7 +432,7 @@ class IrBuiltIns(
     val dataClassArrayMemberHashCode = dataClassArrayMemberHashCodeSymbol.descriptor
 
     val dataClassArrayMemberToStringSymbol = defineOperator("dataClassArrayMemberToString", stringType, listOf(anyNType))
-//    val dataClassArrayMemberToString = dataClassArrayMemberToStringSymbol.descriptor
+    val dataClassArrayMemberToString = dataClassArrayMemberToStringSymbol.descriptor
 
     companion object {
         val KOTLIN_INTERNAL_IR_FQN = FqName("kotlin.internal.ir")
