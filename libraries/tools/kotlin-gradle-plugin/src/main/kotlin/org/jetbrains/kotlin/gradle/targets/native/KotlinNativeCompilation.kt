@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilationWithResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.targets.native.tasks.DynamicCacheTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.utils.SingleWarningPerBuild
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
@@ -34,6 +35,13 @@ class KotlinNativeCompilation(
 
     override val compileKotlinTask: KotlinNativeCompile
         get() = super.compileKotlinTask as KotlinNativeCompile
+
+    internal val precompileTaskName: String
+        get() = disambiguateName("precompile")
+
+    // TODO: Should we access a task here by name? May be make this property lateinit and assign the value in the [KotlinNativeTargetConfigurator]?
+    internal val precompileTask: DynamicCacheTask
+        get() = project.tasks.getByName(precompileTaskName) as DynamicCacheTask
 
     private val project: Project
         get() = target.project

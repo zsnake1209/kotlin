@@ -25,6 +25,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.plugin.LanguageSettingsBuilder
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.asValidFrameworkName
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import org.jetbrains.kotlin.gradle.targets.native.tasks.CachedKlib
+import org.jetbrains.kotlin.gradle.targets.native.tasks.toPrecompiledName
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import org.jetbrains.kotlin.konan.target.CompilerOutputKind.*
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -496,6 +498,40 @@ open class KotlinNativeLink : AbstractKotlinNativeCompile<KotlinCommonToolOption
     val embedBitcode: Framework.BitcodeEmbeddingMode
         get() = (binary as? Framework)?.embedBitcode ?: Framework.BitcodeEmbeddingMode.DISABLE
 
+    @get:Optional
+    @get:InputFile
+    val mappingFile: File?
+        get() = if (binary.buildType == NativeBuildType.DEBUG)
+            compilation.precompileTask.mappingFile
+        else
+            null
+
+    @InputFiles
+    fun getPrecompiledFiles(): FileCollection = if (binary.buildType == NativeBuildType.DEBUG)
+        project.fileTree(compilation.precompileTask.outputDirectory) {
+            val konanTarget = compilation.konanTarget
+            val suffix = DYNAMIC_CACHE.suffix(konanTarget)
+            it.filter { it.name.endsWith(suffix) }
+        }
+    else
+        project.files()
+
+    private fun getPrecompiledLibraries(): List<CachedKlib> {
+        if (binary.buildType != NativeBuildType.DEBUG) {
+            return emptyList()
+        }
+        val mappingFile = compilation.precompileTask.mappingFile
+        return mappingFile.readLines().map { line ->
+            line.split(';', limit = 2).let {
+                val klib = File(it[0])
+                val cache = File(it[1])
+                assert(klib.isAbsolute)
+                assert(cache.isAbsolute)
+                CachedKlib(klib, cache)
+            }
+        }
+    }
+
     // This property allows a user to force the old behaviour of a link task
     // to workaround issues that may occur after switching to the two-stage linking.
     // If it is specified, the final binary is built directly from sources instead of a klib.
@@ -520,6 +556,16 @@ open class KotlinNativeLink : AbstractKotlinNativeCompile<KotlinCommonToolOption
             add("-Xexport-library=${it.absolutePath}")
         }
         addKey("-Xstatic-framework", isStaticFramework)
+
+        if (binary.buildType == NativeBuildType.DEBUG) {
+            // TODO: Better caching for stdlib and other std libraries.
+            val stdlibCache = "stdlib_cache".toPrecompiledName(compilation.konanTarget)
+            add("-Xcached-library=${project.konanHome}/klib/common/stdlib,${project.konanHome}/$stdlibCache")
+
+            getPrecompiledLibraries().forEach { (klib, cache) ->
+                add("-Xcached-library=${klib.absolutePath},${cache.absolutePath}")
+            }
+        }
 
         // Allow a user to force the old behaviour of a link task.
         // TODO: Remove in 1.3.70.

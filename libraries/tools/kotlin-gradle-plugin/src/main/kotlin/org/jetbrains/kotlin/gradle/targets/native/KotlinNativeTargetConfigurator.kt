@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.TEST_COMPI
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.targets.native.DefaultKotlinNativeTestRun
 import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeBinaryTestRun
+import org.jetbrains.kotlin.gradle.targets.native.tasks.DynamicCacheTask
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
 import org.jetbrains.kotlin.gradle.tasks.*
 import org.jetbrains.kotlin.gradle.testing.internal.configureConventions
@@ -126,6 +127,10 @@ open class KotlinNativeTargetConfigurator<T : KotlinNativeTarget>(
                 tasks.maybeCreate(target.artifactsTaskName).dependsOn(this)
                 tasks.maybeCreate(LifecycleBasePlugin.ASSEMBLE_TASK_NAME).dependsOn(this)
             }
+
+            if (binary.buildType == NativeBuildType.DEBUG) {
+                dependsOn(binary.compilation.precompileTaskName)
+            }
         }
     }
 
@@ -214,10 +219,19 @@ open class KotlinNativeTargetConfigurator<T : KotlinNativeTarget>(
 
     // region Configuration.
     override fun configurePlatformSpecificModel(target: T) {
+        configureDependencyPrecompilation(target)
         configureBinaries(target)
         configureFrameworkExport(target)
         configureCInterops(target)
         warnAboutIncorrectDependencies(target)
+    }
+
+    fun configureDependencyPrecompilation(target: T) {
+        target.compilations.all { compilation ->
+            target.project.tasks.create(compilation.precompileTaskName, DynamicCacheTask::class.java) {
+                it.compilation = compilation
+            }
+        }
     }
 
     override fun configureArchivesAndComponent(target: T): Unit = with(target.project) {
