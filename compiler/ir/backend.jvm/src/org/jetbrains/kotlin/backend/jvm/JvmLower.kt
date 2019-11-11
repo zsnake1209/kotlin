@@ -196,6 +196,7 @@ private val jvmFilePhases =
         typeAliasAnnotationMethodsPhase then
         stripTypeAliasDeclarationsPhase then
         repairReferenceParametersPhase then
+        referenceInvokePhase then
         provisionalFunctionExpressionPhase then
         inventNamesForLocalClassesPhase then
         kCallableNamePropertyPhase then
