@@ -435,20 +435,27 @@ private fun IrFunction.generateDefaultsFunctionImpl(
     val newFunction = buildFunctionDeclaration(this, origin)
 
     val syntheticParameters = MutableList((valueParameters.size + 31) / 32) { i ->
-        newFunction.valueParameter(valueParameters.size + i, parameterMaskName(i), context.irBuiltIns.intType)
+        newFunction.valueParameter(
+            valueParameters.size + i,
+            parameterMaskName(i),
+            context.irBuiltIns.intType,
+            IrDeclarationOrigin.MASK_FOR_DEFAULT_FUNCTION
+        )
     }
 
     if (this is IrConstructor) {
         syntheticParameters += newFunction.valueParameter(
             syntheticParameters.last().index + 1,
             kConstructorMarkerName,
-            context.ir.symbols.defaultConstructorMarker.owner.defaultType.makeNullable()
+            context.ir.symbols.defaultConstructorMarker.owner.defaultType.makeNullable(),
+            IrDeclarationOrigin.DEFAULT_CONSTRUCTOR_MARKER
         )
     } else if (context.ir.shouldGenerateHandlerParameterForDefaultBodyFun()) {
         syntheticParameters += newFunction.valueParameter(
             syntheticParameters.last().index + 1,
             "handler".synthesizedName,
-            context.irBuiltIns.anyNType
+            context.irBuiltIns.anyNType,
+            IrDeclarationOrigin.METHOD_HANDLER_IN_DEFAULT_FUNCTION
         )
     }
 
@@ -544,13 +551,13 @@ private fun IrFunction.generateDefaultsFunction(
         generateDefaultsFunctionImpl(context, origin, skipInlineMethods, skipExternalMethods)
     }
 
-private fun IrFunction.valueParameter(index: Int, name: Name, type: IrType): IrValueParameter {
+private fun IrFunction.valueParameter(index: Int, name: Name, type: IrType, origin: IrDeclarationOrigin): IrValueParameter {
     val parameterDescriptor = WrappedValueParameterDescriptor()
 
     return IrValueParameterImpl(
         startOffset,
         endOffset,
-        IrDeclarationOrigin.DEFINED,
+        origin,
         IrValueParameterSymbolImpl(parameterDescriptor),
         name,
         index,
