@@ -185,6 +185,11 @@ class JsIntrinsicTransformers(backendContext: JsIrBackendContext) {
                 JsInvocation(bindRef, jsReceiver)
             }
 
+            add(intrinsics.jsUnsafeCast) { call, context ->
+                val args = translateCallArguments(call, context)
+                args[0]
+            }
+
             add(intrinsics.unreachable) { _, _ ->
                 JsInvocation(JsNameRef(Namer.UNREACHABLE_NAME))
             }

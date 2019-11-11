@@ -192,7 +192,7 @@ class IrElementToJsExpressionTransformer : BaseIrElementToJsNodeTransformer<JsEx
 
     override fun visitTypeOperator(expression: IrTypeOperatorCall, data: JsGenerationContext): JsExpression {
         return when (expression.operator) {
-            IrTypeOperator.IMPLICIT_CAST -> expression.argument.accept(this, data)
+            IrTypeOperator.IMPLICIT_CAST, IrTypeOperator.IMPLICIT_DYNAMIC_CAST -> expression.argument.accept(this, data)
             else -> error("All type operator calls except IMPLICIT_CAST should be lowered at this point")
         }
     }

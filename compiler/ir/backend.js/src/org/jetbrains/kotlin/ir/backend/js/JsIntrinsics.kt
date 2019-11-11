@@ -150,6 +150,8 @@ class JsIntrinsics(private val irBuiltIns: IrBuiltIns, val context: JsIrBackendC
 
     val jsImul = getInternalFunction("imul")
 
+    val jsUnsafeCast = defineUnsafeCastIntrinsic()
+
     // Coroutines
 
     val jsCoroutineContext
@@ -333,6 +335,17 @@ class JsIntrinsics(private val irBuiltIns: IrBuiltIns, val context: JsIrBackendC
             name = Name.identifier(Namer.UNREACHABLE_NAME)
             origin = JsLoweredDeclarationOrigin.JS_INTRINSICS_STUB
             returnType = irBuiltIns.nothingType
+        }
+    }
+
+    private fun defineUnsafeCastIntrinsic(): IrSimpleFunction {
+        return externalPackageFragment.addFunction {
+            name = Name.identifier("jsUnsafeCast")
+            origin = JsLoweredDeclarationOrigin.JS_INTRINSICS_STUB
+        }.apply {
+            val aType = addTypeParameter("A", irBuiltIns.anyNType).defaultType
+            returnType = aType
+            addValueParameter("a", aType)
         }
     }
 

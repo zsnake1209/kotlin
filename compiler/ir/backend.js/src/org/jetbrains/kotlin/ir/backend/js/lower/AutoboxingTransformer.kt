@@ -40,6 +40,8 @@ class AutoboxingTransformer(val context: JsIrBackendContext) : AbstractValueUsag
             else -> false
         }
 
+//    override fun IrExpression.useInTypeOperator(operator: IrTypeOperator, typeOperand: IrType) = useAs(type)
+
     override fun IrExpression.useAs(type: IrType): IrExpression {
 
         val actualType = when (this) {
@@ -54,15 +56,16 @@ class AutoboxingTransformer(val context: JsIrBackendContext) : AbstractValueUsag
             }
             is IrGetField -> this.symbol.owner.type
 
-            is IrTypeOperatorCall -> when (this.operator) {
-                IrTypeOperator.IMPLICIT_INTEGER_COERCION ->
-                    // TODO: is it a workaround for inconsistent IR?
-                    this.typeOperand
-
-                IrTypeOperator.CAST, IrTypeOperator.IMPLICIT_CAST -> context.irBuiltIns.anyNType
-
-                else -> this.type
-            }
+//            is IrTypeOperatorCall -> error("Unreachable execution")
+//                when (this.operator) {
+//                IrTypeOperator.IMPLICIT_INTEGER_COERCION ->
+//                    // TODO: is it a workaround for inconsistent IR?
+//                    this.typeOperand
+//
+//                IrTypeOperator.CAST, IrTypeOperator.IMPLICIT_CAST -> context.irBuiltIns.anyNType
+//
+//                else -> this.type
+//            }
 
             is IrGetValue -> {
                 val value = this.symbol.owner

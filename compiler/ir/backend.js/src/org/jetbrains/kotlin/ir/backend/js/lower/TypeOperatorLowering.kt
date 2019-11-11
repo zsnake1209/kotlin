@@ -121,6 +121,14 @@ class TypeOperatorLowering(val context: JsIrBackendContext) : FileLoweringPass {
                 }
             }
 
+
+            private fun needBoxUnbox(fromType: IrType, toType: IrType): Boolean {
+                val fromInlineType = fromType.getInlinedClass() != null
+                val toInlineType = toType.getInlinedClass() != null
+                return fromInlineType xor toInlineType
+            }
+
+
             private fun lowerImplicitCast(expression: IrTypeOperatorCall) = expression.run {
                 assert(operator == IrTypeOperator.IMPLICIT_CAST)
                 argument
@@ -129,7 +137,11 @@ class TypeOperatorLowering(val context: JsIrBackendContext) : FileLoweringPass {
             private fun lowerImplicitDynamicCast(expression: IrTypeOperatorCall) = expression.run {
                 // TODO check argument
                 assert(operator == IrTypeOperator.IMPLICIT_DYNAMIC_CAST)
-                argument
+                if (needBoxUnbox(argument.type, type)) {
+                    expression
+                } else {
+                    argument
+                }
             }
 
             // Note: native `instanceOf` is not used which is important because of null-behaviour
