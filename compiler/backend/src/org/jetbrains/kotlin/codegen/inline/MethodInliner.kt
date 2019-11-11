@@ -264,7 +264,7 @@ class MethodInliner(
                         listOf(*info.invokeMethod.argumentTypes), valueParameters, invokeParameters, valueParamShift, this, coroutineDesc
                     )
 
-                    if (info.invokeMethodDescriptor.valueParameters.isEmpty()) {
+                    if ((Type.getArgumentsAndReturnSizes(info.invokeMethod.descriptor).shr(2)) - 1 == 0) { //-1 for implicit tgis
                         // There won't be no parameters processing and line call can be left without actual instructions.
                         // Note: if function is called on the line with other instructions like 1 + foo(), 'nop' will still be generated.
                         visitInsn(Opcodes.NOP)
