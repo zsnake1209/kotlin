@@ -5,14 +5,70 @@
 
 package kotlin.coroutines
 
-import kotlin.coroutines.CoroutineContext.*
-import kotlin.io.Serializable
+import kotlin.coroutines.CoroutineContext.Element
+import kotlin.coroutines.CoroutineContext.Key
 
 /**
  * Base class for [CoroutineContext.Element] implementations.
  */
 @SinceKotlin("1.3")
 public abstract class AbstractCoroutineContextElement(public override val key: Key<*>) : Element
+
+/**
+ * Base class for [CoroutineContext.Key] associated with covariant [CoroutineContext.Element] implementation.
+ * Covariant element implementation implies delegating its [get][Element.get] and [minusKey][Element.minusKey]
+ * to [getCovariantElement] and [minusCovariantKey] respectively.
+ *
+ * Polymorphic elements can be extracted from the coroutine context using both element key and its supertype key
+ *
+ * @param K base class of a covariant element
+ * @param baseKey an instance of base key
+ * @param E element associated with the current key
+ * @param safeCast a function that can safely cast abstract [CoroutineContext.Element] to the concrete [E] type
+ *                 and return the element if it is a subtype of [E] or `null` otherwise.
+ */
+//@SinceKotlin("1.4")
+//@ExperimentalStdlinApi
+public abstract class AbstractCoroutineContextKey<K : Element, E : K>(
+    baseKey: Key<K>,
+    private val safeCast: (element: Element) -> E?
+) : Key<E> {
+    private val topMostKey: Key<*> = if (baseKey is AbstractCoroutineContextKey<*, *>) baseKey.topMostKey else baseKey
+
+    internal fun tryCast(element: Element): E? = safeCast(element)
+    internal fun isSubKey(key: Key<*>): Boolean = key === this || topMostKey === key
+}
+
+/**
+ * Returns the current element is it is associated with the given [key] in a covariant manner or `null` otherwise.
+ * This method returns non-null value if either [Element.key] is equal to the given [key] or if the [key] is associated
+ * with [Element.key] via [AbstractCoroutineContextKey]
+ */
+//@SinceKotlin("1.4")
+//@ExperimentalStdlinApi
+public fun <E : Element> Element.getCovariantElement(key: Key<E>): E? {
+    if (key is AbstractCoroutineContextKey<*, *>) {
+        @Suppress("UNCHECKED_CAST")
+        return if (key.isSubKey(this.key)) key.tryCast(this) as? E else null
+    }
+    @Suppress("UNCHECKED_CAST")
+    return if (this.key == key) this as E else null
+}
+
+/**
+ * Returns empty coroutine context if the element is associated with the given [key] in a covariant manner
+ * or `null` otherwise.
+ * This method returns empty context if either [Element.key] is equal to the given [key] or if the [key] is associated
+ * with [Element.key] via [AbstractCoroutineContextKey]
+ */
+//@SinceKotlin("1.4")
+//@ExperimentalStdlinApi
+public fun Element.minusCovariantKey(key: Key<*>): CoroutineContext {
+    if (key is AbstractCoroutineContextKey<*, *>) {
+        return if (key.isSubKey(this.key) && key.tryCast(this) != null) EmptyCoroutineContext else this
+    }
+    return if (this.key == key) EmptyCoroutineContext else this
+}
 
 /**
  * An empty coroutine context.

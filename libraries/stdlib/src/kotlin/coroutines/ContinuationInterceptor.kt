@@ -43,12 +43,8 @@ public interface ContinuationInterceptor : CoroutineContext.Element {
         /* do nothing by default */
     }
 
-    // Performance optimization for a singleton Key
-    public override operator fun <E : CoroutineContext.Element> get(key: CoroutineContext.Key<E>): E? =
-        @Suppress("UNCHECKED_CAST")
-        if (key === Key) this as E else null
+    // TODO we can either inline *covariant here and use "===" on key or discuss it with the committee
+    public override operator fun <E : CoroutineContext.Element> get(key: CoroutineContext.Key<E>): E? = getCovariantElement(key)
 
-    // Performance optimization to a singleton Key
-    public override fun minusKey(key: CoroutineContext.Key<*>): CoroutineContext =
-        if (key === Key) EmptyCoroutineContext else this
+    public override fun minusKey(key: CoroutineContext.Key<*>): CoroutineContext = minusCovariantKey(key)
 }
