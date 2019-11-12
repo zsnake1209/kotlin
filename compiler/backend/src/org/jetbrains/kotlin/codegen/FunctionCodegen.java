@@ -1322,9 +1322,29 @@ public class FunctionCodegen {
     }
 
     private boolean isDefaultNeeded(@NotNull FunctionDescriptor descriptor, @Nullable KtNamedFunction function) {
-        List<ValueParameterDescriptor> parameters =
-                CodegenUtil.getFunctionParametersForDefaultValueGeneration(descriptor, state.getDiagnostics());
+        List<ValueParameterDescriptor> parameters;
+        if (descriptor.isSuspend()) {
+            parameters = getFunctionParametersOfSuspendFunctionForDefaultValueGeneration(descriptor);
+        } else {
+            parameters = CodegenUtil.getFunctionParametersForDefaultValueGeneration(descriptor, state.getDiagnostics());
+        }
         return CollectionsKt.any(parameters, ValueParameterDescriptor::declaresDefaultValue);
+    }
+
+    @NotNull
+    private List<ValueParameterDescriptor> getFunctionParametersOfSuspendFunctionForDefaultValueGeneration(@NotNull FunctionDescriptor descriptor) {
+        assert descriptor.isSuspend();
+        if (descriptor.isActual()) {
+            FunctionDescriptor initial = CoroutineCodegenUtilKt.unwrapInitialDescriptorForSuspendFunction(descriptor);
+            FunctionDescriptor initialExpected = CodegenUtil.findExpectedFunctionForActual(initial);
+            if (initialExpected == null) {
+                return descriptor.getValueParameters();
+            }
+            FunctionDescriptor expectedView = CoroutineCodegenUtilKt.getOrCreateJvmSuspendFunctionView(initialExpected, state);
+            return expectedView.getValueParameters();
+        } else {
+            return descriptor.getValueParameters();
+        }
     }
 
     private void generateBridge(
