@@ -20,7 +20,10 @@ import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
 import org.jetbrains.kotlin.fir.symbols.CallableId
 import org.jetbrains.kotlin.fir.symbols.StandardClassIds
-import org.jetbrains.kotlin.fir.symbols.impl.*
+import org.jetbrains.kotlin.fir.symbols.impl.ConeClassLikeLookupTagImpl
+import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.types.impl.ConeClassTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
@@ -206,7 +209,12 @@ private fun FirRegularClass.getSingleAbstractMethodOrNull(
     scopeSession: ScopeSession
 ): FirSimpleFunction? {
     // TODO: restrict to Java interfaces
-    if (classKind != ClassKind.INTERFACE || hasMoreThenOneAbstractFunctionOrHasAbstractProperty()) return null
+    if (classKind != ClassKind.INTERFACE) return null
+
+    symbol.scopeComputation?.invoke()
+    symbol.scopeComputation = null
+
+    if (hasMoreThenOneAbstractFunctionOrHasAbstractProperty()) return null
 
     val samCandidateNames = computeSamCandidateNames(session)
 
@@ -222,6 +230,8 @@ private fun FirRegularClass.computeSamCandidateNames(session: FirSession): Set<N
 
     val samCandidateNames = mutableSetOf<Name>()
     for (clazz in classes) {
+        clazz.symbol.scopeComputation?.invoke()
+        clazz.symbol.scopeComputation = null
         for (declaration in clazz.declarations) {
             if (declaration !is FirMemberDeclaration || declaration.modality != Modality.ABSTRACT) continue
             samCandidateNames.add(declaration.name)
