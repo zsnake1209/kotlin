@@ -87,6 +87,6 @@ class NumberConversionCallsTransformer(context: JsIrBackendContext) : CallsTrans
     }
 
     private fun useDispatchReceiver(call: IrFunctionAccessExpression): IrExpression {
-        return JsIrBuilder.buildImplicitCast(call.dispatchReceiver!!, call.type)
+        return JsIrBuilder.buildUnsafeCast(call.dispatchReceiver!!, call.type)
     }
 }

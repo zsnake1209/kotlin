@@ -80,6 +80,7 @@ class TypeOperatorLowering(val context: JsIrBackendContext) : FileLoweringPass {
                     IrTypeOperator.NOT_INSTANCEOF -> lowerInstanceOf(expression, data, true)
                     IrTypeOperator.CAST -> lowerCast(expression, data, false)
                     IrTypeOperator.SAFE_CAST -> lowerCast(expression, data, true)
+                    IrTypeOperator.UNSAFE_CAST -> expression
                     IrTypeOperator.SAM_CONVERSION -> TODO("SAM conversion: ${expression.render()}")
                 }
             }
