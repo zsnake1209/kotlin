@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.load.java.structure
 
 import org.jetbrains.kotlin.builtins.PrimitiveType
+import org.jetbrains.kotlin.name.ClassId
 
 interface JavaType
 
@@ -26,12 +27,18 @@ interface JavaArrayType : JavaType {
 
 interface JavaClassifierType : JavaType, JavaAnnotationOwner {
     val classifier: JavaClassifier?
+    val classifierInfo: JavaClassifierInfo get() = JavaClassifierInfo.Other
     val typeArguments: List<JavaType?>
 
     val isRaw: Boolean
 
     val classifierQualifiedName: String
     val presentableText: String
+}
+
+sealed class JavaClassifierInfo {
+    class ClassReference(val classId: ClassId) : JavaClassifierInfo()
+    object Other : JavaClassifierInfo()
 }
 
 interface JavaPrimitiveType : JavaType {
