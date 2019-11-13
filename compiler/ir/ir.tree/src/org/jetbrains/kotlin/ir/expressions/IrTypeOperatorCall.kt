@@ -49,7 +49,12 @@ enum class IrTypeOperator {
      * Implicit dynamic cast: implicit cast from `dynamic` to `T`.
      * This currently can happen in Kotlin/JS only.
      */
-    IMPLICIT_DYNAMIC_CAST;
+    IMPLICIT_DYNAMIC_CAST,
+    /**
+     * Unsafe explicit type transition on IR level to keep it consistent
+     * Currently is used only in JS BE
+     */
+    UNSAFE_CAST;
 }
 
 interface IrTypeOperatorCall : IrExpression {
