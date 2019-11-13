@@ -31,7 +31,11 @@ sealed class FirClassSymbol<C : FirClass<C>>(classId: ClassId) : FirClassLikeSym
     override fun toLookupTag(): ConeClassLikeLookupTag = lookupTag
 }
 
-class FirRegularClassSymbol(classId: ClassId) : FirClassSymbol<FirRegularClass>(classId)
+class FirRegularClassSymbol(
+    classId: ClassId
+) : FirClassSymbol<FirRegularClass>(classId) {
+    var scopeComputation: (() -> Unit)? = null
+}
 
 class FirAnonymousObjectSymbol : FirClassSymbol<FirAnonymousObject>(ClassId(FqName.ROOT, FqName("anonymous"), true))
 

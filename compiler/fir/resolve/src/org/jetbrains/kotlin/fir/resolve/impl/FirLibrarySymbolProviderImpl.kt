@@ -105,6 +105,8 @@ class FirLibrarySymbolProviderImpl(val session: FirSession) : FirSymbolProvider(
                         null, parentContext,
                         this::findAndDeserializeClass
                     )
+                    symbol.scopeComputation?.invoke()
+                    symbol.scopeComputation = null
                 }
             }
         }

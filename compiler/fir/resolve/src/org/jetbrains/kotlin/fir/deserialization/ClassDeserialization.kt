@@ -9,12 +9,8 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.addDeclarations
-import org.jetbrains.kotlin.fir.declarations.impl.FirClassImpl
-import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
-import org.jetbrains.kotlin.fir.declarations.impl.FirEnumEntryImpl
-import org.jetbrains.kotlin.fir.declarations.impl.FirSealedClassImpl
+import org.jetbrains.kotlin.fir.declarations.impl.*
 import org.jetbrains.kotlin.fir.symbols.impl.ConeClassLikeLookupTagImpl
-import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.impl.ConeClassTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.FirResolvedTypeRefImpl
@@ -99,21 +95,9 @@ fun deserializeClassToSymbol(
             FirResolvedTypeRefImpl(null, it)
         }
 
-        addDeclarations(classProto.functionList.map(classDeserializer::loadFunction))
-        addDeclarations(classProto.propertyList.map(classDeserializer::loadProperty))
-
-        addDeclarations(
-            classProto.constructorList.map {
-                classDeserializer.loadConstructor(it, this)
-            }
-        )
-
-        addDeclarations(
-            classProto.nestedClassNameList.mapNotNull { nestedNameId ->
-                val nestedClassId = classId.createNestedClassId(Name.identifier(nameResolver.getString(nestedNameId)))
-                deserializeNestedClass(nestedClassId, context)?.fir
-            }
-        )
+        symbol.scopeComputation = {
+            addAllDeclarations(classProto, classDeserializer, classId, nameResolver, deserializeNestedClass, context, session)
+        }
 
         addDeclarations(
             classProto.enumEntryList.mapNotNull { enumEntryProto ->
@@ -140,4 +124,30 @@ fun deserializeClassToSymbol(
             }
         }
     }
+}
+
+private fun FirModifiableRegularClass.addAllDeclarations(
+    classProto: ProtoBuf.Class,
+    classDeserializer: FirMemberDeserializer,
+    classId: ClassId,
+    nameResolver: NameResolver,
+    deserializeNestedClass: (ClassId, FirDeserializationContext) -> FirRegularClassSymbol?,
+    context: FirDeserializationContext,
+    session: FirSession
+) {
+    addDeclarations(classProto.functionList.map(classDeserializer::loadFunction))
+    addDeclarations(classProto.propertyList.map(classDeserializer::loadProperty))
+
+    addDeclarations(
+        classProto.constructorList.map {
+            classDeserializer.loadConstructor(it, this)
+        }
+    )
+
+    addDeclarations(
+        classProto.nestedClassNameList.mapNotNull { nestedNameId ->
+            val nestedClassId = classId.createNestedClassId(Name.identifier(nameResolver.getString(nestedNameId)))
+            deserializeNestedClass(nestedClassId, context)?.fir
+        }
+    )
 }
