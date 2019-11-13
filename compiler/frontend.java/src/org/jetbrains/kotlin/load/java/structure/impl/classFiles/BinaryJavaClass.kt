@@ -154,7 +154,11 @@ class BinaryJavaClass(
     }
 
     private fun String.convertInternalNameToClassifierType(): JavaClassifierType =
-        PlainJavaClassifierType({ context.resolveByInternalName(this) }, emptyList())
+        PlainJavaClassifierType(
+            { context.resolveByInternalName(this) },
+            { context.mapInternalNameToClassifierInfo(this) },
+            emptyList()
+        )
 
     override fun visitField(access: Int, name: String, desc: String, signature: String?, value: Any?): FieldVisitor? {
         if (access.isSet(Opcodes.ACC_SYNTHETIC)) return null

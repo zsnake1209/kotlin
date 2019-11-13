@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.load.java.structure.impl.classFiles
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.StringInterner
 import org.jetbrains.kotlin.builtins.PrimitiveType
+import org.jetbrains.kotlin.load.java.structure.JavaClassifierInfo
 import org.jetbrains.kotlin.load.java.structure.JavaClassifierType
 import org.jetbrains.kotlin.load.java.structure.JavaType
 import org.jetbrains.kotlin.load.java.structure.JavaTypeParameter
@@ -101,7 +102,7 @@ class BinaryClassSignatureParser {
 
         val parameterName = canonicalNameInterner.intern(id.toString())
 
-        return PlainJavaClassifierType({ context.resolveTypeParameter(parameterName) }, emptyList())
+        return PlainJavaClassifierType({ context.resolveTypeParameter(parameterName) }, { JavaClassifierInfo.Other }, emptyList())
     }
 
     private fun parseParameterizedClassRefSignature(
@@ -139,6 +140,7 @@ class BinaryClassSignatureParser {
         val internalName = canonicalNameInterner.intern(canonicalName.toString().replace('.', '$'))
         return PlainJavaClassifierType(
             { context.resolveByInternalName(internalName) },
+            { context.mapInternalNameToClassifierInfo(internalName) },
             argumentGroups.reversed().flattenTo(arrayListOf()).compact()
         )
     }

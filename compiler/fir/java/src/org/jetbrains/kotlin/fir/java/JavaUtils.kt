@@ -149,28 +149,42 @@ internal fun JavaType?.toConeKotlinTypeWithNullability(
 internal fun JavaClassifierType.toConeKotlinTypeWithNullability(
     session: FirSession, isNullable: Boolean, javaTypeParameterStack: JavaTypeParameterStack
 ): ConeLookupTagBasedType {
-    return when (val classifier = classifier) {
-        is JavaClass -> {
-            //val classId = classifier.classId!!
-            var classId = JavaToKotlinClassMap.mapJavaToKotlin(classifier.fqName!!) ?: classifier.classId!!
-            classId = classId.readOnlyToMutable() ?: classId
-
-            val lookupTag = ConeClassLikeLookupTagImpl(classId)
-            lookupTag.constructClassType(
-                typeArguments.mapIndexed { index, argument ->
-                    argument.toConeProjection(
-                        session, javaTypeParameterStack, null
-                        //symbol.fir.typeParameters.getOrNull(index)
-                    )
-                }.toTypedArray(), isNullable
-            )
+    return when (val classifierInfo = classifierInfo) {
+        is JavaClassifierInfo.ClassReference -> {
+            // Fast path
+            return createTypeForClassId(classifierInfo.classId, session, javaTypeParameterStack, isNullable)
         }
-        is JavaTypeParameter -> {
-            val symbol = javaTypeParameterStack[classifier]
-            ConeTypeParameterTypeImpl(symbol.toLookupTag(), isNullable)
+        JavaClassifierInfo.Other -> when (val classifier = classifier) {
+            is JavaClass -> {
+                createTypeForClassId(classifier.classId!!, session, javaTypeParameterStack, isNullable)
+            }
+            is JavaTypeParameter -> {
+                val symbol = javaTypeParameterStack[classifier]
+                ConeTypeParameterTypeImpl(symbol.toLookupTag(), isNullable)
+            }
+            else -> ConeClassErrorType(reason = "Unexpected classifier: $classifier")
         }
-        else -> ConeClassErrorType(reason = "Unexpected classifier: $classifier")
     }
+}
+
+private fun JavaClassifierType.createTypeForClassId(
+    classifierClassId: ClassId,
+    session: FirSession,
+    javaTypeParameterStack: JavaTypeParameterStack,
+    isNullable: Boolean
+): ConeLookupTagBasedType {
+    var classId = JavaToKotlinClassMap.mapJavaToKotlin(classifierClassId.asSingleFqName()) ?: classifierClassId
+    classId = classId.readOnlyToMutable() ?: classId
+
+    val lookupTag = ConeClassLikeLookupTagImpl(classId)
+    return lookupTag.constructClassType(
+        typeArguments.mapIndexed { index, argument ->
+            argument.toConeProjection(
+                session, javaTypeParameterStack, null
+                //symbol.fir.typeParameters.getOrNull(index)
+            )
+        }.toTypedArray(), isNullable
+    )
 }
 
 internal fun JavaAnnotation.toFirAnnotationCall(

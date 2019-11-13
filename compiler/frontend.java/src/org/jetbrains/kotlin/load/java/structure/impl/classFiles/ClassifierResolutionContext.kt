@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.load.java.structure.impl.classFiles
 
 import org.jetbrains.kotlin.load.java.structure.JavaClass
 import org.jetbrains.kotlin.load.java.structure.JavaClassifier
+import org.jetbrains.kotlin.load.java.structure.JavaClassifierInfo
 import org.jetbrains.kotlin.load.java.structure.JavaTypeParameter
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -72,6 +73,10 @@ class ClassifierResolutionContext private constructor(
         }
 
         return ClassId.topLevel(FqName(internalName.replace('/', '.')))
+    }
+
+    internal fun mapInternalNameToClassifierInfo(internalName: String): JavaClassifierInfo {
+        return JavaClassifierInfo.ClassReference(mapInternalNameToClassId(internalName))
     }
 
     // See com.intellij.psi.impl.compiled.StubBuildingVisitor.GUESSING_MAPPER

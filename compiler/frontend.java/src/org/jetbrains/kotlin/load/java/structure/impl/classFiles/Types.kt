@@ -25,17 +25,21 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 // They are only used for java class files, but potentially may be used in other cases
 // It would be better to call them like JavaSomeTypeImpl, but these names are already occupied by the PSI based types
 internal class PlainJavaArrayType(override val componentType: JavaType) : JavaArrayType
+
 internal class PlainJavaWildcardType(override val bound: JavaType?, override val isExtends: Boolean) : JavaWildcardType
 internal class PlainJavaPrimitiveType(override val type: PrimitiveType?) : JavaPrimitiveType
 
 internal class PlainJavaClassifierType(
-        // calculation of classifier and canonicalText
-        classifierComputation: () -> ClassifierResolutionContext.Result,
-        override val typeArguments: List<JavaType>
+    // calculation of classifier and canonicalText
+    classifierComputation: () -> ClassifierResolutionContext.Result,
+    classifierInfo: () -> JavaClassifierInfo,
+    override val typeArguments: List<JavaType>
 ) : JavaClassifierType {
     private val classifierResolverResult by lazy(LazyThreadSafetyMode.NONE, classifierComputation)
 
     override val classifier get() = classifierResolverResult.classifier
+    override val classifierInfo by lazy(classifierInfo)
+
     override val isRaw
         get() = typeArguments.isEmpty() &&
                 classifierResolverResult.classifier?.safeAs<JavaClass>()?.typeParameters?.isNotEmpty() == true
