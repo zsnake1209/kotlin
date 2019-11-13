@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSessionComponent
 import org.jetbrains.kotlin.fir.declarations.FirClass
 import org.jetbrains.kotlin.fir.resolve.memberScopeProvider
-import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 
@@ -21,10 +20,6 @@ class FirMemberScopeProvider : FirSessionComponent {
 
     fun declaredMemberScope(klass: FirClass<*>): FirClassDeclaredMemberScope {
         return declaredMemberCache.getOrPut(klass) {
-            (klass.symbol as? FirRegularClassSymbol)?.apply {
-                scopeComputation?.invoke()
-                scopeComputation = null
-            }
             FirClassDeclaredMemberScope(klass)
         }
     }

@@ -44,6 +44,9 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.jvm.KotlinJavaPsiFacade
 import org.jetbrains.kotlin.types.Variance.INVARIANT
 
+var loadedJavaClasses = 0
+var loadedJavaClassesContent = 0
+
 class JavaSymbolProvider(
     val session: FirSession,
     val project: Project,
@@ -188,6 +191,7 @@ class JavaSymbolProvider(
                     isStatic = javaClass.isStatic,
                     javaTypeParameterStack = javaTypeParameterStack
                 ).apply {
+                    loadedJavaClasses++
                     this.typeParameters += foundClass.typeParameters.convertTypeParameters(javaTypeParameterStack)
                     addAnnotationsFrom(this@JavaSymbolProvider.session, javaClass, javaTypeParameterStack)
                     for (supertype in javaClass.supertypes) {
@@ -207,6 +211,7 @@ class JavaSymbolProvider(
         javaTypeParameterStack: JavaTypeParameterStack,
         firSymbol: FirRegularClassSymbol
     ) {
+        loadedJavaClassesContent++
         // TODO: may be we can process fields & methods later.
         // However, they should be built up to override resolve stage
         for (javaField in javaClass.fields) {

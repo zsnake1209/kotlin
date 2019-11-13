@@ -8,9 +8,13 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.builder.RawFirBuilder
 import org.jetbrains.kotlin.fir.declarations.FirFile
+import org.jetbrains.kotlin.fir.deserialization.loadedDeserialized
+import org.jetbrains.kotlin.fir.deserialization.loadedDeserializedContent
 import org.jetbrains.kotlin.fir.diagnostics.FirEmptyDiagnostic
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirQualifiedAccessExpression
+import org.jetbrains.kotlin.fir.java.loadedJavaClasses
+import org.jetbrains.kotlin.fir.java.loadedJavaClassesContent
 import org.jetbrains.kotlin.fir.references.FirErrorNamedReference
 import org.jetbrains.kotlin.fir.resolve.firProvider
 import org.jetbrains.kotlin.fir.resolve.impl.FirProviderImpl
@@ -158,7 +162,7 @@ class FirResolveBench(val withProgress: Boolean) {
                 println("Starting stage #$stage. $transformer")
                 val firFileSequence = if (withProgress) firFiles.progress("   ~ ") else firFiles.asSequence()
                 runStage(transformer, firFileSequence)
-                checkFirProvidersConsistency(firFiles)
+                //checkFirProvidersConsistency(firFiles)
             }
 
             if (fails.none()) {
@@ -375,6 +379,9 @@ fun FirResolveBench.TotalStatistics.report(stream: PrintStream, header: String) 
                 printMeasureAsTable(totalMeasure, this@report, "Total time")
             }
         }
+
+        println("Deserialized: $loadedDeserializedContent/$loadedDeserialized")
+        println("Java: $loadedJavaClassesContent/$loadedJavaClasses")
     }
 }
 

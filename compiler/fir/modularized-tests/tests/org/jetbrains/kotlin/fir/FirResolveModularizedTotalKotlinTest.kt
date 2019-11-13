@@ -8,13 +8,13 @@ package org.jetbrains.kotlin.fir
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiElementFinder
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectScope
 import org.jetbrains.kotlin.asJava.finder.JavaElementFinder
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys.CONTENT_ROOTS
 import org.jetbrains.kotlin.cli.common.config.KotlinSourceRoot
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
-import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.fir.builder.RawFirBuilder
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.dump.MultiModuleHtmlFirDump
@@ -49,8 +49,8 @@ class FirResolveModularizedTotalKotlinTest : AbstractModularizedTest() {
         val project = environment.project
         val ktFiles = environment.getSourceFiles()
 
-        val scope = ProjectScope.getContentScope(project)
         val librariesScope = ProjectScope.getLibrariesScope(project)
+        val scope = ProjectScope.getContentScope(project).intersectWith(GlobalSearchScope.notScope(librariesScope))
         val session = createSession(environment, scope, librariesScope)
         val builder = RawFirBuilder(session, stubMode = false)
 

@@ -24,6 +24,9 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.ProtoEnumFlags
 import org.jetbrains.kotlin.serialization.deserialization.getName
 
+var loadedDeserialized = 0
+var loadedDeserializedContent = 0
+
 fun deserializeClassToSymbol(
     classId: ClassId,
     classProto: ProtoBuf.Class,
@@ -95,8 +98,11 @@ fun deserializeClassToSymbol(
             FirResolvedTypeRefImpl(null, it)
         }
 
+        loadedDeserialized++
+
         symbol.scopeComputation = {
             addAllDeclarations(classProto, classDeserializer, classId, nameResolver, deserializeNestedClass, context, session)
+            loadedDeserializedContent++
         }
 
         addDeclarations(
