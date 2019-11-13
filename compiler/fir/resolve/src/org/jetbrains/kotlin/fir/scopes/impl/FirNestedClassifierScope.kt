@@ -15,7 +15,11 @@ import org.jetbrains.kotlin.name.Name
 
 class FirNestedClassifierScope(val klass: FirClass<*>) : FirScope() {
 
-    private val classIndex: Map<Name, FirRegularClassSymbol> = run {
+    private val classIndex: Map<Name, FirRegularClassSymbol> by lazy(LazyThreadSafetyMode.NONE) {
+        (klass.symbol as? FirRegularClassSymbol)?.apply {
+            scopeComputation?.invoke()
+            scopeComputation = null
+        }
         val result = mutableMapOf<Name, FirRegularClassSymbol>()
         for (declaration in klass.declarations) {
             if (declaration is FirRegularClass) {
