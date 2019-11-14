@@ -116,12 +116,11 @@ class EqualityAndComparisonCallsTransformer(context: JsIrBackendContext) : Calls
         val function = call.symbol.owner as IrSimpleFunction
         if (function.parent !is IrClass) return call
 
-        fun IrSimpleFunction.isFakeOverriddenFromComparable(): Boolean = when {
-            origin != IrDeclarationOrigin.FAKE_OVERRIDE ->
+        fun IrSimpleFunction.isFakeOverriddenFromComparable(): Boolean =
+            if (isFakeOverride)
+                overriddenSymbols.all { it.owner.isFakeOverriddenFromComparable() }
+            else
                 !isStaticMethodOfClass && parentAsClass.thisReceiver!!.type.isComparable()
-
-            else -> overriddenSymbols.all { it.owner.isFakeOverriddenFromComparable() }
-        }
 
         return when {
             // Use runtime function call in case when receiverType is a primitive JS type that doesn't have `compareTo` method,

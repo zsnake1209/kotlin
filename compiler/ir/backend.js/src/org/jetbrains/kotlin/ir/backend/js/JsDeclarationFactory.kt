@@ -50,7 +50,13 @@ class JsDeclarationFactory : DeclarationFactory {
             }
         }
 
-    private fun createPropertyWithBackingField(name: Name, visibility: Visibility, parent: IrClass, fieldType: IrType, origin: IrDeclarationOrigin): IrField {
+    private fun createPropertyWithBackingField(
+        name: Name,
+        visibility: Visibility,
+        parent: IrClass,
+        fieldType: IrType,
+        origin: IrDeclarationOrigin
+    ): IrField {
         val descriptor = WrappedFieldDescriptor()
         val symbol = IrFieldSymbolImpl(descriptor)
 
@@ -65,7 +71,7 @@ class JsDeclarationFactory : DeclarationFactory {
             isFinal = true,
             isExternal = false,
             isStatic = false,
-            isFakeOverride = origin == IrDeclarationOrigin.FAKE_OVERRIDE
+            isFakeOverride = false
         ).also {
             descriptor.bind(it)
             it.parent = parent

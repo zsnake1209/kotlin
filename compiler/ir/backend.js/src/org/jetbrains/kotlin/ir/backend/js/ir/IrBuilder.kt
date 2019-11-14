@@ -136,7 +136,7 @@ object JsIrBuilder {
             isTailrec = isTailrec,
             isSuspend = isSuspend,
             isExpect = isExpect,
-            isFakeOverride = origin == IrDeclarationOrigin.FAKE_OVERRIDE
+            isFakeOverride = false
         ).also {
             descriptor.bind(it)
             it.parent = parent
@@ -144,9 +144,9 @@ object JsIrBuilder {
     }
 
     fun buildAnonymousInitializer() =
-        IrAnonymousInitializerImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, SYNTHESIZED_DECLARATION, IrAnonymousInitializerSymbolImpl(
-            WrappedClassDescriptor()
-        ))
+        IrAnonymousInitializerImpl(
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET, SYNTHESIZED_DECLARATION, IrAnonymousInitializerSymbolImpl(WrappedClassDescriptor())
+        )
 
     fun buildGetObjectValue(type: IrType, classSymbol: IrClassSymbol) =
         IrGetObjectValueImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, type, classSymbol)
