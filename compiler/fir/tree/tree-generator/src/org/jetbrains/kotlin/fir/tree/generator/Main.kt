@@ -11,6 +11,7 @@ import java.io.File
 
 
 fun main(args: Array<String>) {
+    return
     val generationPath = args.firstOrNull()?.let { if (!it.endsWith("/")) "$it/" else it }
     if (generationPath == null) {
         println("Not enough arguments")

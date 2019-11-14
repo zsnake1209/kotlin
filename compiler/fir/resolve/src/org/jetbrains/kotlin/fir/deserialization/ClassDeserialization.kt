@@ -100,11 +100,6 @@ fun deserializeClassToSymbol(
 
         loadedDeserialized++
 
-        symbol.scopeComputation = {
-            addAllDeclarations(classProto, classDeserializer, classId, nameResolver, deserializeNestedClass, context, session)
-            loadedDeserializedContent++
-        }
-
         addDeclarations(
             classProto.enumEntryList.mapNotNull { enumEntryProto ->
                 val enumEntryName = nameResolver.getName(enumEntryProto.name)
@@ -123,6 +118,11 @@ fun deserializeClassToSymbol(
                 symbol.fir
             }
         )
+
+        symbol.scopeComputation = {
+            addAllDeclarations(classProto, classDeserializer, classId, nameResolver, deserializeNestedClass, context, session)
+            loadedDeserializedContent++
+        }
 
         if (isSealed) {
             classProto.sealedSubclassFqNameList.mapTo((firClass as FirSealedClassImpl).inheritors) {

@@ -211,9 +211,6 @@ private fun FirRegularClass.getSingleAbstractMethodOrNull(
     // TODO: restrict to Java interfaces
     if (classKind != ClassKind.INTERFACE) return null
 
-    symbol.scopeComputation?.invoke()
-    symbol.scopeComputation = null
-
     if (hasMoreThenOneAbstractFunctionOrHasAbstractProperty()) return null
 
     val samCandidateNames = computeSamCandidateNames(session)
@@ -230,8 +227,6 @@ private fun FirRegularClass.computeSamCandidateNames(session: FirSession): Set<N
 
     val samCandidateNames = mutableSetOf<Name>()
     for (clazz in classes) {
-        clazz.symbol.scopeComputation?.invoke()
-        clazz.symbol.scopeComputation = null
         for (declaration in clazz.declarations) {
             if (declaration !is FirMemberDeclaration || declaration.modality != Modality.ABSTRACT) continue
             samCandidateNames.add(declaration.name)

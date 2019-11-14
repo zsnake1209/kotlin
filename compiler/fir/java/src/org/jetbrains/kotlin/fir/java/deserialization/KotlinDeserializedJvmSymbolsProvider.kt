@@ -416,10 +416,6 @@ class KotlinDeserializedJvmSymbolsProvider(
             .filterIsInstance<FirNamedDeclaration>()
             .mapTo(mutableSetOf(), FirNamedDeclaration::name)
 
-    override fun getNestedClassesNamesInClass(classId: ClassId): Set<Name> {
-        return getClassDeclarations(classId).filterIsInstance<FirRegularClass>().mapTo(mutableSetOf()) { it.name }
-    }
-
     override fun getPackage(fqName: FqName): FqName? = null
 
     companion object {

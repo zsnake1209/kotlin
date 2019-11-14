@@ -9,7 +9,9 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSessionComponent
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
-import org.jetbrains.kotlin.fir.symbols.*
+import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTag
+import org.jetbrains.kotlin.fir.symbols.ConeClassifierLookupTag
+import org.jetbrains.kotlin.fir.symbols.ConeClassifierLookupTagWithFixedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.ConeClassLikeLookupTagImpl
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
@@ -53,7 +55,6 @@ abstract class FirSymbolProvider : FirSessionComponent {
     open fun getClassNamesInPackage(fqName: FqName): Set<Name> = emptySet()
 
     open fun getAllCallableNamesInClass(classId: ClassId): Set<Name> = emptySet()
-    open fun getNestedClassesNamesInClass(classId: ClassId): Set<Name> = emptySet()
 
     abstract fun getPackage(fqName: FqName): FqName? // TODO: Replace to symbol sometime
 

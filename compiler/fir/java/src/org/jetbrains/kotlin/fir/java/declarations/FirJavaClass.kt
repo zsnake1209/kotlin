@@ -56,6 +56,12 @@ class FirJavaClass internal constructor(
     override val superTypeRefs = mutableListOf<FirTypeRef>()
 
     override val declarations = mutableListOf<FirDeclaration>()
+        get() {
+            val x = symbol.scopeComputation
+            symbol.scopeComputation = null
+            x?.invoke()
+            return field
+        }
 
     override val companionObject: FirRegularClass?
         get() = null

@@ -12,7 +12,9 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.declarations.*
+import org.jetbrains.kotlin.fir.declarations.FirRegularClass
+import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.addDeclaration
 import org.jetbrains.kotlin.fir.declarations.impl.*
 import org.jetbrains.kotlin.fir.deserialization.FirBuiltinAnnotationDeserializer
 import org.jetbrains.kotlin.fir.deserialization.FirDeserializationContext
@@ -105,8 +107,6 @@ class FirLibrarySymbolProviderImpl(val session: FirSession) : FirSymbolProvider(
                         null, parentContext,
                         this::findAndDeserializeClass
                     )
-                    symbol.scopeComputation?.invoke()
-                    symbol.scopeComputation = null
                 }
             }
         }
@@ -279,19 +279,6 @@ class FirLibrarySymbolProviderImpl(val session: FirSession) : FirSymbolProvider(
         } ?: emptySet()
     }
 
-    override fun getAllCallableNamesInClass(classId: ClassId): Set<Name> {
-        return getClassDeclarations(classId).filterIsInstance<FirMemberDeclaration>().mapTo(mutableSetOf()) { it.name }
-    }
-
-    private fun getClassDeclarations(classId: ClassId): List<FirDeclaration> {
-        return findRegularClass(classId)?.declarations ?: emptyList()
-    }
-
-
     private fun findRegularClass(classId: ClassId): FirRegularClass? =
         getClassLikeSymbolByFqName(classId)?.fir as? FirRegularClass
-
-    override fun getNestedClassesNamesInClass(classId: ClassId): Set<Name> {
-        return getClassDeclarations(classId).filterIsInstance<FirRegularClass>().mapTo(mutableSetOf()) { it.name }
-    }
 }
