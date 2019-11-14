@@ -116,7 +116,7 @@ private class MoveOrCopyCompanionObjectFieldsLowering(val context: CommonBackend
         fieldParent: IrClass,
         fieldReplacementMap: MutableMap<IrFieldSymbol, IrFieldSymbol>? = null
     ): IrField? {
-        if (irProperty.origin == IrDeclarationOrigin.FAKE_OVERRIDE) return null
+        if (irProperty.isFakeOverride) return null
         val oldField = irProperty.backingField ?: return null
         val newField = createStaticBackingField(oldField, propertyParent, fieldParent)
 

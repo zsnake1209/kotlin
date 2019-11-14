@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.ir.types.impl.IrStarProjectionImpl
 import org.jetbrains.kotlin.ir.util.constructedClass
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.explicitParameters
+import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.InlineClassDescriptorResolver
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
@@ -57,7 +58,7 @@ class MemoizedInlineClassReplacements {
         }
 
     private val IrFunction.hasStaticReplacement: Boolean
-        get() = origin != IrDeclarationOrigin.FAKE_OVERRIDE &&
+        get() = !isFakeOverride &&
                 (this is IrSimpleFunction || this is IrConstructor && constructedClass.isInline)
 
     private val IrFunction.hasMethodReplacement: Boolean
@@ -136,7 +137,7 @@ class MemoizedInlineClassReplacements {
         val overrides = function.overriddenSymbols.mapNotNull {
             getReplacementFunction(it.owner)?.function?.symbol as? IrSimpleFunctionSymbol
         }
-        if (function.origin == IrDeclarationOrigin.FAKE_OVERRIDE && overrides.isEmpty())
+        if (function.isFakeOverride && overrides.isEmpty())
             return null
 
         val parameterMap = mutableMapOf<IrValueParameterSymbol, IrValueParameter>()

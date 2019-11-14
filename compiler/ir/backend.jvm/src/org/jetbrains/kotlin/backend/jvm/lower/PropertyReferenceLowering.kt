@@ -118,7 +118,7 @@ internal class PropertyReferenceLowering(val context: JvmBackendContext) : Class
             name = method.name
             returnType = method.returnType
             visibility = method.visibility
-            origin = IrDeclarationOrigin.FAKE_OVERRIDE
+            isFakeOverride = true
         }.apply {
             overriddenSymbols.add(method.symbol)
             dispatchReceiverParameter = thisReceiver!!.copyTo(this)

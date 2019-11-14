@@ -315,7 +315,7 @@ open class ClassCodegen protected constructor(
     }
 
     private fun generateField(field: IrField) {
-        if (field.origin == IrDeclarationOrigin.FAKE_OVERRIDE) return
+        if (field.isFakeOverride) return
 
         val fieldType = typeMapper.mapType(field)
         val fieldSignature =
@@ -340,7 +340,7 @@ open class ClassCodegen protected constructor(
     }
 
     private fun generateMethod(method: IrFunction) {
-        if (method.origin == IrDeclarationOrigin.FAKE_OVERRIDE) return
+        if (method.isFakeOverride) return
 
         val signature = FunctionCodegen(method, this).generate().asmMethod
 

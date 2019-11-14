@@ -15,6 +15,7 @@ class IrFieldBuilder : IrDeclarationBuilder() {
     var isFinal: Boolean = false
     var isExternal: Boolean = false
     var isStatic: Boolean = false
+    var isFakeOverride: Boolean = false
 
     fun updateFrom(from: IrField) {
         super.updateFrom(from)
@@ -23,5 +24,6 @@ class IrFieldBuilder : IrDeclarationBuilder() {
         isFinal = from.isFinal
         isExternal = from.isExternal
         isStatic = from.isStatic
+        isFakeOverride = from.isFakeOverride
     }
 }

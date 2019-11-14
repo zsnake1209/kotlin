@@ -152,7 +152,7 @@ class JvmDeclarationFactory(
                 // is supposed to allow using `I2.DefaultImpls.f` as if it was inherited from `I1.DefaultImpls`.
                 // The classes are not actually related and `I2.DefaultImpls.f` is not a fake override but a bridge.
                 origin = when {
-                    interfaceFun.origin != IrDeclarationOrigin.FAKE_OVERRIDE -> interfaceFun.origin
+                    !interfaceFun.isFakeOverride -> interfaceFun.origin
                     interfaceFun.resolveFakeOverride()!!.origin.isSynthetic -> JvmLoweredDeclarationOrigin.DEFAULT_IMPLS_BRIDGE_TO_SYNTHETIC
                     else -> JvmLoweredDeclarationOrigin.DEFAULT_IMPLS_BRIDGE
                 },
@@ -188,7 +188,7 @@ class JvmDeclarationFactory(
 
     fun getDefaultImplsRedirection(fakeOverride: IrSimpleFunction): IrSimpleFunction =
         defaultImplsRedirections.getOrPut(fakeOverride) {
-            assert(fakeOverride.origin == IrDeclarationOrigin.FAKE_OVERRIDE)
+            assert(fakeOverride.isFakeOverride)
             val irClass = fakeOverride.parentAsClass
             val descriptor = DescriptorsToIrRemapper.remapDeclaredSimpleFunction(fakeOverride.descriptor)
             with(fakeOverride) {

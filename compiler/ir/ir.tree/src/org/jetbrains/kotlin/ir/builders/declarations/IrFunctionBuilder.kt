@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.impl.IrUninitializedType
+import org.jetbrains.kotlin.ir.util.isFakeOverride
 
 class IrFunctionBuilder : IrDeclarationBuilder() {
 
@@ -23,6 +24,7 @@ class IrFunctionBuilder : IrDeclarationBuilder() {
     var isTailrec: Boolean = false
     var isSuspend: Boolean = false
     var isExpect: Boolean = false
+    var isFakeOverride: Boolean = false
 
     var isPrimary: Boolean = false
 
@@ -32,6 +34,8 @@ class IrFunctionBuilder : IrDeclarationBuilder() {
         isInline = from.isInline
         isExternal = from.isExternal
         isExpect = from.isExpect
+
+        isFakeOverride = from.isFakeOverride
 
         if (from is IrSimpleFunction) {
             modality = from.modality

@@ -5,10 +5,12 @@
 
 package org.jetbrains.kotlin.ir.builders.declarations
 
-import org.jetbrains.kotlin.backend.common.descriptors.*
+import org.jetbrains.kotlin.backend.common.descriptors.synthesizedName
 import org.jetbrains.kotlin.backend.common.ir.copyTo
-import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.descriptors.*
@@ -45,7 +47,7 @@ fun IrFieldBuilder.buildField(): IrField {
         startOffset, endOffset, origin,
         IrFieldSymbolImpl(wrappedDescriptor),
         name, type, visibility, isFinal, isExternal, isStatic,
-        origin == IrDeclarationOrigin.FAKE_OVERRIDE
+        isFakeOverride || origin == IrDeclarationOrigin.FAKE_OVERRIDE // TODO drop FAKE_OVERRIDE
     ).also {
         wrappedDescriptor.bind(it)
     }
@@ -77,7 +79,7 @@ fun IrPropertyBuilder.buildProperty(): IrProperty {
         IrPropertySymbolImpl(wrappedDescriptor),
         name, visibility, modality,
         isVar = isVar, isConst = isConst, isLateinit = isLateinit, isDelegated = isDelegated, isExpect = isExpect, isExternal = isExternal,
-        isFakeOverride = origin == IrDeclarationOrigin.FAKE_OVERRIDE
+        isFakeOverride = isFakeOverride || origin == IrDeclarationOrigin.FAKE_OVERRIDE // TODO drop FAKE_OVERRIDE
     ).also {
         wrappedDescriptor.bind(it)
     }
@@ -116,18 +118,20 @@ inline fun IrProperty.addSetter(builder: IrFunctionBuilder.() -> Unit = {}): IrS
     }
 
 fun IrFunctionBuilder.buildFun(originalDescriptor: FunctionDescriptor? = null): IrFunctionImpl {
-    val wrappedDescriptor = if (originalDescriptor is DescriptorWithContainerSource)
-        WrappedFunctionDescriptorWithContainerSource(originalDescriptor.containerSource)
-    else if (originalDescriptor != null)
-        WrappedSimpleFunctionDescriptor(originalDescriptor)
-    else
-        WrappedSimpleFunctionDescriptor()
+    val wrappedDescriptor = when {
+        originalDescriptor is DescriptorWithContainerSource ->
+            WrappedFunctionDescriptorWithContainerSource(originalDescriptor.containerSource)
+        originalDescriptor != null ->
+            WrappedSimpleFunctionDescriptor(originalDescriptor)
+        else ->
+            WrappedSimpleFunctionDescriptor()
+    }
     return IrFunctionImpl(
         startOffset, endOffset, origin,
         IrSimpleFunctionSymbolImpl(wrappedDescriptor),
         name, visibility, modality, returnType,
         isInline = isInline, isExternal = isExternal, isTailrec = isTailrec, isSuspend = isSuspend, isExpect = isExpect,
-        isFakeOverride = origin == IrDeclarationOrigin.FAKE_OVERRIDE
+        isFakeOverride = isFakeOverride || origin == IrDeclarationOrigin.FAKE_OVERRIDE // TODO drop FAKE_OVERRIDE
     ).also {
         wrappedDescriptor.bind(it)
     }

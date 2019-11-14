@@ -49,7 +49,7 @@ private class CollectionStubMethodLowering(val context: JvmBackendContext) : Cla
         // it means an abstract function in superclass that is not implemented yet,
         // stub generation is still needed to avoid invocation error.
         val existingMethodSignatures = irClass.functions.filterNot {
-            it.modality == Modality.ABSTRACT && it.origin == IrDeclarationOrigin.FAKE_OVERRIDE
+            it.modality == Modality.ABSTRACT && it.isFakeOverride
         }.associateBy { it.toSignature() }
 
         for (member in methodStubsToGenerate) {

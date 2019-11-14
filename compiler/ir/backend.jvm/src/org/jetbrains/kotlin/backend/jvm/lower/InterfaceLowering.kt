@@ -71,7 +71,7 @@ internal class InterfaceLowering(val context: JvmBackendContext) : IrElementTran
                  *    interface B : A { class DefaultImpls { fun foo() = A.DefaultImpls.foo() } }
                  *    ```
                  */
-                function.origin == IrDeclarationOrigin.FAKE_OVERRIDE -> {
+                function.isFakeOverride -> {
                     val implementation = function.resolveFakeOverride()!!
 
                     if (!Visibilities.isPrivate(implementation.visibility)

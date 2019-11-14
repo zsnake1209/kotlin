@@ -65,7 +65,7 @@ private class InterfaceDelegationLowering(val context: JvmBackendContext) : IrEl
     }
 
     private fun IrSimpleFunction.getTargetForRedirection(): IrSimpleFunction? {
-        if (origin != IrDeclarationOrigin.FAKE_OVERRIDE) return null
+        if (!isFakeOverride) return null
         parent.let { if (it is IrClass && it.isJvmInterface) return null }
 
         // Only generate interface delegation for functions immediately inherited from an interface.

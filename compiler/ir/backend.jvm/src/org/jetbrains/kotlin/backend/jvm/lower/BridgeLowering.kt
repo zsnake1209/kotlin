@@ -72,7 +72,7 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
         if (irFunction.isStatic) return
         if (irFunction.isMethodOfAny()) return
 
-        if (irFunction.origin === IrDeclarationOrigin.FAKE_OVERRIDE &&
+        if (irFunction.isFakeOverride &&
             irFunction.overriddenSymbols.all {
                 !it.owner.comesFromJava() &&
                         if ((it.owner.parent as? IrClass)?.isInterface == true)
@@ -102,10 +102,10 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
         // TODO: we assume here that all implementations come from classes. There may be a default implementation in
         // an interface, If it comes from the same module, InterfaceDelegationLowering will build a redirection, and the following code will work.
         // But in an imported module, there will be no redirection => failure!
-        if (irFunction.origin === IrDeclarationOrigin.FAKE_OVERRIDE &&
+        if (irFunction.isFakeOverride &&
             irFunction.modality !== Modality.ABSTRACT &&
             irFunction.visibility !== Visibilities.INVISIBLE_FAKE &&
-            irFunction.overriddenInClasses().firstOrNull { it.getJvmSignature() != ourSignature || it.origin != IrDeclarationOrigin.FAKE_OVERRIDE }
+            irFunction.overriddenInClasses().firstOrNull { it.getJvmSignature() != ourSignature || !it.isFakeOverride }
                 ?.let { (it.getJvmName() != ourMethodName || it.getJvmSignature() == specialOverrideSignature) && it.comesFromJava() } == true
         ) {
             val resolved = irFunction.findConcreteSuperDeclaration()!!
@@ -116,7 +116,7 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
                 irClass.declarations.add(bridge)
                 targetForCommonBridges = bridge
             }
-        } else if (irFunction.origin == IrDeclarationOrigin.FAKE_OVERRIDE &&
+        } else if (irFunction.isFakeOverride &&
             irFunction.modality == Modality.ABSTRACT &&
             irFunction.overriddenSymbols.all { it.owner.getJvmName() != ourMethodName }
         ) {
@@ -206,7 +206,7 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
                 newName,
                 visibility, modality, returnType,
                 isInline = isInline, isExternal = isExternal, isTailrec = isTailrec, isSuspend = isSuspend, isExpect = isExpect,
-                isFakeOverride = origin == IrDeclarationOrigin.FAKE_OVERRIDE
+                isFakeOverride = isFakeOverride
             ).apply {
                 newDescriptor.bind(this)
                 parent = this@copyRenamingTo.parent
@@ -241,7 +241,7 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
             isTailrec = false,
             isSuspend = signatureFunction.isSuspend,
             isExpect = false,
-            isFakeOverride = origin == IrDeclarationOrigin.FAKE_OVERRIDE
+            isFakeOverride = false
         ).apply {
             descriptor.bind(this)
             parent = irClass
@@ -309,14 +309,14 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
             this
         else
             WrappedSimpleFunctionDescriptor(descriptor.annotations).let { wrappedDescriptor ->
-                val newOrigin = if (origin == IrDeclarationOrigin.FAKE_OVERRIDE) IrDeclarationOrigin.DEFINED else origin
+                val newOrigin = if (isFakeOverride) IrDeclarationOrigin.DEFINED else origin
                 IrFunctionImpl(
                     startOffset, endOffset, newOrigin,
                     IrSimpleFunctionSymbolImpl(wrappedDescriptor),
                     Name.identifier(getJvmName()),
                     visibility, modality, returnType,
                     isInline = isInline, isExternal = isExternal, isTailrec = isTailrec, isSuspend = isSuspend, isExpect = isExpect,
-                    isFakeOverride = newOrigin == IrDeclarationOrigin.FAKE_OVERRIDE
+                    isFakeOverride = false
                 ).apply {
                     wrappedDescriptor.bind(this)
                     parent = this@orphanedCopy.parent
@@ -372,7 +372,7 @@ private class BridgeLowering(val context: JvmBackendContext) : ClassLoweringPass
 
 
     private inner class FunctionHandleForIrFunction(val irFunction: IrSimpleFunction) : FunctionHandle {
-        override val isDeclaration get() = irFunction.origin != IrDeclarationOrigin.FAKE_OVERRIDE
+        override val isDeclaration get() = !irFunction.isFakeOverride
         override val isAbstract get() = irFunction.modality == Modality.ABSTRACT
         override val mayBeUsedAsSuperImplementation get() = !irFunction.parentAsClass.isInterface || irFunction.hasJvmDefault()
 
