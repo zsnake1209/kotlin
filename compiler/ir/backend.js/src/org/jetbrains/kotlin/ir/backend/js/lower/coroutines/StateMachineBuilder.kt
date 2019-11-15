@@ -574,6 +574,16 @@ class StateMachineBuilder(
         transformLastExpression { expression.apply { value = it } }
     }
 
+    private fun ensureExceptionState(state: SuspendState) {
+        val lastIndex = currentBlock.statements.lastIndex
+        val last = currentBlock.statements[lastIndex]
+        if (last is IrContinue && last.loop === rootLoop) {
+            currentBlock.statements.removeAt(lastIndex)
+            setupExceptionState(state)
+            currentBlock.statements += last
+        }
+    }
+
     override fun visitTry(aTry: IrTry) {
 
         require(aTry.finallyExpression == null)
@@ -605,6 +615,8 @@ class StateMachineBuilder(
         if (!isBlockEnded()) {
             setupExceptionState(enclosingCatch)
             doDispatch(exitState)
+        } else {
+            ensureExceptionState(enclosingCatch)
         }
         addExceptionEdge()
 
