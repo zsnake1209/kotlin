@@ -824,6 +824,24 @@ class TypedHandlerTest : KotlinLightCodeInsightTestCase() {
         )
     }
 
+    fun testEnterWithTrailingCommaAndWhitespaceBeforeLineBreak() {
+        doTypeTest(
+            '\n',
+            """
+                |fun method(
+                |         arg1: String, <caret>
+                |) {}
+                """,
+            """
+                |fun method(
+                |         arg1: String, 
+                |         <caret>
+                |) {}
+                """,
+            enableSmartEnterWithTabs()
+        )
+    }
+
     fun testSmartEnterBetweenOpeningAndClosingBrackets() {
         doTypeTest(
             '\n',

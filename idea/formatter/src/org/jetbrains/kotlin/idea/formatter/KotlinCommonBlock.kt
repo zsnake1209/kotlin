@@ -665,11 +665,9 @@ private fun hasLineBreakBefore(node: ASTNode): Boolean {
 }
 
 private fun hasDoubleLineBreakBefore(node: ASTNode): Boolean {
-    val prevSibling = node.leaves(false)
-        .dropWhile { it.psi is PsiComment }
-        .firstOrNull()
+    val prevSibling = node.leaves(false).firstOrNull() ?: return false
 
-    return prevSibling?.text?.matches(Regex("\\n.*?\\n")) == true
+    return prevSibling.text.count { it == '\n' } >= 2
 }
 
 fun NodeIndentStrategy.PositionStrategy.continuationIf(
@@ -917,7 +915,7 @@ private fun getAlignmentForChildInParenthesis(
             val childNodeType = node.elementType
 
             val prev = getPrevWithoutWhitespace(node)
-            val hasTrailingComma = prev != null && prev.elementType == COMMA
+            val hasTrailingComma = childNodeType === closeBracket && prev?.elementType == COMMA
 
             if (hasTrailingComma && hasDoubleLineBreakBefore(node)) {
                 // Prefer align to parameters on code with trailing comma (case of line break after comma, when before closing bracket there was a line break)
