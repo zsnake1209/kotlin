@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.jvm.ir
 
 import org.jetbrains.kotlin.backend.common.IrElementVisitorVoidWithContext
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
+import org.jetbrains.kotlin.backend.jvm.codegen.isExtensionFunctionType
 import org.jetbrains.kotlin.backend.jvm.codegen.isInlineFunctionCall
 import org.jetbrains.kotlin.backend.jvm.codegen.isInlineIrExpression
 import org.jetbrains.kotlin.ir.IrElement
@@ -16,7 +17,8 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 internal class IrInlineReferenceLocator(private val context: JvmBackendContext) : IrElementVisitorVoidWithContext() {
-    val inlineReferences = mutableSetOf<IrCallableReference>()
+    // For each inline reference we store a flag telling us whether the caller expects a function with receiver.
+    val inlineReferences = mutableMapOf<IrCallableReference, Boolean>()
 
     // For crossinline lambdas, the call site is null as it's probably in a separate class somewhere.
     // All other lambdas are guaranteed to be inlined into the scope they are declared in.
@@ -31,12 +33,14 @@ internal class IrInlineReferenceLocator(private val context: JvmBackendContext) 
                 if (!parameter.isInlineParameter())
                     continue
 
+                val expectingExtensionFunction = parameter.type.isExtensionFunctionType
+
                 val valueArgument = expression.getValueArgument(parameter.index) ?: continue
                 if (!isInlineIrExpression(valueArgument))
                     continue
 
                 if (valueArgument is IrPropertyReference) {
-                    inlineReferences.add(valueArgument)
+                    inlineReferences[valueArgument] = expectingExtensionFunction
                     continue
                 }
 
@@ -46,7 +50,7 @@ internal class IrInlineReferenceLocator(private val context: JvmBackendContext) 
                     else -> null
                 } ?: continue
 
-                inlineReferences.add(reference)
+                inlineReferences[reference] = expectingExtensionFunction
                 if (valueArgument is IrBlock && valueArgument.origin.isLambda) {
                     lambdaToCallSite[reference.symbol.owner] =
                         if (parameter.isCrossinline) null else currentScope!!.irElement as IrDeclaration

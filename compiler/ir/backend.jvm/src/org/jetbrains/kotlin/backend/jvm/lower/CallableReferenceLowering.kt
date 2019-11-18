@@ -55,7 +55,7 @@ internal class CallableReferenceLowering(private val context: JvmBackendContext)
     private fun IrFunctionReference.isSuspendCallableReference(): Boolean = isSuspend && origin == null
 
     override fun lower(irFile: IrFile) {
-        ignoredFunctionReferences.addAll(IrInlineReferenceLocator.scan(context, irFile).inlineReferences)
+        ignoredFunctionReferences.addAll(IrInlineReferenceLocator.scan(context, irFile).inlineReferences.keys)
         irFile.transformChildrenVoid(this)
     }
 

@@ -134,6 +134,11 @@ public class IrBytecodeTextTestGenerated extends AbstractIrBytecodeTextTest {
         runTest("compiler/testData/codegen/bytecodeText/inlineProtectedJavaConstantFromOtherPackage.kt");
     }
 
+    @TestMetadata("inlineValueParameterInsteadOfReceiver.kt")
+    public void testInlineValueParameterInsteadOfReceiver() throws Exception {
+        runTest("compiler/testData/codegen/bytecodeText/inlineValueParameterInsteadOfReceiver.kt");
+    }
+
     @TestMetadata("intConstantNotNull.kt")
     public void testIntConstantNotNull() throws Exception {
         runTest("compiler/testData/codegen/bytecodeText/intConstantNotNull.kt");
