@@ -824,6 +824,21 @@ class TypedHandlerTest : KotlinLightCodeInsightTestCase() {
         )
     }
 
+    fun testSmartEnterBetweenOpeningAndClosingBrackets() {
+        doTypeTest(
+            '\n',
+            """
+                |fun method(<caret>) {}
+                """,
+            """
+                |fun method(
+                |		<caret>
+                |) {}
+                """,
+            enableSmartEnterWithTabs()
+        )
+    }
+
     fun testAutoIndentInWhenClause() {
         doTypeTest(
             '\n',
