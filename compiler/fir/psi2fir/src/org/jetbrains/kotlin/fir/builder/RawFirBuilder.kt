@@ -349,7 +349,7 @@ class RawFirBuilder(session: FirSession, val stubMode: Boolean) : BaseFirBuilder
                     ConeClassTypeImpl(
                         implicitEnumType.type.lookupTag,
                         delegatedSelfTypeRef?.coneTypeUnsafe<ConeKotlinType>()?.let { arrayOf(it) } ?: emptyArray(),
-                        isNullable = true
+                        isNullable = false
                     )
                 )
                 this is KtClass && this.isAnnotation() -> implicitAnnotationType
