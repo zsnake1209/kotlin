@@ -9,6 +9,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.backend.common.LoggingContext
+import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
 import org.jetbrains.kotlin.backend.common.serialization.metadata.DynamicTypeDeserializer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -118,8 +120,26 @@ fun generateKLib(
     val depsDescriptors = ModulesStructure(project, files, configuration, allDependencies, friendDependencies)
 
     val psi2IrContext = runAnalysisAndPreparePsi2Ir(depsDescriptors)
+    val psi2Ir = Psi2IrTranslator(psi2IrContext.languageVersionSettings, psi2IrContext.configuration)
 
-    val moduleFragment = psi2IrContext.generateModuleFragment(files)
+    for (extension in IrGenerationExtension.getInstances(project)) {
+        psi2Ir.addPostprocessingStep { module ->
+            extension.generate(
+                module,
+                IrPluginContext(
+                    psi2IrContext.moduleDescriptor,
+                    psi2IrContext.bindingContext,
+                    psi2IrContext.languageVersionSettings,
+                    psi2IrContext.symbolTable,
+                    psi2IrContext.typeTranslator,
+                    psi2IrContext.irBuiltIns
+                )
+            )
+        }
+    }
+
+    val moduleFragment =
+        psi2Ir.generateModuleFragment(psi2IrContext, files)
 
     val moduleName = configuration[CommonConfigurationKeys.MODULE_NAME]!!
 
@@ -176,8 +196,30 @@ fun loadIr(
         deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!
     }
 
-    val moduleFragment = psi2IrContext.generateModuleFragment(files, deserializer)
-    // todo: add postprocessing step
+    val psi2Ir = Psi2IrTranslator(psi2IrContext.languageVersionSettings, psi2IrContext.configuration)
+
+    for (extension in IrGenerationExtension.getInstances(project)) {
+        psi2Ir.addPostprocessingStep { module ->
+            extension.generate(
+                module,
+                IrPluginContext(
+                    psi2IrContext.moduleDescriptor,
+                    psi2IrContext.bindingContext,
+                    psi2IrContext.languageVersionSettings,
+                    psi2IrContext.symbolTable,
+                    psi2IrContext.typeTranslator,
+                    psi2IrContext.irBuiltIns
+                )
+            )
+        }
+    }
+
+    val moduleFragment =
+        psi2Ir.generateModuleFragment(
+            psi2IrContext,
+            files,
+            deserializer
+        )
 
     return IrModuleInfo(moduleFragment, deserializedModuleFragments, irBuiltIns, symbolTable, deserializer)
 }
