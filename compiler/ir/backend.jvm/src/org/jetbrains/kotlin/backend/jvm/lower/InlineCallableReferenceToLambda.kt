@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.backend.common.lower.irBlock
 import org.jetbrains.kotlin.backend.common.phaser.makeIrFilePhase
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
+import org.jetbrains.kotlin.backend.jvm.codegen.isExtensionFunctionType
 import org.jetbrains.kotlin.backend.jvm.ir.IrInlineReferenceLocator
 import org.jetbrains.kotlin.backend.jvm.ir.createJvmIrBuilder
 import org.jetbrains.kotlin.backend.jvm.ir.irArray
@@ -49,7 +50,7 @@ internal val inlineCallableReferenceToLambdaPhase = makeIrFilePhase(
 internal class InlineCallableReferenceToLambdaPhase(val context: JvmBackendContext) : FileLoweringPass,
     IrElementTransformerVoidWithContext() {
 
-    private lateinit var inlinableReferences: MutableMap<IrCallableReference, Boolean>
+    private lateinit var inlinableReferences: MutableMap<IrCallableReference, IrType>
 
     override fun lower(irFile: IrFile) {
         IrInlineReferenceLocator.scan(context, irFile).let {
@@ -60,13 +61,13 @@ internal class InlineCallableReferenceToLambdaPhase(val context: JvmBackendConte
 
     override fun visitFunctionReference(expression: IrFunctionReference): IrExpression {
         if (expression.origin.isLambda) return expression
-        val expectingExtensionFunction = inlinableReferences[expression] ?: return expression
+        val expectingExtensionFunction = inlinableReferences[expression]?.isExtensionFunctionType ?: return expression
 
         return expandInlineFunctionReferenceToLambda(expression, expression.symbol.owner, expectingExtensionFunction)
     }
 
     override fun visitPropertyReference(expression: IrPropertyReference): IrExpression {
-        val expectingExtensionFunction = inlinableReferences[expression] ?: return expression
+        val expectingExtensionFunction = inlinableReferences[expression]?.isExtensionFunctionType ?: return expression
 
         return if (expression.field?.owner == null) {
             // Use getter if field is absent ...

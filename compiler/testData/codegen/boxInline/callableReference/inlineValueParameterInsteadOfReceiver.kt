@@ -7,5 +7,3 @@ class Q {
 fun box(): String {
     return Z().run(Q()::f)
 }
-
-// 0 Function1.invoke
