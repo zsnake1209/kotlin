@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.resolve.transformers
 
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.copy
 import org.jetbrains.kotlin.fir.declarations.*
@@ -34,7 +35,8 @@ import org.jetbrains.kotlin.types.Variance
 class FirCallCompletionResultsWriterTransformer(
     override val session: FirSession,
     private val finalSubstitutor: ConeSubstitutor,
-    private val typeCalculator: ReturnTypeCalculator
+    private val typeCalculator: ReturnTypeCalculator,
+    private val replacements: Map<FirElement, FirElement>
 ) : FirAbstractTreeTransformer<Nothing?>(phase = FirResolvePhase.IMPLICIT_TYPES_BODY_RESOLVE) {
 
     override fun transformQualifiedAccessExpression(
@@ -115,7 +117,7 @@ class FirCallCompletionResultsWriterTransformer(
 
     override fun transformFunctionCall(functionCall: FirFunctionCall, data: Nothing?): CompositeTransformResult<FirStatement> {
         val calleeReference = functionCall.calleeReference as? FirNamedReferenceWithCandidate ?: return functionCall.compose()
-        val functionCall = functionCall.transformArguments(this, data) as FirFunctionCall
+        val functionCall = functionCall.transformArguments(MapArguments, replacements).transformArguments(this, data) as FirFunctionCall
 
         val subCandidate = calleeReference.candidate
         val declaration = subCandidate.symbol.phasedFir as FirCallableMemberDeclaration<*>
