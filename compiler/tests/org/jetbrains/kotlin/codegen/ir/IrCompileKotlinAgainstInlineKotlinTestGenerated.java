@@ -2689,6 +2689,11 @@ public class IrCompileKotlinAgainstInlineKotlinTestGenerated extends AbstractIrC
             runTest("compiler/testData/codegen/boxInline/property/kt22649.kt");
         }
 
+        @TestMetadata("privateVarFromInline.kt")
+        public void testPrivateVarFromInline() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/property/privateVarFromInline.kt");
+        }
+
         @TestMetadata("property.kt")
         public void testProperty() throws Exception {
             runTest("compiler/testData/codegen/boxInline/property/property.kt");
