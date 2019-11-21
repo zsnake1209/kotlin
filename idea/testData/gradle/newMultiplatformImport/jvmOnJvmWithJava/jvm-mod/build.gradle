@@ -5,9 +5,7 @@ plugins {
 version 'unspecified'
 
 repositories {
-    maven { url 'http://dl.bintray.com/kotlin/kotlin-dev' }
-    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
-    mavenCentral()
+    {{kotlin_plugin_repositories}}
 }
 
 dependencies {
