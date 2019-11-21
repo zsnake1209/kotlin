@@ -5,13 +5,11 @@ apply plugin: 'kotlin-multiplatform'
 apply plugin: 'maven-publish'
 apply plugin: 'kotlin-allopen'
 apply plugin: 'kotlin-noarg'
-apply plugin: 'com.moowork.node'
 
 buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-noarg:$kotlin_version"
-        classpath "com.moowork.gradle:gradle-node-plugin:$moowork_node"
     }
     repositories {
         {{kotlin_plugin_repositories}}
@@ -75,49 +73,3 @@ kotlin {
         }
     }
 }
-
-// ======================= JS test configurations =====================
-
-task populateNodeModules(type: Sync, dependsOn: compileTestKotlinJs) {
-    from compileKotlinJs.destinationDir
-    into "${buildDir}/node_modules"
-
-    afterEvaluate {
-        configurations.jsTestRuntimeClasspath.each {
-            if (it.absolutePath.endsWith(".jar")) {
-                from zipTree(it.absolutePath).matching {
-                    include '*.js'
-                    include '*.js.map'
-                }
-            }
-        }
-    }
-
-}
-build.dependsOn(populateNodeModules)
-
-// Workaround the problem with Node downloading
-repositories.whenObjectAdded {
-    if (it instanceof IvyArtifactRepository) {
-        metadataSources {
-            artifact()
-        }
-    }
-}
-node {
-    download = true
-}
-
-task installMocha(type: NpmTask) {
-    args = ['install', 'mocha']
-}
-
-task runMocha(type: NodeTask, dependsOn: [compileTestKotlinJs,
-                                          populateNodeModules,
-                                          installMocha]) {
-    script = file('node_modules/mocha/bin/mocha')
-    args = [compileTestKotlinJs.outputFile]
-}
-
-jsTest.dependsOn runMocha
-

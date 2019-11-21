@@ -893,9 +893,9 @@ class NewMultiplatformProjectImportingTest : MultiplePluginVersionGradleImportin
         importProject(true)
 
         checkProjectStructure(false, false, false ) {
-            module("project.javaModule.test") {
-                moduleDependency("project.mppModule.jvmTest", DependencyScope.TEST, true)
-                moduleDependency("project.mppModule.jvmMain", DependencyScope.TEST, false)
+            module("jvm-on-mpp.jvm-mod.main") {
+                moduleDependency("org.jetbrains.qa.mpp-mod-a.jvmMain", DependencyScope.COMPILE, false)
+                moduleDependency("org.jetbrains.qa.mpp-mod-a.commonMain", DependencyScope.COMPILE, false)
             }
         }
     }
