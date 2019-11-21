@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.export.isExported
 import org.jetbrains.kotlin.ir.backend.js.utils.getJsName
 import org.jetbrains.kotlin.ir.backend.js.utils.getJsNameOrKotlinName
+import org.jetbrains.kotlin.ir.backend.js.utils.realOverrideTarget
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
@@ -20,7 +21,6 @@ import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 fun eliminateDeadDeclarations(
     module: IrModuleFragment,
@@ -95,34 +95,11 @@ private fun removeUselessDeclarations(module: IrModuleFragment, usefulDeclaratio
     }
 }
 
-fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendContext): Set<IrDeclaration> {
-    val queue = ArrayDeque<IrDeclaration>()
-    val result = hashSetOf<IrDeclaration>()
-    val constructedClasses = hashSetOf<IrClass>()
+private fun Iterable<IrDeclaration>.withNested(): Iterable<IrDeclaration> {
+    val result = mutableListOf<IrDeclaration>()
 
-    fun IrDeclaration.enqueue() {
-        if (this !in result) {
-            result.add(this)
-            queue.addLast(this)
-            if (this is IrConstructor) {
-                constructedClass.enqueue()
-                constructedClasses += constructedClass
-                constructedClass.declarations.forEach {
-                    // A hack to support `toJson` and other js-specific members
-                    if (it.getJsName() != null ||
-                        it is IrField && it.correspondingPropertySymbol?.owner?.getJsName() != null ||
-                        it is IrSimpleFunction && it.correspondingPropertySymbol?.owner?.getJsName() != null
-                    ) {
-                        it.enqueue()
-                    }
-                }
-            }
-        }
-    }
-
-    // Add nested declarations within roots
-    for (declaration in roots) {
-        declaration.acceptVoid(object : IrElementVisitorVoid {
+    this.forEach {
+        it.acceptVoid(object : IrElementVisitorVoid {
             override fun visitElement(element: IrElement) {
                 element.acceptChildrenVoid(this)
             }
@@ -133,10 +110,34 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
 
             override fun visitDeclaration(declaration: IrDeclaration) {
                 super.visitDeclaration(declaration)
-                declaration.enqueue()
+                result += declaration
             }
         })
     }
+
+    return result
+}
+
+fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendContext): Set<IrDeclaration> {
+    val queue = ArrayDeque<IrDeclaration>()
+    val result = hashSetOf<IrDeclaration>()
+    val constructedClasses = hashSetOf<IrClass>()
+
+    fun IrDeclaration.enqueue() {
+        if (this !in result) {
+            result.add(this)
+            queue.addLast(this)
+
+            // Detect instantiated classes.
+            if (this is IrConstructor) {
+                constructedClass.enqueue()
+                constructedClasses += constructedClass
+            }
+        }
+    }
+
+    // Add roots, including nested declarations
+    roots.withNested().forEach { it.enqueue() }
 
     val toStringMethod =
         context.irBuiltIns.anyClass.owner.declarations.filterIsInstance<IrFunction>().single { it.name.asString() == "toString" }
@@ -144,14 +145,6 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
         context.irBuiltIns.anyClass.owner.declarations.filterIsInstance<IrFunction>().single { it.name.asString() == "equals" }
     val hashCodeMethod =
         context.irBuiltIns.anyClass.owner.declarations.filterIsInstance<IrFunction>().single { it.name.asString() == "hashCode" }
-
-    fun IrOverridableDeclaration<*>.overridesUsefulFunction(): Boolean {
-        return this.overriddenSymbols.any {
-            (it.owner as? IrOverridableDeclaration<*>)?.let {
-                it in result || it.overridesUsefulFunction()
-            } ?: false
-        }
-    }
 
     while (queue.isNotEmpty()) {
         while (queue.isNotEmpty()) {
@@ -186,9 +179,7 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
 
             if (declaration is IrSimpleFunction) {
                 if (declaration.origin == IrDeclarationOrigin.FAKE_OVERRIDE) {
-                    declaration.overriddenSymbols.forEach {
-                        it.owner.enqueue()
-                    }
+                    declaration.realOverrideTarget.enqueue()
                 }
             }
 
@@ -275,14 +266,31 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
             })
         }
 
+        fun IrOverridableDeclaration<*>.overridesUsefulFunction(): Boolean {
+            return this.overriddenSymbols.any {
+                (it.owner as? IrOverridableDeclaration<*>)?.let {
+                    it in result || it.overridesUsefulFunction()
+                } ?: false
+            }
+        }
+
         for (klass in constructedClasses) {
-            for (declaration in ArrayList(klass.declarations)) {
+            for (declaration in klass.declarations) {
                 if (declaration in result) continue
 
                 if (declaration is IrOverridableDeclaration<*> && declaration.overridesUsefulFunction()) {
                     declaration.enqueue()
                 }
+
                 if (declaration is IrSimpleFunction && declaration.getJsNameOrKotlinName().asString() == "valueOf") {
+                    declaration.enqueue()
+                }
+
+                // A hack to support `toJson` and other js-specific members
+                if (declaration.getJsName() != null ||
+                    declaration is IrField && declaration.correspondingPropertySymbol?.owner?.getJsName() != null ||
+                    declaration is IrSimpleFunction && declaration.correspondingPropertySymbol?.owner?.getJsName() != null
+                ) {
                     declaration.enqueue()
                 }
             }
