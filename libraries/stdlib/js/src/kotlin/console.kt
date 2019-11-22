@@ -65,8 +65,7 @@ internal open class BufferedOutput : BaseOutput() {
 internal class BufferedOutputToConsoleLog : BufferedOutput() {
     override fun print(message: Any?) {
         var s = String(message)
-        val i = s.asDynamic().lastIndexOf("\n").unsafeCast<Int>()
-//        val i = s.lastIndexOf("\n")
+        val i = s.lastIndexOf("\n")
         if (i >= 0) {
             buffer += s.substring(0, i)
             flush()

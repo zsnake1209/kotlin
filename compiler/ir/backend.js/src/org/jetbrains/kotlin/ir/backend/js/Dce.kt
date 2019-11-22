@@ -127,12 +127,6 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
         if (this !in result) {
             result.add(this)
             queue.addLast(this)
-
-            // Detect instantiated classes.
-            if (this is IrConstructor) {
-                constructedClass.enqueue()
-                constructedClasses += constructedClass
-            }
         }
     }
 
@@ -149,9 +143,6 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
     while (queue.isNotEmpty()) {
         while (queue.isNotEmpty()) {
             val declaration = queue.pollFirst()
-
-            // Statics are not lowered yet
-            (declaration.parent as? IrDeclaration)?.enqueue()
 
             if (declaration is IrClass) {
                 declaration.superTypes.forEach {
@@ -178,8 +169,14 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
             }
 
             if (declaration is IrSimpleFunction) {
-                if (declaration.origin == IrDeclarationOrigin.FAKE_OVERRIDE) {
-                    declaration.realOverrideTarget.enqueue()
+                declaration.resolveFakeOverride()?.enqueue()
+            }
+
+            // Collect instantiated classes.
+            if (declaration is IrConstructor) {
+                declaration.constructedClass.let {
+                    it.enqueue()
+                    constructedClasses += it
                 }
             }
 
@@ -216,8 +213,6 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                 override fun visitCall(expression: IrCall) {
                     super.visitCall(expression)
 
-                    expression.superQualifierSymbol?.owner?.enqueue()
-
                     when (expression.symbol) {
                         context.intrinsics.jsBoxIntrinsic -> {
                             val inlineClass = expression.getTypeArgument(0)!!.getInlinedClass()!!
@@ -225,7 +220,7 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                             constructor.enqueue()
                         }
                         context.intrinsics.jsClass -> {
-                            (expression.getTypeArgument(0)?.classifierOrNull as? IrClassSymbol)?.owner?.enqueue()
+                            (expression.getTypeArgument(0)!!.classifierOrFail.owner as IrDeclaration).enqueue()
                         }
                         context.intrinsics.jsObjectCreate.symbol -> {
                             val classToCreate = expression.getTypeArgument(0)!!.classifierOrFail.owner as IrClass
