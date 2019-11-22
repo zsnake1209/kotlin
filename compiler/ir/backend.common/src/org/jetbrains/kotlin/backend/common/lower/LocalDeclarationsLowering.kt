@@ -311,7 +311,10 @@ class LocalDeclarationsLowering(
                     val oldParameter = newParameterToOld[newValueParameterDeclaration]
 
                     if (oldParameter != null) {
-                        oldExpression.getValueArgument(oldParameter.index)
+                        if (oldParameter.index < 0) oldExpression.extensionReceiver.also {
+                            assert(oldParameter.index == -1) { "Receiver should have -1 index, but has ${oldParameter.index}" }
+                        }
+                        else oldExpression.getValueArgument(oldParameter.index)
                     } else {
                         // The callee expects captured value as argument.
                         val capturedValueSymbol =
@@ -330,7 +333,6 @@ class LocalDeclarationsLowering(
                 }
 
                 dispatchReceiver = oldExpression.dispatchReceiver
-                extensionReceiver = oldExpression.extensionReceiver
 
                 return this
             }
@@ -508,8 +510,6 @@ class LocalDeclarationsLowering(
                 throw AssertionError("local functions must not have dispatch receiver")
             }
 
-            val newDispatchReceiverParameter = null
-
             // TODO: consider using fields to access the closure of enclosing class.
             val capturedValues = localFunctionContext.closure.capturedValues
 
@@ -536,12 +536,6 @@ class LocalDeclarationsLowering(
 
             newDeclaration.parent = memberOwner
             newDeclaration.copyTypeParametersFrom(oldDeclaration)
-            newDeclaration.dispatchReceiverParameter = newDispatchReceiverParameter
-            newDeclaration.extensionReceiverParameter = oldDeclaration.extensionReceiverParameter?.run {
-                copyTo(newDeclaration).also {
-                    newParameterToOld.putAbsentOrSame(it, this)
-                }
-            }
 
             newDeclaration.valueParameters += createTransformedValueParameters(capturedValues, oldDeclaration, newDeclaration)
             newDeclaration.recordTransformedValueParameters(localFunctionContext)
@@ -579,8 +573,15 @@ class LocalDeclarationsLowering(
                 }
             }
 
+            var shift = capturedValues.size
+            oldDeclaration.extensionReceiverParameter?.let { v ->
+                this.add(v.copyTo(newDeclaration, index = shift++).also {
+                    newParameterToOld.putAbsentOrSame(it, v)
+                })
+            }
+
             oldDeclaration.valueParameters.mapTo(this) { v ->
-                v.copyTo(newDeclaration, index = v.index + capturedValues.size).also {
+                v.copyTo(newDeclaration, index = v.index + shift).also {
                     newParameterToOld.putAbsentOrSame(it, v)
                 }
             }
