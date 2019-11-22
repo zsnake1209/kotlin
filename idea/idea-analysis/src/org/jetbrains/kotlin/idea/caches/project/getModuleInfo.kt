@@ -51,6 +51,7 @@ fun ModuleInfo.findSdkAcrossDependencies(): SdkInfo? {
         // of 'cacheInvalidatingOnRootModifications' as key for cache, and it should be different for Production/Source
         is ModuleProductionSourceInfo -> module.cacheInvalidatingOnRootModifications { doFindSdk() }
         is ModuleTestSourceInfo -> module.cacheInvalidatingOnRootModifications { doFindSdk() }
+        is LibraryInfo -> project.cacheInvalidatingOnRootModifications { doFindSdk() }
         else -> doFindSdk()
     }
 }
