@@ -59,7 +59,7 @@ private fun buildRoots(module: IrModuleFragment, context: JsIrBackendContext, ma
     return rootDeclarations
 }
 
-private fun removeUselessDeclarations(module: IrModuleFragment, usefulDeclarations:Set<IrDeclaration>) {
+private fun removeUselessDeclarations(module: IrModuleFragment, usefulDeclarations: Set<IrDeclaration>) {
     module.files.forEach {
         it.acceptVoid(object : IrElementVisitorVoid {
             override fun visitElement(element: IrElement) {
@@ -159,7 +159,7 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                 }
 
                 // TODO find out how `doResume` gets removed
-                if (declaration.name.asString() == "CoroutineImpl") {
+                if (declaration.symbol == context.ir.symbols.coroutineImpl) {
                     declaration.declarations.forEach {
                         if (it is IrSimpleFunction && it.name.asString() == "doResume") {
                             it.enqueue()
@@ -241,15 +241,6 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                                 toStringMethod.enqueue()
                             }
                         }
-                    }
-                }
-
-                override fun visitGetObjectValue(expression: IrGetObjectValue) {
-                    super.visitGetObjectValue(expression)
-
-                    expression.symbol.owner.let {
-                        constructedClasses += it
-                        it.constructors.find { it.isPrimary }?.enqueue()
                     }
                 }
 

@@ -178,6 +178,8 @@ class NumberOperatorCallsTransformer(context: JsIrBackendContext) : CallsTransfo
             assert(call.valueArgumentsCount == 1)
             val arg = call.getValueArgument(0)!!
 
+            var actualCall = call
+
             if (arg.type.isLong()) {
                 val receiverType = call.dispatchReceiver!!.type
 
@@ -214,39 +216,25 @@ class NumberOperatorCallsTransformer(context: JsIrBackendContext) : CallsTransfo
                         ).apply {
                             putValueArgument(0, call.dispatchReceiver)
                         }
+
+                        // Replace {Byte, Short, Int}.OP with corresponding Long.OP
+                        val declaration = call.symbol.owner as IrSimpleFunction
+                        val replacement = intrinsics.longClassSymbol.owner.declarations.filterIsInstance<IrSimpleFunction>()
+                            .single { member ->
+                                member.name.asString() == declaration.name.asString() &&
+                                        member.valueParameters.size == declaration.valueParameters.size &&
+                                        member.valueParameters.zip(declaration.valueParameters).all { (a, b) -> a.type == b.type }
+                            }.symbol
+
+                        actualCall = irCall(call, replacement)
                     }
                 }
             }
 
-            if (call.dispatchReceiver!!.type.isLong()) {
-                // LHS is Long => check the correct member is used
-                (call.symbol.owner as? IrSimpleFunction)?.let { declaration ->
-                    if (declaration.dispatchReceiverParameter?.type?.isLong() == false) {
-
-                        val replacement = intrinsics.longClassSymbol.owner.declarations.filterIsInstance<IrSimpleFunction>()
-                            .firstOrNull { member ->
-                                member.name.asString() == declaration.name.asString() &&
-                                        member.valueParameters.size == declaration.valueParameters.size &&
-                                        member.valueParameters.zip(declaration.valueParameters).all { (a, b) -> a.type == b.type }
-                            }
-
-                        if (replacement != null) {
-                            IrCallImpl(
-                                call.startOffset,
-                                call.endOffset,
-                                replacement.returnType,
-                                replacement.symbol
-                            ).apply {
-                                dispatchReceiver = call.dispatchReceiver
-                                for (i in 0 until call.valueArgumentsCount) {
-                                    putValueArgument(i, call.getValueArgument(i))
-                                }
-                            }
-                        } else call
-                    } else call
-                } ?: call
+            if (actualCall.dispatchReceiver!!.type.isLong()) {
+                actualCall
             } else {
-                default(call)
+                default(actualCall)
             }
         }
 
