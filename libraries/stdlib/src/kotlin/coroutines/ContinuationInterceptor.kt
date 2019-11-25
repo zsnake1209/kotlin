@@ -43,8 +43,7 @@ public interface ContinuationInterceptor : CoroutineContext.Element {
         /* do nothing by default */
     }
 
-    // TODO we can either inline *covariant here and use "===" on key or discuss it with the committee
-    public override operator fun <E : CoroutineContext.Element> get(key: CoroutineContext.Key<E>): E? = getCovariantElement(key)
+    public override operator fun <E : CoroutineContext.Element> get(key: CoroutineContext.Key<E>): E? = getPolymorphicElement(key)
 
-    public override fun minusKey(key: CoroutineContext.Key<*>): CoroutineContext = minusCovariantKey(key)
+    public override fun minusKey(key: CoroutineContext.Key<*>): CoroutineContext = minusPolymorphicKey(key)
 }

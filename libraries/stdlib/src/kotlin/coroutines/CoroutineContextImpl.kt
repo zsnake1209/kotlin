@@ -15,13 +15,29 @@ import kotlin.coroutines.CoroutineContext.Key
 public abstract class AbstractCoroutineContextElement(public override val key: Key<*>) : Element
 
 /**
- * Base class for [CoroutineContext.Key] associated with covariant [CoroutineContext.Element] implementation.
- * Covariant element implementation implies delegating its [get][Element.get] and [minusKey][Element.minusKey]
- * to [getCovariantElement] and [minusCovariantKey] respectively.
+ * Base class for [CoroutineContext.Key] associated with polymorphic [CoroutineContext.Element] implementation.
+ * Polymorphic element implementation implies delegating its [get][Element.get] and [minusKey][Element.minusKey]
+ * to [getPolymorphicElement] and [minusPolymorphicKey] respectively.
  *
- * Polymorphic elements can be extracted from the coroutine context using both element key and its supertype key
+ * Polymorphic elements can be extracted from the coroutine context using both element key and its supertype key.
+ * Example of polymorphic elements:
+ * ```
+ * open class BaseElement : CoroutineContext.Element {
+ *     companion object Key : CoroutineContext.Key<BaseElement>
+ *     override val key: CoroutineContext.Key<*> get() = Key
+ *     // It is important to use getPolymorphicKey and minusPolymorphicKey
+ *     override fun <E : CoroutineContext.Element> get(key: CoroutineContext.Key<E>): E? = getPolymorphicElement(key)
+ *     override fun minusKey(key: CoroutineContext.Key<*>): CoroutineContext = minusPolymorphicKey(key)
+ * }
  *
- * @param K base class of a covariant element
+ * class DerivedElement : BaseElement() {
+ *     companion object Key : AbstractCoroutineContextKey<BaseElement, DerivedElement>(BaseElement, { it as? DerivedElement })
+ * }
+ * // Now it is possible to query both `BaseElement` and `DerivedElement`
+ * someContext[BaseElement] // Returns BaseElement?, non-null both for BaseElement and DerivedElement instances
+ * someContext[DerivedElement] // Returns DerivedElement?, non-null only for DerivedElement instance
+ * ```
+ * @param K base class of a polymorphic element
  * @param baseKey an instance of base key
  * @param E element associated with the current key
  * @param safeCast a function that can safely cast abstract [CoroutineContext.Element] to the concrete [E] type
@@ -40,34 +56,36 @@ public abstract class AbstractCoroutineContextKey<K : Element, E : K>(
 }
 
 /**
- * Returns the current element is it is associated with the given [key] in a covariant manner or `null` otherwise.
+ * Returns the current element is it is associated with the given [key] in a polymorphic manner or `null` otherwise.
  * This method returns non-null value if either [Element.key] is equal to the given [key] or if the [key] is associated
- * with [Element.key] via [AbstractCoroutineContextKey]
+ * with [Element.key] via [AbstractCoroutineContextKey].
+ * See [AbstractCoroutineContextKey] for the example of usage.
  */
 //@SinceKotlin("1.4")
 //@ExperimentalStdlinApi
-public fun <E : Element> Element.getCovariantElement(key: Key<E>): E? {
+public fun <E : Element> Element.getPolymorphicElement(key: Key<E>): E? {
     if (key is AbstractCoroutineContextKey<*, *>) {
         @Suppress("UNCHECKED_CAST")
         return if (key.isSubKey(this.key)) key.tryCast(this) as? E else null
     }
     @Suppress("UNCHECKED_CAST")
-    return if (this.key == key) this as E else null
+    return if (this.key === key) this as E else null
 }
 
 /**
- * Returns empty coroutine context if the element is associated with the given [key] in a covariant manner
+ * Returns empty coroutine context if the element is associated with the given [key] in a polymorphic manner
  * or `null` otherwise.
  * This method returns empty context if either [Element.key] is equal to the given [key] or if the [key] is associated
- * with [Element.key] via [AbstractCoroutineContextKey]
+ * with [Element.key] via [AbstractCoroutineContextKey].
+ * See [AbstractCoroutineContextKey] for the example of usage.
  */
 //@SinceKotlin("1.4")
 //@ExperimentalStdlinApi
-public fun Element.minusCovariantKey(key: Key<*>): CoroutineContext {
+public fun Element.minusPolymorphicKey(key: Key<*>): CoroutineContext {
     if (key is AbstractCoroutineContextKey<*, *>) {
         return if (key.isSubKey(this.key) && key.tryCast(this) != null) EmptyCoroutineContext else this
     }
-    return if (this.key == key) EmptyCoroutineContext else this
+    return if (this.key === key) EmptyCoroutineContext else this
 }
 
 /**

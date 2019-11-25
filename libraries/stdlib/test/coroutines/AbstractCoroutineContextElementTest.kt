@@ -15,8 +15,8 @@ class AbstractCoroutineContextElementTest {
     abstract class CancelToken : AbstractCoroutineContextElement(Key) {
         companion object Key : CoroutineContext.Key<CancelToken>
 
-        override fun <E : CoroutineContext.Element> get(key: CoroutineContext.Key<E>): E? = getCovariantElement(key)
-        override fun minusKey(key: CoroutineContext.Key<*>): CoroutineContext = minusCovariantKey(key)
+        override fun <E : CoroutineContext.Element> get(key: CoroutineContext.Key<E>): E? = getPolymorphicElement(key)
+        override fun minusKey(key: CoroutineContext.Key<*>): CoroutineContext = minusPolymorphicKey(key)
     }
 
     class StdlibJob : CancelToken() {
