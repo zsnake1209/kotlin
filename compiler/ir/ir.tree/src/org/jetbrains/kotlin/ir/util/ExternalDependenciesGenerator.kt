@@ -31,8 +31,10 @@ class ExternalDependenciesGenerator(val symbolTable: SymbolTable, private val ir
         /*
             Deserializing a reference may lead to new unbound references, so we loop until none are left.
          */
-        var unbound = symbolTable.allUnbound
-        while (unbound.isNotEmpty()) {
+        lateinit var unbound: List<IrSymbol>
+        do {
+            unbound = symbolTable.allUnbound
+
             for (symbol in unbound) {
                 // Symbol could get bound as a side effect of deserializing other symbols.
                 if (!symbol.isBound) {
@@ -40,9 +42,7 @@ class ExternalDependenciesGenerator(val symbolTable: SymbolTable, private val ir
                 }
                 assert(symbol.isBound) { "$symbol unbound even after deserialization attempt" }
             }
-
-            unbound = symbolTable.allUnbound
-        }
+        } while (unbound.isNotEmpty())
 
         irProviders.forEach { (it as? IrDeserializer)?.declareForwardDeclarations() }
     }
