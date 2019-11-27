@@ -110,23 +110,12 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
 
             addField(COROUTINE_LABEL_FIELD_NAME, context.irBuiltIns.intType)
 
-            assert(info.function.extensionReceiverParameter == null) {
-                "extension receiver should be lowered to parameter in LocalDeclarationsLowering"
-            }
-
-            val receiverField = info.function.loweredExtensionReceiver()?.let {
+            val receiverField = info.function.extensionReceiverParameter?.let {
                 assert(info.arity != 0)
                 addField("\$p", it.type)
             }
 
-            val parametersFields = info.function.valueParameters.mapNotNull {
-                if (it.name.isSpecial) {
-                    assert(it.name.asString() == "<this>") { "Unexpected special parameter name: ${it.name.asString()}" }
-                    null
-                } else {
-                    addField(it.name.asString(), it.type)
-                }
-            }
+            val parametersFields = info.function.valueParameters.map { addField(it.name.asString(), it.type) }
             val parametersWithoutArguments = parametersFields.withIndex()
                 .mapNotNull { (i, field) -> if (info.reference.getValueArgument(i) == null) field else null }
             val parametersWithArguments = parametersFields - parametersWithoutArguments
@@ -150,8 +139,6 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
         }
     }
 
-    private fun IrFunction.loweredExtensionReceiver() = valueParameters.find { it.name.isSpecial && it.name.asString() == "<this>" }
-
     private fun IrClass.addInvokeSuspendForLambda(
         irFunction: IrFunction,
         fields: List<IrField>,
@@ -167,7 +154,7 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
                 function.body = irFunction.body?.deepCopyWithSymbols(function)
                 function.body?.transformChildrenVoid(object : IrElementTransformerVoid() {
                     override fun visitGetValue(expression: IrGetValue): IrExpression {
-                        if (expression.symbol.owner == irFunction.loweredExtensionReceiver()) {
+                        if (expression.symbol.owner == irFunction.extensionReceiverParameter) {
                             assert(receiverField != null)
                             return IrGetFieldImpl(
                                 expression.startOffset,
