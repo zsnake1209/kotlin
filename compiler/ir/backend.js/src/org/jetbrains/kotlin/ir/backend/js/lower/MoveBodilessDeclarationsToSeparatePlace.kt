@@ -43,6 +43,9 @@ private val BODILESS_BUILTIN_CLASSES = listOf(
     "kotlin.Function"
 ).map { FqName(it) }.toSet()
 
+fun IrDeclaration.isBuiltInClass(): Boolean =
+    this is IrClass && fqNameWhenAvailable in BODILESS_BUILTIN_CLASSES
+
 private class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFragmentSymbol {
     override val descriptor: PackageFragmentDescriptor
         get() = error("Operation is unsupported")
@@ -89,9 +92,6 @@ fun moveBodilessDeclarationsToSeparatePlace(context: JsIrBackendContext, module:
 
     context.bodilessBuiltInsPackageFragment = bodilessBuiltInsPackageFragment
 
-    fun isBuiltInClass(declaration: IrDeclaration): Boolean =
-        declaration is IrClass && declaration.fqNameWhenAvailable in BODILESS_BUILTIN_CLASSES
-
     fun collectExternalClasses(container: IrDeclarationContainer, includeCurrentLevel: Boolean): List<IrClass> {
         val externalClasses =
             container.declarations.filterIsInstance<IrClass>().filter { it.isEffectivelyExternal() }
@@ -126,7 +126,7 @@ fun moveBodilessDeclarationsToSeparatePlace(context: JsIrBackendContext, module:
         while (it.hasNext()) {
             val d = it.next() as? IrDeclarationWithName ?: continue
 
-            if (isBuiltInClass(d)) {
+            if (d.isBuiltInClass()) {
                 it.remove()
                 bodilessBuiltInsPackageFragment.addChild(d)
             } else if (d.isEffectivelyExternal()) {
