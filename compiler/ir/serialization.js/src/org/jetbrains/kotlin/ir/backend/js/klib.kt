@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.ExpectDeclarationRemover
 import org.jetbrains.kotlin.ir.util.IrDeserializer
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.generateTypicalIrProviderList
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.js.analyzer.JsAnalysisResult
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
@@ -202,8 +201,7 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
     files: List<KtFile>,
     deserializer: IrDeserializer? = null
 ): IrModuleFragment {
-    val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
-    val psi2Ir = Psi2IrTranslator(languageVersionSettings, configuration, mangler = JsMangler)
+    val psi2Ir = Psi2IrTranslator(languageVersionSettings, configuration)
 
     for (extension in IrGenerationExtension.getInstances(project)) {
         psi2Ir.addPostprocessingStep { module ->
@@ -225,17 +223,13 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
         psi2Ir.generateModuleFragment(
             this,
             files,
-            irProviders
+            deserializer
         )
     return moduleFragment
 }
 
-fun GeneratorContext.generateModuleFragment(files: List<KtFile>, deserializer: IrDeserializer? = null): IrModuleFragment {
-    val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
-    return Psi2IrTranslator(
-        languageVersionSettings, configuration, mangler = JsMangler
-    ).generateModuleFragment(this, files, irProviders)
-}
+fun GeneratorContext.generateModuleFragment(files: List<KtFile>, deserializer: IrDeserializer? = null) =
+    Psi2IrTranslator(languageVersionSettings, configuration).generateModuleFragment(this, files, deserializer)
 
 
 private fun createBuiltIns(storageManager: StorageManager) = object : KotlinBuiltIns(storageManager) {}

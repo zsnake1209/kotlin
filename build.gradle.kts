@@ -164,7 +164,7 @@ extra["versions.completion-ranking-kotlin"] = "0.0.2"
 extra["versions.ktor-network"] = "1.0.1"
 
 if (!project.hasProperty("versions.kotlin-native")) {
-    extra["versions.kotlin-native"] = "1.3.70-dev-13235"
+    extra["versions.kotlin-native"] = "1.3.70-dev-13603"
 }
 
 val isTeamcityBuild = project.kotlinBuildProperties.isTeamcityBuild
