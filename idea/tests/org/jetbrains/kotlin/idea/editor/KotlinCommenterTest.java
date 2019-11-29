@@ -55,7 +55,7 @@ public class KotlinCommenterTest extends KotlinLightCodeInsightTestCase {
 
         CodeStyleSettings codeStyleSettings = FormatSettingsUtil.getSettings(getProject());
         try {
-            String text = myFile.getText();
+            String text = getFile().getText();
 
             SettingsConfigurator configurator = FormatSettingsUtil.createConfigurator(text, codeStyleSettings);
             configurator.configureSettings();

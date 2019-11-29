@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.formatter;
 import com.intellij.application.options.CodeStyle;
 import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.testFramework.EditorTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.idea.test.KotlinLightCodeInsightTestCase;
@@ -46,7 +45,7 @@ public abstract class AbstractTypingIndentationTestBase extends KotlinLightCodeI
             doNewlineTest(originFilePath, afterFilePath);
         }
         finally {
-            getSettings().clearCodeStyleSettings();
+            CodeStyle.getSettings(getProject()).clearCodeStyleSettings();
         }
     }
 
@@ -59,10 +58,6 @@ public abstract class AbstractTypingIndentationTestBase extends KotlinLightCodeI
         String actualTextWithCaret = new StringBuilder(getEditor().getDocument().getText()).insert(offset, EditorTestUtil.CARET_TAG).toString();
 
         KotlinTestUtils.assertEqualsToFile(new File(afterFilePath), actualTextWithCaret);
-    }
-
-    public static CodeStyleSettings getSettings() {
-        return CodeStyle.getSettings(getProject());
     }
 
     @NotNull
