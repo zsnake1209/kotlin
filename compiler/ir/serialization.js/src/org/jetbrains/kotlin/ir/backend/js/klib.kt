@@ -14,6 +14,9 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
 import org.jetbrains.kotlin.backend.common.serialization.metadata.DynamicTypeDeserializer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -257,6 +260,8 @@ fun getModuleDescriptorByLibrary(current: KotlinLibrary, mapping: Map<String, Mo
     return md
 }
 
+object JsIrCompilationError : Throwable()
+
 private class ModulesStructure(
     private val project: Project,
     private val files: List<KtFile>,
@@ -279,7 +284,14 @@ private class ModulesStructure(
     val builtInsDep = allDependencies.getFullList().find { it.isBuiltIns }
 
     fun runAnalysis(): JsAnalysisResult {
-        val analysisResult =
+        val messageCollector: MessageCollector =
+            compilerConfiguration.getNotNull(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
+        val analyzerWithCompilerReport = AnalyzerWithCompilerReport(
+            messageCollector,
+            compilerConfiguration.languageVersionSettings
+        )
+
+        analyzerWithCompilerReport.analyzeAndReport(files) {
             TopDownAnalyzerFacadeForJSIR.analyzeFiles(
                 files,
                 project,
@@ -289,6 +301,12 @@ private class ModulesStructure(
                 thisIsBuiltInsModule = builtInModuleDescriptor == null,
                 customBuiltInsModule = builtInModuleDescriptor
             )
+        }
+
+        val analysisResult = analyzerWithCompilerReport.analysisResult
+
+        if (analyzerWithCompilerReport.hasErrors() || analysisResult !is JsAnalysisResult)
+            throw JsIrCompilationError
 
         ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
         TopDownAnalyzerFacadeForJSIR.checkForErrors(files, analysisResult.bindingContext)
