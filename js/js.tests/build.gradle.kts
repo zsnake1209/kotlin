@@ -96,7 +96,6 @@ fun Test.setUpJsBoxTests(jsEnabled: Boolean, jsIrEnabled: Boolean) {
     if (jsEnabled) dependsOn(testJsRuntime)
     if (jsIrEnabled) {
         dependsOn(":kotlin-stdlib-js-ir:generateFullRuntimeKLib")
-        dependsOn(":kotlin-stdlib-js-ir:generateReducedRuntimeKLib")
         dependsOn(":kotlin-stdlib-js-ir:generateKotlinTestKLib")
     }
 
