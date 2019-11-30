@@ -251,7 +251,7 @@ fun JavaExec.buildJs(sources: List<String>, dependencies: List<String>, outPath:
     main = "org.jetbrains.kotlin.cli.js.K2JsIrCompiler"
     workingDir = rootDir
 
-    val libraryString: String = dependencies.joinToString(":")
+    val libraryString: String = dependencies.joinToString(File.pathSeparator)
     val libraryArgs: List<String> = if (libraryString.isEmpty()) emptyList() else listOf<String>("-libraries", libraryString, "-Xfriend-modules=$libraryString")
     val allArgs =
      sources.toList() + listOf("-output", outPath) + libraryArgs + listOf(
@@ -263,9 +263,6 @@ fun JavaExec.buildJs(sources: List<String>, dependencies: List<String>, outPath:
          "-Xuse-experimental=kotlin.ExperimentalStdlibApi",
          "-Xuse-experimental=kotlin.ExperimentalUnsignedTypes"
      )
-
-    println(allArgs)
-
     args = allArgs
 
     dependsOn(":compiler:cli-js:jar")
