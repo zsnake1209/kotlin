@@ -35,8 +35,7 @@ typealias Psi2IrPostprocessingStep = (IrModuleFragment) -> Unit
 
 class Psi2IrTranslator(
     val languageVersionSettings: LanguageVersionSettings,
-    val configuration: Psi2IrConfiguration = Psi2IrConfiguration(),
-    val mangler: KotlinMangler? = null
+    val configuration: Psi2IrConfiguration = Psi2IrConfiguration()
 ) {
     private val postprocessingSteps = SmartList<Psi2IrPostprocessingStep>()
 
@@ -52,19 +51,13 @@ class Psi2IrTranslator(
         stubGeneratorExtensions: StubGeneratorExtensions
     ): IrModuleFragment {
         val context = createGeneratorContext(moduleDescriptor, bindingContext, extensions = generatorExtensions)
-        return generateModuleFragment(
-            context, ktFiles,
-            irProviders = generateTypicalIrProviderList(
-                moduleDescriptor, context.irBuiltIns, context.symbolTable,
-                extensions = stubGeneratorExtensions
-            )
-        )
+        return generateModuleFragment(context, ktFiles, stubGeneratorExtensions = stubGeneratorExtensions)
     }
 
     fun createGeneratorContext(
         moduleDescriptor: ModuleDescriptor,
         bindingContext: BindingContext,
-        symbolTable: SymbolTable = SymbolTable(mangler),
+        symbolTable: SymbolTable = SymbolTable(),
         extensions: GeneratorExtensions = GeneratorExtensions()
     ): GeneratorContext =
         GeneratorContext(configuration, moduleDescriptor, bindingContext, languageVersionSettings, symbolTable, extensions)
@@ -72,17 +65,16 @@ class Psi2IrTranslator(
     fun generateModuleFragment(
         context: GeneratorContext,
         ktFiles: Collection<KtFile>,
-        irProviders: List<IrProvider>
+        deserializer: IrDeserializer? = null,
+        irProviders: List<IrProvider> = emptyList(),
+        stubGeneratorExtensions: StubGeneratorExtensions = StubGeneratorExtensions()
     ): IrModuleFragment {
         val moduleGenerator = ModuleGenerator(context)
-        val irModule = moduleGenerator.generateModuleFragmentWithoutDependencies(ktFiles)
+        val irModule = moduleGenerator.generateModuleFragment(ktFiles)
 
-        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
         irModule.patchDeclarationParents()
         postprocess(context, irModule)
-        irModule.computeUniqIdForDeclarations(context.symbolTable)
-
-        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
+        moduleGenerator.generateUnboundSymbolsAsDependencies(irModule, deserializer, irProviders, stubGeneratorExtensions)
         return irModule
     }
 
