@@ -56,6 +56,7 @@ class NumberOperatorCallsTransformer(context: JsIrBackendContext) : CallsTransfo
 
         for (type in primitiveNumbers) {
             add(type, Name.identifier("rangeTo"), ::transformRangeTo)
+            add(type, Name.identifier("hashCode"), ::transformHashCode)
         }
 
         for (type in primitiveNumbers) {
@@ -92,6 +93,19 @@ class NumberOperatorCallsTransformer(context: JsIrBackendContext) : CallsTransfo
                     irCall(call, intrinsics.jsNumberRangeToNumber, receiversAsArguments = true)
                 isLong() ->
                     irCall(call, intrinsics.jsNumberRangeToLong, receiversAsArguments = true)
+                else -> call
+            }
+        }
+    }
+
+    private fun transformHashCode(call: IrFunctionAccessExpression): IrExpression {
+        return with(call.symbol.owner.dispatchReceiverParameter!!.type) {
+            when {
+                isByte() || isShort() || isInt() ->
+                    call.dispatchReceiver!!
+                isFloat() || isDouble() ->
+                    // TODO introduce doubleToHashCode?
+                    irCall(call, intrinsics.jsGetNumberHashCode, receiversAsArguments = true)
                 else -> call
             }
         }

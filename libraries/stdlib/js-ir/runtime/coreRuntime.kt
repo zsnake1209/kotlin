@@ -5,8 +5,6 @@
 
 package kotlin.js
 
-import kotlin.js.internal.BitUtils
-
 fun equals(obj1: dynamic, obj2: dynamic): Boolean {
     if (obj1 == null) {
         return obj2 == null
@@ -49,7 +47,7 @@ fun hashCode(obj: dynamic): Int {
     return when (jsTypeOf(obj)) {
         "object" -> if ("function" === jsTypeOf(obj.hashCode)) (obj.hashCode)() else getObjectHashCode(obj)
         "function" -> getObjectHashCode(obj)
-        "number" -> BitUtils.getNumberHashCode(obj)
+        "number" -> getNumberHashCode(obj)
         "boolean" -> if(obj.unsafeCast<Boolean>()) 1 else 0
         else -> getStringHashCode(js("String(obj)"))
     }

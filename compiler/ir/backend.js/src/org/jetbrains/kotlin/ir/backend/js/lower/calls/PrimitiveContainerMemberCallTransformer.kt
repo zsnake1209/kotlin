@@ -7,15 +7,12 @@ package org.jetbrains.kotlin.ir.backend.js.lower.calls
 
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
-import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
-import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
+import org.jetbrains.kotlin.ir.util.getSimpleFunction
 
 class PrimitiveContainerMemberCallTransformer(private val context: JsIrBackendContext) : CallsTransformer {
     private val intrinsics = context.intrinsics
@@ -51,6 +48,8 @@ class PrimitiveContainerMemberCallTransformer(private val context: JsIrBackendCo
             add(context.irBuiltIns.stringClass.lengthProperty, context.intrinsics.jsArrayLength, true)
             add(context.irBuiltIns.stringClass.getFunction, intrinsics.jsCharSequenceGet, true)
             add(context.irBuiltIns.stringClass.subSequence, intrinsics.jsCharSequenceSubSequence, true)
+            add(context.irBuiltIns.stringClass.hashCodeFunction, intrinsics.jsGetStringHashCode, true)
+            add(context.irBuiltIns.booleanClass.hashCodeFunction, intrinsics.jsNumberToInt, true) // TODO
             add(intrinsics.charSequenceLengthPropertyGetterSymbol, intrinsics.jsCharSequenceLength, true)
             add(intrinsics.charSequenceGetFunctionSymbol, intrinsics.jsCharSequenceGet, true)
             add(intrinsics.charSequenceSubSequenceFunctionSymbol, intrinsics.jsCharSequenceSubSequence, true)
@@ -89,3 +88,6 @@ private val IrClassSymbol.lengthProperty
 
 private val IrClassSymbol.subSequence
     get() = getSimpleFunction("subSequence")!!
+
+private val IrClassSymbol.hashCodeFunction
+    get() = getSimpleFunction("hashCode")!!

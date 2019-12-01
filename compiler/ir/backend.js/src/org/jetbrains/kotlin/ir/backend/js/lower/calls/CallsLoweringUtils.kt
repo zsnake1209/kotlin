@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.irCall
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.types.SimpleType
 
 typealias SymbolToTransformer = MutableMap<IrFunctionSymbol, (IrFunctionAccessExpression) -> IrExpression>
 
@@ -73,7 +72,7 @@ fun IrType.getPrimitiveType() = makeNotNull().run {
     when {
         isBoolean() -> PrimitiveType.BOOLEAN
         isByte() || isShort() || isInt() -> PrimitiveType.INTEGER_NUMBER
-        isFloat() || isDouble() -> PrimitiveType.FLOATING_POINT_NUMBER
+        isFloat() || isDouble() || isNumber() -> PrimitiveType.FLOATING_POINT_NUMBER
         isString() -> PrimitiveType.STRING
         else -> PrimitiveType.OTHER
     }

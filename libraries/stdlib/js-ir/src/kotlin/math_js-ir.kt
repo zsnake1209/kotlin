@@ -4,8 +4,6 @@
  */
 package kotlin.math
 
-import kotlin.js.internal.BitUtils
-
 /**
  * Returns this value with the sign bit same as of the [sign] value.
  *
@@ -13,7 +11,7 @@ import kotlin.js.internal.BitUtils
  */
 @SinceKotlin("1.2")
 public actual fun Double.withSign(sign: Double): Double {
-    val thisSignBit = BitUtils.doubleSignBit(this)
-    val newSignBit = BitUtils.doubleSignBit(sign)
+    val thisSignBit = doubleSignBit(this)
+    val newSignBit = doubleSignBit(sign)
     return if (thisSignBit == newSignBit) this else -this
 }
