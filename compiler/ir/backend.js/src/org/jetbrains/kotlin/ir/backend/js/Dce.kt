@@ -107,12 +107,12 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
     val result = hashSetOf<IrDeclaration>()
     val constructedClasses = hashSetOf<IrClass>()
 
-    fun IrDeclaration.enqueue(from: IrDeclaration?, description: String?, altFromFqn: String? = null) {
+    fun IrDeclaration.enqueue(from: IrDeclaration?, description: String?, checkExternal: Boolean, altFromFqn: String? = null) {
         if (this !in result) {
             // TODO overloads on inline classes? should not be problematic at the end of pipeline
             // TODO don't mark declarations from external to non-external? Or define overrides explicitly?
-            // it's wrong solution -- we should prohibit only marking overridens
-            if ((from?.isEffectivelyExternal() == true) && !this.isEffectivelyExternal()) return
+            // it's wrong solution -- we should prohibit only marking overriddens
+            if (checkExternal && (from?.isEffectivelyExternal() == true) && !this.isEffectivelyExternal()) return
 
             if (PRINT_REACHABILITY_INFO) {
                 val fromFqn = (from as? IrDeclarationWithName)?.fqNameWhenAvailable?.asString() ?: altFromFqn ?: "<unknown>"
@@ -131,7 +131,7 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
 
     // Add roots
     roots.forEach {
-        it.enqueue(null, null, altFromFqn = "<ROOT>")
+        it.enqueue(null, null, altFromFqn = "<ROOT>", checkExternal = false)
     }
 
     // Add roots' nested declarations
@@ -147,7 +147,7 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
 
             override fun visitDeclaration(declaration: IrDeclaration) {
                 super.visitDeclaration(declaration)
-                declaration.enqueue(it, "roots' nested declaration")
+                declaration.enqueue(it, "roots' nested declaration", checkExternal = true)
             }
         })
     }
@@ -163,20 +163,21 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
         while (queue.isNotEmpty()) {
             val declaration = queue.pollFirst()
 
-            fun IrDeclaration.enqueue(description: String) {
-                enqueue(declaration, description)
+            fun IrDeclaration.enqueue(description: String, checkExternal: Boolean) {
+                enqueue(declaration, description, checkExternal)
             }
 
             if (declaration is IrClass) {
                 declaration.superTypes.forEach {
-                    (it.classifierOrNull as? IrClassSymbol)?.owner?.enqueue("superTypes")
+                    (it.classifierOrNull as? IrClassSymbol)?.owner?.enqueue("superTypes", checkExternal = true)
                 }
 
                 // Special hack for `IntrinsicsJs.kt` support
                 if (declaration.superTypes.any { it.isSuspendFunctionTypeOrSubtype() }) {
                     declaration.declarations.forEach {
                         if (it is IrSimpleFunction && it.name.asString().startsWith("invoke")) {
-                            it.enqueue("hack for SuspendFunctionN::invoke")
+                            it.enqueue("hack for SuspendFunctionN::invoke", checkExternal = false)
+                            // external?
                         }
                     }
                 }
@@ -185,20 +186,20 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                 if (declaration.symbol == context.ir.symbols.coroutineImpl) {
                     declaration.declarations.forEach {
                         if (it is IrSimpleFunction && it.name.asString() == "doResume") {
-                            it.enqueue("hack for CoroutineImpl::doResume")
+                            it.enqueue("hack for CoroutineImpl::doResume", checkExternal = false)
                         }
                     }
                 }
             }
 
             if (declaration is IrSimpleFunction) {
-                declaration.resolveFakeOverride()?.enqueue("real overridden fun")
+                declaration.resolveFakeOverride()?.enqueue("real overridden fun", checkExternal = true)
             }
 
             // Collect instantiated classes.
             if (declaration is IrConstructor) {
                 declaration.constructedClass.let {
-                    it.enqueue("constructed class")
+                    it.enqueue("constructed class", checkExternal = false)
                     constructedClasses += it
                 }
             }
@@ -218,19 +219,19 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                 override fun visitFunctionAccess(expression: IrFunctionAccessExpression) {
                     super.visitFunctionAccess(expression)
 
-                    expression.symbol.owner.enqueue("function access")
+                    expression.symbol.owner.enqueue("function access", checkExternal = false)
                 }
 
                 override fun visitVariableAccess(expression: IrValueAccessExpression) {
                     super.visitVariableAccess(expression)
 
-                    expression.symbol.owner.enqueue("variable access")
+                    expression.symbol.owner.enqueue("variable access", checkExternal = false)
                 }
 
                 override fun visitFieldAccess(expression: IrFieldAccessExpression) {
                     super.visitFieldAccess(expression)
 
-                    expression.symbol.owner.enqueue("field access")
+                    expression.symbol.owner.enqueue("field access", checkExternal = false)
                 }
 
                 override fun visitCall(expression: IrCall) {
@@ -240,24 +241,25 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                         context.intrinsics.jsBoxIntrinsic -> {
                             val inlineClass = expression.getTypeArgument(0)!!.getInlinedClass()!!
                             val constructor = inlineClass.declarations.filterIsInstance<IrConstructor>().single { it.isPrimary }
-                            constructor.enqueue("intrinsic: jsBoxIntrinsic")
+                            constructor.enqueue("intrinsic: jsBoxIntrinsic", checkExternal = false)
                         }
                         context.intrinsics.jsClass -> {
                             (expression.getTypeArgument(0)!!.classifierOrFail.owner as IrDeclaration)
-                                .enqueue("intrinsic: jsClass")
+                                .enqueue("intrinsic: jsClass", checkExternal = false)
                         }
                         context.intrinsics.jsObjectCreate.symbol -> {
                             val classToCreate = expression.getTypeArgument(0)!!.classifierOrFail.owner as IrClass
-                            classToCreate.enqueue("intrinsic: jsObjectCreate")
+                            classToCreate.enqueue("intrinsic: jsObjectCreate", checkExternal = false)
                             constructedClasses += classToCreate
                         }
                         context.intrinsics.jsEquals -> {
                             ///
-                            equalsMethod.enqueue("intrinsic: jsEquals")
+                            equalsMethod.enqueue("intrinsic: jsEquals", checkExternal = false)
                         }
                         context.intrinsics.jsToString -> {
                             // call on concrete type
 //                            toStringMethod.enqueue()
+                            ///
                             enqueueMember(declaration, expression.getValueArgument(0)!!.type, toStringMethod, "intrinsic: jsToString") {
                                 find { it is IrFunction && it.isToStringInheritedFromAny() }
                             }
@@ -265,6 +267,7 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                         context.intrinsics.jsHashCode -> {
                             // call on concrete type
 //                            hashCodeMethod.enqueue()
+                            ///
                             enqueueMember(declaration, expression.getValueArgument(0)!!.type, toStringMethod, "intrinsic: jsHashCode") {
                                 find { it is IrFunction && it.isHashCodeInheritedFromAny() }
                             }
@@ -313,14 +316,17 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                 fun enqueueMember(from: IrDeclaration, type: IrType, default: IrFunction, description: String, getCandidateOrNull: List<IrDeclaration>.() -> IrDeclaration?) {
                     when (val classifier = type.classifierOrNull) {
                         is IrClassSymbol -> {
-                            classifier.owner.declarations.getCandidateOrNull()?.enqueue(from, "$description -- candidate")
+                            /// check external?
+                            classifier.owner.declarations.getCandidateOrNull()?.enqueue(from, "$description -- candidate", checkExternal = false)
                         }
                         is IrTypeParameterSymbol -> {
+                            /// external?
                             classifier.owner.superTypes.forEach { enqueueMember(from, it, default, description, getCandidateOrNull) }
                         }
                         else -> {
                             // it's dynamic or Error type
-                            default.enqueue(from, "$description -- default (type: ${type.render()})")
+                            /// check external?
+                            default.enqueue(from, "$description -- default (type: ${type.render()})", checkExternal = false)
                         }
                     }
                 }
@@ -341,13 +347,15 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
             return null
         }
 
+        // enum, any
+
         for (klass in constructedClasses) {
             for (declaration in klass.declarations) {
                 if (declaration in result) continue
 
                 if (declaration is IrOverridableDeclaration<*>) {
                     declaration.findOverriddenUsefulDeclaration()?.let {
-                        declaration.enqueue(it, "overrides useful declaration")
+                        declaration.enqueue(it, "overrides useful declaration", checkExternal = false)
                     }
                 }
 
@@ -361,7 +369,7 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                     declaration is IrField && declaration.correspondingPropertySymbol?.owner?.getJsName() != null ||
                     declaration is IrSimpleFunction && declaration.correspondingPropertySymbol?.owner?.getJsName() != null
                 ) {
-                    declaration.enqueue(klass, "annotated by @JsName")
+                    declaration.enqueue(klass, "annotated by @JsName", checkExternal = false)
                 }
             }
         }
