@@ -5,11 +5,11 @@
 
 package org.jetbrains.kotlin.konan.library.lite
 
-import org.jetbrains.kotlin.konan.CompilerVersion
+import org.jetbrains.kotlin.konan.KonanVersion
 import java.io.File
 
 class LiteKonanDistribution(
     val distributionHome: File,
-    val konanVersion: CompilerVersion,
+    val konanVersion: KonanVersion,
     val konanVersionString: String
 )

@@ -34,7 +34,7 @@ open class BaseKotlinLibraryImpl(
         access.inPlace { it.manifestFile.loadProperties() }
     }
 
-    override val versions: KotlinLibraryVersioning by lazy {
+    override val versions: KonanLibraryVersioning by lazy {
         manifestProperties.readKonanLibraryVersioning()
     }
 }
