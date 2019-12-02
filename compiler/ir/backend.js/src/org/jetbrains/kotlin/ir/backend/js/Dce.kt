@@ -8,10 +8,7 @@ package org.jetbrains.kotlin.ir.backend.js
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.backend.js.export.isExported
-import org.jetbrains.kotlin.ir.backend.js.utils.getJsName
-import org.jetbrains.kotlin.ir.backend.js.utils.isHashCodeInheritedFromAny
-import org.jetbrains.kotlin.ir.backend.js.utils.isJsValueOf
-import org.jetbrains.kotlin.ir.backend.js.utils.isToStringInheritedFromAny
+import org.jetbrains.kotlin.ir.backend.js.utils.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
@@ -254,7 +251,10 @@ fun usefulDeclarations(roots: Iterable<IrDeclaration>, context: JsIrBackendConte
                         }
                         context.intrinsics.jsEquals -> {
                             ///
-                            equalsMethod.enqueue("intrinsic: jsEquals", checkExternal = false)
+//                            equalsMethod.enqueue("intrinsic: jsEquals", checkExternal = false)
+                            enqueueMember(declaration, expression.getValueArgument(0)!!.type, toStringMethod, "intrinsic: jsEquals") {
+                                find { it is IrFunction && it.isEqualsInheritedFromAny() }
+                            }
                         }
                         context.intrinsics.jsToString -> {
                             // call on concrete type
