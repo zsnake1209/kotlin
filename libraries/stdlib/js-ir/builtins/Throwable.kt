@@ -21,7 +21,8 @@ public external open class Throwable {
     public constructor(cause: Throwable?)
     public constructor()
 
-    public override fun equals(other: Any?): Boolean
-    public override fun hashCode(): Int
+    // TODO: add specialized version to runtime
+//    public override fun equals(other: Any?): Boolean
+//    public override fun hashCode(): Int
     public override fun toString(): String
 }
