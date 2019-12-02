@@ -1121,6 +1121,8 @@ internal fun InstructionAdapter.generateContinuationConstructorCall(
 private fun InstructionAdapter.generateResumeWithExceptionCheck(isReleaseCoroutines: Boolean, dataIndex: Int, exceptionIndex: Int) {
     // Check if resumeWithException has been called
 
+    nop() // inliner transforms suspend lambda and checks for nop there
+
     if (isReleaseCoroutines) {
         load(dataIndex, AsmTypes.OBJECT_TYPE)
         invokestatic("kotlin/ResultKt", "throwOnFailure", "(Ljava/lang/Object;)V", false)
