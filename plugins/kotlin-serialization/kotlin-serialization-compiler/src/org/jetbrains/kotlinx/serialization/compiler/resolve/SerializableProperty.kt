@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlinx.serialization.compiler.resolve
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -26,6 +27,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.isInlineClassType
 import org.jetbrains.kotlin.resolve.source.getPsi
+import org.jetbrains.kotlin.resolve.unsubstitutedUnderlyingType
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.analyzeSpecialSerializers
 
 class SerializableProperty(
@@ -43,7 +45,13 @@ class SerializableProperty(
     val annotationsWithArguments: List<Triple<ClassDescriptor, List<ValueArgument>, List<ValueParameterDescriptor>>> =
         descriptor.annotationsWithArguments()
 
-    val canBeInlined: Boolean = type.isInlineClassType() && !type.isMarkedNullable
+    val hasInlineClassType: Boolean = type.isInlineClassType()
+
+    // if property is nullable & underlying type nullable, an inline class is boxed
+    // OR if property is nullable & underlying type is primitive
+    val hasInlineTypeButBoxed: Boolean =
+        hasInlineClassType && type.isMarkedNullable
+                && type.unsubstitutedUnderlyingType()?.let { it.isMarkedNullable || KotlinBuiltIns.isPrimitiveType(it) } == true
 
     override fun toString(): String {
         return "Property $name : $type in ${descriptor.containingDeclaration.fqNameOrNull() ?: "UNKNOWN"}"

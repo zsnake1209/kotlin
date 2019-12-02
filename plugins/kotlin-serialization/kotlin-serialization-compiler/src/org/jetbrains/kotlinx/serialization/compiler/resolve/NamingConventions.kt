@@ -58,6 +58,7 @@ object SerialEntityNames {
     const val SERIAL_DESCRIPTOR_CLASS = "SerialDescriptor"
     const val SERIAL_DESCRIPTOR_CLASS_IMPL = "SerialClassDescImpl"
     const val SERIAL_DESCRIPTOR_FOR_ENUM = "EnumDescriptor"
+    const val SERIAL_DESCRIPTOR_FOR_INLINE = "InlineClassDescriptor"
 
     //exceptions
     const val SERIAL_EXC = "SerializationException"
@@ -102,6 +103,8 @@ object CallingConventions {
 
     const val decodeInlineElement = "decodeInlineElement"
     const val encodeInlineElement = "encodeInlineElement"
+    const val encodeInline = "encodeInline"
+    const val decodeInline = "decodeInline"
 
     const val addElement = "addElement"
     const val addAnnotation = "pushAnnotation"

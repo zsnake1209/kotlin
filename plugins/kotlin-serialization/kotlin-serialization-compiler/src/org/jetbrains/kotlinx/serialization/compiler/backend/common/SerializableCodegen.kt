@@ -34,9 +34,12 @@ abstract class SerializableCodegen(
         generateSyntheticMethods()
     }
 
+    private inline fun ClassDescriptor.shouldHaveSpecificSyntheticMethods(functionPresenceChecker: () -> FunctionDescriptor?) =
+        !isInline && (isAbstractSerializableClass() || isSealedSerializableClass() || functionPresenceChecker() != null)
+
     private fun generateSyntheticInternalConstructor() {
         val serializerDescriptor = serializableDescriptor.classSerializer ?: return
-        if (serializableDescriptor.isAbstractSerializableClass() || serializableDescriptor.isSealedSerializableClass() || SerializerCodegen.getSyntheticLoadMember(serializerDescriptor) != null) {
+        if (serializableDescriptor.shouldHaveSpecificSyntheticMethods { SerializerCodegen.getSyntheticLoadMember(serializerDescriptor) }) {
             val constrDesc = serializableDescriptor.secondaryConstructors.find(ClassConstructorDescriptor::isSerializationCtor) ?: return
             generateInternalConstructor(constrDesc)
         }
@@ -44,7 +47,7 @@ abstract class SerializableCodegen(
 
     private fun generateSyntheticMethods() {
         val serializerDescriptor = serializableDescriptor.classSerializer ?: return
-        if (serializableDescriptor.isAbstractSerializableClass() || serializableDescriptor.isSealedSerializableClass() || SerializerCodegen.getSyntheticSaveMember(serializerDescriptor) != null) {
+        if (serializableDescriptor.shouldHaveSpecificSyntheticMethods { SerializerCodegen.getSyntheticSaveMember(serializerDescriptor) }) {
             val func = KSerializerDescriptorResolver.createWriteSelfFunctionDescriptor(serializableDescriptor)
             generateWriteSelfMethod(func)
         }

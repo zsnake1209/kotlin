@@ -18,6 +18,7 @@ package org.jetbrains.kotlinx.serialization.compiler.backend.jvm
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.codegen.*
+import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.load.kotlin.TypeMappingMode
@@ -41,6 +42,7 @@ import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.SE
 import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.SERIAL_DESCRIPTOR_CLASS
 import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.SERIAL_DESCRIPTOR_CLASS_IMPL
 import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.SERIAL_DESCRIPTOR_FOR_ENUM
+import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.SERIAL_DESCRIPTOR_FOR_INLINE
 import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.SERIAL_EXC
 import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.SERIAL_LOADER_CLASS
 import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.SERIAL_SAVER_CLASS
@@ -58,6 +60,7 @@ import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 internal val descType = Type.getObjectType("kotlinx/serialization/$SERIAL_DESCRIPTOR_CLASS")
 internal val descImplType = Type.getObjectType("kotlinx/serialization/internal/$SERIAL_DESCRIPTOR_CLASS_IMPL")
 internal val descriptorForEnumsType = Type.getObjectType("kotlinx/serialization/internal/$SERIAL_DESCRIPTOR_FOR_ENUM")
+internal val descriptorForInlineClassesType = Type.getObjectType("kotlinx/serialization/internal/$SERIAL_DESCRIPTOR_FOR_INLINE")
 internal val generatedSerializerType = Type.getObjectType("kotlinx/serialization/internal/${SerialEntityNames.GENERATED_SERIALIZER_CLASS}")
 internal val kOutputType = Type.getObjectType("kotlinx/serialization/$STRUCTURE_ENCODER_CLASS")
 internal val encoderType = Type.getObjectType("kotlinx/serialization/$ENCODER_CLASS")
@@ -99,7 +102,7 @@ fun InstructionAdapter.genKOutputMethodCall(
     propertyOwnerType: Type, ownerVar: Int, fromClassStartVar: Int? = null,
     generator: AbstractSerialGenerator
 ) {
-    val sti = generator.getSerialTypeInfo(property, property.type) { classCodegen.typeMapper.mapType(it) }
+    val sti = generator.getSerialTypeInfo(property, property.type, classCodegen.typeMapper)
 
     val type = sti.kotlinType
     val propertyJvmType = sti.type
@@ -442,29 +445,36 @@ class JVMSerialTypeInfo(
     nn: String,
     serializer: ClassDescriptor? = null,
     unit: Boolean = false,
-    var wasInlined: Boolean = false
+    val wasInlined: Boolean = false
 ) : SerialTypeInfo(property, nn, serializer, unit)
 
 fun AbstractSerialGenerator.getSerialTypeInfo(
     property: SerializableProperty,
     T: KotlinType,
-    typeMapper: (KotlinType) -> Type
+    typeMapper: KotlinTypeMapper
 ): JVMSerialTypeInfo {
+    val wasInlined = property.hasInlineClassType && T.substitutedUnderlyingType() != null
+    val jvmType = typeMapper.mapType(T)
+
     fun SerializableInfo(serializer: ClassDescriptor?): JVMSerialTypeInfo {
-        val underlyingType = T.substitutedUnderlyingType()
-        if (property.canBeInlined && underlyingType != null && serializer.serializerIsNotCustom()) {
-            return getSerialTypeInfo(property, underlyingType, typeMapper).apply { wasInlined = true }
+        var innerSerial: ClassDescriptor? = null
+        var wasNullable = false
+        if (wasInlined && serializer.serializerIsNotCustom()) {
+            val inlinedType = T.substitutedUnderlyingType()!!
+            val serializerForInlinedType = getSerialTypeInfo(property, inlinedType, typeMapper)
+            wasNullable = inlinedType.isMarkedNullable
+            if (!(property.hasInlineTypeButBoxed))
+                innerSerial = serializerForInlinedType.serializer
         }
         return JVMSerialTypeInfo(
             property,
             T,
             Type.getType("Ljava/lang/Object;"),
-            if (T.isMarkedNullable) "Nullable" else "",
-            serializer
+            if (T.isMarkedNullable || wasNullable) "Nullable" else "",
+            innerSerial ?: serializer,
+            wasInlined = wasInlined
         )
     }
-
-    val jvmType = typeMapper(T)
 
     property.serializableWith?.toClassDescriptor?.let { return SerializableInfo(it) }
     findAddOnSerializer(T, property.module)?.let { return SerializableInfo(it) }
@@ -480,11 +490,7 @@ fun AbstractSerialGenerator.getSerialTypeInfo(
     when (jvmType.sort) {
         BOOLEAN, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, CHAR -> {
             val name = jvmType.className
-            val underlyingType = T.substitutedUnderlyingType()
-            if (property.canBeInlined && underlyingType != null) {
-                return getSerialTypeInfo(property, underlyingType, typeMapper).apply { wasInlined = true }
-            }
-            return JVMSerialTypeInfo(property, T, jvmType, Character.toUpperCase(name[0]) + name.substring(1))
+            return JVMSerialTypeInfo(property, T, jvmType, Character.toUpperCase(name[0]) + name.substring(1), wasInlined = wasInlined)
         }
         ARRAY -> {
             // check for explicit serialization annotation on this property

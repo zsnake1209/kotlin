@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.psi.ValueArgument
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.OtherOrigin
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.SerializerCodegen
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.findTypeSerializerOrContext
+import org.jetbrains.kotlinx.serialization.compiler.backend.jvm.SerializerForInlineClassesCodegen.Companion.callInlineClassConstructorAndBoxIfNeeded
 import org.jetbrains.kotlinx.serialization.compiler.resolve.*
 import org.jetbrains.kotlinx.serialization.compiler.resolve.SerialEntityNames.typeArgPrefix
 import org.jetbrains.org.objectweb.asm.Label
@@ -50,10 +51,10 @@ open class SerializerCodegenImpl(
     companion object {
         fun generateSerializerExtensions(codegen: ImplementationBodyCodegen) {
             val serializableClass = getSerializableClassDescriptorBySerializer(codegen.descriptor) ?: return
-            val serializerCodegen = if (serializableClass.isSerializableEnum()) {
-                SerializerForEnumsCodegen(codegen, serializableClass)
-            } else {
-                SerializerCodegenImpl(codegen, serializableClass)
+            val serializerCodegen = when {
+                serializableClass.isSerializableEnum() -> SerializerForEnumsCodegen(codegen, serializableClass)
+                serializableClass.isInline -> SerializerForInlineClassesCodegen(codegen, serializableClass)
+                else -> SerializerCodegenImpl(codegen, serializableClass)
             }
             serializerCodegen.generate()
         }
@@ -466,7 +467,7 @@ open class SerializerCodegenImpl(
         load(descVar, descType)
         iconst(index)
 
-        val sti = getSerialTypeInfo(property, property.type) { codegen.typeMapper.mapType(it) }
+        val sti = getSerialTypeInfo(property, property.type, codegen.typeMapper)
 
         val type = sti.kotlinType
         val propertyJvmType = codegen.typeMapper.mapType(property.type)

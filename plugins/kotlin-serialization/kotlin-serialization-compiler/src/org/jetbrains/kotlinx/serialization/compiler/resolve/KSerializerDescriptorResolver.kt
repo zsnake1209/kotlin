@@ -53,7 +53,8 @@ import java.util.*
 
 object KSerializerDescriptorResolver {
 
-    private fun createDeprecatedHiddenAnnotation(module: ModuleDescriptor): AnnotationDescriptor {
+    // workaround for plugin exception. todo: reproduce & report
+    internal fun createDeprecatedHiddenAnnotation(module: ModuleDescriptor): AnnotationDescriptor {
         return module.builtIns.createDeprecatedAnnotation("This synthesized declaration should not be used directly", level = "HIDDEN")
     }
 
