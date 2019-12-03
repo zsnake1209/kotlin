@@ -146,9 +146,11 @@ dependencies {
 
     libraries(intellijDep()) { includeIntellijCoreJarDependencies(project) { it.startsWith("trove4j") } }
     libraries(commonDep("io.ktor", "ktor-network"))
-    libraries(kotlinStdlib("jdk8"))
-    if (!kotlinBuildProperties.isInJpsBuildIdeaSync) {
-        libraries(kotlinStdlib("js", "distLibrary"))
+    if (kotlinBuildProperties.isInJpsBuildIdeaSync) {
+        libraries(kotlinStdlib("jdk8"))
+    } else {
+        libraries(project(":kotlin-stdlib-js", configuration = "distLibrary"))
+        libraries(project(":kotlin-stdlib-jdk8"))
     }
 
     distLibraryProjects.forEach {
@@ -163,13 +165,18 @@ dependencies {
         sources(project(it, configuration = "sources"))
     }
 
-    sources(kotlinStdlib("jdk7", classifier = "sources"))
-    sources(kotlinStdlib("jdk8", classifier = "sources"))
-
     if (kotlinBuildProperties.isInJpsBuildIdeaSync) {
         sources(kotlinStdlib(classifier = "sources"))
         sources("org.jetbrains.kotlin:kotlin-reflect:$bootstrapKotlinVersion:sources")
+        sources(kotlinStdlib("jdk7", classifier = "sources"))
+        sources(kotlinStdlib("jdk8", classifier = "sources"))
+
+        distCommonContents(kotlinStdlib(suffix = "common"))
+        distCommonContents(kotlinStdlib(suffix = "common", classifier = "sources"))
+        distMavenContents(kotlinStdlib(classifier = "sources"))
     } else {
+        sources(project(":kotlin-stdlib-jdk7", configuration = "sources"))
+        sources(project(":kotlin-stdlib-jdk8", configuration = "sources"))
         sources(project(":kotlin-stdlib", configuration = "distSources"))
         sources(project(":kotlin-stdlib-js", configuration = "distSources"))
         sources(project(":kotlin-reflect", configuration = "sources"))
@@ -178,12 +185,11 @@ dependencies {
 
         distJSContents(project(":kotlin-stdlib-js", configuration = "distJs"))
         distJSContents(project(":kotlin-test:kotlin-test-js", configuration = "distJs"))
+
+        distCommonContents(project(":kotlin-stdlib-common"))
+        distCommonContents(project(":kotlin-stdlib-common", configuration = "sources"))
+        distMavenContents(project(":kotlin-stdlib", configuration = "sources"))
     }
-
-    distCommonContents(kotlinStdlib(suffix = "common"))
-    distCommonContents(kotlinStdlib(suffix = "common", classifier = "sources"))
-
-    distMavenContents(kotlinStdlib(classifier = "sources"))
 
     buildNumber(project(":prepare:build.version", configuration = "buildVersion"))
 

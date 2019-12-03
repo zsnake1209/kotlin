@@ -12,7 +12,7 @@ configurations {
 dependencies {
     expectedBy project(':kotlin-test:kotlin-test-common')
     expectedBy project(':kotlin-test:kotlin-test-annotations-common')
-    compile kotlinStdlib("js")
+    compile project(":kotlin-stdlib-js")
 }
 
 compileKotlin2Js {

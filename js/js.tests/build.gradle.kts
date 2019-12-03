@@ -61,8 +61,8 @@ dependencies {
 
     testCompile(j2v8idString)
 
-    testRuntime(kotlinStdlib())
-    testJsRuntime(kotlinStdlib("js"))
+    testRuntime(project(":kotlin-stdlib"))
+    testJsRuntime(project(":kotlin-stdlib-js"))
     if (!kotlinBuildProperties.isInJpsBuildIdeaSync) {
         testJsRuntime(project(":kotlin-test:kotlin-test-js")) // to be sure that kotlin-test-js built before tests runned
     }
