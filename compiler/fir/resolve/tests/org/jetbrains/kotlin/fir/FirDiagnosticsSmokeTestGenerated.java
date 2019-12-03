@@ -10434,11 +10434,6 @@ public class FirDiagnosticsSmokeTestGenerated extends AbstractFirDiagnosticsSmok
                 runTest("compiler/testData/diagnostics/tests/inference/constraints/recursiveJavaTypeWithStarProjection.kt");
             }
 
-            @TestMetadata("remainConstraintContainingTypeWithoutProjection.kt")
-            public void testRemainConstraintContainingTypeWithoutProjection() throws Exception {
-                runTest("compiler/testData/diagnostics/tests/inference/constraints/remainConstraintContainingTypeWithoutProjection.kt");
-            }
-
             @TestMetadata("returnLambdaFromLambda.kt")
             public void testReturnLambdaFromLambda() throws Exception {
                 runTest("compiler/testData/diagnostics/tests/inference/constraints/returnLambdaFromLambda.kt");

@@ -157,6 +157,7 @@ class ConstraintIncorporator(
         isSubtype: Boolean
     ) {
         if (targetVariable in getNestedTypeVariables(newConstraint)) return
+        if (!containsConstrainingTypeWithoutProjection(newConstraint, otherConstraint)) return
         if (trivialConstraintTypeInferenceOracle.isGeneratedConstraintTrivial(
                 baseConstraint, otherConstraint, newConstraint, isSubtype
             )
@@ -170,6 +171,15 @@ class ConstraintIncorporator(
         val kind = if (isSubtype) ConstraintKind.LOWER else ConstraintKind.UPPER
 
         addNewIncorporatedConstraint(targetVariable, newConstraint, ConstraintContext(kind, derivedFrom))
+    }
+
+    fun Context.containsConstrainingTypeWithoutProjection(
+        newConstraint: KotlinTypeMarker,
+        otherConstraint: Constraint
+    ): Boolean {
+        return getNestedArguments(newConstraint).any {
+            it.getType().typeConstructor() == otherConstraint.type.typeConstructor() && it.getVariance() == TypeVariance.INV
+        }
     }
 
     fun Context.getNestedTypeVariables(type: KotlinTypeMarker): List<TypeVariableMarker> =
