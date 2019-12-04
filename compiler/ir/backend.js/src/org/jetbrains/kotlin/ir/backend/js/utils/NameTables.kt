@@ -55,7 +55,7 @@ class NameTable<T>(
         assert(!finished)
         names[declaration] = name
         reserved.add(name)
-        mappedNames[mapToKey(declaration)] = name
+//        mappedNames[mapToKey(declaration)] = name
     }
 
     fun declareFreshName(declaration: T, suggestedName: String): String {
