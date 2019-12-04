@@ -6,7 +6,9 @@
 package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
@@ -98,24 +100,50 @@ abstract class KotlinManglerImpl : KotlinMangler {
         return true
     }
 
-    private val publishedApiAnnotation = FqName("kotlin.PublishedApi")
-
-    protected fun acyclicTypeMangler(visited: MutableSet<IrTypeParameter>, type: IrType): String {
-        val descriptor = (type.classifierOrNull as? IrTypeParameterSymbol)?.owner
-        if (descriptor != null) {
-            val upperBounds = if (visited.contains(descriptor)) "" else {
-
-                visited.add(descriptor)
-
-                descriptor.superTypes.map {
-                    val bound = acyclicTypeMangler(visited, it)
-                    if (bound == "kotlin.Any?") "" else "_$bound"
-                }.joinToString("")
+    private fun collectTypeParameters(element: IrElement): List<List<IrTypeParameter>> {
+        val result = mutableListOf<List<IrTypeParameter>>()
+        tailrec fun collectTypeParametersImpl(element: IrElement) {
+            result += when (element) {
+                is IrConstructor -> element.typeParameters.filter { it.parent === element }
+                is IrSimpleFunction -> element.typeParameters
+                is IrProperty -> element.run { getter ?: setter }!!.typeParameters
+                is IrClass -> element.typeParameters
+                else -> return
             }
-            return "#GENERIC${if (type.isMarkedNullable()) "?" else ""}$upperBounds"
+
+            collectTypeParametersImpl((element as IrDeclaration).parent)
         }
 
-        var hashString = type.getClass()?.run { fqNameForIrSerialization.asString() } ?: "<dynamic>"
+        collectTypeParametersImpl(element)
+
+        return result
+    }
+
+    private fun mapTypeParameters(element: IrElement): Map<IrTypeParameter, String> {
+        val typeParameters = collectTypeParameters(element)
+
+        val result = mutableMapOf<IrTypeParameter, String>()
+
+        for ((ci, tc) in typeParameters.withIndex()) {
+            for ((i, tp) in tc.withIndex()) {
+                result[tp] = "$ci:$i"
+            }
+        }
+
+        return result
+    }
+
+    private val publishedApiAnnotation = FqName("kotlin.PublishedApi")
+
+    protected fun acyclicTypeMangler(type: IrType, typeParameterMap: Map<IrTypeParameter, String>): String {
+
+        var hashString = type.classifierOrNull?.let {
+            when (it) {
+                is IrClassSymbol -> it.owner.fqNameForIrSerialization.asString()
+                is IrTypeParameterSymbol -> typeParameterMap[it.owner] ?: error("Not found for ${it.owner.render()}")
+                else -> error("Unexpected type constructor")
+            }
+        } ?: "<dynamic>"
 
         when (type) {
             is IrSimpleType -> {
@@ -126,7 +154,7 @@ abstract class KotlinManglerImpl : KotlinMangler {
                             is IrTypeProjection -> {
                                 val variance = it.variance.label
                                 val projection = if (variance == "") "" else "${variance}_"
-                                projection + acyclicTypeMangler(visited, it.type)
+                                projection + acyclicTypeMangler(it.type, typeParameterMap)
                             }
                             else -> error(it)
                         }
@@ -142,31 +170,50 @@ abstract class KotlinManglerImpl : KotlinMangler {
         return hashString
     }
 
-    protected fun typeToHashString(type: IrType) = acyclicTypeMangler(mutableSetOf(), type)
+    protected fun typeToHashString(type: IrType, typeParameterMap: Map<IrTypeParameter, String>) =
+        acyclicTypeMangler(type, typeParameterMap)
 
-    val IrValueParameter.extensionReceiverNamePart: String
-        get() = "@${typeToHashString(this.type)}."
+    fun IrValueParameter.extensionReceiverNamePart(typeParameterMap: Map<IrTypeParameter, String>): String =
+        "@${typeToHashString(this.type, typeParameterMap)}."
 
-    open val IrFunction.argsPart
-        get() = this.valueParameters.map {
-            "${typeToHashString(it.type)}${if (it.isVararg) "_VarArg" else ""}"
+    open fun IrFunction.valueParamsPart(typeParameterNamer: Map<IrTypeParameter, String>): String {
+        return this.valueParameters.map {
+            "${typeToHashString(it.type, typeParameterNamer)}${if (it.isVararg) "_VarArg" else ""}"
         }.joinToString(";")
+    }
 
-    open val IrFunction.signature: String
-        get() {
-            val extensionReceiverPart = this.extensionReceiverParameter?.extensionReceiverNamePart ?: ""
-            val argsPart = this.argsPart
-            // Distinguish value types and references - it's needed for calling virtual methods through bridges.
-            // Also is function has type arguments - frontend allows exactly matching overrides.
-            val signatureSuffix =
-                when {
-                    this.typeParameters.isNotEmpty() -> "Generic"
-                    returnType.isInlined -> "ValueType"
-                    !returnType.isUnitOrNullableUnit() -> typeToHashString(returnType)
-                    else -> ""
-                }
-            return "$extensionReceiverPart($argsPart)$signatureSuffix"
+    open fun IrFunction.typeParamsPart(typeParameters: List<IrTypeParameter>, typeParameterMap: Map<IrTypeParameter, String>): String {
+        if (typeParameters.isEmpty()) return ""
+
+        fun mangleTypeParameter(index: Int, typeParameter: IrTypeParameter): String {
+            // We use type parameter index instead of name since changing name is not a binary-incompatible change
+            return typeParameter.superTypes.joinToString("&", "$index<", ">") {
+                acyclicTypeMangler(it, typeParameterMap)
+            }
         }
+
+        return typeParameters.withIndex().joinToString(";", "{", "}") { (i, tp) ->
+            mangleTypeParameter(i, tp)
+        }
+    }
+
+    open fun IrFunction.signature(typeParameterMap: Map<IrTypeParameter, String>): String {
+        val extensionReceiverPart = this.extensionReceiverParameter?.extensionReceiverNamePart(typeParameterMap) ?: ""
+        val valueParamsPart = this.valueParamsPart(typeParameterMap)
+        // Distinguish value types and references - it's needed for calling virtual methods through bridges.
+        // Also is function has type arguments - frontend allows exactly matching overrides.
+        val signatureSuffix =
+            when {
+                this.typeParameters.isNotEmpty() -> "Generic"
+                returnType.isInlined -> "ValueType"
+                !returnType.isUnitOrNullableUnit() -> typeToHashString(returnType, typeParameterMap)
+                else -> ""
+            }
+
+        val typesParamsPart = this.typeParamsPart(typeParameters, typeParameterMap)
+
+        return "$extensionReceiverPart($valueParamsPart)$typesParamsPart$signatureSuffix"
+    }
 
     open val IrFunction.platformSpecificFunctionName: String? get() = null
 
@@ -175,8 +222,10 @@ abstract class KotlinManglerImpl : KotlinMangler {
         get() {
             // TODO: Again. We can't call super in children, so provide a hook for now.
             this.platformSpecificFunctionName?.let { return it }
+
+            val typeParameterMap = mapTypeParameters(this)
             val name = this.name.mangleIfInternal(this.module, this.visibility)
-            return "$name$signature"
+            return "$name${signature(typeParameterMap)}"
         }
 
     override val Long.isSpecial: Boolean
@@ -257,7 +306,8 @@ abstract class KotlinManglerImpl : KotlinMangler {
 
     private val IrProperty.symbolName: String
         get() {
-            val extensionReceiver: String = getter?.extensionReceiverParameter?.extensionReceiverNamePart ?: ""
+            val typeParameterMap = mapTypeParameters(this)
+            val extensionReceiver: String = getter?.extensionReceiverParameter?.extensionReceiverNamePart(typeParameterMap) ?: ""
 
             val containingDeclarationPart = parent.fqNameForIrSerialization.let {
                 if (it.isRoot) "" else "$it."
