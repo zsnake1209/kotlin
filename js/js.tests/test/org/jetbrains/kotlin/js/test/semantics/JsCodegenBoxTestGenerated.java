@@ -7393,6 +7393,19 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             public void testTryCatch_1_3() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/tailCallOptimizations/tryCatch.kt", "kotlin.coroutines");
             }
+
+            @TestMetadata("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit")
+            @TestDataPath("$PROJECT_ROOT")
+            @RunWith(JUnit3RunnerWithInners.class)
+            public static class Unit extends AbstractJsCodegenBoxTest {
+                private void runTest(String testDataFilePath) throws Exception {
+                    KotlinTestUtils.runTest0(this::doTest, TargetBackend.JS, testDataFilePath);
+                }
+
+                public void testAllFilesPresentInUnit() throws Exception {
+                    KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS, true);
+                }
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/coroutines/tailOperations")
