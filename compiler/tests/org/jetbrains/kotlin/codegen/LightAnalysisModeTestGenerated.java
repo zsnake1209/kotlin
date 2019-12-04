@@ -24526,6 +24526,16 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/sam"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JVM, true);
         }
 
+        @TestMetadata("arrayAsVarargAfterSamArgument.kt")
+        public void testArrayAsVarargAfterSamArgument() throws Exception {
+            runTest("compiler/testData/codegen/box/sam/arrayAsVarargAfterSamArgument.kt");
+        }
+
+        @TestMetadata("arrayAsVarargAfterSamArgumentWithoutSamConversionsPerArgument.kt")
+        public void testArrayAsVarargAfterSamArgumentWithoutSamConversionsPerArgument() throws Exception {
+            runTest("compiler/testData/codegen/box/sam/arrayAsVarargAfterSamArgumentWithoutSamConversionsPerArgument.kt");
+        }
+
         @TestMetadata("castFromAny.kt")
         public void testCastFromAny() throws Exception {
             runTest("compiler/testData/codegen/box/sam/castFromAny.kt");
