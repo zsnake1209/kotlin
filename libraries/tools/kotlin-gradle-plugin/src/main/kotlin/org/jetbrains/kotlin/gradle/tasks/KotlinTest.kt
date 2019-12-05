@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.gradle.tasks
 
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.tasks.testing.filter.DefaultTestFilter
+import org.gradle.api.model.ReplacedBy
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
@@ -15,6 +16,7 @@ import org.gradle.process.internal.ExecHandleFactory
 import org.jetbrains.kotlin.gradle.internal.testing.KotlinTestRunnerListener
 import org.jetbrains.kotlin.gradle.internal.testing.TCServiceMessagesTestExecutor
 import org.jetbrains.kotlin.gradle.utils.injected
+import org.jetbrains.kotlin.gradle.utils.isGradleVersionAtLeast
 import javax.inject.Inject
 
 abstract class KotlinTest : AbstractTestTask() {
@@ -22,7 +24,8 @@ abstract class KotlinTest : AbstractTestTask() {
     @Optional
     var targetName: String? = null
 
-    @Input
+    @Internal // Taken into account by excludePatterns.
+    @Deprecated("Use filter.excludePatterns instead.", ReplaceWith("filter.excludePatterns"))
     var excludes = mutableSetOf<String>()
 
     protected val filterExt: DefaultTestFilter
@@ -33,10 +36,11 @@ abstract class KotlinTest : AbstractTestTask() {
     }
 
     val includePatterns: Set<String>
-        @Internal get() = filterExt.includePatterns + filterExt.commandLineIncludePatterns
+        @Input get() = filterExt.includePatterns + filterExt.commandLineIncludePatterns
 
+    @Suppress("DEPRECATION")
     val excludePatterns: Set<String>
-        @Internal get() = excludes
+        @Input get() = excludes + if (isGradleVersionAtLeast(5, 0)) filterExt.excludePatterns else emptySet()
 
     @get:Inject
     open val fileResolver: FileResolver
