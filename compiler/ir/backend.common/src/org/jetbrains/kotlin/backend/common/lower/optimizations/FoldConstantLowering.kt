@@ -1,13 +1,13 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.jvm.lower
+package org.jetbrains.kotlin.backend.common.lower.optimizations
 
+import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.phaser.makeIrFilePhase
-import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.*
@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.resolve.constants.evaluate.evaluateBinary
 import org.jetbrains.kotlin.resolve.constants.evaluate.evaluateUnary
 
-internal val foldConstantLoweringPhase = makeIrFilePhase(
+val foldConstantLoweringPhase = makeIrFilePhase(
     ::FoldConstantLowering,
     name = "FoldConstantLowering",
     description = "Constant Folding"
@@ -34,7 +34,7 @@ internal val foldConstantLoweringPhase = makeIrFilePhase(
  *
  * TODO: constant fields (e.g. Double.NaN)
  */
-class FoldConstantLowering(private val context: JvmBackendContext) : IrElementTransformerVoid(), FileLoweringPass {
+class FoldConstantLowering(private val context: CommonBackendContext) : IrElementTransformerVoid(), FileLoweringPass {
     /**
      * ID of an binary operator / method.
      *
@@ -50,43 +50,111 @@ class FoldConstantLowering(private val context: JvmBackendContext) : IrElementTr
     private data class PrimitiveType<T>(val name: String)
 
     companion object {
-        private val INT = PrimitiveType<Int>("Int")
-        private val LONG = PrimitiveType<Long>("Long")
-        private val DOUBLE = PrimitiveType<Double>("Double")
-        private val FLOAT = PrimitiveType<Float>("Float")
+        private val INT =
+            PrimitiveType<Int>("Int")
+        private val LONG =
+            PrimitiveType<Long>("Long")
+        private val DOUBLE =
+            PrimitiveType<Double>("Double")
+        private val FLOAT =
+            PrimitiveType<Float>("Float")
 
         private val BINARY_OP_TO_EVALUATOR = HashMap<BinaryOp, Function2<Any?, Any?, Any>>()
 
         @Suppress("UNCHECKED_CAST")
         private fun <T> registerBuiltinBinaryOp(operandType: PrimitiveType<T>, operatorName: String, f: (T, T) -> Any) {
-            BINARY_OP_TO_EVALUATOR[BinaryOp(operandType.name, operandType.name, operatorName)] = f as Function2<Any?, Any?, Any>
+            BINARY_OP_TO_EVALUATOR[BinaryOp(
+                operandType.name,
+                operandType.name,
+                operatorName
+            )] = f as Function2<Any?, Any?, Any>
         }
 
         init {
             // IrBuiltins
-            registerBuiltinBinaryOp(DOUBLE, IrBuiltIns.OperatorNames.LESS) { a, b -> a < b }
-            registerBuiltinBinaryOp(DOUBLE, IrBuiltIns.OperatorNames.LESS_OR_EQUAL) { a, b -> a <= b }
-            registerBuiltinBinaryOp(DOUBLE, IrBuiltIns.OperatorNames.GREATER) { a, b -> a > b }
-            registerBuiltinBinaryOp(DOUBLE, IrBuiltIns.OperatorNames.GREATER_OR_EQUAL) { a, b -> a >= b }
-            registerBuiltinBinaryOp(DOUBLE, IrBuiltIns.OperatorNames.IEEE754_EQUALS) { a, b -> a == b }
+            registerBuiltinBinaryOp(
+                DOUBLE,
+                IrBuiltIns.OperatorNames.LESS
+            ) { a, b -> a < b }
+            registerBuiltinBinaryOp(
+                DOUBLE,
+                IrBuiltIns.OperatorNames.LESS_OR_EQUAL
+            ) { a, b -> a <= b }
+            registerBuiltinBinaryOp(
+                DOUBLE,
+                IrBuiltIns.OperatorNames.GREATER
+            ) { a, b -> a > b }
+            registerBuiltinBinaryOp(
+                DOUBLE,
+                IrBuiltIns.OperatorNames.GREATER_OR_EQUAL
+            ) { a, b -> a >= b }
+            registerBuiltinBinaryOp(
+                DOUBLE,
+                IrBuiltIns.OperatorNames.IEEE754_EQUALS
+            ) { a, b -> a == b }
 
-            registerBuiltinBinaryOp(FLOAT, IrBuiltIns.OperatorNames.LESS) { a, b -> a < b }
-            registerBuiltinBinaryOp(FLOAT, IrBuiltIns.OperatorNames.LESS_OR_EQUAL) { a, b -> a <= b }
-            registerBuiltinBinaryOp(FLOAT, IrBuiltIns.OperatorNames.GREATER) { a, b -> a > b }
-            registerBuiltinBinaryOp(FLOAT, IrBuiltIns.OperatorNames.GREATER_OR_EQUAL) { a, b -> a >= b }
-            registerBuiltinBinaryOp(FLOAT, IrBuiltIns.OperatorNames.IEEE754_EQUALS) { a, b -> a == b }
+            registerBuiltinBinaryOp(
+                FLOAT,
+                IrBuiltIns.OperatorNames.LESS
+            ) { a, b -> a < b }
+            registerBuiltinBinaryOp(
+                FLOAT,
+                IrBuiltIns.OperatorNames.LESS_OR_EQUAL
+            ) { a, b -> a <= b }
+            registerBuiltinBinaryOp(
+                FLOAT,
+                IrBuiltIns.OperatorNames.GREATER
+            ) { a, b -> a > b }
+            registerBuiltinBinaryOp(
+                FLOAT,
+                IrBuiltIns.OperatorNames.GREATER_OR_EQUAL
+            ) { a, b -> a >= b }
+            registerBuiltinBinaryOp(
+                FLOAT,
+                IrBuiltIns.OperatorNames.IEEE754_EQUALS
+            ) { a, b -> a == b }
 
-            registerBuiltinBinaryOp(INT, IrBuiltIns.OperatorNames.LESS) { a, b -> a < b }
-            registerBuiltinBinaryOp(INT, IrBuiltIns.OperatorNames.LESS_OR_EQUAL) { a, b -> a <= b }
-            registerBuiltinBinaryOp(INT, IrBuiltIns.OperatorNames.GREATER) { a, b -> a > b }
-            registerBuiltinBinaryOp(INT, IrBuiltIns.OperatorNames.GREATER_OR_EQUAL) { a, b -> a >= b }
-            registerBuiltinBinaryOp(INT, IrBuiltIns.OperatorNames.EQEQ) { a, b -> a == b }
+            registerBuiltinBinaryOp(
+                INT,
+                IrBuiltIns.OperatorNames.LESS
+            ) { a, b -> a < b }
+            registerBuiltinBinaryOp(
+                INT,
+                IrBuiltIns.OperatorNames.LESS_OR_EQUAL
+            ) { a, b -> a <= b }
+            registerBuiltinBinaryOp(
+                INT,
+                IrBuiltIns.OperatorNames.GREATER
+            ) { a, b -> a > b }
+            registerBuiltinBinaryOp(
+                INT,
+                IrBuiltIns.OperatorNames.GREATER_OR_EQUAL
+            ) { a, b -> a >= b }
+            registerBuiltinBinaryOp(
+                INT,
+                IrBuiltIns.OperatorNames.EQEQ
+            ) { a, b -> a == b }
 
-            registerBuiltinBinaryOp(LONG, IrBuiltIns.OperatorNames.LESS) { a, b -> a < b }
-            registerBuiltinBinaryOp(LONG, IrBuiltIns.OperatorNames.LESS_OR_EQUAL) { a, b -> a <= b }
-            registerBuiltinBinaryOp(LONG, IrBuiltIns.OperatorNames.GREATER) { a, b -> a > b }
-            registerBuiltinBinaryOp(LONG, IrBuiltIns.OperatorNames.GREATER_OR_EQUAL) { a, b -> a >= b }
-            registerBuiltinBinaryOp(LONG, IrBuiltIns.OperatorNames.EQEQ) { a, b -> a == b }
+            registerBuiltinBinaryOp(
+                LONG,
+                IrBuiltIns.OperatorNames.LESS
+            ) { a, b -> a < b }
+            registerBuiltinBinaryOp(
+                LONG,
+                IrBuiltIns.OperatorNames.LESS_OR_EQUAL
+            ) { a, b -> a <= b }
+            registerBuiltinBinaryOp(
+                LONG,
+                IrBuiltIns.OperatorNames.GREATER
+            ) { a, b -> a > b }
+            registerBuiltinBinaryOp(
+                LONG,
+                IrBuiltIns.OperatorNames.GREATER_OR_EQUAL
+            ) { a, b -> a >= b }
+            registerBuiltinBinaryOp(
+                LONG,
+                IrBuiltIns.OperatorNames.EQEQ
+            ) { a, b -> a == b }
         }
     }
 
@@ -150,7 +218,11 @@ class FoldConstantLowering(private val context: JvmBackendContext) : IrElementTr
 
         val evaluated = try {
             val evaluator =
-                BINARY_OP_TO_EVALUATOR[BinaryOp(lhs.kind.toString(), rhs.kind.toString(), call.symbol.owner.name.toString())] ?: return call
+                BINARY_OP_TO_EVALUATOR[BinaryOp(
+                    lhs.kind.toString(),
+                    rhs.kind.toString(),
+                    call.symbol.owner.name.toString()
+                )] ?: return call
             evaluator(lhs.value!!, rhs.value!!)
         } catch (e: Exception) {
             return call
