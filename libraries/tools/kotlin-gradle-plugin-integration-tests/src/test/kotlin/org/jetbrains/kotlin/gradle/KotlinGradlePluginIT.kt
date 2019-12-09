@@ -54,6 +54,24 @@ class KotlinGradleIT : BaseGradleIT() {
     }
 
     @Test
+    fun testGradleKtsSmokeIC() {
+        val project = Project("gradleKtsSmoke", gradleVersionRequirement = GradleVersionRequired.None)
+        val options = defaultBuildOptions().copy(incremental = true)
+
+        project.build("assemble", options = options) {
+            assertSuccessful()
+        }
+
+        val aKt = project.projectDir.getFileByName("A.kt")
+        aKt.modify { it.checkedReplace("fun foo", "open fun foo") }
+
+        project.build("assemble", options = options) {
+            assertSuccessful()
+            assertCompiledKotlinSources(project.relativize(aKt))
+        }
+    }
+
+    @Test
     fun testRunningInDifferentDir() {
         val wd0 = workingDir
         val wd1 = File(wd0, "subdir").apply { mkdirs() }

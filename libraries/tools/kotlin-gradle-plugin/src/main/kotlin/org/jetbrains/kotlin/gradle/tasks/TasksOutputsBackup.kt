@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.gradle.tasks
 
 import org.gradle.api.file.FileCollection
-import org.jetbrains.kotlin.utils.keysToMap
 import java.io.File
 import java.util.HashSet
 
@@ -23,7 +22,8 @@ internal class TaskOutputsBackup(private val outputs: FileCollection) {
             }
         }
 
-        previousOutputs = outputFiles.keysToMap { it.readBytes() }
+        // keysToMap usage was removed, because it breaks IC with Gradle < 5 and Gradle KTS
+        previousOutputs = outputFiles.map { it to it.readBytes() }.toMap()
     }
 
     fun restoreOutputs() {
