@@ -49,10 +49,10 @@ public abstract class AbstractCoroutineContextKey<K : Element, E : K>(
     baseKey: Key<K>,
     private val safeCast: (element: Element) -> E?
 ) : Key<E> {
-    private val topMostKey: Key<*> = if (baseKey is AbstractCoroutineContextKey<*, *>) baseKey.topMostKey else baseKey
+    private val topmostKey: Key<*> = if (baseKey is AbstractCoroutineContextKey<*, *>) baseKey.topmostKey else baseKey
 
     internal fun tryCast(element: Element): E? = safeCast(element)
-    internal fun isSubKey(key: Key<*>): Boolean = key === this || topMostKey === key
+    internal fun isSubKey(key: Key<*>): Boolean = key === this || topmostKey === key
 }
 
 /**

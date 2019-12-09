@@ -12,26 +12,27 @@ class ContinuationInterceptorKeyTest {
 
     private val CoroutineContext.size get() = fold(0) { acc, _ -> acc + 1 }
 
-    abstract class Dispatcher : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
+    abstract class BaseElement : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
         companion object Key :
-            AbstractCoroutineContextKey<ContinuationInterceptor, Dispatcher>(ContinuationInterceptor, { it as? Dispatcher })
+            AbstractCoroutineContextKey<ContinuationInterceptor, BaseElement>(ContinuationInterceptor, { it as? BaseElement })
 
         override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> = continuation
     }
 
-    // "Legacy" code, EventLoop with ContinuationInterceptor key
-    class EventLoop : Dispatcher() {
+    // "Legacy" code, BaseElement with ContinuationInterceptor key
+    class DerivedElementWithOldKey : BaseElement() {
         override val key: CoroutineContext.Key<*>
             get() = ContinuationInterceptor
     }
 
     // "New" code with AbstractCoroutineContextKey
-    class ExecutorDispatcher : Dispatcher() {
-        companion object Key : AbstractCoroutineContextKey<Dispatcher, ExecutorDispatcher>(Dispatcher, { it as? ExecutorDispatcher })
+    class DerivedElementWithPolyKey : BaseElement() {
+        companion object Key :
+            AbstractCoroutineContextKey<BaseElement, DerivedElementWithPolyKey>(BaseElement, { it as? DerivedElementWithPolyKey })
     }
 
     // Irrelevant interceptor
-    class CustomInterceptor() : ContinuationInterceptor {
+    class CustomInterceptor : ContinuationInterceptor {
         override val key: CoroutineContext.Key<*>
             get() = ContinuationInterceptor
 
@@ -43,44 +44,44 @@ class ContinuationInterceptorKeyTest {
     }
 
     @Test
-    fun testDispatcherKeyIsNotOverridden() {
-        val eventLoop = EventLoop()
-        testDispatcherKeyIsNotOverridden(eventLoop, eventLoop)
-        testDispatcherKeyIsNotOverridden(IrrelevantElement + eventLoop, eventLoop) // test for CombinedContext
+    fun testKeyIsNotOverridden() {
+        val derivedElementWithOldKey = DerivedElementWithOldKey()
+        testKeyIsNotOverridden(derivedElementWithOldKey, derivedElementWithOldKey)
+        testKeyIsNotOverridden(IrrelevantElement + derivedElementWithOldKey, derivedElementWithOldKey) // test for CombinedContext
     }
 
-    private fun testDispatcherKeyIsNotOverridden(context: CoroutineContext, element: CoroutineContext.Element) {
+    private fun testKeyIsNotOverridden(context: CoroutineContext, element: CoroutineContext.Element) {
         run {
             val interceptor: ContinuationInterceptor = context[ContinuationInterceptor]!!
             assertSame(element, interceptor)
         }
         run {
-            val dispatcher: Dispatcher = context[Dispatcher]!!
-            assertSame(element, dispatcher)
+            val baseElement: BaseElement = context[BaseElement]!!
+            assertSame(element, baseElement)
         }
 
         val subtracted = context.minusKey(ContinuationInterceptor)
-        assertEquals(subtracted, context.minusKey(Dispatcher))
+        assertEquals(subtracted, context.minusKey(BaseElement))
         assertNull(subtracted[ContinuationInterceptor])
-        assertNull(subtracted[Dispatcher])
+        assertNull(subtracted[BaseElement])
         assertEquals(context.size - 1, subtracted.size)
     }
 
     @Test
-    fun testDispatcherKeyIsOverridden() {
-        val executor = ExecutorDispatcher()
-        testDispatcherKeyIsOverridden(executor, executor)
-        testDispatcherKeyIsOverridden(IrrelevantElement + executor, executor) // test for CombinedContext
+    fun testKeyIsOverridden() {
+        val derivedElementWithPolyKey = DerivedElementWithPolyKey()
+        testKeyIsOverridden(derivedElementWithPolyKey, derivedElementWithPolyKey)
+        testKeyIsOverridden(IrrelevantElement + derivedElementWithPolyKey, derivedElementWithPolyKey) // test for CombinedContext
     }
 
-    private fun testDispatcherKeyIsOverridden(context: CoroutineContext, element: CoroutineContext.Element) {
-        testDispatcherKeyIsNotOverridden(context, element)
-        val executor = context[ExecutorDispatcher]
-        assertNotNull(executor)
-        assertSame(element, executor)
+    private fun testKeyIsOverridden(context: CoroutineContext, element: CoroutineContext.Element) {
+        testKeyIsNotOverridden(context, element)
+        val derived = context[DerivedElementWithPolyKey]
+        assertNotNull(derived)
+        assertSame(element, derived)
         val subtracted = context.minusKey(ContinuationInterceptor)
-        assertEquals(subtracted, context.minusKey(Dispatcher))
-        assertEquals(subtracted, context.minusKey(ExecutorDispatcher))
+        assertEquals(subtracted, context.minusKey(BaseElement))
+        assertEquals(subtracted, context.minusKey(DerivedElementWithPolyKey))
         assertEquals(context.size - 1, subtracted.size)
     }
 
@@ -95,37 +96,37 @@ class ContinuationInterceptorKeyTest {
         val interceptor = context[ContinuationInterceptor]
         assertNotNull(interceptor)
         assertSame(element, interceptor)
-        assertNull(context[Dispatcher])
-        assertNull(context[ExecutorDispatcher])
-        assertEquals(context, context.minusKey(Dispatcher))
-        assertEquals(context, context.minusKey(ExecutorDispatcher))
+        assertNull(context[BaseElement])
+        assertNull(context[DerivedElementWithPolyKey])
+        assertEquals(context, context.minusKey(BaseElement))
+        assertEquals(context, context.minusKey(DerivedElementWithPolyKey))
     }
 
     @Test
     fun testContextOperations() {
         val interceptor = CustomInterceptor()
-        val dispatcher = EventLoop()
-        val executor = ExecutorDispatcher()
+        val derivedWithOld = DerivedElementWithOldKey()
+        val derivedWithPoly = DerivedElementWithPolyKey()
         val e = IrrelevantElement
         run {
-            assertEquals(interceptor, dispatcher + executor + interceptor)
-            assertEquals(interceptor + e, dispatcher + executor + interceptor + e)
-            assertEquals(interceptor, dispatcher + interceptor)
-            assertEquals(interceptor, executor + interceptor)
+            assertEquals(interceptor, derivedWithOld + derivedWithPoly + interceptor)
+            assertEquals(interceptor + e, derivedWithOld + derivedWithPoly + interceptor + e)
+            assertEquals(interceptor, derivedWithOld + interceptor)
+            assertEquals(interceptor, derivedWithPoly + interceptor)
         }
 
         run {
-            assertEquals(dispatcher, executor + interceptor + dispatcher)
-            assertEquals(dispatcher + e, executor + interceptor + dispatcher + e)
-            assertEquals(dispatcher, executor + dispatcher)
-            assertEquals(dispatcher, interceptor + dispatcher)
+            assertEquals(derivedWithOld, derivedWithPoly + interceptor + derivedWithOld)
+            assertEquals(derivedWithOld + e, derivedWithPoly + interceptor + derivedWithOld + e)
+            assertEquals(derivedWithOld, derivedWithPoly + derivedWithOld)
+            assertEquals(derivedWithOld, interceptor + derivedWithOld)
         }
 
         run {
-            assertEquals(executor, interceptor + dispatcher + executor)
-            assertEquals(executor + e, interceptor + dispatcher + executor + e)
-            assertEquals(executor, dispatcher + executor)
-            assertEquals(executor, interceptor + executor)
+            assertEquals(derivedWithPoly, interceptor + derivedWithOld + derivedWithPoly)
+            assertEquals(derivedWithPoly + e, interceptor + derivedWithOld + derivedWithPoly + e)
+            assertEquals(derivedWithPoly, derivedWithOld + derivedWithPoly)
+            assertEquals(derivedWithPoly, interceptor + derivedWithPoly)
         }
     }
 }

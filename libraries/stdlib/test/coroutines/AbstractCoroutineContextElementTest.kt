@@ -12,19 +12,31 @@ class AbstractCoroutineContextElementTest {
 
     private val CoroutineContext.size get() = fold(0) { acc, _ -> acc + 1 }
 
-    abstract class CancelToken : AbstractCoroutineContextElement(Key) {
-        companion object Key : CoroutineContext.Key<CancelToken>
+    abstract class Base : AbstractCoroutineContextElement(Key) {
+        companion object Key : CoroutineContext.Key<Base>
 
         override fun <E : CoroutineContext.Element> get(key: CoroutineContext.Key<E>): E? = getPolymorphicElement(key)
         override fun minusKey(key: CoroutineContext.Key<*>): CoroutineContext = minusPolymorphicKey(key)
     }
 
-    class StdlibJob : CancelToken() {
+    class DerivedWithoutKey : Base() {
         // No custom key
     }
 
-    class Job : CancelToken() {
-        companion object Key : AbstractCoroutineContextKey<CancelToken, Job>(CancelToken, { it as? Job })
+    open class DerivedWithKey : Base() {
+        companion object Key : AbstractCoroutineContextKey<Base, DerivedWithKey>(Base, { it as? DerivedWithKey })
+    }
+
+    class SubDerivedWithKey : DerivedWithKey() {
+        companion object Key : AbstractCoroutineContextKey<Base, SubDerivedWithKey>(Base, { it as? SubDerivedWithKey })
+    }
+
+    class SubDerivedWithKeyAndDifferentBase : DerivedWithKey() {
+        // Note how different base class is used
+        companion object Key :
+            AbstractCoroutineContextKey<DerivedWithKey, SubDerivedWithKeyAndDifferentBase>(
+                DerivedWithKey,
+                { it as? SubDerivedWithKeyAndDifferentBase })
     }
 
     object IrrelevantElement : AbstractCoroutineContextElement(Key) {
@@ -32,52 +44,114 @@ class AbstractCoroutineContextElementTest {
     }
 
     @Test
-    fun testCancelToken() {
-        testCancelToken(EmptyCoroutineContext, StdlibJob()) // Single element
-        testCancelToken(IrrelevantElement, StdlibJob()) // Combined context
+    fun testDerivedWithoutKey() {
+        testDerivedWithoutKey(EmptyCoroutineContext, DerivedWithoutKey()) // Single element
+        testDerivedWithoutKey(IrrelevantElement, DerivedWithoutKey()) // Combined context
     }
 
     @Test
-    fun testCancelTokenOverridesJob() {
-        val context = Job() + StdlibJob()
+    fun testDerivedWithoutKeyOverridesDerived() {
+        val context = DerivedWithKey() + DerivedWithoutKey()
         assertEquals(1, context.size)
-        assertTrue(context[CancelToken] is StdlibJob)
-        assertNull(context[Job])
-        assertEquals(EmptyCoroutineContext, context.minusKey(CancelToken))
-        assertSame(context, context.minusKey(Job))
+        assertTrue(context[Base] is DerivedWithoutKey)
+        assertNull(context[DerivedWithKey])
+        assertEquals(EmptyCoroutineContext, context.minusKey(Base))
+        assertSame(context, context.minusKey(DerivedWithKey))
     }
 
-    private fun testCancelToken(context: CoroutineContext, element: CoroutineContext.Element) {
+    private fun testDerivedWithoutKey(context: CoroutineContext, element: CoroutineContext.Element) {
         val ctx = context + element
         assertEquals(context.size + 1, ctx.size)
-        assertSame(element, ctx[CancelToken]!!)
-        assertNull(ctx[Job])
-        assertEquals(context, ctx.minusKey(CancelToken))
-        assertSame(ctx, ctx.minusKey(Job))
+        assertSame(element, ctx[Base]!!)
+        assertNull(ctx[DerivedWithKey])
+        assertEquals(context, ctx.minusKey(Base))
+        assertSame(ctx, ctx.minusKey(DerivedWithKey))
     }
 
     @Test
-    fun testJob() {
-        testJob(EmptyCoroutineContext, Job()) // Single element
-        testJob(IrrelevantElement, Job()) // Combined context
+    fun testDerivedWithKey() {
+        testDerivedWithKey(EmptyCoroutineContext, DerivedWithKey()) // Single element
+        testDerivedWithKey(IrrelevantElement, DerivedWithKey()) // Combined context
     }
 
-    private fun testJob(context: CoroutineContext, element: CoroutineContext.Element) {
+    private fun testDerivedWithKey(context: CoroutineContext, element: CoroutineContext.Element) {
         val ctx = context + element
         assertEquals(context.size + 1, ctx.size)
-        assertSame(element, ctx[CancelToken]!!)
-        assertSame(element, ctx[Job]!!)
-        assertEquals(context, ctx.minusKey(CancelToken))
-        assertEquals(context, ctx.minusKey(Job))
+        assertSame(element, ctx[Base]!!)
+        assertSame(element, ctx[DerivedWithKey]!!)
+        assertEquals(context, ctx.minusKey(Base))
+        assertEquals(context, ctx.minusKey(DerivedWithKey))
     }
 
     @Test
-    fun testJobOverridesCancelToken() {
-        val context = StdlibJob() + Job()
+    fun testSubDerivedWithKey() {
+        testSubDerivedWithKey(EmptyCoroutineContext, SubDerivedWithKey())
+        testSubDerivedWithKey(IrrelevantElement, SubDerivedWithKey())
+    }
+
+    private fun testSubDerivedWithKey(context: CoroutineContext, element: CoroutineContext.Element) {
+        val ctx = context + element
+        assertEquals(context.size + 1, ctx.size)
+        assertSame(element, ctx[Base]!!)
+        assertSame(element, ctx[DerivedWithKey]!!)
+        assertSame(element, ctx[SubDerivedWithKey]!!)
+        assertNull(ctx[SubDerivedWithKeyAndDifferentBase])
+        assertEquals(context, ctx.minusKey(Base))
+        assertEquals(context, ctx.minusKey(DerivedWithKey))
+        assertEquals(context, ctx.minusKey(SubDerivedWithKey))
+        assertSame(ctx, ctx.minusKey(SubDerivedWithKeyAndDifferentBase))
+    }
+
+    @Test
+    fun testSubDerivedWithKeyAndDifferentBase() {
+        testSubDerivedWithKeyAndDifferentBase(EmptyCoroutineContext, SubDerivedWithKeyAndDifferentBase())
+        testSubDerivedWithKeyAndDifferentBase(IrrelevantElement, SubDerivedWithKeyAndDifferentBase())
+    }
+
+    private fun testSubDerivedWithKeyAndDifferentBase(context: CoroutineContext, element: CoroutineContext.Element) {
+        val ctx = context + element
+        assertEquals(context.size + 1, ctx.size)
+        assertSame(element, ctx[Base]!!)
+        assertSame(element, ctx[DerivedWithKey]!!)
+        assertSame(element, ctx[SubDerivedWithKeyAndDifferentBase]!!)
+        assertNull(ctx[SubDerivedWithKey])
+        assertEquals(context, ctx.minusKey(Base))
+        assertEquals(context, ctx.minusKey(DerivedWithKey))
+        assertEquals(context, ctx.minusKey(SubDerivedWithKeyAndDifferentBase))
+        assertSame(ctx, ctx.minusKey(SubDerivedWithKey))
+    }
+
+    @Test
+    fun testDerivedWithKeyOverridesDerived() {
+        val context = DerivedWithoutKey() + DerivedWithKey()
         assertEquals(1, context.size)
-        assertTrue { context[CancelToken] is Job }
-        assertTrue { context[Job] is Job }
-        assertEquals(EmptyCoroutineContext, context.minusKey(CancelToken))
-        assertEquals(EmptyCoroutineContext, context.minusKey(Job))
+        assertTrue { context[Base] is DerivedWithKey }
+        assertTrue { context[DerivedWithKey] is DerivedWithKey }
+        assertEquals(EmptyCoroutineContext, context.minusKey(Base))
+        assertEquals(EmptyCoroutineContext, context.minusKey(DerivedWithKey))
+    }
+
+    @Test
+    fun testSubDerivedOverrides() {
+        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(DerivedWithoutKey() + SubDerivedWithKeyAndDifferentBase())
+        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(DerivedWithKey() + SubDerivedWithKeyAndDifferentBase())
+        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(SubDerivedWithKeyAndDifferentBase() + SubDerivedWithKeyAndDifferentBase())
+    }
+
+    @Test
+    fun testSubDerivedWithDifferentBaseOverrides() {
+        testSubDerivedOverrides<SubDerivedWithKey>(DerivedWithoutKey() + SubDerivedWithKey())
+        testSubDerivedOverrides<SubDerivedWithKey>(DerivedWithKey() + SubDerivedWithKey())
+        testSubDerivedOverrides<SubDerivedWithKey>(SubDerivedWithKeyAndDifferentBase() + SubDerivedWithKey())
+    }
+
+    private inline fun <reified T> testSubDerivedOverrides(context: CoroutineContext) {
+        assertEquals(1, context.size)
+        assertTrue { context[Base] is DerivedWithKey }
+        assertTrue { context[DerivedWithKey] is DerivedWithKey }
+        assertTrue { context[DerivedWithKey] is T }
+        assertEquals(EmptyCoroutineContext, context.minusKey(Base))
+        assertEquals(EmptyCoroutineContext, context.minusKey(DerivedWithKey))
+
     }
 }
