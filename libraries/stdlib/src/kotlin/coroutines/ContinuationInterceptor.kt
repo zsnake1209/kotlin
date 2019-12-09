@@ -9,6 +9,12 @@ package kotlin.coroutines
  * Marks coroutine context element that intercepts coroutine continuations.
  * The coroutines framework uses [ContinuationInterceptor.Key] to retrieve the interceptor and
  * intercepts all coroutine continuations with [interceptContinuation] invocations.
+ *
+ * [ContinuationInterceptor] behaves like a [polymorphic element][AbstractCoroutineContextKey], meaning that
+ * its implementation delegates [get][CoroutineContext.Element.get] and [minusKey][CoroutineContext.Element.minusKey]
+ * to [getPolymorphicElement] and [minusPolymorphicKey] respectively.
+ * [ContinuationInterceptor] subtypes can be extracted from the coroutine context using either [ContinuationInterceptor.Key]
+ * or subtype key if it extends [AbstractCoroutineContextKey].
  */
 @SinceKotlin("1.3")
 public interface ContinuationInterceptor : CoroutineContext.Element {
