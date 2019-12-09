@@ -783,13 +783,14 @@ class CoroutineTransformerMethodVisitor(
             // See 'splitTryCatchBlocksContainingSuspensionPoint'
             val possibleTryCatchBlockStart = suspension.tryCatchBlocksContinuationLabel
 
-            // Remove NOP as it's unnecessary anymore
+            // Move NOP to try catch block, so the inliner can transform suspend lambdas during inlining
             assert(possibleTryCatchBlockStart.previous.opcode == Opcodes.NOP) {
                 "NOP expected but ${possibleTryCatchBlockStart.previous.opcode} was found"
             }
             remove(possibleTryCatchBlockStart.previous)
 
             insert(possibleTryCatchBlockStart, withInstructionAdapter {
+                nop()
                 generateResumeWithExceptionCheck(languageVersionSettings.isReleaseCoroutines(), dataIndex, exceptionIndex)
 
                 // Load continuation argument just like suspending function returns it
@@ -1120,8 +1121,6 @@ internal fun InstructionAdapter.generateContinuationConstructorCall(
 
 private fun InstructionAdapter.generateResumeWithExceptionCheck(isReleaseCoroutines: Boolean, dataIndex: Int, exceptionIndex: Int) {
     // Check if resumeWithException has been called
-
-    nop() // inliner transforms suspend lambda and checks for nop there
 
     if (isReleaseCoroutines) {
         load(dataIndex, AsmTypes.OBJECT_TYPE)
