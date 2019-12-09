@@ -175,8 +175,11 @@ class FoldConstantLowering(private val context: CommonBackendContext) : IrElemen
 
     private fun tryFoldingUnaryOps(call: IrCall): IrExpression {
         val operand = call.dispatchReceiver as? IrConst<*> ?: return call
-        val evaluated = evaluateUnary(
-            call.symbol.owner.name.toString(),
+        val operationName = call.symbol.owner.name.toString()
+
+        // Since there is no distinguish between signed and unsigned types a special handling for `toString` is required
+        val evaluated = if (operationName == "toString") constToString(operand) else evaluateUnary(
+            operationName,
             operand.kind.toString(),
             operand.value!!
         ) ?: return call
@@ -231,8 +234,28 @@ class FoldConstantLowering(private val context: CommonBackendContext) : IrElemen
         return buildIrConstant(call, evaluated)
     }
 
+    // Unsigned constants are represented through signed constants with a different IrType.
+    private fun constToString(const: IrConst<*>): String {
+        if (const.type.isUnsigned()) {
+            when (val kind = const.kind) {
+                is IrConstKind.Byte ->
+                    return kind.valueOf(const).toUByte().toString()
+                is IrConstKind.Short ->
+                    return kind.valueOf(const).toUShort().toString()
+                is IrConstKind.Int ->
+                    return kind.valueOf(const).toUInt().toString()
+                is IrConstKind.Long ->
+                    return kind.valueOf(const).toULong().toString()
+            }
+        }
+        return const.value.toString()
+    }
+
     @ExperimentalUnsignedTypes
     override fun lower(irFile: IrFile) {
+        if (irFile.fileEntry.name.endsWith("unsignedIntToString.kt")) {
+            1
+        }
         irFile.transformChildrenVoid(object : IrElementTransformerVoid() {
             override fun visitCall(expression: IrCall): IrExpression {
                 expression.transformChildrenVoid(this)
@@ -244,19 +267,6 @@ class FoldConstantLowering(private val context: CommonBackendContext) : IrElemen
                     expression.dispatchReceiver == null && expression.valueArgumentsCount == 2 -> tryFoldingBuiltinBinaryOps(expression)
                     else -> expression
                 }
-            }
-
-            // Unsigned constants are represented through signed constants with a different IrType.
-            private fun constToString(const: IrConst<*>): String {
-                if (const.type.isUnsigned()) {
-                    when (val kind = const.kind) {
-                        is IrConstKind.Byte -> return kind.valueOf(const).toUByte().toString()
-                        is IrConstKind.Short -> return kind.valueOf(const).toUShort().toString()
-                        is IrConstKind.Int -> return kind.valueOf(const).toUInt().toString()
-                        is IrConstKind.Long -> return kind.valueOf(const).toULong().toString()
-                    }
-                }
-                return const.value.toString()
             }
 
             override fun visitStringConcatenation(expression: IrStringConcatenation): IrExpression {
