@@ -57,9 +57,9 @@ internal open class TCServiceMessagesClient(
         // So, escape logged messages if the corresponding setting is specified.
         log.kotlinDebug {
             val messageString = if (settings.escapeTCMessagesInLog) {
-                message.toString()
-            } else {
                 message.toString().replaceFirst("^##teamcity\\[".toRegex(), "##TC[")
+            } else {
+                message.toString()
             }
             "TCSM: $messageString"
         }
