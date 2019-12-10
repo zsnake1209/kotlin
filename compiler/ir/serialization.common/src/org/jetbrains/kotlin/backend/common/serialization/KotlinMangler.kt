@@ -106,7 +106,7 @@ abstract class KotlinManglerImpl : KotlinMangler {
             result += when (element) {
                 is IrConstructor -> element.typeParameters.filter { it.parent === element }
                 is IrSimpleFunction -> element.typeParameters
-                is IrProperty -> element.run { getter ?: setter }!!.typeParameters
+                is IrProperty -> element.run { getter ?: setter }?.typeParameters ?: emptyList() // Java fields have neither getter nor setter
                 is IrClass -> element.typeParameters
                 else -> return
             }
