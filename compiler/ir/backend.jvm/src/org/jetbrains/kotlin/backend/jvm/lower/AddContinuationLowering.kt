@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.codegen.isInlineIrBlock
 import org.jetbrains.kotlin.backend.jvm.codegen.isInvokeOfSuspendCallableReference
+import org.jetbrains.kotlin.backend.jvm.localDeclarationsPhase
 import org.jetbrains.kotlin.codegen.coroutines.*
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement
@@ -48,7 +49,8 @@ import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
 internal val addContinuationPhase = makeIrFilePhase(
     ::AddContinuationLowering,
     "AddContinuation",
-    "Add continuation classes to suspend functions and transform suspend lambdas into continuations"
+    "Add continuation classes to suspend functions and transform suspend lambdas into continuations",
+    prerequisite = setOf(localDeclarationsPhase)
 )
 
 private object CONTINUATION_CLASS : IrDeclarationOriginImpl("CONTINUATION_CLASS")
@@ -110,15 +112,25 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
 
             addField(COROUTINE_LABEL_FIELD_NAME, context.irBuiltIns.intType)
 
-            val receiverField = info.function.extensionReceiverParameter?.let {
-                assert(info.arity != 0)
-                addField("\$p", it.type)
+            assert(info.function.extensionReceiverParameter == null) {
+                "extension receiver should be lowered to parameter in LocalDeclarationsLowering"
             }
 
-            val parametersFields = info.function.valueParameters.map { addField(it.name.asString(), it.type) }
-            val parametersWithoutArguments = parametersFields.withIndex()
+            var receiverField: IrField? = null
+            val parametersFields = info.function.valueParameters.map {
+                if (it.name.isSpecial) {
+                    assert(it.name.asString() == "<this>") { "Unexpected special parameter name: ${it.name.asString()}" }
+                    receiverField = addField("\$p", it.type)
+                    receiverField!!
+                } else {
+                    addField(it.name.asString(), it.type)
+                }
+            }
+
+            val freeParameters = parametersFields.withIndex()
                 .mapNotNull { (i, field) -> if (info.reference.getValueArgument(i) == null) field else null }
-            val parametersWithArguments = parametersFields - parametersWithoutArguments
+            val capturedParameters = parametersFields.withIndex()
+                .mapNotNull { (i, field) -> if (info.reference.getValueArgument(i) != null) field else null }
             val constructor = addPrimaryConstructorForLambda(info.arity, info.reference, parametersFields)
             val secondaryConstructor = addSecondaryConstructorForLambda(constructor)
             val invokeToOverride = functionNClass.functions.single {
@@ -126,16 +138,20 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
             }
             val invokeSuspend = addInvokeSuspendForLambda(info.function, parametersFields, receiverField)
             if (info.arity <= 1) {
-                val singleParameterField = receiverField ?: parametersWithoutArguments.singleOrNull()
-                val create = addCreate(constructor, suspendLambda, info, parametersWithArguments, singleParameterField)
+                assert(freeParameters.size <= 1) {
+                    "Suspend lambda with arity <= 1 should have at most one free parameter, but has ${freeParameters.size}"
+                }
+                val singleParameterField = freeParameters.singleOrNull()
+
+                val create = addCreate(constructor, suspendLambda, info, capturedParameters, singleParameterField)
                 addInvokeCallingCreate(create, invokeSuspend, invokeToOverride, singleParameterField)
             } else {
                 addInvokeCallingConstructor(
                     constructor,
                     invokeSuspend,
                     invokeToOverride,
-                    parametersWithArguments,
-                    listOfNotNull(receiverField) + parametersWithoutArguments
+                    capturedParameters,
+                    freeParameters
                 )
             }
 
@@ -144,6 +160,8 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
             info.constructor = secondaryConstructor
         }
     }
+
+    private fun IrFunction.loweredExtensionReceiver() = valueParameters.find { it.name.isSpecial && it.name.asString() == "<this>" }
 
     private fun IrClass.addInvokeSuspendForLambda(
         irFunction: IrFunction,
@@ -160,7 +178,7 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
                 function.body = irFunction.body?.deepCopyWithSymbols(function)
                 function.body?.transformChildrenVoid(object : IrElementTransformerVoid() {
                     override fun visitGetValue(expression: IrGetValue): IrExpression {
-                        if (expression.symbol.owner == irFunction.extensionReceiverParameter) {
+                        if (expression.symbol.owner == irFunction.loweredExtensionReceiver()) {
                             assert(receiverField != null)
                             return IrGetFieldImpl(
                                 expression.startOffset,

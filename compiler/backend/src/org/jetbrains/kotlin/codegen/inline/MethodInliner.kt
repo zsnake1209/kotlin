@@ -442,9 +442,8 @@ class MethodInliner(
                         // |- captured  -|- extension -|- real -|- locals -|    old descriptor
                         // |- extension -|- real -|- captured -|- locals -|    new descriptor
                         //                         ^-- realParametersSize
-                        `var` >= parameters.argsSizeOnStack -> `var`
-                        `var` >= capturedParamsSize -> `var` - capturedParamsSize
-                        `var` >= 0 -> `var` + realParametersSize
+                        `var` < capturedParamsSize -> `var` + realParametersSize
+                        `var` < parameters.argsSizeOnStack -> `var` - capturedParamsSize
                         else -> `var`
                     }
                 }
