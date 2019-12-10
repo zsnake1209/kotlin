@@ -141,25 +141,27 @@ class AbstractCoroutineContextElementTest {
 
     @Test
     fun testSubDerivedOverrides() {
-        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(DerivedWithoutKey() + SubDerivedWithKeyAndDifferentBase())
-        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(DerivedWithKey() + SubDerivedWithKeyAndDifferentBase())
-        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(SubDerivedWithKeyAndDifferentBase() + SubDerivedWithKeyAndDifferentBase())
+        val key = SubDerivedWithKeyAndDifferentBase
+        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(DerivedWithoutKey() + SubDerivedWithKeyAndDifferentBase(), key)
+        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(DerivedWithKey() + SubDerivedWithKeyAndDifferentBase(), key)
+        testSubDerivedOverrides<SubDerivedWithKeyAndDifferentBase>(SubDerivedWithKeyAndDifferentBase() + SubDerivedWithKeyAndDifferentBase(), key)
     }
 
     @Test
     fun testSubDerivedWithDifferentBaseOverrides() {
-        testSubDerivedOverrides<SubDerivedWithKey>(DerivedWithoutKey() + SubDerivedWithKey())
-        testSubDerivedOverrides<SubDerivedWithKey>(DerivedWithKey() + SubDerivedWithKey())
-        testSubDerivedOverrides<SubDerivedWithKey>(SubDerivedWithKeyAndDifferentBase() + SubDerivedWithKey())
+        val key = SubDerivedWithKey
+        testSubDerivedOverrides<SubDerivedWithKey>(DerivedWithoutKey() + SubDerivedWithKey(), key)
+        testSubDerivedOverrides<SubDerivedWithKey>(DerivedWithKey() + SubDerivedWithKey(), key)
+        testSubDerivedOverrides<SubDerivedWithKey>(SubDerivedWithKeyAndDifferentBase() + SubDerivedWithKey(), key)
     }
 
-    private inline fun <reified T> testSubDerivedOverrides(context: CoroutineContext) {
+    private inline fun <reified T : CoroutineContext.Element> testSubDerivedOverrides(context: CoroutineContext, key: CoroutineContext.Key<T>) {
         assertEquals(1, context.size)
         assertTrue { context[Base] is DerivedWithKey }
         assertTrue { context[DerivedWithKey] is DerivedWithKey }
         assertTrue { context[DerivedWithKey] is T }
+        assertTrue { context[key] is T }
         assertEquals(EmptyCoroutineContext, context.minusKey(Base))
         assertEquals(EmptyCoroutineContext, context.minusKey(DerivedWithKey))
-
     }
 }
