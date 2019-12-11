@@ -1,3 +1,5 @@
-fun unsafe(string: String?) {
-    string?.length ?:
+// FIX: Replace !! with safe call and elvis
+
+fun unsafe(string: String?) : Int {
+    return string?.length ?:
 }

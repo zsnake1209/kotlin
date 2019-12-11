@@ -1,9 +1,9 @@
-// SKIP_ERRORS_AFTER
+// FIX: Change type to 'A'
 class A {
     fun unsafeCall() {}
 }
 
 fun unsafe() {
-    val a: A = null
-    a!!.unsafeCall()
+    val a: A = A()
+    a.unsafeCall()
 }

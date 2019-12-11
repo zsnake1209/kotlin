@@ -12379,14 +12379,14 @@ public class LocalInspectionTestGenerated extends AbstractLocalInspectionTest {
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable"), Pattern.compile("^([\\w\\-_]+)\\.(kt|kts)$"), true);
         }
 
-        @TestMetadata("globalNullableFunToNot.kt")
-        public void testGlobalNullableFunToNot() throws Exception {
-            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/globalNullableFunToNot.kt");
+        @TestMetadata("globalFunWithNullableParamToNot.kt")
+        public void testGlobalFunWithNullableParamToNot() throws Exception {
+            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/globalFunWithNullableParamToNot.kt");
         }
 
-        @TestMetadata("globalNullableVarToNot.kt")
-        public void testGlobalNullableVarToNot() throws Exception {
-            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/globalNullableVarToNot.kt");
+        @TestMetadata("globalNullableVar.kt")
+        public void testGlobalNullableVar() throws Exception {
+            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/globalNullableVar.kt");
         }
 
         @TestMetadata("localPropToNotNullable.kt")
@@ -12394,19 +12394,9 @@ public class LocalInspectionTestGenerated extends AbstractLocalInspectionTest {
             runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/localPropToNotNullable.kt");
         }
 
-        @TestMetadata("nullableClassPropertyToNot.kt")
-        public void testNullableClassPropertyToNot() throws Exception {
-            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/nullableClassPropertyToNot.kt");
-        }
-
-        @TestMetadata("nullableFunToNot.kt")
-        public void testNullableFunToNot() throws Exception {
-            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/nullableFunToNot.kt");
-        }
-
-        @TestMetadata("nullableParamToNot.kt")
-        public void testNullableParamToNot() throws Exception {
-            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/nullableParamToNot.kt");
+        @TestMetadata("nullableClassProperty.kt")
+        public void testNullableClassProperty() throws Exception {
+            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/nullableClassProperty.kt");
         }
 
         @TestMetadata("nullableParamToSafeCallWithElvis.kt")

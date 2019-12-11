@@ -1,6 +1,0 @@
-
-class A{
-    fun printName(name: String){
-        name!!.length
-    }
-}
