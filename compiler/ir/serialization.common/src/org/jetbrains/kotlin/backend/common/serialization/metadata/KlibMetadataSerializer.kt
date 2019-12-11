@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.backend.common.serialization.newDescriptorUniqId
 import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
 import org.jetbrains.kotlin.metadata.ProtoBuf
@@ -29,7 +30,8 @@ internal fun <T, R> Iterable<T>.maybeChunked(size: Int?, transform: (List<T>) ->
 abstract class KlibMetadataSerializer(
     val languageVersionSettings: LanguageVersionSettings,
     val metadataVersion: BinaryVersion,
-    val descriptorTable: DescriptorTable
+    val descriptorTable: DescriptorTable,
+    val includeOnlyPackagesFromSource: Boolean = false
 ) {
 
     lateinit var serializerContext: SerializerContext
@@ -214,9 +216,20 @@ abstract class KlibMetadataSerializer(
     protected fun getPackagesFqNames(module: ModuleDescriptor): Set<FqName> {
         val result = mutableSetOf<FqName>()
 
+        fun getSubPackagesOfModule(fqName: FqName) =
+            if (includeOnlyPackagesFromSource) {
+                val moduleImpl = module as? ModuleDescriptorImpl
+                    ?: error("Can't get a module's package fragments from source, it's not a ${ModuleDescriptorImpl::class.simpleName}.")
+
+                val packageFragmentProvider = moduleImpl.packageFragmentProviderForModuleContentWithoutDependencies
+                packageFragmentProvider.getSubPackagesOf(fqName) { true }
+            } else {
+                module.getSubPackagesOf(fqName) { true }
+            }
+
         fun getSubPackages(fqName: FqName) {
             result.add(fqName)
-            module.getSubPackagesOf(fqName) { true }.forEach { getSubPackages(it) }
+            getSubPackagesOfModule(fqName).forEach { getSubPackages(it) }
         }
 
         getSubPackages(FqName.ROOT)

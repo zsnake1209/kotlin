@@ -17,10 +17,8 @@
 package org.jetbrains.kotlin.analyzer.common
 
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.analyzer.*
-import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.container.StorageComponentContainer
@@ -30,6 +28,8 @@ import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.context.ModuleContext
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
+import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.impl.CompositePackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.frontend.di.configureModule
@@ -38,7 +38,6 @@ import org.jetbrains.kotlin.load.kotlin.MetadataFinderFactory
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.CommonPlatforms
 import org.jetbrains.kotlin.platform.TargetPlatform
-import org.jetbrains.kotlin.platform.TargetPlatformVersion
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
@@ -60,14 +59,16 @@ class CommonResolverForModuleFactory(
     private val platformParameters: CommonAnalysisParameters,
     private val targetEnvironment: TargetEnvironment,
     private val targetPlatform: TargetPlatform,
-    private val shouldCheckExpectActual: Boolean
+    private val shouldCheckExpectActual: Boolean,
+    private val commonDependenciesContainer: CommonDependenciesContainer?
 ) : ResolverForModuleFactory() {
     private class SourceModuleInfo(
         override val name: Name,
         override val capabilities: Map<ModuleDescriptor.Capability<*>, Any?>,
+        private val dependencies: Iterable<ModuleInfo>,
         private val dependOnOldBuiltIns: Boolean
     ) : ModuleInfo {
-        override fun dependencies() = listOf(this)
+        override fun dependencies() = listOf(this, *dependencies.toList().toTypedArray() )
 
         override fun dependencyOnBuiltIns(): ModuleInfo.DependencyOnBuiltIns =
             if (dependOnOldBuiltIns) ModuleInfo.DependencyOnBuiltIns.LAST else ModuleInfo.DependencyOnBuiltIns.NONE
@@ -101,10 +102,13 @@ class CommonResolverForModuleFactory(
             languageVersionSettings, CommonPlatforms.defaultCommonPlatform, CommonPlatformAnalyzerServices, shouldCheckExpectActual
         )
 
-        val packageFragmentProviders = listOf(
-            container.get<ResolveSession>().packageFragmentProvider,
-            container.get<MetadataPackageFragmentProvider>()
-        )
+        val packageFragmentProviders =
+            /** If this is a dependency module that [commonDependenciesContainer] knows about, get the package fragment from there */
+            commonDependenciesContainer?.packageFragmentProviderForModuleInfo(moduleInfo)?.let(::listOf)
+                ?: listOfNotNull(
+                    container.get<ResolveSession>().packageFragmentProvider,
+                    container.get<MetadataPackageFragmentProvider>()
+                )
 
         return ResolverForModule(CompositePackageFragmentProvider(packageFragmentProviders), container)
     }
@@ -113,9 +117,15 @@ class CommonResolverForModuleFactory(
         fun analyzeFiles(
             files: Collection<KtFile>, moduleName: Name, dependOnBuiltIns: Boolean, languageVersionSettings: LanguageVersionSettings,
             capabilities: Map<ModuleDescriptor.Capability<*>, Any?> = emptyMap(),
+            dependenciesContainer: CommonDependenciesContainer? = null,
             metadataPartProviderFactory: (ModuleContent<ModuleInfo>) -> MetadataPartProvider
         ): AnalysisResult {
-            val moduleInfo = SourceModuleInfo(moduleName, capabilities, dependOnBuiltIns)
+            val moduleInfo = SourceModuleInfo(
+                moduleName,
+                capabilities,
+                dependenciesContainer?.moduleInfos?.toList().orEmpty(),
+                dependOnBuiltIns
+            )
             val project = files.firstOrNull()?.project ?: throw AssertionError("No files to analyze")
 
             val multiplatformLanguageSettings = object : LanguageVersionSettings by languageVersionSettings {
@@ -128,21 +138,26 @@ class CommonResolverForModuleFactory(
                 CommonAnalysisParameters(metadataPartProviderFactory),
                 CompilerEnvironment,
                 CommonPlatforms.defaultCommonPlatform,
-                shouldCheckExpectActual = false
+                shouldCheckExpectActual = false,
+                dependenciesContainer
             )
 
             @Suppress("NAME_SHADOWING")
-            val resolver = ResolverForSingleModuleProject(
+            val resolver = ResolverForSingleModuleProject<ModuleInfo>(
                 "sources for metadata serializer",
                 ProjectContext(project, "metadata serializer"),
                 moduleInfo,
                 resolverForModuleFactory,
                 GlobalSearchScope.allScope(project),
                 languageVersionSettings = multiplatformLanguageSettings,
-                syntheticFiles = files
+                syntheticFiles = files,
+                dependencyModules = dependenciesContainer?.moduleInfos ?: emptyList()
             )
 
-            val moduleDescriptor = resolver.descriptorForModule(moduleInfo)
+            val moduleDescriptor = resolver.descriptorForModule(moduleInfo).also {
+                dependenciesContainer?.setModuleDescriptorForPackageFragmentProviders(it)
+            }
+
             val container = resolver.resolverForModule(moduleInfo).componentProvider
 
             container.get<LazyTopDownAnalyzer>().analyzeDeclarations(TopDownAnalysisMode.TopLevelDeclarations, files)
@@ -150,6 +165,26 @@ class CommonResolverForModuleFactory(
             return AnalysisResult.success(container.get<BindingTrace>().bindingContext, moduleDescriptor)
         }
     }
+}
+
+interface CommonDependenciesContainer {
+    val moduleInfos: Iterable<ModuleInfo>
+    fun packageFragmentProvider(): PackageFragmentProvider
+
+    /**
+     * If [moduleInfo] is a part of
+     */
+    fun packageFragmentProviderForModuleInfo(moduleInfo: ModuleInfo): PackageFragmentProvider?
+
+    /**
+     * This is a workaround for resolution: if the dependency package fragment providers are created with their own (dependency) module
+     * descriptors, it breaks resolution, at least delegation `getValue` resolution for delegated properties in some cases.
+     * To avoid that, we create the dependency package fragment providers with the module descriptor that is compiled, so that all
+     * package fragments actually have the same module descriptor.
+     *
+     * TODO: investigate the resolution issues that arise when this workaround is not used, then remove this workaround.
+     */
+    fun setModuleDescriptorForPackageFragmentProviders(moduleDescriptor: ModuleDescriptorImpl)
 }
 
 private fun createContainerToResolveCommonCode(
