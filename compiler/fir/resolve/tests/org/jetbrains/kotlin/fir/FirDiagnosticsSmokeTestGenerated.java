@@ -10560,6 +10560,11 @@ public class FirDiagnosticsSmokeTestGenerated extends AbstractFirDiagnosticsSmok
                 runTest("compiler/testData/diagnostics/tests/inference/nothingType/generateConstraintWithInnerNothingType.kt");
             }
 
+            @TestMetadata("implicitInferenceTToFlexibleNothing.kt")
+            public void testImplicitInferenceTToFlexibleNothing() throws Exception {
+                runTest("compiler/testData/diagnostics/tests/inference/nothingType/implicitInferenceTToFlexibleNothing.kt");
+            }
+
             @TestMetadata("implicitNothingConstraintFromReturn.kt")
             public void testImplicitNothingConstraintFromReturn() throws Exception {
                 runTest("compiler/testData/diagnostics/tests/inference/nothingType/implicitNothingConstraintFromReturn.kt");
