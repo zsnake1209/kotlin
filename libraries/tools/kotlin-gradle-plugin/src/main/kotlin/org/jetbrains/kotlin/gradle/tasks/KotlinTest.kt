@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.gradle.tasks
 
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.tasks.testing.filter.DefaultTestFilter
-import org.gradle.api.model.ReplacedBy
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
