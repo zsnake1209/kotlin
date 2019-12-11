@@ -460,11 +460,16 @@ abstract class KotlinCommonBlock(
 
             parentType === PARENTHESIZED ->
                 object : CommonAlignmentStrategy() {
-                    private var bracketsAlignment: Alignment? =
+                    private val bracketsAlignment: Alignment? =
                         if (kotlinCommonSettings.ALIGN_MULTILINE_BINARY_OPERATION) Alignment.createAlignment() else null
+
+                    private val alignmentInBinaryExpression: Alignment? =
+                        if (kotlinCommonSettings.ALIGN_MULTILINE_PARENTHESIZED_EXPRESSION) getAlignment() else null
 
                     override fun getAlignment(node: ASTNode): Alignment? {
                         val childNodeType = node.elementType
+                        if (childNodeType == BINARY_EXPRESSION) return alignmentInBinaryExpression
+
                         val prev = getPrevWithoutWhitespace(node)
 
                         if (prev != null && prev.elementType === TokenType.ERROR_ELEMENT || childNodeType === TokenType.ERROR_ELEMENT) {
@@ -521,16 +526,6 @@ abstract class KotlinCommonBlock(
 
         val childNodes = when {
             overrideChildren != null -> overrideChildren.asSequence()
-            node.elementType == BINARY_EXPRESSION -> {
-                val binaryExpression = node.psi as? KtBinaryExpression
-                if (binaryExpression != null && ALL_ASSIGNMENTS.contains(binaryExpression.operationToken)) {
-                    node.children()
-                } else {
-                    val binaryExpressionChildren = mutableListOf<ASTNode>()
-                    collectBinaryExpressionChildren(node, binaryExpressionChildren)
-                    binaryExpressionChildren.asSequence()
-                }
-            }
             else -> node.children()
         }
 
@@ -599,6 +594,16 @@ abstract class KotlinCommonBlock(
                 ) {
                     val wrap = Wrap.createWrap(commonSettings.METHOD_PARAMETERS_WRAP, false)
                     return { childElement -> wrap.takeIf { childElement.elementType === VALUE_PARAMETER } }
+                }
+            }
+
+            elementType === BINARY_EXPRESSION -> {
+                val wrap = Wrap.createWrap(commonSettings.BINARY_OPERATION_WRAP, true)
+                return { childNode ->
+                    if (getPrevWithoutWhitespaceAndComments(childNode)?.getTypeOfOperation() in ALIGN_FOR_BINARY_OPERATIONS)
+                        wrap
+                    else
+                        null
                 }
             }
 
@@ -863,7 +868,7 @@ private val INDENT_RULES = arrayOf(
     strategy("Colon of delegation list")
         .within(CLASS, OBJECT_DECLARATION)
         .forType(COLON)
-        .set(Indent.getNormalIndent(false)),
+        .set(Indent.getNormalIndent()),
 
     strategy("Delegation list")
         .within(SUPER_TYPE_LIST)
@@ -872,18 +877,28 @@ private val INDENT_RULES = arrayOf(
     strategy("Indices")
         .within(INDICES)
         .notForType(RBRACKET)
-        .set(Indent.getContinuationIndent(false)),
+        .set(Indent.getContinuationIndent()),
 
     strategy("Binary expressions")
         .within(BINARY_EXPRESSIONS)
         .forElement { node ->
             !node.suppressBinaryExpressionIndent()
         }
-        .set(Indent.getContinuationWithoutFirstIndent(false)),
+        .set(Indent.getContinuationWithoutFirstIndent()),
 
-    strategy("Parenthesized expression")
+    strategy("Parenthesis")
+        .forType(LPAR)
         .within(PARENTHESIZED)
-        .set(Indent.getContinuationWithoutFirstIndent(false)),
+        .set(Indent.getContinuationWithoutFirstIndent(true)),
+
+    strategy("Closing parenthesis")
+        .forType(RPAR)
+        .within(PARENTHESIZED)
+        .set(Indent.getNoneIndent()),
+
+    strategy("Parenthesis")
+        .within(PARENTHESIZED)
+        .set(Indent.getContinuationWithoutFirstIndent()),
 
     strategy("Opening parenthesis for conditions")
         .forType(LPAR)
@@ -949,8 +964,9 @@ private val INDENT_RULES = arrayOf(
 )
 
 
-private fun getOperationType(node: ASTNode): IElementType? =
-    node.findChildByType(OPERATION_REFERENCE)?.firstChildNode?.elementType
+private fun getOperationType(node: ASTNode): IElementType? = node.findChildByType(OPERATION_REFERENCE)?.getTypeOfOperation()
+
+private fun ASTNode.getTypeOfOperation(): IElementType? = firstChildNode?.elementType
 
 fun hasErrorElementBefore(node: ASTNode): Boolean {
     val prevSibling = getPrevWithoutWhitespace(node) ?: return false

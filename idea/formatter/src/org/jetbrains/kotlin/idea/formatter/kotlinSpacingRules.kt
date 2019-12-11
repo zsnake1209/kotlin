@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.psi.psiUtil.children
 import org.jetbrains.kotlin.psi.psiUtil.isObjectLiteral
 import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jetbrains.kotlin.psi.psiUtil.textRangeWithoutComments
+import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
 
 val MODIFIERS_LIST_ENTRIES = TokenSet.orSet(TokenSet.create(ANNOTATION_ENTRY, ANNOTATION), MODIFIER_KEYWORDS)
 
@@ -189,6 +190,25 @@ fun createSpacingBuilder(settings: CodeStyleSettings, builderUtil: KotlinSpacing
                     false, 0
                 )
             }
+
+            fun KotlinSpacingBuilder.lineBreakInBinary(flag: Boolean): (parent: ASTBlock, left: ASTBlock, right: ASTBlock) -> Spacing? {
+                return lambda@{ parent, _, _ ->
+                    if (parent.node?.elementType != PARENTHESIZED) return@lambda null
+                    if (flag) {
+                        Spacing.createDependentLFSpacing(
+                            0, 0,
+                            parent.textRange,
+                            commonCodeStyleSettings.KEEP_LINE_BREAKS,
+                            commonCodeStyleSettings.KEEP_BLANK_LINES_IN_CODE
+                        )
+                    } else {
+                        createSpacing(0)
+                    }
+                }
+            }
+
+            inPosition(right = BINARY_EXPRESSION).customRule(lineBreakInBinary(kotlinCommonSettings.PARENTHESES_EXPRESSION_LPAREN_WRAP))
+            inPosition(left = BINARY_EXPRESSION).customRule(lineBreakInBinary(kotlinCommonSettings.PARENTHESES_EXPRESSION_RPAREN_WRAP))
 
             inPosition(parent = VALUE_ARGUMENT_LIST, left = LPAR).customRule { parent, _, _ ->
                 if (kotlinCommonSettings.CALL_PARAMETERS_LPAREN_ON_NEXT_LINE && needWrapArgumentList(parent.requireNode().psi)) {
