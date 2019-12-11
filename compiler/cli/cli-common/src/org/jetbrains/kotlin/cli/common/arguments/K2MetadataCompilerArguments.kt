@@ -24,6 +24,9 @@ class K2MetadataCompilerArguments : CommonCompilerArguments() {
     @Argument(value = "-d", valueDescription = "<directory|jar>", description = "Destination for generated .kotlin_metadata files")
     var destination: String? by NullableStringFreezableVar(null)
 
+    @Argument(value = "-Xgenerate-klib", description = "Use klib as the output format.")
+    var generateKlib: Boolean by FreezableVar(false)
+
     @Argument(
             value = "-classpath",
             shortName = "-cp",
