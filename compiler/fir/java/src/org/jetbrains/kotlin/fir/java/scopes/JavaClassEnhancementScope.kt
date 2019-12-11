@@ -34,6 +34,8 @@ import org.jetbrains.kotlin.load.kotlin.SignatureBuildingComponents
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.Jsr305State
 
+val QQQ = Name.identifier("java")
+
 class JavaClassEnhancementScope(
     private val session: FirSession,
     private val useSiteMemberScope: JavaClassUseSiteMemberScope
@@ -140,9 +142,11 @@ class JavaClassEnhancementScope(
         val memberContext = context.copyWithNewDefaultTypeQualifiers(typeQualifierResolver, jsr305State, firMethod.annotations)
 
         val predefinedEnhancementInfo =
-            SignatureBuildingComponents.signature(owner.symbol.classId, firMethod.computeJvmDescriptor()).let { signature ->
-                PREDEFINED_FUNCTION_ENHANCEMENT_INFO_BY_SIGNATURE[signature]
-            }
+            if (owner.symbol.classId.startsWith(QQQ))
+                SignatureBuildingComponents.signature(owner.symbol.classId, firMethod.computeJvmDescriptor()).let { signature ->
+                    PREDEFINED_FUNCTION_ENHANCEMENT_INFO_BY_SIGNATURE[signature]
+                }
+            else null
 
         predefinedEnhancementInfo?.let {
             assert(it.parametersInfo.size == firMethod.valueParameters.size) {
