@@ -1388,7 +1388,7 @@ class NewMultiplatformIT : BaseGradleIT() {
             }
 
             assertTestResults("testProject/new-mpp-native-tests/TEST-TestKt.xml", hostTestTask)
-            // K/N doesn't report line numbers correctly on Linux.
+            // K/N doesn't report line numbers correctly on Linux (see KT-35408).
             // TODO: Uncomment when this is fixed.
             //assertStacktrace(hostTestTask)
             if (hostIsMac) {
