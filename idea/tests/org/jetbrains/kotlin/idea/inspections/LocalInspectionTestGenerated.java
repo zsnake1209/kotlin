@@ -12384,6 +12384,11 @@ public class LocalInspectionTestGenerated extends AbstractLocalInspectionTest {
             runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/globalFunWithNullableParamToNot.kt");
         }
 
+        @TestMetadata("globalNullableVal.kt")
+        public void testGlobalNullableVal() throws Exception {
+            runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/globalNullableVal.kt");
+        }
+
         @TestMetadata("globalNullableVar.kt")
         public void testGlobalNullableVar() throws Exception {
             runTest("idea/testData/inspectionsLocal/unsafeNotNullAssertionOnReallyNullable/globalNullableVar.kt");

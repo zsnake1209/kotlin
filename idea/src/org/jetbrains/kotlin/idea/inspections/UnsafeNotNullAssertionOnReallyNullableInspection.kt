@@ -15,6 +15,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.SmartPsiElementPointer
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.VariableDescriptorImpl
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.core.replaced
@@ -74,8 +75,13 @@ class UnsafeNotNullAssertionOnReallyNullableInspection : AbstractKotlinInspectio
             is KtProperty -> {
                 if (resolvedReference.isMember) return
                 val baseRawDescriptor = context[BindingContext.REFERENCE_TARGET, base]
-                val basePropertyDescriptor = baseRawDescriptor as? LocalVariableDescriptor ?: return
+                val basePropertyDescriptor =
+                    if(resolvedReference.isTopLevel && !resolvedReference.isVar)
+                        baseRawDescriptor as? VariableDescriptorImpl ?: return
+                    else
+                        baseRawDescriptor as? LocalVariableDescriptor ?: return
                 val declaration = resolvedReference as KtVariableDeclaration
+//                declaration.isVar
                 val fix = ChangeVariableTypeFix.OnType(
                     declaration,
                     TypeUtils.makeNotNullable(basePropertyDescriptor.returnType)
@@ -90,6 +96,12 @@ class UnsafeNotNullAssertionOnReallyNullableInspection : AbstractKotlinInspectio
             else -> return
         }
     }
+
+    private fun KtProperty.isGlobalVal(): Boolean {
+        val parent = parent
+        return parent is KtClassOrObject || parent is KtClassBody
+    }
+
 
     private class WrapperWithEmbeddedFixBeforeMainFix(
         intention: IntentionAction,
@@ -113,6 +125,7 @@ class UnsafeNotNullAssertionOnReallyNullableInspection : AbstractKotlinInspectio
         const val inspectionDescription: String = "Unsafe using of '!!' operator"
     }
 }
+
 
 private class AddSaveCallAndElvisFix : LocalQuickFix {
     override fun getName() = "Replace !! with safe call and elvis"
