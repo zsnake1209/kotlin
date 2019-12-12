@@ -22,6 +22,7 @@ package org.jetbrains.kotlin.js.backend.ast;
  *  file: dev/core/src/com/google/gwt/dev/js/ast/JsVisitor.java
  */
 
+import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public abstract class JsVisitorWithContext {
         return (T) doAcceptStatement(statement);
     }
 
-    public final void acceptStatementList(List<JsStatement> statements) {
+    public final void acceptStatementList(@Mutable List<JsStatement> statements) {
         doAcceptStatementList(statements);
     }
 
@@ -398,7 +399,7 @@ public abstract class JsVisitorWithContext {
 
     protected abstract <T extends JsStatement> JsStatement doAcceptStatement(T statement);
 
-    protected abstract void doAcceptStatementList(List<JsStatement> statements);
+    protected abstract void doAcceptStatementList(@Mutable List<JsStatement> statements);
 
     protected abstract <T extends JsNode> void doTraverse(T node, JsContext ctx) ;
 }

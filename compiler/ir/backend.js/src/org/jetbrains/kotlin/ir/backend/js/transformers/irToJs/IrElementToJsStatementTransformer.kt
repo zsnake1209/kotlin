@@ -27,16 +27,16 @@ class IrElementToJsStatementTransformer : BaseIrElementToJsNodeTransformer<JsSta
     }
 
     override fun visitBlockBody(body: IrBlockBody, context: JsGenerationContext): JsStatement {
-        return JsBlock(body.statements.map { it.accept(this, context) })
+        return JsBlock(body.statements.mapTo(mutableListOf()) { it.accept(this, context) })
     }
 
     override fun visitBlock(expression: IrBlock, context: JsGenerationContext): JsBlock {
-        return JsBlock(expression.statements.map { it.accept(this, context) })
+        return JsBlock(expression.statements.mapTo(mutableListOf()) { it.accept(this, context) })
     }
 
     override fun visitComposite(expression: IrComposite, context: JsGenerationContext): JsStatement {
         // TODO introduce JsCompositeBlock?
-        return JsBlock(expression.statements.map { it.accept(this, context) })
+        return JsBlock(expression.statements.mapTo(mutableListOf()) { it.accept(this, context) })
     }
 
     override fun visitExpression(expression: IrExpression, context: JsGenerationContext): JsStatement {
@@ -78,7 +78,7 @@ class IrElementToJsStatementTransformer : BaseIrElementToJsNodeTransformer<JsSta
                 0 -> JsEmpty
                 1 -> statements.single()
                 // TODO: use transparent block (e.g. JsCompositeBlock)
-                else -> JsBlock(statements)
+                else -> JsBlock(statements.toMutableList())
             }
         }
         return translateCall(expression, data, IrElementToJsExpressionTransformer()).makeStmt()

@@ -47,7 +47,7 @@ private fun mergeStdlibParts(outputFile: File, wrapperFile: File, baseDir: File,
 
     for (file in allFiles) {
         val statements = parse(file.readText(), ThrowExceptionOnErrorReporter, program.scope, file.relativizeIfNecessary())!!
-        val block = JsBlock(statements)
+        val block = JsBlock(statements.toMutableList())
         block.fixForwardNameReferences()
 
         val sourceMapFile = File(file.parent, file.name + ".map")

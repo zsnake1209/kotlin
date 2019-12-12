@@ -135,9 +135,9 @@ class ImportIntoFragmentInliningScope private constructor(
 
     val allCode: JsBlock
         get() = JsBlock(
-            JsBlock(fragment.inlinedLocalDeclarations.values.toList()),
+            JsBlock(fragment.inlinedLocalDeclarations.values.toMutableList<JsStatement>()),
             fragment.declarationBlock,
-            JsBlock(fragment.classes.values.map { it.postDeclarationBlock }),
+            JsBlock(fragment.classes.values.mapTo(mutableListOf<JsStatement>()) { it.postDeclarationBlock }),
             fragment.exportBlock,
             JsExpressionStatement(JsFunction(JsDynamicScope, fragment.initializerBlock, ""))
         ).also { block ->

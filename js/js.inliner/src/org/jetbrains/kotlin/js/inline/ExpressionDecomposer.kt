@@ -521,7 +521,7 @@ private fun JsNode.withParentsOfNodes(nodes: Set<JsNode>): Set<JsNode> {
     return visitor.matched
 }
 
-private fun List<JsStatement>.toStatement(): JsStatement =
+private fun MutableList<JsStatement>.toStatement(): JsStatement =
         when (size) {
             0 -> JsEmpty
             1 -> get(0)

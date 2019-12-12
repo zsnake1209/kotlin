@@ -23,6 +23,7 @@ package org.jetbrains.kotlin.js.backend.ast;
  */
 
 import com.intellij.util.SmartList;
+import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -165,7 +166,7 @@ public class JsVisitorWithContextImpl extends JsVisitorWithContext {
     }
 
     @Override
-    protected void doAcceptStatementList(List<JsStatement> statements) {
+    protected void doAcceptStatementList(@Mutable List<JsStatement> statements) {
         ListContext<JsStatement> context = new ListContext<>();
         statementContexts.push(context);
         context.traverse(statements);

@@ -7,6 +7,8 @@
 
 package kotlin.text
 
+import java.util.*
+
 @SinceKotlin("1.1") public actual typealias Appendable = java.lang.Appendable
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") // TODO: some supertypes are missing

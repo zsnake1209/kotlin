@@ -109,8 +109,8 @@ fun TranslationContext.wrapWithInlineMetadata(
         else {
             val block =
                 inlineFunctionContext!!.let {
-                    JsBlock(it.importBlock.statements + it.prototypeBlock.statements + it.declarationsBlock.statements +
-                        JsReturn(function))
+                    JsBlock((it.importBlock.statements + it.prototypeBlock.statements + it.declarationsBlock.statements +
+                        JsReturn(function)).toMutableList())
                 }
             InlineMetadata.wrapFunction(outerContext, FunctionWithWrapper(function, block), sourceInfo)
         }.also {

@@ -4,6 +4,7 @@
 
 package org.jetbrains.kotlin.js.backend.ast;
 
+import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.kotlin.js.util.AstUtil;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.util.SmartList;
@@ -15,7 +16,7 @@ import java.util.List;
  * Represents a JavaScript block statement.
  */
 public class JsBlock extends SourceInfoAwareJsNode implements JsStatement {
-    @NotNull
+    @NotNull @Mutable
     private final List<JsStatement> statements;
 
     public JsBlock() {
@@ -30,7 +31,7 @@ public class JsBlock extends SourceInfoAwareJsNode implements JsStatement {
         this(new SmartList<JsStatement>(statements));
     }
 
-    public JsBlock(@NotNull List<JsStatement> statements) {
+    public JsBlock(@NotNull @Mutable List<JsStatement> statements) {
         this.statements = statements;
     }
 

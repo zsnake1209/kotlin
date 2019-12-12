@@ -71,6 +71,6 @@ class JsInliner(
         // TODO shouldn't we process the resultExpression qualifier along with the lambda inlining?
         resultExpression?.synthetic = true
 
-        return InlineableResult(JsBlock(inliningContext.previousStatements + inlineableBody), resultExpression)
+        return InlineableResult(JsBlock((inliningContext.previousStatements + inlineableBody).toMutableList()), resultExpression)
     }
 }

@@ -53,8 +53,8 @@ object ModuleWrapperTranslation {
                                      JsNameRef("amd", defineName.makeRef()))
         val commonJsTest = JsAstUtils.typeOfIs(exportsName.makeRef(), JsStringLiteral("object"))
 
-        val amdBody = JsBlock(wrapAmd(factoryName.makeRef(), importedModules, program))
-        val commonJsBody = JsBlock(wrapCommonJs(factoryName.makeRef(), importedModules, program))
+        val amdBody = JsBlock(wrapAmd(factoryName.makeRef(), importedModules, program).toMutableList())
+        val commonJsBody = JsBlock(wrapCommonJs(factoryName.makeRef(), importedModules, program).toMutableList())
         val plainInvocation = makePlainInvocation(moduleId, factoryName.makeRef(), importedModules, program)
 
         val lhs: JsExpression = if (Namer.requiresEscaping(moduleId)) {

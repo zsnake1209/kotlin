@@ -141,7 +141,7 @@ class CoroutineBodyTransformer(private val context: CoroutineTransformationConte
 
         currentBlock = bodyEntryBlock
         if (!JsBooleanLiteral.isTrue(x.condition)) {
-            currentStatements += JsIf(JsAstUtils.notOptimized(x.condition), JsBlock(stateAndJump(successor, x))).apply { source = x.source }
+            currentStatements += JsIf(JsAstUtils.notOptimized(x.condition), JsBlock(stateAndJump(successor, x).toMutableList())).apply { source = x.source }
         }
 
         withBreakAndContinue(x, successor, bodyEntryBlock) {
@@ -163,7 +163,7 @@ class CoroutineBodyTransformer(private val context: CoroutineTransformationConte
         }
 
         if (!JsBooleanLiteral.isTrue(x.condition)) {
-            val jsIf = JsIf(JsAstUtils.notOptimized(x.condition), JsBlock(stateAndJump(successor, x))).apply { source = x.source }
+            val jsIf = JsIf(JsAstUtils.notOptimized(x.condition), JsBlock(stateAndJump(successor, x).toMutableList())).apply { source = x.source }
             currentStatements.add(jsIf)
         }
         currentBlock.statements += stateAndJump(bodyEntryBlock, x)
@@ -188,7 +188,7 @@ class CoroutineBodyTransformer(private val context: CoroutineTransformationConte
 
         currentBlock = bodyEntryBlock
         if (x.condition != null && !JsBooleanLiteral.isTrue(x.condition)) {
-            currentStatements += JsIf(JsAstUtils.notOptimized(x.condition), JsBlock(stateAndJump(successor, x))).apply { source = x.source }
+            currentStatements += JsIf(JsAstUtils.notOptimized(x.condition), JsBlock(stateAndJump(successor, x).toMutableList())).apply { source = x.source }
         }
 
         withBreakAndContinue(x, successor, increment) {

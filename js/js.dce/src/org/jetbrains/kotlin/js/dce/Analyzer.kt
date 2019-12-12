@@ -300,7 +300,7 @@ class Analyzer(private val context: Context) : JsVisitor() {
             is JsInvocation -> {
                 if (context.isWrapFunction(expression.qualifier)) {
                     (expression.arguments.getOrNull(0) as? JsFunction)?.let { wrapper ->
-                        val statementsWithoutBody = wrapper.body.statements.filter { it !is JsReturn }
+                        val statementsWithoutBody = wrapper.body.statements.filterTo(mutableListOf()) { it !is JsReturn }
                         JsBlock(statementsWithoutBody).let {
                             context.addNodesForLocalVars(collectDefinedNames(it))
                             accept(it)

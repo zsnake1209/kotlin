@@ -126,7 +126,7 @@ class JSTestGenerator(val context: TranslationContext) {
             functionToTest.body.statements += JsTry(
                     JsBlock(JsReturn(functionDescriptor.buildCall())),
                     listOf(),
-                    JsBlock(afterDescriptors.map { it.buildCall().makeStmt() }))
+                    JsBlock(afterDescriptors.mapTo(mutableListOf<JsStatement>()) { it.buildCall().makeStmt() }))
         }
 
         return functionToTest
