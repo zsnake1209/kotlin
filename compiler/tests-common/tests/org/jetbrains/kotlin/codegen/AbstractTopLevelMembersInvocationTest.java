@@ -33,7 +33,7 @@ public abstract class AbstractTopLevelMembersInvocationTest extends AbstractByte
     @Override
     public void doTest(@NotNull String filename) throws Exception {
         File root = new File(filename);
-        List<String> sourceFiles = SequencesKt.toList(SequencesKt.map(
+        List<String> sourceFiles = SequencesKt.toMutableList(SequencesKt.map(
                 SequencesKt.filter(FilesKt.walkTopDown(root).maxDepth(1), File::isFile),
                 this::relativePath
         ));

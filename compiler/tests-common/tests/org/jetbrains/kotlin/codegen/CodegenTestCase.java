@@ -354,10 +354,10 @@ public abstract class CodegenTestCase extends KtUsefulTestCase {
 
     @NotNull
     public static CodegenTestFiles loadMultiFiles(@NotNull List<TestFile> files, @NotNull Project project) {
-        Collections.sort(files);
+        List<TestFile> sortedFiles = CollectionsKt.sorted(files);
 
         List<KtFile> ktFiles = new ArrayList<>(files.size());
-        for (TestFile file : files) {
+        for (TestFile file : sortedFiles) {
             if (file.name.endsWith(".kt") || file.name.endsWith(".kts")) {
                 // `rangesToDiagnosticNames` parameter is not-null only for diagnostic tests, it's using for lazy diagnostics
                 String content = CheckerTestUtil.INSTANCE.parseDiagnosedRanges(file.content, new ArrayList<>(0), null);
