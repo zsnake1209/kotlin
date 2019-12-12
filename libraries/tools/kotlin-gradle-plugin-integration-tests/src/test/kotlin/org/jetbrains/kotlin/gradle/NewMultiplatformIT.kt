@@ -984,11 +984,6 @@ class NewMultiplatformIT : BaseGradleIT() {
         }
     }
 
-    @Test
-    fun testNativeBinaryKotlinDSL() = doTestNativeBinaryDSL("kotlin-dsl")
-
-    @Test
-    fun testNativeBinaryGroovyDSL() = doTestNativeBinaryDSL("groovy-dsl")
 
     private fun CompiledProject.checkNativeCommandLineFor(vararg taskPaths: String, check: (String) -> Unit) = taskPaths.forEach { taskPath ->
         val commandLine = output.lineSequence().dropWhile {
@@ -999,10 +994,8 @@ class NewMultiplatformIT : BaseGradleIT() {
         check(commandLine)
     }
 
-    private fun doTestNativeBinaryDSL(
-        projectName: String,
-        gradleVersionRequired: GradleVersionRequired = gradleVersion
-    ) = with(transformProjectWithPluginsDsl(projectName, gradleVersionRequired, "new-mpp-native-binaries")) {
+    @Test
+    fun testNativeBinaries() = with(transformProjectWithPluginsDsl("new-mpp-native-binaries", gradleVersion)) {
 
         val hostSuffix = nativeHostTargetName.capitalize()
         val binaries = mutableListOf(
@@ -1190,10 +1183,10 @@ class NewMultiplatformIT : BaseGradleIT() {
     }
 
     // Check that we still can build binaries from sources if the corresponding property is specified.
-    // TODO: Drop in 1.3.70.
+    // TODO: Drop in 1.4
     @Test
     fun testLinkNativeBinaryFromSources() = with(
-        transformProjectWithPluginsDsl("groovy-dsl", gradleVersion, "new-mpp-native-binaries")
+        transformProjectWithPluginsDsl("new-mpp-native-binaries", gradleVersion)
     ) {
         val linkTask = ":linkDebugExecutable${nativeHostTargetName.capitalize()}"
 
