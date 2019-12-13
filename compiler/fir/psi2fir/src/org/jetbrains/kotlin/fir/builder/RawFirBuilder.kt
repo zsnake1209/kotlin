@@ -965,6 +965,8 @@ class RawFirBuilder(session: FirSession, val stubMode: Boolean) : BaseFirBuilder
                         statements += firStatement.statements
                     }
                 }
+
+                trimStatements()
             }
         }
 
@@ -1147,8 +1149,11 @@ class RawFirBuilder(session: FirSession, val stubMode: Boolean) : BaseFirBuilder
                             block.statements.add(0, firLoopParameter)
                         }
                     }
+                    block.trimStatements()
                     block
                 }
+
+                trimStatements()
             }
         }
 

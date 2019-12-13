@@ -287,6 +287,8 @@ internal fun generateDestructuringBlock(
                 symbol.bind(this)
             }
         }
+
+        trimStatements()
     }
 }
 
@@ -399,3 +401,7 @@ private val GET_VALUE = Name.identifier("getValue")
 private val SET_VALUE = Name.identifier("setValue")
 private val PROVIDE_DELEGATE = Name.identifier("provideDelegate")
 private val DELEGATED_SETTER_PARAM = Name.special("<set-?>")
+
+fun FirBlockImpl.trimStatements() {
+    (statements as ArrayList).trimToSize()
+}

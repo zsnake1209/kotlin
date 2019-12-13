@@ -388,6 +388,8 @@ abstract class BaseFirBuilder<T>(val session: FirSession, val context: Context =
                 appendAssignment()
                 statements += generateResolvedAccessExpression(source, temporaryVariable)
             }
+
+            trimStatements()
         }
     }
 
@@ -459,6 +461,7 @@ abstract class BaseFirBuilder<T>(val session: FirSession, val context: Context =
                     this@BaseFirBuilder.session, this@generateAssignment.getSourceOrNull(), name, firArrayAccess.explicitReceiver!!
                 )
                 statements += arraySet.apply { lValue = FirSimpleNamedReference(psiArrayExpression?.toFirSourceElement(), name, null) }
+                trimStatements()
             }
         }
 
