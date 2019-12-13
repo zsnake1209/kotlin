@@ -870,7 +870,7 @@ class CoroutineTransformerMethodVisitor(
         instructions.insert(firstLabel.next, secondLabel)
 
         methodNode.tryCatchBlocks =
-            methodNode.tryCatchBlocks.flatMap {
+            methodNode.tryCatchBlocks.flatMapTo(mutableListOf()) {
                 val isContainingSuspensionPoint =
                     instructions.indexOf(it.start) < beginIndex && beginIndex < instructions.indexOf(it.end)
 
