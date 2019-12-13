@@ -135,12 +135,17 @@ abstract class KotlinManglerImpl : KotlinMangler {
 
     private val publishedApiAnnotation = FqName("kotlin.PublishedApi")
 
+    protected open fun mangleTypeParameter(typeParameter: IrTypeParameter, typeParameterMap: Map<IrTypeParameter, String>): String {
+        return typeParameterMap[typeParameter] ?:
+        error("Not found for ${typeParameter.render()}")
+    }
+
     protected fun acyclicTypeMangler(type: IrType, typeParameterMap: Map<IrTypeParameter, String>): String {
 
         var hashString = type.classifierOrNull?.let {
             when (it) {
                 is IrClassSymbol -> it.owner.fqNameForIrSerialization.asString()
-                is IrTypeParameterSymbol -> typeParameterMap[it.owner] ?: error("Not found for ${it.owner.render()}")
+                is IrTypeParameterSymbol -> mangleTypeParameter(it.owner, typeParameterMap)
                 else -> error("Unexpected type constructor")
             }
         } ?: "<dynamic>"
