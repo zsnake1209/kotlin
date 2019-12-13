@@ -150,7 +150,7 @@ class TypeOperatorLowering(val context: JsIrBackendContext) : FileLoweringPass {
             }
 
             // Note: native `instanceOf` is not used which is important because of null-behaviour
-            private fun advancedCheckRequired(type: IrType) = type.isInterface() ||
+            private fun advancedCheckRequired(type: IrType) =
                     type.isArray() ||
                     type.isPrimitiveArray() ||
                     isTypeOfCheckingType(type)

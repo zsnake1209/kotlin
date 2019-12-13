@@ -34,7 +34,7 @@ private fun isInterfaceImpl(ctor: Ctor, iface: dynamic): Boolean {
 }
 
 public fun isInterface(obj: dynamic, iface: dynamic): Boolean {
-    val ctor = obj.constructor ?: return false
+    val ctor = obj?.constructor ?: return false
 
     return isInterfaceImpl(ctor, iface)
 }
