@@ -5,6 +5,7 @@
 package org.jetbrains.kotlin.js.util;
 
 import com.intellij.util.SmartList;
+import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.js.backend.ast.JsNode;
@@ -24,7 +25,7 @@ public final class AstUtil {
         return (T) node.deepCopy();
     }
 
-    @NotNull
+    @NotNull @Mutable
     public static <T extends JsNode> List<T> deepCopy(@Nullable List<T> nodes) {
         if (nodes == null) return new SmartList<>();
 

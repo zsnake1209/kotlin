@@ -35,7 +35,7 @@ public class JsBlock extends SourceInfoAwareJsNode implements JsStatement {
         this.statements = statements;
     }
 
-    @NotNull
+    @NotNull @Mutable
     public List<JsStatement> getStatements() {
         return statements;
     }

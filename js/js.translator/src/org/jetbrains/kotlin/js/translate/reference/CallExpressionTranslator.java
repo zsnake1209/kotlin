@@ -116,7 +116,7 @@ public final class CallExpressionTranslator extends AbstractCallExpressionTransl
             node = new JsNullLiteral();
         }
         else if (size > 1) {
-            node = new JsBlock(statements);
+            node = new JsBlock(new ArrayList<>(statements));
         }
         else {
             JsStatement resultStatement = statements.get(0);

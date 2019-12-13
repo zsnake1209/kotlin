@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.js.translate.utils;
 
 import com.intellij.util.SmartList;
 import kotlin.Pair;
+import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
@@ -509,7 +510,7 @@ public final class JsAstUtils {
         return new JsObjectLiteral(Collections.singletonList(new JsPropertyInitializer(label, value)));
     }
 
-    @NotNull
+    @NotNull @Mutable
     public static List<JsStatement> flattenStatement(@NotNull JsStatement statement) {
         if (statement instanceof JsBlock) {
             return ((JsBlock) statement).getStatements();
