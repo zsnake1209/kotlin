@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.utils.SmartList
 
 class ControlFlowGraph(val name: String, val kind: Kind) {
     val nodes = mutableListOf<CFGNode<*>>()
@@ -29,8 +30,8 @@ sealed class CFGNode<out E : FirElement>(val owner: ControlFlowGraph, val level:
         owner.nodes += this
     }
 
-    val previousNodes = mutableListOf<CFGNode<*>>()
-    val followingNodes = mutableListOf<CFGNode<*>>()
+    val previousNodes = SmartList<CFGNode<*>>()
+    val followingNodes = SmartList<CFGNode<*>>()
 
     abstract val fir: E
     var isDead: Boolean = false
