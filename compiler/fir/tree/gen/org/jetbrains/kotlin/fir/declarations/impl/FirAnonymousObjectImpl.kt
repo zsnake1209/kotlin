@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousObjectSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -30,9 +31,9 @@ class FirAnonymousObjectImpl(
 ) : FirAnonymousObject(), FirModifiableClass<FirAnonymousObject>, FirAbstractAnnotatedElement {
     override var resolvePhase: FirResolvePhase = FirResolvePhase.RAW_FIR
     override val classKind: ClassKind get() = ClassKind.OBJECT
-    override val superTypeRefs: MutableList<FirTypeRef> = mutableListOf()
+    override val superTypeRefs: MutableList<FirTypeRef> = SmartList()
     override val declarations: MutableList<FirDeclaration> = mutableListOf()
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
 
     init {

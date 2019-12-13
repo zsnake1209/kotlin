@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.tree.generator
 
 import org.jetbrains.kotlin.fir.tree.generator.context.AbstractFirTreeBuilder
 import org.jetbrains.kotlin.fir.tree.generator.model.*
+import org.jetbrains.kotlin.utils.SmartList
 import java.io.File
 import java.io.PrintWriter
 import java.util.*
@@ -177,7 +178,8 @@ fun Implementation.collectImports(): List<String> {
                 + usedTypes.mapNotNull { it.fullQualifiedName } + parents.mapNotNull { it.fullQualifiedName }
                 + listOfNotNull(pureAbstractElementType.fullQualifiedName?.takeIf { needPureAbstractElement }
         ),
-        isImpl = true
+        isImpl = true,
+        implKind = kind
     )
 }
 
@@ -193,14 +195,25 @@ fun Element.collectImports(): List<String> {
     }
     return collectImportsInternal(
         baseTypes,
-        isImpl = false
+        isImpl = false,
+        implKind = null
     )
 }
 
-fun Element.collectImportsInternal(base: List<String>, isImpl: Boolean): List<String> {
-    val fqns = base + allFields.mapNotNull { it.fullQualifiedName } +
-            allFields.flatMap { it.arguments.mapNotNull { it.fullQualifiedName } } +
-            typeArguments.flatMap { it.upperBounds.mapNotNull { it.fullQualifiedName } }
+fun Element.collectImportsInternal(base: List<String>, isImpl: Boolean, implKind: Implementation.Kind?): List<String> {
+    val fqns = mutableListOf<String>().apply {
+        addAll(base)
+        allFields.mapNotNullTo(this) { it.fullQualifiedName }
+        allFields.flatMapTo(this) { it.arguments.mapNotNull { it.fullQualifiedName } }
+        typeArguments.flatMapTo(this) { it.upperBounds.mapNotNull { it.fullQualifiedName } }
+
+        val isInterfaceOrAbstractClass = implKind == Implementation.Kind.Interface || implKind == Implementation.Kind.AbstractClass
+
+        if (isImpl && !isInterfaceOrAbstractClass && allFields.any { it.useSmartList }) {
+            add(SmartList::class.qualifiedName!!)
+        }
+    }
+
     val realPackageName = if (isImpl) "$packageName.impl." else "$packageName."
     return fqns.filter { fqn ->
         fqn.dropLastWhile { it != '.' } != realPackageName

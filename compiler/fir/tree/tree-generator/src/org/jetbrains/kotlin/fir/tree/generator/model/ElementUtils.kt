@@ -62,12 +62,12 @@ fun field(element: Element, nullable: Boolean = false, withReplace: Boolean = fa
 
 // ----------- Field list -----------
 
-fun fieldList(name: String, type: Importable, withReplace: Boolean = false): Field {
-    return FieldList(name, type, withReplace)
+fun fieldList(name: String, type: Importable, withReplace: Boolean = false, useSmartList: Boolean = false): Field {
+    return FieldList(name, type, withReplace, useSmartList)
 }
 
-fun fieldList(element: Element, withReplace: Boolean = false): Field {
-    return FieldList(element.name.decapitalize() + "s", element, withReplace)
+fun fieldList(element: Element, withReplace: Boolean = false, useSmartList: Boolean = false): Field {
+    return FieldList(element.name.decapitalize() + "s", element, withReplace, useSmartList)
 }
 
 // ----------- Field set -----------

@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.fir.expressions.FirStringConcatenationCall
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitStringTypeRef
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -22,8 +23,8 @@ import org.jetbrains.kotlin.fir.visitors.*
 class FirStringConcatenationCallImpl(
     override val source: FirSourceElement?
 ) : FirStringConcatenationCall(), FirCallWithArgumentList, FirAbstractAnnotatedElement {
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
-    override val arguments: MutableList<FirExpression> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
+    override val arguments: MutableList<FirExpression> = SmartList()
     override var typeRef: FirTypeRef = FirImplicitStringTypeRef(source)
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

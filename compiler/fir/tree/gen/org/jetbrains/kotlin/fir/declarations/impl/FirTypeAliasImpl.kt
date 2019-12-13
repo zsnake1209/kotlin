@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -32,8 +33,8 @@ class FirTypeAliasImpl(
     override var expandedTypeRef: FirTypeRef
 ) : FirTypeAlias(), FirModifiableTypeParametersOwner, FirAbstractAnnotatedElement {
     override var resolvePhase: FirResolvePhase = FirResolvePhase.RAW_FIR
-    override val typeParameters: MutableList<FirTypeParameter> = mutableListOf()
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val typeParameters: MutableList<FirTypeParameter> = SmartList()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
 
     init {
         symbol.bind(this)

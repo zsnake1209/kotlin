@@ -166,7 +166,7 @@ object NodeConfigurator : AbstractFieldConfigurator() {
 
         tryExpression.configure {
             +field("tryBlock", block).withTransform()
-            +fieldList("catches", catchClause).withTransform()
+            +fieldList("catches", catchClause, useSmartList = true).withTransform()
             +field("finallyBlock", block, nullable = true).withTransform()
             needTransformOtherChildren()
         }
@@ -261,7 +261,7 @@ object NodeConfigurator : AbstractFieldConfigurator() {
             +symbol("FirTypeParameterSymbol")
             +field(varianceType)
             +booleanField("isReified")
-            +fieldList("bounds", typeRef)
+            +fieldList("bounds", typeRef, useSmartList = true)
             +annotations
         }
 
@@ -389,7 +389,7 @@ object NodeConfigurator : AbstractFieldConfigurator() {
             +field("rValue", expression).withTransform()
             +field("operation", operationType)
             +field("lValue", reference)
-            +fieldList("indexes", expression).withTransform()
+            +fieldList("indexes", expression, useSmartList = true).withTransform()
         }
 
         classReferenceExpression.configure {
@@ -464,7 +464,7 @@ object NodeConfigurator : AbstractFieldConfigurator() {
         }
 
         resolvedCallableReference.configure {
-            +fieldList("inferredTypeArguments", coneKotlinTypeType)
+            +fieldList("inferredTypeArguments", coneKotlinTypeType, useSmartList = true)
         }
 
         delegateFieldReference.configure {
@@ -530,7 +530,7 @@ object NodeConfigurator : AbstractFieldConfigurator() {
         }
 
         contractDescription.configure {
-            +fieldList("effects", effectDeclarationType)
+            +fieldList("effects", effectDeclarationType, useSmartList = true)
         }
     }
 }

@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirWhileLoop
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -23,7 +24,7 @@ class FirWhileLoopImpl(
     override val source: FirSourceElement?,
     override var condition: FirExpression
 ) : FirWhileLoop(), FirAbstractLoop, FirAbstractAnnotatedElement {
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var label: FirLabel? = null
     override lateinit var block: FirBlock
 

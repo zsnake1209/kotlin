@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -41,11 +42,11 @@ open class FirSimpleFunctionImpl(
 ) : FirSimpleFunction(), FirModifiableFunction<FirSimpleFunction>, FirModifiableTypeParametersOwner, FirAbstractAnnotatedElement {
     override var resolvePhase: FirResolvePhase = FirResolvePhase.RAW_FIR
     override var controlFlowGraphReference: FirControlFlowGraphReference = FirEmptyControlFlowGraphReference()
-    override val typeParameters: MutableList<FirTypeParameter> = mutableListOf()
-    override val valueParameters: MutableList<FirValueParameter> = mutableListOf()
+    override val typeParameters: MutableList<FirTypeParameter> = SmartList()
+    override val valueParameters: MutableList<FirValueParameter> = SmartList()
     override var body: FirBlock? = null
     override var containerSource: DeserializedContainerSource? = null
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var contractDescription: FirContractDescription = FirEmptyContractDescription
 
     init {

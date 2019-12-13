@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fir.references.FirReference
 import org.jetbrains.kotlin.fir.references.impl.FirExplicitSuperReference
 import org.jetbrains.kotlin.fir.references.impl.FirExplicitThisReference
 import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -27,8 +28,8 @@ class FirDelegatedConstructorCallImpl(
     override val isThis: Boolean
 ) : FirDelegatedConstructorCall(), FirCallWithArgumentList, FirAbstractAnnotatedElement {
     override var calleeReference: FirReference = if (isThis) FirExplicitThisReference(source, null) else FirExplicitSuperReference(source, constructedTypeRef)
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
-    override val arguments: MutableList<FirExpression> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
+    override val arguments: MutableList<FirExpression> = SmartList()
     override val isSuper: Boolean get() = !isThis
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

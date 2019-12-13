@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fir.expressions.FirReturnExpression
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitNothingTypeRef
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -26,7 +27,7 @@ class FirReturnExpressionImpl(
     override var result: FirExpression
 ) : FirReturnExpression(), FirAbstractAnnotatedElement {
     override var typeRef: FirTypeRef = FirImplicitNothingTypeRef(source)
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override lateinit var target: FirTarget<FirFunction<*>>
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

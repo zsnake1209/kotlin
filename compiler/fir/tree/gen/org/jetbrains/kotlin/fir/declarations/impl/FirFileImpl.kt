@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -27,7 +28,7 @@ class FirFileImpl(
     override val name: String,
     override val packageFqName: FqName
 ) : FirFile(), FirAbstractAnnotatedElement {
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var resolvePhase: FirResolvePhase = FirResolvePhase.RAW_FIR
     override val imports: MutableList<FirImport> = mutableListOf()
     override val declarations: MutableList<FirDeclaration> = mutableListOf()

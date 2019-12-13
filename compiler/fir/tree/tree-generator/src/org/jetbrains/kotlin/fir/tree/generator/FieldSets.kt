@@ -29,15 +29,15 @@ object FieldSets {
     )
 
     val typeArguments =
-        fieldList("typeArguments", typeProjection)
+        fieldList("typeArguments", typeProjection, useSmartList = true)
 
     val arguments =
-        fieldList("arguments", expression)
+        fieldList("arguments", expression, useSmartList = true)
 
     val declarations = fieldList(declaration)
 
     val annotations =
-        fieldList("annotations", annotationCall)
+        fieldList("annotations", annotationCall, useSmartList = true)
 
     fun symbolWithPackage(packageName: String?, symbolClassName: String, argument: String? = null): Field {
         return field("symbol", type(packageName, symbolClassName), argument)
@@ -57,15 +57,15 @@ object FieldSets {
 
     fun receiverTypeRef(nullable: Boolean = false) = field("receiverTypeRef", typeRef, nullable)
 
-    val valueParameters = fieldList(valueParameter)
+    val valueParameters = fieldList(valueParameter, useSmartList = true)
 
-    val typeParameters = fieldList(typeParameter)
+    val typeParameters = fieldList(typeParameter, useSmartList = true)
 
     val name = field(nameType)
 
     val initializer = field("initializer", expression, nullable = true)
 
-    fun superTypeRefs(withReplace: Boolean = false) = fieldList("superTypeRefs", typeRef, withReplace)
+    fun superTypeRefs(withReplace: Boolean = false) = fieldList("superTypeRefs", typeRef, withReplace, useSmartList = true)
 
     val classKind = field(classKindType)
 

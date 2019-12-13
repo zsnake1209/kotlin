@@ -25,6 +25,8 @@ sealed class Field : Importable {
     open val customSetter: String? get() = null
     open val fromDelegate: Boolean get() = false
 
+    open val useSmartList: Boolean get() = false
+
     fun copy(): Field = internalCopy().also {
         updateFieldsInCopy(it)
     }
@@ -157,9 +159,18 @@ class FirField(
 class FieldList(
     override val name: String,
     val baseType: Importable,
-    override val withReplace: Boolean
+    override val withReplace: Boolean,
+    override val useSmartList: Boolean
 ) : Field() {
-    override val defaultValue: String? get() = if (isMutable) "mutableListOf()" else "emptyListOf()"
+    override val defaultValue: String?
+        get() = when {
+            useSmartList -> {
+                require(isMutable)
+                "SmartList()"
+            }
+            isMutable -> "mutableListOf()"
+            else -> "emptyListOf()"
+        }
     override val packageName: String? get() = baseType.packageName
     override val fullQualifiedName: String? get() = baseType.fullQualifiedName
     override val type: String = "List<${baseType.typeWithArguments}>"
@@ -173,7 +184,8 @@ class FieldList(
         return FieldList(
             name,
             baseType,
-            withReplace
+            withReplace,
+            useSmartList
         )
     }
 

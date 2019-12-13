@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirDelegateFieldSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -44,7 +45,7 @@ open class FirValueParameterImpl(
     override val isVal: Boolean get() = true
     override var getter: FirPropertyAccessor? = null
     override var setter: FirPropertyAccessor? = null
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
 
     init {
         symbol.bind(this)

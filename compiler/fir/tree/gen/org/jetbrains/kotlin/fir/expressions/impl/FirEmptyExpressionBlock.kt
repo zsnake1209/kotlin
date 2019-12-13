@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -21,7 +22,7 @@ import org.jetbrains.kotlin.fir.visitors.*
 
 class FirEmptyExpressionBlock : FirBlock(), FirAbstractAnnotatedElement {
     override val source: FirSourceElement? = null
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override val statements: MutableList<FirStatement> = mutableListOf()
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
 

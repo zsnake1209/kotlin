@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.contracts.impl
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.contracts.FirContractDescription
 import org.jetbrains.kotlin.fir.contracts.description.ConeEffectDeclaration
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -18,7 +19,7 @@ import org.jetbrains.kotlin.fir.visitors.*
 class FirContractDescriptionImpl(
     override val source: FirSourceElement?
 ) : FirContractDescription() {
-    override val effects: MutableList<ConeEffectDeclaration> = mutableListOf()
+    override val effects: MutableList<ConeEffectDeclaration> = SmartList()
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {}
 

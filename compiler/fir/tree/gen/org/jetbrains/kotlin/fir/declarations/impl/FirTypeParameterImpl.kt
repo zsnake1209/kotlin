@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -31,8 +32,8 @@ class FirTypeParameterImpl(
     override val isReified: Boolean
 ) : FirTypeParameter(), FirAbstractAnnotatedElement {
     override var resolvePhase: FirResolvePhase = FirResolvePhase.RAW_FIR
-    override val bounds: MutableList<FirTypeRef> = mutableListOf()
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val bounds: MutableList<FirTypeRef> = SmartList()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
 
     init {
         symbol.bind(this)

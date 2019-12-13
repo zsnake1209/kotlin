@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fir.references.FirNamedReference
 import org.jetbrains.kotlin.fir.types.FirTypeProjection
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -25,13 +26,13 @@ open class FirFunctionCallImpl(
     override val source: FirSourceElement?
 ) : FirFunctionCall(), FirModifiableQualifiedAccess, FirCallWithArgumentList, FirAbstractAnnotatedElement {
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var safe: Boolean = false
-    override val typeArguments: MutableList<FirTypeProjection> = mutableListOf()
+    override val typeArguments: MutableList<FirTypeProjection> = SmartList()
     override var explicitReceiver: FirExpression? = null
     override var dispatchReceiver: FirExpression = FirNoReceiverExpression
     override var extensionReceiver: FirExpression = FirNoReceiverExpression
-    override val arguments: MutableList<FirExpression> = mutableListOf()
+    override val arguments: MutableList<FirExpression> = SmartList()
     override lateinit var calleeReference: FirNamedReference
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.fir.references.impl.FirEmptyControlFlowGraphReferenc
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousFunctionSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -37,10 +38,10 @@ class FirAnonymousFunctionImpl(
     override val isLambda: Boolean
 ) : FirAnonymousFunction(), FirModifiableFunction<FirAnonymousFunction>, FirAbstractAnnotatedElement {
     override var resolvePhase: FirResolvePhase = FirResolvePhase.DECLARATIONS
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var controlFlowGraphReference: FirControlFlowGraphReference = FirEmptyControlFlowGraphReference()
-    override val typeParameters: MutableList<FirTypeParameter> = mutableListOf()
-    override val valueParameters: MutableList<FirValueParameter> = mutableListOf()
+    override val typeParameters: MutableList<FirTypeParameter> = SmartList()
+    override val valueParameters: MutableList<FirValueParameter> = SmartList()
     override var body: FirBlock? = null
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
     override var label: FirLabel? = null

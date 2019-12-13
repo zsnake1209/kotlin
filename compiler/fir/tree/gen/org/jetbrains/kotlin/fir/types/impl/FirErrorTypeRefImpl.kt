@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.types.ConeClassErrorType
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.FirErrorTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -24,7 +25,7 @@ class FirErrorTypeRefImpl(
     override val source: FirSourceElement?,
     override val diagnostic: FirDiagnostic
 ) : FirErrorTypeRef(), FirAbstractAnnotatedElement {
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override val type: ConeKotlinType = ConeClassErrorType(diagnostic.reason)
     override val delegatedTypeRef: FirTypeRef? get() = null
 

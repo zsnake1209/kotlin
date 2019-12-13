@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirWrappedDelegateExpression
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -23,7 +24,7 @@ class FirWrappedDelegateExpressionImpl(
     override var expression: FirExpression
 ) : FirWrappedDelegateExpression(), FirAbstractAnnotatedElement {
     override val typeRef: FirTypeRef get() = expression.typeRef
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override lateinit var delegateProvider: FirExpression
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.types.FirFunctionTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -25,8 +26,8 @@ class FirFunctionTypeRefImpl(
     override var receiverTypeRef: FirTypeRef?,
     override var returnTypeRef: FirTypeRef
 ) : FirPureAbstractElement(), FirFunctionTypeRef, FirAbstractAnnotatedElement {
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
-    override val valueParameters: MutableList<FirValueParameter> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
+    override val valueParameters: MutableList<FirValueParameter> = SmartList()
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         annotations.forEach { it.accept(visitor, data) }

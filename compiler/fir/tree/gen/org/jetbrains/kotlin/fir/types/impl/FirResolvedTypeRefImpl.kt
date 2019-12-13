@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -22,7 +23,7 @@ class FirResolvedTypeRefImpl(
     override val source: FirSourceElement?,
     override val type: ConeKotlinType
 ) : FirResolvedTypeRef(), FirAbstractAnnotatedElement {
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var delegatedTypeRef: FirTypeRef? = null
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

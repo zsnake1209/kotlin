@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.fir.references.FirControlFlowGraphReference
 import org.jetbrains.kotlin.fir.references.impl.FirEmptyControlFlowGraphReference
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertyAccessorSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -40,12 +41,12 @@ open class FirPropertyAccessorImpl(
     override var resolvePhase: FirResolvePhase = FirResolvePhase.RAW_FIR
     override var receiverTypeRef: FirTypeRef? = null
     override var controlFlowGraphReference: FirControlFlowGraphReference = FirEmptyControlFlowGraphReference()
-    override val typeParameters: MutableList<FirTypeParameter> = mutableListOf()
-    override val valueParameters: MutableList<FirValueParameter> = mutableListOf()
+    override val typeParameters: MutableList<FirTypeParameter> = SmartList()
+    override val valueParameters: MutableList<FirValueParameter> = SmartList()
     override var body: FirBlock? = null
     override var contractDescription: FirContractDescription = FirEmptyContractDescription
     override val isSetter: Boolean get() = !isGetter
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
 
     init {
         symbol.bind(this)

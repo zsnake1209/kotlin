@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.fir.references.FirReference
 import org.jetbrains.kotlin.fir.references.impl.FirStubReference
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -29,7 +30,7 @@ class FirWhenExpressionImpl(
     override var subjectVariable: FirVariable<*>?
 ) : FirWhenExpression(), FirAbstractAnnotatedElement {
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(null)
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var calleeReference: FirReference = FirStubReference()
     override val branches: MutableList<FirWhenBranch> = mutableListOf()
     override var isExhaustive: Boolean = false

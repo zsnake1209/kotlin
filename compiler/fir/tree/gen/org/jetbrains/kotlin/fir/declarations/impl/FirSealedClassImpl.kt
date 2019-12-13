@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -36,11 +37,11 @@ class FirSealedClassImpl(
     override val symbol: FirRegularClassSymbol
 ) : FirSealedClass(), FirModifiableRegularClass, FirAbstractAnnotatedElement {
     override var resolvePhase: FirResolvePhase = FirResolvePhase.RAW_FIR
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
-    override val typeParameters: MutableList<FirTypeParameter> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
+    override val typeParameters: MutableList<FirTypeParameter> = SmartList()
     override val declarations: MutableList<FirDeclaration> = mutableListOf()
     override var companionObject: FirRegularClass? = null
-    override val superTypeRefs: MutableList<FirTypeRef> = mutableListOf()
+    override val superTypeRefs: MutableList<FirTypeRef> = SmartList()
     override val inheritors: MutableList<ClassId> = mutableListOf()
 
     init {

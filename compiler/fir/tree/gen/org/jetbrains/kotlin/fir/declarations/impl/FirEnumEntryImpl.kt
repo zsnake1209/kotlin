@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -36,14 +37,14 @@ class FirEnumEntryImpl(
     override val symbol: FirRegularClassSymbol
 ) : FirEnumEntry(), FirModifiableClass<FirRegularClass>, FirModifiableTypeParametersOwner, FirAbstractAnnotatedElement {
     override var resolvePhase: FirResolvePhase = FirResolvePhase.RAW_FIR
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
-    override val typeParameters: MutableList<FirTypeParameter> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
+    override val typeParameters: MutableList<FirTypeParameter> = SmartList()
     override var status: FirDeclarationStatus = FirDeclarationStatusImpl(Visibilities.UNKNOWN, Modality.FINAL)
     override val classKind: ClassKind get() = ClassKind.ENUM_ENTRY
     override val declarations: MutableList<FirDeclaration> = mutableListOf()
     override val companionObject: FirRegularClass? get() = null
-    override val superTypeRefs: MutableList<FirTypeRef> = mutableListOf()
-    override val arguments: MutableList<FirExpression> = mutableListOf()
+    override val superTypeRefs: MutableList<FirTypeRef> = SmartList()
+    override val arguments: MutableList<FirExpression> = SmartList()
     override var typeRef: FirTypeRef = session.builtinTypes.enumType
 
     init {

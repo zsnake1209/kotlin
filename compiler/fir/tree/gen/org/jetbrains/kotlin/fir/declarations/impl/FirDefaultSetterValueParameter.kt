@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirDelegateFieldSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.fir.visitors.*
 
 /*
@@ -40,7 +41,7 @@ class FirDefaultSetterValueParameter(
     override val isVal: Boolean = true
     override var getter: FirPropertyAccessor? = null
     override var setter: FirPropertyAccessor? = null
-    override val annotations: MutableList<FirAnnotationCall> = mutableListOf()
+    override val annotations: MutableList<FirAnnotationCall> = SmartList()
     override var defaultValue: FirExpression? = null
     override val isCrossinline: Boolean = false
     override val isNoinline: Boolean = false
