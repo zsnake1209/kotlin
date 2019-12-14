@@ -83,7 +83,8 @@ private fun Any.copyValueIfNeeded(): Any {
             (this@copyValueIfNeeded as Array<Any?>).forEachIndexed { i, value -> this[i] = value?.copyValueIfNeeded() }
         }
 
-        is MutableCollection<*> -> (this as Collection<Any?>).mapTo(this::class.java.newInstance() as MutableCollection<Any?>) { it?.copyValueIfNeeded() }
+        is MutableSet<*> -> this.mapTo(mutableSetOf()) { it?.copyValueIfNeeded() }
+        is MutableCollection<*> -> this.mapTo(mutableListOf()) { it?.copyValueIfNeeded() }
 
         is MutableMap<*, *> -> (this::class.java.newInstance() as MutableMap<Any?, Any?>).apply {
             for ((k, v) in this@copyValueIfNeeded.entries) {
