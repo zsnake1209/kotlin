@@ -168,24 +168,6 @@ class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunct
         stateMachineFunction.transform(LiveLocalsTransformer(localToPropertyMap, { JsIrBuilder.buildGetValue(thisReceiver) }, unit), null)
     }
 
-    private fun computeLivenessAtSuspensionPoints(body: IrBody): Map<IrCall, List<IrValueDeclaration>> {
-        // TODO: data flow analysis.
-        // Just save all visible for now.
-        val result = mutableMapOf<IrCall, List<IrValueDeclaration>>()
-        body.acceptChildrenVoid(object : VariablesScopeTracker() {
-            override fun visitCall(expression: IrCall) {
-                if (!expression.isSuspend) return super.visitCall(expression)
-
-                expression.acceptChildrenVoid(this)
-                val visibleVariables = mutableListOf<IrValueDeclaration>()
-                scopeStack.forEach { visibleVariables += it }
-                result[expression] = visibleVariables
-            }
-        })
-
-        return result
-    }
-
     private fun assignStateIds(entryState: SuspendState, subject: IrVariableSymbol, switch: IrWhen, rootLoop: IrLoop) {
         val visited = mutableSetOf<SuspendState>()
 
@@ -211,6 +193,23 @@ class JsSuspendFunctionsLowering(ctx: JsIrBackendContext) : AbstractSuspendFunct
         rootLoop.transformChildrenVoid(dispatchPointTransformer)
     }
 
+    private fun computeLivenessAtSuspensionPoints(body: IrBody): Map<IrCall, List<IrValueDeclaration>> {
+        // TODO: data flow analysis.
+        // Just save all visible for now.
+        val result = mutableMapOf<IrCall, List<IrValueDeclaration>>()
+        body.acceptChildrenVoid(object : VariablesScopeTracker() {
+            override fun visitCall(expression: IrCall) {
+                if (!expression.isSuspend) return super.visitCall(expression)
+
+                expression.acceptChildrenVoid(this)
+                val visibleVariables = mutableListOf<IrValueDeclaration>()
+                scopeStack.forEach { visibleVariables += it }
+                result[expression] = visibleVariables
+            }
+        })
+
+        return result
+    }
 
     override fun initializeStateMachine(coroutineConstructors: List<IrConstructor>, coroutineClassThis: IrValueDeclaration) {
         for (it in coroutineConstructors) {
