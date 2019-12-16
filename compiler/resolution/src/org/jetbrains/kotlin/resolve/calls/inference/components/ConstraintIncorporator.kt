@@ -5,8 +5,10 @@
 
 package org.jetbrains.kotlin.resolve.calls.inference.components
 
+import org.jetbrains.kotlin.resolve.calls.components.shouldBeFlexible
 import org.jetbrains.kotlin.resolve.calls.inference.model.Constraint
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintKind
+import org.jetbrains.kotlin.resolve.calls.inference.model.TypeVariableFromCallableDescriptor
 import org.jetbrains.kotlin.resolve.calls.inference.model.VariableWithConstraints
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.model.*
@@ -54,7 +56,17 @@ class ConstraintIncorporator(
         if (constraint.kind != ConstraintKind.LOWER) {
             getConstraintsForVariable(typeVariable).forEach {
                 if (it.kind != ConstraintKind.UPPER) {
-                    addNewIncorporatedConstraint(it.type, constraint.type)
+                    if (typeVariable is TypeVariableFromCallableDescriptor && typeVariable.originalTypeParameter.shouldBeFlexible()) {
+                        addNewIncorporatedConstraint(
+                            createFlexibleType(
+                                it.type.makeDefinitelyNotNullOrNotNull().lowerBoundIfFlexible(),
+                                it.type.withNullability(true).upperBoundIfFlexible()
+                            ),
+                            constraint.type
+                        )
+                    } else {
+                        addNewIncorporatedConstraint(it.type, constraint.type)
+                    }
                 }
             }
         }
@@ -63,7 +75,17 @@ class ConstraintIncorporator(
         if (constraint.kind != ConstraintKind.UPPER) {
             getConstraintsForVariable(typeVariable).forEach {
                 if (it.kind != ConstraintKind.LOWER) {
-                    addNewIncorporatedConstraint(constraint.type, it.type)
+                    if (typeVariable is TypeVariableFromCallableDescriptor && typeVariable.originalTypeParameter.shouldBeFlexible()) {
+                        addNewIncorporatedConstraint(
+                            constraint.type,
+                            createFlexibleType(
+                                it.type.makeDefinitelyNotNullOrNotNull().lowerBoundIfFlexible(),
+                                it.type.withNullability(true).upperBoundIfFlexible()
+                            )
+                        )
+                    } else {
+                        addNewIncorporatedConstraint(constraint.type, it.type)
+                    }
                 }
             }
         }

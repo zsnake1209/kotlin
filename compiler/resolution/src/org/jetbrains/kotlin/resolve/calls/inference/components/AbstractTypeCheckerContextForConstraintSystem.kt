@@ -8,7 +8,9 @@ package org.jetbrains.kotlin.resolve.calls.inference.components
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker
 import org.jetbrains.kotlin.types.AbstractTypeChecker
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
+import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.model.*
+import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 
 abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheckerContext(), TypeSystemInferenceExtensionContext {
 
@@ -27,6 +29,10 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
     abstract fun addUpperConstraint(typeVariable: TypeConstructorMarker, superType: KotlinTypeMarker)
 
     abstract fun addLowerConstraint(typeVariable: TypeConstructorMarker, subType: KotlinTypeMarker)
+
+    abstract fun isFromTypeParameter(): Boolean
+
+    abstract fun isFromTypeArgument(): Boolean
 
     override fun getLowerCapturedTypePolicy(subType: SimpleTypeMarker, superType: CapturedTypeMarker): LowerCapturedTypePolicy = when {
         isMyTypeVariable(subType) -> LowerCapturedTypePolicy.SKIP_LOWER
@@ -136,7 +142,7 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
      *
      * => Foo <: T! -- (Foo!! .. Foo) <: T
      *
-     * Foo? <: T! -- (Foo!! .. Foo?) <: T
+     * Foo? <: T! -- Foo? <: T
      *
      *
      * (Foo..Bar) <: T! --
@@ -163,7 +169,11 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
                 when (subType) {
                     is SimpleTypeMarker ->
                         // Foo <: T! -- (Foo!! .. Foo) <: T
-                        createFlexibleType(subType.makeSimpleTypeDefinitelyNotNullOrNotNull(), subType)
+                        if (subType.isMarkedNullable()) {
+                            subType // prefer nullable type to flexible one: `Foo? <: (T..T?)` => lowerConstraint = `Foo?`
+                        } else {
+                            createFlexibleType(subType, subType.withNullability(true))
+                        }
 
                     is FlexibleTypeMarker ->
                         // (Foo..Bar) <: T! -- (Foo!! .. Bar) <: T
@@ -190,20 +200,24 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
      * T! <: Foo <=> T <: Foo
      * T? <: Foo <=> T <: Foo && Nothing? <: Foo
      * T  <: Foo -- leave as is
+     * test: testData/diagnostics/tests/generics/nullability/correctSubstitutionForIncorporationConstraint.kt
+     * testData/diagnostics/tests/platformTypes/methodCall/singleton.kt
      */
     private fun simplifyUpperConstraint(typeVariable: KotlinTypeMarker, superType: KotlinTypeMarker): Boolean {
-        @Suppress("NAME_SHADOWING")
-        val typeVariable = typeVariable.lowerBoundIfFlexible()
+        val isFlexibleTypeVariable = typeVariable.isFlexible()
+        val typeVariableLowerBound = typeVariable.lowerBoundIfFlexible()
+        val simplifiedSuperType = if (typeVariableLowerBound.isDefinitelyNotNullType()) {
+            superType.withNullability(true)
+        } else if (isFlexibleTypeVariable && superType is SimpleTypeMarker) {
+            createFlexibleType(superType, superType.withNullability(true))
+        } else superType
 
-        @Suppress("NAME_SHADOWING")
-        val superType = if (typeVariable.isDefinitelyNotNullType()) superType.withNullability(true) else superType
+        addUpperConstraint(typeVariableLowerBound.typeConstructor(), simplifiedSuperType)
 
-        addUpperConstraint(typeVariable.typeConstructor(), superType)
-
-        if (typeVariable.isMarkedNullable()) {
+        if (typeVariableLowerBound.isMarkedNullable()) {
             // here is important that superType is singleClassifierType
-            return superType.anyBound(this::isMyTypeVariable) ||
-                    isSubtypeOfByTypeChecker(nullableNothingType(), superType)
+            return simplifiedSuperType.anyBound(this::isMyTypeVariable) ||
+                    isSubtypeOfByTypeChecker(nullableNothingType(), simplifiedSuperType)
         }
 
         return true

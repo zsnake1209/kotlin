@@ -66,6 +66,7 @@ dependencies {
         testRuntime(intellijPluginDep("android-layoutlib"))
         testRuntime(intellijPluginDep("android-wizardTemplate-plugin"))
     }
+    if (System.getProperty("idea.active") != null) testRuntimeOnly(files("${rootProject.projectDir}/dist/kotlinc/lib/kotlin-reflect.jar"))
 }
 
 sourceSets {

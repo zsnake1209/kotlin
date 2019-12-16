@@ -139,6 +139,14 @@ class ConstraintInjector(
             return baseContext.prepareType(type)
         }
 
+        override fun isFromTypeParameter(): Boolean {
+            return position.from is ExplicitTypeParameterConstraintPosition
+        }
+
+        override fun isFromTypeArgument(): Boolean {
+            return position.from is ArgumentConstraintPosition
+        }
+
         @UseExperimental(TypeRefinement::class)
         override fun refineType(type: KotlinTypeMarker): KotlinTypeMarker {
             return if (type is KotlinType) {

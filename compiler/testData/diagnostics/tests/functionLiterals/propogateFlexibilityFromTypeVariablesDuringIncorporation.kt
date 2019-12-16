@@ -1,5 +1,3 @@
-// !DIAGNOSTICS: -UNUSED_VARIABLE
-
 // FILE: Function.java
 
 public interface Function<Param, Result> {
@@ -9,7 +7,7 @@ public interface Function<Param, Result> {
 // FILE: AdapterProcessor.java
 
 public class AdapterProcessor<T, S> {
-  public AdapterProcessor(Function<? super T, ? extends S> conversion) {}
+    public AdapterProcessor(Function<? super T, ? extends S> conversion) {}
 }
 
 
@@ -22,7 +20,7 @@ interface PsiMethod {
 interface PsiClass
 
 fun test() {
-    val <!UNUSED_VARIABLE!>processor<!> = AdapterProcessor<PsiMethod, PsiClass>(
+    val processor = AdapterProcessor<PsiMethod, PsiClass>(
         Function { method: PsiMethod? -> method?.containingClass }
     )
 }
