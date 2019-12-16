@@ -60,10 +60,10 @@ abstract class AbstractBlockDecomposerLowering(context: CommonBackendContext) : 
 
     private inner class CodeCleaner : IrElementTransformerVoid() {
 
-        private fun cleanUpStatements(statements: List<IrStatement>): List<IrStatement> {
+        private fun IrStatementContainer.cleanUpStatements() {
             var unreachable = false
 
-            return statements.filter {
+            val newStatements = statements.filter {
                 when {
                     unreachable -> false
                     it.isPure(true) -> false
@@ -74,29 +74,27 @@ abstract class AbstractBlockDecomposerLowering(context: CommonBackendContext) : 
                     }
                 }
             }
+
+            statements.clear()
+
+            statements += newStatements
         }
 
         override fun visitBlock(expression: IrBlock): IrExpression {
             expression.transformChildrenVoid(this)
-            val newStatements = cleanUpStatements(expression.statements)
-            expression.statements.clear()
-            expression.statements += newStatements
+            expression.cleanUpStatements()
             return expression
         }
 
         override fun visitBlockBody(body: IrBlockBody): IrBody {
             body.transformChildrenVoid(this)
-            val newStatements = cleanUpStatements(body.statements)
-            body.statements.clear()
-            body.statements += newStatements
+            body.cleanUpStatements()
             return body
         }
 
         override fun visitComposite(expression: IrComposite): IrExpression {
             expression.transformChildrenVoid(this)
-            val newStatements = cleanUpStatements(expression.statements)
-            expression.statements.clear()
-            expression.statements += newStatements
+            expression.cleanUpStatements()
             return expression
         }
     }
