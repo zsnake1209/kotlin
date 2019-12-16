@@ -7481,6 +7481,21 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
                     runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override3.kt");
                 }
 
+                @TestMetadata("override4.kt")
+                public void testOverride4() throws Exception {
+                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override4.kt");
+                }
+
+                @TestMetadata("override5.kt")
+                public void testOverride5() throws Exception {
+                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override5.kt");
+                }
+
+                @TestMetadata("override6.kt")
+                public void testOverride6() throws Exception {
+                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override6.kt");
+                }
+
                 @TestMetadata("overrideCrossinline.kt")
                 public void testOverrideCrossinline() throws Exception {
                     runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/overrideCrossinline.kt");
