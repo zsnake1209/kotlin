@@ -66,6 +66,7 @@ class MemberBuilder(
     var returns: String? = null; private set
     val throwsExceptions = mutableListOf<ThrowsException>()
     var body: String? = null; private set
+    var toplevelCompanion: String? = null; private set
     val annotations: MutableList<String> = mutableListOf()
     val suppressions: MutableList<String> = mutableListOf()
 
@@ -141,6 +142,10 @@ class MemberBuilder(
     }
     fun body(vararg families: Family, valueBuilder: () -> String) {
         specialFor(*families) { body(valueBuilder) }
+    }
+
+    fun toplevelCompanion(valueBuilder: () -> String) {
+        toplevelCompanion = valueBuilder()
     }
 
 
@@ -376,25 +381,38 @@ class MemberBuilder(
         }
 
         if (keyword == Keyword.Function) builder.append(" {")
+        builder.append('\n')
 
         val body = (body ?:
                 deprecate?.replaceWith?.let { "return $it" } ?:
                 """TODO("Body is not provided")""".also { System.err.println("ERROR: $signature for ${target.fullName}: no body specified for ${family to primitive}") }
-                ).trim('\n')
-        val indent: Int = body.takeWhile { it == ' ' }.length
+                )
 
-        builder.append('\n')
-        body.lineSequence().forEach {
-            var count = indent
-            val line = it.dropWhile { count-- > 0 && it == ' ' }.renderType()
-            if (!line.isEmpty()) {
-                builder.append("    ").append(line)
-                builder.append("\n")
+        fun outputIndented(block: String, startIndent: Int = 4) {
+            val block_ = block.trim('\n')
+            val blockIndent: Int = block_.takeWhile { it == ' ' }.length
+            val indentString = " ".repeat(startIndent)
+
+            block_.lineSequence().forEach { line ->
+                var count = blockIndent
+                val lineRender = line.dropWhile { count-- > 0 && it == ' ' }.renderType()
+                if (!lineRender.isEmpty()) {
+                    builder.append(indentString).append(lineRender)
+                    builder.append("\n")
+                }
             }
         }
 
+        outputIndented(body)
+
         if (keyword == Keyword.Function) builder.append("}\n")
         builder.append("\n")
+
+        toplevelCompanion?.let {
+            outputIndented(it, startIndent = 0)
+            builder.append("\n")
+        }
+
     }
 
 }
