@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.resolve.constants.evaluate.evaluateBinary
 import org.jetbrains.kotlin.resolve.constants.evaluate.evaluateUnary
+import kotlin.math.floor
 
 val foldConstantLoweringPhase = makeIrFilePhase(
     { ctx: CommonBackendContext -> FoldConstantLowering(ctx) },
@@ -197,6 +198,27 @@ class FoldConstantLowering(
 
     // Unsigned constants are represented through signed constants with a different IrType.
     private fun constToString(const: IrConst<*>): String {
+        if (floatSpecial) {
+            when (val kind = const.kind) {
+                is IrConstKind.Float -> {
+                    val f = kind.valueOf(const)
+                    if (!f.isInfinite()) {
+                        if (floor(f) == f) {
+                            return f.toInt().toString()
+                        }
+                    }
+                }
+                is IrConstKind.Double -> {
+                    val d = kind.valueOf(const)
+                    if (!d.isInfinite()) {
+                        if (floor(d) == d) {
+                            return d.toLong().toString()
+                        }
+                    }
+                }
+            }
+        }
+
         if (const.type.isUnsigned()) {
             when (val kind = const.kind) {
                 is IrConstKind.Byte ->
