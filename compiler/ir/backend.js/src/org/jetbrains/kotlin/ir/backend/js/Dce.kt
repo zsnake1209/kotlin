@@ -48,7 +48,7 @@ private fun buildRoots(module: IrModuleFragment, context: JsIrBackendContext, ma
                         || it.isEffectivelyExternal()
                         || it is IrField && it.correspondingPropertySymbol?.owner?.isExported(context) == true
                         || it is IrSimpleFunction && it.correspondingPropertySymbol?.owner?.isExported(context) == true
-            }.filter { it !is IrField || !it.isConstant() }
+            }.filter { !(it is IrField && it.isConstant() && !it.isExported(context)) }
         }
 
     if (context.hasTests) rootDeclarations += context.testContainer
