@@ -149,6 +149,7 @@ class FirResolveModularizedTotalKotlinTest : AbstractModularizedTest() {
         val bestStatistics = bestStatistics ?: return
         printStatistics(bestStatistics, "Best pass: $bestPass")
         printErrors(bestStatistics)
+        println(vmStateSnapshot())
     }
 
     private fun saveReport(pass: Int, statistics: FirResolveBench.TotalStatistics) {
