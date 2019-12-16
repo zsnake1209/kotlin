@@ -19,6 +19,6 @@ object JsMangler : AbstractJsMangler()
 
 object JsManglerForBE : AbstractJsMangler() {
 
-    override fun mangleTypeParameter(typeParameter: IrTypeParameter, typeParameterMap: Map<IrTypeParameter, String>): String =
+    override fun mangleTypeParameter(typeParameter: IrTypeParameter, typeParameterNamer: (IrTypeParameter) -> String): String =
         typeParameter.name.asString()
 }
