@@ -1183,12 +1183,6 @@ object ArrayOps : TemplateGroupBase() {
     } builder {
         doc { "Returns a [List] that wraps the original array." }
         returns("List<T>")
-        on(Platform.JVM) {
-            body { """return ArraysUtilJVM.asList(this)""" }
-        }
-        on(Platform.JS) {
-            body { """return ArrayList<T>(this.unsafeCast<Array<Any?>>())""" }
-        }
 
         val objectLiteralImpl = """
                         return object : AbstractList<T>(), RandomAccess {
@@ -1200,10 +1194,13 @@ object ArrayOps : TemplateGroupBase() {
                             override fun lastIndexOf(element: T): Int = this@asList.lastIndexOf(element)
                         }
                         """
+        on(Platform.JVM) {
+            body { objectLiteralImpl }
+        }
+        on(Platform.JS) {
+            body { """return ArrayList<T>(this.unsafeCast<Array<Any?>>())""" }
+        }
         specialFor(ArraysOfPrimitives, ArraysOfUnsigned) {
-            on(Platform.JVM) {
-                body { objectLiteralImpl }
-            }
             on(Platform.JS) {
                 if (primitive == PrimitiveType.Char || primitive in PrimitiveType.unsignedPrimitives) {
                     body {

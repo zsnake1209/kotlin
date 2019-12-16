@@ -126,7 +126,14 @@ public fun <C : MutableCollection<in R>, R> Array<*>.filterIsInstanceTo(destinat
  * Returns a [List] that wraps the original array.
  */
 public actual fun <T> Array<out T>.asList(): List<T> {
-    return ArraysUtilJVM.asList(this)
+    return object : AbstractList<T>(), RandomAccess {
+        override val size: Int get() = this@asList.size
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+        override fun contains(element: T): Boolean = this@asList.contains(element)
+        override fun get(index: Int): T = this@asList[index]
+        override fun indexOf(element: T): Int = this@asList.indexOf(element)
+        override fun lastIndexOf(element: T): Int = this@asList.lastIndexOf(element)
+    }
 }
 
 /**
