@@ -122,7 +122,7 @@ class SwitchOptimizer(private val context: JsGenerationContext, private val last
         // Seems it is not reasonable to optimize very simple when
         if (caseCount < 3) return null
 
-        if (s!!.owner.type.isSuitableForSwitch()) return SwitchData(s, cases)
+        if (s?.owner?.type?.isSuitableForSwitch() == true) return SwitchData(s, cases)
         return null
     }
 
