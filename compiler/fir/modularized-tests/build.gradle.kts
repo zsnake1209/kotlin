@@ -47,6 +47,7 @@ projectTest {
     jvmArgs!!.removeIf { it.contains("-Xmx") }
     maxHeapSize = "8g"
     dependsOn(":dist")
+    jvmArgs("-XX:+UseParallelGC")
 
     run {
         val argsExt = project.findProperty("fir.modularized.jvm.args") as? String
