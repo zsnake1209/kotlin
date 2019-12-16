@@ -11,6 +11,8 @@ import org.gradle.util.ConfigureUtil
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDce
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsPlatformTestRun
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsReportAggregatingTestRun
+import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinIntermediateMode
+import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinTerminalMode
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
@@ -28,6 +30,22 @@ interface KotlinJsTargetDsl {
     fun nodejs(body: KotlinJsNodeDsl.() -> Unit)
     fun nodejs(fn: Closure<*>) {
         nodejs {
+            ConfigureUtil.configure(fn, this)
+        }
+    }
+
+    fun intermediate() = intermediate { }
+    fun intermediate(body: KotlinIntermediateMode.() -> Unit)
+    fun intermediate(fn: Closure<*>) {
+        intermediate {
+            ConfigureUtil.configure(fn, this)
+        }
+    }
+
+    fun terminal() = terminal { }
+    fun terminal(body: KotlinTerminalMode.() -> Unit)
+    fun terminal(fn: Closure<*>) {
+        terminal {
             ConfigureUtil.configure(fn, this)
         }
     }

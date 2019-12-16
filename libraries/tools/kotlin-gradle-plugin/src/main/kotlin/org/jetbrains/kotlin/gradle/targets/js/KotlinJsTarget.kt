@@ -8,13 +8,16 @@ package org.jetbrains.kotlin.gradle.targets.js
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.AbstractKotlinTargetConfigurator.Companion.runTaskNameSuffix
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinTargetWithTests
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinOnlyTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsBrowserDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsNodeDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
+import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinIntermediateMode
+import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinTerminalMode
 import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinBrowserJs
 import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinNodeJs
 import org.jetbrains.kotlin.gradle.tasks.locateTask
@@ -75,6 +78,26 @@ open class KotlinJsTarget @Inject constructor(project: Project, platformType: Ko
 
     override fun nodejs(body: KotlinJsNodeDsl.() -> Unit) {
         body(nodejs)
+    }
+
+    private val intermediateLazyDelegate = lazy {
+        project.objects.newInstance(KotlinIntermediateMode::class.java, this)
+    }
+
+    val intermediate: KotlinIntermediateMode by intermediateLazyDelegate
+
+    override fun intermediate(body: KotlinIntermediateMode.() -> Unit) {
+        intermediate.body()
+    }
+
+    private val terminalLazyDelegate = lazy {
+        project.objects.newInstance(KotlinTerminalMode::class.java, this)
+    }
+
+    val terminal: KotlinTerminalMode by terminalLazyDelegate
+
+    override fun terminal(body: KotlinTerminalMode.() -> Unit) {
+        terminal.body()
     }
 
     fun whenBrowserConfigured(body: KotlinJsBrowserDsl.() -> Unit) {
