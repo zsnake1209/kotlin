@@ -1195,7 +1195,26 @@ object ArrayOps : TemplateGroupBase() {
                         }
                         """
         on(Platform.JVM) {
-            body { objectLiteralImpl }
+            val listName = when(family) {
+                ArraysOfObjects -> "ObjectArray"
+                ArraysOfPrimitives, ArraysOfUnsigned -> "${primitive!!.name.capitalize()}Array"
+                else -> error(family)
+            } + "List"
+            toplevelCompanion {
+                val typeParameter = if (family == ArraysOfObjects) "<T>" else ""
+                val visibility = if (family == ArraysOfUnsigned) "internal" else "private"
+                """
+                $visibility class $listName$typeParameter(val array: SELF) : AbstractList<T>(), RandomAccess, Serializable {
+                    override val size: Int get() = array.size
+                    override fun isEmpty(): Boolean = array.isEmpty()
+                    override fun contains(element: T): Boolean = array.contains(element)
+                    override fun get(index: Int): T = array[index]
+                    override fun indexOf(element: T): Int = array.indexOf(element)
+                    override fun lastIndexOf(element: T): Int = array.lastIndexOf(element)
+                }
+                """
+            }
+            body { "return $listName(this)" }
         }
         on(Platform.JS) {
             body { """return ArrayList<T>(this.unsafeCast<Array<Any?>>())""" }
