@@ -602,11 +602,8 @@ fun IrStatement.isPure(anyVariable: Boolean): Boolean {
         is IrGetValue -> {
             if (anyVariable) return true
             val valueDeclaration = symbol.owner
-            if (valueDeclaration is IrValueParameter) true
-            else {
-                val variable = valueDeclaration as IrVariable
-                variable.run { isConst || !isVar }
-            }
+            if (valueDeclaration is IrVariable) !valueDeclaration.isVar
+            else true
         }
         is IrGetObjectValue -> type.isUnit()
         else -> false
