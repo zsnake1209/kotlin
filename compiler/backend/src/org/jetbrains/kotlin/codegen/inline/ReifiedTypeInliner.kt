@@ -222,7 +222,8 @@ class ReifiedTypeInliner<KT : KotlinTypeMarker>(
         generateAsCast(InstructionAdapter(newMethodNode), kotlinType, asmType, safe, languageVersionSettings)
 
         instructions.insert(insn, newMethodNode.instructions)
-        instructions.remove(stubCheckcast)
+        //Keep stubCheckcast to avoud VerificationErrors on 1.8+ bytecode
+        //instructions.remove(stubCheckcast)
 
         // TODO: refine max stack calculation (it's not always as big as +4)
         maxStackSize = max(maxStackSize, 4)
