@@ -13,13 +13,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetWithTests
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinOnlyTarget
-import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsBrowserDsl
-import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsNodeDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
-import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinIntermediateMode
-import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinTerminalMode
-import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinBrowserJs
-import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinNodeJs
+import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinModeDsl
+import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinMode
 import org.jetbrains.kotlin.gradle.tasks.locateTask
 import org.jetbrains.kotlin.gradle.testing.internal.KotlinTestReport
 import org.jetbrains.kotlin.gradle.testing.testTaskName
@@ -29,8 +25,7 @@ import javax.inject.Inject
 open class KotlinJsTarget @Inject constructor(project: Project, platformType: KotlinPlatformType) :
     KotlinOnlyTarget<KotlinJsCompilation>(project, platformType),
     KotlinTargetWithTests<JsAggregatingExecutionSource, KotlinJsReportAggregatingTestRun>,
-    KotlinJsTargetDsl
-{
+    KotlinJsTargetDsl {
     override lateinit var testRuns: NamedDomainObjectContainer<KotlinJsReportAggregatingTestRun>
         internal set
 
@@ -44,75 +39,52 @@ open class KotlinJsTarget @Inject constructor(project: Project, platformType: Ko
             it.description = "Run js on all configured platforms"
         }
 
-    private val browserLazyDelegate = lazy {
-        project.objects.newInstance(KotlinBrowserJs::class.java, this).also {
-            it.configure()
-            browserConfiguredHandlers.forEach { handler -> handler(it) }
-            browserConfiguredHandlers.clear()
+    private val modeConfiguredHandlers = mutableListOf<KotlinModeDsl.() -> Unit>()
+
+    internal val mode: KotlinMode
+        get() = _mode ?: throw IllegalStateException("Neither intermediate nor terminal mode is not configured")
+
+    private val _mode: KotlinMode?
+        get() {
+            if (intermediateLazyDelegate.isInitialized()) {
+                return intermediate
+            }
+
+            if (terminalLazyDelegate.isInitialized()) {
+                return terminal
+            }
+
+            return null
         }
-    }
-
-    private val browserConfiguredHandlers = mutableListOf<KotlinJsBrowserDsl.() -> Unit>()
-
-    val browser by browserLazyDelegate
-
-    internal val isBrowserConfigured: Boolean = browserLazyDelegate.isInitialized()
-
-    override fun browser(body: KotlinJsBrowserDsl.() -> Unit) {
-        body(browser)
-    }
-
-    private val nodejsLazyDelegate = lazy {
-        project.objects.newInstance(KotlinNodeJs::class.java, this).also {
-            it.configure()
-            nodejsConfiguredHandlers.forEach { handler -> handler(it) }
-            nodejsConfiguredHandlers.clear()
-        }
-    }
-
-    private val nodejsConfiguredHandlers = mutableListOf<KotlinJsNodeDsl.() -> Unit>()
-
-    val nodejs by nodejsLazyDelegate
-
-    internal val isNodejsConfigured: Boolean = nodejsLazyDelegate.isInitialized()
-
-    override fun nodejs(body: KotlinJsNodeDsl.() -> Unit) {
-        body(nodejs)
-    }
 
     private val intermediateLazyDelegate = lazy {
-        project.objects.newInstance(KotlinIntermediateMode::class.java, this)
+        project.objects.newInstance(KotlinMode::class.java, this).also {
+            modeConfiguredHandlers.forEach { handler -> handler(it) }
+            modeConfiguredHandlers.clear()
+        }
     }
 
-    val intermediate: KotlinIntermediateMode by intermediateLazyDelegate
+    val intermediate: KotlinMode by intermediateLazyDelegate
 
-    override fun intermediate(body: KotlinIntermediateMode.() -> Unit) {
+    override fun intermediate(body: KotlinModeDsl.() -> Unit) {
         intermediate.body()
     }
 
     private val terminalLazyDelegate = lazy {
-        project.objects.newInstance(KotlinTerminalMode::class.java, this)
+        project.objects.newInstance(KotlinMode::class.java, this)
     }
 
-    val terminal: KotlinTerminalMode by terminalLazyDelegate
+    val terminal: KotlinMode by terminalLazyDelegate
 
-    override fun terminal(body: KotlinTerminalMode.() -> Unit) {
+    override fun terminal(body: KotlinModeDsl.() -> Unit) {
         terminal.body()
     }
 
-    fun whenBrowserConfigured(body: KotlinJsBrowserDsl.() -> Unit) {
-        if (browserLazyDelegate.isInitialized()) {
-            browser(body)
+    fun whenModeConfigured(body: KotlinModeDsl.() -> Unit) {
+        if (_mode != null) {
+            body(mode)
         } else {
-            browserConfiguredHandlers += body
-        }
-    }
-
-    fun whenNodejsConfigured(body: KotlinJsNodeDsl.() -> Unit) {
-        if (nodejsLazyDelegate.isInitialized()) {
-            nodejs(body)
-        } else {
-            nodejsConfiguredHandlers += body
+            modeConfiguredHandlers += body
         }
     }
 

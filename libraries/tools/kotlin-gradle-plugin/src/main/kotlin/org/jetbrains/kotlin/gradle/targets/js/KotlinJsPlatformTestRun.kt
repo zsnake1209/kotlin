@@ -6,11 +6,11 @@
 package org.jetbrains.kotlin.gradle.targets.js
 
 import org.jetbrains.kotlin.gradle.execution.KotlinAggregateExecutionSource
-import org.jetbrains.kotlin.gradle.execution.KotlinAggregatingExecution
 import org.jetbrains.kotlin.gradle.plugin.CompilationExecutionSource
 import org.jetbrains.kotlin.gradle.plugin.CompilationExecutionSourceSupport
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetTestRun
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
+import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinMode
 import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinJsSubTarget
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import org.jetbrains.kotlin.gradle.testing.KotlinReportAggregatingTestRun
@@ -65,11 +65,11 @@ open class KotlinJsReportAggregatingTestRun(
     private fun KotlinJsSubTarget.getChildTestExecution() = testRuns.maybeCreate(testRunName)
 
     override fun getConfiguredExecutions(): Iterable<KotlinJsPlatformTestRun> = mutableListOf<KotlinJsPlatformTestRun>().apply {
-        if (target.isNodejsConfigured) {
-            add(target.nodejs.getChildTestExecution())
+        if (target.mode.isNodejsConfigured) {
+            add(target.mode.nodejs.getChildTestExecution())
         }
-        if (target.isBrowserConfigured) {
-            add(target.browser.getChildTestExecution())
+        if (target.mode.isBrowserConfigured) {
+            add(target.mode.browser.getChildTestExecution())
         }
     }
 
@@ -78,7 +78,11 @@ open class KotlinJsReportAggregatingTestRun(
             configure(getChildTestExecution())
         }
 
-        target.whenBrowserConfigured { doConfigureInChildren(this as KotlinJsSubTarget) }
-        target.whenNodejsConfigured { doConfigureInChildren(this as KotlinJsSubTarget) }
+        target.whenModeConfigured {
+            (this as KotlinMode).apply {
+                whenBrowserConfigured { doConfigureInChildren(this as KotlinJsSubTarget) }
+                whenNodejsConfigured { doConfigureInChildren(this as KotlinJsSubTarget) }
+            }
+        }
     }
 }

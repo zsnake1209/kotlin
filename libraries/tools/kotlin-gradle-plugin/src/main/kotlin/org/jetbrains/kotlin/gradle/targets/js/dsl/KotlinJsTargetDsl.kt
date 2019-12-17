@@ -11,31 +11,13 @@ import org.gradle.util.ConfigureUtil
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDce
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsPlatformTestRun
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsReportAggregatingTestRun
-import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinIntermediateMode
-import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinTerminalMode
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 interface KotlinJsTargetDsl {
-    fun browser() = browser { }
-    fun browser(body: KotlinJsBrowserDsl.() -> Unit)
-    fun browser(fn: Closure<*>) {
-        browser {
-            ConfigureUtil.configure(fn, this)
-        }
-    }
-
-    fun nodejs() = nodejs { }
-    fun nodejs(body: KotlinJsNodeDsl.() -> Unit)
-    fun nodejs(fn: Closure<*>) {
-        nodejs {
-            ConfigureUtil.configure(fn, this)
-        }
-    }
-
     fun intermediate() = intermediate { }
-    fun intermediate(body: KotlinIntermediateMode.() -> Unit)
+    fun intermediate(body: KotlinModeDsl.() -> Unit)
     fun intermediate(fn: Closure<*>) {
         intermediate {
             ConfigureUtil.configure(fn, this)
@@ -43,7 +25,7 @@ interface KotlinJsTargetDsl {
     }
 
     fun terminal() = terminal { }
-    fun terminal(body: KotlinTerminalMode.() -> Unit)
+    fun terminal(body: KotlinModeDsl.() -> Unit)
     fun terminal(fn: Closure<*>) {
         terminal {
             ConfigureUtil.configure(fn, this)
