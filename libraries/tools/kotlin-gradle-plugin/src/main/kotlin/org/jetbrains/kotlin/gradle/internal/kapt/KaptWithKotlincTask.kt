@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import org.jetbrains.kotlin.gradle.tasks.CompilerPluginOptions
 import org.jetbrains.kotlin.gradle.tasks.thisTaskProvider
 import org.jetbrains.kotlin.gradle.utils.getValue
+import org.jetbrains.kotlin.gradle.utils.optionalProvider
 import org.jetbrains.kotlin.gradle.utils.toSortedPathsArray
 import java.io.File
 
@@ -60,8 +61,8 @@ open class KaptWithKotlincTask : KaptTask(), CompilerArgumentAwareWithInput<K2JV
     @get:Internal
     internal var processIncrementally = false
 
-    private val javaPackagePrefix by project.provider { kotlinCompileTask.javaPackagePrefix }
-    private val buildReportMode by project.provider { kotlinCompileTask.buildReportMode }
+    private val javaPackagePrefix by project.optionalProvider { kotlinCompileTask.javaPackagePrefix }
+    private val buildReportMode by project.optionalProvider { kotlinCompileTask.buildReportMode }
 
     @TaskAction
     fun compile(inputs: IncrementalTaskInputs) {
