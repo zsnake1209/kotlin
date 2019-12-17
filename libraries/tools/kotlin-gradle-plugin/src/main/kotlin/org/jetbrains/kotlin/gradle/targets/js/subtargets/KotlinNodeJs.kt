@@ -12,8 +12,16 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import javax.inject.Inject
 
-open class KotlinNodeJs @Inject constructor(target: KotlinJsTarget) :
-    KotlinJsSubTarget(target, "node"),
+open class KotlinNodeJs
+@Inject constructor(
+    target: KotlinJsTarget,
+    testsOnly: Boolean
+) :
+    KotlinJsSubTarget(
+        target,
+        "node",
+        testsOnly
+    ),
     KotlinJsNodeDsl {
     override val testTaskDescription: String
         get() = "Run all ${target.name} tests inside nodejs using the builtin test framework"

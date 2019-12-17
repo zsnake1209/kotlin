@@ -27,7 +27,8 @@ import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
 
 abstract class KotlinJsSubTarget(
     val target: KotlinJsTarget,
-    private val disambiguationClassifier: String
+    private val disambiguationClassifier: String,
+    private val testsOnly: Boolean
 ) : KotlinJsSubTargetDsl {
     val project get() = target.project
     private val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
@@ -42,7 +43,9 @@ abstract class KotlinJsSubTarget(
 
         configureBuildVariants()
         configureTests()
-        configureMain()
+        if (!testsOnly) {
+            configureMain()
+        }
 
         target.compilations.all {
             val npmProject = it.npmProject

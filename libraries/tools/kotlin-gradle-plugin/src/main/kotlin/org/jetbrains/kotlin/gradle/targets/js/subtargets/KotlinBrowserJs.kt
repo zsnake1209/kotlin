@@ -29,8 +29,16 @@ import java.io.File
 import javax.inject.Inject
 import org.jetbrains.kotlin.gradle.tasks.KotlinJsDce as KotlinJsDceTask
 
-open class KotlinBrowserJs @Inject constructor(target: KotlinJsTarget) :
-    KotlinJsSubTarget(target, "browser"),
+open class KotlinBrowserJs
+@Inject constructor(
+    target: KotlinJsTarget,
+    testsOnly: Boolean
+) :
+    KotlinJsSubTarget(
+        target,
+        "browser",
+        testsOnly
+    ),
     KotlinJsBrowserDsl {
 
     private val commonWebpackConfigurations: MutableList<KotlinWebpack.() -> Unit> = mutableListOf()

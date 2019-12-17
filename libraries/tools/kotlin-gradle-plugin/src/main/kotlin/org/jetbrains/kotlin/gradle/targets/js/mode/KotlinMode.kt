@@ -19,8 +19,10 @@ abstract class KotlinMode @Inject constructor(
     private val project
         get() = target.project
 
+    protected abstract val testsOnly: Boolean
+
     private val browserLazyDelegate = lazy {
-        project.objects.newInstance(KotlinBrowserJs::class.java, target).also {
+        project.objects.newInstance(KotlinBrowserJs::class.java, target, testsOnly).also {
             it.configure()
             browserConfiguredHandlers.forEach { handler -> handler(it) }
             browserConfiguredHandlers.clear()
@@ -38,7 +40,7 @@ abstract class KotlinMode @Inject constructor(
     }
 
     private val nodejsLazyDelegate = lazy {
-        project.objects.newInstance(KotlinNodeJs::class.java, target).also {
+        project.objects.newInstance(KotlinNodeJs::class.java, target, testsOnly).also {
             it.configure()
             nodejsConfiguredHandlers.forEach { handler -> handler(it) }
             nodejsConfiguredHandlers.clear()

@@ -11,6 +11,8 @@ import javax.inject.Inject
 
 open class KotlinTerminalMode
 @Inject constructor(target: KotlinJsTarget) : KotlinMode(target) {
+    override val testsOnly: Boolean = false
+
     override fun configure() {
         target.compilations
             .all {
