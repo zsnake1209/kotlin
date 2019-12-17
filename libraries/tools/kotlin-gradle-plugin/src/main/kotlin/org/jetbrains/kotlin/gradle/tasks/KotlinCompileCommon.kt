@@ -25,6 +25,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformCommonOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformCommonOptionsImpl
 import org.jetbrains.kotlin.gradle.dsl.fillDefaultValues
+import org.jetbrains.kotlin.gradle.internal.CompilerArgumentsContributor
+import org.jetbrains.kotlin.gradle.internal.KotlinCommonCompilerArgumentsContributor
 import org.jetbrains.kotlin.gradle.internal.tasks.allOutputFiles
 import org.jetbrains.kotlin.gradle.logging.GradlePrintingMessageCollector
 import org.jetbrains.kotlin.incremental.ChangedFiles
@@ -46,23 +48,8 @@ open class KotlinCompileCommon : AbstractKotlinCompile<K2MetadataCompilerArgumen
     override fun findKotlinCompilerClasspath(project: Project): List<File> =
         findKotlinMetadataCompilerClasspath(project)
 
-    override fun setupCompilerArgs(args: K2MetadataCompilerArguments, defaultsOnly: Boolean, ignoreClasspathResolutionErrors: Boolean) {
-        args.apply { fillDefaultValues() }
-        super.setupCompilerArgs(args, defaultsOnly = defaultsOnly, ignoreClasspathResolutionErrors = ignoreClasspathResolutionErrors)
-
-        args.moduleName = this@KotlinCompileCommon.moduleName
-
-        if (defaultsOnly) return
-
-        val classpathList = classpath.files.toMutableList()
-
-        with(args) {
-            classpath = classpathList.joinToString(File.pathSeparator)
-            destination = destinationDir.canonicalPath
-        }
-
-        kotlinOptionsImpl.updateArguments(args)
-    }
+    override val compilerArgumentsContributor: CompilerArgumentsContributor<K2MetadataCompilerArguments>
+        get() = KotlinCommonCompilerArgumentsContributor(thisTaskProvider)
 
     override fun callCompilerAsync(args: K2MetadataCompilerArguments, sourceRoots: SourceRoots, changedFiles: ChangedFiles) {
         val messageCollector = GradlePrintingMessageCollector(logger)

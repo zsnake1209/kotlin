@@ -23,6 +23,8 @@ import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
 import org.jetbrains.kotlin.gradle.logging.GradlePrintingMessageCollector
 import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 import org.jetbrains.kotlin.gradle.tasks.CompilerPluginOptions
+import org.jetbrains.kotlin.gradle.tasks.thisTaskProvider
+import org.jetbrains.kotlin.gradle.utils.getValue
 import org.jetbrains.kotlin.gradle.utils.toSortedPathsArray
 import java.io.File
 
@@ -43,31 +45,23 @@ open class KaptWithKotlincTask : KaptTask(), CompilerArgumentAwareWithInput<K2JV
 
     override fun createCompilerArgs(): K2JVMCompilerArguments = K2JVMCompilerArguments()
 
-    override fun setupCompilerArgs(args: K2JVMCompilerArguments, defaultsOnly: Boolean, ignoreClasspathResolutionErrors: Boolean) {
-        kotlinCompileTask.setupCompilerArgs(args, ignoreClasspathResolutionErrors = ignoreClasspathResolutionErrors)
-
-        args.pluginClasspaths = pluginClasspath.toSortedPathsArray()
-
-        val pluginOptionsWithKapt: CompilerPluginOptions = pluginOptions.withWrappedKaptOptions(
-            withApClasspath = kaptClasspath,
-            changedFiles = changedFiles,
-            classpathChanges = classpathChanges,
-            compiledSourcesDir = getCompiledSources(),
-            processIncrementally = processIncrementally
-        )
-
-        args.pluginOptions = (pluginOptionsWithKapt.arguments + args.pluginOptions!!).toTypedArray()
-
-        args.verbose = project.hasProperty("kapt.verbose") && project.property("kapt.verbose").toString().toBoolean() == true
+    override val compilerArgumentsContributor: CompilerArgumentsContributor<K2JVMCompilerArguments> by project.provider {
+        KaptWithKotlincArgumentsContributor(thisTaskProvider, kotlinCompileTask.thisTaskProvider)
     }
 
     /**
      * This will be part of the subplugin options that is not part of the input snapshotting, so just initialize it. Actual value is set
      * in the task action.
      */
-    private var changedFiles: List<File> = emptyList()
-    private var classpathChanges: List<String> = emptyList()
-    private var processIncrementally = false
+    @get:Internal
+    internal var changedFiles: List<File> = emptyList()
+    @get:Internal
+    internal var classpathChanges: List<String> = emptyList()
+    @get:Internal
+    internal var processIncrementally = false
+
+    private val javaPackagePrefix by project.provider { kotlinCompileTask.javaPackagePrefix }
+    private val buildReportMode by project.provider { kotlinCompileTask.buildReportMode }
 
     @TaskAction
     fun compile(inputs: IncrementalTaskInputs) {
@@ -75,11 +69,6 @@ open class KaptWithKotlincTask : KaptTask(), CompilerArgumentAwareWithInput<K2JV
         checkAnnotationProcessorClasspath()
 
         val incrementalChanges = getIncrementalChanges(inputs)
-        if (incrementalChanges is KaptIncrementalChanges.Known) {
-            changedFiles = incrementalChanges.changedSources.toList()
-            classpathChanges = incrementalChanges.changedClasspathJvmNames.toList()
-            processIncrementally = true
-        }
 
         val args = prepareCompilerArguments()
 
@@ -87,7 +76,7 @@ open class KaptWithKotlincTask : KaptTask(), CompilerArgumentAwareWithInput<K2JV
         val outputItemCollector = OutputItemsCollectorImpl()
         val environment = GradleCompilerEnvironment(
             compilerClasspath, messageCollector, outputItemCollector,
-            buildReportMode = kotlinCompileTask.buildReportMode,
+            buildReportMode = buildReportMode,
             outputFiles = allOutputFiles()
         )
         if (environment.toolsJar == null && !isAtLeastJava9) {
@@ -99,7 +88,7 @@ open class KaptWithKotlincTask : KaptTask(), CompilerArgumentAwareWithInput<K2JV
             sourcesToCompile = emptyList(),
             commonSources = emptyList(),
             javaSourceRoots = javaSourceRoots,
-            javaPackagePrefix = kotlinCompileTask.javaPackagePrefix,
+            javaPackagePrefix = javaPackagePrefix,
             args = args,
             environment = environment
         )

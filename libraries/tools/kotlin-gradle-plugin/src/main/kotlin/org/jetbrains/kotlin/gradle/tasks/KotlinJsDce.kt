@@ -19,19 +19,32 @@ package org.jetbrains.kotlin.gradle.tasks
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
-import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
+import org.jetbrains.kotlin.cli.common.arguments.K2JSCompilerArguments
 import org.jetbrains.kotlin.cli.common.arguments.K2JSDceArguments
 import org.jetbrains.kotlin.cli.js.dce.K2JSDce
 import org.jetbrains.kotlin.compilerRunner.runToolInSeparateProcess
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDce
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDceOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDceOptionsImpl
+import org.jetbrains.kotlin.gradle.internal.CompilerArgumentConfigurationFlag
+import org.jetbrains.kotlin.gradle.internal.CompilerArgumentsContributor
 import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
 import org.jetbrains.kotlin.gradle.utils.canonicalPathWithoutExtension
+import org.jetbrains.kotlin.gradle.utils.getValue
 import java.io.File
+
+private class KotlinJsDceArgumentsContributor(
+    kotlinJsDceTaskProvider: TaskProvider<out KotlinJsDce>
+) : CompilerArgumentsContributor<K2JSDceArguments> {
+    val dceOptions by kotlinJsDceTaskProvider.map { it.dceOptions }
+    val keep by kotlinJsDceTaskProvider.map { it.keep }
+
+    override fun contributeArgumentsTo(args: K2JSDceArguments, flags: Collection<CompilerArgumentConfigurationFlag>) {
+        (dceOptions as KotlinJsDceOptionsImpl).updateArguments(args)
+        args.declarationsToKeep = keep.toTypedArray()
+    }
+}
 
 @CacheableTask
 open class KotlinJsDce : AbstractKotlinCompileTool<K2JSDceArguments>(), KotlinJsDce {
@@ -44,9 +57,8 @@ open class KotlinJsDce : AbstractKotlinCompileTool<K2JSDceArguments>(), KotlinJs
 
     override fun createCompilerArgs(): K2JSDceArguments = K2JSDceArguments()
 
-    override fun setupCompilerArgs(args: K2JSDceArguments, defaultsOnly: Boolean, ignoreClasspathResolutionErrors: Boolean) {
-        dceOptionsImpl.updateArguments(args)
-        args.declarationsToKeep = keep.toTypedArray()
+    override val compilerArgumentsContributor: CompilerArgumentsContributor<K2JSDceArguments> by project.provider {
+        KotlinJsDceArgumentsContributor(thisTaskProvider)
     }
 
     private val dceOptionsImpl = KotlinJsDceOptionsImpl()
