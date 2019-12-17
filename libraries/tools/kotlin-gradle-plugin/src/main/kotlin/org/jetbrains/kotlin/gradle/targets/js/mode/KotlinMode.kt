@@ -13,10 +13,11 @@ import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinBrowserJs
 import org.jetbrains.kotlin.gradle.targets.js.subtargets.KotlinNodeJs
 import javax.inject.Inject
 
-open class KotlinMode @Inject constructor(
-    target: KotlinJsTarget
+abstract class KotlinMode @Inject constructor(
+    protected val target: KotlinJsTarget
 ) : KotlinModeDsl {
-    private val project = target.project
+    private val project
+        get() = target.project
 
     private val browserLazyDelegate = lazy {
         project.objects.newInstance(KotlinBrowserJs::class.java, target).also {
@@ -29,6 +30,8 @@ open class KotlinMode @Inject constructor(
     private val browserConfiguredHandlers = mutableListOf<KotlinJsBrowserDsl.() -> Unit>()
 
     val browser by browserLazyDelegate
+
+    abstract fun configure()
 
     override fun browser(body: KotlinJsBrowserDsl.() -> Unit) {
         body(browser)

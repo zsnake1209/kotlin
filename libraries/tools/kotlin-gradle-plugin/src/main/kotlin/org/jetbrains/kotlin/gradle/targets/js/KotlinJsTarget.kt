@@ -15,7 +15,9 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinOnlyTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinModeDsl
+import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinIntermediateMode
 import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinMode
+import org.jetbrains.kotlin.gradle.targets.js.mode.KotlinTerminalMode
 import org.jetbrains.kotlin.gradle.tasks.locateTask
 import org.jetbrains.kotlin.gradle.testing.internal.KotlinTestReport
 import org.jetbrains.kotlin.gradle.testing.testTaskName
@@ -58,23 +60,28 @@ open class KotlinJsTarget @Inject constructor(project: Project, platformType: Ko
         }
 
     private val intermediateLazyDelegate = lazy {
-        project.objects.newInstance(KotlinMode::class.java, this).also {
+        project.objects.newInstance(KotlinIntermediateMode::class.java, this).also {
+            it.configure()
             modeConfiguredHandlers.forEach { handler -> handler(it) }
             modeConfiguredHandlers.clear()
         }
     }
 
-    val intermediate: KotlinMode by intermediateLazyDelegate
+    private val intermediate: KotlinIntermediateMode by intermediateLazyDelegate
 
     override fun intermediate(body: KotlinModeDsl.() -> Unit) {
         intermediate.body()
     }
 
     private val terminalLazyDelegate = lazy {
-        project.objects.newInstance(KotlinMode::class.java, this)
+        project.objects.newInstance(KotlinTerminalMode::class.java, this).also {
+            it.configure()
+            modeConfiguredHandlers.forEach { handler -> handler(it) }
+            modeConfiguredHandlers.clear()
+        }
     }
 
-    val terminal: KotlinMode by terminalLazyDelegate
+    private val terminal: KotlinTerminalMode by terminalLazyDelegate
 
     override fun terminal(body: KotlinModeDsl.() -> Unit) {
         terminal.body()
