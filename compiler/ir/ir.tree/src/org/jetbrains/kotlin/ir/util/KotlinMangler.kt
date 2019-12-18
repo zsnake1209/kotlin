@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.ir.util
 
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.types.IrType
@@ -15,12 +18,18 @@ interface KotlinMangler {
     val IrDeclaration.hashedMangle: Long
     fun IrDeclaration.isExported(): Boolean
     val IrFunction.functionName: String
-    val IrType.isInlined: Boolean
-    val Long.isSpecial: Boolean
+    val IrDeclaration.mangleString: String
 
-    companion object {
-        private val FUNCTION_PREFIX = "<BUILT-IN-FUNCTION>"
-        fun functionClassSymbolName(name: Name) = "ktype:$FUNCTION_PREFIX$name"
-        fun functionInvokeSymbolName(name: Name) = "kfun:$FUNCTION_PREFIX$name.invoke"
+    val manglerName: String
+
+    interface DescriptorMangler {
+
+        fun String.hashMangle(): Long
+
+        fun isExport(declarationDescriptor: DeclarationDescriptor): Boolean
+        fun isExportEnumEntry(declarationDescriptor: ClassDescriptor): Boolean
+
+        fun mangleDeclaration(descriptor: DeclarationDescriptor): String
+        fun mangleEnumEntry(descriptor: ClassDescriptor): String
     }
 }

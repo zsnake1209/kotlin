@@ -35,38 +35,29 @@ public interface IrLocalDelegatedPropertyOrBuilder extends
   int getType();
 
   /**
-   * <code>required bool is_var = 4;</code>
-   */
-  boolean hasIsVar();
-  /**
-   * <code>required bool is_var = 4;</code>
-   */
-  boolean getIsVar();
-
-  /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrVariable delegate = 5;</code>
+   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrVariable delegate = 4;</code>
    */
   boolean hasDelegate();
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrVariable delegate = 5;</code>
+   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrVariable delegate = 4;</code>
    */
   org.jetbrains.kotlin.backend.common.serialization.proto.IrVariable getDelegate();
 
   /**
-   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction getter = 6;</code>
+   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction getter = 5;</code>
    */
   boolean hasGetter();
   /**
-   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction getter = 6;</code>
+   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction getter = 5;</code>
    */
   org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction getGetter();
 
   /**
-   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction setter = 7;</code>
+   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction setter = 6;</code>
    */
   boolean hasSetter();
   /**
-   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction setter = 7;</code>
+   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction setter = 6;</code>
    */
   org.jetbrains.kotlin.backend.common.serialization.proto.IrFunction getSetter();
 }

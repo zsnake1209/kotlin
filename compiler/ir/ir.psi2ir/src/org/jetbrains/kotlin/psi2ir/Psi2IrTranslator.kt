@@ -35,7 +35,8 @@ typealias Psi2IrPostprocessingStep = (IrModuleFragment) -> Unit
 class Psi2IrTranslator(
     val languageVersionSettings: LanguageVersionSettings,
     val configuration: Psi2IrConfiguration = Psi2IrConfiguration(),
-    val mangler: KotlinMangler? = null
+    val mangler: KotlinMangler.DescriptorMangler,
+    val signaturer: IdSignatureComposer
 ) {
     private val postprocessingSteps = SmartList<Psi2IrPostprocessingStep>()
 
@@ -59,10 +60,10 @@ class Psi2IrTranslator(
     fun createGeneratorContext(
         moduleDescriptor: ModuleDescriptor,
         bindingContext: BindingContext,
-        symbolTable: SymbolTable = SymbolTable(mangler),
+        symbolTable: SymbolTable = SymbolTable(signaturer, mangler),
         extensions: GeneratorExtensions = GeneratorExtensions()
     ): GeneratorContext =
-        GeneratorContext(configuration, moduleDescriptor, bindingContext, languageVersionSettings, symbolTable, extensions)
+        GeneratorContext(configuration, moduleDescriptor, bindingContext, languageVersionSettings, symbolTable, extensions, mangler, signaturer)
 
     fun generateModuleFragment(
         context: GeneratorContext,
@@ -78,9 +79,6 @@ class Psi2IrTranslator(
         postprocess(context, irModule)
         // do not generate unbound symbols before postprocessing,
         // since plugins must work with non-lazy IR
-        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
-        irModule.computeUniqIdForDeclarations(context.symbolTable)
-
         moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
 
         return irModule

@@ -27,6 +27,8 @@ import org.jetbrains.kotlin.ir.types.impl.buildSimpleType
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.types.withHasQuestionMark
+import org.jetbrains.kotlin.ir.util.IdSignatureComposer
+import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.name.FqName
@@ -37,6 +39,8 @@ import org.jetbrains.kotlin.types.*
 class IrBuiltIns(
     val builtIns: KotlinBuiltIns,
     private val typeTranslator: TypeTranslator,
+    mangler: KotlinMangler.DescriptorMangler,
+    signaturer: IdSignatureComposer,
     outerSymbolTable: SymbolTable? = null
 ) {
     val languageVersionSettings = typeTranslator.languageVersionSettings
@@ -45,7 +49,7 @@ class IrBuiltIns(
 
     val irBuiltInsSymbols = mutableListOf<IrBuiltinWithMangle>()
 
-    private val symbolTable = outerSymbolTable ?: SymbolTable()
+    private val symbolTable = outerSymbolTable ?: SymbolTable(signaturer, mangler)
 
     private val packageFragmentDescriptor = IrBuiltinsPackageFragmentDescriptorImpl(builtInsModule, KOTLIN_INTERNAL_IR_FQN)
     private val packageFragment =
@@ -56,8 +60,9 @@ class IrBuiltIns(
 
     fun defineOperator(name: String, returnType: IrType, valueParameterTypes: List<IrType>): IrSimpleFunctionSymbol {
         val descriptor = WrappedSimpleFunctionDescriptor()
-        val symbol = symbolTable.declareSimpleFunction(UNDEFINED_OFFSET, UNDEFINED_OFFSET, BUILTIN_OPERATOR, descriptor) {
-            val suffix = valueParameterTypes.joinToString(":", "[", "]") { t -> t.originalKotlinType?.toString() ?: "T" }
+        val suffix = valueParameterTypes.joinToString(":", "[", "]") { t -> t.originalKotlinType?.toString() ?: "T" }
+        val mangle = "operator#$name@$suffix"
+        val symbol = symbolTable.declareBuiltInOperator(descriptor, mangle) {
             val operator = IrBuiltInOperator(it, Name.identifier(name), returnType, suffix)
             operator.parent = packageFragment
             packageFragment.declarations += operator
@@ -135,7 +140,8 @@ class IrBuiltIns(
             buildSimpleType()
         }
 
-        return symbolTable.declareSimpleFunction(UNDEFINED_OFFSET, UNDEFINED_OFFSET, BUILTIN_OPERATOR, descriptor) {
+        val mangle = "operator#$name@:!!"
+        return symbolTable.declareBuiltInOperator(descriptor, mangle) {
             val operator = IrBuiltInOperator(it, name, returnIrType, ":!!")
             operator.parent = packageFragment
             packageFragment.declarations += operator
@@ -234,6 +240,9 @@ class IrBuiltIns(
     private val kMutableProperty0Class = builtIns.kMutableProperty0.toIrSymbol()
     private val kMutableProperty1Class = builtIns.kMutableProperty1.toIrSymbol()
     private val kMutableProperty2Class = builtIns.kMutableProperty2.toIrSymbol()
+
+    val functionClass = builtIns.getBuiltInClassByFqName(FqName("kotlin.Function")).toIrSymbol()
+    val kFunctionClass = builtIns.getBuiltInClassByFqName(FqName("kotlin.reflect.KFunction")).toIrSymbol()
 
     fun getKPropertyClass(mutable: Boolean, n: Int): IrClassSymbol = when (n) {
         0 -> if (mutable) kMutableProperty0Class else kProperty0Class

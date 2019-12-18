@@ -26,38 +26,25 @@ public interface IrTypeAliasOrBuilder extends
   int getName();
 
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
    */
-  boolean hasVisibility();
+  java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> 
+      getTypeParameterList();
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
    */
-  org.jetbrains.kotlin.backend.common.serialization.proto.Visibility getVisibility();
+  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter getTypeParameter(int index);
+  /**
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
+   */
+  int getTypeParameterCount();
 
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer type_parameters = 4;</code>
-   */
-  boolean hasTypeParameters();
-  /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer type_parameters = 4;</code>
-   */
-  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer getTypeParameters();
-
-  /**
-   * <code>required int32 expanded_type = 5;</code>
+   * <code>required int32 expanded_type = 4;</code>
    */
   boolean hasExpandedType();
   /**
-   * <code>required int32 expanded_type = 5;</code>
+   * <code>required int32 expanded_type = 4;</code>
    */
   int getExpandedType();
-
-  /**
-   * <code>required bool is_actual = 6;</code>
-   */
-  boolean hasIsActual();
-  /**
-   * <code>required bool is_actual = 6;</code>
-   */
-  boolean getIsActual();
 }

@@ -31,7 +31,7 @@ fun compileWasm(
     friendDependencies: List<KotlinLibrary>,
     exportedDeclarations: Set<FqName> = emptySet()
 ): WasmCompilerResult {
-    val (moduleFragment, dependencyModules, irBuiltIns, symbolTable, deserializer) =
+    val (moduleFragment, dependencyModules, irBuiltIns, symbolTable, functionFactory, deserializer) =
         loadIr(project, MainModule.SourceFiles(files), configuration, allDependencies, friendDependencies)
 
     val moduleDescriptor = moduleFragment.descriptor
@@ -39,7 +39,7 @@ fun compileWasm(
 
     // Load declarations referenced during `context` initialization
     dependencyModules.forEach {
-        val irProviders = generateTypicalIrProviderList(it.descriptor, irBuiltIns, symbolTable, deserializer)
+        val irProviders = generateTypicalIrProviderList(it.descriptor, irBuiltIns, symbolTable, deserializer, functionFactory)
         ExternalDependenciesGenerator(symbolTable, irProviders).generateUnboundSymbolsAsDependencies()
     }
 
@@ -49,7 +49,7 @@ fun compileWasm(
     moduleFragment.files += irFiles
 
     // Create stubs
-    val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
+    val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer, functionFactory)
     ExternalDependenciesGenerator(symbolTable, irProviders).generateUnboundSymbolsAsDependencies()
     moduleFragment.patchDeclarationParents()
     deserializer.finalizeExpectActualLinker()
