@@ -49,70 +49,33 @@ class IrElementToJsStatementTransformer : BaseIrElementToJsNodeTransformer<JsSta
         return JsContinue(context.getNameForLoop(jump.loop)?.let { JsNameRef(it) })
     }
 
+    private fun IrExpression.maybeOptimizeIntoSwitch(context: JsGenerationContext, transformer: (JsExpression) -> JsStatement): JsStatement {
+        if (this is IrWhen) {
+            val stmtTransformer = { stmt: JsStatement -> transformer((stmt as JsExpressionStatement).expression) }
+            SwitchOptimizer(context, stmtTransformer).tryOptimize(this)?.let { return it }
+        }
+
+        return transformer(accept(IrElementToJsExpressionTransformer(), context))
+    }
+
     override fun visitSetField(expression: IrSetField, context: JsGenerationContext): JsStatement {
         val fieldName = context.getNameForField(expression.symbol.owner)
         val expressionTransformer = IrElementToJsExpressionTransformer()
         val dest = JsNameRef(fieldName, expression.receiver?.accept(expressionTransformer, context))
-        val value = expression.value
-        if (value is IrWhen) {
-            val transformer = { stmt: JsStatement ->
-                val expr = (stmt as JsExpressionStatement).expression
-                jsAssignment(dest, expr).makeStmt()
-            }
-
-            SwitchOptimizer(context, transformer).tryOptimize(value)?.let { return it }
-        }
-
-        val source = value.accept(expressionTransformer, context)
-        return jsAssignment(dest, source).makeStmt()
+        return expression.value.maybeOptimizeIntoSwitch(context) { jsAssignment(dest, it).makeStmt() }
     }
 
     override fun visitSetVariable(expression: IrSetVariable, context: JsGenerationContext): JsStatement {
         val ref = JsNameRef(context.getNameForValueDeclaration(expression.symbol.owner))
-        val value = expression.value
-        if (value is IrWhen) {
-            val transformer = { stmt: JsStatement ->
-                val expr = (stmt as JsExpressionStatement).expression
-                JsBinaryOperation(JsBinaryOperator.ASG, ref, expr).makeStmt()
-            }
-
-            SwitchOptimizer(context, transformer).tryOptimize(value)?.let { return it }
-        }
-        val jsValue = expression.value.accept(IrElementToJsExpressionTransformer(), context)
-        return JsBinaryOperation(JsBinaryOperator.ASG, ref, jsValue).makeStmt()
+        return expression.value.maybeOptimizeIntoSwitch(context) { JsBinaryOperation(JsBinaryOperator.ASG, ref, it).makeStmt() }
     }
 
     override fun visitReturn(expression: IrReturn, context: JsGenerationContext): JsStatement {
-        val value = expression.value
-
-        if (value is IrWhen) {
-            val transformer = { stmt: JsStatement ->
-                val expr = (stmt as JsExpressionStatement).expression
-                JsReturn(expr)
-            }
-
-            SwitchOptimizer(context, transformer).tryOptimize(value)?.let {
-                return it
-            }
-        }
-
-        return JsReturn(expression.value.accept(IrElementToJsExpressionTransformer(), context))
+        return expression.value.maybeOptimizeIntoSwitch(context) { JsReturn(it) }
     }
 
     override fun visitThrow(expression: IrThrow, context: JsGenerationContext): JsStatement {
-        val value = expression.value
-
-        if (value is IrWhen) {
-            val transformer = { stmt: JsStatement ->
-                val expr = (stmt as JsExpressionStatement).expression
-                JsThrow(expr)
-            }
-
-            SwitchOptimizer(context, transformer).tryOptimize(value)?.let {
-                return it
-            }
-        }
-        return JsThrow(value.accept(IrElementToJsExpressionTransformer(), context))
+        return expression.value.maybeOptimizeIntoSwitch(context) { JsThrow(it) }
     }
 
     override fun visitVariable(declaration: IrVariable, context: JsGenerationContext): JsStatement {
