@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.gradle.targets.js.dsl
 import groovy.lang.Closure
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.util.ConfigureUtil
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsDce
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsPlatformTestRun
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsReportAggregatingTestRun
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
@@ -67,16 +66,6 @@ interface KotlinJsBrowserDsl : KotlinJsSubTargetDsl {
     fun webpackTask(body: KotlinWebpack.() -> Unit)
     fun webpackTask(fn: Closure<*>) {
         webpackTask {
-            ConfigureUtil.configure(fn, this)
-        }
-    }
-
-    @ExperimentalDceDsl
-    fun dceTask(body: KotlinJsDce.() -> Unit)
-
-    @ExperimentalDceDsl
-    fun dceTask(fn: Closure<*>) {
-        dceTask {
             ConfigureUtil.configure(fn, this)
         }
     }
