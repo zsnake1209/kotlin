@@ -10,12 +10,15 @@ import org.jetbrains.kotlin.backend.common.ir.isProperExpect
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 private const val PUBLIC_MANGLE_FLAG = 1L shl 63
 
@@ -44,62 +47,60 @@ abstract class KotlinManglerImpl : KotlinMangler {
      * that doesn't depend on any internal transformations (e.g. IR lowering),
      * and so should be computable from the descriptor itself without checking a backend state.
      */
-    private tailrec fun isExportedImpl(declaration: IrDeclaration): Boolean {
-        // TODO: revise
-        val descriptorAnnotations = declaration.descriptor.annotations
 
-        if (declaration.isPlatformSpecificExported()) return true
+    private class IsExportVisitor : IrElementVisitor<Boolean, Nothing?> {
 
-        if (declaration is IrTypeAlias && declaration.parent is IrPackageFragment) {
-            return true
+        private val publishedApiAnnotation = FqName("kotlin.PublishedApi")
+
+        private fun IrDeclaration.isExported(annotations: List<IrConstructorCall>, visibility: Visibility?): Boolean {
+            if (annotations.hasAnnotation(publishedApiAnnotation)) return true
+            if (visibility != null && !visibility.isPubliclyVisible()) return false
+
+            return parent.accept(this@IsExportVisitor, null)
         }
 
-        if (descriptorAnnotations.hasAnnotation(publishedApiAnnotation)) {
-            return true
+        private fun Visibility.isPubliclyVisible(): Boolean = isPublicAPI || this === Visibilities.INTERNAL
+
+        override fun visitElement(element: IrElement, data: Nothing?): Boolean = error("Should bot reach here ${element.render()}")
+
+        override fun visitDeclaration(declaration: IrDeclaration, data: Nothing?) = declaration.run { isExported(annotations, null) }
+
+        override fun visitField(declaration: IrField, data: Nothing?): Boolean {
+            val annotations = declaration.run { correspondingPropertySymbol?.owner?.annotations ?: annotations }
+            return declaration.run { isExported(annotations, visibility) }
         }
 
-        if (declaration.isAnonymousObject)
-            return false
-
-        if (declaration is IrConstructor && declaration.constructedClass.kind.isSingleton) {
-            // Currently code generator can access the constructor of the singleton,
-            // so ignore visibility of the constructor itself.
-            return isExportedImpl(declaration.constructedClass)
+        override fun visitProperty(declaration: IrProperty, data: Nothing?): Boolean {
+            return declaration.run { isExported(annotations, visibility) }
         }
 
-        if (declaration is IrFunction) {
-            val descriptor = declaration.descriptor
-            // TODO: this code is required because accessor doesn't have a reference to property.
-            if (descriptor is PropertyAccessorDescriptor) {
-                val property = descriptor.correspondingProperty
-                if (property.annotations.hasAnnotation(publishedApiAnnotation)) return true
-            }
+        override fun visitPackageFragment(declaration: IrPackageFragment, data: Nothing?): Boolean = true
+
+        override fun visitTypeAlias(declaration: IrTypeAlias, data: Nothing?): Boolean =
+            if (declaration.parent is IrPackageFragment) true
+            else declaration.run { isExported(annotations, visibility) }
+
+        override fun visitClass(declaration: IrClass, data: Nothing?): Boolean {
+            if (declaration.name == SpecialNames.NO_NAME_PROVIDED) return false
+            return declaration.run { isExported(annotations, visibility) }
         }
 
-        val visibility = when (declaration) {
-            is IrClass -> declaration.visibility
-            is IrFunction -> declaration.visibility
-            is IrProperty -> declaration.visibility
-            is IrField -> declaration.visibility
-            is IrTypeAlias -> declaration.visibility
-            else -> null
+        override fun visitConstructor(declaration: IrConstructor, data: Nothing?): Boolean {
+            val klass = declaration.constructedClass
+            return if (klass.kind.isSingleton) klass.accept(this, null) else declaration.run { isExported(annotations, visibility) }
         }
 
-        /**
-         * note: about INTERNAL - with support of friend modules we let frontend to deal with internal declarations.
-         */
-        if (visibility != null && !visibility.isPublicAPI && visibility != Visibilities.INTERNAL) {
-            // If the declaration is explicitly marked as non-public,
-            // then it must not be accessible from other modules.
-            return false
+        override fun visitSimpleFunction(declaration: IrSimpleFunction, data: Nothing?): Boolean {
+            val annotations = declaration.run { correspondingPropertySymbol?.owner?.annotations ?: annotations }
+            return declaration.run { isExported(annotations, visibility) }
         }
+    }
 
-        val parent = declaration.parent
-        if (parent is IrDeclaration) {
-            return isExportedImpl(parent)
-        }
+    private val isExportedVisitor = IsExportVisitor()
 
-        return true
+    private fun isExportedImpl(declaration: IrDeclaration): Boolean {
+        return if (declaration.isPlatformSpecificExported()) true
+        else declaration.accept(isExportedVisitor, null)
     }
 
     private fun IrTypeParameter.effectiveParent(): IrDeclaration = when (val irParent = parent) {
@@ -132,8 +133,6 @@ abstract class KotlinManglerImpl : KotlinMangler {
     private fun mapTypeParameterContainers(element: IrElement): Map<IrDeclaration, Int> {
         return collectTypeParameterContainers(element).mapIndexed { i, d -> d to i }.toMap()
     }
-
-    private val publishedApiAnnotation = FqName("kotlin.PublishedApi")
 
     protected open fun mangleTypeParameter(typeParameter: IrTypeParameter, typeParameterNamer: (IrTypeParameter) -> String): String {
         return typeParameterNamer(typeParameter)
