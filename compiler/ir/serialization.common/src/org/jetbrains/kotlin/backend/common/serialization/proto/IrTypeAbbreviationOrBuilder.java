@@ -22,13 +22,13 @@ public interface IrTypeAbbreviationOrBuilder extends
   int getAnnotationCount();
 
   /**
-   * <code>required int32 type_alias = 2;</code>
+   * <code>required int64 type_alias = 2;</code>
    */
   boolean hasTypeAlias();
   /**
-   * <code>required int32 type_alias = 2;</code>
+   * <code>required int64 type_alias = 2;</code>
    */
-  int getTypeAlias();
+  long getTypeAlias();
 
   /**
    * <code>required bool has_question_mark = 3;</code>
@@ -40,16 +40,15 @@ public interface IrTypeAbbreviationOrBuilder extends
   boolean getHasQuestionMark();
 
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+   * <code>repeated int64 argument = 4 [packed = true];</code>
    */
-  java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument> 
-      getArgumentList();
+  java.util.List<java.lang.Long> getArgumentList();
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-   */
-  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument getArgument(int index);
-  /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+   * <code>repeated int64 argument = 4 [packed = true];</code>
    */
   int getArgumentCount();
+  /**
+   * <code>repeated int64 argument = 4 [packed = true];</code>
+   */
+  long getArgument(int index);
 }

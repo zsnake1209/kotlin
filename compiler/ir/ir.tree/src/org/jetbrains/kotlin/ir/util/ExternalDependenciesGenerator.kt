@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.ir.util
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
+import org.jetbrains.kotlin.ir.descriptors.IrFunctionFactory
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 
@@ -73,12 +74,13 @@ fun generateTypicalIrProviderList(
     irBuiltins: IrBuiltIns,
     symbolTable: SymbolTable,
     deserializer: IrDeserializer? = null,
+    functionFactory: IrFunctionFactory? = null,
     extensions: StubGeneratorExtensions = StubGeneratorExtensions.EMPTY
 ): List<IrProvider> {
     val stubGenerator = DeclarationStubGenerator(
         moduleDescriptor, symbolTable, irBuiltins.languageVersionSettings, extensions
     )
-    return listOfNotNull(deserializer, stubGenerator).also {
+    return listOfNotNull(deserializer, functionFactory, stubGenerator).also {
         stubGenerator.setIrProviders(it)
     }
 }

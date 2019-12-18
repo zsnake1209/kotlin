@@ -76,42 +76,9 @@ public final class IrField extends
             name_ = input.readInt32();
             break;
           }
-          case 34: {
-            org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.Builder subBuilder = null;
-            if (((bitField0_ & 0x00000008) == 0x00000008)) {
-              subBuilder = visibility_.toBuilder();
-            }
-            visibility_ = input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.PARSER, extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(visibility_);
-              visibility_ = subBuilder.buildPartial();
-            }
+          case 32: {
             bitField0_ |= 0x00000008;
-            break;
-          }
-          case 40: {
-            bitField0_ |= 0x00000010;
-            isFinal_ = input.readBool();
-            break;
-          }
-          case 48: {
-            bitField0_ |= 0x00000020;
-            isExternal_ = input.readBool();
-            break;
-          }
-          case 56: {
-            bitField0_ |= 0x00000040;
-            isStatic_ = input.readBool();
-            break;
-          }
-          case 64: {
-            bitField0_ |= 0x00000080;
             type_ = input.readInt32();
-            break;
-          }
-          case 72: {
-            bitField0_ |= 0x00000100;
-            isFakeOverride_ = input.readBool();
             break;
           }
         }
@@ -193,106 +160,26 @@ public final class IrField extends
     return name_;
   }
 
-  public static final int VISIBILITY_FIELD_NUMBER = 4;
-  private org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility_;
+  public static final int TYPE_FIELD_NUMBER = 4;
+  private int type_;
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
+   * <code>required int32 type = 4;</code>
    */
-  public boolean hasVisibility() {
+  public boolean hasType() {
     return ((bitField0_ & 0x00000008) == 0x00000008);
   }
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
-   */
-  public org.jetbrains.kotlin.backend.common.serialization.proto.Visibility getVisibility() {
-    return visibility_;
-  }
-
-  public static final int IS_FINAL_FIELD_NUMBER = 5;
-  private boolean isFinal_;
-  /**
-   * <code>required bool is_final = 5;</code>
-   */
-  public boolean hasIsFinal() {
-    return ((bitField0_ & 0x00000010) == 0x00000010);
-  }
-  /**
-   * <code>required bool is_final = 5;</code>
-   */
-  public boolean getIsFinal() {
-    return isFinal_;
-  }
-
-  public static final int IS_EXTERNAL_FIELD_NUMBER = 6;
-  private boolean isExternal_;
-  /**
-   * <code>required bool is_external = 6;</code>
-   */
-  public boolean hasIsExternal() {
-    return ((bitField0_ & 0x00000020) == 0x00000020);
-  }
-  /**
-   * <code>required bool is_external = 6;</code>
-   */
-  public boolean getIsExternal() {
-    return isExternal_;
-  }
-
-  public static final int IS_STATIC_FIELD_NUMBER = 7;
-  private boolean isStatic_;
-  /**
-   * <code>required bool is_static = 7;</code>
-   */
-  public boolean hasIsStatic() {
-    return ((bitField0_ & 0x00000040) == 0x00000040);
-  }
-  /**
-   * <code>required bool is_static = 7;</code>
-   */
-  public boolean getIsStatic() {
-    return isStatic_;
-  }
-
-  public static final int TYPE_FIELD_NUMBER = 8;
-  private int type_;
-  /**
-   * <code>required int32 type = 8;</code>
-   */
-  public boolean hasType() {
-    return ((bitField0_ & 0x00000080) == 0x00000080);
-  }
-  /**
-   * <code>required int32 type = 8;</code>
+   * <code>required int32 type = 4;</code>
    */
   public int getType() {
     return type_;
-  }
-
-  public static final int IS_FAKE_OVERRIDE_FIELD_NUMBER = 9;
-  private boolean isFakeOverride_;
-  /**
-   * <code>required bool is_fake_override = 9;</code>
-   */
-  public boolean hasIsFakeOverride() {
-    return ((bitField0_ & 0x00000100) == 0x00000100);
-  }
-  /**
-   * <code>required bool is_fake_override = 9;</code>
-   */
-  public boolean getIsFakeOverride() {
-    return isFakeOverride_;
   }
 
   private void initFields() {
     base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
     initializer_ = 0;
     name_ = 0;
-    visibility_ = org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance();
-    isFinal_ = false;
-    isExternal_ = false;
-    isStatic_ = false;
     type_ = 0;
-    isFakeOverride_ = false;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -308,35 +195,11 @@ public final class IrField extends
       memoizedIsInitialized = 0;
       return false;
     }
-    if (!hasVisibility()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasIsFinal()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasIsExternal()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasIsStatic()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     if (!hasType()) {
       memoizedIsInitialized = 0;
       return false;
     }
-    if (!hasIsFakeOverride()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     if (!getBase().isInitialized()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!getVisibility().isInitialized()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -357,22 +220,7 @@ public final class IrField extends
       output.writeInt32(3, name_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeMessage(4, visibility_);
-    }
-    if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      output.writeBool(5, isFinal_);
-    }
-    if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      output.writeBool(6, isExternal_);
-    }
-    if (((bitField0_ & 0x00000040) == 0x00000040)) {
-      output.writeBool(7, isStatic_);
-    }
-    if (((bitField0_ & 0x00000080) == 0x00000080)) {
-      output.writeInt32(8, type_);
-    }
-    if (((bitField0_ & 0x00000100) == 0x00000100)) {
-      output.writeBool(9, isFakeOverride_);
+      output.writeInt32(4, type_);
     }
     output.writeRawBytes(unknownFields);
   }
@@ -397,27 +245,7 @@ public final class IrField extends
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeMessageSize(4, visibility_);
-    }
-    if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeBoolSize(5, isFinal_);
-    }
-    if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeBoolSize(6, isExternal_);
-    }
-    if (((bitField0_ & 0x00000040) == 0x00000040)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeBoolSize(7, isStatic_);
-    }
-    if (((bitField0_ & 0x00000080) == 0x00000080)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(8, type_);
-    }
-    if (((bitField0_ & 0x00000100) == 0x00000100)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeBoolSize(9, isFakeOverride_);
+        .computeInt32Size(4, type_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -519,18 +347,8 @@ public final class IrField extends
       bitField0_ = (bitField0_ & ~0x00000002);
       name_ = 0;
       bitField0_ = (bitField0_ & ~0x00000004);
-      visibility_ = org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance();
-      bitField0_ = (bitField0_ & ~0x00000008);
-      isFinal_ = false;
-      bitField0_ = (bitField0_ & ~0x00000010);
-      isExternal_ = false;
-      bitField0_ = (bitField0_ & ~0x00000020);
-      isStatic_ = false;
-      bitField0_ = (bitField0_ & ~0x00000040);
       type_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000080);
-      isFakeOverride_ = false;
-      bitField0_ = (bitField0_ & ~0x00000100);
+      bitField0_ = (bitField0_ & ~0x00000008);
       return this;
     }
 
@@ -569,27 +387,7 @@ public final class IrField extends
       if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
         to_bitField0_ |= 0x00000008;
       }
-      result.visibility_ = visibility_;
-      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-        to_bitField0_ |= 0x00000010;
-      }
-      result.isFinal_ = isFinal_;
-      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-        to_bitField0_ |= 0x00000020;
-      }
-      result.isExternal_ = isExternal_;
-      if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-        to_bitField0_ |= 0x00000040;
-      }
-      result.isStatic_ = isStatic_;
-      if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-        to_bitField0_ |= 0x00000080;
-      }
       result.type_ = type_;
-      if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
-        to_bitField0_ |= 0x00000100;
-      }
-      result.isFakeOverride_ = isFakeOverride_;
       result.bitField0_ = to_bitField0_;
       return result;
     }
@@ -605,23 +403,8 @@ public final class IrField extends
       if (other.hasName()) {
         setName(other.getName());
       }
-      if (other.hasVisibility()) {
-        mergeVisibility(other.getVisibility());
-      }
-      if (other.hasIsFinal()) {
-        setIsFinal(other.getIsFinal());
-      }
-      if (other.hasIsExternal()) {
-        setIsExternal(other.getIsExternal());
-      }
-      if (other.hasIsStatic()) {
-        setIsStatic(other.getIsStatic());
-      }
       if (other.hasType()) {
         setType(other.getType());
-      }
-      if (other.hasIsFakeOverride()) {
-        setIsFakeOverride(other.getIsFakeOverride());
       }
       setUnknownFields(
           getUnknownFields().concat(other.unknownFields));
@@ -637,35 +420,11 @@ public final class IrField extends
         
         return false;
       }
-      if (!hasVisibility()) {
-        
-        return false;
-      }
-      if (!hasIsFinal()) {
-        
-        return false;
-      }
-      if (!hasIsExternal()) {
-        
-        return false;
-      }
-      if (!hasIsStatic()) {
-        
-        return false;
-      }
       if (!hasType()) {
         
         return false;
       }
-      if (!hasIsFakeOverride()) {
-        
-        return false;
-      }
       if (!getBase().isInitialized()) {
-        
-        return false;
-      }
-      if (!getVisibility().isInitialized()) {
         
         return false;
       }
@@ -815,222 +574,34 @@ public final class IrField extends
       return this;
     }
 
-    private org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility_ = org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance();
+    private int type_ ;
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
+     * <code>required int32 type = 4;</code>
      */
-    public boolean hasVisibility() {
+    public boolean hasType() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
-     */
-    public org.jetbrains.kotlin.backend.common.serialization.proto.Visibility getVisibility() {
-      return visibility_;
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
-     */
-    public Builder setVisibility(org.jetbrains.kotlin.backend.common.serialization.proto.Visibility value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      visibility_ = value;
-
-      bitField0_ |= 0x00000008;
-      return this;
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
-     */
-    public Builder setVisibility(
-        org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.Builder builderForValue) {
-      visibility_ = builderForValue.build();
-
-      bitField0_ |= 0x00000008;
-      return this;
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
-     */
-    public Builder mergeVisibility(org.jetbrains.kotlin.backend.common.serialization.proto.Visibility value) {
-      if (((bitField0_ & 0x00000008) == 0x00000008) &&
-          visibility_ != org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance()) {
-        visibility_ =
-          org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.newBuilder(visibility_).mergeFrom(value).buildPartial();
-      } else {
-        visibility_ = value;
-      }
-
-      bitField0_ |= 0x00000008;
-      return this;
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
-     */
-    public Builder clearVisibility() {
-      visibility_ = org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance();
-
-      bitField0_ = (bitField0_ & ~0x00000008);
-      return this;
-    }
-
-    private boolean isFinal_ ;
-    /**
-     * <code>required bool is_final = 5;</code>
-     */
-    public boolean hasIsFinal() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    /**
-     * <code>required bool is_final = 5;</code>
-     */
-    public boolean getIsFinal() {
-      return isFinal_;
-    }
-    /**
-     * <code>required bool is_final = 5;</code>
-     */
-    public Builder setIsFinal(boolean value) {
-      bitField0_ |= 0x00000010;
-      isFinal_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required bool is_final = 5;</code>
-     */
-    public Builder clearIsFinal() {
-      bitField0_ = (bitField0_ & ~0x00000010);
-      isFinal_ = false;
-      
-      return this;
-    }
-
-    private boolean isExternal_ ;
-    /**
-     * <code>required bool is_external = 6;</code>
-     */
-    public boolean hasIsExternal() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
-    }
-    /**
-     * <code>required bool is_external = 6;</code>
-     */
-    public boolean getIsExternal() {
-      return isExternal_;
-    }
-    /**
-     * <code>required bool is_external = 6;</code>
-     */
-    public Builder setIsExternal(boolean value) {
-      bitField0_ |= 0x00000020;
-      isExternal_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required bool is_external = 6;</code>
-     */
-    public Builder clearIsExternal() {
-      bitField0_ = (bitField0_ & ~0x00000020);
-      isExternal_ = false;
-      
-      return this;
-    }
-
-    private boolean isStatic_ ;
-    /**
-     * <code>required bool is_static = 7;</code>
-     */
-    public boolean hasIsStatic() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    /**
-     * <code>required bool is_static = 7;</code>
-     */
-    public boolean getIsStatic() {
-      return isStatic_;
-    }
-    /**
-     * <code>required bool is_static = 7;</code>
-     */
-    public Builder setIsStatic(boolean value) {
-      bitField0_ |= 0x00000040;
-      isStatic_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required bool is_static = 7;</code>
-     */
-    public Builder clearIsStatic() {
-      bitField0_ = (bitField0_ & ~0x00000040);
-      isStatic_ = false;
-      
-      return this;
-    }
-
-    private int type_ ;
-    /**
-     * <code>required int32 type = 8;</code>
-     */
-    public boolean hasType() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
-    }
-    /**
-     * <code>required int32 type = 8;</code>
+     * <code>required int32 type = 4;</code>
      */
     public int getType() {
       return type_;
     }
     /**
-     * <code>required int32 type = 8;</code>
+     * <code>required int32 type = 4;</code>
      */
     public Builder setType(int value) {
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000008;
       type_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 type = 8;</code>
+     * <code>required int32 type = 4;</code>
      */
     public Builder clearType() {
-      bitField0_ = (bitField0_ & ~0x00000080);
+      bitField0_ = (bitField0_ & ~0x00000008);
       type_ = 0;
-      
-      return this;
-    }
-
-    private boolean isFakeOverride_ ;
-    /**
-     * <code>required bool is_fake_override = 9;</code>
-     */
-    public boolean hasIsFakeOverride() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
-    }
-    /**
-     * <code>required bool is_fake_override = 9;</code>
-     */
-    public boolean getIsFakeOverride() {
-      return isFakeOverride_;
-    }
-    /**
-     * <code>required bool is_fake_override = 9;</code>
-     */
-    public Builder setIsFakeOverride(boolean value) {
-      bitField0_ |= 0x00000100;
-      isFakeOverride_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required bool is_fake_override = 9;</code>
-     */
-    public Builder clearIsFakeOverride() {
-      bitField0_ = (bitField0_ & ~0x00000100);
-      isFakeOverride_ = false;
       
       return this;
     }

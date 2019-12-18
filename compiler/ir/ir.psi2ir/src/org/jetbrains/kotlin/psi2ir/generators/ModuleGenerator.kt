@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.MetadataSource
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrModuleFragmentImpl
+import org.jetbrains.kotlin.ir.descriptors.IrFunctionFactory
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -34,7 +35,7 @@ class ModuleGenerator(override val context: GeneratorContext) : Generator {
 
     fun generateModuleFragment(ktFiles: Collection<KtFile>, deserializer: IrDeserializer, extensions: StubGeneratorExtensions = StubGeneratorExtensions.EMPTY): IrModuleFragment =
         generateModuleFragmentWithoutDependencies(ktFiles).also { irModule ->
-            generateUnboundSymbolsAsDependencies(irModule, deserializer, extensions)
+            generateUnboundSymbolsAsDependencies(irModule, deserializer, null, extensions)
         }
 
     fun generateModuleFragmentWithoutDependencies(ktFiles: Collection<KtFile>): IrModuleFragment =
@@ -45,10 +46,11 @@ class ModuleGenerator(override val context: GeneratorContext) : Generator {
     fun generateUnboundSymbolsAsDependencies(
         irModule: IrModuleFragment,
         deserializer: IrDeserializer? = null,
+        functionFactory: IrFunctionFactory? = null,
         extensions: StubGeneratorExtensions = StubGeneratorExtensions.EMPTY
     ) {
         val fullIrProvidersList = generateTypicalIrProviderList(
-            irModule.descriptor, context.irBuiltIns, context.symbolTable, deserializer,
+            irModule.descriptor, context.irBuiltIns, context.symbolTable, deserializer, functionFactory,
             extensions
         )
         ExternalDependenciesGenerator(context.symbolTable, fullIrProvidersList).generateUnboundSymbolsAsDependencies()
