@@ -72,7 +72,12 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         targets: Collection<KotlinTarget>,
         project: Project
     ): Map<String, KotlinSourceSetImpl> {
-        if (project.properties["import_orphan_source_sets"]?.toString()?.toBoolean() ?: DEFAULT_IMPORT_ORPHAN_SOURCE_SETS) return sourceSets
+        if (try {
+                project.properties["import_orphan_source_sets"]
+            } catch (e: Exception) {
+                null
+            }?.toString()?.toBoolean() ?: DEFAULT_IMPORT_ORPHAN_SOURCE_SETS
+        ) return sourceSets
         val compiledSourceSets: Collection<String> = targets.flatMap { it.compilations }.flatMap { it.sourceSets }.flatMap { it.dependsOnSourceSets.union(listOf(it.name)) }.distinct()
         sourceSets.filter { !compiledSourceSets.contains(it.key) }.forEach {
             logger.warn("[sync warning] Source set \"${it.key}\" is not compiled with any compilation. This source set is not imported in the IDE.")
@@ -134,9 +139,13 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
             (getSourceSets(kotlinExt) as? NamedDomainObjectContainer<Named>)?.asMap?.values ?: emptyList<Named>()
 
         // Some performance optimisation: do not build metadata dependencies if source set is not common
-        val doBuildMetadataDependencies =
-            project.properties["build_metadata_dependencies_for_actualised_source_sets"]?.toString()?.toBoolean()
-                ?: DEFAULT_BUILD_METADATA_DEPENDENCIES_FOR_ACTUALISED_SOURCE_SETS
+        val doBuildMetadataDependencies = try {
+            project.properties["build_metadata_dependencies_for_actualised_source_sets"]
+        } catch (e: Exception) {
+            null
+        }
+            ?.toString()?.toBoolean()
+            ?: DEFAULT_BUILD_METADATA_DEPENDENCIES_FOR_ACTUALISED_SOURCE_SETS
         val allSourceSetsProtos = sourceSets.mapNotNull { buildSourceSet(it, dependencyResolver, project, dependencyMapper) }
         val allSourceSets = if (doBuildMetadataDependencies) {
             allSourceSetsProtos.map { proto -> proto.buildKotlinSourceSetImpl(true)}
