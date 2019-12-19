@@ -1,0 +1,2 @@
+Failures detected in FirBodyResolveTransformerAdapter, file: /kt30300.fir.kt
+Cause: java.lang.RuntimeException: While resolving call R?C|/selectInvOut|(R|<local>/b|, R?C|/select|(R?C|/create|(R|<local>/s|), R?C|/emptyInvOut|()))

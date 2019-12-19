@@ -1,0 +1,2 @@
+Failures detected in FirBodyResolveTransformerAdapter, file: /main.kt
+Cause: java.lang.RuntimeException: While resolving call R?C|/select|(R|<local>/x1|, R|<local>/x2|)
