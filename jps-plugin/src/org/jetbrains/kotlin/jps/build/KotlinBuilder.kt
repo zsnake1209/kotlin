@@ -57,6 +57,7 @@ import org.jetbrains.kotlin.utils.KotlinPathsFromHomeDir
 import org.jetbrains.kotlin.utils.PathUtil
 import org.jetbrains.org.objectweb.asm.ClassReader
 import java.io.File
+import java.lang.management.ManagementFactory
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.system.measureTimeMillis
@@ -144,7 +145,7 @@ class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR) {
             kotlinContext.reportUnsupportedTargets()
         }
 
-        LOG.info("Total Kotlin global compile context initialization time: $time ms")
+        LOG.info("initializeKotlinContext]]]Total Kotlin global compile context initialization time: $time ms")
 
         return kotlinContext
     }
@@ -187,7 +188,10 @@ class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR) {
         kotlinContext.checkChunkCacheVersion(kotlinChunk)
 
         if (!kotlinContext.rebuildingAllKotlin && kotlinChunk.isEnabled) {
-            markAdditionalFilesForInitialRound(kotlinChunk, chunk, kotlinContext)
+            val time = measureTimeMillis {
+                markAdditionalFilesForInitialRound(kotlinChunk, chunk, kotlinContext)
+            }
+            LOG.info("markAdditionalFilesForInitialRound]]] Total mark additional files for initial round time: $time ms")
         }
 
         buildLogger?.afterChunkBuildStarted(context, chunk)
@@ -281,6 +285,8 @@ class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR) {
         dirtyFilesHolder: DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget>,
         outputConsumer: ModuleLevelBuilder.OutputConsumer
     ): ModuleLevelBuilder.ExitCode {
+        val buildInvokedTime = System.currentTimeMillis()
+
         if (chunk.isDummy(context))
             return NOTHING_DONE
 
@@ -305,6 +311,7 @@ class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR) {
         val fsOperations = FSOperationsHelper(context, chunk, kotlinDirtyFilesHolder, LOG)
 
         try {
+            LOG.info("doBuild]]]Time to start doBuild: ${System.currentTimeMillis() - buildInvokedTime} ms")
             val proposedExitCode =
                 doBuild(chunk, kotlinTarget, context, kotlinDirtyFilesHolder, messageCollector, outputConsumer, fsOperations)
 
@@ -457,13 +464,16 @@ class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR) {
             it.doAfterBuild()
         }
 
-        representativeTarget.updateChunkMappings(
-            context,
-            chunk,
-            kotlinDirtyFilesHolder,
-            generatedFiles,
-            incrementalCaches
-        )
+        val duration = measureTimeMillis {
+            representativeTarget.updateChunkMappings(
+                context,
+                chunk,
+                kotlinDirtyFilesHolder,
+                generatedFiles,
+                incrementalCaches
+            )
+        }
+        LOG.info("updateChunkMappings]]] updateChunkMappings ${duration}")
 
         if (!representativeTarget.isIncrementalCompilationEnabled) {
             return OK
@@ -472,6 +482,7 @@ class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR) {
         context.checkCanceled()
 
         environment.withProgressReporter { progress ->
+            val start = System.currentTimeMillis()
             progress.progress("performing incremental compilation analysis")
 
             val changesCollector = ChangesCollector()
@@ -497,6 +508,7 @@ class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR) {
                     incrementalCaches.values
                 )
             }
+            LOG.info("withProgressReporter]]] withProgressReporter ${System.currentTimeMillis() - start}")
         }
 
         return OK

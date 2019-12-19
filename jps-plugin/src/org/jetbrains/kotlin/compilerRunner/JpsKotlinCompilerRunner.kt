@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.jps.build.KotlinBuilder
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
+import kotlin.system.measureTimeMillis
 
 class JpsKotlinCompilerRunner {
     private val log: KotlinLogger = JpsKotlinLogger(KotlinBuilder.LOG)
@@ -229,7 +230,9 @@ class JpsKotlinCompilerRunner {
         fn: (sessionId: Int, daemon: CompileService) -> CompileService.CallResult<T>
     ): T? {
         log.debug("Try to connect to daemon")
+        val startConnectingToDaemon = System.currentTimeMillis()
         val connection = getDaemonConnection(environment)
+        log.info("getDaemonConnection]]]Connecting to daemon took ${System.currentTimeMillis() - startConnectingToDaemon}")
         if (connection == null) {
             log.info("Could not connect to daemon")
             return null

@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.compilerRunner.JpsCompilerEnvironment
 import org.jetbrains.kotlin.compilerRunner.JpsKotlinCompilerRunner
 import org.jetbrains.kotlin.config.IncrementalCompilation
 import org.jetbrains.kotlin.config.Services
+import org.jetbrains.kotlin.daemon.common.experimental.log
 import org.jetbrains.kotlin.incremental.*
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
 import org.jetbrains.kotlin.incremental.components.LookupTracker
@@ -45,6 +46,7 @@ import org.jetbrains.kotlin.utils.keysToMap
 import org.jetbrains.org.objectweb.asm.ClassReader
 import java.io.File
 import java.io.IOException
+import kotlin.system.measureTimeMillis
 
 private const val JVM_BUILD_META_INFO_FILE_NAME = "jvm-build-meta-info.txt"
 
@@ -131,14 +133,18 @@ class KotlinJvmModuleBuildTarget(kotlinContext: KotlinCompileContext, jpsModuleB
         }
 
         try {
-            val compilerRunner = JpsKotlinCompilerRunner()
-            compilerRunner.runK2JvmCompiler(
-                commonArguments,
-                module.k2JvmCompilerArguments,
-                module.kotlinCompilerSettings,
-                environment,
-                moduleFile
-            )
+            val duration = measureTimeMillis {
+                val compilerRunner = JpsKotlinCompilerRunner()
+                compilerRunner.runK2JvmCompiler(
+                    commonArguments,
+                    module.k2JvmCompilerArguments,
+                    module.kotlinCompilerSettings,
+                    environment,
+                    moduleFile
+                )
+            }
+            log.info("runK2JvmCompiler]]] duration of runK2JvmCompiler ${duration}")
+
         } finally {
             if (System.getProperty(DELETE_MODULE_FILE_PROPERTY) != "false") {
                 moduleFile.delete()
