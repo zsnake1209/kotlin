@@ -18,11 +18,11 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import java.util.regex.Pattern
 
-private val functionPattern = Pattern.compile("^K?(Suspend)?Function\\d+$")
+internal val functionPattern = Pattern.compile("^K?(Suspend)?Function\\d+$")
 
 private val kotlinFqn = FqName("kotlin")
 
-private val functionalPackages =
+internal val functionalPackages =
     listOf(kotlinFqn, kotlinFqn.child(Name.identifier("coroutines")), kotlinFqn.child(Name.identifier("reflect")))
 
 fun isBuiltInFunction(value: IrDeclaration): Boolean = when (value) {

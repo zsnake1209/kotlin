@@ -11,8 +11,7 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
-import org.jetbrains.kotlin.backend.common.serialization.KlibIrVersion
+import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.backend.common.serialization.metadata.DynamicTypeDeserializer
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVersion
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -385,6 +384,29 @@ fun serializeModuleIntoKlib(
     val descriptorTable = DescriptorTable.createDefault()
     val serializedIr =
         JsIrModuleSerializer(emptyLoggingContext, moduleFragment.irBuiltins, descriptorTable, skipExpects = !configuration.klibMpp, expectDescriptorToSymbol = expectDescriptorToSymbol).serializedIrModule(moduleFragment)
+
+    fun List<Int>.printStatistic(name: String) {
+
+        println("----- $name -----")
+        println("Min mangle size: ${first()}")
+        println("Max mangle size: ${last()}")
+        println("Average mangle size: ${sum() / size}")
+
+        println("25%%: ${this[(size * 0.25).toInt()]}")
+        println("50%%: ${this[(size * 0.50).toInt()]}")
+        println("75%%: ${this[(size * 0.75).toInt()]}")
+        println("95%%: ${this[(size * 0.95).toInt()]}")
+        println("96%%: ${this[(size * 0.96).toInt()]}")
+        println("97%%: ${this[(size * 0.97).toInt()]}")
+        println("98%%: ${this[(size * 0.98).toInt()]}")
+        println("99%%: ${this[(size * 0.99).toInt()]}")
+    }
+
+
+    mangleSizes.sorted().printStatistic("Declaration Mangle")
+    vpSizes.sorted().printStatistic("Value Parameters")
+    tpSizes.sorted().printStatistic("Type Parameters")
+
 
     val moduleDescriptor = moduleFragment.descriptor
 
