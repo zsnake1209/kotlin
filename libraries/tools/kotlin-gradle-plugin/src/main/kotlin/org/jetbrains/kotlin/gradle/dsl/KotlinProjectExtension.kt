@@ -24,11 +24,9 @@ import org.gradle.util.ConfigureUtil
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetContainer
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinOnlyTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinWithJavaTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsTarget
+import org.jetbrains.kotlin.konan.target.CompilerOutputKind
 import kotlin.reflect.KClass
 
 private const val KOTLIN_PROJECT_EXTENSION_NAME = "kotlin"
@@ -130,10 +128,10 @@ enum class Coroutines {
     }
 }
 
-enum class NativeCacheKind(val produce: String) {
-    NONE("none"),
-    DYNAMIC("dynamic_cache"),
-    STATIC("static_cache");
+enum class NativeCacheKind(val produce: String?, val outputKind: CompilerOutputKind?) {
+    NONE(null, null),
+    DYNAMIC("dynamic_cache", CompilerOutputKind.DYNAMIC_CACHE),
+    STATIC("static_cache", CompilerOutputKind.STATIC_CACHE);
 
     companion object {
         fun byCompilerArgument(argument: String): NativeCacheKind? =

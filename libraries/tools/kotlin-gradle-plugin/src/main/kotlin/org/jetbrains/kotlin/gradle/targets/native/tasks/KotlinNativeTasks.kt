@@ -731,7 +731,7 @@ class CacheBuilder(val project: Project, val binary: NativeBinary) {
                 continue
             project.logger.info("Compiling ${library.uniqueName} to cache")
             val args = mutableListOf(
-                "-p", konanCacheKind.produce,
+                "-p", konanCacheKind.produce!!,
                 "-target", target
             )
             if (debuggable)
@@ -762,11 +762,9 @@ class CacheBuilder(val project: Project, val binary: NativeBinary) {
     }
 
     private val String.cachedName
-        get() = when (konanCacheKind) {
-            NativeCacheKind.DYNAMIC -> System.mapLibraryName("${this}-cache")
-            NativeCacheKind.STATIC -> "lib${this}-cache.a"
-            else -> error("Unsupported cache kind: $konanCacheKind")
-        }
+        get() = konanCacheKind.outputKind?.let {
+            "${it.prefix(compilation.konanTarget)}${this}-cache${it.suffix(compilation.konanTarget)}"
+        } ?: error("No output for kind $konanCacheKind")
 
     private fun ensureCompilerProvidedLibPrecached(platformLibName: String, platformLibs: Map<String, File>, visitedLibs: MutableSet<String>) {
         if (platformLibName in visitedLibs)
@@ -779,7 +777,7 @@ class CacheBuilder(val project: Project, val binary: NativeBinary) {
             ensureCompilerProvidedLibPrecached(dependency.path, platformLibs, visitedLibs)
         project.logger.info("Compiling $platformLibName (${visitedLibs.size}/${platformLibs.size}) to cache")
         val args = mutableListOf(
-            "-p", konanCacheKind.produce,
+            "-p", konanCacheKind.produce!!,
             "-target", target
         )
         if (debuggable)
