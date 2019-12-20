@@ -129,3 +129,14 @@ enum class Coroutines {
             Coroutines.values().firstOrNull { it.name.equals(argument, ignoreCase = true) }
     }
 }
+
+enum class NativeCacheKind(val produce: String) {
+    NONE("none"),
+    DYNAMIC("dynamic_cache"),
+    STATIC("static_cache");
+
+    companion object {
+        fun byCompilerArgument(argument: String): NativeCacheKind? =
+            NativeCacheKind.values().firstOrNull { it.name.equals(argument, ignoreCase = true) }
+    }
+}
