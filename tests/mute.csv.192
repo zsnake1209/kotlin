@@ -1,0 +1,43 @@
+org.jetbrains.kotlin.j2k.JavaToKotlinConverterSingleFileTestGenerated$AnonymousClass.testKt_13146	Muted failure	1222
+org.jetbrains.kotlin.j2k.JavaToKotlinConverterSingleFileTestGenerated$Issues.testKt_807	Muted failure	922
+org.jetbrains.kotlin.idea.configuration.GradleConfigureProjectByChangingFileTestGenerated$Gradle.testWithJava9ModuleInfo	Muted failure	1569
+org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testAndroidGradleJsDetection[0: with Gradle-4.9]	Muted failure	18108
+org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[0: with Gradle-4.9]	Muted failure	2983
+org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testAndroidGradleJsDetection[1: with Gradle-5.6.4]	Muted failure	18655
+org.jetbrains.kotlin.idea.codeInsight.gradle.GradleBuildFileHighlightingTest.testKtsInJsProject[0: with Gradle-4.9]	Muted failure	89891
+org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[1: with Gradle-5.6.4]	Muted failure	11710
+org.jetbrains.kotlin.idea.codeInsight.gradle.GradleBuildFileHighlightingTest.testKtsInJsProject[1: with Gradle-5.6.4]	Muted failure	91264
+org.jetbrains.kotlin.idea.maven.configuration.MavenConfigureProjectByChangingFileTestGenerated$Jvm.testWithJava9ModuleInfo	Muted failure	4989
+org.jetbrains.kotlin.idea.maven.KotlinMavenInspectionTestGenerated.testWrongPhaseExecution	Muted failure	5381
+org.jetbrains.kotlin.idea.completion.test.JvmSmartCompletionTestGenerated.testFilterTo	Muted failure	753
+org.jetbrains.kotlin.idea.configuration.ConfigureKotlinInTempDirTest.testKotlincExistsNoSettingsLatestRuntimeNoVersionAutoAdvance	Muted failure	915
+org.jetbrains.kotlin.idea.configuration.ConfigureKotlinTest.testJava9WithModuleInfo	Muted failure	5594
+org.jetbrains.kotlin.idea.completion.test.weighers.BasicCompletionWeigherTestGenerated.testPreferFromJdk	Muted failure	260
+org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testJunit	Muted failure	405
+org.jetbrains.kotlin.idea.quick\fix.QuickFixTestGenerated$Libraries.testTestNG	Muted failure	535
+org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$ChangeFeatureSupport.testInlineClass	Muted failure	149
+org.jetbrains.kotlin.idea.quickfix.DeprecatedSymbolUsageFixSpecialTest.testDefaultParameterValuesFromLibrary	Muted failure	978
+org.jetbrains.kotlin.idea.highlighter.NoErrorsInStdlibTest.testNoErrors	Muted failure	14405
+org.jetbrains.kotlin.idea.highlighter.HighlightingTestGenerated.testSuspend	Muted failure	291
+org.jetbrains.kotlin.idea.stubs.MultiFileHighlightingTestGenerated.testTopLevelMembersReference	Muted failure	337
+org.jetbrains.kotlin.idea.quickfix.QuickFixMultiModuleTestGenerated$CreateActual.testWithTestDummy	Muted failure	375
+org.jetbrains.kotlin.idea.parameterInfo.ParameterInfoTestGenerated$FunctionCall.testNoSynthesizedParameterNames	Muted failure	147
+org.jetbrains.kotlin.idea.caches.resolve.HighlightingWithDependentLibrariesTest.testHighlightingWithDependentLibraries	Muted failure	448
+org.jetbrains.kotlin.idea.quickfix.QuickFixMultiFileTestGenerated$AutoImports.testAmbiguousNamePreferFromJdk	Muted failure	497
+org.jetbrains.kotlin.idea.run.RunConfigurationTest.testWithModuleForJdk9	Muted failure	1877
+org.jetbrains.kotlin.idea.caches.resolve.MultiPlatformHighlightingTestGenerated.testJvmKotlinReferencesCommonKotlinThroughJavaDifferentJvmImpls	Muted failure	481
+org.jetbrains.kotlin.idea.intentions.IntentionTestGenerated$ImportAllMembers.testAmbiguousCalls	Muted failure	195
+org.jetbrains.kotlin.psi.injection.StringInterpolationInjectionTest.testInterpolationSimpleName	Muted failure	59
+org.jetbrains.kotlin.checkers.JavaAgainstKotlinBinariesCheckerTestGenerated.testUsingKotlinPackageDeclarations	Muted failure	388
+org.jetbrains.kotlin.checkers.JavaAgainstKotlinBinariesCheckerTestGenerated.testClassObjects	Muted failure	402
+org.jetbrains.kotlin.findUsages.FindUsagesTestGenerated$Kotlin$Conventions.testSet	Muted failure	146
+org.jetbrains.kotlin.shortenRefs.ShortenRefsTestGenerated.testExtensionForObject2	Muted failure	108
+org.jetbrains.kotlin.jps.build.IncrementalJvmJpsTestGenerated$WithJava$JavaUsedInKotlin.testMixedInheritance	Muted failure	1896
+org.jetbrains.kotlin.jps.build.IncrementalJvmJpsTestGenerated$Custom.testBuildError	Muted failure	450
+org.jetbrains.kotlin.jps.build.IncrementalJvmJpsTestGenerated$Custom.testBuildError2Levels	Muted failure	537
+org.jetbrains.kotlin.allopen.BytecodeListingTestForAllOpenGenerated.initializationError	Muted failure	1
+org.jetbrains.kotlin.noarg.BytecodeListingTestForNoArgGenerated.initializationError	Muted failure	1
+org.jetbrains.kotlin.noarg.BlackBoxCodegenTestForNoArgGenerated.initializationError	Muted failure	1
+org.jetbrains.kotlinx.serialization.SerializationIrBytecodeListingTestGenerated.testBasic	Muted failure	5838
+org.jetbrains.kotlin.idea.spring.tests.references.SpringReferenceNavigationTestGenerated.testPackageReferenceInComponentScan	Muted failure	251
+org.jetbrains.kotlin.idea.spring.tests.quickfixes.SpringQuickFixTestGenerated$AddQualifierAnnotation.testAmbiguousBean	Muted failure	1683
