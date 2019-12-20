@@ -22,10 +22,10 @@
 -- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testConfigureGradleKtsKotlinDevVersion[1: with Gradle-5.6.4]	Muted failure
 -- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testConfigureKotlinDevVersion[1: with Gradle-5.6.4]	Muted failure
 -- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testConfigureKotlinWithPluginsBlock[1: with Gradle-5.6.4]	Muted failure
-* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testAndroidGradleJsDetection[0: with Gradle-4.9] STABLE 192, 193
-* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testAndroidGradleJsDetection[1: with Gradle-5.6.4] STABLE 192, 193
-* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[0: with Gradle-4.9]	STABLE 192, 193
-* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[1: with Gradle-5.6.4] STABLE 192, 193
+-- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testAndroidGradleJsDetection[0: with Gradle-4.9] STABLE 192, 193
+-- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testAndroidGradleJsDetection[1: with Gradle-5.6.4] STABLE 192, 193
+-- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[0: with Gradle-4.9]	STABLE 192, 193
+-- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[1: with Gradle-5.6.4] STABLE 192, 193
 * org.jetbrains.kotlin.idea.configuration.ConfigureKotlinInTempDirTest.testKotlincExistsNoSettingsLatestRuntimeNoVersionAutoAdvance FLAKY
 * org.jetbrains.kotlin.idea.configuration.ConfigureKotlinTest.testJava9WithModuleInfo	STABLE, Works on AS 34
 * org.jetbrains.kotlin.idea.configuration.GradleConfigureProjectByChangingFileTestGenerated$Gradle.testWithJava9ModuleInfo STABLE, Works on AS 34
