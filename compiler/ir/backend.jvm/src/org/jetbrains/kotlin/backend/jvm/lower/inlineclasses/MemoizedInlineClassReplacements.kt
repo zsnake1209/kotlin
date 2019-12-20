@@ -18,6 +18,8 @@ import org.jetbrains.kotlin.ir.builders.declarations.buildFunWithDescriptorForIn
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
+import org.jetbrains.kotlin.ir.expressions.impl.IrErrorExpressionImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrValueParameterSymbol
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
@@ -133,6 +135,14 @@ class MemoizedInlineClassReplacements {
         }
     }
 
+    // When copying default values, they need to be replaced with stubs. *Some* value is needed for
+    // `DefaultParameterInjector` to replace the call with a call to `$default`, but the *real* value will
+    // only be set by `JvmInlineClassLowering`; otherwise, depending on file order, it might be unaffected
+    // by lowerings that come before it.
+    private fun IrValueParameter.defaultStub() = defaultValue?.run {
+        IrExpressionBodyImpl(startOffset, endOffset, IrErrorExpressionImpl(startOffset, endOffset, expression.type, "stub"))
+    }
+
     private fun createMethodReplacement(function: IrFunction): IrReplacementFunction? {
         require(function.dispatchReceiverParameter != null && function is IrSimpleFunction)
         val overrides = function.overriddenSymbols.mapNotNull {
@@ -151,10 +161,10 @@ class MemoizedInlineClassReplacements {
                 val name = if (parameter == function.extensionReceiverParameter) Name.identifier("\$receiver") else parameter.name
                 val newParameter: IrValueParameter
                 if (parameter == function.dispatchReceiverParameter) {
-                    newParameter = parameter.copyTo(this, index = -1, name = name)
+                    newParameter = parameter.copyTo(this, index = -1, name = name, defaultValue = parameter.defaultStub())
                     dispatchReceiverParameter = newParameter
                 } else {
-                    newParameter = parameter.copyTo(this, index = index - 1, name = name)
+                    newParameter = parameter.copyTo(this, index = index - 1, name = name, defaultValue = parameter.defaultStub())
                     valueParameters.add(newParameter)
                 }
                 parameterMap[parameter.symbol] = newParameter
@@ -176,7 +186,7 @@ class MemoizedInlineClassReplacements {
                     else -> parameter.name
                 }
 
-                val newParameter = parameter.copyTo(this, index = index, name = name)
+                val newParameter = parameter.copyTo(this, index = index, name = name, defaultValue = parameter.defaultStub())
                 valueParameters.add(newParameter)
                 parameterMap[parameter.symbol] = newParameter
             }

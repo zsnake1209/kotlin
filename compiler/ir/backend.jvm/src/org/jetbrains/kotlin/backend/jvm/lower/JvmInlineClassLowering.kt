@@ -63,6 +63,7 @@ private class JvmInlineClassLowering(private val context: JvmBackendContext) : F
         // The arguments to the primary constructor are in scope in the initializers of IrFields.
         declaration.primaryConstructor?.let {
             context.inlineClassReplacements.getReplacementFunction(it)?.let { replacement ->
+                copyDefaultArguments(replacement)
                 valueMap.putAll(replacement.valueParameterMap)
             }
         }
@@ -89,6 +90,12 @@ private class JvmInlineClassLowering(private val context: JvmBackendContext) : F
         return declaration
     }
 
+    private fun copyDefaultArguments(replacement: IrReplacementFunction) {
+        for ((oldParameter, newParameter) in replacement.valueParameterMap) {
+            newParameter.defaultValue = oldParameter.owner.defaultValue?.deepCopyWithSymbols(replacement.function)
+        }
+    }
+
     private fun transformFunctionFlat(function: IrFunction): List<IrDeclaration>? {
         if (function.isPrimaryInlineClassConstructor)
             return null
@@ -99,6 +106,7 @@ private class JvmInlineClassLowering(private val context: JvmBackendContext) : F
             return null
         }
 
+        copyDefaultArguments(replacement)
         return when (function) {
             is IrSimpleFunction -> transformSimpleFunctionFlat(function, replacement)
             is IrConstructor -> transformConstructorFlat(function, replacement)
