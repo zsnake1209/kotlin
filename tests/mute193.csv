@@ -1,10 +1,10 @@
 * org.jetbrains.kotlin.allopen.BytecodeListingTestForAllOpenGenerated.initializationError STABLE
-* org.jetbrains.kotlin.checkers.JavaAgainstKotlinBinariesCheckerTestGenerated.testClassObjects STABLE 192, 193
-* org.jetbrains.kotlin.checkers.JavaAgainstKotlinBinariesCheckerTestGenerated.testUsingKotlinPackageDeclarations STABLE 192, 193
+-- * org.jetbrains.kotlin.checkers.JavaAgainstKotlinBinariesCheckerTestGenerated.testClassObjects STABLE 192, 193
+-- * org.jetbrains.kotlin.checkers.JavaAgainstKotlinBinariesCheckerTestGenerated.testUsingKotlinPackageDeclarations STABLE 192, 193
 * org.jetbrains.kotlin.checkers.JavaAgainstKotlinSourceCheckerWithoutUltraLightTestGenerated$JavaAgainstKotlin.testUsingMutableInterfaces	FLAKY
 * org.jetbrains.kotlin.checkers.PsiCheckerTestGenerated$Checker.testRedeclaration	STABLE 192, 193 (my fix)
 * org.jetbrains.kotlin.checkers.PsiCheckerTestGenerated$Recovery.testReturnInFileAnnotation FLAKY (my fix)
-* org.jetbrains.kotlin.findUsages.FindUsagesTestGenerated$Kotlin$Conventions.testSet STABLE
+-- * org.jetbrains.kotlin.findUsages.FindUsagesTestGenerated$Kotlin$Conventions.testSet STABLE
 -- * org.jetbrains.kotlin.gradle.ImportAndCheckHighlighting.testMultiplatformLibrary[1: Gradle-4.9, KotlinGradlePlugin-latest stable] STABLE 193
 -- * org.jetbrains.kotlin.gradle.ImportAndCheckHighlighting.testMultiplatformLibrary[3: Gradle-5.6.4, KotlinGradlePlugin-latest stable] STABLE 193
 -- * org.jetbrains.kotlin.gradle.NewMultiplatformProjectImportingTest.testSingleAndroidTarget[1: Gradle-4.9, KotlinGradlePlugin-latest stable]	WINDOWS, 191, 192, 193
@@ -50,9 +50,9 @@ org.jetbrains.kotlin.idea.spring.tests.references.SpringReferenceNavigationTestG
 org.jetbrains.kotlin.idea.stubs.MultiFileHighlightingTestGenerated.testTopLevelMembersReference	Muted failure
 -- * org.jetbrains.kotlin.j2k.JavaToKotlinConverterSingleFileTestGenerated$AnonymousClass.testKt_13146	STABLE
 -- * org.jetbrains.kotlin.j2k.JavaToKotlinConverterSingleFileTestGenerated$Issues.testKt_807	STABLE
-org.jetbrains.kotlin.jps.build.IncrementalJvmJpsTestGenerated$WithJava$JavaUsedInKotlin.testMixedInheritance	Muted failure
+-- org.jetbrains.kotlin.jps.build.IncrementalJvmJpsTestGenerated$WithJava$JavaUsedInKotlin.testMixedInheritance	Muted failure
 org.jetbrains.kotlin.noarg.BlackBoxCodegenTestForNoArgGenerated.initializationError	Muted failure
 org.jetbrains.kotlin.noarg.BytecodeListingTestForNoArgGenerated.initializationError	Muted failure
-org.jetbrains.kotlin.psi.injection.StringInterpolationInjectionTest.testInterpolationSimpleName	Muted failure
-org.jetbrains.kotlin.shortenRefs.ShortenRefsTestGenerated.testExtensionForObject2	Muted failure
-org.jetbrains.kotlinx.serialization.SerializationIrBytecodeListingTestGenerated.testBasic	Muted failure
+-- org.jetbrains.kotlin.psi.injection.StringInterpolationInjectionTest.testInterpolationSimpleName	Muted failure
+-- org.jetbrains.kotlin.shortenRefs.ShortenRefsTestGenerated.testExtensionForObject2	Muted failure
+-- org.jetbrains.kotlinx.serialization.SerializationIrBytecodeListingTestGenerated.testBasic	Muted failure
