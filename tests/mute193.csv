@@ -27,8 +27,8 @@
 -- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[0: with Gradle-4.9]	STABLE 192, 193
 -- * org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[1: with Gradle-5.6.4] STABLE 192, 193
 * org.jetbrains.kotlin.idea.configuration.ConfigureKotlinInTempDirTest.testKotlincExistsNoSettingsLatestRuntimeNoVersionAutoAdvance FLAKY
-* org.jetbrains.kotlin.idea.configuration.ConfigureKotlinTest.testJava9WithModuleInfo	STABLE, Works on AS 34
-* org.jetbrains.kotlin.idea.configuration.GradleConfigureProjectByChangingFileTestGenerated$Gradle.testWithJava9ModuleInfo STABLE, Works on AS 34
+-- * org.jetbrains.kotlin.idea.configuration.ConfigureKotlinTest.testJava9WithModuleInfo	STABLE, Works on AS 34
+-- * org.jetbrains.kotlin.idea.configuration.GradleConfigureProjectByChangingFileTestGenerated$Gradle.testWithJava9ModuleInfo STABLE, Works on AS 34
 -- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testNoCoroutines	WINDOWS
 -- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testThreeCoroutines	WINDOWS
 -- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testTwoDumps	WINDOWS
@@ -37,12 +37,12 @@ org.jetbrains.kotlin.idea.highlighter.NoErrorsInStdlibTest.testNoErrors	Muted fa
 org.jetbrains.kotlin.idea.intentions.IntentionTestGenerated$ImportAllMembers.testAmbiguousCalls	Muted failure
 org.jetbrains.kotlin.idea.maven.KotlinMavenInspectionTestGenerated.testWrongPhaseExecution	Muted failure
 * org.jetbrains.kotlin.idea.maven.MavenMigrateTest.testMigrateApiAndLanguageVersions	FLAKY, WINDOWS
-org.jetbrains.kotlin.idea.maven.configuration.MavenConfigureProjectByChangingFileTestGenerated$Jvm.testWithJava9ModuleInfo	Muted failure
+-- * org.jetbrains.kotlin.idea.maven.configuration.MavenConfigureProjectByChangingFileTestGenerated$Jvm.testWithJava9ModuleInfo	Muted failure
 org.jetbrains.kotlin.idea.parameterInfo.ParameterInfoTestGenerated$FunctionCall.testNoSynthesizedParameterNames	Muted failure
 org.jetbrains.kotlin.idea.quickfix.DeprecatedSymbolUsageFixSpecialTest.testDefaultParameterValuesFromLibrary	Muted failure
 org.jetbrains.kotlin.idea.quickfix.QuickFixMultiModuleTestGenerated$CreateActual.testWithTestDummy	Muted failure
-org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testJunit	Muted failure
-org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testTestNG	Muted failure
+-- org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testJunit	Muted failure
+-- org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testTestNG	Muted failure
 org.jetbrains.kotlin.idea.refactoring.move.MoveTestGenerated.testKotlin_moveTopLevelDeclarations_moveFunctionToPackage_MoveFunctionToPackage	Muted failure
 org.jetbrains.kotlin.idea.run.RunConfigurationTest.testWithModuleForJdk9	Muted failure
 org.jetbrains.kotlin.idea.spring.tests.quickfixes.SpringQuickFixTestGenerated$AddQualifierAnnotation.testAmbiguousBean	Muted failure
