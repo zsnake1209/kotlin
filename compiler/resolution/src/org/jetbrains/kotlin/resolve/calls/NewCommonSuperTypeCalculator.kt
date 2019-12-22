@@ -16,13 +16,13 @@
 
 package org.jetbrains.kotlin.resolve.calls
 
-import org.jetbrains.kotlin.types.AbstractNullabilityChecker
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.AbstractFlexibilityChecker.hasDifferentFlexibilityAtDepth
+import org.jetbrains.kotlin.types.AbstractFlexibilityChecker.hasDifferentFlexibility
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker.hasPathByNotMarkedNullableNodes
-import org.jetbrains.kotlin.types.AbstractTypeChecker
-import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
-import org.jetbrains.kotlin.types.UnwrappedType
 import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext
 import org.jetbrains.kotlin.types.model.*
+import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
 
 object NewCommonSuperTypeCalculator {
     // TODO: Bridge for old calls
@@ -103,7 +103,9 @@ object NewCommonSuperTypeCalculator {
 
     private fun TypeSystemCommonSuperTypesContext.uniteTypeParametersFlexibilityForSameTypes(types: List<SimpleTypeMarker>) {
         types.forEach {
+            val p = it.asFlexibleType()
             for (i in 0 until it.argumentsCount()) {
+                val a = it.getArgument(i)
 
             }
         }
@@ -114,22 +116,33 @@ object NewCommonSuperTypeCalculator {
         types: List<SimpleTypeMarker>,
         contextStubTypesNotEqual: AbstractTypeCheckerContext
     ): List<SimpleTypeMarker> {
-        val uniqueTypes = arrayListOf<SimpleTypeMarker>()
+        val uniqueTypes = mutableSetOf<SimpleTypeMarker>()
+        val candidateWithDifferentFlexibility = mutableMapOf<SimpleTypeMarker, MutableSet<SimpleTypeMarker>>()
+
         for (type in types) {
             val isNewUniqueType = uniqueTypes.all {
-                !AbstractTypeChecker.equalTypes(contextStubTypesNotEqual, it, type) ||
-                        it.typeConstructor().isIntegerLiteralTypeConstructor()
+                val equalsExcludingFlexibility = AbstractTypeChecker.equalTypes(contextStubTypesNotEqual, it, type)
+
+                if (equalsExcludingFlexibility && hasDifferentFlexibilityAtDepth(it, type)) {
+                    candidateWithDifferentFlexibility.putIfAbsent(it, mutableSetOf())
+                    candidateWithDifferentFlexibility[it]?.add(type)
+                }
+
+                !equalsExcludingFlexibility ||
+                        it.typeConstructor().isIntegerLiteralTypeConstructor() ||
+                        hasDifferentFlexibilityAtDepth(it, type)
             }
             if (isNewUniqueType) {
-                uniqueTypes += type
+                uniqueTypes.add(type)
             }
         }
-        return uniqueTypes
+
+        return uniqueTypes.toList()
     }
 
     // This function leaves only supertypes, i.e. A0 is a strong supertype for A iff A != A0 && A <: A0
     // Explanation: consider types (A : A0, B : B0, A0, B0), then CST(A, B, A0, B0) == CST(CST(A, A0), CST(B, B0)) == CST(A0, B0)
-    private fun filterSupertypes(
+    private fun TypeSystemCommonSuperTypesContext.filterSupertypes(
         list: List<SimpleTypeMarker>,
         contextStubTypesNotEqual: AbstractTypeCheckerContext
     ): List<SimpleTypeMarker> {
@@ -138,7 +151,9 @@ object NewCommonSuperTypeCalculator {
         while (iterator.hasNext()) {
             val potentialSubtype = iterator.next()
             val isSubtype = supertypes.any { supertype ->
-                supertype !== potentialSubtype && AbstractTypeChecker.isSubtypeOf(contextStubTypesNotEqual, potentialSubtype, supertype)
+                supertype !== potentialSubtype &&
+                        AbstractTypeChecker.isSubtypeOf(contextStubTypesNotEqual, potentialSubtype, supertype) &&
+                        !hasDifferentFlexibilityAtDepth(potentialSubtype, supertype)
             }
 
             if (isSubtype) iterator.remove()
@@ -205,11 +220,12 @@ object NewCommonSuperTypeCalculator {
         types: List<SimpleTypeMarker>,
         depth: Int,
         contextStubTypesEqualToAnything: AbstractTypeCheckerContext
-    ): SimpleTypeMarker =
-        intersectTypes(
+    ): SimpleTypeMarker {
+        return intersectTypes(
             allCommonSuperTypeConstructors(types, contextStubTypesEqualToAnything)
                 .map { superTypeWithGivenConstructor(types, it, depth) }
         )
+    }
 
     /**
      * Note that if there is captured type C, then no one else is not subtype of C => lowerType cannot help here
@@ -224,11 +240,12 @@ object NewCommonSuperTypeCalculator {
 
             result.retainAll(collectAllSupertypes(type, contextStubTypesEqualToAnything))
         }
-        return result.filterNot { target ->
+        val o = result.filterNot { target ->
             result.any { other ->
                 other != target && other.supertypes().any { it.typeConstructor() == target }
             }
         }
+        return o
     }
 
     private fun TypeSystemCommonSuperTypesContext.collectAllSupertypes(
@@ -323,6 +340,11 @@ object NewCommonSuperTypeCalculator {
         return capturedType.typeConstructor().projection()
     }
 
+    private fun TypeSystemCommonSuperTypesContext.isEqualsModuloNullability(typeA: KotlinTypeMarker, typeB: KotlinTypeMarker) =
+        if (typeA is KotlinType && typeB is KotlinType) {
+            AbstractTypeChecker.equalTypes(this, typeA.makeNotNullable(), typeB.makeNotNullable())
+        } else false
+
     // no star projections in arguments
     private fun TypeSystemCommonSuperTypesContext.calculateArgument(
         parameter: TypeParameterMarker,
@@ -336,7 +358,16 @@ object NewCommonSuperTypeCalculator {
         // Inv<A>, Inv<A> = Inv<A>
         if (parameter.getVariance() == TypeVariance.INV && arguments.all { it.getVariance() == TypeVariance.INV }) {
             val first = arguments.first()
-            if (arguments.all { it.getType() == first.getType() }) return first
+            val firstType = first.getType()
+            val argumentTypes = arguments.map { it.getType() }
+
+            if (argumentTypes.all { it == firstType }) return first
+
+            val allTypesAreEqualsModuloNullability = argumentTypes.all { isEqualsModuloNullability(it, firstType) }
+
+            if (allTypesAreEqualsModuloNullability && hasDifferentFlexibility(*argumentTypes.toTypedArray())) {
+                return arguments.first { it.getType().isFlexible() } // check the arguments
+            }
         }
 
         val asOut: Boolean

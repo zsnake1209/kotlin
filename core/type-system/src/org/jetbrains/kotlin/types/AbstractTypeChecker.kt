@@ -580,3 +580,23 @@ object AbstractNullabilityChecker {
         return isEqualTypeConstructors(type.typeConstructor(), end)
     }
 }
+
+
+object AbstractFlexibilityChecker {
+    fun TypeSystemCommonSuperTypesContext.hasDifferentFlexibilityAtDepth(vararg types: KotlinTypeMarker): Boolean {
+        if (hasDifferentFlexibility(*types)) return true
+
+        for (i in 0 until types.first().argumentsCount()) {
+            if (hasDifferentFlexibilityAtDepth(*types.map { it.getArgument(i).getType() }.toTypedArray())) return true
+        }
+
+        return false
+    }
+
+    fun TypeSystemCommonSuperTypesContext.hasDifferentFlexibility(vararg types: KotlinTypeMarker): Boolean {
+        val firstType = types.first()
+        if (types.all { it === firstType }) return false
+
+        return !types.all { it.isFlexible() } && !types.all { !it.isFlexible() }
+    }
+}
