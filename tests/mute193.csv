@@ -32,22 +32,22 @@
 -- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testNoCoroutines	WINDOWS
 -- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testThreeCoroutines	WINDOWS
 -- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testTwoDumps	WINDOWS
-org.jetbrains.kotlin.idea.highlighter.HighlightingTestGenerated.testSuspend	Muted failure
-org.jetbrains.kotlin.idea.highlighter.NoErrorsInStdlibTest.testNoErrors	Muted failure
+-- org.jetbrains.kotlin.idea.highlighter.HighlightingTestGenerated.testSuspend	Muted failure
+-- org.jetbrains.kotlin.idea.highlighter.NoErrorsInStdlibTest.testNoErrors	Muted failure
 org.jetbrains.kotlin.idea.intentions.IntentionTestGenerated$ImportAllMembers.testAmbiguousCalls	Muted failure
 org.jetbrains.kotlin.idea.maven.KotlinMavenInspectionTestGenerated.testWrongPhaseExecution	Muted failure
 * org.jetbrains.kotlin.idea.maven.MavenMigrateTest.testMigrateApiAndLanguageVersions	FLAKY, WINDOWS
 -- * org.jetbrains.kotlin.idea.maven.configuration.MavenConfigureProjectByChangingFileTestGenerated$Jvm.testWithJava9ModuleInfo	Muted failure
-org.jetbrains.kotlin.idea.parameterInfo.ParameterInfoTestGenerated$FunctionCall.testNoSynthesizedParameterNames	Muted failure
-org.jetbrains.kotlin.idea.quickfix.DeprecatedSymbolUsageFixSpecialTest.testDefaultParameterValuesFromLibrary	Muted failure
-org.jetbrains.kotlin.idea.quickfix.QuickFixMultiModuleTestGenerated$CreateActual.testWithTestDummy	Muted failure
+-- org.jetbrains.kotlin.idea.parameterInfo.ParameterInfoTestGenerated$FunctionCall.testNoSynthesizedParameterNames	Muted failure
+-- org.jetbrains.kotlin.idea.quickfix.DeprecatedSymbolUsageFixSpecialTest.testDefaultParameterValuesFromLibrary	Muted failure
+-- * org.jetbrains.kotlin.idea.quickfix.QuickFixMultiModuleTestGenerated$CreateActual.testWithTestDummy, FLAKY
 -- org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testJunit	Muted failure
 -- org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testTestNG	Muted failure
-org.jetbrains.kotlin.idea.refactoring.move.MoveTestGenerated.testKotlin_moveTopLevelDeclarations_moveFunctionToPackage_MoveFunctionToPackage	Muted failure
-org.jetbrains.kotlin.idea.run.RunConfigurationTest.testWithModuleForJdk9	Muted failure
+-- org.jetbrains.kotlin.idea.refactoring.move.MoveTestGenerated.testKotlin_moveTopLevelDeclarations_moveFunctionToPackage_MoveFunctionToPackage	Muted failure
+-- org.jetbrains.kotlin.idea.run.RunConfigurationTest.testWithModuleForJdk9	Muted failure
 org.jetbrains.kotlin.idea.spring.tests.quickfixes.SpringQuickFixTestGenerated$AddQualifierAnnotation.testAmbiguousBean	Muted failure
 org.jetbrains.kotlin.idea.spring.tests.references.SpringReferenceNavigationTestGenerated.testPackageReferenceInComponentScan	Muted failure
-org.jetbrains.kotlin.idea.stubs.MultiFileHighlightingTestGenerated.testTopLevelMembersReference	Muted failure
+-- org.jetbrains.kotlin.idea.stubs.MultiFileHighlightingTestGenerated.testTopLevelMembersReference	Muted failure
 -- * org.jetbrains.kotlin.j2k.JavaToKotlinConverterSingleFileTestGenerated$AnonymousClass.testKt_13146	STABLE
 -- * org.jetbrains.kotlin.j2k.JavaToKotlinConverterSingleFileTestGenerated$Issues.testKt_807	STABLE
 -- org.jetbrains.kotlin.jps.build.IncrementalJvmJpsTestGenerated$WithJava$JavaUsedInKotlin.testMixedInheritance	Muted failure
