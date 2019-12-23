@@ -32,7 +32,9 @@ task populateNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
 
     from {
         configurations.nodeModules.collect {
-            zipTree(it.absolutePath).matching { include '*.js' }
+            if (it.exists()) {
+                zipTree(it.absolutePath).matching { include '*.js' }
+            }
         }
     }
 
