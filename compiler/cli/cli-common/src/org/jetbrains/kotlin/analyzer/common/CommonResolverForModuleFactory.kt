@@ -101,10 +101,13 @@ class CommonResolverForModuleFactory(
             languageVersionSettings, CommonPlatforms.defaultCommonPlatform, CommonPlatformAnalyzerServices, shouldCheckExpectActual
         )
 
-        val packageFragmentProviders = listOf(
-            container.get<ResolveSession>().packageFragmentProvider,
-            container.get<MetadataPackageFragmentProvider>()
-        )
+        val packageFragmentProviders =
+            /** If this is a dependency module that [commonDependenciesContainer] knows about, get the package fragment from there */
+            commonDependenciesContainer?.packageFragmentProviderForModuleInfo(moduleInfo)?.let(::listOf)
+                ?: listOfNotNull(
+                    container.get<ResolveSession>().packageFragmentProvider,
+                    container.get<MetadataPackageFragmentProvider>()
+                )
 
         return ResolverForModule(CompositePackageFragmentProvider(packageFragmentProviders), container)
     }
