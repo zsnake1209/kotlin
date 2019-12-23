@@ -23,8 +23,8 @@ fun main() {
         foo(<!DEBUG_INFO_SMARTCAST!>x<!>)
     } else {
         foo(<!DEBUG_INFO_CONSTANT, TYPE_MISMATCH!>x<!>)
-        <!UNREACHABLE_CODE!>foo(<!><!ALWAYS_NULL!>x<!>!!<!UNREACHABLE_CODE!>)<!>
-        <!UNREACHABLE_CODE!>foo(<!DEBUG_INFO_SMARTCAST!>x<!>)<!>
+        <!OI;UNREACHABLE_CODE!>foo(<!><!ALWAYS_NULL!>x<!>!!<!OI;UNREACHABLE_CODE!>)<!>
+        <!OI;UNREACHABLE_CODE!><!NI;UNREACHABLE_CODE!>foo(<!><!DEBUG_INFO_SMARTCAST!>x<!><!NI;UNREACHABLE_CODE!>)<!><!>
     }
 
     foo(<!DEBUG_INFO_SMARTCAST!>x<!>)
