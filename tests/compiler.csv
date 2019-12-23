@@ -1,0 +1,92 @@
+Ignored
+FloatMathTest.floatRangeConversiontest.numbers
+1ms
+1260
+Ignored
+floatRangeConversiontest.numbers: FloatMathTest:
+< 1ms
+13036
+Ignored
+testValueWrongIgnoredkotlin.test.tests: AnnotationsTest:
+< 1ms
+13471
+Ignored
+floatRangeConversionstdlib-js-ir: test.numbers: FloatMathTest:
+< 1ms
+14548
+Ignored
+AnnotationsTest.testValueWrongIgnoredkotlin.test.tests
+1ms
+15248
+Ignored
+FirResolveTestTotalKotlin.testTotalKotlinorg.jetbrains.kotlin.fir
+< 1ms
+20808
+Ignored
+TemporaryAssignmentEliminationTest.declarationorg.jetbrains.kotlin.js.test.optimizer
+1ms
+32582
+Ignored
+TemporaryAssignmentEliminationTest.skipsGlobalDeclarationsorg.jetbrains.kotlin.js.test.optimizer
+1ms
+32583
+Ignored
+TemporaryAssignmentEliminationTest.ifWithoutElseorg.jetbrains.kotlin.js.test.optimizer
+1ms
+32584
+Ignored
+TemporaryAssignmentEliminationTest.transitiveChainorg.jetbrains.kotlin.js.test.optimizer
+< 1ms
+32585
+Ignored
+TemporaryAssignmentEliminationTest.forInitVariablesorg.jetbrains.kotlin.js.test.optimizer
+2ms
+32586
+Ignored
+TemporaryAssignmentEliminationTest.returnStatementorg.jetbrains.kotlin.js.test.optimizer
+1ms
+32587
+Ignored
+TemporaryAssignmentEliminationTest.transitiveAssignmentorg.jetbrains.kotlin.js.test.optimizer
+< 1ms
+32588
+Ignored
+TemporaryAssignmentEliminationTest.assignmentorg.jetbrains.kotlin.js.test.optimizer
+< 1ms
+32589
+Ignored
+TemporaryAssignmentEliminationTest.forInitExpressionPreventsOptimizationorg.jetbrains.kotlin.js.test.optimizer
+< 1ms
+32590
+Ignored
+TemporaryAssignmentEliminationTest.tryCatchorg.jetbrains.kotlin.js.test.optimizer
+< 1ms
+32591
+Ignored
+TestSuite$1.warningorg.jetbrains.kotlin.daemon.experimental.integration.CompilerApiTest: junit.framework
+1ms
+81295
+Ignored
+TestSuite$1.warningorg.jetbrains.kotlin.daemon.experimental.unit.ClientSerializationTest: junit.framework
+1ms
+81296
+Ignored
+TestSuite$1.warningorg.jetbrains.kotlin.daemon.experimental.integration.CompilerDaemonTest: junit.framework
+< 1ms
+81406
+Ignored
+TestSuite$1.warningorg.jetbrains.kotlin.daemon.experimental.unit.ConnectionsTest: junit.framework
+< 1ms
+81407
+Ignored
+MainKtsIT.testKotlinxHtmlorg.jetbrains.kotlin.mainKts.test
+< 1ms
+81925
+Ignored
+ScriptUtilIT.testResolveStdJUnitHelloWorldorg.jetbrains.kotlin.script.util
+1ms
+81926
+Ignored
+ScriptUtilIT.testResolveStdJUnitDynVerorg.jetbrains.kotlin.script.util
+< 1ms
+81929

@@ -1,0 +1,58 @@
+* org.jetbrains.kotlin.allopen.BytecodeListingTestForAllOpenGenerated.initializationError STABLE
+* org.jetbrains.kotlin.checkers.JavaAgainstKotlinBinariesCheckerTestGenerated.testClassObjects STABLE 192, 193
+* org.jetbrains.kotlin.checkers.JavaAgainstKotlinBinariesCheckerTestGenerated.testUsingKotlinPackageDeclarations STABLE 192, 193
+* org.jetbrains.kotlin.checkers.JavaAgainstKotlinSourceCheckerWithoutUltraLightTestGenerated$JavaAgainstKotlin.testUsingMutableInterfaces	FLAKY
+* org.jetbrains.kotlin.checkers.PsiCheckerTestGenerated$Checker.testRedeclaration	STABLE 192, 193 (my fix)
+* org.jetbrains.kotlin.checkers.PsiCheckerTestGenerated$Recovery.testReturnInFileAnnotation FLAKY (my fix)
+* org.jetbrains.kotlin.findUsages.FindUsagesTestGenerated$Kotlin$Conventions.testSet STABLE
+* org.jetbrains.kotlin.gradle.ImportAndCheckHighlighting.testMultiplatformLibrary[1: Gradle-4.9, KotlinGradlePlugin-latest stable] STABLE 193
+* org.jetbrains.kotlin.gradle.ImportAndCheckHighlighting.testMultiplatformLibrary[3: Gradle-5.6.4, KotlinGradlePlugin-latest stable] STABLE 193
+* org.jetbrains.kotlin.gradle.NewMultiplatformProjectImportingTest.testSingleAndroidTarget[1: Gradle-4.9, KotlinGradlePlugin-latest stable]	WINDOWS, 191, 192, 193
+* org.jetbrains.kotlin.gradle.NewMultiplatformProjectImportingTest.testSingleAndroidTarget[3: Gradle-5.6.4, KotlinGradlePlugin-latest stable] WINDOWS, 191, 192, 193
+* org.jetbrains.kotlin.idea.caches.resolve.HighlightingWithDependentLibrariesTest.testHighlightingWithDependentLibraries 192, 193
+* org.jetbrains.kotlin.idea.caches.resolve.Java9MultiModuleHighlightingTest.testDeclarationKinds STABLE (my fix)
+* org.jetbrains.kotlin.idea.caches.resolve.MultiPlatformHighlightingTestGenerated.testJvmKotlinReferencesCommonKotlinThroughJavaDifferentJvmImpls STABLE
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleBuildFileHighlightingTest.testKtsInJsProject[0: with Gradle-4.9]	STABLE
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleBuildFileHighlightingTest.testKtsInJsProject[1: with Gradle-5.6.4] STABLE
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testAddLibraryGSK[1: with Gradle-5.6.4]	STABLE
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testAddNonKotlinLibraryGSK[1: with Gradle-5.6.4] STABLE
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testAddTestLibraryGSK[1: with Gradle-5.6.4]	STABLE
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testConfigure10[1: with Gradle-5.6.4] STABLE
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testConfigureGSK[1: with Gradle-5.6.4]	STABLE
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testConfigureGradleKtsKotlinDevVersion[1: with Gradle-5.6.4]	Muted failure
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testConfigureKotlinDevVersion[1: with Gradle-5.6.4]	Muted failure
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleConfiguratorTest.testConfigureKotlinWithPluginsBlock[1: with Gradle-5.6.4]	Muted failure
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testAndroidGradleJsDetection[0: with Gradle-4.9] STABLE 192, 193
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testAndroidGradleJsDetection[1: with Gradle-5.6.4] STABLE 192, 193
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[0: with Gradle-4.9]	STABLE 192, 193
+* org.jetbrains.kotlin.idea.codeInsight.gradle.GradleFacetImportTest.testKotlinAndroidPluginDetection[1: with Gradle-5.6.4] STABLE 192, 193
+* org.jetbrains.kotlin.idea.configuration.ConfigureKotlinInTempDirTest.testKotlincExistsNoSettingsLatestRuntimeNoVersionAutoAdvance FLAKY
+* org.jetbrains.kotlin.idea.configuration.ConfigureKotlinTest.testJava9WithModuleInfo	STABLE, Works on AS 34
+* org.jetbrains.kotlin.idea.configuration.GradleConfigureProjectByChangingFileTestGenerated$Gradle.testWithJava9ModuleInfo STABLE, Works on AS 34
+-- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testNoCoroutines	WINDOWS
+-- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testThreeCoroutines	WINDOWS
+-- * org.jetbrains.kotlin.idea.debugger.test.CoroutineDumpTestGenerated.testTwoDumps	WINDOWS
+org.jetbrains.kotlin.idea.highlighter.HighlightingTestGenerated.testSuspend	Muted failure
+org.jetbrains.kotlin.idea.highlighter.NoErrorsInStdlibTest.testNoErrors	Muted failure
+org.jetbrains.kotlin.idea.intentions.IntentionTestGenerated$ImportAllMembers.testAmbiguousCalls	Muted failure
+org.jetbrains.kotlin.idea.maven.KotlinMavenInspectionTestGenerated.testWrongPhaseExecution	Muted failure
+* org.jetbrains.kotlin.idea.maven.MavenMigrateTest.testMigrateApiAndLanguageVersions	FLAKY, WINDOWS
+org.jetbrains.kotlin.idea.maven.configuration.MavenConfigureProjectByChangingFileTestGenerated$Jvm.testWithJava9ModuleInfo	Muted failure
+org.jetbrains.kotlin.idea.parameterInfo.ParameterInfoTestGenerated$FunctionCall.testNoSynthesizedParameterNames	Muted failure
+org.jetbrains.kotlin.idea.quickfix.DeprecatedSymbolUsageFixSpecialTest.testDefaultParameterValuesFromLibrary	Muted failure
+org.jetbrains.kotlin.idea.quickfix.QuickFixMultiModuleTestGenerated$CreateActual.testWithTestDummy	Muted failure
+org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testJunit	Muted failure
+org.jetbrains.kotlin.idea.quickfix.QuickFixTestGenerated$Libraries.testTestNG	Muted failure
+org.jetbrains.kotlin.idea.refactoring.move.MoveTestGenerated.testKotlin_moveTopLevelDeclarations_moveFunctionToPackage_MoveFunctionToPackage	Muted failure
+org.jetbrains.kotlin.idea.run.RunConfigurationTest.testWithModuleForJdk9	Muted failure
+org.jetbrains.kotlin.idea.spring.tests.quickfixes.SpringQuickFixTestGenerated$AddQualifierAnnotation.testAmbiguousBean	Muted failure
+org.jetbrains.kotlin.idea.spring.tests.references.SpringReferenceNavigationTestGenerated.testPackageReferenceInComponentScan	Muted failure
+org.jetbrains.kotlin.idea.stubs.MultiFileHighlightingTestGenerated.testTopLevelMembersReference	Muted failure
+-- * org.jetbrains.kotlin.j2k.JavaToKotlinConverterSingleFileTestGenerated$AnonymousClass.testKt_13146	STABLE
+-- * org.jetbrains.kotlin.j2k.JavaToKotlinConverterSingleFileTestGenerated$Issues.testKt_807	STABLE
+org.jetbrains.kotlin.jps.build.IncrementalJvmJpsTestGenerated$WithJava$JavaUsedInKotlin.testMixedInheritance	Muted failure
+org.jetbrains.kotlin.noarg.BlackBoxCodegenTestForNoArgGenerated.initializationError	Muted failure
+org.jetbrains.kotlin.noarg.BytecodeListingTestForNoArgGenerated.initializationError	Muted failure
+org.jetbrains.kotlin.psi.injection.StringInterpolationInjectionTest.testInterpolationSimpleName	Muted failure
+org.jetbrains.kotlin.shortenRefs.ShortenRefsTestGenerated.testExtensionForObject2	Muted failure
+org.jetbrains.kotlinx.serialization.SerializationIrBytecodeListingTestGenerated.testBasic	Muted failure
