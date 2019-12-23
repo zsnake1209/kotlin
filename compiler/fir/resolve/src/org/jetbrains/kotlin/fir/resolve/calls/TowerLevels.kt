@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
 import org.jetbrains.kotlin.fir.resolve.BodyResolveComponents
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.fir.resolve.firSymbolProvider
+import org.jetbrains.kotlin.fir.resolve.scope
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
@@ -241,12 +242,11 @@ class QualifiedReceiverTowerLevel(
             }
             else -> {
                 val symbol = session.firSymbolProvider.getClassLikeSymbolByFqName(classId) ?: return ProcessorAction.NEXT
-                val fir = symbol.fir
-                if (fir is FirClass<*>) {
-                    fir.scope(ConeSubstitutor.Empty, session, bodyResolveComponents.scopeSession)
-                } else {
-                    TODO("error not ssss")
-
+                when (symbol) {
+                    is FirClassSymbol<*> -> symbol.fir.scope(ConeSubstitutor.Empty, session, bodyResolveComponents.scopeSession)
+                    is FirTypeAliasSymbol ->
+                        symbol.fir.expandedTypeRef.coneTypeUnsafe<ConeKotlinType>()
+                            .scope(session, bodyResolveComponents.scopeSession) ?: return ProcessorAction.NEXT
                 }
             }
         }
