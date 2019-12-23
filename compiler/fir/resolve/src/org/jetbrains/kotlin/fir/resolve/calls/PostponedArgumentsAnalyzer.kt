@@ -39,7 +39,6 @@ interface LambdaAnalyzer {
 
 class PostponedArgumentsAnalyzer(
     private val lambdaAnalyzer: LambdaAnalyzer,
-    private val typeProvider: (FirExpression) -> FirTypeRef?,
     private val components: InferenceComponents,
     private val candidate: Candidate,
     private val replacements: MutableMap<FirExpression, FirExpression>,
@@ -148,8 +147,7 @@ class PostponedArgumentsAnalyzer(
                 checkerSink,
                 isReceiver = false,
                 isDispatch = false,
-                isSafeCall = false,
-                typeProvider = typeProvider
+                isSafeCall = false
             )
 //            resolveKtPrimitive(
 //                c.getBuilder(), it, lambda.returnType.let(::substitute), diagnosticHolder, isReceiver = false

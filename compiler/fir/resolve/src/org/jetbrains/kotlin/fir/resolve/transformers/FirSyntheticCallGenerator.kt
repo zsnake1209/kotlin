@@ -148,7 +148,7 @@ class FirSyntheticCallGenerator(
         session = session,
         containingFile = file,
         implicitReceiverStack = implicitReceiverStack
-    ) { it.resultType }
+    )
 
     private fun generateSyntheticSelectFunction(callableId: CallableId): FirSimpleFunctionImpl {
         // Synthetic function signature:

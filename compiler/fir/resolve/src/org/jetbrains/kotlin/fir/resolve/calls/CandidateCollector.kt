@@ -105,8 +105,7 @@ class InvokeReceiverCandidateCollector(
                 invokeCallInfo.implicitReceiverStack,
                 invokeCallInfo.expectedType,
                 invokeCallInfo.outerCSBuilder,
-                invokeCallInfo.lhs,
-                invokeCallInfo.typeProvider
+                invokeCallInfo.lhs
             )
 
             invokeConsumer.addConsumer(
