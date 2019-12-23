@@ -90,6 +90,9 @@ enum class CompilerOutputKind {
     LIBRARY {
         override fun suffix(target: KonanTarget?) = ".klib"
     },
+    DESCRIPTORS_ONLY_LIBRARY {
+        override fun suffix(target: KonanTarget?) = ".klib"
+    },
     BITCODE {
         override fun suffix(target: KonanTarget?) = ".bc"
     },
