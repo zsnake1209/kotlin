@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir
 
-import org.jetbrains.kotlin.backend.common.serialization.KotlinManglerImpl
+import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinManglerImpl
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.isInlined
@@ -27,4 +27,6 @@ object JsManglerForBE : AbstractJsMangler() {
     override fun mangleTypeParameter(typeParameter: IrTypeParameter, typeParameterNamer: (IrTypeParameter) -> String?): String {
         return typeParameterNamer(typeParameter) ?: "-1:${typeParameter.index}"
     }
+
+    override fun doCheck() = false
 }

@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.backend.jvm.serialization
 
-import org.jetbrains.kotlin.backend.common.serialization.KotlinManglerImpl
+import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinManglerImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.isInlined
 
