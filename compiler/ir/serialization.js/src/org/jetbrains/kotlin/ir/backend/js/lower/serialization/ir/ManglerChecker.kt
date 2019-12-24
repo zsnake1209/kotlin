@@ -7,17 +7,14 @@ package org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.*
 import org.jetbrains.kotlin.ir.IrElement
-import org.jetbrains.kotlin.ir.declarations.IrAnonymousInitializer
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrField
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 class ManglerChecker : IrElementVisitorVoid {
     private val irExportChecker = IrExportCheckerVisitor()
-    private val descirptorExportChecker =
-        DescriptorExportCheckerVisitor()
+    private val descirptorExportChecker = DescriptorExportCheckerVisitor()
 
     override fun visitElement(element: IrElement) {
         element.acceptChildrenVoid(this)
@@ -34,11 +31,16 @@ class ManglerChecker : IrElementVisitorVoid {
 
     private fun hashedMangleImplDesc(declaration: IrDeclaration): String {
         val sb = StringBuilder(256)
-        val kind = SpecialDeclarationType.declarationToType(declaration)
-        val prefix = if (declaration is IrField) "kfield" else "kprop"
-        declaration.descriptor.accept(DescriptorMangleVisitor(sb, prefix, kind), true)
+        declaration.descriptor.accept(DescriptorMangleVisitor(sb, descriptorPrefix(declaration)), true)
 
         return sb.toString()
+    }
+
+    private fun isExportedImplClassic(declaration: IrDeclaration): Boolean {
+        if (declaration is IrValueDeclaration) return false
+        if (declaration is IrAnonymousInitializer) return false
+        if (declaration is IrLocalDelegatedProperty) return false
+        return with(JsManglerForBE) { declaration.isExportedClassic() }
     }
 
     private fun hashedMangleImplClassic(declaration: IrDeclaration): String {
@@ -46,7 +48,14 @@ class ManglerChecker : IrElementVisitorVoid {
     }
 
     override fun visitDeclaration(declaration: IrDeclaration) {
+        val e0 = isExportedImplClassic(declaration)
         val e1 = declaration.accept(irExportChecker, null)
+
+        if (e0 != e1) {
+            println("${declaration.render()}\n Classic: $e0\n Visitor: $e1\n")
+            error("${declaration.render()}\n Classic: $e0\n Visitor: $e1\n")
+        }
+
         val kind = SpecialDeclarationType.declarationToType(declaration)
         val e2 = declaration.descriptor.accept(descirptorExportChecker, kind)
         if (e1 != e2) {

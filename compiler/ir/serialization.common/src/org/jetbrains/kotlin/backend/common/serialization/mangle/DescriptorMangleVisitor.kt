@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
-open class DescriptorMangleVisitor(private val builder: StringBuilder, private val propPrefix: String, private val dType: SpecialDeclarationType) : DeclarationDescriptorVisitor<Unit, Boolean> {
+open class DescriptorMangleVisitor(private val builder: StringBuilder, private val specialPrefix: String) : DeclarationDescriptorVisitor<Unit, Boolean> {
 
     private val typeParameterContainer = ArrayList<DeclarationDescriptor>(4)
 
@@ -132,7 +132,7 @@ open class DescriptorMangleVisitor(private val builder: StringBuilder, private v
                 if (type.isMarkedNullable) tBuilder.append('?')
             }
             is DynamicType -> tBuilder.append("<dynamic>")
-            else -> error("Unexepcted type $wtype")
+            else -> error("Unexpected type $wtype")
         }
     }
 
@@ -188,7 +188,7 @@ open class DescriptorMangleVisitor(private val builder: StringBuilder, private v
 
         isRealExpect = isRealExpect or descriptor.isExpect
         typeParameterContainer.add(descriptor)
-        val prefix = if (dType == SpecialDeclarationType.ENUM_ENTRY) "kenumentry" else "kclass"
+        val prefix = if (specialPrefix == "kenumentry") specialPrefix else "kclass"
         descriptor.mangleSimpleDeclaration(prefix, data, descriptor.name.asString())
 
         if (data && isRealExpect) builder.append("#expect")
@@ -209,7 +209,8 @@ open class DescriptorMangleVisitor(private val builder: StringBuilder, private v
     override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, data: Boolean) {
         val extensionReceiver = descriptor.extensionReceiverParameter
 
-        val prefixLength = addPrefix(propPrefix, data)
+        val prefix = if (specialPrefix == "kfield") specialPrefix else "kprop"
+        val prefixLength = addPrefix(prefix, data)
 
         isRealExpect = isRealExpect or descriptor.isExpect
         typeParameterContainer.add(descriptor)

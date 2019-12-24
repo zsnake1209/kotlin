@@ -19,8 +19,6 @@ import org.jetbrains.kotlin.name.SpecialNames
 
 class IrExportCheckerVisitor : IrElementVisitor<Boolean, Nothing?> {
 
-    private val publishedApiAnnotation = FqName("kotlin.PublishedApi")
-
     private fun IrDeclaration.isExported(annotations: List<IrConstructorCall>, visibility: Visibility?): Boolean {
         if (annotations.hasAnnotation(publishedApiAnnotation)) return true
         if (visibility != null && !visibility.isPubliclyVisible()) return false

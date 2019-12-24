@@ -21,7 +21,7 @@ enum class SpecialDeclarationType {
             return when {
                 declaration is IrAnonymousInitializer -> ANON_INIT
                 declaration is IrEnumEntry -> ENUM_ENTRY
-                declaration is IrField && declaration.correspondingPropertySymbol?.owner?.run { isConst || isLateinit && visibility.isPublicAPI } == false -> BACKING_FIELD
+                declaration is IrField && declaration.correspondingPropertySymbol != null -> BACKING_FIELD
                 else -> REGULAR
             }
         }

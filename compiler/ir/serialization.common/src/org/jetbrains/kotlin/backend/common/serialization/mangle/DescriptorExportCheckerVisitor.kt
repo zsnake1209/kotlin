@@ -15,7 +15,6 @@ class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boolean, Spe
     private fun reportUnexpectedDescriptor(descriptor: DeclarationDescriptor): Nothing {
         error("unexpected descriptor $descriptor")
     }
-    private val publishedApiAnnotation = FqName("kotlin.PublishedApi")
 
     private fun Visibility.isPubliclyVisible(): Boolean = isPublicAPI || this === Visibilities.INTERNAL
 
@@ -62,7 +61,9 @@ class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boolean, Spe
 
     override fun visitConstructorDescriptor(constructorDescriptor: ConstructorDescriptor, data: SpecialDeclarationType): Boolean {
         val klass = constructorDescriptor.constructedClass
-        return if (klass.kind.isSingleton) klass.accept(this, SpecialDeclarationType.REGULAR) else constructorDescriptor.run { isExported(annotations, visibility) }
+        return if (klass.kind.isSingleton)
+            klass.accept(this, SpecialDeclarationType.REGULAR)
+        else constructorDescriptor.run { isExported(annotations, visibility) }
     }
 
     override fun visitScriptDescriptor(scriptDescriptor: ScriptDescriptor, data: SpecialDeclarationType): Boolean {
@@ -70,7 +71,14 @@ class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boolean, Spe
     }
 
     override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, data: SpecialDeclarationType): Boolean {
-        if (data == SpecialDeclarationType.BACKING_FIELD) return descriptor.annotations.hasAnnotation(publishedApiAnnotation)
+        val visibility = if (data == SpecialDeclarationType.BACKING_FIELD) {
+            when {
+                descriptor.isConst -> descriptor.visibility
+                descriptor.isLateInit -> descriptor.run { setter?.visibility ?: visibility }
+                else -> Visibilities.PRIVATE
+            }
+        } else descriptor.visibility
+
         return descriptor.run { isExported(annotations, visibility) }
     }
 

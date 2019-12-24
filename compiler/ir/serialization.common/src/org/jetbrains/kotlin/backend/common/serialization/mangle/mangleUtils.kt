@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.backend.common.serialization.mangle
 
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.name.FqName
+
 val mangleSizes = mutableListOf<Int>()
 val vpSizes = mutableListOf<Int>()
 val tpSizes = mutableListOf<Int>()
@@ -28,3 +31,15 @@ internal fun <T> Collection<T>.collect(builder: StringBuilder, separator: String
 }
 
 internal const val PUBLIC_MANGLE_FLAG = 1L shl 63
+
+internal val publishedApiAnnotation = FqName("kotlin.PublishedApi")
+
+fun descriptorPrefix(declaration: IrDeclaration): String {
+    return when (declaration) {
+        is IrEnumEntry -> "kenumentry"
+        is IrClass -> "kclass"
+        is IrField -> "kfield"
+        is IrProperty -> "kprop"
+        else -> ""
+    }
+}
