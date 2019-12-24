@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.metadata.ProtoBuf
 import org.jetbrains.kotlin.metadata.deserialization.BinaryVersion
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.serialization.DescriptorSerializer
@@ -36,7 +35,7 @@ abstract class KlibMetadataSerializer(
     val metadataVersion: BinaryVersion,
     val descriptorTable: DescriptorTable,
     val skipExpects: Boolean = false,
-    val includeOnlyPackagesFromSource: Boolean = false
+    val includeOnlyModuleContent: Boolean = false
 ) {
 
     lateinit var serializerContext: SerializerContext
@@ -237,12 +236,8 @@ abstract class KlibMetadataSerializer(
         val result = mutableSetOf<FqName>()
 
         fun getSubPackagesOfModule(fqName: FqName) =
-            if (includeOnlyPackagesFromSource) {
-                val moduleImpl = module as? ModuleDescriptorImpl
-                    ?: error("Can't get a module's package fragments from source, it's not a ${ModuleDescriptorImpl::class.simpleName}.")
-
-                val packageFragmentProvider = moduleImpl.packageFragmentProviderForModuleContentWithoutDependencies
-                packageFragmentProvider.getSubPackagesOf(fqName) { true }
+            if (includeOnlyModuleContent) {
+                module.packageFragmentProviderForModuleContentWithoutDependencies.getSubPackagesOf(fqName) { true }
             } else {
                 module.getSubPackagesOf(fqName) { true }
             }
@@ -305,3 +300,7 @@ fun DeclarationDescriptor.extractFileId(): Int? = when (this) {
     is DeserializedPropertyDescriptor -> proto.getExtension(KlibMetadataProtoBuf.propertyFile)
     else -> null
 }
+
+internal val ModuleDescriptor.packageFragmentProviderForModuleContentWithoutDependencies: PackageFragmentProvider
+    get() = (this as? ModuleDescriptorImpl)?.packageFragmentProviderForModuleContentWithoutDependencies
+        ?: error("Can't get a module content package fragments, it's not a ${ModuleDescriptorImpl::class.simpleName}.")

@@ -1,11 +1,8 @@
 package org.jetbrains.kotlin.backend.common.serialization.metadata
 
 import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
-import org.jetbrains.kotlin.backend.common.serialization.isExpectMember
-import org.jetbrains.kotlin.backend.common.serialization.isSerializableExpectClass
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.library.SerializedMetadata
 import org.jetbrains.kotlin.library.metadata.KlibMetadataProtoBuf
 import org.jetbrains.kotlin.metadata.ProtoBuf
@@ -22,13 +19,13 @@ class KlibMetadataMonolithicSerializer(
     metadataVersion: BinaryVersion,
     descriptorTable: DescriptorTable,
     skipExpects: Boolean,
-    includeOnlyPackagesFromSource: Boolean = false
-) : KlibMetadataSerializer(languageVersionSettings, metadataVersion, descriptorTable, skipExpects, includeOnlyPackagesFromSource) {
+    includeOnlyModuleContent: Boolean = false
+) : KlibMetadataSerializer(languageVersionSettings, metadataVersion, descriptorTable, skipExpects, includeOnlyModuleContent) {
 
     private fun serializePackageFragment(fqName: FqName, module: ModuleDescriptor): List<ProtoBuf.PackageFragment> {
 
-        val fragments = if (includeOnlyPackagesFromSource) {
-            (module as ModuleDescriptorImpl).packageFragmentProviderForModuleContentWithoutDependencies.getPackageFragments(fqName)
+        val fragments = if (includeOnlyModuleContent) {
+            module.packageFragmentProviderForModuleContentWithoutDependencies.getPackageFragments(fqName)
         } else {
             module.getPackage(fqName).fragments.filter { it.module == module }
         }
