@@ -53,16 +53,17 @@ task libraryJarWithoutIr(type: Jar, dependsOn: compileKotlin2Js) {
 }
 
 task libraryJarWithIr(type: Zip, dependsOn: libraryJarWithoutIr) {
-    def irKlib = tasks.getByPath(":kotlin-stdlib-js-ir:generateKotlinTestKLib")
-    dependsOn(irKlib)
-
     archiveExtension = "jar"
     destinationDirectory = file("$buildDir/libs")
 
     duplicatesStrategy DuplicatesStrategy.FAIL
 
     from zipTree(libraryJarWithoutIr.archiveFile)
-    from fileTree("${irKlib.outputs.files.singleFile.path}/klib")
+    if (rootProject.includeStdlibJsIr) {
+        def irKlib = tasks.getByPath(":kotlin-stdlib-js-ir:generateKotlinTestKLib")
+        dependsOn(irKlib)
+        from fileTree("${irKlib.outputs.files.singleFile.path}/klib")
+    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
