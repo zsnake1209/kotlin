@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.idea.core.util
 
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
@@ -49,11 +50,11 @@ fun PsiElement.getLineCount(): Int {
             val startLine = doc.getLineNumber(spaceRange.startOffset)
             val endLine = doc.getLineNumber(spaceRange.endOffset)
 
-            return endLine - startLine
+            return endLine - startLine + 1
         }
     }
 
-    return (text ?: "").count { it == '\n' } + 1
+    return StringUtil.getLineBreakCount(text ?: "") + 1
 }
 
 fun PsiElement.isMultiLine(): Boolean = getLineCount() > 1
