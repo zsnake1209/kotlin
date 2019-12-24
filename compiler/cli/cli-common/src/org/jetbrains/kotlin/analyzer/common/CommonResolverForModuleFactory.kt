@@ -59,7 +59,7 @@ class CommonResolverForModuleFactory(
     private val targetEnvironment: TargetEnvironment,
     private val targetPlatform: TargetPlatform,
     private val shouldCheckExpectActual: Boolean,
-    private val commonDependenciesContainer: CommonDependenciesContainer?
+    private val commonDependenciesContainer: CommonDependenciesContainer? = null
 ) : ResolverForModuleFactory() {
     private class SourceModuleInfo(
         override val name: Name,
@@ -153,9 +153,7 @@ class CommonResolverForModuleFactory(
                 dependencyModules = dependenciesContainer?.moduleInfos ?: emptyList()
             )
 
-            val moduleDescriptor = resolver.descriptorForModule(moduleInfo).also {
-                dependenciesContainer?.setModuleDescriptorForPackageFragmentProviders(it)
-            }
+            val moduleDescriptor = resolver.descriptorForModule(moduleInfo)
 
             val container = resolver.resolverForModule(moduleInfo).componentProvider
 
@@ -170,16 +168,6 @@ interface CommonDependenciesContainer {
     val moduleInfos: List<ModuleInfo>
 
     fun packageFragmentProviderForModuleInfo(moduleInfo: ModuleInfo): PackageFragmentProvider?
-
-    /**
-     * This is a workaround for resolution: if the dependency package fragment providers are created with their own (dependency) module
-     * descriptors, it breaks resolution, at least delegation `getValue` resolution for delegated properties in some cases.
-     * To avoid that, we create the dependency package fragment providers with the module descriptor that is compiled, so that all
-     * package fragments actually have the same module descriptor.
-     *
-     * TODO: investigate the resolution issues that arise when this workaround is not used, then remove this workaround.
-     */
-    fun setModuleDescriptorForPackageFragmentProviders(moduleDescriptor: ModuleDescriptorImpl)
 }
 
 private fun createContainerToResolveCommonCode(

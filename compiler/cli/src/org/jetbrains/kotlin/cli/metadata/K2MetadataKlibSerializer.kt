@@ -142,8 +142,9 @@ private class KlibMetadataDependencyContainer(
             )
         }.also { result ->
             val resultValues = result.values.toList()
+            val dependenciesForModuleDescriptors = resultValues + builtIns.builtInsModule
             resultValues.forEach { module ->
-                module.setDependencies(resultValues)
+                module.setDependencies(dependenciesForModuleDescriptors)
             }
         }
 
@@ -163,15 +164,6 @@ private class KlibMetadataDependencyContainer(
         moduleInfo as KlibModuleInfo
         return packageFragmentProviderForKotlinLibrary(moduleInfo.kotlinLibrary)
     }
-
-    override fun setModuleDescriptorForPackageFragmentProviders(moduleDescriptor: ModuleDescriptorImpl) {
-        check(moduleDescriptorForPackageFragments == null) {
-            "Module descriptor for package fragments has already been set: $moduleDescriptorForPackageFragments"
-        }
-        moduleDescriptorForPackageFragments = moduleDescriptor
-    }
-
-    private var moduleDescriptorForPackageFragments: ModuleDescriptor? = null
 
     private val klibMetadataModuleDescriptorFactory by lazy {
         KlibMetadataModuleDescriptorFactoryImpl(
@@ -194,7 +186,7 @@ private class KlibMetadataDependencyContainer(
             packageAccessHandler = null,
             packageFragmentNames = packageFragmentNames,
             storageManager = LockBasedStorageManager("KlibMetadataPackageFragmentProvider"),
-            moduleDescriptor = moduleDescriptorForPackageFragments ?: libraryModuleDescriptor,
+            moduleDescriptor = libraryModuleDescriptor,
             configuration = CompilerDeserializationConfiguration(languageVersionSettings),
             compositePackageFragmentAddend = null
         ).also {
