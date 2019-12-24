@@ -1,0 +1,21 @@
+/*
+ * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
+package org.jetbrains.kotlin.ir.util
+
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.ClassifierDescriptorWithTypeParameters
+import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
+
+val TypeParameterDescriptor.originalTypeParameter: TypeParameterDescriptor
+    get() =
+        when (val container = containingDeclaration.original) {
+            is ClassifierDescriptorWithTypeParameters ->
+                container.declaredTypeParameters[index]
+            is CallableDescriptor ->
+                container.typeParameters[index]
+            else ->
+                throw AssertionError("Unexpected type parameter container: $container")
+        }

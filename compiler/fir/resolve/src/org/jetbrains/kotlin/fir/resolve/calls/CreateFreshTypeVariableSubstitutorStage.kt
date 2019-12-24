@@ -126,9 +126,9 @@ fun createToFreshVariableSubstitutorAndAddInitialConstraints(
 //            for (originalIndex in typeMapping) {
 //                // there can be null in case we already captured type parameter in outer class (in case of inner classes)
 //                // see test innerClassTypeAliasConstructor.kt
-//                val originalTypeParameter = originalTypeParameters.getOrNull(originalIndex) ?: continue
-//                val position = DeclaredUpperBoundConstraintPosition(originalTypeParameter)
-//                for (upperBound in originalTypeParameter.upperBounds) {
+//                val org.jetbrains.kotlin.ir.util.getOriginalTypeParameter = originalTypeParameters.getOrNull(originalIndex) ?: continue
+//                val position = DeclaredUpperBoundConstraintPosition(org.jetbrains.kotlin.ir.util.getOriginalTypeParameter)
+//                for (upperBound in org.jetbrains.kotlin.ir.util.getOriginalTypeParameter.upperBounds) {
 //                    freshVariable.addSubtypeConstraint(upperBound, position)
 //                }
 //            }
