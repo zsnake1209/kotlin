@@ -12,7 +12,7 @@ internal class KTypeImpl(
     override val arguments: List<KTypeProjection>,
     override val isMarkedNullable: Boolean
 ) : KType {
-    override val annotations: List<Annotation>
+    /*override*/ val annotations: List<Annotation>
         get() = emptyList()
 
     override fun equals(other: Any?): Boolean =
@@ -49,7 +49,7 @@ internal object DynamicKType : KType {
     override val classifier: KClassifier? = null
     override val arguments: List<KTypeProjection> = emptyList()
     override val isMarkedNullable: Boolean = false
-    override val annotations: List<Annotation> = emptyList()
+    /*override*/ val annotations: List<Annotation> = emptyList()
     override fun toString(): String = "dynamic"
 }
 
