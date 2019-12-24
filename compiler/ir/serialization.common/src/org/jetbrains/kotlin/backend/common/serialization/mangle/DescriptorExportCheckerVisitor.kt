@@ -10,7 +10,8 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.SpecialNames
 
-class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boolean, Boolean> {
+class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boolean, SpecialDeclarationType> {
+
     private fun reportUnexpectedDescriptor(descriptor: DeclarationDescriptor): Nothing {
         error("unexpected descriptor $descriptor")
     }
@@ -22,69 +23,70 @@ class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boolean, Boo
         if (annotations.hasAnnotation(publishedApiAnnotation)) return true
         if (visibility != null && !visibility.isPubliclyVisible()) return false
 
-        return containingDeclaration.accept(this@DescriptorExportCheckerVisitor, false)
+        return containingDeclaration.accept(this@DescriptorExportCheckerVisitor, SpecialDeclarationType.REGULAR)
     }
 
-    override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: Boolean): Boolean {
+    override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: SpecialDeclarationType): Boolean {
         return true
     }
 
-    override fun visitPackageViewDescriptor(descriptor: PackageViewDescriptor, data: Boolean): Boolean {
+    override fun visitPackageViewDescriptor(descriptor: PackageViewDescriptor, data: SpecialDeclarationType): Boolean {
         return true
     }
 
-    override fun visitVariableDescriptor(descriptor: VariableDescriptor, data: Boolean): Boolean {
+    override fun visitVariableDescriptor(descriptor: VariableDescriptor, data: SpecialDeclarationType): Boolean {
         return false
     }
 
-    override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, data: Boolean): Boolean {
+    override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, data: SpecialDeclarationType): Boolean {
         return descriptor.run { isExported(annotations, visibility) }
     }
 
-    override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: Boolean): Boolean {
+    override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: SpecialDeclarationType): Boolean {
         return descriptor.run { isExported(annotations, null) }
     }
 
-    override fun visitClassDescriptor(descriptor: ClassDescriptor, data: Boolean): Boolean {
+    override fun visitClassDescriptor(descriptor: ClassDescriptor, data: SpecialDeclarationType): Boolean {
+        if (data == SpecialDeclarationType.ANON_INIT) return false
         if (descriptor.name == SpecialNames.NO_NAME_PROVIDED) return false
         return descriptor.run { isExported(annotations, visibility) }
     }
 
-    override fun visitTypeAliasDescriptor(descriptor: TypeAliasDescriptor, data: Boolean) =
+    override fun visitTypeAliasDescriptor(descriptor: TypeAliasDescriptor, data: SpecialDeclarationType) =
         if (descriptor.containingDeclaration is PackageFragmentDescriptor) true
         else descriptor.run { isExported(annotations, visibility) }
 
-    override fun visitModuleDeclaration(descriptor: ModuleDescriptor, data: Boolean): Boolean {
+    override fun visitModuleDeclaration(descriptor: ModuleDescriptor, data: SpecialDeclarationType): Boolean {
         reportUnexpectedDescriptor(descriptor)
     }
 
-    override fun visitConstructorDescriptor(constructorDescriptor: ConstructorDescriptor, data: Boolean): Boolean {
+    override fun visitConstructorDescriptor(constructorDescriptor: ConstructorDescriptor, data: SpecialDeclarationType): Boolean {
         val klass = constructorDescriptor.constructedClass
-        return if (klass.kind.isSingleton) klass.accept(this, false) else constructorDescriptor.run { isExported(annotations, visibility) }
+        return if (klass.kind.isSingleton) klass.accept(this, SpecialDeclarationType.REGULAR) else constructorDescriptor.run { isExported(annotations, visibility) }
     }
 
-    override fun visitScriptDescriptor(scriptDescriptor: ScriptDescriptor, data: Boolean): Boolean {
+    override fun visitScriptDescriptor(scriptDescriptor: ScriptDescriptor, data: SpecialDeclarationType): Boolean {
         reportUnexpectedDescriptor(scriptDescriptor)
     }
 
-    override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, data: Boolean): Boolean {
-        if (data) return descriptor.annotations.hasAnnotation(publishedApiAnnotation)
+    override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, data: SpecialDeclarationType): Boolean {
+        if (data == SpecialDeclarationType.BACKING_FIELD) return descriptor.annotations.hasAnnotation(publishedApiAnnotation)
         return descriptor.run { isExported(annotations, visibility) }
     }
 
-    override fun visitValueParameterDescriptor(descriptor: ValueParameterDescriptor, data: Boolean): Boolean {
+    override fun visitValueParameterDescriptor(descriptor: ValueParameterDescriptor, data: SpecialDeclarationType): Boolean {
         return false
     }
 
-    override fun visitPropertyGetterDescriptor(descriptor: PropertyGetterDescriptor, data: Boolean): Boolean {
+    override fun visitPropertyGetterDescriptor(descriptor: PropertyGetterDescriptor, data: SpecialDeclarationType): Boolean {
         return descriptor.run { isExported(correspondingProperty.annotations, visibility) }
     }
 
-    override fun visitPropertySetterDescriptor(descriptor: PropertySetterDescriptor, data: Boolean): Boolean {
+    override fun visitPropertySetterDescriptor(descriptor: PropertySetterDescriptor, data: SpecialDeclarationType): Boolean {
         return descriptor.run { isExported(correspondingProperty.annotations, visibility) }
     }
 
-    override fun visitReceiverParameterDescriptor(descriptor: ReceiverParameterDescriptor, data: Boolean): Boolean {
+    override fun visitReceiverParameterDescriptor(descriptor: ReceiverParameterDescriptor, data: SpecialDeclarationType): Boolean {
         return false
     }
 

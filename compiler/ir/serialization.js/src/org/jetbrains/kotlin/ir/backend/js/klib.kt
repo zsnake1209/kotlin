@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.*
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.ManglerChecker
+import org.jetbrains.kotlin.backend.common.serialization.mangle.mangleSizes
 import org.jetbrains.kotlin.backend.common.serialization.metadata.DynamicTypeDeserializer
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVersion
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -133,6 +135,8 @@ fun generateKLib(
 
     val moduleFragment = psi2IrContext.generateModuleFragmentWithPlugins(project, files,
         deserializer = null, expectDescriptorToSymbol = expectDescriptorToSymbol)
+
+    moduleFragment.acceptVoid(ManglerChecker())
 
     val moduleName = configuration[CommonConfigurationKeys.MODULE_NAME]!!
 
@@ -402,11 +406,7 @@ fun serializeModuleIntoKlib(
         println("99%%: ${this[(size * 0.99).toInt()]}")
     }
 
-
-    mangleSizes.sorted().printStatistic("Declaration Mangle")
-    vpSizes.sorted().printStatistic("Value Parameters")
-    tpSizes.sorted().printStatistic("Type Parameters")
-
+//    mangleSizes.sorted().printStatistic("Declaration Mangle")
 
     val moduleDescriptor = moduleFragment.descriptor
 

@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
-open class DescriptorMangleVisitor(private val builder: StringBuilder, private val propPrefix: String) : DeclarationDescriptorVisitor<Unit, Boolean> {
+open class DescriptorMangleVisitor(private val builder: StringBuilder, private val propPrefix: String, private val dType: SpecialDeclarationType) : DeclarationDescriptorVisitor<Unit, Boolean> {
 
     private val typeParameterContainer = ArrayList<DeclarationDescriptor>(4)
 
@@ -156,8 +156,10 @@ open class DescriptorMangleVisitor(private val builder: StringBuilder, private v
 
     override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, data: Boolean) {
         if (descriptor is FunctionInvokeDescriptor) {
-            builder.append(KotlinMangler.functionInvokeSymbolName(descriptor.containingDeclaration.name))
-            return
+            if (descriptor.containingDeclaration.name.asString().contains("Function")) {
+                builder.append(KotlinMangler.functionInvokeSymbolName(descriptor.containingDeclaration.name))
+                return
+            }
         }
 
         descriptor.platformSpecificFunctionName?.let {
@@ -186,7 +188,7 @@ open class DescriptorMangleVisitor(private val builder: StringBuilder, private v
 
         isRealExpect = isRealExpect or descriptor.isExpect
         typeParameterContainer.add(descriptor)
-        val prefix = if (descriptor.kind == ClassKind.ENUM_ENTRY) "kenumentry" else "ktype"
+        val prefix = if (dType == SpecialDeclarationType.ENUM_ENTRY) "kenumentry" else "kclass"
         descriptor.mangleSimpleDeclaration(prefix, data, descriptor.name.asString())
 
         if (data && isRealExpect) builder.append("#expect")

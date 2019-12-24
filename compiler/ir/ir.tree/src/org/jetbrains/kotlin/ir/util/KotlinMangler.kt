@@ -17,6 +17,7 @@ interface KotlinMangler {
     val IrFunction.functionName: String
     val IrType.isInlined: Boolean
     val Long.isSpecial: Boolean
+    val IrDeclaration.mangleString: String
 
     companion object {
         private val FUNCTION_PREFIX = "<BUILT-IN-FUNCTION>"

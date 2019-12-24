@@ -34,16 +34,14 @@ class IrExportCheckerVisitor : IrElementVisitor<Boolean, Nothing?> {
 
     override fun visitDeclaration(declaration: IrDeclaration, data: Nothing?) = declaration.run { isExported(annotations, null) }
 
+    override fun visitAnonymousInitializer(declaration: IrAnonymousInitializer, data: Nothing?) = false
     override fun visitValueParameter(declaration: IrValueParameter, data: Nothing?) = false
     override fun visitVariable(declaration: IrVariable, data: Nothing?) = false
+    override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty, data: Nothing?) = false
 
     override fun visitField(declaration: IrField, data: Nothing?): Boolean {
         val annotations = declaration.run { correspondingPropertySymbol?.owner?.annotations ?: annotations }
-        val r = declaration.run { isExported(annotations, visibility) }
-        if (r) {
-            1
-        }
-        return r
+        return declaration.run { isExported(annotations, visibility) }
     }
 
     override fun visitProperty(declaration: IrProperty, data: Nothing?): Boolean {

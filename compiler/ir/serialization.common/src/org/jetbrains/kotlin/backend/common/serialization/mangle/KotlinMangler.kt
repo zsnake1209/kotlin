@@ -41,14 +41,15 @@ abstract class KotlinManglerImpl : KotlinMangler {
     private fun hashedMangleImpl3(declaration: IrDeclaration): String {
         val sb = StringBuilder(256)
         val prefix = if (declaration is IrField) "kfield" else "kprop"
-        declaration.descriptor.accept(DescriptorMangleVisitor(sb, prefix), true)
+        val kind = SpecialDeclarationType.declarationToType(declaration)
+        declaration.descriptor.accept(DescriptorMangleVisitor(sb, prefix, kind), true)
 
         return sb.toString()
     }
 
     open fun doCheck(): Boolean = true
 
-    private fun hashedMangleImpl(declaration: IrDeclaration): Long {
+    private fun mangleImpl(declaration: IrDeclaration): String {
 
         val m2 = hashedMangleImpl2(declaration)
         if (doCheck()) {
@@ -61,12 +62,14 @@ abstract class KotlinManglerImpl : KotlinMangler {
                 println("Visitor: $m2\nDescrip: $m3\n")
             }
         }
-        val m = m2.hashMangle
-        return m
+        return m2
     }
 
+    override val IrDeclaration.mangleString: String
+        get() = mangleImpl(this)
+
     override val IrDeclaration.hashedMangle: Long
-        get() = hashedMangleImpl(this)
+        get() = mangleImpl(this).hashMangle
 
 
     // We can't call "with (super) { this.isExported() }" in children.
@@ -90,16 +93,15 @@ abstract class KotlinManglerImpl : KotlinMangler {
         if (declaration.isPlatformSpecificExported()) return true
         val e1 = declaration.accept(isExportedVisitor, null)
         if (doCheck()) {
-            val e2 = declaration.descriptor.accept(
-                descExportedVisitor,
-                declaration is IrField && declaration.correspondingPropertySymbol != null
-            )
+            val kind = SpecialDeclarationType.declarationToType(declaration)
+            val e2 = declaration.descriptor.accept(descExportedVisitor, kind)
             if (e1 != e2) {
                 println("${declaration.render()}\n Visitor: $e1\n Descrip: $e2\n")
             }
         }
         return e1
     }
+
 
     private fun IrTypeParameter.effectiveParent(): IrDeclaration = when (val irParent = parent) {
         is IrClass -> irParent
@@ -272,7 +274,7 @@ abstract class KotlinManglerImpl : KotlinMangler {
             assert(isExportedImpl(this))
             if (isBuiltInFunction(this))
                 return KotlinMangler.functionClassSymbolName(name)
-            return "ktype:" + this.fqNameForIrSerialization.toString()
+            return "kclass:" + this.fqNameForIrSerialization.toString()
         }
 
     val IrTypeParameter.symbolName: String

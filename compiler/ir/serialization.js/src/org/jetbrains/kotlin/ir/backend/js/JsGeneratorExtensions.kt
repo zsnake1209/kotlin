@@ -12,14 +12,14 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
 
 class JsGeneratorExtensions : GeneratorExtensions() {
-    override fun computeFieldVisibility(descriptor: PropertyDescriptor): Visibility =
-        if (descriptor.annotations.hasAnnotation(JS_EXPORT_FQ_NAME))
-            descriptor.visibility
-        else
-            Visibilities.PRIVATE
-
-
-    companion object {
-        val JS_EXPORT_FQ_NAME = FqName("kotlin.js.JsExport")
-    }
+//    override fun computeFieldVisibility(descriptor: PropertyDescriptor): Visibility =
+//        if (descriptor.annotations.hasAnnotation(JS_EXPORT_FQ_NAME))
+//            descriptor.visibility
+//        else
+//            Visibilities.PRIVATE
+//
+//
+//    companion object {
+//        val JS_EXPORT_FQ_NAME = FqName("kotlin.js.JsExport")
+//    }
 }

@@ -160,7 +160,7 @@ open class IrMangleVisitor(private val builder: StringBuilder) : IrElementVisito
 
         isRealExpect = isRealExpect or declaration.isExpect
         typeParameterContainer.add(declaration)
-        declaration.mangleSimpleDeclaration("ktype", data, declaration.name.asString())
+        declaration.mangleSimpleDeclaration("kclass", data, declaration.name.asString())
 
         if (data && isRealExpect) builder.append("#expect")
     }
@@ -191,7 +191,10 @@ open class IrMangleVisitor(private val builder: StringBuilder) : IrElementVisito
 
     override fun visitField(declaration: IrField, data: Boolean) = declaration.mangleSimpleDeclaration("kfield", data, declaration.name.asString())
 
-    override fun visitEnumEntry(declaration: IrEnumEntry, data: Boolean) = declaration.mangleSimpleDeclaration("kenumentry", data, declaration.name.asString())
+    override fun visitEnumEntry(declaration: IrEnumEntry, data: Boolean) {
+        declaration.mangleSimpleDeclaration("kenumentry", data, declaration.name.asString())
+        if (data && isRealExpect) builder.append("#expect")
+    }
 
     override fun visitTypeAlias(declaration: IrTypeAlias, data: Boolean) = declaration.mangleSimpleDeclaration("ktypealias", data, declaration.name.asString())
 
