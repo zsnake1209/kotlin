@@ -49,7 +49,7 @@ class PostponedArgumentsAnalyzer(
 
             is LambdaWithTypeVariableAsExpectedTypeAtom ->
                 analyzeLambda(
-                    c, resolutionCallbacks, argument.transformToResolvedLambda(c.getBuilder()), diagnosticsHolder
+                    c, resolutionCallbacks, argument.transformToResolvedLambda(c.getBuilder(), argument.returnTypeVariable), diagnosticsHolder
                 )
 
             is ResolvedCallableReferenceAtom ->
@@ -60,6 +60,9 @@ class PostponedArgumentsAnalyzer(
             else -> error("Unexpected resolved primitive: ${argument.javaClass.canonicalName}")
         }
     }
+
+//    private val LambdaWithTypeVariableAsExpectedTypeAtom.returnTypeVariable: TypeVariableForLambdaReturnType?
+//        get() = (this as? LambdaWithTypeVariableAsExpectedTypeAndKnownVariableAsReturnTypeAtom)?.returnTypeVariable
 
     private fun analyzeLambda(
         c: Context,

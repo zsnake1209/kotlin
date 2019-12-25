@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.components.FreshVariableNewT
 import org.jetbrains.kotlin.resolve.calls.inference.components.NewTypeSubstitutor
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage
 import org.jetbrains.kotlin.resolve.calls.inference.model.NewConstraintError
+import org.jetbrains.kotlin.resolve.calls.inference.model.NewTypeVariable
 import org.jetbrains.kotlin.resolve.calls.inference.model.TypeVariableForLambdaReturnType
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.types.KotlinType
@@ -91,12 +92,13 @@ sealed class PostponedResolvedAtom : ResolvedAtom(), PostponedResolvedAtomMarker
     abstract override val outputType: UnwrappedType?
 }
 
-class LambdaWithTypeVariableAsExpectedTypeAtom(
+open class LambdaWithTypeVariableAsExpectedTypeAtom(
     override val atom: LambdaKotlinCallArgument,
-    val expectedType: UnwrappedType
+    var expectedType: UnwrappedType
 ) : PostponedResolvedAtom() {
     override val inputTypes: Collection<UnwrappedType> get() = listOf(expectedType)
     override val outputType: UnwrappedType? get() = null
+    var returnTypeVariable: TypeVariableForLambdaReturnType? = null
 
     fun setAnalyzed(resolvedLambdaAtom: ResolvedLambdaAtom) {
         setAnalyzedResults(listOf(resolvedLambdaAtom))
