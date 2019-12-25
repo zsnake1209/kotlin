@@ -5,15 +5,17 @@
 
 package org.jetbrains.kotlin.fir.deserialization
 
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.addDeclarations
-import org.jetbrains.kotlin.fir.declarations.impl.FirClassImpl
-import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
-import org.jetbrains.kotlin.fir.declarations.impl.FirEnumEntryImpl
-import org.jetbrains.kotlin.fir.declarations.impl.FirSealedClassImpl
+import org.jetbrains.kotlin.fir.declarations.impl.*
+import org.jetbrains.kotlin.fir.symbols.CallableId
 import org.jetbrains.kotlin.fir.symbols.impl.ConeClassLikeLookupTagImpl
+import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousObjectSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.FirResolvedTypeRefImpl
@@ -117,19 +119,30 @@ fun deserializeClassToSymbol(
         addDeclarations(
             classProto.enumEntryList.mapNotNull { enumEntryProto ->
                 val enumEntryName = nameResolver.getName(enumEntryProto.name)
-                val enumEntryId = classId.createNestedClassId(enumEntryName)
 
-                val symbol = FirRegularClassSymbol(enumEntryId)
-                FirEnumEntryImpl(null, session, enumEntryId.shortClassName, symbol).apply {
-                    resolvePhase = FirResolvePhase.DECLARATIONS
-                    superTypeRefs += FirResolvedTypeRefImpl(
+                val enumType = ConeClassLikeTypeImpl(ConeClassLikeLookupTagImpl(classId), emptyArray(), false)
+                val property = FirPropertyImpl(
+                    null,
+                    session,
+                    FirResolvedTypeRefImpl(null, enumType),
+                    null,
+                    enumEntryName,
+                    initializer = FirAnonymousObjectImpl(
                         null,
-                        ConeClassLikeTypeImpl(ConeClassLikeLookupTagImpl(classId), emptyArray(), false)
-                    )
+                        session,
+                        classKind = ClassKind.ENUM_ENTRY,
+                        symbol = FirAnonymousObjectSymbol()
+                    ),
+                    delegate = null,
+                    isVar = false,
+                    symbol = FirPropertySymbol(CallableId(classId, enumEntryName)),
+                    isLocal = false,
+                    status = FirDeclarationStatusImpl(Visibilities.PUBLIC, Modality.FINAL)
+                ).apply {
+                    resolvePhase = FirResolvePhase.DECLARATIONS
                 }
 
-
-                symbol.fir
+                property
             }
         )
 

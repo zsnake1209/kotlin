@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.declarations.impl.FirEnumEntryImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirSimpleFunctionImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirPropertyImpl
 import org.jetbrains.kotlin.fir.deserialization.FirDeserializationContext
@@ -347,9 +346,7 @@ class KotlinDeserializedJvmSymbolsProvider(
                 JvmBinaryAnnotationDeserializer(session),
                 parentContext, this::findAndDeserializeClass
             )
-            symbol.fir.declarations.filterIsInstance<FirEnumEntryImpl>().forEach {
-                classesCache[it.symbol.classId] = it.symbol
-            }
+
             classesCache[classId] = symbol
             val annotations = mutableListOf<FirAnnotationCall>()
             kotlinJvmBinaryClass.loadClassAnnotations(object : KotlinJvmBinaryClass.AnnotationVisitor {
