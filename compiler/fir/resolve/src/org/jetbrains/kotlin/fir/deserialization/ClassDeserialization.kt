@@ -120,7 +120,7 @@ fun deserializeClassToSymbol(
             classProto.enumEntryList.mapNotNull { enumEntryProto ->
                 val enumEntryName = nameResolver.getName(enumEntryProto.name)
 
-                val enumType = ConeClassLikeTypeImpl(ConeClassLikeLookupTagImpl(classId), emptyArray(), false)
+                val enumType = ConeClassLikeTypeImpl(symbol.toLookupTag(), emptyArray(), false)
                 val property = FirPropertyImpl(
                     null,
                     session,
@@ -132,12 +132,16 @@ fun deserializeClassToSymbol(
                         session,
                         classKind = ClassKind.ENUM_ENTRY,
                         symbol = FirAnonymousObjectSymbol()
-                    ),
+                    ).apply {
+                        superTypeRefs += FirResolvedTypeRefImpl(source = null, type = enumType)
+                    },
                     delegate = null,
                     isVar = false,
                     symbol = FirPropertySymbol(CallableId(classId, enumEntryName)),
                     isLocal = false,
-                    status = FirDeclarationStatusImpl(Visibilities.PUBLIC, Modality.FINAL)
+                    status = FirDeclarationStatusImpl(Visibilities.PUBLIC, Modality.FINAL).apply {
+                        isStatic = true
+                    }
                 ).apply {
                     resolvePhase = FirResolvePhase.DECLARATIONS
                 }

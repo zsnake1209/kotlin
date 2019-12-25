@@ -219,11 +219,6 @@ class KotlinDeserializedJvmSymbolsProvider(
                         ).firstOrNull()
 
                     this.calleeReference = when {
-                        entryClassSymbol != null && (entryClassSymbol as? FirClassSymbol)?.fir is FirEnumEntry -> {
-                            FirResolvedNamedReferenceImpl(
-                                null, name, entryClassSymbol
-                            )
-                        }
                         entryCallableSymbol != null -> {
                             FirResolvedNamedReferenceImpl(
                                 null, name, entryCallableSymbol
