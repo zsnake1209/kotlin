@@ -3,14 +3,21 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.common.serialization.mangle
+package org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor
 
+import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinExportChecker
+import org.jetbrains.kotlin.backend.common.serialization.mangle.SpecialDeclarationType
+import org.jetbrains.kotlin.backend.common.serialization.mangle.publishedApiAnnotation
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.SpecialNames
 
-class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boolean, SpecialDeclarationType> {
+abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boolean, SpecialDeclarationType>,
+    KotlinExportChecker<DeclarationDescriptor> {
+
+    override fun check(declaration: DeclarationDescriptor, type: SpecialDeclarationType): Boolean {
+        return declaration.accept(this, type)
+    }
 
     private fun reportUnexpectedDescriptor(descriptor: DeclarationDescriptor): Nothing {
         error("unexpected descriptor $descriptor")

@@ -3,13 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.common.serialization.mangle
+package org.jetbrains.kotlin.backend.common.serialization.mangle.classic
 
 import org.jetbrains.kotlin.backend.common.ir.isProperExpect
-import org.jetbrains.kotlin.backend.common.serialization.cityHash64
 import org.jetbrains.kotlin.backend.common.serialization.isBuiltInFunction
+import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.ir.IrElement
@@ -21,157 +20,13 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
+abstract class ClassicMangleComputer : KotlinMangleComputer<IrDeclaration> {
+    override fun computeMangle(declaration: IrDeclaration) = declaration.uniqSymbolName()
 
-abstract class KotlinManglerImpl : KotlinMangler {
-
-    override val String.hashMangle get() = (this.cityHash64() % PUBLIC_MANGLE_FLAG) or PUBLIC_MANGLE_FLAG
-
-    private fun hashedMangleImpl1(declaration: IrDeclaration): String {
-        return declaration.uniqSymbolName()
+    override fun computeMangleString(declaration: IrDeclaration): String {
+        if (declaration is IrFunction) return declaration.functionName
+        else error("Unexpected declaration for raw name ${declaration.render()}")
     }
-
-    private fun hashedMangleImpl2(declaration: IrDeclaration): String {
-        val sb = StringBuilder(256) // this capacity in enough for JS stdlib which 99%% is 225 symbols
-        declaration.accept(IrMangleVisitor(sb), true)
-
-        mangleSizes.add(sb.length)
-
-        return sb.toString()
-    }
-
-    private fun hashedMangleImpl3(declaration: IrDeclaration): String {
-        val sb = StringBuilder(256)
-        val prefix = descriptorPrefix(declaration)
-        declaration.descriptor.accept(DescriptorMangleVisitor(sb, prefix), true)
-
-        return sb.toString()
-    }
-
-    open fun doCheck(): Boolean = true
-
-    private fun mangleImpl(declaration: IrDeclaration): String {
-
-        val m1 = hashedMangleImpl1(declaration)
-        if (doCheck()) {
-            val m2 = hashedMangleImpl2(declaration)
-            if (m1 != m2) {
-                println("Classic: $m1\nVisitor: $m2\n")
-            }
-            val m3 = hashedMangleImpl3(declaration)
-            if (m2 != m3) {
-                println("Visitor: $m2\nDescrip: $m3\n")
-            }
-        }
-        return m1
-    }
-
-    override val IrDeclaration.mangleString: String
-        get() = mangleImpl(this)
-
-    override val IrDeclaration.hashedMangle: Long
-        get() = mangleImpl(this).hashMangle
-
-
-    override fun IrDeclaration.isExportedClassic(): Boolean {
-        return isExportedImplClasssic(this)
-    }
-
-    // We can't call "with (super) { this.isExported() }" in children.
-    // So provide a hook.
-    protected open fun IrDeclaration.isPlatformSpecificExported(): Boolean = false
-
-    override fun IrDeclaration.isExported(): Boolean = isExportedImpl(this)
-
-    private fun isExportedImplClasssic(declaration: IrDeclaration): Boolean {
-        // TODO: revise
-        if (declaration is IrValueDeclaration) return false
-        if (declaration is IrAnonymousInitializer) return false
-        if (declaration is IrLocalDelegatedProperty) return false
-
-        val descriptorAnnotations = declaration.descriptor.annotations
-
-        if (declaration.isPlatformSpecificExported()) return true
-
-        if (declaration is IrTypeAlias && declaration.parent is IrPackageFragment) {
-            return true
-        }
-
-        if (descriptorAnnotations.hasAnnotation(publishedApiAnnotation)) {
-            return true
-        }
-
-        if (declaration.isAnonymousObject)
-            return false
-
-        if (declaration is IrConstructor && declaration.constructedClass.kind.isSingleton) {
-            // Currently code generator can access the constructor of the singleton,
-            // so ignore visibility of the constructor itself.
-            return isExportedImpl(declaration.constructedClass)
-        }
-
-        if (declaration is IrFunction) {
-            val descriptor = declaration.descriptor
-            // TODO: this code is required because accessor doesn't have a reference to property.
-            if (descriptor is PropertyAccessorDescriptor) {
-                val property = descriptor.correspondingProperty
-                if (property.annotations.hasAnnotation(publishedApiAnnotation)) return true
-            }
-        }
-
-        val visibility = when (declaration) {
-            is IrClass -> declaration.visibility
-            is IrFunction -> declaration.visibility
-            is IrProperty -> declaration.visibility
-            is IrField -> declaration.visibility
-            is IrTypeAlias -> declaration.visibility
-            else -> null
-        }
-
-        /**
-         * note: about INTERNAL - with support of friend modules we let frontend to deal with internal declarations.
-         */
-        if (visibility != null && !visibility.isPublicAPI && visibility != Visibilities.INTERNAL) {
-            // If the declaration is explicitly marked as non-public,
-            // then it must not be accessible from other modules.
-            return false
-        }
-
-        val parent = declaration.parent
-        if (parent !is IrDeclaration) {
-            return true
-        }
-
-        return isExportedImpl(parent)
-    }
-
-    /**
-     * Defines whether the declaration is exported, i.e. visible from other modules.
-     *
-     * Exported declarations must have predictable and stable ABI
-     * that doesn't depend on any internal transformations (e.g. IR lowering),
-     * and so should be computable from the descriptor itself without checking a backend state.
-     */
-
-    private val isExportedVisitor = IrExportCheckerVisitor()
-    private val descExportedVisitor = DescriptorExportCheckerVisitor()
-
-    private fun isExportedImpl(declaration: IrDeclaration): Boolean {
-        if (declaration.isPlatformSpecificExported()) return true
-        val e1 = declaration.accept(isExportedVisitor, null)
-        if (doCheck()) {
-            val e0 = isExportedImplClasssic(declaration)
-            if (e0 != e1) {
-                println("${declaration.render()}\n Classic: $e0\n Visitor: $e1\n")
-            }
-            val kind = SpecialDeclarationType.declarationToType(declaration)
-            val e2 = declaration.descriptor.accept(descExportedVisitor, kind)
-            if (e0 != e2) {
-                println("${declaration.render()}\n Classic: $e0\n Descrip: $e2\n")
-            }
-        }
-        return e1
-    }
-
 
     private fun IrTypeParameter.effectiveParent(): IrDeclaration = when (val irParent = parent) {
         is IrClass -> irParent
@@ -202,10 +57,6 @@ abstract class KotlinManglerImpl : KotlinMangler {
 
     private fun mapTypeParameterContainers(element: IrElement): List<IrDeclaration> {
         return collectTypeParameterContainers(element)
-    }
-
-    protected open fun mangleTypeParameter(typeParameter: IrTypeParameter, typeParameterNamer: (IrTypeParameter) -> String?): String {
-        return typeParameterNamer(typeParameter) ?: error("No parent for ${typeParameter.render()}")
     }
 
     protected fun acyclicTypeMangler(type: IrType, typeParameterNamer: (IrTypeParameter) -> String?): String {
@@ -278,8 +129,6 @@ abstract class KotlinManglerImpl : KotlinMangler {
         val signatureSuffix =
             when {
                 this is IrConstructor -> ""
-//                this.typeParameters.isNotEmpty() -> "Generic"
-//                returnType.isInlined -> "ValueType"
                 !returnType.isUnit() -> typeToHashString(returnType, typeParameterNamer)
                 else -> ""
             }
@@ -292,7 +141,7 @@ abstract class KotlinManglerImpl : KotlinMangler {
     open val IrFunction.platformSpecificFunctionName: String? get() = null
 
     // TODO: rename to indicate that it has signature included
-    override val IrFunction.functionName: String
+    val IrFunction.functionName: String
         get() {
             // TODO: Again. We can't call super in children, so provide a hook for now.
             this.platformSpecificFunctionName?.let { return it }
@@ -317,9 +166,6 @@ abstract class KotlinManglerImpl : KotlinMangler {
             return "$name${signature(typeParameterNamer)}"
         }
 
-    override val Long.isSpecial: Boolean
-        get() = specialHashes.contains(this)
-
     fun Name.mangleIfInternal(moduleDescriptor: ModuleDescriptor, visibility: Visibility): String =
         if (visibility != Visibilities.INTERNAL) {
             this.asString()
@@ -341,7 +187,6 @@ abstract class KotlinManglerImpl : KotlinMangler {
 
     val IrClass.typeInfoSymbolName: String
         get() {
-            assert(isExportedImpl(this))
             if (isBuiltInFunction(this))
                 return KotlinMangler.functionClassSymbolName(name)
             return "kclass:" + this.fqNameForIrSerialization.toString()
@@ -436,10 +281,4 @@ abstract class KotlinManglerImpl : KotlinMangler {
 
             return "kfun:$containingDeclarationPart#$functionName"
         }
-
-    private val specialHashes = listOf("Function", "KFunction", "SuspendFunction", "KSuspendFunction")
-        .flatMap { name ->
-            (0..255).map { KotlinMangler.functionClassSymbolName(Name.identifier(name + it)) }
-        }.map { it.hashMangle }
-        .toSet()
 }

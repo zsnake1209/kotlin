@@ -9,8 +9,6 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.name.FqName
 
 val mangleSizes = mutableListOf<Int>()
-val vpSizes = mutableListOf<Int>()
-val tpSizes = mutableListOf<Int>()
 
 internal fun <T> Collection<T>.collect(builder: StringBuilder, separator: String, prefix: String, suffix: String, collect: StringBuilder.(T) -> Unit) {
     var first = true

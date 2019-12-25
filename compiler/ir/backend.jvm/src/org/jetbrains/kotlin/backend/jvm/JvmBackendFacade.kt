@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen
 import org.jetbrains.kotlin.backend.jvm.lower.MultifileFacadeFileEntry
-import org.jetbrains.kotlin.backend.jvm.serialization.JvmMangler
+import org.jetbrains.kotlin.backend.jvm.serialization.JvmManglerClassic
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.psi2ir.PsiSourceManager
 object JvmBackendFacade {
     fun doGenerateFiles(files: Collection<KtFile>, state: GenerationState, phaseConfig: PhaseConfig) {
         val extensions = JvmGeneratorExtensions()
-        val psi2ir = Psi2IrTranslator(state.languageVersionSettings, mangler = JvmMangler)
+        val psi2ir = Psi2IrTranslator(state.languageVersionSettings, mangler = JvmManglerClassic)
         val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = extensions)
 
         for (extension in IrGenerationExtension.getInstances(state.project)) {

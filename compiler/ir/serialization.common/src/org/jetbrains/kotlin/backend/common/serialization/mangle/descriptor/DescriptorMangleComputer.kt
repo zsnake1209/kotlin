@@ -3,8 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.common.serialization.mangle
+package org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor
 
+import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
+import org.jetbrains.kotlin.backend.common.serialization.mangle.collect
 import org.jetbrains.kotlin.builtins.functions.FunctionClassDescriptor
 import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor
 import org.jetbrains.kotlin.descriptors.*
@@ -17,7 +19,19 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
-open class DescriptorMangleVisitor(private val builder: StringBuilder, private val specialPrefix: String) : DeclarationDescriptorVisitor<Unit, Boolean> {
+abstract class DescriptorMangleComputer(protected val builder: StringBuilder, protected val specialPrefix: String) : DeclarationDescriptorVisitor<Unit, Boolean>, KotlinMangleComputer<DeclarationDescriptor> {
+
+    override fun computeMangle(declaration: DeclarationDescriptor): String {
+        declaration.accept(this, true)
+        return builder.toString()
+    }
+
+    override fun computeMangleString(declaration: DeclarationDescriptor): String {
+        declaration.accept(this, false)
+        return builder.toString()
+    }
+
+    protected abstract fun copy(): DescriptorMangleComputer
 
     private val typeParameterContainer = ArrayList<DeclarationDescriptor>(4)
 
@@ -33,7 +47,7 @@ open class DescriptorMangleVisitor(private val builder: StringBuilder, private v
 
     private fun DeclarationDescriptor.mangleSimpleDeclaration(prefix: String, addPrefix: Boolean, name: String) {
         val prefixLength = addPrefix(prefix, addPrefix)
-        containingDeclaration?.accept(this@DescriptorMangleVisitor, false)
+        containingDeclaration?.accept(this@DescriptorMangleComputer, false)
 
         if (prefixLength != builder.length) builder.append('.')
 
@@ -53,7 +67,7 @@ open class DescriptorMangleVisitor(private val builder: StringBuilder, private v
         val prefixLength = addPrefix("kfun", prefix)
 
         typeParameterContainer.add(this)
-        containingDeclaration.accept(this@DescriptorMangleVisitor, false)
+        containingDeclaration.accept(this@DescriptorMangleComputer, false)
 
         if (prefixLength != builder.length) builder.append('.')
 
@@ -109,7 +123,7 @@ open class DescriptorMangleVisitor(private val builder: StringBuilder, private v
         when (val type = wtype.unwrap()) {
             is SimpleType -> {
                 when (val classifier = type.constructor.declarationDescriptor) {
-                    is ClassDescriptor -> classifier.accept(this, false)
+                    is ClassDescriptor -> classifier.accept(copy(), false)
                     is TypeParameterDescriptor -> tBuilder.mangleTypeParameterReference(classifier)
                     else -> error("Unexpected classifier: $classifier")
                 }

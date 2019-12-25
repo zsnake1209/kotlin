@@ -3,8 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.common.serialization.mangle
+package org.jetbrains.kotlin.backend.common.serialization.mangle.ir
 
+import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinExportChecker
+import org.jetbrains.kotlin.backend.common.serialization.mangle.SpecialDeclarationType
+import org.jetbrains.kotlin.backend.common.serialization.mangle.publishedApiAnnotation
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.ir.IrElement
@@ -14,10 +17,15 @@ import org.jetbrains.kotlin.ir.util.constructedClass
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.SpecialNames
 
-class IrExportCheckerVisitor : IrElementVisitor<Boolean, Nothing?> {
+abstract class IrExportCheckerVisitor : IrElementVisitor<Boolean, Nothing?>, KotlinExportChecker<IrDeclaration> {
+
+    override fun check(declaration: IrDeclaration, type: SpecialDeclarationType): Boolean {
+        return declaration.accept(this, null)
+    }
+
+    abstract override fun IrDeclaration.isPlatformSpecificExported(): Boolean
 
     private fun IrDeclaration.isExported(annotations: List<IrConstructorCall>, visibility: Visibility?): Boolean {
         if (annotations.hasAnnotation(publishedApiAnnotation)) return true

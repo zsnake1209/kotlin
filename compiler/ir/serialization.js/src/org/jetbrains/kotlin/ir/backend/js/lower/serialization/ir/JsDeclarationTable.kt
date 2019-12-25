@@ -40,7 +40,7 @@ class JsUniqIdClashTracker : UniqIdClashTracker {
     }
 }
 
-class JsGlobalDeclarationTable(builtIns: IrBuiltIns) : GlobalDeclarationTable(JsMangler, JsUniqIdClashTracker()) {
+class JsGlobalDeclarationTable(builtIns: IrBuiltIns) : GlobalDeclarationTable(JsManglerIr, JsUniqIdClashTracker()) {
     init {
         loadKnownBuiltins(builtIns)
     }

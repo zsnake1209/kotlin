@@ -14,11 +14,11 @@ interface KotlinMangler {
     val String.hashMangle: Long
     val IrDeclaration.hashedMangle: Long
     fun IrDeclaration.isExported(): Boolean
-    fun IrDeclaration.isExportedClassic(): Boolean
     val IrFunction.functionName: String
-    val IrType.isInlined: Boolean
     val Long.isSpecial: Boolean
     val IrDeclaration.mangleString: String
+
+    val manglerName: String
 
     companion object {
         private val FUNCTION_PREFIX = "<BUILT-IN-FUNCTION>"

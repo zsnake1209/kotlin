@@ -3,15 +3,16 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.common.serialization.mangle
+package org.jetbrains.kotlin.backend.common.serialization.mangle.ir
 
 import org.jetbrains.kotlin.backend.common.serialization.functionPattern
 import org.jetbrains.kotlin.backend.common.serialization.functionalPackages
+import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
+import org.jetbrains.kotlin.backend.common.serialization.mangle.collect
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
@@ -19,13 +20,25 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
-open class IrMangleVisitor(private val builder: StringBuilder) : IrElementVisitor<Unit, Boolean> {
+abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElementVisitor<Unit, Boolean>, KotlinMangleComputer<IrDeclaration> {
 
     private val typeParameterContainer = ArrayList<IrDeclaration>(4)
 
     private var isRealExpect = false
 
     open val IrFunction.platformSpecificFunctionName: String? get() = null
+
+    protected abstract fun copy(): IrMangleComputer
+
+    override fun computeMangle(declaration: IrDeclaration): String {
+        declaration.accept(this, true)
+        return builder.toString()
+    }
+
+    override fun computeMangleString(declaration: IrDeclaration): String {
+        declaration.accept(this, false)
+        return builder.toString()
+    }
 
     private fun addPrefix(prefix: String, addPrefix: Boolean): Int {
         if (addPrefix) {
@@ -37,7 +50,7 @@ open class IrMangleVisitor(private val builder: StringBuilder) : IrElementVisito
 
     private fun IrDeclaration.mangleSimpleDeclaration(prefix: String, addPrefix: Boolean, name: String) {
         val prefixLength = addPrefix(prefix, addPrefix)
-        parent.accept(this@IrMangleVisitor, false)
+        parent.accept(this@IrMangleComputer, false)
 
         if (prefixLength != builder.length) builder.append('.')
 
@@ -51,7 +64,7 @@ open class IrMangleVisitor(private val builder: StringBuilder) : IrElementVisito
         val prefixLength = addPrefix("kfun", prefix)
 
         typeParameterContainer.add(this)
-        parent.accept(this@IrMangleVisitor, false)
+        parent.accept(this@IrMangleComputer, false)
 
         if (prefixLength != builder.length) builder.append('.')
 
@@ -117,7 +130,7 @@ open class IrMangleVisitor(private val builder: StringBuilder) : IrElementVisito
         when (type) {
             is IrSimpleType -> {
                 when (val classifier = type.classifier) {
-                    is IrClassSymbol -> classifier.owner.accept(IrMangleVisitor(builder), false)
+                    is IrClassSymbol -> classifier.owner.accept(copy(), false)
                     is IrTypeParameterSymbol -> tBuilder.mangleTypeParameterReference(classifier.owner)
                 }
 
