@@ -30,7 +30,7 @@ class CandidateFactory(
 
     fun createCandidate(
         symbol: AbstractFirBasedSymbol<*>,
-        dispatchReceiverValue: ClassDispatchReceiverValue?,
+        dispatchReceiverValue: ReceiverValue?,
         implicitExtensionReceiverValue: ImplicitReceiverValue<*>?,
         explicitReceiverKind: ExplicitReceiverKind
     ): Candidate {

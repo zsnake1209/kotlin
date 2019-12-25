@@ -56,7 +56,7 @@ enum class CandidateApplicability {
 
 class Candidate(
     val symbol: AbstractFirBasedSymbol<*>,
-    val dispatchReceiverValue: ClassDispatchReceiverValue?,
+    val dispatchReceiverValue: ReceiverValue?,
     val implicitExtensionReceiverValue: ImplicitReceiverValue<*>?,
     val explicitReceiverKind: ExplicitReceiverKind,
     val bodyResolveComponents: BodyResolveComponents,
