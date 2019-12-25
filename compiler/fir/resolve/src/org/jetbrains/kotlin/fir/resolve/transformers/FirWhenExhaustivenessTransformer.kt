@@ -115,18 +115,18 @@ class FirWhenExhaustivenessTransformer(private val bodyResolveComponents: BodyRe
         if (sealedClass.inheritors.isEmpty()) return true
         val data = SealedExhaustivenessData(
             sealedClass.session.firSymbolProvider,
-            sealedClass.inheritors.associateByTo(mutableMapOf(), { it }, { false }),
+            sealedClass.inheritors.toMutableSet(),
             !nullable
         )
         for (branch in whenExpression.branches) {
             branch.condition.accept(SealedExhaustivenessVisitor, data)
         }
-        return data.containsNull && data.visitedInheritors.values.all { it }
+        return data.containsNull && data.remainingInheritors.isEmpty()
     }
 
     private class SealedExhaustivenessData(
         val symbolProvider: FirSymbolProvider,
-        val visitedInheritors: MutableMap<ClassId, Boolean>,
+        val remainingInheritors: MutableSet<ClassId>,
         var containsNull: Boolean
     )
 
@@ -151,7 +151,7 @@ class FirWhenExhaustivenessTransformer(private val bodyResolveComponents: BodyRe
         override fun visitResolvedTypeRef(resolvedTypeRef: FirResolvedTypeRef, data: SealedExhaustivenessData) {
             val lookupTag = (resolvedTypeRef.type as? ConeLookupTagBasedType)?.lookupTag ?: return
             val symbol = data.symbolProvider.getSymbolByLookupTag(lookupTag) as? FirClassSymbol ?: return
-            data.visitedInheritors.replace(symbol.classId, true)
+            data.remainingInheritors.remove(symbol.classId)
         }
 
         override fun visitBinaryLogicExpression(binaryLogicExpression: FirBinaryLogicExpression, data: SealedExhaustivenessData) {
