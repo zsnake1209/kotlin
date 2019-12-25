@@ -408,15 +408,9 @@ private fun BodyResolveComponents.typeFromSymbol(symbol: AbstractFirBasedSymbol<
         is FirClassifierSymbol<*> -> {
             val fir = (symbol as? AbstractFirBasedSymbol<*>)?.phasedFir
             // TODO: unhack
-            if (fir is FirEnumEntry) {
-                (fir.superTypeRefs.firstOrNull() as? FirResolvedTypeRef) ?: FirErrorTypeRefImpl(
-                    null,
-                    FirSimpleDiagnostic("No enum item supertype", DiagnosticKind.EnumAsSupertype)
-                )
-            } else
-                FirResolvedTypeRefImpl(
-                    null, symbol.constructType(emptyArray(), isNullable = false)
-                )
+            FirResolvedTypeRefImpl(
+                null, symbol.constructType(emptyArray(), isNullable = false)
+            )
         }
         else -> error("WTF ! $symbol")
     }
