@@ -177,49 +177,51 @@ open class KotlinCocoapodsPlugin : Plugin<Project> {
     ) {
         val moduleNames = mutableSetOf<String>()
         cocoapodsExtension.pods.all { pod ->
-            if (!moduleNames.contains(pod.moduleName)) {
-                moduleNames.add(pod.moduleName)
+            if (moduleNames.contains(pod.moduleName)) {
+                return@all
+            }
+            moduleNames.add(pod.moduleName)
 
-                val defTask = project.tasks.create(
-                    lowerCamelCaseName("generateDef", pod.moduleName).asValidTaskName(),
-                    DefFileTask::class.java
-                ) {
-                    it.pod = pod
-                    it.description = "Generates a def file for CocoaPods dependencies with module ${pod.moduleName}"
-                    // This task is an implementation detail so we don't add it in any group
-                    // to avoid showing it in the `tasks` output.
-                }
+            val defTask = project.tasks.create(
+                lowerCamelCaseName("generateDef", pod.moduleName).asValidTaskName(),
+                DefFileTask::class.java
+            ) {
+                it.pod = pod
+                it.description = "Generates a def file for CocoaPods dependencies with module ${pod.moduleName}"
+                // This task is an implementation detail so we don't add it in any group
+                // to avoid showing it in the `tasks` output.
+            }
 
-                kotlinExtension.supportedTargets().all { target ->
-                    target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops.create(pod.moduleName) { interop ->
+            kotlinExtension.supportedTargets().all { target ->
+                target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops.create(pod.moduleName) { interop ->
 
-                        val interopTask = project.tasks.getByPath(interop.interopProcessingTaskName)
-                        interopTask.dependsOn(defTask)
-                        interop.defFile = defTask.outputFile
-                        interop.packageName = "cocoapods.${pod.moduleName}"
+                    val interopTask = project.tasks.getByPath(interop.interopProcessingTaskName)
+                    interopTask.dependsOn(defTask)
+                    interop.defFile = defTask.outputFile
+                    interop.packageName = "cocoapods.${pod.moduleName}"
 
-                        project.findProperty(CFLAGS_PROPERTY)?.toString()?.let { args ->
-                            // Xcode quotes around paths with spaces.
-                            // Here and below we need to split such paths taking this into account.
-                            interop.compilerOpts.addAll(args.splitQuotedArgs())
+                    project.findProperty(CFLAGS_PROPERTY)?.toString()?.let { args ->
+                        // Xcode quotes around paths with spaces.
+                        // Here and below we need to split such paths taking this into account.
+                        interop.compilerOpts.addAll(args.splitQuotedArgs())
+                    }
+                    project.findProperty(HEADER_PATHS_PROPERTY)?.toString()?.let { args ->
+                        interop.compilerOpts.addAll(args.splitQuotedArgs().map { "-I$it" })
+                    }
+                    project.findProperty(FRAMEWORK_PATHS_PROPERTY)?.toString()?.let { args ->
+                        interop.compilerOpts.addAll(args.splitQuotedArgs().map { "-F$it" })
+                    }
+
+                    // Show a human-readable error messages if the interop is created
+                    // but there are no parameters set by Xcode or manually by user (KT-31062).
+                    interopTask.doFirst { _ ->
+                        val hasCompilerOpts = interop.compilerOpts.isNotEmpty()
+                        val hasHeaderSearchPath = interop.includeDirs.let {
+                            !it.headerFilterDirs.isEmpty || !it.allHeadersDirs.isEmpty
                         }
-                        project.findProperty(HEADER_PATHS_PROPERTY)?.toString()?.let { args ->
-                            interop.compilerOpts.addAll(args.splitQuotedArgs().map { "-I$it" })
-                        }
-                        project.findProperty(FRAMEWORK_PATHS_PROPERTY)?.toString()?.let { args ->
-                            interop.compilerOpts.addAll(args.splitQuotedArgs().map { "-F$it" })
-                        }
 
-                        // Show a human-readable error messages if the interop is created
-                        // but there are no parameters set by Xcode or manually by user (KT-31062).
-                        interopTask.doFirst { _ ->
-                            val hasCompilerOpts = interop.compilerOpts.isNotEmpty()
-                            val hasHeaderSearchPath = interop.includeDirs.let {
-                                !it.headerFilterDirs.isEmpty || !it.allHeadersDirs.isEmpty
-                            }
-
-                            check(hasCompilerOpts || hasHeaderSearchPath) {
-                                """
+                        check(hasCompilerOpts || hasHeaderSearchPath) {
+                            """
                                 |Cannot perform cinterop processing for module ${pod.moduleName}: cannot determine headers location.
                                 |
                                 |Probably the build is executed from command line.
@@ -227,9 +229,7 @@ open class KotlinCocoapodsPlugin : Plugin<Project> {
                                 |
                                 |See details at https://kotlinlang.org/docs/reference/native/cocoapods.html#interoperability.
                             """.trimMargin()
-                            }
                         }
-
                     }
                 }
             }
