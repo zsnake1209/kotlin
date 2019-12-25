@@ -42,7 +42,7 @@ internal class CocoapodsBuildDirs(val project: Project) {
 
 internal fun String.asValidFrameworkName() = replace('-', '_')
 
-open class KotlinCocoapodsPlugin: Plugin<Project> {
+open class KotlinCocoapodsPlugin : Plugin<Project> {
 
     private fun KotlinMultiplatformExtension.supportedTargets() = targets
         .withType(KotlinNativeTarget::class.java)
@@ -175,57 +175,62 @@ open class KotlinCocoapodsPlugin: Plugin<Project> {
         kotlinExtension: KotlinMultiplatformExtension,
         cocoapodsExtension: CocoapodsExtension
     ) {
+        val moduleNames = mutableSetOf<String>()
         cocoapodsExtension.pods.all { pod ->
-            val defTask = project.tasks.create(
-                lowerCamelCaseName("generateDef", pod.name).asValidTaskName(),
-                DefFileTask::class.java
-            ) {
-                it.pod = pod
-                it.description = "Generates a def file for CocoaPods dependency ${pod.name}"
-                // This task is an implementation detail so we don't add it in any group
-                // to avoid showing it in the `tasks` output.
-            }
+            if (!moduleNames.contains(pod.moduleName)) {
+                moduleNames.add(pod.moduleName)
 
-            kotlinExtension.supportedTargets().all { target ->
-                target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops.create(pod.name) { interop ->
+                val defTask = project.tasks.create(
+                    lowerCamelCaseName("generateDef", pod.moduleName).asValidTaskName(),
+                    DefFileTask::class.java
+                ) {
+                    it.pod = pod
+                    it.description = "Generates a def file for CocoaPods dependencies with module ${pod.moduleName}"
+                    // This task is an implementation detail so we don't add it in any group
+                    // to avoid showing it in the `tasks` output.
+                }
 
-                    val interopTask = project.tasks.getByPath(interop.interopProcessingTaskName)
-                    interopTask.dependsOn(defTask)
-                    interop.defFile = defTask.outputFile
-                    interop.packageName = "cocoapods.${pod.moduleName}"
+                kotlinExtension.supportedTargets().all { target ->
+                    target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops.create(pod.moduleName) { interop ->
 
-                    project.findProperty(CFLAGS_PROPERTY)?.toString()?.let { args ->
-                        // Xcode quotes around paths with spaces.
-                        // Here and below we need to split such paths taking this into account.
-                        interop.compilerOpts.addAll(args.splitQuotedArgs())
-                    }
-                    project.findProperty(HEADER_PATHS_PROPERTY)?.toString()?.let { args->
-                        interop.compilerOpts.addAll(args.splitQuotedArgs().map { "-I$it" })
-                    }
-                    project.findProperty(FRAMEWORK_PATHS_PROPERTY)?.toString()?.let { args ->
-                        interop.compilerOpts.addAll(args.splitQuotedArgs().map { "-F$it" })
-                    }
+                        val interopTask = project.tasks.getByPath(interop.interopProcessingTaskName)
+                        interopTask.dependsOn(defTask)
+                        interop.defFile = defTask.outputFile
+                        interop.packageName = "cocoapods.${pod.moduleName}"
 
-                    // Show a human-readable error messages if the interop is created
-                    // but there are no parameters set by Xcode or manually by user (KT-31062).
-                    interopTask.doFirst { _ ->
-                        val hasCompilerOpts = interop.compilerOpts.isNotEmpty()
-                        val hasHeaderSearchPath = interop.includeDirs.let {
-                            !it.headerFilterDirs.isEmpty || !it.allHeadersDirs.isEmpty
+                        project.findProperty(CFLAGS_PROPERTY)?.toString()?.let { args ->
+                            // Xcode quotes around paths with spaces.
+                            // Here and below we need to split such paths taking this into account.
+                            interop.compilerOpts.addAll(args.splitQuotedArgs())
+                        }
+                        project.findProperty(HEADER_PATHS_PROPERTY)?.toString()?.let { args ->
+                            interop.compilerOpts.addAll(args.splitQuotedArgs().map { "-I$it" })
+                        }
+                        project.findProperty(FRAMEWORK_PATHS_PROPERTY)?.toString()?.let { args ->
+                            interop.compilerOpts.addAll(args.splitQuotedArgs().map { "-F$it" })
                         }
 
-                        check(hasCompilerOpts || hasHeaderSearchPath) {
-                            """
-                                |Cannot perform cinterop processing for ${pod.name}: cannot determine headers location.
+                        // Show a human-readable error messages if the interop is created
+                        // but there are no parameters set by Xcode or manually by user (KT-31062).
+                        interopTask.doFirst { _ ->
+                            val hasCompilerOpts = interop.compilerOpts.isNotEmpty()
+                            val hasHeaderSearchPath = interop.includeDirs.let {
+                                !it.headerFilterDirs.isEmpty || !it.allHeadersDirs.isEmpty
+                            }
+
+                            check(hasCompilerOpts || hasHeaderSearchPath) {
+                                """
+                                |Cannot perform cinterop processing for module ${pod.moduleName}: cannot determine headers location.
                                 |
                                 |Probably the build is executed from command line.
                                 |Note that a Kotlin/Native module using CocoaPods dependencies can be built only from Xcode.
                                 |
                                 |See details at https://kotlinlang.org/docs/reference/native/cocoapods.html#interoperability.
                             """.trimMargin()
+                            }
                         }
-                    }
 
+                    }
                 }
             }
         }
