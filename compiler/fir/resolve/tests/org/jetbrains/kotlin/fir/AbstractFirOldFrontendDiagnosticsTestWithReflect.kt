@@ -7,8 +7,8 @@ package org.jetbrains.kotlin.fir
 
 import org.jetbrains.kotlin.test.ConfigurationKind
 
-abstract class AbstractFirOldFrontendDiagnosticsTestWithStdlib : AbstractFirOldFrontendDiagnosticsTest() {
+abstract class AbstractFirOldFrontendDiagnosticsTestWithReflect : AbstractFirOldFrontendDiagnosticsTest() {
     override fun getConfigurationKind(): ConfigurationKind {
-        return ConfigurationKind.NO_KOTLIN_REFLECT
+        return ConfigurationKind.ALL
     }
 }

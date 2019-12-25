@@ -8,10 +8,10 @@ package org.jetbrains.kotlin.checkers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.test.ConfigurationKind;
 
-public abstract class AbstractDiagnosticsTestWithStdLib extends AbstractDiagnosticsTest {
+public abstract class AbstractDiagnosticsTestWithReflect extends AbstractDiagnosticsTest {
     @NotNull
     @Override
     protected ConfigurationKind getConfigurationKind() {
-        return ConfigurationKind.NO_KOTLIN_REFLECT;
+        return ConfigurationKind.ALL;
     }
 }
