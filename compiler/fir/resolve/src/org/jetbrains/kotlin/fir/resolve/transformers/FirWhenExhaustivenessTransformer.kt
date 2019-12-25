@@ -72,7 +72,7 @@ class FirWhenExhaustivenessTransformer(private val bodyResolveComponents: BodyRe
 
     private fun checkEnumExhaustiveness(whenExpression: FirWhenExpression, enum: FirRegularClass, nullable: Boolean): Boolean {
         val data = EnumExhaustivenessData(
-            enum.collectEnumEntries().associateByTo(mutableMapOf(), { it.classId }, { false }),
+            enum.collectEnumEntries().toMutableSet(),
             !nullable
         )
         for (branch in whenExpression.branches) {

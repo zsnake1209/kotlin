@@ -69,21 +69,6 @@ object ImplementationConfigurator : AbstractFirTreeImplementationConfigurator() 
             parents += modifiableClass.withArg(anonymousObject)
         }
 
-        impl(enumEntry) {
-            parents += modifiableClass.withArg(regularClass)
-            parents += modifiableTypeParametersOwner
-            default("status", "FirDeclarationStatusImpl(Visibilities.UNKNOWN, Modality.FINAL)")
-            default("classKind") {
-                value = "ClassKind.ENUM_ENTRY"
-                withGetter = true
-            }
-            default("companionObject") {
-                value = "null"
-                withGetter = true
-            }
-            default("typeRef", "session.builtinTypes.enumType")
-            useTypes(visibilitiesType, modalityType)
-        }
 
         impl(typeAlias) {
             parents += modifiableTypeParametersOwner
