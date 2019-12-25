@@ -10,11 +10,9 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.impl.FirImportImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedImportImpl
+import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
-import org.jetbrains.kotlin.fir.resolve.BodyResolveComponents
-import org.jetbrains.kotlin.fir.resolve.ScopeSession
-import org.jetbrains.kotlin.fir.resolve.firSymbolProvider
-import org.jetbrains.kotlin.fir.resolve.scope
+import org.jetbrains.kotlin.fir.resolve.*
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
@@ -23,8 +21,8 @@ import org.jetbrains.kotlin.fir.scopes.impl.FirExplicitSimpleImportingScope
 import org.jetbrains.kotlin.fir.scopes.scope
 import org.jetbrains.kotlin.fir.symbols.AbstractFirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.*
-import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.ConeNullability
 import org.jetbrains.kotlin.fir.types.coneTypeUnsafe
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -49,7 +47,7 @@ interface TowerScopeLevel {
     interface TowerScopeLevelProcessor<T : AbstractFirBasedSymbol<*>> {
         fun consumeCandidate(
             symbol: T,
-            dispatchReceiverValue: ClassDispatchReceiverValue?,
+            dispatchReceiverValue: ReceiverValue?,
             implicitExtensionReceiverValue: ImplicitReceiverValue<*>?
         ): ProcessorAction
     }
@@ -106,7 +104,7 @@ class MemberScopeTowerLevel(
                 if (candidate is FirCallableSymbol<*> && candidate.hasConsistentExtensionReceiver(extensionReceiver)) {
                     // NB: we do not check dispatchReceiverValue != null here,
                     // because of objects & constructors (see comments in dispatchReceiverValue() implementation)
-                    output.consumeCandidate(candidate, candidate.dispatchReceiverValue(), implicitExtensionReceiver)
+                    output.consumeCandidate(candidate, NotNullableReceiverValue(dispatchReceiver), implicitExtensionReceiver)
                 } else if (candidate is FirClassLikeSymbol<*>) {
                     output.consumeCandidate(candidate, null, implicitExtensionReceiver)
                 } else {
@@ -116,7 +114,7 @@ class MemberScopeTowerLevel(
         ) return ProcessorAction.STOP
         val withSynthetic = FirSyntheticPropertiesScope(session, scope)
         return withSynthetic.processScopeMembers { symbol ->
-            output.consumeCandidate(symbol, symbol.dispatchReceiverValue(), implicitExtensionReceiver)
+            output.consumeCandidate(symbol, NotNullableReceiverValue(dispatchReceiver), implicitExtensionReceiver)
         }
     }
 
@@ -160,7 +158,7 @@ class ScopeTowerLevel(
             extensionsOnly && !hasExtensionReceiver() -> false
             !hasConsistentExtensionReceiver(extensionReceiver) -> false
             scope is FirAbstractImportingScope -> true
-            else -> dispatchReceiverValue().let { it == null || it.klassSymbol.fir.classKind == ClassKind.OBJECT }
+            else -> true//dispatchReceiverValue().let { it == null || it.klassSymbol.fir.classKind == ClassKind.OBJECT }
         }
 
     override fun <T : AbstractFirBasedSymbol<*>> processElementsByName(
@@ -177,12 +175,12 @@ class ScopeTowerLevel(
         return when (token) {
             TowerScopeLevel.Token.Properties -> scope.processPropertiesByName(name) { candidate ->
                 if (candidate.hasConsistentReceivers(extensionReceiver)) {
-                    val dispatchReceiverValue = when (candidate) {
-                        is FirBackingFieldSymbol -> candidate.fir.symbol.dispatchReceiverValue()
-                        else -> candidate.dispatchReceiverValue()
-                    }
+//                    val dispatchReceiverValue = when (candidate) {
+//                        is FirBackingFieldSymbol -> candidate.fir.symbol.dispatchReceiverValue()
+//                        else -> candidate.dispatchReceiverValue()
+//                    }
                     processor.consumeCandidate(
-                        candidate as T, dispatchReceiverValue = dispatchReceiverValue,
+                        candidate as T, dispatchReceiverValue = null,
                         implicitExtensionReceiverValue = implicitExtensionReceiver
                     )
                 } else {
@@ -196,7 +194,7 @@ class ScopeTowerLevel(
             ) { candidate ->
                 if (candidate.hasConsistentReceivers(extensionReceiver)) {
                     processor.consumeCandidate(
-                        candidate as T, dispatchReceiverValue = candidate.dispatchReceiverValue(),
+                        candidate as T, dispatchReceiverValue = null,
                         implicitExtensionReceiverValue = implicitExtensionReceiver
                     )
                 } else {
@@ -276,6 +274,14 @@ class QualifiedReceiverTowerLevel(
 
         }
     }
+}
+
+
+class NotNullableReceiverValue(val value: ReceiverValue): ReceiverValue {
+    override val type: ConeKotlinType
+        get() = value.type.withNullability(ConeNullability.NOT_NULL)
+    override val receiverExpression: FirExpression
+        get() = value.receiverExpression
 }
 
 fun FirCallableDeclaration<*>.dispatchReceiverValue(session: FirSession): ClassDispatchReceiverValue? {

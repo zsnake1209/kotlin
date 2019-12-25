@@ -63,7 +63,7 @@ class QualifiedReceiverTowerDataConsumer<T : AbstractFirBasedSymbol<*>>(
     private inner class TowerLevelProcessorImpl(val group: Int) : TowerScopeLevel.TowerScopeLevelProcessor<T> {
         override fun consumeCandidate(
             symbol: T,
-            dispatchReceiverValue: ClassDispatchReceiverValue?,
+            dispatchReceiverValue: ReceiverValue?,
             implicitExtensionReceiverValue: ImplicitReceiverValue<*>?
         ): ProcessorAction {
             assert(dispatchReceiverValue == null)
@@ -195,7 +195,7 @@ class ExplicitReceiverTowerDataConsumer<T : AbstractFirBasedSymbol<*>>(
     private inner class EmptyKindTowerProcessor(val group: Int) : TowerScopeLevel.TowerScopeLevelProcessor<T> {
         override fun consumeCandidate(
             symbol: T,
-            dispatchReceiverValue: ClassDispatchReceiverValue?,
+            dispatchReceiverValue: ReceiverValue?,
             implicitExtensionReceiverValue: ImplicitReceiverValue<*>?
         ): ProcessorAction {
             resultCollector.consumeCandidate(
@@ -214,7 +214,7 @@ class ExplicitReceiverTowerDataConsumer<T : AbstractFirBasedSymbol<*>>(
     private inner class TowerLevelKindTowerProcessor(val group: Int) : TowerScopeLevel.TowerScopeLevelProcessor<T> {
         override fun consumeCandidate(
             symbol: T,
-            dispatchReceiverValue: ClassDispatchReceiverValue?,
+            dispatchReceiverValue: ReceiverValue?,
             implicitExtensionReceiverValue: ImplicitReceiverValue<*>?
         ): ProcessorAction {
             if (symbol is FirNamedFunctionSymbol && symbol.callableId.packageName.startsWith(defaultPackage)) {
@@ -284,7 +284,7 @@ class NoExplicitReceiverTowerDataConsumer<T : AbstractFirBasedSymbol<*>>(
     private inner class TowerLevelProcessorImpl(val group: Int) : TowerScopeLevel.TowerScopeLevelProcessor<T> {
         override fun consumeCandidate(
             symbol: T,
-            dispatchReceiverValue: ClassDispatchReceiverValue?,
+            dispatchReceiverValue: ReceiverValue?,
             implicitExtensionReceiverValue: ImplicitReceiverValue<*>?
         ): ProcessorAction {
             resultCollector.consumeCandidate(
