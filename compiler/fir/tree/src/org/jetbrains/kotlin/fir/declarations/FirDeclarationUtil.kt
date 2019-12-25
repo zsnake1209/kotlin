@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.fir.declarations.impl.FirModifiableRegularClass
 import org.jetbrains.kotlin.fir.declarations.impl.FirTypeParameterImpl
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousObjectSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.coneTypeSafe
@@ -67,7 +68,14 @@ val FirClassSymbol<*>.superConeTypes
 
 val FirClass<*>.superConeTypes get() = superTypeRefs.mapNotNull { it.coneTypeSafe<ConeClassLikeType>() }
 
-fun FirRegularClass.collectEnumEntries(): Collection<FirProperty> {
+fun FirRegularClass.collectEnumEntries(): Collection<FirPropertySymbol> {
     assert(classKind == ClassKind.ENUM_CLASS)
-    return declarations.filterIsInstance<FirProperty>().filter { (it.initializer as? FirAnonymousObject)?.classKind == ClassKind.ENUM_ENTRY }
+    return declarations
+        .mapNotNull {
+            if (it !is FirProperty) return@mapNotNull null
+            val initializer = it.initializer
+            if (initializer == null || initializer !is FirAnonymousObject || initializer.classKind != ClassKind.ENUM_ENTRY)
+                return@mapNotNull null
+            return@mapNotNull it.symbol
+        }
 }

@@ -81,30 +81,16 @@ class FirLibrarySymbolProviderImpl(val session: FirSession) : FirSymbolProvider(
             parentContext: FirDeserializationContext? = null
         ): FirRegularClassSymbol? {
             val classIdExists = classId in classDataFinder.allClassIds
-//            val shouldBeEnumEntry = !classIdExists && classId.outerClassId in classDataFinder.allClassIds
-//            if (!classIdExists && !shouldBeEnumEntry) return null
-//            if (shouldBeEnumEntry) {
-//                val outerClassData = classDataFinder.findClassData(classId.outerClassId!!)!!
-//                val outerClassProto = outerClassData.classProto
-//                if (outerClassProto.enumEntryList.none { nameResolver.getName(it.name) == classId.shortClassName }) {
-//                    return null
-//                }
-//            }
+            if (!classIdExists) return null
             return lookup.getOrPut(classId, { FirRegularClassSymbol(classId) }) { symbol ->
-//                if (shouldBeEnumEntry) {
-//                    FirEnumEntryImpl(null, session, classId.shortClassName, symbol).apply {
-//                        resolvePhase = FirResolvePhase.DECLARATIONS
-//                    }
-//                } else {
-                    val classData = classDataFinder.findClassData(classId)!!
-                    val classProto = classData.classProto
+                val classData = classDataFinder.findClassData(classId)!!
+                val classProto = classData.classProto
 
-                    deserializeClassToSymbol(
-                        classId, classProto, symbol, nameResolver, session,
-                        null, parentContext,
-                        this::findAndDeserializeClass
-                    )
-//                }
+                deserializeClassToSymbol(
+                    classId, classProto, symbol, nameResolver, session,
+                    null, parentContext,
+                    this::findAndDeserializeClass
+                )
             }
         }
 

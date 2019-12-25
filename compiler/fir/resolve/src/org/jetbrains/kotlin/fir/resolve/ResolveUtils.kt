@@ -317,19 +317,14 @@ fun BodyResolveComponents.typeForQualifier(resolvedQualifier: FirResolvedQualifi
     val classId = resolvedQualifier.classId
     val resultType = resolvedQualifier.resultType
     if (classId != null) {
-        val classSymbol = symbolProvider.getClassLikeSymbolByFqName(classId)!!
+        val classSymbol = symbolProvider.getClassLikeSymbolByFqName(classId)
+            ?: return FirErrorTypeRefImpl(source = null, diagnostic = FirSimpleDiagnostic("No type for qualifier", DiagnosticKind.Other))
         val declaration = classSymbol.phasedFir
         typeForQualifierByDeclaration(declaration, resultType)?.let { return it }
-        if (declaration is FirRegularClass && declaration.classKind == ClassKind.ENUM_ENTRY) {
-            val enumClassSymbol = symbolProvider.getClassLikeSymbolByFqName(classSymbol.classId.outerClassId!!)!!
-            return resultType.resolvedTypeFromPrototype(
-                enumClassSymbol.constructType(emptyArray(), false)
-            )
-        }
     }
     // TODO: Handle no value type here
     return resultType.resolvedTypeFromPrototype(
-        session.builtinTypes.unitType.type//StandardClassIds.Unit(symbolProvider).constructType(emptyArray(), isNullable = false)
+        session.builtinTypes.unitType.type
     )
 }
 

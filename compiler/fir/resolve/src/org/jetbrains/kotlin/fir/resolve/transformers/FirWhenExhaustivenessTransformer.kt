@@ -11,12 +11,14 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
+import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.BodyResolveComponents
 import org.jetbrains.kotlin.fir.resolve.FirSymbolProvider
 import org.jetbrains.kotlin.fir.resolve.firSymbolProvider
 import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTag
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.types.ConeLookupTagBasedType
 import org.jetbrains.kotlin.fir.types.ConeNullability
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
@@ -78,10 +80,10 @@ class FirWhenExhaustivenessTransformer(private val bodyResolveComponents: BodyRe
         for (branch in whenExpression.branches) {
             branch.condition.accept(EnumExhaustivenessVisitor, data)
         }
-        return data.containsNull && data.visitedEntries.values.all { it }
+        return data.containsNull && data.remainingEntries.isEmpty()
     }
 
-    private class EnumExhaustivenessData(val visitedEntries: MutableMap<ClassId, Boolean>, var containsNull: Boolean)
+    private class EnumExhaustivenessData(val remainingEntries: MutableSet<FirPropertySymbol>, var containsNull: Boolean)
 
     private object EnumExhaustivenessVisitor : FirVisitor<Unit, EnumExhaustivenessData>() {
         override fun visitElement(element: FirElement, data: EnumExhaustivenessData) {}
@@ -94,9 +96,11 @@ class FirWhenExhaustivenessTransformer(private val bodyResolveComponents: BodyRe
                             data.containsNull = true
                         }
                     }
-                    is FirResolvedQualifier -> {
-                        val classId = argument.classId ?: return
-                        data.visitedEntries.replace(classId, true)
+                    is FirQualifiedAccessExpression -> {
+                        val reference = argument.calleeReference as? FirResolvedNamedReference ?: return
+                        val symbol = reference.resolvedSymbol
+                        if (symbol is FirPropertySymbol)
+                            data.remainingEntries.remove(symbol)
                     }
                 }
             }

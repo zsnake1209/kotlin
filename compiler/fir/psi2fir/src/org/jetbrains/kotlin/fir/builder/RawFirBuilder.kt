@@ -349,8 +349,6 @@ class RawFirBuilder(session: FirSession, val stubMode: Boolean) : BaseFirBuilder
             }
 
             when {
-                this is KtEnumEntry && classKind == ClassKind.ENUM_ENTRY ->
-                    delegatedEnumSuperTypeRef!!
                 this is KtClass && classKind == ClassKind.ENUM_CLASS -> {
                     /*
                      * kotlin.Enum constructor has (name: String, ordinal: Int) signature,
@@ -372,7 +370,13 @@ class RawFirBuilder(session: FirSession, val stubMode: Boolean) : BaseFirBuilder
                 }
             }
 
-            val defaultDelegatedSuperTypeRef = implicitAnyType
+            val defaultDelegatedSuperTypeRef =
+                when {
+                    classKind == ClassKind.ENUM_ENTRY && this is KtClass -> delegatedEnumSuperTypeRef ?: implicitAnyType
+                    else -> implicitAnyType
+                }
+
+
             if (container.superTypeRefs.isEmpty()) {
                 container.superTypeRefs += defaultDelegatedSuperTypeRef
             }
@@ -466,15 +470,19 @@ class RawFirBuilder(session: FirSession, val stubMode: Boolean) : BaseFirBuilder
                 ClassKind.ENUM_ENTRY,
                 FirAnonymousObjectSymbol()
             )
+            val delegatedEntrySelfType =
+                FirResolvedTypeRefImpl(source = null, ConeClassLikeTypeImpl(obj.symbol.toLookupTag(), emptyArray(), isNullable = false))
 
-            extractSuperTypeListEntriesTo(obj, null, delegatedEnumSelfTypeRef, ClassKind.ENUM_ENTRY)
+            extractSuperTypeListEntriesTo(obj, delegatedEntrySelfType, delegatedEnumSelfTypeRef, ClassKind.ENUM_ENTRY)
 
             for (declaration in declarations) {
-                obj.declarations +=
-                    declaration.convert<FirDeclaration>()
+                obj.declarations += declaration.toFirDeclaration(
+                    delegatedEnumSelfTypeRef,
+                    delegatedSelfType = null,
+                    this,
+                    hasPrimaryConstructor = false
+                )
             }
-
-
 
             return FirPropertyImpl(
                 source = toFirSourceElement(),
