@@ -30,7 +30,9 @@ interface IrSymbol {
     val descriptor: DeclarationDescriptor
     val isBound: Boolean
 
-    var uniqId: UniqId
+//    var uniqId: UniqId
+    val uniqId: UniqId
+    val isPublicApi: Boolean
 
     fun <D, R> accept(visitor: IrSymbolVisitor<R, D>, data: D): R
 }

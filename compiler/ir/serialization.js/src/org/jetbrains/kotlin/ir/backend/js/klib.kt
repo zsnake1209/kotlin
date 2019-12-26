@@ -134,7 +134,7 @@ fun generateKLib(
     val moduleFragment = psi2IrContext.generateModuleFragmentWithPlugins(project, files,
         deserializer = null, expectDescriptorToSymbol = expectDescriptorToSymbol)
 
-    moduleFragment.acceptVoid(ManglerChecker(JsManglerClassic, JsManglerIr, JsManglerDesc))
+    moduleFragment.acceptVoid(ManglerChecker(JsManglerIr, JsManglerDesc))
 
     val moduleName = configuration[CommonConfigurationKeys.MODULE_NAME]!!
 
@@ -209,8 +209,9 @@ private fun runAnalysisAndPreparePsi2Ir(depsDescriptors: ModulesStructure): Gene
         analysisResult.moduleDescriptor,
         analysisResult.bindingContext,
         depsDescriptors.compilerConfiguration.languageVersionSettings,
-        SymbolTable(),
-        GeneratorExtensions()
+        SymbolTable(JsDescriptorMangler),
+        GeneratorExtensions(),
+        JsDescriptorMangler
     )
 }
 
@@ -221,7 +222,7 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
     expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>? = null
 ): IrModuleFragment {
     val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
-    val psi2Ir = Psi2IrTranslator(languageVersionSettings, configuration, mangler = JsManglerIr)
+    val psi2Ir = Psi2IrTranslator(languageVersionSettings, configuration, mangler = JsDescriptorMangler)
 
     for (extension in IrGenerationExtension.getInstances(project)) {
         psi2Ir.addPostprocessingStep { module ->
@@ -252,7 +253,7 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
 fun GeneratorContext.generateModuleFragment(files: List<KtFile>, deserializer: IrDeserializer? = null, expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>? = null): IrModuleFragment {
     val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
     return Psi2IrTranslator(
-        languageVersionSettings, configuration, mangler = JsManglerIr
+        languageVersionSettings, configuration, mangler = JsDescriptorMangler
     ).generateModuleFragment(this, files, irProviders, expectDescriptorToSymbol)
 }
 

@@ -59,6 +59,10 @@ private class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFra
     override fun bind(owner: IrExternalPackageFragment) {
         _owner = owner
     }
+
+    override val isPublicApi: Boolean
+        get() = error("Operation is unsupported")
+
 }
 
 private class DescriptorlessIrFileSymbol : IrFileSymbol {
@@ -77,6 +81,9 @@ private class DescriptorlessIrFileSymbol : IrFileSymbol {
         set(value) { error("Operation is unsupported") }
 
     override val isBound get() = _owner != null
+
+    override val isPublicApi: Boolean
+        get() = error("Operation is unsupported")
 }
 
 

@@ -501,7 +501,7 @@ abstract class KotlinIrLinker(
         builtIns.knownBuiltins.forEach {
             val currentIndex = with(mangler) { it.mangle.hashMangle }
             globalDeserializedSymbols[UniqId(currentIndex or mask)] = it.symbol
-            assert(symbolTable.referenceSimpleFunction(it.symbol.descriptor as SimpleFunctionDescriptor).owner === it)
+            assert(symbolTable.referenceBuiltInOperator(it.symbol.descriptor as SimpleFunctionDescriptor, it.mangle).owner === it)
         }
     }
 

@@ -77,6 +77,13 @@ abstract class AbstractJsDescriptorMangler : DescriptorBasedKotlinManglerImpl() 
     override fun getMangleComputer(prefix: String): KotlinMangleComputer<DeclarationDescriptor> {
         return JsDescriptorManglerComputer(StringBuilder(256), prefix)
     }
+
+    abstract class AbstractDescriptorManglerImpl : AbstractDescriptorMangler() {
+        override fun getMangleComputer(prefix: String): DescriptorMangleComputer = JsDescriptorManglerComputer(StringBuilder(256), prefix)
+        override fun getExportChecker(): DescriptorExportCheckerVisitor = exportChecker
+    }
 }
 
 object JsManglerDesc : AbstractJsDescriptorMangler()
+
+object JsDescriptorMangler : AbstractJsDescriptorMangler.AbstractDescriptorManglerImpl()

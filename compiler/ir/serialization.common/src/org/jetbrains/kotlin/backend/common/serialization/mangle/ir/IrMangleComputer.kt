@@ -247,6 +247,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
         val length = addPrefix("kfun", data)
 
         typeParameterContainer.add(property)
+        isRealExpect = isRealExpect or property.isExpect
         property.parent.accept(this, false)
 
         if (length != builder.length) builder.append('.')

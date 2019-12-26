@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.emptyLoggingContext
 import org.jetbrains.kotlin.ir.backend.js.generateJsCode
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsDescriptorMangler
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrLinker
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr
 import org.jetbrains.kotlin.ir.backend.js.utils.NameTables
@@ -45,7 +46,7 @@ class JsScriptDependencyCompiler(
             it.constantValueGenerator = ConstantValueGenerator(moduleDescriptor, symbolTable)
         }
 
-        val irBuiltIns = IrBuiltIns(builtIns, typeTranslator, symbolTable)
+        val irBuiltIns = IrBuiltIns(builtIns, typeTranslator, JsDescriptorMangler, symbolTable)
         val jsLinker = JsIrLinker(moduleDescriptor, JsManglerIr, emptyLoggingContext, irBuiltIns, symbolTable)
 
         val moduleFragment = IrModuleFragmentImpl(moduleDescriptor, irBuiltIns)

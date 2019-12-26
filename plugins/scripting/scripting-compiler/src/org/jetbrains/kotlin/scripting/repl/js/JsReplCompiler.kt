@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.scripting.repl.js
 
 import org.jetbrains.kotlin.cli.common.repl.*
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
+import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsDescriptorMangler
 import org.jetbrains.kotlin.ir.backend.js.utils.NameTables
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.scripting.compiler.plugin.repl.ReplCodeAnalyzer
@@ -21,7 +22,7 @@ class JsReplCompiler(private val environment: KotlinCoreEnvironment) : ReplCompi
             NameTables(emptyList()),
             readLibrariesFromConfiguration(environment.configuration),
             ReplCodeAnalyzer.ResettableAnalyzerState(),
-            SymbolTable()
+            SymbolTable(JsDescriptorMangler)
         )
     }
 

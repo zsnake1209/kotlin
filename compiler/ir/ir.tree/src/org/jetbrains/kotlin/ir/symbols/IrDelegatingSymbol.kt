@@ -9,9 +9,13 @@ abstract class IrDelegatingSymbol<S: IrBindableSymbol<D, B>, B: IrSymbolOwner, D
     override val owner: B get() = delegate.owner
     override val descriptor: D get() = delegate.descriptor
     override val isBound: Boolean get() = delegate.isBound
-    override var uniqId: UniqId
+    override val isPublicApi: Boolean
+        get() = delegate.isPublicApi
+    override val uniqId: UniqId
         get() = delegate.uniqId
-        set(value: UniqId) { delegate.uniqId = value }
+//    override var uniqId: UniqId
+//        get() = delegate.uniqId
+//        set(value: UniqId) { delegate.uniqId = value }
 
     override fun bind(owner: B) = delegate.bind(owner)
     override fun hashCode() = delegate.hashCode()

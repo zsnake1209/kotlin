@@ -249,6 +249,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         val property = accessor.correspondingProperty
 
         typeParameterContainer.add(property)
+        isRealExpect = isRealExpect or property.isExpect
         property.containingDeclaration.accept(this, false)
 
         if (length != builder.length) builder.append('.')
