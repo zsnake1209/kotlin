@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.ir.declarations.impl
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.IrElementBase
 import org.jetbrains.kotlin.ir.SourceManager
+import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.MetadataSource
@@ -63,11 +64,19 @@ class IrFileImpl(
         visitor.visitFile(this, data)
 
     override fun <D> acceptChildren(visitor: IrElementVisitor<Unit, D>, data: D) {
-        declarations.forEach { it.accept(visitor, data) }
+        declarations.forEach {
+            if (it is IrClass && it.name.asString() == "KFunction") {
+                1
+            }
+            it.accept(visitor, data)
+        }
     }
 
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
         declarations.forEachIndexed { i, irDeclaration ->
+            if (irDeclaration is IrClass && irDeclaration.name.asString() == "KFunction") {
+                1
+            }
             declarations[i] = irDeclaration.transform(transformer, data) as IrDeclaration
         }
     }

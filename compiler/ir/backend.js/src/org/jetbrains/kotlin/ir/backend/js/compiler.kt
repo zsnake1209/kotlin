@@ -86,6 +86,8 @@ fun compile(
 
     moveBodilessDeclarationsToSeparatePlace(context, moduleFragment)
 
+    val f = moduleFragment.files.filter { it.fileEntry.name.endsWith("KFunction.kt") }
+
     jsPhases.invokeToplevel(phaseConfig, context, moduleFragment)
 
     val transformer = IrModuleToJsTransformer(context, mainFunction, mainArguments)

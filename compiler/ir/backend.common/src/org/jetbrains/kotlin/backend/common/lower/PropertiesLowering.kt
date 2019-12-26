@@ -58,7 +58,10 @@ class PropertiesLowering(
     }
 
     private fun lowerProperty(declaration: IrDeclaration, kind: ClassKind): List<IrDeclaration>? =
-        if (declaration is IrProperty)
+        if (declaration is IrProperty) {
+            if (declaration.name.asString() == "name" && declaration.parent.let { it is IrClass && it.name.asString() == "KFunction" }) {
+                1
+            }
             if (skipExternalProperties && declaration.isEffectivelyExternal()) listOf(declaration) else {
                 ArrayList<IrDeclaration>(4).apply {
                     // JvmFields in a companion object refer to companion's owners and should not be generated within companion.
@@ -76,6 +79,7 @@ class PropertiesLowering(
                     }
                 }
             }
+        }
         else
             null
 
