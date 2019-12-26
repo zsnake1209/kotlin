@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.codegen.CodegenTestCase
 import org.jetbrains.kotlin.config.languageVersionSettings
-import org.jetbrains.kotlin.ir.backend.js.JsGeneratorExtensions
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.js.analyze.TopDownAnalyzerFacadeForJS
@@ -111,7 +110,7 @@ abstract class AbstractIrGeneratorTestCase : CodegenTestCase() {
                     moduleDescriptors = emptyList(),
                     friendModuleDescriptors = emptyList()
                 ),
-                psi2ir, ktFilesToAnalyze, JsGeneratorExtensions()
+                psi2ir, ktFilesToAnalyze, GeneratorExtensions()
             )
 
         fun generateIrModuleWithJvmResolve(
