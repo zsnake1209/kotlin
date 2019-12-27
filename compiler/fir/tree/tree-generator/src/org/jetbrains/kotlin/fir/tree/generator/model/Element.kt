@@ -27,6 +27,7 @@ interface AbstractElement : FieldContainer, KindOwner {
     val transformerType: AbstractElement
     val doesNotNeedImplementation: Boolean
     val needTransformOtherChildren: Boolean
+    val needScopeBuilding: Boolean
     val allImplementations: List<Implementation>
     val allFirFields: List<Field>
     val defaultImplementation: Implementation?
@@ -58,6 +59,10 @@ class Element(val name: String, kind: Kind) : AbstractElement {
     override val transformerType: Element get() = baseTransformerType ?: this
 
     override var doesNotNeedImplementation: Boolean = false
+
+    var _needScopeBuilding: Boolean = false
+
+    override val needScopeBuilding: Boolean get() = _needScopeBuilding || parents.any { it.needScopeBuilding }
 
     override val needTransformOtherChildren: Boolean get() = _needTransformOtherChildren || parents.any { it.needTransformOtherChildren }
 

@@ -15,6 +15,9 @@ import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.FirTypeParameter
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
+import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
+import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.FirScopeProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -43,6 +46,8 @@ interface FirModifiableRegularClass : FirRegularClass, FirModifiableClass<FirReg
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirModifiableRegularClass
 
     override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirModifiableRegularClass
+
+    override fun scope(substitutor: ConeSubstitutor, useSiteSession: FirSession, scopeSession: ScopeSession): FirScope
 
     override fun replaceResolvePhase(newResolvePhase: FirResolvePhase)
 

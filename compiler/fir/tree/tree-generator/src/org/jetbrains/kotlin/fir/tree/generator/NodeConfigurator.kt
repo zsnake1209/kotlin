@@ -218,6 +218,7 @@ object NodeConfigurator : AbstractFieldConfigurator() {
             +declarations
             +annotations
             +scopeProvider
+            needScopeBuilding()
         }
 
         regularClass.configure {

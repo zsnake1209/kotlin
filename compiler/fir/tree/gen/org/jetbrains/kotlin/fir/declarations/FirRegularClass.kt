@@ -9,6 +9,9 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
+import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
+import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.FirScopeProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -40,4 +43,6 @@ interface FirRegularClass : FirMemberDeclaration, FirTypeParametersOwner, FirCla
     override fun replaceSuperTypeRefs(newSuperTypeRefs: List<FirTypeRef>)
 
     override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirRegularClass
+
+    override fun scope(substitutor: ConeSubstitutor, useSiteSession: FirSession, scopeSession: ScopeSession): FirScope
 }

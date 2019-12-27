@@ -13,6 +13,9 @@ import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
+import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
+import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.FirScopeProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -34,6 +37,8 @@ interface FirModifiableClass<F : FirClass<F>>  : FirClass<F>, FirAbstractAnnotat
     override val annotations: MutableList<FirAnnotationCall>
     override val scopeProvider: FirScopeProvider
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirModifiableClass<F>
+
+    override fun scope(substitutor: ConeSubstitutor, useSiteSession: FirSession, scopeSession: ScopeSession): FirScope
 
     override fun replaceResolvePhase(newResolvePhase: FirResolvePhase)
 

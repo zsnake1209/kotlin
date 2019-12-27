@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.wrapSubstitutionScopeIfNeed
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.jvm.JvmMappedScope
-import org.jetbrains.kotlin.fir.scopes.scope
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 

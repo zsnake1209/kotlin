@@ -11,6 +11,9 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirExpression
+import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
+import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.FirScopeProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -44,4 +47,6 @@ abstract class FirEnumEntry : FirPureAbstractElement(), FirRegularClass {
     abstract override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirEnumEntry
 
     abstract fun <D> transformArguments(transformer: FirTransformer<D>, data: D): FirEnumEntry
+
+    abstract override fun scope(substitutor: ConeSubstitutor, useSiteSession: FirSession, scopeSession: ScopeSession): FirScope
 }

@@ -73,6 +73,10 @@ abstract class AbstractFieldConfigurator {
             element._needTransformOtherChildren = true
         }
 
+        fun needScopeBuilding() {
+            element._needScopeBuilding = true
+        }
+
         fun shouldBeAnInterface() {
             element.kind = Implementation.Kind.Interface
         }

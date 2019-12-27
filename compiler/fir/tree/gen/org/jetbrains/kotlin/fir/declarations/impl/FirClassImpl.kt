@@ -16,6 +16,9 @@ import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.FirTypeParameter
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
+import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
+import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.FirScopeProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -70,6 +73,10 @@ class FirClassImpl(
     override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirClassImpl {
         status = status.transformSingle(transformer, data)
         return this
+    }
+
+    override fun scope(substitutor: ConeSubstitutor, useSiteSession: FirSession, scopeSession: ScopeSession): FirScope {
+        return scopeProvider.getUseSiteMemberScope(this, substitutor, useSiteSession, scopeSession)
     }
 
     override fun replaceResolvePhase(newResolvePhase: FirResolvePhase) {

@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.fir.tree.generator.model.*
 import java.io.File
 import java.io.PrintWriter
 import java.util.*
-import kotlin.math.abs
 
 val COPYRIGHT = """
 /*
@@ -175,7 +174,11 @@ fun Implementation.collectImports(): List<String> {
         listOf(
             element.fullQualifiedName)
                 + usedTypes.mapNotNull { it.fullQualifiedName } + parents.mapNotNull { it.fullQualifiedName }
-                + listOfNotNull(pureAbstractElementType.fullQualifiedName?.takeIf { needPureAbstractElement }
+                + listOfNotNull(pureAbstractElementType.fullQualifiedName?.takeIf { needPureAbstractElement })
+                + listOfNotNull(
+                    "org.jetbrains.kotlin.fir.resolve.ScopeSession".takeIf { element.needScopeBuilding },
+                    "org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor".takeIf { element.needScopeBuilding },
+                    "org.jetbrains.kotlin.fir.scopes.FirScope".takeIf { element.needScopeBuilding }
         ),
         isImpl = true
     )
@@ -190,6 +193,13 @@ fun Element.collectImports(): List<String> {
     }
     if (needPureAbstractElement) {
         baseTypes += pureAbstractElementType.fullQualifiedName!!
+    }
+    if (needScopeBuilding) {
+        baseTypes += listOf(
+            "org.jetbrains.kotlin.fir.resolve.ScopeSession",
+            "org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor",
+            "org.jetbrains.kotlin.fir.scopes.FirScope"
+        )
     }
     return collectImportsInternal(
         baseTypes,
@@ -526,6 +536,22 @@ fun PrintWriter.printImplementation(implementation: Implementation) {
             }
         }
 
+        if (element.needScopeBuilding) {
+            println()
+            indent()
+            abstract()
+            print("override fun scope(substitutor: ConeSubstitutor, useSiteSession: FirSession, scopeSession: ScopeSession): FirScope")
+            if (isInterface || isAbstract) {
+                println()
+            } else {
+                println(" {")
+                indent(2)
+                println("return scopeProvider.getUseSiteMemberScope(this, substitutor, useSiteSession, scopeSession)")
+                indent()
+                println("}")
+            }
+        }
+
         for (field in allFields.filter { it.withReplace }) {
             println()
             indent()
@@ -571,6 +597,10 @@ fun Field.transformFunctionDeclaration(returnType: String): String {
 
 fun transformFunctionDeclaration(transformName: String, returnType: String): String {
     return "fun <D> transform$transformName(transformer: FirTransformer<D>, data: D): $returnType"
+}
+
+fun scopeFunctionDeclaration(): String {
+    return "fun scope(substitutor: ConeSubstitutor, useSiteSession: FirSession, scopeSession: ScopeSession): FirScope"
 }
 
 fun Field.replaceFunctionDeclaration(): String {
@@ -743,6 +773,14 @@ fun PrintWriter.printElement(element: Element) {
                 print("override ")
             }
             println(transformFunctionDeclaration("OtherChildren", typeWithArguments))
+        }
+        if (needScopeBuilding) {
+            println()
+            abstract()
+            if (element.parents.any { it.needScopeBuilding }) {
+                print("override ")
+            }
+            println(scopeFunctionDeclaration())
         }
 
         if (element == AbstractFirTreeBuilder.baseFirElement) {

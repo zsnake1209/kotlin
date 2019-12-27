@@ -13,6 +13,9 @@ import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.impl.FirAbstractAnnotatedElement
+import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
+import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.FirScopeProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousObjectSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -54,6 +57,10 @@ class FirAnonymousObjectImpl(
         annotations.transformInplace(transformer, data)
         typeRef = typeRef.transformSingle(transformer, data)
         return this
+    }
+
+    override fun scope(substitutor: ConeSubstitutor, useSiteSession: FirSession, scopeSession: ScopeSession): FirScope {
+        return scopeProvider.getUseSiteMemberScope(this, substitutor, useSiteSession, scopeSession)
     }
 
     override fun replaceResolvePhase(newResolvePhase: FirResolvePhase) {
