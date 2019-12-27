@@ -2399,7 +2399,7 @@ public class KotlinParsing extends AbstractKotlinParsing {
             return false;
         }
 
-        closeDeclarationWithCommentBinders(parameter, VALUE_PARAMETER, false);
+        parameter.done(VALUE_PARAMETER);
         return true;
     }
 
