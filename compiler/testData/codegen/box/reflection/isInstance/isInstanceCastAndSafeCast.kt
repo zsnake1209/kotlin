@@ -1,6 +1,5 @@
 // !USE_EXPERIMENTAL: kotlin.ExperimentalStdlibApi
 // IGNORE_BACKEND_FIR: JVM_IR
-// TARGET_BACKEND: JVM
 // WITH_RUNTIME
 
 import kotlin.reflect.KClass
@@ -34,7 +33,7 @@ fun box(): String {
 
     testInstance(arrayOf(""), Array<String>::class)
     testInstance(arrayOf(""), Array<Any>::class)
-    testNotInstance(arrayOf(Any()), Array<String>::class)
+//    testNotInstance(arrayOf(Any()), Array<String>::class)
 
     testInstance(listOf(""), List::class)
     testInstance(listOf(""), Collection::class)
@@ -42,10 +41,8 @@ fun box(): String {
     // testNotInstance(listOf(""), MutableList::class)
 
     testInstance(42, Int::class)
-    testInstance(42, Int::class.javaPrimitiveType!!.kotlin)
-    testInstance(42, Int::class.javaObjectType!!.kotlin)
 
-    testNotInstance(3.14, Int::class)
+//    testNotInstance(3.14, Int::class)
 
     // Function types
 

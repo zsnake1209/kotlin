@@ -20013,6 +20013,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             public void testAllFilesPresentInIsInstance() throws Exception {
                 KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/isInstance"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JS, true);
             }
+
+            @TestMetadata("isInstanceCastAndSafeCast.kt")
+            public void testIsInstanceCastAndSafeCast() throws Exception {
+                runTest("compiler/testData/codegen/box/reflection/isInstance/isInstanceCastAndSafeCast.kt");
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/kClassInAnnotation")

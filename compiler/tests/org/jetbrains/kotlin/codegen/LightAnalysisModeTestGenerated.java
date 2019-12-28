@@ -22655,6 +22655,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
             public void testIsInstanceCastAndSafeCast() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/isInstance/isInstanceCastAndSafeCast.kt");
             }
+
+            @TestMetadata("isInstanceCastAndSafeCastJvm.kt")
+            public void testIsInstanceCastAndSafeCastJvm() throws Exception {
+                runTest("compiler/testData/codegen/box/reflection/isInstance/isInstanceCastAndSafeCastJvm.kt");
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/kClassInAnnotation")
