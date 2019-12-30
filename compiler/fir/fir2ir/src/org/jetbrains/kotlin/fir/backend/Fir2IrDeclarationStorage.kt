@@ -28,10 +28,13 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.descriptors.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.impl.IrEnumConstructorCallImpl
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
@@ -202,6 +205,25 @@ class Fir2IrDeclarationStorage(
                 IrClassImpl(
                     startOffset, endOffset, origin, symbol,
                     Name.special("<no name provided>"), anonymousObject.classKind,
+                    Visibilities.LOCAL, modality,
+                    isCompanion = false, isInner = false, isData = false, isExternal = false, isInline = false, isExpect = false
+                ).apply {
+                    descriptor.bind(this)
+                    declareThisReceiver()
+                }
+            }
+        }.declareSupertypesAndTypeParameters(anonymousObject)
+    }
+
+    fun getIrEnumEntryClass(enumEntry: FirEnumEntry, anonymousObject: FirAnonymousObject): IrClass {
+        val descriptor = WrappedClassDescriptor()
+        val origin = IrDeclarationOrigin.DEFINED
+        val modality = Modality.FINAL
+        return anonymousObject.convertWithOffsets { startOffset, endOffset ->
+            irSymbolTable.declareClass(startOffset, endOffset, origin, descriptor, modality) { symbol ->
+                IrClassImpl(
+                    startOffset, endOffset, origin, symbol,
+                    enumEntry.name, anonymousObject.classKind,
                     Visibilities.LOCAL, modality,
                     isCompanion = false, isInner = false, isData = false, isExternal = false, isInline = false, isExpect = false
                 ).apply {
@@ -510,6 +532,43 @@ class Fir2IrDeclarationStorage(
                 correspondingPropertySymbol = correspondingProperty.symbol
             }
         }
+    }
+
+
+    fun getIrEnumEntry(
+        enumEntry: FirEnumEntry,
+        irParent: IrClass,
+        origin: IrDeclarationOrigin = IrDeclarationOrigin.DEFINED
+    ): IrEnumEntry {
+        return enumEntry.convertWithOffsets { startOffset, endOffset ->
+
+            val desc = WrappedEnumEntryDescriptor()
+            enterScope(desc)
+            val result = irSymbolTable.declareEnumEntry(startOffset, endOffset, origin, desc) { symbol ->
+                IrEnumEntryImpl(
+                    startOffset, endOffset, origin, symbol, enumEntry.name
+                ).apply {
+                    desc.bind(this)
+                    val irType = enumEntry.returnTypeRef.toIrType(session, this@Fir2IrDeclarationStorage)
+                    this.parent = irParent
+                    val initializer = enumEntry.initializer
+                    if (initializer != null) {
+                        initializer as FirAnonymousObject
+                        val klass = getIrEnumEntryClass(enumEntry, initializer)
+
+                        this.correspondingClass = klass
+                    } else {
+                        this.initializerExpression = IrEnumConstructorCallImpl(startOffset, endOffset, irType, irParent.constructors.first().symbol)
+                    }
+                }
+            }
+            leaveScope(desc)
+            result
+//            IrEnumEntryImpl(
+//                startOffset, endOffset, origin,
+//            )
+        }
+
     }
 
     fun getIrProperty(

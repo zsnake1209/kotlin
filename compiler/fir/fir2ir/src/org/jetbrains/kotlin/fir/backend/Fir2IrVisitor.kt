@@ -168,6 +168,15 @@ class Fir2IrVisitor(
         return accept(this@Fir2IrVisitor, null) as IrDeclaration
     }
 
+    override fun visitEnumEntry(enumEntry: FirEnumEntry, data: Any?): IrElement {
+        val irEnumEntry = declarationStorage.getIrEnumEntry(enumEntry, irParent = parentStack.last() as IrClass)
+        irEnumEntry.correspondingClass?.withParent {
+            setClassContent(enumEntry.initializer as FirAnonymousObject)
+        }
+        //irEnumEntry.initializerExpression = IrEnumConstructorCallImpl()
+        return irEnumEntry.setParentByParentStack()
+    }
+
     private fun FirTypeRef.collectCallableNamesFromThisAndSupertypes(result: MutableList<Name> = mutableListOf()): List<Name> {
         if (this is FirResolvedTypeRef) {
             val superType = type
