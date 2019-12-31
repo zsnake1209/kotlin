@@ -1809,6 +1809,11 @@ public class JSBasicCompletionTestGenerated extends AbstractJSBasicCompletionTes
                 runTest("idea/idea-completion/testData/basic/common/namedArguments/NamedArgumentOnItsOwnPosition.kt");
             }
 
+            @TestMetadata("NamedArgumentOnItsOwnPosition2.kt")
+            public void testNamedArgumentOnItsOwnPosition2() throws Exception {
+                runTest("idea/idea-completion/testData/basic/common/namedArguments/NamedArgumentOnItsOwnPosition2.kt");
+            }
+
             @TestMetadata("NamedArgumentsFromOverloads.kt")
             public void testNamedArgumentsFromOverloads() throws Exception {
                 runTest("idea/idea-completion/testData/basic/common/namedArguments/NamedArgumentsFromOverloads.kt");

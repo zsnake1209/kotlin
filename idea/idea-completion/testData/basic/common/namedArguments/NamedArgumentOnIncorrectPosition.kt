@@ -1,10 +1,10 @@
-fun foo(paramFirst: Int, paramSecond: Long) {}
+fun foo(p1: Int, p2: Int, p3: Long) {}
 
-fun usage(longParam: Long) {
-    foo(paramSecond = 10, <caret>)
+fun usage(param: Long) {
+    foo(p2 = 10, <caret>)
 }
 
 // LANGUAGE_VERSION: 1.4
-// ABSENT: longParam
-// EXIST: { itemText: "paramFirst =" }
+// EXIST: { itemText: "p1 =" }
+// EXIST: { itemText: "p3 =" }
 // NOTHING_ELSE
