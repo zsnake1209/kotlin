@@ -7,6 +7,7 @@ fun usage(param: Int) {
 // LANGUAGE_VERSION: 1.4
 // EXIST: param
 // EXIST: { itemText: "p5 =" }
+// ABSENT: { itemText: "p1 =" }
 // ABSENT: { itemText: "p2 =" }
 // ABSENT: { itemText: "p3 =" }
 // ABSENT: { itemText: "p4 =" }
