@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.js.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
+import org.jetbrains.kotlin.platform.konan.isNative
 import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.components.isVararg
@@ -71,8 +72,7 @@ object KSerializerDescriptorResolver {
     }
 
     private fun ClassDescriptor.needSerializerFactory(): Boolean {
-        // todo: figure out how to compare platform with Native
-//        if (this.platform == null || this.platform?.isJs() == true || this.platform?.isJvm() == true) return false
+        if (this.platform?.isNative() != true) return false
         val serializableClass = getSerializableClassDescriptorByCompanion(this) ?: return false
         if (serializableClass.declaredTypeParameters.isEmpty()) return false
         return true
