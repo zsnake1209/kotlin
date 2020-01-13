@@ -49,7 +49,9 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
     }
 
     override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: SpecialDeclarationType): Boolean {
-        return descriptor.run { isExported(annotations, null) }
+        // TODO: Seems like a bug
+        return false
+//        return descriptor.run { isExported(annotations, null) }
     }
 
     override fun visitClassDescriptor(descriptor: ClassDescriptor, data: SpecialDeclarationType): Boolean {

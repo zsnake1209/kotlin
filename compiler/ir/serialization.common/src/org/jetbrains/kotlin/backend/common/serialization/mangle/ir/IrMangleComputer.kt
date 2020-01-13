@@ -74,7 +74,12 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
         else {
             builder.append(name)
             builder.append('$')
-            builder.append(module.name.asString().run { substring(1, lastIndex) })
+            val moduleName = try {
+                module.name.asString().run { substring(1, lastIndex) }
+            } catch (e: Throwable) {
+                "<unknown>"
+            }
+            builder.append(moduleName)
         }
 
         mangleSignature(isCtor)

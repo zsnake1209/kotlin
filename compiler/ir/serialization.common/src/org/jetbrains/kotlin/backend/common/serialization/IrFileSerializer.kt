@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.findTopLevelDeclaration
 import org.jetbrains.kotlin.ir.util.lineStartOffsets
 import org.jetbrains.kotlin.ir.util.module
+import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
@@ -1073,6 +1074,14 @@ open class IrFileSerializer(
             .build()
 
     private fun serializeIrFunction(declaration: IrSimpleFunction): ProtoFunction {
+        if (declaration.name.asString() == "equals") {
+            if (declaration.dispatchReceiverParameter != null) {
+                val klass = declaration.parentAsClass
+                if (klass.name.asString() == "Array") {
+                    1
+                }
+            }
+        }
         val proto = ProtoFunction.newBuilder()
             .setBase(serializeIrFunctionBase(declaration))
             .setModality(serializeModality(declaration.modality))

@@ -20,10 +20,11 @@ import java.util.regex.Pattern
 
 internal val functionPattern = Pattern.compile("^K?(Suspend)?Function\\d+$")
 
-private val kotlinFqn = FqName("kotlin")
+internal val kotlinFqn = FqName("kotlin")
+internal val kotlinCoroutinesFqn = kotlinFqn.child(Name.identifier("coroutines"))
+internal val kotlinReflectFqn = kotlinFqn.child(Name.identifier("reflect"))
 
-internal val functionalPackages =
-    listOf(kotlinFqn, kotlinFqn.child(Name.identifier("coroutines")), kotlinFqn.child(Name.identifier("reflect")))
+internal val functionalPackages = listOf(kotlinFqn, kotlinCoroutinesFqn, kotlinReflectFqn)
 
 fun isBuiltInFunction(value: IrDeclaration): Boolean = when (value) {
     is IrSimpleFunction ->

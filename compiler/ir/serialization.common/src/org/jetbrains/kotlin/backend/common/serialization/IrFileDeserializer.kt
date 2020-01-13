@@ -33,7 +33,9 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.*
 import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.UniqId
 import org.jetbrains.kotlin.ir.util.render
+import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedTypeParameterDescriptor
@@ -131,13 +133,16 @@ abstract class IrFileDeserializer(
     val symbolTable: SymbolTable
 ) {
 
+    abstract fun deserializeIrSymbolToDeclare(index: Int): Pair<IrSymbol, UniqId>
     abstract fun deserializeIrSymbol(index: Int): IrSymbol
     abstract fun deserializeIrType(index: Int): IrType
-    abstract fun deserializeDescriptorReference(proto: ProtoDescriptorReference): DeclarationDescriptor
+    abstract fun deserializeDescriptorReference(proto: ProtoDescriptorReference): DeclarationDescriptor?
     abstract fun deserializeString(index: Int): String
     abstract fun deserializeExpressionBody(index: Int): IrExpression
     abstract fun deserializeStatementBody(index: Int): IrElement
     abstract fun deserializeLoopHeader(loopIndex: Int, loopBuilder: () -> IrLoopBase): IrLoopBase
+
+    abstract fun deserializeSymbolId(index: Int): UniqId
 
     private val parentsStack = mutableListOf<IrDeclarationParent>()
 
@@ -899,10 +904,12 @@ abstract class IrFileDeserializer(
 
     private inline fun <T> withDeserializedIrDeclarationBase(
         proto: ProtoDeclarationBase,
-        block: (IrSymbol, Int, Int, IrDeclarationOrigin) -> T
+        block: (IrSymbol, UniqId, Int, Int, IrDeclarationOrigin) -> T
     ): T where T : IrDeclaration, T : IrSymbolOwner {
+        val (s, uid) = deserializeIrSymbolToDeclare(proto.symbol)
         val result = block(
-            deserializeIrSymbol(proto.symbol),
+            s,
+            uid,
             proto.coordinates.startOffset, proto.coordinates.endOffset,
             deserializeIrDeclarationOrigin(proto.origin)
         )
@@ -911,8 +918,8 @@ abstract class IrFileDeserializer(
         return result
     }
 
-    private fun deserializeIrTypeParameter(proto: ProtoTypeParameter) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+    private fun deserializeIrTypeParameter(proto: ProtoTypeParameter, isGlobal: Boolean) =
+        withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
             val name = deserializeName(proto.name)
             val variance = deserializeIrTypeVariance(proto.variance)
 
@@ -921,8 +928,16 @@ abstract class IrFileDeserializer(
                 // TODO: Get rid of once new properties are implemented
                 IrTypeParameterImpl(startOffset, endOffset, origin, IrTypeParameterSymbolImpl(descriptor), name, proto.index, proto.isReified, variance)
             } else {
-                symbolTable.declareGlobalTypeParameter(UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin, descriptor) {
-                    IrTypeParameterImpl(startOffset, endOffset, origin, it, name, proto.index, proto.isReified, variance)
+                symbolTable.run {
+                    if (isGlobal) {
+                        declareGlobalTypeParameterFromLinker(descriptor, uniqId) {
+                            IrTypeParameterImpl(startOffset, endOffset, origin, it, name, proto.index, proto.isReified, variance)
+                        }
+                    } else {
+                        declareGlobalTypeParameterFromLinker(descriptor, uniqId) {
+                            IrTypeParameterImpl(startOffset, endOffset, origin, it, name, proto.index, proto.isReified, variance)
+                        }
+                    }
                 }
             }.apply {
                 proto.superTypeList.mapTo(superTypes) { deserializeIrType(it) }
@@ -941,7 +956,7 @@ abstract class IrFileDeserializer(
     }
 
     private fun deserializeIrValueParameter(proto: ProtoValueParameter) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+        withDeserializedIrDeclarationBase(proto.base) { symbol, _, startOffset, endOffset, origin ->
             IrValueParameterImpl(
                 startOffset, endOffset, origin,
                 symbol as IrValueParameterSymbol,
@@ -961,13 +976,10 @@ abstract class IrFileDeserializer(
         }
 
     private fun deserializeIrClass(proto: ProtoClass) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+        withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
             val modality = deserializeModality(proto.modality)
 
-            symbolTable.declareClass(
-                UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin,
-                (symbol as IrClassSymbol).descriptor, modality
-            ) {
+            symbolTable.declareClassFromLinker((symbol as IrClassSymbol).descriptor, uniqId) {
                 IrClassImpl(
                     startOffset, endOffset, origin,
                     it,
@@ -987,7 +999,7 @@ abstract class IrFileDeserializer(
 
                 thisReceiver = deserializeIrValueParameter(proto.thisReceiver)
 
-                proto.typeParameters.typeParameterList.mapTo(typeParameters) { deserializeIrTypeParameter(it) }
+                proto.typeParameters.typeParameterList.mapTo(typeParameters) { deserializeIrTypeParameter(it, true) }
 
                 proto.superTypeList.mapTo(superTypes) { deserializeIrType(it) }
 
@@ -996,8 +1008,8 @@ abstract class IrFileDeserializer(
         }
 
     private fun deserializeIrTypeAlias(proto: ProtoTypeAlias) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
-            symbolTable.declareTypeAlias((symbol as IrTypeAliasSymbol).descriptor) {
+        withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
+            symbolTable.declareTypeAliasFromLinker((symbol as IrTypeAliasSymbol).descriptor, uniqId) {
                 IrTypeAliasImpl(
                     startOffset, endOffset,
                     it,
@@ -1009,7 +1021,7 @@ abstract class IrFileDeserializer(
                 )
             }.usingParent {
                 proto.typeParameters.typeParameterList.mapTo(typeParameters) {
-                    deserializeIrTypeParameter(it)
+                    deserializeIrTypeParameter(it, true)
                 }
 
                 (descriptor as? WrappedTypeAliasDescriptor)?.bind(this)
@@ -1018,29 +1030,29 @@ abstract class IrFileDeserializer(
 
     private inline fun <T : IrFunction> withDeserializedIrFunctionBase(
         proto: ProtoFunctionBase,
-        block: (IrFunctionSymbol, Int, Int, IrDeclarationOrigin) -> T
-    ) = withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
-        block(symbol as IrFunctionSymbol, startOffset, endOffset, origin).usingParent {
-            proto.typeParameters.typeParameterList.mapTo(typeParameters) { deserializeIrTypeParameter(it) }
-            proto.valueParameterList.mapTo(valueParameters) { deserializeIrValueParameter(it) }
-            if (proto.hasDispatchReceiver())
-                dispatchReceiverParameter = deserializeIrValueParameter(proto.dispatchReceiver)
-            if (proto.hasExtensionReceiver())
-                extensionReceiverParameter = deserializeIrValueParameter(proto.extensionReceiver)
-            if (proto.hasBody()) {
-                body = deserializeStatementBody(proto.body) as IrBody
-            }
+        block: (IrFunctionSymbol, UniqId, Int, Int, IrDeclarationOrigin) -> T
+    ) = withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
+        block(symbol as IrFunctionSymbol, uniqId, startOffset, endOffset, origin).usingParent {
+//            symbolTable.withScope(descriptor) {
+                proto.typeParameters.typeParameterList.mapTo(typeParameters) { deserializeIrTypeParameter(it, false) }
+                proto.valueParameterList.mapTo(valueParameters) { deserializeIrValueParameter(it) }
+                if (proto.hasDispatchReceiver())
+                    dispatchReceiverParameter = deserializeIrValueParameter(proto.dispatchReceiver)
+                if (proto.hasExtensionReceiver())
+                    extensionReceiverParameter = deserializeIrValueParameter(proto.extensionReceiver)
+                if (proto.hasBody()) {
+                    body = deserializeStatementBody(proto.body) as IrBody
+                }
+//            }
         }
     }
 
-    private fun deserializeIrFunction(proto: ProtoFunction) =
-        withDeserializedIrFunctionBase(proto.base) { symbol, startOffset, endOffset, origin ->
-            logger.log { "### deserializing IrFunction ${proto.base.name}" }
+    private fun deserializeIrFunction(proto: ProtoFunction): IrSimpleFunction {
+        val name = deserializeName(proto.base.name)
+        return withDeserializedIrFunctionBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
+            logger.log { "### deserializing IrFunction $name" }
 
-            symbolTable.declareSimpleFunction(
-                UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin,
-                symbol.descriptor
-            ) {
+            symbolTable.declareSimpeFunctionFromLinker(symbol.descriptor, uniqId) {
                 IrFunctionImpl(
                     startOffset, endOffset, origin,
                     it,
@@ -1062,9 +1074,10 @@ abstract class IrFileDeserializer(
                 (descriptor as? WrappedSimpleFunctionDescriptor)?.bind(this)
             }
         }
+    }
 
     private fun deserializeIrVariable(proto: ProtoVariable) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+        withDeserializedIrDeclarationBase(proto.base) { symbol, _, startOffset, endOffset, origin ->
             IrVariableImpl(
                 startOffset, endOffset, origin,
                 symbol as IrVariableSymbol,
@@ -1082,13 +1095,8 @@ abstract class IrFileDeserializer(
         }
 
     private fun deserializeIrEnumEntry(proto: ProtoEnumEntry): IrEnumEntry =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
-            symbolTable.declareEnumEntry(
-                UNDEFINED_OFFSET,
-                UNDEFINED_OFFSET,
-                irrelevantOrigin,
-                (symbol as IrEnumEntrySymbol).descriptor
-            ) {
+        withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
+            symbolTable.declareEnumEntryFromLinker((symbol as IrEnumEntrySymbol).descriptor, uniqId) {
                 IrEnumEntryImpl(startOffset, endOffset, origin, it, deserializeName(proto.name))
             }.apply {
                 if (proto.hasCorrespondingClass())
@@ -1101,7 +1109,7 @@ abstract class IrFileDeserializer(
         }
 
     private fun deserializeIrAnonymousInit(proto: ProtoAnonymousInit) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+        withDeserializedIrDeclarationBase(proto.base) { symbol, _, startOffset, endOffset, origin ->
             IrAnonymousInitializerImpl(startOffset, endOffset, origin, symbol as IrAnonymousInitializerSymbol).apply {
 //                body = deserializeBlockBody(proto.body.blockBody, startOffset, endOffset)
                 body = deserializeStatementBody(proto.body) as IrBlockBody
@@ -1124,11 +1132,8 @@ abstract class IrFileDeserializer(
     }
 
     private fun deserializeIrConstructor(proto: ProtoConstructor) =
-        withDeserializedIrFunctionBase(proto.base) { symbol, startOffset, endOffset, origin ->
-            symbolTable.declareConstructor(
-                UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin,
-                (symbol as IrConstructorSymbol).descriptor
-            ) {
+        withDeserializedIrFunctionBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
+            symbolTable.declareConstructorFromLinker((symbol as IrConstructorSymbol).descriptor, uniqId) {
                 IrConstructorImpl(
                     startOffset, endOffset, origin,
                     it,
@@ -1146,14 +1151,10 @@ abstract class IrFileDeserializer(
         }
 
     private fun deserializeIrField(proto: ProtoField) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+        withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
             val type = deserializeIrType(proto.type)
 
-            symbolTable.declareField(
-                UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin,
-                (symbol as IrFieldSymbol).descriptor,
-                type
-            ) {
+            symbolTable.declareFieldFromLinker((symbol as IrFieldSymbol).descriptor, uniqId) {
                 IrFieldImpl(
                     startOffset, endOffset, origin,
                     it,
@@ -1181,7 +1182,7 @@ abstract class IrFileDeserializer(
     }
 
     private fun deserializeIrLocalDelegatedProperty(proto: ProtoLocalDelegatedProperty) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
+        withDeserializedIrDeclarationBase(proto.base) { symbol, _, startOffset, endOffset, origin ->
             IrLocalDelegatedPropertyImpl(
                 startOffset, endOffset, origin,
                 symbol as IrLocalDelegatedPropertySymbol,
@@ -1199,11 +1200,8 @@ abstract class IrFileDeserializer(
         }
 
     private fun deserializeIrProperty(proto: ProtoProperty) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, startOffset, endOffset, origin ->
-            symbolTable.declareProperty(
-                UNDEFINED_OFFSET, UNDEFINED_OFFSET, irrelevantOrigin,
-                (symbol as IrPropertySymbol).descriptor, proto.isDelegated
-            ) {
+        withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
+            symbolTable.declarePropertyFromLinker((symbol as IrPropertySymbol).descriptor, uniqId) {
                 IrPropertyImpl(
                     startOffset, endOffset, origin,
                     it,
@@ -1282,7 +1280,7 @@ abstract class IrFileDeserializer(
             IR_CLASS -> deserializeIrClass(proto.irClass)
             IR_FUNCTION -> deserializeIrFunction(proto.irFunction)
             IR_PROPERTY -> deserializeIrProperty(proto.irProperty)
-            IR_TYPE_PARAMETER -> deserializeIrTypeParameter(proto.irTypeParameter)
+            IR_TYPE_PARAMETER -> error("Unreachable execution") // deserializeIrTypeParameter(proto.irTypeParameter)
             IR_VARIABLE -> deserializeIrVariable(proto.irVariable)
             IR_VALUE_PARAMETER -> deserializeIrValueParameter(proto.irValueParameter)
             IR_ENUM_ENTRY -> deserializeIrEnumEntry(proto.irEnumEntry)

@@ -93,6 +93,9 @@ abstract class KotlinIrLinker(
             private val reachableTopLevels = LinkedHashSet<UniqId>()
 
             override fun addUniqID(key: UniqId) {
+                if (key.index == -4506687136880287223) {
+                    1
+                }
                 reachableTopLevels.add(key)
             }
 
@@ -210,74 +213,27 @@ abstract class KotlinIrLinker(
 
             private fun referenceDeserializedSymbol(
                 proto: ProtoSymbolData,
+                id: UniqId,
                 descriptor: DeclarationDescriptor?
-            ): IrSymbol = when (proto.kind) {
-                ProtoSymbolKind.ANONYMOUS_INIT_SYMBOL ->
-                    IrAnonymousInitializerSymbolImpl(
-                        descriptor as ClassDescriptor?
-                            ?: WrappedClassDescriptor()
-                    )
-                ProtoSymbolKind.CLASS_SYMBOL ->
-                    symbolTable.referenceClass(
-                        descriptor as ClassDescriptor?
-                            ?: WrappedClassDescriptor()
-                    )
-                ProtoSymbolKind.CONSTRUCTOR_SYMBOL ->
-                    symbolTable.referenceConstructor(
-                        descriptor as ClassConstructorDescriptor?
-                            ?: WrappedClassConstructorDescriptor()
-                    )
-                ProtoSymbolKind.TYPE_PARAMETER_SYMBOL ->
-                    symbolTable.referenceTypeParameter(
-                        descriptor as TypeParameterDescriptor?
-                            ?: WrappedTypeParameterDescriptor()
-                    )
-                ProtoSymbolKind.ENUM_ENTRY_SYMBOL ->
-                    symbolTable.referenceEnumEntry(
-                        descriptor as ClassDescriptor?
-                            ?: WrappedEnumEntryDescriptor()
-                    )
-                ProtoSymbolKind.STANDALONE_FIELD_SYMBOL ->
-                    symbolTable.referenceField(WrappedFieldDescriptor())
-
-                ProtoSymbolKind.FIELD_SYMBOL ->
-                    symbolTable.referenceField(
-                        descriptor as PropertyDescriptor?
-                            ?: WrappedPropertyDescriptor()
-                    )
-                ProtoSymbolKind.FUNCTION_SYMBOL ->
-                    symbolTable.referenceSimpleFunction(
-                        descriptor as FunctionDescriptor?
-                            ?: WrappedSimpleFunctionDescriptor()
-                    )
-                ProtoSymbolKind.TYPEALIAS_SYMBOL ->
-                    symbolTable.referenceTypeAlias(
-                        descriptor as TypeAliasDescriptor?
-                            ?: WrappedTypeAliasDescriptor()
-                    )
-                ProtoSymbolKind.VARIABLE_SYMBOL ->
-                    IrVariableSymbolImpl(
-                        descriptor as VariableDescriptor?
-                            ?: WrappedVariableDescriptor()
-                    )
-                ProtoSymbolKind.VALUE_PARAMETER_SYMBOL ->
-                    IrValueParameterSymbolImpl(
-                        descriptor as ParameterDescriptor?
-                            ?: WrappedValueParameterDescriptor()
-                    )
-                ProtoSymbolKind.RECEIVER_PARAMETER_SYMBOL ->
-                    IrValueParameterSymbolImpl(
-                        descriptor as ParameterDescriptor? ?: WrappedReceiverParameterDescriptor()
-                    )
-                ProtoSymbolKind.PROPERTY_SYMBOL ->
-                    symbolTable.referenceProperty(
-                        descriptor as PropertyDescriptor? ?: WrappedPropertyDescriptor()
-                    )
-                ProtoSymbolKind.LOCAL_DELEGATED_PROPERTY_SYMBOL ->
-                    IrLocalDelegatedPropertySymbolImpl(
-                        descriptor as? VariableDescriptorWithAccessors ?: WrappedVariableDescriptorWithAccessor()
-                    )
-                else -> TODO("Unexpected classifier symbol kind: ${proto.kind}")
+            ): IrSymbol = symbolTable.run {
+                when (proto.kind) {
+                    ProtoSymbolKind.ANONYMOUS_INIT_SYMBOL ->
+                        IrAnonymousInitializerSymbolImpl(WrappedClassDescriptor()).also { require(id.isLocal) }
+                    ProtoSymbolKind.CLASS_SYMBOL -> referenceClassFromLinker(descriptor as ClassDescriptor? ?: WrappedClassDescriptor(), id) // TODO: FunctionInterfaces
+                    ProtoSymbolKind.CONSTRUCTOR_SYMBOL -> referenceConstructorFromLinker(WrappedClassConstructorDescriptor(), id)
+                    ProtoSymbolKind.TYPE_PARAMETER_SYMBOL -> referenceTypeParameterFromLinker(WrappedTypeParameterDescriptor(), id)
+                    ProtoSymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntryFromLinker(WrappedEnumEntryDescriptor(), id)
+                    ProtoSymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), id)
+                    ProtoSymbolKind.FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), id)
+                    ProtoSymbolKind.FUNCTION_SYMBOL -> referenceSimpleFunctionFromLinker(descriptor as FunctionDescriptor? ?: WrappedSimpleFunctionDescriptor(), id) //TODO: FunctionInterfaces
+                    ProtoSymbolKind.TYPEALIAS_SYMBOL -> referenceTypeAliasFromLinker(WrappedTypeAliasDescriptor(), id)
+                    ProtoSymbolKind.VARIABLE_SYMBOL -> IrVariableSymbolImpl(WrappedVariableDescriptor())
+                    ProtoSymbolKind.VALUE_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedValueParameterDescriptor())
+                    ProtoSymbolKind.RECEIVER_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedReceiverParameterDescriptor())
+                    ProtoSymbolKind.PROPERTY_SYMBOL -> referencePropertyFromLinker(WrappedPropertyDescriptor(), id)
+                    ProtoSymbolKind.LOCAL_DELEGATED_PROPERTY_SYMBOL -> IrLocalDelegatedPropertySymbolImpl(WrappedVariableDescriptorWithAccessor())
+                    else -> TODO("Unexpected classifier symbol kind: ${proto.kind}")
+                }
             }
 
             fun loadSymbolData(index: Int): ProtoSymbolData {
@@ -329,19 +285,28 @@ abstract class KotlinIrLinker(
                 val deserializationState =
                     if (topLevelKey.isLocal xor key.isLocal) getStateForID(key) else topLevelDeserializationState
 
+
+                if (key.index == -7641994795384116145) {
+                    1
+                }
+                if (key.index == -2272495843167253415) {
+                    2
+                }
                 val symbol = deserializationState.deserializedSymbols.getOrPut(key) {
                     val descriptor = if (proto.hasDescriptorReference()) {
+                        // TODO: deserialize only functional descriptor
                         deserializeDescriptorReference(proto.descriptorReference)
                     } else {
                         null
                     }
+//                    val descriptor = null
 
                     resolvedForwardDeclarations[key]?.let {
                         val fdState = getStateForID(it)
                         if (it !in fdState) fdState.addUniqID(it)
                     }
 
-                    val symbol = referenceDeserializedSymbol(proto, descriptor).let {
+                    val symbol = referenceDeserializedSymbol(proto, key, descriptor).let {
                         if (expectUniqIdToActualUniqId[key] != null) wrapInDelegatedSymbol(it) else it
                     }
 
@@ -369,9 +334,18 @@ abstract class KotlinIrLinker(
                     if (proto.hasUniqIdIndex()) proto.uniqIdIndex else null
                 )
 
+            override fun deserializeIrSymbolToDeclare(index: Int): Pair<IrSymbol, UniqId> {
+                val symbolData = loadSymbolProto(index)
+                return Pair(deserializeIrSymbolData(symbolData), UniqId(symbolData.uniqIdIndex))
+            }
+
             override fun deserializeIrSymbol(index: Int): IrSymbol {
                 val symbolData = loadSymbolProto(index)
                 return deserializeIrSymbolData(symbolData)
+            }
+
+            override fun deserializeSymbolId(index: Int): UniqId {
+                return UniqId(loadSymbolData(index).uniqIdIndex)
             }
 
             override fun deserializeIrType(index: Int): IrType {
@@ -544,7 +518,14 @@ abstract class KotlinIrLinker(
         } while (modulesWithReachableTopLevels.isNotEmpty())
     }
 
-    private fun findDeserializedDeclarationForDescriptor(descriptor: DeclarationDescriptor): DeclarationDescriptor? {
+    private fun findDeserializedDeclarationForDescriptor(symbol: IrSymbol): DeclarationDescriptor? {
+        if (!symbol.isPublicApi) {
+            1
+        }
+        require(symbol.isPublicApi)
+
+        val descriptor = symbol.descriptor
+        if (descriptor is WrappedDeclarationDescriptor<*>) return null
         val topLevelDescriptor = descriptor.findTopLevelDescriptor() as DeclarationDescriptorWithVisibility
 
         // This is Native specific. Try to eliminate.
@@ -578,7 +559,7 @@ abstract class KotlinIrLinker(
     override fun getDeclaration(symbol: IrSymbol): IrDeclaration? {
 
         if (!symbol.isBound) {
-            findDeserializedDeclarationForDescriptor(symbol.descriptor) ?: return null
+            findDeserializedDeclarationForDescriptor(symbol) ?: return null
         }
 
         // TODO: we do have serializations for those, but let's just create a stub for now.

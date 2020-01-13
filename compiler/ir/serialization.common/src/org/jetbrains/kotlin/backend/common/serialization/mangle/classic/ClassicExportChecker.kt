@@ -14,19 +14,19 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.constructedClass
 import org.jetbrains.kotlin.ir.util.isAnonymousObject
 
-abstract class ClassicExportChecker :
-    KotlinExportChecker<IrDeclaration> {
+abstract class ClassicExportChecker : KotlinExportChecker<IrDeclaration> {
     override fun check(declaration: IrDeclaration, type: SpecialDeclarationType): Boolean {
-        return isExportedImplClasssic(declaration)
+        return isExportedImplClassic(declaration)
     }
 
     override fun IrDeclaration.isPlatformSpecificExported(): Boolean = false
 
-    private fun isExportedImplClasssic(declaration: IrDeclaration): Boolean {
+    private fun isExportedImplClassic(declaration: IrDeclaration): Boolean {
         // TODO: revise
         if (declaration is IrValueDeclaration) return false
         if (declaration is IrAnonymousInitializer) return false
         if (declaration is IrLocalDelegatedProperty) return false
+        if (declaration is IrTypeParameter) return false
 
         val descriptorAnnotations = declaration.descriptor.annotations
 
@@ -46,7 +46,7 @@ abstract class ClassicExportChecker :
         if (declaration is IrConstructor && declaration.constructedClass.kind.isSingleton) {
             // Currently code generator can access the constructor of the singleton,
             // so ignore visibility of the constructor itself.
-            return isExportedImplClasssic(declaration.constructedClass)
+            return isExportedImplClassic(declaration.constructedClass)
         }
 
         if (declaration is IrFunction) {
@@ -81,6 +81,6 @@ abstract class ClassicExportChecker :
             return true
         }
 
-        return isExportedImplClasssic(parent)
+        return isExportedImplClassic(parent)
     }
 }

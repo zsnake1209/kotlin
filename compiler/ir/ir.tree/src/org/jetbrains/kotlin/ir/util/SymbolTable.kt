@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.declarations.lazy.IrLazyDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.lazy.IrLazySymbolTable
+import org.jetbrains.kotlin.ir.descriptors.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.symbols.*
@@ -69,6 +70,15 @@ interface ReferenceSymbolTable {
     fun referenceVariable(descriptor: VariableDescriptor): IrVariableSymbol
 
     fun referenceTypeAlias(descriptor: TypeAliasDescriptor): IrTypeAliasSymbol
+
+    fun referenceClassFromLinker(descriptor: ClassDescriptor, uniqId: UniqId): IrClassSymbol
+    fun referenceConstructorFromLinker(descriptor: ClassConstructorDescriptor, uniqId: UniqId): IrConstructorSymbol
+    fun referenceEnumEntryFromLinker(descriptor: ClassDescriptor, uniqId: UniqId): IrEnumEntrySymbol
+    fun referenceFieldFromLinker(descriptor: PropertyDescriptor, uniqId: UniqId): IrFieldSymbol
+    fun referencePropertyFromLinker(descriptor: PropertyDescriptor, uniqId: UniqId): IrPropertySymbol
+    fun referenceSimpleFunctionFromLinker(descriptor: FunctionDescriptor, uniqId: UniqId): IrSimpleFunctionSymbol
+    fun referenceTypeParameterFromLinker(classifier: TypeParameterDescriptor, uniqId: UniqId): IrTypeParameterSymbol
+    fun referenceTypeAliasFromLinker(descriptor: TypeAliasDescriptor, uniqId: UniqId): IrTypeAliasSymbol
 
     fun enterScope(owner: DeclarationDescriptor)
 
@@ -195,18 +205,22 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
 
         override fun get(d: D): S? {
             return with(mangler) {
-                val exported = when (kind) {
-                    "E" -> isExportEnumEntry(d as ClassDescriptor)
-                    "F" -> isExportField(d as PropertyDescriptor)
-                    else -> isExport(d)
-                }
-                if (exported) {
-                    val m = when (kind) {
-                        "E" -> mangleEnumEntry(d as ClassDescriptor)
-                        "F" -> mangleField(d as PropertyDescriptor)
-                        else -> mangleDeclaration(d)
+                if (d !is WrappedDeclarationDescriptor<*>) {
+                    val exported = when (kind) {
+                        "E" -> isExportEnumEntry(d as ClassDescriptor)
+                        "F" -> isExportField(d as PropertyDescriptor)
+                        else -> isExport(d)
                     }
-                    uniqIdToSymbol[UniqId(m.hashMangle())]
+                    if (exported) {
+                        val m = when (kind) {
+                            "E" -> mangleEnumEntry(d as ClassDescriptor)
+                            "F" -> mangleField(d as PropertyDescriptor)
+                            else -> mangleDeclaration(d)
+                        }
+                        uniqIdToSymbol[UniqId(m.hashMangle())]
+                    } else {
+                        descriptorToSymbol[d]
+                    }
                 } else {
                     descriptorToSymbol[d]
                 }
@@ -405,11 +419,28 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
         )
     }
 
+    fun declareClassFromLinker(descriptor: ClassDescriptor, uniqId: UniqId, factory: (IrClassSymbol) -> IrClass): IrClass {
+        return classSymbolTable.run {
+            if (uniqId.isPublic) {
+                declare(uniqId, descriptor, { IrClassPublicSymbolImpl(descriptor, uniqId, "") }, factory)
+            } else {
+                declare(descriptor, { IrClassSymbolImpl(descriptor) }, factory)
+            }
+        }
+    }
+
     override fun referenceClass(descriptor: ClassDescriptor) =
         classSymbolTable.referenced(descriptor) { createClassSymbol(descriptor) }
 
-    override fun referenceClass(uniqId: UniqId): IrClassSymbol = error("..")
-//        classSymbolTable.referenced(uniqId) { IrClassSymbolImpl(uniqId) }
+    override fun referenceClass(uniqId: UniqId): IrClassSymbol {
+        error("...")
+    }
+
+    override fun referenceClassFromLinker(descriptor: ClassDescriptor, uniqId: UniqId): IrClassSymbol =
+        classSymbolTable.run {
+            if (uniqId.isPublic) referenced(uniqId) { IrClassPublicSymbolImpl(descriptor, uniqId, "") }
+            else referenced(descriptor) { IrClassSymbolImpl(descriptor) }
+        }
 
     val unboundClasses: Set<IrClassSymbol> get() = classSymbolTable.unboundSymbols
 
@@ -442,8 +473,23 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
     override fun referenceConstructor(descriptor: ClassConstructorDescriptor) =
         constructorSymbolTable.referenced(descriptor) { createConstructorSymbol(descriptor) }
 
+    fun declareConstructorFromLinker(descriptor: ClassConstructorDescriptor, uniqId: UniqId, constructorFactory: (IrConstructorSymbol) -> IrConstructor): IrConstructor {
+        return constructorSymbolTable.run {
+            if (uniqId.isPublic) {
+                declare(uniqId, descriptor, { IrConstructorPublicSymbolImpl(descriptor, uniqId, "") }, constructorFactory)
+            } else {
+                declare(descriptor, { IrConstructorSymbolImpl(descriptor) }, constructorFactory)
+            }
+        }
+    }
+
+    override fun referenceConstructorFromLinker(descriptor: ClassConstructorDescriptor, uniqId: UniqId): IrConstructorSymbol =
+        constructorSymbolTable.run {
+            if (uniqId.isPublic) referenced(uniqId) { IrConstructorPublicSymbolImpl(descriptor, uniqId, "") }
+            else referenced(descriptor) { IrConstructorSymbolImpl(descriptor) }
+        }
+
     override fun referenceConstructor(uniqId: UniqId): IrConstructorSymbol = error("...")
-//        constructorSymbolTable.referenced(uniqId) { IrConstructorSymbolImpl(uniqId) }
 
     val unboundConstructors: Set<IrConstructorSymbol> get() = constructorSymbolTable.unboundSymbols
 
@@ -466,8 +512,24 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
             factory
         )
 
+    fun declareEnumEntryFromLinker(descriptor: ClassDescriptor, uniqId: UniqId, factory: (IrEnumEntrySymbol) -> IrEnumEntry): IrEnumEntry {
+        return enumEntrySymbolTable.run {
+            if (uniqId.isPublic) {
+                declare(uniqId, descriptor, { IrEnumEntryPublicSymbolImpl(descriptor, uniqId, "") }, factory)
+            } else {
+                declare(descriptor, { IrEnumEntrySymbolImpl(descriptor) }, factory)
+            }
+        }
+    }
+
     override fun referenceEnumEntry(descriptor: ClassDescriptor) =
         enumEntrySymbolTable.referenced(descriptor) { createEnumEntrySymbol(descriptor) }
+
+    override fun referenceEnumEntryFromLinker(descriptor: ClassDescriptor, uniqId: UniqId) =
+        enumEntrySymbolTable.run {
+            if (uniqId.isPublic) referenced(uniqId) { IrEnumEntryPublicSymbolImpl(descriptor, uniqId, "") } else
+                referenced(descriptor) { IrEnumEntrySymbolImpl(descriptor) }
+        }
 
     override fun referenceEnumEntry(uniqId: UniqId): IrEnumEntrySymbol = error("...")
 //        enumEntrySymbolTable.referenced(uniqId) { IrEnumEntrySymbolImpl(uniqId) }
@@ -514,8 +576,24 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
             initializer = irInitializer
         }
 
+    fun declareFieldFromLinker(descriptor: PropertyDescriptor, uniqId: UniqId, factory: (IrFieldSymbol) -> IrField): IrField {
+        return fieldSymbolTable.run {
+            if (uniqId.isPublic) {
+                declare(uniqId, descriptor, { IrFieldPublicSymbolImpl(descriptor, uniqId, "") }, factory)
+            } else {
+                declare(descriptor, { IrFieldSymbolImpl(descriptor) }, factory)
+            }
+        }
+    }
+
     override fun referenceField(descriptor: PropertyDescriptor) =
         fieldSymbolTable.referenced(descriptor) { createFieldSymbol(descriptor) }
+
+    override fun referenceFieldFromLinker(descriptor: PropertyDescriptor, uniqId: UniqId) =
+        fieldSymbolTable.run {
+            if (uniqId.isPublic) referenced(uniqId) { IrFieldPublicSymbolImpl(descriptor, uniqId, "") }
+            else referenced(descriptor) { IrFieldSymbolImpl(descriptor) }
+        }
 
     override fun referenceField(uniqId: UniqId) = error("...")
 //        fieldSymbolTable.referenced(uniqId) { IrFieldSymbolImpl(uniqId) }
@@ -555,8 +633,24 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
             propertyFactory
         )
 
+    fun declarePropertyFromLinker(descriptor: PropertyDescriptor, uniqId: UniqId, factory: (IrPropertySymbol) -> IrProperty): IrProperty {
+        return propertySymbolTable.run {
+            if (uniqId.isPublic) {
+                declare(uniqId, descriptor, { IrPropertyPublicSymbolImpl(descriptor, uniqId, "") }, factory)
+            } else {
+                declare(descriptor, { IrPropertySymbolImpl(descriptor) }, factory)
+            }
+        }
+    }
+
     fun referenceProperty(descriptor: PropertyDescriptor): IrPropertySymbol =
         propertySymbolTable.referenced(descriptor) { createPropertySymbol(descriptor) }
+
+    override fun referencePropertyFromLinker(descriptor: PropertyDescriptor, uniqId: UniqId): IrPropertySymbol =
+        propertySymbolTable.run {
+            if (uniqId.isPublic) referenced(uniqId) { IrPropertyPublicSymbolImpl(descriptor, uniqId, "") }
+            else referenced(descriptor) { IrPropertySymbolImpl(descriptor) }
+        }
 
     override fun referenceProperty(uniqId: UniqId): IrPropertySymbol = error("...")
 //        propertySymbolTable.referenced(uniqId) { IrPropertySymbolImpl(uniqId) }
@@ -574,6 +668,22 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
 
     override fun referenceTypeAlias(descriptor: TypeAliasDescriptor): IrTypeAliasSymbol =
         typeAliasSymbolTable.referenced(descriptor) { createTypeAliasSymbol(descriptor) }
+
+    fun declareTypeAliasFromLinker(descriptor: TypeAliasDescriptor, uniqId: UniqId, factory: (IrTypeAliasSymbol) -> IrTypeAlias): IrTypeAlias {
+        return typeAliasSymbolTable.run {
+            if (uniqId.isPublic) {
+                declare(uniqId, descriptor, { IrTypeAliasPublicSymbolImpl(descriptor, uniqId, "") }, factory)
+            } else {
+               declare(descriptor, { IrTypeAliasSymbolImpl(descriptor) }, factory)
+            }
+        }
+    }
+
+    override fun referenceTypeAliasFromLinker(descriptor: TypeAliasDescriptor, uniqId: UniqId) =
+        typeAliasSymbolTable.run {
+            if (uniqId.isPublic) referenced(uniqId) { IrTypeAliasPublicSymbolImpl(descriptor, uniqId, "") } else
+                referenced(descriptor) { IrTypeAliasSymbolImpl(descriptor) }
+        }
 
     override fun referenceTypeAlias(uniqId: UniqId): IrTypeAliasSymbol = error("...")
 //        typeAliasSymbolTable.referenced(uniqId) { IrTypeAliasSymbolImpl(uniqId) }
@@ -610,6 +720,16 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
         )
     }
 
+    fun declareSimpeFunctionFromLinker(descriptor: FunctionDescriptor, uniqId: UniqId, functionFactory: (IrSimpleFunctionSymbol) -> IrSimpleFunction): IrSimpleFunction {
+        return simpleFunctionSymbolTable.run {
+            if (uniqId.isPublic) {
+                declare(uniqId, descriptor, { IrSimpleFunctionPublicSymbolImpl(descriptor, uniqId, "") }, functionFactory)
+            } else {
+                declare(descriptor, { IrSimpleFunctionSymbolImpl(descriptor) }, functionFactory)
+            }
+        }
+    }
+
     private fun createBuiltInOperatorSymbol(descriptor: FunctionDescriptor, mangle: String): IrSimpleFunctionSymbol {
         return mangler.run { IrSimpleFunctionPublicSymbolImpl(descriptor, UniqId(mangle.hashMangle()), mangle) }
     }
@@ -634,8 +754,14 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
     override fun referenceSimpleFunction(descriptor: FunctionDescriptor) =
         simpleFunctionSymbolTable.referenced(descriptor) { createSimpleFunctionSymbol(descriptor) }
 
+    override fun referenceSimpleFunctionFromLinker(descriptor: FunctionDescriptor, uniqId: UniqId): IrSimpleFunctionSymbol {
+        return simpleFunctionSymbolTable.run {
+            if (uniqId.isPublic) referenced(uniqId) { IrSimpleFunctionPublicSymbolImpl(descriptor, uniqId, "") } else
+                referenced(descriptor) { IrSimpleFunctionSymbolImpl(descriptor) }
+        }
+    }
+
     override fun referenceSimpleFunction(uniqId: UniqId): IrSimpleFunctionSymbol = error("...")
-//        simpleFunctionSymbolTable.referenced(uniqId) { IrSimpleFunctionSymbolImpl(uniqId) }
 
     override fun referenceDeclaredFunction(descriptor: FunctionDescriptor) =
         simpleFunctionSymbolTable.referenced(descriptor) { throw AssertionError("Function is not declared: $descriptor") }
@@ -664,6 +790,23 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
             typeParameterFactory
         )
 
+    fun declareGlobalTypeParameterFromLinker(
+        descriptor: TypeParameterDescriptor,
+        id: UniqId,
+        typeParameterFactory: (IrTypeParameterSymbol) -> IrTypeParameter
+    ): IrTypeParameter {
+        return if (id.isPublic) {
+            globalTypeParameterSymbolTable.declare(
+                id,
+                descriptor,
+                { IrTypeParameterPublicSymbolImpl(descriptor, id, "") },
+                typeParameterFactory
+            )
+        } else {
+            globalTypeParameterSymbolTable.declare(descriptor, { IrTypeParameterSymbolImpl(descriptor) }, typeParameterFactory)
+        }
+    }
+
     fun declareScopedTypeParameter(
         startOffset: Int,
         endOffset: Int,
@@ -677,6 +820,22 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
             typeParameterFactory
         )
 
+    fun declareScopedTypeParameterFromLinker(
+        descriptor: TypeParameterDescriptor,
+        id: UniqId,
+        typeParameterFactory: (IrTypeParameterSymbol) -> IrTypeParameter
+    ): IrTypeParameter {
+        return if (id.isPublic) {
+            scopedTypeParameterSymbolTable.declare(
+                id,
+                descriptor,
+                { IrTypeParameterPublicSymbolImpl(descriptor, id, "") },
+                typeParameterFactory
+            )
+        } else {
+            scopedTypeParameterSymbolTable.declare(descriptor, { IrTypeParameterSymbolImpl(descriptor) }, typeParameterFactory)
+        }
+    }
 
     val unboundTypeParameters: Set<IrTypeParameterSymbol> get() = globalTypeParameterSymbolTable.unboundSymbols
 
@@ -709,6 +868,16 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
     override fun referenceTypeParameter(classifier: TypeParameterDescriptor): IrTypeParameterSymbol =
         scopedTypeParameterSymbolTable.get(classifier) ?: globalTypeParameterSymbolTable.referenced(classifier) {
             createTypeParameterSymbol(classifier)
+        }
+
+    override fun referenceTypeParameterFromLinker(classifier: TypeParameterDescriptor, uniqId: UniqId) =
+        if (uniqId.isPublic) {
+            scopedTypeParameterSymbolTable.get(uniqId) ?: globalTypeParameterSymbolTable.referenced(uniqId) {
+                IrTypeParameterPublicSymbolImpl(classifier, uniqId, "")
+            }
+        } else {
+            scopedTypeParameterSymbolTable.get(classifier)
+                ?: globalTypeParameterSymbolTable.referenced(classifier) { IrTypeParameterSymbolImpl(classifier) }
         }
 
     override fun referenceTypeParameter(uniqId: UniqId): IrTypeParameterSymbol =
@@ -804,7 +973,7 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
 //    }
 }
 
-inline fun <T, D: DeclarationDescriptor> SymbolTable.withScope(owner: D, block: SymbolTable.(D) -> T): T {
+inline fun <T, D : DeclarationDescriptor> SymbolTable.withScope(owner: D, block: SymbolTable.(D) -> T): T {
     enterScope(owner)
     val result = block(owner)
     leaveScope(owner)

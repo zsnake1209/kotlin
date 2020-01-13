@@ -72,7 +72,7 @@ open class DeclarationTable(
     private val table = mutableMapOf<IrDeclaration, UniqId>()
 
     private fun IrDeclaration.isLocalDeclaration(): Boolean {
-        return origin == IrDeclarationOrigin.FAKE_OVERRIDE || !isExportedDeclaration(this) || this is IrValueDeclaration || this is IrAnonymousInitializer || this is IrLocalDelegatedProperty
+        return /*origin == IrDeclarationOrigin.FAKE_OVERRIDE || */!isExportedDeclaration(this) || this is IrValueDeclaration || this is IrAnonymousInitializer || this is IrLocalDelegatedProperty
     }
 
     private var localIndex = startIndex

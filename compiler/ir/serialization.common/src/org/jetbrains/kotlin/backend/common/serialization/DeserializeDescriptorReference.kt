@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.backend.common.serialization
 import org.jetbrains.kotlin.builtins.functions.FunctionClassDescriptor
 import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.KotlinMangler
@@ -109,7 +110,24 @@ abstract class DescriptorReferenceDeserializer(
         name: String,
         flags: Int,
         index: Long?
-    ): DeclarationDescriptor {
+    ): DeclarationDescriptor? {
+
+
+        index?.let {
+            if (checkIfSpecialDescriptorId(it)) {
+                return resolveSpecialDescriptor(packageFqName.child(Name.identifier(name)))
+            }
+        }
+
+        if (packageFqName in functionalPackages) {
+            if (functionPattern.matcher(classFqName.asString()).find()) {
+                val klass = resolveSpecialDescriptor(packageFqName.child(classFqName.shortName()))
+                return klass.unsubstitutedMemberScope.getContributedFunctions(Name.identifier(name), NoLookupLocation.FROM_BACKEND).single()
+            }
+        }
+
+        return null
+
 
         val protoIndex = index
 
