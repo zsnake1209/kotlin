@@ -93,9 +93,6 @@ abstract class KotlinIrLinker(
             private val reachableTopLevels = LinkedHashSet<UniqId>()
 
             override fun addUniqID(key: UniqId) {
-                if (key.index == -4506687136880287223) {
-                    1
-                }
                 reachableTopLevels.add(key)
             }
 
@@ -270,7 +267,7 @@ abstract class KotlinIrLinker(
                 return getModuleForTopLevelId(key)?.moduleDeserializationState ?: handleNoModuleDeserializerFound(key)
             }
 
-            private fun deserializeIrSymbolData(proto: ProtoSymbolData): IrSymbol {
+            private fun findDeserializationState(proto: ProtoSymbolData): DeserializationState<*> {
                 val key = UniqId(proto.uniqIdIndex)
                 val topLevelKey = UniqId(proto.topLevelUniqIdIndex)
 
@@ -285,13 +282,20 @@ abstract class KotlinIrLinker(
                 val deserializationState =
                     if (topLevelKey.isLocal xor key.isLocal) getStateForID(key) else topLevelDeserializationState
 
+                return deserializationState
+            }
 
-                if (key.index == -7641994795384116145) {
-                    1
-                }
-                if (key.index == -2272495843167253415) {
-                    2
-                }
+            private fun referenceIrSymbolData(symbol: IrSymbol, proto: ProtoSymbolData) {
+                val key = UniqId(proto.uniqIdIndex)
+                val deserializationState = findDeserializationState(proto)
+
+                deserializationState.deserializedSymbols.putIfAbsent(key, symbol)
+            }
+
+            private fun deserializeIrSymbolData(proto: ProtoSymbolData): IrSymbol {
+                val key = UniqId(proto.uniqIdIndex)
+                val deserializationState = findDeserializationState(proto)
+
                 val symbol = deserializationState.deserializedSymbols.getOrPut(key) {
                     val descriptor = if (proto.hasDescriptorReference()) {
                         // TODO: deserialize only functional descriptor
@@ -299,7 +303,6 @@ abstract class KotlinIrLinker(
                     } else {
                         null
                     }
-//                    val descriptor = null
 
                     resolvedForwardDeclarations[key]?.let {
                         val fdState = getStateForID(it)
@@ -337,6 +340,11 @@ abstract class KotlinIrLinker(
             override fun deserializeIrSymbolToDeclare(index: Int): Pair<IrSymbol, UniqId> {
                 val symbolData = loadSymbolProto(index)
                 return Pair(deserializeIrSymbolData(symbolData), UniqId(symbolData.uniqIdIndex))
+            }
+
+            override fun deserializeIrSymbolId(index: Int): UniqId {
+                val symbolData = loadSymbolProto(index)
+                return UniqId(symbolData.uniqIdIndex)
             }
 
             override fun deserializeIrSymbol(index: Int): IrSymbol {
@@ -377,6 +385,11 @@ abstract class KotlinIrLinker(
                     val errorType = IrErrorTypeImpl(null, emptyList(), Variance.INVARIANT)
                     return IrBlockBodyImpl(-1, -1, listOf(IrErrorExpressionImpl(-1, -1, errorType, "Statement body is not deserialized yet")))
                 }
+            }
+
+            override fun referenceIrSymbol(symbol: IrSymbol, index: Int) {
+                val symbolData = loadSymbolProto(index)
+                referenceIrSymbolData(symbol, symbolData)
             }
 
             fun deserializeFileImplicitDataIfFirstUse() {

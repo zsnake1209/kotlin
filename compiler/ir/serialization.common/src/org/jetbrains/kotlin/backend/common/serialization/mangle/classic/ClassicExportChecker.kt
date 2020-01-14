@@ -26,7 +26,6 @@ abstract class ClassicExportChecker : KotlinExportChecker<IrDeclaration> {
         if (declaration is IrValueDeclaration) return false
         if (declaration is IrAnonymousInitializer) return false
         if (declaration is IrLocalDelegatedProperty) return false
-        if (declaration is IrTypeParameter) return false
 
         val descriptorAnnotations = declaration.descriptor.annotations
 

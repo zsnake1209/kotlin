@@ -248,8 +248,29 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
             private val descriptorToSymbol = linkedMapOf<D, S>()
             private val uniqIdToSymbol = linkedMapOf<UniqId, S>()
 
-            operator fun get(d: D): S? =
-                descriptorToSymbol[d] ?: parent?.get(d)
+            private fun getByDescriptor(d: D): S? {
+                return descriptorToSymbol[d] ?: parent?.getByDescriptor(d)
+            }
+
+            private fun getByMangleId(id: UniqId): S? {
+                return uniqIdToSymbol[id] ?: parent?.getByMangleId(id)
+            }
+
+            operator fun get(d: D): S? {
+                return with(mangler) {
+                    if (d !is WrappedDeclarationDescriptor<*>) {
+                        val exported = isExport(d)
+                        if (exported) {
+                            val m = mangleDeclaration(d)
+                            getByMangleId(UniqId(m.hashMangle()))
+                        } else {
+                            getByDescriptor(d)
+                        }
+                    } else {
+                        getByDescriptor(d)
+                    }
+                }
+            }
 
             fun getLocal(d: D) = descriptorToSymbol[d]
 

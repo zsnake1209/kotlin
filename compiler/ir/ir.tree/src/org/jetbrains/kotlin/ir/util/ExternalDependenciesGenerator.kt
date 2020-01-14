@@ -65,8 +65,7 @@ private val SymbolTable.allUnbound: List<IrSymbol>
 fun List<IrProvider>.getDeclaration(symbol: IrSymbol): IrDeclaration =
     firstNotNullResult { provider ->
         provider.getDeclaration(symbol)
-    } ?:
-    error("Could not find declaration for unbound symbol $symbol")
+    } ?: error("Could not find declaration for unbound symbol $symbol")
 
 // In most cases, IrProviders list consist of an optional deserializer and a DeclarationStubGenerator.
 fun generateTypicalIrProviderList(
