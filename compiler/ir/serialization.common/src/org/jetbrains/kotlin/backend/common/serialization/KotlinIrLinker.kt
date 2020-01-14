@@ -519,9 +519,6 @@ abstract class KotlinIrLinker(
     }
 
     private fun findDeserializedDeclarationForDescriptor(symbol: IrSymbol): DeclarationDescriptor? {
-        if (!symbol.isPublicApi) {
-            1
-        }
         require(symbol.isPublicApi)
 
         val descriptor = symbol.descriptor
@@ -557,6 +554,8 @@ abstract class KotlinIrLinker(
     }
 
     override fun getDeclaration(symbol: IrSymbol): IrDeclaration? {
+
+        if (!symbol.isPublicApi) return null
 
         if (!symbol.isBound) {
             findDeserializedDeclarationForDescriptor(symbol) ?: return null

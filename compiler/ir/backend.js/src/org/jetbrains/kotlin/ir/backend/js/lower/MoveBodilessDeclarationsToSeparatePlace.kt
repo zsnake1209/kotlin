@@ -78,7 +78,9 @@ private class DescriptorlessIrFileSymbol : IrFileSymbol {
 
     override var uniqId: UniqId
         get() = error("Operation is unsupported")
-        set(value) { error("Operation is unsupported") }
+        set(_) {
+            error("Operation is unsupported")
+        }
 
     override val isBound get() = _owner != null
 

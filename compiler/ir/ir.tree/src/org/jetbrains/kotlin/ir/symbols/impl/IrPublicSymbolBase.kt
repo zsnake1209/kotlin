@@ -22,9 +22,6 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
         assert(isOriginalDescriptor(descriptor)) {
             "Substituted descriptor $descriptor for ${descriptor.original}"
         }
-        if (mangle == "kfun:kotlin.internal.ir.#dataClassArrayMemberHashCode(kotlin.Any){}kotlin.Int") {
-            2
-        }
     }
 
     private fun isOriginalDescriptor(descriptor: DeclarationDescriptor): Boolean =
