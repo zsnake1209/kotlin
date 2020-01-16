@@ -57,6 +57,8 @@ interface IrKotlinLibraryLayout : KotlinLibraryLayout {
         get() = File(irDir, "symbols.knt")
     val irTypes
         get() = File(irDir, "types.knt")
+    val irSignatures
+        get() = File(irDir, "signatures.knt")
     val irStrings
         get() = File(irDir, "strings.knt")
     val irBodies
@@ -69,6 +71,7 @@ interface IrKotlinLibraryLayout : KotlinLibraryLayout {
     fun irDeclarations(file: File): File = File(file, "irCombined.knd")
     fun irSymbols(file: File): File = File(file, "symbols.knt")
     fun irTypes(file: File): File = File(file, "types.knt")
+    fun irSignatures(file: File): File = File(file, "signatures.knt")
     fun irStrings(file: File): File = File(file, "strings.knt")
     fun irBodies(file: File): File = File(file, "body.knb")
     fun irFile(file: File): File = File(file, "file.knf")

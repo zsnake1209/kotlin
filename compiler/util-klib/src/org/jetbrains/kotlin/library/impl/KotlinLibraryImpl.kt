@@ -90,6 +90,8 @@ class IrMonoliticLibraryImpl(_access: IrLibraryAccess<IrKotlinLibraryLayout>) : 
 
     override fun type(index: Int, fileIndex: Int) = types.tableItemBytes(fileIndex, index)
 
+    override fun signature(index: Int, fileIndex: Int) = signatures.tableItemBytes(fileIndex, index)
+
     override fun string(index: Int, fileIndex: Int) = strings.tableItemBytes(fileIndex, index)
 
     override fun body(index: Int, fileIndex: Int) = bodies.tableItemBytes(fileIndex, index)
@@ -114,6 +116,12 @@ class IrMonoliticLibraryImpl(_access: IrLibraryAccess<IrKotlinLibraryLayout>) : 
     private val types: IrMultiArrayReader by lazy {
         IrMultiArrayReader(access.realFiles {
             it.irTypes
+        })
+    }
+
+    private val signatures: IrMultiArrayReader by lazy {
+        IrMultiArrayReader(access.realFiles {
+            it.irSignatures
         })
     }
 
@@ -172,6 +180,16 @@ class IrPerFileLibraryImpl(_access: IrLibraryAccess<IrKotlinLibraryLayout>) : Ir
             val fileDirectory = directories[fileIndex]
             IrArrayReader(access.realFiles {
                 it.irTypes(fileDirectory)
+            })
+        }
+        return dataReader.tableItemBytes(index)
+    }
+
+    override fun signature(index: Int, fileIndex: Int): ByteArray {
+        val dataReader = fileToTypeMap.getOrPut(fileIndex) {
+            val fileDirectory = directories[fileIndex]
+            IrArrayReader(access.realFiles {
+                it.irSignatures(fileDirectory)
             })
         }
         return dataReader.tableItemBytes(index)

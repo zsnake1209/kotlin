@@ -116,7 +116,7 @@ fun generateKLib(
             val irData = compiledIrFiles[f] ?: error("No Ir Data found for file $f")
             val metaFile = compiledMetaFiles[f] ?: error("No Meta Data found for file $f")
             val irFile = with(irData) {
-                SerializedIrFile(fileData, String(fqn), f.path.replace('\\', '/'), symbols, types, strings, bodies, declarations)
+                SerializedIrFile(fileData, String(fqn), f.path.replace('\\', '/'), symbols, types, signatures, strings, bodies, declarations)
             }
             storage.add(KotlinFileSerializedData(metaFile.metadata, irFile))
         }
@@ -438,7 +438,7 @@ fun serializeModuleIntoKlib(
         incrementalResultsConsumer?.run {
             processPackagePart(ioFile, compiledFile.metadata, empty, empty)
             with(compiledFile.irData) {
-                processIrFile(ioFile, fileData, symbols, types, strings, declarations, bodies, fqName.toByteArray())
+                processIrFile(ioFile, fileData, symbols, types, signatures, strings, declarations, bodies, fqName.toByteArray())
             }
         }
     }

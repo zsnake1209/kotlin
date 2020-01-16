@@ -146,6 +146,9 @@ open class IrFileSerializer(
     private val protoStringMap = mutableMapOf<String, Int>()
     private val protoStringArray = arrayListOf<String>()
 
+    private val protoIdSignatureMap = mutableMapOf<IdSignature, Int>()
+    private val protoIdSignatureArray = arrayListOf<ProtoIdSignature>()
+
     private val protoBodyArray = mutableListOf<XStatementOrExpression>()
 
     private val descriptorReferenceSerializer =
@@ -1341,6 +1344,7 @@ open class IrFileSerializer(
             file.path,
             IrMemoryArrayWriter(protoSymbolArray.map { it.toByteArray() }).writeIntoMemory(),
             IrMemoryArrayWriter(protoTypeArray.map { it.toByteArray() }).writeIntoMemory(),
+            IrMemoryArrayWriter(protoIdSignatureArray.map { it.toByteArray() }).writeIntoMemory(),
             IrMemoryArrayWriter(protoStringArray.map { it.toByteArray() }).writeIntoMemory(),
             IrMemoryArrayWriter(protoBodyArray.map { it.toByteArray() }).writeIntoMemory(),
             IrMemoryDeclarationWriter(topLevelDeclarations).writeIntoMemory()

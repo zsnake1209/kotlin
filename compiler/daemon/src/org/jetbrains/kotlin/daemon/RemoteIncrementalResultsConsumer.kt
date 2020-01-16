@@ -20,6 +20,7 @@ class RemoteIncrementalResultsConsumer(val facade: CompilerCallbackServicesFacad
         fileData: ByteArray,
         symbols: ByteArray,
         types: ByteArray,
+        signatures: ByteArray,
         strings: ByteArray,
         declarations: ByteArray,
         bodies: ByteArray,
