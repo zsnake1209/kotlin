@@ -79,9 +79,6 @@ class Psi2IrTranslator(
         // do not generate unbound symbols before postprocessing,
         // since plugins must work with non-lazy IR
         moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
-        irModule.computeUniqIdForDeclarations(context.symbolTable)
-
-        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
 
         return irModule
     }
