@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.idea.debugger.coroutine.data.PreCoroutineStackFrameI
 import org.jetbrains.kotlin.idea.debugger.coroutine.data.CoroutineStackFrameItem
 import org.jetbrains.kotlin.idea.debugger.hopelessAware
 import org.jetbrains.kotlin.idea.debugger.isInKotlinSources
+import org.jetbrains.kotlin.idea.debugger.safeLocation
 
 class CoroutineAsyncStackTraceProvider : AsyncStackTraceProvider {
 
@@ -59,7 +60,7 @@ class CoroutineAsyncStackTraceProvider : AsyncStackTraceProvider {
         frameProxy: StackFrameProxyImpl,
         suspendContext: SuspendContextImpl
     ): List<CoroutineStackFrameItem>? {
-        val location = frameProxy.location()
+        val location = frameProxy.safeLocation() ?: return null
         if (!location.isInKotlinSources())
             return null
 
