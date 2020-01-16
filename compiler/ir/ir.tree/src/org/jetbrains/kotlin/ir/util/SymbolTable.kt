@@ -457,6 +457,22 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
         error("...")
     }
 
+    private fun createBuiltInClassSymbol(descriptor: ClassDescriptor, mangle: String): IrClassSymbol {
+        return mangler.run { IrClassPublicSymbolImpl(descriptor, UniqId(mangle.hashMangle()), mangle) }
+    }
+
+    fun declareBuiltInClass(
+        descriptor: ClassDescriptor,
+        mangle: String,
+        classFactory: (IrClassSymbol) -> IrClass
+    ): IrClass {
+        val id = mangler.run { UniqId(mangle.hashMangle()) }
+        return classSymbolTable.declare(id, descriptor, { createBuiltInClassSymbol(descriptor, mangle) }, classFactory)
+    }
+
+    fun referenceBuiltInClass(descriptor: ClassDescriptor, mangle: String) =
+        classSymbolTable.referenced(mangler.run { UniqId(mangle.hashMangle()) }) { createBuiltInClassSymbol(descriptor, mangle) }
+
     override fun referenceClassFromLinker(descriptor: ClassDescriptor, uniqId: UniqId): IrClassSymbol =
         classSymbolTable.run {
             if (uniqId.isPublic) referenced(uniqId) { IrClassPublicSymbolImpl(descriptor, uniqId, "") }
@@ -741,7 +757,7 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
         )
     }
 
-    fun declareSimpeFunctionFromLinker(descriptor: FunctionDescriptor, uniqId: UniqId, functionFactory: (IrSimpleFunctionSymbol) -> IrSimpleFunction): IrSimpleFunction {
+    fun declareSimpleFunctionFromLinker(descriptor: FunctionDescriptor, uniqId: UniqId, functionFactory: (IrSimpleFunctionSymbol) -> IrSimpleFunction): IrSimpleFunction {
         return simpleFunctionSymbolTable.run {
             if (uniqId.isPublic) {
                 declare(uniqId, descriptor, { IrSimpleFunctionPublicSymbolImpl(descriptor, uniqId, "") }, functionFactory)
@@ -770,7 +786,7 @@ open class SymbolTable(val mangler: KotlinMangler.DescriptorMangler) : Reference
     }
 
     fun referenceBuiltInOperator(descriptor: FunctionDescriptor, mangle: String) =
-        simpleFunctionSymbolTable.referenced(mangler.run { UniqId(mangle.hashMangle()) }) { createSimpleFunctionSymbol(descriptor) }
+        simpleFunctionSymbolTable.referenced(mangler.run { UniqId(mangle.hashMangle()) }) { createBuiltInOperatorSymbol(descriptor, mangle) }
 
     override fun referenceSimpleFunction(descriptor: FunctionDescriptor) =
         simpleFunctionSymbolTable.referenced(descriptor) { createSimpleFunctionSymbol(descriptor) }

@@ -298,6 +298,9 @@ class IrBuiltIns(
     private val kMutableProperty1Class = builtIns.kMutableProperty1.toIrSymbol()
     private val kMutableProperty2Class = builtIns.kMutableProperty2.toIrSymbol()
 
+    val functionClass = builtIns.getBuiltInClassByFqName(FqName("kotlin.Function")).toIrSymbol()
+    val kFunctionClass = builtIns.getBuiltInClassByFqName(FqName("kotlin.reflect.KFunction")).toIrSymbol()
+
     fun getKPropertyClass(mutable: Boolean, n: Int): IrClassSymbol = when (n) {
         0 -> if (mutable) kMutableProperty0Class else kProperty0Class
         1 -> if (mutable) kMutableProperty1Class else kProperty1Class

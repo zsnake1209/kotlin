@@ -1070,7 +1070,7 @@ abstract class IrFileDeserializer(
         return withDeserializedIrFunctionBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
             logger.log { "### deserializing IrFunction $name" }
 
-            symbolTable.declareSimpeFunctionFromLinker(symbol.descriptor, uniqId) {
+            symbolTable.declareSimpleFunctionFromLinker(symbol.descriptor, uniqId) {
                 IrFunctionImpl(
                     startOffset, endOffset, origin,
                     it,

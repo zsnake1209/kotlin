@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransf
 import org.jetbrains.kotlin.ir.backend.js.utils.JsMainFunctionDetector
 import org.jetbrains.kotlin.ir.backend.js.utils.NameTables
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.descriptors.IrFunctionFactory
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
 import org.jetbrains.kotlin.ir.util.generateTypicalIrProviderList
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
@@ -55,7 +56,7 @@ fun compile(
     generateFullJs: Boolean = true,
     generateDceJs: Boolean = false
 ): CompilerResult {
-    val (moduleFragment, dependencyModules, irBuiltIns, symbolTable, deserializer) =
+    val (moduleFragment, dependencyModules, irBuiltIns, symbolTable, functionFactory, deserializer) =
         loadIr(project, files, configuration, allDependencies, friendDependencies)
 
     moduleFragment.acceptVoid(ManglerChecker(JsManglerClassic, JsManglerIr, JsManglerDesc))
@@ -68,7 +69,7 @@ fun compile(
 
     // Load declarations referenced during `context` initialization
     dependencyModules.forEach {
-        val irProviders = generateTypicalIrProviderList(it.descriptor, irBuiltIns, symbolTable, deserializer)
+        val irProviders = generateTypicalIrProviderList(it.descriptor, irBuiltIns, symbolTable, deserializer, functionFactory)
         ExternalDependenciesGenerator(symbolTable, irProviders).generateUnboundSymbolsAsDependencies()
     }
 

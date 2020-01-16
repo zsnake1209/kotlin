@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.*
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.metadata.KlibMetadataIncrementalSerializer
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
+import org.jetbrains.kotlin.ir.descriptors.IrFunctionFactory
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.ExpectDeclarationRemover
 import org.jetbrains.kotlin.ir.util.IrDeserializer
@@ -161,6 +162,7 @@ data class IrModuleInfo(
     val allDependencies: List<IrModuleFragment>,
     val bultins: IrBuiltIns,
     val symbolTable: SymbolTable,
+    val functionFactory: IrFunctionFactory,
     val deserializer: JsIrLinker
 )
 
@@ -188,6 +190,7 @@ fun loadIr(
     val symbolTable = psi2IrContext.symbolTable
     val moduleDescriptor = psi2IrContext.moduleDescriptor
 
+    val functionFactory = IrFunctionFactory(irBuiltIns, symbolTable)
     val deserializer = JsIrLinker(moduleDescriptor, JsManglerIr, emptyLoggingContext, irBuiltIns, symbolTable)
 
     val deserializedModuleFragments = sortDependencies(allDependencies.getFullList(), depsDescriptors.descriptors).map {
@@ -196,9 +199,9 @@ fun loadIr(
 
     deserializer.initializeExpectActualLinker()
 
-    val moduleFragment = psi2IrContext.generateModuleFragmentWithPlugins(project, files, deserializer)
+    val moduleFragment = psi2IrContext.generateModuleFragmentWithPlugins(project, files, deserializer, functionFactory)
 
-    return IrModuleInfo(moduleFragment, deserializedModuleFragments, irBuiltIns, symbolTable, deserializer)
+    return IrModuleInfo(moduleFragment, deserializedModuleFragments, irBuiltIns, symbolTable, functionFactory, deserializer)
 }
 
 private fun runAnalysisAndPreparePsi2Ir(depsDescriptors: ModulesStructure): GeneratorContext {
@@ -219,9 +222,10 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
     project: Project,
     files: List<KtFile>,
     deserializer: IrDeserializer? = null,
+    functionFactory: IrFunctionFactory? = null,
     expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>? = null
 ): IrModuleFragment {
-    val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
+    val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer, functionFactory)
     val psi2Ir = Psi2IrTranslator(languageVersionSettings, configuration, mangler = JsDescriptorMangler)
 
     for (extension in IrGenerationExtension.getInstances(project)) {
