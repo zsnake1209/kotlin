@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.types.Variance
 
 class IrFunctionFactory(private val irBuiltIns: IrBuiltIns, private val symbolTable: SymbolTable) : IrProvider {
     override fun getDeclaration(symbol: IrSymbol): IrDeclaration? {
+        return null
         return symbol.descriptor.let {
             if (it is FunctionClassDescriptor) it.createFunctionClass()
             if (it is FunctionInvokeDescriptor) (it.containingDeclaration as FunctionClassDescriptor).createFunctionClass().declarations.find { d ->
