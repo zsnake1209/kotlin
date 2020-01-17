@@ -16,9 +16,11 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclaration.Dec
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrOperation.OperationCase.*
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement.StatementCase
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrType.KindCase.*
+import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature.IdsigCase.*
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument.KindCase.STAR
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument.KindCase.TYPE
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrVarargElement.VarargElementCase
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignature
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -41,7 +43,6 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.ClassKind as Prot
 import org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference as ProtoDescriptorReference
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnonymousInit as ProtoAnonymousInit
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlock as ProtoBlock
-//import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoBodyIndex
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlockBody as ProtoBlockBody
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBranch as ProtoBranch
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBreak as ProtoBreak
@@ -90,7 +91,6 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrSpreadElement a
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement as ProtoStatement
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatementOrigin as ProtoStatementOrigin
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStringConcat as ProtoStringConcat
-//import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoSymbolIndex
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSyntheticBody as ProtoSyntheticBody
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSyntheticBodyKind as ProtoSyntheticBodyKind
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrThrow as ProtoThrow
@@ -99,7 +99,6 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrType as ProtoTy
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeAbbreviation as ProtoTypeAbbreviation
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeAlias as ProtoTypeAlias
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument as ProtoTypeArgument
-//import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoTypeIndex
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeOp as ProtoTypeOp
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeOperator as ProtoTypeOperator
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter as ProtoTypeParameter
@@ -113,10 +112,12 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrWhile as ProtoW
 import org.jetbrains.kotlin.backend.common.serialization.proto.Loop as ProtoLoop
 import org.jetbrains.kotlin.backend.common.serialization.proto.MemberAccessCommon as ProtoMemberAccessCommon
 import org.jetbrains.kotlin.backend.common.serialization.proto.ModalityKind as ProtoModalityKind
-//import org.jetbrains.kotlin.backend.common.serialization.proto.IrDataIndex as ProtoStringIndex
 import org.jetbrains.kotlin.backend.common.serialization.proto.TypeArguments as ProtoTypeArguments
 import org.jetbrains.kotlin.backend.common.serialization.proto.Visibility as ProtoVisibility
-//import org.jetbrains.kotlin.backend.common.serialization.proto.FqName as ProtoFqName
+import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature as ProtoIdSignature
+import org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature as ProtoPublicIdSignature
+import org.jetbrains.kotlin.backend.common.serialization.proto.FileLocalIdSignature as ProtoFileLocalIdSignature
+import org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId as ProtoClassAndPackageId
 
 // TODO: This code still has some uses of descriptors:
 // 1. We use descriptors as keys for symbolTable -- probably symbol table related code should be refactored out from
@@ -134,6 +135,7 @@ abstract class IrFileDeserializer(
     abstract fun deserializeIrSymbolId(index: Int): UniqId
     abstract fun deserializeIrSymbol(index: Int): IrSymbol
     abstract fun deserializeIrType(index: Int): IrType
+    abstract fun deserializeIdSignature(index: Int): IdSignature
     abstract fun deserializeDescriptorReference(proto: ProtoDescriptorReference): DeclarationDescriptor?
     abstract fun deserializeString(index: Int): String
     abstract fun deserializeExpressionBody(index: Int): IrExpression
@@ -236,7 +238,37 @@ abstract class IrFileDeserializer(
             SIMPLE -> deserializeSimpleType(proto.simple)
             DYNAMIC -> deserializeDynamicType(proto.dynamic)
             ERROR -> deserializeErrorType(proto.error)
-            else -> TODO("Unexpected IrType kind: ${proto.kindCase}")
+            else -> error("Unexpected IrType kind: ${proto.kindCase}")
+        }
+    }
+
+    /* -------------------------------------------------------------- */
+
+    private fun deserializePackageAndClassId(proto: ProtoClassAndPackageId): Pair<FqName, FqName> {
+        return Pair(deserializeFqName(proto.packageFqNameList), deserializeFqName(proto.classFqNameList))
+    }
+
+    private fun deserializePublicIdSignature(proto: ProtoPublicIdSignature): IdSignature.PublicSignature {
+        val (pkg, cls) = deserializePackageAndClassId(proto.container)
+        val memberId = if (proto.hasMemberUniqId()) proto.memberUniqId else null
+
+        return IdSignature.PublicSignature(pkg, cls, memberId, proto.flags)
+    }
+
+    private fun deserializeFileLocalIdSignature(proto: ProtoFileLocalIdSignature): IdSignature.FileLocalSignature {
+        return IdSignature.FileLocalSignature(deserializeIdSignature(proto.container), proto.localId)
+    }
+
+    private fun deserializeBuiltInIdSignature(proto: Long): IdSignature.BuiltInSignature {
+        return IdSignature.BuiltInSignature(proto)
+    }
+
+    fun deserializeSignatureData(proto: ProtoIdSignature): IdSignature {
+        return when (proto.idsigCase) {
+            PUBLIC_SIG -> deserializePublicIdSignature(proto.publicSig)
+            PRIVATE_SIG -> deserializeFileLocalIdSignature(proto.privateSig)
+            BUILTIN_SIG -> deserializeBuiltInIdSignature(proto.builtinSig)
+            else -> error("Unexpected IdSignature kind: ${proto.idsigCase}")
         }
     }
 

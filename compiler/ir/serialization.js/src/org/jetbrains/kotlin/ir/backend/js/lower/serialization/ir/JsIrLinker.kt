@@ -40,6 +40,9 @@ class JsIrLinker(
     override fun readType(moduleDescriptor: ModuleDescriptor, fileIndex: Int, typeIndex: Int) =
         moduleDescriptor.kotlinLibrary.type(typeIndex, fileIndex)
 
+    override fun readSignature(moduleDescriptor: ModuleDescriptor, fileIndex: Int, signatureIndex: Int) =
+        moduleDescriptor.kotlinLibrary.signature(signatureIndex, fileIndex)
+
     override fun readString(moduleDescriptor: ModuleDescriptor, fileIndex: Int, stringIndex: Int) =
         moduleDescriptor.kotlinLibrary.string(stringIndex, fileIndex)
 

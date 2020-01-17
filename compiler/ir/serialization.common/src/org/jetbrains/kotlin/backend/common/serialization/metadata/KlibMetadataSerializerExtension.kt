@@ -36,7 +36,8 @@ class KlibMetadataSerializerExtension(
     }
 
     private fun uniqId(descriptor: DeclarationDescriptor): KlibMetadataProtoBuf.DescriptorUniqId? {
-        return declarationTableHandler(descriptor)
+//        return declarationTableHandler(descriptor)
+        return null
     }
 
     override fun serializeTypeParameter(typeParameter: TypeParameterDescriptor, proto: ProtoBuf.TypeParameter.Builder) {

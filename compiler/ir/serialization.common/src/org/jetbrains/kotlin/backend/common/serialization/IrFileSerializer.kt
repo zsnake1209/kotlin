@@ -7,8 +7,8 @@ package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.ir.ir2string
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignature
 import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.ClassKind.*
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.SourceManager
@@ -16,10 +16,9 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.ir.util.findTopLevelDeclaration
 import org.jetbrains.kotlin.ir.util.lineStartOffsets
-import org.jetbrains.kotlin.ir.util.module
-import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
@@ -32,10 +31,14 @@ import org.jetbrains.kotlin.library.impl.IrMemoryDeclarationWriter
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.backend.common.serialization.proto.Actual as ProtoActual
+import org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId as ProtoClassAndPackageId
 import org.jetbrains.kotlin.backend.common.serialization.proto.ClassKind as ProtoClassKind
 import org.jetbrains.kotlin.backend.common.serialization.proto.Coordinates as ProtoCoordinates
 import org.jetbrains.kotlin.backend.common.serialization.proto.FieldAccessCommon as ProtoFieldAccessCommon
 import org.jetbrains.kotlin.backend.common.serialization.proto.FileEntry as ProtoFileEntry
+import org.jetbrains.kotlin.backend.common.serialization.proto.FileLocalIdSignature as ProtoFileLocalIdSignature
+import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature as ProtoIdSignature
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnonymousInit as ProtoAnonymousInit
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlock as ProtoBlock
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlockBody as ProtoBlockBody
@@ -115,13 +118,14 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.Loop as ProtoLoop
 import org.jetbrains.kotlin.backend.common.serialization.proto.MemberAccessCommon as ProtoMemberAccessCommon
 import org.jetbrains.kotlin.backend.common.serialization.proto.ModalityKind as ProtoModalityKind
 import org.jetbrains.kotlin.backend.common.serialization.proto.NullableIrExpression as ProtoNullableIrExpression
+import org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature as ProtoPublicIdSignature
 import org.jetbrains.kotlin.backend.common.serialization.proto.TypeArguments as ProtoTypeArguments
 import org.jetbrains.kotlin.backend.common.serialization.proto.Visibility as ProtoVisibility
-import org.jetbrains.kotlin.backend.common.serialization.proto.Actual as ProtoActual
 
 open class IrFileSerializer(
     val logger: LoggingContext,
     private val declarationTable: DeclarationTable,
+    private val declarationTableX: DeclarationTableX,
     private val expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>,
     private val bodiesOnlyForInlines: Boolean = false,
     private val skipExpects: Boolean = false
@@ -219,6 +223,57 @@ open class IrFileSerializer(
 
     private fun serializeName(name: Name): Int = serializeString(name.toString())
 
+    /* ------- IdSignature ------------------------------------------------------ */
+
+    private fun serializeClassId(packageFqn: FqName, classFqn: FqName): ProtoClassAndPackageId {
+        val proto = ProtoClassAndPackageId.newBuilder()
+        proto.addAllPackageFqName(serializeFqName(packageFqn))
+        proto.addAllClassFqName(serializeFqName(classFqn))
+        return proto.build()
+    }
+
+    private fun serializePublicSignature(signature: IdSignature.PublicSignature): ProtoPublicIdSignature {
+        val proto = ProtoPublicIdSignature.newBuilder()
+        proto.container = serializeClassId(signature.packageFqn, signature.classFqn)
+
+        signature.id?.let { proto.memberUniqId = it }
+
+        proto.flags = signature.mask
+
+        return proto.build()
+    }
+
+    private fun serializePrivateSignature(signature: IdSignature.FileLocalSignature): ProtoFileLocalIdSignature {
+        val proto = ProtoFileLocalIdSignature.newBuilder()
+
+        proto.container = protoIdSignature(signature.container)
+        proto.localId = signature.id
+
+        return proto.build()
+    }
+
+    private fun serializeIdSignature(idSignature: IdSignature): ProtoIdSignature {
+        val proto = ProtoIdSignature.newBuilder()
+        when (idSignature) {
+            is IdSignature.PublicSignature -> proto.publicSig = serializePublicSignature(idSignature)
+            is IdSignature.FileLocalSignature -> proto.privateSig = serializePrivateSignature(idSignature)
+            is IdSignature.BuiltInSignature -> proto.builtinSig = idSignature.id
+        }
+        return proto.build()
+    }
+
+    private fun protoIdSignature(declaration: IrDeclaration): Int {
+        val idSig = declarationTableX.uniqIdByDeclaration(declaration)
+        return protoIdSignature(idSig)
+    }
+
+    private fun protoIdSignature(idSig: IdSignature): Int {
+        return protoIdSignatureMap.getOrPut(idSig) {
+            protoIdSignatureArray.add(serializeIdSignature(idSig))
+            protoIdSignatureArray.size - 1
+        }
+    }
+
     /* ------- IrSymbols -------------------------------------------------------- */
 
     private fun protoSymbolKind(symbol: IrSymbol): ProtoSymbolKind = when (symbol) {
@@ -265,6 +320,8 @@ open class IrFileSerializer(
         val proto = ProtoSymbolData.newBuilder()
         proto.kind = protoSymbolKind(symbol)
 
+        proto.idSig = protoIdSignature(declaration)
+
         val uniqId =
             declarationTable.uniqIdByDeclaration(declaration)
         proto.uniqIdIndex = uniqId.index
@@ -308,7 +365,7 @@ open class IrFileSerializer(
     private fun serializeAnnotations(annotations: List<IrConstructorCall>) =
         annotations.map { serializeConstructorCall(it) }
 
-    private fun serializeFqName(fqName: FqName) = fqName.pathSegments().map { serializeString(it.identifier) }
+    private fun serializeFqName(fqName: FqName) = fqName.pathSegments().map { serializeString(it.asString()) }
 
     private fun serializeIrTypeProjection(argument: IrTypeProjection): ProtoTypeProjection = ProtoTypeProjection.newBuilder()
         .setVariance(serializeIrTypeVariance(argument.variance))

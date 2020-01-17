@@ -48,9 +48,11 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
         return descriptor.run { isExported(annotations, visibility) }
     }
 
-    override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: SpecialDeclarationType): Boolean {
-        return descriptor.run { isExported(annotations, null) }
-    }
+//    override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: SpecialDeclarationType): Boolean {
+//        return descriptor.run { isExported(annotations, null) }
+//    }
+
+    override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: SpecialDeclarationType): Boolean = false
 
     override fun visitClassDescriptor(descriptor: ClassDescriptor, data: SpecialDeclarationType): Boolean {
         if (data == SpecialDeclarationType.ANON_INIT) return false
@@ -79,6 +81,7 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
 
     override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, data: SpecialDeclarationType): Boolean {
         val visibility = if (data == SpecialDeclarationType.BACKING_FIELD) {
+            return false
             when {
                 descriptor.isConst -> descriptor.visibility
                 descriptor.isLateInit -> descriptor.run { setter?.visibility ?: visibility }

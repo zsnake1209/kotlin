@@ -65,20 +65,25 @@ public final class IrSymbolData extends
             }
             break;
           }
-          case 32: {
+          case 16: {
             bitField0_ |= 0x00000002;
+            idSig_ = input.readInt32();
+            break;
+          }
+          case 32: {
+            bitField0_ |= 0x00000004;
             uniqIdIndex_ = input.readInt64();
             break;
           }
           case 40: {
-            bitField0_ |= 0x00000004;
+            bitField0_ |= 0x00000008;
             topLevelUniqIdIndex_ = input.readInt64();
             break;
           }
           case 48: {
-            if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+            if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
               fqName_ = new java.util.ArrayList<java.lang.Integer>();
-              mutable_bitField0_ |= 0x00000008;
+              mutable_bitField0_ |= 0x00000010;
             }
             fqName_.add(input.readInt32());
             break;
@@ -86,9 +91,9 @@ public final class IrSymbolData extends
           case 50: {
             int length = input.readRawVarint32();
             int limit = input.pushLimit(length);
-            if (!((mutable_bitField0_ & 0x00000008) == 0x00000008) && input.getBytesUntilLimit() > 0) {
+            if (!((mutable_bitField0_ & 0x00000010) == 0x00000010) && input.getBytesUntilLimit() > 0) {
               fqName_ = new java.util.ArrayList<java.lang.Integer>();
-              mutable_bitField0_ |= 0x00000008;
+              mutable_bitField0_ |= 0x00000010;
             }
             while (input.getBytesUntilLimit() > 0) {
               fqName_.add(input.readInt32());
@@ -98,7 +103,7 @@ public final class IrSymbolData extends
           }
           case 58: {
             org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference.Builder subBuilder = null;
-            if (((bitField0_ & 0x00000008) == 0x00000008)) {
+            if (((bitField0_ & 0x00000010) == 0x00000010)) {
               subBuilder = descriptorReference_.toBuilder();
             }
             descriptorReference_ = input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference.PARSER, extensionRegistry);
@@ -106,7 +111,7 @@ public final class IrSymbolData extends
               subBuilder.mergeFrom(descriptorReference_);
               descriptorReference_ = subBuilder.buildPartial();
             }
-            bitField0_ |= 0x00000008;
+            bitField0_ |= 0x00000010;
             break;
           }
         }
@@ -117,7 +122,7 @@ public final class IrSymbolData extends
       throw new org.jetbrains.kotlin.protobuf.InvalidProtocolBufferException(
           e.getMessage()).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
         fqName_ = java.util.Collections.unmodifiableList(fqName_);
       }
       try {
@@ -161,13 +166,28 @@ public final class IrSymbolData extends
     return kind_;
   }
 
+  public static final int ID_SIG_FIELD_NUMBER = 2;
+  private int idSig_;
+  /**
+   * <code>required int32 id_sig = 2;</code>
+   */
+  public boolean hasIdSig() {
+    return ((bitField0_ & 0x00000002) == 0x00000002);
+  }
+  /**
+   * <code>required int32 id_sig = 2;</code>
+   */
+  public int getIdSig() {
+    return idSig_;
+  }
+
   public static final int UNIQ_ID_INDEX_FIELD_NUMBER = 4;
   private long uniqIdIndex_;
   /**
    * <code>required int64 uniq_id_index = 4;</code>
    */
   public boolean hasUniqIdIndex() {
-    return ((bitField0_ & 0x00000002) == 0x00000002);
+    return ((bitField0_ & 0x00000004) == 0x00000004);
   }
   /**
    * <code>required int64 uniq_id_index = 4;</code>
@@ -182,7 +202,7 @@ public final class IrSymbolData extends
    * <code>required int64 top_level_uniq_id_index = 5;</code>
    */
   public boolean hasTopLevelUniqIdIndex() {
-    return ((bitField0_ & 0x00000004) == 0x00000004);
+    return ((bitField0_ & 0x00000008) == 0x00000008);
   }
   /**
    * <code>required int64 top_level_uniq_id_index = 5;</code>
@@ -219,7 +239,7 @@ public final class IrSymbolData extends
    * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference descriptor_reference = 7;</code>
    */
   public boolean hasDescriptorReference() {
-    return ((bitField0_ & 0x00000008) == 0x00000008);
+    return ((bitField0_ & 0x00000010) == 0x00000010);
   }
   /**
    * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference descriptor_reference = 7;</code>
@@ -230,6 +250,7 @@ public final class IrSymbolData extends
 
   private void initFields() {
     kind_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind.FUNCTION_SYMBOL;
+    idSig_ = 0;
     uniqIdIndex_ = 0L;
     topLevelUniqIdIndex_ = 0L;
     fqName_ = java.util.Collections.emptyList();
@@ -242,6 +263,10 @@ public final class IrSymbolData extends
     if (isInitialized == 0) return false;
 
     if (!hasKind()) {
+      memoizedIsInitialized = 0;
+      return false;
+    }
+    if (!hasIdSig()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -270,15 +295,18 @@ public final class IrSymbolData extends
       output.writeEnum(1, kind_.getNumber());
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeInt64(4, uniqIdIndex_);
+      output.writeInt32(2, idSig_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      output.writeInt64(4, uniqIdIndex_);
+    }
+    if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeInt64(5, topLevelUniqIdIndex_);
     }
     for (int i = 0; i < fqName_.size(); i++) {
       output.writeInt32(6, fqName_.get(i));
     }
-    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
       output.writeMessage(7, descriptorReference_);
     }
     output.writeRawBytes(unknownFields);
@@ -296,9 +324,13 @@ public final class IrSymbolData extends
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt64Size(4, uniqIdIndex_);
+        .computeInt32Size(2, idSig_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+        .computeInt64Size(4, uniqIdIndex_);
+    }
+    if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeInt64Size(5, topLevelUniqIdIndex_);
     }
@@ -311,7 +343,7 @@ public final class IrSymbolData extends
       size += dataSize;
       size += 1 * getFqNameList().size();
     }
-    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+    if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeMessageSize(7, descriptorReference_);
     }
@@ -411,14 +443,16 @@ public final class IrSymbolData extends
       super.clear();
       kind_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind.FUNCTION_SYMBOL;
       bitField0_ = (bitField0_ & ~0x00000001);
-      uniqIdIndex_ = 0L;
+      idSig_ = 0;
       bitField0_ = (bitField0_ & ~0x00000002);
-      topLevelUniqIdIndex_ = 0L;
+      uniqIdIndex_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000004);
-      fqName_ = java.util.Collections.emptyList();
+      topLevelUniqIdIndex_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000008);
-      descriptorReference_ = org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference.getDefaultInstance();
+      fqName_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000010);
+      descriptorReference_ = org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference.getDefaultInstance();
+      bitField0_ = (bitField0_ & ~0x00000020);
       return this;
     }
 
@@ -449,18 +483,22 @@ public final class IrSymbolData extends
       if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
         to_bitField0_ |= 0x00000002;
       }
-      result.uniqIdIndex_ = uniqIdIndex_;
+      result.idSig_ = idSig_;
       if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
         to_bitField0_ |= 0x00000004;
       }
+      result.uniqIdIndex_ = uniqIdIndex_;
+      if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+        to_bitField0_ |= 0x00000008;
+      }
       result.topLevelUniqIdIndex_ = topLevelUniqIdIndex_;
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         fqName_ = java.util.Collections.unmodifiableList(fqName_);
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
       }
       result.fqName_ = fqName_;
-      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-        to_bitField0_ |= 0x00000008;
+      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+        to_bitField0_ |= 0x00000010;
       }
       result.descriptorReference_ = descriptorReference_;
       result.bitField0_ = to_bitField0_;
@@ -472,6 +510,9 @@ public final class IrSymbolData extends
       if (other.hasKind()) {
         setKind(other.getKind());
       }
+      if (other.hasIdSig()) {
+        setIdSig(other.getIdSig());
+      }
       if (other.hasUniqIdIndex()) {
         setUniqIdIndex(other.getUniqIdIndex());
       }
@@ -481,7 +522,7 @@ public final class IrSymbolData extends
       if (!other.fqName_.isEmpty()) {
         if (fqName_.isEmpty()) {
           fqName_ = other.fqName_;
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000010);
         } else {
           ensureFqNameIsMutable();
           fqName_.addAll(other.fqName_);
@@ -498,6 +539,10 @@ public final class IrSymbolData extends
 
     public final boolean isInitialized() {
       if (!hasKind()) {
+        
+        return false;
+      }
+      if (!hasIdSig()) {
         
         return false;
       }
@@ -572,12 +617,44 @@ public final class IrSymbolData extends
       return this;
     }
 
+    private int idSig_ ;
+    /**
+     * <code>required int32 id_sig = 2;</code>
+     */
+    public boolean hasIdSig() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>required int32 id_sig = 2;</code>
+     */
+    public int getIdSig() {
+      return idSig_;
+    }
+    /**
+     * <code>required int32 id_sig = 2;</code>
+     */
+    public Builder setIdSig(int value) {
+      bitField0_ |= 0x00000002;
+      idSig_ = value;
+      
+      return this;
+    }
+    /**
+     * <code>required int32 id_sig = 2;</code>
+     */
+    public Builder clearIdSig() {
+      bitField0_ = (bitField0_ & ~0x00000002);
+      idSig_ = 0;
+      
+      return this;
+    }
+
     private long uniqIdIndex_ ;
     /**
      * <code>required int64 uniq_id_index = 4;</code>
      */
     public boolean hasUniqIdIndex() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>required int64 uniq_id_index = 4;</code>
@@ -589,7 +666,7 @@ public final class IrSymbolData extends
      * <code>required int64 uniq_id_index = 4;</code>
      */
     public Builder setUniqIdIndex(long value) {
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000004;
       uniqIdIndex_ = value;
       
       return this;
@@ -598,7 +675,7 @@ public final class IrSymbolData extends
      * <code>required int64 uniq_id_index = 4;</code>
      */
     public Builder clearUniqIdIndex() {
-      bitField0_ = (bitField0_ & ~0x00000002);
+      bitField0_ = (bitField0_ & ~0x00000004);
       uniqIdIndex_ = 0L;
       
       return this;
@@ -609,7 +686,7 @@ public final class IrSymbolData extends
      * <code>required int64 top_level_uniq_id_index = 5;</code>
      */
     public boolean hasTopLevelUniqIdIndex() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>required int64 top_level_uniq_id_index = 5;</code>
@@ -621,7 +698,7 @@ public final class IrSymbolData extends
      * <code>required int64 top_level_uniq_id_index = 5;</code>
      */
     public Builder setTopLevelUniqIdIndex(long value) {
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000008;
       topLevelUniqIdIndex_ = value;
       
       return this;
@@ -630,7 +707,7 @@ public final class IrSymbolData extends
      * <code>required int64 top_level_uniq_id_index = 5;</code>
      */
     public Builder clearTopLevelUniqIdIndex() {
-      bitField0_ = (bitField0_ & ~0x00000004);
+      bitField0_ = (bitField0_ & ~0x00000008);
       topLevelUniqIdIndex_ = 0L;
       
       return this;
@@ -638,9 +715,9 @@ public final class IrSymbolData extends
 
     private java.util.List<java.lang.Integer> fqName_ = java.util.Collections.emptyList();
     private void ensureFqNameIsMutable() {
-      if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (!((bitField0_ & 0x00000010) == 0x00000010)) {
         fqName_ = new java.util.ArrayList<java.lang.Integer>(fqName_);
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
        }
     }
     /**
@@ -697,7 +774,7 @@ public final class IrSymbolData extends
      */
     public Builder clearFqName() {
       fqName_ = java.util.Collections.emptyList();
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000010);
       
       return this;
     }
@@ -707,7 +784,7 @@ public final class IrSymbolData extends
      * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference descriptor_reference = 7;</code>
      */
     public boolean hasDescriptorReference() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference descriptor_reference = 7;</code>
@@ -724,7 +801,7 @@ public final class IrSymbolData extends
       }
       descriptorReference_ = value;
 
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000020;
       return this;
     }
     /**
@@ -734,14 +811,14 @@ public final class IrSymbolData extends
         org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference.Builder builderForValue) {
       descriptorReference_ = builderForValue.build();
 
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000020;
       return this;
     }
     /**
      * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference descriptor_reference = 7;</code>
      */
     public Builder mergeDescriptorReference(org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference value) {
-      if (((bitField0_ & 0x00000010) == 0x00000010) &&
+      if (((bitField0_ & 0x00000020) == 0x00000020) &&
           descriptorReference_ != org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference.getDefaultInstance()) {
         descriptorReference_ =
           org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference.newBuilder(descriptorReference_).mergeFrom(value).buildPartial();
@@ -749,7 +826,7 @@ public final class IrSymbolData extends
         descriptorReference_ = value;
       }
 
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000020;
       return this;
     }
     /**
@@ -758,7 +835,7 @@ public final class IrSymbolData extends
     public Builder clearDescriptorReference() {
       descriptorReference_ = org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference.getDefaultInstance();
 
-      bitField0_ = (bitField0_ & ~0x00000010);
+      bitField0_ = (bitField0_ & ~0x00000020);
       return this;
     }
 

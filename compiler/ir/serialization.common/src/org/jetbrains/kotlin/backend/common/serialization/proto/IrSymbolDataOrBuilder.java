@@ -17,6 +17,15 @@ public interface IrSymbolDataOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind getKind();
 
   /**
+   * <code>required int32 id_sig = 2;</code>
+   */
+  boolean hasIdSig();
+  /**
+   * <code>required int32 id_sig = 2;</code>
+   */
+  int getIdSig();
+
+  /**
    * <code>required int64 uniq_id_index = 4;</code>
    */
   boolean hasUniqIdIndex();

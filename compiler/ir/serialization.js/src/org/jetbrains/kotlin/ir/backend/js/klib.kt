@@ -19,8 +19,6 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
-import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -390,7 +388,12 @@ fun serializeModuleIntoKlib(
 
     val descriptorTable = DescriptorTable.createDefault()
     val serializedIr =
-        JsIrModuleSerializer(emptyLoggingContext, moduleFragment.irBuiltins, descriptorTable, skipExpects = !configuration.klibMpp, expectDescriptorToSymbol = expectDescriptorToSymbol).serializedIrModule(moduleFragment)
+        JsIrModuleSerializer(
+            emptyLoggingContext,
+            moduleFragment.irBuiltins,
+            expectDescriptorToSymbol = expectDescriptorToSymbol,
+            skipExpects = !configuration.klibMpp
+        ).serializedIrModule(moduleFragment)
 
     fun List<Int>.printStatistic(name: String) {
 

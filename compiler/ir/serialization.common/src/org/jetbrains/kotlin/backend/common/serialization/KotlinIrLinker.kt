@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignature
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.IrElement
@@ -39,6 +40,7 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement as Pr
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression as ProtoExpression
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrConstructorCall as ProtoConstructorCall
 import org.jetbrains.kotlin.backend.common.serialization.proto.Actual as ProtoActual
+import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature as ProtoIdSignature
 
 abstract class KotlinIrLinker(
     val logger: LoggingContext,
@@ -195,6 +197,11 @@ abstract class KotlinIrLinker(
                 return ProtoType.parseFrom(stream, newInstance())
             }
 
+            private fun loadSignatureProto(index: Int): ProtoIdSignature {
+                val stream = readSignature(moduleDescriptor, fileIndex, index).codedInputStream
+                return ProtoIdSignature.parseFrom(stream, newInstance())
+            }
+
             private fun loadStatementBodyProto(index: Int): ProtoStatement {
                 val stream = readBody(moduleDescriptor, fileIndex, index).codedInputStream
                 return ProtoStatement.parseFrom(stream, newInstance())
@@ -295,6 +302,7 @@ abstract class KotlinIrLinker(
 
             private fun deserializeIrSymbolData(proto: ProtoSymbolData): IrSymbol {
                 val key = UniqId(proto.uniqIdIndex)
+                val idSignature = deserializeIdSignature(proto.idSig)
                 val deserializationState = findDeserializationState(proto)
 
                 val symbol = deserializationState.deserializedSymbols.getOrPut(key) {
@@ -360,6 +368,11 @@ abstract class KotlinIrLinker(
             override fun deserializeIrType(index: Int): IrType {
                 val typeData = loadTypeProto(index)
                 return deserializeIrTypeData(typeData)
+            }
+
+            override fun deserializeIdSignature(index: Int): IdSignature {
+                val sigData = loadSignatureProto(index)
+                return deserializeSignatureData(sigData)
             }
 
             override fun deserializeString(index: Int): String =
@@ -507,6 +520,7 @@ abstract class KotlinIrLinker(
     protected abstract fun reader(moduleDescriptor: ModuleDescriptor, fileIndex: Int, uniqId: UniqId): ByteArray
     protected abstract fun readSymbol(moduleDescriptor: ModuleDescriptor, fileIndex: Int, symbolIndex: Int): ByteArray
     protected abstract fun readType(moduleDescriptor: ModuleDescriptor, fileIndex: Int, typeIndex: Int): ByteArray
+    protected abstract fun readSignature(moduleDescriptor: ModuleDescriptor, fileIndex: Int, signatureIndex: Int): ByteArray
     protected abstract fun readString(moduleDescriptor: ModuleDescriptor, fileIndex: Int, stringIndex: Int): ByteArray
     protected abstract fun readBody(moduleDescriptor: ModuleDescriptor, fileIndex: Int, bodyIndex: Int): ByteArray
     protected abstract fun readFile(moduleDescriptor: ModuleDescriptor, fileIndex: Int): ByteArray

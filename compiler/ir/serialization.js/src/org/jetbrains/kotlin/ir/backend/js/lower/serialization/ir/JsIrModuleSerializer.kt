@@ -7,8 +7,9 @@ package org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
-import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
+import org.jetbrains.kotlin.backend.common.serialization.DeclarationTableX
 import org.jetbrains.kotlin.backend.common.serialization.IrModuleSerializer
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureSerializer
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
@@ -17,13 +18,21 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 class JsIrModuleSerializer(
     logger: LoggingContext,
     irBuiltIns: IrBuiltIns,
-    private val descriptorTable: DescriptorTable,
     private val expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>,
     val skipExpects: Boolean
 ) : IrModuleSerializer<JsIrFileSerializer>(logger) {
 
     private val globalDeclarationTable = JsGlobalDeclarationTable(irBuiltIns)
 
+    private val signaturer = IdSignatureSerializer(JsManglerIr, 0)
+    private val globalDeclarationTableX = JsGlobalDeclarationTableX(signaturer, irBuiltIns)
+
     override fun createSerializerForFile(file: IrFile): JsIrFileSerializer =
-        JsIrFileSerializer(logger, DeclarationTable(globalDeclarationTable, 0), expectDescriptorToSymbol, skipExpects = skipExpects)
+        JsIrFileSerializer(
+            logger,
+            DeclarationTable(globalDeclarationTable, 0),
+            DeclarationTableX(globalDeclarationTableX),
+            expectDescriptorToSymbol,
+            skipExpects = skipExpects
+        )
 }
