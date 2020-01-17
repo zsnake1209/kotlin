@@ -21,10 +21,11 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.isPublishedApi
 class JsIrLinker(
     currentModule: ModuleDescriptor,
     mangler: KotlinMangler,
+    descriptorMangler: KotlinMangler.DescriptorMangler,
     logger: LoggingContext,
     builtIns: IrBuiltIns,
     symbolTable: SymbolTable
-) : KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, mangler),
+) : KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, descriptorMangler, mangler),
     DescriptorUniqIdAware by DeserializedDescriptorUniqIdAware {
 
     override val descriptorReferenceDeserializer =

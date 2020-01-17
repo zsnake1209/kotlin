@@ -18,7 +18,14 @@ class JsIrFileSerializer(
     private val expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>,
     skipExpects: Boolean,
     bodiesOnlyForInlines: Boolean = false
-) : IrFileSerializer(logger, declarationTable, expectDescriptorToSymbol, bodiesOnlyForInlines = bodiesOnlyForInlines, skipExpects = skipExpects) {
+) : IrFileSerializer(
+    logger,
+    declarationTable,
+    expectDescriptorToSymbol,
+    bodiesOnlyForInlines = bodiesOnlyForInlines,
+    skipExpects = skipExpects,
+    mangler = JsManglerIr
+) {
 
     // Temporary keep order of any property, even of constants
     override fun keepOrderOfProperties(property: IrProperty): Boolean = true

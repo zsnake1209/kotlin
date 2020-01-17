@@ -25,5 +25,5 @@ class JsIrModuleSerializer(
     private val globalDeclarationTable = JsGlobalDeclarationTable(irBuiltIns)
 
     override fun createSerializerForFile(file: IrFile): JsIrFileSerializer =
-        JsIrFileSerializer(logger, DeclarationTable(descriptorTable, globalDeclarationTable, 0), expectDescriptorToSymbol, skipExpects = skipExpects)
+        JsIrFileSerializer(logger, DeclarationTable(globalDeclarationTable, 0), expectDescriptorToSymbol, skipExpects = skipExpects)
 }

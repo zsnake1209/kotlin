@@ -46,6 +46,7 @@ abstract class KotlinIrLinker(
     val symbolTable: SymbolTable,
     private val exportedDependencies: List<ModuleDescriptor>,
     private val forwardModuleDescriptor: ModuleDescriptor?,
+    private val descriptorMangler: KotlinMangler.DescriptorMangler,
     mangler: KotlinMangler
 ) : DescriptorUniqIdAware, IrDeserializer {
 
@@ -552,8 +553,7 @@ abstract class KotlinIrLinker(
             return null
         }
 
-        val descriptorUniqId = topLevelDescriptor.getUniqId()
-            ?: error("Could not get descriptor uniq id for $topLevelDescriptor")
+        val descriptorUniqId = with(descriptorMangler) { mangleDeclaration(topLevelDescriptor).hashMangle() }
         val topLevelKey = UniqId(descriptorUniqId)
 
         val moduleOfOrigin = topLevelDescriptor.module
