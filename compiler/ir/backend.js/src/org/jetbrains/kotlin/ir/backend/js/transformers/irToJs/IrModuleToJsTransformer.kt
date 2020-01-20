@@ -181,7 +181,7 @@ class IrModuleToJsTransformer(
             if (mainFunction.valueParameters.isNotEmpty()) JsArrayLiteral(mainArguments.map { JsStringLiteral(it) }) else null
 
         val continuation = if (mainFunction.isSuspend) {
-            val emptyContinuationField = backendContext.coroutineEmptyContinuation.owner
+            val emptyContinuationField = backendContext.coroutineEmptyContinuation.owner.backingField!!
             rootContext.getNameForField(emptyContinuationField).makeRef()
         } else null
 
