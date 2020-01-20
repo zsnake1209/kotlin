@@ -79,8 +79,21 @@ public final class IdSignature extends
             idsigCase_ = 2;
             break;
           }
-          case 24: {
+          case 26: {
+            org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature.Builder subBuilder = null;
+            if (idsigCase_ == 3) {
+              subBuilder = ((org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature) idsig_).toBuilder();
+            }
+            idsig_ = input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature.PARSER, extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom((org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature) idsig_);
+              idsig_ = subBuilder.buildPartial();
+            }
             idsigCase_ = 3;
+            break;
+          }
+          case 32: {
+            idsigCase_ = 4;
             idsig_ = input.readInt64();
             break;
           }
@@ -124,7 +137,8 @@ public final class IdSignature extends
       implements org.jetbrains.kotlin.protobuf.Internal.EnumLite {
     PUBLIC_SIG(1),
     PRIVATE_SIG(2),
-    BUILTIN_SIG(3),
+    ACCESSOR_SIG(3),
+    BUILTIN_SIG(4),
     IDSIG_NOT_SET(0);
     private int value = 0;
     private IdsigCase(int value) {
@@ -134,7 +148,8 @@ public final class IdSignature extends
       switch (value) {
         case 1: return PUBLIC_SIG;
         case 2: return PRIVATE_SIG;
-        case 3: return BUILTIN_SIG;
+        case 3: return ACCESSOR_SIG;
+        case 4: return BUILTIN_SIG;
         case 0: return IDSIG_NOT_SET;
         default: throw new java.lang.IllegalArgumentException(
           "Value is undefined for this oneof enum.");
@@ -185,18 +200,35 @@ public final class IdSignature extends
     return org.jetbrains.kotlin.backend.common.serialization.proto.FileLocalIdSignature.getDefaultInstance();
   }
 
-  public static final int BUILTIN_SIG_FIELD_NUMBER = 3;
+  public static final int ACCESSOR_SIG_FIELD_NUMBER = 3;
   /**
-   * <code>optional int64 builtin_sig = 3;</code>
+   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
    */
-  public boolean hasBuiltinSig() {
+  public boolean hasAccessorSig() {
     return idsigCase_ == 3;
   }
   /**
-   * <code>optional int64 builtin_sig = 3;</code>
+   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
+   */
+  public org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature getAccessorSig() {
+    if (idsigCase_ == 3) {
+       return (org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature) idsig_;
+    }
+    return org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature.getDefaultInstance();
+  }
+
+  public static final int BUILTIN_SIG_FIELD_NUMBER = 4;
+  /**
+   * <code>optional int64 builtin_sig = 4;</code>
+   */
+  public boolean hasBuiltinSig() {
+    return idsigCase_ == 4;
+  }
+  /**
+   * <code>optional int64 builtin_sig = 4;</code>
    */
   public long getBuiltinSig() {
-    if (idsigCase_ == 3) {
+    if (idsigCase_ == 4) {
       return (java.lang.Long) idsig_;
     }
     return 0L;
@@ -222,6 +254,12 @@ public final class IdSignature extends
         return false;
       }
     }
+    if (hasAccessorSig()) {
+      if (!getAccessorSig().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -236,8 +274,11 @@ public final class IdSignature extends
       output.writeMessage(2, (org.jetbrains.kotlin.backend.common.serialization.proto.FileLocalIdSignature) idsig_);
     }
     if (idsigCase_ == 3) {
+      output.writeMessage(3, (org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature) idsig_);
+    }
+    if (idsigCase_ == 4) {
       output.writeInt64(
-          3, (long)((java.lang.Long) idsig_));
+          4, (long)((java.lang.Long) idsig_));
     }
     output.writeRawBytes(unknownFields);
   }
@@ -258,8 +299,12 @@ public final class IdSignature extends
     }
     if (idsigCase_ == 3) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+        .computeMessageSize(3, (org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature) idsig_);
+    }
+    if (idsigCase_ == 4) {
+      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeInt64Size(
-            3, (long)((java.lang.Long) idsig_));
+            4, (long)((java.lang.Long) idsig_));
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -389,6 +434,9 @@ public final class IdSignature extends
       if (idsigCase_ == 3) {
         result.idsig_ = idsig_;
       }
+      if (idsigCase_ == 4) {
+        result.idsig_ = idsig_;
+      }
       result.bitField0_ = to_bitField0_;
       result.idsigCase_ = idsigCase_;
       return result;
@@ -403,6 +451,10 @@ public final class IdSignature extends
         }
         case PRIVATE_SIG: {
           mergePrivateSig(other.getPrivateSig());
+          break;
+        }
+        case ACCESSOR_SIG: {
+          mergeAccessorSig(other.getAccessorSig());
           break;
         }
         case BUILTIN_SIG: {
@@ -427,6 +479,12 @@ public final class IdSignature extends
       }
       if (hasPrivateSig()) {
         if (!getPrivateSig().isInitialized()) {
+          
+          return false;
+        }
+      }
+      if (hasAccessorSig()) {
+        if (!getAccessorSig().isInitialized()) {
           
           return false;
         }
@@ -596,34 +654,98 @@ public final class IdSignature extends
     }
 
     /**
-     * <code>optional int64 builtin_sig = 3;</code>
+     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
      */
-    public boolean hasBuiltinSig() {
+    public boolean hasAccessorSig() {
       return idsigCase_ == 3;
     }
     /**
-     * <code>optional int64 builtin_sig = 3;</code>
+     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
+     */
+    public org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature getAccessorSig() {
+      if (idsigCase_ == 3) {
+        return (org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature) idsig_;
+      }
+      return org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature.getDefaultInstance();
+    }
+    /**
+     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
+     */
+    public Builder setAccessorSig(org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      idsig_ = value;
+
+      idsigCase_ = 3;
+      return this;
+    }
+    /**
+     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
+     */
+    public Builder setAccessorSig(
+        org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature.Builder builderForValue) {
+      idsig_ = builderForValue.build();
+
+      idsigCase_ = 3;
+      return this;
+    }
+    /**
+     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
+     */
+    public Builder mergeAccessorSig(org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature value) {
+      if (idsigCase_ == 3 &&
+          idsig_ != org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature.getDefaultInstance()) {
+        idsig_ = org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature.newBuilder((org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature) idsig_)
+            .mergeFrom(value).buildPartial();
+      } else {
+        idsig_ = value;
+      }
+
+      idsigCase_ = 3;
+      return this;
+    }
+    /**
+     * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
+     */
+    public Builder clearAccessorSig() {
+      if (idsigCase_ == 3) {
+        idsigCase_ = 0;
+        idsig_ = null;
+        
+      }
+      return this;
+    }
+
+    /**
+     * <code>optional int64 builtin_sig = 4;</code>
+     */
+    public boolean hasBuiltinSig() {
+      return idsigCase_ == 4;
+    }
+    /**
+     * <code>optional int64 builtin_sig = 4;</code>
      */
     public long getBuiltinSig() {
-      if (idsigCase_ == 3) {
+      if (idsigCase_ == 4) {
         return (java.lang.Long) idsig_;
       }
       return 0L;
     }
     /**
-     * <code>optional int64 builtin_sig = 3;</code>
+     * <code>optional int64 builtin_sig = 4;</code>
      */
     public Builder setBuiltinSig(long value) {
-      idsigCase_ = 3;
+      idsigCase_ = 4;
       idsig_ = value;
       
       return this;
     }
     /**
-     * <code>optional int64 builtin_sig = 3;</code>
+     * <code>optional int64 builtin_sig = 4;</code>
      */
     public Builder clearBuiltinSig() {
-      if (idsigCase_ == 3) {
+      if (idsigCase_ == 4) {
         idsigCase_ = 0;
         idsig_ = null;
         

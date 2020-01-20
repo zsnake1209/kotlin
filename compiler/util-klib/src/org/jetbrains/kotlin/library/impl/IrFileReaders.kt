@@ -169,7 +169,10 @@ abstract class IrTableReader<K>(file: File, keyReader: ByteBuffer.() -> K) {
 
 class IndexIrTableReader(file: File) : IrTableReader<Long>(file, { long })
 
-data class DeclarationId(val id: Long)
+data class DeclarationIdX(val id: Long)
+data class DeclarationId(val id: Int)
 
-class DeclarationIrTableReader(file: File) : IrTableReader<DeclarationId>(file, { DeclarationId(long) })
-class DeclarationIrMultiTableReader(file: File) : IrMultiTableReader<DeclarationId>(file, { DeclarationId(long) })
+class DeclarationIrTableReaderX(file: File) : IrTableReader<DeclarationIdX>(file, { DeclarationIdX(long) })
+class DeclarationIrTableReader(file: File) : IrTableReader<DeclarationId>(file, { DeclarationId(int) })
+class DeclarationIrMultiTableReaderX(file: File) : IrMultiTableReader<DeclarationIdX>(file, { DeclarationIdX(long) })
+class DeclarationIrMultiTableReader(file: File) : IrMultiTableReader<DeclarationId>(file, { DeclarationId(int) })

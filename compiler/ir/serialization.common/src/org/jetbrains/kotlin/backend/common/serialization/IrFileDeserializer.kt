@@ -40,7 +40,6 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.backend.common.serialization.proto.ClassKind as ProtoClassKind
-import org.jetbrains.kotlin.backend.common.serialization.proto.DescriptorReference as ProtoDescriptorReference
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrAnonymousInit as ProtoAnonymousInit
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlock as ProtoBlock
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrBlockBody as ProtoBlockBody
@@ -116,6 +115,7 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.TypeArguments as 
 import org.jetbrains.kotlin.backend.common.serialization.proto.Visibility as ProtoVisibility
 import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature as ProtoIdSignature
 import org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature as ProtoPublicIdSignature
+import org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature as ProtoAccessorIdSignature
 import org.jetbrains.kotlin.backend.common.serialization.proto.FileLocalIdSignature as ProtoFileLocalIdSignature
 import org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId as ProtoClassAndPackageId
 
@@ -136,7 +136,6 @@ abstract class IrFileDeserializer(
     abstract fun deserializeIrSymbol(index: Int): IrSymbol
     abstract fun deserializeIrType(index: Int): IrType
     abstract fun deserializeIdSignature(index: Int): IdSignature
-    abstract fun deserializeDescriptorReference(proto: ProtoDescriptorReference): DeclarationDescriptor?
     abstract fun deserializeString(index: Int): String
     abstract fun deserializeExpressionBody(index: Int): IrExpression
     abstract fun deserializeStatementBody(index: Int): IrElement
@@ -255,6 +254,20 @@ abstract class IrFileDeserializer(
         return IdSignature.PublicSignature(pkg, cls, memberId, proto.flags)
     }
 
+    private fun deserializeAccessorIdSignature(proto: ProtoAccessorIdSignature): IdSignature.AccessorSignature {
+        val propertySignature = deserializeIdSignature(proto.propertySignature)
+        require(propertySignature is IdSignature.PublicSignature) { "For public accessor corresponding property supposed to be public as well" }
+        val name = deserializeString(proto.name)
+        val hash = proto.accessorHashId
+        val mask = proto.flags
+
+        val accessorSignature = with(propertySignature) {
+            IdSignature.PublicSignature(packageFqn, classFqn.child(Name.special(name)), hash, mask)
+        }
+
+        return IdSignature.AccessorSignature(propertySignature, accessorSignature)
+    }
+
     private fun deserializeFileLocalIdSignature(proto: ProtoFileLocalIdSignature): IdSignature.FileLocalSignature {
         return IdSignature.FileLocalSignature(deserializeIdSignature(proto.container), proto.localId)
     }
@@ -266,6 +279,7 @@ abstract class IrFileDeserializer(
     fun deserializeSignatureData(proto: ProtoIdSignature): IdSignature {
         return when (proto.idsigCase) {
             PUBLIC_SIG -> deserializePublicIdSignature(proto.publicSig)
+            ACCESSOR_SIG -> deserializeAccessorIdSignature(proto.accessorSig)
             PRIVATE_SIG -> deserializeFileLocalIdSignature(proto.privateSig)
             BUILTIN_SIG -> deserializeBuiltInIdSignature(proto.builtinSig)
             else -> error("Unexpected IdSignature kind: ${proto.idsigCase}")

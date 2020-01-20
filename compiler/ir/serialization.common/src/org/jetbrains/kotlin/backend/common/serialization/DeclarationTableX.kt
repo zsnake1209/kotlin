@@ -54,7 +54,7 @@ abstract class GlobalDeclarationTableX(
 
 open class DeclarationTableX(private val globalDeclarationTable: GlobalDeclarationTableX) {
     private val table = mutableMapOf<IrDeclaration, IdSignature>()
-    private val signaturer = globalDeclarationTable.signaturer
+    private val signaturer = globalDeclarationTable.signaturer.also { it.table = this }
 
     private fun IrDeclaration.isLocalDeclaration(): Boolean {
         return !isExportedDeclaration(this)
@@ -69,6 +69,11 @@ open class DeclarationTableX(private val globalDeclarationTable: GlobalDeclarati
         return if (declaration.isLocalDeclaration()) {
             table.getOrPut(declaration) { signaturer.composeFileLocalIdSignature(declaration) }
         } else globalDeclarationTable.computeUniqIdByDeclaration(declaration)
+    }
+
+    fun privateDeclarationSignature(declaration: IrDeclaration, builder: () -> IdSignature): IdSignature {
+        assert(declaration.isLocalDeclaration())
+        return table.getOrPut(declaration) { builder() }
     }
 
     fun uniqIdByDeclaration(declaration: IrDeclaration): IdSignature {

@@ -26,11 +26,20 @@ public interface IdSignatureOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.FileLocalIdSignature getPrivateSig();
 
   /**
-   * <code>optional int64 builtin_sig = 3;</code>
+   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
+   */
+  boolean hasAccessorSig();
+  /**
+   * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature accessor_sig = 3;</code>
+   */
+  org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature getAccessorSig();
+
+  /**
+   * <code>optional int64 builtin_sig = 4;</code>
    */
   boolean hasBuiltinSig();
   /**
-   * <code>optional int64 builtin_sig = 3;</code>
+   * <code>optional int64 builtin_sig = 4;</code>
    */
   long getBuiltinSig();
 }

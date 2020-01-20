@@ -16,16 +16,11 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.KotlinMangler
-import org.jetbrains.kotlin.ir.util.findTopLevelDeclaration
-import org.jetbrains.kotlin.ir.util.lineStartOffsets
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
-import org.jetbrains.kotlin.library.SerializedDeclaration
-import org.jetbrains.kotlin.library.SerializedIrFile
-import org.jetbrains.kotlin.library.SkippedDeclaration
-import org.jetbrains.kotlin.library.TopLevelDeclaration
+import org.jetbrains.kotlin.library.*
 import org.jetbrains.kotlin.library.impl.IrMemoryArrayWriter
 import org.jetbrains.kotlin.library.impl.IrMemoryDeclarationWriter
 import org.jetbrains.kotlin.name.FqName
@@ -119,6 +114,7 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.MemberAccessCommo
 import org.jetbrains.kotlin.backend.common.serialization.proto.ModalityKind as ProtoModalityKind
 import org.jetbrains.kotlin.backend.common.serialization.proto.NullableIrExpression as ProtoNullableIrExpression
 import org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature as ProtoPublicIdSignature
+import org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature as ProtoAccessorIdSignature
 import org.jetbrains.kotlin.backend.common.serialization.proto.TypeArguments as ProtoTypeArguments
 import org.jetbrains.kotlin.backend.common.serialization.proto.Visibility as ProtoVisibility
 
@@ -154,9 +150,6 @@ open class IrFileSerializer(
     private val protoIdSignatureArray = arrayListOf<ProtoIdSignature>()
 
     private val protoBodyArray = mutableListOf<XStatementOrExpression>()
-
-    private val descriptorReferenceSerializer =
-        DescriptorReferenceSerializer(declarationTable, { serializeString(it) }, { serializeFqName(it) }, skipExpects)
 
     sealed class XStatementOrExpression {
         abstract fun toByteArray(): ByteArray
@@ -243,6 +236,19 @@ open class IrFileSerializer(
         return proto.build()
     }
 
+    private fun serializeAccessorSignature(signature: IdSignature.AccessorSignature): ProtoAccessorIdSignature {
+        val proto = ProtoAccessorIdSignature.newBuilder()
+
+        proto.propertySignature = protoIdSignature(signature.propertySignature)
+        with(signature.accessorSignature) {
+            proto.name = serializeString(classFqn.shortName().asString())
+            proto.accessorHashId = id ?: error("Expected hash Id")
+            proto.flags = mask
+        }
+
+        return proto.build()
+    }
+
     private fun serializePrivateSignature(signature: IdSignature.FileLocalSignature): ProtoFileLocalIdSignature {
         val proto = ProtoFileLocalIdSignature.newBuilder()
 
@@ -256,6 +262,7 @@ open class IrFileSerializer(
         val proto = ProtoIdSignature.newBuilder()
         when (idSignature) {
             is IdSignature.PublicSignature -> proto.publicSig = serializePublicSignature(idSignature)
+            is IdSignature.AccessorSignature -> proto.accessorSig = serializeAccessorSignature(idSignature)
             is IdSignature.FileLocalSignature -> proto.privateSig = serializePrivateSignature(idSignature)
             is IdSignature.BuiltInSignature -> proto.builtinSig = idSignature.id
         }
@@ -315,27 +322,16 @@ open class IrFileSerializer(
 
     private fun serializeIrSymbolData(symbol: IrSymbol): ProtoSymbolData {
 
-        val declaration = symbol.owner as? IrDeclaration ?: error("Expected IrDeclaration: ${symbol.owner}")
+        val declaration = symbol.owner as? IrDeclaration ?: error("Expected IrDeclaration: ${symbol.owner.render()}")
 
-        val proto = ProtoSymbolData.newBuilder()
-        proto.kind = protoSymbolKind(symbol)
+        return with(ProtoSymbolData.newBuilder()) {
 
-        proto.idSig = protoIdSignature(declaration)
+            kind = protoSymbolKind(symbol)
+            idSig = protoIdSignature(declaration)
+            uniqIdIndex = declarationTable.uniqIdByDeclaration(declaration).index
 
-        val uniqId =
-            declarationTable.uniqIdByDeclaration(declaration)
-        proto.uniqIdIndex = uniqId.index
-
-        val topLevelUniqId =
-            declarationTable.uniqIdByDeclaration((declaration).findTopLevelDeclaration())
-
-        proto.topLevelUniqIdIndex = topLevelUniqId.index
-
-        descriptorReferenceSerializer.serializeDescriptorReference(declaration)?.let {
-            proto.setDescriptorReference(it)
+            build()
         }
-
-        return proto.build()
     }
 
     fun serializeIrSymbol(symbol: IrSymbol) = protoSymbolMap.getOrPut(symbol) {
@@ -1356,11 +1352,14 @@ open class IrFileSerializer(
             }
 
             val byteArray = serializeDeclaration(it).toByteArray()
-            val uniqId = declarationTable.uniqIdByDeclaration(it)
-            topLevelDeclarations.add(TopLevelDeclaration(uniqId.index, uniqId.isLocal, it.descriptor.toString(), byteArray))
-            if (uniqId.isPublic) {
-                proto.addDeclarationId(uniqId.index)
-            }
+            val idSig = declarationTableX.uniqIdByDeclaration(it)
+            require(idSig === idSig.topLevelSignature()) { "IdSig: $idSig\ntopLevel: ${idSig.topLevelSignature()}" }
+            require(!idSig.isPackageSignature()) { "IsSig: $idSig\nDeclaration: ${it.render()}" }
+
+            // TODO: keep order similar
+            val sigIndex = protoIdSignatureMap[idSig] ?: error("Not found ID for $idSig (${it.render()})")
+            topLevelDeclarations.add(TopLevelDeclarationX(sigIndex, it.descriptor.toString(), byteArray))
+            proto.addDeclarationId(sigIndex)
         }
 
         // TODO: is it Konan specific?
@@ -1369,7 +1368,11 @@ open class IrFileSerializer(
         file.declarations
             .filterIsInstance<IrProperty>()
             .filter { it.backingField?.initializer != null && keepOrderOfProperties(it) }
-            .forEach { proto.addExplicitlyExportedToCompiler(serializeIrSymbol(it.backingField!!.symbol)) }
+            .forEach {
+                val idSig = declarationTableX.uniqIdByDeclaration(it.backingField!!)
+                val sigIndex = protoIdSignatureMap[idSig] ?: error("Not found ID for $idSig (${it.backingField?.render()})")
+                proto.addExplicitlyExportedToCompiler(sigIndex)
+            }
 
         // TODO: Konan specific
 
@@ -1412,10 +1415,7 @@ open class IrFileSerializer(
         if (skipExpects) return
 
         expectActualTable.table.forEach next@{ (expect, actualSymbol) ->
-            val expectSymbol = expectDescriptorToSymbol[expect]
-                ?: error("Could not find expect symbol for expect descriptor $expect")
-            val expectDeclaration = expectSymbol.owner as IrDeclaration
-            val actualDeclaration = actualSymbol.owner as IrDeclaration
+            val expectSymbol = expectDescriptorToSymbol[expect] ?: error("Could not find expect symbol for expect descriptor $expect")
 
             proto.addActuals(
                 ProtoActual.newBuilder()
