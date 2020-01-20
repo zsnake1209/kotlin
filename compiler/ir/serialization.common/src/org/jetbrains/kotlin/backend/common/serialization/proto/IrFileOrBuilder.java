@@ -8,17 +8,29 @@ public interface IrFileOrBuilder extends
     org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
   /**
-   * <code>repeated int64 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1;</code>
+   *
+   * <pre>
+   *  repeated int64 declaration_id = 1;
+   * </pre>
    */
-  java.util.List<java.lang.Long> getDeclarationIdList();
+  java.util.List<java.lang.Integer> getDeclarationIdList();
   /**
-   * <code>repeated int64 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1;</code>
+   *
+   * <pre>
+   *  repeated int64 declaration_id = 1;
+   * </pre>
    */
   int getDeclarationIdCount();
   /**
-   * <code>repeated int64 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1;</code>
+   *
+   * <pre>
+   *  repeated int64 declaration_id = 1;
+   * </pre>
    */
-  long getDeclarationId(int index);
+  int getDeclarationId(int index);
 
   /**
    * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.FileEntry file_entry = 2;</code>

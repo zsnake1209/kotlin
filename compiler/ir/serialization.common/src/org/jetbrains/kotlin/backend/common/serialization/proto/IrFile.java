@@ -55,21 +55,21 @@ public final class IrFile extends
           }
           case 8: {
             if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-              declarationId_ = new java.util.ArrayList<java.lang.Long>();
+              declarationId_ = new java.util.ArrayList<java.lang.Integer>();
               mutable_bitField0_ |= 0x00000001;
             }
-            declarationId_.add(input.readInt64());
+            declarationId_.add(input.readInt32());
             break;
           }
           case 10: {
             int length = input.readRawVarint32();
             int limit = input.pushLimit(length);
             if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
-              declarationId_ = new java.util.ArrayList<java.lang.Long>();
+              declarationId_ = new java.util.ArrayList<java.lang.Integer>();
               mutable_bitField0_ |= 0x00000001;
             }
             while (input.getBytesUntilLimit() > 0) {
-              declarationId_.add(input.readInt64());
+              declarationId_.add(input.readInt32());
             }
             input.popLimit(limit);
             break;
@@ -195,24 +195,36 @@ public final class IrFile extends
 
   private int bitField0_;
   public static final int DECLARATION_ID_FIELD_NUMBER = 1;
-  private java.util.List<java.lang.Long> declarationId_;
+  private java.util.List<java.lang.Integer> declarationId_;
   /**
-   * <code>repeated int64 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1;</code>
+   *
+   * <pre>
+   *  repeated int64 declaration_id = 1;
+   * </pre>
    */
-  public java.util.List<java.lang.Long>
+  public java.util.List<java.lang.Integer>
       getDeclarationIdList() {
     return declarationId_;
   }
   /**
-   * <code>repeated int64 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1;</code>
+   *
+   * <pre>
+   *  repeated int64 declaration_id = 1;
+   * </pre>
    */
   public int getDeclarationIdCount() {
     return declarationId_.size();
   }
   /**
-   * <code>repeated int64 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1;</code>
+   *
+   * <pre>
+   *  repeated int64 declaration_id = 1;
+   * </pre>
    */
-  public long getDeclarationId(int index) {
+  public int getDeclarationId(int index) {
     return declarationId_.get(index);
   }
 
@@ -387,7 +399,7 @@ public final class IrFile extends
                       throws java.io.IOException {
     getSerializedSize();
     for (int i = 0; i < declarationId_.size(); i++) {
-      output.writeInt64(1, declarationId_.get(i));
+      output.writeInt32(1, declarationId_.get(i));
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeMessage(2, fileEntry_);
@@ -417,7 +429,7 @@ public final class IrFile extends
       int dataSize = 0;
       for (int i = 0; i < declarationId_.size(); i++) {
         dataSize += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeInt64SizeNoTag(declarationId_.get(i));
+          .computeInt32SizeNoTag(declarationId_.get(i));
       }
       size += dataSize;
       size += 1 * getDeclarationIdList().size();
@@ -717,56 +729,80 @@ public final class IrFile extends
     }
     private int bitField0_;
 
-    private java.util.List<java.lang.Long> declarationId_ = java.util.Collections.emptyList();
+    private java.util.List<java.lang.Integer> declarationId_ = java.util.Collections.emptyList();
     private void ensureDeclarationIdIsMutable() {
       if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-        declarationId_ = new java.util.ArrayList<java.lang.Long>(declarationId_);
+        declarationId_ = new java.util.ArrayList<java.lang.Integer>(declarationId_);
         bitField0_ |= 0x00000001;
        }
     }
     /**
-     * <code>repeated int64 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1;</code>
+     *
+     * <pre>
+     *  repeated int64 declaration_id = 1;
+     * </pre>
      */
-    public java.util.List<java.lang.Long>
+    public java.util.List<java.lang.Integer>
         getDeclarationIdList() {
       return java.util.Collections.unmodifiableList(declarationId_);
     }
     /**
-     * <code>repeated int64 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1;</code>
+     *
+     * <pre>
+     *  repeated int64 declaration_id = 1;
+     * </pre>
      */
     public int getDeclarationIdCount() {
       return declarationId_.size();
     }
     /**
-     * <code>repeated int64 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1;</code>
+     *
+     * <pre>
+     *  repeated int64 declaration_id = 1;
+     * </pre>
      */
-    public long getDeclarationId(int index) {
+    public int getDeclarationId(int index) {
       return declarationId_.get(index);
     }
     /**
-     * <code>repeated int64 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1;</code>
+     *
+     * <pre>
+     *  repeated int64 declaration_id = 1;
+     * </pre>
      */
     public Builder setDeclarationId(
-        int index, long value) {
+        int index, int value) {
       ensureDeclarationIdIsMutable();
       declarationId_.set(index, value);
       
       return this;
     }
     /**
-     * <code>repeated int64 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1;</code>
+     *
+     * <pre>
+     *  repeated int64 declaration_id = 1;
+     * </pre>
      */
-    public Builder addDeclarationId(long value) {
+    public Builder addDeclarationId(int value) {
       ensureDeclarationIdIsMutable();
       declarationId_.add(value);
       
       return this;
     }
     /**
-     * <code>repeated int64 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1;</code>
+     *
+     * <pre>
+     *  repeated int64 declaration_id = 1;
+     * </pre>
      */
     public Builder addAllDeclarationId(
-        java.lang.Iterable<? extends java.lang.Long> values) {
+        java.lang.Iterable<? extends java.lang.Integer> values) {
       ensureDeclarationIdIsMutable();
       org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
           values, declarationId_);
@@ -774,7 +810,11 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int64 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1;</code>
+     *
+     * <pre>
+     *  repeated int64 declaration_id = 1;
+     * </pre>
      */
     public Builder clearDeclarationId() {
       declarationId_ = java.util.Collections.emptyList();

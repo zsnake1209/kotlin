@@ -189,7 +189,7 @@ fun loadIr(
     val moduleDescriptor = psi2IrContext.moduleDescriptor
 
     val functionFactory = IrFunctionFactory(irBuiltIns, symbolTable)
-    val deserializer = JsIrLinker(moduleDescriptor, JsManglerIr, JsDescriptorMangler, emptyLoggingContext, irBuiltIns, symbolTable)
+    val deserializer = JsIrLinker(JsDescriptorMangler, emptyLoggingContext, irBuiltIns, symbolTable)
 
     val deserializedModuleFragments = sortDependencies(allDependencies.getFullList(), depsDescriptors.descriptors).map {
         deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!

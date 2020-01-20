@@ -27,8 +27,4 @@ class JsIrFileSerializer(
     expectDescriptorToSymbol,
     bodiesOnlyForInlines = bodiesOnlyForInlines,
     skipExpects = skipExpects
-) {
-
-    // Temporary keep order of any property, even of constants
-    override fun keepOrderOfProperties(property: IrProperty): Boolean = true
-}
+)

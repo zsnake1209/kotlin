@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.serialization.signature
 
-import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
+import org.jetbrains.kotlin.backend.common.serialization.DeclarationTableX
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.KotlinMangler
@@ -22,23 +22,18 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
     }
 
     private var localIndex: Long = startIndex
+    lateinit var table: DeclarationTableX
 
-    private inner class PublicIdSigBuilder : IrElementVisitorVoid {
-        private var packageFqn = FqName.ROOT
-        private val classFanSegments = mutableListOf<String>()
-        private var hash_id: Long? = null
-        private var mask = 0L
-        private var tail = false
+    private inner class PublicIdSigBuilder : IdSignatureBuilder<IrDeclaration>(), IrElementVisitorVoid {
 
-        private fun reset() {
-            this.packageFqn = FqName.ROOT
-            this.classFanSegments.clear()
-            this.hash_id = null
-            this.mask = 0L
-            this.tail = false
+        override fun accept(d: IrDeclaration) {
+            d.acceptVoid(this)
         }
 
-        private fun build() = IdSignature.PublicSignature(packageFqn, FqName.fromSegments(classFanSegments), hash_id, mask)
+        private fun collectFqNames(declaration: IrDeclarationWithName) {
+            declaration.parent.acceptVoid(this)
+            classFanSegments.add(declaration.name.asString())
+        }
 
         override fun visitElement(element: IrElement) = error("Unexpected element ${element.render()}")
 
@@ -47,51 +42,41 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
         }
 
         override fun visitClass(declaration: IrClass) {
-            declaration.parent.acceptVoid(this)
-            classFanSegments.add(declaration.name.asString())
+            collectFqNames(declaration)
+            setExpected(declaration.isExpect)
         }
 
-        override fun visitFunction(declaration: IrFunction) {
-            assert(!tail)
-            tail = true
+        override fun visitSimpleFunction(declaration: IrSimpleFunction) {
+            val property = declaration.correspondingPropertySymbol
+            if (property != null) {
+                hash_id_acc = mangler.run { declaration.hashedMangle }
+                property.owner.acceptVoid(this)
+                classFanSegments.add(declaration.name.asString())
+            } else {
+                hash_id = mangler.run { declaration.hashedMangle }
+                collectFqNames(declaration)
+            }
+            setExpected(declaration.isExpect)
+        }
+
+        override fun visitConstructor(declaration: IrConstructor) {
             hash_id = mangler.run { declaration.hashedMangle }
-            declaration.parent.acceptVoid(this)
-            classFanSegments.add(declaration.name.asString())
+            collectFqNames(declaration)
+            setExpected(declaration.isExpect)
         }
 
         override fun visitProperty(declaration: IrProperty) {
-            assert(!tail)
-            tail = true
-//            hash_id = mangler.run { declaration.name.asString().hashMangle }
             hash_id = mangler.run { declaration.hashedMangle }
-            declaration.parent.acceptVoid(this)
-            classFanSegments.add(declaration.name.asString())
+            collectFqNames(declaration)
+            setExpected(declaration.isExpect)
         }
 
         override fun visitTypeAlias(declaration: IrTypeAlias) {
-            assert(!tail)
-            tail = true
-//            hash_id = mangler.run { declaration.name.asString().hashMangle }
-//            hash_id = mangler.run { declaration.hashedMangle }
-            declaration.parent.acceptVoid(this)
-            classFanSegments.add(declaration.name.asString())
+            collectFqNames(declaration)
         }
 
         override fun visitEnumEntry(declaration: IrEnumEntry) {
-            assert(!tail)
-            tail = true
-//            hash_id = mangler.run { declaration.name.asString().hashMangle }
-//            hash_id = mangler.run { declaration.hashedMangle }
-            declaration.parent.acceptVoid(this)
-            classFanSegments.add(declaration.name.asString())
-        }
-
-        fun buildSignature(declaration: IrDeclaration): IdSignature.PublicSignature {
-            reset()
-
-            declaration.acceptVoid(this)
-
-            return build()
+            collectFqNames(declaration)
         }
     }
 
@@ -99,17 +84,27 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
 
     private fun composeContainerIdSignature(container: IrDeclarationParent): IdSignature {
         if (container is IrPackageFragment) return IdSignature.PublicSignature(container.fqName, FqName.ROOT, null, 0)
-        if (container is IrDeclaration) return composeSignatureForDeclaration(container)
+        if (container is IrDeclaration) return table.uniqIdByDeclaration(container)
         error("Unexpected container ${container.render()}")
     }
 
-    fun composePublicIdSignature(declaration: IrDeclaration): IdSignature.PublicSignature {
+    fun composePublicIdSignature(declaration: IrDeclaration): IdSignature {
         assert(mangler.run { declaration.isExported() })
         return publicSignatureBuilder.buildSignature(declaration)
     }
 
-    fun composeFileLocalIdSignature(declaration: IrDeclaration): IdSignature.FileLocalSignature {
+    fun composeFileLocalIdSignature(declaration: IrDeclaration): IdSignature {
         assert(!mangler.run { declaration.isExported() })
-        return IdSignature.FileLocalSignature(composeContainerIdSignature(declaration.parent), ++localIndex)
+
+        return table.privateDeclarationSignature(declaration) {
+            val container = when (declaration) {
+                is IrField -> composeSignatureForDeclaration(declaration.correspondingPropertySymbol!!.owner)
+                is IrSimpleFunction -> declaration.correspondingPropertySymbol?.let {
+                    composeSignatureForDeclaration(it.owner)
+                } ?: composeContainerIdSignature(declaration.parent)
+                else -> composeContainerIdSignature(declaration.parent)
+            }
+            IdSignature.FileLocalSignature(container, ++localIndex)
+        }
     }
 }

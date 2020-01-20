@@ -5,16 +5,23 @@
 
 package org.jetbrains.kotlin.backend.common.serialization.signature
 
+import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.name.FqName
 
 sealed class IdSignature {
 
     abstract val isPublic: Boolean
 
+    open fun isPackageSignature() = false
+
     abstract fun topLevelSignature(): IdSignature
     abstract fun nearestPublicSig(): IdSignature
 
+    abstract fun packageFqName(): FqName
+
     abstract fun render(): String
+
+    val isLocal: Boolean get() = !isPublic
 
     override fun toString(): String {
         return "${if (isPublic) "public" else "private"} ${render()}"
@@ -23,6 +30,8 @@ sealed class IdSignature {
     data class PublicSignature(val packageFqn: FqName, val classFqn: FqName, val id: Long?, val mask: Long) : IdSignature() {
         override val isPublic = true
 
+        override fun packageFqName() = packageFqn
+
         override fun topLevelSignature(): IdSignature {
             if (classFqn.isRoot) {
                 assert(id == null)
@@ -30,22 +39,45 @@ sealed class IdSignature {
                 return this
             }
 
-            val topLevelFqn = FqName(classFqn.pathSegments().first().asString())
-            if (topLevelFqn == classFqn) {
-                if (id != null) return this // Top level functions & properties
-            }
+            val pathSegments = classFqn.pathSegments()
 
-            return PublicSignature(packageFqn, topLevelFqn, null, 0)
+            if (pathSegments.size == 1) return this
+
+            return PublicSignature(packageFqn, FqName(pathSegments.first().asString()), null, mask)
         }
+
+        override fun isPackageSignature(): Boolean = id == null && classFqn.isRoot
+
         override fun nearestPublicSig(): PublicSignature = this
 
-        override fun render(): String = "${packageFqn.asString().replace('.', '/')}/${classFqn.asString()}|$id[${mask.toString(2)}]"
+        override fun render(): String = "${packageFqn.asString()}/${classFqn.asString()}|$id[${mask.toString(2)}]"
 
         override fun toString() = super.toString()
     }
 
+    class AccessorSignature(val propertySignature: IdSignature, val accessorSignature: PublicSignature) : IdSignature() {
+        override val isPublic: Boolean = true
+
+        override fun topLevelSignature() = propertySignature.topLevelSignature()
+
+        override fun nearestPublicSig() = this
+
+        override fun packageFqName() = propertySignature.packageFqName()
+
+        override fun render(): String = accessorSignature.render()
+
+        override fun equals(other: Any?): Boolean {
+            if (other is AccessorSignature) return accessorSignature == other.accessorSignature
+            return accessorSignature == other
+        }
+
+        override fun hashCode(): Int = accessorSignature.hashCode()
+    }
+
     data class FileLocalSignature(val container: IdSignature, val id: Long) : IdSignature() {
         override val isPublic = false
+
+        override fun packageFqName(): FqName = container.packageFqName()
 
         override fun topLevelSignature(): IdSignature {
             val topLevelContainer = container.topLevelSignature()
@@ -70,6 +102,8 @@ sealed class IdSignature {
 
         override fun topLevelSignature(): IdSignature = this // built ins are always top level
         override fun nearestPublicSig(): IdSignature = this
+
+        override fun packageFqName(): FqName = IrBuiltIns.KOTLIN_INTERNAL_IR_FQN
 
         override val isPublic: Boolean = true
         override fun render(): String = "<ß|$mangle>"
