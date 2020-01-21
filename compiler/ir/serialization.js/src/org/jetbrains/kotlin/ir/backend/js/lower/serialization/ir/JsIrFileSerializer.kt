@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 class JsIrFileSerializer(
     logger: LoggingContext,
     declarationTable: DeclarationTable,
-    private val expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>,
+    expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>,
     skipExpects: Boolean,
     bodiesOnlyForInlines: Boolean = false
 ) : IrFileSerializer(

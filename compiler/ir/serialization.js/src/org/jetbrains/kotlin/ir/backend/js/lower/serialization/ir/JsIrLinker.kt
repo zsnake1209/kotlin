@@ -13,17 +13,11 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
-import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.resolve.descriptorUtil.isPublishedApi
 
-class JsIrLinker(
-    descriptorMangler: KotlinMangler.DescriptorMangler,
-    logger: LoggingContext,
-    builtIns: IrBuiltIns,
-    symbolTable: SymbolTable
-) : KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, descriptorMangler, JsManglerIr),
-    DescriptorUniqIdAware by DeserializedDescriptorUniqIdAware {
+class JsIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable) :
+    KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, JsManglerIr) {
 
     override fun reader(moduleDescriptor: ModuleDescriptor, fileIndex: Int, idSigIndex: Int) =
         moduleDescriptor.kotlinLibrary.irDeclaration(idSigIndex, fileIndex)

@@ -5,15 +5,13 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.UniqId
 
-abstract class IrDelegatingSymbol<S: IrBindableSymbol<D, B>, B: IrSymbolOwner, D: DeclarationDescriptor>(var delegate: S)
-    : IrBindableSymbol<D, B> {
+abstract class IrDelegatingSymbol<S : IrBindableSymbol<D, B>, B : IrSymbolOwner, D : DeclarationDescriptor>(var delegate: S) :
+    IrBindableSymbol<D, B> {
     override val owner: B get() = delegate.owner
     override val descriptor: D get() = delegate.descriptor
     override val isBound: Boolean get() = delegate.isBound
     override val isPublicApi: Boolean
         get() = delegate.isPublicApi
-    override val uniqId: UniqId
-        get() = delegate.uniqId
 
     override val signature: IdSignature
         get() = delegate.signature
@@ -22,7 +20,7 @@ abstract class IrDelegatingSymbol<S: IrBindableSymbol<D, B>, B: IrSymbolOwner, D
     override fun hashCode() = delegate.hashCode()
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (this === delegate) return true
+        if (delegate === other) return true
         return false
     }
 }

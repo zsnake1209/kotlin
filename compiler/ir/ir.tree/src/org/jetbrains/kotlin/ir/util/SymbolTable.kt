@@ -91,7 +91,6 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
 
         abstract fun get(d: D): S?
         abstract fun set(d: D, s: S)
-        abstract fun get(uid: UniqId): S?
         abstract fun get(sig: IdSignature): S?
 
         inline fun declare(d: D, createSymbol: () -> S, createOwner: (S) -> B): B {
@@ -101,24 +100,6 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
                 "Non-original descriptor in declaration: $d\n\tExpected: $d0"
             }
             val existing = get(d0)
-            val symbol = if (existing == null) {
-                val new = createSymbol()
-                set(d0, new)
-                new
-            } else {
-                unboundSymbols.remove(existing)
-                existing
-            }
-            return createOwner(symbol)
-        }
-
-        inline fun declare(id: UniqId, d: D, createSymbol: () -> S, createOwner: (S) -> B): B {
-            @Suppress("UNCHECKED_CAST")
-            val d0 = d.original as D
-            assert(d0 === d) {
-                "Non-original descriptor in declaration: $d\n\tExpected: $d0"
-            }
-            val existing = get(id)
             val symbol = if (existing == null) {
                 val new = createSymbol()
                 set(d0, new)
@@ -166,22 +147,11 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
             return s
         }
 
-        inline fun referenced(uid: UniqId, orElse: () -> S): S {
-            return get(uid) ?: run {
-                val new = orElse()
-                assert(unboundSymbols.add(new)) {
-                    "Symbol for ${new.uniqId} was already referenced"
-                }
-                set(new.descriptor, new)
-                new
-            }
-        }
-
         inline fun referenced(sig: IdSignature, orElse: () -> S): S {
             return get(sig) ?: run {
                 val new = orElse()
                 assert(unboundSymbols.add(new)) {
-                    "Symbol for ${new.uniqId} was already referenced"
+                    "Symbol for ${new.signature} was already referenced"
                 }
                 set(new.descriptor, new)
                 new
@@ -191,7 +161,6 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
 
     private open inner class FlatSymbolTable<D : DeclarationDescriptor, B : IrSymbolOwner, S : IrBindableSymbol<D, B>> : SymbolTableBase<D, B, S>() {
         val descriptorToSymbol = linkedMapOf<D, S>()
-        val uniqIdToSymbol = linkedMapOf<UniqId, S>()
         val idSigToSymbol = linkedMapOf<IdSignature, S>()
 
         protected open fun signature(descriptor: D): IdSignature? = signaturer.composeSignature(descriptor)
@@ -217,8 +186,6 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
             }
         }
 
-        override fun get(uid: UniqId): S? = uniqIdToSymbol[uid]
-
         override fun get(sig: IdSignature): S? = idSigToSymbol[sig]
     }
 
@@ -234,7 +201,6 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
         : SymbolTableBase<D, B, S>() {
         inner class Scope(val owner: DeclarationDescriptor, val parent: Scope?) {
             private val descriptorToSymbol = linkedMapOf<D, S>()
-            private val uniqIdToSymbol = linkedMapOf<UniqId, S>()
             private val idSigToSymbol = linkedMapOf<IdSignature, S>()
 
             private fun getByDescriptor(d: D): S? {
@@ -269,8 +235,6 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
                 }
             }
 
-            operator fun get(uid: UniqId): S? = uniqIdToSymbol[uid] ?: parent?.get(uid)
-
             operator fun get(sig: IdSignature): S? = idSigToSymbol[sig] ?: parent?.get(sig)
 
             fun dumpTo(stringBuilder: StringBuilder): StringBuilder =
@@ -296,11 +260,6 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
         override fun set(d: D, s: S) {
             val scope = currentScope ?: throw AssertionError("No active scope")
             scope[d] = s
-        }
-
-        override fun get(uid: UniqId): S? {
-            val scope = currentScope ?: return null
-            return scope[uid]
         }
 
         override fun get(sig: IdSignature): S? {
@@ -430,8 +389,8 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
     override fun referenceClass(descriptor: ClassDescriptor) =
         classSymbolTable.referenced(descriptor) { createClassSymbol(descriptor) }
 
-    private fun createBuiltInClassSymbol(descriptor: ClassDescriptor, mangle: String): IrClassSymbol {
-        return mangler.run { IrClassPublicSymbolImpl(descriptor, IdSignature.BuiltInSignature(mangle, mangle.hashMangle())) }
+    private fun createBuiltInClassSymbol(descriptor: ClassDescriptor, sig: IdSignature): IrClassSymbol {
+        return mangler.run { IrClassPublicSymbolImpl(descriptor, sig) }
     }
 
     fun declareBuiltInClass(
@@ -439,12 +398,9 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
         mangle: String,
         classFactory: (IrClassSymbol) -> IrClass
     ): IrClass {
-        val id = mangler.run { UniqId(mangle.hashMangle()) }
-        return classSymbolTable.declare(id, descriptor, { createBuiltInClassSymbol(descriptor, mangle) }, classFactory)
+        val sig = mangler.run { IdSignature.BuiltInSignature(mangle, mangle.hashMangle()) }
+        return classSymbolTable.declare(sig, descriptor, { createBuiltInClassSymbol(descriptor, sig) }, classFactory)
     }
-
-    fun referenceBuiltInClass(descriptor: ClassDescriptor, mangle: String) =
-        classSymbolTable.referenced(mangler.run { UniqId(mangle.hashMangle()) }) { createBuiltInClassSymbol(descriptor, mangle) }
 
     override fun referenceClassFromLinker(descriptor: ClassDescriptor, sig: IdSignature): IrClassSymbol =
         classSymbolTable.run {
@@ -480,7 +436,11 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
     override fun referenceConstructor(descriptor: ClassConstructorDescriptor) =
         constructorSymbolTable.referenced(descriptor) { createConstructorSymbol(descriptor) }
 
-    fun declareConstructorFromLinker(descriptor: ClassConstructorDescriptor, sig: IdSignature, constructorFactory: (IrConstructorSymbol) -> IrConstructor): IrConstructor {
+    fun declareConstructorFromLinker(
+        descriptor: ClassConstructorDescriptor,
+        sig: IdSignature,
+        constructorFactory: (IrConstructorSymbol) -> IrConstructor
+    ): IrConstructor {
         return constructorSymbolTable.run {
             if (sig.isPublic) {
                 declare(sig, descriptor, { IrConstructorPublicSymbolImpl(descriptor, sig) }, constructorFactory)
@@ -513,7 +473,11 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
             factory
         )
 
-    fun declareEnumEntryFromLinker(descriptor: ClassDescriptor, sig: IdSignature, factory: (IrEnumEntrySymbol) -> IrEnumEntry): IrEnumEntry {
+    fun declareEnumEntryFromLinker(
+        descriptor: ClassDescriptor,
+        sig: IdSignature,
+        factory: (IrEnumEntrySymbol) -> IrEnumEntry
+    ): IrEnumEntry {
         return enumEntrySymbolTable.run {
             if (sig.isPublic) {
                 declare(sig, descriptor, { IrEnumEntryPublicSymbolImpl(descriptor, sig) }, factory)
@@ -648,12 +612,16 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
     override fun referenceTypeAlias(descriptor: TypeAliasDescriptor): IrTypeAliasSymbol =
         typeAliasSymbolTable.referenced(descriptor) { createTypeAliasSymbol(descriptor) }
 
-    fun declareTypeAliasFromLinker(descriptor: TypeAliasDescriptor, sig: IdSignature, factory: (IrTypeAliasSymbol) -> IrTypeAlias): IrTypeAlias {
+    fun declareTypeAliasFromLinker(
+        descriptor: TypeAliasDescriptor,
+        sig: IdSignature,
+        factory: (IrTypeAliasSymbol) -> IrTypeAlias
+    ): IrTypeAlias {
         return typeAliasSymbolTable.run {
             if (sig.isPublic) {
                 declare(sig, descriptor, { IrTypeAliasPublicSymbolImpl(descriptor, sig) }, factory)
             } else {
-               declare(descriptor, { IrTypeAliasSymbolImpl(descriptor) }, factory)
+                declare(descriptor, { IrTypeAliasSymbolImpl(descriptor) }, factory)
             }
         }
     }
@@ -692,7 +660,11 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
         )
     }
 
-    fun declareSimpleFunctionFromLinker(descriptor: FunctionDescriptor, sig: IdSignature, functionFactory: (IrSimpleFunctionSymbol) -> IrSimpleFunction): IrSimpleFunction {
+    fun declareSimpleFunctionFromLinker(
+        descriptor: FunctionDescriptor,
+        sig: IdSignature,
+        functionFactory: (IrSimpleFunctionSymbol) -> IrSimpleFunction
+    ): IrSimpleFunction {
         return simpleFunctionSymbolTable.run {
             if (sig.isPublic) {
                 declare(sig, descriptor, { IrSimpleFunctionPublicSymbolImpl(descriptor, sig) }, functionFactory)
@@ -702,8 +674,8 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
         }
     }
 
-    private fun createBuiltInOperatorSymbol(descriptor: FunctionDescriptor, mangle: String): IrSimpleFunctionSymbol {
-        return mangler.run { IrSimpleFunctionPublicSymbolImpl(descriptor, IdSignature.BuiltInSignature(mangle, mangle.hashMangle())) }
+    private fun createBuiltInOperatorSymbol(descriptor: FunctionDescriptor, sig: IdSignature): IrSimpleFunctionSymbol {
+        return mangler.run { IrSimpleFunctionPublicSymbolImpl(descriptor, sig) }
     }
 
     fun declareBuiltInOperator(
@@ -711,17 +683,19 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
         mangle: String,
         functionFactory: (IrSimpleFunctionSymbol) -> IrSimpleFunction
     ): IrSimpleFunction {
-        val id = mangler.run { UniqId(mangle.hashMangle()) }
+        val sig = mangler.run { IdSignature.BuiltInSignature(mangle, mangle.hashMangle()) }
         return simpleFunctionSymbolTable.declare(
-            id,
+            sig,
             descriptor,
-            { createBuiltInOperatorSymbol(descriptor, mangle) },
+            { createBuiltInOperatorSymbol(descriptor, sig) },
             functionFactory
         )
     }
 
-    fun referenceBuiltInOperator(descriptor: FunctionDescriptor, mangle: String) =
-        simpleFunctionSymbolTable.referenced(mangler.run { IdSignature.BuiltInSignature(mangle, mangle.hashMangle()) }) { createBuiltInOperatorSymbol(descriptor, mangle) }
+    fun referenceBuiltInOperator(descriptor: FunctionDescriptor, mangle: String): IrSimpleFunctionSymbol {
+        val sig = mangler.run { IdSignature.BuiltInSignature(mangle, mangle.hashMangle()) }
+        return simpleFunctionSymbolTable.referenced(sig) { createBuiltInOperatorSymbol(descriptor, sig) }
+    }
 
     override fun referenceSimpleFunction(descriptor: FunctionDescriptor) =
         simpleFunctionSymbolTable.referenced(descriptor) { createSimpleFunctionSymbol(descriptor) }
@@ -822,7 +796,7 @@ open class SymbolTable(private val signaturer: IdSignatureComposer, val mangler:
     override fun referenceTypeParameterFromLinker(classifier: TypeParameterDescriptor, sig: IdSignature): IrTypeParameterSymbol {
         require(sig.isLocal)
         return scopedTypeParameterSymbolTable.get(classifier)
-                ?: globalTypeParameterSymbolTable.referenced(classifier) { IrTypeParameterSymbolImpl(classifier) }
+            ?: globalTypeParameterSymbolTable.referenced(classifier) { IrTypeParameterSymbolImpl(classifier) }
     }
 
     fun declareVariable(

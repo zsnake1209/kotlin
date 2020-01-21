@@ -87,10 +87,6 @@ class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFragmentSym
     private var _owner: IrExternalPackageFragment? = null
     override val owner get() = _owner!!
 
-    override var uniqId: UniqId
-        get() = error("Operation is unsupported")
-        set(value) { error("Operation is unsupported") }
-
     override val isBound get() = _owner != null
 
     override fun bind(owner: IrExternalPackageFragment) {

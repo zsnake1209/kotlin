@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
-import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
+import org.jetbrains.kotlin.builtins.functions.FunctionClassDescriptor
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.IrElement
@@ -28,8 +28,6 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.protobuf.ExtensionRegistryLite.newInstance
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
-import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor
-import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclaration as ProtoDeclaration
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrFile as ProtoFile
@@ -48,9 +46,8 @@ abstract class KotlinIrLinker(
     val symbolTable: SymbolTable,
     private val exportedDependencies: List<ModuleDescriptor>,
     private val forwardModuleDescriptor: ModuleDescriptor?,
-    private val descriptorMangler: KotlinMangler.DescriptorMangler,
     mangler: KotlinMangler
-) : DescriptorUniqIdAware, IrDeserializer {
+) : IrDeserializer {
 
     private val expectUniqIdToActualUniqId = mutableMapOf<IdSignature, IdSignature>()
     private val topLevelActualUniqItToDeserializer = mutableMapOf<IdSignature, IrModuleDeserializer>()
@@ -66,7 +63,8 @@ abstract class KotlinIrLinker(
         abstract fun addIdSignature(key: IdSignature)
         abstract fun processPendingDeclarations(processor: (T) -> Unit)
 
-        class ModuleDeserializationState(val module: IrModuleDeserializer): DeserializationState<IrModuleDeserializer.IrDeserializerForFile>() {
+        class ModuleDeserializationState(val module: IrModuleDeserializer) :
+            DeserializationState<IrModuleDeserializer.IrDeserializerForFile>() {
             private val filesWithPendingTopLevels = mutableSetOf<IrModuleDeserializer.IrDeserializerForFile>()
 
             fun enqueueFile(fileDeserializer: IrModuleDeserializer.IrDeserializerForFile) {
@@ -92,7 +90,7 @@ abstract class KotlinIrLinker(
             }
         }
 
-        class SimpleDeserializationState: DeserializationState<IdSignature>() {
+        class SimpleDeserializationState : DeserializationState<IdSignature>() {
             private val reachableTopLevels = LinkedHashSet<IdSignature>()
 
             override fun addIdSignature(key: IdSignature) {
@@ -116,19 +114,18 @@ abstract class KotlinIrLinker(
     protected val globalDeserializationState = DeserializationState.SimpleDeserializationState()
     private val modulesWithReachableTopLevels = mutableSetOf<IrModuleDeserializer>()
 
-    val signaturer: IdSignatureDescriptor = IdSignatureDescriptor(descriptorMangler)
-
     //TODO: This is Native specific. Eliminate me.
     private val forwardDeclarations = mutableSetOf<IrSymbol>()
     val resolvedForwardDeclarations = mutableMapOf<IdSignature, IdSignature>()
 
     protected val deserializersForModules = mutableMapOf<ModuleDescriptor, IrModuleDeserializer>()
 
-    private fun getForwardDeclararationModuleDeserializer() = deserializersForModules.entries.single { it.key.isForwardDeclarationModule }.value
+    private fun getForwardDeclararationModuleDeserializer() =
+        deserializersForModules.entries.single { it.key.isForwardDeclarationModule }.value
 
     inner class IrModuleDeserializer(
         private val moduleDescriptor: ModuleDescriptor,
-        private val deserializationStrategy: DeserializationStrategy
+        private val strategy: DeserializationStrategy
     ) {
 
         val fileToDeserializerMap = mutableMapOf<IrFile, IrDeserializerForFile>()
@@ -236,24 +233,27 @@ abstract class KotlinIrLinker(
                 when (proto.kind) {
                     ProtoSymbolKind.ANONYMOUS_INIT_SYMBOL ->
                         IrAnonymousInitializerSymbolImpl(WrappedClassDescriptor()).also { require(idSig.isLocal) }
-                    ProtoSymbolKind.CLASS_SYMBOL -> referenceClassFromLinker(descriptor as ClassDescriptor? ?: WrappedClassDescriptor(), idSig) // TODO: FunctionInterfaces
+                    ProtoSymbolKind.CLASS_SYMBOL ->
+                        referenceClassFromLinker(descriptor as ClassDescriptor? ?: WrappedClassDescriptor(), idSig) // TODO: FunctionInterfaces
                     ProtoSymbolKind.CONSTRUCTOR_SYMBOL -> referenceConstructorFromLinker(WrappedClassConstructorDescriptor(), idSig)
                     ProtoSymbolKind.TYPE_PARAMETER_SYMBOL -> referenceTypeParameterFromLinker(WrappedTypeParameterDescriptor(), idSig)
                     ProtoSymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntryFromLinker(WrappedEnumEntryDescriptor(), idSig)
                     ProtoSymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
                     ProtoSymbolKind.FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
-                    ProtoSymbolKind.FUNCTION_SYMBOL -> referenceSimpleFunctionFromLinker(descriptor as FunctionDescriptor? ?: WrappedSimpleFunctionDescriptor(), idSig) //TODO: FunctionInterfaces
+                    ProtoSymbolKind.FUNCTION_SYMBOL ->
+                        referenceSimpleFunctionFromLinker(descriptor as FunctionDescriptor? ?: WrappedSimpleFunctionDescriptor(), idSig) //TODO: FunctionInterfaces
                     ProtoSymbolKind.TYPEALIAS_SYMBOL -> referenceTypeAliasFromLinker(WrappedTypeAliasDescriptor(), idSig)
                     ProtoSymbolKind.PROPERTY_SYMBOL -> referencePropertyFromLinker(WrappedPropertyDescriptor(), idSig)
                     ProtoSymbolKind.VARIABLE_SYMBOL -> IrVariableSymbolImpl(WrappedVariableDescriptor())
                     ProtoSymbolKind.VALUE_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedValueParameterDescriptor())
                     ProtoSymbolKind.RECEIVER_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedReceiverParameterDescriptor())
-                    ProtoSymbolKind.LOCAL_DELEGATED_PROPERTY_SYMBOL -> IrLocalDelegatedPropertySymbolImpl(WrappedVariableDescriptorWithAccessor())
+                    ProtoSymbolKind.LOCAL_DELEGATED_PROPERTY_SYMBOL ->
+                        IrLocalDelegatedPropertySymbolImpl(WrappedVariableDescriptorWithAccessor())
                     else -> TODO("Unexpected classifier symbol kind: ${proto.kind}")
                 }
             }
 
-            fun loadSymbolData(index: Int): ProtoSymbolData {
+            private fun loadSymbolData(index: Int): ProtoSymbolData {
                 return symbolProtosCache.getOrPut(index) {
                     loadSymbolProto(index)
                 }
@@ -331,8 +331,8 @@ abstract class KotlinIrLinker(
                     val className = fqnParts.first()
 
                     val classDescriptor = builtIns.builtIns.getBuiltInClassByFqName(idSig.packageFqn.child(className))
-                    when (fqnParts.size) {
-                        1 -> return classDescriptor
+                    return when (fqnParts.size) {
+                        1 -> classDescriptor
                         2 -> {
                             val memberName = fqnParts[1]!!
                             val memberDescriptors =
@@ -341,7 +341,7 @@ abstract class KotlinIrLinker(
 
                             val memberDescriptor = memberDescriptors.single()
                             if (idSig.id != null && memberDescriptor is PropertyDescriptor) TODO("... return accessor")
-                            return memberDescriptor
+                            memberDescriptor
                         }
                         else -> error("No member found for signature $idSig")
                     }
@@ -351,7 +351,6 @@ abstract class KotlinIrLinker(
             }
 
             private fun deserializeIrSymbolData(proto: ProtoSymbolData): IrSymbol {
-//                val key = UniqId(proto.uniqIdIndex)
                 val idSignature = deserializeIdSignature(proto.idSig)
                 val deserializationState = findDeserializationState(proto)
 
@@ -413,12 +412,12 @@ abstract class KotlinIrLinker(
                 fileLoops.getOrPut(loopIndex, loopBuilder)
 
             override fun deserializeExpressionBody(index: Int): IrExpression {
-                if (deserializeBodies) {
+                return if (deserializeBodies) {
                     val bodyData = loadExpressionBodyProto(index)
-                    return deserializeExpression(bodyData)
+                    deserializeExpression(bodyData)
                 } else {
                     val errorType = IrErrorTypeImpl(null, emptyList(), Variance.INVARIANT)
-                    return IrErrorExpressionImpl(-1, -1, errorType, "Expression body is not deserialized yet")
+                    IrErrorExpressionImpl(-1, -1, errorType, "Expression body is not deserialized yet")
                 }
             }
 
@@ -459,7 +458,7 @@ abstract class KotlinIrLinker(
             val fileEntry = NaiveSourceBasedFileEntryImpl(fileName, fileProto.fileEntry.lineStartOffsetsList.toIntArray())
 
             val fileDeserializer =
-                IrDeserializerForFile(fileProto.annotationList, fileProto.actualsList, fileIndex, !deserializationStrategy.needBodies).apply {
+                IrDeserializerForFile(fileProto.annotationList, fileProto.actualsList, fileIndex, !strategy.needBodies).apply {
 
                     // Explicitly exported declarations (e.g. top-level initializers) must be deserialized before all other declarations.
                     // Thus we schedule their deserialization in deserializer's constructor.
@@ -488,12 +487,12 @@ abstract class KotlinIrLinker(
 
             fileDeserializer.reversedSignatureIndex = fileSignatureIndex.toMap()
 
-            if (deserializationStrategy.theWholeWorld) {
+            if (strategy.theWholeWorld) {
                 for (id in fileSignatureIndex) {
                     moduleDeserializationState.addIdSignature(id.first)
                 }
                 moduleDeserializationState.enqueueFile(fileDeserializer)
-            } else if (deserializationStrategy.explicitlyExported) {
+            } else if (strategy.explicitlyExported) {
                 moduleDeserializationState.enqueueFile(fileDeserializer)
             }
 
@@ -582,38 +581,24 @@ abstract class KotlinIrLinker(
         require(symbol.isPublicApi)
 
         val descriptor = symbol.descriptor
-        if (descriptor is WrappedDeclarationDescriptor<*>) return null
-        val topLevelDescriptor = descriptor.findTopLevelDescriptor() as DeclarationDescriptorWithVisibility
 
         // This is Native specific. Try to eliminate.
-        if (topLevelDescriptor.module.isForwardDeclarationModule) return null
+//        if (topLevelDescriptor.module.isForwardDeclarationModule) return null
+//        if (!topLevelDescriptor.shouldBeDeserialized()) return null
 
-        //
-        if (!topLevelDescriptor.shouldBeDeserialized()) return null
-
-        require(checkAccessibility(topLevelDescriptor)) {
-            "Locally accessible declarations should not be accessed here $topLevelDescriptor"
-        }
-
-        if (topLevelDescriptor !is DeserializedClassDescriptor && topLevelDescriptor !is DeserializedCallableMemberDescriptor) {
+        if (descriptor is FunctionClassDescriptor || descriptor.containingDeclaration is FunctionClassDescriptor) {
             return null
         }
 
-        val topLevelSignature = signaturer.composeSignature(topLevelDescriptor) ?: error("Expected signature for $topLevelDescriptor")
-        val sig = signaturer.composeSignature(descriptor)!!
-        val topLevelSignature2 = sig.topLevelSignature()
-        require(topLevelSignature == topLevelSignature2) {
-            "Descriptor $descriptor\n  $sig\nTopLevel: $topLevelDescriptor\n  sig1: $topLevelSignature vs sig2: $topLevelSignature2"
-        }
-
-        val moduleOfOrigin = topLevelDescriptor.module
+        val topLevelSignature = symbol.signature.topLevelSignature()
+        val moduleOfOrigin = descriptor.module
 
         val moduleDeserializer = deserializersForModules[moduleOfOrigin] ?: error("No module deserializer found for $moduleOfOrigin")
 
         moduleDeserializer.addModuleReachableTopLevel(topLevelSignature)
 
         deserializeAllReachableTopLevels()
-        return topLevelDescriptor
+        return descriptor
     }
 
     override fun getDeclaration(symbol: IrSymbol): IrDeclaration? {
@@ -625,10 +610,11 @@ abstract class KotlinIrLinker(
         }
 
         // TODO: we do have serializations for those, but let's just create a stub for now.
-        if (!symbol.isBound && (symbol.descriptor.isExpectMember || symbol.descriptor.containingDeclaration?.isExpectMember ?: false)) return null
+        if (!symbol.isBound && (symbol.descriptor.isExpectMember || symbol.descriptor.containingDeclaration?.isExpectMember ?: false))
+            return null
 
         assert(symbol.isBound) {
-            "getDeclaration: symbol ${symbol} is unbound, descriptor = ${symbol.descriptor}, hash = ${symbol.descriptor.hashCode()}"
+            "getDeclaration: symbol ${symbol} is unbound, descriptor = ${symbol.descriptor}, signature = ${symbol.signature}"
         }
 
         return symbol.owner as IrDeclaration

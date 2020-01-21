@@ -645,12 +645,7 @@ abstract class IrFileDeserializer(
         return IrSpreadElementImpl(proto.coordinates.startOffset, proto.coordinates.endOffset, expression)
     }
 
-    private fun deserializeStringConcat(
-        proto: ProtoStringConcat,
-        start: Int,
-        end: Int,
-        type: IrType
-    ): IrStringConcatenation {
+    private fun deserializeStringConcat(proto: ProtoStringConcat, start: Int, end: Int, type: IrType): IrStringConcatenation {
         val argumentProtos = proto.argumentList
         val arguments = mutableListOf<IrExpression>()
 

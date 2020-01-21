@@ -31,8 +31,6 @@ interface IrSymbol {
     val descriptor: DeclarationDescriptor
     val isBound: Boolean
 
-    val uniqId: UniqId
-
     val signature: IdSignature
 
     val isPublicApi: Boolean

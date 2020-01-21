@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.WrappedDeclarationDescriptor
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.util.IdSignature
-import org.jetbrains.kotlin.ir.util.UniqId
 
 abstract class IrPublicSymbolBase<out D : DeclarationDescriptor>(override val descriptor: D, override val signature: IdSignature) : IrSymbol
 
@@ -42,9 +41,6 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
         }
     }
 
-    override val uniqId: UniqId
-        get() = error("...")
-
     override val isPublicApi: Boolean = true
 
     override val isBound: Boolean
@@ -59,16 +55,6 @@ class IrClassPublicSymbolImpl(descriptor: ClassDescriptor, sig: IdSignature) :
 class IrEnumEntryPublicSymbolImpl(descriptor: ClassDescriptor, sig: IdSignature) :
     IrBindablePublicSymbolBase<ClassDescriptor, IrEnumEntry>(descriptor, sig),
     IrEnumEntrySymbol {
-}
-
-class IrFieldPublicSymbolImpl(descriptor: PropertyDescriptor, sig: IdSignature) :
-    IrBindablePublicSymbolBase<PropertyDescriptor, IrField>(descriptor, sig),
-    IrFieldSymbol {
-}
-
-class IrTypeParameterPublicSymbolImpl(descriptor: TypeParameterDescriptor, sig: IdSignature) :
-    IrBindablePublicSymbolBase<TypeParameterDescriptor, IrTypeParameter>(descriptor, sig),
-    IrTypeParameterSymbol {
 }
 
 class IrSimpleFunctionPublicSymbolImpl(descriptor: FunctionDescriptor, sig: IdSignature) :

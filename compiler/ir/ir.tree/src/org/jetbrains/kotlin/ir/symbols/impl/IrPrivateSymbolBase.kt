@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.ir.descriptors.*
 import org.jetbrains.kotlin.ir.expressions.IrReturnableBlock
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.util.IdSignature
-import org.jetbrains.kotlin.ir.util.UniqId
 
 abstract class IrSymbolBase<out D : DeclarationDescriptor>(override val descriptor: D) : IrSymbol
 
@@ -60,8 +59,6 @@ abstract class IrBindableSymbolBase<out D : DeclarationDescriptor, B : IrSymbolO
     }
 
     override val isPublicApi: Boolean = false
-    override val uniqId: UniqId
-        get() = error("UniqId is allowed only for PublicApi symbols")
 
     override val signature: IdSignature
         get() = error("IdSignature is allowed only for PublicApi symbols")

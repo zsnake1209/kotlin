@@ -49,7 +49,7 @@ class JsScriptDependencyCompiler(
         val mangler = JsDescriptorMangler
         val signaturer = IdSignatureDescriptor(mangler)
         val irBuiltIns = IrBuiltIns(builtIns, typeTranslator, mangler, signaturer, symbolTable)
-        val jsLinker = JsIrLinker(JsDescriptorMangler, emptyLoggingContext, irBuiltIns, symbolTable)
+        val jsLinker = JsIrLinker(emptyLoggingContext, irBuiltIns, symbolTable)
 
         val moduleFragment = IrModuleFragmentImpl(moduleDescriptor, irBuiltIns)
         val irDependencies = dependencies.map { jsLinker.deserializeFullModule(it) }
