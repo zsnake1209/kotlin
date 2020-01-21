@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.serialization.signature
 
+import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.name.FqName
 
 abstract class IdSignatureBuilder<D> {

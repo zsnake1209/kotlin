@@ -132,9 +132,7 @@ enum IrSymbolKind {
 
 message IrSymbolData {
   required IrSymbolKind kind = 1;
-
   required int32 id_sig = 2;
-  required int64 uniq_id_index = 3;
 }
 
 message Actual {

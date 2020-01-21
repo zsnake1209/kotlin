@@ -9,19 +9,19 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.WrappedDeclarationDescriptor
 import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.UniqId
 
-abstract class IrPublicSymbolBase<out D : DeclarationDescriptor>(override val descriptor: D, override val uniqId: UniqId) : IrSymbol
+abstract class IrPublicSymbolBase<out D : DeclarationDescriptor>(override val descriptor: D, override val signature: IdSignature) : IrSymbol
 
-abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrSymbolOwner>(
-    descriptor: D, id: UniqId, private val mangle: String
-) :
-    IrBindableSymbol<D, B>, IrPublicSymbolBase<D>(descriptor, id) {
+abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrSymbolOwner>(descriptor: D, sig: IdSignature) :
+    IrBindableSymbol<D, B>, IrPublicSymbolBase<D>(descriptor, sig) {
 
     init {
         assert(isOriginalDescriptor(descriptor)) {
             "Substituted descriptor $descriptor for ${descriptor.original}"
         }
+        assert(sig.isPublic)
     }
 
     private fun isOriginalDescriptor(descriptor: DeclarationDescriptor): Boolean =
@@ -32,15 +32,18 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
 
     private var _owner: B? = null
     override val owner: B
-        get() = _owner ?: throw IllegalStateException("Symbol for $mangle is unbound")
+        get() = _owner ?: throw IllegalStateException("Symbol for $signature is unbound")
 
     override fun bind(owner: B) {
         if (_owner == null) {
             _owner = owner
         } else {
-            throw IllegalStateException("${javaClass.simpleName} for $mangle is already bound")
+            throw IllegalStateException("${javaClass.simpleName} for $signature is already bound")
         }
     }
+
+    override val uniqId: UniqId
+        get() = error("...")
 
     override val isPublicApi: Boolean = true
 
@@ -48,42 +51,42 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
         get() = _owner != null
 }
 
-class IrClassPublicSymbolImpl(descriptor: ClassDescriptor, id: UniqId, m: String) :
-    IrBindablePublicSymbolBase<ClassDescriptor, IrClass>(descriptor, id, m),
+class IrClassPublicSymbolImpl(descriptor: ClassDescriptor, sig: IdSignature) :
+    IrBindablePublicSymbolBase<ClassDescriptor, IrClass>(descriptor, sig),
     IrClassSymbol {
 }
 
-class IrEnumEntryPublicSymbolImpl(descriptor: ClassDescriptor, id: UniqId, m: String) :
-    IrBindablePublicSymbolBase<ClassDescriptor, IrEnumEntry>(descriptor, id, m),
+class IrEnumEntryPublicSymbolImpl(descriptor: ClassDescriptor, sig: IdSignature) :
+    IrBindablePublicSymbolBase<ClassDescriptor, IrEnumEntry>(descriptor, sig),
     IrEnumEntrySymbol {
 }
 
-class IrFieldPublicSymbolImpl(descriptor: PropertyDescriptor, id: UniqId, m: String) :
-    IrBindablePublicSymbolBase<PropertyDescriptor, IrField>(descriptor, id, m),
+class IrFieldPublicSymbolImpl(descriptor: PropertyDescriptor, sig: IdSignature) :
+    IrBindablePublicSymbolBase<PropertyDescriptor, IrField>(descriptor, sig),
     IrFieldSymbol {
 }
 
-class IrTypeParameterPublicSymbolImpl(descriptor: TypeParameterDescriptor, id: UniqId, m: String) :
-    IrBindablePublicSymbolBase<TypeParameterDescriptor, IrTypeParameter>(descriptor, id, m),
+class IrTypeParameterPublicSymbolImpl(descriptor: TypeParameterDescriptor, sig: IdSignature) :
+    IrBindablePublicSymbolBase<TypeParameterDescriptor, IrTypeParameter>(descriptor, sig),
     IrTypeParameterSymbol {
 }
 
-class IrSimpleFunctionPublicSymbolImpl(descriptor: FunctionDescriptor, id: UniqId, m: String) :
-    IrBindablePublicSymbolBase<FunctionDescriptor, IrSimpleFunction>(descriptor, id, m),
+class IrSimpleFunctionPublicSymbolImpl(descriptor: FunctionDescriptor, sig: IdSignature) :
+    IrBindablePublicSymbolBase<FunctionDescriptor, IrSimpleFunction>(descriptor, sig),
     IrSimpleFunctionSymbol {
 }
 
-class IrConstructorPublicSymbolImpl(descriptor: ClassConstructorDescriptor, id: UniqId, m: String) :
-    IrBindablePublicSymbolBase<ClassConstructorDescriptor, IrConstructor>(descriptor, id, m),
+class IrConstructorPublicSymbolImpl(descriptor: ClassConstructorDescriptor, sig: IdSignature) :
+    IrBindablePublicSymbolBase<ClassConstructorDescriptor, IrConstructor>(descriptor, sig),
     IrConstructorSymbol {
 }
 
-class IrPropertyPublicSymbolImpl(descriptor: PropertyDescriptor, id: UniqId, m: String) :
-    IrBindablePublicSymbolBase<PropertyDescriptor, IrProperty>(descriptor, id, m),
+class IrPropertyPublicSymbolImpl(descriptor: PropertyDescriptor, sig: IdSignature) :
+    IrBindablePublicSymbolBase<PropertyDescriptor, IrProperty>(descriptor, sig),
     IrPropertySymbol {
 }
 
-class IrTypeAliasPublicSymbolImpl(descriptor: TypeAliasDescriptor, id: UniqId, m: String) :
-    IrBindablePublicSymbolBase<TypeAliasDescriptor, IrTypeAlias>(descriptor, id, m),
+class IrTypeAliasPublicSymbolImpl(descriptor: TypeAliasDescriptor, sig: IdSignature) :
+    IrBindablePublicSymbolBase<TypeAliasDescriptor, IrTypeAlias>(descriptor, sig),
     IrTypeAliasSymbol {
 }

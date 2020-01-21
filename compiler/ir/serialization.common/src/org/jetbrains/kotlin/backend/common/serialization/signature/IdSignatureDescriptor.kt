@@ -6,9 +6,11 @@
 package org.jetbrains.kotlin.backend.common.serialization.signature
 
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.ir.util.IdSignature
+import org.jetbrains.kotlin.ir.util.IdSignatureComposer
 import org.jetbrains.kotlin.ir.util.KotlinMangler
 
-class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMangler) {
+class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMangler) : IdSignatureComposer {
 
     private inner class DescriptorBasedSignatureBuilder : IdSignatureBuilder<DeclarationDescriptor>(),
         DeclarationDescriptorVisitor<Unit, Nothing?> {
@@ -94,15 +96,15 @@ class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMangler
 
     private val composer = DescriptorBasedSignatureBuilder()
 
-    fun composeSignature(descriptor: DeclarationDescriptor): IdSignature? {
+    override fun composeSignature(descriptor: DeclarationDescriptor): IdSignature? {
         return if (mangler.isExport(descriptor)) {
             composer.buildSignature(descriptor)
         } else null
     }
 
-    fun composeEnumEntrySignature(declarationDescriptor: ClassDescriptor): IdSignature? {
-        return if (mangler.isExportEnumEntry(declarationDescriptor)) {
-            TODO("..")
+    override fun composeEnumEntrySignature(descriptor: ClassDescriptor): IdSignature? {
+        return if (mangler.isExportEnumEntry(descriptor)) {
+            composer.buildSignature(descriptor)
         } else null
     }
 }

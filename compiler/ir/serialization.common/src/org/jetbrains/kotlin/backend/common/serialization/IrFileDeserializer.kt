@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IdSignature.Idsig
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument.KindCase.STAR
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument.KindCase.TYPE
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrVarargElement.VarargElementCase
-import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignature
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -32,10 +31,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.types.impl.*
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.UniqId
-import org.jetbrains.kotlin.ir.util.render
-import org.jetbrains.kotlin.ir.util.withScope
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
@@ -131,8 +127,7 @@ abstract class IrFileDeserializer(
     val symbolTable: SymbolTable
 ) {
 
-    abstract fun deserializeIrSymbolToDeclare(index: Int): Pair<IrSymbol, UniqId>
-    abstract fun deserializeIrSymbolId(index: Int): UniqId
+    abstract fun deserializeIrSymbolToDeclare(index: Int): Pair<IrSymbol, IdSignature>
     abstract fun deserializeIrSymbol(index: Int): IrSymbol
     abstract fun deserializeIrType(index: Int): IrType
     abstract fun deserializeIdSignature(index: Int): IdSignature
@@ -141,7 +136,7 @@ abstract class IrFileDeserializer(
     abstract fun deserializeStatementBody(index: Int): IrElement
     abstract fun deserializeLoopHeader(loopIndex: Int, loopBuilder: () -> IrLoopBase): IrLoopBase
 
-    abstract fun deserializeSymbolId(index: Int): UniqId
+    abstract fun deserializeSymbolId(index: Int): IdSignature
 
     abstract fun referenceIrSymbol(symbol: IrSymbol, index: Int)
 
@@ -950,7 +945,7 @@ abstract class IrFileDeserializer(
 
     private inline fun <T> withDeserializedIrDeclarationBase(
         proto: ProtoDeclarationBase,
-        block: (IrSymbol, UniqId, Int, Int, IrDeclarationOrigin) -> T
+        block: (IrSymbol, IdSignature, Int, Int, IrDeclarationOrigin) -> T
     ): T where T : IrDeclaration, T : IrSymbolOwner {
         val (s, uid) = deserializeIrSymbolToDeclare(proto.symbol)
         val result = block(
@@ -983,13 +978,13 @@ abstract class IrFileDeserializer(
 
         val result = symbolTable.run {
             if (isGlobal) {
-                val (symbol, uid) = deserializeIrSymbolToDeclare(proto.base.symbol)
+                val (symbol, sig) = deserializeIrSymbolToDeclare(proto.base.symbol)
                 val descriptor = (symbol as IrTypeParameterSymbol).descriptor
-                declareGlobalTypeParameterFromLinker(descriptor, uid, factory)
+                declareGlobalTypeParameterFromLinker(descriptor, sig, factory)
             } else {
-                val uid = deserializeSymbolId(proto.base.symbol)
+                val sig = deserializeSymbolId(proto.base.symbol)
                 val descriptor = WrappedTypeParameterDescriptor()
-                declareScopedTypeParameterFromLinker(descriptor, uid, factory)
+                declareScopedTypeParameterFromLinker(descriptor, sig, factory)
             }
         }
 
@@ -1093,10 +1088,10 @@ abstract class IrFileDeserializer(
 
     private inline fun <T : IrFunction> withDeserializedIrFunctionBase(
         proto: ProtoFunctionBase,
-        block: (IrFunctionSymbol, UniqId, Int, Int, IrDeclarationOrigin) -> T
-    ) = withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
+        block: (IrFunctionSymbol, IdSignature, Int, Int, IrDeclarationOrigin) -> T
+    ) = withDeserializedIrDeclarationBase(proto.base) { symbol, idSig, startOffset, endOffset, origin ->
         symbolTable.withScope(symbol.descriptor) {
-            block(symbol as IrFunctionSymbol, uniqId, startOffset, endOffset, origin).usingParent {
+            block(symbol as IrFunctionSymbol, idSig, startOffset, endOffset, origin).usingParent {
                 deserializeTypeParameters(proto.typeParameters.typeParameterList, false)
                 returnType = deserializeIrType(proto.returnType)
                 proto.valueParameterList.mapTo(valueParameters) { deserializeIrValueParameter(it) }
@@ -1113,10 +1108,10 @@ abstract class IrFileDeserializer(
 
     private fun deserializeIrFunction(proto: ProtoFunction): IrSimpleFunction {
         val name = deserializeName(proto.base.name)
-        return withDeserializedIrFunctionBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
+        return withDeserializedIrFunctionBase(proto.base) { symbol, idSig, startOffset, endOffset, origin ->
             logger.log { "### deserializing IrFunction $name" }
 
-            symbolTable.declareSimpleFunctionFromLinker(symbol.descriptor, uniqId) {
+            symbolTable.declareSimpleFunctionFromLinker(symbol.descriptor, idSig) {
                 IrFunctionImpl(
                     startOffset, endOffset, origin,
                     it,
@@ -1196,8 +1191,8 @@ abstract class IrFileDeserializer(
     }
 
     private fun deserializeIrConstructor(proto: ProtoConstructor) =
-        withDeserializedIrFunctionBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin ->
-            symbolTable.declareConstructorFromLinker((symbol as IrConstructorSymbol).descriptor, uniqId) {
+        withDeserializedIrFunctionBase(proto.base) { symbol, idSig, startOffset, endOffset, origin ->
+            symbolTable.declareConstructorFromLinker((symbol as IrConstructorSymbol).descriptor, idSig) {
                 IrConstructorImpl(
                     startOffset, endOffset, origin,
                     it,

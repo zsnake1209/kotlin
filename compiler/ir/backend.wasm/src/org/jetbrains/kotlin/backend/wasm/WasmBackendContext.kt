@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrExternalPackageFragmentSymbolImpl
+import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.UniqId
 import org.jetbrains.kotlin.name.FqName
@@ -97,6 +98,9 @@ class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFragmentSym
     }
 
     override val isPublicApi: Boolean
+        get() = error("Operation is unsupported")
+
+    override val signature: IdSignature
         get() = error("Operation is unsupported")
 }
 

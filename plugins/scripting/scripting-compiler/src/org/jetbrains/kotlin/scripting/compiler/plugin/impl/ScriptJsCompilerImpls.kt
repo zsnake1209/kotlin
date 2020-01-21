@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.scripting.compiler.plugin.impl
 
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.repl.ReplCompileResult
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -21,7 +22,7 @@ import kotlin.script.experimental.api.*
 
 class JsScriptCompilerWithDependenciesProxy(private val environment: KotlinCoreEnvironment) : ScriptCompilerProxy {
     private val nameTables = NameTables(emptyList())
-    private val symbolTable = SymbolTable(JsDescriptorMangler)
+    private val symbolTable = SymbolTable(IdSignatureDescriptor(JsDescriptorMangler), JsDescriptorMangler)
     private val dependencies: List<ModuleDescriptor> = readLibrariesFromConfiguration(environment.configuration)
     private val compiler = JsCoreScriptingCompiler(environment, nameTables, symbolTable, dependencies)
     private var scriptDependencyCompiler: JsScriptDependencyCompiler? =

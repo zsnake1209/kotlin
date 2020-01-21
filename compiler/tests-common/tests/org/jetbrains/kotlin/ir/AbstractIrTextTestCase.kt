@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.ir
 
 import com.intellij.openapi.util.text.StringUtil
 import junit.framework.TestCase
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.cli.js.loadPluginsForTests
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.languageVersionSettings
@@ -62,10 +63,12 @@ abstract class AbstractIrTextTestCase : AbstractIrGeneratorTestCase() {
 
     private fun doTestIrModuleDependencies(wholeFile: File, irModule: IrModuleFragment) {
         val wholeText = wholeFile.readText()
+        val mangler = JsDescriptorMangler
+        val signaturer = IdSignatureDescriptor(mangler)
 
         val stubGenerator = DeclarationStubGenerator(
             irModule.descriptor,
-            SymbolTable(JsDescriptorMangler), // TODO
+            SymbolTable(signaturer, mangler), // TODO
             myEnvironment.configuration.languageVersionSettings
         )
 

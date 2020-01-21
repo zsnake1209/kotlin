@@ -5,9 +5,10 @@
 
 package org.jetbrains.kotlin.backend.common.serialization.signature
 
-import org.jetbrains.kotlin.backend.common.serialization.DeclarationTableX
+import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
@@ -22,7 +23,7 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
     }
 
     private var localIndex: Long = startIndex
-    lateinit var table: DeclarationTableX
+    lateinit var table: DeclarationTable
 
     private inner class PublicIdSigBuilder : IdSignatureBuilder<IrDeclaration>(), IrElementVisitorVoid {
 
@@ -84,7 +85,7 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
 
     private fun composeContainerIdSignature(container: IrDeclarationParent): IdSignature {
         if (container is IrPackageFragment) return IdSignature.PublicSignature(container.fqName, FqName.ROOT, null, 0)
-        if (container is IrDeclaration) return table.uniqIdByDeclaration(container)
+        if (container is IrDeclaration) return table.signatureByDeclaration(container)
         error("Unexpected container ${container.render()}")
     }
 

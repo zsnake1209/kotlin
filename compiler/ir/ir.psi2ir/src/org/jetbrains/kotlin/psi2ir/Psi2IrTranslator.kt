@@ -35,7 +35,8 @@ typealias Psi2IrPostprocessingStep = (IrModuleFragment) -> Unit
 class Psi2IrTranslator(
     val languageVersionSettings: LanguageVersionSettings,
     val configuration: Psi2IrConfiguration = Psi2IrConfiguration(),
-    val mangler: KotlinMangler.DescriptorMangler
+    val mangler: KotlinMangler.DescriptorMangler,
+    val signaturer: IdSignatureComposer
 ) {
     private val postprocessingSteps = SmartList<Psi2IrPostprocessingStep>()
 
@@ -59,10 +60,10 @@ class Psi2IrTranslator(
     fun createGeneratorContext(
         moduleDescriptor: ModuleDescriptor,
         bindingContext: BindingContext,
-        symbolTable: SymbolTable = SymbolTable(mangler),
+        symbolTable: SymbolTable = SymbolTable(signaturer, mangler),
         extensions: GeneratorExtensions = GeneratorExtensions()
     ): GeneratorContext =
-        GeneratorContext(configuration, moduleDescriptor, bindingContext, languageVersionSettings, symbolTable, extensions, mangler)
+        GeneratorContext(configuration, moduleDescriptor, bindingContext, languageVersionSettings, symbolTable, extensions, mangler, signaturer)
 
     fun generateModuleFragment(
         context: GeneratorContext,

@@ -38,37 +38,20 @@ class ManglerChecker(vararg _manglers: KotlinMangler) : IrElementVisitorVoid {
                 val tmp = it.op()
                 if (r != tmp) {
                     onError(prev, r, it, tmp)
-                } else {
-                    prev = it
-                    r = tmp
                 }
+                prev = it
+                r = tmp
             }
         }
 
         return r
     }
 
-    private fun checkIfEnumClass(declaration: IrDeclaration): Boolean {
-        if (declaration is IrClass) {
-            val parent = declaration.parent
-            if (parent is IrClass) {
-                // Note: there is no way to figure that information out using descriptors
-                if (parent.declarations.any { it is IrEnumEntry && it.correspondingClass === declaration }) {
-                    return true
-                }
-            }
-        }
-
-        return false
-    }
-
     override fun visitDeclaration(declaration: IrDeclaration) {
 
         val exported = manglers.checkAllEqual(false, { isExportCheck(declaration) }) { m1, r1, m2, r2 ->
-            if (!checkIfEnumClass(declaration)) {
-                println("${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
-                error("${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
-            }
+            println("${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
+            error("${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
         }
 
         if (!exported) return

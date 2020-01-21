@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.ir.ir2string
-import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignature
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.ClassKind.*
 import org.jetbrains.kotlin.ir.IrElement
@@ -121,7 +120,6 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.Visibility as Pro
 open class IrFileSerializer(
     val logger: LoggingContext,
     private val declarationTable: DeclarationTable,
-    private val declarationTableX: DeclarationTableX,
     private val expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>,
     private val bodiesOnlyForInlines: Boolean = false,
     private val skipExpects: Boolean = false
@@ -270,7 +268,7 @@ open class IrFileSerializer(
     }
 
     private fun protoIdSignature(declaration: IrDeclaration): Int {
-        val idSig = declarationTableX.uniqIdByDeclaration(declaration)
+        val idSig = declarationTable.signatureByDeclaration(declaration)
         return protoIdSignature(idSig)
     }
 
@@ -328,7 +326,6 @@ open class IrFileSerializer(
 
             kind = protoSymbolKind(symbol)
             idSig = protoIdSignature(declaration)
-            uniqIdIndex = declarationTable.uniqIdByDeclaration(declaration).index
 
             build()
         }
@@ -1166,8 +1163,6 @@ open class IrFileSerializer(
     }
 
     private fun serializeIrProperty(property: IrProperty): ProtoProperty {
-        declarationTable.uniqIdByDeclaration(property)
-
         val proto = ProtoProperty.newBuilder()
             .setBase(serializeIrDeclarationBase(property))
             .setIsDelegated(property.isDelegated)
@@ -1352,7 +1347,7 @@ open class IrFileSerializer(
             }
 
             val byteArray = serializeDeclaration(it).toByteArray()
-            val idSig = declarationTableX.uniqIdByDeclaration(it)
+            val idSig = declarationTable.signatureByDeclaration(it)
             require(idSig === idSig.topLevelSignature()) { "IdSig: $idSig\ntopLevel: ${idSig.topLevelSignature()}" }
             require(!idSig.isPackageSignature()) { "IsSig: $idSig\nDeclaration: ${it.render()}" }
 
@@ -1369,7 +1364,7 @@ open class IrFileSerializer(
             .filterIsInstance<IrProperty>()
             .filter { it.backingField?.initializer != null && keepOrderOfProperties(it) }
             .forEach {
-                val idSig = declarationTableX.uniqIdByDeclaration(it.backingField!!)
+                val idSig = declarationTable.signatureByDeclaration(it.backingField!!)
                 val sigIndex = protoIdSignatureMap[idSig] ?: error("Not found ID for $idSig (${it.backingField?.render()})")
                 proto.addExplicitlyExportedToCompiler(sigIndex)
             }

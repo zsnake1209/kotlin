@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.psi2ir.PsiSourceManager
 object JvmBackendFacade {
     fun doGenerateFiles(files: Collection<KtFile>, state: GenerationState, phaseConfig: PhaseConfig) {
         val extensions = JvmGeneratorExtensions()
-        val psi2ir = Psi2IrTranslator(state.languageVersionSettings, mangler = JvmDescriptorMangler)
+        val psi2ir = Psi2IrTranslator(state.languageVersionSettings, mangler = JvmDescriptorMangler, signaturer = TODO("..."))
         val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = extensions)
 
         for (extension in IrGenerationExtension.getInstances(state.project)) {

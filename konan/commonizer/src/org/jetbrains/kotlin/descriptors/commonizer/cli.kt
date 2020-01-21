@@ -5,16 +5,13 @@
 
 package org.jetbrains.kotlin.descriptors.commonizer
 
-import org.jetbrains.kotlin.backend.common.serialization.DescriptorTable
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataMonolithicSerializer
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVersion
 import org.jetbrains.kotlin.backend.common.serialization.metadata.metadataVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.commonizer.ModuleForCommonization.DeserializedModule
 import org.jetbrains.kotlin.descriptors.commonizer.ModuleForCommonization.SyntheticModule
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
-import org.jetbrains.kotlin.ir.util.UniqId
 import org.jetbrains.kotlin.konan.library.*
 import org.jetbrains.kotlin.konan.library.KonanFactories.DefaultDeserializedDescriptorFactory
 import org.jetbrains.kotlin.konan.properties.propertyList
@@ -230,7 +227,6 @@ private fun saveModules(
     val serializer = KlibMetadataMonolithicSerializer(
         languageVersionSettings = LanguageVersionSettingsImpl.DEFAULT,
         metadataVersion = KlibMetadataVersion.INSTANCE,
-        descriptorTable = EmptyDescriptorTable,
         skipExpects = false
     )
 
@@ -316,13 +312,6 @@ private data class SensitiveManifestData(
             exportForwardDeclarations = library.exportForwardDeclarations
         )
     }
-}
-
-private object EmptyDescriptorTable : DescriptorTable {
-    private const val DEFAULT_UNIQ_ID_INDEX = 0L
-
-    override fun put(descriptor: DeclarationDescriptor, uniqId: UniqId) = error("unsupported")
-    override fun get(descriptor: DeclarationDescriptor): Long = DEFAULT_UNIQ_ID_INDEX
 }
 
 private fun writeLibrary(

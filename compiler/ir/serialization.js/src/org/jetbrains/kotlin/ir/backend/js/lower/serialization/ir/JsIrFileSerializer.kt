@@ -8,22 +8,18 @@ package org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir
 import org.jetbrains.kotlin.backend.common.LoggingContext
 import org.jetbrains.kotlin.backend.common.serialization.IrFileSerializer
 import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
-import org.jetbrains.kotlin.backend.common.serialization.DeclarationTableX
-import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 
 class JsIrFileSerializer(
     logger: LoggingContext,
     declarationTable: DeclarationTable,
-    declarationTableX: DeclarationTableX,
     private val expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>,
     skipExpects: Boolean,
     bodiesOnlyForInlines: Boolean = false
 ) : IrFileSerializer(
     logger,
     declarationTable,
-    declarationTableX,
     expectDescriptorToSymbol,
     bodiesOnlyForInlines = bodiesOnlyForInlines,
     skipExpects = skipExpects

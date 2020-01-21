@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.scripting.repl.js
 
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.cli.common.repl.*
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsDescriptorMangler
@@ -22,7 +23,7 @@ class JsReplCompiler(private val environment: KotlinCoreEnvironment) : ReplCompi
             NameTables(emptyList()),
             readLibrariesFromConfiguration(environment.configuration),
             ReplCodeAnalyzer.ResettableAnalyzerState(),
-            SymbolTable(JsDescriptorMangler)
+            SymbolTable(IdSignatureDescriptor(JsDescriptorMangler), JsDescriptorMangler)
         )
     }
 

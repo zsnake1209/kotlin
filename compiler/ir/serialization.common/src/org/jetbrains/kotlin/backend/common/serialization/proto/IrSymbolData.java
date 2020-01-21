@@ -70,11 +70,6 @@ public final class IrSymbolData extends
             idSig_ = input.readInt32();
             break;
           }
-          case 24: {
-            bitField0_ |= 0x00000004;
-            uniqIdIndex_ = input.readInt64();
-            break;
-          }
         }
       }
     } catch (org.jetbrains.kotlin.protobuf.InvalidProtocolBufferException e) {
@@ -128,36 +123,28 @@ public final class IrSymbolData extends
   private int idSig_;
   /**
    * <code>required int32 id_sig = 2;</code>
+   *
+   * <pre>
+   *  required int64 uniq_id_index = 3;
+   * </pre>
    */
   public boolean hasIdSig() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
    * <code>required int32 id_sig = 2;</code>
+   *
+   * <pre>
+   *  required int64 uniq_id_index = 3;
+   * </pre>
    */
   public int getIdSig() {
     return idSig_;
   }
 
-  public static final int UNIQ_ID_INDEX_FIELD_NUMBER = 3;
-  private long uniqIdIndex_;
-  /**
-   * <code>required int64 uniq_id_index = 3;</code>
-   */
-  public boolean hasUniqIdIndex() {
-    return ((bitField0_ & 0x00000004) == 0x00000004);
-  }
-  /**
-   * <code>required int64 uniq_id_index = 3;</code>
-   */
-  public long getUniqIdIndex() {
-    return uniqIdIndex_;
-  }
-
   private void initFields() {
     kind_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind.FUNCTION_SYMBOL;
     idSig_ = 0;
-    uniqIdIndex_ = 0L;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -173,10 +160,6 @@ public final class IrSymbolData extends
       memoizedIsInitialized = 0;
       return false;
     }
-    if (!hasUniqIdIndex()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -189,9 +172,6 @@ public final class IrSymbolData extends
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeInt32(2, idSig_);
-    }
-    if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeInt64(3, uniqIdIndex_);
     }
     output.writeRawBytes(unknownFields);
   }
@@ -209,10 +189,6 @@ public final class IrSymbolData extends
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeInt32Size(2, idSig_);
-    }
-    if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt64Size(3, uniqIdIndex_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -312,8 +288,6 @@ public final class IrSymbolData extends
       bitField0_ = (bitField0_ & ~0x00000001);
       idSig_ = 0;
       bitField0_ = (bitField0_ & ~0x00000002);
-      uniqIdIndex_ = 0L;
-      bitField0_ = (bitField0_ & ~0x00000004);
       return this;
     }
 
@@ -345,10 +319,6 @@ public final class IrSymbolData extends
         to_bitField0_ |= 0x00000002;
       }
       result.idSig_ = idSig_;
-      if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-        to_bitField0_ |= 0x00000004;
-      }
-      result.uniqIdIndex_ = uniqIdIndex_;
       result.bitField0_ = to_bitField0_;
       return result;
     }
@@ -361,9 +331,6 @@ public final class IrSymbolData extends
       if (other.hasIdSig()) {
         setIdSig(other.getIdSig());
       }
-      if (other.hasUniqIdIndex()) {
-        setUniqIdIndex(other.getUniqIdIndex());
-      }
       setUnknownFields(
           getUnknownFields().concat(other.unknownFields));
       return this;
@@ -375,10 +342,6 @@ public final class IrSymbolData extends
         return false;
       }
       if (!hasIdSig()) {
-        
-        return false;
-      }
-      if (!hasUniqIdIndex()) {
         
         return false;
       }
@@ -442,18 +405,30 @@ public final class IrSymbolData extends
     private int idSig_ ;
     /**
      * <code>required int32 id_sig = 2;</code>
+     *
+     * <pre>
+     *  required int64 uniq_id_index = 3;
+     * </pre>
      */
     public boolean hasIdSig() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>required int32 id_sig = 2;</code>
+     *
+     * <pre>
+     *  required int64 uniq_id_index = 3;
+     * </pre>
      */
     public int getIdSig() {
       return idSig_;
     }
     /**
      * <code>required int32 id_sig = 2;</code>
+     *
+     * <pre>
+     *  required int64 uniq_id_index = 3;
+     * </pre>
      */
     public Builder setIdSig(int value) {
       bitField0_ |= 0x00000002;
@@ -463,42 +438,14 @@ public final class IrSymbolData extends
     }
     /**
      * <code>required int32 id_sig = 2;</code>
+     *
+     * <pre>
+     *  required int64 uniq_id_index = 3;
+     * </pre>
      */
     public Builder clearIdSig() {
       bitField0_ = (bitField0_ & ~0x00000002);
       idSig_ = 0;
-      
-      return this;
-    }
-
-    private long uniqIdIndex_ ;
-    /**
-     * <code>required int64 uniq_id_index = 3;</code>
-     */
-    public boolean hasUniqIdIndex() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>required int64 uniq_id_index = 3;</code>
-     */
-    public long getUniqIdIndex() {
-      return uniqIdIndex_;
-    }
-    /**
-     * <code>required int64 uniq_id_index = 3;</code>
-     */
-    public Builder setUniqIdIndex(long value) {
-      bitField0_ |= 0x00000004;
-      uniqIdIndex_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required int64 uniq_id_index = 3;</code>
-     */
-    public Builder clearUniqIdIndex() {
-      bitField0_ = (bitField0_ & ~0x00000004);
-      uniqIdIndex_ = 0L;
       
       return this;
     }

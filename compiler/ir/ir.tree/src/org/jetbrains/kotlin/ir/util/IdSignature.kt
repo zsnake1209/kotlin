@@ -3,8 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.common.serialization.signature
+package org.jetbrains.kotlin.ir.util
 
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.name.FqName
 
@@ -114,4 +116,9 @@ sealed class IdSignature {
 
         override fun hashCode(): Int = id.toInt()
     }
+}
+
+interface IdSignatureComposer {
+    fun composeSignature(descriptor: DeclarationDescriptor): IdSignature?
+    fun composeEnumEntrySignature(descriptor: ClassDescriptor): IdSignature?
 }

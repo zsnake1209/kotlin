@@ -57,14 +57,14 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
         builder.append(name)
     }
 
-    private fun IrFunction.mangleFunction(isCtor: Boolean, prefix: Boolean) {
+    private fun IrFunction.mangleFunction(isCtor: Boolean, prefix: Boolean, container: IrDeclaration) {
 
         isRealExpect = isRealExpect or isExpect
 
         val prefixLength = addPrefix("kfun", prefix)
 
-        typeParameterContainer.add(this)
-        parent.accept(this@IrMangleComputer, false)
+        typeParameterContainer.add(container)
+        container.parent.accept(this@IrMangleComputer, false)
 
         if (prefixLength != builder.length) builder.append('.')
 
@@ -171,11 +171,6 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
     override fun visitElement(element: IrElement, data: Boolean) = error("unexpected element ${element.render()}")
 
     override fun visitClass(declaration: IrClass, data: Boolean) {
-        if (data && declaration.isBuiltFunctionClass()) {
-            builder.append(KotlinMangler.functionClassSymbolName(declaration.name))
-            return
-        }
-
         isRealExpect = isRealExpect or declaration.isExpect
         typeParameterContainer.add(declaration)
         declaration.mangleSimpleDeclaration("kclass", data, declaration.name.asString())
@@ -207,7 +202,8 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
         if (data && isRealExpect) builder.append("#expect")
     }
 
-    override fun visitField(declaration: IrField, data: Boolean) = declaration.mangleSimpleDeclaration("kfield", data, declaration.name.asString())
+    override fun visitField(declaration: IrField, data: Boolean) =
+        declaration.mangleSimpleDeclaration("kfield", data, declaration.name.asString())
 
     override fun visitEnumEntry(declaration: IrEnumEntry, data: Boolean) {
         declaration.mangleSimpleDeclaration("kenumentry", data, declaration.name.asString())
@@ -228,50 +224,15 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
 
         isRealExpect = isRealExpect or declaration.isExpect
 
-        declaration.correspondingPropertySymbol?.let {
-            manglePropertyAccessor(it.owner, declaration, data)
-            return
-        }
-
-        if (declaration.parent.let { it is IrClass && it.isBuiltFunctionClass() }) {
-            if (declaration.name.asString() == "invoke") {
-                builder.append(KotlinMangler.functionInvokeSymbolName(declaration.parentAsClass.name))
-                return
-            }
-        }
-
         declaration.platformSpecificFunctionName?.let {
             builder.append(it)
             return
         }
 
-        declaration.mangleFunction(false, data)
+        val container = declaration.correspondingPropertySymbol?.owner ?: declaration
+
+        declaration.mangleFunction(false, data, container)
     }
 
-    private fun manglePropertyAccessor(property: IrProperty, declaration: IrSimpleFunction, data: Boolean) {
-        val length = addPrefix("kfun", data)
-
-        typeParameterContainer.add(property)
-        isRealExpect = isRealExpect or property.isExpect
-        property.parent.accept(this, false)
-
-        if (length != builder.length) builder.append('.')
-        builder.append('#')
-        builder.append(property.name)
-
-        declaration.extensionReceiverParameter?.let { e ->
-            builder.append('@')
-            mangleValueParameter(builder, e)
-        }
-
-        if (property.getter === declaration) {
-            builder.append(":getter:")
-        } else {
-            builder.append(":setter:")
-        }
-
-        if (data && isRealExpect) builder.append("#expect")
-    }
-
-    override fun visitConstructor(declaration: IrConstructor, data: Boolean) = declaration.mangleFunction(true, data)
+    override fun visitConstructor(declaration: IrConstructor, data: Boolean) = declaration.mangleFunction(true, data, declaration)
 }

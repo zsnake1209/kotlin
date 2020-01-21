@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.ir
 
 import org.jetbrains.kotlin.analyzer.AnalysisResult
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.backend.jvm.JvmGeneratorExtensions
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -84,7 +85,9 @@ abstract class AbstractIrGeneratorTestCase : CodegenTestCase() {
     protected open fun generateIrModule(ignoreErrors: Boolean = false): IrModuleFragment {
         assert(myFiles != null) { "myFiles not initialized" }
         assert(myEnvironment != null) { "myEnvironment not initialized" }
-        return doGenerateIrModule(Psi2IrTranslator(myEnvironment.configuration.languageVersionSettings, Psi2IrConfiguration(ignoreErrors), JsDescriptorMangler))
+        val mangler = JsDescriptorMangler
+        val signaturer = IdSignatureDescriptor(mangler)
+        return doGenerateIrModule(Psi2IrTranslator(myEnvironment.configuration.languageVersionSettings, Psi2IrConfiguration(ignoreErrors), mangler, signaturer))
     }
 
     protected open fun doGenerateIrModule(psi2IrTranslator: Psi2IrTranslator): IrModuleFragment =

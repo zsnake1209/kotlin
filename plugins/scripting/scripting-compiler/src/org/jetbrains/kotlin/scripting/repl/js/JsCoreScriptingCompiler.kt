@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.scripting.repl.js
 
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
@@ -61,8 +62,9 @@ class JsCoreScriptingCompiler(
 
         val module = analysisResult.moduleDescriptor
         val bindingContext = analysisResult.bindingContext
-
-        val psi2ir = Psi2IrTranslator(environment.configuration.languageVersionSettings, mangler = JsDescriptorMangler)
+        val mangler = JsDescriptorMangler
+        val signaturer = IdSignatureDescriptor(mangler)
+        val psi2ir = Psi2IrTranslator(environment.configuration.languageVersionSettings, mangler = mangler, signaturer = signaturer)
         val psi2irContext = psi2ir.createGeneratorContext(module, bindingContext, symbolTable)
 
         val irModuleFragment = psi2irContext.generateModuleFragment(listOf(snippetKtFile))

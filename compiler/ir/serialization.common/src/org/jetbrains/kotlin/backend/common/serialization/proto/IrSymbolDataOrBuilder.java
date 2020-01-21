@@ -18,19 +18,18 @@ public interface IrSymbolDataOrBuilder extends
 
   /**
    * <code>required int32 id_sig = 2;</code>
+   *
+   * <pre>
+   *  required int64 uniq_id_index = 3;
+   * </pre>
    */
   boolean hasIdSig();
   /**
    * <code>required int32 id_sig = 2;</code>
+   *
+   * <pre>
+   *  required int64 uniq_id_index = 3;
+   * </pre>
    */
   int getIdSig();
-
-  /**
-   * <code>required int64 uniq_id_index = 3;</code>
-   */
-  boolean hasUniqIdIndex();
-  /**
-   * <code>required int64 uniq_id_index = 3;</code>
-   */
-  long getUniqIdIndex();
 }

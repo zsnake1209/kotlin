@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.backend.common.serialization.mangle.classic
 
 import org.jetbrains.kotlin.backend.common.ir.isProperExpect
-import org.jetbrains.kotlin.backend.common.serialization.isBuiltInFunction
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
@@ -107,7 +106,6 @@ abstract class ClassicMangleComputer : KotlinMangleComputer<IrDeclaration> {
     }
 
     open fun IrFunction.typeParamsPart(typeParameters: List<IrTypeParameter>, typeParameterNamer: (IrTypeParameter) -> String?): String {
-//        if (typeParameters.isEmpty()) return ""
 
         fun mangleTypeParameter(index: Int, typeParameter: IrTypeParameter): String {
             // We use type parameter index instead of name since changing name is not a binary-incompatible change
@@ -154,14 +152,6 @@ abstract class ClassicMangleComputer : KotlinMangleComputer<IrDeclaration> {
                 }
             }
 
-            if (isAccessor) {
-                val property = (this as IrSimpleFunction).correspondingPropertySymbol!!.owner
-                val suffix = if (this === property.getter) ":getter:" else ":setter:"
-                val extensionReceiverPart = extensionReceiverParameter?.extensionReceiverNamePart(typeParameterNamer) ?: ""
-
-                return property.name.asString() + extensionReceiverPart + suffix
-            }
-
             val name = this.name.mangleIfInternal(this.module, this.visibility)
             return "$name${signature(typeParameterNamer)}"
         }
@@ -187,8 +177,6 @@ abstract class ClassicMangleComputer : KotlinMangleComputer<IrDeclaration> {
 
     val IrClass.typeInfoSymbolName: String
         get() {
-            if (isBuiltInFunction(this))
-                return KotlinMangler.functionClassSymbolName(name)
             return "kclass:" + this.fqNameForIrSerialization.toString()
         }
 
@@ -268,11 +256,9 @@ abstract class ClassicMangleComputer : KotlinMangleComputer<IrDeclaration> {
         }
 
     // This is basicly the same as .symbolName, but disambiguates external functions with the same C name.
-// In addition functions appearing in fq sequence appear as <full signature>.
+    // In addition functions appearing in fq sequence appear as <full signature>.
     private val IrFunction.uniqFunctionName: String
         get() {
-            if (isBuiltInFunction(this))
-                return KotlinMangler.functionInvokeSymbolName(parentAsClass.name)
             val parent = this.parent
 
             val containingDeclarationPart = parent.fqNameUnique.let {

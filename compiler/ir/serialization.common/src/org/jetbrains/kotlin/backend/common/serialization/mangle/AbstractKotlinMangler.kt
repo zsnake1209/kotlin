@@ -16,18 +16,7 @@ import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.name.Name
 
 abstract class AbstractKotlinMangler<D : Any> : KotlinMangler {
-    private val specialHashes = listOf("Function", "KFunction", "SuspendFunction", "KSuspendFunction")
-        .flatMap { name ->
-            (0..255).map { KotlinMangler.functionClassSymbolName(Name.identifier(name + it)) }
-        }.map { it.hashMangle }
-        .toSet()
-
     override val String.hashMangle get() = (this.cityHash64() % PUBLIC_MANGLE_FLAG) or PUBLIC_MANGLE_FLAG
-
-    override val Long.isSpecial: Boolean
-        get() = specialHashes.contains(this)
-
-
 
     abstract class AbstractDescriptorMangler : KotlinMangler.DescriptorMangler {
 
@@ -45,14 +34,9 @@ abstract class AbstractKotlinMangler<D : Any> : KotlinMangler {
         override fun isExportEnumEntry(declarationDescriptor: ClassDescriptor): Boolean =
             getExportChecker().check(declarationDescriptor, SpecialDeclarationType.ENUM_ENTRY)
 
-        override fun isExportField(declarationDescriptor: PropertyDescriptor): Boolean =
-            getExportChecker().check(declarationDescriptor, SpecialDeclarationType.BACKING_FIELD)
-
         override fun mangleDeclaration(descriptor: DeclarationDescriptor) = withPrefix("", descriptor)
 
         override fun mangleEnumEntry(descriptor: ClassDescriptor) = withPrefix("kenumentry", descriptor)
-
-        override fun mangleField(descriptor: PropertyDescriptor) = withPrefix("kfield", descriptor)
     }
 
     protected abstract fun getExportChecker(): KotlinExportChecker<D>

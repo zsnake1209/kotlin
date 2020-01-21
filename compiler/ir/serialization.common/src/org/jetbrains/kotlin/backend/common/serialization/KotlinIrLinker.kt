@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
-import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignature
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
@@ -230,26 +229,25 @@ abstract class KotlinIrLinker(
             }
 
             private fun referenceDeserializedSymbol(
-                proto: ProtoSymbolData,
-                id: UniqId,
+                proto: org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolData,
                 idSig: IdSignature,
                 descriptor: DeclarationDescriptor?
             ): IrSymbol = symbolTable.run {
                 when (proto.kind) {
                     ProtoSymbolKind.ANONYMOUS_INIT_SYMBOL ->
-                        IrAnonymousInitializerSymbolImpl(WrappedClassDescriptor()).also { require(id.isLocal) }
-                    ProtoSymbolKind.CLASS_SYMBOL -> referenceClassFromLinker(descriptor as ClassDescriptor? ?: WrappedClassDescriptor(), id) // TODO: FunctionInterfaces
-                    ProtoSymbolKind.CONSTRUCTOR_SYMBOL -> referenceConstructorFromLinker(WrappedClassConstructorDescriptor(), id)
-                    ProtoSymbolKind.TYPE_PARAMETER_SYMBOL -> referenceTypeParameterFromLinker(WrappedTypeParameterDescriptor(), id)
-                    ProtoSymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntryFromLinker(WrappedEnumEntryDescriptor(), id)
-                    ProtoSymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), id)
-                    ProtoSymbolKind.FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), id)
-                    ProtoSymbolKind.FUNCTION_SYMBOL -> referenceSimpleFunctionFromLinker(descriptor as FunctionDescriptor? ?: WrappedSimpleFunctionDescriptor(), id) //TODO: FunctionInterfaces
-                    ProtoSymbolKind.TYPEALIAS_SYMBOL -> referenceTypeAliasFromLinker(WrappedTypeAliasDescriptor(), id)
+                        IrAnonymousInitializerSymbolImpl(WrappedClassDescriptor()).also { require(idSig.isLocal) }
+                    ProtoSymbolKind.CLASS_SYMBOL -> referenceClassFromLinker(descriptor as ClassDescriptor? ?: WrappedClassDescriptor(), idSig) // TODO: FunctionInterfaces
+                    ProtoSymbolKind.CONSTRUCTOR_SYMBOL -> referenceConstructorFromLinker(WrappedClassConstructorDescriptor(), idSig)
+                    ProtoSymbolKind.TYPE_PARAMETER_SYMBOL -> referenceTypeParameterFromLinker(WrappedTypeParameterDescriptor(), idSig)
+                    ProtoSymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntryFromLinker(WrappedEnumEntryDescriptor(), idSig)
+                    ProtoSymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
+                    ProtoSymbolKind.FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
+                    ProtoSymbolKind.FUNCTION_SYMBOL -> referenceSimpleFunctionFromLinker(descriptor as FunctionDescriptor? ?: WrappedSimpleFunctionDescriptor(), idSig) //TODO: FunctionInterfaces
+                    ProtoSymbolKind.TYPEALIAS_SYMBOL -> referenceTypeAliasFromLinker(WrappedTypeAliasDescriptor(), idSig)
+                    ProtoSymbolKind.PROPERTY_SYMBOL -> referencePropertyFromLinker(WrappedPropertyDescriptor(), idSig)
                     ProtoSymbolKind.VARIABLE_SYMBOL -> IrVariableSymbolImpl(WrappedVariableDescriptor())
                     ProtoSymbolKind.VALUE_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedValueParameterDescriptor())
                     ProtoSymbolKind.RECEIVER_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedReceiverParameterDescriptor())
-                    ProtoSymbolKind.PROPERTY_SYMBOL -> referencePropertyFromLinker(WrappedPropertyDescriptor(), id)
                     ProtoSymbolKind.LOCAL_DELEGATED_PROPERTY_SYMBOL -> IrLocalDelegatedPropertySymbolImpl(WrappedVariableDescriptorWithAccessor())
                     else -> TODO("Unexpected classifier symbol kind: ${proto.kind}")
                 }
@@ -353,7 +351,7 @@ abstract class KotlinIrLinker(
             }
 
             private fun deserializeIrSymbolData(proto: ProtoSymbolData): IrSymbol {
-                val key = UniqId(proto.uniqIdIndex)
+//                val key = UniqId(proto.uniqIdIndex)
                 val idSignature = deserializeIdSignature(proto.idSig)
                 val deserializationState = findDeserializationState(proto)
 
@@ -365,7 +363,7 @@ abstract class KotlinIrLinker(
                         if (it !in fdState) fdState.addIdSignature(it)
                     }
 
-                    val symbol = referenceDeserializedSymbol(proto, key, idSignature, descriptor).let {
+                    val symbol = referenceDeserializedSymbol(proto, idSignature, descriptor).let {
                         if (expectUniqIdToActualUniqId[idSignature] != null) wrapInDelegatedSymbol(it) else it
                     }
 
@@ -384,14 +382,9 @@ abstract class KotlinIrLinker(
                 return symbol
             }
 
-            override fun deserializeIrSymbolToDeclare(index: Int): Pair<IrSymbol, UniqId> {
+            override fun deserializeIrSymbolToDeclare(index: Int): Pair<IrSymbol, IdSignature> {
                 val symbolData = loadSymbolProto(index)
-                return Pair(deserializeIrSymbolData(symbolData), UniqId(symbolData.uniqIdIndex))
-            }
-
-            override fun deserializeIrSymbolId(index: Int): UniqId {
-                val symbolData = loadSymbolProto(index)
-                return UniqId(symbolData.uniqIdIndex)
+                return Pair(deserializeIrSymbolData(symbolData), deserializeIdSignature(symbolData.idSig))
             }
 
             override fun deserializeIrSymbol(index: Int): IrSymbol {
@@ -399,8 +392,8 @@ abstract class KotlinIrLinker(
                 return deserializeIrSymbolData(symbolData)
             }
 
-            override fun deserializeSymbolId(index: Int): UniqId {
-                return UniqId(loadSymbolData(index).uniqIdIndex)
+            override fun deserializeSymbolId(index: Int): IdSignature {
+                return deserializeIdSignature(loadSymbolData(index).idSig)
             }
 
             override fun deserializeIrType(index: Int): IrType {
@@ -536,11 +529,10 @@ abstract class KotlinIrLinker(
     }
 
     private fun loadKnownBuiltinSymbols(mangler: KotlinMangler) {
-        val mask = 1L shl 63
         val globalDeserializedSymbols = globalDeserializationState.deserializedSymbols
         builtIns.knownBuiltins.forEach {
             val currentIndex = with(mangler) { it.mangle.hashMangle }
-            val signature = IdSignature.BuiltInSignature(it.mangle, currentIndex or mask)
+            val signature = IdSignature.BuiltInSignature(it.mangle, currentIndex)
             globalDeserializedSymbols[signature] = it.symbol
             assert(symbolTable.referenceBuiltInOperator(it.symbol.descriptor as SimpleFunctionDescriptor, it.mangle).owner === it)
         }

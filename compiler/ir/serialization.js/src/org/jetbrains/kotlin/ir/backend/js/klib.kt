@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.backend.common.serialization.mangle.ManglerChecker
 import org.jetbrains.kotlin.backend.common.serialization.metadata.DynamicTypeDeserializer
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataVersion
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
@@ -204,15 +205,17 @@ fun loadIr(
 
 private fun runAnalysisAndPreparePsi2Ir(depsDescriptors: ModulesStructure): GeneratorContext {
     val analysisResult = depsDescriptors.runAnalysis()
+    val mangler = JsDescriptorMangler
+    val signaturer = IdSignatureDescriptor(mangler)
 
     return GeneratorContext(
         Psi2IrConfiguration(),
         analysisResult.moduleDescriptor,
         analysisResult.bindingContext,
         depsDescriptors.compilerConfiguration.languageVersionSettings,
-        SymbolTable(JsDescriptorMangler),
+        SymbolTable(signaturer, mangler),
         GeneratorExtensions(),
-        JsDescriptorMangler
+        mangler, signaturer
     )
 }
 
@@ -224,7 +227,9 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
     expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>? = null
 ): IrModuleFragment {
     val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer, functionFactory)
-    val psi2Ir = Psi2IrTranslator(languageVersionSettings, configuration, mangler = JsDescriptorMangler)
+    val mangler = JsDescriptorMangler
+    val signaturer = IdSignatureDescriptor(mangler)
+    val psi2Ir = Psi2IrTranslator(languageVersionSettings, configuration, mangler, signaturer)
 
     for (extension in IrGenerationExtension.getInstances(project)) {
         psi2Ir.addPostprocessingStep { module ->
@@ -254,8 +259,10 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
 
 fun GeneratorContext.generateModuleFragment(files: List<KtFile>, deserializer: IrDeserializer? = null, expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>? = null): IrModuleFragment {
     val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
+    val mangler = JsDescriptorMangler
+    val signaturer = IdSignatureDescriptor(mangler)
     return Psi2IrTranslator(
-        languageVersionSettings, configuration, mangler = JsDescriptorMangler
+        languageVersionSettings, configuration, mangler, signaturer
     ).generateModuleFragment(this, files, irProviders, expectDescriptorToSymbol)
 }
 
@@ -386,7 +393,6 @@ fun serializeModuleIntoKlib(
 ) {
     assert(files.size == moduleFragment.files.size)
 
-    val descriptorTable = DescriptorTable.createDefault()
     val serializedIr =
         JsIrModuleSerializer(
             emptyLoggingContext,
@@ -394,25 +400,6 @@ fun serializeModuleIntoKlib(
             expectDescriptorToSymbol = expectDescriptorToSymbol,
             skipExpects = !configuration.klibMpp
         ).serializedIrModule(moduleFragment)
-
-    fun List<Int>.printStatistic(name: String) {
-
-        println("----- $name -----")
-        println("Min mangle size: ${first()}")
-        println("Max mangle size: ${last()}")
-        println("Average mangle size: ${sum() / size}")
-
-        println("25%%: ${this[(size * 0.25).toInt()]}")
-        println("50%%: ${this[(size * 0.50).toInt()]}")
-        println("75%%: ${this[(size * 0.75).toInt()]}")
-        println("95%%: ${this[(size * 0.95).toInt()]}")
-        println("96%%: ${this[(size * 0.96).toInt()]}")
-        println("97%%: ${this[(size * 0.97).toInt()]}")
-        println("98%%: ${this[(size * 0.98).toInt()]}")
-        println("99%%: ${this[(size * 0.99).toInt()]}")
-    }
-
-//    mangleSizes.sorted().printStatistic("Declaration Mangle")
 
     val moduleDescriptor = moduleFragment.descriptor
 
@@ -422,7 +409,6 @@ fun serializeModuleIntoKlib(
     val metadataSerializer = KlibMetadataIncrementalSerializer(
         languageVersionSettings,
         metadataVersion,
-        descriptorTable,
         skipExpects = !configuration.klibMpp
     )
 

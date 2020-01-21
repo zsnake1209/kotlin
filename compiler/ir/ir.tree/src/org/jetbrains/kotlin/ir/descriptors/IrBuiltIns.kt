@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.ir.types.impl.buildSimpleType
 import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.types.withHasQuestionMark
+import org.jetbrains.kotlin.ir.util.IdSignatureComposer
 import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.TypeTranslator
@@ -39,6 +40,7 @@ class IrBuiltIns(
     val builtIns: KotlinBuiltIns,
     private val typeTranslator: TypeTranslator,
     mangler: KotlinMangler.DescriptorMangler,
+    signaturer: IdSignatureComposer,
     outerSymbolTable: SymbolTable? = null
 ) {
     val languageVersionSettings = typeTranslator.languageVersionSettings
@@ -47,7 +49,7 @@ class IrBuiltIns(
 
     val irBuiltInsSymbols = mutableListOf<IrBuiltinWithMangle>()
 
-    private val symbolTable = outerSymbolTable ?: SymbolTable(mangler)
+    private val symbolTable = outerSymbolTable ?: SymbolTable(signaturer, mangler)
 
     private val packageFragmentDescriptor = IrBuiltinsPackageFragmentDescriptorImpl(builtInsModule, KOTLIN_INTERNAL_IR_FQN)
     private val packageFragment =

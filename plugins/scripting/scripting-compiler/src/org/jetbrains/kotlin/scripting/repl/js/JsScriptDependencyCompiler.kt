@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.scripting.repl.js
 
+import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDescriptor
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
@@ -45,7 +46,9 @@ class JsScriptDependencyCompiler(
             it.constantValueGenerator = ConstantValueGenerator(moduleDescriptor, symbolTable)
         }
 
-        val irBuiltIns = IrBuiltIns(builtIns, typeTranslator, JsDescriptorMangler, symbolTable)
+        val mangler = JsDescriptorMangler
+        val signaturer = IdSignatureDescriptor(mangler)
+        val irBuiltIns = IrBuiltIns(builtIns, typeTranslator, mangler, signaturer, symbolTable)
         val jsLinker = JsIrLinker(JsDescriptorMangler, emptyLoggingContext, irBuiltIns, symbolTable)
 
         val moduleFragment = IrModuleFragmentImpl(moduleDescriptor, irBuiltIns)

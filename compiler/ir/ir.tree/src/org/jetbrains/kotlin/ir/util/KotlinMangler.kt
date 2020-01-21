@@ -18,7 +18,6 @@ interface KotlinMangler {
     val IrDeclaration.hashedMangle: Long
     fun IrDeclaration.isExported(): Boolean
     val IrFunction.functionName: String
-    val Long.isSpecial: Boolean
     val IrDeclaration.mangleString: String
 
     val manglerName: String
@@ -29,16 +28,13 @@ interface KotlinMangler {
 
         fun isExport(declarationDescriptor: DeclarationDescriptor): Boolean
         fun isExportEnumEntry(declarationDescriptor: ClassDescriptor): Boolean
-        fun isExportField(declarationDescriptor: PropertyDescriptor): Boolean
 
         fun mangleDeclaration(descriptor: DeclarationDescriptor): String
         fun mangleEnumEntry(descriptor: ClassDescriptor): String
-        fun mangleField(descriptor: PropertyDescriptor): String
     }
 
     companion object {
         private val FUNCTION_PREFIX = "<BUILT-IN-FUNCTION>"
         fun functionClassSymbolName(name: Name) = "ktype:$FUNCTION_PREFIX$name"
-        fun functionInvokeSymbolName(name: Name) = "kfun:$FUNCTION_PREFIX$name.invoke"
     }
 }

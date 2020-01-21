@@ -7,10 +7,7 @@ package org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
 import org.jetbrains.kotlin.backend.common.serialization.mangle.collect
-import org.jetbrains.kotlin.builtins.functions.FunctionClassDescriptor
-import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor
 import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.DynamicType
 import org.jetbrains.kotlin.types.KotlinType
@@ -19,7 +16,8 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
-abstract class DescriptorMangleComputer(protected val builder: StringBuilder, protected val specialPrefix: String) : DeclarationDescriptorVisitor<Unit, Boolean>, KotlinMangleComputer<DeclarationDescriptor> {
+abstract class DescriptorMangleComputer(protected val builder: StringBuilder, protected val specialPrefix: String) :
+    DeclarationDescriptorVisitor<Unit, Boolean>, KotlinMangleComputer<DeclarationDescriptor> {
 
     override fun computeMangle(declaration: DeclarationDescriptor): String {
         declaration.accept(this, true)
@@ -60,14 +58,14 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         error("unexpected descriptor $descriptor")
     }
 
-    private fun FunctionDescriptor.mangleFunction(isCtor: Boolean, prefix: Boolean) {
+    private fun FunctionDescriptor.mangleFunction(isCtor: Boolean, prefix: Boolean, container: CallableDescriptor) {
 
         isRealExpect = isRealExpect or isExpect
 
         val prefixLength = addPrefix("kfun", prefix)
 
-        typeParameterContainer.add(this)
-        containingDeclaration.accept(this@DescriptorMangleComputer, false)
+        typeParameterContainer.add(container)
+        container.containingDeclaration.accept(this@DescriptorMangleComputer, false)
 
         if (prefixLength != builder.length) builder.append('.')
 
@@ -80,12 +78,12 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
             builder.append(module.name.asString().run { substring(1, lastIndex) })
         }
 
-        mangleSignature(isCtor)
+        mangleSignature(isCtor, container)
 
         if (prefix && isRealExpect) builder.append("#expect")
     }
 
-    private fun FunctionDescriptor.mangleSignature(isCtor: Boolean) {
+    private fun FunctionDescriptor.mangleSignature(isCtor: Boolean, realTypeParameterContainer: CallableDescriptor) {
 
         extensionReceiverParameter?.let {
             builder.append('@')
@@ -93,7 +91,8 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         }
 
         valueParameters.collect(builder, ";", "(", ")") { mangleValueParameter(this, it) }
-        typeParameters.filter { it.containingDeclaration == this }.collect(builder, ";", "{", "}") { mangleTypeParameter(this, it) }
+        realTypeParameterContainer.typeParameters.filter { it.containingDeclaration == realTypeParameterContainer }
+            .collect(builder, ";", "{", "}") { mangleTypeParameter(this, it) }
 
         returnType?.run {
             if (!isCtor && !isUnit()) {
@@ -169,19 +168,12 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     override fun visitVariableDescriptor(descriptor: VariableDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
 
     override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, data: Boolean) {
-        if (descriptor is FunctionInvokeDescriptor) {
-            if (descriptor.containingDeclaration.name.asString().contains("Function")) {
-                builder.append(KotlinMangler.functionInvokeSymbolName(descriptor.containingDeclaration.name))
-                return
-            }
-        }
-
         descriptor.platformSpecificFunctionName?.let {
             builder.append(it)
             return
         }
 
-        descriptor.mangleFunction(false, data)
+        descriptor.mangleFunction(false, data, descriptor)
     }
 
     override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: Boolean) {
@@ -193,13 +185,6 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     }
 
     override fun visitClassDescriptor(descriptor: ClassDescriptor, data: Boolean) {
-        if (data && descriptor is FunctionClassDescriptor) {
-            builder.append(KotlinMangler.functionClassSymbolName(descriptor.name))
-            return
-        }
-
-        // TODO: what if EnumEntry descriptor?
-
         isRealExpect = isRealExpect or descriptor.isExpect
         typeParameterContainer.add(descriptor)
         val prefix = if (specialPrefix == "kenumentry") specialPrefix else "kclass"
@@ -215,7 +200,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     override fun visitModuleDeclaration(descriptor: ModuleDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
 
     override fun visitConstructorDescriptor(constructorDescriptor: ConstructorDescriptor, data: Boolean) {
-        constructorDescriptor.mangleFunction(true, data)
+        constructorDescriptor.mangleFunction(true, data, constructorDescriptor)
     }
 
     override fun visitScriptDescriptor(scriptDescriptor: ScriptDescriptor, data: Boolean) = reportUnexpectedDescriptor(scriptDescriptor)
@@ -243,36 +228,18 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
 
     override fun visitValueParameterDescriptor(descriptor: ValueParameterDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
 
-    private fun manglePropertyAccessor(accessor: PropertyAccessorDescriptor, name: String, data: Boolean) {
-        val length = addPrefix("kfun", data)
-
-        val property = accessor.correspondingProperty
-
-        typeParameterContainer.add(property)
-        isRealExpect = isRealExpect or property.isExpect
-        property.containingDeclaration.accept(this, false)
-
-        if (length != builder.length) builder.append('.')
-        builder.append('#')
-        builder.append(property.name)
-
-        accessor.extensionReceiverParameter?.let { e ->
-            builder.append('@')
-            mangleExtensionReceiverParameter(builder, e)
-        }
-
-        builder.append(name)
-
-        if (data && isRealExpect) builder.append("#expect")
+    private fun manglePropertyAccessor(accessor: PropertyAccessorDescriptor, data: Boolean) {
+        accessor.mangleFunction(false, data, accessor.correspondingProperty)
     }
 
     override fun visitPropertyGetterDescriptor(descriptor: PropertyGetterDescriptor, data: Boolean) {
-        manglePropertyAccessor(descriptor, ":getter:", data)
+        manglePropertyAccessor(descriptor, data)
     }
 
     override fun visitPropertySetterDescriptor(descriptor: PropertySetterDescriptor, data: Boolean) {
-        manglePropertyAccessor(descriptor, ":setter:", data)
+        manglePropertyAccessor(descriptor, data)
     }
 
-    override fun visitReceiverParameterDescriptor(descriptor: ReceiverParameterDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
+    override fun visitReceiverParameterDescriptor(descriptor: ReceiverParameterDescriptor, data: Boolean) =
+        reportUnexpectedDescriptor(descriptor)
 }

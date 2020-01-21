@@ -15,10 +15,7 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.symbols.IrExternalPackageFragmentSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFileSymbol
-import org.jetbrains.kotlin.ir.util.UniqId
-import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
-import org.jetbrains.kotlin.ir.util.isEffectivelyExternal
-import org.jetbrains.kotlin.ir.util.transformFlat
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 
 private val BODILESS_BUILTIN_CLASSES = listOf(
@@ -63,6 +60,9 @@ private class DescriptorlessExternalPackageFragmentSymbol : IrExternalPackageFra
     override val isPublicApi: Boolean
         get() = error("Operation is unsupported")
 
+    override val signature: IdSignature
+        get() = error("Operation is unsupported")
+
 }
 
 private class DescriptorlessIrFileSymbol : IrFileSymbol {
@@ -85,6 +85,9 @@ private class DescriptorlessIrFileSymbol : IrFileSymbol {
     override val isBound get() = _owner != null
 
     override val isPublicApi: Boolean
+        get() = error("Operation is unsupported")
+
+    override val signature: IdSignature
         get() = error("Operation is unsupported")
 }
 

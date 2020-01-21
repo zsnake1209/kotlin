@@ -47,11 +47,7 @@ abstract class IrExportCheckerVisitor : IrElementVisitor<Boolean, Nothing?>, Kot
 
     override fun visitTypeParameter(declaration: IrTypeParameter, data: Nothing?) = false
 
-    override fun visitField(declaration: IrField, data: Nothing?): Boolean {
-        return false
-        val annotations = declaration.run { correspondingPropertySymbol?.owner?.annotations ?: annotations }
-        return declaration.run { isExported(annotations, visibility) }
-    }
+    override fun visitField(declaration: IrField, data: Nothing?) = false
 
     override fun visitProperty(declaration: IrProperty, data: Nothing?): Boolean {
         return declaration.run { isExported(annotations, visibility) }
