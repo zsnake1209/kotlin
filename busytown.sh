@@ -1,9 +1,13 @@
 #!/bin/bash
 set -e
 readonly PROG_DIR="$(dirname $0)"
-readonly OUT=${1:-"out"}
-readonly DIST=${2:-"dist"}
-readonly BUILD_NUMBER="$3"
+
+readonly OUT="${OUT:-"out"}"
+readonly DIST="${DIST:-"out/dist"}"
+mkdir -p $OUT
+mkdir -p $DIST
+readonly OUT_DIR="$(realpath $OUT)"
+readonly DIST_DIR="$(realpath $DIST)"
 function set_java_home() {
     case `uname -s` in
         Darwin)
@@ -25,7 +29,7 @@ function copy_jar_into_maven_repo() {
         echo "  File $SOURCE_JAR does not exist"
         exit 1
     fi
-    local MODULE_DIRECTORY=$OUT/m2/org/jetbrains/kotlin/$MODULE_NAME/$R4A_BUILD_NUMBER
+    local MODULE_DIRECTORY=$OUT_DIR/m2/org/jetbrains/kotlin/$MODULE_NAME/$R4A_BUILD_NUMBER
     mkdir -p $MODULE_DIRECTORY
     cp $SOURCE_JAR $MODULE_DIRECTORY/$MODULE_NAME-$R4A_BUILD_NUMBER.jar
 }
@@ -33,12 +37,11 @@ set_java_home
 export JDK_18=$JAVA_HOME
 export JDK_17=$JAVA_HOME
 export JDK_16=$JAVA_HOME
+
 cd $PROG_DIR
-rm -rf $OUT
-mkdir -p $OUT
-mkdir -p $DIST
+
 # Build a custom version of Kotlin
-./gradlew install ideaPlugin  :compiler:tests-common:testJar --no-daemon -Pbuild.number=$R4A_BUILD_NUMBER -PdeployVersion=$R4A_BUILD_NUMBER -Dmaven.repo.local=$OUT/m2
+./gradlew install ideaPlugin  :compiler:tests-common:testJar --no-daemon -Pbuild.number=$R4A_BUILD_NUMBER -PdeployVersion=$R4A_BUILD_NUMBER -Dmaven.repo.local=$OUT_DIR/m2
 
 # Copy jar files that are not published in the build but are required by androidx.compose
 echo "Copying additional repositories"
@@ -63,8 +66,8 @@ rm -rf libraries/tools/kotlin-test-js-runner/lib/
 rm -rf libraries/tools/kotlin-test-js-runner/node_modules/
 # tar up the distrbution
 echo "tar'ing result"
-tar cf $OUT/m2.tar $OUT/m2
-mv $OUT/m2.tar $DIST
-cp -r dist/artifacts/ideaPlugin/Kotlin $OUT/Kotlin
-tar cf $OUT/Kotlin.tar $OUT/Kotlin
-mv $OUT/Kotlin.tar $DIST
+tar cf $OUT_DIR/m2.tar -C $OUT_DIR m2
+mv $OUT_DIR/m2.tar $DIST_DIR
+cp -r dist/artifacts/ideaPlugin/Kotlin $OUT_DIR/Kotlin
+tar cf $OUT_DIR/Kotlin.tar -C $OUT_DIR Kotlin
+mv $OUT_DIR/Kotlin.tar $DIST_DIR
