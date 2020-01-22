@@ -55,22 +55,22 @@ public final class IrLocalDelegatedPropertyReference extends
           }
           case 8: {
             bitField0_ |= 0x00000001;
-            delegate_ = input.readInt32();
+            delegate_ = input.readInt64();
             break;
           }
           case 16: {
             bitField0_ |= 0x00000002;
-            getter_ = input.readInt32();
+            getter_ = input.readInt64();
             break;
           }
           case 24: {
             bitField0_ |= 0x00000004;
-            setter_ = input.readInt32();
+            setter_ = input.readInt64();
             break;
           }
           case 32: {
             bitField0_ |= 0x00000008;
-            symbol_ = input.readInt32();
+            symbol_ = input.readInt64();
             break;
           }
           case 42: {
@@ -121,62 +121,94 @@ public final class IrLocalDelegatedPropertyReference extends
 
   private int bitField0_;
   public static final int DELEGATE_FIELD_NUMBER = 1;
-  private int delegate_;
+  private long delegate_;
   /**
-   * <code>required int32 delegate = 1;</code>
+   * <code>required int64 delegate = 1;</code>
+   *
+   * <pre>
+   *  required int32 delegate = 1;
+   * </pre>
    */
   public boolean hasDelegate() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
-   * <code>required int32 delegate = 1;</code>
+   * <code>required int64 delegate = 1;</code>
+   *
+   * <pre>
+   *  required int32 delegate = 1;
+   * </pre>
    */
-  public int getDelegate() {
+  public long getDelegate() {
     return delegate_;
   }
 
   public static final int GETTER_FIELD_NUMBER = 2;
-  private int getter_;
+  private long getter_;
   /**
-   * <code>optional int32 getter = 2;</code>
+   * <code>optional int64 getter = 2;</code>
+   *
+   * <pre>
+   *  optional int32 getter = 2;
+   * </pre>
    */
   public boolean hasGetter() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
-   * <code>optional int32 getter = 2;</code>
+   * <code>optional int64 getter = 2;</code>
+   *
+   * <pre>
+   *  optional int32 getter = 2;
+   * </pre>
    */
-  public int getGetter() {
+  public long getGetter() {
     return getter_;
   }
 
   public static final int SETTER_FIELD_NUMBER = 3;
-  private int setter_;
+  private long setter_;
   /**
-   * <code>optional int32 setter = 3;</code>
+   * <code>optional int64 setter = 3;</code>
+   *
+   * <pre>
+   *  optional int32 setter = 3;
+   * </pre>
    */
   public boolean hasSetter() {
     return ((bitField0_ & 0x00000004) == 0x00000004);
   }
   /**
-   * <code>optional int32 setter = 3;</code>
+   * <code>optional int64 setter = 3;</code>
+   *
+   * <pre>
+   *  optional int32 setter = 3;
+   * </pre>
    */
-  public int getSetter() {
+  public long getSetter() {
     return setter_;
   }
 
   public static final int SYMBOL_FIELD_NUMBER = 4;
-  private int symbol_;
+  private long symbol_;
   /**
-   * <code>required int32 symbol = 4;</code>
+   * <code>required int64 symbol = 4;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 4;
+   * </pre>
    */
   public boolean hasSymbol() {
     return ((bitField0_ & 0x00000008) == 0x00000008);
   }
   /**
-   * <code>required int32 symbol = 4;</code>
+   * <code>required int64 symbol = 4;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 4;
+   * </pre>
    */
-  public int getSymbol() {
+  public long getSymbol() {
     return symbol_;
   }
 
@@ -196,10 +228,10 @@ public final class IrLocalDelegatedPropertyReference extends
   }
 
   private void initFields() {
-    delegate_ = 0;
-    getter_ = 0;
-    setter_ = 0;
-    symbol_ = 0;
+    delegate_ = 0L;
+    getter_ = 0L;
+    setter_ = 0L;
+    symbol_ = 0L;
     origin_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrStatementOrigin.getDefaultInstance();
   }
   private byte memoizedIsInitialized = -1;
@@ -230,16 +262,16 @@ public final class IrLocalDelegatedPropertyReference extends
                       throws java.io.IOException {
     getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeInt32(1, delegate_);
+      output.writeInt64(1, delegate_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeInt32(2, getter_);
+      output.writeInt64(2, getter_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeInt32(3, setter_);
+      output.writeInt64(3, setter_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeInt32(4, symbol_);
+      output.writeInt64(4, symbol_);
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       output.writeMessage(5, origin_);
@@ -255,19 +287,19 @@ public final class IrLocalDelegatedPropertyReference extends
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(1, delegate_);
+        .computeInt64Size(1, delegate_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(2, getter_);
+        .computeInt64Size(2, getter_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(3, setter_);
+        .computeInt64Size(3, setter_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(4, symbol_);
+        .computeInt64Size(4, symbol_);
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -367,13 +399,13 @@ public final class IrLocalDelegatedPropertyReference extends
 
     public Builder clear() {
       super.clear();
-      delegate_ = 0;
+      delegate_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000001);
-      getter_ = 0;
+      getter_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000002);
-      setter_ = 0;
+      setter_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000004);
-      symbol_ = 0;
+      symbol_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000008);
       origin_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrStatementOrigin.getDefaultInstance();
       bitField0_ = (bitField0_ & ~0x00000010);
@@ -483,130 +515,194 @@ public final class IrLocalDelegatedPropertyReference extends
     }
     private int bitField0_;
 
-    private int delegate_ ;
+    private long delegate_ ;
     /**
-     * <code>required int32 delegate = 1;</code>
+     * <code>required int64 delegate = 1;</code>
+     *
+     * <pre>
+     *  required int32 delegate = 1;
+     * </pre>
      */
     public boolean hasDelegate() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 delegate = 1;</code>
+     * <code>required int64 delegate = 1;</code>
+     *
+     * <pre>
+     *  required int32 delegate = 1;
+     * </pre>
      */
-    public int getDelegate() {
+    public long getDelegate() {
       return delegate_;
     }
     /**
-     * <code>required int32 delegate = 1;</code>
+     * <code>required int64 delegate = 1;</code>
+     *
+     * <pre>
+     *  required int32 delegate = 1;
+     * </pre>
      */
-    public Builder setDelegate(int value) {
+    public Builder setDelegate(long value) {
       bitField0_ |= 0x00000001;
       delegate_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 delegate = 1;</code>
+     * <code>required int64 delegate = 1;</code>
+     *
+     * <pre>
+     *  required int32 delegate = 1;
+     * </pre>
      */
     public Builder clearDelegate() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      delegate_ = 0;
+      delegate_ = 0L;
       
       return this;
     }
 
-    private int getter_ ;
+    private long getter_ ;
     /**
-     * <code>optional int32 getter = 2;</code>
+     * <code>optional int64 getter = 2;</code>
+     *
+     * <pre>
+     *  optional int32 getter = 2;
+     * </pre>
      */
     public boolean hasGetter() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional int32 getter = 2;</code>
+     * <code>optional int64 getter = 2;</code>
+     *
+     * <pre>
+     *  optional int32 getter = 2;
+     * </pre>
      */
-    public int getGetter() {
+    public long getGetter() {
       return getter_;
     }
     /**
-     * <code>optional int32 getter = 2;</code>
+     * <code>optional int64 getter = 2;</code>
+     *
+     * <pre>
+     *  optional int32 getter = 2;
+     * </pre>
      */
-    public Builder setGetter(int value) {
+    public Builder setGetter(long value) {
       bitField0_ |= 0x00000002;
       getter_ = value;
       
       return this;
     }
     /**
-     * <code>optional int32 getter = 2;</code>
+     * <code>optional int64 getter = 2;</code>
+     *
+     * <pre>
+     *  optional int32 getter = 2;
+     * </pre>
      */
     public Builder clearGetter() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      getter_ = 0;
+      getter_ = 0L;
       
       return this;
     }
 
-    private int setter_ ;
+    private long setter_ ;
     /**
-     * <code>optional int32 setter = 3;</code>
+     * <code>optional int64 setter = 3;</code>
+     *
+     * <pre>
+     *  optional int32 setter = 3;
+     * </pre>
      */
     public boolean hasSetter() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional int32 setter = 3;</code>
+     * <code>optional int64 setter = 3;</code>
+     *
+     * <pre>
+     *  optional int32 setter = 3;
+     * </pre>
      */
-    public int getSetter() {
+    public long getSetter() {
       return setter_;
     }
     /**
-     * <code>optional int32 setter = 3;</code>
+     * <code>optional int64 setter = 3;</code>
+     *
+     * <pre>
+     *  optional int32 setter = 3;
+     * </pre>
      */
-    public Builder setSetter(int value) {
+    public Builder setSetter(long value) {
       bitField0_ |= 0x00000004;
       setter_ = value;
       
       return this;
     }
     /**
-     * <code>optional int32 setter = 3;</code>
+     * <code>optional int64 setter = 3;</code>
+     *
+     * <pre>
+     *  optional int32 setter = 3;
+     * </pre>
      */
     public Builder clearSetter() {
       bitField0_ = (bitField0_ & ~0x00000004);
-      setter_ = 0;
+      setter_ = 0L;
       
       return this;
     }
 
-    private int symbol_ ;
+    private long symbol_ ;
     /**
-     * <code>required int32 symbol = 4;</code>
+     * <code>required int64 symbol = 4;</code>
+     *
+     * <pre>
+     *  required int32 symbol = 4;
+     * </pre>
      */
     public boolean hasSymbol() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required int32 symbol = 4;</code>
+     * <code>required int64 symbol = 4;</code>
+     *
+     * <pre>
+     *  required int32 symbol = 4;
+     * </pre>
      */
-    public int getSymbol() {
+    public long getSymbol() {
       return symbol_;
     }
     /**
-     * <code>required int32 symbol = 4;</code>
+     * <code>required int64 symbol = 4;</code>
+     *
+     * <pre>
+     *  required int32 symbol = 4;
+     * </pre>
      */
-    public Builder setSymbol(int value) {
+    public Builder setSymbol(long value) {
       bitField0_ |= 0x00000008;
       symbol_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 symbol = 4;</code>
+     * <code>required int64 symbol = 4;</code>
+     *
+     * <pre>
+     *  required int32 symbol = 4;
+     * </pre>
      */
     public Builder clearSymbol() {
       bitField0_ = (bitField0_ & ~0x00000008);
-      symbol_ = 0;
+      symbol_ = 0L;
       
       return this;
     }

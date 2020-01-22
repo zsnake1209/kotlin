@@ -8,40 +8,72 @@ public interface IrLocalDelegatedPropertyReferenceOrBuilder extends
     org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
   /**
-   * <code>required int32 delegate = 1;</code>
+   * <code>required int64 delegate = 1;</code>
+   *
+   * <pre>
+   *  required int32 delegate = 1;
+   * </pre>
    */
   boolean hasDelegate();
   /**
-   * <code>required int32 delegate = 1;</code>
+   * <code>required int64 delegate = 1;</code>
+   *
+   * <pre>
+   *  required int32 delegate = 1;
+   * </pre>
    */
-  int getDelegate();
+  long getDelegate();
 
   /**
-   * <code>optional int32 getter = 2;</code>
+   * <code>optional int64 getter = 2;</code>
+   *
+   * <pre>
+   *  optional int32 getter = 2;
+   * </pre>
    */
   boolean hasGetter();
   /**
-   * <code>optional int32 getter = 2;</code>
+   * <code>optional int64 getter = 2;</code>
+   *
+   * <pre>
+   *  optional int32 getter = 2;
+   * </pre>
    */
-  int getGetter();
+  long getGetter();
 
   /**
-   * <code>optional int32 setter = 3;</code>
+   * <code>optional int64 setter = 3;</code>
+   *
+   * <pre>
+   *  optional int32 setter = 3;
+   * </pre>
    */
   boolean hasSetter();
   /**
-   * <code>optional int32 setter = 3;</code>
+   * <code>optional int64 setter = 3;</code>
+   *
+   * <pre>
+   *  optional int32 setter = 3;
+   * </pre>
    */
-  int getSetter();
+  long getSetter();
 
   /**
-   * <code>required int32 symbol = 4;</code>
+   * <code>required int64 symbol = 4;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 4;
+   * </pre>
    */
   boolean hasSymbol();
   /**
-   * <code>required int32 symbol = 4;</code>
+   * <code>required int64 symbol = 4;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 4;
+   * </pre>
    */
-  int getSymbol();
+  long getSymbol();
 
   /**
    * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrStatementOrigin origin = 5;</code>

@@ -44,17 +44,29 @@ public interface IrFunctionOrBuilder extends
   boolean getIsSuspend();
 
   /**
-   * <code>repeated int32 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 overridden = 5;
+   * </pre>
    */
-  java.util.List<java.lang.Integer> getOverriddenList();
+  java.util.List<java.lang.Long> getOverriddenList();
   /**
-   * <code>repeated int32 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 overridden = 5;
+   * </pre>
    */
   int getOverriddenCount();
   /**
-   * <code>repeated int32 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 overridden = 5;
+   * </pre>
    */
-  int getOverridden(int index);
+  long getOverridden(int index);
 
   /**
    * <code>required bool is_fake_override = 8;</code>

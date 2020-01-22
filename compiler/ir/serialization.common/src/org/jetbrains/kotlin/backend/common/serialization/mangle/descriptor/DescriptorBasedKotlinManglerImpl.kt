@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.AbstractKotlinMangler
+import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleConstant
 import org.jetbrains.kotlin.backend.common.serialization.mangle.SpecialDeclarationType
 import org.jetbrains.kotlin.backend.common.serialization.mangle.descriptorPrefix
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -20,7 +21,7 @@ abstract class DescriptorBasedKotlinManglerImpl : AbstractKotlinMangler<Declarat
     override fun IrDeclaration.isExported() = getExportChecker().check(descriptor, SpecialDeclarationType.declarationToType(this))
 
     override val IrFunction.functionName: String
-        get() = getMangleComputer("fun").computeMangleString(descriptor)
+        get() = getMangleComputer(MangleConstant.FUN_PREFIX).computeMangleString(descriptor)
 
     override val IrDeclaration.mangleString: String
         get() = getMangleComputer(descriptorPrefix(this)).computeMangle(descriptor)

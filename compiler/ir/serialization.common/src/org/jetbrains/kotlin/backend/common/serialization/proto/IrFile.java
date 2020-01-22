@@ -118,21 +118,21 @@ public final class IrFile extends
           }
           case 40: {
             if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-              explicitlyExportedToCompiler_ = new java.util.ArrayList<java.lang.Integer>();
+              explicitlyExportedToCompiler_ = new java.util.ArrayList<java.lang.Long>();
               mutable_bitField0_ |= 0x00000010;
             }
-            explicitlyExportedToCompiler_.add(input.readInt32());
+            explicitlyExportedToCompiler_.add(input.readInt64());
             break;
           }
           case 42: {
             int length = input.readRawVarint32();
             int limit = input.pushLimit(length);
             if (!((mutable_bitField0_ & 0x00000010) == 0x00000010) && input.getBytesUntilLimit() > 0) {
-              explicitlyExportedToCompiler_ = new java.util.ArrayList<java.lang.Integer>();
+              explicitlyExportedToCompiler_ = new java.util.ArrayList<java.lang.Long>();
               mutable_bitField0_ |= 0x00000010;
             }
             while (input.getBytesUntilLimit() > 0) {
-              explicitlyExportedToCompiler_.add(input.readInt32());
+              explicitlyExportedToCompiler_.add(input.readInt64());
             }
             input.popLimit(limit);
             break;
@@ -289,24 +289,36 @@ public final class IrFile extends
   }
 
   public static final int EXPLICITLY_EXPORTED_TO_COMPILER_FIELD_NUMBER = 5;
-  private java.util.List<java.lang.Integer> explicitlyExportedToCompiler_;
+  private java.util.List<java.lang.Long> explicitlyExportedToCompiler_;
   /**
-   * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 explicitly_exported_to_compiler = 5;
+   * </pre>
    */
-  public java.util.List<java.lang.Integer>
+  public java.util.List<java.lang.Long>
       getExplicitlyExportedToCompilerList() {
     return explicitlyExportedToCompiler_;
   }
   /**
-   * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 explicitly_exported_to_compiler = 5;
+   * </pre>
    */
   public int getExplicitlyExportedToCompilerCount() {
     return explicitlyExportedToCompiler_.size();
   }
   /**
-   * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 explicitly_exported_to_compiler = 5;
+   * </pre>
    */
-  public int getExplicitlyExportedToCompiler(int index) {
+  public long getExplicitlyExportedToCompiler(int index) {
     return explicitlyExportedToCompiler_.get(index);
   }
 
@@ -399,7 +411,7 @@ public final class IrFile extends
       output.writeMessage(4, annotation_.get(i));
     }
     for (int i = 0; i < explicitlyExportedToCompiler_.size(); i++) {
-      output.writeInt32(5, explicitlyExportedToCompiler_.get(i));
+      output.writeInt64(5, explicitlyExportedToCompiler_.get(i));
     }
     for (int i = 0; i < actuals_.size(); i++) {
       output.writeMessage(6, actuals_.get(i));
@@ -443,7 +455,7 @@ public final class IrFile extends
       int dataSize = 0;
       for (int i = 0; i < explicitlyExportedToCompiler_.size(); i++) {
         dataSize += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeInt32SizeNoTag(explicitlyExportedToCompiler_.get(i));
+          .computeInt64SizeNoTag(explicitlyExportedToCompiler_.get(i));
       }
       size += dataSize;
       size += 1 * getExplicitlyExportedToCompilerList().size();
@@ -1034,56 +1046,80 @@ public final class IrFile extends
       return this;
     }
 
-    private java.util.List<java.lang.Integer> explicitlyExportedToCompiler_ = java.util.Collections.emptyList();
+    private java.util.List<java.lang.Long> explicitlyExportedToCompiler_ = java.util.Collections.emptyList();
     private void ensureExplicitlyExportedToCompilerIsMutable() {
       if (!((bitField0_ & 0x00000010) == 0x00000010)) {
-        explicitlyExportedToCompiler_ = new java.util.ArrayList<java.lang.Integer>(explicitlyExportedToCompiler_);
+        explicitlyExportedToCompiler_ = new java.util.ArrayList<java.lang.Long>(explicitlyExportedToCompiler_);
         bitField0_ |= 0x00000010;
        }
     }
     /**
-     * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 explicitly_exported_to_compiler = 5;
+     * </pre>
      */
-    public java.util.List<java.lang.Integer>
+    public java.util.List<java.lang.Long>
         getExplicitlyExportedToCompilerList() {
       return java.util.Collections.unmodifiableList(explicitlyExportedToCompiler_);
     }
     /**
-     * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 explicitly_exported_to_compiler = 5;
+     * </pre>
      */
     public int getExplicitlyExportedToCompilerCount() {
       return explicitlyExportedToCompiler_.size();
     }
     /**
-     * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 explicitly_exported_to_compiler = 5;
+     * </pre>
      */
-    public int getExplicitlyExportedToCompiler(int index) {
+    public long getExplicitlyExportedToCompiler(int index) {
       return explicitlyExportedToCompiler_.get(index);
     }
     /**
-     * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 explicitly_exported_to_compiler = 5;
+     * </pre>
      */
     public Builder setExplicitlyExportedToCompiler(
-        int index, int value) {
+        int index, long value) {
       ensureExplicitlyExportedToCompilerIsMutable();
       explicitlyExportedToCompiler_.set(index, value);
       
       return this;
     }
     /**
-     * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 explicitly_exported_to_compiler = 5;
+     * </pre>
      */
-    public Builder addExplicitlyExportedToCompiler(int value) {
+    public Builder addExplicitlyExportedToCompiler(long value) {
       ensureExplicitlyExportedToCompilerIsMutable();
       explicitlyExportedToCompiler_.add(value);
       
       return this;
     }
     /**
-     * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 explicitly_exported_to_compiler = 5;
+     * </pre>
      */
     public Builder addAllExplicitlyExportedToCompiler(
-        java.lang.Iterable<? extends java.lang.Integer> values) {
+        java.lang.Iterable<? extends java.lang.Long> values) {
       ensureExplicitlyExportedToCompilerIsMutable();
       org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
           values, explicitlyExportedToCompiler_);
@@ -1091,7 +1127,11 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 explicitly_exported_to_compiler = 5;
+     * </pre>
      */
     public Builder clearExplicitlyExportedToCompiler() {
       explicitlyExportedToCompiler_ = java.util.Collections.emptyList();

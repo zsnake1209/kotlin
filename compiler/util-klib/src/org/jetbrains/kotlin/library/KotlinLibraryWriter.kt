@@ -62,7 +62,6 @@ class SerializedIrFile(
     val fileData: ByteArray,
     val fqName: String,
     val path: String,
-    val symbols: ByteArray,
     val types: ByteArray,
     val signatures: ByteArray,
     val strings: ByteArray,

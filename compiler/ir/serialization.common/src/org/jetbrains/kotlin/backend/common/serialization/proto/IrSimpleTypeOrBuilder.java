@@ -22,13 +22,21 @@ public interface IrSimpleTypeOrBuilder extends
   int getAnnotationCount();
 
   /**
-   * <code>required int32 classifier = 2;</code>
+   * <code>required int64 classifier = 2;</code>
+   *
+   * <pre>
+   *  required int32 classifier = 2;
+   * </pre>
    */
   boolean hasClassifier();
   /**
-   * <code>required int32 classifier = 2;</code>
+   * <code>required int64 classifier = 2;</code>
+   *
+   * <pre>
+   *  required int32 classifier = 2;
+   * </pre>
    */
-  int getClassifier();
+  long getClassifier();
 
   /**
    * <code>required bool has_question_mark = 3;</code>

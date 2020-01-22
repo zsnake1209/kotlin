@@ -8,13 +8,21 @@ public interface IrFunctionReferenceOrBuilder extends
     org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
   /**
-   * <code>required int32 symbol = 1;</code>
+   * <code>required int64 symbol = 1;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 1;
+   * </pre>
    */
   boolean hasSymbol();
   /**
-   * <code>required int32 symbol = 1;</code>
+   * <code>required int64 symbol = 1;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 1;
+   * </pre>
    */
-  int getSymbol();
+  long getSymbol();
 
   /**
    * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrStatementOrigin origin = 2;</code>

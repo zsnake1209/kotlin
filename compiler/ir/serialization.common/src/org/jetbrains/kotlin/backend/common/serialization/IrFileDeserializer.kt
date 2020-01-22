@@ -127,8 +127,8 @@ abstract class IrFileDeserializer(
     val symbolTable: SymbolTable
 ) {
 
-    abstract fun deserializeIrSymbolToDeclare(index: Int): Pair<IrSymbol, IdSignature>
-    abstract fun deserializeIrSymbol(index: Int): IrSymbol
+    abstract fun deserializeIrSymbolToDeclare(code: Long): Pair<IrSymbol, IdSignature>
+    abstract fun deserializeIrSymbol(code: Long): IrSymbol
     abstract fun deserializeIrType(index: Int): IrType
     abstract fun deserializeIdSignature(index: Int): IdSignature
     abstract fun deserializeString(index: Int): String
@@ -136,9 +136,9 @@ abstract class IrFileDeserializer(
     abstract fun deserializeStatementBody(index: Int): IrElement
     abstract fun deserializeLoopHeader(loopIndex: Int, loopBuilder: () -> IrLoopBase): IrLoopBase
 
-    abstract fun deserializeSymbolId(index: Int): IdSignature
+    abstract fun deserializeSymbolId(code: Long): IdSignature
 
-    abstract fun referenceIrSymbol(symbol: IrSymbol, index: Int)
+    abstract fun referenceIrSymbol(symbol: IrSymbol, code: Long)
 
     private val parentsStack = mutableListOf<IrDeclarationParent>()
 
@@ -271,12 +271,17 @@ abstract class IrFileDeserializer(
         return IdSignature.BuiltInSignature(proto)
     }
 
+    private fun deserializeScopeLocalIdSignature(proto: Int): IdSignature.ScopeLocalDeclaration {
+        return IdSignature.ScopeLocalDeclaration(proto)
+    }
+
     fun deserializeSignatureData(proto: ProtoIdSignature): IdSignature {
         return when (proto.idsigCase) {
             PUBLIC_SIG -> deserializePublicIdSignature(proto.publicSig)
             ACCESSOR_SIG -> deserializeAccessorIdSignature(proto.accessorSig)
             PRIVATE_SIG -> deserializeFileLocalIdSignature(proto.privateSig)
             BUILTIN_SIG -> deserializeBuiltInIdSignature(proto.builtinSig)
+            SCOPED_LOCAL_SIG -> deserializeScopeLocalIdSignature(proto.scopedLocalSig)
             else -> error("Unexpected IdSignature kind: ${proto.idsigCase}")
         }
     }
@@ -750,16 +755,22 @@ abstract class IrFileDeserializer(
     // we create the loop before deserializing the body, so that
     // IrBreak statements have something to put into 'loop' field.
     private fun deserializeDoWhile(proto: ProtoDoWhile, start: Int, end: Int, type: IrType) =
-        deserializeLoop(proto.loop, deserializeLoopHeader(proto.loop.loopId) {
-            val origin = if (proto.loop.hasOrigin()) deserializeIrStatementOrigin(proto.loop.origin) else null
-            IrDoWhileLoopImpl(start, end, type, origin)
-        })
+        deserializeLoop(
+            proto.loop,
+            deserializeLoopHeader(proto.loop.loopId) {
+                val origin = if (proto.loop.hasOrigin()) deserializeIrStatementOrigin(proto.loop.origin) else null
+                IrDoWhileLoopImpl(start, end, type, origin)
+            }
+        )
 
     private fun deserializeWhile(proto: ProtoWhile, start: Int, end: Int, type: IrType) =
-        deserializeLoop(proto.loop, deserializeLoopHeader(proto.loop.loopId) {
-            val origin = if (proto.loop.hasOrigin()) deserializeIrStatementOrigin(proto.loop.origin) else null
-            IrWhileLoopImpl(start, end, type, origin)
-        })
+        deserializeLoop(
+            proto.loop,
+            deserializeLoopHeader(proto.loop.loopId) {
+                val origin = if (proto.loop.hasOrigin()) deserializeIrStatementOrigin(proto.loop.origin) else null
+                IrWhileLoopImpl(start, end, type, origin)
+            }
+        )
 
     private fun deserializeDynamicMemberExpression(
         proto: ProtoDynamicMemberExpression,

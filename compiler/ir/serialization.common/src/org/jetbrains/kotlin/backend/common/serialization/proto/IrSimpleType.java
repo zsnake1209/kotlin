@@ -63,7 +63,7 @@ public final class IrSimpleType extends
           }
           case 16: {
             bitField0_ |= 0x00000001;
-            classifier_ = input.readInt32();
+            classifier_ = input.readInt64();
             break;
           }
           case 24: {
@@ -168,17 +168,25 @@ public final class IrSimpleType extends
   }
 
   public static final int CLASSIFIER_FIELD_NUMBER = 2;
-  private int classifier_;
+  private long classifier_;
   /**
-   * <code>required int32 classifier = 2;</code>
+   * <code>required int64 classifier = 2;</code>
+   *
+   * <pre>
+   *  required int32 classifier = 2;
+   * </pre>
    */
   public boolean hasClassifier() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
-   * <code>required int32 classifier = 2;</code>
+   * <code>required int64 classifier = 2;</code>
+   *
+   * <pre>
+   *  required int32 classifier = 2;
+   * </pre>
    */
-  public int getClassifier() {
+  public long getClassifier() {
     return classifier_;
   }
 
@@ -249,7 +257,7 @@ public final class IrSimpleType extends
 
   private void initFields() {
     annotation_ = java.util.Collections.emptyList();
-    classifier_ = 0;
+    classifier_ = 0L;
     hasQuestionMark_ = false;
     argument_ = java.util.Collections.emptyList();
     abbreviation_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeAbbreviation.getDefaultInstance();
@@ -297,7 +305,7 @@ public final class IrSimpleType extends
       output.writeMessage(1, annotation_.get(i));
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeInt32(2, classifier_);
+      output.writeInt64(2, classifier_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeBool(3, hasQuestionMark_);
@@ -323,7 +331,7 @@ public final class IrSimpleType extends
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(2, classifier_);
+        .computeInt64Size(2, classifier_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -433,7 +441,7 @@ public final class IrSimpleType extends
       super.clear();
       annotation_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000001);
-      classifier_ = 0;
+      classifier_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000002);
       hasQuestionMark_ = false;
       bitField0_ = (bitField0_ & ~0x00000004);
@@ -700,34 +708,50 @@ public final class IrSimpleType extends
       return this;
     }
 
-    private int classifier_ ;
+    private long classifier_ ;
     /**
-     * <code>required int32 classifier = 2;</code>
+     * <code>required int64 classifier = 2;</code>
+     *
+     * <pre>
+     *  required int32 classifier = 2;
+     * </pre>
      */
     public boolean hasClassifier() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int32 classifier = 2;</code>
+     * <code>required int64 classifier = 2;</code>
+     *
+     * <pre>
+     *  required int32 classifier = 2;
+     * </pre>
      */
-    public int getClassifier() {
+    public long getClassifier() {
       return classifier_;
     }
     /**
-     * <code>required int32 classifier = 2;</code>
+     * <code>required int64 classifier = 2;</code>
+     *
+     * <pre>
+     *  required int32 classifier = 2;
+     * </pre>
      */
-    public Builder setClassifier(int value) {
+    public Builder setClassifier(long value) {
       bitField0_ |= 0x00000002;
       classifier_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 classifier = 2;</code>
+     * <code>required int64 classifier = 2;</code>
+     *
+     * <pre>
+     *  required int32 classifier = 2;
+     * </pre>
      */
     public Builder clearClassifier() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      classifier_ = 0;
+      classifier_ = 0L;
       
       return this;
     }

@@ -8,28 +8,19 @@ public interface IrSymbolDataOrBuilder extends
     org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind = 1;</code>
-   */
-  boolean hasKind();
-  /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind = 1;</code>
-   */
-  org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind getKind();
-
-  /**
-   * <code>required int32 id_sig = 2;</code>
+   * <code>required int64 symbol_code = 1;</code>
    *
    * <pre>
-   *  required int64 uniq_id_index = 3;
+   * [63..8 - id_sig index | 7..0 - symbol_kind]
    * </pre>
    */
-  boolean hasIdSig();
+  boolean hasSymbolCode();
   /**
-   * <code>required int32 id_sig = 2;</code>
+   * <code>required int64 symbol_code = 1;</code>
    *
    * <pre>
-   *  required int64 uniq_id_index = 3;
+   * [63..8 - id_sig index | 7..0 - symbol_kind]
    * </pre>
    */
-  int getIdSig();
+  long getSymbolCode();
 }

@@ -22,13 +22,21 @@ public interface IrTypeAbbreviationOrBuilder extends
   int getAnnotationCount();
 
   /**
-   * <code>required int32 type_alias = 2;</code>
+   * <code>required int64 type_alias = 2;</code>
+   *
+   * <pre>
+   *  required int32 type_alias = 2;
+   * </pre>
    */
   boolean hasTypeAlias();
   /**
-   * <code>required int32 type_alias = 2;</code>
+   * <code>required int64 type_alias = 2;</code>
+   *
+   * <pre>
+   *  required int32 type_alias = 2;
+   * </pre>
    */
-  int getTypeAlias();
+  long getTypeAlias();
 
   /**
    * <code>required bool has_question_mark = 3;</code>

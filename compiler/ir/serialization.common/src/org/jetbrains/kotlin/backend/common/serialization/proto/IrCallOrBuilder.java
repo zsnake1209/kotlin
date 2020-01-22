@@ -8,13 +8,21 @@ public interface IrCallOrBuilder extends
     org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
   /**
-   * <code>required int32 symbol = 1;</code>
+   * <code>required int64 symbol = 1;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 1;
+   * </pre>
    */
   boolean hasSymbol();
   /**
-   * <code>required int32 symbol = 1;</code>
+   * <code>required int64 symbol = 1;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 1;
+   * </pre>
    */
-  int getSymbol();
+  long getSymbol();
 
   /**
    * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.MemberAccessCommon member_access = 2;</code>
@@ -26,13 +34,21 @@ public interface IrCallOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.MemberAccessCommon getMemberAccess();
 
   /**
-   * <code>optional int32 super = 3;</code>
+   * <code>optional int64 super = 3;</code>
+   *
+   * <pre>
+   *  optional int32 super = 3;
+   * </pre>
    */
   boolean hasSuper();
   /**
-   * <code>optional int32 super = 3;</code>
+   * <code>optional int64 super = 3;</code>
+   *
+   * <pre>
+   *  optional int32 super = 3;
+   * </pre>
    */
-  int getSuper();
+  long getSuper();
 
   /**
    * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrStatementOrigin origin = 4;</code>

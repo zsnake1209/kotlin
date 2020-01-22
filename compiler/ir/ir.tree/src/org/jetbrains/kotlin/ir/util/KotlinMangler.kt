@@ -32,9 +32,4 @@ interface KotlinMangler {
         fun mangleDeclaration(descriptor: DeclarationDescriptor): String
         fun mangleEnumEntry(descriptor: ClassDescriptor): String
     }
-
-    companion object {
-        private val FUNCTION_PREFIX = "<BUILT-IN-FUNCTION>"
-        fun functionClassSymbolName(name: Name) = "ktype:$FUNCTION_PREFIX$name"
-    }
 }

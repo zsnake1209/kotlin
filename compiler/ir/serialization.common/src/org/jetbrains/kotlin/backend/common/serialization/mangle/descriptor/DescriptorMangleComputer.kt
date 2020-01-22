@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
+import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleConstant
 import org.jetbrains.kotlin.backend.common.serialization.mangle.collect
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
@@ -38,7 +39,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     private fun addPrefix(prefix: String, addPrefix: Boolean): Int {
         if (addPrefix) {
             builder.append(prefix)
-            builder.append(':')
+            builder.append(MangleConstant.PREFIX_SEPARATOR)
         }
         return builder.length
     }
@@ -47,7 +48,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         val prefixLength = addPrefix(prefix, addPrefix)
         containingDeclaration?.accept(this@DescriptorMangleComputer, false)
 
-        if (prefixLength != builder.length) builder.append('.')
+        if (prefixLength != builder.length) builder.append(MangleConstant.FQN_SEPARATOR)
 
         builder.append(name)
     }
@@ -62,37 +63,37 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
 
         isRealExpect = isRealExpect or isExpect
 
-        val prefixLength = addPrefix("kfun", prefix)
+        val prefixLength = addPrefix(MangleConstant.FUN_PREFIX, prefix)
 
         typeParameterContainer.add(container)
         container.containingDeclaration.accept(this@DescriptorMangleComputer, false)
 
-        if (prefixLength != builder.length) builder.append('.')
+        if (prefixLength != builder.length) builder.append(MangleConstant.FQN_SEPARATOR)
 
-        builder.append('#')
+        builder.append(MangleConstant.FUNCTION_NAME_PREFIX)
 
         if (visibility != Visibilities.INTERNAL) builder.append(name)
         else {
             builder.append(name)
-            builder.append('$')
+            builder.append(MangleConstant.MODULE_SEPARATOR)
             builder.append(module.name.asString().run { substring(1, lastIndex) })
         }
 
         mangleSignature(isCtor, container)
 
-        if (prefix && isRealExpect) builder.append("#expect")
+        if (prefix && isRealExpect) builder.append(MangleConstant.EXPECT_MARK)
     }
 
     private fun FunctionDescriptor.mangleSignature(isCtor: Boolean, realTypeParameterContainer: CallableDescriptor) {
 
         extensionReceiverParameter?.let {
-            builder.append('@')
+            builder.append(MangleConstant.EXTENSION_RECEIVER_PREFIX)
             mangleExtensionReceiverParameter(builder, it)
         }
 
-        valueParameters.collect(builder, ";", "(", ")") { mangleValueParameter(this, it) }
+        valueParameters.collect(builder, MangleConstant.VALUE_PARAMETERS) { mangleValueParameter(this, it) }
         realTypeParameterContainer.typeParameters.filter { it.containingDeclaration == realTypeParameterContainer }
-            .collect(builder, ";", "{", "}") { mangleTypeParameter(this, it) }
+            .collect(builder, MangleConstant.TYPE_PARAMETERS) { mangleTypeParameter(this, it) }
 
         returnType?.run {
             if (!isCtor && !isUnit()) {
@@ -108,14 +109,14 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     private fun mangleValueParameter(vpBuilder: StringBuilder, param: ValueParameterDescriptor) {
         mangleType(vpBuilder, param.type)
 
-        if (param.varargElementType != null) vpBuilder.append("...")
+        if (param.varargElementType != null) vpBuilder.append(MangleConstant.VAR_ARG_MARK)
     }
 
     private fun mangleTypeParameter(tpBuilder: StringBuilder, param: TypeParameterDescriptor) {
         tpBuilder.append(param.index)
-        tpBuilder.append('§')
+        tpBuilder.append(MangleConstant.UPPER_BOUND_SEPARATOR)
 
-        param.upperBounds.collect(tpBuilder, "&", "<", ">") { mangleType(this, it) }
+        param.upperBounds.collect(tpBuilder, MangleConstant.UPPER_BOUNDS) { mangleType(this, it) }
     }
 
     private fun mangleType(tBuilder: StringBuilder, wtype: KotlinType) {
@@ -128,13 +129,13 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
                 }
 
                 type.arguments.ifNotEmpty {
-                    collect(tBuilder, ",", "<", ">") { arg ->
+                    collect(tBuilder, MangleConstant.TYPE_ARGUMENTS) { arg ->
                         if (arg.isStarProjection) {
-                            append('*')
+                            append(MangleConstant.STAR_MARK)
                         } else {
                             if (arg.projectionKind != Variance.INVARIANT) {
                                 append(arg.projectionKind.label)
-                                append('|')
+                                append(MangleConstant.VARIANCE_SEPARATOR)
                             }
 
                             mangleType(this, arg.type)
@@ -142,9 +143,9 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
                     }
                 }
 
-                if (type.isMarkedNullable) tBuilder.append('?')
+                if (type.isMarkedNullable) tBuilder.append(MangleConstant.Q_MARK)
             }
-            is DynamicType -> tBuilder.append("<dynamic>")
+            is DynamicType -> tBuilder.append(MangleConstant.DYNAMIC_MARK)
             else -> error("Unexpected type $wtype")
         }
     }
@@ -155,7 +156,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         // TODO: what should we do in this case?
 //            require(ci >= 0) { "No type container found for ${typeParameter.render()}" }
         append(ci)
-        append(':')
+        append(MangleConstant.INDEX_SEPARATOR)
         append(typeParameter.index)
     }
 
@@ -177,24 +178,24 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     }
 
     override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: Boolean) {
-        addPrefix("ktypeparam", data)
+        addPrefix(MangleConstant.TYPE_PARAM_PREFIX, data)
         descriptor.containingDeclaration.accept(this, data)
 
-        builder.append('@')
+        builder.append(MangleConstant.TYPE_PARAM_INDEX_PREFIX)
         builder.append(descriptor.index)
     }
 
     override fun visitClassDescriptor(descriptor: ClassDescriptor, data: Boolean) {
         isRealExpect = isRealExpect or descriptor.isExpect
         typeParameterContainer.add(descriptor)
-        val prefix = if (specialPrefix == "kenumentry") specialPrefix else "kclass"
+        val prefix = if (specialPrefix == MangleConstant.ENUM_ENTRY_PREFIX) specialPrefix else MangleConstant.CLASS_PREFIX
         descriptor.mangleSimpleDeclaration(prefix, data, descriptor.name.asString())
 
-        if (data && isRealExpect) builder.append("#expect")
+        if (data && isRealExpect) builder.append(MangleConstant.EXPECT_MARK)
     }
 
     override fun visitTypeAliasDescriptor(descriptor: TypeAliasDescriptor, data: Boolean) {
-        descriptor.mangleSimpleDeclaration("ktypealias", data, descriptor.name.asString())
+        descriptor.mangleSimpleDeclaration(MangleConstant.TYPE_ALIAS_PREFIX, data, descriptor.name.asString())
     }
 
     override fun visitModuleDeclaration(descriptor: ModuleDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
@@ -208,22 +209,22 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, data: Boolean) {
         val extensionReceiver = descriptor.extensionReceiverParameter
 
-        val prefix = if (specialPrefix == "kfield") specialPrefix else "kprop"
+        val prefix = if (specialPrefix == MangleConstant.FIELD_PREFIX) specialPrefix else MangleConstant.PROPERTY_PREFIX
         val prefixLength = addPrefix(prefix, data)
 
         isRealExpect = isRealExpect or descriptor.isExpect
         typeParameterContainer.add(descriptor)
         descriptor.containingDeclaration.accept(this, false)
 
-        if (prefixLength != builder.length) builder.append('.')
+        if (prefixLength != builder.length) builder.append(MangleConstant.FQN_SEPARATOR)
 
         if (extensionReceiver != null) {
-            builder.append('@')
+            builder.append(MangleConstant.EXTENSION_RECEIVER_PREFIX)
             mangleExtensionReceiverParameter(builder, extensionReceiver)
         }
 
         builder.append(descriptor.name)
-        if (data && isRealExpect) builder.append("#expect")
+        if (data && isRealExpect) builder.append(MangleConstant.EXPECT_MARK)
     }
 
     override fun visitValueParameterDescriptor(descriptor: ValueParameterDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)

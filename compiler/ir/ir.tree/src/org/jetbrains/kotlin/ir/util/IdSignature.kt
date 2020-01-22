@@ -23,6 +23,8 @@ sealed class IdSignature {
 
     abstract fun render(): String
 
+    open val hasTopLevel: Boolean get() = !isPackageSignature()
+
     val isLocal: Boolean get() = !isPublic
 
     override fun toString(): String {
@@ -114,7 +116,28 @@ sealed class IdSignature {
             return this === other || other is BuiltInSignature && id == other.id
         }
 
-        override fun hashCode(): Int = id.toInt()
+        override fun hashCode(): Int = id.toInt() xor (id shr 32).toInt()
+    }
+
+    // Used to reference local variable and value parameters in function
+    class ScopeLocalDeclaration(val id: Int, val description: String = "<no description>") : IdSignature() {
+        override val isPublic: Boolean = false
+
+        override val hasTopLevel: Boolean = false
+
+        override fun topLevelSignature(): IdSignature = error("Is not supported for Local ID")
+
+        override fun nearestPublicSig(): IdSignature = error("Is not supported for Local ID")
+
+        override fun packageFqName(): FqName = error("Is not supported Local ID")
+
+        override fun render(): String = "#$id"
+
+        override fun equals(other: Any?): Boolean {
+            return other is ScopeLocalDeclaration && id == other.id
+        }
+
+        override fun hashCode(): Int = id
     }
 }
 

@@ -57,17 +57,29 @@ public interface IrFileOrBuilder extends
   int getAnnotationCount();
 
   /**
-   * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 explicitly_exported_to_compiler = 5;
+   * </pre>
    */
-  java.util.List<java.lang.Integer> getExplicitlyExportedToCompilerList();
+  java.util.List<java.lang.Long> getExplicitlyExportedToCompilerList();
   /**
-   * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 explicitly_exported_to_compiler = 5;
+   * </pre>
    */
   int getExplicitlyExportedToCompilerCount();
   /**
-   * <code>repeated int32 explicitly_exported_to_compiler = 5;</code>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 explicitly_exported_to_compiler = 5;
+   * </pre>
    */
-  int getExplicitlyExportedToCompiler(int index);
+  long getExplicitlyExportedToCompiler(int index);
 
   /**
    * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.Actual actuals = 6;</code>

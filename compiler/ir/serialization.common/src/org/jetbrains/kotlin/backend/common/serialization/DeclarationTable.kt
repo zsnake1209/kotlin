@@ -34,8 +34,7 @@ abstract class GlobalDeclarationTable(
 
     protected fun loadKnownBuiltins(builtIns: IrBuiltIns) {
         builtIns.knownBuiltins.forEach {
-            val index = mangler.run { it.mangle.hashMangle }
-            table[it] = IdSignature.BuiltInSignature(it.mangle, index).also { id -> clashTracker.commit(it, id) }
+            table[it] = it.symbol.signature.also { id -> clashTracker.commit(it, id) }
         }
     }
 

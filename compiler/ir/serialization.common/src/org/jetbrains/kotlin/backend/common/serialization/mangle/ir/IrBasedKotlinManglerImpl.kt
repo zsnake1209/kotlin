@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.common.serialization.mangle.ir
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.AbstractKotlinMangler
+import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleConstant
 import org.jetbrains.kotlin.backend.common.serialization.mangle.SpecialDeclarationType
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -20,10 +21,10 @@ abstract class IrBasedKotlinManglerImpl : AbstractKotlinMangler<IrDeclaration>()
     }
 
     override val IrFunction.functionName: String
-        get() = getMangleComputer("").computeMangleString(this)
+        get() = getMangleComputer(MangleConstant.EMPTY_PREFIX).computeMangleString(this)
 
     override val IrDeclaration.mangleString: String
-        get() = getMangleComputer("").computeMangle(this)
+        get() = getMangleComputer(MangleConstant.EMPTY_PREFIX).computeMangle(this)
 
     override val manglerName = "Ir"
 }

@@ -23,6 +23,7 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
     }
 
     private var localIndex: Long = startIndex
+    private var scopeIndex: Int = 0
     lateinit var table: DeclarationTable
 
     private inner class PublicIdSigBuilder : IdSignatureBuilder<IrDeclaration>(), IrElementVisitorVoid {
@@ -98,14 +99,18 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
         assert(!mangler.run { declaration.isExported() })
 
         return table.privateDeclarationSignature(declaration) {
-            val container = when (declaration) {
-                is IrField -> composeSignatureForDeclaration(declaration.correspondingPropertySymbol!!.owner)
-                is IrSimpleFunction -> declaration.correspondingPropertySymbol?.let {
-                    composeSignatureForDeclaration(it.owner)
-                } ?: composeContainerIdSignature(declaration.parent)
-                else -> composeContainerIdSignature(declaration.parent)
+            if (declaration is IrValueDeclaration) {
+                IdSignature.ScopeLocalDeclaration(scopeIndex++, declaration.name.asString())
+            } else {
+                val container = when (declaration) {
+                    is IrField -> composeSignatureForDeclaration(declaration.correspondingPropertySymbol!!.owner)
+                    is IrSimpleFunction -> declaration.correspondingPropertySymbol?.let {
+                        composeSignatureForDeclaration(it.owner)
+                    } ?: composeContainerIdSignature(declaration.parent)
+                    else -> composeContainerIdSignature(declaration.parent)
+                }
+                IdSignature.FileLocalSignature(container, ++localIndex)
             }
-            IdSignature.FileLocalSignature(container, ++localIndex)
         }
     }
 }

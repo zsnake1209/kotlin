@@ -63,7 +63,7 @@ public final class IrTypeAbbreviation extends
           }
           case 16: {
             bitField0_ |= 0x00000001;
-            typeAlias_ = input.readInt32();
+            typeAlias_ = input.readInt64();
             break;
           }
           case 24: {
@@ -155,17 +155,25 @@ public final class IrTypeAbbreviation extends
   }
 
   public static final int TYPE_ALIAS_FIELD_NUMBER = 2;
-  private int typeAlias_;
+  private long typeAlias_;
   /**
-   * <code>required int32 type_alias = 2;</code>
+   * <code>required int64 type_alias = 2;</code>
+   *
+   * <pre>
+   *  required int32 type_alias = 2;
+   * </pre>
    */
   public boolean hasTypeAlias() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
-   * <code>required int32 type_alias = 2;</code>
+   * <code>required int64 type_alias = 2;</code>
+   *
+   * <pre>
+   *  required int32 type_alias = 2;
+   * </pre>
    */
-  public int getTypeAlias() {
+  public long getTypeAlias() {
     return typeAlias_;
   }
 
@@ -221,7 +229,7 @@ public final class IrTypeAbbreviation extends
 
   private void initFields() {
     annotation_ = java.util.Collections.emptyList();
-    typeAlias_ = 0;
+    typeAlias_ = 0L;
     hasQuestionMark_ = false;
     argument_ = java.util.Collections.emptyList();
   }
@@ -262,7 +270,7 @@ public final class IrTypeAbbreviation extends
       output.writeMessage(1, annotation_.get(i));
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeInt32(2, typeAlias_);
+      output.writeInt64(2, typeAlias_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeBool(3, hasQuestionMark_);
@@ -285,7 +293,7 @@ public final class IrTypeAbbreviation extends
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(2, typeAlias_);
+        .computeInt64Size(2, typeAlias_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -391,7 +399,7 @@ public final class IrTypeAbbreviation extends
       super.clear();
       annotation_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000001);
-      typeAlias_ = 0;
+      typeAlias_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000002);
       hasQuestionMark_ = false;
       bitField0_ = (bitField0_ & ~0x00000004);
@@ -643,34 +651,50 @@ public final class IrTypeAbbreviation extends
       return this;
     }
 
-    private int typeAlias_ ;
+    private long typeAlias_ ;
     /**
-     * <code>required int32 type_alias = 2;</code>
+     * <code>required int64 type_alias = 2;</code>
+     *
+     * <pre>
+     *  required int32 type_alias = 2;
+     * </pre>
      */
     public boolean hasTypeAlias() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int32 type_alias = 2;</code>
+     * <code>required int64 type_alias = 2;</code>
+     *
+     * <pre>
+     *  required int32 type_alias = 2;
+     * </pre>
      */
-    public int getTypeAlias() {
+    public long getTypeAlias() {
       return typeAlias_;
     }
     /**
-     * <code>required int32 type_alias = 2;</code>
+     * <code>required int64 type_alias = 2;</code>
+     *
+     * <pre>
+     *  required int32 type_alias = 2;
+     * </pre>
      */
-    public Builder setTypeAlias(int value) {
+    public Builder setTypeAlias(long value) {
       bitField0_ |= 0x00000002;
       typeAlias_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 type_alias = 2;</code>
+     * <code>required int64 type_alias = 2;</code>
+     *
+     * <pre>
+     *  required int32 type_alias = 2;
+     * </pre>
      */
     public Builder clearTypeAlias() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      typeAlias_ = 0;
+      typeAlias_ = 0L;
       
       return this;
     }

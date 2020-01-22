@@ -8,11 +8,19 @@ public interface IrGetEnumValueOrBuilder extends
     org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
   /**
-   * <code>required int32 symbol = 2;</code>
+   * <code>required int64 symbol = 1;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 2;
+   * </pre>
    */
   boolean hasSymbol();
   /**
-   * <code>required int32 symbol = 2;</code>
+   * <code>required int64 symbol = 1;</code>
+   *
+   * <pre>
+   *  required int32 symbol = 2;
+   * </pre>
    */
-  int getSymbol();
+  long getSymbol();
 }

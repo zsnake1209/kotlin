@@ -54,20 +54,8 @@ public final class IrSymbolData extends
             break;
           }
           case 8: {
-            int rawValue = input.readEnum();
-            org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind value = org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind.valueOf(rawValue);
-            if (value == null) {
-              unknownFieldsCodedOutput.writeRawVarint32(tag);
-              unknownFieldsCodedOutput.writeRawVarint32(rawValue);
-            } else {
-              bitField0_ |= 0x00000001;
-              kind_ = value;
-            }
-            break;
-          }
-          case 16: {
-            bitField0_ |= 0x00000002;
-            idSig_ = input.readInt32();
+            bitField0_ |= 0x00000001;
+            symbolCode_ = input.readInt64();
             break;
           }
         }
@@ -104,47 +92,31 @@ public final class IrSymbolData extends
   }
 
   private int bitField0_;
-  public static final int KIND_FIELD_NUMBER = 1;
-  private org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind_;
+  public static final int SYMBOL_CODE_FIELD_NUMBER = 1;
+  private long symbolCode_;
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind = 1;</code>
+   * <code>required int64 symbol_code = 1;</code>
+   *
+   * <pre>
+   * [63..8 - id_sig index | 7..0 - symbol_kind]
+   * </pre>
    */
-  public boolean hasKind() {
+  public boolean hasSymbolCode() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind = 1;</code>
-   */
-  public org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind getKind() {
-    return kind_;
-  }
-
-  public static final int ID_SIG_FIELD_NUMBER = 2;
-  private int idSig_;
-  /**
-   * <code>required int32 id_sig = 2;</code>
+   * <code>required int64 symbol_code = 1;</code>
    *
    * <pre>
-   *  required int64 uniq_id_index = 3;
+   * [63..8 - id_sig index | 7..0 - symbol_kind]
    * </pre>
    */
-  public boolean hasIdSig() {
-    return ((bitField0_ & 0x00000002) == 0x00000002);
-  }
-  /**
-   * <code>required int32 id_sig = 2;</code>
-   *
-   * <pre>
-   *  required int64 uniq_id_index = 3;
-   * </pre>
-   */
-  public int getIdSig() {
-    return idSig_;
+  public long getSymbolCode() {
+    return symbolCode_;
   }
 
   private void initFields() {
-    kind_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind.FUNCTION_SYMBOL;
-    idSig_ = 0;
+    symbolCode_ = 0L;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -152,11 +124,7 @@ public final class IrSymbolData extends
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
 
-    if (!hasKind()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasIdSig()) {
+    if (!hasSymbolCode()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -168,10 +136,7 @@ public final class IrSymbolData extends
                       throws java.io.IOException {
     getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeEnum(1, kind_.getNumber());
-    }
-    if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeInt32(2, idSig_);
+      output.writeInt64(1, symbolCode_);
     }
     output.writeRawBytes(unknownFields);
   }
@@ -184,11 +149,7 @@ public final class IrSymbolData extends
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeEnumSize(1, kind_.getNumber());
-    }
-    if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(2, idSig_);
+        .computeInt64Size(1, symbolCode_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -284,10 +245,8 @@ public final class IrSymbolData extends
 
     public Builder clear() {
       super.clear();
-      kind_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind.FUNCTION_SYMBOL;
+      symbolCode_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000001);
-      idSig_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000002);
       return this;
     }
 
@@ -314,22 +273,15 @@ public final class IrSymbolData extends
       if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
         to_bitField0_ |= 0x00000001;
       }
-      result.kind_ = kind_;
-      if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-        to_bitField0_ |= 0x00000002;
-      }
-      result.idSig_ = idSig_;
+      result.symbolCode_ = symbolCode_;
       result.bitField0_ = to_bitField0_;
       return result;
     }
 
     public Builder mergeFrom(org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolData other) {
       if (other == org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolData.getDefaultInstance()) return this;
-      if (other.hasKind()) {
-        setKind(other.getKind());
-      }
-      if (other.hasIdSig()) {
-        setIdSig(other.getIdSig());
+      if (other.hasSymbolCode()) {
+        setSymbolCode(other.getSymbolCode());
       }
       setUnknownFields(
           getUnknownFields().concat(other.unknownFields));
@@ -337,11 +289,7 @@ public final class IrSymbolData extends
     }
 
     public final boolean isInitialized() {
-      if (!hasKind()) {
-        
-        return false;
-      }
-      if (!hasIdSig()) {
+      if (!hasSymbolCode()) {
         
         return false;
       }
@@ -367,85 +315,50 @@ public final class IrSymbolData extends
     }
     private int bitField0_;
 
-    private org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind.FUNCTION_SYMBOL;
+    private long symbolCode_ ;
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind = 1;</code>
+     * <code>required int64 symbol_code = 1;</code>
+     *
+     * <pre>
+     * [63..8 - id_sig index | 7..0 - symbol_kind]
+     * </pre>
      */
-    public boolean hasKind() {
+    public boolean hasSymbolCode() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind = 1;</code>
+     * <code>required int64 symbol_code = 1;</code>
+     *
+     * <pre>
+     * [63..8 - id_sig index | 7..0 - symbol_kind]
+     * </pre>
      */
-    public org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind getKind() {
-      return kind_;
+    public long getSymbolCode() {
+      return symbolCode_;
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind = 1;</code>
+     * <code>required int64 symbol_code = 1;</code>
+     *
+     * <pre>
+     * [63..8 - id_sig index | 7..0 - symbol_kind]
+     * </pre>
      */
-    public Builder setKind(org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
+    public Builder setSymbolCode(long value) {
       bitField0_ |= 0x00000001;
-      kind_ = value;
+      symbolCode_ = value;
       
       return this;
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind kind = 1;</code>
+     * <code>required int64 symbol_code = 1;</code>
+     *
+     * <pre>
+     * [63..8 - id_sig index | 7..0 - symbol_kind]
+     * </pre>
      */
-    public Builder clearKind() {
+    public Builder clearSymbolCode() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      kind_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolKind.FUNCTION_SYMBOL;
-      
-      return this;
-    }
-
-    private int idSig_ ;
-    /**
-     * <code>required int32 id_sig = 2;</code>
-     *
-     * <pre>
-     *  required int64 uniq_id_index = 3;
-     * </pre>
-     */
-    public boolean hasIdSig() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>required int32 id_sig = 2;</code>
-     *
-     * <pre>
-     *  required int64 uniq_id_index = 3;
-     * </pre>
-     */
-    public int getIdSig() {
-      return idSig_;
-    }
-    /**
-     * <code>required int32 id_sig = 2;</code>
-     *
-     * <pre>
-     *  required int64 uniq_id_index = 3;
-     * </pre>
-     */
-    public Builder setIdSig(int value) {
-      bitField0_ |= 0x00000002;
-      idSig_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required int32 id_sig = 2;</code>
-     *
-     * <pre>
-     *  required int64 uniq_id_index = 3;
-     * </pre>
-     */
-    public Builder clearIdSig() {
-      bitField0_ = (bitField0_ & ~0x00000002);
-      idSig_ = 0;
+      symbolCode_ = 0L;
       
       return this;
     }

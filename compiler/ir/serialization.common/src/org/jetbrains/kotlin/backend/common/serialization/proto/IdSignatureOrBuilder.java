@@ -42,4 +42,13 @@ public interface IdSignatureOrBuilder extends
    * <code>optional int64 builtin_sig = 4;</code>
    */
   long getBuiltinSig();
+
+  /**
+   * <code>optional int32 scoped_local_sig = 5;</code>
+   */
+  boolean hasScopedLocalSig();
+  /**
+   * <code>optional int32 scoped_local_sig = 5;</code>
+   */
+  int getScopedLocalSig();
 }

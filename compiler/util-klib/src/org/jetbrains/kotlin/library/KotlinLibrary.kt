@@ -39,7 +39,6 @@ interface IrLibrary {
     val dataFlowGraph: ByteArray?
     fun irDeclaration(index: Long, fileIndex: Int): ByteArray
     fun irDeclaration(index: Int, fileIndex: Int): ByteArray
-    fun symbol(index: Int, fileIndex: Int): ByteArray
     fun type(index: Int, fileIndex: Int): ByteArray
     fun signature(index: Int, fileIndex: Int): ByteArray
     fun string(index: Int, fileIndex: Int): ByteArray

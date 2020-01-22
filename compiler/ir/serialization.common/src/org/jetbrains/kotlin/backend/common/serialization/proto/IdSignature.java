@@ -97,6 +97,11 @@ public final class IdSignature extends
             idsig_ = input.readInt64();
             break;
           }
+          case 40: {
+            idsigCase_ = 5;
+            idsig_ = input.readInt32();
+            break;
+          }
         }
       }
     } catch (org.jetbrains.kotlin.protobuf.InvalidProtocolBufferException e) {
@@ -139,6 +144,7 @@ public final class IdSignature extends
     PRIVATE_SIG(2),
     ACCESSOR_SIG(3),
     BUILTIN_SIG(4),
+    SCOPED_LOCAL_SIG(5),
     IDSIG_NOT_SET(0);
     private int value = 0;
     private IdsigCase(int value) {
@@ -150,6 +156,7 @@ public final class IdSignature extends
         case 2: return PRIVATE_SIG;
         case 3: return ACCESSOR_SIG;
         case 4: return BUILTIN_SIG;
+        case 5: return SCOPED_LOCAL_SIG;
         case 0: return IDSIG_NOT_SET;
         default: throw new java.lang.IllegalArgumentException(
           "Value is undefined for this oneof enum.");
@@ -234,6 +241,23 @@ public final class IdSignature extends
     return 0L;
   }
 
+  public static final int SCOPED_LOCAL_SIG_FIELD_NUMBER = 5;
+  /**
+   * <code>optional int32 scoped_local_sig = 5;</code>
+   */
+  public boolean hasScopedLocalSig() {
+    return idsigCase_ == 5;
+  }
+  /**
+   * <code>optional int32 scoped_local_sig = 5;</code>
+   */
+  public int getScopedLocalSig() {
+    if (idsigCase_ == 5) {
+      return (java.lang.Integer) idsig_;
+    }
+    return 0;
+  }
+
   private void initFields() {
   }
   private byte memoizedIsInitialized = -1;
@@ -280,6 +304,10 @@ public final class IdSignature extends
       output.writeInt64(
           4, (long)((java.lang.Long) idsig_));
     }
+    if (idsigCase_ == 5) {
+      output.writeInt32(
+          5, (int)((java.lang.Integer) idsig_));
+    }
     output.writeRawBytes(unknownFields);
   }
 
@@ -305,6 +333,11 @@ public final class IdSignature extends
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeInt64Size(
             4, (long)((java.lang.Long) idsig_));
+    }
+    if (idsigCase_ == 5) {
+      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+        .computeInt32Size(
+            5, (int)((java.lang.Integer) idsig_));
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -437,6 +470,9 @@ public final class IdSignature extends
       if (idsigCase_ == 4) {
         result.idsig_ = idsig_;
       }
+      if (idsigCase_ == 5) {
+        result.idsig_ = idsig_;
+      }
       result.bitField0_ = to_bitField0_;
       result.idsigCase_ = idsigCase_;
       return result;
@@ -459,6 +495,10 @@ public final class IdSignature extends
         }
         case BUILTIN_SIG: {
           setBuiltinSig(other.getBuiltinSig());
+          break;
+        }
+        case SCOPED_LOCAL_SIG: {
+          setScopedLocalSig(other.getScopedLocalSig());
           break;
         }
         case IDSIG_NOT_SET: {
@@ -746,6 +786,42 @@ public final class IdSignature extends
      */
     public Builder clearBuiltinSig() {
       if (idsigCase_ == 4) {
+        idsigCase_ = 0;
+        idsig_ = null;
+        
+      }
+      return this;
+    }
+
+    /**
+     * <code>optional int32 scoped_local_sig = 5;</code>
+     */
+    public boolean hasScopedLocalSig() {
+      return idsigCase_ == 5;
+    }
+    /**
+     * <code>optional int32 scoped_local_sig = 5;</code>
+     */
+    public int getScopedLocalSig() {
+      if (idsigCase_ == 5) {
+        return (java.lang.Integer) idsig_;
+      }
+      return 0;
+    }
+    /**
+     * <code>optional int32 scoped_local_sig = 5;</code>
+     */
+    public Builder setScopedLocalSig(int value) {
+      idsigCase_ = 5;
+      idsig_ = value;
+      
+      return this;
+    }
+    /**
+     * <code>optional int32 scoped_local_sig = 5;</code>
+     */
+    public Builder clearScopedLocalSig() {
+      if (idsigCase_ == 5) {
         idsigCase_ = 0;
         idsig_ = null;
         

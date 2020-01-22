@@ -17,13 +17,10 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.resolve.descriptorUtil.isPublishedApi
 
 class JsIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable) :
-    KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, JsManglerIr) {
+    KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null) {
 
     override fun reader(moduleDescriptor: ModuleDescriptor, fileIndex: Int, idSigIndex: Int) =
         moduleDescriptor.kotlinLibrary.irDeclaration(idSigIndex, fileIndex)
-
-    override fun readSymbol(moduleDescriptor: ModuleDescriptor, fileIndex: Int, symbolIndex: Int) =
-        moduleDescriptor.kotlinLibrary.symbol(symbolIndex, fileIndex)
 
     override fun readType(moduleDescriptor: ModuleDescriptor, fileIndex: Int, typeIndex: Int) =
         moduleDescriptor.kotlinLibrary.type(typeIndex, fileIndex)

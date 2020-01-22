@@ -16,11 +16,11 @@ import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.name.Name
 
 abstract class AbstractKotlinMangler<D : Any> : KotlinMangler {
-    override val String.hashMangle get() = (this.cityHash64() % PUBLIC_MANGLE_FLAG) or PUBLIC_MANGLE_FLAG
+    override val String.hashMangle get() = cityHash64()
 
     abstract class AbstractDescriptorMangler : KotlinMangler.DescriptorMangler {
 
-        override fun String.hashMangle() = (this.cityHash64() % PUBLIC_MANGLE_FLAG) or PUBLIC_MANGLE_FLAG
+        override fun String.hashMangle() = cityHash64()
 
         protected abstract fun getMangleComputer(prefix: String): DescriptorMangleComputer
         protected abstract fun getExportChecker(): DescriptorExportCheckerVisitor
@@ -34,9 +34,9 @@ abstract class AbstractKotlinMangler<D : Any> : KotlinMangler {
         override fun isExportEnumEntry(declarationDescriptor: ClassDescriptor): Boolean =
             getExportChecker().check(declarationDescriptor, SpecialDeclarationType.ENUM_ENTRY)
 
-        override fun mangleDeclaration(descriptor: DeclarationDescriptor) = withPrefix("", descriptor)
+        override fun mangleDeclaration(descriptor: DeclarationDescriptor) = withPrefix(MangleConstant.EMPTY_PREFIX, descriptor)
 
-        override fun mangleEnumEntry(descriptor: ClassDescriptor) = withPrefix("kenumentry", descriptor)
+        override fun mangleEnumEntry(descriptor: ClassDescriptor) = withPrefix(MangleConstant.ENUM_ENTRY_PREFIX, descriptor)
     }
 
     protected abstract fun getExportChecker(): KotlinExportChecker<D>

@@ -90,21 +90,21 @@ public final class IrFunction extends
           }
           case 40: {
             if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-              overridden_ = new java.util.ArrayList<java.lang.Integer>();
+              overridden_ = new java.util.ArrayList<java.lang.Long>();
               mutable_bitField0_ |= 0x00000010;
             }
-            overridden_.add(input.readInt32());
+            overridden_.add(input.readInt64());
             break;
           }
           case 42: {
             int length = input.readRawVarint32();
             int limit = input.pushLimit(length);
             if (!((mutable_bitField0_ & 0x00000010) == 0x00000010) && input.getBytesUntilLimit() > 0) {
-              overridden_ = new java.util.ArrayList<java.lang.Integer>();
+              overridden_ = new java.util.ArrayList<java.lang.Long>();
               mutable_bitField0_ |= 0x00000010;
             }
             while (input.getBytesUntilLimit() > 0) {
-              overridden_.add(input.readInt32());
+              overridden_.add(input.readInt64());
             }
             input.popLimit(limit);
             break;
@@ -217,24 +217,36 @@ public final class IrFunction extends
   }
 
   public static final int OVERRIDDEN_FIELD_NUMBER = 5;
-  private java.util.List<java.lang.Integer> overridden_;
+  private java.util.List<java.lang.Long> overridden_;
   /**
-   * <code>repeated int32 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 overridden = 5;
+   * </pre>
    */
-  public java.util.List<java.lang.Integer>
+  public java.util.List<java.lang.Long>
       getOverriddenList() {
     return overridden_;
   }
   /**
-   * <code>repeated int32 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 overridden = 5;
+   * </pre>
    */
   public int getOverriddenCount() {
     return overridden_.size();
   }
   /**
-   * <code>repeated int32 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5;</code>
+   *
+   * <pre>
+   *  repeated int32 overridden = 5;
+   * </pre>
    */
-  public int getOverridden(int index) {
+  public long getOverridden(int index) {
     return overridden_.get(index);
   }
 
@@ -339,7 +351,7 @@ public final class IrFunction extends
       output.writeBool(4, isSuspend_);
     }
     for (int i = 0; i < overridden_.size(); i++) {
-      output.writeInt32(5, overridden_.get(i));
+      output.writeInt64(5, overridden_.get(i));
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       output.writeBool(8, isFakeOverride_);
@@ -376,7 +388,7 @@ public final class IrFunction extends
       int dataSize = 0;
       for (int i = 0; i < overridden_.size(); i++) {
         dataSize += org.jetbrains.kotlin.protobuf.CodedOutputStream
-          .computeInt32SizeNoTag(overridden_.get(i));
+          .computeInt64SizeNoTag(overridden_.get(i));
       }
       size += dataSize;
       size += 1 * getOverriddenList().size();
@@ -798,56 +810,80 @@ public final class IrFunction extends
       return this;
     }
 
-    private java.util.List<java.lang.Integer> overridden_ = java.util.Collections.emptyList();
+    private java.util.List<java.lang.Long> overridden_ = java.util.Collections.emptyList();
     private void ensureOverriddenIsMutable() {
       if (!((bitField0_ & 0x00000010) == 0x00000010)) {
-        overridden_ = new java.util.ArrayList<java.lang.Integer>(overridden_);
+        overridden_ = new java.util.ArrayList<java.lang.Long>(overridden_);
         bitField0_ |= 0x00000010;
        }
     }
     /**
-     * <code>repeated int32 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 overridden = 5;
+     * </pre>
      */
-    public java.util.List<java.lang.Integer>
+    public java.util.List<java.lang.Long>
         getOverriddenList() {
       return java.util.Collections.unmodifiableList(overridden_);
     }
     /**
-     * <code>repeated int32 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 overridden = 5;
+     * </pre>
      */
     public int getOverriddenCount() {
       return overridden_.size();
     }
     /**
-     * <code>repeated int32 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 overridden = 5;
+     * </pre>
      */
-    public int getOverridden(int index) {
+    public long getOverridden(int index) {
       return overridden_.get(index);
     }
     /**
-     * <code>repeated int32 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 overridden = 5;
+     * </pre>
      */
     public Builder setOverridden(
-        int index, int value) {
+        int index, long value) {
       ensureOverriddenIsMutable();
       overridden_.set(index, value);
       
       return this;
     }
     /**
-     * <code>repeated int32 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 overridden = 5;
+     * </pre>
      */
-    public Builder addOverridden(int value) {
+    public Builder addOverridden(long value) {
       ensureOverriddenIsMutable();
       overridden_.add(value);
       
       return this;
     }
     /**
-     * <code>repeated int32 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 overridden = 5;
+     * </pre>
      */
     public Builder addAllOverridden(
-        java.lang.Iterable<? extends java.lang.Integer> values) {
+        java.lang.Iterable<? extends java.lang.Long> values) {
       ensureOverriddenIsMutable();
       org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
           values, overridden_);
@@ -855,7 +891,11 @@ public final class IrFunction extends
       return this;
     }
     /**
-     * <code>repeated int32 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5;</code>
+     *
+     * <pre>
+     *  repeated int32 overridden = 5;
+     * </pre>
      */
     public Builder clearOverridden() {
       overridden_ = java.util.Collections.emptyList();
