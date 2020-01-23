@@ -9,18 +9,10 @@ public interface IrClassReferenceOrBuilder extends
 
   /**
    * <code>required int64 class_symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 class_symbol = 1;
-   * </pre>
    */
   boolean hasClassSymbol();
   /**
    * <code>required int64 class_symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 class_symbol = 1;
-   * </pre>
    */
   long getClassSymbol();
 

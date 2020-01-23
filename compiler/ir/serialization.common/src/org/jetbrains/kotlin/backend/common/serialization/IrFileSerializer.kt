@@ -26,9 +26,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.backend.common.serialization.proto.Actual as ProtoActual
-import org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId as ProtoClassAndPackageId
 import org.jetbrains.kotlin.backend.common.serialization.proto.ClassKind as ProtoClassKind
-import org.jetbrains.kotlin.backend.common.serialization.proto.Coordinates as ProtoCoordinates
 import org.jetbrains.kotlin.backend.common.serialization.proto.FieldAccessCommon as ProtoFieldAccessCommon
 import org.jetbrains.kotlin.backend.common.serialization.proto.FileEntry as ProtoFileEntry
 import org.jetbrains.kotlin.backend.common.serialization.proto.FileLocalIdSignature as ProtoFileLocalIdSignature
@@ -82,7 +80,6 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrSetField as Pro
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSetVariable as ProtoSetVariable
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSimpleType as ProtoSimpleType
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrSpreadElement as ProtoSpreadElement
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrStarProjection as ProtoStarProjection
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement as ProtoStatement
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatementOrigin as ProtoStatementOrigin
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStringConcat as ProtoStringConcat
@@ -93,12 +90,9 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrTry as ProtoTry
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrType as ProtoType
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeAbbreviation as ProtoTypeAbbreviation
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeAlias as ProtoTypeAlias
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument as ProtoTypeArgument
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeOp as ProtoTypeOp
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeOperator as ProtoTypeOperator
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter as ProtoTypeParameter
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer as ProtoTypeParameterContainer
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeProjection as ProtoTypeProjection
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeVariance as ProtoTypeVariance
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrValueParameter as ProtoValueParameter
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrVararg as ProtoVararg
@@ -112,7 +106,6 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.ModalityKind as P
 import org.jetbrains.kotlin.backend.common.serialization.proto.NullableIrExpression as ProtoNullableIrExpression
 import org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature as ProtoPublicIdSignature
 import org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature as ProtoAccessorIdSignature
-import org.jetbrains.kotlin.backend.common.serialization.proto.TypeArguments as ProtoTypeArguments
 import org.jetbrains.kotlin.backend.common.serialization.proto.Visibility as ProtoVisibility
 
 open class IrFileSerializer(
@@ -193,12 +186,7 @@ open class IrFileSerializer(
             .setName(serializeString(visibility.name))
             .build()
 
-    private fun serializeCoordinates(start: Int, end: Int): ProtoCoordinates {
-        return ProtoCoordinates.newBuilder()
-            .setStartOffset(start)
-            .setEndOffset(end)
-            .build()
-    }
+    private fun serializeCoordinates(start: Int, end: Int): Long = BinaryCoordinates.encode(start, end)
 
     /* ------- Strings ---------------------------------------------------------- */
 
@@ -211,16 +199,10 @@ open class IrFileSerializer(
 
     /* ------- IdSignature ------------------------------------------------------ */
 
-    private fun serializeClassId(packageFqn: FqName, classFqn: FqName): ProtoClassAndPackageId {
-        val proto = ProtoClassAndPackageId.newBuilder()
-        proto.addAllPackageFqName(serializeFqName(packageFqn))
-        proto.addAllClassFqName(serializeFqName(classFqn))
-        return proto.build()
-    }
-
     private fun serializePublicSignature(signature: IdSignature.PublicSignature): ProtoPublicIdSignature {
         val proto = ProtoPublicIdSignature.newBuilder()
-        proto.container = serializeClassId(signature.packageFqn, signature.classFqn)
+        proto.addAllPackageFqName(serializeFqName(signature.packageFqn))
+        proto.addAllClassFqName(serializeFqName(signature.classFqn))
 
         signature.id?.let { proto.memberUniqId = it }
 
@@ -330,13 +312,13 @@ open class IrFileSerializer(
 
     // TODO: we, probably, need a type table.
 
-    private fun serializeTypeArguments(call: IrMemberAccessExpression): ProtoTypeArguments {
-        val proto = ProtoTypeArguments.newBuilder()
-        for (i in 0 until call.typeArgumentsCount) {
-            proto.addTypeArgument(serializeIrType(call.getTypeArgument(i)!!))
-        }
-        return proto.build()
-    }
+//    private fun serializeTypeArguments(call: IrMemberAccessExpression): ProtoTypeArguments {
+//        val proto = ProtoTypeArguments.newBuilder()
+//        for (i in 0 until call.typeArgumentsCount) {
+//            proto.addTypeArgument(serializeIrType(call.getTypeArgument(i)!!))
+//        }
+//        return proto.build()
+//    }
 
     private fun serializeIrTypeVariance(variance: Variance) = when (variance) {
         Variance.IN_VARIANCE -> ProtoTypeVariance.IN
@@ -349,21 +331,17 @@ open class IrFileSerializer(
 
     private fun serializeFqName(fqName: FqName) = fqName.pathSegments().map { serializeString(it.asString()) }
 
-    private fun serializeIrTypeProjection(argument: IrTypeProjection): ProtoTypeProjection = ProtoTypeProjection.newBuilder()
-        .setVariance(serializeIrTypeVariance(argument.variance))
-        .setType(serializeIrType(argument.type))
-        .build()
+    private fun serializeIrStarProjection() = BinaryTypeProjection.STAR_CODE
 
-    private fun serializeTypeArgument(argument: IrTypeArgument): ProtoTypeArgument {
-        val proto = ProtoTypeArgument.newBuilder()
-        when (argument) {
-            is IrStarProjection ->
-                proto.star = ProtoStarProjection.newBuilder().build() // TODO: Do we need a singletone here? Or just an enum?
-            is IrTypeProjection ->
-                proto.type = serializeIrTypeProjection(argument)
+    private fun serializeIrTypeProjection(argument: IrTypeProjection) =
+        BinaryTypeProjection.encodeType(argument.variance, serializeIrType(argument.type))
+
+    private fun serializeTypeArgument(argument: IrTypeArgument): Long {
+        return when (argument) {
+            is IrStarProjection -> serializeIrStarProjection()
+            is IrTypeProjection -> serializeIrTypeProjection(argument)
             else -> TODO("Unexpected type argument kind: $argument")
         }
-        return proto.build()
     }
 
     private fun serializeSimpleType(type: IrSimpleType): ProtoSimpleType {
@@ -534,7 +512,11 @@ open class IrFileSerializer(
         if (call.dispatchReceiver != null) {
             proto.dispatchReceiver = serializeExpression(call.dispatchReceiver!!)
         }
-        proto.typeArguments = serializeTypeArguments(call)
+
+        for (index in 0 until call.typeArgumentsCount) {
+            val typeArgument = call.getTypeArgument(index) ?: error("Expected type argument at $index in ${call.render()}")
+            proto.addTypeArgument(serializeIrType(typeArgument))
+        }
 
         for (index in 0 until call.valueArgumentsCount) {
             val actual = call.getValueArgument(index)
@@ -1040,6 +1022,7 @@ open class IrFileSerializer(
             .setCoordinates(serializeCoordinates(declaration.startOffset, declaration.endOffset))
             .addAllAnnotation(serializeAnnotations(declaration.annotations))
             .setOrigin(serializeIrDeclarationOrigin(declaration.origin))
+            .setFlags(0)
             .build()
     }
 
@@ -1047,7 +1030,6 @@ open class IrFileSerializer(
         val proto = ProtoValueParameter.newBuilder()
             .setBase(serializeIrDeclarationBase(parameter))
             .setName(serializeName(parameter.name))
-            .setIndex(parameter.index)
             .setType(serializeIrType(parameter.type))
             .setIsCrossinline(parameter.isCrossinline)
             .setIsNoinline(parameter.isNoinline)
@@ -1062,19 +1044,10 @@ open class IrFileSerializer(
         val proto = ProtoTypeParameter.newBuilder()
             .setBase(serializeIrDeclarationBase(parameter))
             .setName(serializeName(parameter.name))
-            .setIndex(parameter.index)
             .setVariance(serializeIrTypeVariance(parameter.variance))
             .setIsReified(parameter.isReified)
         parameter.superTypes.forEach {
             proto.addSuperType(serializeIrType(it))
-        }
-        return proto.build()
-    }
-
-    private fun serializeIrTypeParameterContainer(typeParameters: List<IrTypeParameter>): ProtoTypeParameterContainer {
-        val proto = ProtoTypeParameterContainer.newBuilder()
-        typeParameters.forEach {
-            proto.addTypeParameter(serializeIrTypeParameter(it))
         }
         return proto.build()
     }
@@ -1088,7 +1061,10 @@ open class IrFileSerializer(
             .setIsExternal(function.isExternal)
             .setIsExpect(function.isExpect)
             .setReturnType(serializeIrType(function.returnType))
-            .setTypeParameters(serializeIrTypeParameterContainer(function.typeParameters))
+
+        function.typeParameters.forEach {
+            proto.addTypeParameter(serializeIrTypeParameter(it))
+        }
 
         function.dispatchReceiverParameter?.let { proto.setDispatchReceiver(serializeIrValueParameter(it)) }
         function.extensionReceiverParameter?.let { proto.setExtensionReceiver(serializeIrValueParameter(it)) }
@@ -1238,8 +1214,11 @@ open class IrFileSerializer(
             .setIsExternal(clazz.isExternal)
             .setIsInline(clazz.isInline)
             .setIsExpect(clazz.isExpect)
-            .setTypeParameters(serializeIrTypeParameterContainer(clazz.typeParameters))
             .setDeclarationContainer(serializeIrDeclarationContainer(clazz.declarations))
+
+        clazz.typeParameters.forEach {
+            proto.addTypeParameter(serializeIrTypeParameter(it))
+        }
         clazz.superTypes.forEach {
             proto.addSuperType(serializeIrType(it))
         }
@@ -1248,15 +1227,21 @@ open class IrFileSerializer(
         return proto.build()
     }
 
-    private fun serializeIrTypeAlias(typeAlias: IrTypeAlias): ProtoTypeAlias =
-        ProtoTypeAlias.newBuilder()
-            .setBase(serializeIrDeclarationBase(typeAlias))
+    private fun serializeIrTypeAlias(typeAlias: IrTypeAlias): ProtoTypeAlias {
+        val proto = ProtoTypeAlias.newBuilder()
+
+        proto.setBase(serializeIrDeclarationBase(typeAlias))
             .setName(serializeName(typeAlias.name))
             .setVisibility(serializeVisibility(typeAlias.visibility))
-            .setTypeParameters(serializeIrTypeParameterContainer(typeAlias.typeParameters))
             .setExpandedType(serializeIrType(typeAlias.expandedType))
             .setIsActual(typeAlias.isActual)
-            .build()
+
+        typeAlias.typeParameters.forEach {
+            proto.addTypeParameter(serializeIrTypeParameter(it))
+        }
+
+        return proto.build()
+    }
 
     private fun serializeIrEnumEntry(enumEntry: IrEnumEntry): ProtoEnumEntry {
         val proto = ProtoEnumEntry.newBuilder()

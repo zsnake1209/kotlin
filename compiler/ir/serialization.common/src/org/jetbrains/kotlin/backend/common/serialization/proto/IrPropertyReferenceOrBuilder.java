@@ -9,52 +9,28 @@ public interface IrPropertyReferenceOrBuilder extends
 
   /**
    * <code>optional int64 field = 1;</code>
-   *
-   * <pre>
-   *  optional int32 field = 1;
-   * </pre>
    */
   boolean hasField();
   /**
    * <code>optional int64 field = 1;</code>
-   *
-   * <pre>
-   *  optional int32 field = 1;
-   * </pre>
    */
   long getField();
 
   /**
    * <code>optional int64 getter = 2;</code>
-   *
-   * <pre>
-   *  optional int32 getter = 2;
-   * </pre>
    */
   boolean hasGetter();
   /**
    * <code>optional int64 getter = 2;</code>
-   *
-   * <pre>
-   *  optional int32 getter = 2;
-   * </pre>
    */
   long getGetter();
 
   /**
    * <code>optional int64 setter = 3;</code>
-   *
-   * <pre>
-   *  optional int32 setter = 3;
-   * </pre>
    */
   boolean hasSetter();
   /**
    * <code>optional int64 setter = 3;</code>
-   *
-   * <pre>
-   *  optional int32 setter = 3;
-   * </pre>
    */
   long getSetter();
 
@@ -78,18 +54,10 @@ public interface IrPropertyReferenceOrBuilder extends
 
   /**
    * <code>required int64 symbol = 6;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 6;
-   * </pre>
    */
   boolean hasSymbol();
   /**
    * <code>required int64 symbol = 6;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 6;
-   * </pre>
    */
   long getSymbol();
 }

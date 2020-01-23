@@ -53,13 +53,18 @@ public interface IrFunctionBaseOrBuilder extends
   boolean getIsExternal();
 
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer type_parameters = 6;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 6;</code>
    */
-  boolean hasTypeParameters();
+  java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> 
+      getTypeParameterList();
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer type_parameters = 6;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 6;</code>
    */
-  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer getTypeParameters();
+  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter getTypeParameter(int index);
+  /**
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 6;</code>
+   */
+  int getTypeParameterCount();
 
   /**
    * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrValueParameter dispatch_receiver = 7;</code>

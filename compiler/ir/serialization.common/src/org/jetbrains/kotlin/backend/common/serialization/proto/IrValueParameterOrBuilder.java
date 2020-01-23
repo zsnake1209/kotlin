@@ -26,56 +26,47 @@ public interface IrValueParameterOrBuilder extends
   int getName();
 
   /**
-   * <code>required int32 index = 3;</code>
-   */
-  boolean hasIndex();
-  /**
-   * <code>required int32 index = 3;</code>
-   */
-  int getIndex();
-
-  /**
-   * <code>required int32 type = 4;</code>
+   * <code>required int32 type = 3;</code>
    */
   boolean hasType();
   /**
-   * <code>required int32 type = 4;</code>
+   * <code>required int32 type = 3;</code>
    */
   int getType();
 
   /**
-   * <code>optional int32 vararg_element_type = 5;</code>
+   * <code>optional int32 vararg_element_type = 4;</code>
    */
   boolean hasVarargElementType();
   /**
-   * <code>optional int32 vararg_element_type = 5;</code>
+   * <code>optional int32 vararg_element_type = 4;</code>
    */
   int getVarargElementType();
 
   /**
-   * <code>required bool is_crossinline = 6;</code>
+   * <code>required bool is_crossinline = 5;</code>
    */
   boolean hasIsCrossinline();
   /**
-   * <code>required bool is_crossinline = 6;</code>
+   * <code>required bool is_crossinline = 5;</code>
    */
   boolean getIsCrossinline();
 
   /**
-   * <code>required bool is_noinline = 7;</code>
+   * <code>required bool is_noinline = 6;</code>
    */
   boolean hasIsNoinline();
   /**
-   * <code>required bool is_noinline = 7;</code>
+   * <code>required bool is_noinline = 6;</code>
    */
   boolean getIsNoinline();
 
   /**
-   * <code>optional int32 default_value = 8;</code>
+   * <code>optional int32 default_value = 7;</code>
    */
   boolean hasDefaultValue();
   /**
-   * <code>optional int32 default_value = 8;</code>
+   * <code>optional int32 default_value = 7;</code>
    */
   int getDefaultValue();
 }

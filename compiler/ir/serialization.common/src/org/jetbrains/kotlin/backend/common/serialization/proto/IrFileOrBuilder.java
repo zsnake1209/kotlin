@@ -8,15 +8,15 @@ public interface IrFileOrBuilder extends
     org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
   /**
-   * <code>repeated int32 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1 [packed = true];</code>
    */
   java.util.List<java.lang.Integer> getDeclarationIdList();
   /**
-   * <code>repeated int32 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1 [packed = true];</code>
    */
   int getDeclarationIdCount();
   /**
-   * <code>repeated int32 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1 [packed = true];</code>
    */
   int getDeclarationId(int index);
 
@@ -30,15 +30,15 @@ public interface IrFileOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.FileEntry getFileEntry();
 
   /**
-   * <code>repeated int32 fq_name = 3;</code>
+   * <code>repeated int32 fq_name = 3 [packed = true];</code>
    */
   java.util.List<java.lang.Integer> getFqNameList();
   /**
-   * <code>repeated int32 fq_name = 3;</code>
+   * <code>repeated int32 fq_name = 3 [packed = true];</code>
    */
   int getFqNameCount();
   /**
-   * <code>repeated int32 fq_name = 3;</code>
+   * <code>repeated int32 fq_name = 3 [packed = true];</code>
    */
   int getFqName(int index);
 
@@ -57,27 +57,15 @@ public interface IrFileOrBuilder extends
   int getAnnotationCount();
 
   /**
-   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-   *
-   * <pre>
-   *  repeated int32 explicitly_exported_to_compiler = 5;
-   * </pre>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
    */
   java.util.List<java.lang.Long> getExplicitlyExportedToCompilerList();
   /**
-   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-   *
-   * <pre>
-   *  repeated int32 explicitly_exported_to_compiler = 5;
-   * </pre>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
    */
   int getExplicitlyExportedToCompilerCount();
   /**
-   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-   *
-   * <pre>
-   *  repeated int32 explicitly_exported_to_compiler = 5;
-   * </pre>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
    */
   long getExplicitlyExportedToCompiler(int index);
 

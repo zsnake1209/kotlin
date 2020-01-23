@@ -31,7 +31,6 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclaration as ProtoDeclaration
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrFile as ProtoFile
-import org.jetbrains.kotlin.backend.common.serialization.proto.IrSymbolData as ProtoSymbolData
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrType as ProtoType
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement as ProtoStatement
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression as ProtoExpression
@@ -152,6 +151,8 @@ abstract class KotlinIrLinker(
 
             private val deserializeBodies: Boolean = !onlyHeaders
 
+            private val irTypeCache = mutableMapOf<Int, IrType>()
+
             var reversedSignatureIndex = emptyMap<IdSignature, Int>()
 
             private val fileLocalResolvedForwardDeclarations = mutableMapOf<IdSignature, IdSignature>()
@@ -164,8 +165,8 @@ abstract class KotlinIrLinker(
 
             fun deserializeExpectActualMapping() {
                 actuals.forEach {
-                    val expectSymbol = deserializeIrSymbolX(it.expectSymbol)
-                    val actualSymbol = deserializeIrSymbolX(it.actualSymbol)
+                    val expectSymbol = parseSymbolData(it.expectSymbol)
+                    val actualSymbol = parseSymbolData(it.actualSymbol)
 
                     val expect = deserializeIdSignature(expectSymbol.signatureId)
                     val actual = deserializeIdSignature(actualSymbol.signatureId)
@@ -213,15 +214,21 @@ abstract class KotlinIrLinker(
                 return String(readString(moduleDescriptor, fileIndex, index))
             }
 
-            private fun referenceDeserializedSymbol(proto: BinarySymbolData, idSig: IdSignature, descriptor: DeclarationDescriptor?) =
+            private fun referenceDeserializedSymbol(
+                symbolKind: BinarySymbolData.SymbolKind,
+                idSig: IdSignature,
+                descriptor: DeclarationDescriptor?
+            ) =
                 symbolTable.run {
-                    when (proto.kind) {
+                    when (symbolKind) {
                         BinarySymbolData.SymbolKind.ANONYMOUS_INIT_SYMBOL ->
                             IrAnonymousInitializerSymbolImpl(WrappedClassDescriptor()).also { require(idSig.isLocal) }
                         BinarySymbolData.SymbolKind.CLASS_SYMBOL ->  // TODO: FunctionInterfaces
                             referenceClassFromLinker(descriptor as ClassDescriptor? ?: WrappedClassDescriptor(), idSig)
-                        BinarySymbolData.SymbolKind.CONSTRUCTOR_SYMBOL -> referenceConstructorFromLinker(WrappedClassConstructorDescriptor(), idSig)
-                        BinarySymbolData.SymbolKind.TYPE_PARAMETER_SYMBOL -> referenceTypeParameterFromLinker(WrappedTypeParameterDescriptor(), idSig)
+                        BinarySymbolData.SymbolKind.CONSTRUCTOR_SYMBOL ->
+                            referenceConstructorFromLinker(WrappedClassConstructorDescriptor(), idSig)
+                        BinarySymbolData.SymbolKind.TYPE_PARAMETER_SYMBOL ->
+                            referenceTypeParameterFromLinker(WrappedTypeParameterDescriptor(), idSig)
                         BinarySymbolData.SymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntryFromLinker(WrappedEnumEntryDescriptor(), idSig)
                         BinarySymbolData.SymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
                         BinarySymbolData.SymbolKind.FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
@@ -231,10 +238,11 @@ abstract class KotlinIrLinker(
                         BinarySymbolData.SymbolKind.PROPERTY_SYMBOL -> referencePropertyFromLinker(WrappedPropertyDescriptor(), idSig)
                         BinarySymbolData.SymbolKind.VARIABLE_SYMBOL -> IrVariableSymbolImpl(WrappedVariableDescriptor())
                         BinarySymbolData.SymbolKind.VALUE_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedValueParameterDescriptor())
-                        BinarySymbolData.SymbolKind.RECEIVER_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedReceiverParameterDescriptor())
+                        BinarySymbolData.SymbolKind.RECEIVER_PARAMETER_SYMBOL ->
+                            IrValueParameterSymbolImpl(WrappedReceiverParameterDescriptor())
                         BinarySymbolData.SymbolKind.LOCAL_DELEGATED_PROPERTY_SYMBOL ->
                             IrLocalDelegatedPropertySymbolImpl(WrappedVariableDescriptorWithAccessor())
-                        else -> TODO("Unexpected classifier symbol kind: ${proto.kind}")
+                        else -> TODO("Unexpected classifier symbol kind: $symbolKind")
                     }
                 }
 
@@ -253,9 +261,7 @@ abstract class KotlinIrLinker(
                 return getModuleForTopLevelId(isSignature)?.moduleDeserializationState ?: handleNoModuleDeserializerFound(isSignature)
             }
 
-            private fun findDeserializationState(proto: BinarySymbolData): DeserializationState<*> {
-                val idSignature = deserializeIdSignature(proto.signatureId)
-
+            private fun findDeserializationState(idSignature: IdSignature): DeserializationState<*> {
                 if (idSignature.hasTopLevel) {
                     val topLevelSignature = idSignature.topLevelSignature()
 
@@ -274,10 +280,8 @@ abstract class KotlinIrLinker(
                 return fileLocalDeserializationState
             }
 
-            private fun referenceIrSymbolData(symbol: IrSymbol, proto: BinarySymbolData) {
-                val signature = deserializeIdSignature(proto.signatureId)
-                val deserializationState = findDeserializationState(proto)
-
+            private fun referenceIrSymbolData(symbol: IrSymbol, signature: IdSignature) {
+                val deserializationState = findDeserializationState(signature)
                 deserializationState.deserializedSymbols.putIfAbsent(signature, symbol)
             }
 
@@ -320,9 +324,8 @@ abstract class KotlinIrLinker(
                 return null
             }
 
-            private fun deserializeIrSymbolData(proto: BinarySymbolData): IrSymbol {
-                val idSignature = deserializeIdSignature(proto.signatureId)
-                val deserializationState = findDeserializationState(proto)
+            private fun deserializeIrSymbolData(idSignature: IdSignature, symbolKind: BinarySymbolData.SymbolKind): IrSymbol {
+                val deserializationState = findDeserializationState(idSignature)
 
                 val symbol = deserializationState.deserializedSymbols.getOrPut(idSignature) {
                     val descriptor = resolveSpecialDescriptor(idSignature)
@@ -332,7 +335,7 @@ abstract class KotlinIrLinker(
                         if (it !in fdState) fdState.addIdSignature(it)
                     }
 
-                    val symbol = referenceDeserializedSymbol(proto, idSignature, descriptor).let {
+                    val symbol = referenceDeserializedSymbol(symbolKind, idSignature, descriptor).let {
                         if (expectUniqIdToActualUniqId[idSignature] != null) wrapInDelegatedSymbol(it) else it
                     }
 
@@ -352,24 +355,24 @@ abstract class KotlinIrLinker(
             }
 
             override fun deserializeIrSymbolToDeclare(code: Long): Pair<IrSymbol, IdSignature> {
-                val symbolData = deserializeIrSymbolX(code)
-                return Pair(deserializeIrSymbolData(symbolData), deserializeIdSignature(symbolData.signatureId))
+                val symbolData = parseSymbolData(code)
+                val signature = deserializeIdSignature(symbolData.signatureId)
+                return Pair(deserializeIrSymbolData(signature, symbolData.kind), signature)
             }
 
-            fun deserializeIrSymbolX(code: Long): BinarySymbolData = BinarySymbolData.decode(code)
+            fun parseSymbolData(code: Long): BinarySymbolData = BinarySymbolData.decode(code)
 
             override fun deserializeIrSymbol(code: Long): IrSymbol {
-                val symbolData = deserializeIrSymbolX(code)
-                return deserializeIrSymbolData(symbolData)
-            }
-
-            override fun deserializeSymbolId(code: Long): IdSignature {
-                return deserializeIdSignature(deserializeIrSymbolX(code).signatureId)
+                val symbolData = parseSymbolData(code)
+                val signature = deserializeIdSignature(symbolData.signatureId)
+                return deserializeIrSymbolData(signature, symbolData.kind)
             }
 
             override fun deserializeIrType(index: Int): IrType {
-                val typeData = loadTypeProto(index)
-                return deserializeIrTypeData(typeData)
+                return irTypeCache.getOrPut(index) {
+                    val typeData = loadTypeProto(index)
+                    deserializeIrTypeData(typeData)
+                }
             }
 
             override fun deserializeIdSignature(index: Int): IdSignature {
@@ -403,9 +406,8 @@ abstract class KotlinIrLinker(
                 }
             }
 
-            override fun referenceIrSymbol(symbol: IrSymbol, code: Long) {
-                val symbolData = deserializeIrSymbolX(code)
-                referenceIrSymbolData(symbol, symbolData)
+            override fun referenceIrSymbol(symbol: IrSymbol, signature: IdSignature) {
+                referenceIrSymbolData(symbol, signature)
             }
 
             fun deserializeFileImplicitDataIfFirstUse() {
@@ -435,7 +437,7 @@ abstract class KotlinIrLinker(
                     // Explicitly exported declarations (e.g. top-level initializers) must be deserialized before all other declarations.
                     // Thus we schedule their deserialization in deserializer's constructor.
                     fileProto.explicitlyExportedToCompilerList.forEach {
-                        val symbolData = deserializeIrSymbolX(it)
+                        val symbolData = parseSymbolData(it)
                         val sig = deserializeIdSignature(symbolData.signatureId)
                         assert(!sig.isPackageSignature())
                         fileLocalDeserializationState.addIdSignature(sig.topLevelSignature())

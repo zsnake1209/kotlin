@@ -18,18 +18,10 @@ public interface IrSetVariableOrBuilder extends
 
   /**
    * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   boolean hasValue();
   /**
    * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression getValue();
 

@@ -114,20 +114,12 @@ public final class FieldAccessCommon extends
   private long symbol_;
   /**
    * <code>required int64 symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   public boolean hasSymbol() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
    * <code>required int64 symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   public long getSymbol() {
     return symbol_;
@@ -137,20 +129,12 @@ public final class FieldAccessCommon extends
   private long super_;
   /**
    * <code>optional int64 super = 2;</code>
-   *
-   * <pre>
-   *  optional int32 super = 2;
-   * </pre>
    */
   public boolean hasSuper() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
    * <code>optional int64 super = 2;</code>
-   *
-   * <pre>
-   *  optional int32 super = 2;
-   * </pre>
    */
   public long getSuper() {
     return super_;
@@ -420,30 +404,18 @@ public final class FieldAccessCommon extends
     private long symbol_ ;
     /**
      * <code>required int64 symbol = 1;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public boolean hasSymbol() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>required int64 symbol = 1;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public long getSymbol() {
       return symbol_;
     }
     /**
      * <code>required int64 symbol = 1;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public Builder setSymbol(long value) {
       bitField0_ |= 0x00000001;
@@ -453,10 +425,6 @@ public final class FieldAccessCommon extends
     }
     /**
      * <code>required int64 symbol = 1;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public Builder clearSymbol() {
       bitField0_ = (bitField0_ & ~0x00000001);
@@ -468,30 +436,18 @@ public final class FieldAccessCommon extends
     private long super_ ;
     /**
      * <code>optional int64 super = 2;</code>
-     *
-     * <pre>
-     *  optional int32 super = 2;
-     * </pre>
      */
     public boolean hasSuper() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>optional int64 super = 2;</code>
-     *
-     * <pre>
-     *  optional int32 super = 2;
-     * </pre>
      */
     public long getSuper() {
       return super_;
     }
     /**
      * <code>optional int64 super = 2;</code>
-     *
-     * <pre>
-     *  optional int32 super = 2;
-     * </pre>
      */
     public Builder setSuper(long value) {
       bitField0_ |= 0x00000002;
@@ -501,10 +457,6 @@ public final class FieldAccessCommon extends
     }
     /**
      * <code>optional int64 super = 2;</code>
-     *
-     * <pre>
-     *  optional int32 super = 2;
-     * </pre>
      */
     public Builder clearSuper() {
       bitField0_ = (bitField0_ & ~0x00000002);

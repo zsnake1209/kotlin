@@ -9,35 +9,19 @@ public interface ActualOrBuilder extends
 
   /**
    * <code>required int64 actual_symbol = 1;</code>
-   *
-   * <pre>
-   *    required int32 actual_symbol = 1;
-   * </pre>
    */
   boolean hasActualSymbol();
   /**
    * <code>required int64 actual_symbol = 1;</code>
-   *
-   * <pre>
-   *    required int32 actual_symbol = 1;
-   * </pre>
    */
   long getActualSymbol();
 
   /**
    * <code>required int64 expect_symbol = 2;</code>
-   *
-   * <pre>
-   *    required int32 expect_symbol = 2;
-   * </pre>
    */
   boolean hasExpectSymbol();
   /**
    * <code>required int64 expect_symbol = 2;</code>
-   *
-   * <pre>
-   *    required int32 expect_symbol = 2;
-   * </pre>
    */
   long getExpectSymbol();
 }

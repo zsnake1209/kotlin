@@ -23,18 +23,10 @@ public interface IrSimpleTypeOrBuilder extends
 
   /**
    * <code>required int64 classifier = 2;</code>
-   *
-   * <pre>
-   *  required int32 classifier = 2;
-   * </pre>
    */
   boolean hasClassifier();
   /**
    * <code>required int64 classifier = 2;</code>
-   *
-   * <pre>
-   *  required int32 classifier = 2;
-   * </pre>
    */
   long getClassifier();
 
@@ -48,18 +40,17 @@ public interface IrSimpleTypeOrBuilder extends
   boolean getHasQuestionMark();
 
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+   * <code>repeated int64 argument = 4 [packed = true];</code>
    */
-  java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument> 
-      getArgumentList();
+  java.util.List<java.lang.Long> getArgumentList();
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-   */
-  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument getArgument(int index);
-  /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+   * <code>repeated int64 argument = 4 [packed = true];</code>
    */
   int getArgumentCount();
+  /**
+   * <code>repeated int64 argument = 4 [packed = true];</code>
+   */
+  long getArgument(int index);
 
   /**
    * <code>optional .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeAbbreviation abbreviation = 5;</code>

@@ -197,24 +197,25 @@ public final class IrFile extends
   public static final int DECLARATION_ID_FIELD_NUMBER = 1;
   private java.util.List<java.lang.Integer> declarationId_;
   /**
-   * <code>repeated int32 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1 [packed = true];</code>
    */
   public java.util.List<java.lang.Integer>
       getDeclarationIdList() {
     return declarationId_;
   }
   /**
-   * <code>repeated int32 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1 [packed = true];</code>
    */
   public int getDeclarationIdCount() {
     return declarationId_.size();
   }
   /**
-   * <code>repeated int32 declaration_id = 1;</code>
+   * <code>repeated int32 declaration_id = 1 [packed = true];</code>
    */
   public int getDeclarationId(int index) {
     return declarationId_.get(index);
   }
+  private int declarationIdMemoizedSerializedSize = -1;
 
   public static final int FILE_ENTRY_FIELD_NUMBER = 2;
   private org.jetbrains.kotlin.backend.common.serialization.proto.FileEntry fileEntry_;
@@ -234,24 +235,25 @@ public final class IrFile extends
   public static final int FQ_NAME_FIELD_NUMBER = 3;
   private java.util.List<java.lang.Integer> fqName_;
   /**
-   * <code>repeated int32 fq_name = 3;</code>
+   * <code>repeated int32 fq_name = 3 [packed = true];</code>
    */
   public java.util.List<java.lang.Integer>
       getFqNameList() {
     return fqName_;
   }
   /**
-   * <code>repeated int32 fq_name = 3;</code>
+   * <code>repeated int32 fq_name = 3 [packed = true];</code>
    */
   public int getFqNameCount() {
     return fqName_.size();
   }
   /**
-   * <code>repeated int32 fq_name = 3;</code>
+   * <code>repeated int32 fq_name = 3 [packed = true];</code>
    */
   public int getFqName(int index) {
     return fqName_.get(index);
   }
+  private int fqNameMemoizedSerializedSize = -1;
 
   public static final int ANNOTATION_FIELD_NUMBER = 4;
   private java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrConstructorCall> annotation_;
@@ -291,36 +293,25 @@ public final class IrFile extends
   public static final int EXPLICITLY_EXPORTED_TO_COMPILER_FIELD_NUMBER = 5;
   private java.util.List<java.lang.Long> explicitlyExportedToCompiler_;
   /**
-   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-   *
-   * <pre>
-   *  repeated int32 explicitly_exported_to_compiler = 5;
-   * </pre>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
    */
   public java.util.List<java.lang.Long>
       getExplicitlyExportedToCompilerList() {
     return explicitlyExportedToCompiler_;
   }
   /**
-   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-   *
-   * <pre>
-   *  repeated int32 explicitly_exported_to_compiler = 5;
-   * </pre>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
    */
   public int getExplicitlyExportedToCompilerCount() {
     return explicitlyExportedToCompiler_.size();
   }
   /**
-   * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-   *
-   * <pre>
-   *  repeated int32 explicitly_exported_to_compiler = 5;
-   * </pre>
+   * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
    */
   public long getExplicitlyExportedToCompiler(int index) {
     return explicitlyExportedToCompiler_.get(index);
   }
+  private int explicitlyExportedToCompilerMemoizedSerializedSize = -1;
 
   public static final int ACTUALS_FIELD_NUMBER = 6;
   private java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.Actual> actuals_;
@@ -398,20 +389,32 @@ public final class IrFile extends
   public void writeTo(org.jetbrains.kotlin.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
     getSerializedSize();
+    if (getDeclarationIdList().size() > 0) {
+      output.writeRawVarint32(10);
+      output.writeRawVarint32(declarationIdMemoizedSerializedSize);
+    }
     for (int i = 0; i < declarationId_.size(); i++) {
-      output.writeInt32(1, declarationId_.get(i));
+      output.writeInt32NoTag(declarationId_.get(i));
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       output.writeMessage(2, fileEntry_);
     }
+    if (getFqNameList().size() > 0) {
+      output.writeRawVarint32(26);
+      output.writeRawVarint32(fqNameMemoizedSerializedSize);
+    }
     for (int i = 0; i < fqName_.size(); i++) {
-      output.writeInt32(3, fqName_.get(i));
+      output.writeInt32NoTag(fqName_.get(i));
     }
     for (int i = 0; i < annotation_.size(); i++) {
       output.writeMessage(4, annotation_.get(i));
     }
+    if (getExplicitlyExportedToCompilerList().size() > 0) {
+      output.writeRawVarint32(42);
+      output.writeRawVarint32(explicitlyExportedToCompilerMemoizedSerializedSize);
+    }
     for (int i = 0; i < explicitlyExportedToCompiler_.size(); i++) {
-      output.writeInt64(5, explicitlyExportedToCompiler_.get(i));
+      output.writeInt64NoTag(explicitlyExportedToCompiler_.get(i));
     }
     for (int i = 0; i < actuals_.size(); i++) {
       output.writeMessage(6, actuals_.get(i));
@@ -432,7 +435,12 @@ public final class IrFile extends
           .computeInt32SizeNoTag(declarationId_.get(i));
       }
       size += dataSize;
-      size += 1 * getDeclarationIdList().size();
+      if (!getDeclarationIdList().isEmpty()) {
+        size += 1;
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(dataSize);
+      }
+      declarationIdMemoizedSerializedSize = dataSize;
     }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -445,7 +453,12 @@ public final class IrFile extends
           .computeInt32SizeNoTag(fqName_.get(i));
       }
       size += dataSize;
-      size += 1 * getFqNameList().size();
+      if (!getFqNameList().isEmpty()) {
+        size += 1;
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(dataSize);
+      }
+      fqNameMemoizedSerializedSize = dataSize;
     }
     for (int i = 0; i < annotation_.size(); i++) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -458,7 +471,12 @@ public final class IrFile extends
           .computeInt64SizeNoTag(explicitlyExportedToCompiler_.get(i));
       }
       size += dataSize;
-      size += 1 * getExplicitlyExportedToCompilerList().size();
+      if (!getExplicitlyExportedToCompilerList().isEmpty()) {
+        size += 1;
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(dataSize);
+      }
+      explicitlyExportedToCompilerMemoizedSerializedSize = dataSize;
     }
     for (int i = 0; i < actuals_.size(); i++) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -737,26 +755,26 @@ public final class IrFile extends
        }
     }
     /**
-     * <code>repeated int32 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1 [packed = true];</code>
      */
     public java.util.List<java.lang.Integer>
         getDeclarationIdList() {
       return java.util.Collections.unmodifiableList(declarationId_);
     }
     /**
-     * <code>repeated int32 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1 [packed = true];</code>
      */
     public int getDeclarationIdCount() {
       return declarationId_.size();
     }
     /**
-     * <code>repeated int32 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1 [packed = true];</code>
      */
     public int getDeclarationId(int index) {
       return declarationId_.get(index);
     }
     /**
-     * <code>repeated int32 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1 [packed = true];</code>
      */
     public Builder setDeclarationId(
         int index, int value) {
@@ -766,7 +784,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int32 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1 [packed = true];</code>
      */
     public Builder addDeclarationId(int value) {
       ensureDeclarationIdIsMutable();
@@ -775,7 +793,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int32 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1 [packed = true];</code>
      */
     public Builder addAllDeclarationId(
         java.lang.Iterable<? extends java.lang.Integer> values) {
@@ -786,7 +804,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int32 declaration_id = 1;</code>
+     * <code>repeated int32 declaration_id = 1 [packed = true];</code>
      */
     public Builder clearDeclarationId() {
       declarationId_ = java.util.Collections.emptyList();
@@ -863,26 +881,26 @@ public final class IrFile extends
        }
     }
     /**
-     * <code>repeated int32 fq_name = 3;</code>
+     * <code>repeated int32 fq_name = 3 [packed = true];</code>
      */
     public java.util.List<java.lang.Integer>
         getFqNameList() {
       return java.util.Collections.unmodifiableList(fqName_);
     }
     /**
-     * <code>repeated int32 fq_name = 3;</code>
+     * <code>repeated int32 fq_name = 3 [packed = true];</code>
      */
     public int getFqNameCount() {
       return fqName_.size();
     }
     /**
-     * <code>repeated int32 fq_name = 3;</code>
+     * <code>repeated int32 fq_name = 3 [packed = true];</code>
      */
     public int getFqName(int index) {
       return fqName_.get(index);
     }
     /**
-     * <code>repeated int32 fq_name = 3;</code>
+     * <code>repeated int32 fq_name = 3 [packed = true];</code>
      */
     public Builder setFqName(
         int index, int value) {
@@ -892,7 +910,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int32 fq_name = 3;</code>
+     * <code>repeated int32 fq_name = 3 [packed = true];</code>
      */
     public Builder addFqName(int value) {
       ensureFqNameIsMutable();
@@ -901,7 +919,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int32 fq_name = 3;</code>
+     * <code>repeated int32 fq_name = 3 [packed = true];</code>
      */
     public Builder addAllFqName(
         java.lang.Iterable<? extends java.lang.Integer> values) {
@@ -912,7 +930,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int32 fq_name = 3;</code>
+     * <code>repeated int32 fq_name = 3 [packed = true];</code>
      */
     public Builder clearFqName() {
       fqName_ = java.util.Collections.emptyList();
@@ -1054,42 +1072,26 @@ public final class IrFile extends
        }
     }
     /**
-     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-     *
-     * <pre>
-     *  repeated int32 explicitly_exported_to_compiler = 5;
-     * </pre>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
      */
     public java.util.List<java.lang.Long>
         getExplicitlyExportedToCompilerList() {
       return java.util.Collections.unmodifiableList(explicitlyExportedToCompiler_);
     }
     /**
-     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-     *
-     * <pre>
-     *  repeated int32 explicitly_exported_to_compiler = 5;
-     * </pre>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
      */
     public int getExplicitlyExportedToCompilerCount() {
       return explicitlyExportedToCompiler_.size();
     }
     /**
-     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-     *
-     * <pre>
-     *  repeated int32 explicitly_exported_to_compiler = 5;
-     * </pre>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
      */
     public long getExplicitlyExportedToCompiler(int index) {
       return explicitlyExportedToCompiler_.get(index);
     }
     /**
-     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-     *
-     * <pre>
-     *  repeated int32 explicitly_exported_to_compiler = 5;
-     * </pre>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
      */
     public Builder setExplicitlyExportedToCompiler(
         int index, long value) {
@@ -1099,11 +1101,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-     *
-     * <pre>
-     *  repeated int32 explicitly_exported_to_compiler = 5;
-     * </pre>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
      */
     public Builder addExplicitlyExportedToCompiler(long value) {
       ensureExplicitlyExportedToCompilerIsMutable();
@@ -1112,11 +1110,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-     *
-     * <pre>
-     *  repeated int32 explicitly_exported_to_compiler = 5;
-     * </pre>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
      */
     public Builder addAllExplicitlyExportedToCompiler(
         java.lang.Iterable<? extends java.lang.Long> values) {
@@ -1127,11 +1121,7 @@ public final class IrFile extends
       return this;
     }
     /**
-     * <code>repeated int64 explicitly_exported_to_compiler = 5;</code>
-     *
-     * <pre>
-     *  repeated int32 explicitly_exported_to_compiler = 5;
-     * </pre>
+     * <code>repeated int64 explicitly_exported_to_compiler = 5 [packed = true];</code>
      */
     public Builder clearExplicitlyExportedToCompiler() {
       explicitlyExportedToCompiler_ = java.util.Collections.emptyList();

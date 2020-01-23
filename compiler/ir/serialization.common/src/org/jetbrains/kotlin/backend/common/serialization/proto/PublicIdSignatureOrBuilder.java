@@ -8,29 +8,46 @@ public interface PublicIdSignatureOrBuilder extends
     org.jetbrains.kotlin.protobuf.MessageLiteOrBuilder {
 
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
+   * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
    */
-  boolean hasContainer();
+  java.util.List<java.lang.Integer> getPackageFqNameList();
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
+   * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
    */
-  org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId getContainer();
+  int getPackageFqNameCount();
+  /**
+   * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
+   */
+  int getPackageFqName(int index);
 
   /**
-   * <code>optional int64 member_uniq_id = 2;</code>
+   * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+   */
+  java.util.List<java.lang.Integer> getClassFqNameList();
+  /**
+   * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+   */
+  int getClassFqNameCount();
+  /**
+   * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+   */
+  int getClassFqName(int index);
+
+  /**
+   * <code>optional int64 member_uniq_id = 3;</code>
    */
   boolean hasMemberUniqId();
   /**
-   * <code>optional int64 member_uniq_id = 2;</code>
+   * <code>optional int64 member_uniq_id = 3;</code>
    */
   long getMemberUniqId();
 
   /**
-   * <code>required int64 flags = 3;</code>
+   * <code>required int64 flags = 4;</code>
    */
   boolean hasFlags();
   /**
-   * <code>required int64 flags = 3;</code>
+   * <code>required int64 flags = 4;</code>
    */
   long getFlags();
 }

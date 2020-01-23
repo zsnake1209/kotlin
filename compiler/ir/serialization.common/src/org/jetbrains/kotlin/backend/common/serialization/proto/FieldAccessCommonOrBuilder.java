@@ -9,35 +9,19 @@ public interface FieldAccessCommonOrBuilder extends
 
   /**
    * <code>required int64 symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   boolean hasSymbol();
   /**
    * <code>required int64 symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   long getSymbol();
 
   /**
    * <code>optional int64 super = 2;</code>
-   *
-   * <pre>
-   *  optional int32 super = 2;
-   * </pre>
    */
   boolean hasSuper();
   /**
    * <code>optional int64 super = 2;</code>
-   *
-   * <pre>
-   *  optional int32 super = 2;
-   * </pre>
    */
   long getSuper();
 

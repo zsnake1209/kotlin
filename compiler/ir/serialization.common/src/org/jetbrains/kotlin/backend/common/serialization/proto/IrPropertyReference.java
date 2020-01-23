@@ -137,20 +137,12 @@ public final class IrPropertyReference extends
   private long field_;
   /**
    * <code>optional int64 field = 1;</code>
-   *
-   * <pre>
-   *  optional int32 field = 1;
-   * </pre>
    */
   public boolean hasField() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
    * <code>optional int64 field = 1;</code>
-   *
-   * <pre>
-   *  optional int32 field = 1;
-   * </pre>
    */
   public long getField() {
     return field_;
@@ -160,20 +152,12 @@ public final class IrPropertyReference extends
   private long getter_;
   /**
    * <code>optional int64 getter = 2;</code>
-   *
-   * <pre>
-   *  optional int32 getter = 2;
-   * </pre>
    */
   public boolean hasGetter() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
    * <code>optional int64 getter = 2;</code>
-   *
-   * <pre>
-   *  optional int32 getter = 2;
-   * </pre>
    */
   public long getGetter() {
     return getter_;
@@ -183,20 +167,12 @@ public final class IrPropertyReference extends
   private long setter_;
   /**
    * <code>optional int64 setter = 3;</code>
-   *
-   * <pre>
-   *  optional int32 setter = 3;
-   * </pre>
    */
   public boolean hasSetter() {
     return ((bitField0_ & 0x00000004) == 0x00000004);
   }
   /**
    * <code>optional int64 setter = 3;</code>
-   *
-   * <pre>
-   *  optional int32 setter = 3;
-   * </pre>
    */
   public long getSetter() {
     return setter_;
@@ -236,20 +212,12 @@ public final class IrPropertyReference extends
   private long symbol_;
   /**
    * <code>required int64 symbol = 6;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 6;
-   * </pre>
    */
   public boolean hasSymbol() {
     return ((bitField0_ & 0x00000020) == 0x00000020);
   }
   /**
    * <code>required int64 symbol = 6;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 6;
-   * </pre>
    */
   public long getSymbol() {
     return symbol_;
@@ -571,30 +539,18 @@ public final class IrPropertyReference extends
     private long field_ ;
     /**
      * <code>optional int64 field = 1;</code>
-     *
-     * <pre>
-     *  optional int32 field = 1;
-     * </pre>
      */
     public boolean hasField() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>optional int64 field = 1;</code>
-     *
-     * <pre>
-     *  optional int32 field = 1;
-     * </pre>
      */
     public long getField() {
       return field_;
     }
     /**
      * <code>optional int64 field = 1;</code>
-     *
-     * <pre>
-     *  optional int32 field = 1;
-     * </pre>
      */
     public Builder setField(long value) {
       bitField0_ |= 0x00000001;
@@ -604,10 +560,6 @@ public final class IrPropertyReference extends
     }
     /**
      * <code>optional int64 field = 1;</code>
-     *
-     * <pre>
-     *  optional int32 field = 1;
-     * </pre>
      */
     public Builder clearField() {
       bitField0_ = (bitField0_ & ~0x00000001);
@@ -619,30 +571,18 @@ public final class IrPropertyReference extends
     private long getter_ ;
     /**
      * <code>optional int64 getter = 2;</code>
-     *
-     * <pre>
-     *  optional int32 getter = 2;
-     * </pre>
      */
     public boolean hasGetter() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>optional int64 getter = 2;</code>
-     *
-     * <pre>
-     *  optional int32 getter = 2;
-     * </pre>
      */
     public long getGetter() {
       return getter_;
     }
     /**
      * <code>optional int64 getter = 2;</code>
-     *
-     * <pre>
-     *  optional int32 getter = 2;
-     * </pre>
      */
     public Builder setGetter(long value) {
       bitField0_ |= 0x00000002;
@@ -652,10 +592,6 @@ public final class IrPropertyReference extends
     }
     /**
      * <code>optional int64 getter = 2;</code>
-     *
-     * <pre>
-     *  optional int32 getter = 2;
-     * </pre>
      */
     public Builder clearGetter() {
       bitField0_ = (bitField0_ & ~0x00000002);
@@ -667,30 +603,18 @@ public final class IrPropertyReference extends
     private long setter_ ;
     /**
      * <code>optional int64 setter = 3;</code>
-     *
-     * <pre>
-     *  optional int32 setter = 3;
-     * </pre>
      */
     public boolean hasSetter() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>optional int64 setter = 3;</code>
-     *
-     * <pre>
-     *  optional int32 setter = 3;
-     * </pre>
      */
     public long getSetter() {
       return setter_;
     }
     /**
      * <code>optional int64 setter = 3;</code>
-     *
-     * <pre>
-     *  optional int32 setter = 3;
-     * </pre>
      */
     public Builder setSetter(long value) {
       bitField0_ |= 0x00000004;
@@ -700,10 +624,6 @@ public final class IrPropertyReference extends
     }
     /**
      * <code>optional int64 setter = 3;</code>
-     *
-     * <pre>
-     *  optional int32 setter = 3;
-     * </pre>
      */
     public Builder clearSetter() {
       bitField0_ = (bitField0_ & ~0x00000004);
@@ -835,30 +755,18 @@ public final class IrPropertyReference extends
     private long symbol_ ;
     /**
      * <code>required int64 symbol = 6;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 6;
-     * </pre>
      */
     public boolean hasSymbol() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>required int64 symbol = 6;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 6;
-     * </pre>
      */
     public long getSymbol() {
       return symbol_;
     }
     /**
      * <code>required int64 symbol = 6;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 6;
-     * </pre>
      */
     public Builder setSymbol(long value) {
       bitField0_ |= 0x00000020;
@@ -868,10 +776,6 @@ public final class IrPropertyReference extends
     }
     /**
      * <code>required int64 symbol = 6;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 6;
-     * </pre>
      */
     public Builder clearSymbol() {
       bitField0_ = (bitField0_ & ~0x00000020);

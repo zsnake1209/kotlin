@@ -44,26 +44,26 @@ public interface IrFunctionOrBuilder extends
   boolean getIsSuspend();
 
   /**
-   * <code>repeated int64 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5 [packed = true];</code>
    *
    * <pre>
-   *  repeated int32 overridden = 5;
+   * TODO: supposed to be deleted
    * </pre>
    */
   java.util.List<java.lang.Long> getOverriddenList();
   /**
-   * <code>repeated int64 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5 [packed = true];</code>
    *
    * <pre>
-   *  repeated int32 overridden = 5;
+   * TODO: supposed to be deleted
    * </pre>
    */
   int getOverriddenCount();
   /**
-   * <code>repeated int64 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5 [packed = true];</code>
    *
    * <pre>
-   *  repeated int32 overridden = 5;
+   * TODO: supposed to be deleted
    * </pre>
    */
   long getOverridden(int index);

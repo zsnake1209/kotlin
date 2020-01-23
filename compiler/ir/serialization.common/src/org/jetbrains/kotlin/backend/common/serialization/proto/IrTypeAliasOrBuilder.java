@@ -35,13 +35,18 @@ public interface IrTypeAliasOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.Visibility getVisibility();
 
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer type_parameters = 4;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
    */
-  boolean hasTypeParameters();
+  java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> 
+      getTypeParameterList();
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer type_parameters = 4;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
    */
-  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer getTypeParameters();
+  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter getTypeParameter(int index);
+  /**
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+   */
+  int getTypeParameterCount();
 
   /**
    * <code>required int32 expanded_type = 5;</code>

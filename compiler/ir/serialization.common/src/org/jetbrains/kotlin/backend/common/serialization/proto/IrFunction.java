@@ -219,10 +219,10 @@ public final class IrFunction extends
   public static final int OVERRIDDEN_FIELD_NUMBER = 5;
   private java.util.List<java.lang.Long> overridden_;
   /**
-   * <code>repeated int64 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5 [packed = true];</code>
    *
    * <pre>
-   *  repeated int32 overridden = 5;
+   * TODO: supposed to be deleted
    * </pre>
    */
   public java.util.List<java.lang.Long>
@@ -230,25 +230,26 @@ public final class IrFunction extends
     return overridden_;
   }
   /**
-   * <code>repeated int64 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5 [packed = true];</code>
    *
    * <pre>
-   *  repeated int32 overridden = 5;
+   * TODO: supposed to be deleted
    * </pre>
    */
   public int getOverriddenCount() {
     return overridden_.size();
   }
   /**
-   * <code>repeated int64 overridden = 5;</code>
+   * <code>repeated int64 overridden = 5 [packed = true];</code>
    *
    * <pre>
-   *  repeated int32 overridden = 5;
+   * TODO: supposed to be deleted
    * </pre>
    */
   public long getOverridden(int index) {
     return overridden_.get(index);
   }
+  private int overriddenMemoizedSerializedSize = -1;
 
   public static final int IS_FAKE_OVERRIDE_FIELD_NUMBER = 8;
   private boolean isFakeOverride_;
@@ -350,8 +351,12 @@ public final class IrFunction extends
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       output.writeBool(4, isSuspend_);
     }
+    if (getOverriddenList().size() > 0) {
+      output.writeRawVarint32(42);
+      output.writeRawVarint32(overriddenMemoizedSerializedSize);
+    }
     for (int i = 0; i < overridden_.size(); i++) {
-      output.writeInt64(5, overridden_.get(i));
+      output.writeInt64NoTag(overridden_.get(i));
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       output.writeBool(8, isFakeOverride_);
@@ -391,7 +396,12 @@ public final class IrFunction extends
           .computeInt64SizeNoTag(overridden_.get(i));
       }
       size += dataSize;
-      size += 1 * getOverriddenList().size();
+      if (!getOverriddenList().isEmpty()) {
+        size += 1;
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(dataSize);
+      }
+      overriddenMemoizedSerializedSize = dataSize;
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -818,10 +828,10 @@ public final class IrFunction extends
        }
     }
     /**
-     * <code>repeated int64 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5 [packed = true];</code>
      *
      * <pre>
-     *  repeated int32 overridden = 5;
+     * TODO: supposed to be deleted
      * </pre>
      */
     public java.util.List<java.lang.Long>
@@ -829,30 +839,30 @@ public final class IrFunction extends
       return java.util.Collections.unmodifiableList(overridden_);
     }
     /**
-     * <code>repeated int64 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5 [packed = true];</code>
      *
      * <pre>
-     *  repeated int32 overridden = 5;
+     * TODO: supposed to be deleted
      * </pre>
      */
     public int getOverriddenCount() {
       return overridden_.size();
     }
     /**
-     * <code>repeated int64 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5 [packed = true];</code>
      *
      * <pre>
-     *  repeated int32 overridden = 5;
+     * TODO: supposed to be deleted
      * </pre>
      */
     public long getOverridden(int index) {
       return overridden_.get(index);
     }
     /**
-     * <code>repeated int64 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5 [packed = true];</code>
      *
      * <pre>
-     *  repeated int32 overridden = 5;
+     * TODO: supposed to be deleted
      * </pre>
      */
     public Builder setOverridden(
@@ -863,10 +873,10 @@ public final class IrFunction extends
       return this;
     }
     /**
-     * <code>repeated int64 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5 [packed = true];</code>
      *
      * <pre>
-     *  repeated int32 overridden = 5;
+     * TODO: supposed to be deleted
      * </pre>
      */
     public Builder addOverridden(long value) {
@@ -876,10 +886,10 @@ public final class IrFunction extends
       return this;
     }
     /**
-     * <code>repeated int64 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5 [packed = true];</code>
      *
      * <pre>
-     *  repeated int32 overridden = 5;
+     * TODO: supposed to be deleted
      * </pre>
      */
     public Builder addAllOverridden(
@@ -891,10 +901,10 @@ public final class IrFunction extends
       return this;
     }
     /**
-     * <code>repeated int64 overridden = 5;</code>
+     * <code>repeated int64 overridden = 5 [packed = true];</code>
      *
      * <pre>
-     *  repeated int32 overridden = 5;
+     * TODO: supposed to be deleted
      * </pre>
      */
     public Builder clearOverridden() {

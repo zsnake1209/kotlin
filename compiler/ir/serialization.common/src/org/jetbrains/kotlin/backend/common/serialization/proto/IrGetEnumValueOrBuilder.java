@@ -9,18 +9,10 @@ public interface IrGetEnumValueOrBuilder extends
 
   /**
    * <code>required int64 symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 2;
-   * </pre>
    */
   boolean hasSymbol();
   /**
    * <code>required int64 symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 2;
-   * </pre>
    */
   long getSymbol();
 }

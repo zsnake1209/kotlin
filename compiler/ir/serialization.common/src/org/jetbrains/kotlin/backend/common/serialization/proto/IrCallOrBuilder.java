@@ -9,18 +9,10 @@ public interface IrCallOrBuilder extends
 
   /**
    * <code>required int64 symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   boolean hasSymbol();
   /**
    * <code>required int64 symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   long getSymbol();
 
@@ -35,18 +27,10 @@ public interface IrCallOrBuilder extends
 
   /**
    * <code>optional int64 super = 3;</code>
-   *
-   * <pre>
-   *  optional int32 super = 3;
-   * </pre>
    */
   boolean hasSuper();
   /**
    * <code>optional int64 super = 3;</code>
-   *
-   * <pre>
-   *  optional int32 super = 3;
-   * </pre>
    */
   long getSuper();
 

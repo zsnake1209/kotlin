@@ -26,13 +26,13 @@ inline class BinarySymbolData(val code: Long) {
 
     private fun symbolKindId(): Int = (code and 0xFF).toInt()
 
-    val signatureId: Int get() = (code shr 8).toInt()
+    val signatureId: Int get() = (code ushr 8).toInt()
     val kind: SymbolKind get() = SymbolKind.values()[symbolKindId()]
 
     companion object {
         fun encode(kind: SymbolKind, signatureId: Int): Long {
             val kindId = kind.ordinal
-            return (signatureId shl 8).toLong() or kindId.toLong()
+            return (signatureId.toLong() shl 8) or kindId.toLong()
         }
 
         fun decode(code: Long): BinarySymbolData = BinarySymbolData(code)

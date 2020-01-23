@@ -109,20 +109,12 @@ public final class IrReturn extends
   private long returnTarget_;
   /**
    * <code>required int64 return_target = 1;</code>
-   *
-   * <pre>
-   *  required int32 return_target = 1;
-   * </pre>
    */
   public boolean hasReturnTarget() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
    * <code>required int64 return_target = 1;</code>
-   *
-   * <pre>
-   *  required int32 return_target = 1;
-   * </pre>
    */
   public long getReturnTarget() {
     return returnTarget_;
@@ -379,30 +371,18 @@ public final class IrReturn extends
     private long returnTarget_ ;
     /**
      * <code>required int64 return_target = 1;</code>
-     *
-     * <pre>
-     *  required int32 return_target = 1;
-     * </pre>
      */
     public boolean hasReturnTarget() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>required int64 return_target = 1;</code>
-     *
-     * <pre>
-     *  required int32 return_target = 1;
-     * </pre>
      */
     public long getReturnTarget() {
       return returnTarget_;
     }
     /**
      * <code>required int64 return_target = 1;</code>
-     *
-     * <pre>
-     *  required int32 return_target = 1;
-     * </pre>
      */
     public Builder setReturnTarget(long value) {
       bitField0_ |= 0x00000001;
@@ -412,10 +392,6 @@ public final class IrReturn extends
     }
     /**
      * <code>required int64 return_target = 1;</code>
-     *
-     * <pre>
-     *  required int32 return_target = 1;
-     * </pre>
      */
     public Builder clearReturnTarget() {
       bitField0_ = (bitField0_ & ~0x00000001);

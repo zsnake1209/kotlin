@@ -137,20 +137,12 @@ public final class IrSetVariable extends
   private org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value_;
   /**
    * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   public boolean hasValue() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
    * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 1;
-   * </pre>
    */
   public org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression getValue() {
     return value_;
@@ -468,30 +460,18 @@ public final class IrSetVariable extends
     private org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression.getDefaultInstance();
     /**
      * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public boolean hasValue() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression getValue() {
       return value_;
     }
     /**
      * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public Builder setValue(org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value) {
       if (value == null) {
@@ -504,10 +484,6 @@ public final class IrSetVariable extends
     }
     /**
      * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public Builder setValue(
         org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression.Builder builderForValue) {
@@ -518,10 +494,6 @@ public final class IrSetVariable extends
     }
     /**
      * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public Builder mergeValue(org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value) {
       if (((bitField0_ & 0x00000002) == 0x00000002) &&
@@ -537,10 +509,6 @@ public final class IrSetVariable extends
     }
     /**
      * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression value = 2;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 1;
-     * </pre>
      */
     public Builder clearValue() {
       value_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrExpression.getDefaultInstance();

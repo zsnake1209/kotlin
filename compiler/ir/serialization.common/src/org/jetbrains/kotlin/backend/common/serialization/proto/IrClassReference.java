@@ -101,20 +101,12 @@ public final class IrClassReference extends
   private long classSymbol_;
   /**
    * <code>required int64 class_symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 class_symbol = 1;
-   * </pre>
    */
   public boolean hasClassSymbol() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
    * <code>required int64 class_symbol = 1;</code>
-   *
-   * <pre>
-   *  required int32 class_symbol = 1;
-   * </pre>
    */
   public long getClassSymbol() {
     return classSymbol_;
@@ -363,30 +355,18 @@ public final class IrClassReference extends
     private long classSymbol_ ;
     /**
      * <code>required int64 class_symbol = 1;</code>
-     *
-     * <pre>
-     *  required int32 class_symbol = 1;
-     * </pre>
      */
     public boolean hasClassSymbol() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>required int64 class_symbol = 1;</code>
-     *
-     * <pre>
-     *  required int32 class_symbol = 1;
-     * </pre>
      */
     public long getClassSymbol() {
       return classSymbol_;
     }
     /**
      * <code>required int64 class_symbol = 1;</code>
-     *
-     * <pre>
-     *  required int32 class_symbol = 1;
-     * </pre>
      */
     public Builder setClassSymbol(long value) {
       bitField0_ |= 0x00000001;
@@ -396,10 +376,6 @@ public final class IrClassReference extends
     }
     /**
      * <code>required int64 class_symbol = 1;</code>
-     *
-     * <pre>
-     *  required int32 class_symbol = 1;
-     * </pre>
      */
     public Builder clearClassSymbol() {
       bitField0_ = (bitField0_ & ~0x00000001);

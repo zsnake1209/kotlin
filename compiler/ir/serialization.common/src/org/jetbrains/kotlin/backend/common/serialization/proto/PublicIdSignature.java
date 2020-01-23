@@ -53,26 +53,55 @@ public final class PublicIdSignature extends
             }
             break;
           }
+          case 8: {
+            if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              packageFqName_ = new java.util.ArrayList<java.lang.Integer>();
+              mutable_bitField0_ |= 0x00000001;
+            }
+            packageFqName_.add(input.readInt32());
+            break;
+          }
           case 10: {
-            org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.Builder subBuilder = null;
-            if (((bitField0_ & 0x00000001) == 0x00000001)) {
-              subBuilder = container_.toBuilder();
+            int length = input.readRawVarint32();
+            int limit = input.pushLimit(length);
+            if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
+              packageFqName_ = new java.util.ArrayList<java.lang.Integer>();
+              mutable_bitField0_ |= 0x00000001;
             }
-            container_ = input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.PARSER, extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(container_);
-              container_ = subBuilder.buildPartial();
+            while (input.getBytesUntilLimit() > 0) {
+              packageFqName_.add(input.readInt32());
             }
-            bitField0_ |= 0x00000001;
+            input.popLimit(limit);
             break;
           }
           case 16: {
-            bitField0_ |= 0x00000002;
-            memberUniqId_ = input.readInt64();
+            if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+              classFqName_ = new java.util.ArrayList<java.lang.Integer>();
+              mutable_bitField0_ |= 0x00000002;
+            }
+            classFqName_.add(input.readInt32());
+            break;
+          }
+          case 18: {
+            int length = input.readRawVarint32();
+            int limit = input.pushLimit(length);
+            if (!((mutable_bitField0_ & 0x00000002) == 0x00000002) && input.getBytesUntilLimit() > 0) {
+              classFqName_ = new java.util.ArrayList<java.lang.Integer>();
+              mutable_bitField0_ |= 0x00000002;
+            }
+            while (input.getBytesUntilLimit() > 0) {
+              classFqName_.add(input.readInt32());
+            }
+            input.popLimit(limit);
             break;
           }
           case 24: {
-            bitField0_ |= 0x00000004;
+            bitField0_ |= 0x00000001;
+            memberUniqId_ = input.readInt64();
+            break;
+          }
+          case 32: {
+            bitField0_ |= 0x00000002;
             flags_ = input.readInt64();
             break;
           }
@@ -84,6 +113,12 @@ public final class PublicIdSignature extends
       throw new org.jetbrains.kotlin.protobuf.InvalidProtocolBufferException(
           e.getMessage()).setUnfinishedMessage(this);
     } finally {
+      if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+        packageFqName_ = java.util.Collections.unmodifiableList(packageFqName_);
+      }
+      if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+        classFqName_ = java.util.Collections.unmodifiableList(classFqName_);
+      }
       try {
         unknownFieldsCodedOutput.flush();
       } catch (java.io.IOException e) {
@@ -110,53 +145,85 @@ public final class PublicIdSignature extends
   }
 
   private int bitField0_;
-  public static final int CONTAINER_FIELD_NUMBER = 1;
-  private org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container_;
+  public static final int PACKAGE_FQ_NAME_FIELD_NUMBER = 1;
+  private java.util.List<java.lang.Integer> packageFqName_;
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
+   * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
    */
-  public boolean hasContainer() {
+  public java.util.List<java.lang.Integer>
+      getPackageFqNameList() {
+    return packageFqName_;
+  }
+  /**
+   * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
+   */
+  public int getPackageFqNameCount() {
+    return packageFqName_.size();
+  }
+  /**
+   * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
+   */
+  public int getPackageFqName(int index) {
+    return packageFqName_.get(index);
+  }
+  private int packageFqNameMemoizedSerializedSize = -1;
+
+  public static final int CLASS_FQ_NAME_FIELD_NUMBER = 2;
+  private java.util.List<java.lang.Integer> classFqName_;
+  /**
+   * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+   */
+  public java.util.List<java.lang.Integer>
+      getClassFqNameList() {
+    return classFqName_;
+  }
+  /**
+   * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+   */
+  public int getClassFqNameCount() {
+    return classFqName_.size();
+  }
+  /**
+   * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+   */
+  public int getClassFqName(int index) {
+    return classFqName_.get(index);
+  }
+  private int classFqNameMemoizedSerializedSize = -1;
+
+  public static final int MEMBER_UNIQ_ID_FIELD_NUMBER = 3;
+  private long memberUniqId_;
+  /**
+   * <code>optional int64 member_uniq_id = 3;</code>
+   */
+  public boolean hasMemberUniqId() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
-   */
-  public org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId getContainer() {
-    return container_;
-  }
-
-  public static final int MEMBER_UNIQ_ID_FIELD_NUMBER = 2;
-  private long memberUniqId_;
-  /**
-   * <code>optional int64 member_uniq_id = 2;</code>
-   */
-  public boolean hasMemberUniqId() {
-    return ((bitField0_ & 0x00000002) == 0x00000002);
-  }
-  /**
-   * <code>optional int64 member_uniq_id = 2;</code>
+   * <code>optional int64 member_uniq_id = 3;</code>
    */
   public long getMemberUniqId() {
     return memberUniqId_;
   }
 
-  public static final int FLAGS_FIELD_NUMBER = 3;
+  public static final int FLAGS_FIELD_NUMBER = 4;
   private long flags_;
   /**
-   * <code>required int64 flags = 3;</code>
+   * <code>required int64 flags = 4;</code>
    */
   public boolean hasFlags() {
-    return ((bitField0_ & 0x00000004) == 0x00000004);
+    return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
-   * <code>required int64 flags = 3;</code>
+   * <code>required int64 flags = 4;</code>
    */
   public long getFlags() {
     return flags_;
   }
 
   private void initFields() {
-    container_ = org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.getDefaultInstance();
+    packageFqName_ = java.util.Collections.emptyList();
+    classFqName_ = java.util.Collections.emptyList();
     memberUniqId_ = 0L;
     flags_ = 0L;
   }
@@ -166,10 +233,6 @@ public final class PublicIdSignature extends
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
 
-    if (!hasContainer()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     if (!hasFlags()) {
       memoizedIsInitialized = 0;
       return false;
@@ -181,14 +244,25 @@ public final class PublicIdSignature extends
   public void writeTo(org.jetbrains.kotlin.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
     getSerializedSize();
+    if (getPackageFqNameList().size() > 0) {
+      output.writeRawVarint32(10);
+      output.writeRawVarint32(packageFqNameMemoizedSerializedSize);
+    }
+    for (int i = 0; i < packageFqName_.size(); i++) {
+      output.writeInt32NoTag(packageFqName_.get(i));
+    }
+    if (getClassFqNameList().size() > 0) {
+      output.writeRawVarint32(18);
+      output.writeRawVarint32(classFqNameMemoizedSerializedSize);
+    }
+    for (int i = 0; i < classFqName_.size(); i++) {
+      output.writeInt32NoTag(classFqName_.get(i));
+    }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, container_);
+      output.writeInt64(3, memberUniqId_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeInt64(2, memberUniqId_);
-    }
-    if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeInt64(3, flags_);
+      output.writeInt64(4, flags_);
     }
     output.writeRawBytes(unknownFields);
   }
@@ -199,17 +273,41 @@ public final class PublicIdSignature extends
     if (size != -1) return size;
 
     size = 0;
+    {
+      int dataSize = 0;
+      for (int i = 0; i < packageFqName_.size(); i++) {
+        dataSize += org.jetbrains.kotlin.protobuf.CodedOutputStream
+          .computeInt32SizeNoTag(packageFqName_.get(i));
+      }
+      size += dataSize;
+      if (!getPackageFqNameList().isEmpty()) {
+        size += 1;
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(dataSize);
+      }
+      packageFqNameMemoizedSerializedSize = dataSize;
+    }
+    {
+      int dataSize = 0;
+      for (int i = 0; i < classFqName_.size(); i++) {
+        dataSize += org.jetbrains.kotlin.protobuf.CodedOutputStream
+          .computeInt32SizeNoTag(classFqName_.get(i));
+      }
+      size += dataSize;
+      if (!getClassFqNameList().isEmpty()) {
+        size += 1;
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(dataSize);
+      }
+      classFqNameMemoizedSerializedSize = dataSize;
+    }
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeMessageSize(1, container_);
+        .computeInt64Size(3, memberUniqId_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt64Size(2, memberUniqId_);
-    }
-    if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt64Size(3, flags_);
+        .computeInt64Size(4, flags_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -305,12 +403,14 @@ public final class PublicIdSignature extends
 
     public Builder clear() {
       super.clear();
-      container_ = org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.getDefaultInstance();
+      packageFqName_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000001);
-      memberUniqId_ = 0L;
+      classFqName_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000002);
-      flags_ = 0L;
+      memberUniqId_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000004);
+      flags_ = 0L;
+      bitField0_ = (bitField0_ & ~0x00000008);
       return this;
     }
 
@@ -334,16 +434,22 @@ public final class PublicIdSignature extends
       org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature result = new org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature(this);
       int from_bitField0_ = bitField0_;
       int to_bitField0_ = 0;
-      if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        packageFqName_ = java.util.Collections.unmodifiableList(packageFqName_);
+        bitField0_ = (bitField0_ & ~0x00000001);
+      }
+      result.packageFqName_ = packageFqName_;
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        classFqName_ = java.util.Collections.unmodifiableList(classFqName_);
+        bitField0_ = (bitField0_ & ~0x00000002);
+      }
+      result.classFqName_ = classFqName_;
+      if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
         to_bitField0_ |= 0x00000001;
       }
-      result.container_ = container_;
-      if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-        to_bitField0_ |= 0x00000002;
-      }
       result.memberUniqId_ = memberUniqId_;
-      if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-        to_bitField0_ |= 0x00000004;
+      if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+        to_bitField0_ |= 0x00000002;
       }
       result.flags_ = flags_;
       result.bitField0_ = to_bitField0_;
@@ -352,8 +458,25 @@ public final class PublicIdSignature extends
 
     public Builder mergeFrom(org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature other) {
       if (other == org.jetbrains.kotlin.backend.common.serialization.proto.PublicIdSignature.getDefaultInstance()) return this;
-      if (other.hasContainer()) {
-        mergeContainer(other.getContainer());
+      if (!other.packageFqName_.isEmpty()) {
+        if (packageFqName_.isEmpty()) {
+          packageFqName_ = other.packageFqName_;
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          ensurePackageFqNameIsMutable();
+          packageFqName_.addAll(other.packageFqName_);
+        }
+        
+      }
+      if (!other.classFqName_.isEmpty()) {
+        if (classFqName_.isEmpty()) {
+          classFqName_ = other.classFqName_;
+          bitField0_ = (bitField0_ & ~0x00000002);
+        } else {
+          ensureClassFqNameIsMutable();
+          classFqName_.addAll(other.classFqName_);
+        }
+        
       }
       if (other.hasMemberUniqId()) {
         setMemberUniqId(other.getMemberUniqId());
@@ -367,10 +490,6 @@ public final class PublicIdSignature extends
     }
 
     public final boolean isInitialized() {
-      if (!hasContainer()) {
-        
-        return false;
-      }
       if (!hasFlags()) {
         
         return false;
@@ -397,93 +516,165 @@ public final class PublicIdSignature extends
     }
     private int bitField0_;
 
-    private org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container_ = org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.getDefaultInstance();
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
-     */
-    public boolean hasContainer() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
+    private java.util.List<java.lang.Integer> packageFqName_ = java.util.Collections.emptyList();
+    private void ensurePackageFqNameIsMutable() {
+      if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        packageFqName_ = new java.util.ArrayList<java.lang.Integer>(packageFqName_);
+        bitField0_ |= 0x00000001;
+       }
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
+     * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
      */
-    public org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId getContainer() {
-      return container_;
+    public java.util.List<java.lang.Integer>
+        getPackageFqNameList() {
+      return java.util.Collections.unmodifiableList(packageFqName_);
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
+     * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
      */
-    public Builder setContainer(org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      container_ = value;
-
-      bitField0_ |= 0x00000001;
+    public int getPackageFqNameCount() {
+      return packageFqName_.size();
+    }
+    /**
+     * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
+     */
+    public int getPackageFqName(int index) {
+      return packageFqName_.get(index);
+    }
+    /**
+     * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
+     */
+    public Builder setPackageFqName(
+        int index, int value) {
+      ensurePackageFqNameIsMutable();
+      packageFqName_.set(index, value);
+      
       return this;
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
+     * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
      */
-    public Builder setContainer(
-        org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.Builder builderForValue) {
-      container_ = builderForValue.build();
-
-      bitField0_ |= 0x00000001;
+    public Builder addPackageFqName(int value) {
+      ensurePackageFqNameIsMutable();
+      packageFqName_.add(value);
+      
       return this;
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
+     * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
      */
-    public Builder mergeContainer(org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId value) {
-      if (((bitField0_ & 0x00000001) == 0x00000001) &&
-          container_ != org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.getDefaultInstance()) {
-        container_ =
-          org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.newBuilder(container_).mergeFrom(value).buildPartial();
-      } else {
-        container_ = value;
-      }
-
-      bitField0_ |= 0x00000001;
+    public Builder addAllPackageFqName(
+        java.lang.Iterable<? extends java.lang.Integer> values) {
+      ensurePackageFqNameIsMutable();
+      org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
+          values, packageFqName_);
+      
       return this;
     }
     /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId container = 1;</code>
+     * <code>repeated int32 package_fq_name = 1 [packed = true];</code>
      */
-    public Builder clearContainer() {
-      container_ = org.jetbrains.kotlin.backend.common.serialization.proto.ClassAndPackageId.getDefaultInstance();
-
+    public Builder clearPackageFqName() {
+      packageFqName_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000001);
+      
+      return this;
+    }
+
+    private java.util.List<java.lang.Integer> classFqName_ = java.util.Collections.emptyList();
+    private void ensureClassFqNameIsMutable() {
+      if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+        classFqName_ = new java.util.ArrayList<java.lang.Integer>(classFqName_);
+        bitField0_ |= 0x00000002;
+       }
+    }
+    /**
+     * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getClassFqNameList() {
+      return java.util.Collections.unmodifiableList(classFqName_);
+    }
+    /**
+     * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+     */
+    public int getClassFqNameCount() {
+      return classFqName_.size();
+    }
+    /**
+     * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+     */
+    public int getClassFqName(int index) {
+      return classFqName_.get(index);
+    }
+    /**
+     * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+     */
+    public Builder setClassFqName(
+        int index, int value) {
+      ensureClassFqNameIsMutable();
+      classFqName_.set(index, value);
+      
+      return this;
+    }
+    /**
+     * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+     */
+    public Builder addClassFqName(int value) {
+      ensureClassFqNameIsMutable();
+      classFqName_.add(value);
+      
+      return this;
+    }
+    /**
+     * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+     */
+    public Builder addAllClassFqName(
+        java.lang.Iterable<? extends java.lang.Integer> values) {
+      ensureClassFqNameIsMutable();
+      org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
+          values, classFqName_);
+      
+      return this;
+    }
+    /**
+     * <code>repeated int32 class_fq_name = 2 [packed = true];</code>
+     */
+    public Builder clearClassFqName() {
+      classFqName_ = java.util.Collections.emptyList();
+      bitField0_ = (bitField0_ & ~0x00000002);
+      
       return this;
     }
 
     private long memberUniqId_ ;
     /**
-     * <code>optional int64 member_uniq_id = 2;</code>
+     * <code>optional int64 member_uniq_id = 3;</code>
      */
     public boolean hasMemberUniqId() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional int64 member_uniq_id = 2;</code>
+     * <code>optional int64 member_uniq_id = 3;</code>
      */
     public long getMemberUniqId() {
       return memberUniqId_;
     }
     /**
-     * <code>optional int64 member_uniq_id = 2;</code>
+     * <code>optional int64 member_uniq_id = 3;</code>
      */
     public Builder setMemberUniqId(long value) {
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000004;
       memberUniqId_ = value;
       
       return this;
     }
     /**
-     * <code>optional int64 member_uniq_id = 2;</code>
+     * <code>optional int64 member_uniq_id = 3;</code>
      */
     public Builder clearMemberUniqId() {
-      bitField0_ = (bitField0_ & ~0x00000002);
+      bitField0_ = (bitField0_ & ~0x00000004);
       memberUniqId_ = 0L;
       
       return this;
@@ -491,31 +682,31 @@ public final class PublicIdSignature extends
 
     private long flags_ ;
     /**
-     * <code>required int64 flags = 3;</code>
+     * <code>required int64 flags = 4;</code>
      */
     public boolean hasFlags() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required int64 flags = 3;</code>
+     * <code>required int64 flags = 4;</code>
      */
     public long getFlags() {
       return flags_;
     }
     /**
-     * <code>required int64 flags = 3;</code>
+     * <code>required int64 flags = 4;</code>
      */
     public Builder setFlags(long value) {
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000008;
       flags_ = value;
       
       return this;
     }
     /**
-     * <code>required int64 flags = 3;</code>
+     * <code>required int64 flags = 4;</code>
      */
     public Builder clearFlags() {
-      bitField0_ = (bitField0_ & ~0x00000004);
+      bitField0_ = (bitField0_ & ~0x00000008);
       flags_ = 0L;
       
       return this;

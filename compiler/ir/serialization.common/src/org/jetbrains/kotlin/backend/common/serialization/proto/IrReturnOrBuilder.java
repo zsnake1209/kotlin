@@ -9,18 +9,10 @@ public interface IrReturnOrBuilder extends
 
   /**
    * <code>required int64 return_target = 1;</code>
-   *
-   * <pre>
-   *  required int32 return_target = 1;
-   * </pre>
    */
   boolean hasReturnTarget();
   /**
    * <code>required int64 return_target = 1;</code>
-   *
-   * <pre>
-   *  required int32 return_target = 1;
-   * </pre>
    */
   long getReturnTarget();
 

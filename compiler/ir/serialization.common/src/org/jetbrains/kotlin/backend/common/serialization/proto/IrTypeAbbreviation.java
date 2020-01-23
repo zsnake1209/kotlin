@@ -71,12 +71,25 @@ public final class IrTypeAbbreviation extends
             hasQuestionMark_ = input.readBool();
             break;
           }
-          case 34: {
+          case 32: {
             if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-              argument_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument>();
+              argument_ = new java.util.ArrayList<java.lang.Long>();
               mutable_bitField0_ |= 0x00000008;
             }
-            argument_.add(input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument.PARSER, extensionRegistry));
+            argument_.add(input.readInt64());
+            break;
+          }
+          case 34: {
+            int length = input.readRawVarint32();
+            int limit = input.pushLimit(length);
+            if (!((mutable_bitField0_ & 0x00000008) == 0x00000008) && input.getBytesUntilLimit() > 0) {
+              argument_ = new java.util.ArrayList<java.lang.Long>();
+              mutable_bitField0_ |= 0x00000008;
+            }
+            while (input.getBytesUntilLimit() > 0) {
+              argument_.add(input.readInt64());
+            }
+            input.popLimit(limit);
             break;
           }
         }
@@ -158,20 +171,12 @@ public final class IrTypeAbbreviation extends
   private long typeAlias_;
   /**
    * <code>required int64 type_alias = 2;</code>
-   *
-   * <pre>
-   *  required int32 type_alias = 2;
-   * </pre>
    */
   public boolean hasTypeAlias() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
    * <code>required int64 type_alias = 2;</code>
-   *
-   * <pre>
-   *  required int32 type_alias = 2;
-   * </pre>
    */
   public long getTypeAlias() {
     return typeAlias_;
@@ -193,39 +198,27 @@ public final class IrTypeAbbreviation extends
   }
 
   public static final int ARGUMENT_FIELD_NUMBER = 4;
-  private java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument> argument_;
+  private java.util.List<java.lang.Long> argument_;
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+   * <code>repeated int64 argument = 4 [packed = true];</code>
    */
-  public java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument> getArgumentList() {
+  public java.util.List<java.lang.Long>
+      getArgumentList() {
     return argument_;
   }
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-   */
-  public java.util.List<? extends org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgumentOrBuilder> 
-      getArgumentOrBuilderList() {
-    return argument_;
-  }
-  /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+   * <code>repeated int64 argument = 4 [packed = true];</code>
    */
   public int getArgumentCount() {
     return argument_.size();
   }
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+   * <code>repeated int64 argument = 4 [packed = true];</code>
    */
-  public org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument getArgument(int index) {
+  public long getArgument(int index) {
     return argument_.get(index);
   }
-  /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-   */
-  public org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgumentOrBuilder getArgumentOrBuilder(
-      int index) {
-    return argument_.get(index);
-  }
+  private int argumentMemoizedSerializedSize = -1;
 
   private void initFields() {
     annotation_ = java.util.Collections.emptyList();
@@ -253,12 +246,6 @@ public final class IrTypeAbbreviation extends
         return false;
       }
     }
-    for (int i = 0; i < getArgumentCount(); i++) {
-      if (!getArgument(i).isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-    }
     memoizedIsInitialized = 1;
     return true;
   }
@@ -275,8 +262,12 @@ public final class IrTypeAbbreviation extends
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeBool(3, hasQuestionMark_);
     }
+    if (getArgumentList().size() > 0) {
+      output.writeRawVarint32(34);
+      output.writeRawVarint32(argumentMemoizedSerializedSize);
+    }
     for (int i = 0; i < argument_.size(); i++) {
-      output.writeMessage(4, argument_.get(i));
+      output.writeInt64NoTag(argument_.get(i));
     }
     output.writeRawBytes(unknownFields);
   }
@@ -299,9 +290,19 @@ public final class IrTypeAbbreviation extends
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeBoolSize(3, hasQuestionMark_);
     }
-    for (int i = 0; i < argument_.size(); i++) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeMessageSize(4, argument_.get(i));
+    {
+      int dataSize = 0;
+      for (int i = 0; i < argument_.size(); i++) {
+        dataSize += org.jetbrains.kotlin.protobuf.CodedOutputStream
+          .computeInt64SizeNoTag(argument_.get(i));
+      }
+      size += dataSize;
+      if (!getArgumentList().isEmpty()) {
+        size += 1;
+        size += org.jetbrains.kotlin.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(dataSize);
+      }
+      argumentMemoizedSerializedSize = dataSize;
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -498,12 +499,6 @@ public final class IrTypeAbbreviation extends
           return false;
         }
       }
-      for (int i = 0; i < getArgumentCount(); i++) {
-        if (!getArgument(i).isInitialized()) {
-          
-          return false;
-        }
-      }
       return true;
     }
 
@@ -654,30 +649,18 @@ public final class IrTypeAbbreviation extends
     private long typeAlias_ ;
     /**
      * <code>required int64 type_alias = 2;</code>
-     *
-     * <pre>
-     *  required int32 type_alias = 2;
-     * </pre>
      */
     public boolean hasTypeAlias() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>required int64 type_alias = 2;</code>
-     *
-     * <pre>
-     *  required int32 type_alias = 2;
-     * </pre>
      */
     public long getTypeAlias() {
       return typeAlias_;
     }
     /**
      * <code>required int64 type_alias = 2;</code>
-     *
-     * <pre>
-     *  required int32 type_alias = 2;
-     * </pre>
      */
     public Builder setTypeAlias(long value) {
       bitField0_ |= 0x00000002;
@@ -687,10 +670,6 @@ public final class IrTypeAbbreviation extends
     }
     /**
      * <code>required int64 type_alias = 2;</code>
-     *
-     * <pre>
-     *  required int32 type_alias = 2;
-     * </pre>
      */
     public Builder clearTypeAlias() {
       bitField0_ = (bitField0_ & ~0x00000002);
@@ -731,128 +710,69 @@ public final class IrTypeAbbreviation extends
       return this;
     }
 
-    private java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument> argument_ =
-      java.util.Collections.emptyList();
+    private java.util.List<java.lang.Long> argument_ = java.util.Collections.emptyList();
     private void ensureArgumentIsMutable() {
       if (!((bitField0_ & 0x00000008) == 0x00000008)) {
-        argument_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument>(argument_);
+        argument_ = new java.util.ArrayList<java.lang.Long>(argument_);
         bitField0_ |= 0x00000008;
        }
     }
-
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+     * <code>repeated int64 argument = 4 [packed = true];</code>
      */
-    public java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument> getArgumentList() {
+    public java.util.List<java.lang.Long>
+        getArgumentList() {
       return java.util.Collections.unmodifiableList(argument_);
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+     * <code>repeated int64 argument = 4 [packed = true];</code>
      */
     public int getArgumentCount() {
       return argument_.size();
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+     * <code>repeated int64 argument = 4 [packed = true];</code>
      */
-    public org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument getArgument(int index) {
+    public long getArgument(int index) {
       return argument_.get(index);
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+     * <code>repeated int64 argument = 4 [packed = true];</code>
      */
     public Builder setArgument(
-        int index, org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
+        int index, long value) {
       ensureArgumentIsMutable();
       argument_.set(index, value);
-
+      
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+     * <code>repeated int64 argument = 4 [packed = true];</code>
      */
-    public Builder setArgument(
-        int index, org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument.Builder builderForValue) {
-      ensureArgumentIsMutable();
-      argument_.set(index, builderForValue.build());
-
-      return this;
-    }
-    /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-     */
-    public Builder addArgument(org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
+    public Builder addArgument(long value) {
       ensureArgumentIsMutable();
       argument_.add(value);
-
+      
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-     */
-    public Builder addArgument(
-        int index, org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      ensureArgumentIsMutable();
-      argument_.add(index, value);
-
-      return this;
-    }
-    /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-     */
-    public Builder addArgument(
-        org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument.Builder builderForValue) {
-      ensureArgumentIsMutable();
-      argument_.add(builderForValue.build());
-
-      return this;
-    }
-    /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-     */
-    public Builder addArgument(
-        int index, org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument.Builder builderForValue) {
-      ensureArgumentIsMutable();
-      argument_.add(index, builderForValue.build());
-
-      return this;
-    }
-    /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+     * <code>repeated int64 argument = 4 [packed = true];</code>
      */
     public Builder addAllArgument(
-        java.lang.Iterable<? extends org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument> values) {
+        java.lang.Iterable<? extends java.lang.Long> values) {
       ensureArgumentIsMutable();
       org.jetbrains.kotlin.protobuf.AbstractMessageLite.Builder.addAll(
           values, argument_);
-
+      
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
+     * <code>repeated int64 argument = 4 [packed = true];</code>
      */
     public Builder clearArgument() {
       argument_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000008);
-
-      return this;
-    }
-    /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeArgument argument = 4;</code>
-     */
-    public Builder removeArgument(int index) {
-      ensureArgumentIsMutable();
-      argument_.remove(index);
-
+      
       return this;
     }
 

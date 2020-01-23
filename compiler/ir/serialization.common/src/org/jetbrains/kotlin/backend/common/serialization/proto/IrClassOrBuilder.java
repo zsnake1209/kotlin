@@ -115,13 +115,18 @@ public interface IrClassOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.IrValueParameter getThisReceiver();
 
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer type_parameters = 12;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 12;</code>
    */
-  boolean hasTypeParameters();
+  java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> 
+      getTypeParameterList();
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer type_parameters = 12;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 12;</code>
    */
-  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterContainer getTypeParameters();
+  org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter getTypeParameter(int index);
+  /**
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 12;</code>
+   */
+  int getTypeParameterCount();
 
   /**
    * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationContainer declaration_container = 13;</code>
@@ -133,15 +138,15 @@ public interface IrClassOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationContainer getDeclarationContainer();
 
   /**
-   * <code>repeated int32 super_type = 14;</code>
+   * <code>repeated int32 super_type = 14 [packed = true];</code>
    */
   java.util.List<java.lang.Integer> getSuperTypeList();
   /**
-   * <code>repeated int32 super_type = 14;</code>
+   * <code>repeated int32 super_type = 14 [packed = true];</code>
    */
   int getSuperTypeCount();
   /**
-   * <code>repeated int32 super_type = 14;</code>
+   * <code>repeated int32 super_type = 14 [packed = true];</code>
    */
   int getSuperType(int index);
 

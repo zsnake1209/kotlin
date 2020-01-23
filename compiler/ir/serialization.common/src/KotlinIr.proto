@@ -5,11 +5,6 @@ option java_multiple_files = true;
 option java_outer_classname = "KotlinIr";
 option optimize_for = LITE_RUNTIME;
 
-message Coordinates {
-  required int32 start_offset = 1;
-  required int32 end_offset = 2;
-}
-
 message Visibility {
   required int32 name = 1;
 }
@@ -64,29 +59,25 @@ message IrDeclarationContainer {
 
 message FileEntry {
   required string name = 1;
-  repeated int32 line_start_offsets = 2;
+  repeated int32 line_start_offsets = 2 [packed=true];
 }
 
 message IrFile {
-  repeated int32 declaration_id = 1;
+  repeated int32 declaration_id = 1 [packed=true];
   required FileEntry file_entry = 2;
-  repeated int32 fq_name = 3;
+  repeated int32 fq_name = 3 [packed=true];
   repeated IrConstructorCall annotation = 4;
-  repeated int64 explicitly_exported_to_compiler = 5;
+  repeated int64 explicitly_exported_to_compiler = 5 [packed=true];
   repeated Actual actuals = 6;
 }
 
 /* ------ IdSignature -------------------------------------------- */
 
-message ClassAndPackageId {
-  repeated int32 package_fq_name = 1;
-  repeated int32 class_fq_name = 2;
-}
-
 message PublicIdSignature {
-  required ClassAndPackageId container = 1;
-  optional int64 member_uniq_id = 2;
-  required int64 flags = 3;
+  repeated int32 package_fq_name = 1 [packed=true];
+  repeated int32 class_fq_name = 2 [packed=true];
+  optional int64 member_uniq_id = 3;
+  required int64 flags = 4;
 }
 
 message AccessorIdSignature {
@@ -113,11 +104,6 @@ message IdSignature {
 
 /* ------ IrSymbols --------------------------------------------- */
 
-message IrSymbolData {
-  required int64 symbol_code = 1; // [63..8 - id_sig index | 7..0 - symbol_kind]
-
-}
-
 message Actual {
     required int64 actual_symbol = 1;
     required int64 expect_symbol = 2;
@@ -131,31 +117,14 @@ enum IrTypeVariance { // Should we import metadata variance, or better stay sepa
                       INV = 2;
 }
 
-message TypeArguments {
-  repeated int32 type_argument = 1;
-}
-
-message IrStarProjection {
-  optional bool void = 1;
-}
-
-message IrTypeProjection {
-  required IrTypeVariance variance = 1;
-  required int32 type = 2;
-}
-
-message IrTypeArgument {
-  oneof kind {
-    IrStarProjection star = 1;
-    IrTypeProjection type = 2;
-  }
-}
+// Note: IrTypeArgument [63..2 - IrType index | 1..0 - Variance]
+// If x...xxx00 -> *
 
 message IrSimpleType {
   repeated IrConstructorCall annotation = 1;
   required int64 classifier = 2;
   required bool has_question_mark = 3;
-  repeated IrTypeArgument argument = 4;
+  repeated int64 argument = 4 [packed=true];
   optional IrTypeAbbreviation abbreviation = 5;
 }
 
@@ -163,7 +132,7 @@ message IrTypeAbbreviation {
   repeated IrConstructorCall annotation = 1;
   required int64 type_alias = 2;
   required bool has_question_mark = 3;
-  repeated IrTypeArgument argument = 4;
+  repeated int64 argument = 4 [packed=true];
 }
 
 message IrDynamicType {
@@ -180,10 +149,6 @@ message IrType {
     IrDynamicType dynamic = 2;
     IrErrorType error = 3;
   }
-}
-
-message IrTypeTable {
-  repeated IrType types = 1;
 }
 
 /* ------ IrExpressions --------------------------------------------- */
@@ -203,7 +168,7 @@ message MemberAccessCommon {
   optional IrExpression dispatch_receiver = 1;
   optional IrExpression extension_receiver = 2;
   repeated NullableIrExpression value_argument = 3;
-  required TypeArguments type_arguments = 4;
+  repeated int32 type_argument = 4 [packed=true];
 }
 
 message IrCall {
@@ -345,7 +310,7 @@ message IrSetVariable {
 
 message IrSpreadElement {
   required IrExpression expression = 1;
-  required Coordinates coordinates = 2;
+  required int64 coordinates = 2;
 }
 
 message IrStringConcat {
@@ -499,7 +464,7 @@ enum IrTypeOperator {
 message IrExpression {
   required IrOperation operation = 1;
   required int32 type = 2;
-  required Coordinates coordinates = 3;
+  required int64 coordinates = 3;
 }
 
 message NullableIrExpression {
@@ -511,8 +476,9 @@ message NullableIrExpression {
 message IrDeclarationBase {
   required int64 symbol = 1;
   required IrDeclarationOrigin origin = 2;
-  required Coordinates coordinates = 3;
-  repeated IrConstructorCall annotation = 4;
+  required int64 coordinates = 3;
+  required int64 flags = 4;
+  repeated IrConstructorCall annotation = 5;
 }
 
 message IrFunctionBase {
@@ -521,7 +487,7 @@ message IrFunctionBase {
   required Visibility visibility = 3;
   required bool is_inline = 4;
   required bool is_external = 5;
-  required IrTypeParameterContainer type_parameters = 6;
+  repeated IrTypeParameter type_parameter = 6;
   optional IrValueParameter dispatch_receiver = 7;
   optional IrValueParameter extension_receiver = 8;
   repeated IrValueParameter value_parameter = 9;
@@ -535,7 +501,7 @@ message IrFunction {
   required ModalityKind modality = 2;
   required bool is_tailrec = 3;
   required bool is_suspend = 4;
-  repeated int64 overridden = 5; // TODO: supposed to be deleted
+  repeated int64 overridden = 5 [packed=true]; // TODO: supposed to be deleted
   //optional UniqId corresponding_property = 7;
   required bool is_fake_override = 8;
   required bool is_operator = 9;
@@ -614,25 +580,19 @@ enum ModalityKind { // It is ModalityKind to not clash with Modality in descript
 message IrValueParameter {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
-  required int32 index = 3;
-  required int32 type = 4;
-  optional int32 vararg_element_type = 5;
-  required bool is_crossinline = 6;
-  required bool is_noinline = 7;
-  optional int32 default_value = 8;
+  required int32 type = 3;
+  optional int32 vararg_element_type = 4;
+  required bool is_crossinline = 5;
+  required bool is_noinline = 6;
+  optional int32 default_value = 7;
 }
 
 message IrTypeParameter {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
-  required int32 index = 3;
-  required IrTypeVariance variance = 4;
-  repeated int32 super_type = 5;
-  required bool is_reified = 6;
-}
-
-message IrTypeParameterContainer {
-  repeated IrTypeParameter type_parameter = 1;
+  required IrTypeVariance variance = 3;
+  repeated int32 super_type = 4 [packed=true];
+  required bool is_reified = 5;
 }
 
 message IrClass {
@@ -648,9 +608,9 @@ message IrClass {
   required bool is_external = 9;
   required bool is_inline = 10;
   optional IrValueParameter this_receiver = 11;
-  required IrTypeParameterContainer type_parameters = 12;
+  repeated IrTypeParameter type_parameter = 12;
   required IrDeclarationContainer declaration_container = 13;
-  repeated int32 super_type = 14;
+  repeated int32 super_type = 14 [packed=true];
   required bool is_expect = 15;
 }
 
@@ -658,7 +618,7 @@ message IrTypeAlias {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
   required Visibility visibility = 3;
-  required IrTypeParameterContainer type_parameters = 4;
+  repeated IrTypeParameter type_parameter = 4;
   required int32 expanded_type = 5;
   required bool is_actual = 6;
 }
@@ -722,7 +682,7 @@ message IrSyntheticBody {
 
 // Let's try to map IrElement as well as IrStatement to IrStatement.
 message IrStatement {
-  required Coordinates coordinates = 1;
+  required int64 coordinates = 1;
   oneof statement {
     IrDeclaration declaration = 2;
     IrExpression expression = 3;

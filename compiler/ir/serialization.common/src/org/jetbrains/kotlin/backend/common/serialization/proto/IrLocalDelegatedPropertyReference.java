@@ -124,20 +124,12 @@ public final class IrLocalDelegatedPropertyReference extends
   private long delegate_;
   /**
    * <code>required int64 delegate = 1;</code>
-   *
-   * <pre>
-   *  required int32 delegate = 1;
-   * </pre>
    */
   public boolean hasDelegate() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
    * <code>required int64 delegate = 1;</code>
-   *
-   * <pre>
-   *  required int32 delegate = 1;
-   * </pre>
    */
   public long getDelegate() {
     return delegate_;
@@ -147,20 +139,12 @@ public final class IrLocalDelegatedPropertyReference extends
   private long getter_;
   /**
    * <code>optional int64 getter = 2;</code>
-   *
-   * <pre>
-   *  optional int32 getter = 2;
-   * </pre>
    */
   public boolean hasGetter() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
    * <code>optional int64 getter = 2;</code>
-   *
-   * <pre>
-   *  optional int32 getter = 2;
-   * </pre>
    */
   public long getGetter() {
     return getter_;
@@ -170,20 +154,12 @@ public final class IrLocalDelegatedPropertyReference extends
   private long setter_;
   /**
    * <code>optional int64 setter = 3;</code>
-   *
-   * <pre>
-   *  optional int32 setter = 3;
-   * </pre>
    */
   public boolean hasSetter() {
     return ((bitField0_ & 0x00000004) == 0x00000004);
   }
   /**
    * <code>optional int64 setter = 3;</code>
-   *
-   * <pre>
-   *  optional int32 setter = 3;
-   * </pre>
    */
   public long getSetter() {
     return setter_;
@@ -193,20 +169,12 @@ public final class IrLocalDelegatedPropertyReference extends
   private long symbol_;
   /**
    * <code>required int64 symbol = 4;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 4;
-   * </pre>
    */
   public boolean hasSymbol() {
     return ((bitField0_ & 0x00000008) == 0x00000008);
   }
   /**
    * <code>required int64 symbol = 4;</code>
-   *
-   * <pre>
-   *  required int32 symbol = 4;
-   * </pre>
    */
   public long getSymbol() {
     return symbol_;
@@ -518,30 +486,18 @@ public final class IrLocalDelegatedPropertyReference extends
     private long delegate_ ;
     /**
      * <code>required int64 delegate = 1;</code>
-     *
-     * <pre>
-     *  required int32 delegate = 1;
-     * </pre>
      */
     public boolean hasDelegate() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>required int64 delegate = 1;</code>
-     *
-     * <pre>
-     *  required int32 delegate = 1;
-     * </pre>
      */
     public long getDelegate() {
       return delegate_;
     }
     /**
      * <code>required int64 delegate = 1;</code>
-     *
-     * <pre>
-     *  required int32 delegate = 1;
-     * </pre>
      */
     public Builder setDelegate(long value) {
       bitField0_ |= 0x00000001;
@@ -551,10 +507,6 @@ public final class IrLocalDelegatedPropertyReference extends
     }
     /**
      * <code>required int64 delegate = 1;</code>
-     *
-     * <pre>
-     *  required int32 delegate = 1;
-     * </pre>
      */
     public Builder clearDelegate() {
       bitField0_ = (bitField0_ & ~0x00000001);
@@ -566,30 +518,18 @@ public final class IrLocalDelegatedPropertyReference extends
     private long getter_ ;
     /**
      * <code>optional int64 getter = 2;</code>
-     *
-     * <pre>
-     *  optional int32 getter = 2;
-     * </pre>
      */
     public boolean hasGetter() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>optional int64 getter = 2;</code>
-     *
-     * <pre>
-     *  optional int32 getter = 2;
-     * </pre>
      */
     public long getGetter() {
       return getter_;
     }
     /**
      * <code>optional int64 getter = 2;</code>
-     *
-     * <pre>
-     *  optional int32 getter = 2;
-     * </pre>
      */
     public Builder setGetter(long value) {
       bitField0_ |= 0x00000002;
@@ -599,10 +539,6 @@ public final class IrLocalDelegatedPropertyReference extends
     }
     /**
      * <code>optional int64 getter = 2;</code>
-     *
-     * <pre>
-     *  optional int32 getter = 2;
-     * </pre>
      */
     public Builder clearGetter() {
       bitField0_ = (bitField0_ & ~0x00000002);
@@ -614,30 +550,18 @@ public final class IrLocalDelegatedPropertyReference extends
     private long setter_ ;
     /**
      * <code>optional int64 setter = 3;</code>
-     *
-     * <pre>
-     *  optional int32 setter = 3;
-     * </pre>
      */
     public boolean hasSetter() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>optional int64 setter = 3;</code>
-     *
-     * <pre>
-     *  optional int32 setter = 3;
-     * </pre>
      */
     public long getSetter() {
       return setter_;
     }
     /**
      * <code>optional int64 setter = 3;</code>
-     *
-     * <pre>
-     *  optional int32 setter = 3;
-     * </pre>
      */
     public Builder setSetter(long value) {
       bitField0_ |= 0x00000004;
@@ -647,10 +571,6 @@ public final class IrLocalDelegatedPropertyReference extends
     }
     /**
      * <code>optional int64 setter = 3;</code>
-     *
-     * <pre>
-     *  optional int32 setter = 3;
-     * </pre>
      */
     public Builder clearSetter() {
       bitField0_ = (bitField0_ & ~0x00000004);
@@ -662,30 +582,18 @@ public final class IrLocalDelegatedPropertyReference extends
     private long symbol_ ;
     /**
      * <code>required int64 symbol = 4;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 4;
-     * </pre>
      */
     public boolean hasSymbol() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>required int64 symbol = 4;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 4;
-     * </pre>
      */
     public long getSymbol() {
       return symbol_;
     }
     /**
      * <code>required int64 symbol = 4;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 4;
-     * </pre>
      */
     public Builder setSymbol(long value) {
       bitField0_ |= 0x00000008;
@@ -695,10 +603,6 @@ public final class IrLocalDelegatedPropertyReference extends
     }
     /**
      * <code>required int64 symbol = 4;</code>
-     *
-     * <pre>
-     *  required int32 symbol = 4;
-     * </pre>
      */
     public Builder clearSymbol() {
       bitField0_ = (bitField0_ & ~0x00000008);

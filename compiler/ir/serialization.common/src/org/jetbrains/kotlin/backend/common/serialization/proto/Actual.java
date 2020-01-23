@@ -101,20 +101,12 @@ public final class Actual extends
   private long actualSymbol_;
   /**
    * <code>required int64 actual_symbol = 1;</code>
-   *
-   * <pre>
-   *    required int32 actual_symbol = 1;
-   * </pre>
    */
   public boolean hasActualSymbol() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
    * <code>required int64 actual_symbol = 1;</code>
-   *
-   * <pre>
-   *    required int32 actual_symbol = 1;
-   * </pre>
    */
   public long getActualSymbol() {
     return actualSymbol_;
@@ -124,20 +116,12 @@ public final class Actual extends
   private long expectSymbol_;
   /**
    * <code>required int64 expect_symbol = 2;</code>
-   *
-   * <pre>
-   *    required int32 expect_symbol = 2;
-   * </pre>
    */
   public boolean hasExpectSymbol() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
    * <code>required int64 expect_symbol = 2;</code>
-   *
-   * <pre>
-   *    required int32 expect_symbol = 2;
-   * </pre>
    */
   public long getExpectSymbol() {
     return expectSymbol_;
@@ -371,30 +355,18 @@ public final class Actual extends
     private long actualSymbol_ ;
     /**
      * <code>required int64 actual_symbol = 1;</code>
-     *
-     * <pre>
-     *    required int32 actual_symbol = 1;
-     * </pre>
      */
     public boolean hasActualSymbol() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>required int64 actual_symbol = 1;</code>
-     *
-     * <pre>
-     *    required int32 actual_symbol = 1;
-     * </pre>
      */
     public long getActualSymbol() {
       return actualSymbol_;
     }
     /**
      * <code>required int64 actual_symbol = 1;</code>
-     *
-     * <pre>
-     *    required int32 actual_symbol = 1;
-     * </pre>
      */
     public Builder setActualSymbol(long value) {
       bitField0_ |= 0x00000001;
@@ -404,10 +376,6 @@ public final class Actual extends
     }
     /**
      * <code>required int64 actual_symbol = 1;</code>
-     *
-     * <pre>
-     *    required int32 actual_symbol = 1;
-     * </pre>
      */
     public Builder clearActualSymbol() {
       bitField0_ = (bitField0_ & ~0x00000001);
@@ -419,30 +387,18 @@ public final class Actual extends
     private long expectSymbol_ ;
     /**
      * <code>required int64 expect_symbol = 2;</code>
-     *
-     * <pre>
-     *    required int32 expect_symbol = 2;
-     * </pre>
      */
     public boolean hasExpectSymbol() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>required int64 expect_symbol = 2;</code>
-     *
-     * <pre>
-     *    required int32 expect_symbol = 2;
-     * </pre>
      */
     public long getExpectSymbol() {
       return expectSymbol_;
     }
     /**
      * <code>required int64 expect_symbol = 2;</code>
-     *
-     * <pre>
-     *    required int32 expect_symbol = 2;
-     * </pre>
      */
     public Builder setExpectSymbol(long value) {
       bitField0_ |= 0x00000002;
@@ -452,10 +408,6 @@ public final class Actual extends
     }
     /**
      * <code>required int64 expect_symbol = 2;</code>
-     *
-     * <pre>
-     *    required int32 expect_symbol = 2;
-     * </pre>
      */
     public Builder clearExpectSymbol() {
       bitField0_ = (bitField0_ & ~0x00000002);
