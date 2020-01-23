@@ -316,7 +316,9 @@ internal class InsertImplicitCasts(
 
         val notNullableExpectedType = expectedType.makeNotNullable()
 
-        val valueType = this.type.originalKotlinType!!
+        // NOTE(lmr): originalKotlinType can sometimes be null and was causing a failure. Changing this
+        // to return this instead fixes it, but I am unsure if this is the proper fix.
+        val valueType = this.type.originalKotlinType ?: return this
 
         return when {
             expectedType.isUnit() ->

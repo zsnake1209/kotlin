@@ -29,6 +29,7 @@ abstract class IrBindableSymbolBase<out D : DeclarationDescriptor, B : IrSymbolO
     IrBindableSymbol<D, B>, IrSymbolBase<D>(descriptor, uniqId) {
 
     init {
+	// TODO: This was commented before by google, if this fails, try commenting it out again.
         assert(isOriginalDescriptor(descriptor)) {
             "Substituted descriptor $descriptor for ${descriptor.original}"
         }

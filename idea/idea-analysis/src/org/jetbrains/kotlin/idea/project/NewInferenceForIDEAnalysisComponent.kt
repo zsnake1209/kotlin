@@ -13,13 +13,17 @@ import org.jetbrains.kotlin.idea.util.isEap
 import org.jetbrains.kotlin.idea.util.isSnapshot
 
 object NewInferenceForIDEAnalysisComponent {
+
     private const val inferenceOptionV1 = "kotlin.use.new.inference.for.ide.analysis"
     private const val inferenceOptionV2 = "kotlin.use.new.inference.for.ide.analysis.v2"
-    val defaultState: Boolean
+    // NOTE(lmr): setting to default = false for Compose branch temporarily. Should update to true ASAP.
+    const val defaultState = false
+/*    val defaultState: Boolean
         get() {
             val bundledVersion = KotlinCompilerVersion.VERSION
             return isEap(bundledVersion) || isDev(bundledVersion) || isSnapshot(bundledVersion)
         }
+ */
 
     @JvmStatic
     fun setEnabled(project: Project, state: Boolean) {

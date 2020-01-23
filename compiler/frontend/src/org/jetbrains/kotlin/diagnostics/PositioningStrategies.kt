@@ -544,8 +544,8 @@ object PositioningStrategies {
             if (valueParameterList != null) {
                 return markElement(valueParameterList)
             }
-            if (element is KtFunctionLiteral) {
-                return markNode(element.lBrace.node)
+            if (element is KtFunctionLiteral && element.lBrace != null) {
+                return markNode(element.lBrace!!.node)
             }
             return DECLARATION_SIGNATURE_OR_DEFAULT.mark(element)
         }

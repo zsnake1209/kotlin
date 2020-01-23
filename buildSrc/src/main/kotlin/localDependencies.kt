@@ -159,6 +159,7 @@ fun Project.runIdeTask(name: String, ideaPluginDir: File, ideaSandboxDir: File, 
 
     return tasks.register<JavaExec>(name) {
         val ideaSandboxConfigDir = File(ideaSandboxDir, "config")
+        val composeDir = File(ideaPluginDir.parent, "Compose")
 
         classpath = mainSourceSet.runtimeClasspath
 
@@ -177,7 +178,7 @@ fun Project.runIdeTask(name: String, ideaPluginDir: File, ideaSandboxDir: File, 
             "-Dapple.laf.useScreenMenuBar=true",
             "-Dapple.awt.graphics.UseQuartz=true",
             "-Dsun.io.useCanonCaches=false",
-            "-Dplugin.path=${ideaPluginDir.absolutePath}"
+            "-Dplugin.path=${ideaPluginDir.absolutePath},${composeDir.absolutePath}"
         )
 
         if (rootProject.findProperty("versions.androidStudioRelease") != null) {

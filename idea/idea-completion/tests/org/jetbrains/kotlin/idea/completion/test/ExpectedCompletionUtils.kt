@@ -282,10 +282,10 @@ object ExpectedCompletionUtils {
     }
 
     fun getItemsInformation(items: Array<LookupElement>): List<CompletionProposal> {
-        val presentation = LookupElementPresentation()
 
         val result = ArrayList<CompletionProposal>(items.size)
         for (item in items) {
+            val presentation = LookupElementPresentation()
             item.renderElement(presentation)
 
             val map = HashMap<String, String?>()
@@ -329,8 +329,7 @@ object ExpectedCompletionUtils {
                 append("underlined")
             }
             val foreground = presentation.itemTextForeground
-            if (foreground != JBColor.foreground()) {
-                assert(foreground == LookupElementFactory.CAST_REQUIRED_COLOR)
+            if (foreground != JBColor.foreground() && foreground == LookupElementFactory.CAST_REQUIRED_COLOR) {
                 if (length > 0) append(" ")
                 append("grayed")
             }

@@ -90,6 +90,7 @@ import org.jetbrains.org.objectweb.asm.Type;
 import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter;
 import org.jetbrains.org.objectweb.asm.commons.Method;
 
+import java.io.*;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -1239,7 +1240,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         throw new IllegalStateException("Can't get outer value in " + this + " for " + d);
     }
 
-    private StackValueWithLeaveTask generateBlock(
+    protected StackValueWithLeaveTask generateBlock(
             @NotNull List<KtExpression> statements,
             boolean isStatement,
             @Nullable Label labelBeforeLastExpression,

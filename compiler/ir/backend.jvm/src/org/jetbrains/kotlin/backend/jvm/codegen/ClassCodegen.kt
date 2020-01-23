@@ -125,6 +125,7 @@ open class ClassCodegen protected constructor(
             signature.superclassName,
             signature.interfaces.toTypedArray()
         )
+
         AnnotationCodegen(this, context, visitor.visitor::visitAnnotation).genAnnotations(irClass, null)
 
         val nestedClasses = irClass.declarations.mapNotNull { declaration ->
