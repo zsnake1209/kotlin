@@ -64,20 +64,11 @@ dependencies {
     if (Ide.AS36.orHigher()) {
         testRuntime(intellijPluginDep("android-layoutlib"))
     }
-
-    if (Ide.AS36()) {
-        testRuntime(intellijPluginDep("android-wizardTemplate-plugin"))
-    }
 }
 
 sourceSets {
-    if (Ide.IJ183()) {
-        "main" { projectDefault() }
-        "test" { projectDefault() }
-    } else {
-        "main" { }
-        "test" { }
-    }
+    "main" { }
+    "test" { }
 }
 
 testsJar {}

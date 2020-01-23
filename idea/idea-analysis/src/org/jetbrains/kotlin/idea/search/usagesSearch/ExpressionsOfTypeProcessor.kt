@@ -46,6 +46,7 @@ import org.jetbrains.kotlin.load.java.sam.SingleAbstractMethodUtils
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
+import org.jetbrains.kotlin.resolve.sam.getSingleAbstractMethodOrNull
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
 
@@ -763,7 +764,7 @@ class ExpressionsOfTypeProcessor(
                 testLog { "Resolved java class to descriptor: ${psiClass.qualifiedName}" }
 
                 val classDescriptor = psiClass.getJavaMemberDescriptor() as? JavaClassDescriptor
-                if (classDescriptor != null && SingleAbstractMethodUtils.getSingleAbstractMethodOrNull(classDescriptor) != null) {
+                if (classDescriptor != null && getSingleAbstractMethodOrNull(classDescriptor) != null) {
                     addSamInterfaceToProcess(psiClass)
                     return true
                 }

@@ -2880,6 +2880,11 @@ public class IrCompileKotlinAgainstInlineKotlinTestGenerated extends AbstractIrC
             runTest("compiler/testData/codegen/boxInline/reified/kt9637_2.kt");
         }
 
+        @TestMetadata("nonCapturingObjectInLambda.kt")
+        public void testNonCapturingObjectInLambda() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/reified/nonCapturingObjectInLambda.kt");
+        }
+
         @TestMetadata("packages.kt")
         public void testPackages() throws Exception {
             runTest("compiler/testData/codegen/boxInline/reified/packages.kt");
@@ -2940,6 +2945,11 @@ public class IrCompileKotlinAgainstInlineKotlinTestGenerated extends AbstractIrC
             @TestMetadata("simpleSafe.kt")
             public void testSimpleSafe() throws Exception {
                 runTest("compiler/testData/codegen/boxInline/reified/checkCast/simpleSafe.kt");
+            }
+
+            @TestMetadata("simple_1_3.kt")
+            public void testSimple_1_3() throws Exception {
+                runTest("compiler/testData/codegen/boxInline/reified/checkCast/simple_1_3.kt");
             }
         }
 
@@ -3236,6 +3246,11 @@ public class IrCompileKotlinAgainstInlineKotlinTestGenerated extends AbstractIrC
         @TestMetadata("classFromDefaultPackage.kt")
         public void testClassFromDefaultPackage() throws Exception {
             runTest("compiler/testData/codegen/boxInline/smap/classFromDefaultPackage.kt");
+        }
+
+        @TestMetadata("crossroutines.kt")
+        public void testCrossroutines() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/smap/crossroutines.kt");
         }
 
         @TestMetadata("defaultFunction.kt")

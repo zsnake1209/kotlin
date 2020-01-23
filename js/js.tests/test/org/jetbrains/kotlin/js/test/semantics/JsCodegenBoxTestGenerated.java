@@ -756,6 +756,26 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             runTest("compiler/testData/codegen/box/binaryOp/divisionByZero.kt");
         }
 
+        @TestMetadata("eqNullableDoubles.kt")
+        public void testEqNullableDoubles() throws Exception {
+            runTest("compiler/testData/codegen/box/binaryOp/eqNullableDoubles.kt");
+        }
+
+        @TestMetadata("eqNullableDoublesToInt.kt")
+        public void testEqNullableDoublesToInt() throws Exception {
+            runTest("compiler/testData/codegen/box/binaryOp/eqNullableDoublesToInt.kt");
+        }
+
+        @TestMetadata("eqNullableDoublesToIntWithTP.kt")
+        public void testEqNullableDoublesToIntWithTP() throws Exception {
+            runTest("compiler/testData/codegen/box/binaryOp/eqNullableDoublesToIntWithTP.kt");
+        }
+
+        @TestMetadata("eqNullableDoublesWithTP.kt")
+        public void testEqNullableDoublesWithTP() throws Exception {
+            runTest("compiler/testData/codegen/box/binaryOp/eqNullableDoublesWithTP.kt");
+        }
+
         @TestMetadata("intrinsic.kt")
         public void testIntrinsic() throws Exception {
             runTest("compiler/testData/codegen/box/binaryOp/intrinsic.kt");
@@ -977,6 +997,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             runTest("compiler/testData/codegen/box/bridges/complexTraitImpl.kt");
         }
 
+        @TestMetadata("covariantGenericDiamond.kt")
+        public void testCovariantGenericDiamond() throws Exception {
+            runTest("compiler/testData/codegen/box/bridges/covariantGenericDiamond.kt");
+        }
+
         @TestMetadata("delegation.kt")
         public void testDelegation() throws Exception {
             runTest("compiler/testData/codegen/box/bridges/delegation.kt");
@@ -1135,6 +1160,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
         @TestMetadata("propertyDiamond.kt")
         public void testPropertyDiamond() throws Exception {
             runTest("compiler/testData/codegen/box/bridges/propertyDiamond.kt");
+        }
+
+        @TestMetadata("propertyDiamondFakeOverride.kt")
+        public void testPropertyDiamondFakeOverride() throws Exception {
+            runTest("compiler/testData/codegen/box/bridges/propertyDiamondFakeOverride.kt");
         }
 
         @TestMetadata("propertyInConstructor.kt")
@@ -7293,6 +7323,16 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine/superCallInterface.kt", "kotlin.coroutines");
             }
 
+            @TestMetadata("superCallOverload.kt")
+            public void testSuperCallOverload_1_2() throws Exception {
+                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine/superCallOverload.kt", "kotlin.coroutines.experimental");
+            }
+
+            @TestMetadata("superCallOverload.kt")
+            public void testSuperCallOverload_1_3() throws Exception {
+                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine/superCallOverload.kt", "kotlin.coroutines");
+            }
+
             @TestMetadata("superCall.kt")
             public void testSuperCall_1_2() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine/superCall.kt", "kotlin.coroutines.experimental");
@@ -10045,6 +10085,19 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
         }
     }
 
+    @TestMetadata("compiler/testData/codegen/box/funInterface")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class FunInterface extends AbstractJsCodegenBoxTest {
+        private void runTest(String testDataFilePath) throws Exception {
+            KotlinTestUtils.runTest0(this::doTest, TargetBackend.JS, testDataFilePath);
+        }
+
+        public void testAllFilesPresentInFunInterface() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/funInterface"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JS, true);
+        }
+    }
+
     @TestMetadata("compiler/testData/codegen/box/functions")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
@@ -10546,6 +10599,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             @TestMetadata("localFunctionVsLocalVariable.kt")
             public void testLocalFunctionVsLocalVariable() throws Exception {
                 runTest("compiler/testData/codegen/box/functions/localFunctions/localFunctionVsLocalVariable.kt");
+            }
+
+            @TestMetadata("nameClash.kt")
+            public void testNameClash() throws Exception {
+                runTest("compiler/testData/codegen/box/functions/localFunctions/nameClash.kt");
             }
 
             @TestMetadata("overloadedLocalFunWithoutClosure.kt")
@@ -15414,6 +15472,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
 
         public void testAllFilesPresentInPlatformTypes() throws Exception {
             KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/platformTypes"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JS, true);
+        }
+
+        @TestMetadata("inferenceFlexibleTToNullable.kt")
+        public void testInferenceFlexibleTToNullable() throws Exception {
+            runTest("compiler/testData/codegen/box/platformTypes/inferenceFlexibleTToNullable.kt");
         }
 
         @TestMetadata("compiler/testData/codegen/box/platformTypes/primitives")
@@ -21171,6 +21234,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
         @TestMetadata("kt3587.kt")
         public void testKt3587() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt3587.kt");
+        }
+
+        @TestMetadata("kt35914.kt")
+        public void testKt35914() throws Exception {
+            runTest("compiler/testData/codegen/box/regressions/kt35914.kt");
         }
 
         @TestMetadata("kt3850.kt")

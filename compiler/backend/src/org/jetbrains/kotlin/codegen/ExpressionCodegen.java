@@ -3756,13 +3756,13 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
     @Nullable
     private static KotlinType getLeftOperandType(@Nullable PrimitiveNumericComparisonInfo numericComparisonInfo) {
         if (numericComparisonInfo == null) return null;
-        return numericComparisonInfo.getLeftType();
+        return numericComparisonInfo.getLeftPrimitiveType();
     }
 
     @Nullable
     private static KotlinType getRightOperandType(@Nullable PrimitiveNumericComparisonInfo numericComparisonInfo) {
         if (numericComparisonInfo == null) return null;
-        return numericComparisonInfo.getRightType();
+        return numericComparisonInfo.getRightPrimitiveType();
     }
 
     /*tries to use IEEE 754 arithmetic*/
@@ -4044,7 +4044,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         boolean properIeee754Comparisons = shouldUseProperIeee754Comparisons();
 
         if (properIeee754Comparisons && left754Type != null && right754Type != null) {
-            type = comparisonOperandType(leftType, rightType);
+            type = comparisonOperandType(left754Type.type, right754Type.type);
+            //type = comparisonOperandType(leftType, rightType);
             leftValue = gen(left);
             rightValue = gen(right);
         }

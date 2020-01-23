@@ -562,7 +562,17 @@ class NewMultiplatformIT : BaseGradleIT() {
             """.trimIndent()
         )
 
-        fun testMonotonousCheck(sourceSetConfigurationChange: String, expectedErrorHint: String) {
+        fun testMonotonousCheck(
+            initialSetupForSourceSets: String?,
+            sourceSetConfigurationChange: String,
+            expectedErrorHint: String
+        ) {
+            if (initialSetupForSourceSets != null) {
+                gradleBuildScript().appendText(
+                    "\nkotlin.sourceSets.foo.${initialSetupForSourceSets}\n" + "" +
+                            "kotlin.sourceSets.bar.${initialSetupForSourceSets}",
+                )
+            }
             gradleBuildScript().appendText("\nkotlin.sourceSets.foo.${sourceSetConfigurationChange}")
             build("tasks") {
                 assertFailed()
@@ -574,7 +584,11 @@ class NewMultiplatformIT : BaseGradleIT() {
             }
         }
 
+        fun testMonotonousCheck(sourceSetConfigurationChange: String, expectedErrorHint: String): Unit =
+            testMonotonousCheck(null, sourceSetConfigurationChange, expectedErrorHint)
+
         testMonotonousCheck(
+            "languageSettings.languageVersion = '1.3'",
             "languageSettings.languageVersion = '1.4'",
             SourceSetConsistencyChecks.languageVersionCheckHint
         )
@@ -594,7 +608,7 @@ class NewMultiplatformIT : BaseGradleIT() {
         gradleBuildScript().appendText(
             "\n" + """
                 kotlin.sourceSets.foo.languageSettings {
-                    apiVersion = '1.3'
+                    apiVersion = '1.4'
                     enableLanguageFeature('SoundSmartcastForEnumEntries')
                     progressiveMode = true
                 }
@@ -985,10 +999,22 @@ class NewMultiplatformIT : BaseGradleIT() {
     }
 
     @Test
-    fun testNativeBinaryKotlinDSL() = doTestNativeBinaryDSL("kotlin-dsl")
+    fun testNativeBinaryGroovyDSL() {
+        // Building K/N binaries is very time-consuming. So we check building only for Kotlin DSL.
+        // For Groovy DSl we just check that a project can be configured.
+        val project = transformProjectWithPluginsDsl(
+            "groovy-dsl", gradleVersion, "new-mpp-native-binaries"
+        )
+        project.build("tasks") {
+            assertSuccessful()
 
-    @Test
-    fun testNativeBinaryGroovyDSL() = doTestNativeBinaryDSL("groovy-dsl")
+            // Check that getters work fine.
+            val hostSuffix = nativeHostTargetName.capitalize()
+            assertTrue(output.contains("Check link task: linkReleaseShared$hostSuffix"))
+            assertTrue(output.contains("Check run task: runFooReleaseExecutable$hostSuffix"))
+        }
+
+    }
 
     private fun CompiledProject.checkNativeCommandLineFor(vararg taskPaths: String, check: (String) -> Unit) = taskPaths.forEach { taskPath ->
         val commandLine = output.lineSequence().dropWhile {
@@ -999,10 +1025,10 @@ class NewMultiplatformIT : BaseGradleIT() {
         check(commandLine)
     }
 
-    private fun doTestNativeBinaryDSL(
-        projectName: String,
-        gradleVersionRequired: GradleVersionRequired = gradleVersion
-    ) = with(transformProjectWithPluginsDsl(projectName, gradleVersionRequired, "new-mpp-native-binaries")) {
+    @Test
+    fun testNativeBinaryKotlinDSL() = with(
+        transformProjectWithPluginsDsl("kotlin-dsl", gradleVersion, "new-mpp-native-binaries")
+    ) {
 
         val hostSuffix = nativeHostTargetName.capitalize()
         val binaries = mutableListOf(
@@ -1023,8 +1049,8 @@ class NewMultiplatformIT : BaseGradleIT() {
             val prefix = outputKind.prefix(HostManager.host)
             val suffix = outputKind.suffix(HostManager.host)
             val fileName = "$prefix$fileBaseName$suffix"
-            "build/bin/$nativeHostTargetName/$name/$fileName"
-        }
+            name to "build/bin/$nativeHostTargetName/$name/$fileName"
+        }.toMap()
 
         val runTasks = listOf(
             "runDebugExecutable",
@@ -1046,12 +1072,22 @@ class NewMultiplatformIT : BaseGradleIT() {
             assertSuccessful()
             assertTasksExecuted(linkTasks.map { ":$it" })
             assertTasksExecuted(":$compileTask", ":$compileTestTask")
-            outputFiles.forEach {
-                assertFileExists(it)
+            outputFiles.forEach { (_, file) ->
+                assertFileExists(file)
             }
             // Check that getters work fine.
             assertTrue(output.contains("Check link task: linkReleaseShared$hostSuffix"))
             assertTrue(output.contains("Check run task: runFooReleaseExecutable$hostSuffix"))
+
+            // Check that dependency export works for static and shared libs.
+            val staticSuffix = CompilerOutputKind.STATIC.suffix(HostManager.host)
+            val sharedSuffix = CompilerOutputKind.DYNAMIC.suffix(HostManager.host)
+            val staticPrefix = CompilerOutputKind.STATIC.prefix(HostManager.host)
+            val sharedPrefix = CompilerOutputKind.DYNAMIC.prefix(HostManager.host)
+            val staticHeader = outputFiles.getValue("releaseStatic").removeSuffix(staticSuffix) + "_api.h"
+            val sharedHeader = outputFiles.getValue("releaseShared").removeSuffix(sharedSuffix) + "_api.h"
+            assertTrue(fileInWorkingDir(staticHeader).readText().contains("${staticPrefix}native_binary_KInt (*exported)();"))
+            assertTrue(fileInWorkingDir(sharedHeader).readText().contains("${sharedPrefix}native_binary_KInt (*exported)();"))
         }
 
         build("tasks") {
@@ -1126,8 +1162,11 @@ class NewMultiplatformIT : BaseGradleIT() {
             build("linkDebugFrameworkIos") {
                 assertSuccessful()
                 assertFileExists("build/bin/ios/debugFramework/native_binary.framework")
-                fileInWorkingDir("build/bin/ios/debugFramework/native_binary.framework/Headers/native_binary.h")
-                    .readText().contains("+ (int32_t)exported")
+                assertTrue(
+                    fileInWorkingDir("build/bin/ios/debugFramework/native_binary.framework/Headers/native_binary.h")
+                    .readText()
+                    .contains("+ (int32_t)exported")
+                )
                 // Check that by default debug frameworks have bitcode marker embedded.
                 checkNativeCommandLineFor(":linkDebugFrameworkIos") {
                     assertTrue(it.contains("-Xembed-bitcode-marker"))
@@ -1177,7 +1216,7 @@ class NewMultiplatformIT : BaseGradleIT() {
     }
 
     // Check that we still can build binaries from sources if the corresponding property is specified.
-    // TODO: Drop in 1.3.70.
+    // TODO: Drop in 1.4
     @Test
     fun testLinkNativeBinaryFromSources() = with(
         transformProjectWithPluginsDsl("groovy-dsl", gradleVersion, "new-mpp-native-binaries")
@@ -1280,7 +1319,7 @@ class NewMultiplatformIT : BaseGradleIT() {
             }
         }
     }
-    
+
     private fun getBootedSimulators(workingDirectory: File): Set<String>? =
         if (HostManager.hostIsMac) {
             val simulators = runProcess(listOf("xcrun", "simctl", "list"), workingDirectory, System.getenv()).also {
@@ -2246,6 +2285,22 @@ class NewMultiplatformIT : BaseGradleIT() {
             }
             targetsToTest.forEach {
                 checkIntegrationTestOutput(it)
+            }
+        }
+    }
+
+    @Test
+    fun testNativeArgsWithSpaces() = with(Project("sample-lib", directoryPrefix = "new-mpp-lib-and-app")) {
+        setupWorkingDir()
+        val fileWithSpacesInPath = projectDir.resolve("src/commonMain/kotlin/path with spaces and special symbols like \"")
+            .apply { mkdirs() }
+            .resolve("B.kt")
+        fileWithSpacesInPath.writeText("fun foo() = 42")
+
+        build("compileKotlin${nativeHostTargetName.capitalize()}") {
+            assertSuccessful()
+            checkNativeCommandLineFor(":compileKotlin${nativeHostTargetName.capitalize()}") {
+                it.contains(fileWithSpacesInPath.absolutePath)
             }
         }
     }

@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.resolve.jvm.annotations.SYNCHRONIZED_ANNOTATION_FQ_N
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodGenericSignature
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterKind
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
+import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.kotlin.utils.sure
 import org.jetbrains.org.objectweb.asm.MethodVisitor
@@ -118,24 +119,29 @@ open class FunctionCodegen(
         isAnonymousObject || origin == JvmLoweredDeclarationOrigin.CONTINUATION_CLASS || origin == JvmLoweredDeclarationOrigin.SUSPEND_LAMBDA
 
     private fun psiElement(): KtElement =
-        if (irFunction.isSuspend) irFunction.symbol.descriptor.psiElement as KtElement
-        else context.suspendLambdaToOriginalFunctionMap[irFunction.parentAsClass.attributeOwnerId]!!.symbol.descriptor.psiElement as KtElement
+        (if (irFunction.isSuspend)
+            irFunction.symbol.descriptor.psiElement ?: irFunction.parentAsClass.descriptor.psiElement
+        else
+            context.suspendLambdaToOriginalFunctionMap[irFunction.parentAsClass.attributeOwnerId]!!.symbol.descriptor.psiElement)
+                as KtElement
 
     private fun IrFunction.hasContinuation(): Boolean = isSuspend &&
             // We do not generate continuation and state-machine for synthetic accessors, bridges, and delegated members,
             // in a sense, they are tail-call
             !isKnownToBeTailCall() &&
-            // TODO: We should generate two versions of inline suspend function: one with state-machine and one without
-            !isInline &&
             // This is suspend lambda parameter of inline function
             origin != IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA &&
             // This is just a template for inliner
             origin != JvmLoweredDeclarationOrigin.FOR_INLINE_STATE_MACHINE_TEMPLATE_CAPTURES_CROSSINLINE &&
             // Continuations are generated for suspendImpls
-            parentAsClass.functions.none { it.name.asString() == name.asString() + SUSPEND_IMPL_NAME_SUFFIX }
+            parentAsClass.functions.none {
+                it.name.asString() == name.asString() + SUSPEND_IMPL_NAME_SUFFIX &&
+                        it.attributeOwnerId == (this as? IrAttributeContainer)?.attributeOwnerId
+            } &&
+            // $$forInline functions never have a continuation
+            origin != JvmLoweredDeclarationOrigin.FOR_INLINE_STATE_MACHINE_TEMPLATE
 
-    private fun continuationClass(): IrClass =
-        irFunction.body!!.statements[0] as IrClass
+    private fun continuationClass() = irFunction.body!!.statements.firstIsInstance<IrClass>()
 
     private fun IrFunction.getVisibilityForDefaultArgumentStub(): Int =
         when (visibility) {
@@ -307,7 +313,8 @@ private fun generateParameterNames(irFunction: IrFunction, mv: MethodVisitor, jv
             irParameter.origin == JvmLoweredDeclarationOrigin.FIELD_FOR_OUTER_THIS -> Opcodes.ACC_MANDATED
             // TODO mark these backend-common origins as synthetic? (note: ExpressionCodegen is still expected
             //      to generate LVT entries for them)
-            irParameter.origin == IrDeclarationOrigin.MOVED_RECEIVER_PARAMETER -> Opcodes.ACC_SYNTHETIC
+            irParameter.origin == IrDeclarationOrigin.MOVED_EXTENSION_RECEIVER -> Opcodes.ACC_MANDATED
+            irParameter.origin == IrDeclarationOrigin.MOVED_DISPATCH_RECEIVER -> Opcodes.ACC_SYNTHETIC
             irParameter.origin == BOUND_VALUE_PARAMETER -> Opcodes.ACC_SYNTHETIC
             irParameter.origin == BOUND_RECEIVER_PARAMETER -> Opcodes.ACC_SYNTHETIC
             irParameter.origin.isSynthetic -> Opcodes.ACC_SYNTHETIC
