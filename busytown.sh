@@ -3,7 +3,7 @@ set -e
 readonly PROG_DIR="$(dirname $0)"
 
 readonly OUT="${OUT:-"out"}"
-readonly DIST="${DIST:-"out/dist"}"
+readonly DIST="${DIST_DIR:-"out/dist"}"
 mkdir -p $OUT
 mkdir -p $DIST
 readonly OUT_DIR="$(realpath $OUT)"
