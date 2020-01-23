@@ -83,16 +83,6 @@ public final class IrValueParameter extends
           }
           case 40: {
             bitField0_ |= 0x00000010;
-            isCrossinline_ = input.readBool();
-            break;
-          }
-          case 48: {
-            bitField0_ |= 0x00000020;
-            isNoinline_ = input.readBool();
-            break;
-          }
-          case 56: {
-            bitField0_ |= 0x00000040;
             defaultValue_ = input.readInt32();
             break;
           }
@@ -190,46 +180,16 @@ public final class IrValueParameter extends
     return varargElementType_;
   }
 
-  public static final int IS_CROSSINLINE_FIELD_NUMBER = 5;
-  private boolean isCrossinline_;
+  public static final int DEFAULT_VALUE_FIELD_NUMBER = 5;
+  private int defaultValue_;
   /**
-   * <code>required bool is_crossinline = 5;</code>
+   * <code>optional int32 default_value = 5;</code>
    */
-  public boolean hasIsCrossinline() {
+  public boolean hasDefaultValue() {
     return ((bitField0_ & 0x00000010) == 0x00000010);
   }
   /**
-   * <code>required bool is_crossinline = 5;</code>
-   */
-  public boolean getIsCrossinline() {
-    return isCrossinline_;
-  }
-
-  public static final int IS_NOINLINE_FIELD_NUMBER = 6;
-  private boolean isNoinline_;
-  /**
-   * <code>required bool is_noinline = 6;</code>
-   */
-  public boolean hasIsNoinline() {
-    return ((bitField0_ & 0x00000020) == 0x00000020);
-  }
-  /**
-   * <code>required bool is_noinline = 6;</code>
-   */
-  public boolean getIsNoinline() {
-    return isNoinline_;
-  }
-
-  public static final int DEFAULT_VALUE_FIELD_NUMBER = 7;
-  private int defaultValue_;
-  /**
-   * <code>optional int32 default_value = 7;</code>
-   */
-  public boolean hasDefaultValue() {
-    return ((bitField0_ & 0x00000040) == 0x00000040);
-  }
-  /**
-   * <code>optional int32 default_value = 7;</code>
+   * <code>optional int32 default_value = 5;</code>
    */
   public int getDefaultValue() {
     return defaultValue_;
@@ -240,8 +200,6 @@ public final class IrValueParameter extends
     name_ = 0;
     type_ = 0;
     varargElementType_ = 0;
-    isCrossinline_ = false;
-    isNoinline_ = false;
     defaultValue_ = 0;
   }
   private byte memoizedIsInitialized = -1;
@@ -259,14 +217,6 @@ public final class IrValueParameter extends
       return false;
     }
     if (!hasType()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasIsCrossinline()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasIsNoinline()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -294,13 +244,7 @@ public final class IrValueParameter extends
       output.writeInt32(4, varargElementType_);
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      output.writeBool(5, isCrossinline_);
-    }
-    if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      output.writeBool(6, isNoinline_);
-    }
-    if (((bitField0_ & 0x00000040) == 0x00000040)) {
-      output.writeInt32(7, defaultValue_);
+      output.writeInt32(5, defaultValue_);
     }
     output.writeRawBytes(unknownFields);
   }
@@ -329,15 +273,7 @@ public final class IrValueParameter extends
     }
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeBoolSize(5, isCrossinline_);
-    }
-    if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeBoolSize(6, isNoinline_);
-    }
-    if (((bitField0_ & 0x00000040) == 0x00000040)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(7, defaultValue_);
+        .computeInt32Size(5, defaultValue_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -441,12 +377,8 @@ public final class IrValueParameter extends
       bitField0_ = (bitField0_ & ~0x00000004);
       varargElementType_ = 0;
       bitField0_ = (bitField0_ & ~0x00000008);
-      isCrossinline_ = false;
-      bitField0_ = (bitField0_ & ~0x00000010);
-      isNoinline_ = false;
-      bitField0_ = (bitField0_ & ~0x00000020);
       defaultValue_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000040);
+      bitField0_ = (bitField0_ & ~0x00000010);
       return this;
     }
 
@@ -489,14 +421,6 @@ public final class IrValueParameter extends
       if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
         to_bitField0_ |= 0x00000010;
       }
-      result.isCrossinline_ = isCrossinline_;
-      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-        to_bitField0_ |= 0x00000020;
-      }
-      result.isNoinline_ = isNoinline_;
-      if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-        to_bitField0_ |= 0x00000040;
-      }
       result.defaultValue_ = defaultValue_;
       result.bitField0_ = to_bitField0_;
       return result;
@@ -516,12 +440,6 @@ public final class IrValueParameter extends
       if (other.hasVarargElementType()) {
         setVarargElementType(other.getVarargElementType());
       }
-      if (other.hasIsCrossinline()) {
-        setIsCrossinline(other.getIsCrossinline());
-      }
-      if (other.hasIsNoinline()) {
-        setIsNoinline(other.getIsNoinline());
-      }
       if (other.hasDefaultValue()) {
         setDefaultValue(other.getDefaultValue());
       }
@@ -540,14 +458,6 @@ public final class IrValueParameter extends
         return false;
       }
       if (!hasType()) {
-        
-        return false;
-      }
-      if (!hasIsCrossinline()) {
-        
-        return false;
-      }
-      if (!hasIsNoinline()) {
         
         return false;
       }
@@ -733,97 +643,33 @@ public final class IrValueParameter extends
       return this;
     }
 
-    private boolean isCrossinline_ ;
+    private int defaultValue_ ;
     /**
-     * <code>required bool is_crossinline = 5;</code>
+     * <code>optional int32 default_value = 5;</code>
      */
-    public boolean hasIsCrossinline() {
+    public boolean hasDefaultValue() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>required bool is_crossinline = 5;</code>
-     */
-    public boolean getIsCrossinline() {
-      return isCrossinline_;
-    }
-    /**
-     * <code>required bool is_crossinline = 5;</code>
-     */
-    public Builder setIsCrossinline(boolean value) {
-      bitField0_ |= 0x00000010;
-      isCrossinline_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required bool is_crossinline = 5;</code>
-     */
-    public Builder clearIsCrossinline() {
-      bitField0_ = (bitField0_ & ~0x00000010);
-      isCrossinline_ = false;
-      
-      return this;
-    }
-
-    private boolean isNoinline_ ;
-    /**
-     * <code>required bool is_noinline = 6;</code>
-     */
-    public boolean hasIsNoinline() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
-    }
-    /**
-     * <code>required bool is_noinline = 6;</code>
-     */
-    public boolean getIsNoinline() {
-      return isNoinline_;
-    }
-    /**
-     * <code>required bool is_noinline = 6;</code>
-     */
-    public Builder setIsNoinline(boolean value) {
-      bitField0_ |= 0x00000020;
-      isNoinline_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required bool is_noinline = 6;</code>
-     */
-    public Builder clearIsNoinline() {
-      bitField0_ = (bitField0_ & ~0x00000020);
-      isNoinline_ = false;
-      
-      return this;
-    }
-
-    private int defaultValue_ ;
-    /**
-     * <code>optional int32 default_value = 7;</code>
-     */
-    public boolean hasDefaultValue() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    /**
-     * <code>optional int32 default_value = 7;</code>
+     * <code>optional int32 default_value = 5;</code>
      */
     public int getDefaultValue() {
       return defaultValue_;
     }
     /**
-     * <code>optional int32 default_value = 7;</code>
+     * <code>optional int32 default_value = 5;</code>
      */
     public Builder setDefaultValue(int value) {
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000010;
       defaultValue_ = value;
       
       return this;
     }
     /**
-     * <code>optional int32 default_value = 7;</code>
+     * <code>optional int32 default_value = 5;</code>
      */
     public Builder clearDefaultValue() {
-      bitField0_ = (bitField0_ & ~0x00000040);
+      bitField0_ = (bitField0_ & ~0x00000010);
       defaultValue_ = 0;
       
       return this;

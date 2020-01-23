@@ -35,11 +35,11 @@ public interface IrDeclarationBaseOrBuilder extends
   long getCoordinates();
 
   /**
-   * <code>required int64 flags = 4;</code>
+   * <code>optional int64 flags = 4 [default = 0];</code>
    */
   boolean hasFlags();
   /**
-   * <code>required int64 flags = 4;</code>
+   * <code>optional int64 flags = 4 [default = 0];</code>
    */
   long getFlags();
 

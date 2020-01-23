@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.common.serialization
+package org.jetbrains.kotlin.backend.common.serialization.encodings
 
 inline class BinaryCoordinates(val code: Long) {
     private fun diff(): Int = (code ushr 32).toInt()

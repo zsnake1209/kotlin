@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
+import org.jetbrains.kotlin.backend.common.serialization.encodings.BinarySymbolData
 import org.jetbrains.kotlin.builtins.functions.FunctionClassDescriptor
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
@@ -229,15 +230,22 @@ abstract class KotlinIrLinker(
                             referenceConstructorFromLinker(WrappedClassConstructorDescriptor(), idSig)
                         BinarySymbolData.SymbolKind.TYPE_PARAMETER_SYMBOL ->
                             referenceTypeParameterFromLinker(WrappedTypeParameterDescriptor(), idSig)
-                        BinarySymbolData.SymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntryFromLinker(WrappedEnumEntryDescriptor(), idSig)
-                        BinarySymbolData.SymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
-                        BinarySymbolData.SymbolKind.FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
+                        BinarySymbolData
+                            .SymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntryFromLinker(WrappedEnumEntryDescriptor(), idSig)
+                        BinarySymbolData
+                            .SymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
+                        BinarySymbolData
+                            .SymbolKind.FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
                         BinarySymbolData.SymbolKind.FUNCTION_SYMBOL ->  //TODO: FunctionInterfaces
                             referenceSimpleFunctionFromLinker(descriptor as FunctionDescriptor? ?: WrappedSimpleFunctionDescriptor(), idSig)
-                        BinarySymbolData.SymbolKind.TYPEALIAS_SYMBOL -> referenceTypeAliasFromLinker(WrappedTypeAliasDescriptor(), idSig)
-                        BinarySymbolData.SymbolKind.PROPERTY_SYMBOL -> referencePropertyFromLinker(WrappedPropertyDescriptor(), idSig)
-                        BinarySymbolData.SymbolKind.VARIABLE_SYMBOL -> IrVariableSymbolImpl(WrappedVariableDescriptor())
-                        BinarySymbolData.SymbolKind.VALUE_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedValueParameterDescriptor())
+                        BinarySymbolData
+                            .SymbolKind.TYPEALIAS_SYMBOL -> referenceTypeAliasFromLinker(WrappedTypeAliasDescriptor(), idSig)
+                        BinarySymbolData
+                            .SymbolKind.PROPERTY_SYMBOL -> referencePropertyFromLinker(WrappedPropertyDescriptor(), idSig)
+                        BinarySymbolData
+                            .SymbolKind.VARIABLE_SYMBOL -> IrVariableSymbolImpl(WrappedVariableDescriptor())
+                        BinarySymbolData
+                            .SymbolKind.VALUE_PARAMETER_SYMBOL -> IrValueParameterSymbolImpl(WrappedValueParameterDescriptor())
                         BinarySymbolData.SymbolKind.RECEIVER_PARAMETER_SYMBOL ->
                             IrValueParameterSymbolImpl(WrappedReceiverParameterDescriptor())
                         BinarySymbolData.SymbolKind.LOCAL_DELEGATED_PROPERTY_SYMBOL ->

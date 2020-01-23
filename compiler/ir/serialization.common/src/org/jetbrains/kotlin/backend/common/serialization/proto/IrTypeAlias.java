@@ -72,34 +72,16 @@ public final class IrTypeAlias extends
             break;
           }
           case 26: {
-            org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.Builder subBuilder = null;
-            if (((bitField0_ & 0x00000004) == 0x00000004)) {
-              subBuilder = visibility_.toBuilder();
-            }
-            visibility_ = input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.PARSER, extensionRegistry);
-            if (subBuilder != null) {
-              subBuilder.mergeFrom(visibility_);
-              visibility_ = subBuilder.buildPartial();
-            }
-            bitField0_ |= 0x00000004;
-            break;
-          }
-          case 34: {
-            if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+            if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
               typeParameter_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter>();
-              mutable_bitField0_ |= 0x00000008;
+              mutable_bitField0_ |= 0x00000004;
             }
             typeParameter_.add(input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter.PARSER, extensionRegistry));
             break;
           }
-          case 40: {
-            bitField0_ |= 0x00000008;
+          case 32: {
+            bitField0_ |= 0x00000004;
             expandedType_ = input.readInt32();
-            break;
-          }
-          case 48: {
-            bitField0_ |= 0x00000010;
-            isActual_ = input.readBool();
             break;
           }
         }
@@ -110,7 +92,7 @@ public final class IrTypeAlias extends
       throw new org.jetbrains.kotlin.protobuf.InvalidProtocolBufferException(
           e.getMessage()).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
         typeParameter_ = java.util.Collections.unmodifiableList(typeParameter_);
       }
       try {
@@ -169,93 +151,61 @@ public final class IrTypeAlias extends
     return name_;
   }
 
-  public static final int VISIBILITY_FIELD_NUMBER = 3;
-  private org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility_;
-  /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
-   */
-  public boolean hasVisibility() {
-    return ((bitField0_ & 0x00000004) == 0x00000004);
-  }
-  /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
-   */
-  public org.jetbrains.kotlin.backend.common.serialization.proto.Visibility getVisibility() {
-    return visibility_;
-  }
-
-  public static final int TYPE_PARAMETER_FIELD_NUMBER = 4;
+  public static final int TYPE_PARAMETER_FIELD_NUMBER = 3;
   private java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> typeParameter_;
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
    */
   public java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> getTypeParameterList() {
     return typeParameter_;
   }
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
    */
   public java.util.List<? extends org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterOrBuilder> 
       getTypeParameterOrBuilderList() {
     return typeParameter_;
   }
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
    */
   public int getTypeParameterCount() {
     return typeParameter_.size();
   }
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
    */
   public org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter getTypeParameter(int index) {
     return typeParameter_.get(index);
   }
   /**
-   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+   * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
    */
   public org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameterOrBuilder getTypeParameterOrBuilder(
       int index) {
     return typeParameter_.get(index);
   }
 
-  public static final int EXPANDED_TYPE_FIELD_NUMBER = 5;
+  public static final int EXPANDED_TYPE_FIELD_NUMBER = 4;
   private int expandedType_;
   /**
-   * <code>required int32 expanded_type = 5;</code>
+   * <code>required int32 expanded_type = 4;</code>
    */
   public boolean hasExpandedType() {
-    return ((bitField0_ & 0x00000008) == 0x00000008);
+    return ((bitField0_ & 0x00000004) == 0x00000004);
   }
   /**
-   * <code>required int32 expanded_type = 5;</code>
+   * <code>required int32 expanded_type = 4;</code>
    */
   public int getExpandedType() {
     return expandedType_;
   }
 
-  public static final int IS_ACTUAL_FIELD_NUMBER = 6;
-  private boolean isActual_;
-  /**
-   * <code>required bool is_actual = 6;</code>
-   */
-  public boolean hasIsActual() {
-    return ((bitField0_ & 0x00000010) == 0x00000010);
-  }
-  /**
-   * <code>required bool is_actual = 6;</code>
-   */
-  public boolean getIsActual() {
-    return isActual_;
-  }
-
   private void initFields() {
     base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
     name_ = 0;
-    visibility_ = org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance();
     typeParameter_ = java.util.Collections.emptyList();
     expandedType_ = 0;
-    isActual_ = false;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -271,23 +221,11 @@ public final class IrTypeAlias extends
       memoizedIsInitialized = 0;
       return false;
     }
-    if (!hasVisibility()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     if (!hasExpandedType()) {
       memoizedIsInitialized = 0;
       return false;
     }
-    if (!hasIsActual()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     if (!getBase().isInitialized()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!getVisibility().isInitialized()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -310,17 +248,11 @@ public final class IrTypeAlias extends
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       output.writeInt32(2, name_);
     }
-    if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeMessage(3, visibility_);
-    }
     for (int i = 0; i < typeParameter_.size(); i++) {
-      output.writeMessage(4, typeParameter_.get(i));
+      output.writeMessage(3, typeParameter_.get(i));
     }
-    if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeInt32(5, expandedType_);
-    }
-    if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      output.writeBool(6, isActual_);
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      output.writeInt32(4, expandedType_);
     }
     output.writeRawBytes(unknownFields);
   }
@@ -339,21 +271,13 @@ public final class IrTypeAlias extends
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeInt32Size(2, name_);
     }
-    if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeMessageSize(3, visibility_);
-    }
     for (int i = 0; i < typeParameter_.size(); i++) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeMessageSize(4, typeParameter_.get(i));
+        .computeMessageSize(3, typeParameter_.get(i));
     }
-    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(5, expandedType_);
-    }
-    if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeBoolSize(6, isActual_);
+        .computeInt32Size(4, expandedType_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -453,14 +377,10 @@ public final class IrTypeAlias extends
       bitField0_ = (bitField0_ & ~0x00000001);
       name_ = 0;
       bitField0_ = (bitField0_ & ~0x00000002);
-      visibility_ = org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance();
-      bitField0_ = (bitField0_ & ~0x00000004);
       typeParameter_ = java.util.Collections.emptyList();
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000004);
       expandedType_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000010);
-      isActual_ = false;
-      bitField0_ = (bitField0_ & ~0x00000020);
+      bitField0_ = (bitField0_ & ~0x00000008);
       return this;
     }
 
@@ -492,23 +412,15 @@ public final class IrTypeAlias extends
         to_bitField0_ |= 0x00000002;
       }
       result.name_ = name_;
-      if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-        to_bitField0_ |= 0x00000004;
-      }
-      result.visibility_ = visibility_;
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
         typeParameter_ = java.util.Collections.unmodifiableList(typeParameter_);
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000004);
       }
       result.typeParameter_ = typeParameter_;
-      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-        to_bitField0_ |= 0x00000008;
+      if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+        to_bitField0_ |= 0x00000004;
       }
       result.expandedType_ = expandedType_;
-      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-        to_bitField0_ |= 0x00000010;
-      }
-      result.isActual_ = isActual_;
       result.bitField0_ = to_bitField0_;
       return result;
     }
@@ -521,13 +433,10 @@ public final class IrTypeAlias extends
       if (other.hasName()) {
         setName(other.getName());
       }
-      if (other.hasVisibility()) {
-        mergeVisibility(other.getVisibility());
-      }
       if (!other.typeParameter_.isEmpty()) {
         if (typeParameter_.isEmpty()) {
           typeParameter_ = other.typeParameter_;
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000004);
         } else {
           ensureTypeParameterIsMutable();
           typeParameter_.addAll(other.typeParameter_);
@@ -536,9 +445,6 @@ public final class IrTypeAlias extends
       }
       if (other.hasExpandedType()) {
         setExpandedType(other.getExpandedType());
-      }
-      if (other.hasIsActual()) {
-        setIsActual(other.getIsActual());
       }
       setUnknownFields(
           getUnknownFields().concat(other.unknownFields));
@@ -554,23 +460,11 @@ public final class IrTypeAlias extends
         
         return false;
       }
-      if (!hasVisibility()) {
-        
-        return false;
-      }
       if (!hasExpandedType()) {
         
         return false;
       }
-      if (!hasIsActual()) {
-        
-        return false;
-      }
       if (!getBase().isInitialized()) {
-        
-        return false;
-      }
-      if (!getVisibility().isInitialized()) {
         
         return false;
       }
@@ -694,95 +588,35 @@ public final class IrTypeAlias extends
       return this;
     }
 
-    private org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility_ = org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance();
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
-     */
-    public boolean hasVisibility() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
-     */
-    public org.jetbrains.kotlin.backend.common.serialization.proto.Visibility getVisibility() {
-      return visibility_;
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
-     */
-    public Builder setVisibility(org.jetbrains.kotlin.backend.common.serialization.proto.Visibility value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      visibility_ = value;
-
-      bitField0_ |= 0x00000004;
-      return this;
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
-     */
-    public Builder setVisibility(
-        org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.Builder builderForValue) {
-      visibility_ = builderForValue.build();
-
-      bitField0_ |= 0x00000004;
-      return this;
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
-     */
-    public Builder mergeVisibility(org.jetbrains.kotlin.backend.common.serialization.proto.Visibility value) {
-      if (((bitField0_ & 0x00000004) == 0x00000004) &&
-          visibility_ != org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance()) {
-        visibility_ =
-          org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.newBuilder(visibility_).mergeFrom(value).buildPartial();
-      } else {
-        visibility_ = value;
-      }
-
-      bitField0_ |= 0x00000004;
-      return this;
-    }
-    /**
-     * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 3;</code>
-     */
-    public Builder clearVisibility() {
-      visibility_ = org.jetbrains.kotlin.backend.common.serialization.proto.Visibility.getDefaultInstance();
-
-      bitField0_ = (bitField0_ & ~0x00000004);
-      return this;
-    }
-
     private java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> typeParameter_ =
       java.util.Collections.emptyList();
     private void ensureTypeParameterIsMutable() {
-      if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (!((bitField0_ & 0x00000004) == 0x00000004)) {
         typeParameter_ = new java.util.ArrayList<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter>(typeParameter_);
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
        }
     }
 
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public java.util.List<org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> getTypeParameterList() {
       return java.util.Collections.unmodifiableList(typeParameter_);
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public int getTypeParameterCount() {
       return typeParameter_.size();
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter getTypeParameter(int index) {
       return typeParameter_.get(index);
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder setTypeParameter(
         int index, org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter value) {
@@ -795,7 +629,7 @@ public final class IrTypeAlias extends
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder setTypeParameter(
         int index, org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter.Builder builderForValue) {
@@ -805,7 +639,7 @@ public final class IrTypeAlias extends
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder addTypeParameter(org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter value) {
       if (value == null) {
@@ -817,7 +651,7 @@ public final class IrTypeAlias extends
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder addTypeParameter(
         int index, org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter value) {
@@ -830,7 +664,7 @@ public final class IrTypeAlias extends
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder addTypeParameter(
         org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter.Builder builderForValue) {
@@ -840,7 +674,7 @@ public final class IrTypeAlias extends
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder addTypeParameter(
         int index, org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter.Builder builderForValue) {
@@ -850,7 +684,7 @@ public final class IrTypeAlias extends
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder addAllTypeParameter(
         java.lang.Iterable<? extends org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter> values) {
@@ -861,16 +695,16 @@ public final class IrTypeAlias extends
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder clearTypeParameter() {
       typeParameter_ = java.util.Collections.emptyList();
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000004);
 
       return this;
     }
     /**
-     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 4;</code>
+     * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
      */
     public Builder removeTypeParameter(int index) {
       ensureTypeParameterIsMutable();
@@ -881,64 +715,32 @@ public final class IrTypeAlias extends
 
     private int expandedType_ ;
     /**
-     * <code>required int32 expanded_type = 5;</code>
+     * <code>required int32 expanded_type = 4;</code>
      */
     public boolean hasExpandedType() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required int32 expanded_type = 5;</code>
+     * <code>required int32 expanded_type = 4;</code>
      */
     public int getExpandedType() {
       return expandedType_;
     }
     /**
-     * <code>required int32 expanded_type = 5;</code>
+     * <code>required int32 expanded_type = 4;</code>
      */
     public Builder setExpandedType(int value) {
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000008;
       expandedType_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 expanded_type = 5;</code>
+     * <code>required int32 expanded_type = 4;</code>
      */
     public Builder clearExpandedType() {
-      bitField0_ = (bitField0_ & ~0x00000010);
+      bitField0_ = (bitField0_ & ~0x00000008);
       expandedType_ = 0;
-      
-      return this;
-    }
-
-    private boolean isActual_ ;
-    /**
-     * <code>required bool is_actual = 6;</code>
-     */
-    public boolean hasIsActual() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
-    }
-    /**
-     * <code>required bool is_actual = 6;</code>
-     */
-    public boolean getIsActual() {
-      return isActual_;
-    }
-    /**
-     * <code>required bool is_actual = 6;</code>
-     */
-    public Builder setIsActual(boolean value) {
-      bitField0_ |= 0x00000020;
-      isActual_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required bool is_actual = 6;</code>
-     */
-    public Builder clearIsActual() {
-      bitField0_ = (bitField0_ & ~0x00000020);
-      isActual_ = false;
       
       return this;
     }

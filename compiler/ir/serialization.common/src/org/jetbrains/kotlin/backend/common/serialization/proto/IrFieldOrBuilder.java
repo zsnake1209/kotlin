@@ -35,56 +35,11 @@ public interface IrFieldOrBuilder extends
   int getName();
 
   /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
-   */
-  boolean hasVisibility();
-  /**
-   * <code>required .org.jetbrains.kotlin.backend.common.serialization.proto.Visibility visibility = 4;</code>
-   */
-  org.jetbrains.kotlin.backend.common.serialization.proto.Visibility getVisibility();
-
-  /**
-   * <code>required bool is_final = 5;</code>
-   */
-  boolean hasIsFinal();
-  /**
-   * <code>required bool is_final = 5;</code>
-   */
-  boolean getIsFinal();
-
-  /**
-   * <code>required bool is_external = 6;</code>
-   */
-  boolean hasIsExternal();
-  /**
-   * <code>required bool is_external = 6;</code>
-   */
-  boolean getIsExternal();
-
-  /**
-   * <code>required bool is_static = 7;</code>
-   */
-  boolean hasIsStatic();
-  /**
-   * <code>required bool is_static = 7;</code>
-   */
-  boolean getIsStatic();
-
-  /**
-   * <code>required int32 type = 8;</code>
+   * <code>required int32 type = 4;</code>
    */
   boolean hasType();
   /**
-   * <code>required int32 type = 8;</code>
+   * <code>required int32 type = 4;</code>
    */
   int getType();
-
-  /**
-   * <code>required bool is_fake_override = 9;</code>
-   */
-  boolean hasIsFakeOverride();
-  /**
-   * <code>required bool is_fake_override = 9;</code>
-   */
-  boolean getIsFakeOverride();
 }

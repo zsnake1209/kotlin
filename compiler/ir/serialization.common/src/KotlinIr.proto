@@ -477,104 +477,60 @@ message IrDeclarationBase {
   required int64 symbol = 1;
   required IrDeclarationOrigin origin = 2;
   required int64 coordinates = 3;
-  required int64 flags = 4;
+  optional int64 flags = 4 [default = 0];
   repeated IrConstructorCall annotation = 5;
 }
 
 message IrFunctionBase {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
-  required Visibility visibility = 3;
-  required bool is_inline = 4;
-  required bool is_external = 5;
-  repeated IrTypeParameter type_parameter = 6;
-  optional IrValueParameter dispatch_receiver = 7;
-  optional IrValueParameter extension_receiver = 8;
-  repeated IrValueParameter value_parameter = 9;
-  optional int32 body = 10;
-  required int32 return_type = 11;
-  required bool is_expect = 12;
+  repeated IrTypeParameter type_parameter = 3;
+  optional IrValueParameter dispatch_receiver = 4;
+  optional IrValueParameter extension_receiver = 5;
+  repeated IrValueParameter value_parameter = 6;
+  optional int32 body = 7;
+  required int32 return_type = 8;
 }
 
 message IrFunction {
   required IrFunctionBase base = 1;
-  required ModalityKind modality = 2;
-  required bool is_tailrec = 3;
-  required bool is_suspend = 4;
-  repeated int64 overridden = 5 [packed=true]; // TODO: supposed to be deleted
+  repeated int64 overridden = 2 [packed=true]; // TODO: supposed to be deleted
   //optional UniqId corresponding_property = 7;
-  required bool is_fake_override = 8;
-  required bool is_operator = 9;
 }
 
 message IrConstructor {
   required IrFunctionBase base = 1;
-  required bool is_primary = 2;
 }
 
 message IrField {
   required IrDeclarationBase base = 1;
   optional int32 initializer = 2;
   required int32 name = 3;
-  required Visibility visibility = 4;
-  required bool is_final = 5;
-  required bool is_external = 6;
-  required bool is_static = 7;
-  required int32 type = 8;
-  required bool is_fake_override = 9;
+  required int32 type = 4;
 }
 
 message IrLocalDelegatedProperty {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
   required int32 type = 3;
-  required bool is_var = 4;
-  required IrVariable delegate = 5;
-  optional IrFunction getter = 6;
-  optional IrFunction setter = 7;
+  required IrVariable delegate = 4;
+  optional IrFunction getter = 5;
+  optional IrFunction setter = 6;
 }
 
 message IrProperty {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
-  required Visibility visibility = 3;
-  required ModalityKind modality = 4;
-  required bool is_var = 5;
-  required bool is_const = 6;
-  required bool is_lateinit = 7;
-  required bool is_delegated = 8;
-  required bool is_external = 9;
-  optional IrField backing_field = 10;
-  optional IrFunction getter = 11;
-  optional IrFunction setter = 12;
-  required bool is_expect = 13;
-  required bool is_fake_override = 14;
+  optional IrField backing_field = 3;
+  optional IrFunction getter = 4;
+  optional IrFunction setter = 5;
 }
 
 message IrVariable {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
   required int32 type = 3;
-  required bool is_var = 4;
-  required bool is_const = 5;
-  required bool is_lateinit = 6;
-  optional IrExpression initializer = 7;
-}
-
-enum ClassKind {
-  CLASS = 1;
-  INTERFACE = 2;
-  ENUM_CLASS = 3;
-  ENUM_ENTRY = 4;
-  ANNOTATION_CLASS = 5;
-  OBJECT = 6;
-}
-
-enum ModalityKind { // It is ModalityKind to not clash with Modality in descriptor metadata.
-                    FINAL_MODALITY = 1;
-                    SEALED_MODALITY = 2;
-                    OPEN_MODALITY = 3;
-                    ABSTRACT_MODALITY = 4;
+  optional IrExpression initializer = 4;
 }
 
 message IrValueParameter {
@@ -582,45 +538,29 @@ message IrValueParameter {
   required int32 name = 2;
   required int32 type = 3;
   optional int32 vararg_element_type = 4;
-  required bool is_crossinline = 5;
-  required bool is_noinline = 6;
-  optional int32 default_value = 7;
+  optional int32 default_value = 5;
 }
 
 message IrTypeParameter {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
-  required IrTypeVariance variance = 3;
-  repeated int32 super_type = 4 [packed=true];
-  required bool is_reified = 5;
+  repeated int32 super_type = 3 [packed=true];
 }
 
 message IrClass {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
-  required ClassKind kind = 3;
-  required Visibility visibility = 4;
-  required ModalityKind modality = 5;
-  // TODO: consider using flags for the booleans.
-  required bool is_companion = 6;
-  required bool is_inner = 7;
-  required bool is_data = 8;
-  required bool is_external = 9;
-  required bool is_inline = 10;
-  optional IrValueParameter this_receiver = 11;
-  repeated IrTypeParameter type_parameter = 12;
-  required IrDeclarationContainer declaration_container = 13;
-  repeated int32 super_type = 14 [packed=true];
-  required bool is_expect = 15;
+  optional IrValueParameter this_receiver = 3;
+  repeated IrTypeParameter type_parameter = 4;
+  required IrDeclarationContainer declaration_container = 5;
+  repeated int32 super_type = 6 [packed=true];
 }
 
 message IrTypeAlias {
   required IrDeclarationBase base = 1;
   required int32 name = 2;
-  required Visibility visibility = 3;
-  repeated IrTypeParameter type_parameter = 4;
-  required int32 expanded_type = 5;
-  required bool is_actual = 6;
+  repeated IrTypeParameter type_parameter = 3;
+  required int32 expanded_type = 4;
 }
 
 message IrEnumEntry {

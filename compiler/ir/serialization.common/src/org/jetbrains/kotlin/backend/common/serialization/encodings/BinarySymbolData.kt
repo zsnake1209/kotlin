@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.backend.common.serialization
+package org.jetbrains.kotlin.backend.common.serialization.encodings
 
 inline class BinarySymbolData(val code: Long) {
     enum class SymbolKind {
@@ -27,7 +27,8 @@ inline class BinarySymbolData(val code: Long) {
     private fun symbolKindId(): Int = (code and 0xFF).toInt()
 
     val signatureId: Int get() = (code ushr 8).toInt()
-    val kind: SymbolKind get() = SymbolKind.values()[symbolKindId()]
+    val kind: SymbolKind
+        get() = SymbolKind.values()[symbolKindId()]
 
     companion object {
         fun encode(kind: SymbolKind, signatureId: Int): Long {
@@ -35,6 +36,7 @@ inline class BinarySymbolData(val code: Long) {
             return (signatureId.toLong() shl 8) or kindId.toLong()
         }
 
-        fun decode(code: Long): BinarySymbolData = BinarySymbolData(code)
+        fun decode(code: Long): BinarySymbolData =
+            BinarySymbolData(code)
     }
 }

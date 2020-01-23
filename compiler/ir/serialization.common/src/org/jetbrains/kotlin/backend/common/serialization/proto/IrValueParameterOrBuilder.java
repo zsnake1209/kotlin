@@ -44,29 +44,11 @@ public interface IrValueParameterOrBuilder extends
   int getVarargElementType();
 
   /**
-   * <code>required bool is_crossinline = 5;</code>
-   */
-  boolean hasIsCrossinline();
-  /**
-   * <code>required bool is_crossinline = 5;</code>
-   */
-  boolean getIsCrossinline();
-
-  /**
-   * <code>required bool is_noinline = 6;</code>
-   */
-  boolean hasIsNoinline();
-  /**
-   * <code>required bool is_noinline = 6;</code>
-   */
-  boolean getIsNoinline();
-
-  /**
-   * <code>optional int32 default_value = 7;</code>
+   * <code>optional int32 default_value = 5;</code>
    */
   boolean hasDefaultValue();
   /**
-   * <code>optional int32 default_value = 7;</code>
+   * <code>optional int32 default_value = 5;</code>
    */
   int getDefaultValue();
 }
