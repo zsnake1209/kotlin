@@ -18,21 +18,19 @@ package org.jetbrains.kotlin.load.java.sam;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.builtins.FunctionTypesKt;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.descriptors.annotations.Annotations;
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl;
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl;
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl;
-import org.jetbrains.kotlin.load.java.components.SamConversionResolver;
 import org.jetbrains.kotlin.load.java.descriptors.JavaClassConstructorDescriptor;
 import org.jetbrains.kotlin.load.java.descriptors.JavaClassDescriptor;
 import org.jetbrains.kotlin.load.java.descriptors.JavaMethodDescriptor;
+import org.jetbrains.kotlin.load.java.lazy.descriptors.LazyJavaClassDescriptor;
 import org.jetbrains.kotlin.name.Name;
-import org.jetbrains.kotlin.name.SpecialNames;
-import org.jetbrains.kotlin.resolve.DescriptorUtils;
-import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
+import org.jetbrains.kotlin.resolve.sam.SamConversionResolver;
 import org.jetbrains.kotlin.resolve.jvm.JavaResolverUtils;
+import org.jetbrains.kotlin.resolve.sam.SamConversionResolverImplKt;
 import org.jetbrains.kotlin.types.*;
 
 import java.util.ArrayList;
@@ -46,31 +44,8 @@ public class SingleAbstractMethodUtils {
     private SingleAbstractMethodUtils() {
     }
 
-    @NotNull
-    public static List<CallableMemberDescriptor> getAbstractMembers(@NotNull ClassDescriptor classDescriptor) {
-        List<CallableMemberDescriptor> abstractMembers = new ArrayList<>();
-        for (DeclarationDescriptor member : DescriptorUtils.getAllDescriptors(classDescriptor.getUnsubstitutedMemberScope())) {
-            if (member instanceof CallableMemberDescriptor && ((CallableMemberDescriptor) member).getModality() == Modality.ABSTRACT) {
-                abstractMembers.add((CallableMemberDescriptor) member);
-            }
-        }
-        return abstractMembers;
-    }
-
     @Nullable
-    public static SimpleType getFunctionTypeForSamInterface(
-            @NotNull JavaClassDescriptor clazz,
-            @Nullable SamConversionResolver samResolver
-    ) {
-        if (samResolver == null) {
-            return clazz.getDefaultFunctionTypeForSamInterface();
-        }
-
-        return samResolver.resolveFunctionTypeIfSamInterface(clazz);
-    }
-
-    @Nullable
-    public static KotlinType getFunctionTypeForSamType(@NotNull KotlinType samType, @Nullable SamConversionResolver samResolver) {
+    public static KotlinType getFunctionTypeForSamType(@NotNull KotlinType samType, @NotNull SamConversionResolver samResolver) {
         UnwrappedType unwrappedType = samType.unwrap();
         if (unwrappedType instanceof FlexibleType) {
             SimpleType lower = getFunctionTypeForSamType(((FlexibleType) unwrappedType).getLowerBound(), samResolver);
@@ -86,13 +61,16 @@ public class SingleAbstractMethodUtils {
     }
 
     @Nullable
-    private static SimpleType getFunctionTypeForSamType(@NotNull SimpleType samType, @Nullable SamConversionResolver samResolver) {
+    private static SimpleType getFunctionTypeForSamType(@NotNull SimpleType samType, @NotNull SamConversionResolver samResolver) {
         // e.g. samType == Comparator<String>?
 
         ClassifierDescriptor classifier = samType.getConstructor().getDeclarationDescriptor();
-        if (classifier instanceof JavaClassDescriptor) {
+        if (classifier instanceof ClassDescriptor) {
+            ClassDescriptor descriptor = (ClassDescriptor) classifier;
+            if (!(descriptor instanceof JavaClassDescriptor) && !descriptor.isFun()) return null;
+
             // Function2<T, T, Int>
-            SimpleType functionTypeDefault = getFunctionTypeForSamInterface((JavaClassDescriptor) classifier, samResolver);
+            SimpleType functionTypeDefault = samResolver.resolveFunctionTypeIfSamInterface(descriptor);
 
             if (functionTypeDefault != null) {
                 SimpleType noProjectionsSamType = SingleAbstractMethodUtilsKt.nonProjectionParametrization(samType);
@@ -112,68 +90,12 @@ public class SingleAbstractMethodUtils {
     }
 
     @NotNull
-    public static SimpleType getFunctionTypeForAbstractMethod(
-            @NotNull FunctionDescriptor function,
-            boolean shouldConvertFirstParameterToDescriptor
-    ) {
-        KotlinType returnType = function.getReturnType();
-        assert returnType != null : "function is not initialized: " + function;
-        List<ValueParameterDescriptor> valueParameters = function.getValueParameters();
-        List<KotlinType> parameterTypes = new ArrayList<>(valueParameters.size());
-        List<Name> parameterNames = new ArrayList<>(valueParameters.size());
-
-        int startIndex = 0;
-        KotlinType receiverType = null;
-
-        if (shouldConvertFirstParameterToDescriptor && !function.getValueParameters().isEmpty()) {
-            receiverType = valueParameters.get(0).getType();
-            startIndex = 1;
-        }
-
-        for (int i = startIndex; i < valueParameters.size(); ++i) {
-            ValueParameterDescriptor parameter = valueParameters.get(i);
-            parameterTypes.add(parameter.getType());
-            parameterNames.add(function.hasSynthesizedParameterNames() ? SpecialNames.NO_NAME_PROVIDED : parameter.getName());
-        }
-
-        return FunctionTypesKt.createFunctionType(
-                DescriptorUtilsKt.getBuiltIns(function), Annotations.Companion.getEMPTY(),
-                receiverType, parameterTypes, parameterNames, returnType
-        );
-    }
-
-    @Nullable
-    public static FunctionDescriptor getSingleAbstractMethodOrNull(@NotNull JavaClassDescriptor klass) {
-        // NB: this check MUST BE at start. Please do not touch until following to-do is resolved
-        // Otherwise android data binding can cause resolve re-entrance
-        // For details see KT-18687, KT-16149
-        // TODO: prevent resolve re-entrance on architecture level, or (alternatively) ask data binding owners not to do it
-        if (DescriptorUtilsKt.getFqNameSafe(klass).asString().endsWith(".databinding.DataBindingComponent")) {
-            return null;
-        }
-
-        if (klass.isDefinitelyNotSamInterface()) return null;
-
-        List<CallableMemberDescriptor> abstractMembers = getAbstractMembers(klass);
-        if (abstractMembers.size() == 1) {
-            CallableMemberDescriptor member = abstractMembers.get(0);
-            if (member instanceof SimpleFunctionDescriptor) {
-                return member.getTypeParameters().isEmpty()
-                       ? (FunctionDescriptor) member
-                       : null;
-            }
-        }
-
-        return null;
-    }
-
-    @NotNull
     public static SamConstructorDescriptor createSamConstructorFunction(
             @NotNull DeclarationDescriptor owner,
-            @NotNull JavaClassDescriptor samInterface,
+            @NotNull ClassDescriptor samInterface,
             @NotNull SamConversionResolver samResolver
     ) {
-        assert getSingleAbstractMethodOrNull(samInterface) != null : samInterface;
+        assert SamConversionResolverImplKt.getSingleAbstractMethodOrNull(samInterface) != null : samInterface;
 
         SamConstructorDescriptorImpl result = new SamConstructorDescriptorImpl(owner, samInterface);
 
@@ -185,7 +107,7 @@ public class SingleAbstractMethodUtils {
     }
 
     private static void initializeSamConstructorDescriptor(
-            @NotNull JavaClassDescriptor samInterface,
+            @NotNull ClassDescriptor samInterface,
             @NotNull SimpleFunctionDescriptorImpl samConstructor,
             @NotNull List<TypeParameterDescriptor> samTypeParameters,
             @NotNull KotlinType unsubstitutedSamType,
@@ -227,7 +149,7 @@ public class SingleAbstractMethodUtils {
     ) {
         SamTypeAliasConstructorDescriptorImpl result = new SamTypeAliasConstructorDescriptorImpl(typeAliasDescriptor, underlyingSamConstructor);
 
-        JavaClassDescriptor samInterface = underlyingSamConstructor.getBaseDescriptorForSynthetic();
+        ClassDescriptor samInterface = underlyingSamConstructor.getBaseDescriptorForSynthetic();
         List<TypeParameterDescriptor> samTypeParameters = typeAliasDescriptor.getTypeConstructor().getParameters();
         SimpleType unsubstitutedSamType = typeAliasDescriptor.getExpandedType();
         initializeSamConstructorDescriptor(samInterface, result, samTypeParameters, unsubstitutedSamType, samResolver);
@@ -235,8 +157,18 @@ public class SingleAbstractMethodUtils {
         return result;
     }
 
+    public static boolean isSamClassDescriptor(@NotNull ClassDescriptor descriptor) {
+        if (descriptor.isFun()) return true;
+        if (descriptor instanceof LazyJavaClassDescriptor && descriptor.getDefaultFunctionTypeForSamInterface() != null) return true;
+
+        return false;
+    }
+
     public static boolean isSamType(@NotNull KotlinType type) {
-        return getFunctionTypeForSamType(type, null) != null;
+        ClassifierDescriptor descriptor = type.getConstructor().getDeclarationDescriptor();
+        if (descriptor instanceof ClassDescriptor && ((ClassDescriptor) descriptor).isFun()) return true;
+
+        return getFunctionTypeForSamType(type, JavaBasedSamConversionResolver.INSTANCE) != null;
     }
 
     public static boolean isSamAdapterNecessary(@NotNull FunctionDescriptor fun) {

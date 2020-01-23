@@ -595,6 +595,8 @@ open class WrappedClassDescriptor(
 
     override fun isInline() = owner.isInline
 
+    override fun isFun() = TODO("not implemented")
+
     override fun getThisAsReceiverParameter() = owner.thisReceiver?.descriptor as ReceiverParameterDescriptor
 
     override fun getUnsubstitutedPrimaryConstructor() =
@@ -635,6 +637,14 @@ open class WrappedClassDescriptor(
 
     override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
         visitor!!.visitClassDescriptor(this, null)
+    }
+
+    override fun getDefaultFunctionTypeForSamInterface(): SimpleType? {
+        TODO("not implemented")
+    }
+
+    override fun isDefinitelyNotSamInterface(): Boolean {
+        return owner.descriptor.isDefinitelyNotSamInterface
     }
 }
 
@@ -705,6 +715,8 @@ open class WrappedEnumEntryDescriptor(
 
     override fun isInline() = false
 
+    override fun isFun() = false
+
     override fun getThisAsReceiverParameter() = (owner.parent as IrClass).descriptor.thisAsReceiverParameter
 
     override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor? {
@@ -747,6 +759,10 @@ open class WrappedEnumEntryDescriptor(
     override fun acceptVoid(visitor: DeclarationDescriptorVisitor<Void, Void>?) {
         visitor!!.visitClassDescriptor(this, null)
     }
+
+    override fun getDefaultFunctionTypeForSamInterface(): SimpleType? = null
+
+    override fun isDefinitelyNotSamInterface() = true
 }
 
 

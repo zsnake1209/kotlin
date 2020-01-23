@@ -122,7 +122,7 @@ open class KotlinNativeTargetConfigurator<T : KotlinNativeTarget>(
             group = BasePlugin.BUILD_GROUP
             description = "Links ${binary.outputKind.description} '${binary.name}' for a target '${target.name}'."
             enabled = binary.konanTarget.enabledOnCurrentHost
-            destinationDir = binary.outputDirectory
+
             addCompilerPlugins()
 
             if (binary !is TestExecutable) {
@@ -304,7 +304,7 @@ open class KotlinNativeTargetConfigurator<T : KotlinNativeTarget>(
             }
         }
 
-        target.binaries.withType(Framework::class.java).all { framework ->
+        target.binaries.withType(AbstractNativeLibrary::class.java).all { framework ->
             val exportConfiguration = project.configurations.maybeCreate(framework.exportConfigurationName).apply {
                 isVisible = false
                 isTransitive = false

@@ -1,11 +1,12 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.backend.jvm.codegen
 
 import org.jetbrains.kotlin.backend.common.lower.BOUND_RECEIVER_PARAMETER
+import org.jetbrains.kotlin.backend.common.lower.LocalDeclarationsLowering
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.intrinsics.IrIntrinsicMethods
 import org.jetbrains.kotlin.backend.jvm.intrinsics.JavaClassProperty
@@ -42,6 +43,7 @@ import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes.OBJECT_TYPE
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodParameterKind
@@ -400,7 +402,7 @@ class ExpressionCodegen(
             }
             expression.symbol.descriptor is ConstructorDescriptor ->
                 throw AssertionError("IrCall with ConstructorDescriptor: ${expression.javaClass.simpleName}")
-            callee.isSuspend && !irFunction.shouldNotContainSuspendMarkers() ->
+            expression.isSuspensionPoint() ->
                 addInlineMarker(mv, isStartNotEnd = true)
         }
 
@@ -426,20 +428,33 @@ class ExpressionCodegen(
         expression.markLineNumber(true)
 
         // Do not generate redundant markers in continuation class.
-        if (callee.isSuspend && !irFunction.shouldNotContainSuspendMarkers()) {
+        if (expression.isSuspensionPoint()) {
             addSuspendMarker(mv, isStartNotEnd = true)
         }
 
-        callGenerator.genCall(callable, this, expression)
+        if (irFunction.isInvokeSuspendOfContinuation()) {
+            // Do not inline callee to continuation, instead, call it
+            with(callable) {
+                mv.visitMethodInsn(invokeOpcode, owner.internalName, asmMethod.name, asmMethod.descriptor, isInterfaceMethod)
+            }
+        } else {
+            callGenerator.genCall(callable, this, expression)
+        }
 
-        if (callee.isSuspend && !irFunction.shouldNotContainSuspendMarkers()) {
+        if (expression.isSuspensionPoint()) {
+            // Check return type of non-lowered suspend call, in order to replace the result of the call with Unit,
+            // otherwise, it would seem like the call returns non-unit upon resume.
+            // See box/coroutines/tailCallOptimization/unit tests.
+            if (context.suspendFunctionViewToOriginal[expression.symbol.owner]?.returnType?.isUnit() == true) {
+                addReturnsUnitMarker(mv)
+            }
+
             addSuspendMarker(mv, isStartNotEnd = false)
             addInlineMarker(mv, isStartNotEnd = false)
         }
 
-        val returnType = callee.returnType
         return when {
-            returnType.substitute(expression.typeSubstitutionMap).isNothing() -> {
+            expression.type.isNothing() -> {
                 mv.aconst(null)
                 mv.athrow()
                 immaterialUnitValue
@@ -451,9 +466,33 @@ class ExpressionCodegen(
                 immaterialUnitValue
             expression.type.isUnit() ->
                 // NewInference allows casting `() -> T` to `() -> Unit`. A CHECKCAST here will fail.
-                MaterialValue(this, callable.asmMethod.returnType, returnType).discard().coerce(expression.type)
+                MaterialValue(this, callable.asmMethod.returnType, callee.returnType).discard().coerce(expression.type)
             else ->
-                MaterialValue(this, callable.asmMethod.returnType, returnType).coerce(expression.type)
+                MaterialValue(this, callable.asmMethod.returnType, callee.returnType).coerce(expression.type)
+        }
+    }
+
+    private fun IrFunctionAccessExpression.isSuspensionPoint(): Boolean {
+        val owner = symbol.owner
+        return when {
+            // Only suspend functions are suspension points
+            !owner.isSuspend -> false
+            // But not inside continuation classes and bridges
+            irFunction.shouldNotContainSuspendMarkers() -> false
+            // Noinline function are always suspension points
+            !owner.isInline -> true
+            // The suspend intrinsics are, albeit inline, also suspension points
+            owner.fqNameForIrSerialization == FqName("kotlin.coroutines.intrinsics.IntrinsicsKt.suspendCoroutineUninterceptedOrReturn") -> true
+            // Inside $$forInline functions crossinline calls are (usually) not suspension points, otherwise, flow will be pessimized
+            (dispatchReceiver as? IrGetField)?.symbol?.owner?.origin ==
+                    LocalDeclarationsLowering.DECLARATION_ORIGIN_FIELD_FOR_CROSSINLINE_CAPTURED_VALUE ->
+                irFunction.origin != JvmLoweredDeclarationOrigin.FOR_INLINE_STATE_MACHINE_TEMPLATE_CAPTURES_CROSSINLINE
+            // The same goes for inline lambdas
+            (dispatchReceiver as? IrGetValue)?.let {
+                it.origin == IrStatementOrigin.VARIABLE_AS_FUNCTION && (it.symbol.owner as? IrValueParameter)?.isNoinline != true
+            } == true -> irFunction.origin != JvmLoweredDeclarationOrigin.FOR_INLINE_STATE_MACHINE_TEMPLATE
+            // Otherwise, this is normal inline call, ergo not a suspension point
+            else -> false
         }
     }
 
@@ -616,6 +655,13 @@ class ExpressionCodegen(
         val returnType = if (owner == irFunction) signature.returnType else methodSignatureMapper.mapReturnType(owner)
         val afterReturnLabel = Label()
         expression.value.accept(this, data).coerce(returnType, owner.returnType).materialize()
+        // We replaced COERTION_TO_UNIT with IrReturn during TailCallOptimizationLowering.
+        // Generate POP GETSTATIC kotlin/Unit.INSTANCE now.
+        // Otherwise, tail-call optimization will not work. See tailSuspendUnitFun.kt test.
+        if (expression in context.suspendTailCallsWithUnitReplacement) {
+            mv.pop()
+            mv.getstatic("kotlin/Unit", "INSTANCE", "Lkotlin/Unit;")
+        }
         generateFinallyBlocksIfNeeded(returnType, afterReturnLabel, data)
         expression.markLineNumber(startOffset = true)
         if (isNonLocalReturn) {

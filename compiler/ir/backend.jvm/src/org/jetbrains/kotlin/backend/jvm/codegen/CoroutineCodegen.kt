@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
 import org.jetbrains.kotlin.backend.common.ir.copyValueParametersInsertingContinuationFrom
 import org.jetbrains.kotlin.backend.common.ir.isSuspend
 import org.jetbrains.kotlin.backend.common.lower.VariableRemapper
+import org.jetbrains.kotlin.backend.common.lower.allOverridden
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.codegen.ClassBuilder
@@ -71,10 +72,14 @@ internal fun generateStateMachineForNamedFunction(
         internalNameForDispatchReceiver = classCodegen.visitor.thisName,
         putContinuationParameterToLvt = false,
         disableTailCallOptimizationForFunctionReturningUnit = irFunction.returnType.isUnit() &&
-                (irFunction as? IrSimpleFunction)?.overriddenSymbols?.let { symbols ->
-                    symbols.isNotEmpty() && symbols.any { !it.owner.returnType.isUnit() }
-                } == true
+                irFunction.anyOfOverriddenFunctionsReturnsNonUnit()
     )
+}
+
+internal fun IrFunction.anyOfOverriddenFunctionsReturnsNonUnit(): Boolean {
+    return (this as? IrSimpleFunction)?.allOverridden()?.toList()?.let { functions ->
+        functions.isNotEmpty() && functions.any { !it.returnType.isUnit() }
+    } == true
 }
 
 internal fun generateStateMachineForLambda(
@@ -135,10 +140,10 @@ internal fun IrFunction.getOrCreateSuspendFunctionViewIfNeeded(context: JvmBacke
     if (!isSuspend || origin == JvmLoweredDeclarationOrigin.SUSPEND_FUNCTION_VIEW ||
         origin == JvmLoweredDeclarationOrigin.FOR_INLINE_STATE_MACHINE_TEMPLATE_CAPTURES_CROSSINLINE_VIEW
     ) return this
-    return context.suspendFunctionOriginalToView[this] ?: suspendFunctionView(context)
+    return context.suspendFunctionOriginalToView[this] ?: suspendFunctionView(context, true)
 }
 
-private fun IrFunction.suspendFunctionView(context: JvmBackendContext): IrFunction {
+fun IrFunction.suspendFunctionView(context: JvmBackendContext, generateBody: Boolean): IrFunction {
     require(this.isSuspend && this is IrSimpleFunction)
     // For SuspendFunction{N}.invoke we need to generate INVOKEINTERFACE Function{N+1}.invoke(...Ljava/lang/Object;)...
     // instead of INVOKEINTERFACE Function{N+1}.invoke(...Lkotlin/coroutines/Continuation;)...
@@ -175,19 +180,21 @@ private fun IrFunction.suspendFunctionView(context: JvmBackendContext): IrFuncti
             continuationValueParam = it.addValueParameter(SUSPEND_FUNCTION_COMPLETION_PARAMETER_NAME, continuationType)
         }
 
-        // Add the suspend function view to the map before transforming the body to make sure
-        // that recursive suspend functions do not lead to unbounded recursion at compile time.
-        context.recordSuspendFunctionView(this, it)
+        if (generateBody) {
+            // Add the suspend function view to the map before transforming the body to make sure
+            // that recursive suspend functions do not lead to unbounded recursion at compile time.
+            context.recordSuspendFunctionView(this, it)
 
-        val valueParametersMapping = explicitParameters.zip(it.explicitParameters.filter { it != continuationValueParam }).toMap()
-        it.body = body?.deepCopyWithSymbols(this)
-        it.body?.transformChildrenVoid(object : VariableRemapper(valueParametersMapping) {
-            // Do not cross class boundaries inside functions. Otherwise, callable references will try to access wrong $completion.
-            override fun visitClass(declaration: IrClass): IrStatement = declaration
+            val valueParametersMapping = explicitParameters.zip(it.explicitParameters.filter { it != continuationValueParam }).toMap()
+            it.body = body?.deepCopyWithSymbols(this)
+            it.body?.transformChildrenVoid(object : VariableRemapper(valueParametersMapping) {
+                // Do not cross class boundaries inside functions. Otherwise, callable references will try to access wrong $completion.
+                override fun visitClass(declaration: IrClass): IrStatement = declaration
 
-            override fun visitCall(expression: IrCall): IrExpression =
-                super.visitCall(expression.createSuspendFunctionCallViewIfNeeded(context, it, callerIsInlineLambda = false))
-        })
+                override fun visitCall(expression: IrCall): IrExpression =
+                    super.visitCall(expression.createSuspendFunctionCallViewIfNeeded(context, it, callerIsInlineLambda = false))
+            })
+        }
     }
 }
 
@@ -260,7 +267,7 @@ internal fun generateFakeContinuationConstructorCall(
             load(continuationIndex, Type.getObjectType("kotlin/coroutines/Continuation"))
             invokespecial(continuationType.internalName, "<init>", "(Lkotlin/coroutines/Continuation;)V", false)
         }
-        pop()
         addFakeContinuationConstructorCallMarker(this, false)
+        pop()
     }
 }

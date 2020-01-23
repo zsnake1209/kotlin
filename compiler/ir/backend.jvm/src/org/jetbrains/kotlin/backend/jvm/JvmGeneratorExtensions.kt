@@ -24,6 +24,8 @@ import org.jetbrains.kotlin.psi2ir.generators.GeneratorExtensions
 import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import org.jetbrains.kotlin.resolve.jvm.annotations.hasJvmFieldAnnotation
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
+import org.jetbrains.kotlin.resolve.sam.getFunctionTypeForAbstractMethod
+import org.jetbrains.kotlin.resolve.sam.getSingleAbstractMethodOrNull
 import org.jetbrains.kotlin.synthetic.SamAdapterExtensionFunctionDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeSubstitutor
@@ -56,11 +58,11 @@ class JvmGeneratorExtensions(private val generateFacades: Boolean = true) : Gene
         }
 
         override fun getSubstitutedFunctionTypeForSamType(samType: KotlinType): KotlinType {
-            val descriptor = samType.constructor.declarationDescriptor as? JavaClassDescriptor
-                ?: throw AssertionError("SAM should be represented by a Java class: $samType")
-            val singleAbstractMethod = SingleAbstractMethodUtils.getSingleAbstractMethodOrNull(descriptor)
+            val descriptor = samType.constructor.declarationDescriptor as? ClassDescriptor
+                ?: throw AssertionError("SAM should be represented by a class: $samType")
+            val singleAbstractMethod = getSingleAbstractMethodOrNull(descriptor)
                 ?: throw AssertionError("$descriptor should have a single abstract method")
-            val unsubstitutedFunctionType = SingleAbstractMethodUtils.getFunctionTypeForAbstractMethod(singleAbstractMethod, false)
+            val unsubstitutedFunctionType = getFunctionTypeForAbstractMethod(singleAbstractMethod, false)
             return TypeSubstitutor.create(samType).substitute(unsubstitutedFunctionType, Variance.INVARIANT)
                 ?: throw AssertionError("Failed to substitute function type $unsubstitutedFunctionType corresponding to $samType")
         }

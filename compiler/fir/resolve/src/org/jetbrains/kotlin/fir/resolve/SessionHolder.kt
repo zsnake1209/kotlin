@@ -36,7 +36,7 @@ interface BodyResolveComponents : SessionHolder {
     val callResolver: FirCallResolver
     val doubleColonExpressionResolver: FirDoubleColonExpressionResolver
     val syntheticCallGenerator: FirSyntheticCallGenerator
-    val dataFlowAnalyzer: FirDataFlowAnalyzer
+    val dataFlowAnalyzer: FirDataFlowAnalyzer<*>
     val integerLiteralTypeApproximator: IntegerLiteralTypeApproximationTransformer
     val integerOperatorsTypeUpdater: IntegerOperatorsTypeUpdater
 
