@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.Constrain
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPositionKind.RECEIVER_POSITION
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPositionKind.VALUE_PARAMETER_POSITION
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ValidityConstraintForConstituentType
+import org.jetbrains.kotlin.resolve.calls.model.MutableResolvedCall
 import org.jetbrains.kotlin.resolve.calls.model.VariableAsFunctionResolvedCall
 import org.jetbrains.kotlin.resolve.calls.resolvedCallUtil.makeNullableTypeIfSafeReceiver
 import org.jetbrains.kotlin.resolve.calls.results.ResolutionStatus
@@ -291,6 +292,14 @@ class GenericCandidateResolver(
         if (possibleTypes.isEmpty()) return type
 
         return TypeIntersector.intersectTypes(possibleTypes + type)
+    }
+
+    fun <D : CallableDescriptor> completeTypeInferenceForExtensionProperties(resolvedCall: MutableResolvedCall<D>) {
+        val constraintSystem = resolvedCall.constraintSystem?.toBuilder() ?: return
+
+        val resultingSystem = constraintSystem.build()
+        resolvedCall.setConstraintSystem(resultingSystem)
+        resolvedCall.setResultingSubstitutor(resultingSystem.resultingSubstitutor)
     }
 
     fun <D : CallableDescriptor> completeTypeInferenceDependentOnFunctionArgumentsForCall(context: CallCandidateResolutionContext<D>) {

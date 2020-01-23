@@ -18499,6 +18499,11 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                     KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/tests/resolve/invoke"), Pattern.compile("^(.*)\\.kts?$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true);
                 }
 
+                @TestMetadata("extensionGenericPropertyWithAdditionalCall.kt")
+                public void testExtensionGenericPropertyWithAdditionalCall() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/resolve/invoke/extensionGenericPropertyWithAdditionalCall.kt");
+                }
+
                 @TestMetadata("extensionValueAsNonExtension.kt")
                 public void testExtensionValueAsNonExtension() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/resolve/invoke/extensionValueAsNonExtension.kt");

@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
 import org.jetbrains.kotlin.resolve.calls.CallResolver
 import org.jetbrains.kotlin.resolve.calls.CallTransformer
 import org.jetbrains.kotlin.resolve.calls.CandidateResolver
+import org.jetbrains.kotlin.resolve.calls.GenericCandidateResolver
 import org.jetbrains.kotlin.resolve.calls.callResolverUtil.isBinaryRemOperator
 import org.jetbrains.kotlin.resolve.calls.callResolverUtil.isConventionCall
 import org.jetbrains.kotlin.resolve.calls.callResolverUtil.isInfixCall
@@ -66,6 +67,7 @@ import java.util.*
 
 class NewResolutionOldInference(
     private val candidateResolver: CandidateResolver,
+    private val genericCandidateResolver: GenericCandidateResolver,
     private val towerResolver: TowerResolver,
     private val resolutionResultsHandler: ResolutionResultsHandler,
     private val dynamicCallableDescriptors: DynamicCallableDescriptors,
@@ -84,20 +86,22 @@ class NewResolutionOldInference(
             tracing: TracingStrategy,
             scopeTower: ImplicitScopeTower,
             explicitReceiver: DetailedReceiver?,
-            context: BasicCallResolutionContext
+            context: BasicCallResolutionContext,
+            genericCandidateResolver: GenericCandidateResolver
         ): ScopeTowerProcessor<MyCandidate>
 
         object Function : ResolutionKind() {
             override fun createTowerProcessor(
                 outer: NewResolutionOldInference, name: Name, tracing: TracingStrategy,
-                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext
+                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext,
+                genericCandidateResolver: GenericCandidateResolver
             ): ScopeTowerProcessor<MyCandidate> {
                 val functionFactory = outer.CandidateFactoryImpl(name, context, tracing)
                 return createFunctionProcessor(
                     scopeTower,
                     name,
                     functionFactory,
-                    outer.CandidateFactoryProviderForInvokeImpl(functionFactory),
+                    outer.CandidateFactoryProviderForInvokeImpl(functionFactory, genericCandidateResolver),
                     explicitReceiver
                 )
             }
@@ -106,7 +110,8 @@ class NewResolutionOldInference(
         object Variable : ResolutionKind() {
             override fun createTowerProcessor(
                 outer: NewResolutionOldInference, name: Name, tracing: TracingStrategy,
-                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext
+                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext,
+                genericCandidateResolver: GenericCandidateResolver
             ): ScopeTowerProcessor<MyCandidate> {
                 val variableFactory = outer.CandidateFactoryImpl(name, context, tracing)
                 return createVariableAndObjectProcessor(scopeTower, name, variableFactory, explicitReceiver)
@@ -116,7 +121,8 @@ class NewResolutionOldInference(
         object CallableReference : ResolutionKind() {
             override fun createTowerProcessor(
                 outer: NewResolutionOldInference, name: Name, tracing: TracingStrategy,
-                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext
+                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext,
+                genericCandidateResolver: GenericCandidateResolver
             ): ScopeTowerProcessor<MyCandidate> {
                 val functionFactory = outer.CandidateFactoryImpl(name, context, tracing)
                 val variableFactory = outer.CandidateFactoryImpl(name, context, tracing)
@@ -130,7 +136,8 @@ class NewResolutionOldInference(
         object Invoke : ResolutionKind() {
             override fun createTowerProcessor(
                 outer: NewResolutionOldInference, name: Name, tracing: TracingStrategy,
-                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext
+                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext,
+                genericCandidateResolver: GenericCandidateResolver
             ): ScopeTowerProcessor<MyCandidate> {
                 val functionFactory = outer.CandidateFactoryImpl(name, context, tracing)
                 // todo
@@ -152,7 +159,8 @@ class NewResolutionOldInference(
         class GivenCandidates : ResolutionKind() {
             override fun createTowerProcessor(
                 outer: NewResolutionOldInference, name: Name, tracing: TracingStrategy,
-                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext
+                scopeTower: ImplicitScopeTower, explicitReceiver: DetailedReceiver?, context: BasicCallResolutionContext,
+                genericCandidateResolver: GenericCandidateResolver
             ): ScopeTowerProcessor<MyCandidate> {
                 throw IllegalStateException("Should be not called")
             }
@@ -184,7 +192,9 @@ class NewResolutionOldInference(
         else
             name
 
-        val processor = kind.createTowerProcessor(this, nameToResolve, tracing, scopeTower, detailedReceiver, context)
+        val processor = kind.createTowerProcessor(
+            this, nameToResolve, tracing, scopeTower, detailedReceiver, context, genericCandidateResolver
+        )
 
         if (context.collectAllCandidates) {
             return allCandidatesResult(towerResolver.collectAllCandidates(scopeTower, processor, nameToResolve))
@@ -199,7 +209,7 @@ class NewResolutionOldInference(
         if (isBinaryRemOperator && shouldUseOperatorRem && emptyOrInapplicableCandidates) {
             val deprecatedName = OperatorConventions.REM_TO_MOD_OPERATION_NAMES[name]
             val processorForDeprecatedName =
-                kind.createTowerProcessor(this, deprecatedName!!, tracing, scopeTower, detailedReceiver, context)
+                kind.createTowerProcessor(this, deprecatedName!!, tracing, scopeTower, detailedReceiver, context, genericCandidateResolver)
             candidates = towerResolver.runResolve(
                 scopeTower,
                 processorForDeprecatedName,
@@ -491,7 +501,8 @@ class NewResolutionOldInference(
     }
 
     private inner class CandidateFactoryProviderForInvokeImpl(
-        val functionContext: CandidateFactoryImpl
+        val functionContext: CandidateFactoryImpl,
+        val genericCandidateResolver: GenericCandidateResolver
     ) : CandidateFactoryProviderForInvoke<MyCandidate> {
 
         override fun transformCandidate(
@@ -530,6 +541,11 @@ class NewResolutionOldInference(
                 "Incorrect status: ${variable.resolvedCall.status} for variable call: ${variable.resolvedCall} " +
                         "and descriptor: ${variable.resolvedCall.candidateDescriptor}"
             }
+
+            genericCandidateResolver.completeTypeInferenceForExtensionProperties(
+                variable.resolvedCall as MutableResolvedCall<VariableDescriptor>
+            )
+
             val calleeExpression = variable.resolvedCall.call.calleeExpression
             val variableDescriptor = variable.resolvedCall.resultingDescriptor as VariableDescriptor
             assert(variable.resolvedCall.status.possibleTransformToSuccess() && calleeExpression != null) {

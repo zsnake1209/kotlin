@@ -1,0 +1,14 @@
+package
+
+public val </*0*/ T> T.foo: Wrapper<T>
+public fun main(/*0*/ args: kotlin.Array<kotlin.String>): kotlin.Unit
+public fun </*0*/ T> T.bar(): Wrapper<T>
+
+public final class Wrapper</*0*/ K> {
+    public constructor Wrapper</*0*/ K>(/*0*/ value: K)
+    public final val value: K
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public final operator fun invoke(/*0*/ other: K): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
