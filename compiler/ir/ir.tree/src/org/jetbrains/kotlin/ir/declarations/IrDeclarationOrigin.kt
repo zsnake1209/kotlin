@@ -53,6 +53,8 @@ interface IrDeclarationOrigin {
     object FIELD_FOR_ENUM_VALUES : IrDeclarationOriginImpl("FIELD_FOR_ENUM_VALUES", isSynthetic = true)
     object FIELD_FOR_OBJECT_INSTANCE : IrDeclarationOriginImpl("FIELD_FOR_OBJECT_INSTANCE")
 
+    object LOCAL_FUNCTION_NO_CLOSURE : IrDeclarationOriginImpl("LOCAL_FUNCTION_NO_CLOSURE")
+
     val isSynthetic: Boolean get() = false
 }
 
