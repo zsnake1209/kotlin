@@ -161,7 +161,7 @@ private class RingBuffer<T>(private val buffer: Array<Any?>, filledSize: Int) : 
      */
     fun expanded(maxCapacity: Int): RingBuffer<T> {
         val newCapacity = (capacity + (capacity shr 1) + 1).coerceAtMost(maxCapacity)
-        val newBuffer = if (startIndex == 0) buffer.copyOf(newCapacity) else toArray(arrayOfNulls(newCapacity))
+        val newBuffer = if (startIndex == 0) buffer.copyOf(newCapacity) else toArray(arrayOfNulls<Any?>(newCapacity))
         return RingBuffer(newBuffer, size)
     }
 
