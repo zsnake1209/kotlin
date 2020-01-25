@@ -61,12 +61,6 @@ message Actual {
 
 /* ------ IrTypes --------------------------------------------- */
 
-enum IrTypeVariance { // Should we import metadata variance, or better stay separate?
-                      IN = 0;
-                      OUT = 1;
-                      INV = 2;
-}
-
 // Note: IrTypeArgument [63..2 - IrType index | 1..0 - Variance]
 // If x...xxx00 -> *
 
@@ -74,7 +68,7 @@ message IrSimpleType {
   repeated IrConstructorCall annotation = 1;
   required int64 classifier = 2;
   required bool has_question_mark = 3;
-  repeated int64 argument = 4 [packed=true];
+  repeated int64 argument = 4 [packed=true]; // 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
   optional IrTypeAbbreviation abbreviation = 5;
 }
 
@@ -82,7 +76,7 @@ message IrTypeAbbreviation {
   repeated IrConstructorCall annotation = 1;
   required int64 type_alias = 2;
   required bool has_question_mark = 3;
-  repeated int64 argument = 4 [packed=true];
+  repeated int64 argument = 4 [packed=true]; // 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
 }
 
 message IrDynamicType {
@@ -434,13 +428,12 @@ message IrDeclarationBase {
 
 message IrFunctionBase {
   required IrDeclarationBase base = 1;
-  required int32 name = 2;
+  required int64 name_type = 2;
   repeated IrTypeParameter type_parameter = 3;
   optional IrValueParameter dispatch_receiver = 4;
   optional IrValueParameter extension_receiver = 5;
   repeated IrValueParameter value_parameter = 6;
   optional int32 body = 7;
-  required int32 return_type = 8;
 }
 
 message IrFunction {
@@ -455,18 +448,16 @@ message IrConstructor {
 
 message IrField {
   required IrDeclarationBase base = 1;
-  optional int32 initializer = 2;
-  required int32 name = 3;
-  required int32 type = 4;
+  required int64 name_type = 2;
+  optional int32 initializer = 3;
 }
 
 message IrLocalDelegatedProperty {
   required IrDeclarationBase base = 1;
-  required int32 name = 2;
-  required int32 type = 3;
-  required IrVariable delegate = 4;
-  optional IrFunction getter = 5;
-  optional IrFunction setter = 6;
+  required int64 name_type = 2;
+  required IrVariable delegate = 3;
+  optional IrFunction getter = 4;
+  optional IrFunction setter = 5;
 }
 
 message IrProperty {
@@ -479,17 +470,15 @@ message IrProperty {
 
 message IrVariable {
   required IrDeclarationBase base = 1;
-  required int32 name = 2;
-  required int32 type = 3;
-  optional IrExpression initializer = 4;
+  required int64 name_type =2;
+  optional IrExpression initializer = 3;
 }
 
 message IrValueParameter {
   required IrDeclarationBase base = 1;
-  required int32 name = 2;
-  required int32 type = 3;
-  optional int32 vararg_element_type = 4;
-  optional int32 default_value = 5;
+  required int64 name_type = 2;
+  optional int32 vararg_element_type = 3;
+  optional int32 default_value = 4;
 }
 
 message IrTypeParameter {
@@ -509,16 +498,15 @@ message IrClass {
 
 message IrTypeAlias {
   required IrDeclarationBase base = 1;
-  required int32 name = 2;
+  required int64 name_type = 2;
   repeated IrTypeParameter type_parameter = 3;
-  required int32 expanded_type = 4;
 }
 
 message IrEnumEntry {
   required IrDeclarationBase base = 1;
-  optional int32 initializer = 2;
-  optional IrClass corresponding_class = 3;
-  required int32 name = 4;
+  required int32 name = 2;
+  optional int32 initializer = 3;
+  optional IrClass corresponding_class = 4;
 }
 
 message IrAnonymousInit {

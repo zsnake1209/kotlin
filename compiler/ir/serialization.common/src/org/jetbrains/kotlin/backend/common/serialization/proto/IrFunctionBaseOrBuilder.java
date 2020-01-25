@@ -17,13 +17,13 @@ public interface IrFunctionBaseOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase getBase();
 
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  boolean hasName();
+  boolean hasNameType();
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  int getName();
+  long getNameType();
 
   /**
    * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
@@ -79,13 +79,4 @@ public interface IrFunctionBaseOrBuilder extends
    * <code>optional int32 body = 7;</code>
    */
   int getBody();
-
-  /**
-   * <code>required int32 return_type = 8;</code>
-   */
-  boolean hasReturnType();
-  /**
-   * <code>required int32 return_type = 8;</code>
-   */
-  int getReturnType();
 }

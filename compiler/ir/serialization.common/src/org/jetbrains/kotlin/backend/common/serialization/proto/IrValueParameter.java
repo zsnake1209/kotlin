@@ -68,21 +68,16 @@ public final class IrValueParameter extends
           }
           case 16: {
             bitField0_ |= 0x00000002;
-            name_ = input.readInt32();
+            nameType_ = input.readInt64();
             break;
           }
           case 24: {
             bitField0_ |= 0x00000004;
-            type_ = input.readInt32();
+            varargElementType_ = input.readInt32();
             break;
           }
           case 32: {
             bitField0_ |= 0x00000008;
-            varargElementType_ = input.readInt32();
-            break;
-          }
-          case 40: {
-            bitField0_ |= 0x00000010;
             defaultValue_ = input.readInt32();
             break;
           }
@@ -135,61 +130,46 @@ public final class IrValueParameter extends
     return base_;
   }
 
-  public static final int NAME_FIELD_NUMBER = 2;
-  private int name_;
+  public static final int NAME_TYPE_FIELD_NUMBER = 2;
+  private long nameType_;
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  public boolean hasName() {
+  public boolean hasNameType() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  public int getName() {
-    return name_;
+  public long getNameType() {
+    return nameType_;
   }
 
-  public static final int TYPE_FIELD_NUMBER = 3;
-  private int type_;
+  public static final int VARARG_ELEMENT_TYPE_FIELD_NUMBER = 3;
+  private int varargElementType_;
   /**
-   * <code>required int32 type = 3;</code>
+   * <code>optional int32 vararg_element_type = 3;</code>
    */
-  public boolean hasType() {
+  public boolean hasVarargElementType() {
     return ((bitField0_ & 0x00000004) == 0x00000004);
   }
   /**
-   * <code>required int32 type = 3;</code>
-   */
-  public int getType() {
-    return type_;
-  }
-
-  public static final int VARARG_ELEMENT_TYPE_FIELD_NUMBER = 4;
-  private int varargElementType_;
-  /**
-   * <code>optional int32 vararg_element_type = 4;</code>
-   */
-  public boolean hasVarargElementType() {
-    return ((bitField0_ & 0x00000008) == 0x00000008);
-  }
-  /**
-   * <code>optional int32 vararg_element_type = 4;</code>
+   * <code>optional int32 vararg_element_type = 3;</code>
    */
   public int getVarargElementType() {
     return varargElementType_;
   }
 
-  public static final int DEFAULT_VALUE_FIELD_NUMBER = 5;
+  public static final int DEFAULT_VALUE_FIELD_NUMBER = 4;
   private int defaultValue_;
   /**
-   * <code>optional int32 default_value = 5;</code>
+   * <code>optional int32 default_value = 4;</code>
    */
   public boolean hasDefaultValue() {
-    return ((bitField0_ & 0x00000010) == 0x00000010);
+    return ((bitField0_ & 0x00000008) == 0x00000008);
   }
   /**
-   * <code>optional int32 default_value = 5;</code>
+   * <code>optional int32 default_value = 4;</code>
    */
   public int getDefaultValue() {
     return defaultValue_;
@@ -197,8 +177,7 @@ public final class IrValueParameter extends
 
   private void initFields() {
     base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
-    name_ = 0;
-    type_ = 0;
+    nameType_ = 0L;
     varargElementType_ = 0;
     defaultValue_ = 0;
   }
@@ -212,11 +191,7 @@ public final class IrValueParameter extends
       memoizedIsInitialized = 0;
       return false;
     }
-    if (!hasName()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasType()) {
+    if (!hasNameType()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -235,16 +210,13 @@ public final class IrValueParameter extends
       output.writeMessage(1, base_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeInt32(2, name_);
+      output.writeInt64(2, nameType_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeInt32(3, type_);
+      output.writeInt32(3, varargElementType_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
-      output.writeInt32(4, varargElementType_);
-    }
-    if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      output.writeInt32(5, defaultValue_);
+      output.writeInt32(4, defaultValue_);
     }
     output.writeRawBytes(unknownFields);
   }
@@ -261,19 +233,15 @@ public final class IrValueParameter extends
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(2, name_);
+        .computeInt64Size(2, nameType_);
     }
     if (((bitField0_ & 0x00000004) == 0x00000004)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(3, type_);
+        .computeInt32Size(3, varargElementType_);
     }
     if (((bitField0_ & 0x00000008) == 0x00000008)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(4, varargElementType_);
-    }
-    if (((bitField0_ & 0x00000010) == 0x00000010)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(5, defaultValue_);
+        .computeInt32Size(4, defaultValue_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -371,14 +339,12 @@ public final class IrValueParameter extends
       super.clear();
       base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
       bitField0_ = (bitField0_ & ~0x00000001);
-      name_ = 0;
+      nameType_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000002);
-      type_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000004);
       varargElementType_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000004);
       defaultValue_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000010);
+      bitField0_ = (bitField0_ & ~0x00000008);
       return this;
     }
 
@@ -409,17 +375,13 @@ public final class IrValueParameter extends
       if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
         to_bitField0_ |= 0x00000002;
       }
-      result.name_ = name_;
+      result.nameType_ = nameType_;
       if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
         to_bitField0_ |= 0x00000004;
       }
-      result.type_ = type_;
+      result.varargElementType_ = varargElementType_;
       if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
         to_bitField0_ |= 0x00000008;
-      }
-      result.varargElementType_ = varargElementType_;
-      if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-        to_bitField0_ |= 0x00000010;
       }
       result.defaultValue_ = defaultValue_;
       result.bitField0_ = to_bitField0_;
@@ -431,11 +393,8 @@ public final class IrValueParameter extends
       if (other.hasBase()) {
         mergeBase(other.getBase());
       }
-      if (other.hasName()) {
-        setName(other.getName());
-      }
-      if (other.hasType()) {
-        setType(other.getType());
+      if (other.hasNameType()) {
+        setNameType(other.getNameType());
       }
       if (other.hasVarargElementType()) {
         setVarargElementType(other.getVarargElementType());
@@ -453,11 +412,7 @@ public final class IrValueParameter extends
         
         return false;
       }
-      if (!hasName()) {
-        
-        return false;
-      }
-      if (!hasType()) {
+      if (!hasNameType()) {
         
         return false;
       }
@@ -547,97 +502,65 @@ public final class IrValueParameter extends
       return this;
     }
 
-    private int name_ ;
+    private long nameType_ ;
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public boolean hasName() {
+    public boolean hasNameType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public int getName() {
-      return name_;
+    public long getNameType() {
+      return nameType_;
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public Builder setName(int value) {
+    public Builder setNameType(long value) {
       bitField0_ |= 0x00000002;
-      name_ = value;
+      nameType_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public Builder clearName() {
+    public Builder clearNameType() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      name_ = 0;
-      
-      return this;
-    }
-
-    private int type_ ;
-    /**
-     * <code>required int32 type = 3;</code>
-     */
-    public boolean hasType() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>required int32 type = 3;</code>
-     */
-    public int getType() {
-      return type_;
-    }
-    /**
-     * <code>required int32 type = 3;</code>
-     */
-    public Builder setType(int value) {
-      bitField0_ |= 0x00000004;
-      type_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required int32 type = 3;</code>
-     */
-    public Builder clearType() {
-      bitField0_ = (bitField0_ & ~0x00000004);
-      type_ = 0;
+      nameType_ = 0L;
       
       return this;
     }
 
     private int varargElementType_ ;
     /**
-     * <code>optional int32 vararg_element_type = 4;</code>
+     * <code>optional int32 vararg_element_type = 3;</code>
      */
     public boolean hasVarargElementType() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional int32 vararg_element_type = 4;</code>
+     * <code>optional int32 vararg_element_type = 3;</code>
      */
     public int getVarargElementType() {
       return varargElementType_;
     }
     /**
-     * <code>optional int32 vararg_element_type = 4;</code>
+     * <code>optional int32 vararg_element_type = 3;</code>
      */
     public Builder setVarargElementType(int value) {
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000004;
       varargElementType_ = value;
       
       return this;
     }
     /**
-     * <code>optional int32 vararg_element_type = 4;</code>
+     * <code>optional int32 vararg_element_type = 3;</code>
      */
     public Builder clearVarargElementType() {
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000004);
       varargElementType_ = 0;
       
       return this;
@@ -645,31 +568,31 @@ public final class IrValueParameter extends
 
     private int defaultValue_ ;
     /**
-     * <code>optional int32 default_value = 5;</code>
+     * <code>optional int32 default_value = 4;</code>
      */
     public boolean hasDefaultValue() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional int32 default_value = 5;</code>
+     * <code>optional int32 default_value = 4;</code>
      */
     public int getDefaultValue() {
       return defaultValue_;
     }
     /**
-     * <code>optional int32 default_value = 5;</code>
+     * <code>optional int32 default_value = 4;</code>
      */
     public Builder setDefaultValue(int value) {
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000008;
       defaultValue_ = value;
       
       return this;
     }
     /**
-     * <code>optional int32 default_value = 5;</code>
+     * <code>optional int32 default_value = 4;</code>
      */
     public Builder clearDefaultValue() {
-      bitField0_ = (bitField0_ & ~0x00000010);
+      bitField0_ = (bitField0_ & ~0x00000008);
       defaultValue_ = 0;
       
       return this;

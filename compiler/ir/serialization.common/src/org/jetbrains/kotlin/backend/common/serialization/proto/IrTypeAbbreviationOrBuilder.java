@@ -41,14 +41,26 @@ public interface IrTypeAbbreviationOrBuilder extends
 
   /**
    * <code>repeated int64 argument = 4 [packed = true];</code>
+   *
+   * <pre>
+   * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+   * </pre>
    */
   java.util.List<java.lang.Long> getArgumentList();
   /**
    * <code>repeated int64 argument = 4 [packed = true];</code>
+   *
+   * <pre>
+   * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+   * </pre>
    */
   int getArgumentCount();
   /**
    * <code>repeated int64 argument = 4 [packed = true];</code>
+   *
+   * <pre>
+   * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+   * </pre>
    */
   long getArgument(int index);
 }

@@ -17,38 +17,29 @@ public interface IrValueParameterOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase getBase();
 
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  boolean hasName();
+  boolean hasNameType();
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  int getName();
+  long getNameType();
 
   /**
-   * <code>required int32 type = 3;</code>
-   */
-  boolean hasType();
-  /**
-   * <code>required int32 type = 3;</code>
-   */
-  int getType();
-
-  /**
-   * <code>optional int32 vararg_element_type = 4;</code>
+   * <code>optional int32 vararg_element_type = 3;</code>
    */
   boolean hasVarargElementType();
   /**
-   * <code>optional int32 vararg_element_type = 4;</code>
+   * <code>optional int32 vararg_element_type = 3;</code>
    */
   int getVarargElementType();
 
   /**
-   * <code>optional int32 default_value = 5;</code>
+   * <code>optional int32 default_value = 4;</code>
    */
   boolean hasDefaultValue();
   /**
-   * <code>optional int32 default_value = 5;</code>
+   * <code>optional int32 default_value = 4;</code>
    */
   int getDefaultValue();
 }

@@ -996,11 +996,16 @@ open class IrFileSerializer(
         }
     }
 
+    private fun serializeNameAndType(name: Name, type: IrType): Long {
+        val nameIndex = serializeName(name)
+        val typeIndex = serializeIrType(type)
+        return BinaryNameAndType.encode(nameIndex, typeIndex)
+    }
+
     private fun serializeIrValueParameter(parameter: IrValueParameter): ProtoValueParameter {
         val proto = ProtoValueParameter.newBuilder()
             .setBase(serializeIrDeclarationBase(parameter, ValueParameterFlags.encode(parameter)))
-            .setName(serializeName(parameter.name))
-            .setType(serializeIrType(parameter.type))
+            .setNameType(serializeNameAndType(parameter.name, parameter.type))
 
         parameter.varargElementType?.let { proto.setVarargElementType(serializeIrType(it)) }
         parameter.defaultValue?.let { proto.setDefaultValue(serializeIrExpressionBody(it.expression)) }
@@ -1021,8 +1026,7 @@ open class IrFileSerializer(
     private fun serializeIrFunctionBase(function: IrFunction, flags: Long): ProtoFunctionBase {
         val proto = ProtoFunctionBase.newBuilder()
             .setBase(serializeIrDeclarationBase(function, flags))
-            .setName(serializeName(function.name))
-            .setReturnType(serializeIrType(function.returnType))
+            .setNameType(serializeNameAndType(function.name, function.returnType))
 
         function.typeParameters.forEach {
             proto.addTypeParameter(serializeIrTypeParameter(it))
@@ -1064,8 +1068,7 @@ open class IrFileSerializer(
     private fun serializeIrLocalDelegatedProperty(variable: IrLocalDelegatedProperty): ProtoLocalDelegatedProperty {
         val proto = ProtoLocalDelegatedProperty.newBuilder()
             .setBase(serializeIrDeclarationBase(variable, LocalVariableFlags.encode(variable)))
-            .setName(serializeString(variable.name.toString()))
-            .setType(serializeIrType(variable.type))
+            .setNameType(serializeNameAndType(variable.name, variable.type))
             .setDelegate(serializeIrVariable(variable.delegate))
             .setGetter(serializeIrFunction(variable.getter as IrSimpleFunction)) // TODO: can it be non simple?
 
@@ -1095,8 +1098,7 @@ open class IrFileSerializer(
     private fun serializeIrField(field: IrField): ProtoField {
         val proto = ProtoField.newBuilder()
             .setBase(serializeIrDeclarationBase(field, FieldFlags.encode(field)))
-            .setName(serializeName(field.name))
-            .setType(serializeIrType(field.type))
+            .setNameType(serializeNameAndType(field.name, field.type))
         val initializer = field.initializer?.expression
         if (initializer != null) {
             proto.initializer = serializeIrExpressionBody(initializer)
@@ -1107,8 +1109,7 @@ open class IrFileSerializer(
     private fun serializeIrVariable(variable: IrVariable): ProtoVariable {
         val proto = ProtoVariable.newBuilder()
             .setBase(serializeIrDeclarationBase(variable, LocalVariableFlags.encode(variable)))
-            .setName(serializeName(variable.name))
-            .setType(serializeIrType(variable.type))
+            .setNameType(serializeNameAndType(variable.name, variable.type))
         variable.initializer?.let { proto.initializer = serializeExpression(it) }
         return proto.build()
     }
@@ -1139,8 +1140,7 @@ open class IrFileSerializer(
         val proto = ProtoTypeAlias.newBuilder()
 
         proto.setBase(serializeIrDeclarationBase(typeAlias, TypeAliasFlags.encode(typeAlias)))
-            .setName(serializeName(typeAlias.name))
-            .setExpandedType(serializeIrType(typeAlias.expandedType))
+            .setNameType(serializeNameAndType(typeAlias.name, typeAlias.expandedType))
 
         typeAlias.typeParameters.forEach {
             proto.addTypeParameter(serializeIrTypeParameter(it))

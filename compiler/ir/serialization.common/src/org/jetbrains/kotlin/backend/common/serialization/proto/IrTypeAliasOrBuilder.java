@@ -17,13 +17,13 @@ public interface IrTypeAliasOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase getBase();
 
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  boolean hasName();
+  boolean hasNameType();
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  int getName();
+  long getNameType();
 
   /**
    * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
@@ -38,13 +38,4 @@ public interface IrTypeAliasOrBuilder extends
    * <code>repeated .org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter type_parameter = 3;</code>
    */
   int getTypeParameterCount();
-
-  /**
-   * <code>required int32 expanded_type = 4;</code>
-   */
-  boolean hasExpandedType();
-  /**
-   * <code>required int32 expanded_type = 4;</code>
-   */
-  int getExpandedType();
 }

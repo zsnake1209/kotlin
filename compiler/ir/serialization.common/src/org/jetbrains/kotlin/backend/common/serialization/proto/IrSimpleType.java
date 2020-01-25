@@ -214,6 +214,10 @@ public final class IrSimpleType extends
   private java.util.List<java.lang.Long> argument_;
   /**
    * <code>repeated int64 argument = 4 [packed = true];</code>
+   *
+   * <pre>
+   * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+   * </pre>
    */
   public java.util.List<java.lang.Long>
       getArgumentList() {
@@ -221,12 +225,20 @@ public final class IrSimpleType extends
   }
   /**
    * <code>repeated int64 argument = 4 [packed = true];</code>
+   *
+   * <pre>
+   * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+   * </pre>
    */
   public int getArgumentCount() {
     return argument_.size();
   }
   /**
    * <code>repeated int64 argument = 4 [packed = true];</code>
+   *
+   * <pre>
+   * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+   * </pre>
    */
   public long getArgument(int index) {
     return argument_.get(index);
@@ -776,6 +788,10 @@ public final class IrSimpleType extends
     }
     /**
      * <code>repeated int64 argument = 4 [packed = true];</code>
+     *
+     * <pre>
+     * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+     * </pre>
      */
     public java.util.List<java.lang.Long>
         getArgumentList() {
@@ -783,18 +799,30 @@ public final class IrSimpleType extends
     }
     /**
      * <code>repeated int64 argument = 4 [packed = true];</code>
+     *
+     * <pre>
+     * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+     * </pre>
      */
     public int getArgumentCount() {
       return argument_.size();
     }
     /**
      * <code>repeated int64 argument = 4 [packed = true];</code>
+     *
+     * <pre>
+     * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+     * </pre>
      */
     public long getArgument(int index) {
       return argument_.get(index);
     }
     /**
      * <code>repeated int64 argument = 4 [packed = true];</code>
+     *
+     * <pre>
+     * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+     * </pre>
      */
     public Builder setArgument(
         int index, long value) {
@@ -805,6 +833,10 @@ public final class IrSimpleType extends
     }
     /**
      * <code>repeated int64 argument = 4 [packed = true];</code>
+     *
+     * <pre>
+     * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+     * </pre>
      */
     public Builder addArgument(long value) {
       ensureArgumentIsMutable();
@@ -814,6 +846,10 @@ public final class IrSimpleType extends
     }
     /**
      * <code>repeated int64 argument = 4 [packed = true];</code>
+     *
+     * <pre>
+     * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+     * </pre>
      */
     public Builder addAllArgument(
         java.lang.Iterable<? extends java.lang.Long> values) {
@@ -825,6 +861,10 @@ public final class IrSimpleType extends
     }
     /**
      * <code>repeated int64 argument = 4 [packed = true];</code>
+     *
+     * <pre>
+     * 0 - STAR, otherwise [63..2 - IrType index | 1..0 - Variance]
+     * </pre>
      */
     public Builder clearArgument() {
       argument_ = java.util.Collections.emptyList();

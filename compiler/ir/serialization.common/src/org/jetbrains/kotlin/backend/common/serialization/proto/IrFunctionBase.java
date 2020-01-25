@@ -68,7 +68,7 @@ public final class IrFunctionBase extends
           }
           case 16: {
             bitField0_ |= 0x00000002;
-            name_ = input.readInt32();
+            nameType_ = input.readInt64();
             break;
           }
           case 26: {
@@ -116,11 +116,6 @@ public final class IrFunctionBase extends
           case 56: {
             bitField0_ |= 0x00000010;
             body_ = input.readInt32();
-            break;
-          }
-          case 64: {
-            bitField0_ |= 0x00000020;
-            returnType_ = input.readInt32();
             break;
           }
         }
@@ -178,19 +173,19 @@ public final class IrFunctionBase extends
     return base_;
   }
 
-  public static final int NAME_FIELD_NUMBER = 2;
-  private int name_;
+  public static final int NAME_TYPE_FIELD_NUMBER = 2;
+  private long nameType_;
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  public boolean hasName() {
+  public boolean hasNameType() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  public int getName() {
-    return name_;
+  public long getNameType() {
+    return nameType_;
   }
 
   public static final int TYPE_PARAMETER_FIELD_NUMBER = 3;
@@ -308,30 +303,14 @@ public final class IrFunctionBase extends
     return body_;
   }
 
-  public static final int RETURN_TYPE_FIELD_NUMBER = 8;
-  private int returnType_;
-  /**
-   * <code>required int32 return_type = 8;</code>
-   */
-  public boolean hasReturnType() {
-    return ((bitField0_ & 0x00000020) == 0x00000020);
-  }
-  /**
-   * <code>required int32 return_type = 8;</code>
-   */
-  public int getReturnType() {
-    return returnType_;
-  }
-
   private void initFields() {
     base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
-    name_ = 0;
+    nameType_ = 0L;
     typeParameter_ = java.util.Collections.emptyList();
     dispatchReceiver_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrValueParameter.getDefaultInstance();
     extensionReceiver_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrValueParameter.getDefaultInstance();
     valueParameter_ = java.util.Collections.emptyList();
     body_ = 0;
-    returnType_ = 0;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -343,11 +322,7 @@ public final class IrFunctionBase extends
       memoizedIsInitialized = 0;
       return false;
     }
-    if (!hasName()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasReturnType()) {
+    if (!hasNameType()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -390,7 +365,7 @@ public final class IrFunctionBase extends
       output.writeMessage(1, base_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeInt32(2, name_);
+      output.writeInt64(2, nameType_);
     }
     for (int i = 0; i < typeParameter_.size(); i++) {
       output.writeMessage(3, typeParameter_.get(i));
@@ -407,9 +382,6 @@ public final class IrFunctionBase extends
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       output.writeInt32(7, body_);
     }
-    if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      output.writeInt32(8, returnType_);
-    }
     output.writeRawBytes(unknownFields);
   }
 
@@ -425,7 +397,7 @@ public final class IrFunctionBase extends
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(2, name_);
+        .computeInt64Size(2, nameType_);
     }
     for (int i = 0; i < typeParameter_.size(); i++) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
@@ -446,10 +418,6 @@ public final class IrFunctionBase extends
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeInt32Size(7, body_);
-    }
-    if (((bitField0_ & 0x00000020) == 0x00000020)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(8, returnType_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -547,7 +515,7 @@ public final class IrFunctionBase extends
       super.clear();
       base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
       bitField0_ = (bitField0_ & ~0x00000001);
-      name_ = 0;
+      nameType_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000002);
       typeParameter_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000004);
@@ -559,8 +527,6 @@ public final class IrFunctionBase extends
       bitField0_ = (bitField0_ & ~0x00000020);
       body_ = 0;
       bitField0_ = (bitField0_ & ~0x00000040);
-      returnType_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000080);
       return this;
     }
 
@@ -591,7 +557,7 @@ public final class IrFunctionBase extends
       if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
         to_bitField0_ |= 0x00000002;
       }
-      result.name_ = name_;
+      result.nameType_ = nameType_;
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         typeParameter_ = java.util.Collections.unmodifiableList(typeParameter_);
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -614,10 +580,6 @@ public final class IrFunctionBase extends
         to_bitField0_ |= 0x00000010;
       }
       result.body_ = body_;
-      if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-        to_bitField0_ |= 0x00000020;
-      }
-      result.returnType_ = returnType_;
       result.bitField0_ = to_bitField0_;
       return result;
     }
@@ -627,8 +589,8 @@ public final class IrFunctionBase extends
       if (other.hasBase()) {
         mergeBase(other.getBase());
       }
-      if (other.hasName()) {
-        setName(other.getName());
+      if (other.hasNameType()) {
+        setNameType(other.getNameType());
       }
       if (!other.typeParameter_.isEmpty()) {
         if (typeParameter_.isEmpty()) {
@@ -659,9 +621,6 @@ public final class IrFunctionBase extends
       if (other.hasBody()) {
         setBody(other.getBody());
       }
-      if (other.hasReturnType()) {
-        setReturnType(other.getReturnType());
-      }
       setUnknownFields(
           getUnknownFields().concat(other.unknownFields));
       return this;
@@ -672,11 +631,7 @@ public final class IrFunctionBase extends
         
         return false;
       }
-      if (!hasName()) {
-        
-        return false;
-      }
-      if (!hasReturnType()) {
+      if (!hasNameType()) {
         
         return false;
       }
@@ -790,34 +745,34 @@ public final class IrFunctionBase extends
       return this;
     }
 
-    private int name_ ;
+    private long nameType_ ;
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public boolean hasName() {
+    public boolean hasNameType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public int getName() {
-      return name_;
+    public long getNameType() {
+      return nameType_;
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public Builder setName(int value) {
+    public Builder setNameType(long value) {
       bitField0_ |= 0x00000002;
-      name_ = value;
+      nameType_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public Builder clearName() {
+    public Builder clearNameType() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      name_ = 0;
+      nameType_ = 0L;
       
       return this;
     }
@@ -1220,38 +1175,6 @@ public final class IrFunctionBase extends
     public Builder clearBody() {
       bitField0_ = (bitField0_ & ~0x00000040);
       body_ = 0;
-      
-      return this;
-    }
-
-    private int returnType_ ;
-    /**
-     * <code>required int32 return_type = 8;</code>
-     */
-    public boolean hasReturnType() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
-    }
-    /**
-     * <code>required int32 return_type = 8;</code>
-     */
-    public int getReturnType() {
-      return returnType_;
-    }
-    /**
-     * <code>required int32 return_type = 8;</code>
-     */
-    public Builder setReturnType(int value) {
-      bitField0_ |= 0x00000080;
-      returnType_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required int32 return_type = 8;</code>
-     */
-    public Builder clearReturnType() {
-      bitField0_ = (bitField0_ & ~0x00000080);
-      returnType_ = 0;
       
       return this;
     }

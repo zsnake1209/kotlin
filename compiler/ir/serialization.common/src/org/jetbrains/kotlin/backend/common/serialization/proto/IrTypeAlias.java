@@ -68,7 +68,7 @@ public final class IrTypeAlias extends
           }
           case 16: {
             bitField0_ |= 0x00000002;
-            name_ = input.readInt32();
+            nameType_ = input.readInt64();
             break;
           }
           case 26: {
@@ -77,11 +77,6 @@ public final class IrTypeAlias extends
               mutable_bitField0_ |= 0x00000004;
             }
             typeParameter_.add(input.readMessage(org.jetbrains.kotlin.backend.common.serialization.proto.IrTypeParameter.PARSER, extensionRegistry));
-            break;
-          }
-          case 32: {
-            bitField0_ |= 0x00000004;
-            expandedType_ = input.readInt32();
             break;
           }
         }
@@ -136,19 +131,19 @@ public final class IrTypeAlias extends
     return base_;
   }
 
-  public static final int NAME_FIELD_NUMBER = 2;
-  private int name_;
+  public static final int NAME_TYPE_FIELD_NUMBER = 2;
+  private long nameType_;
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  public boolean hasName() {
+  public boolean hasNameType() {
     return ((bitField0_ & 0x00000002) == 0x00000002);
   }
   /**
-   * <code>required int32 name = 2;</code>
+   * <code>required int64 name_type = 2;</code>
    */
-  public int getName() {
-    return name_;
+  public long getNameType() {
+    return nameType_;
   }
 
   public static final int TYPE_PARAMETER_FIELD_NUMBER = 3;
@@ -186,26 +181,10 @@ public final class IrTypeAlias extends
     return typeParameter_.get(index);
   }
 
-  public static final int EXPANDED_TYPE_FIELD_NUMBER = 4;
-  private int expandedType_;
-  /**
-   * <code>required int32 expanded_type = 4;</code>
-   */
-  public boolean hasExpandedType() {
-    return ((bitField0_ & 0x00000004) == 0x00000004);
-  }
-  /**
-   * <code>required int32 expanded_type = 4;</code>
-   */
-  public int getExpandedType() {
-    return expandedType_;
-  }
-
   private void initFields() {
     base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
-    name_ = 0;
+    nameType_ = 0L;
     typeParameter_ = java.util.Collections.emptyList();
-    expandedType_ = 0;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -217,11 +196,7 @@ public final class IrTypeAlias extends
       memoizedIsInitialized = 0;
       return false;
     }
-    if (!hasName()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasExpandedType()) {
+    if (!hasNameType()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -246,13 +221,10 @@ public final class IrTypeAlias extends
       output.writeMessage(1, base_);
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
-      output.writeInt32(2, name_);
+      output.writeInt64(2, nameType_);
     }
     for (int i = 0; i < typeParameter_.size(); i++) {
       output.writeMessage(3, typeParameter_.get(i));
-    }
-    if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      output.writeInt32(4, expandedType_);
     }
     output.writeRawBytes(unknownFields);
   }
@@ -269,15 +241,11 @@ public final class IrTypeAlias extends
     }
     if (((bitField0_ & 0x00000002) == 0x00000002)) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(2, name_);
+        .computeInt64Size(2, nameType_);
     }
     for (int i = 0; i < typeParameter_.size(); i++) {
       size += org.jetbrains.kotlin.protobuf.CodedOutputStream
         .computeMessageSize(3, typeParameter_.get(i));
-    }
-    if (((bitField0_ & 0x00000004) == 0x00000004)) {
-      size += org.jetbrains.kotlin.protobuf.CodedOutputStream
-        .computeInt32Size(4, expandedType_);
     }
     size += unknownFields.size();
     memoizedSerializedSize = size;
@@ -375,12 +343,10 @@ public final class IrTypeAlias extends
       super.clear();
       base_ = org.jetbrains.kotlin.backend.common.serialization.proto.IrDeclarationBase.getDefaultInstance();
       bitField0_ = (bitField0_ & ~0x00000001);
-      name_ = 0;
+      nameType_ = 0L;
       bitField0_ = (bitField0_ & ~0x00000002);
       typeParameter_ = java.util.Collections.emptyList();
       bitField0_ = (bitField0_ & ~0x00000004);
-      expandedType_ = 0;
-      bitField0_ = (bitField0_ & ~0x00000008);
       return this;
     }
 
@@ -411,16 +377,12 @@ public final class IrTypeAlias extends
       if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
         to_bitField0_ |= 0x00000002;
       }
-      result.name_ = name_;
+      result.nameType_ = nameType_;
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         typeParameter_ = java.util.Collections.unmodifiableList(typeParameter_);
         bitField0_ = (bitField0_ & ~0x00000004);
       }
       result.typeParameter_ = typeParameter_;
-      if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-        to_bitField0_ |= 0x00000004;
-      }
-      result.expandedType_ = expandedType_;
       result.bitField0_ = to_bitField0_;
       return result;
     }
@@ -430,8 +392,8 @@ public final class IrTypeAlias extends
       if (other.hasBase()) {
         mergeBase(other.getBase());
       }
-      if (other.hasName()) {
-        setName(other.getName());
+      if (other.hasNameType()) {
+        setNameType(other.getNameType());
       }
       if (!other.typeParameter_.isEmpty()) {
         if (typeParameter_.isEmpty()) {
@@ -443,9 +405,6 @@ public final class IrTypeAlias extends
         }
         
       }
-      if (other.hasExpandedType()) {
-        setExpandedType(other.getExpandedType());
-      }
       setUnknownFields(
           getUnknownFields().concat(other.unknownFields));
       return this;
@@ -456,11 +415,7 @@ public final class IrTypeAlias extends
         
         return false;
       }
-      if (!hasName()) {
-        
-        return false;
-      }
-      if (!hasExpandedType()) {
+      if (!hasNameType()) {
         
         return false;
       }
@@ -556,34 +511,34 @@ public final class IrTypeAlias extends
       return this;
     }
 
-    private int name_ ;
+    private long nameType_ ;
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public boolean hasName() {
+    public boolean hasNameType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public int getName() {
-      return name_;
+    public long getNameType() {
+      return nameType_;
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public Builder setName(int value) {
+    public Builder setNameType(long value) {
       bitField0_ |= 0x00000002;
-      name_ = value;
+      nameType_ = value;
       
       return this;
     }
     /**
-     * <code>required int32 name = 2;</code>
+     * <code>required int64 name_type = 2;</code>
      */
-    public Builder clearName() {
+    public Builder clearNameType() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      name_ = 0;
+      nameType_ = 0L;
       
       return this;
     }
@@ -710,38 +665,6 @@ public final class IrTypeAlias extends
       ensureTypeParameterIsMutable();
       typeParameter_.remove(index);
 
-      return this;
-    }
-
-    private int expandedType_ ;
-    /**
-     * <code>required int32 expanded_type = 4;</code>
-     */
-    public boolean hasExpandedType() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    /**
-     * <code>required int32 expanded_type = 4;</code>
-     */
-    public int getExpandedType() {
-      return expandedType_;
-    }
-    /**
-     * <code>required int32 expanded_type = 4;</code>
-     */
-    public Builder setExpandedType(int value) {
-      bitField0_ |= 0x00000008;
-      expandedType_ = value;
-      
-      return this;
-    }
-    /**
-     * <code>required int32 expanded_type = 4;</code>
-     */
-    public Builder clearExpandedType() {
-      bitField0_ = (bitField0_ & ~0x00000008);
-      expandedType_ = 0;
-      
       return this;
     }
 
