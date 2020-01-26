@@ -10,10 +10,10 @@ import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.name.FqName
 
 abstract class IdSignatureBuilder<D> {
-    protected var packageFqn = FqName.ROOT
+    protected var packageFqn: FqName = FqName.ROOT
     protected val classFanSegments = mutableListOf<String>()
-    protected var hash_id: Long? = null
-    protected var hash_id_acc: Long? = null
+    protected var hashId: Long? = null
+    protected var hashIdAcc: Long? = null
     protected var mask = 0L
 
     protected abstract fun accept(d: D)
@@ -21,16 +21,16 @@ abstract class IdSignatureBuilder<D> {
     protected fun reset() {
         this.packageFqn = FqName.ROOT
         this.classFanSegments.clear()
-        this.hash_id = null
+        this.hashId = null
         this.mask = 0L
     }
 
     protected fun build(): IdSignature {
-        return if (hash_id_acc == null) {
-            IdSignature.PublicSignature(packageFqn, FqName.fromSegments(classFanSegments), hash_id, mask)
+        return if (hashIdAcc == null) {
+            IdSignature.PublicSignature(packageFqn, FqName.fromSegments(classFanSegments), hashId, mask)
         } else {
-            val accessorSignature = IdSignature.PublicSignature(packageFqn, FqName.fromSegments(classFanSegments), hash_id_acc, mask)
-            hash_id_acc = null
+            val accessorSignature = IdSignature.PublicSignature(packageFqn, FqName.fromSegments(classFanSegments), hashIdAcc, mask)
+            hashIdAcc = null
             classFanSegments.run { removeAt(lastIndex) }
             val propertySignature = build()
             IdSignature.AccessorSignature(propertySignature, accessorSignature)

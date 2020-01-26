@@ -17,7 +17,6 @@ interface KotlinMangler {
     val String.hashMangle: Long
     val IrDeclaration.hashedMangle: Long
     fun IrDeclaration.isExported(): Boolean
-    val IrFunction.functionName: String
     val IrDeclaration.mangleString: String
 
     val manglerName: String

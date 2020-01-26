@@ -18,12 +18,6 @@ abstract class ClassicKotlinManglerImpl : AbstractKotlinMangler<IrDeclaration>()
     override val IrDeclaration.mangleString: String
         get() = mangleImpl(this)
 
-    override val IrDeclaration.hashedMangle: Long
-        get() = mangleString.hashMangle
-
-    override val IrFunction.functionName: String
-        get() = getMangleComputer("").computeMangleString(this)
-
     private fun mangleImpl(declaration: IrDeclaration): String {
         return getMangleComputer("").computeMangle(declaration)
     }

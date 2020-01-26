@@ -12,16 +12,9 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 
 abstract class IrBasedKotlinManglerImpl : AbstractKotlinMangler<IrDeclaration>() {
-
-    override val IrDeclaration.hashedMangle: Long
-        get() = mangleString.hashMangle
-
     override fun IrDeclaration.isExported(): Boolean {
         return getExportChecker().check(this, SpecialDeclarationType.REGULAR)
     }
-
-    override val IrFunction.functionName: String
-        get() = getMangleComputer(MangleConstant.EMPTY_PREFIX).computeMangleString(this)
 
     override val IrDeclaration.mangleString: String
         get() = getMangleComputer(MangleConstant.EMPTY_PREFIX).computeMangle(this)

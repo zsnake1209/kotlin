@@ -37,11 +37,6 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
         return builder.toString()
     }
 
-    override fun computeMangleString(declaration: IrDeclaration): String {
-        declaration.accept(this, false)
-        return builder.toString()
-    }
-
     private fun addPrefix(prefix: String, addPrefix: Boolean): Int {
         if (addPrefix) {
             builder.append(prefix)

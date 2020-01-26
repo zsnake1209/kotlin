@@ -22,11 +22,6 @@ import org.jetbrains.kotlin.name.Name
 abstract class ClassicMangleComputer : KotlinMangleComputer<IrDeclaration> {
     override fun computeMangle(declaration: IrDeclaration) = declaration.uniqSymbolName()
 
-    override fun computeMangleString(declaration: IrDeclaration): String {
-        if (declaration is IrFunction) return declaration.functionName
-        else error("Unexpected declaration for raw name ${declaration.render()}")
-    }
-
     private fun IrTypeParameter.effectiveParent(): IrDeclaration = when (val irParent = parent) {
         is IrClass -> irParent
         is IrConstructor -> irParent

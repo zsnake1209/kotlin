@@ -22,11 +22,6 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         return builder.toString()
     }
 
-    override fun computeMangleString(declaration: DeclarationDescriptor): String {
-        declaration.accept(this, false)
-        return builder.toString()
-    }
-
     protected abstract fun copy(): DescriptorMangleComputer
 
     private val typeParameterContainer = ArrayList<DeclarationDescriptor>(4)

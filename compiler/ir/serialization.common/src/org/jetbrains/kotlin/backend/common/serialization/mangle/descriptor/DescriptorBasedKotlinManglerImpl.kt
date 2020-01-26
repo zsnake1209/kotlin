@@ -14,14 +14,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 
 abstract class DescriptorBasedKotlinManglerImpl : AbstractKotlinMangler<DeclarationDescriptor>() {
-
-    override val IrDeclaration.hashedMangle: Long
-        get() = mangleString.hashMangle
-
     override fun IrDeclaration.isExported() = getExportChecker().check(descriptor, SpecialDeclarationType.declarationToType(this))
-
-    override val IrFunction.functionName: String
-        get() = getMangleComputer(MangleConstant.FUN_PREFIX).computeMangleString(descriptor)
 
     override val IrDeclaration.mangleString: String
         get() = getMangleComputer(descriptorPrefix(this)).computeMangle(descriptor)

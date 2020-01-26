@@ -10,7 +10,7 @@ enum class MangleConstant(val prefix: Char, val separator: Char, val suffix: Cha
     TYPE_PARAMETERS('{', ';', '}'),
     UPPER_BOUNDS('<', '&', '>'),
     TYPE_ARGUMENTS('<', ',', '>'),
-    FLEXIBLE_TYPE('[', '^', ']');
+    FLEXIBLE_TYPE('[', '~', ']');
 
     companion object {
         const val VAR_ARG_MARK = "..."

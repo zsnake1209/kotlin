@@ -558,6 +558,7 @@ open class IrFileSerializer(
         val proto = ProtoPropertyReference.newBuilder()
             .setMemberAccess(serializeMemberAccessCommon(callable))
             .setSymbol(serializeIrSymbol(callable.symbol))
+
         callable.origin?.let { proto.originName = serializeIrStatementOrigin(it) }
         callable.field?.let { proto.field = serializeIrSymbol(it) }
         callable.getter?.let { proto.getter = serializeIrSymbol(it) }

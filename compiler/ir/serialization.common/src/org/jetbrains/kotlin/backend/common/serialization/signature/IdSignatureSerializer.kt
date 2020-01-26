@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.FqName
 
 open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
-    fun composeSignatureForDeclaration(declaration: IrDeclaration): IdSignature {
+    private fun composeSignatureForDeclaration(declaration: IrDeclaration): IdSignature {
         return if (mangler.run { declaration.isExported() }) {
             composePublicIdSignature(declaration)
         } else composeFileLocalIdSignature(declaration)
@@ -51,24 +51,24 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
         override fun visitSimpleFunction(declaration: IrSimpleFunction) {
             val property = declaration.correspondingPropertySymbol
             if (property != null) {
-                hash_id_acc = mangler.run { declaration.hashedMangle }
+                hashIdAcc = mangler.run { declaration.hashedMangle }
                 property.owner.acceptVoid(this)
                 classFanSegments.add(declaration.name.asString())
             } else {
-                hash_id = mangler.run { declaration.hashedMangle }
+                hashId = mangler.run { declaration.hashedMangle }
                 collectFqNames(declaration)
             }
             setExpected(declaration.isExpect)
         }
 
         override fun visitConstructor(declaration: IrConstructor) {
-            hash_id = mangler.run { declaration.hashedMangle }
+            hashId = mangler.run { declaration.hashedMangle }
             collectFqNames(declaration)
             setExpected(declaration.isExpect)
         }
 
         override fun visitProperty(declaration: IrProperty) {
-            hash_id = mangler.run { declaration.hashedMangle }
+            hashId = mangler.run { declaration.hashedMangle }
             collectFqNames(declaration)
             setExpected(declaration.isExpect)
         }
@@ -92,6 +92,7 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
 
     fun composePublicIdSignature(declaration: IrDeclaration): IdSignature {
         assert(mangler.run { declaration.isExported() })
+
         return publicSignatureBuilder.buildSignature(declaration)
     }
 
@@ -99,20 +100,19 @@ open class IdSignatureSerializer(val mangler: KotlinMangler, startIndex: Long) {
         assert(!mangler.run { declaration.isExported() })
 
         return table.privateDeclarationSignature(declaration) {
-            if (declaration is IrValueDeclaration) {
-                IdSignature.ScopeLocalDeclaration(scopeIndex++, declaration.name.asString())
-            } else {
-                val container = when (declaration) {
-                    is IrField -> {
-                        declaration.correspondingPropertySymbol?.let { composeSignatureForDeclaration(it.owner) }
-                            ?: composeContainerIdSignature(declaration.parent)
-                    }
-                    is IrSimpleFunction -> declaration.correspondingPropertySymbol?.let {
-                        composeSignatureForDeclaration(it.owner)
-                    } ?: composeContainerIdSignature(declaration.parent)
-                    else -> composeContainerIdSignature(declaration.parent)
+            when (declaration) {
+                is IrValueDeclaration -> IdSignature.ScopeLocalDeclaration(scopeIndex++, declaration.name.asString())
+                is IrField -> {
+                    val p = declaration.correspondingPropertySymbol?.let { composeSignatureForDeclaration(it.owner) }
+                        ?: composeContainerIdSignature(declaration.parent)
+                    IdSignature.FileLocalSignature(p, ++localIndex)
                 }
-                IdSignature.FileLocalSignature(container, ++localIndex)
+                is IrSimpleFunction -> {
+                    val p = declaration.correspondingPropertySymbol?.let { composeSignatureForDeclaration(it.owner) }
+                        ?: composeContainerIdSignature(declaration.parent)
+                    IdSignature.FileLocalSignature(p, ++localIndex)
+                }
+                else -> IdSignature.FileLocalSignature(composeContainerIdSignature(declaration.parent), ++localIndex)
             }
         }
     }

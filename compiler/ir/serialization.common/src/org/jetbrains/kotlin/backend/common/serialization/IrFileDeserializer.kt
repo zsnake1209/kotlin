@@ -197,6 +197,8 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
 
     /* -------------------------------------------------------------- */
 
+    // TODO: Think about isolating id signature related logic behind corresponding interface
+
     private fun deserializePublicIdSignature(proto: ProtoPublicIdSignature): IdSignature.PublicSignature {
         val pkg = deserializeFqName(proto.packageFqNameList)
         val cls = deserializeFqName(proto.classFqNameList)

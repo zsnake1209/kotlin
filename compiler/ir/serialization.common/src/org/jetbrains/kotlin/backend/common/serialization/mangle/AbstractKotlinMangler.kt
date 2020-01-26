@@ -10,13 +10,14 @@ import org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor.Descr
 import org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor.DescriptorMangleComputer
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.util.KotlinMangler
-import org.jetbrains.kotlin.name.Name
 
 abstract class AbstractKotlinMangler<D : Any> : KotlinMangler {
     override val String.hashMangle get() = cityHash64()
+
+    override val IrDeclaration.hashedMangle: Long
+        get() = mangleString.hashMangle
 
     abstract class AbstractDescriptorMangler : KotlinMangler.DescriptorMangler {
 
