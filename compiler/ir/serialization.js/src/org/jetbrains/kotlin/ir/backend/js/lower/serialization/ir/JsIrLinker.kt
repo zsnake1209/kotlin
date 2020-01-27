@@ -13,31 +13,20 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
-import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.UniqId
 import org.jetbrains.kotlin.resolve.descriptorUtil.isPublishedApi
 
-class JsIrLinker(
-    currentModule: ModuleDescriptor,
-    mangler: KotlinMangler,
-    logger: LoggingContext,
-    builtIns: IrBuiltIns,
-    symbolTable: SymbolTable
-) : KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, mangler),
-    DescriptorUniqIdAware by DeserializedDescriptorUniqIdAware {
+class JsIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable) :
+    KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null) {
 
-    override val descriptorReferenceDeserializer =
-        JsDescriptorReferenceDeserializer(currentModule, mangler, builtIns)
-
-    override fun reader(moduleDescriptor: ModuleDescriptor, fileIndex: Int, uniqId: UniqId) =
-        moduleDescriptor.kotlinLibrary.irDeclaration(uniqId.index, fileIndex)
-
-    override fun readSymbol(moduleDescriptor: ModuleDescriptor, fileIndex: Int, symbolIndex: Int) =
-        moduleDescriptor.kotlinLibrary.symbol(symbolIndex, fileIndex)
+    override fun reader(moduleDescriptor: ModuleDescriptor, fileIndex: Int, idSigIndex: Int) =
+        moduleDescriptor.kotlinLibrary.irDeclaration(idSigIndex, fileIndex)
 
     override fun readType(moduleDescriptor: ModuleDescriptor, fileIndex: Int, typeIndex: Int) =
         moduleDescriptor.kotlinLibrary.type(typeIndex, fileIndex)
+
+    override fun readSignature(moduleDescriptor: ModuleDescriptor, fileIndex: Int, signatureIndex: Int) =
+        moduleDescriptor.kotlinLibrary.signature(signatureIndex, fileIndex)
 
     override fun readString(moduleDescriptor: ModuleDescriptor, fileIndex: Int, stringIndex: Int) =
         moduleDescriptor.kotlinLibrary.string(stringIndex, fileIndex)
