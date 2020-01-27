@@ -21,7 +21,7 @@ class JsIrModuleSerializer(
     val skipExpects: Boolean
 ) : IrModuleSerializer<JsIrFileSerializer>(logger) {
 
-    private val signaturer = IdSignatureSerializer(JsManglerIr, 0)
+    private val signaturer = IdSignatureSerializer(JsManglerIr)
     private val globalDeclarationTable = JsGlobalDeclarationTable(signaturer, irBuiltIns)
 
     override fun createSerializerForFile(file: IrFile): JsIrFileSerializer =
