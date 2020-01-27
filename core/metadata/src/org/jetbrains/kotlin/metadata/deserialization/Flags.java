@@ -50,6 +50,8 @@ public class Flags {
     public static final BooleanFlagField IS_SUSPEND = FlagField.booleanAfter(IS_EXTERNAL_FUNCTION);
     public static final BooleanFlagField IS_EXPECT_FUNCTION = FlagField.booleanAfter(IS_SUSPEND);
 
+    public static final BooleanFlagField IS_PRIMARY = FlagField.booleanAfter(IS_EXPECT_FUNCTION);
+
     // Properties
 
     public static final BooleanFlagField IS_VAR = FlagField.booleanAfter(MEMBER_KIND);
@@ -67,6 +69,24 @@ public class Flags {
     public static final BooleanFlagField DECLARES_DEFAULT_VALUE = FlagField.booleanAfter(HAS_ANNOTATIONS);
     public static final BooleanFlagField IS_CROSSINLINE = FlagField.booleanAfter(DECLARES_DEFAULT_VALUE);
     public static final BooleanFlagField IS_NOINLINE = FlagField.booleanAfter(IS_CROSSINLINE);
+
+    // Type Aliases
+    public static final BooleanFlagField IS_ACTUAL = FlagField.booleanAfter(VISIBILITY);
+
+    // Type Parameters
+    public static final FlagField<ProtoBuf.TypeParameter.Variance> VARIANCE = FlagField.after(HAS_ANNOTATIONS, ProtoBuf.TypeParameter.Variance.values());
+    public static final BooleanFlagField IS_REIFIED = FlagField.booleanAfter(VARIANCE);
+
+    // Fields
+    public static final BooleanFlagField IS_FINAL = FlagField.booleanAfter(VISIBILITY);
+    public static final BooleanFlagField IS_EXTERNAL_FIELD = FlagField.booleanAfter(IS_FINAL);
+    public static final BooleanFlagField IS_STATIC = FlagField.booleanAfter(IS_EXTERNAL_FIELD);
+    public static final BooleanFlagField IS_FAKE_OVERRIDE = FlagField.booleanAfter(IS_STATIC);
+
+    // Local variables
+    public static final BooleanFlagField IS_LOCAL_VAR = FlagField.booleanAfter(HAS_ANNOTATIONS);
+    public static final BooleanFlagField IS_LOCAL_CONST = FlagField.booleanAfter(IS_LOCAL_VAR);
+    public static final BooleanFlagField IS_LOCAL_LATEINIT = FlagField.booleanAfter(IS_LOCAL_CONST);
 
     // Accessors
 
@@ -150,6 +170,23 @@ public class Flags {
                 ;
     }
 
+    public static int getConstructorFlags(
+            boolean hasAnnotations,
+            @NotNull ProtoBuf.Visibility visibility,
+            boolean isInline,
+            boolean isExternal,
+            boolean isExpect,
+            boolean isPrimary
+    ) {
+        return HAS_ANNOTATIONS.toFlags(hasAnnotations)
+               | VISIBILITY.toFlags(visibility)
+               | IS_INLINE.toFlags(isInline)
+               | IS_EXTERNAL_FUNCTION.toFlags(isExternal)
+               | IS_EXPECT_FUNCTION.toFlags(isExpect)
+               | IS_PRIMARY.toFlags(isPrimary)
+                ;
+    }
+
     public static int getPropertyFlags(
             boolean hasAnnotations,
             @NotNull ProtoBuf.Visibility visibility,
@@ -219,6 +256,45 @@ public class Flags {
     public static int getTypeAliasFlags(boolean hasAnnotations, ProtoBuf.Visibility visibility) {
         return HAS_ANNOTATIONS.toFlags(hasAnnotations)
                | VISIBILITY.toFlags(visibility)
+                ;
+    }
+
+    public static int getTypeAliasFlags(boolean hasAnnotations, ProtoBuf.Visibility visibility, boolean isActual) {
+        return HAS_ANNOTATIONS.toFlags(hasAnnotations)
+               | VISIBILITY.toFlags(visibility)
+               | IS_ACTUAL.toFlags(isActual)
+                ;
+    }
+
+    public static int getTypeParameterFlags(boolean hasAnnotations, ProtoBuf.TypeParameter.Variance variance, boolean isReified) {
+        return HAS_ANNOTATIONS.toFlags(hasAnnotations)
+               | VARIANCE.toFlags(variance)
+               | IS_REIFIED.toFlags(isReified)
+                ;
+    }
+
+    public static int getFieldFlags(
+            boolean hasAnnotations,
+            ProtoBuf.Visibility visibility,
+            boolean isFinal,
+            boolean isExternal,
+            boolean isStatic,
+            boolean isFakeOverride
+    ) {
+        return HAS_ANNOTATIONS.toFlags(hasAnnotations)
+               | VISIBILITY.toFlags(visibility)
+               | IS_FINAL.toFlags(isFinal)
+               | IS_EXTERNAL_FIELD.toFlags(isExternal)
+               | IS_STATIC.toFlags(isStatic)
+               | IS_FAKE_OVERRIDE.toFlags(isFakeOverride)
+                ;
+    }
+
+    public static int getLocalFlags(boolean hasAnnotations, boolean isVar, boolean isConst, boolean isLateinit) {
+        return HAS_ANNOTATIONS.toFlags(hasAnnotations)
+               | IS_LOCAL_VAR.toFlags(isVar)
+               | IS_LOCAL_CONST.toFlags(isConst)
+               | IS_LOCAL_LATEINIT.toFlags(isLateinit)
                 ;
     }
 
