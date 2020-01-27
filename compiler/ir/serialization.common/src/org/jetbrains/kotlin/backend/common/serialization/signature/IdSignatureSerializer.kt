@@ -15,16 +15,21 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.FqName
 
-open class IdSignatureSerializer(val mangler: KotlinMangler.IrMangler, startIndex: Long) {
+open class IdSignatureSerializer(val mangler: KotlinMangler.IrMangler) {
     private fun composeSignatureForDeclaration(declaration: IrDeclaration): IdSignature {
         return if (mangler.run { declaration.isExported() }) {
             composePublicIdSignature(declaration)
         } else composeFileLocalIdSignature(declaration)
     }
 
-    private var localIndex: Long = startIndex
+    private var localIndex: Long = 0
     private var scopeIndex: Int = 0
     lateinit var table: DeclarationTable
+
+    fun reset() {
+        localIndex = 0
+        scopeIndex = 0
+    }
 
     private inner class PublicIdSigBuilder : IdSignatureBuilder<IrDeclaration>(), IrElementVisitorVoid {
 
