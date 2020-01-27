@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.idea.codeInsight.gradle
 import org.junit.Test
 import com.intellij.testFramework.runInEdtAndWait
 import com.intellij.util.PlatformUtils
+import org.jetbrains.kotlin.idea.run.KotlinGradleRunConfiguration
 import org.jetbrains.kotlin.idea.run.KotlinJvmTestClassGradleConfigurationProducer
 import org.jetbrains.kotlin.idea.run.KotlinJvmTestMethodGradleConfigurationProducer
 import org.jetbrains.kotlin.idea.run.getConfiguration
@@ -32,20 +33,20 @@ class GradleTestRunConfigurationTest : GradleImportingTestCase() {
                 val kotlinFile = files.first { it.name == "MyKotlinTest.kt" }
 
                 val javaClassConfiguration = getConfiguration(javaFile, myProject, "MyTest")
-                assert(javaClassConfiguration.isProducedBy(TestClassGradleConfigurationProducer::class.java))
-                assert(javaClassConfiguration.configuration.name == "MyTest")
+                javaClassConfiguration.isProducedBy(TestClassGradleConfigurationProducer::class.java)
+                assert(javaClassConfiguration.configuration !is KotlinGradleRunConfiguration)
 
                 val javaMethodConfiguration = getConfiguration(javaFile, myProject, "testA")
-                assert(javaMethodConfiguration.isProducedBy(TestMethodGradleConfigurationProducer::class.java))
-                assert(javaMethodConfiguration.configuration.name == "MyTest.testA")
+                javaMethodConfiguration.isProducedBy(TestMethodGradleConfigurationProducer::class.java)
+                assert(javaMethodConfiguration.configuration !is KotlinGradleRunConfiguration)
 
                 val kotlinClassConfiguration = getConfiguration(kotlinFile, myProject, "MyKotlinTest")
-                assert(kotlinClassConfiguration.isProducedBy(KotlinJvmTestClassGradleConfigurationProducer::class.java))
-                assert(kotlinClassConfiguration.configuration.name == "MyKotlinTest")
+                kotlinClassConfiguration.isProducedBy(KotlinJvmTestClassGradleConfigurationProducer::class.java)
+                assert(kotlinClassConfiguration.configuration is KotlinGradleRunConfiguration)
 
                 val kotlinFunctionConfiguration = getConfiguration(kotlinFile, myProject, "testA")
-                assert(kotlinFunctionConfiguration.isProducedBy(KotlinJvmTestMethodGradleConfigurationProducer::class.java))
-                assert(kotlinFunctionConfiguration.configuration.name == "MyKotlinTest.testA")
+                kotlinFunctionConfiguration.isProducedBy(KotlinJvmTestMethodGradleConfigurationProducer::class.java)
+                assert(kotlinFunctionConfiguration.configuration is KotlinGradleRunConfiguration)
             }
         }
     }
