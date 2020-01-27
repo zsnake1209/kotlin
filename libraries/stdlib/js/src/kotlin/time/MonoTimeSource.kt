@@ -5,9 +5,6 @@
 
 package kotlin.time
 
-import org.w3c.performance.GlobalPerformance
-import org.w3c.performance.Performance
-
 @SinceKotlin("1.3")
 @ExperimentalTime
 internal actual object MonotonicTimeSource : TimeSource {
