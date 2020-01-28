@@ -134,7 +134,7 @@ class ClassResolutionScopesSupport(
     }
 
     private fun <T : Any> StorageManager.createLazyValue(onRecursion: ((Boolean) -> T), compute: () -> T) =
-        createLazyValue(compute, onRecursion)
+        createLazyValueWithPostCompute(compute, onRecursion, {})
 
     companion object {
         private val createErrorLexicalScope: (Boolean) -> LexicalScope = { ErrorLexicalScope() }
