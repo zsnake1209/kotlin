@@ -55,6 +55,13 @@ if [ ! -f $INTELLIJ_DEPENDENCIES/intellij-core/$INTELLIJ_SDK_VERSION/artifacts/i
     exit 1
 fi
 copy_jar_into_maven_repo $INTELLIJ_DEPENDENCIES/intellij-core/$INTELLIJ_SDK_VERSION/artifacts/intellij-core.jar kotlin-intellij-core
+copy_jar_into_maven_repo $INTELLIJ_DEPENDENCIES/android-studio-ide/$ANDROID_STUDIO_BUILD/artifacts/lib/idea.jar kotlin-idea
+copy_jar_into_maven_repo $INTELLIJ_DEPENDENCIES/android-studio-ide/$ANDROID_STUDIO_BUILD/artifacts/lib/idea_rt.jar kotlin-idea-rt
+copy_jar_into_maven_repo $INTELLIJ_DEPENDENCIES/android-studio-ide/$ANDROID_STUDIO_BUILD/artifacts/plugins/java/lib/java-impl.jar kotlin-java-impl
+copy_jar_into_maven_repo $INTELLIJ_DEPENDENCIES/android-studio-ide/$ANDROID_STUDIO_BUILD/artifacts/lib/bootstrap.jar kotlin-bootstrap
+copy_jar_into_maven_repo $INTELLIJ_DEPENDENCIES/android-studio-ide/$ANDROID_STUDIO_BUILD/artifacts/lib/openapi.jar kotlin-openapi
+copy_jar_into_maven_repo $INTELLIJ_DEPENDENCIES/android-studio-ide/$ANDROID_STUDIO_BUILD/artifacts/lib/platform-api.jar kotlin-platform-api
+copy_jar_into_maven_repo $INTELLIJ_DEPENDENCIES/android-studio-ide/$ANDROID_STUDIO_BUILD/artifacts/lib/platform-impl.jar kotlin-platform-impl
 copy_jar_into_maven_repo dist/artifacts/ideaPlugin/Kotlin/lib/kotlin-plugin.jar kotlin-plugin
 copy_jar_into_maven_repo dist/artifacts/ideaPlugin/Kotlin/lib/jps/kotlin-jps-plugin.jar kotlin-jps-plugin
 copy_jar_into_maven_repo idea/idea-jps-common/build/libs/idea-jps-common-$R4A_BUILD_NUMBER.jar kotlin-jps-common-ide
