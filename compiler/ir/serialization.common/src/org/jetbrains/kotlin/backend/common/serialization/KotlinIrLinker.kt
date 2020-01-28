@@ -133,7 +133,7 @@ abstract class KotlinIrLinker(
         private val moduleDeserializationState = DeserializationState.ModuleDeserializationState(this)
         val moduleReversedFileIndex = mutableMapOf<IdSignature, IrDeserializerForFile>()
         private val moduleDependencies by lazy {
-            moduleDescriptor.allDependencyModules.filter { it != moduleDescriptor }.map { deserializersForModules[it]!! }
+            moduleDescriptor.allDependencyModules.filter { it != moduleDescriptor }.mapNotNull { resolveModuleDeserializer(it) }
         }
 
         // This is a heavy initializer
@@ -538,9 +538,12 @@ abstract class KotlinIrLinker(
     protected abstract fun readFile(moduleDescriptor: ModuleDescriptor, fileIndex: Int): ByteArray
     protected abstract fun readFileCount(moduleDescriptor: ModuleDescriptor): Int
 
-    protected abstract fun checkAccessibility(declarationDescriptor: DeclarationDescriptor): Boolean
     protected open fun handleNoModuleDeserializerFound(isSignature: IdSignature): DeserializationState<*> {
         error("Deserializer for declaration $isSignature is not found")
+    }
+
+    protected open fun resolveModuleDeserializer(moduleDescriptor: ModuleDescriptor): IrModuleDeserializer? {
+        return deserializersForModules[moduleDescriptor] ?: error("No module deserializer found for $moduleDescriptor")
     }
 
     /**
@@ -558,7 +561,7 @@ abstract class KotlinIrLinker(
         } while (modulesWithReachableTopLevels.isNotEmpty())
     }
 
-    private fun findDeserializedDeclarationForDescriptor(symbol: IrSymbol): DeclarationDescriptor? {
+    private fun findDeserializedDeclarationForSymbol(symbol: IrSymbol): DeclarationDescriptor? {
         require(symbol.isPublicApi)
 
         val descriptor = symbol.descriptor
@@ -567,14 +570,12 @@ abstract class KotlinIrLinker(
 //        if (topLevelDescriptor.module.isForwardDeclarationModule) return null
 //        if (!topLevelDescriptor.shouldBeDeserialized()) return null
 
-        if (descriptor is FunctionClassDescriptor || descriptor.containingDeclaration is FunctionClassDescriptor) {
+        if (descriptor is FunctionClassDescriptor || (descriptor.containingDeclaration is FunctionClassDescriptor)) {
             return null
         }
 
         val topLevelSignature = symbol.signature.topLevelSignature()
-        val moduleOfOrigin = descriptor.module
-
-        val moduleDeserializer = deserializersForModules[moduleOfOrigin] ?: error("No module deserializer found for $moduleOfOrigin")
+        val moduleDeserializer = resolveModuleDeserializer(descriptor.module) ?: return null
 
         moduleDeserializer.addModuleReachableTopLevel(topLevelSignature)
 
@@ -587,7 +588,7 @@ abstract class KotlinIrLinker(
         if (!symbol.isPublicApi) return null
 
         if (!symbol.isBound) {
-            findDeserializedDeclarationForDescriptor(symbol) ?: return null
+            findDeserializedDeclarationForSymbol(symbol) ?: return null
         }
 
         // TODO: we do have serializations for those, but let's just create a stub for now.
@@ -707,6 +708,10 @@ abstract class KotlinIrLinker(
 
     fun deserializeOnlyHeaderModule(moduleDescriptor: ModuleDescriptor): IrModuleFragment =
         deserializeIrModuleHeader(moduleDescriptor, DeserializationStrategy.ONLY_DECLARATION_HEADERS)
+
+    fun getAllIrFiles(): List<IrFile> {
+        return deserializersForModules.values.flatMap { it.module.files }
+    }
 }
 
 enum class DeserializationStrategy(val needBodies: Boolean, val explicitlyExported: Boolean, val theWholeWorld: Boolean) {
