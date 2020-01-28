@@ -403,13 +403,9 @@ public class LockBasedStorageManager implements StorageManager {
         }
     }
 
-    /**
-     * Computed value has an early publication and accessible from the same thread while executing a post-compute lambda.
-     * For other threads value will be accessible only after post-compute lambda is finished (when a real lock is used).
-     */
     private static abstract class LockBasedLazyValueWithPostCompute<T> extends LockBasedLazyValue<T> {
         @Nullable
-        private volatile SingleThreadValue<T> valuePostCompute = null;
+        private volatile ThreadLocal<Object> valuePostCompute = null;
 
         public LockBasedLazyValueWithPostCompute(
                 @NotNull LockBasedStorageManager storageManager,
@@ -420,9 +416,17 @@ public class LockBasedStorageManager implements StorageManager {
 
         @Override
         public T invoke() {
-            SingleThreadValue<T> postComputeCache = valuePostCompute;
-            if (postComputeCache != null && postComputeCache.hasValue()) {
-                return postComputeCache.getValue();
+            ThreadLocal<Object> postComputeCache = valuePostCompute;
+            if (postComputeCache != null) {
+                try {
+                    Object _value = postComputeCache.get();
+                    if (!(_value instanceof NotValue)) {
+                        // This thread is counting the value so allow an early publication
+                        return WrappedValues.unescapeThrowable(_value);
+                    }
+                } finally {
+                    postComputeCache.remove();
+                }
             }
 
             return super.invoke();
@@ -431,13 +435,21 @@ public class LockBasedStorageManager implements StorageManager {
         // Doing something in post-compute helps prevent infinite recursion
         @Override
         protected final void postCompute(T value) {
-            // Protected from rewrites in other threads because it is executed under lock in invoke().
-            // May be overwritten when NO_LOCK is used.
-            valuePostCompute = new SingleThreadValue<T>(value);
+            ThreadLocal<Object> postComputeCache = new ThreadLocal<Object>() {
+                @Override
+                protected Object initialValue() {
+                    return NotValue.NOT_COMPUTED;
+                }
+            };
+
+            postComputeCache.set(value);
+
             try {
+                valuePostCompute = postComputeCache;
                 doPostCompute(value);
             } finally {
                 valuePostCompute = null;
+                postComputeCache.remove();
             }
         }
 
