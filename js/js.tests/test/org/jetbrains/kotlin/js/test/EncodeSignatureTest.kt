@@ -177,6 +177,19 @@ class EncodeSignatureTest {
     }
 
     @Test
+    fun typeParameterUsageInConstraints2() {
+        assertSignature("0:0|0:0<:1:0,1:0<:I", """
+            import A.bar
+
+            object A {
+                inline fun <T> bar(x: T) = 42
+            }
+            
+            fun <T> T.foo(): Int = bar(this)
+        """)
+    }
+
+    @Test
     fun recursiveType() {
         assertSignature("1:0|1:0<:I<1:0>", """
             interface I<T : I<T>> {

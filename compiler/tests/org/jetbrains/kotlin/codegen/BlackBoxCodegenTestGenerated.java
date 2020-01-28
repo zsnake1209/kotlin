@@ -14510,11 +14510,6 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
             public void testMutable1() throws Exception {
                 runTest("compiler/testData/codegen/box/ir/closureConversion/mutable1.kt");
             }
-
-            @TestMetadata("mutablePrimitives.kt")
-            public void testMutablePrimitives() throws Exception {
-                runTest("compiler/testData/codegen/box/ir/closureConversion/mutablePrimitives.kt");
-            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/ir/primitiveNumberComparisons")
