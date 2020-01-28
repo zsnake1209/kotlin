@@ -43,7 +43,7 @@ cd $PROG_DIR
 ./bunch-cli/bin/bunch switch as40
 
 # Build a custom version of Kotlin
-./gradlew install ideaPlugin  :compiler:tests-common:testJar --no-daemon -Pbuild.number=$R4A_BUILD_NUMBER -PdeployVersion=$R4A_BUILD_NUMBER -Dmaven.repo.local=$OUT_DIR/m2
+./gradlew install ideaPlugin  :compiler:tests-common:testJar --no-daemon -Pbuild.number=$R4A_BUILD_NUMBER -PdeployVersion=$R4A_BUILD_NUMBER -Dmaven.repo.local=$OUT_DIR/m2  -Pteamcity=true
 
 # Copy jar files that are not published in the build but are required by androidx.compose
 echo "Copying additional repositories"
