@@ -404,8 +404,13 @@ public class LockBasedStorageManager implements StorageManager {
     }
 
     private static abstract class LockBasedLazyValueWithPostCompute<T> extends LockBasedLazyValue<T> {
-        @Nullable
-        private volatile ThreadLocal<Object> valuePostCompute = null;
+        @NotNull
+        private final ThreadLocal<Object> valuePostCompute = new ThreadLocal<Object>() {
+            @Override
+            protected Object initialValue() {
+                return NotValue.NOT_COMPUTED;
+            }
+        };
 
         public LockBasedLazyValueWithPostCompute(
                 @NotNull LockBasedStorageManager storageManager,
@@ -416,13 +421,10 @@ public class LockBasedStorageManager implements StorageManager {
 
         @Override
         public T invoke() {
-            ThreadLocal<Object> postComputeCache = valuePostCompute;
-            if (postComputeCache != null) {
-                Object _value = postComputeCache.get();
-                if (!(_value instanceof NotValue)) {
-                    // This thread is counting the value so allow an early publication
-                    return WrappedValues.unescapeThrowable(_value);
-                }
+            Object _value = valuePostCompute.get();
+            if (!(_value instanceof NotValue)) {
+                // This thread is counting the value so allow an early publication
+                return WrappedValues.unescapeThrowable(_value);
             }
 
             return super.invoke();
@@ -431,21 +433,11 @@ public class LockBasedStorageManager implements StorageManager {
         // Doing something in post-compute helps prevent infinite recursion
         @Override
         protected final void postCompute(T value) {
-            ThreadLocal<Object> postComputeCache = new ThreadLocal<Object>() {
-                @Override
-                protected Object initialValue() {
-                    return NotValue.NOT_COMPUTED;
-                }
-            };
-
-            postComputeCache.set(value);
-
+            valuePostCompute.set(value);
             try {
-                valuePostCompute = postComputeCache;
                 doPostCompute(value);
             } finally {
-                postComputeCache.remove();
-                valuePostCompute = null;
+                valuePostCompute.remove();
             }
         }
 
