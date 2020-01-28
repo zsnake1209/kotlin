@@ -418,14 +418,10 @@ public class LockBasedStorageManager implements StorageManager {
         public T invoke() {
             ThreadLocal<Object> postComputeCache = valuePostCompute;
             if (postComputeCache != null) {
-                try {
-                    Object _value = postComputeCache.get();
-                    if (!(_value instanceof NotValue)) {
-                        // This thread is counting the value so allow an early publication
-                        return WrappedValues.unescapeThrowable(_value);
-                    }
-                } finally {
-                    postComputeCache.remove();
+                Object _value = postComputeCache.get();
+                if (!(_value instanceof NotValue)) {
+                    // This thread is counting the value so allow an early publication
+                    return WrappedValues.unescapeThrowable(_value);
                 }
             }
 
@@ -448,8 +444,8 @@ public class LockBasedStorageManager implements StorageManager {
                 valuePostCompute = postComputeCache;
                 doPostCompute(value);
             } finally {
-                valuePostCompute = null;
                 postComputeCache.remove();
+                valuePostCompute = null;
             }
         }
 
