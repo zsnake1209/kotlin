@@ -18,15 +18,13 @@ package org.jetbrains.kotlin.storage;
  */
 class SingleThreadValue<T> {
     private final T value;
-    private final Thread thread;
 
     SingleThreadValue(T value) {
         this.value = value;
-        thread = Thread.currentThread();
     }
 
     public boolean hasValue() {
-        return thread == Thread.currentThread();
+        return true;
     }
 
     public T getValue() {
