@@ -40,6 +40,8 @@ export JDK_16=$JAVA_HOME
 
 cd $PROG_DIR
 
+./bunch-cli/bin/bunch switch as40
+
 # Build a custom version of Kotlin
 ./gradlew install ideaPlugin  :compiler:tests-common:testJar --no-daemon -Pbuild.number=$R4A_BUILD_NUMBER -PdeployVersion=$R4A_BUILD_NUMBER -Dmaven.repo.local=$OUT_DIR/m2
 
