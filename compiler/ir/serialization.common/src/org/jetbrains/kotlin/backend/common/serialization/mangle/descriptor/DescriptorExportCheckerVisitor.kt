@@ -66,9 +66,7 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
         else constructorDescriptor.run { isExported(annotations, visibility) }
     }
 
-    override fun visitScriptDescriptor(scriptDescriptor: ScriptDescriptor, data: SpecialDeclarationType): Boolean {
-        reportUnexpectedDescriptor(scriptDescriptor)
-    }
+    override fun visitScriptDescriptor(scriptDescriptor: ScriptDescriptor, data: SpecialDeclarationType): Boolean = false
 
     override fun visitPropertyDescriptor(descriptor: PropertyDescriptor, data: SpecialDeclarationType): Boolean {
         val visibility = if (data == SpecialDeclarationType.BACKING_FIELD) {
