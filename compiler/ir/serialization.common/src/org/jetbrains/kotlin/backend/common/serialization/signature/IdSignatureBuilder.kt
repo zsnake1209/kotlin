@@ -39,11 +39,11 @@ abstract class IdSignatureBuilder<D> {
 
 
     protected fun setExpected(f: Boolean) {
-        mask = mask or IdSignatureFlags.IS_EXPECT.encode(f)
+        mask = mask or IdSignature.Flags.IS_EXPECT.encode(f)
     }
 
     protected fun setSpecialJavaProperty(f: Boolean) {
-        mask = mask or IdSignatureFlags.IS_JAVA_FOR_KOTLIN_OVERRIDE_PPROPERTY.encode(f)
+        mask = mask or IdSignature.Flags.IS_JAVA_FOR_KOTLIN_OVERRIDE_PPROPERTY.encode(f)
     }
 
     protected open fun platformSpecificProperty(descriptor: PropertyDescriptor) {}
@@ -53,6 +53,7 @@ abstract class IdSignatureBuilder<D> {
     protected open fun platformSpecificConstructor(descriptor: ConstructorDescriptor) {}
     protected open fun platformSpecificClass(descriptor: ClassDescriptor) {}
     protected open fun platformSpecificAlias(descriptor: TypeAliasDescriptor) {}
+    protected open fun platformSpecificPackage(descriptor: PackageFragmentDescriptor) {}
 
     fun buildSignature(declaration: D): IdSignature {
         reset()

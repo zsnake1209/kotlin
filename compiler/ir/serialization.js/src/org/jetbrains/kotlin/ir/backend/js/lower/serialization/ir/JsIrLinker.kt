@@ -6,15 +6,12 @@
 package org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
-import org.jetbrains.kotlin.backend.common.serialization.*
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithVisibility
+import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
+import org.jetbrains.kotlin.backend.common.serialization.KotlinIrLinker
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.resolve.descriptorUtil.isPublishedApi
 
 class JsIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable) :
     KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null) {
@@ -40,5 +37,9 @@ class JsIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: Symb
     override fun readFileCount(moduleDescriptor: ModuleDescriptor) =
         moduleDescriptor.kotlinLibrary.fileCount()
 
-    private val ModuleDescriptor.userName get() = kotlinLibrary.libraryFile.absolutePath
+    override fun createModuleDeserializer(moduleDescriptor: ModuleDescriptor, strategy: DeserializationStrategy): IrModuleDeserializer =
+        JsModuleDeserializer(moduleDescriptor, strategy)
+
+    private inner class JsModuleDeserializer(moduleDescriptor: ModuleDescriptor, strategy: DeserializationStrategy) :
+        KotlinIrLinker.IrModuleDeserializer(moduleDescriptor, strategy)
 }

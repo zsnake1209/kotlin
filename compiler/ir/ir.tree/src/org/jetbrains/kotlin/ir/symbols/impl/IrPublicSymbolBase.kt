@@ -21,6 +21,10 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
             "Substituted descriptor $descriptor for ${descriptor.original}"
         }
         assert(sig.isPublic)
+
+        if (sig.toString() == "public platform.darwin/simd_make_int3|-6808441878446017602[0]") {
+            1
+        }
     }
 
     private fun isOriginalDescriptor(descriptor: DeclarationDescriptor): Boolean =

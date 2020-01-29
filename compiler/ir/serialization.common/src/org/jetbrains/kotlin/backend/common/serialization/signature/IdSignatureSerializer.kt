@@ -96,7 +96,9 @@ open class IdSignatureSerializer(val mangler: KotlinMangler.IrMangler) {
     }
 
     fun composePublicIdSignature(declaration: IrDeclaration): IdSignature {
-        assert(mangler.run { declaration.isExported() })
+        assert(mangler.run { declaration.isExported() }) {
+            "${declaration.render()} expected to be exported"
+        }
 
         return publicSignatureBuilder.buildSignature(declaration)
     }

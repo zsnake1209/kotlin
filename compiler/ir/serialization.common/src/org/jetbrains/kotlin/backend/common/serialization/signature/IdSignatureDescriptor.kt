@@ -38,6 +38,7 @@ open class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMa
 
         override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: Nothing?) {
             packageFqn = descriptor.fqName
+            platformSpecificPackage(descriptor)
         }
 
         override fun visitPackageViewDescriptor(descriptor: PackageViewDescriptor, data: Nothing?) {
