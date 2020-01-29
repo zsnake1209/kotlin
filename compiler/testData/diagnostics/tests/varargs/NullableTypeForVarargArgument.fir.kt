@@ -31,7 +31,7 @@ fun getArr(): Array<String>? = null
 
 fun f() {
     A().foo(1, *args)
-    bar(2, *args)
+    <!INAPPLICABLE_CANDIDATE!>bar<!>(2, *args)
     <!INAPPLICABLE_CANDIDATE!>baz<!>(*args)
 }
 
