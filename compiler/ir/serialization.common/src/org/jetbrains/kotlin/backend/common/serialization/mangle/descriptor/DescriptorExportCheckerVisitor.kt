@@ -29,6 +29,8 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
         if (annotations.hasAnnotation(publishedApiAnnotation)) return true
         if (visibility != null && !visibility.isPubliclyVisible()) return false
 
+        if (isPlatformSpecificExported()) return true
+
         return containingDeclaration.accept(this@DescriptorExportCheckerVisitor, SpecialDeclarationType.REGULAR) ?: false
     }
 
