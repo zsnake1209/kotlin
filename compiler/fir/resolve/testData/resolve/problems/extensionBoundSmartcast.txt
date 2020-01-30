@@ -1,0 +1,28 @@
+FILE: extensionBoundSmartcast.kt
+    public abstract interface I : R|kotlin/Any| {
+        public abstract val checkMember: R|kotlin/Boolean|
+            public get(): R|kotlin/Boolean|
+
+    }
+    public final val R|I|.checkExt: R|kotlin/Boolean|
+        public get(): R|kotlin/Boolean| {
+            ^ Boolean(true)
+        }
+    public final fun useI(i: R|I|): R|kotlin/Unit| {
+    }
+    public final fun test(iN: R|I?|): R|kotlin/Unit| {
+        when () {
+            ==(R|<local>/iN|?.R|/checkExt|, Boolean(true)) ->  {
+                <Inapplicable(INAPPLICABLE): [/useI]>#(R|<local>/iN|)
+            }
+        }
+
+    }
+    public final fun test_2(iN: R|I?|): R|kotlin/Unit| {
+        when () {
+            ==(R|<local>/iN|?.R|/I.checkMember|, Boolean(true)) ->  {
+                <Inapplicable(INAPPLICABLE): [/useI]>#(R|<local>/iN|)
+            }
+        }
+
+    }
