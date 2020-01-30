@@ -1091,6 +1091,11 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
             runTest("compiler/fir/resolve/testData/resolve/problems/definitelyNotNullAmbiguity.kt");
         }
 
+        @TestMetadata("extensionBoundSmartcast.kt")
+        public void testExtensionBoundSmartcast() throws Exception {
+            runTest("compiler/fir/resolve/testData/resolve/problems/extensionBoundSmartcast.kt");
+        }
+
         @TestMetadata("incorrectSuperCall.kt")
         public void testIncorrectSuperCall() throws Exception {
             runTest("compiler/fir/resolve/testData/resolve/problems/incorrectSuperCall.kt");
