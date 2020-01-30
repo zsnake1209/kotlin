@@ -23,6 +23,8 @@ sealed class IdSignature {
 
     abstract fun render(): String
 
+    open fun flags(): Long = 0
+
     open val hasTopLevel: Boolean get() = !isPackageSignature()
 
     val isLocal: Boolean get() = !isPublic
@@ -59,6 +61,8 @@ sealed class IdSignature {
 
         override fun nearestPublicSig(): PublicSignature = this
 
+        override fun flags(): Long = mask
+
         override fun render(): String = "${packageFqn.asString()}/${classFqn.asString()}|$id[${mask.toString(2)}]"
 
         override fun toString() = super.toString()
@@ -79,6 +83,8 @@ sealed class IdSignature {
             if (other is AccessorSignature) return accessorSignature == other.accessorSignature
             return accessorSignature == other
         }
+
+        override fun flags(): Long = accessorSignature.mask
 
         override fun hashCode(): Int = accessorSignature.hashCode()
     }

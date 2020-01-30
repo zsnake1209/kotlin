@@ -1,17 +1,27 @@
 // IGNORE_BACKEND_FIR: JVM_IR
+// MODULE: lib1
+// FILE: lib1.kt
 
-@Target(AnnotationTarget.PROPERTY)
-annotation class Anno
-
-inline class Z(val s: String)
-
-class A {
-    @Anno
-    val Z.r: String get() = s
+class C<T>(val t: T) {
+    override fun hashCode(): Int = t as Int
 }
 
+// MODULE: lib2(lib1)
+// FILE: lib2.kt
+
+inline class ICCCCC<TT>(val c: C<TT>) {
+    fun foo(): Int = c.hashCode()
+}
+
+
+// MODULE: main(lib2)
+// FILE: main.kt
+
+
+
 fun box(): String {
-    with(A()) {
-        return Z("OK").r
-    }
+    val ic = ICCCCC<Int>(C(42))
+
+    if (ic.foo() != 42) return "FAIL"
+    return "OK"
 }

@@ -190,13 +190,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
             return
         }
 
-        try {
-
-            descriptor.mangleFunction(false, data, descriptor)
-        } catch (ex: StackOverflowError) {
-            1
-            throw ex
-        }
+        descriptor.mangleFunction(false, data, descriptor)
     }
 
     override fun visitTypeParameterDescriptor(descriptor: TypeParameterDescriptor, data: Boolean) {

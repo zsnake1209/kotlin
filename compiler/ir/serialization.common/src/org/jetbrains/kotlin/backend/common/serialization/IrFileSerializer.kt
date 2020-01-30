@@ -1116,6 +1116,11 @@ open class IrFileSerializer(
     }
 
     private fun serializeIrClass(clazz: IrClass): ProtoClass {
+
+        if (clazz.name.asString() == "KProperty") {
+            2
+        }
+
         val proto = ProtoClass.newBuilder()
             .setBase(serializeIrDeclarationBase(clazz, ClassFlags.encode(clazz)))
             .setName(serializeName(clazz.name))

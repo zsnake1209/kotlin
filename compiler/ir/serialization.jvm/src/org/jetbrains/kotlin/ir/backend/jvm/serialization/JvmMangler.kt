@@ -47,14 +47,14 @@ abstract class AbstractJvmManglerIr : IrBasedKotlinManglerImpl() {
         override fun IrDeclaration.isPlatformSpecificExported() = false
     }
 
-    private class JvmIrManglerComputer(builder: StringBuilder) : IrMangleComputer(builder) {
-        override fun copy(): IrMangleComputer = JvmIrManglerComputer(builder)
+    private class JvmIrManglerComputer(builder: StringBuilder, skipSig: Boolean) : IrMangleComputer(builder, skipSig) {
+        override fun copy(skipSig: Boolean): IrMangleComputer = JvmIrManglerComputer(builder, skipSig)
     }
 
     override fun getExportChecker(): KotlinExportChecker<IrDeclaration> = exportChecker
 
     override fun getMangleComputer(prefix: String): KotlinMangleComputer<IrDeclaration> {
-        return JvmIrManglerComputer(StringBuilder(256))
+        return JvmIrManglerComputer(StringBuilder(256), false)
     }
 }
 

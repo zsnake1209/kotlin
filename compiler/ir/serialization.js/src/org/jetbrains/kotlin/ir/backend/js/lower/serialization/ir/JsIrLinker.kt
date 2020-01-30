@@ -39,6 +39,4 @@ class JsIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: Symb
 
     override fun readFileCount(moduleDescriptor: ModuleDescriptor) =
         moduleDescriptor.kotlinLibrary.fileCount()
-
-    private val ModuleDescriptor.userName get() = kotlinLibrary.libraryFile.absolutePath
 }

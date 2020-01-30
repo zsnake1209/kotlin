@@ -7,7 +7,8 @@ package org.jetbrains.kotlin.backend.common.serialization.signature
 
 enum class IdSignatureFlags {
     IS_EXPECT,
-    IS_JAVA_FOR_KOTLIN_OVERRIDE_PPROPERTY;
+    IS_JAVA_FOR_KOTLIN_OVERRIDE_PPROPERTY,
+    IS_NATIVE_INTEROP_LIBRARY;
 
     fun encode(isSet: Boolean): Long = if (isSet) 1L shl ordinal else 0L
     fun decode(flags: Long): Boolean = (flags and (1L shl ordinal) != 0L)

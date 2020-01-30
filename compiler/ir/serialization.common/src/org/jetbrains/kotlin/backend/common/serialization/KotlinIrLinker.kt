@@ -233,7 +233,7 @@ abstract class KotlinIrLinker(
                         BinarySymbolData
                             .SymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntryFromLinker(WrappedEnumEntryDescriptor(), idSig)
                         BinarySymbolData
-                            .SymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
+                            .SymbolKind.STANDALONE_FIELD_SYMBOL -> referenceFieldFromLinker(WrappedFieldDescriptor(), idSig)
                         BinarySymbolData
                             .SymbolKind.FIELD_SYMBOL -> referenceFieldFromLinker(WrappedPropertyDescriptor(), idSig)
                         BinarySymbolData.SymbolKind.FUNCTION_SYMBOL ->  //TODO: FunctionInterfaces
@@ -255,7 +255,7 @@ abstract class KotlinIrLinker(
                 }
 
             private fun isGlobalIdSignature(isSignature: IdSignature): Boolean {
-                return isSignature in globalDeserializationState || isSpecialFunctionDescriptor(isSignature)
+                return isSignature in globalDeserializationState || isSpecialSignature(isSignature)
             }
 
             private fun getModuleForTopLevelId(isSignature: IdSignature): IrModuleDeserializer? {
@@ -293,50 +293,11 @@ abstract class KotlinIrLinker(
                 deserializationState.deserializedSymbols.putIfAbsent(signature, symbol)
             }
 
-            private fun isSpecialFunctionDescriptor(idSig: IdSignature): Boolean {
-                if (idSig !is IdSignature.PublicSignature) return false
-                if (idSig.packageFqn !in functionalPackages) return false
-
-                if (idSig.classFqn.isRoot) return false
-
-                val fqnParts = idSig.classFqn.pathSegments()
-
-                val className = fqnParts.first()
-
-                return functionPattern.matcher(className.asString()).find()
-            }
-
-            private fun resolveSpecialDescriptor(idSig: IdSignature): DeclarationDescriptor? {
-                if (isSpecialFunctionDescriptor(idSig)) {
-                    val publicSig = idSig as IdSignature.PublicSignature
-                    val fqnParts = publicSig.classFqn.pathSegments()
-                    val className = fqnParts.first()
-
-                    val classDescriptor = builtIns.builtIns.getBuiltInClassByFqName(idSig.packageFqn.child(className))
-                    return when (fqnParts.size) {
-                        1 -> classDescriptor
-                        2 -> {
-                            val memberName = fqnParts[1]!!
-                            val memberDescriptors =
-                                classDescriptor.unsubstitutedMemberScope.getContributedDescriptors(DescriptorKindFilter.CALLABLES)
-                                    .filter { d -> d.name == memberName }
-
-                            val memberDescriptor = memberDescriptors.single()
-                            if (idSig.id != null && memberDescriptor is PropertyDescriptor) TODO("... return accessor")
-                            memberDescriptor
-                        }
-                        else -> error("No member found for signature $idSig")
-                    }
-                }
-
-                return null
-            }
-
             private fun deserializeIrSymbolData(idSignature: IdSignature, symbolKind: BinarySymbolData.SymbolKind): IrSymbol {
                 val deserializationState = findDeserializationState(idSignature)
 
                 val symbol = deserializationState.deserializedSymbols.getOrPut(idSignature) {
-                    val descriptor = resolveSpecialDescriptor(idSignature)
+                    val descriptor = resolveSpecialSignature(idSignature)
 
                     resolvedForwardDeclarations[idSignature]?.let {
                         val fdState = getStateForID(it)
@@ -546,11 +507,63 @@ abstract class KotlinIrLinker(
         return deserializersForModules[moduleDescriptor] ?: error("No module deserializer found for $moduleDescriptor")
     }
 
+
+    // TODO: the following code worths some refactoring in the nearest future
+
+    private fun isSpecialSignature(idSig: IdSignature): Boolean {
+        return isSpecialPlatformSignature(idSig) || isSpecialFunctionDescriptor(idSig)
+    }
+    private fun resolveSpecialSignature(idSig: IdSignature): DeclarationDescriptor? {
+        return resolvePlatformDescriptor(idSig) ?: resolveFunctionDescriptor(idSig)
+    }
+
+    protected open fun resolvePlatformDescriptor(idSig: IdSignature): DeclarationDescriptor? = null
+    protected open fun isSpecialPlatformSignature(idSig: IdSignature): Boolean = false
+
+    private fun isSpecialFunctionDescriptor(idSig: IdSignature): Boolean {
+        if (idSig !is IdSignature.PublicSignature) return false
+        if (idSig.packageFqn !in functionalPackages) return false
+
+        if (idSig.classFqn.isRoot) return false
+
+        val fqnParts = idSig.classFqn.pathSegments()
+
+        val className = fqnParts.first()
+
+        return functionPattern.matcher(className.asString()).find()
+    }
+
+    private fun resolveFunctionDescriptor(idSig: IdSignature): DeclarationDescriptor? {
+        if (isSpecialFunctionDescriptor(idSig)) {
+            val publicSig = idSig as IdSignature.PublicSignature
+            val fqnParts = publicSig.classFqn.pathSegments()
+            val className = fqnParts.first()
+
+            val classDescriptor = builtIns.builtIns.getBuiltInClassByFqName(idSig.packageFqn.child(className))
+            return when (fqnParts.size) {
+                1 -> classDescriptor
+                2 -> {
+                    val memberName = fqnParts[1]!!
+                    val memberDescriptors =
+                            classDescriptor.unsubstitutedMemberScope.getContributedDescriptors(DescriptorKindFilter.CALLABLES)
+                                    .filter { d -> d.name == memberName }
+
+                    val memberDescriptor = memberDescriptors.single()
+                    if (idSig.id != null && memberDescriptor is PropertyDescriptor) TODO("... return accessor")
+                    memberDescriptor
+                }
+                else -> error("No member found for signature $idSig")
+            }
+        }
+
+        return null
+    }
+
     /**
      * Check that descriptor shouldn't be processed by some backend-specific logic.
      * For example, it is the case for Native interop libraries where there is no IR in libraries.
      */
-    protected open fun DeclarationDescriptor.shouldBeDeserialized(): Boolean = true
+    protected open fun IdSignature.shouldBeDeserialized(): Boolean = true
 
     private fun deserializeAllReachableTopLevels() {
         do {
@@ -564,17 +577,17 @@ abstract class KotlinIrLinker(
     private fun findDeserializedDeclarationForSymbol(symbol: IrSymbol): DeclarationDescriptor? {
         require(symbol.isPublicApi)
 
-        val descriptor = symbol.descriptor
+        val signature = symbol.signature
 
         // This is Native specific. Try to eliminate.
-//        if (topLevelDescriptor.module.isForwardDeclarationModule) return null
-//        if (!topLevelDescriptor.shouldBeDeserialized()) return null
+        if (!signature.shouldBeDeserialized()) return null
 
+        val descriptor = symbol.descriptor
         if (descriptor is FunctionClassDescriptor || (descriptor.containingDeclaration is FunctionClassDescriptor)) {
             return null
         }
 
-        val topLevelSignature = symbol.signature.topLevelSignature()
+        val topLevelSignature = signature.topLevelSignature()
         val moduleDeserializer = resolveModuleDeserializer(descriptor.module) ?: return null
 
         moduleDeserializer.addModuleReachableTopLevel(topLevelSignature)

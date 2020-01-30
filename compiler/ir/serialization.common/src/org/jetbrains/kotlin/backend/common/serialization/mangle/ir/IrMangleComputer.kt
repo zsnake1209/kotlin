@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.backend.common.serialization.mangle.ir
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
 import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleConstant
 import org.jetbrains.kotlin.backend.common.serialization.mangle.collect
+import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
@@ -21,16 +22,18 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
-abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElementVisitor<Unit, Boolean>,
+abstract class IrMangleComputer(protected val builder: StringBuilder, private val skipSig: Boolean) : IrElementVisitor<Unit, Boolean>,
     KotlinMangleComputer<IrDeclaration> {
 
     private val typeParameterContainer = ArrayList<IrDeclaration>(4)
 
     private var isRealExpect = false
 
-    open val IrFunction.platformSpecificFunctionName: String? get() = null
+    open fun IrFunction.platformSpecificFunctionName(): String? = null
 
-    protected abstract fun copy(): IrMangleComputer
+    open fun IrFunction.specialValueParamPrefix(param: IrValueParameter): String = ""
+
+    protected abstract fun copy(skipSig: Boolean): IrMangleComputer
 
     override fun computeMangle(declaration: IrDeclaration): String {
         declaration.accept(this, true)
@@ -85,6 +88,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
     }
 
     private fun IrFunction.mangleSignature(isCtor: Boolean) {
+        if (skipSig) return
 
         extensionReceiverParameter?.let {
             builder.append(MangleConstant.EXTENSION_RECEIVER_PREFIX)
@@ -132,7 +136,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
         when (type) {
             is IrSimpleType -> {
                 when (val classifier = type.classifier) {
-                    is IrClassSymbol -> classifier.owner.accept(copy(), false)
+                    is IrClassSymbol -> classifier.owner.accept(copy(true), false)
                     is IrTypeParameterSymbol -> tBuilder.mangleTypeParameterReference(classifier.owner)
                 }
 
@@ -216,7 +220,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder) : IrElemen
 
         isRealExpect = isRealExpect or declaration.isExpect
 
-        declaration.platformSpecificFunctionName?.let {
+        declaration.platformSpecificFunctionName()?.let {
             builder.append(it)
             return
         }

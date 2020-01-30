@@ -1100,9 +1100,9 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
                     flags.isExternal,
                     flags.isTailrec,
                     flags.isSuspend,
+                    flags.isOperator,
                     flags.isExpect,
-                    flags.isFakeOverride,
-                    flags.isOperator
+                    flags.isFakeOverride
                 )
             }.apply {
                 proto.overriddenList.mapTo(overriddenSymbols) { deserializeIrSymbol(it) as IrSimpleFunctionSymbol }

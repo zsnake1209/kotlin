@@ -21,6 +21,10 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
             "Substituted descriptor $descriptor for ${descriptor.original}"
         }
         assert(sig.isPublic)
+
+        if (signature.toString() == "public kotlin.reflect/KProperty.name.<get-name>|-2793925011523520086[1]") {
+            1
+        }
     }
 
     private fun isOriginalDescriptor(descriptor: DeclarationDescriptor): Boolean =
