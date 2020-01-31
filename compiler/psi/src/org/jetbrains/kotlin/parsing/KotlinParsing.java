@@ -2240,8 +2240,7 @@ public class KotlinParsing extends AbstractKotlinParsing {
 
     private void recoverOnPlatformTypeSuffix() {
         // Recovery for platform types
-        boolean a = WHITE_SPACE_OR_COMMENT_BIT_SET.contains(myBuilder.rawLookup(-1));
-        if (at(EXCL) && !a && !languageVersionSettings.supportsFeature(LanguageFeature.TrailingCommas)) {
+        if (at(EXCL) && !WHITE_SPACE_OR_COMMENT_BIT_SET.contains(myBuilder.rawLookup(-1))) {
             PsiBuilder.Marker error = mark();
             advance(); // EXCL
             error.error("Unexpected token");
