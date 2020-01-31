@@ -407,7 +407,7 @@ abstract class FirDataFlowAnalyzer<FLOW : Flow>(
                 loopBlockEnterNode.flow,
                 conditionVariable eq true,
                 shouldForkFlow = false,
-                shouldRemoveSynthetics = true
+                shouldRemoveSynthetics = false
             )
         }
     }
@@ -416,6 +416,7 @@ abstract class FirDataFlowAnalyzer<FLOW : Flow>(
         val (blockExitNode, exitNode) = graphBuilder.exitWhileLoop(loop)
         blockExitNode.mergeIncomingFlow()
         exitNode.mergeIncomingFlow()
+        exitCommonLoop(exitNode)
     }
 
     // ----------------------------------- Do while Loop -----------------------------------
@@ -436,6 +437,22 @@ abstract class FirDataFlowAnalyzer<FLOW : Flow>(
         val (loopConditionExitNode, loopExitNode) = graphBuilder.exitDoWhileLoop(loop)
         loopConditionExitNode.mergeIncomingFlow()
         loopExitNode.mergeIncomingFlow()
+        exitCommonLoop(loopExitNode)
+    }
+
+    // ----------------------------------- [Do] while Loop common -----------------------------------
+
+    private fun exitCommonLoop(exitNode: LoopExitNode) {
+        val singlePreviousNode = exitNode.alivePreviousNodes.singleOrNull()
+        if (singlePreviousNode is LoopConditionExitNode) {
+            val variable = variableStorage.getOrCreateVariable(singlePreviousNode.fir)
+            exitNode.flow = logicSystem.approveStatementsInsideFlow(
+                exitNode.flow,
+                variable eq false,
+                shouldForkFlow = false,
+                shouldRemoveSynthetics = true
+            )
+        }
     }
 
     // ----------------------------------- Try-catch-finally -----------------------------------
