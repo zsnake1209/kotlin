@@ -320,6 +320,11 @@ public class ParsingTestGenerated extends AbstractParsingTest {
             runTest("compiler/testData/psi/Enums.kt");
         }
 
+        @TestMetadata("exclamationMarkAfterType.kt")
+        public void testExclamationMarkAfterType() throws Exception {
+            runTest("compiler/testData/psi/exclamationMarkAfterType.kt");
+        }
+
         @TestMetadata("Expressions_ERR.kt")
         public void testExpressions_ERR() throws Exception {
             runTest("compiler/testData/psi/Expressions_ERR.kt");

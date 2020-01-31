@@ -1,9 +1,4 @@
-class Foo {
-
-  init {
-    foo()
-    val c = f
-  }
-
+fun test(x: Any, b: Boolean) {
+    x as Int
+    !b
 }
-

@@ -42,7 +42,7 @@ class BlockExpressionElementType : IErrorCounterReparseableElementType("BLOCK", 
             project, chameleon, null, KotlinLanguage.INSTANCE, chameleon.chars
         )
 
-        return KotlinParser.parseBlockExpression(builder).firstChildNode
+        return KotlinParser.parseBlockExpression(builder, chameleon).firstChildNode
     }
 
     companion object {

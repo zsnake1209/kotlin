@@ -16,15 +16,20 @@
 
 package org.jetbrains.kotlin.idea.stubindex;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
+import com.intellij.util.indexing.IndexingDataKeys;
 import com.intellij.util.io.StringRef;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.config.LanguageVersionSettings;
+import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl;
 import org.jetbrains.kotlin.fileClasses.JvmFileClassInfo;
 import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil;
+import org.jetbrains.kotlin.idea.project.PlatformKt;
 import org.jetbrains.kotlin.lexer.KtTokens;
 import org.jetbrains.kotlin.load.java.JvmAbi;
 import org.jetbrains.kotlin.name.FqName;
@@ -305,5 +310,23 @@ public class IdeStubIndexService extends StubIndexService {
             facadePartNames.add(partNameRef);
         }
         return new KotlinFileStubForIde(null, packageFqNameAsString, isScript, facadeStringRef, partSimpleName, facadePartNames);
+    }
+
+    @Override
+    public LanguageVersionSettings getLanguageVersionSettings(KtFile ktFile) {
+        if (ktFile == null) {
+            return LanguageVersionSettingsImpl.DEFAULT;
+        }
+        if (ktFile.getVirtualFile() != null) {
+            return PlatformKt.getLanguageVersionSettings(ktFile.getVirtualFile(), ktFile.getProject());
+        }
+
+        VirtualFile vFile = ktFile.getUserData(IndexingDataKeys.VIRTUAL_FILE);
+        if (vFile == null) {
+            return PlatformKt.getLanguageVersionSettings(ktFile.getProject()); // dummy.kt
+        }
+        // приходят левые файлы, напр. jar:///Users/victor/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.41/785575d6b699a02527a4ad16f0972fa2c1ee583f/kotlin-stdlib-1.3.41-sources.jar!/kotlin/io/Console.kt
+        // мб проверять, что в скоупе проекта?
+        return PlatformKt.getLanguageVersionSettings(vFile, ktFile.getProject());
     }
 }

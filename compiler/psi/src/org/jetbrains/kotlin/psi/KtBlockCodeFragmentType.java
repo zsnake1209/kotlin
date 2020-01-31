@@ -44,7 +44,7 @@ public class KtBlockCodeFragmentType extends KtFileElementType {
         Project project = psi.getProject();
         Language languageForParser = getLanguageForParser(psi);
         PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, null, languageForParser, chameleon.getChars());
-        return KotlinParser.parseBlockCodeFragment(builder).getFirstChildNode();
+        return KotlinParser.parseBlockCodeFragment(builder, chameleon).getFirstChildNode();
     }
 }
 

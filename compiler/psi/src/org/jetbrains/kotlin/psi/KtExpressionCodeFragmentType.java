@@ -44,6 +44,6 @@ public class KtExpressionCodeFragmentType extends KtFileElementType {
         Project project = psi.getProject();
         Language languageForParser = getLanguageForParser(psi);
         PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, null, languageForParser, chameleon.getChars());
-        return KotlinParser.parseExpressionCodeFragment(builder).getFirstChildNode();
+        return KotlinParser.parseExpressionCodeFragment(builder, chameleon).getFirstChildNode();
     }
 }

@@ -24,6 +24,8 @@ import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.config.LanguageFeature;
+import org.jetbrains.kotlin.config.LanguageVersionSettings;
 import org.jetbrains.kotlin.lexer.KtKeywordToken;
 import org.jetbrains.kotlin.lexer.KtTokens;
 
@@ -65,15 +67,15 @@ public class KotlinParsing extends AbstractKotlinParsing {
             FILE_KEYWORD, FIELD_KEYWORD, GET_KEYWORD, SET_KEYWORD, PROPERTY_KEYWORD,
             RECEIVER_KEYWORD, PARAM_KEYWORD, SETPARAM_KEYWORD, DELEGATE_KEYWORD);
 
-    static KotlinParsing createForTopLevel(SemanticWhitespaceAwarePsiBuilder builder) {
-        KotlinParsing kotlinParsing = new KotlinParsing(builder);
+    static KotlinParsing createForTopLevel(SemanticWhitespaceAwarePsiBuilder builder, LanguageVersionSettings languageVersionSettings) {
+        KotlinParsing kotlinParsing = new KotlinParsing(builder, languageVersionSettings);
         kotlinParsing.myExpressionParsing = new KotlinExpressionParsing(builder, kotlinParsing);
         return kotlinParsing;
     }
 
-    private static KotlinParsing createForByClause(SemanticWhitespaceAwarePsiBuilder builder) {
+    private static KotlinParsing createForByClause(SemanticWhitespaceAwarePsiBuilder builder, LanguageVersionSettings languageVersionSettings) {
         SemanticWhitespaceAwarePsiBuilderForByClause builderForByClause = new SemanticWhitespaceAwarePsiBuilderForByClause(builder);
-        KotlinParsing kotlinParsing = new KotlinParsing(builderForByClause);
+        KotlinParsing kotlinParsing = new KotlinParsing(builderForByClause, languageVersionSettings);
         kotlinParsing.myExpressionParsing = new KotlinExpressionParsing(builderForByClause, kotlinParsing) {
             @Override
             protected boolean parseCallWithClosure() {
@@ -85,7 +87,7 @@ public class KotlinParsing extends AbstractKotlinParsing {
 
             @Override
             protected KotlinParsing create(SemanticWhitespaceAwarePsiBuilder builder) {
-                return createForByClause(builder);
+                return createForByClause(builder, languageVersionSettings);
             }
         };
         return kotlinParsing;
@@ -93,8 +95,9 @@ public class KotlinParsing extends AbstractKotlinParsing {
 
     private KotlinExpressionParsing myExpressionParsing;
 
-    private KotlinParsing(SemanticWhitespaceAwarePsiBuilder builder) {
+    private KotlinParsing(SemanticWhitespaceAwarePsiBuilder builder, LanguageVersionSettings languageVersionSettings) {
         super(builder);
+        this.languageVersionSettings = languageVersionSettings;
     }
 
     /*
@@ -1879,7 +1882,7 @@ public class KotlinParsing extends AbstractKotlinParsing {
         if (at(BY_KEYWORD)) {
             reference.drop();
             advance(); // BY_KEYWORD
-            createForByClause(myBuilder).myExpressionParsing.parseExpression();
+            createForByClause(myBuilder, languageVersionSettings).myExpressionParsing.parseExpression();
             delegator.done(DELEGATED_SUPER_TYPE_ENTRY);
         }
         else if (at(LPAR)) {
@@ -2239,10 +2242,16 @@ public class KotlinParsing extends AbstractKotlinParsing {
 
     private void recoverOnPlatformTypeSuffix() {
         // Recovery for platform types
-        if (at(EXCL)) {
+        boolean a = WHITE_SPACE_OR_COMMENT_BIT_SET.contains(myBuilder.rawLookup(-1));
+        if (at(EXCL) && !a && !languageVersionSettings.supportsFeature(LanguageFeature.TrailingCommas)) {
             PsiBuilder.Marker error = mark();
             advance(); // EXCL
             error.error("Unexpected token");
+        } else if (languageVersionSettings.supportsFeature(LanguageFeature.TrailingCommas)) {
+        } else {
+            PsiBuilder.Marker error = mark();
+            advance(); // EXCL
+            error.error("Enable trailing comma!");
         }
     }
 
@@ -2467,7 +2476,7 @@ public class KotlinParsing extends AbstractKotlinParsing {
 
     @Override
     protected KotlinParsing create(SemanticWhitespaceAwarePsiBuilder builder) {
-        return createForTopLevel(builder);
+        return createForTopLevel(builder, languageVersionSettings);
     }
 
     /*package*/ static class ModifierDetector implements Consumer<IElementType> {

@@ -22,6 +22,7 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.containers.Stack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
+import org.jetbrains.kotlin.config.LanguageVersionSettings;
 import org.jetbrains.kotlin.lexer.KtKeywordToken;
 import org.jetbrains.kotlin.lexer.KtToken;
 import org.jetbrains.kotlin.lexer.KtTokens;
@@ -34,6 +35,8 @@ import static org.jetbrains.kotlin.lexer.KtTokens.*;
 
 /*package*/ abstract class AbstractKotlinParsing {
     private static final Map<String, KtKeywordToken> SOFT_KEYWORD_TEXTS = new HashMap<>();
+
+    protected LanguageVersionSettings languageVersionSettings;
 
     static {
         for (IElementType type : KtTokens.SOFT_KEYWORDS.getTypes()) {

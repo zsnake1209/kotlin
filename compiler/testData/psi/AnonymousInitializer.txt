@@ -3,37 +3,51 @@ KtFile: AnonymousInitializer.kt
     <empty list>
   IMPORT_LIST
     <empty list>
-  CLASS
-    PsiElement(class)('class')
+  FUN
+    PsiElement(fun)('fun')
     PsiWhiteSpace(' ')
-    PsiElement(IDENTIFIER)('Foo')
-    PsiWhiteSpace(' ')
-    CLASS_BODY
-      PsiElement(LBRACE)('{')
-      PsiWhiteSpace('\n\n  ')
-      CLASS_INITIALIZER
-        PsiElement(init)('init')
+    PsiElement(IDENTIFIER)('test')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      VALUE_PARAMETER
+        PsiElement(IDENTIFIER)('x')
+        PsiElement(COLON)(':')
         PsiWhiteSpace(' ')
-        BLOCK
-          PsiElement(LBRACE)('{')
-          PsiWhiteSpace('\n    ')
-          CALL_EXPRESSION
+        TYPE_REFERENCE
+          USER_TYPE
             REFERENCE_EXPRESSION
-              PsiElement(IDENTIFIER)('foo')
-            VALUE_ARGUMENT_LIST
-              PsiElement(LPAR)('(')
-              PsiElement(RPAR)(')')
-          PsiWhiteSpace('\n    ')
-          PROPERTY
-            PsiElement(val)('val')
-            PsiWhiteSpace(' ')
-            PsiElement(IDENTIFIER)('c')
-            PsiWhiteSpace(' ')
-            PsiElement(EQ)('=')
-            PsiWhiteSpace(' ')
+              PsiElement(IDENTIFIER)('Ant')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      VALUE_PARAMETER
+        PsiElement(IDENTIFIER)('b')
+        PsiElement(COLON)(':')
+        PsiWhiteSpace(' ')
+        TYPE_REFERENCE
+          USER_TYPE
             REFERENCE_EXPRESSION
-              PsiElement(IDENTIFIER)('f')
-          PsiWhiteSpace('\n  ')
-          PsiElement(RBRACE)('}')
-      PsiWhiteSpace('\n\n')
+              PsiElement(IDENTIFIER)('Boolean')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n  ')
+      BINARY_WITH_TYPE
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('x')
+        PsiWhiteSpace(' ')
+        OPERATION_REFERENCE
+          PsiElement(as)('as')
+        PsiWhiteSpace(' ')
+        TYPE_REFERENCE
+          USER_TYPE
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('Int')
+      PsiWhiteSpace('\n  ')
+      PREFIX_EXPRESSION
+        OPERATION_REFERENCE
+          PsiElement(EXCL)('!')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('b')
+      PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')

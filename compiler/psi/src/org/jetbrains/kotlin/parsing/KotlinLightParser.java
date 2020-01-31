@@ -8,23 +8,28 @@ package org.jetbrains.kotlin.parsing;
 import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.util.diff.FlyweightCapableTreeStructure;
+import org.jetbrains.kotlin.config.LanguageVersionSettings;
+import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl;
 
 public class KotlinLightParser {
     public static FlyweightCapableTreeStructure<LighterASTNode> parse(PsiBuilder builder) {
-        KotlinParsing ktParsing = KotlinParsing.createForTopLevel(new SemanticWhitespaceAwarePsiBuilderImpl(builder));
+        LanguageVersionSettings languageVersionSettings = LanguageVersionSettingsImpl.DEFAULT;
+        KotlinParsing ktParsing = KotlinParsing.createForTopLevel(new SemanticWhitespaceAwarePsiBuilderImpl(builder), languageVersionSettings);
         ktParsing.parseFile();
 
         return builder.getLightTree();
     }
 
     public static FlyweightCapableTreeStructure<LighterASTNode> parseLambdaExpression(PsiBuilder psiBuilder) {
-        KotlinParsing ktParsing = KotlinParsing.createForTopLevel(new SemanticWhitespaceAwarePsiBuilderImpl(psiBuilder));
+        LanguageVersionSettings languageVersionSettings = LanguageVersionSettingsImpl.DEFAULT;
+        KotlinParsing ktParsing = KotlinParsing.createForTopLevel(new SemanticWhitespaceAwarePsiBuilderImpl(psiBuilder), languageVersionSettings);
         ktParsing.parseLambdaExpression();
         return psiBuilder.getLightTree();
     }
 
     public static FlyweightCapableTreeStructure<LighterASTNode> parseBlockExpression(PsiBuilder builder) {
-        KotlinParsing ktParsing = KotlinParsing.createForTopLevel(new SemanticWhitespaceAwarePsiBuilderImpl(builder));
+        LanguageVersionSettings languageVersionSettings = LanguageVersionSettingsImpl.DEFAULT;
+        KotlinParsing ktParsing = KotlinParsing.createForTopLevel(new SemanticWhitespaceAwarePsiBuilderImpl(builder), languageVersionSettings);
         ktParsing.parseBlockExpression();
         return builder.getLightTree();
     }

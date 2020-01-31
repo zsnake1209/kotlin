@@ -621,6 +621,15 @@ public class KtPsiUtil {
     }
 
     @Nullable
+    public static PsiElement nextLeafIgnoringWhitespaceAndComments(@NotNull PsiElement element) {
+        PsiElement next = PsiTreeUtil.nextLeaf(element, true);
+        while (next != null && KtTokens.WHITE_SPACE_OR_COMMENT_BIT_SET.contains(next.getNode().getElementType())) {
+            next = PsiTreeUtil.nextLeaf(next, true);
+        }
+        return next;
+    }
+
+    @Nullable
     public static PsiElement getPreviousWord(@NotNull PsiElement element, @NotNull String word) {
         PsiElement prev = prevLeafIgnoringWhitespaceAndComments(element);
         if (prev != null && prev.getNode().getElementType() == KtTokens.IDENTIFIER && word.equals(prev.getText())) {

@@ -81,7 +81,8 @@ public class KtFileElementType extends IStubFileElementType<KotlinFileStub> {
         Language languageForParser = getLanguageForParser(psi);
         PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, null, languageForParser, chameleon.getChars());
         KotlinParser parser = (KotlinParser) LanguageParserDefinitions.INSTANCE.forLanguage(languageForParser).createParser(project);
-        return parser.parse(this, builder, psi.getContainingFile()).getFirstChildNode();
+
+        return parser.parse(this, builder, chameleon, psi.getContainingFile()).getFirstChildNode();
     }
 
     @Override

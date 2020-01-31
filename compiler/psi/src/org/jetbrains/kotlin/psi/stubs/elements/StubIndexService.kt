@@ -20,12 +20,15 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.stubs.*
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinFileStubImpl
 import java.io.IOException
 
 open class StubIndexService protected constructor() {
+    open fun getLanguageVersionSettings(psiElement: KtFile?): LanguageVersionSettings? = null
+
     open fun indexFile(stub: KotlinFileStub, sink: IndexSink) {
     }
 

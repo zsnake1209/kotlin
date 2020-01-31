@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.parsing;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.impl.PsiBuilderAdapter;
 import com.intellij.lang.impl.PsiBuilderImpl;
@@ -35,7 +37,9 @@ public class SemanticWhitespaceAwarePsiBuilderImpl extends PsiBuilderAdapter imp
 
     private final Stack<Boolean> newlinesEnabled = new Stack<>();
 
-    private final PsiBuilderImpl delegateImpl;
+    private ASTNode chameleon = null;
+
+    final PsiBuilderImpl delegateImpl;
 
     public SemanticWhitespaceAwarePsiBuilderImpl(PsiBuilder delegate) {
         super(delegate);
@@ -59,6 +63,22 @@ public class SemanticWhitespaceAwarePsiBuilderImpl extends PsiBuilderAdapter imp
 
             builder = ((PsiBuilderAdapter) builder).getDelegate();
         }
+    }
+
+    @Override
+    public int getCurrentOffset() {
+        if (chameleon != null) {
+            return super.getCurrentOffset();
+            //return chameleon.getStartOffset() + super.getCurrentOffset();
+        } else {
+            return super.getCurrentOffset();
+        }
+    }
+
+    @Nullable
+    @Override
+    public LighterASTNode getLatestDoneMarker() {
+        return super.getLatestDoneMarker();
     }
 
     @Override
