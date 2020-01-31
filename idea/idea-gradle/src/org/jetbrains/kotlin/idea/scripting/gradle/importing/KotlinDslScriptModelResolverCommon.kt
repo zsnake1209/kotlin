@@ -19,10 +19,6 @@ import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExten
 internal val LOG = Logger.getInstance(KotlinDslScriptModelResolverCommon::class.java)
 
 abstract class KotlinDslScriptModelResolverCommon : AbstractProjectResolverExtension() {
-    override fun getExtraProjectModelClasses(): Set<Class<out Any>> {
-        return setOf(KotlinDslScriptsModel::class.java)
-    }
-
     override fun getExtraJvmArgs(): List<Pair<String, String>> {
         return listOf(
             Pair(
