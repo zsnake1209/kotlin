@@ -329,10 +329,12 @@ fun FirModifiableVariable<*>.generateAccessorsByDelegate(
     }
 
     fun thisRef(): FirExpression =
-        if (member) FirQualifiedAccessExpressionImpl(null).apply {
-            calleeReference = FirExplicitThisReference(null, null)
+        when {
+            member || extension -> FirQualifiedAccessExpressionImpl(null).apply {
+                calleeReference = FirExplicitThisReference(null, null)
+            }
+            else -> FirConstExpressionImpl(null, FirConstKind.Null, null)
         }
-        else FirConstExpressionImpl(null, FirConstKind.Null, null)
 
     fun propertyRef() = FirCallableReferenceAccessImpl(null).apply {
         calleeReference = FirResolvedNamedReferenceImpl(null, variable.name, variable.symbol)
