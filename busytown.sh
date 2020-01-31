@@ -20,7 +20,7 @@ function set_java_home() {
             ;;
     esac
 }
-readonly R4A_BUILD_NUMBER=1.3.61
+readonly R4A_BUILD_NUMBER=1.3.71
 function copy_jar_into_maven_repo() {
     local SOURCE_JAR="$1"
     local MODULE_NAME="$2"
