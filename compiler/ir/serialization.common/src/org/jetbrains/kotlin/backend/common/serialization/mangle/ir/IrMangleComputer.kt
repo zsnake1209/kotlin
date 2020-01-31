@@ -33,7 +33,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
 
     open fun IrFunction.specialValueParamPrefix(param: IrValueParameter): String = ""
 
-    protected abstract fun copy(skipSig: Boolean): IrMangleComputer
+    abstract override fun copy(skipSig: Boolean): IrMangleComputer
 
     override fun computeMangle(declaration: IrDeclaration): String {
         declaration.accept(this, true)
@@ -70,6 +70,11 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
 
         builder.append(MangleConstant.FUNCTION_NAME_PREFIX)
 
+        platformSpecificFunctionName()?.let {
+            builder.append(it)
+            return
+        }
+
         if (visibility != Visibilities.INTERNAL) builder.append(name)
         else {
             builder.append(name)
@@ -95,7 +100,10 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
             mangleValueParameter(builder, it)
         }
 
-        valueParameters.collect(builder, MangleConstant.VALUE_PARAMETERS) { mangleValueParameter(this, it) }
+        valueParameters.collect(builder, MangleConstant.VALUE_PARAMETERS) {
+            append(specialValueParamPrefix(it))
+            mangleValueParameter(this, it)
+        }
         typeParameters.collect(builder, MangleConstant.TYPE_PARAMETERS) { mangleTypeParameter(this, it) }
 
         if (!isCtor && !returnType.isUnit()) {
@@ -217,13 +225,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
     }
 
     override fun visitSimpleFunction(declaration: IrSimpleFunction, data: Boolean) {
-
         isRealExpect = isRealExpect or declaration.isExpect
-
-        declaration.platformSpecificFunctionName()?.let {
-            builder.append(it)
-            return
-        }
 
         val container = declaration.correspondingPropertySymbol?.owner ?: declaration
 

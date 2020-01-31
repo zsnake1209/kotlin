@@ -22,7 +22,7 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
         }
         assert(sig.isPublic)
 
-        if (signature.toString() == "public kotlin.reflect/KProperty.name.<get-name>|-2793925011523520086[1]") {
+        if (sig.toString() == "public platform.darwin/simd_make_int3|-6808441878446017602[0]") {
             1
         }
     }

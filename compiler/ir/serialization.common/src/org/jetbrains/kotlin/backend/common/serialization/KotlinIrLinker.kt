@@ -88,8 +88,10 @@ abstract class KotlinIrLinker(
             }
         }
 
-        class SimpleDeserializationState : DeserializationState<IdSignature>() {
+        class SimpleDeserializationState(private val checker: (IdSignature) -> Boolean) : DeserializationState<IdSignature>() {
             private val reachableTopLevels = LinkedHashSet<IdSignature>()
+
+            private fun shouldBeProcessed(idSig: IdSignature): Boolean = checker(idSig)
 
             override fun addIdSignature(key: IdSignature) {
                 reachableTopLevels.add(key)
@@ -99,9 +101,16 @@ abstract class KotlinIrLinker(
                 while (reachableTopLevels.isNotEmpty()) {
                     val reachableKey = reachableTopLevels.first()
 
-                    if (deserializedSymbols[reachableKey]?.isBound != true) {
-                        processor(reachableKey)
+                    if (shouldBeProcessed(reachableKey)) {
+                        val existedSymbol = deserializedSymbols[reachableKey]
+                        if (existedSymbol == null || !existedSymbol.isBound) {
+                            processor(reachableKey)
+                        }
                     }
+
+//                    if (deserializedSymbols[reachableKey]?.isBound != true) {
+//                        processor(reachableKey)
+//                    }
 
                     reachableTopLevels.remove(reachableKey)
                 }
@@ -109,7 +118,7 @@ abstract class KotlinIrLinker(
         }
     }
 
-    protected val globalDeserializationState = DeserializationState.SimpleDeserializationState()
+    protected val globalDeserializationState = DeserializationState.SimpleDeserializationState { true }
     private val modulesWithReachableTopLevels = mutableSetOf<IrModuleDeserializer>()
 
     //TODO: This is Native specific. Eliminate me.
@@ -158,7 +167,9 @@ abstract class KotlinIrLinker(
 
             private val fileLocalResolvedForwardDeclarations = mutableMapOf<IdSignature, IdSignature>()
 
-            val fileLocalDeserializationState = DeserializationState.SimpleDeserializationState()
+            val fileLocalDeserializationState = DeserializationState.SimpleDeserializationState {
+                moduleDeserializationState.deserializedSymbols[it]?.isBound != true
+            }
 
             fun deserializeDeclaration(idSig: IdSignature): IrDeclaration {
                 return deserializeDeclaration(loadTopLevelDeclarationProto(idSig), file)

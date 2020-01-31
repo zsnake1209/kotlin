@@ -22,7 +22,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         return builder.toString()
     }
 
-    protected abstract fun copy(skipSig: Boolean): DescriptorMangleComputer
+    abstract override fun copy(skipSig: Boolean): DescriptorMangleComputer
 
     private val typeParameterContainer = ArrayList<DeclarationDescriptor>(4)
 
@@ -67,6 +67,11 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         if (prefixLength != builder.length) builder.append(MangleConstant.FQN_SEPARATOR)
 
         builder.append(MangleConstant.FUNCTION_NAME_PREFIX)
+
+        platformSpecificFunctionName()?.let {
+            builder.append(it)
+            return
+        }
 
         if (visibility != Visibilities.INTERNAL) builder.append(name)
         else {
@@ -185,11 +190,6 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     override fun visitVariableDescriptor(descriptor: VariableDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
 
     override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, data: Boolean) {
-        descriptor.platformSpecificFunctionName()?.let {
-            builder.append(it)
-            return
-        }
-
         descriptor.mangleFunction(false, data, descriptor)
     }
 
