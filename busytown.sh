@@ -47,6 +47,7 @@ cd $PROG_DIR
 ./gradlew install ideaPlugin  :compiler:tests-common:testJar --no-daemon -Pbuild.number=$R4A_BUILD_NUMBER -PdeployVersion=$R4A_BUILD_NUMBER -Dmaven.repo.local=$OUT_DIR/m2  -Pteamcity=true
 
 # Run tests
+rm -rf $DIST_DIR/host-test-reports
 mkdir $DIST_DIR/host-test-reports
 
 ./gradlew --info --full-stacktrace --continue :compiler:test --tests *ParsingTestGenerated* -Pteamcity=true
