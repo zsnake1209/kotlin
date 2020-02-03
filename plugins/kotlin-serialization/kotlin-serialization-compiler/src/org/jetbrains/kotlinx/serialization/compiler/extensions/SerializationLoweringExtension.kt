@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.serialization.compiler.extensions
 
+import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -53,7 +54,8 @@ private class SerializerClassLowering(
 open class SerializationLoweringExtension : IrGenerationExtension {
     override fun generate(
         moduleFragment: IrModuleFragment,
-        pluginContext: IrPluginContext
+        pluginContext: IrPluginContext,
+        context: BackendContext?
     ) {
         val serializerClassLowering = SerializerClassLowering(pluginContext)
         for (file in moduleFragment.files)

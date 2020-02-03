@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.extensions
 
+import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.ir.BuiltinSymbolsBase
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -32,6 +33,7 @@ interface IrGenerationExtension {
 
     fun generate(
         moduleFragment: IrModuleFragment,
-        pluginContext: IrPluginContext
+        pluginContext: IrPluginContext,
+        backendContext: BackendContext?
     )
 }

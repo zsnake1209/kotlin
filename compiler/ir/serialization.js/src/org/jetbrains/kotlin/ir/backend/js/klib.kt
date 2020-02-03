@@ -268,7 +268,8 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
                     symbolTable,
                     typeTranslator,
                     irBuiltIns
-                )
+                ),
+                null
             )
         }
     }
