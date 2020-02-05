@@ -121,10 +121,22 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     private fun mangleType(tBuilder: StringBuilder, wtype: KotlinType) {
         when (val type = wtype.unwrap()) {
             is SimpleType -> {
-                when (val classifier = type.constructor.declarationDescriptor) {
-                    is ClassDescriptor -> classifier.accept(copy(), false)
-                    is TypeParameterDescriptor -> tBuilder.mangleTypeParameterReference(classifier)
-                    else -> error("Unexpected classifier: $classifier")
+
+                if (type is SupposititiousSimpleType) {
+                    val classId = type.overwrittenClass
+                    classId.packageFqName.let {
+                        if (!it.isRoot) {
+                            builder.append(it.asString())
+                            builder.append(MangleConstant.FQN_SEPARATOR)
+                        }
+                        builder.append(classId.relativeClassName.asString())
+                    }
+                } else {
+                    when (val classifier = type.constructor.declarationDescriptor) {
+                        is ClassDescriptor -> classifier.accept(copy(true), false)
+                        is TypeParameterDescriptor -> tBuilder.mangleTypeParameterReference(classifier)
+                        else -> error("Unexpected classifier: $classifier")
+                    }
                 }
 
                 type.arguments.ifNotEmpty {
