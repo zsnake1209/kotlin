@@ -14,9 +14,6 @@ import org.jetbrains.kotlin.idea.scripting.gradle.kotlinDslScriptsModelImportSup
 import org.jetbrains.plugins.gradle.model.Build
 
 class KotlinDslScriptModelResolver : KotlinDslScriptModelResolverCommon() {
-    override fun getModelProvider() = KotlinDslScriptModelProvider()
-    override fun requiresTaskRunning() = true
-
     override fun populateProjectExtraModels(gradleProject: IdeaProject, ideProject: DataNode<ProjectData>) {
         super.populateProjectExtraModels(gradleProject, ideProject)
 

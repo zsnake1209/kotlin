@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.idea.scripting.gradle.importing
 
 import org.gradle.tooling.BuildController
 import org.gradle.tooling.model.Model
+import org.gradle.tooling.model.ProjectModel
 import org.gradle.tooling.model.gradle.GradleBuild
 import org.gradle.tooling.model.kotlin.dsl.KotlinDslScriptsModel
 import org.jetbrains.plugins.gradle.model.ProjectImportModelProvider
@@ -19,23 +20,28 @@ class KotlinDslScriptModelProvider : ProjectImportModelProvider {
         buildModel: GradleBuild,
         consumer: ProjectImportModelProvider.BuildModelConsumer
     ) {
-        buildModel.projects.forEach {
-            if (it.parent == null) {
-                try {
-                    val model = controller.findModel(it, kotlinDslScriptModelClass)
-                    if (model != null) {
-                        consumer.consumeProjectModel(it, model, kotlinDslScriptModelClass)
-                    }
-                } catch (e: Throwable) {
-                    consumer.consumeProjectModel(it, BrokenKotlinDslScriptsModel(e), kotlinDslScriptModelClass)
-                }
-            }
-        }
+        // do nothing as "build" level models requested after "project" models
     }
 
     override fun populateProjectModels(
         controller: BuildController,
         projectModel: Model,
         modelConsumer: ProjectImportModelProvider.ProjectModelConsumer
-    ) = Unit
+    ) {
+        if (projectModel.isRootProject()) {
+            try {
+                val scriptsModel = controller.findModel(projectModel, kotlinDslScriptModelClass)
+                if (scriptsModel != null) {
+                    modelConsumer.consume(scriptsModel, kotlinDslScriptModelClass)
+                }
+            } catch (e: Throwable) {
+                modelConsumer.consume(BrokenKotlinDslScriptsModel(e), kotlinDslScriptModelClass)
+            }
+        }
+
+    }
+
+    private fun Model.isRootProject(): Boolean {
+        return (this as? ProjectModel)?.projectIdentifier?.projectPath == ":"
+    }
 }

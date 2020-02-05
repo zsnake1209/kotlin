@@ -9,11 +9,11 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.util.Pair
-import com.intellij.util.Consumer
 import org.gradle.tooling.model.kotlin.dsl.EditorReportSeverity
 import org.gradle.tooling.model.kotlin.dsl.KotlinDslModelsParameters.*
 import org.gradle.tooling.model.kotlin.dsl.KotlinDslScriptsModel
-import org.jetbrains.kotlin.idea.scripting.gradle.minimal_gradle_version_supported
+import org.jetbrains.plugins.gradle.model.ClassSetImportModelProvider
+import org.jetbrains.plugins.gradle.model.ProjectImportModelProvider
 import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExtension
 
 internal val LOG = Logger.getInstance(KotlinDslScriptModelResolverCommon::class.java)
@@ -28,14 +28,17 @@ abstract class KotlinDslScriptModelResolverCommon : AbstractProjectResolverExten
         )
     }
 
-    override fun enhanceTaskProcessing(taskNames: MutableList<String>, jvmParametersSetup: String?, initScriptConsumer: Consumer<String>) {
-        initScriptConsumer.consume(
-            "if (org.gradle.util.GradleVersion.current() >= org.gradle.util.GradleVersion.version(\"$minimal_gradle_version_supported\")) startParameter.taskNames += [\"${PREPARATION_TASK_NAME}\"]"
-        )
-    }
-
     override fun getExtraCommandLineArgs(): List<String> {
         return listOf("-P$CORRELATION_ID_GRADLE_PROPERTY_NAME=${System.nanoTime()}")
+    }
+
+    override fun getModelProvider() = KotlinDslScriptModelProvider()
+
+    override fun getProjectsLoadedModelProvider(): ProjectImportModelProvider? {
+        return ClassSetImportModelProvider(
+            emptySet(),
+            setOf(KotlinDslScriptAdditionalTask::class.java)
+        )
     }
 
     @Suppress("unused")
