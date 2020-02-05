@@ -22,6 +22,8 @@ import org.jetbrains.kotlin.name.Name
 abstract class ClassicMangleComputer : KotlinMangleComputer<IrDeclaration> {
     override fun computeMangle(declaration: IrDeclaration) = declaration.uniqSymbolName()
 
+    override fun copy(skipSig: Boolean): KotlinMangleComputer<IrDeclaration> = this
+
     private fun IrTypeParameter.effectiveParent(): IrDeclaration = when (val irParent = parent) {
         is IrClass -> irParent
         is IrConstructor -> irParent

@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
-abstract class DescriptorMangleComputer(protected val builder: StringBuilder, protected val specialPrefix: String) :
+abstract class DescriptorMangleComputer(protected val builder: StringBuilder, protected val specialPrefix: String, private val skipSig: Boolean) :
     DeclarationDescriptorVisitor<Unit, Boolean>, KotlinMangleComputer<DeclarationDescriptor> {
 
     override fun computeMangle(declaration: DeclarationDescriptor): String {
@@ -22,7 +22,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         return builder.toString()
     }
 
-    protected abstract fun copy(): DescriptorMangleComputer
+    abstract override fun copy(skipSig: Boolean): DescriptorMangleComputer
 
     private val typeParameterContainer = ArrayList<DeclarationDescriptor>(4)
 
@@ -45,13 +45,15 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         builder.append(name)
     }
 
-    open val FunctionDescriptor.platformSpecificFunctionName: String? get() = null
+    open fun FunctionDescriptor.platformSpecificFunctionName(): String? = null
 
     private fun reportUnexpectedDescriptor(descriptor: DeclarationDescriptor) {
         error("unexpected descriptor $descriptor")
     }
 
     open fun FunctionDescriptor.platformSpecificSuffix(): String? = null
+
+    open fun FunctionDescriptor.specialValueParamPrefix(param: ValueParameterDescriptor): String = ""
 
     private fun FunctionDescriptor.mangleFunction(isCtor: Boolean, prefix: Boolean, container: CallableDescriptor) {
 
@@ -65,6 +67,11 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         if (prefixLength != builder.length) builder.append(MangleConstant.FQN_SEPARATOR)
 
         builder.append(MangleConstant.FUNCTION_NAME_PREFIX)
+
+        platformSpecificFunctionName()?.let {
+            builder.append(it)
+            return
+        }
 
         if (visibility != Visibilities.INTERNAL) builder.append(name)
         else {
@@ -85,12 +92,17 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
 
     private fun FunctionDescriptor.mangleSignature(isCtor: Boolean, realTypeParameterContainer: CallableDescriptor) {
 
+        if (skipSig) return
+
         extensionReceiverParameter?.let {
             builder.append(MangleConstant.EXTENSION_RECEIVER_PREFIX)
             mangleExtensionReceiverParameter(builder, it)
         }
 
-        valueParameters.collect(builder, MangleConstant.VALUE_PARAMETERS) { mangleValueParameter(this, it) }
+        valueParameters.collect(builder, MangleConstant.VALUE_PARAMETERS) {
+            append(specialValueParamPrefix(it))
+            mangleValueParameter(this, it)
+        }
         realTypeParameterContainer.typeParameters.filter { it.containingDeclaration == realTypeParameterContainer }
             .collect(builder, MangleConstant.TYPE_PARAMETERS) { mangleTypeParameter(this, it) }
 
@@ -190,11 +202,6 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     override fun visitVariableDescriptor(descriptor: VariableDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
 
     override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, data: Boolean) {
-        descriptor.platformSpecificFunctionName?.let {
-            builder.append(it)
-            return
-        }
-
         descriptor.mangleFunction(false, data, descriptor)
     }
 

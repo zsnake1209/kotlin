@@ -27,7 +27,10 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
 
     private fun DeclarationDescriptorNonRoot.isExported(annotations: Annotations, visibility: Visibility?): Boolean {
         if (annotations.hasAnnotation(publishedApiAnnotation)) return true
+        if (isPlatformSpecificExported()) return true
+
         if (visibility != null && !visibility.isPubliclyVisible()) return false
+
 
         return containingDeclaration.accept(this@DescriptorExportCheckerVisitor, SpecialDeclarationType.REGULAR) ?: false
     }

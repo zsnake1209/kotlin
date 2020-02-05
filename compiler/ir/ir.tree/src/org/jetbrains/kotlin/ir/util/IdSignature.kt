@@ -12,6 +12,16 @@ import org.jetbrains.kotlin.name.FqName
 
 sealed class IdSignature {
 
+    enum class Flags(val recursive: Boolean) {
+        IS_EXPECT(true),
+        IS_JAVA_FOR_KOTLIN_OVERRIDE_PPROPERTY(false),
+        IS_NATIVE_INTEROP_LIBRARY(true);
+
+        fun encode(isSet: Boolean): Long = if (isSet) 1L shl ordinal else 0L
+        fun decode(flags: Long): Boolean = (flags and (1L shl ordinal) != 0L)
+    }
+
+
     abstract val isPublic: Boolean
 
     open fun isPackageSignature() = false
@@ -22,6 +32,10 @@ sealed class IdSignature {
     abstract fun packageFqName(): FqName
 
     abstract fun render(): String
+
+    fun Flags.test(): Boolean = decode(flags())
+
+    protected open fun flags(): Long = 0
 
     open val hasTopLevel: Boolean get() = !isPackageSignature()
 
@@ -37,8 +51,10 @@ sealed class IdSignature {
         override fun packageFqName() = packageFqn
 
         private fun adaptMask(old: Long): Long {
-            // TODO: design the way flags are being mutated up to declaration tree
-            return old
+            return old xor Flags.values().fold(0L) { a, f ->
+                if (!f.recursive) a or (old and (1L shl f.ordinal))
+                else a
+            }
         }
 
         override fun topLevelSignature(): IdSignature {
@@ -58,6 +74,8 @@ sealed class IdSignature {
         override fun isPackageSignature(): Boolean = id == null && classFqn.isRoot
 
         override fun nearestPublicSig(): PublicSignature = this
+
+        override fun flags(): Long = mask
 
         override fun render(): String = "${packageFqn.asString()}/${classFqn.asString()}|$id[${mask.toString(2)}]"
 
@@ -79,6 +97,8 @@ sealed class IdSignature {
             if (other is AccessorSignature) return accessorSignature == other.accessorSignature
             return accessorSignature == other
         }
+
+        override fun flags(): Long = accessorSignature.mask
 
         override fun hashCode(): Int = accessorSignature.hashCode()
     }

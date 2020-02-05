@@ -994,10 +994,10 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
         }
 
     private fun deserializeIrClass(proto: ProtoClass) =
-        withDeserializedIrDeclarationBase(proto.base) { symbol, uniqId, startOffset, endOffset, origin, fcode ->
+        withDeserializedIrDeclarationBase(proto.base) { symbol, signature, startOffset, endOffset, origin, fcode ->
             val flags = ClassFlags.decode(fcode)
 
-            symbolTable.declareClassFromLinker((symbol as IrClassSymbol).descriptor, uniqId) {
+            symbolTable.declareClassFromLinker((symbol as IrClassSymbol).descriptor, signature) {
                 IrClassImpl(
                     startOffset, endOffset, origin,
                     it,
@@ -1116,9 +1116,9 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
                     flags.isExternal,
                     flags.isTailrec,
                     flags.isSuspend,
+                    flags.isOperator,
                     flags.isExpect,
-                    flags.isFakeOverride,
-                    flags.isOperator
+                    flags.isFakeOverride
                 )
             }.apply {
                 overriddenSymbols = proto.overriddenList.map { deserializeIrSymbol(it) as IrSimpleFunctionSymbol }

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.ir.backend.jvm.serialization
 
 import org.jetbrains.kotlin.backend.common.LoggingContext
+import org.jetbrains.kotlin.backend.common.serialization.DeserializationStrategy
 import org.jetbrains.kotlin.backend.common.serialization.KotlinIrLinker
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
@@ -17,6 +18,7 @@ class JvmIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: Sym
     KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null) {
 
     override fun handleNoModuleDeserializerFound(isSignature: IdSignature): DeserializationState<*> {
+        // TODO: Implement special java-module deserializer instead of this hack
         return globalDeserializationState // !!!!!! Wrong, as external references will all have UniqId.NONE
     }
 
@@ -45,5 +47,10 @@ class JvmIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: Sym
         return deserializersForModules[moduleDescriptor]
     }
 
-    private val ModuleDescriptor.userName get() = kotlinLibrary.libraryFile.absolutePath
+    // TODO: implement special Java deserializer
+    override fun createModuleDeserializer(moduleDescriptor: ModuleDescriptor, strategy: DeserializationStrategy): IrModuleDeserializer =
+        JvmModuleDeserializer(moduleDescriptor, strategy)
+
+    private inner class JvmModuleDeserializer(moduleDescriptor: ModuleDescriptor, strategy: DeserializationStrategy) :
+        KotlinIrLinker.IrModuleDeserializer(moduleDescriptor, strategy)
 }

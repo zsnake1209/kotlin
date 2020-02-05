@@ -38,6 +38,7 @@ open class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMa
 
         override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: Nothing?) {
             packageFqn = descriptor.fqName
+            platformSpecificPackage(descriptor)
         }
 
         override fun visitPackageViewDescriptor(descriptor: PackageViewDescriptor, data: Nothing?) {
@@ -119,6 +120,7 @@ open class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMa
     }
 
     override fun composeEnumEntrySignature(descriptor: ClassDescriptor): IdSignature? {
+        if (descriptor is WrappedDeclarationDescriptor<*>) return null
         return if (mangler.run { descriptor.isExportEnumEntry() }) {
             composer.buildSignature(descriptor)
         } else null

@@ -47,14 +47,14 @@ abstract class AbstractJvmManglerIr : IrBasedKotlinManglerImpl() {
         override fun IrDeclaration.isPlatformSpecificExported() = false
     }
 
-    private class JvmIrManglerComputer(builder: StringBuilder) : IrMangleComputer(builder) {
-        override fun copy(): IrMangleComputer = JvmIrManglerComputer(builder)
+    private class JvmIrManglerComputer(builder: StringBuilder, skipSig: Boolean) : IrMangleComputer(builder, skipSig) {
+        override fun copy(skipSig: Boolean): IrMangleComputer = JvmIrManglerComputer(builder, skipSig)
     }
 
     override fun getExportChecker(): KotlinExportChecker<IrDeclaration> = exportChecker
 
     override fun getMangleComputer(prefix: String): KotlinMangleComputer<IrDeclaration> {
-        return JvmIrManglerComputer(StringBuilder(256))
+        return JvmIrManglerComputer(StringBuilder(256), false)
     }
 }
 
@@ -70,9 +70,9 @@ abstract class AbstractJvmDescriptorMangler(private val mainDetector: MainFuncti
         override fun DeclarationDescriptor.isPlatformSpecificExported() = false
     }
 
-    private class JvmDescriptorManglerComputer(builder: StringBuilder, prefix: String, private val mainDetector: MainFunctionDetector?) :
-        DescriptorMangleComputer(builder, prefix) {
-        override fun copy(): DescriptorMangleComputer = JvmDescriptorManglerComputer(builder, specialPrefix, mainDetector)
+    private class JvmDescriptorManglerComputer(builder: StringBuilder, prefix: String, private val mainDetector: MainFunctionDetector?, skipSig: Boolean) :
+        DescriptorMangleComputer(builder, prefix, skipSig) {
+        override fun copy(skipSig: Boolean): DescriptorMangleComputer = JvmDescriptorManglerComputer(builder, specialPrefix, mainDetector, skipSig)
 
         private fun isMainFunction(descriptor: FunctionDescriptor): Boolean = mainDetector?.isMain(descriptor) ?: false
 
@@ -86,7 +86,7 @@ abstract class AbstractJvmDescriptorMangler(private val mainDetector: MainFuncti
     override fun getExportChecker(): KotlinExportChecker<DeclarationDescriptor> = exportChecker
 
     override fun getMangleComputer(prefix: String): KotlinMangleComputer<DeclarationDescriptor> {
-        return JvmDescriptorManglerComputer(StringBuilder(256), prefix, mainDetector)
+        return JvmDescriptorManglerComputer(StringBuilder(256), prefix, mainDetector, false)
     }
 }
 

@@ -29,6 +29,8 @@ abstract class IrExportCheckerVisitor : IrElementVisitor<Boolean, Nothing?>, Kot
 
     private fun IrDeclaration.isExported(annotations: List<IrConstructorCall>, visibility: Visibility?): Boolean {
         if (annotations.hasAnnotation(publishedApiAnnotation)) return true
+        if (isPlatformSpecificExported()) return true
+
         if (visibility != null && !visibility.isPubliclyVisible()) return false
 
         return parent.accept(this@IrExportCheckerVisitor, null)
