@@ -56,7 +56,7 @@ fun compile(
     val (moduleFragment: IrModuleFragment, dependencyModules, irBuiltIns, symbolTable, deserializer) =
         loadIr(project, mainModule, analyzer, configuration, allDependencies, friendDependencies)
 
-    moduleFragment.acceptVoid(ManglerChecker(JsManglerClassic, JsManglerIr, Ir2DescriptorManglerAdapter(JsManglerDesc)))
+    moduleFragment.acceptVoid(ManglerChecker(JsManglerIr, Ir2DescriptorManglerAdapter(JsManglerDesc)))
 
     val moduleDescriptor = moduleFragment.descriptor
 
