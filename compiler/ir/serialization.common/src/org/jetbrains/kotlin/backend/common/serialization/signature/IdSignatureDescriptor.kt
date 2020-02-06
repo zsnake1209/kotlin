@@ -114,6 +114,9 @@ open class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMa
 
     override fun composeSignature(descriptor: DeclarationDescriptor): IdSignature? {
         if (descriptor is WrappedDeclarationDescriptor<*>) return null
+        if (descriptor.containingDeclaration?.name?.asString() == "InvokeOnCancelling") {
+            1
+        }
         return if (mangler.run { descriptor.isExported() }) {
             composer.buildSignature(descriptor)
         } else null

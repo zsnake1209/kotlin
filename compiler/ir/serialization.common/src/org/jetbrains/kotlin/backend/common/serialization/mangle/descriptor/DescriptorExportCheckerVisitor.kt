@@ -26,13 +26,10 @@ abstract class DescriptorExportCheckerVisitor : DeclarationDescriptorVisitor<Boo
     private fun Visibility.isPubliclyVisible(): Boolean = isPublicAPI || this === Visibilities.INTERNAL
 
     private fun DeclarationDescriptorNonRoot.isExported(annotations: Annotations, visibility: Visibility?): Boolean {
-        if (annotations.hasAnnotation(publishedApiAnnotation)) return true
-        if (isPlatformSpecificExported()) return true
+        val speciallyExported = annotations.hasAnnotation(publishedApiAnnotation) || isPlatformSpecificExported()
+        val selfExported = speciallyExported || visibility == null || visibility.isPubliclyVisible()
 
-        if (visibility != null && !visibility.isPubliclyVisible()) return false
-
-
-        return containingDeclaration.accept(this@DescriptorExportCheckerVisitor, SpecialDeclarationType.REGULAR) ?: false
+        return selfExported && containingDeclaration.accept(this@DescriptorExportCheckerVisitor, SpecialDeclarationType.REGULAR) ?: false
     }
 
     override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: SpecialDeclarationType) = true
