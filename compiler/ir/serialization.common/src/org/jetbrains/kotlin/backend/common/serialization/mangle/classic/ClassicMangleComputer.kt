@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.common.serialization.mangle.classic
 
 import org.jetbrains.kotlin.backend.common.ir.isProperExpect
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
+import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleMode
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
@@ -22,7 +23,7 @@ import org.jetbrains.kotlin.name.Name
 abstract class ClassicMangleComputer : KotlinMangleComputer<IrDeclaration> {
     override fun computeMangle(declaration: IrDeclaration) = declaration.uniqSymbolName()
 
-    override fun copy(skipSig: Boolean): KotlinMangleComputer<IrDeclaration> = this
+    override fun copy(newMode: MangleMode): KotlinMangleComputer<IrDeclaration> = this
 
     private fun IrTypeParameter.effectiveParent(): IrDeclaration = when (val irParent = parent) {
         is IrClass -> irParent

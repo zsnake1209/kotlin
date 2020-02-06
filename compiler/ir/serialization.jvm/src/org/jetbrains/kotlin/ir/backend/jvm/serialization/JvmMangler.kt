@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.ir.backend.jvm.serialization
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinExportChecker
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
+import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleMode
 import org.jetbrains.kotlin.backend.common.serialization.mangle.classic.ClassicExportChecker
 import org.jetbrains.kotlin.backend.common.serialization.mangle.classic.ClassicKotlinManglerImpl
 import org.jetbrains.kotlin.backend.common.serialization.mangle.classic.ClassicMangleComputer
@@ -32,7 +33,7 @@ abstract class AbstractJvmManglerClassic : ClassicKotlinManglerImpl() {
 
     override fun getExportChecker(): ClassicExportChecker = exportChecker
 
-    override fun getMangleComputer(prefix: String): KotlinMangleComputer<IrDeclaration> = JvmClassicMangleComputer()
+    override fun getMangleComputer(mode: MangleMode): KotlinMangleComputer<IrDeclaration> = JvmClassicMangleComputer()
 }
 
 object JvmManglerClassic : AbstractJvmManglerClassic()
@@ -47,14 +48,14 @@ abstract class AbstractJvmManglerIr : IrBasedKotlinManglerImpl() {
         override fun IrDeclaration.isPlatformSpecificExported() = false
     }
 
-    private class JvmIrManglerComputer(builder: StringBuilder, skipSig: Boolean) : IrMangleComputer(builder, skipSig) {
-        override fun copy(skipSig: Boolean): IrMangleComputer = JvmIrManglerComputer(builder, skipSig)
+    private class JvmIrManglerComputer(builder: StringBuilder, mode: MangleMode) : IrMangleComputer(builder, mode) {
+        override fun copy(newMode: MangleMode): IrMangleComputer = JvmIrManglerComputer(builder, newMode)
     }
 
     override fun getExportChecker(): KotlinExportChecker<IrDeclaration> = exportChecker
 
-    override fun getMangleComputer(prefix: String): KotlinMangleComputer<IrDeclaration> {
-        return JvmIrManglerComputer(StringBuilder(256), false)
+    override fun getMangleComputer(mode: MangleMode): KotlinMangleComputer<IrDeclaration> {
+        return JvmIrManglerComputer(StringBuilder(256), mode)
     }
 }
 
@@ -70,9 +71,10 @@ abstract class AbstractJvmDescriptorMangler(private val mainDetector: MainFuncti
         override fun DeclarationDescriptor.isPlatformSpecificExported() = false
     }
 
-    private class JvmDescriptorManglerComputer(builder: StringBuilder, prefix: String, private val mainDetector: MainFunctionDetector?, skipSig: Boolean) :
-        DescriptorMangleComputer(builder, prefix, skipSig) {
-        override fun copy(skipSig: Boolean): DescriptorMangleComputer = JvmDescriptorManglerComputer(builder, specialPrefix, mainDetector, skipSig)
+    private class JvmDescriptorManglerComputer(builder: StringBuilder, private val mainDetector: MainFunctionDetector?, mode: MangleMode) :
+        DescriptorMangleComputer(builder, mode) {
+        override fun copy(newMode: MangleMode): DescriptorMangleComputer =
+            JvmDescriptorManglerComputer(builder, mainDetector, newMode)
 
         private fun isMainFunction(descriptor: FunctionDescriptor): Boolean = mainDetector?.isMain(descriptor) ?: false
 
@@ -85,8 +87,8 @@ abstract class AbstractJvmDescriptorMangler(private val mainDetector: MainFuncti
 
     override fun getExportChecker(): KotlinExportChecker<DeclarationDescriptor> = exportChecker
 
-    override fun getMangleComputer(prefix: String): KotlinMangleComputer<DeclarationDescriptor> {
-        return JvmDescriptorManglerComputer(StringBuilder(256), prefix, mainDetector, false)
+    override fun getMangleComputer(mode: MangleMode): KotlinMangleComputer<DeclarationDescriptor> {
+        return JvmDescriptorManglerComputer(StringBuilder(256), mainDetector, mode)
     }
 }
 

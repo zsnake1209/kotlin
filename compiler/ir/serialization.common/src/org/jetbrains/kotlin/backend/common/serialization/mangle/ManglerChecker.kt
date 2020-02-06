@@ -22,6 +22,8 @@ class ManglerChecker(vararg _manglers: KotlinMangler<IrDeclaration>) : IrElement
 
     private fun KotlinMangler<IrDeclaration>.isExportCheck(declaration: IrDeclaration) = declaration.isExported()
     private fun KotlinMangler<IrDeclaration>.stringMangle(declaration: IrDeclaration) = declaration.mangleString
+    private fun KotlinMangler<IrDeclaration>.signatureMangle(declaration: IrDeclaration) = declaration.signatureString
+    private fun KotlinMangler<IrDeclaration>.fqnMangle(declaration: IrDeclaration) = declaration.fqnString
 
     private fun <T : Any, R> Iterable<T>.checkAllEqual(init: R, op: T.() -> R, onError: (T, R, T, R) -> Unit): R {
         var prev: T? = null
@@ -55,8 +57,18 @@ class ManglerChecker(vararg _manglers: KotlinMangler<IrDeclaration>) : IrElement
         if (!exported) return
 
         manglers.checkAllEqual("", { stringMangle(declaration) }) { m1, r1, m2, r2 ->
-            println("${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
-            error("${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
+            println("FULL: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
+            error("FULL: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
+        }
+
+        manglers.checkAllEqual("", { signatureMangle(declaration) }) { m1, r1, m2, r2 ->
+            println("SIG: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
+            error("SIG: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
+        }
+
+        manglers.checkAllEqual("", { fqnMangle(declaration) }) { m1, r1, m2, r2 ->
+            println("FQN: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
+            error("FQN: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
         }
 
         declaration.acceptChildrenVoid(this)

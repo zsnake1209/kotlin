@@ -15,7 +15,14 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.name.FqName
 
-open class IdSignatureSerializer(val mangler: KotlinMangler.IrMangler) {
+open class IdSignatureSerializer(val mangler: KotlinMangler.IrMangler) : IdSignatureComputer {
+
+    override fun computeSignature(declaration: IrDeclaration): IdSignature? {
+        return if (mangler.run { declaration.isExported() }) {
+            composePublicIdSignature(declaration)
+        } else null
+    }
+
     private fun composeSignatureForDeclaration(declaration: IrDeclaration): IdSignature {
         return if (mangler.run { declaration.isExported() }) {
             composePublicIdSignature(declaration)
@@ -56,24 +63,24 @@ open class IdSignatureSerializer(val mangler: KotlinMangler.IrMangler) {
         override fun visitSimpleFunction(declaration: IrSimpleFunction) {
             val property = declaration.correspondingPropertySymbol
             if (property != null) {
-                hashIdAcc = mangler.run { declaration.hashedMangle }
+                hashIdAcc = mangler.run { declaration.signatureMangle }
                 property.owner.acceptVoid(this)
                 classFanSegments.add(declaration.name.asString())
             } else {
-                hashId = mangler.run { declaration.hashedMangle }
+                hashId = mangler.run { declaration.signatureMangle }
                 collectFqNames(declaration)
             }
             setExpected(declaration.isExpect)
         }
 
         override fun visitConstructor(declaration: IrConstructor) {
-            hashId = mangler.run { declaration.hashedMangle }
+            hashId = mangler.run { declaration.signatureMangle }
             collectFqNames(declaration)
             setExpected(declaration.isExpect)
         }
 
         override fun visitProperty(declaration: IrProperty) {
-            hashId = mangler.run { declaration.hashedMangle }
+            hashId = mangler.run { declaration.signatureMangle }
             collectFqNames(declaration)
             setExpected(declaration.isExpect)
         }

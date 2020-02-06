@@ -7,8 +7,8 @@ package org.jetbrains.kotlin.backend.common.serialization.mangle.ir
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
 import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleConstant
+import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleMode
 import org.jetbrains.kotlin.backend.common.serialization.mangle.collect
-import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
@@ -22,8 +22,8 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 
-abstract class IrMangleComputer(protected val builder: StringBuilder, private val skipSig: Boolean) : IrElementVisitor<Unit, Boolean>,
-    KotlinMangleComputer<IrDeclaration> {
+abstract class IrMangleComputer(protected val builder: StringBuilder, private val mode: MangleMode) :
+    IrElementVisitor<Unit, Boolean>, KotlinMangleComputer<IrDeclaration> {
 
     private val typeParameterContainer = ArrayList<IrDeclaration>(4)
 
@@ -33,51 +33,65 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
 
     open fun IrFunction.specialValueParamPrefix(param: IrValueParameter): String = ""
 
-    abstract override fun copy(skipSig: Boolean): IrMangleComputer
+    abstract override fun copy(newMode: MangleMode): IrMangleComputer
+
+    private fun StringBuilder.appendName(s: String) {
+        if (mode.fqn) {
+            append(s)
+        }
+    }
+
+    private fun StringBuilder.appendName(c: Char) {
+        if (mode.fqn) {
+            append(c)
+        }
+    }
+
+    private fun StringBuilder.appendSignature(s: String) {
+        if (mode.signature) {
+            append(s)
+        }
+    }
+
+    private fun StringBuilder.appendSignature(c: Char) {
+        if (mode.signature) {
+            append(c)
+        }
+    }
+
+    private fun StringBuilder.appendSignature(i: Int) {
+        if (mode.signature) {
+            append(i)
+        }
+    }
 
     override fun computeMangle(declaration: IrDeclaration): String {
         declaration.accept(this, true)
         return builder.toString()
     }
 
-    private fun addPrefix(prefix: String, addPrefix: Boolean): Int {
-        if (addPrefix) {
-            builder.append(prefix)
-            builder.append(MangleConstant.PREFIX_SEPARATOR)
-        }
-        return builder.length
-    }
-
-    private fun IrDeclaration.mangleSimpleDeclaration(prefix: String, addPrefix: Boolean, name: String) {
-        val prefixLength = addPrefix(prefix, addPrefix)
+    private fun IrDeclaration.mangleSimpleDeclaration(name: String) {
         parent.accept(this@IrMangleComputer, false)
-
-        if (prefixLength != builder.length) builder.append(MangleConstant.FQN_SEPARATOR)
-
-        builder.append(name)
+        builder.appendName(name)
     }
 
-    private fun IrFunction.mangleFunction(isCtor: Boolean, prefix: Boolean, container: IrDeclaration) {
+    private fun IrFunction.mangleFunction(isCtor: Boolean, container: IrDeclaration) {
 
         isRealExpect = isRealExpect or isExpect
-
-        val prefixLength = addPrefix(MangleConstant.FUN_PREFIX, prefix)
 
         typeParameterContainer.add(container)
         container.parent.accept(this@IrMangleComputer, false)
 
-        if (prefixLength != builder.length) builder.append(MangleConstant.FQN_SEPARATOR)
-
-        builder.append(MangleConstant.FUNCTION_NAME_PREFIX)
+        builder.appendName(MangleConstant.FUNCTION_NAME_PREFIX)
 
         platformSpecificFunctionName()?.let {
             builder.append(it)
             return
         }
 
-        if (visibility != Visibilities.INTERNAL) builder.append(name)
-        else {
-            builder.append(name)
+        builder.appendName(name.asString())
+
+        if (visibility == Visibilities.INTERNAL) {
             builder.append(MangleConstant.MODULE_SEPARATOR)
             val moduleName = try {
                 module.name.asString().run { substring(1, lastIndex) }
@@ -88,20 +102,18 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
         }
 
         mangleSignature(isCtor)
-
-        if (prefix && isRealExpect) builder.append(MangleConstant.EXPECT_MARK)
     }
 
     private fun IrFunction.mangleSignature(isCtor: Boolean) {
-        if (skipSig) return
+        if (!mode.signature) return
 
         extensionReceiverParameter?.let {
-            builder.append(MangleConstant.EXTENSION_RECEIVER_PREFIX)
+            builder.appendSignature(MangleConstant.EXTENSION_RECEIVER_PREFIX)
             mangleValueParameter(builder, it)
         }
 
         valueParameters.collect(builder, MangleConstant.VALUE_PARAMETERS) {
-            append(specialValueParamPrefix(it))
+            appendSignature(specialValueParamPrefix(it))
             mangleValueParameter(this, it)
         }
         typeParameters.collect(builder, MangleConstant.TYPE_PARAMETERS) { mangleTypeParameter(this, it) }
@@ -120,12 +132,12 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
     private fun mangleValueParameter(vpBuilder: StringBuilder, param: IrValueParameter) {
         mangleType(vpBuilder, param.type)
 
-        if (param.isVararg) vpBuilder.append(MangleConstant.VAR_ARG_MARK)
+        if (param.isVararg) vpBuilder.appendSignature(MangleConstant.VAR_ARG_MARK)
     }
 
     private fun mangleTypeParameter(tpBuilder: StringBuilder, param: IrTypeParameter) {
-        tpBuilder.append(param.index)
-        tpBuilder.append(MangleConstant.UPPER_BOUND_SEPARATOR)
+        tpBuilder.appendSignature(param.index)
+        tpBuilder.appendSignature(MangleConstant.UPPER_BOUND_SEPARATOR)
 
         param.superTypes.collect(tpBuilder, MangleConstant.UPPER_BOUNDS) { mangleType(this, it) }
     }
@@ -135,27 +147,27 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
         val ci = typeParameterContainer.indexOf(parent)
         // TODO: what should we do in this case?
 //            require(ci >= 0) { "No type container found for ${typeParameter.render()}" }
-        append(ci)
-        append(MangleConstant.INDEX_SEPARATOR)
-        append(typeParameter.index)
+        appendSignature(ci)
+        appendSignature(MangleConstant.INDEX_SEPARATOR)
+        appendSignature(typeParameter.index)
     }
 
     private fun mangleType(tBuilder: StringBuilder, type: IrType) {
         when (type) {
             is IrSimpleType -> {
                 when (val classifier = type.classifier) {
-                    is IrClassSymbol -> classifier.owner.accept(copy(true), false)
+                    is IrClassSymbol -> classifier.owner.accept(copy(MangleMode.FQNAME), false)
                     is IrTypeParameterSymbol -> tBuilder.mangleTypeParameterReference(classifier.owner)
                 }
 
                 type.arguments.ifNotEmpty {
                     collect(tBuilder, MangleConstant.TYPE_ARGUMENTS) { arg ->
                         when (arg) {
-                            is IrStarProjection -> append(MangleConstant.STAR_MARK)
+                            is IrStarProjection -> appendSignature(MangleConstant.STAR_MARK)
                             is IrTypeProjection -> {
                                 if (arg.variance != Variance.INVARIANT) {
-                                    append(arg.variance.label)
-                                    append(MangleConstant.VARIANCE_SEPARATOR)
+                                    appendSignature(arg.variance.label)
+                                    appendSignature(MangleConstant.VARIANCE_SEPARATOR)
                                 }
 
                                 mangleType(this, arg.type)
@@ -164,9 +176,9 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
                     }
                 }
 
-                if (type.hasQuestionMark) tBuilder.append(MangleConstant.Q_MARK)
+                if (type.hasQuestionMark) tBuilder.appendSignature(MangleConstant.Q_MARK)
             }
-            is IrDynamicType -> tBuilder.append(MangleConstant.DYNAMIC_MARK)
+            is IrDynamicType -> tBuilder.appendSignature(MangleConstant.DYNAMIC_MARK)
             else -> error("Unexpected type $type")
         }
     }
@@ -176,52 +188,43 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
     override fun visitClass(declaration: IrClass, data: Boolean) {
         isRealExpect = isRealExpect or declaration.isExpect
         typeParameterContainer.add(declaration)
-        declaration.mangleSimpleDeclaration(MangleConstant.CLASS_PREFIX, data, declaration.name.asString())
-
-        if (data && isRealExpect) builder.append(MangleConstant.EXPECT_MARK)
+        declaration.mangleSimpleDeclaration(declaration.name.asString())
     }
 
     override fun visitPackageFragment(declaration: IrPackageFragment, data: Boolean) {
-        declaration.fqName.let { if (!it.isRoot) builder.append(it.asString()) }
+        declaration.fqName.let { if (!it.isRoot) builder.appendName(it.asString()) }
     }
 
     override fun visitProperty(declaration: IrProperty, data: Boolean) {
         val extensionReceiver = declaration.run { (getter ?: setter)?.extensionReceiverParameter }
 
-        val prefixLength = addPrefix(MangleConstant.PROPERTY_PREFIX, data)
-
         isRealExpect = isRealExpect or declaration.isExpect
         typeParameterContainer.add(declaration)
         declaration.parent.accept(this, false)
 
-        if (prefixLength != builder.length) builder.append(MangleConstant.FQN_SEPARATOR)
-
         if (extensionReceiver != null) {
-            builder.append(MangleConstant.EXTENSION_RECEIVER_PREFIX)
+            builder.appendSignature(MangleConstant.EXTENSION_RECEIVER_PREFIX)
             mangleValueParameter(builder, extensionReceiver)
         }
 
-        builder.append(declaration.name)
-        if (data && isRealExpect) builder.append(MangleConstant.EXPECT_MARK)
+        builder.appendName(declaration.name.asString())
     }
 
     override fun visitField(declaration: IrField, data: Boolean) =
-        declaration.mangleSimpleDeclaration(MangleConstant.FIELD_PREFIX, data, declaration.name.asString())
+        declaration.mangleSimpleDeclaration(declaration.name.asString())
 
     override fun visitEnumEntry(declaration: IrEnumEntry, data: Boolean) {
-        declaration.mangleSimpleDeclaration(MangleConstant.ENUM_ENTRY_PREFIX, data, declaration.name.asString())
-        if (data && isRealExpect) builder.append(MangleConstant.EXPECT_MARK)
+        declaration.mangleSimpleDeclaration(declaration.name.asString())
     }
 
     override fun visitTypeAlias(declaration: IrTypeAlias, data: Boolean) =
-        declaration.mangleSimpleDeclaration(MangleConstant.TYPE_ALIAS_PREFIX, data, declaration.name.asString())
+        declaration.mangleSimpleDeclaration(declaration.name.asString())
 
     override fun visitTypeParameter(declaration: IrTypeParameter, data: Boolean) {
-        addPrefix(MangleConstant.TYPE_PARAM_PREFIX, data)
         declaration.effectiveParent().accept(this, data)
 
-        builder.append(MangleConstant.TYPE_PARAM_INDEX_PREFIX)
-        builder.append(declaration.index)
+        builder.appendSignature(MangleConstant.TYPE_PARAM_INDEX_PREFIX)
+        builder.appendSignature(declaration.index)
     }
 
     override fun visitSimpleFunction(declaration: IrSimpleFunction, data: Boolean) {
@@ -229,8 +232,8 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
 
         val container = declaration.correspondingPropertySymbol?.owner ?: declaration
 
-        declaration.mangleFunction(false, data, container)
+        declaration.mangleFunction(false, container)
     }
 
-    override fun visitConstructor(declaration: IrConstructor, data: Boolean) = declaration.mangleFunction(true, data, declaration)
+    override fun visitConstructor(declaration: IrConstructor, data: Boolean) = declaration.mangleFunction(true, declaration)
 }
