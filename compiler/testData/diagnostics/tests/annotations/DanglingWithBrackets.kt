@@ -1,16 +1,17 @@
-annotation class Ann
+// !LANGUAGE: +NewInference
 
-class C {
-    fun test() {
-        @Ann<!SYNTAX!><!>
-    }
+// FILE: Convertor.java
 
-    fun foo() {
-        class Local {
-            @Ann<!SYNTAX!><!>
-        }
-    }
-    @Ann<!SYNTAX!><!>
+public interface Convertor<Src, Dst> {
+    Out<Dst> convert(Out<Src> o);
 }
 
-@Ann<!SYNTAX!><!>
+// FILE: main.kt
+
+fun takeConvertor(c: Convertor<String, String>) {}
+
+class Out<out T> {}
+
+fun main(o: Out<Nothing?>) {
+    takeConvertor(Convertor { o }) // NI: Null can not be a value of a non-null type TypeVariable(Dst)!
+}

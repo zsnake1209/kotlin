@@ -148,10 +148,28 @@ class ConstraintInjector(
             }
         }
 
-        fun runIsSubtypeOf(lowerType: KotlinTypeMarker, upperType: KotlinTypeMarker) {
-            if (!AbstractTypeChecker.isSubtypeOf(this@TypeCheckerContext as AbstractTypeCheckerContext, lowerType, upperType)) {
+        fun runIsSubtypeOf(
+            lowerType: KotlinTypeMarker,
+            upperType: KotlinTypeMarker,
+            shouldTryDifferentFlexibilityForUpperType: Boolean = false
+        ) {
+            fun isSubtypeOf(upperType: KotlinTypeMarker) =
+                AbstractTypeChecker.isSubtypeOf(
+                    this@TypeCheckerContext as AbstractTypeCheckerContext,
+                    lowerType,
+                    upperType
+                )
+
+            if (!isSubtypeOf(upperType)) {
                 // todo improve error reporting -- add information about base types
-                c.addError(NewConstraintError(lowerType, upperType, position))
+                if (shouldTryDifferentFlexibilityForUpperType && upperType is SimpleType) {
+                    val flexibleUpperType = createFlexibleType(upperType, upperType.withNullability(true))
+                    if (!isSubtypeOf(flexibleUpperType)) {
+                        c.addError(NewConstraintError(lowerType, flexibleUpperType, position))
+                    }
+                } else {
+                    c.addError(NewConstraintError(lowerType, upperType, position))
+                }
             }
         }
 
@@ -181,10 +199,14 @@ class ConstraintInjector(
         }
 
         // from ConstraintIncorporator.Context
-        override fun addNewIncorporatedConstraint(lowerType: KotlinTypeMarker, upperType: KotlinTypeMarker) {
+        override fun addNewIncorporatedConstraint(
+            lowerType: KotlinTypeMarker,
+            upperType: KotlinTypeMarker,
+            shouldTryDifferentFlexibilityForUpperType: Boolean
+        ) {
             if (lowerType === upperType) return
             if (c.isAllowedType(lowerType) && c.isAllowedType(upperType)) {
-                runIsSubtypeOf(lowerType, upperType)
+                runIsSubtypeOf(lowerType, upperType, shouldTryDifferentFlexibilityForUpperType)
             }
         }
 

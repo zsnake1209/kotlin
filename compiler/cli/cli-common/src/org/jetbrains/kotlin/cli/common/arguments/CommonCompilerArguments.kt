@@ -129,7 +129,7 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
         value = "-Xnew-inference",
         description = "Enable new experimental generic type inference algorithm"
     )
-    var newInference: Boolean by FreezableVar(false)
+    var newInference: Boolean by FreezableVar(true)
 
     @Argument(
         value = "-Xinline-classes",
