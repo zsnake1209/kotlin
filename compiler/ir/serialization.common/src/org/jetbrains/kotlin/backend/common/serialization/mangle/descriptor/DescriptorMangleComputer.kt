@@ -60,7 +60,10 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     private var isRealExpect = false
 
     private fun DeclarationDescriptor.mangleSimpleDeclaration(name: String) {
+        val l = builder.length
         containingDeclaration?.accept(this@DescriptorMangleComputer, false)
+
+        if (builder.length != l) builder.appendName(MangleConstant.FQN_SEPARATOR)
 
         builder.appendName(name)
     }

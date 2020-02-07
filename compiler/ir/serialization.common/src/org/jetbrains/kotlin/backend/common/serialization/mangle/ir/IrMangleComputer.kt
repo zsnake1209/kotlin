@@ -71,7 +71,11 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
     }
 
     private fun IrDeclaration.mangleSimpleDeclaration(name: String) {
+        val l = builder.length
         parent.accept(this@IrMangleComputer, false)
+
+        if (builder.length != l) builder.appendName(MangleConstant.FQN_SEPARATOR)
+
         builder.appendName(name)
     }
 
