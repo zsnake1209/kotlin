@@ -966,7 +966,7 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
 
         // make sure this symbol is known to linker
         referenceIrSymbol(result.symbol, sig)
-        result.annotations.addAll(deserializeAnnotations(proto.base.annotationList))
+        result.annotations += deserializeAnnotations(proto.base.annotationList)
         result.parent = parentsStack.peek()!!
         return result
     }
@@ -1014,12 +1014,11 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
                     isFun = flags.isFun
                 )
             }.usingParent {
-                deserializeTypeParameters(proto.typeParameterList, true)
+                typeParameters = deserializeTypeParameters(proto.typeParameterList, true)
 
                 proto.declarationList.mapTo(declarations) { deserializeDeclaration(it) }
 
                 thisReceiver = deserializeIrValueParameter(proto.thisReceiver, -1)
-                //typeParameters = proto.typeParameters.typeParameterList.map { deserializeIrTypeParameter(it) }
 
                 superTypes = proto.superTypeList.map { deserializeIrType(it) }
 
@@ -1042,25 +1041,35 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
                     origin
                 )
             }.usingParent {
-                deserializeTypeParameters(proto.typeParameterList, true)
-//                typeParameters = proto.typeParameters.typeParameterList.map {
-//                    deserializeIrTypeParameter(it)
-//                }
+                typeParameters = deserializeTypeParameters(proto.typeParameterList, true)
 
                 (descriptor as? WrappedTypeAliasDescriptor)?.bind(this)
             }
         }
 
-    private fun IrTypeParametersContainer.deserializeTypeParameters(protos: List<ProtoTypeParameter>, isGlobal: Boolean) {
+    private fun deserializeTypeParameters(protos: List<ProtoTypeParameter>, isGlobal: Boolean): List<IrTypeParameter> {
         // NOTE: fun <C : MutableCollection<in T>, T : Any> Array<out T?>.filterNotNullTo(destination: C): C
+        val result = ArrayList<IrTypeParameter>(protos.size)
         for (index in protos.indices) {
             val proto = protos[index]
-            typeParameters.add(deserializeIrTypeParameter(proto, index, isGlobal))
+            result.add(deserializeIrTypeParameter(proto, index, isGlobal))
         }
 
         for (i in protos.indices) {
-            protos[i].superTypeList.mapTo(typeParameters[i].superTypes) { deserializeIrType(it) }
+            protos[i].superTypeList.mapTo(result[i].superTypes) { deserializeIrType(it) }
         }
+
+        return result
+    }
+
+    private fun deserializeValueParameters(protos: List<ProtoValueParameter>): List<IrValueParameter> {
+        val result = ArrayList<IrValueParameter>(protos.size)
+
+        for (i in protos.indices) {
+            result.add(deserializeIrValueParameter(protos[i], i))
+        }
+
+        return result
     }
 
     private inline fun <T : IrFunction> withDeserializedIrFunctionBase(
@@ -1069,14 +1078,11 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
     ) = withDeserializedIrDeclarationBase(proto.base) { symbol, idSig, startOffset, endOffset, origin, fcode ->
         symbolTable.withScope(symbol.descriptor) {
             block(symbol as IrFunctionSymbol, idSig, startOffset, endOffset, origin, fcode).usingParent {
-                deserializeTypeParameters(proto.typeParameterList, false)
+                typeParameters = deserializeTypeParameters(proto.typeParameterList, false)
+                valueParameters = deserializeValueParameters(proto.valueParameterList)
+
                 val nameType = BinaryNameAndType.decode(proto.nameType)
                 returnType = deserializeIrType(nameType.typeIndex)
-
-                for (i in 0 until proto.valueParameterCount) {
-                    val valueParameter = deserializeIrValueParameter(proto.valueParameterList[i], i)
-                    valueParameters.add(valueParameter)
-                }
 
                 if (proto.hasDispatchReceiver())
                     dispatchReceiverParameter = deserializeIrValueParameter(proto.dispatchReceiver, -1)
@@ -1086,17 +1092,6 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
                     body = deserializeStatementBody(proto.body) as IrBody
                 }
             }
-//            block(symbol as IrFunctionSymbol, startOffset, endOffset, origin).usingParent {
-//                typeParameters = proto.typeParameters.typeParameterList.map { deserializeIrTypeParameter(it) }
-//                valueParameters = proto.valueParameterList.map { deserializeIrValueParameter(it) }
-//                if (proto.hasDispatchReceiver())
-//                    dispatchReceiverParameter = deserializeIrValueParameter(proto.dispatchReceiver)
-//                if (proto.hasExtensionReceiver())
-//                    extensionReceiverParameter = deserializeIrValueParameter(proto.extensionReceiver)
-//                if (proto.hasBody()) {
-//                    body = deserializeStatementBody(proto.body) as IrBody
-//                }
-//            }
         }
     }
 
