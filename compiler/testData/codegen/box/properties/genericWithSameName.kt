@@ -1,3 +1,5 @@
+// IGNORE_BACKEND: JVM, JVM_IR
+
 package foo
 
 class C<T>(val pp: T)
