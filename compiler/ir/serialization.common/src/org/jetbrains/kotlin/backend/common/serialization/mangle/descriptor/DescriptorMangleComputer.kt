@@ -93,7 +93,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
             return
         }
 
-        builder.appendName(name.asString())
+        builder.append(name.asString())
 
         if (visibility == Visibilities.INTERNAL) {
             builder.append(MangleConstant.MODULE_SEPARATOR)
@@ -263,7 +263,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
 
         descriptor.typeParameters.collect(builder, MangleConstant.TYPE_PARAMETERS) { mangleTypeParameter(this, it) }
 
-        builder.appendName(descriptor.name.asString())
+        builder.append(descriptor.name.asString())
 
         descriptor.platformSpecificSuffix()?.let {
             builder.appendSignature(it)

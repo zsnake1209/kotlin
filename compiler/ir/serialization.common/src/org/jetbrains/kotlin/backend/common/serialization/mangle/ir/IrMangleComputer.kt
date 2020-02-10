@@ -93,7 +93,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
             return
         }
 
-        builder.appendName(name.asString())
+        builder.append(name.asString())
 
         if (visibility == Visibilities.INTERNAL) {
             builder.append(MangleConstant.MODULE_SEPARATOR)
@@ -215,7 +215,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
 
         typeParameters.collect(builder, MangleConstant.TYPE_PARAMETERS) { mangleTypeParameter(this, it) }
 
-        builder.appendName(declaration.name.asString())
+        builder.append(declaration.name.asString())
     }
 
     override fun visitField(declaration: IrField, data: Boolean) =
