@@ -280,9 +280,11 @@ abstract class KotlinIrLinker(
                         topLevelDeserializationState.addIdSignature(topLevelSignature)
                     }
 
-                    // If topLevel declaration is module-public and current declaration in not (e.g. value parameter)
+                    // If topLevel declaration is module-public and current declaration iы not (e.g. value parameter)
                     // they should be processed via different tables
-                    return if (topLevelSignature.isLocal xor idSignature.isLocal) getStateForID(idSignature) else topLevelDeserializationState
+                    if (idSignature.isLocal) return fileLocalDeserializationState
+
+                    return topLevelDeserializationState
                 }
 
                 assert(idSignature.isLocal)
