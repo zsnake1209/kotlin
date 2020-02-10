@@ -46,7 +46,7 @@ open class IdSignatureSerializer(val mangler: KotlinMangler.IrMangler) : IdSigna
 
         private fun collectFqNames(declaration: IrDeclarationWithName) {
             declaration.parent.acceptVoid(this)
-            classFanSegments.add(declaration.name.asString())
+            classFqnSegments.add(declaration.name.asString())
         }
 
         override fun visitElement(element: IrElement) = error("Unexpected element ${element.render()}")
@@ -65,7 +65,7 @@ open class IdSignatureSerializer(val mangler: KotlinMangler.IrMangler) : IdSigna
             if (property != null) {
                 hashIdAcc = mangler.run { declaration.signatureMangle }
                 property.owner.acceptVoid(this)
-                classFanSegments.add(declaration.name.asString())
+                classFqnSegments.add(declaration.name.asString())
             } else {
                 hashId = mangler.run { declaration.signatureMangle }
                 collectFqNames(declaration)

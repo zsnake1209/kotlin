@@ -503,8 +503,8 @@ abstract class KotlinIrLinker(
     protected abstract fun readFile(moduleDescriptor: ModuleDescriptor, fileIndex: Int): ByteArray
     protected abstract fun readFileCount(moduleDescriptor: ModuleDescriptor): Int
 
-    protected open fun handleNoModuleDeserializerFound(isSignature: IdSignature): DeserializationState<*> {
-        error("Deserializer for declaration $isSignature is not found")
+    protected open fun handleNoModuleDeserializerFound(idSignature: IdSignature): DeserializationState<*> {
+        error("Deserializer for declaration $idSignature is not found")
     }
 
     protected open fun resolveModuleDeserializer(moduleDescriptor: ModuleDescriptor): IrModuleDeserializer? {

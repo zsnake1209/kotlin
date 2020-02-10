@@ -38,7 +38,7 @@ abstract class GlobalDeclarationTable(
         }
     }
 
-    open fun computeUniqIdByDeclaration(declaration: IrDeclaration): IdSignature {
+    open fun computeSignatureByDeclaration(declaration: IrDeclaration): IdSignature {
         return table.getOrPut(declaration) {
             signaturer.composePublicIdSignature(declaration).also { clashTracker.commit(declaration, it) }
         }
@@ -60,13 +60,13 @@ open class DeclarationTable(private val globalDeclarationTable: GlobalDeclaratio
 
     fun isExportedDeclaration(declaration: IrDeclaration) = globalDeclarationTable.isExportedDeclaration(declaration)
 
-    protected open fun tryComputeBackendSpecificUniqId(declaration: IrDeclaration): IdSignature? = null
+    protected open fun tryComputeBackendSpecificSignature(declaration: IrDeclaration): IdSignature? = null
 
     private fun computeSignatureByDeclaration(declaration: IrDeclaration): IdSignature {
-        tryComputeBackendSpecificUniqId(declaration)?.let { return it }
+        tryComputeBackendSpecificSignature(declaration)?.let { return it }
         return if (declaration.isLocalDeclaration()) {
             table.getOrPut(declaration) { signaturer.composeFileLocalIdSignature(declaration) }
-        } else globalDeclarationTable.computeUniqIdByDeclaration(declaration)
+        } else globalDeclarationTable.computeSignatureByDeclaration(declaration)
     }
 
     fun privateDeclarationSignature(declaration: IrDeclaration, builder: () -> IdSignature): IdSignature {

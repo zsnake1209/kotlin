@@ -33,7 +33,7 @@ open class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMa
 
         private fun collectFqNames(descriptor: DeclarationDescriptorNonRoot) {
             descriptor.containingDeclaration.accept(this, null)
-            classFanSegments.add(descriptor.name.asString())
+            classFqnSegments.add(descriptor.name.asString())
         }
 
         override fun visitPackageFragmentDescriptor(descriptor: PackageFragmentDescriptor, data: Nothing?) {
@@ -93,7 +93,7 @@ open class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMa
         override fun visitPropertyGetterDescriptor(descriptor: PropertyGetterDescriptor, data: Nothing?) {
             hashIdAcc = mangler.run { descriptor.signatureMangle }
             descriptor.correspondingProperty.accept(this, null)
-            classFanSegments.add(descriptor.name.asString())
+            classFqnSegments.add(descriptor.name.asString())
             setExpected(descriptor.isExpect)
             platformSpecificGetter(descriptor)
         }
@@ -101,7 +101,7 @@ open class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMa
         override fun visitPropertySetterDescriptor(descriptor: PropertySetterDescriptor, data: Nothing?) {
             hashIdAcc = mangler.run { descriptor.signatureMangle }
             descriptor.correspondingProperty.accept(this, null)
-            classFanSegments.add(descriptor.name.asString())
+            classFqnSegments.add(descriptor.name.asString())
             setExpected(descriptor.isExpect)
             platformSpecificSetter(descriptor)
         }

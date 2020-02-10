@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 class JvmIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable) :
     KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null) {
 
-    override fun handleNoModuleDeserializerFound(isSignature: IdSignature): DeserializationState<*> {
+    override fun handleNoModuleDeserializerFound(idSignature: IdSignature): DeserializationState<*> {
         // TODO: Implement special java-module deserializer instead of this hack
         return globalDeserializationState // !!!!!! Wrong, as external references will all have UniqId.NONE
     }
