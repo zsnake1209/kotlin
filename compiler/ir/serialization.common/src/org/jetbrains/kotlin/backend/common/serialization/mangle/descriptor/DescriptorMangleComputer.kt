@@ -260,6 +260,8 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
             mangleExtensionReceiverParameter(builder, extensionReceiver)
         }
 
+        descriptor.typeParameters.collect(builder, MangleConstant.TYPE_PARAMETERS) { mangleTypeParameter(this, it) }
+
         builder.appendName(descriptor.name.asString())
     }
 
