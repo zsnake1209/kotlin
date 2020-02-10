@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureDe
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.load.java.descriptors.JavaForKotlinOverridePropertyDescriptor
+import org.jetbrains.kotlin.load.java.descriptors.JavaPropertyDescriptor
 
 class JvmIdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMangler) : IdSignatureDescriptor(mangler) {
 
@@ -16,6 +17,7 @@ class JvmIdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMang
         override fun platformSpecificProperty(descriptor: PropertyDescriptor) {
             // See KT-31646
             setSpecialJavaProperty(descriptor is JavaForKotlinOverridePropertyDescriptor)
+            setJavaProperty(descriptor is JavaPropertyDescriptor)
         }
     }
 

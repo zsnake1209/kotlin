@@ -43,7 +43,11 @@ abstract class IdSignatureBuilder<D> {
     }
 
     protected fun setSpecialJavaProperty(f: Boolean) {
-        mask = mask or IdSignature.Flags.IS_JAVA_FOR_KOTLIN_OVERRIDE_PPROPERTY.encode(f)
+        mask = mask or IdSignature.Flags.IS_JAVA_FOR_KOTLIN_OVERRIDE_PROPERTY.encode(f)
+    }
+
+    protected fun setJavaProperty(f: Boolean) {
+        mask = mask or IdSignature.Flags.IS_JAVA_PROPERTY.encode(f)
     }
 
     protected open fun platformSpecificProperty(descriptor: PropertyDescriptor) {}
