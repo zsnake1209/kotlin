@@ -121,6 +121,8 @@ messages/**)
     public protected *;
 }
 
+-keep class com.google.common.** { *; }
+
 -keep class org.jetbrains.kotlin.container.** { *; }
 
 -keep class org.jetbrains.org.objectweb.asm.Opcodes { *; }
