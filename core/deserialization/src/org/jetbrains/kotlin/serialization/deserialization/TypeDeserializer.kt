@@ -100,6 +100,7 @@ class TypeDeserializer(
             simpleType.withAbbreviation(simpleType(it))
         } ?: simpleType
 
+        // TODO: move this hack in some platform specific place ASAP
         if (proto.hasClassName()) {
             val classId = c.nameResolver.getClassId(proto.className)
             val originalPackageFqn = classId.packageFqName

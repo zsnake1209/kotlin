@@ -88,6 +88,9 @@ abstract class AbstractJvmDescriptorMangler(private val mainDetector: MainFuncti
         }
 
         override fun PropertyDescriptor.platformSpecificSuffix(): String? {
+            // Since LV 1.4 there is a feature PreferJavaFieldOverload which allows to have java and kotlin
+            // properties with the same signature on the same level.
+            // For more details see JvmPlatformOverloadsSpecificityComparator.kt
             return if (isJavaField) MangleConstant.JAVA_FIELD_SUFFIX else null
         }
     }
