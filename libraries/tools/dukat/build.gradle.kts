@@ -8,8 +8,8 @@ repositories {
 
 dependencies {
     implementation(kotlinStdlib())
-    implementation("org.jetbrains.dukat:dukat:0.0.20.1")
-    implementation("org.jsoup:jsoup:1.8.2")
+    implementation("org.jetbrains.dukat:dukat:0.0.27")
+    implementation("org.jsoup:jsoup:1.12.1")
 }
 
 task("downloadIDL", JavaExec::class) {

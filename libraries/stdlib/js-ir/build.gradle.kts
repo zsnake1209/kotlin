@@ -74,7 +74,25 @@ val fullRuntimeSources by task<Sync> {
         // browser API will be extracted as kotlinx-browser library
         "libraries/stdlib/js/src/kotlin/browser/**",
         "libraries/stdlib/js/src/kotlin/dom/**",
-        "libraries/stdlib/js/src/org.w3c/**",
+        // we should keep org.w3c/typedarray.kt in js-v1, all other files in this package will be extracted
+        "libraries/stdlib/js/src/org.w3c/deprecated.kt",
+        "libraries/stdlib/js/src/org.w3c/org.khronos.webgl.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.css.masking.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.clipboard.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.css.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.events.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.mediacapture.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.parsing.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.pointerevents.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.svg.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.dom.url.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.fetch.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.files.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.notifications.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.performance.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.workers.kt",
+        "libraries/stdlib/js/src/org.w3c/org.w3c.xhr.kt",
 
         // TODO: we should use 'https://github.com/kotlin/js-externals' instead
         "libraries/stdlib/js/src/jquery/**",
