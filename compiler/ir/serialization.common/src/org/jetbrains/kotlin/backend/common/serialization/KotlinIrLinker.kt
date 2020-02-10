@@ -119,7 +119,6 @@ abstract class KotlinIrLinker(
 
     //TODO: This is Native specific. Eliminate me.
     private val forwardDeclarations = mutableSetOf<IrSymbol>()
-    val resolvedForwardDeclarations = mutableMapOf<IdSignature, IdSignature>()
 
     protected val deserializersForModules = mutableMapOf<ModuleDescriptor, IrModuleDeserializer>()
 
@@ -302,8 +301,10 @@ abstract class KotlinIrLinker(
                 val symbol = deserializationState.deserializedSymbols.getOrPut(idSignature) {
                     val descriptor = resolveSpecialSignature(idSignature)
 
-                    resolvedForwardDeclarations[idSignature]?.let {
+                    // TODO: move this logic out there
+                    postProcessPlatformSpecificDeclaration(idSignature, descriptor) {
                         val fdState = getStateForID(it)
+                        assert(it.isPublic && it.topLevelSignature() == it)
                         if (it !in fdState) fdState.addIdSignature(it)
                     }
 
@@ -526,6 +527,10 @@ abstract class KotlinIrLinker(
 
     protected open fun resolvePlatformDescriptor(idSig: IdSignature): DeclarationDescriptor? = null
     protected open fun isSpecialPlatformSignature(idSig: IdSignature): Boolean = false
+
+    protected open fun postProcessPlatformSpecificDeclaration(idSig: IdSignature, descriptor: DeclarationDescriptor?, block: (IdSignature) -> Unit) {
+
+    }
 
     private fun isSpecialFunctionDescriptor(idSig: IdSignature): Boolean {
         if (idSig !is IdSignature.PublicSignature) return false
