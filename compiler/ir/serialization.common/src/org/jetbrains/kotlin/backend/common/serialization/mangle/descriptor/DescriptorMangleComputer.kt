@@ -75,6 +75,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     }
 
     open fun FunctionDescriptor.platformSpecificSuffix(): String? = null
+    open fun PropertyDescriptor.platformSpecificSuffix(): String? = null
 
     open fun FunctionDescriptor.specialValueParamPrefix(param: ValueParameterDescriptor): String = ""
 
@@ -263,6 +264,10 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         descriptor.typeParameters.collect(builder, MangleConstant.TYPE_PARAMETERS) { mangleTypeParameter(this, it) }
 
         builder.appendName(descriptor.name.asString())
+
+        descriptor.platformSpecificSuffix()?.let {
+            builder.appendSignature(it)
+        }
     }
 
     override fun visitValueParameterDescriptor(descriptor: ValueParameterDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)

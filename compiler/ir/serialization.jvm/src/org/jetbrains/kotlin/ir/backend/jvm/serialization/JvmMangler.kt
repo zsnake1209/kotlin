@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.ir.backend.jvm.serialization
 
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinExportChecker
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
+import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleConstant
 import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleMode
 import org.jetbrains.kotlin.backend.common.serialization.mangle.classic.ClassicExportChecker
 import org.jetbrains.kotlin.backend.common.serialization.mangle.classic.ClassicKotlinManglerImpl
@@ -19,8 +20,10 @@ import org.jetbrains.kotlin.backend.common.serialization.mangle.ir.IrExportCheck
 import org.jetbrains.kotlin.backend.common.serialization.mangle.ir.IrMangleComputer
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.idea.MainFunctionDetector
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.load.java.lazy.descriptors.isJavaField
 
 abstract class AbstractJvmManglerClassic : ClassicKotlinManglerImpl() {
     companion object {
@@ -82,6 +85,10 @@ abstract class AbstractJvmDescriptorMangler(private val mainDetector: MainFuncti
             return if (isMainFunction(this)) {
                 return source.containingFile.name
             } else null
+        }
+
+        override fun PropertyDescriptor.platformSpecificSuffix(): String? {
+            return if (isJavaField) MangleConstant.JAVA_FIELD_SUFFIX else null
         }
     }
 

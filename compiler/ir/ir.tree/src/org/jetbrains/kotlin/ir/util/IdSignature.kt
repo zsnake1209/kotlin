@@ -15,7 +15,6 @@ sealed class IdSignature {
     enum class Flags(val recursive: Boolean) {
         IS_EXPECT(true),
         IS_JAVA_FOR_KOTLIN_OVERRIDE_PROPERTY(false),
-        IS_JAVA_PROPERTY(false),
         IS_NATIVE_INTEROP_LIBRARY(true);
 
         fun encode(isSet: Boolean): Long = if (isSet) 1L shl ordinal else 0L

@@ -17,7 +17,6 @@ class JvmIdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMang
         override fun platformSpecificProperty(descriptor: PropertyDescriptor) {
             // See KT-31646
             setSpecialJavaProperty(descriptor is JavaForKotlinOverridePropertyDescriptor)
-            setJavaProperty(descriptor is JavaPropertyDescriptor)
         }
     }
 
