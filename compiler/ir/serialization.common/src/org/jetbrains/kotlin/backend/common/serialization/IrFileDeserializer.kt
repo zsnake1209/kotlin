@@ -225,10 +225,6 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
         return IdSignature.FileLocalSignature(deserializeIdSignature(proto.container), proto.localId)
     }
 
-    private fun deserializeBuiltInIdSignature(proto: Long): IdSignature.BuiltInSignature {
-        return IdSignature.BuiltInSignature(proto)
-    }
-
     private fun deserializeScopeLocalIdSignature(proto: Int): IdSignature.ScopeLocalDeclaration {
         return IdSignature.ScopeLocalDeclaration(proto)
     }
@@ -238,7 +234,6 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
             PUBLIC_SIG -> deserializePublicIdSignature(proto.publicSig)
             ACCESSOR_SIG -> deserializeAccessorIdSignature(proto.accessorSig)
             PRIVATE_SIG -> deserializeFileLocalIdSignature(proto.privateSig)
-            BUILTIN_SIG -> deserializeBuiltInIdSignature(proto.builtinSig)
             SCOPED_LOCAL_SIG -> deserializeScopeLocalIdSignature(proto.scopedLocalSig)
             else -> error("Unexpected IdSignature kind: ${proto.idsigCase}")
         }

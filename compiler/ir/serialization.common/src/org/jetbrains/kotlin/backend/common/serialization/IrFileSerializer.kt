@@ -215,8 +215,6 @@ open class IrFileSerializer(
         return proto.build()
     }
 
-    private fun serializeBuiltInSignature(signature: IdSignature.BuiltInSignature): Long = signature.id
-
     private fun serializeScopeLocalSignature(signature: IdSignature.ScopeLocalDeclaration): Int = signature.id
 
     private fun serializeIdSignature(idSignature: IdSignature): ProtoIdSignature {
@@ -225,7 +223,6 @@ open class IrFileSerializer(
             is IdSignature.PublicSignature -> proto.publicSig = serializePublicSignature(idSignature)
             is IdSignature.AccessorSignature -> proto.accessorSig = serializeAccessorSignature(idSignature)
             is IdSignature.FileLocalSignature -> proto.privateSig = serializePrivateSignature(idSignature)
-            is IdSignature.BuiltInSignature -> proto.builtinSig = serializeBuiltInSignature(idSignature)
             is IdSignature.ScopeLocalDeclaration -> proto.scopedLocalSig = serializeScopeLocalSignature(idSignature)
         }
         return proto.build()

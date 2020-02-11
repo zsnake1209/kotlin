@@ -13,10 +13,6 @@ import org.jetbrains.kotlin.ir.util.KotlinMangler
 
 open class IdSignatureDescriptor(private val mangler: KotlinMangler.DescriptorMangler) : IdSignatureComposer {
 
-    override fun string2Hash(s: String): Long {
-        return mangler.run { s.hashMangle }
-    }
-
     protected open fun createSignatureBuilder(): DescriptorBasedSignatureBuilder = DescriptorBasedSignatureBuilder(mangler)
 
     protected open class DescriptorBasedSignatureBuilder(private val mangler: KotlinMangler.DescriptorMangler) :

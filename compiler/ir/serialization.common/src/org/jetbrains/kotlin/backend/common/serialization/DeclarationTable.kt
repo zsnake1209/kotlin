@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.backend.common.serialization
 
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureSerializer
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.KotlinMangler
@@ -34,7 +35,8 @@ abstract class GlobalDeclarationTable(
 
     protected fun loadKnownBuiltins(builtIns: IrBuiltIns) {
         builtIns.knownBuiltins.forEach {
-            table[it] = it.symbol.signature.also { id -> clashTracker.commit(it, id) }
+            val symbol = (it as IrSymbolOwner).symbol
+            table[it] = symbol.signature.also { id -> clashTracker.commit(it, id) }
         }
     }
 
@@ -80,5 +82,5 @@ open class DeclarationTable(private val globalDeclarationTable: GlobalDeclaratio
 }
 
 // This is what we pre-populate tables with
-val IrBuiltIns.knownBuiltins
-    get() = irBuiltInsSymbols
+val IrBuiltIns.knownBuiltins: List<IrDeclaration>
+    get() = packageFragment.declarations

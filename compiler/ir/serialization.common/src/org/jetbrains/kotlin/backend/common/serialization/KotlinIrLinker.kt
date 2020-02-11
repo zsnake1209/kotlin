@@ -478,9 +478,9 @@ abstract class KotlinIrLinker(
     private fun loadKnownBuiltinSymbols() {
         val globalDeserializedSymbols = globalDeserializationState.deserializedSymbols
         builtIns.knownBuiltins.forEach {
-            val signature = it.symbol.signature
-            globalDeserializedSymbols[signature] = it.symbol
-            assert(symbolTable.referenceBuiltInOperator(it.symbol.descriptor as SimpleFunctionDescriptor, it.mangle).owner === it)
+            val symbol = (it as IrSymbolOwner).symbol
+            val signature = symbol.signature
+            globalDeserializedSymbols[signature] = symbol
         }
     }
 

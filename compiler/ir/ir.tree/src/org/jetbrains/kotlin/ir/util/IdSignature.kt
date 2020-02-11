@@ -126,24 +126,6 @@ sealed class IdSignature {
         override fun toString() = super.toString()
     }
 
-    class BuiltInSignature(val mangle: String, val id: Long) : IdSignature() {
-        constructor(id: Long) : this("", id)
-
-        override fun topLevelSignature(): IdSignature = this // built ins are always top level
-        override fun nearestPublicSig(): IdSignature = this
-
-        override fun packageFqName(): FqName = IrBuiltIns.KOTLIN_INTERNAL_IR_FQN
-
-        override val isPublic: Boolean = true
-        override fun render(): String = "<ß|$mangle>"
-
-        override fun equals(other: Any?): Boolean {
-            return this === other || other is BuiltInSignature && id == other.id
-        }
-
-        override fun hashCode(): Int = id.toInt() xor (id shr 32).toInt()
-    }
-
     // Used to reference local variable and value parameters in function
     class ScopeLocalDeclaration(val id: Int, val description: String = "<no description>") : IdSignature() {
         override val isPublic: Boolean = false
@@ -169,6 +151,4 @@ sealed class IdSignature {
 interface IdSignatureComposer {
     fun composeSignature(descriptor: DeclarationDescriptor): IdSignature?
     fun composeEnumEntrySignature(descriptor: ClassDescriptor): IdSignature?
-
-    fun string2Hash(s: String): Long
 }

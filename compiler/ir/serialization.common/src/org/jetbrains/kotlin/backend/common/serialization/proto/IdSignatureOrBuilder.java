@@ -35,20 +35,11 @@ public interface IdSignatureOrBuilder extends
   org.jetbrains.kotlin.backend.common.serialization.proto.AccessorIdSignature getAccessorSig();
 
   /**
-   * <code>optional int64 builtin_sig = 4;</code>
-   */
-  boolean hasBuiltinSig();
-  /**
-   * <code>optional int64 builtin_sig = 4;</code>
-   */
-  long getBuiltinSig();
-
-  /**
-   * <code>optional int32 scoped_local_sig = 5;</code>
+   * <code>optional int32 scoped_local_sig = 4;</code>
    */
   boolean hasScopedLocalSig();
   /**
-   * <code>optional int32 scoped_local_sig = 5;</code>
+   * <code>optional int32 scoped_local_sig = 4;</code>
    */
   int getScopedLocalSig();
 }

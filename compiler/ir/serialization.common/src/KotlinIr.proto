@@ -47,8 +47,7 @@ message IdSignature {
     PublicIdSignature public_sig = 1;
     FileLocalIdSignature private_sig = 2;
     AccessorIdSignature accessor_sig = 3;
-    int64 builtin_sig = 4;
-    int32 scoped_local_sig = 5;
+    int32 scoped_local_sig = 4;
   }
 }
 
