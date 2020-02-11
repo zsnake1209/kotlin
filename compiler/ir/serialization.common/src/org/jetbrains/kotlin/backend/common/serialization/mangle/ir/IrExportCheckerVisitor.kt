@@ -28,12 +28,7 @@ abstract class IrExportCheckerVisitor : IrElementVisitor<Boolean, Nothing?>, Kot
     abstract override fun IrDeclaration.isPlatformSpecificExported(): Boolean
 
     private fun IrDeclaration.isExported(annotations: List<IrConstructorCall>, visibility: Visibility?): Boolean {
-//        if (annotations.hasAnnotation(publishedApiAnnotation)) return true
-//        if (isPlatformSpecificExported()) return true
-
         val speciallyExported = annotations.hasAnnotation(publishedApiAnnotation) || isPlatformSpecificExported()
-
-//        if (visibility != null && !visibility.isPubliclyVisible()) return false
 
         val selfExported = speciallyExported || visibility == null || visibility.isPubliclyVisible()
 
