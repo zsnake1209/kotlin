@@ -9,9 +9,6 @@ import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinExportChec
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
 import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleConstant
 import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleMode
-import org.jetbrains.kotlin.backend.common.serialization.mangle.classic.ClassicExportChecker
-import org.jetbrains.kotlin.backend.common.serialization.mangle.classic.ClassicKotlinManglerImpl
-import org.jetbrains.kotlin.backend.common.serialization.mangle.classic.ClassicMangleComputer
 import org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor.DescriptorBasedKotlinManglerImpl
 import org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor.DescriptorExportCheckerVisitor
 import org.jetbrains.kotlin.backend.common.serialization.mangle.descriptor.DescriptorMangleComputer
@@ -24,22 +21,6 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.idea.MainFunctionDetector
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.load.java.lazy.descriptors.isJavaField
-
-abstract class AbstractJvmManglerClassic : ClassicKotlinManglerImpl() {
-    companion object {
-        private val exportChecker = JvmClassicExportChecker()
-    }
-
-    private class JvmClassicExportChecker : ClassicExportChecker()
-
-    private class JvmClassicMangleComputer : ClassicMangleComputer()
-
-    override fun getExportChecker(): ClassicExportChecker = exportChecker
-
-    override fun getMangleComputer(mode: MangleMode): KotlinMangleComputer<IrDeclaration> = JvmClassicMangleComputer()
-}
-
-object JvmManglerClassic : AbstractJvmManglerClassic()
 
 abstract class AbstractJvmManglerIr : IrBasedKotlinManglerImpl() {
 

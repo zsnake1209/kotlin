@@ -50,24 +50,20 @@ class ManglerChecker(vararg _manglers: KotlinMangler<IrDeclaration>) : IrElement
     override fun visitDeclaration(declaration: IrDeclaration) {
 
         val exported = manglers.checkAllEqual(false, { isExportCheck(declaration) }) { m1, r1, m2, r2 ->
-            println("${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
             error("${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
         }
 
         if (!exported) return
 
         manglers.checkAllEqual("", { stringMangle(declaration) }) { m1, r1, m2, r2 ->
-            println("FULL: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
             error("FULL: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
         }
 
         manglers.checkAllEqual("", { signatureMangle(declaration) }) { m1, r1, m2, r2 ->
-            println("SIG: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
             error("SIG: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
         }
 
         manglers.checkAllEqual("", { fqnMangle(declaration) }) { m1, r1, m2, r2 ->
-            println("FQN: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
             error("FQN: ${declaration.render()}\n ${m1.manglerName}: $r1\n ${m2.manglerName}: $r2\n")
         }
 
