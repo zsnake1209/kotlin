@@ -1,4 +1,5 @@
 // IGNORE_BACKEND: JVM, JVM_IR
+// IGNORE_BACKEND_FIR: JVM_IR
 
 package foo
 
