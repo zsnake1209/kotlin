@@ -49,6 +49,8 @@ interface KotlinJsTargetDsl : KotlinTarget {
         }
     }
 
+    fun produceExecutable()
+
     val binaries: KotlinJsBinaryContainer
 
     val testRuns: NamedDomainObjectContainer<KotlinJsReportAggregatingTestRun>
