@@ -38,9 +38,9 @@ import org.jetbrains.kotlin.gradle.logging.kotlinWarn
 import org.jetbrains.kotlin.gradle.model.builder.KotlinModelBuilder
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.scripting.internal.ScriptingGradleSubplugin
+import org.jetbrains.kotlin.gradle.targets.js.dsl.BuildVariantKind
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrCompilation
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink
-import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrType
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.gradle.tasks.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -329,7 +329,7 @@ internal class KotlinJsIrSourceSetProcessor(
             return registerJsLink(
                 project,
                 taskName,
-                KotlinJsIrType.PRODUCTION,
+                BuildVariantKind.PRODUCTION,
                 configureAction
             )
         }
@@ -338,7 +338,7 @@ internal class KotlinJsIrSourceSetProcessor(
             return registerJsLink(
                 project,
                 taskName,
-                KotlinJsIrType.DEVELOPMENT,
+                BuildVariantKind.DEVELOPMENT,
                 configureAction
             )
         }
@@ -349,7 +349,7 @@ internal class KotlinJsIrSourceSetProcessor(
     private fun registerJsLink(
         project: Project,
         taskName: String,
-        type: KotlinJsIrType,
+        type: BuildVariantKind,
         configureAction: (Kotlin2JsCompile) -> Unit
     ): TaskProvider<out KotlinJsIrLink> {
         return tasksProvider.registerKotlinJsIrTask(

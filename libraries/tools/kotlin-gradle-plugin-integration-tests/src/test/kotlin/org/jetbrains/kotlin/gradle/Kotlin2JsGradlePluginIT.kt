@@ -54,7 +54,7 @@ class Kotlin2JsIrGradlePluginIT : AbstractKotlin2JsGradlePluginIT(true) {
                 """${"\n"}
                 tasks {
                     compileProductionKotlinJs {
-                        type = org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrType.DEVELOPMENT
+                        type = org.jetbrains.kotlin.gradle.targets.js.dsl.BuildVariantKind.DEVELOPMENT
                     }
                 }
             """.trimIndent()
