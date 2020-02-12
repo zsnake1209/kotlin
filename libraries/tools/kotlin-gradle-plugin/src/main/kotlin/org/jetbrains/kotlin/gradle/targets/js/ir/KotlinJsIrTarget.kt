@@ -101,14 +101,6 @@ constructor(
         body(nodejs)
     }
 
-    override fun produceKotlinLibrary() {
-        // do nothing
-    }
-
-    override fun produceExecutable() {
-        // do nothing
-    }
-
     override fun whenBrowserConfigured(body: KotlinJsBrowserDsl.() -> Unit) {
         if (browserLazyDelegate.isInitialized()) {
             browser(body)
