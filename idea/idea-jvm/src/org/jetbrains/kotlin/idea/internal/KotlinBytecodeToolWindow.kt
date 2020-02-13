@@ -316,7 +316,7 @@ class KotlinBytecodeToolWindow(private val myProject: Project, private val toolW
                     return script.containingKtFile === ktFile
                 }
 
-                override fun shouldGenerateCodeFragment(script: KtCodeFragment) = false
+                override fun shouldGenerateCodeFragment(codeFragment: KtCodeFragment) = false
             }
 
             val state = GenerationState.Builder(
