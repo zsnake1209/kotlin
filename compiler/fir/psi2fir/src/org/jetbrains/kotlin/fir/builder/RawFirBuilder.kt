@@ -1095,7 +1095,9 @@ class RawFirBuilder(session: FirSession, val baseScopeProvider: FirScopeProvider
                 source = expression.toFirSourceElement()
                 for (statement in expression.statements) {
                     val firStatement = statement.toFirStatement("Statement expected: ${statement.text}")
-                    if (firStatement !is FirBlock || firStatement.annotations.isNotEmpty()) {
+                    if (firStatement !is FirBlock || firStatement.annotations.isNotEmpty() ||
+                        KtPsiUtil.deparenthesize(statement) is KtForExpression && expression.statements.size > 1
+                    ) {
                         statements += firStatement
                     } else {
                         statements += firStatement.statements
@@ -1243,15 +1245,12 @@ class RawFirBuilder(session: FirSession, val baseScopeProvider: FirScopeProvider
         }
 
         override fun visitForExpression(expression: KtForExpression, data: Unit?): FirElement {
-            val ktRangeExpression = expression.loopRange.toFirExpression("No range in for loop")
+            val rangeExpression = expression.loopRange.toFirExpression("No range in for loop")
             val ktParameter = expression.loopParameter
             val loopSource = expression.toFirSourceElement()
             return buildBlock {
                 source = loopSource
                 val rangeSource = expression.loopRange?.toFirSourceElement()
-                val rangeVal =
-                    generateTemporaryVariable(baseSession, rangeSource, Name.special("<range>"), ktRangeExpression)
-                statements += rangeVal
                 val iteratorVal = generateTemporaryVariable(
                     baseSession, rangeSource, Name.special("<iterator>"),
                     buildFunctionCall {
@@ -1260,7 +1259,7 @@ class RawFirBuilder(session: FirSession, val baseScopeProvider: FirScopeProvider
                             source = loopSource
                             name = Name.identifier("iterator")
                         }
-                        explicitReceiver = generateResolvedAccessExpression(rangeSource, rangeVal)
+                        explicitReceiver = rangeExpression
                     },
                 )
                 statements += iteratorVal

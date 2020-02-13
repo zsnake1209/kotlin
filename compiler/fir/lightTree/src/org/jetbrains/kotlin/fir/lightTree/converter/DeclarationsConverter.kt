@@ -116,7 +116,9 @@ class DeclarationsConverter(
         return FirBlockBuilder().apply {
             source = block.toFirSourceElement()
             firStatements.forEach { firStatement ->
-                if (firStatement !is FirBlock || firStatement.annotations.isNotEmpty()) {
+                if (firStatement !is FirBlock || firStatement.annotations.isNotEmpty() ||
+                    (firStatement.source as? FirLightSourceElement)?.element?.tokenType == FOR && firStatements.size > 1
+                ) {
                     statements += firStatement
                 } else {
                     statements += firStatement.statements

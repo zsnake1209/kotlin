@@ -1139,6 +1139,10 @@ class Fir2IrVisitor(
         }
     }
 
+    override fun visitBlock(block: FirBlock, data: Any?): IrElement {
+        return block.convertToIrExpressionOrBlock()
+    }
+
     override fun visitErrorExpression(errorExpression: FirErrorExpression, data: Any?): IrElement {
         return errorExpression.convertWithOffsets { startOffset, endOffset ->
             IrErrorExpressionImpl(
