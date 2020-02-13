@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.backend.common.serialization.mangle.ir
 
+import org.jetbrains.kotlin.backend.common.ir.isStatic
 import org.jetbrains.kotlin.backend.common.serialization.mangle.KotlinMangleComputer
 import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleConstant
 import org.jetbrains.kotlin.backend.common.serialization.mangle.MangleMode
@@ -110,6 +111,10 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
 
     private fun IrFunction.mangleSignature(isCtor: Boolean) {
         if (!mode.signature) return
+
+        if (isStatic) {
+            builder.appendSignature(MangleConstant.STATIC_MEMBER_MARK)
+        }
 
         extensionReceiverParameter?.let {
             builder.appendSignature(MangleConstant.EXTENSION_RECEIVER_PREFIX)

@@ -103,9 +103,15 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         mangleSignature(isCtor, container)
     }
 
+    private val FunctionDescriptor.isStatic get() = dispatchReceiverParameter == null && containingDeclaration is ClassDescriptor
+
     private fun FunctionDescriptor.mangleSignature(isCtor: Boolean, realTypeParameterContainer: CallableDescriptor) {
 
         if (!mode.signature) return
+
+        if (isStatic) {
+            builder.appendSignature(MangleConstant.STATIC_MEMBER_MARK)
+        }
 
         extensionReceiverParameter?.let {
             builder.appendSignature(MangleConstant.EXTENSION_RECEIVER_PREFIX)
