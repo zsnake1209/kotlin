@@ -96,6 +96,8 @@ class ClassFileToSourceStubConverter(val kaptContext: KaptContextForStubGenerati
             "kotlin.jvm." // Kotlin annotations from runtime
         )
 
+        private val KOTLIN_METADATA_ANNOTATION = Metadata::class.java.name
+
         private val NON_EXISTENT_CLASS_NAME = FqName("error.NonExistentClass")
 
         private val JAVA_KEYWORD_FILTER_REGEX = "[a-z]+".toRegex()
@@ -108,6 +110,7 @@ class ClassFileToSourceStubConverter(val kaptContext: KaptContextForStubGenerati
 
     private val correctErrorTypes = kaptContext.options[KaptFlag.CORRECT_ERROR_TYPES]
     private val strictMode = kaptContext.options[KaptFlag.STRICT]
+    private val stripMetadata = kaptContext.options[KaptFlag.STRIP_METADATA]
 
     private val mutableBindings = mutableMapOf<String, KaptJavaFileObject>()
 
@@ -1050,6 +1053,7 @@ class ClassFileToSourceStubConverter(val kaptContext: KaptContextForStubGenerati
 
         if (filtered) {
             if (BLACKLISTED_ANNOTATIONS.any { fqName.startsWith(it) }) return null
+            if (stripMetadata && fqName == KOTLIN_METADATA_ANNOTATION) return null
         }
 
         val ktAnnotation = (annotationDescriptor?.source as? PsiSourceElement)?.psi as? KtAnnotationEntry
