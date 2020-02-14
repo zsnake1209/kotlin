@@ -533,12 +533,16 @@ abstract class KotlinIrLinker(
     }
 
     private fun isSpecialFunctionDescriptor(idSig: IdSignature): Boolean {
-        if (idSig !is IdSignature.PublicSignature) return false
-        if (idSig.packageFqn !in functionalPackages) return false
 
-        if (idSig.classFqn.isRoot) return false
+        val publicSig = idSig.asPublic() ?: return false
 
-        val fqnParts = idSig.classFqn.pathSegments()
+        if (publicSig.packageFqn !in functionalPackages) return false
+
+        val classFqn = publicSig.classFqn
+
+        if (classFqn.isRoot) return false
+
+        val fqnParts = classFqn.pathSegments()
 
         val className = fqnParts.first()
 
@@ -547,22 +551,26 @@ abstract class KotlinIrLinker(
 
     private fun resolveFunctionDescriptor(idSig: IdSignature): DeclarationDescriptor? {
         if (isSpecialFunctionDescriptor(idSig)) {
-            val publicSig = idSig as IdSignature.PublicSignature
+            val publicSig = idSig.asPublic() ?: error("$idSig has to be public")
+
             val fqnParts = publicSig.classFqn.pathSegments()
             val className = fqnParts.first()
+            val classDescriptor = builtIns.builtIns.getBuiltInClassByFqName(publicSig.packageFqn.child(className))
 
-            val classDescriptor = builtIns.builtIns.getBuiltInClassByFqName(idSig.packageFqn.child(className))
+            fun findMemberDescriptor(): DeclarationDescriptor {
+                val memberName = fqnParts[1]!!
+                val memberDescriptors = classDescriptor.unsubstitutedMemberScope.getContributedDescriptors(DescriptorKindFilter.CALLABLES).filter { d -> d.name == memberName }
+
+                return memberDescriptors.single()
+            }
             return when (fqnParts.size) {
                 1 -> classDescriptor
-                2 -> {
-                    val memberName = fqnParts[1]!!
-                    val memberDescriptors =
-                            classDescriptor.unsubstitutedMemberScope.getContributedDescriptors(DescriptorKindFilter.CALLABLES)
-                                    .filter { d -> d.name == memberName }
-
-                    val memberDescriptor = memberDescriptors.single()
-                    if (idSig.id != null && memberDescriptor is PropertyDescriptor) TODO("... return accessor")
-                    memberDescriptor
+                2 -> findMemberDescriptor()
+                3 -> {
+                    assert(idSig is IdSignature.AccessorSignature)
+                    val propertyDescriptor = findMemberDescriptor() as PropertyDescriptor
+                    val accessorName = fqnParts[2]
+                    propertyDescriptor.accessors.single { it.name == accessorName }
                 }
                 else -> error("No member found for signature $idSig")
             }

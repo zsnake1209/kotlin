@@ -31,6 +31,8 @@ sealed class IdSignature {
 
     abstract fun packageFqName(): FqName
 
+    open fun asPublic(): PublicSignature? = null
+
     abstract fun render(): String
 
     fun Flags.test(): Boolean = decode(flags())
@@ -80,6 +82,8 @@ sealed class IdSignature {
         override fun render(): String = "${packageFqn.asString()}/${classFqn.asString()}|$id[${mask.toString(2)}]"
 
         override fun toString() = super.toString()
+
+        override fun asPublic(): PublicSignature? = this
     }
 
     class AccessorSignature(val propertySignature: IdSignature, val accessorSignature: PublicSignature) : IdSignature() {
@@ -101,6 +105,8 @@ sealed class IdSignature {
         override fun flags(): Long = accessorSignature.mask
 
         override fun hashCode(): Int = accessorSignature.hashCode()
+
+        override fun asPublic(): PublicSignature? = accessorSignature
     }
 
     data class FileLocalSignature(val container: IdSignature, val id: Long) : IdSignature() {
