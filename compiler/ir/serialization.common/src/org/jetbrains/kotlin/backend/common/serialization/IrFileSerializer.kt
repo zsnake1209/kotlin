@@ -187,8 +187,9 @@ open class IrFileSerializer(
         proto.addAllClassFqName(serializeFqName(signature.classFqn))
 
         signature.id?.let { proto.memberUniqId = it }
-
-        proto.flags = signature.mask
+        if (signature.mask != 0L) {
+            proto.flags = signature.mask
+        }
 
         return proto.build()
     }
@@ -200,7 +201,9 @@ open class IrFileSerializer(
         with(signature.accessorSignature) {
             proto.name = serializeString(classFqn.shortName().asString())
             proto.accessorHashId = id ?: error("Expected hash Id")
-            proto.flags = mask
+            if (mask != 0L) {
+                proto.flags = mask
+            }
         }
 
         return proto.build()

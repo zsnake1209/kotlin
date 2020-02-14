@@ -242,12 +242,6 @@ public final class IdSignature extends
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
 
-    if (hasPublicSig()) {
-      if (!getPublicSig().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-    }
     if (hasPrivateSig()) {
       if (!getPrivateSig().isInitialized()) {
         memoizedIsInitialized = 0;
@@ -471,12 +465,6 @@ public final class IdSignature extends
     }
 
     public final boolean isInitialized() {
-      if (hasPublicSig()) {
-        if (!getPublicSig().isInitialized()) {
-          
-          return false;
-        }
-      }
       if (hasPrivateSig()) {
         if (!getPrivateSig().isInitialized()) {
           

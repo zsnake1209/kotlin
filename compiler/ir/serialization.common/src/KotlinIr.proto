@@ -27,14 +27,14 @@ message PublicIdSignature {
   repeated int32 package_fq_name = 1 [packed=true];
   repeated int32 class_fq_name = 2 [packed=true];
   optional int64 member_uniq_id = 3;
-  required int64 flags = 4;
+  optional int64 flags = 4 [default = 0];
 }
 
 message AccessorIdSignature {
   required int32 property_signature = 1;
   required int32 name = 2;
   required int64 accessor_hash_id = 3;
-  required int64 flags = 4;
+  optional int64 flags = 4 [default = 0];
 }
 
 message FileLocalIdSignature {

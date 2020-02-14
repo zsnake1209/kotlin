@@ -155,13 +155,13 @@ public final class AccessorIdSignature extends
   public static final int FLAGS_FIELD_NUMBER = 4;
   private long flags_;
   /**
-   * <code>required int64 flags = 4;</code>
+   * <code>optional int64 flags = 4 [default = 0];</code>
    */
   public boolean hasFlags() {
     return ((bitField0_ & 0x00000008) == 0x00000008);
   }
   /**
-   * <code>required int64 flags = 4;</code>
+   * <code>optional int64 flags = 4 [default = 0];</code>
    */
   public long getFlags() {
     return flags_;
@@ -188,10 +188,6 @@ public final class AccessorIdSignature extends
       return false;
     }
     if (!hasAccessorHashId()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
-    if (!hasFlags()) {
       memoizedIsInitialized = 0;
       return false;
     }
@@ -416,10 +412,6 @@ public final class AccessorIdSignature extends
         
         return false;
       }
-      if (!hasFlags()) {
-        
-        return false;
-      }
       return true;
     }
 
@@ -540,19 +532,19 @@ public final class AccessorIdSignature extends
 
     private long flags_ ;
     /**
-     * <code>required int64 flags = 4;</code>
+     * <code>optional int64 flags = 4 [default = 0];</code>
      */
     public boolean hasFlags() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required int64 flags = 4;</code>
+     * <code>optional int64 flags = 4 [default = 0];</code>
      */
     public long getFlags() {
       return flags_;
     }
     /**
-     * <code>required int64 flags = 4;</code>
+     * <code>optional int64 flags = 4 [default = 0];</code>
      */
     public Builder setFlags(long value) {
       bitField0_ |= 0x00000008;
@@ -561,7 +553,7 @@ public final class AccessorIdSignature extends
       return this;
     }
     /**
-     * <code>required int64 flags = 4;</code>
+     * <code>optional int64 flags = 4 [default = 0];</code>
      */
     public Builder clearFlags() {
       bitField0_ = (bitField0_ & ~0x00000008);
