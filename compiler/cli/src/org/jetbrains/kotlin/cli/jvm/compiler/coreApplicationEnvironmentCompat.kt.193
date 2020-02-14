@@ -8,11 +8,9 @@ package org.jetbrains.kotlin.cli.jvm.compiler
 import com.intellij.core.CoreApplicationEnvironment
 import com.intellij.openapi.extensions.ExtensionsArea
 import java.io.File
-import java.nio.file.FileSystems
 
 // BUNCH: 193
 fun registerExtensionPointAndExtensionsEx(pluginFile: File, fileName: String, area: ExtensionsArea) {
-    val pluginRoot = FileSystems.getDefault().getPath(pluginFile.path)
     @Suppress("MissingRecentApi")
-    CoreApplicationEnvironment.registerExtensionPointAndExtensions(pluginRoot, fileName, area)
+    CoreApplicationEnvironment.registerExtensionPointAndExtensions(pluginFile, fileName, area)
 }

@@ -13,8 +13,8 @@ import com.intellij.testFramework.propertyBased.MadTestingUtil
 
 // BUNCH: 193
 fun enableAllInspectionsCompat(project: Project, disposable: Disposable) {
-    MadTestingUtil.enableAllInspections(project)
+    MadTestingUtil.enableAllInspections(project, disposable)
 }
 
 // BUNCH: 193
-typealias TestApplicationManager = com.intellij.testFramework.TestApplicationManager
+typealias TestApplicationManager = com.intellij.idea.IdeaTestApplication
