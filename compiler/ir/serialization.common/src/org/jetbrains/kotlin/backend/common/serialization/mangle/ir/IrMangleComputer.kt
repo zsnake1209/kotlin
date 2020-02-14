@@ -80,7 +80,7 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
         builder.appendName(name)
     }
 
-    private fun IrFunction.mangleFunction(isCtor: Boolean, container: IrDeclaration) {
+    private fun IrFunction.mangleFunction(isCtor: Boolean, isStatic: Boolean, container: IrDeclaration) {
 
         isRealExpect = isRealExpect or isExpect
 
@@ -106,10 +106,10 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
             builder.append(moduleName)
         }
 
-        mangleSignature(isCtor)
+        mangleSignature(isCtor, isStatic)
     }
 
-    private fun IrFunction.mangleSignature(isCtor: Boolean) {
+    private fun IrFunction.mangleSignature(isCtor: Boolean, isStatic: Boolean) {
         if (!mode.signature) return
 
         if (isStatic) {
@@ -211,6 +211,12 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
         typeParameterContainer.add(declaration)
         declaration.parent.accept(this, false)
 
+        val isStaticProperty = accessor.dispatchReceiverParameter == null && declaration.parent !is IrPackageFragment
+
+        if (isStaticProperty) {
+            builder.appendSignature(MangleConstant.STATIC_MEMBER_MARK)
+        }
+
         accessor.extensionReceiverParameter?.let {
             builder.appendSignature(MangleConstant.EXTENSION_RECEIVER_PREFIX)
             mangleValueParameter(builder, it)
@@ -244,9 +250,11 @@ abstract class IrMangleComputer(protected val builder: StringBuilder, private va
         isRealExpect = isRealExpect or declaration.isExpect
 
         val container = declaration.correspondingPropertySymbol?.owner ?: declaration
+        val isStatic = declaration.dispatchReceiverParameter == null && container.parent !is IrPackageFragment
 
-        declaration.mangleFunction(false, container)
+        declaration.mangleFunction(false, isStatic, container)
     }
 
-    override fun visitConstructor(declaration: IrConstructor, data: Boolean) = declaration.mangleFunction(true, declaration)
+    override fun visitConstructor(declaration: IrConstructor, data: Boolean) =
+        declaration.mangleFunction(isCtor = true, isStatic = false, declaration)
 }

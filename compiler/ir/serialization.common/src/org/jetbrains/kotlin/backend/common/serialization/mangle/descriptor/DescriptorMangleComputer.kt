@@ -79,6 +79,9 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
 
     open fun FunctionDescriptor.specialValueParamPrefix(param: ValueParameterDescriptor): String = ""
 
+    private val CallableDescriptor.isRealStatic: Boolean
+        get() = dispatchReceiverParameter == null && containingDeclaration !is PackageFragmentDescriptor
+
     private fun FunctionDescriptor.mangleFunction(isCtor: Boolean, container: CallableDescriptor) {
 
         isRealExpect = isRealExpect or isExpect
@@ -103,13 +106,11 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         mangleSignature(isCtor, container)
     }
 
-    private val FunctionDescriptor.isStatic get() = dispatchReceiverParameter == null && containingDeclaration is ClassDescriptor
-
     private fun FunctionDescriptor.mangleSignature(isCtor: Boolean, realTypeParameterContainer: CallableDescriptor) {
 
         if (!mode.signature) return
 
-        if (isStatic) {
+        if (!isCtor && realTypeParameterContainer.isRealStatic) {
             builder.appendSignature(MangleConstant.STATIC_MEMBER_MARK)
         }
 
@@ -249,7 +250,7 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     override fun visitModuleDeclaration(descriptor: ModuleDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
 
     override fun visitConstructorDescriptor(constructorDescriptor: ConstructorDescriptor, data: Boolean) {
-        constructorDescriptor.mangleFunction(true, constructorDescriptor)
+        constructorDescriptor.mangleFunction(isCtor = true, container = constructorDescriptor)
     }
 
     override fun visitScriptDescriptor(scriptDescriptor: ScriptDescriptor, data: Boolean) = reportUnexpectedDescriptor(scriptDescriptor)
@@ -261,6 +262,10 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
 
         typeParameterContainer.add(descriptor)
         descriptor.containingDeclaration.accept(this, false)
+
+        if (descriptor.isRealStatic) {
+            builder.appendSignature(MangleConstant.STATIC_MEMBER_MARK)
+        }
 
         if (extensionReceiver != null) {
             builder.appendSignature(MangleConstant.EXTENSION_RECEIVER_PREFIX)
@@ -279,7 +284,8 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
     override fun visitValueParameterDescriptor(descriptor: ValueParameterDescriptor, data: Boolean) = reportUnexpectedDescriptor(descriptor)
 
     private fun manglePropertyAccessor(accessor: PropertyAccessorDescriptor) {
-        accessor.mangleFunction(false, accessor.correspondingProperty)
+        val property = accessor.correspondingProperty
+        accessor.mangleFunction(false, property)
     }
 
     override fun visitPropertyGetterDescriptor(descriptor: PropertyGetterDescriptor, data: Boolean) {
