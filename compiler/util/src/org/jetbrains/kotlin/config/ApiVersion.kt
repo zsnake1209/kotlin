@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.config
 
 import org.jetbrains.kotlin.utils.DescriptionAware
 
+
 class ApiVersion private constructor(
         val version: MavenComparableVersion,
         val versionString: String

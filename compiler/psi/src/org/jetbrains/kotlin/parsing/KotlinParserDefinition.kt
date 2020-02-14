@@ -60,8 +60,7 @@ class KotlinParserDefinition : ParserDefinition {
 
     override fun createElement(astNode: ASTNode): PsiElement {
         val elementType = astNode.elementType
-
-        return when (elementType) {
+        val f = when (elementType) {
             is KtStubElementType<*, *> -> elementType.createPsiFromAst(astNode)
             KtNodeTypes.TYPE_CODE_FRAGMENT, KtNodeTypes.EXPRESSION_CODE_FRAGMENT, KtNodeTypes.BLOCK_CODE_FRAGMENT -> ASTWrapperPsiElement(
                 astNode
@@ -70,6 +69,8 @@ class KotlinParserDefinition : ParserDefinition {
             KDocTokens.MARKDOWN_LINK -> KDocLink(astNode)
             else -> (elementType as KtNodeType).createPsi(astNode)
         }
+
+        return f
     }
 
     override fun createFile(fileViewProvider: FileViewProvider): PsiFile = KtFile(fileViewProvider, false)

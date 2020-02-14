@@ -20,10 +20,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.diagnostics.PositioningStrategy
 import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters3
 import org.jetbrains.kotlin.diagnostics.ParametrizedDiagnostic
-import org.jetbrains.kotlin.js.resolve.diagnostics.JsCallData
-import org.jetbrains.kotlin.diagnostics.DiagnosticFactory1
 import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
 
 object JsCodePositioningStrategy : PositioningStrategy<PsiElement>() {

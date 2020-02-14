@@ -19,13 +19,16 @@ package org.jetbrains.kotlin.idea.caches.resolve
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.analyzer.AnalysisResult
+import org.jetbrains.kotlin.config.LANGUAGE_VERSION_SETTINGS_KEY2
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.container.getService
 import org.jetbrains.kotlin.container.tryGetService
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.idea.caches.project.IdeaModuleInfo
+import org.jetbrains.kotlin.idea.caches.project.projectSourceModules
 import org.jetbrains.kotlin.idea.project.ResolveElementCache
+import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
@@ -54,6 +57,9 @@ internal class ModuleResolutionFacadeImpl(
     }
 
     override fun analyze(elements: Collection<KtElement>, bodyResolveMode: BodyResolveMode): BindingContext {
+        if (elements.isNotEmpty()) {
+            project.putUserData(LANGUAGE_VERSION_SETTINGS_KEY2, elements.first().languageVersionSettings)
+        }
         ResolveInDispatchThreadManager.assertNoResolveInDispatchThread()
 
         if (elements.isEmpty()) return BindingContext.EMPTY
@@ -62,6 +68,10 @@ internal class ModuleResolutionFacadeImpl(
     }
 
     override fun analyzeWithAllCompilerChecks(elements: Collection<KtElement>): AnalysisResult {
+        if (elements.isNotEmpty()) {
+            project.putUserData(LANGUAGE_VERSION_SETTINGS_KEY2, elements.first().languageVersionSettings)
+        }
+
         ResolveInDispatchThreadManager.assertNoResolveInDispatchThread()
 
         return projectFacade.getAnalysisResultsForElements(elements)

@@ -926,6 +926,7 @@ public class DefaultErrorMessages {
         MAP.put(CONST_VAL_WITH_DELEGATE, "Const 'val' should not have a delegate");
         MAP.put(CONST_VAL_WITH_GETTER, "Const 'val' should not have a getter");
         MAP.put(TYPE_CANT_BE_USED_FOR_CONST_VAL, "Const ''val'' has type ''{0}''. Only primitives and String are allowed", RENDER_TYPE);
+        MAP.put(EXCLAMATION_MARK_AFTER_TYPE, "Forbidden");
         MAP.put(CONST_VAL_WITHOUT_INITIALIZER, "Const 'val' should have an initializer");
         MAP.put(CONST_VAL_WITH_NON_CONST_INITIALIZER, "Const 'val' initializer should be a constant value");
         MAP.put(NON_CONST_VAL_USED_IN_CONSTANT_EXPRESSION, "Only 'const val' can be used in constant expressions");

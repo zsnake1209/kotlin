@@ -19,13 +19,16 @@ package org.jetbrains.kotlin.resolve
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors.*
 import org.jetbrains.kotlin.incremental.KotlinLookupLocation
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.parsing.KotlinParser
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.psiUtil.allChildren
 import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
 import org.jetbrains.kotlin.resolve.checkers.ClassifierUsageChecker
 import org.jetbrains.kotlin.resolve.checkers.ClassifierUsageCheckerContext
@@ -41,6 +44,7 @@ class LazyTopDownAnalyzer(
     private val overrideResolver: OverrideResolver,
     private val overloadResolver: OverloadResolver,
     private val varianceChecker: VarianceChecker,
+    private val psiChecker: PsiChecker,
     private val moduleDescriptor: ModuleDescriptor,
     private val lazyDeclarationResolver: LazyDeclarationResolver,
     private val bodyResolver: BodyResolver,
@@ -230,6 +234,8 @@ class LazyTopDownAnalyzer(
             declarations, classifierUsageCheckers,
             ClassifierUsageCheckerContext(trace, languageVersionSettings, deprecationResolver, moduleDescriptor)
         )
+
+        psiChecker.check(c)
 
         return c
     }
