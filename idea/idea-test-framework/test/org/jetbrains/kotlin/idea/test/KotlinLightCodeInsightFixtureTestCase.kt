@@ -344,9 +344,7 @@ private fun configureLanguageAndApiVersion(
         val modelsProvider = IdeModifiableModelsProviderImpl(project)
         val facet = module.getOrCreateFacet(modelsProvider, useProjectSettings = false)
         facet.configureFacet(languageVersion, LanguageFeature.State.DISABLED, null, modelsProvider)
-        if (apiVersion != null) {
-            facet.configuration.settings.apiLevel = LanguageVersion.fromVersionString(apiVersion)
-        }
+        facet.configuration.settings.apiLevel = LanguageVersion.fromVersionString(apiVersion)
         KotlinCommonCompilerArgumentsHolder.getInstance(project).update { this.languageVersion = languageVersion }
         modelsProvider.commit()
     }
