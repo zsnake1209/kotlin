@@ -227,10 +227,6 @@ class ResolveElementCache(
             bindingContexts.add(resolveSession.bindingContext)
         }
 
-        elements.forEach {
-            PsiChecker.check(resolveSession.trace, it)
-        }
-
         //TODO: it can be slow if too many contexts
         return CompositeBindingContext.create(bindingContexts)
     }

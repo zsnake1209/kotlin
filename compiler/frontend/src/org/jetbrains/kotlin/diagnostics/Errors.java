@@ -230,8 +230,6 @@ public interface Errors {
 
     DiagnosticFactory0<KtSuperTypeList> SUPERTYPES_FOR_ANNOTATION_CLASS = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtAnnotationEntry> ANNOTATION_ON_SUPERCLASS = DiagnosticFactory0.create(ERROR);
-    DiagnosticFactory0<PsiElement> EXCLAMATION_MARK_AFTER_TYPE =
-            DiagnosticFactoryByParserErrors.createDiagnostic0(ParserErrors.EXCLAMATION_MARK_AFTER_TYPE);
     DiagnosticFactory0<KtAnnotationEntry> ANNOTATION_ON_SUPERCLASS_WARNING = DiagnosticFactory0.create(WARNING);
     DiagnosticFactory0<KtParameter> MISSING_VAL_ON_ANNOTATION_PARAMETER = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtParameter> VAR_ANNOTATION_PARAMETER = DiagnosticFactory0.create(ERROR, VAL_OR_VAR_NODE);

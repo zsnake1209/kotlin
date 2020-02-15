@@ -180,13 +180,3 @@ fun <D : Diagnostic> DiagnosticSink.reportFromPlugin(diagnostic: D, ext: Default
         Severity.INFO -> report(Errors.PLUGIN_INFO.on(diagnostic.psiElement, renderedDiagnostic))
     }
 }
-
-object DiagnosticFactoryByParserErrors {
-    private val map = mutableMapOf<ParserErrors, DiagnosticFactory0<PsiElement>>()
-    
-    fun getDiagnostic(parserError: ParserErrors) = map[parserError]
-
-    @JvmStatic
-    fun createDiagnostic0(parserError: ParserErrors) =
-        DiagnosticFactory0.create<PsiElement>(parserError.severity).apply { map[parserError] = this }
-}

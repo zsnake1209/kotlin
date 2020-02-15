@@ -17,8 +17,6 @@
 package org.jetbrains.kotlin.psi.stubs.elements;
 
 import com.intellij.lang.*;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBuilder;

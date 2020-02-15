@@ -16,8 +16,6 @@ import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.analyzer.AnalysisResult
-import org.jetbrains.kotlin.config.LANGUAGE_VERSION_SETTINGS_KEY
-import org.jetbrains.kotlin.config.LANGUAGE_VERSION_SETTINGS_KEY2
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.GlobalContext
@@ -27,12 +25,10 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticUtils
 import org.jetbrains.kotlin.frontend.di.createContainerForLazyBodyResolve
-import org.jetbrains.kotlin.idea.caches.project.ModuleTestSourceInfo
 import org.jetbrains.kotlin.idea.caches.project.getModuleInfo
 import org.jetbrains.kotlin.idea.caches.trackers.clearInBlockModifications
 import org.jetbrains.kotlin.idea.caches.trackers.inBlockModifications
 import org.jetbrains.kotlin.idea.project.IdeaModuleStructureOracle
-import org.jetbrains.kotlin.idea.project.LANGUAGE_VERSION_SETTINGS
 import org.jetbrains.kotlin.idea.project.findAnalyzerServices
 import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.psi.*
@@ -374,15 +370,10 @@ private object KotlinResolveDataProvider {
         analyzableElement: KtElement,
         bindingTrace: BindingTrace?
     ): AnalysisResult {
-        val x = null as ModuleTestSourceInfo
-
         try {
             if (analyzableElement is KtCodeFragment) {
                 val bodyResolveMode = BodyResolveMode.PARTIAL_FOR_COMPLETION
                 val bindingContext = codeFragmentAnalyzer.analyzeCodeFragment(analyzableElement, bodyResolveMode).bindingContext
-
-                PsiChecker.check(bindingTrace, analyzableElement)
-
                 return AnalysisResult.success(bindingContext, moduleDescriptor)
             }
 
@@ -419,8 +410,6 @@ private object KotlinResolveDataProvider {
             ).get<LazyTopDownAnalyzer>()
 
             lazyTopDownAnalyzer.analyzeDeclarations(TopDownAnalysisMode.TopLevelDeclarations, listOf(analyzableElement))
-
-            PsiChecker.check(bindingTrace, analyzableElement)
 
             return AnalysisResult.success(trace.bindingContext, moduleDescriptor)
         } catch (e: ProcessCanceledException) {

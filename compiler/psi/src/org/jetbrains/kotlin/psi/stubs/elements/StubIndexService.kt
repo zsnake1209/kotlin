@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.psi.stubs.elements
 
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream

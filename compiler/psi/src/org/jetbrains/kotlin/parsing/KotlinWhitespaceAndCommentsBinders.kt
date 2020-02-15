@@ -16,15 +16,10 @@
 
 package org.jetbrains.kotlin.parsing
 
-import com.intellij.lang.PsiBuilder
 import com.intellij.lang.WhitespacesAndCommentsBinder
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.lexer.KtTokens
-
-fun PsiBuilder.Marker.addUserData() {
-
-}
 
 object PrecedingCommentsBinder : WhitespacesAndCommentsBinder {
     override fun getEdgePosition(

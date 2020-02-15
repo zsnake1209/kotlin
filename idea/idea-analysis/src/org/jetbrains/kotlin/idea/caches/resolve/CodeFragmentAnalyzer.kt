@@ -69,8 +69,6 @@ class CodeFragmentAnalyzer(
             }
         }
 
-        PsiChecker.check(bindingTrace, codeFragment)
-
         return bindingTrace
     }
 

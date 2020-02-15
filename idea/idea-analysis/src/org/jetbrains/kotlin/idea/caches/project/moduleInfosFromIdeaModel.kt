@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.platform.isCommon
 import org.jetbrains.kotlin.types.typeUtil.closure
 import java.util.concurrent.ConcurrentHashMap
-//org.jetbrains.kotlin.idea.caches.project.ModuleInfosFromIdeaModelKt$getModuleInfosFromIdeaModel$modelInfosCache$1
+
 /** null-platform means that we should get all modules */
 fun getModuleInfosFromIdeaModel(project: Project, platform: TargetPlatform? = null): List<IdeaModuleInfo> {
     val modelInfosCache = project.cacheInvalidatingOnRootModifications {
