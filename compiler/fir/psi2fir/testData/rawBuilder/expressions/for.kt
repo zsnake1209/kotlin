@@ -33,3 +33,7 @@ fun withParameter(list: List<Some>) {
         println(s)
     }
 }
+
+fun inLambda() = run {
+    for (i in 1..10) {}
+}

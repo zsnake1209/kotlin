@@ -1096,7 +1096,7 @@ class RawFirBuilder(session: FirSession, val baseScopeProvider: FirScopeProvider
                 for (statement in expression.statements) {
                     val firStatement = statement.toFirStatement("Statement expected: ${statement.text}")
                     if (firStatement !is FirBlock || firStatement.annotations.isNotEmpty() ||
-                        KtPsiUtil.deparenthesize(statement) is KtForExpression && expression.statements.size > 1
+                        KtPsiUtil.deparenthesize(statement) is KtForExpression
                     ) {
                         statements += firStatement
                     } else {

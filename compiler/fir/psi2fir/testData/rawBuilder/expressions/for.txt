@@ -1,9 +1,12 @@
 FILE: for.kt
     public? final? fun foo(): R|kotlin/Unit| {
-        lval <iterator>: <implicit> = IntegerLiteral(1).rangeTo#(IntegerLiteral(10)).iterator#()
-        while(R|<local>/<iterator>|.hasNext#()) {
-            lval i: <implicit> = R|<local>/<iterator>|.next#()
-            println#(i#)
+         {
+            lval <iterator>: <implicit> = IntegerLiteral(1).rangeTo#(IntegerLiteral(10)).iterator#()
+            while(R|<local>/<iterator>|.hasNext#()) {
+                lval i: <implicit> = R|<local>/<iterator>|.next#()
+                println#(i#)
+            }
+
         }
 
     }
@@ -70,20 +73,39 @@ FILE: for.kt
 
     }
     public? final? fun baz(set: Set<Some>): R|kotlin/Unit| {
-        lval <iterator>: <implicit> = set#.iterator#()
-        while(R|<local>/<iterator>|.hasNext#()) {
-            lval <destruct>: <implicit> = R|<local>/<iterator>|.next#()
-            lval x: <implicit> = R|<local>/<destruct>|.component1()
-            lval y: <implicit> = R|<local>/<destruct>|.component2()
-            println#(<strcat>(String(x = ), x#.toString#(), String( y = ), y#.toString#()))
+         {
+            lval <iterator>: <implicit> = set#.iterator#()
+            while(R|<local>/<iterator>|.hasNext#()) {
+                lval <destruct>: <implicit> = R|<local>/<iterator>|.next#()
+                lval x: <implicit> = R|<local>/<destruct>|.component1()
+                lval y: <implicit> = R|<local>/<destruct>|.component2()
+                println#(<strcat>(String(x = ), x#.toString#(), String( y = ), y#.toString#()))
+            }
+
         }
 
     }
     public? final? fun withParameter(list: List<Some>): R|kotlin/Unit| {
-        lval <iterator>: <implicit> = list#.iterator#()
-        while(R|<local>/<iterator>|.hasNext#()) {
-            lval s: Some = R|<local>/<iterator>|.next#()
-            println#(s#)
+         {
+            lval <iterator>: <implicit> = list#.iterator#()
+            while(R|<local>/<iterator>|.hasNext#()) {
+                lval s: Some = R|<local>/<iterator>|.next#()
+                println#(s#)
+            }
+
         }
 
+    }
+    public? final? fun inLambda(): <implicit> {
+        ^inLambda run#(<L> = run@fun <implicit>.<anonymous>(): <implicit> {
+             {
+                lval <iterator>: <implicit> = IntegerLiteral(1).rangeTo#(IntegerLiteral(10)).iterator#()
+                while(R|<local>/<iterator>|.hasNext#()) {
+                    lval i: <implicit> = R|<local>/<iterator>|.next#()
+                }
+
+            }
+
+        }
+        )
     }
