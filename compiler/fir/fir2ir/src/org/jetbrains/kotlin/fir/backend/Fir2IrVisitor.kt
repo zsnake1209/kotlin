@@ -471,7 +471,8 @@ class Fir2IrVisitor(
         assert(variable.isLocal)
         val initializer = variable.initializer
         val isNextVariable = initializer is FirFunctionCall &&
-                initializer.resolvedNamedFunctionSymbol()?.callableId?.isIteratorNext() == true
+                initializer.resolvedNamedFunctionSymbol()?.callableId?.isIteratorNext() == true &&
+                variable.source.psi?.parent is KtForExpression
         val irVariable = declarationStorage.createAndSaveIrVariable(
             variable, if (isNextVariable) IrDeclarationOrigin.FOR_LOOP_VARIABLE else null
         )
@@ -677,9 +678,9 @@ class Fir2IrVisitor(
                 is AccessorSymbol, is SyntheticPropertySymbol -> IrStatementOrigin.GET_PROPERTY
                 is FirNamedFunctionSymbol -> when {
                     resolvedSymbol.callableId.isInvoke() -> IrStatementOrigin.INVOKE
-                    resolvedSymbol.callableId.isIteratorNext() -> IrStatementOrigin.FOR_LOOP_NEXT
-                    resolvedSymbol.callableId.isIteratorHasNext() -> IrStatementOrigin.FOR_LOOP_HAS_NEXT
-                    resolvedSymbol.callableId.isIterator() -> IrStatementOrigin.FOR_LOOP_ITERATOR
+                    source.psi is KtForExpression && resolvedSymbol.callableId.isIteratorNext() -> IrStatementOrigin.FOR_LOOP_NEXT
+                    source.psi is KtForExpression && resolvedSymbol.callableId.isIteratorHasNext() -> IrStatementOrigin.FOR_LOOP_HAS_NEXT
+                    source.psi is KtForExpression && resolvedSymbol.callableId.isIterator() -> IrStatementOrigin.FOR_LOOP_ITERATOR
                     else -> null
                 }
                 else -> null
