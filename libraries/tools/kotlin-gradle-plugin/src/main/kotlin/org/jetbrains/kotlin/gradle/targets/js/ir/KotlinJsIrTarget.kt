@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.gradle.plugin.AbstractKotlinTargetConfigurator.Compa
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.MAIN_COMPILATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetWithTests
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinBinaryContainer
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinTargetWithBinaries
 import org.jetbrains.kotlin.gradle.targets.js.JsAggregatingExecutionSource
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsReportAggregatingTestRun
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsBrowserDsl
@@ -29,7 +29,7 @@ constructor(
     platformType: KotlinPlatformType,
     internal val mixedMode: Boolean
 ) :
-    KotlinBinaryContainer<KotlinJsIrCompilation, KotlinJsBinaryContainer>(project, platformType),
+    KotlinTargetWithBinaries<KotlinJsIrCompilation, KotlinJsBinaryContainer>(project, platformType),
     KotlinTargetWithTests<JsAggregatingExecutionSource, KotlinJsReportAggregatingTestRun>,
     KotlinJsTargetDsl,
     KotlinJsSubTargetContainerDsl {
