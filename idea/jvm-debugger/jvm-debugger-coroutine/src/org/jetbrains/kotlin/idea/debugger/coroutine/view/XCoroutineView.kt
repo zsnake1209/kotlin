@@ -46,7 +46,10 @@ import org.jetbrains.kotlin.idea.debugger.coroutine.CoroutineDebuggerContentInfo
 import org.jetbrains.kotlin.idea.debugger.coroutine.CoroutineDebuggerContentInfo.Companion.XCOROUTINE_POPUP_ACTION_GROUP
 import org.jetbrains.kotlin.idea.debugger.coroutine.VersionedImplementationProvider
 import org.jetbrains.kotlin.idea.debugger.coroutine.data.*
-import org.jetbrains.kotlin.idea.debugger.coroutine.proxy.*
+import org.jetbrains.kotlin.idea.debugger.coroutine.proxy.ApplicationThreadExecutor
+import org.jetbrains.kotlin.idea.debugger.coroutine.proxy.CoroutineDebugProbesProxy
+import org.jetbrains.kotlin.idea.debugger.coroutine.proxy.LookupContinuation
+import org.jetbrains.kotlin.idea.debugger.coroutine.proxy.ManagerThreadExecutor
 import org.jetbrains.kotlin.idea.debugger.coroutine.util.CreateContentParams
 import org.jetbrains.kotlin.idea.debugger.coroutine.util.CreateContentParamsProvider
 import org.jetbrains.kotlin.idea.debugger.coroutine.util.XDebugSessionListenerProvider
