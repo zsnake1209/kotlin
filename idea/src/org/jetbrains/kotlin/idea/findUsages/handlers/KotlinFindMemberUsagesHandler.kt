@@ -44,7 +44,6 @@ import org.jetbrains.kotlin.asJava.toLightMethods
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ParameterDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptorIfAny
-import org.jetbrains.kotlin.idea.debugger.readAction
 import org.jetbrains.kotlin.idea.findUsages.KotlinCallableFindUsagesOptions
 import org.jetbrains.kotlin.idea.findUsages.KotlinFindUsagesHandlerFactory
 import org.jetbrains.kotlin.idea.findUsages.KotlinFunctionFindUsagesOptions
@@ -136,7 +135,7 @@ abstract class KotlinFindMemberUsagesHandler<T : KtNamedDeclaration> protected c
             }
         }
 
-        private val isPropertyOfDataClass = readAction {
+        private val isPropertyOfDataClass = runReadAction {
             propertyDeclaration.parent is KtParameterList &&
                     propertyDeclaration.parent.parent is KtPrimaryConstructor &&
                     propertyDeclaration.parent.parent.parent.let { it is KtClass && it.isData() }
