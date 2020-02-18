@@ -29,17 +29,14 @@ import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCallWithAssert
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.util.OperatorNameConventions
-import org.jetbrains.org.objectweb.asm.ClassReader
-import org.jetbrains.org.objectweb.asm.ClassVisitor
-import org.jetbrains.org.objectweb.asm.Opcodes
-import org.jetbrains.org.objectweb.asm.Type
+import org.jetbrains.org.objectweb.asm.*
 import org.jetbrains.org.objectweb.asm.commons.Method
 import org.jetbrains.org.objectweb.asm.tree.FieldInsnNode
 import kotlin.properties.Delegates
 
 interface FunctionalArgument
 
-abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : FunctionalArgument, ReturnLabelOwner {
+abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : FunctionalArgument {
 
     abstract val isBoundCallableReference: Boolean
 
@@ -52,6 +49,9 @@ abstract class LambdaInfo(@JvmField val isCrossInline: Boolean) : FunctionalArgu
     abstract val invokeMethodDescriptor: FunctionDescriptor
 
     abstract val capturedVars: List<CapturedParamDesc>
+
+    open val returnLabels: Map<String, Label?>
+        get() = mapOf()
 
     lateinit var node: SMAPAndMethodNode
 
@@ -119,8 +119,6 @@ abstract class DefaultLambda(
 
     final override lateinit var capturedVars: List<CapturedParamDesc>
         private set
-
-    override fun isReturnFromMe(labelName: String): Boolean = false
 
     var originalBoundReceiverType: Type? = null
         private set
@@ -239,7 +237,7 @@ class PsiExpressionLambda(
 
     val functionWithBodyOrCallableReference: KtExpression = (expression as? KtLambdaExpression)?.functionLiteral ?: expression
 
-    private val labels: Set<String>
+    override val returnLabels: Map<String, Label?>
 
     override val isSuspend: Boolean
 
@@ -276,7 +274,7 @@ class PsiExpressionLambda(
             closure = it!!
         }
 
-        labels = InlineCodegen.getDeclarationLabels(expression, invokeMethodDescriptor)
+        returnLabels = InlineCodegen.getDeclarationLabels(expression, invokeMethodDescriptor).associateWith { null }
         invokeMethod = typeMapper.mapAsmMethod(invokeMethodDescriptor)
         isSuspend = invokeMethodDescriptor.isSuspend
     }
@@ -314,10 +312,6 @@ class PsiExpressionLambda(
                 add(getCapturedParamInfo(descriptor))
             }
         }
-    }
-
-    override fun isReturnFromMe(labelName: String): Boolean {
-        return labels.contains(labelName)
     }
 
     val isPropertyReference: Boolean

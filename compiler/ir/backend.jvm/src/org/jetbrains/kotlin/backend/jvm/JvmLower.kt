@@ -288,8 +288,6 @@ private val jvmFilePhases =
 
         jvmInlineClassPhase then
 
-        sharedVariablesPhase then
-
         makePatchParentsPhase(1) then
 
         enumWhenPhase then
@@ -299,6 +297,7 @@ private val jvmFilePhases =
         singleAbstractMethodPhase then
         assertionPhase then
         returnableBlocksPhase then
+        sharedVariablesPhase then
         localDeclarationsPhase then
         jvmLocalClassExtractionPhase then
 
