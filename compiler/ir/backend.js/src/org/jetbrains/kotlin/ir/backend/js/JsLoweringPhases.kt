@@ -282,6 +282,12 @@ private val sharedVariablesLoweringPhase = makeBodyLoweringPhase(
     description = "Box captured mutable variables"
 )
 
+private val callableReferenceLoweringX = makeBodyLoweringPhase(
+    ::CallableReferenceLowering,
+    name = "CallableReferenceLoweringXX",
+    description = "Build a callable reference class and capture arguments"
+)
+
 private val returnableBlockLoweringPhase = makeBodyLoweringPhase(
     ::ReturnableBlockLowering,
     name = "ReturnableBlockLowering",
@@ -371,15 +377,15 @@ private val privateMemberUsagesLoweringPhase = makeBodyLoweringPhase(
     description = "Rewrite the private member usages"
 )
 
-private val callableReferenceLoweringPhase = makeBodyLoweringPhase(
-    ::CallableReferenceLowering,
+private val interopCallableReferenceLoweringPhase = makeBodyLoweringPhase(
+    ::InteropCallableReferenceLowering,
     name = "CallableReferenceLowering",
     description = "Handle callable references",
     prerequisite = setOf(
         suspendFunctionsLoweringPhase,
         localDeclarationsLoweringPhase,
         localDelegatedPropertiesLoweringPhase,
-        privateMembersLoweringPhase
+        callableReferenceLoweringX
     )
 )
 
@@ -400,7 +406,7 @@ private val defaultParameterInjectorPhase = makeBodyLoweringPhase(
     { context -> DefaultParameterInjector(context, skipExternalMethods = true, forceSetOverrideSymbols = false) },
     name = "DefaultParameterInjector",
     description = "Replace callsite with default parameters with corresponding stub function",
-    prerequisite = setOf(callableReferenceLoweringPhase, innerClassesLoweringPhase)
+    prerequisite = setOf(interopCallableReferenceLoweringPhase, innerClassesLoweringPhase)
 )
 
 private val defaultParameterCleanerPhase = makeDeclarationTransformerPhase(
@@ -419,7 +425,7 @@ private val varargLoweringPhase = makeBodyLoweringPhase(
     ::VarargLowering,
     name = "VarargLowering",
     description = "Lower vararg arguments",
-    prerequisite = setOf(callableReferenceLoweringPhase)
+    prerequisite = setOf(interopCallableReferenceLoweringPhase)
 )
 
 private val propertiesLoweringPhase = makeDeclarationTransformerPhase(
@@ -589,7 +595,7 @@ val loweringList = listOf<Lowering>(
     functionInliningPhase,
     copyInlineFunctionBodyLoweringPhase,
     createScriptFunctionsPhase,
-    provisionalFunctionExpressionPhase,
+    callableReferenceLoweringX,
     singleAbstractMethodPhase,
     lateinitNullableFieldsPhase,
     lateinitDeclarationLoweringPhase,
@@ -620,6 +626,7 @@ val loweringList = listOf<Lowering>(
     enumEntryRemovalLoweringPhase,
     suspendFunctionsLoweringPhase,
     suspendLambdasRemovalLoweringPhase,
+    interopCallableReferenceLoweringPhase,
     returnableBlockLoweringPhase,
     forLoopsLoweringPhase,
     primitiveCompanionLoweringPhase,
@@ -627,7 +634,6 @@ val loweringList = listOf<Lowering>(
     foldConstantLoweringPhase,
     privateMembersLoweringPhase,
     privateMemberUsagesLoweringPhase,
-    callableReferenceLoweringPhase,
     defaultArgumentStubGeneratorPhase,
     defaultArgumentPatchOverridesPhase,
     defaultParameterInjectorPhase,
