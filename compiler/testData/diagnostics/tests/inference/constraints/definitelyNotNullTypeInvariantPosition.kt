@@ -1,4 +1,4 @@
-// !DIAGNOSTICS: -UNUSED_PARAMETER -UNUSED_EXPRESSION
+// !DIAGNOSTICS: -UNUSED_PARAMETER -UNUSED_EXPRESSION -UNUSED_VARIABLE
 
 class Inv<T>(val x: T?)
 
@@ -21,4 +21,13 @@ fun <S> test(i: Int, s: S) {
     <!DEBUG_INFO_EXPRESSION_TYPE("Inv<kotlin.Int>")!>c<!>
 
     takeInvInt(create(i))
+}
+
+class Foo<T>(x: T)
+class Bar<S>
+
+fun <K> foo(x: K?, y: Foo<Bar<K>>) {}
+
+fun <L> main(x: L?) {
+    val f = foo(x, Foo(Bar()))
 }
