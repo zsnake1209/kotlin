@@ -66,8 +66,6 @@ private fun isNativeInvoke(call: IrCall): Boolean {
     val simpleFunction = call.symbol.owner as? IrSimpleFunction ?: return false
     val receiverType = simpleFunction.dispatchReceiverParameter?.type ?: return false
 
-    if (simpleFunction.isSuspend) return false
-
     if (call.origin === InteropCallableReferenceLowering.Companion.EXPLICIT_INVOKE) return false
 
     return simpleFunction.name == OperatorNameConventions.INVOKE && receiverType.isFunctionTypeOrSubtype()
