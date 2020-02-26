@@ -373,7 +373,7 @@ class Fir2IrDeclarationStorage(
     }
 
     internal fun findIrParent(callableDeclaration: FirCallableDeclaration<*>): IrDeclarationParent? {
-        val firBasedSymbol = callableDeclaration.symbol
+        val firBasedSymbol = callableDeclaration.symbol.let { it.overriddenSymbol ?: it }
         val callableId = firBasedSymbol.callableId
         val parentClassId = callableId.classId
         return if (parentClassId != null) {
