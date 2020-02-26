@@ -896,7 +896,7 @@ class Fir2IrDeclarationStorage(
                 val irDeclaration = getIrFunction(firDeclaration, irParent, shouldLeaveScope = true).apply {
                     setAndModifyParent(irParent)
                 }
-                if (firFunctionSymbol.callableId.isKFunctionInvoke()) {
+                if (firFunctionSymbol.callableId.isKFunctionInvoke() && irDeclaration.overriddenSymbols.isEmpty()) {
                     (firFunctionSymbol.overriddenSymbol as? FirNamedFunctionSymbol)?.let {
                         irDeclaration.overriddenSymbols += (it.toFunctionSymbol(this) as IrSimpleFunctionSymbol)
                     }
