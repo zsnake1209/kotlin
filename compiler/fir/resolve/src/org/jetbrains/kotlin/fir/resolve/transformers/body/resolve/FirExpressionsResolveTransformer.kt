@@ -541,7 +541,7 @@ class FirExpressionsResolveTransformer(transformer: FirBodyResolveTransformer) :
             }.compose()
     }
 
-    private fun ConeKotlinTypeProjection.toFirTypeProjection(): FirTypeProjection = when (this) {
+    private fun ConeTypeProjection.toFirTypeProjection(): FirTypeProjection = when (this) {
         is ConeStarProjection -> buildStarProjection()
         else -> {
             val type = when (this) {
