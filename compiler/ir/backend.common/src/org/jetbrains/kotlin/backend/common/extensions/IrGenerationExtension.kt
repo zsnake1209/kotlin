@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.extensions.ProjectExtensionDescriptor
 import org.jetbrains.kotlin.ir.builders.IrGeneratorContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
+import org.jetbrains.kotlin.ir.util.IrProvider
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -24,7 +25,8 @@ class IrPluginContext(
     val symbolTable: SymbolTable,
     val typeTranslator: TypeTranslator,
     override val irBuiltIns: IrBuiltIns,
-    val symbols: BuiltinSymbolsBase = BuiltinSymbolsBase(irBuiltIns.builtIns, symbolTable)
+    val symbols: BuiltinSymbolsBase = BuiltinSymbolsBase(irBuiltIns.builtIns, symbolTable),
+    val irProviders: List<IrProvider>
 ) : IrGeneratorContext()
 
 interface IrGenerationExtension {
@@ -33,7 +35,6 @@ interface IrGenerationExtension {
 
     fun generate(
         moduleFragment: IrModuleFragment,
-        pluginContext: IrPluginContext,
-        backendContext: BackendContext?
+        pluginContext: IrPluginContext
     )
 }

@@ -267,9 +267,9 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
                     languageVersionSettings,
                     symbolTable,
                     typeTranslator,
-                    irBuiltIns
-                ),
-                null
+                    irBuiltIns,
+                    irProviders = irProviders
+                )
             )
         }
     }

@@ -32,7 +32,7 @@ class SerializationIDEJsExtension : SerializationJsExtension() {
 }
 
 class SerializationIDEIrExtension : SerializationLoweringExtension() {
-    override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext, context: BackendContext?) {
+    override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
         /* No-op – don't enable IR extensions in IDE */
     }
 }

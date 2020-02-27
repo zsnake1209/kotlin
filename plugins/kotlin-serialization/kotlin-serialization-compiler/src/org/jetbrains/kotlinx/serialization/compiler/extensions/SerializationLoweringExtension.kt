@@ -54,8 +54,7 @@ private class SerializerClassLowering(
 open class SerializationLoweringExtension : IrGenerationExtension {
     override fun generate(
         moduleFragment: IrModuleFragment,
-        pluginContext: IrPluginContext,
-        context: BackendContext?
+        pluginContext: IrPluginContext
     ) {
         val serializerClassLowering = SerializerClassLowering(pluginContext)
         for (file in moduleFragment.files)
