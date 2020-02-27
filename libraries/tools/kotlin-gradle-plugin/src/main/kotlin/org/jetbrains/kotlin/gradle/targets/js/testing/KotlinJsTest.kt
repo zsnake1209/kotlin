@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import org.jetbrains.kotlin.gradle.targets.js.testing.karma.KotlinKarma
 import org.jetbrains.kotlin.gradle.targets.js.testing.mocha.KotlinMocha
 import org.jetbrains.kotlin.gradle.tasks.KotlinTest
+import org.jetbrains.kotlin.gradle.utils.getValue
 import org.jetbrains.kotlin.gradle.utils.newFileProperty
 
 open class KotlinJsTest :
@@ -61,8 +62,10 @@ open class KotlinJsTest :
             target.project.path + "@" + target.name + ":" + it.compilationName
         }
 
-    val nodeModulesToLoad: List<String>
-        @Internal get() = listOf("./" + compilation.npmProject.main)
+    @get:Internal
+    val inputFilePath: String by inputFileProperty
+        .asFile
+        .map { it.canonicalPath }
 
     override val nodeModulesRequired: Boolean
         @Internal get() = testFramework!!.nodeModulesRequired

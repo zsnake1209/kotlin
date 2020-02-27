@@ -65,9 +65,7 @@ class KotlinMocha(override val compilation: KotlinJsCompilation) :
 
         val mocha = npmProject.require("mocha/bin/mocha")
 
-        val file = task.nodeModulesToLoad
-            .map { npmProject.require(it) }
-            .single()
+        val file = task.inputFilePath
 
         val adapter = createAdapterJs(file, debug)
 
