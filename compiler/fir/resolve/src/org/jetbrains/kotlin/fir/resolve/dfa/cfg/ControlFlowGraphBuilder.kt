@@ -194,6 +194,14 @@ class ControlFlowGraphBuilder {
         return enterNode to exitNode
     }
 
+    // ----------------------------------- Anonymous object -----------------------------------
+
+    fun exitAnonymousObject(anonymousObject: FirAnonymousObject): AnonymousObjectExitNode {
+        return createAnonymousObjectExitNode(anonymousObject).also {
+            addNewSimpleNode(it)
+        }
+    }
+
     // ----------------------------------- Block -----------------------------------
 
     fun enterBlock(block: FirBlock): BlockEnterNode? {
