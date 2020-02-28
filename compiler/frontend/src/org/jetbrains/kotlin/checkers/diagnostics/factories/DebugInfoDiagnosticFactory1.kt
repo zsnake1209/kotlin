@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.checkers.diagnostics.factories
 
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.cfg.pseudocode.getContainingPseudocode
 import org.jetbrains.kotlin.checkers.utils.CheckerTestUtil
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl

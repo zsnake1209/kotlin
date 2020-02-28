@@ -330,8 +330,6 @@ public class IdeStubIndexService extends StubIndexService {
         if (vFile == null) {
             return PlatformKt.getLanguageVersionSettings(ktFile.getProject()); // dummy.kt
         }
-        // приходят левые файлы, напр. jar:///Users/victor/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.41/785575d6b699a02527a4ad16f0972fa2c1ee583f/kotlin-stdlib-1.3.41-sources.jar!/kotlin/io/Console.kt
-        // мб проверять, что в скоупе проекта?
         return PlatformKt.getLanguageVersionSettings(vFile, ktFile.getProject());
     }
 }
