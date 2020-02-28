@@ -49,38 +49,6 @@ class ConstraintIncorporator(
         c.insideOtherConstraint(typeVariable, constraint)
     }
 
-    private fun Context.approximateDefNotNullToNotNull(type: KotlinTypeMarker) =
-        if (type is DefinitelyNotNullType) type.original.withNullability(false) else type
-
-    private fun Context.isThereTypeVariableInInvPosition(typeVariable: TypeVariableMarker) =
-        allTypeVariablesWithConstraints.any { otherVariable ->
-            otherVariable.constraints.any { otherConstraint -> isThereTypeInInvPosition(otherConstraint.type, typeVariable.defaultType()) }
-        }
-
-    private fun Context.isThereTypeInInvPosition(baseType: KotlinTypeMarker, typeToCheck: KotlinTypeMarker): Boolean {
-        for (i in 0 until baseType.argumentsCount()) {
-            val typeArgument = baseType.getArgument(i)
-
-            if (typeArgument.getVariance() == TypeVariance.INV && typeArgument.getType() == typeToCheck) return true
-            if (!typeArgument.isStarProjection() && isThereTypeInInvPosition(typeArgument.getType(), typeToCheck)) return true
-        }
-
-        return false
-    }
-
-    private fun Context.shouldBeDefNotNullApproximatedToNotNull(
-        constraint: Constraint,
-        otherConstraint: Constraint,
-        typeVariable: TypeVariableMarker
-    ): Boolean {
-        val isConstraintDefNotNull = constraint.type.isDefinitelyNotNullType()
-        val isOtherConstraintDefNotNull = otherConstraint.type.isDefinitelyNotNullType()
-        val isOneOfTypesDefNotNullType =
-            isOtherConstraintDefNotNull && !isConstraintDefNotNull || !isOtherConstraintDefNotNull && isConstraintDefNotNull
-
-        return otherConstraint.kind == ConstraintKind.EQUALITY && isOneOfTypesDefNotNullType && isThereTypeVariableInInvPosition(typeVariable)
-    }
-
     // A <:(=) \alpha <:(=) B => A <: B
     private fun Context.directWithVariable(
         typeVariable: TypeVariableMarker,
@@ -93,13 +61,7 @@ class ConstraintIncorporator(
         if (constraint.kind != ConstraintKind.LOWER) {
             getConstraintsForVariable(typeVariable).forEach {
                 if (it.kind != ConstraintKind.UPPER) {
-                    val shouldBeDefNotNullApproximatedToNotNull = shouldBeDefNotNullApproximatedToNotNull(constraint, it, typeVariable)
-
-                    addNewIncorporatedConstraint(
-                        if (shouldBeDefNotNullApproximatedToNotNull) approximateDefNotNullToNotNull(it.type) else it.type,
-                        if (shouldBeDefNotNullApproximatedToNotNull) approximateDefNotNullToNotNull(constraint.type) else constraint.type,
-                        shouldBeTypeVariableFlexible,
-                    )
+                    addNewIncorporatedConstraint(it.type, constraint.type, shouldBeTypeVariableFlexible)
                 }
             }
         }
@@ -108,13 +70,7 @@ class ConstraintIncorporator(
         if (constraint.kind != ConstraintKind.UPPER) {
             getConstraintsForVariable(typeVariable).forEach {
                 if (it.kind != ConstraintKind.LOWER) {
-                    val shouldBeDefNotNullApproximatedToNotNull = shouldBeDefNotNullApproximatedToNotNull(constraint, it, typeVariable)
-
-                    addNewIncorporatedConstraint(
-                        if (shouldBeDefNotNullApproximatedToNotNull) approximateDefNotNullToNotNull(constraint.type) else constraint.type,
-                        if (shouldBeDefNotNullApproximatedToNotNull) approximateDefNotNullToNotNull(it.type) else it.type,
-                        shouldBeTypeVariableFlexible,
-                    )
+                    addNewIncorporatedConstraint(constraint.type, it.type, shouldBeTypeVariableFlexible)
                 }
             }
         }

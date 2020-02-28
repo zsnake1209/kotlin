@@ -30,6 +30,8 @@ import org.jetbrains.kotlin.types.typeUtil.contains
 import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 internal object CheckInstantiationOfAbstractClass : ResolutionPart() {
     override fun KotlinResolutionCandidate.process(workIndex: Int) {
@@ -285,12 +287,37 @@ internal object CheckExplicitReceiverKindConsistency : ResolutionPart() {
     }
 }
 
+fun isContainedInInvPositionsAmongArguments(baseType: KotlinType?, checkingType: KotlinType): Boolean =
+    baseType != null && baseType.arguments.any {
+        if (it.projectionKind != Variance.INVARIANT || it.isStarProjection) return@any false
+        it.type.constructor == checkingType.constructor || isContainedInInvPositionsAmongArguments(it.type, checkingType)
+    }
+
+fun isContainedInInvPositions(checkingType: KotlinType?, declarationDescriptor: DeclarationDescriptor?): Boolean {
+    if (checkingType == null || declarationDescriptor !is CallableDescriptor)
+        return false
+
+    return isContainedInInvPositionsAmongArguments(declarationDescriptor.extensionReceiverParameter?.value?.type, checkingType) ||
+            declarationDescriptor.valueParameters.any { isContainedInInvPositionsAmongArguments(it.type, checkingType) } ||
+            isContainedInInvPositionsAmongArguments(declarationDescriptor.returnType, checkingType)
+}
+
 private fun KotlinResolutionCandidate.resolveKotlinArgument(
     argument: KotlinCallArgument,
     candidateParameter: ParameterDescriptor?,
     receiverInfo: ReceiverInfo
 ) {
-    val expectedType = candidateParameter?.let { prepareExpectedType(argument, candidateParameter) }
+    val expectedType = candidateParameter?.run {
+        val preparedType = prepareExpectedType(argument, this)
+
+        if (preparedType is NullableSimpleType &&
+            preparedType.constructor is TypeVariableTypeConstructor &&
+            isContainedInInvPositions(returnType, containingDeclaration)
+        ) {
+            preparedType.makeWithInvPosition()
+        } else preparedType
+    }
+
     val convertedArgument = if (expectedType != null && shouldRunConversionForConstants(expectedType)) {
         val convertedConstant = resolutionCallbacks.convertSignedConstantToUnsigned(argument)
         if (convertedConstant != null) {

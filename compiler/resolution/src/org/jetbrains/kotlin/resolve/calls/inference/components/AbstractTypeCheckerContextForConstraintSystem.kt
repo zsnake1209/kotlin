@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.resolve.calls.inference.components
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker
 import org.jetbrains.kotlin.types.AbstractTypeChecker
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
+import org.jetbrains.kotlin.types.NullableSimpleType
 import org.jetbrains.kotlin.types.model.*
 
 abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheckerContext(), TypeSystemInferenceExtensionContext {
@@ -181,7 +182,13 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
             is SimpleTypeMarker ->
                 // Foo <: T or
                 // Foo <: T? -- Foo!! <: T
-                if (typeVariable.isMarkedNullable()) subType.makeDefinitelyNotNullOrNotNull() else subType
+                if (typeVariable.isMarkedNullable()) {
+                    if (typeVariable is NullableSimpleType && typeVariable.invPositions) {
+                        subType.withNullability(false)
+                    } else {
+                        subType.makeDefinitelyNotNullOrNotNull()
+                    }
+                } else subType
 
             is FlexibleTypeMarker -> {
                 assertFlexibleTypeVariable(typeVariable)

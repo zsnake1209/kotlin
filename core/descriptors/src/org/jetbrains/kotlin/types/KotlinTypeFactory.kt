@@ -273,7 +273,9 @@ private class AnnotatedSimpleType(
     override fun replaceDelegate(delegate: SimpleType) = AnnotatedSimpleType(delegate, annotations)
 }
 
-private class NullableSimpleType(delegate: SimpleType) : DelegatingSimpleTypeImpl(delegate) {
+class NullableSimpleType(delegate: SimpleType, val invPositions: Boolean = false) : DelegatingSimpleTypeImpl(delegate) {
+    fun makeWithInvPosition() = NullableSimpleType(delegate, true)
+
     override val isMarkedNullable: Boolean
         get() = true
 
