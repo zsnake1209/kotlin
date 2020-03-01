@@ -6,6 +6,8 @@ public fun </*0*/ K> foo(/*0*/ x: K?, /*1*/ y: Foo<Bar<K>>): kotlin.Unit
 public fun </*0*/ L> main(/*0*/ x: L?): kotlin.Unit
 public fun takeInvInt(/*0*/ i: Inv<kotlin.Int>): kotlin.Unit
 public fun </*0*/ S> test(/*0*/ i: kotlin.Int, /*1*/ s: S): kotlin.Unit
+public fun </*0*/ K : T?, /*1*/ T> Bar<K>.foo18(/*0*/ x: T): kotlin.Unit
+public fun </*0*/ K> Bar<K>.foo20(): K
 
 public final class Bar</*0*/ S> {
     public constructor Bar</*0*/ S>()
