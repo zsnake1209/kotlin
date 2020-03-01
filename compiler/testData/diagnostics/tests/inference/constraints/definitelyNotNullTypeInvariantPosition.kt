@@ -52,6 +52,10 @@ class Foo13<T>(x: T) {
 fun <K> foo14(x: K?, y: Bar<K>) where K: Comparable<K>, K: CharSequence {}
 fun <K: T?, T> foo15(x: T, y: Bar<K>) {}
 fun <K: T?, T> foo16(x: K, y: Bar<T>) {}
+fun <K: T?, T> foo17(x: K): Bar<T> = null <!CAST_NEVER_SUCCEEDS!>as<!> Bar<T>
+fun <K: T?, T> Bar<K>.foo18(x: T) {}
+fun <K> foo19(x: Bar<K>): K = null <!UNCHECKED_CAST!>as K<!>
+fun <K> Bar<K>.foo20(): K = null <!UNCHECKED_CAST!>as K<!>
 
 fun <L> main(x: L?, y: L) {
     // invariant
@@ -151,4 +155,20 @@ fun <L> main(x: L?, y: L) {
         val x163 = foo16(<!DEBUG_INFO_SMARTCAST!>x<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
         val x164 = foo16(<!DEBUG_INFO_SMARTCAST!>y<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
     }
+
+    // generic in return position
+    val x170 = <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>foo17(x)<!>
+    val x171 = <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>foo17(y)<!>
+
+    // generic in receiver (it shouldn't work)
+    val x180 = <!DEBUG_INFO_EXPRESSION_TYPE("Type is unknown")!><!NEW_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>Bar<!>()<!>.<!DEBUG_INFO_MISSING_UNRESOLVED!>foo18<!>(x)
+    val x181 = <!DEBUG_INFO_EXPRESSION_TYPE("Type is unknown")!><!NEW_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>Bar<!>()<!>.<!DEBUG_INFO_MISSING_UNRESOLVED!>foo18<!>(y)
+
+    // with expected type
+    val x190: L = foo19(<!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+    val x191: L = foo19(<!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+
+    // with expected type and receiver
+    val x200: L = <!DEBUG_INFO_EXPRESSION_TYPE("Type is unknown")!><!NEW_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>Bar<!>()<!>.<!DEBUG_INFO_MISSING_UNRESOLVED!>foo19<!>()
+    val x201: L = <!DEBUG_INFO_EXPRESSION_TYPE("Type is unknown")!><!NEW_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>Bar<!>()<!>.<!DEBUG_INFO_MISSING_UNRESOLVED!>foo19<!>()
 }
