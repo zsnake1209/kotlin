@@ -74,13 +74,13 @@ abstract class AbstractSuspendFunctionsLowering<C : CommonBackendContext>(val co
     private fun transformToCoroutine(irBody: IrBody, container: IrDeclaration) {
         if (container !is IrSimpleFunction || !container.isSuspend) return
 
-        transformSuspendFunction2(container, irBody)?.let {
+        transformSuspendFunction(container, irBody)?.let {
             val dc = container.parent as IrDeclarationContainer
             dc.addChild(it)
         }
     }
 
-    private fun getSuspendFunctionKind2(function: IrSimpleFunction, body: IrBody): SuspendFunctionKind {
+    private fun getSuspendFunctionKind(function: IrSimpleFunction, body: IrBody): SuspendFunctionKind {
 
         fun IrSimpleFunction.isSuspendLambda() =
             name.asString() == "invoke" && parentClassOrNull?.let { it.origin === CallableReferenceLowering.Companion.LAMBDA_IMPL } == true
@@ -136,10 +136,10 @@ abstract class AbstractSuspendFunctionsLowering<C : CommonBackendContext>(val co
         }
     }
 
-    private fun transformSuspendFunction2(function: IrSimpleFunction, body: IrBody): IrClass? {
+    private fun transformSuspendFunction(function: IrSimpleFunction, body: IrBody): IrClass? {
         assert(function.isSuspend)
 
-        return when (val functionKind = getSuspendFunctionKind2(function, body)) {
+        return when (val functionKind = getSuspendFunctionKind(function, body)) {
             is SuspendFunctionKind.NO_SUSPEND_CALLS -> {
                 null                                                            // No suspend function calls - just an ordinary function.
             }
@@ -150,7 +150,7 @@ abstract class AbstractSuspendFunctionsLowering<C : CommonBackendContext>(val co
             }
 
             is SuspendFunctionKind.NEEDS_STATE_MACHINE -> {
-                val coroutine = buildCoroutine2(function)      // Coroutine implementation.
+                val coroutine = buildCoroutine(function)      // Coroutine implementation.
                 if (coroutine === function.parent)             // Suspend lambdas are called through factory method <create>,
                     null
                 else
@@ -180,8 +180,8 @@ abstract class AbstractSuspendFunctionsLowering<C : CommonBackendContext>(val co
         }
     }
 
-    private fun buildCoroutine2(function: IrSimpleFunction): IrClass {
-        val coroutine = CoroutineBuilder2(function).build()
+    private fun buildCoroutine(function: IrSimpleFunction): IrClass {
+        val coroutine = CoroutineBuilder(function).build()
 
         val isSuspendLambda = coroutine.coroutineClass === function.parent
 
@@ -201,7 +201,7 @@ abstract class AbstractSuspendFunctionsLowering<C : CommonBackendContext>(val co
         return coroutine.coroutineClass
     }
 
-    private inner class CoroutineBuilder2(private val function: IrSimpleFunction) {
+    private inner class CoroutineBuilder(private val function: IrSimpleFunction) {
         private val startOffset = function.startOffset
         private val endOffset = function.endOffset
         private val isSuspendLambda = function.isOperator && function.name.asString() == "invoke" && function.parentClassOrNull
@@ -577,13 +577,3 @@ abstract class AbstractSuspendFunctionsLowering<C : CommonBackendContext>(val co
         }
     }
 }
-
-//private val IrDeclaration.isLambda
-//    get() = origin == IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
-
-//class RemoveSuspendLambdas() : DeclarationTransformer {
-//
-//    override fun transformFlat(declaration: IrDeclaration): List<IrDeclaration>? {
-//        return if (declaration.isLambda && declaration is IrFunction && declaration.isSuspend) emptyList() else null
-//    }
-//}
