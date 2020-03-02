@@ -1,3 +1,4 @@
+// IGNORE_BACKEND: JVM_IR
 // FILE: test.kt
 public val MASSERTIONS_ENABLED: Boolean = true
 
@@ -29,17 +30,17 @@ fun box(): String {
 }
 
 // LINENUMBERS
-// TestKt.box():23
-// TestKt.box():14
-// TestKt.box():15
-// TestKt.getMASSERTIONS_ENABLED():2
-// TestKt.box():15
-// TestKt.box():16
-// TestKt.box():20
-// TestKt.box():24
-// TestKt.box():5
-// TestKt.getMASSERTIONS_ENABLED():2
-// TestKt.box():5
-// TestKt.box():6
-// TestKt.box():11
-// TestKt.box():28
+// test.kt:24
+// test.kt:15
+// test.kt:16
+// test.kt:3
+// test.kt:16
+// test.kt:17
+// test.kt:21
+// test.kt:25
+// test.kt:6
+// test.kt:3
+// test.kt:6
+// test.kt:7
+// test.kt:12
+// test.kt:29

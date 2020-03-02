@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.codegen.inline.*
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
@@ -167,7 +166,7 @@ class IrInlineCodegen(
                 false,
                 codegen.typeMapper.typeSystem,
                 registerLineNumberAfterwards = false,
-                isSyntheticCall = expression.startOffset == UNDEFINED_OFFSET
+                isCallOfFunctionInCorrespondingDefaultDispatch = codegen.irFunction == codegen.context.mapping.defaultArgumentsDispatchFunction[function]
             )
         } finally {
             state.globalInlineContext.exitFromInlining()

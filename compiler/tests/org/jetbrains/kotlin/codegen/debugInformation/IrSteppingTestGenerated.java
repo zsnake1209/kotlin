@@ -110,6 +110,12 @@ public class IrSteppingTestGenerated extends AbstractIrSteppingTest {
     }
 
     @Test
+    @TestMetadata("simpleInlineDefaultArg.kt")
+    public void testSimpleInlineDefaultArg() throws Exception {
+        runTest("compiler/testData/debug/stepping/simpleInlineDefaultArg.kt");
+    }
+
+    @Test
     @TestMetadata("throwException.kt")
     public void testThrowException() throws Exception {
         runTest("compiler/testData/debug/stepping/throwException.kt");

@@ -5,6 +5,6 @@ open class Base {
     open fun `foo$default`(d: Derived, i: Int, mask: Int, mh: Any) {}
 }
 
-class <!ACCIDENTAL_OVERRIDE!>Derived<!> : Base() {
-    fun foo(i: Int = 0) {}
+class Derived : Base() {
+    <!ACCIDENTAL_OVERRIDE!>fun foo(i: Int = 0)<!> {}
 }
