@@ -29,7 +29,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinCommonOptions
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsCompilerAttribute
-import org.jetbrains.kotlin.gradle.targets.js.KotlinJsTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.utils.COMPILE
 import org.jetbrains.kotlin.gradle.utils.RUNTIME
@@ -152,15 +151,22 @@ abstract class AbstractKotlinTargetConfigurator<KotlinTargetType : KotlinTarget>
         val configurations = project.configurations
 
         val defaultConfiguration = configurations.maybeCreate(target.defaultConfigurationName).apply {
+            isCanBeConsumed = false
             setupAsLocalTargetSpecificConfigurationIfSupported(target)
         }
 
         val mainCompilation = target.compilations.maybeCreate(KotlinCompilation.MAIN_COMPILATION_NAME)
 
-        val compileConfiguration = configurations.maybeCreate(mainCompilation.deprecatedCompileConfigurationName)
-        val implementationConfiguration = configurations.maybeCreate(mainCompilation.implementationConfigurationName)
+        val compileConfiguration = configurations.maybeCreate(mainCompilation.deprecatedCompileConfigurationName).apply {
+            isCanBeConsumed = false
+        }
+        val implementationConfiguration = configurations.maybeCreate(mainCompilation.implementationConfigurationName).apply {
+            isCanBeConsumed = false
+        }
 
-        val runtimeOnlyConfiguration = configurations.maybeCreate(mainCompilation.runtimeOnlyConfigurationName)
+        val runtimeOnlyConfiguration = configurations.maybeCreate(mainCompilation.runtimeOnlyConfigurationName).apply {
+            isCanBeConsumed = false
+        }
 
         val apiElementsConfiguration = configurations.maybeCreate(target.apiElementsConfigurationName).apply {
             description = "API elements for main."
@@ -168,9 +174,15 @@ abstract class AbstractKotlinTargetConfigurator<KotlinTargetType : KotlinTarget>
             isCanBeResolved = false
             isCanBeConsumed = true
             attributes.attribute<Usage>(USAGE_ATTRIBUTE, KotlinUsages.producerApiUsage(target))
-            extendsFrom(configurations.maybeCreate(mainCompilation.apiConfigurationName))
+            extendsFrom(
+                configurations.maybeCreate(mainCompilation.apiConfigurationName).apply {
+                    isCanBeConsumed = false
+                }
+            )
             if (mainCompilation is KotlinCompilationToRunnableFiles) {
-                val runtimeConfiguration = configurations.maybeCreate(mainCompilation.deprecatedRuntimeConfigurationName)
+                val runtimeConfiguration = configurations.maybeCreate(mainCompilation.deprecatedRuntimeConfigurationName).apply {
+                    isCanBeConsumed = false
+                }
                 extendsFrom(runtimeConfiguration)
             }
             usesPlatformOf(target)
@@ -184,7 +196,9 @@ abstract class AbstractKotlinTargetConfigurator<KotlinTargetType : KotlinTarget>
                 isCanBeConsumed = true
                 isCanBeResolved = false
                 attributes.attribute<Usage>(USAGE_ATTRIBUTE, KotlinUsages.producerRuntimeUsage(target))
-                val runtimeConfiguration = configurations.maybeCreate(mainCompilation.deprecatedRuntimeConfigurationName)
+                val runtimeConfiguration = configurations.maybeCreate(mainCompilation.deprecatedRuntimeConfigurationName).apply {
+                    isCanBeConsumed = false
+                }
                 extendsFrom(implementationConfiguration, runtimeOnlyConfiguration, runtimeConfiguration)
                 usesPlatformOf(target)
                 setupAsPublicConfigurationIfSupported(target)
@@ -196,17 +210,27 @@ abstract class AbstractKotlinTargetConfigurator<KotlinTargetType : KotlinTarget>
 
         if (createTestCompilation) {
             val testCompilation = target.compilations.getByName(KotlinCompilation.TEST_COMPILATION_NAME)
-            val compileTestsConfiguration = configurations.maybeCreate(testCompilation.deprecatedCompileConfigurationName)
-            val testImplementationConfiguration = configurations.maybeCreate(testCompilation.implementationConfigurationName)
-            val testRuntimeOnlyConfiguration = configurations.maybeCreate(testCompilation.runtimeOnlyConfigurationName)
+            val compileTestsConfiguration = configurations.maybeCreate(testCompilation.deprecatedCompileConfigurationName).apply {
+                isCanBeConsumed = false
+            }
+            val testImplementationConfiguration = configurations.maybeCreate(testCompilation.implementationConfigurationName).apply {
+                isCanBeConsumed = false
+            }
+            val testRuntimeOnlyConfiguration = configurations.maybeCreate(testCompilation.runtimeOnlyConfigurationName).apply {
+                isCanBeConsumed = false
+            }
 
             compileTestsConfiguration.extendsFrom(compileConfiguration)
             testImplementationConfiguration.extendsFrom(implementationConfiguration)
             testRuntimeOnlyConfiguration.extendsFrom(runtimeOnlyConfiguration)
 
             if (mainCompilation is KotlinCompilationToRunnableFiles && testCompilation is KotlinCompilationToRunnableFiles) {
-                val runtimeConfiguration = configurations.maybeCreate(mainCompilation.deprecatedRuntimeConfigurationName)
-                val testRuntimeConfiguration = configurations.maybeCreate(testCompilation.deprecatedRuntimeConfigurationName)
+                val runtimeConfiguration = configurations.maybeCreate(mainCompilation.deprecatedRuntimeConfigurationName).apply {
+                    isCanBeConsumed = false
+                }
+                val testRuntimeConfiguration = configurations.maybeCreate(testCompilation.deprecatedRuntimeConfigurationName).apply {
+                    isCanBeConsumed = false
+                }
                 testRuntimeConfiguration.extendsFrom(runtimeConfiguration)
             }
         }
@@ -259,6 +283,7 @@ abstract class AbstractKotlinTargetConfigurator<KotlinTargetType : KotlinTarget>
             val compileConfiguration = configurations.maybeCreate(compilation.deprecatedCompileConfigurationName).apply {
                 setupAsLocalTargetSpecificConfigurationIfSupported(target)
                 isVisible = false
+                isCanBeConsumed = false
                 isCanBeResolved = true // Needed for IDE import
                 description = "Dependencies for $compilation (deprecated, use '${compilation.implementationConfigurationName} ' instead)."
             }
@@ -282,6 +307,7 @@ abstract class AbstractKotlinTargetConfigurator<KotlinTargetType : KotlinTarget>
             val compileOnlyConfiguration = configurations.maybeCreate(compilation.compileOnlyConfigurationName).apply {
                 setupAsLocalTargetSpecificConfigurationIfSupported(target)
                 isVisible = false
+                isCanBeConsumed = false
                 isCanBeResolved = true // Needed for IDE import
                 description = "Compile only dependencies for $compilation."
             }
@@ -300,6 +326,7 @@ abstract class AbstractKotlinTargetConfigurator<KotlinTargetType : KotlinTarget>
                     setupAsLocalTargetSpecificConfigurationIfSupported(target)
                     extendsFrom(compileConfiguration)
                     isVisible = false
+                    isCanBeConsumed = false
                     isCanBeResolved = true // Needed for IDE import
                     description =
                         "Runtime dependencies for $compilation (deprecated, use '${compilation.runtimeOnlyConfigurationName} ' instead)."
@@ -451,10 +478,6 @@ internal fun Project.usageByName(usageName: String): Usage =
 
 fun Configuration.usesPlatformOf(target: KotlinTarget): Configuration {
     attributes.attribute(KotlinPlatformType.attribute, target.platformType)
-
-    if (target is KotlinJsTarget) {
-        attributes.attribute(KotlinJsCompilerAttribute.jsCompilerAttribute, KotlinJsCompilerAttribute.legacy)
-    }
 
     if (target is KotlinJsIrTarget) {
         attributes.attribute(KotlinJsCompilerAttribute.jsCompilerAttribute, KotlinJsCompilerAttribute.ir)

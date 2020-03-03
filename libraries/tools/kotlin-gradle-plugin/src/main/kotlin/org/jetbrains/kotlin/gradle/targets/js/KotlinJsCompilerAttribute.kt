@@ -13,9 +13,7 @@ import java.io.Serializable
 // For Gradle attributes
 @Suppress("EnumEntryName")
 enum class KotlinJsCompilerAttribute : Named, Serializable {
-    legacy,
-    ir,
-    both;
+    ir;
 
     override fun getName(): String =
         name
