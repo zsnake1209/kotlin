@@ -292,8 +292,16 @@ class NewMultiplatformIT : BaseGradleIT() {
         appProjectName: String,
         jsCompilerType: KotlinJsCompilerType
     ) {
-        val libProject = transformProjectWithPluginsDsl(libProjectName, directoryPrefix = "both-js-lib-and-app")
-        val appProject = transformProjectWithPluginsDsl(appProjectName, directoryPrefix = "both-js-lib-and-app")
+        val libProject = transformProjectWithPluginsDsl(
+            libProjectName,
+            wrapperVersion = GradleVersionRequired.AtLeast("5.4"),
+            directoryPrefix = "both-js-lib-and-app"
+        )
+        val appProject = transformProjectWithPluginsDsl(
+            appProjectName,
+            wrapperVersion = GradleVersionRequired.AtLeast("5.4"),
+            directoryPrefix = "both-js-lib-and-app"
+        )
 
         val compileTasksNames =
             listOf(
@@ -303,7 +311,7 @@ class NewMultiplatformIT : BaseGradleIT() {
                     arrayOf(
                         "NodeJs${LEGACY.lowerName.capitalize()}",
                         "NodeJs${IR.lowerName.capitalize()}",
-                    )
+                        )
                 }),
                 "Metadata"
             ).map { ":compileKotlin$it" }
