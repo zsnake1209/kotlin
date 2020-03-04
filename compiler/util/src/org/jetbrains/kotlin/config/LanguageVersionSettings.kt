@@ -144,10 +144,10 @@ enum class LanguageFeature(
 
     MultiPlatformProjects(sinceVersion = null, defaultState = State.DISABLED),
 
-    NewInference(sinceVersion = KOTLIN_1_4),
+    NewInference(sinceVersion = KOTLIN_1_5),
     // In the next block, features can be enabled only along with new inference
-    SamConversionForKotlinFunctions(sinceVersion = KOTLIN_1_4),
-    SamConversionPerArgument(sinceVersion = KOTLIN_1_4),
+    SamConversionForKotlinFunctions(sinceVersion = KOTLIN_1_5),
+    SamConversionPerArgument(sinceVersion = KOTLIN_1_5),
     FunctionReferenceWithDefaultValueAsOtherType(sinceVersion = KOTLIN_1_4),
     NonStrictOnlyInputTypesChecks(sinceVersion = KOTLIN_1_4),
 
