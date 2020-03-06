@@ -335,8 +335,9 @@ internal object CollectionTypeVariableUsagesInfo : ResolutionPart() {
     ): List<Pair<TypeConstructorMarker, KotlinTypeMarker?>> {
         val context = asConstraintSystemCompleterContext()
         val dependentTypeParameters = getBuilder().currentStorage().notFixedTypeVariables.mapNotNull { (typeConstructor, constraints) ->
-            val upperBounds =
-                constraints.constraints.filter { it.position.from is DeclaredUpperBoundConstraintPosition && it.kind == ConstraintKind.UPPER }
+            val upperBounds = constraints.constraints.filter {
+                it.position.from is DeclaredUpperBoundConstraintPosition && it.kind == ConstraintKind.UPPER
+            }
 
             upperBounds.mapNotNull { constraint ->
                 if (constraint.type.typeConstructor(context) != variable) {
@@ -347,7 +348,7 @@ internal object CollectionTypeVariableUsagesInfo : ResolutionPart() {
                     if (suitableUpperBound != null) typeConstructor to suitableUpperBound else null
                 } else typeConstructor to null
             }
-        }.flatten().filter { it !in dependentTypeParametersSeen }
+        }.flatten().filter { it !in dependentTypeParametersSeen && it.first != variable }
 
         return dependentTypeParameters + dependentTypeParameters.mapNotNull { (typeConstructor, _) ->
             if (typeConstructor != variable) {

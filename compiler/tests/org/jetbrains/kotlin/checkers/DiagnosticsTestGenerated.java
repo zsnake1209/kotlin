@@ -10443,14 +10443,14 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                     runTest("compiler/testData/diagnostics/tests/inference/coercionToUnit/coersionWithAnonymousFunctionsAndUnresolved.kt");
                 }
 
-                @TestMetadata("indirectCoercionWithExpectedType.kt")
-                public void testIndirectCoercionWithExpectedType() throws Exception {
-                    runTest("compiler/testData/diagnostics/tests/inference/coercionToUnit/indirectCoercionWithExpectedType.kt");
-                }
-
                 @TestMetadata("kt30242.kt")
                 public void testKt30242() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/inference/coercionToUnit/kt30242.kt");
+                }
+
+                @TestMetadata("indirectCoercionWithExpectedType.kt")
+                public void testIndirectCoercionWithExpectedType() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/inference/coercionToUnit/indirectCoercionWithExpectedType.kt");
                 }
 
                 @TestMetadata("noCoercion.kt")

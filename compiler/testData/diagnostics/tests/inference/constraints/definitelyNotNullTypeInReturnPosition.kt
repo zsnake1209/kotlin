@@ -271,3 +271,8 @@ fun <K> take(x: Foo<K>, comparator: Foo<K>): Foo<K> {<!NO_RETURN_IN_FUNCTION_WIT
 fun <L> test() {
     <!DEBUG_INFO_EXPRESSION_TYPE("Foo<kotlin.String?>")!>take(null as Foo<String?>, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<kotlin.String?>")!>nullsLast()<!>)<!>
 }
+
+class Inv1<T>
+class Inv2<T>
+fun <K : Comparable<K>> Inv1<K>.assertStableSorted() {}
+fun <K : Comparable<K>> Inv2<K>.assertStableSorted() = Inv1<K>().assertStableSorted()

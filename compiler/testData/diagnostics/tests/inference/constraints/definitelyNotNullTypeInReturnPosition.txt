@@ -53,6 +53,8 @@ public fun </*0*/ T> materialize(): T
 public fun </*0*/ T : kotlin.Comparable<T>> nullsLast(): Foo<T?>
 public fun </*0*/ K> take(/*0*/ x: Foo<K>, /*1*/ comparator: Foo<K>): Foo<K>
 public fun </*0*/ L> test(): kotlin.Unit
+public fun </*0*/ K : kotlin.Comparable<K>> Inv1<K>.assertStableSorted(): kotlin.Unit
+public fun </*0*/ K : kotlin.Comparable<K>> Inv2<K>.assertStableSorted(): kotlin.Unit
 public fun </*0*/ K> Bar<K>.foo20(): K
 
 public final class Bar</*0*/ S> {
@@ -91,6 +93,20 @@ public interface IFoo</*0*/ S> {
 
 public final class InBar</*0*/ in S> {
     public constructor InBar</*0*/ in S>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class Inv1</*0*/ T> {
+    public constructor Inv1</*0*/ T>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class Inv2</*0*/ T> {
+    public constructor Inv2</*0*/ T>()
     public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
     public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
     public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
