@@ -298,7 +298,7 @@ internal object CollectionTypeVariableUsagesInfo : ResolutionPart() {
         baseType: KotlinTypeMarker,
         wasOutVariance: Boolean = true
     ): Boolean {
-        if (baseType !is KotlinType || !baseType.isComputed) return false
+        if (baseType !is KotlinType) return false
 
         val dependentTypeParameter = getTypeParameterByVariable(variableTypeConstructor) ?: return false
         val declaredTypeParameters = baseType.constructor.parameters
@@ -388,6 +388,9 @@ internal object CollectionTypeVariableUsagesInfo : ResolutionPart() {
         if (declarationDescriptor !is CallableDescriptor) return false
 
         val returnType = declarationDescriptor.returnType ?: return false
+
+        if (!returnType.isComputed) return false
+
         val typeVariableConstructor = variable.freshTypeConstructor
         val dependentTypeParameters = getDependentTypeParameters(typeVariableConstructor)
         val dependingOnTypeParameter = getDependingOnTypeParameter(typeVariableConstructor)
@@ -399,13 +402,6 @@ internal object CollectionTypeVariableUsagesInfo : ResolutionPart() {
                 it.typeConstructor(asConstraintSystemCompleterContext()) == getTypeParameterByVariable(typeParameter) && !it.isMarkedNullable
             }
         }
-//        val hasNotNullUpperBound = this.getBuilder().currentStorage().notFixedTypeVariables[typeVariableConstructor]?.constraints?.any {
-//            it.type.typeConstructor(asConstraintSystemCompleterContext()) is AbstractClassTypeConstructor && it.position.from is DeclaredUpperBoundConstraintPosition && (it.type as? KotlinType)?.isNullable() == false
-//        } == true
-
-//        if (hasNotNullUpperBound) {
-//            println(1)
-//        }
 
         return isContainedInInvariantOrContravariantPositions(typeVariableConstructor, returnType)
                 || dependingOnTypeParameter.any { isContainedInInvariantOrContravariantPositions(it, returnType) }
