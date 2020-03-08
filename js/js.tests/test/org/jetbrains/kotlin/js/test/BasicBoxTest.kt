@@ -12,6 +12,7 @@ import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiManager
 import junit.framework.TestCase
+import org.jetbrains.kotlin.backend.common.push
 import org.jetbrains.kotlin.checkers.CompilerTestLanguageVersionSettings
 import org.jetbrains.kotlin.checkers.parseLanguageVersionSettings
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
@@ -71,7 +72,7 @@ import java.util.regex.Pattern
 abstract class BasicBoxTest(
         protected val pathToTestDir: String,
         testGroupOutputDirPrefix: String,
-        pathToRootOutputDir: String = BasicBoxTest.TEST_DATA_DIR_PATH,
+        pathToRootOutputDir: String = TEST_DATA_DIR_PATH,
         private val typedArraysEnabled: Boolean = true,
         private val generateSourceMap: Boolean = false,
         private val generateNodeJsRunner: Boolean = true,
@@ -679,8 +680,9 @@ abstract class BasicBoxTest(
             configuration.languageVersionSettings = languageVersionSettings
         }
 
+        // todo add dependencies to those already registered
         val libraries = when (targetBackend) {
-            TargetBackend.JS_IR -> dependencies
+            TargetBackend.JS_IR -> configuration[JSConfigurationKeys.LIBRARIES]!!
             TargetBackend.JS -> JsConfig.JS_STDLIB + JsConfig.JS_KOTLIN_TEST + dependencies
             else -> error("Unsupported target backend: $targetBackend")
         }
