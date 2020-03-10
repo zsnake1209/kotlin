@@ -40,11 +40,13 @@ fun FirFunctionCall.copy(
         FirIntegerOperatorCallBuilder().apply {
             this.calleeReference = calleeReference
             this.isOperatorCall = isOperatorCall
+            this.isInfixCall = isInfixCall
         }
     } else {
         FirFunctionCallBuilder().apply {
             this.calleeReference = calleeReference
             this.isOperatorCall = isOperatorCall
+            this.isInfixCall = isInfixCall
         }
     }
     builder.apply {

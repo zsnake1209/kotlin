@@ -5,7 +5,7 @@ inline var value: (p: Int) -> String
     set(s: (p: Int) -> String) {
         s(11)
         s.invoke(11)
-        s invoke 11
+        s <!INAPPLICABLE_CANDIDATE!>invoke<!> 11
 
         val z = s
     }

@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.resolve.calls
 
 import org.jetbrains.kotlin.descriptors.Visibilities
-import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.expressions.FirExpression
@@ -502,6 +501,16 @@ internal object CheckOperatorModifier : CheckerStage() {
         if (!callInfo.isOperatorCall) return
         val function = candidate.symbol.fir as? FirSimpleFunction ?: return
         if (!function.isOperator) {
+            sink.reportApplicability(CandidateApplicability.INAPPLICABLE)
+        }
+    }
+}
+
+internal object CheckInfixModifier : CheckerStage() {
+    override suspend fun check(candidate: Candidate, sink: CheckerSink, callInfo: CallInfo) {
+        if (!callInfo.isInfixCall) return
+        val function = candidate.symbol.fir as? FirSimpleFunction ?: return
+        if (!function.isInfix) {
             sink.reportApplicability(CandidateApplicability.INAPPLICABLE)
         }
     }

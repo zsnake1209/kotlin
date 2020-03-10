@@ -24,13 +24,13 @@ fun a() {
             consumeInt(a - b)
 
             consumeString(a plus b)
-            <!INAPPLICABLE_CANDIDATE!>consumeInt<!>(a minus b)
+            consumeInt(a minus b)
 
             a * b
             a <!INAPPLICABLE_CANDIDATE!>/<!> b
 
             a times b
-            a div b
+            a <!INAPPLICABLE_CANDIDATE!>div<!> b
         }
     }
 }

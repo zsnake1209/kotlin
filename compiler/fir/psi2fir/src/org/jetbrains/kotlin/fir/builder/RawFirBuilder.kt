@@ -1390,6 +1390,7 @@ class RawFirBuilder(
                     explicitReceiver = leftArgument
                     arguments += rightArgument
                     isOperatorCall = operationToken != IDENTIFIER
+                    isInfixCall = !isOperatorCall
                 }
             } else {
                 val firOperation = operationToken.toFirOperation()

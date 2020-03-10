@@ -34,6 +34,7 @@ data class CallInfo(
     val arguments: List<FirExpression>,
     val isSafeCall: Boolean,
     val isOperatorCall: Boolean,
+    val isInfixCall: Boolean,
     val isPotentialQualifierPart: Boolean,
 
     val typeArguments: List<FirTypeProjection>,
@@ -52,7 +53,7 @@ data class CallInfo(
     fun noStubReceiver(): CallInfo =
         if (stubReceiver == null) this else CallInfo(
             callKind, name, explicitReceiver, arguments,
-            isSafeCall, isOperatorCall, isPotentialQualifierPart, typeArguments, session,
+            isSafeCall, isOperatorCall, isInfixCall, isPotentialQualifierPart, typeArguments, session,
             containingFile, implicitReceiverStack, expectedType, outerCSBuilder, lhs, null
         )
 

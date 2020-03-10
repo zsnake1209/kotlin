@@ -33,6 +33,7 @@ open class FirFunctionCallImpl @FirImplementationDetail constructor(
     override val arguments: MutableList<FirExpression>,
     override var calleeReference: FirNamedReference,
     override val isOperatorCall: Boolean,
+    override val isInfixCall: Boolean,
 ) : FirFunctionCall(), FirModifiableQualifiedAccess {
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         typeRef.accept(visitor, data)

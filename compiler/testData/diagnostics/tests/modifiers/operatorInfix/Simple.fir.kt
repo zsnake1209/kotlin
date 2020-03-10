@@ -37,7 +37,7 @@ fun test() {
 
     consumeExample2(++a)
 
-    <!INAPPLICABLE_CANDIDATE!>consumeString<!>(a plus b)
+    consumeString(a plus b)
 }
 
 fun consumeInt(i: Int) {}

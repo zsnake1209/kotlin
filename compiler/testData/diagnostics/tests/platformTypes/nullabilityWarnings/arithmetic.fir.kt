@@ -41,13 +41,13 @@ fun test() {
     platformN <!INAPPLICABLE_CANDIDATE!>+<!> 1
     platformJ + 1
 
-    1 plus platformNN
+    1 <!INAPPLICABLE_CANDIDATE!>plus<!> platformNN
     1 <!INAPPLICABLE_CANDIDATE!>plus<!> platformN
-    1 plus platformJ
+    1 <!INAPPLICABLE_CANDIDATE!>plus<!> platformJ
 
-    platformNN plus 1
+    platformNN <!INAPPLICABLE_CANDIDATE!>plus<!> 1
     platformN <!INAPPLICABLE_CANDIDATE!>plus<!> 1
-    platformJ plus 1
+    platformJ <!INAPPLICABLE_CANDIDATE!>plus<!> 1
 
     platformNN += 1
     <!UNRESOLVED_REFERENCE!>platformN += 1<!>

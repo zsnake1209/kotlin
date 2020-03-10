@@ -106,6 +106,7 @@ class FirIntegerLiteralTypeScope(private val session: FirSession) : FirScope() {
             kind,
             FirResolvedDeclarationStatusImpl(Visibilities.PUBLIC, Modality.FINAL).apply {
                 isOperator = kind.isOperator
+                isInfix = kind.isInfix
             },
             symbol
         ).apply {
@@ -152,21 +153,21 @@ class FirIntegerOperator @FirImplementationDetail constructor(
     symbol,
     annotations = mutableListOf(),
 ) {
-    enum class Kind(val unary: Boolean, val operatorName: Name, val isOperator: Boolean) {
-        PLUS(unary = false, OperatorNameConventions.PLUS, isOperator = true),
-        MINUS(unary = false, OperatorNameConventions.MINUS, isOperator = true),
-        TIMES(unary = false, OperatorNameConventions.TIMES, isOperator = true),
-        DIV(unary = false, OperatorNameConventions.DIV, isOperator = true),
-        REM(unary = false, OperatorNameConventions.REM, isOperator = true),
-        SHL(unary = false, Name.identifier("shl"), isOperator = false),
-        SHR(unary = false, Name.identifier("shr"), isOperator = false),
-        USHR(unary = false, Name.identifier("ushr"), isOperator = false),
-        XOR(unary = false, Name.identifier("xor"), isOperator = false),
-        AND(unary = false, Name.identifier("and"), isOperator = false),
-        OR(unary = false, Name.identifier("or"), isOperator = false),
-        UNARY_PLUS(unary = true, OperatorNameConventions.UNARY_PLUS, isOperator = true),
-        UNARY_MINUS(unary = true, OperatorNameConventions.UNARY_MINUS, isOperator = true),
-        INV(unary = true, Name.identifier("inv"), isOperator = false)
+    enum class Kind(val unary: Boolean, val operatorName: Name, val isOperator: Boolean, val isInfix: Boolean) {
+        PLUS(unary = false, OperatorNameConventions.PLUS, isOperator = true, isInfix = false),
+        MINUS(unary = false, OperatorNameConventions.MINUS, isOperator = true, isInfix = false),
+        TIMES(unary = false, OperatorNameConventions.TIMES, isOperator = true, isInfix = false),
+        DIV(unary = false, OperatorNameConventions.DIV, isOperator = true, isInfix = false),
+        REM(unary = false, OperatorNameConventions.REM, isOperator = true, isInfix = false),
+        SHL(unary = false, Name.identifier("shl"), isOperator = false, isInfix = true),
+        SHR(unary = false, Name.identifier("shr"), isOperator = false, isInfix = true),
+        USHR(unary = false, Name.identifier("ushr"), isOperator = false, isInfix = true),
+        XOR(unary = false, Name.identifier("xor"), isOperator = false, isInfix = true),
+        AND(unary = false, Name.identifier("and"), isOperator = false, isInfix = true),
+        OR(unary = false, Name.identifier("or"), isOperator = false, isInfix = true),
+        UNARY_PLUS(unary = true, OperatorNameConventions.UNARY_PLUS, isOperator = true, isInfix = false),
+        UNARY_MINUS(unary = true, OperatorNameConventions.UNARY_MINUS, isOperator = true, isInfix = false),
+        INV(unary = true, Name.identifier("inv"), isOperator = false, isInfix = false)
     }
 }
 

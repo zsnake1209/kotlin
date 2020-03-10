@@ -3,13 +3,13 @@
 inline fun inlineFunWithInvoke(s: (p: Int) -> Unit) {
     (s)(11)
     (s).invoke(11)
-    (s) invoke 11
+    (s) <!INAPPLICABLE_CANDIDATE!>invoke<!> 11
     (s)
 }
 
 inline fun Function1<Int, Unit>.inlineExt() {
     (this).invoke(11)
-    (this) invoke 11
+    (this) <!INAPPLICABLE_CANDIDATE!>invoke<!> 11
     (this)(11)
     (this)
 }
@@ -17,7 +17,7 @@ inline fun Function1<Int, Unit>.inlineExt() {
 inline fun inlineFunWithInvoke2(s: (p: Int) -> Unit) {
     (((s)))(11)
     (((s))).invoke(11)
-    (((s))) invoke 11
+    (((s))) <!INAPPLICABLE_CANDIDATE!>invoke<!> 11
     (((s)))
 }
 

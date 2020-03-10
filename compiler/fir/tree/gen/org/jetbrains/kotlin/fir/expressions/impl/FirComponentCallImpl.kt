@@ -39,6 +39,7 @@ internal class FirComponentCallImpl(
     override val extensionReceiver: FirExpression get() = FirNoReceiverExpression
     override var calleeReference: FirNamedReference = FirSimpleNamedReference(source, Name.identifier("component$componentIndex"), null)
     override val isOperatorCall: Boolean get() = true
+    override val isInfixCall: Boolean get() = false
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         typeRef.accept(visitor, data)

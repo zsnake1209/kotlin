@@ -104,17 +104,15 @@ object ImplementationConfigurator : AbstractFirTreeImplementationConfigurator() 
         }
 
         impl(componentCall) {
-            default("safe") {
-                value = "false"
-                withGetter = true
-            }
             listOf("dispatchReceiver", "extensionReceiver").forEach {
                 default(it) {
                     value = "FirNoReceiverExpression"
                     withGetter = true
                 }
             }
+            defaultFalse("safe", withGetter = true)
             defaultTrue("isOperatorCall", withGetter = true)
+            defaultFalse("isInfixCall", withGetter = true)
             default("calleeReference", "FirSimpleNamedReference(source, Name.identifier(\"component\$componentIndex\"), null)")
             useTypes(simpleNamedReferenceType, nameType, noReceiverExpressionType)
             optInToInternals()

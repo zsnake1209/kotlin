@@ -210,6 +210,7 @@ private fun FirFunctionCall.toOperatorCall(): FirIntegerOperatorCall {
         extensionReceiver,
         arguments.toMutableList(),
         calleeReference,
-        isOperatorCall
+        isOperatorCall,
+        isInfixCall
     )
 }

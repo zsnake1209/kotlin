@@ -181,6 +181,7 @@ object NodeConfigurator : AbstractFieldConfigurator<FirTreeBuilder>(FirTreeBuild
         functionCall.configure {
             +field("calleeReference", namedReference)
             +booleanField("isOperatorCall")
+            +booleanField("isInfixCall")
         }
 
         operatorCall.configure {

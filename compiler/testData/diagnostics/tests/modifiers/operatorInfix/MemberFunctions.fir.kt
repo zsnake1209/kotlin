@@ -26,7 +26,7 @@ fun a() {
     a plus b
     a minus b
     a times b
-    a div b
+    a <!INAPPLICABLE_CANDIDATE!>div<!> b
 
     with (Example()) {
         consumeInt(this + a)
@@ -35,9 +35,9 @@ fun a() {
         consumeInt(this <!INAPPLICABLE_CANDIDATE!>/<!> b)
 
         consumeInt(this plus a)
-        <!INAPPLICABLE_CANDIDATE!>consumeString<!>(this minus b)
+        consumeString(this minus b)
         consumeInt(this times a)
-        consumeInt(this div b)
+        consumeInt(this <!INAPPLICABLE_CANDIDATE!>div<!> b)
     }
 }
 

@@ -35,7 +35,8 @@ class FirIntegerOperatorCall @FirImplementationDetail constructor(
     extensionReceiver: FirExpression,
     arguments: MutableList<FirExpression>,
     calleeReference: FirNamedReference,
-    isOperatorCall: Boolean
+    isOperatorCall: Boolean,
+    isInfixCall: Boolean
 ) : FirFunctionCallImpl(
     source,
     typeRef,
@@ -47,7 +48,8 @@ class FirIntegerOperatorCall @FirImplementationDetail constructor(
     extensionReceiver,
     arguments,
     calleeReference,
-    isOperatorCall
+    isOperatorCall,
+    isInfixCall
 )
 
 @FirBuilderDsl
@@ -62,6 +64,7 @@ class FirIntegerOperatorCallBuilder : FirQualifiedAccessBuilder, FirCallBuilder,
     override var extensionReceiver: FirExpression = FirNoReceiverExpression
     override val arguments: MutableList<FirExpression> = mutableListOf()
     var isOperatorCall: Boolean by Delegates.notNull()
+    var isInfixCall: Boolean by Delegates.notNull()
     lateinit var calleeReference: FirNamedReference
 
     @UseExperimental(FirImplementationDetail::class)
@@ -77,7 +80,8 @@ class FirIntegerOperatorCallBuilder : FirQualifiedAccessBuilder, FirCallBuilder,
             extensionReceiver,
             arguments,
             calleeReference,
-            isOperatorCall
+            isOperatorCall,
+            isInfixCall
         )
     }
 

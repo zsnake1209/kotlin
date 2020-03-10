@@ -43,6 +43,7 @@ open class FirFunctionCallBuilder : FirQualifiedAccessBuilder, FirCallBuilder, F
     override val arguments: MutableList<FirExpression> = mutableListOf()
     open lateinit var calleeReference: FirNamedReference
     open var isOperatorCall: Boolean = false
+    open var isInfixCall: Boolean = false
 
     @UseExperimental(FirImplementationDetail::class)
     override fun build(): FirFunctionCall {
@@ -58,6 +59,7 @@ open class FirFunctionCallBuilder : FirQualifiedAccessBuilder, FirCallBuilder, F
             arguments,
             calleeReference,
             isOperatorCall,
+            isInfixCall,
         )
     }
 
