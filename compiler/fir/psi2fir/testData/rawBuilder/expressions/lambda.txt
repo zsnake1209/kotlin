@@ -10,11 +10,11 @@ FILE: lambda.kt
         public? final? val y: Int = R|<local>/y|
             public? get(): Int
 
-        public final fun component1(): <implicit> {
+        public final operator fun component1(): <implicit> {
             ^component1 this@R|/Tuple|.R|/Tuple.x|
         }
 
-        public final fun component2(): <implicit> {
+        public final operator fun component2(): <implicit> {
             ^component2 this@R|/Tuple|.R|/Tuple.y|
         }
 

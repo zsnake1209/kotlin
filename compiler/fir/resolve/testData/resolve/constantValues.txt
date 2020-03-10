@@ -19,11 +19,11 @@ FILE: constantValues.kt
         public final val arrayNestedness: R|kotlin/Int| = R|<local>/arrayNestedness|
             public get(): R|kotlin/Int|
 
-        public final fun component1(): R|ClassId| {
+        public final operator fun component1(): R|ClassId| {
             ^component1 this@R|/ClassLiteralValue|.R|/ClassLiteralValue.classId|
         }
 
-        public final fun component2(): R|kotlin/Int| {
+        public final operator fun component2(): R|kotlin/Int| {
             ^component2 this@R|/ClassLiteralValue|.R|/ClassLiteralValue.arrayNestedness|
         }
 
@@ -67,7 +67,7 @@ FILE: constantValues.kt
                 public final val arrayDimensions: R|kotlin/Int|
                     public get(): R|kotlin/Int|
 
-                public final fun component1(): R|ClassLiteralValue| {
+                public final operator fun component1(): R|ClassLiteralValue| {
                     ^component1 this@R|/KClassValue.Value.NormalClass|.R|/KClassValue.Value.NormalClass.value|
                 }
 
@@ -84,7 +84,7 @@ FILE: constantValues.kt
                 public final val type: R|KotlinType| = R|<local>/type|
                     public get(): R|KotlinType|
 
-                public final fun component1(): R|KotlinType| {
+                public final operator fun component1(): R|KotlinType| {
                     ^component1 this@R|/KClassValue.Value.LocalClass|.R|/KClassValue.Value.LocalClass.type|
                 }
 

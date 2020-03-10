@@ -542,7 +542,9 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                 }
                 receiverTypeRef = null
                 this.name = name
-                this.status = FirDeclarationStatusImpl(Visibilities.PUBLIC, Modality.FINAL)
+                this.status = FirDeclarationStatusImpl(Visibilities.PUBLIC, Modality.FINAL).apply {
+                    isOperator = true
+                }
                 this.symbol = FirNamedFunctionSymbol(CallableId(packageFqName, classFqName, name))
 
                 val returnExpression = buildReturnExpression {

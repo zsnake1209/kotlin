@@ -13,15 +13,15 @@ FILE: destructuring.kt
         public? final? val third: String = R|<local>/third|
             public? get(): String
 
-        public final fun component1(): <implicit> {
+        public final operator fun component1(): <implicit> {
             ^component1 this@R|/Some|.R|/Some.first|
         }
 
-        public final fun component2(): <implicit> {
+        public final operator fun component2(): <implicit> {
             ^component2 this@R|/Some|.R|/Some.second|
         }
 
-        public final fun component3(): <implicit> {
+        public final operator fun component3(): <implicit> {
             ^component3 this@R|/Some|.R|/Some.third|
         }
 
