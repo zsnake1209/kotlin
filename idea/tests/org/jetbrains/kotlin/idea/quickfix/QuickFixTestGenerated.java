@@ -13954,6 +13954,11 @@ public class QuickFixTestGenerated extends AbstractQuickFixTest {
                 runTest("idea/testData/quickfix/typeMismatch/parameterTypeMismatch/changePrimaryConstructorParameterType.kt");
             }
 
+            @TestMetadata("changePrimaryConstructorParameterTypeOnPropertyDelegate.kt")
+            public void testChangePrimaryConstructorParameterTypeOnPropertyDelegate() throws Exception {
+                runTest("idea/testData/quickfix/typeMismatch/parameterTypeMismatch/changePrimaryConstructorParameterTypeOnPropertyDelegate.kt");
+            }
+
             @TestMetadata("multiFakeOverride.kt")
             public void testMultiFakeOverride() throws Exception {
                 runTest("idea/testData/quickfix/typeMismatch/parameterTypeMismatch/multiFakeOverride.kt");
