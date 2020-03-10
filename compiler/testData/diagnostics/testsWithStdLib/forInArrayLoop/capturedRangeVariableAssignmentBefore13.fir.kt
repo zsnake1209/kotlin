@@ -48,7 +48,7 @@ fun testArrayCapturedInLocalObject() {
 
     for (x in xs) {
         println(x)
-        updateXs()
+        <!INAPPLICABLE_CANDIDATE!>updateXs<!>()
     }
 }
 

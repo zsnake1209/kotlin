@@ -1,3 +1,4 @@
+// IGNORE_BACKEND_FIR: JVM_IR
 // !LANGUAGE: +FunctionTypesWithBigArity
 
 // Implementing function interface is prohibited in JavaScript

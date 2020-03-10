@@ -3,9 +3,9 @@ class Function1Impl : (String) -> Unit {
 }
 
 fun test1(f: Function1Impl) {
-    f("")
+    <!INAPPLICABLE_CANDIDATE!>f<!>("")
     <!INAPPLICABLE_CANDIDATE!>f<!>(p0 = "")
-    f(myParamName = "")
+    <!INAPPLICABLE_CANDIDATE!>f<!>(myParamName = "")
     f.invoke("")
     f.<!INAPPLICABLE_CANDIDATE!>invoke<!>(p0 = "")
     f.invoke(myParamName = "")

@@ -99,7 +99,7 @@ class X : A()
 
 fun main() {
     val x = X()
-    x[0]
+    <!INAPPLICABLE_CANDIDATE!>x[0]<!>
     x.size
     x.remove("")
     x.remove(1)

@@ -22,6 +22,6 @@ class MyElement
 
 fun test1(collection: MyCollection) {
     collection.<!AMBIGUITY!>iterator<!>()
-    <!AMBIGUITY, UNRESOLVED_REFERENCE, UNRESOLVED_REFERENCE!>for (element in collection) {
+    <!INAPPLICABLE_CANDIDATE, UNRESOLVED_REFERENCE, UNRESOLVED_REFERENCE!>for (element in collection) {
     }<!>
 }
