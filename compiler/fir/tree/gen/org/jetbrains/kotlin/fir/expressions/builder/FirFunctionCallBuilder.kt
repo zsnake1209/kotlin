@@ -42,6 +42,7 @@ open class FirFunctionCallBuilder : FirQualifiedAccessBuilder, FirCallBuilder, F
     override var extensionReceiver: FirExpression = FirNoReceiverExpression
     override val arguments: MutableList<FirExpression> = mutableListOf()
     open lateinit var calleeReference: FirNamedReference
+    open var isOperatorCall: Boolean = false
 
     @UseExperimental(FirImplementationDetail::class)
     override fun build(): FirFunctionCall {
@@ -56,6 +57,7 @@ open class FirFunctionCallBuilder : FirQualifiedAccessBuilder, FirCallBuilder, F
             extensionReceiver,
             arguments,
             calleeReference,
+            isOperatorCall,
         )
     }
 

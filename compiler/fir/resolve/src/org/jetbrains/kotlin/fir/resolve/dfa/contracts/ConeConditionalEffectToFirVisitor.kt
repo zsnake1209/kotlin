@@ -47,6 +47,7 @@ private object ConeConditionalEffectToFirVisitor : ConeContractDescriptionVisito
         return buildFunctionCall {
             calleeReference = buildSimpleNamedReference { name = OperatorNameConventions.NOT }
             this.explicitReceiver = explicitReceiver
+            isOperatorCall = true
         }
     }
 

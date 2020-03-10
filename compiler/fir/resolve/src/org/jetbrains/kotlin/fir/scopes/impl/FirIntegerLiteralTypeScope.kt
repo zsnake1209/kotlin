@@ -96,16 +96,21 @@ class FirIntegerLiteralTypeScope(private val session: FirSession) : FirScope() {
     }.toMap()
 
     @UseExperimental(FirImplementationDetail::class)
-    private fun createFirFunction(name: Name, symbol: FirNamedFunctionSymbol): FirSimpleFunctionImpl = FirIntegerOperator(
-        source = null,
-        session,
-        FirILTTypeRefPlaceHolder(),
-        receiverTypeRef = null,
-        ALL_OPERATORS.getValue(name),
-        FirResolvedDeclarationStatusImpl(Visibilities.PUBLIC, Modality.FINAL),
-        symbol
-    ).apply {
-        resolvePhase = FirResolvePhase.BODY_RESOLVE
+    private fun createFirFunction(name: Name, symbol: FirNamedFunctionSymbol): FirSimpleFunctionImpl {
+        val kind = ALL_OPERATORS.getValue(name)
+        return FirIntegerOperator(
+            source = null,
+            session,
+            FirILTTypeRefPlaceHolder(),
+            receiverTypeRef = null,
+            kind,
+            FirResolvedDeclarationStatusImpl(Visibilities.PUBLIC, Modality.FINAL).apply {
+                isOperator = kind.isOperator
+            },
+            symbol
+        ).apply {
+            resolvePhase = FirResolvePhase.BODY_RESOLVE
+        }
     }
 
     override fun processClassifiersByName(name: Name, processor: (FirClassifierSymbol<*>) -> Unit) {
@@ -147,21 +152,21 @@ class FirIntegerOperator @FirImplementationDetail constructor(
     symbol,
     annotations = mutableListOf(),
 ) {
-    enum class Kind(val unary: Boolean, val operatorName: Name) {
-        PLUS(false, OperatorNameConventions.PLUS),
-        MINUS(false, OperatorNameConventions.MINUS),
-        TIMES(false, OperatorNameConventions.TIMES),
-        DIV(false, OperatorNameConventions.DIV),
-        REM(false, OperatorNameConventions.REM),
-        SHL(false, Name.identifier("shl")),
-        SHR(false, Name.identifier("shr")),
-        USHR(false, Name.identifier("ushr")),
-        XOR(false, Name.identifier("xor")),
-        AND(false, Name.identifier("and")),
-        OR(false, Name.identifier("or")),
-        UNARY_PLUS(true, OperatorNameConventions.UNARY_PLUS),
-        UNARY_MINUS(true, OperatorNameConventions.UNARY_MINUS),
-        INV(true, Name.identifier("inv"))
+    enum class Kind(val unary: Boolean, val operatorName: Name, val isOperator: Boolean) {
+        PLUS(unary = false, OperatorNameConventions.PLUS, isOperator = true),
+        MINUS(unary = false, OperatorNameConventions.MINUS, isOperator = true),
+        TIMES(unary = false, OperatorNameConventions.TIMES, isOperator = true),
+        DIV(unary = false, OperatorNameConventions.DIV, isOperator = true),
+        REM(unary = false, OperatorNameConventions.REM, isOperator = true),
+        SHL(unary = false, Name.identifier("shl"), isOperator = false),
+        SHR(unary = false, Name.identifier("shr"), isOperator = false),
+        USHR(unary = false, Name.identifier("ushr"), isOperator = false),
+        XOR(unary = false, Name.identifier("xor"), isOperator = false),
+        AND(unary = false, Name.identifier("and"), isOperator = false),
+        OR(unary = false, Name.identifier("or"), isOperator = false),
+        UNARY_PLUS(unary = true, OperatorNameConventions.UNARY_PLUS, isOperator = true),
+        UNARY_MINUS(unary = true, OperatorNameConventions.UNARY_MINUS, isOperator = true),
+        INV(unary = true, Name.identifier("inv"), isOperator = false)
     }
 }
 

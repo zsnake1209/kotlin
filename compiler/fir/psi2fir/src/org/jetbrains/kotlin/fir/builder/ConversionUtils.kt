@@ -268,6 +268,7 @@ fun FirExpression.generateContainsOperation(
             name = OperatorNameConventions.NOT
         }
         explicitReceiver = containsCall
+        isOperatorCall = true
     }
 }
 
@@ -314,6 +315,7 @@ private fun FirExpression.createConventionCall(
         }
         explicitReceiver = this@createConventionCall
         arguments += argument
+        isOperatorCall = true
     }
 }
 
@@ -439,6 +441,7 @@ fun FirPropertyBuilder.generateAccessorsByDelegate(
         }
         arguments += thisRef()
         arguments += propertyRef()
+        isOperatorCall = true
     }
     delegate = delegateBuilder.build()
     if (stubMode) return
@@ -462,6 +465,7 @@ fun FirPropertyBuilder.generateAccessorsByDelegate(
                         }
                         arguments += thisRef()
                         arguments += propertyRef()
+                        isOperatorCall = true
                     }
                     target = returnTarget
                 }
@@ -501,6 +505,7 @@ fun FirPropertyBuilder.generateAccessorsByDelegate(
                             resolvedSymbol = parameter.symbol
                         }
                     }
+                    isOperatorCall = true
                 }
             )
         }

@@ -28,14 +28,14 @@ fun test() {
     var a = Example()
     val b = Example()
 
-    <!INAPPLICABLE_CANDIDATE!>consumeString<!>(a())
-    <!INAPPLICABLE_CANDIDATE!>consumeString<!>(a[1])
+    consumeString(a())
+    consumeString(a[1])
 
     val (x, y) = Example()
-    <!INAPPLICABLE_CANDIDATE!>consumeString<!>(x)
-    <!INAPPLICABLE_CANDIDATE!>consumeString<!>(y)
+    consumeString(x)
+    consumeString(y)
 
-    <!INAPPLICABLE_CANDIDATE!>consumeExample2<!>(++a)
+    consumeExample2(++a)
 
     <!INAPPLICABLE_CANDIDATE!>consumeString<!>(a plus b)
 }

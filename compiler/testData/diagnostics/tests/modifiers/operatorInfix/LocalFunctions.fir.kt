@@ -21,13 +21,13 @@ fun a() {
             val b = Example()
 
             consumeString(a + b)
-            <!INAPPLICABLE_CANDIDATE!>consumeInt<!>(a - b)
+            consumeInt(a - b)
 
             consumeString(a plus b)
             <!INAPPLICABLE_CANDIDATE!>consumeInt<!>(a minus b)
 
             a * b
-            a / b
+            a <!INAPPLICABLE_CANDIDATE!>/<!> b
 
             a times b
             a div b

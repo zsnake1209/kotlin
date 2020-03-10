@@ -250,6 +250,7 @@ class FirExpressionsResolveTransformer(transformer: FirBodyResolveTransformer) :
                     this.name = name
                     candidateSymbol = null
                 }
+                isOperatorCall = true
             }
 
             // TODO: disable DataFlowAnalyzer for resolving that two calls

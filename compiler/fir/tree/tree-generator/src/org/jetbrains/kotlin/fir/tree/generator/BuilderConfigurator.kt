@@ -145,7 +145,7 @@ object BuilderConfigurator : AbstractBuilderConfigurator<FirTreeBuilder>(FirTree
         builder(functionCall) {
             parents += qualifiedAccessBuilder
             parents += callBuilder
-            defaultFalse("safe")
+            defaultFalse("safe", "isOperatorCall")
             defaultNoReceivers()
             openBuilder()
         }

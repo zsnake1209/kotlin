@@ -2,7 +2,7 @@
 class A {
     fun bar() = foo() // should resolve to invoke
 
-    fun invoke() = this
+    operator fun invoke() = this
 }
 
 fun create() = A()

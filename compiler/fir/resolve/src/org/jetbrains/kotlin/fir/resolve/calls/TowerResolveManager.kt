@@ -204,7 +204,11 @@ class TowerResolveManager internal constructor(private val towerResolver: FirTow
                             }
 
                             val invokeFunctionInfo =
-                                info.copy(explicitReceiver = invokeReceiverExpression, name = OperatorNameConventions.INVOKE).let {
+                                info.copy(
+                                    isOperatorCall = true,
+                                    explicitReceiver = invokeReceiverExpression,
+                                    name = OperatorNameConventions.INVOKE
+                                ).let {
                                     when {
                                         invokeBuiltinExtensionMode -> it.withReceiverAsArgument(info.explicitReceiver!!)
                                         else -> it

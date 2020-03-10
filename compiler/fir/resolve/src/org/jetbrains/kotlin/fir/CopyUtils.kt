@@ -39,10 +39,12 @@ fun FirFunctionCall.copy(
     val builder = if (this is FirIntegerOperatorCall) {
         FirIntegerOperatorCallBuilder().apply {
             this.calleeReference = calleeReference
+            this.isOperatorCall = isOperatorCall
         }
     } else {
         FirFunctionCallBuilder().apply {
             this.calleeReference = calleeReference
+            this.isOperatorCall = isOperatorCall
         }
     }
     builder.apply {

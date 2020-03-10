@@ -24,6 +24,7 @@ enum class CallKind(vararg resolutionSequence: ResolutionStage) {
     Function(
         CheckVisibility,
         DiscriminateSynthetics,
+        CheckOperatorModifier,
         MapArguments,
         CheckExplicitReceiverConsistency,
         CreateFreshTypeVariableSubstitutorStage,

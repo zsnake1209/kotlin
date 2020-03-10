@@ -21,7 +21,7 @@ fun a() {
     a + b
     a - b
     a * b
-    a / b
+    a <!INAPPLICABLE_CANDIDATE!>/<!> b
 
     a plus b
     a minus b
@@ -30,9 +30,9 @@ fun a() {
 
     with (Example()) {
         consumeInt(this + a)
-        <!INAPPLICABLE_CANDIDATE!>consumeString<!>(this - b)
+        consumeString(this - b)
         consumeInt(this * a)
-        consumeInt(this / b)
+        consumeInt(this <!INAPPLICABLE_CANDIDATE!>/<!> b)
 
         consumeInt(this plus a)
         <!INAPPLICABLE_CANDIDATE!>consumeString<!>(this minus b)

@@ -495,3 +495,14 @@ internal object CheckLowPriorityInOverloadResolution : CheckerStage() {
         }
     }
 }
+
+
+internal object CheckOperatorModifier : CheckerStage() {
+    override suspend fun check(candidate: Candidate, sink: CheckerSink, callInfo: CallInfo) {
+        if (!callInfo.isOperatorCall) return
+        val function = candidate.symbol.fir as? FirSimpleFunction ?: return
+        if (!function.isOperator) {
+            sink.reportApplicability(CandidateApplicability.INAPPLICABLE)
+        }
+    }
+}

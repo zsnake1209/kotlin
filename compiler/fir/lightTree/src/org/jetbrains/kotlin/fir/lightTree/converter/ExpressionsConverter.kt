@@ -237,6 +237,7 @@ class ExpressionsConverter(
                 }
                 explicitReceiver = leftArgAsFir
                 arguments += rightArgAsFir
+                isOperatorCall = operationToken != IDENTIFIER
             }
         } else {
             val firOperation = operationToken.toFirOperation()
@@ -734,6 +735,7 @@ class ExpressionsConverter(
             explicitReceiver = firExpression
             arguments += indices
             getArgument?.let { arguments += it }
+            isOperatorCall = true
         }
     }
 
@@ -838,6 +840,7 @@ class ExpressionsConverter(
                 buildFunctionCall {
                     calleeReference = buildSimpleNamedReference { name = Name.identifier("iterator") }
                     explicitReceiver = rangeExpression
+                    isOperatorCall = true
                 }
             )
             statements += iteratorVal

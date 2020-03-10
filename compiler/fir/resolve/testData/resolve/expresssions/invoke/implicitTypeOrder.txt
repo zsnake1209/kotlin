@@ -8,7 +8,7 @@ FILE: implicitTypeOrder.kt
             ^bar R|/foo|.R|/A.invoke|()
         }
 
-        public final fun invoke(): R|A| {
+        public final operator fun invoke(): R|A| {
             ^invoke this@R|/A|
         }
 

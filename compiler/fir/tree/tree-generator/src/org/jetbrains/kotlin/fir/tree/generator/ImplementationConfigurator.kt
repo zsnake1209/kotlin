@@ -114,6 +114,7 @@ object ImplementationConfigurator : AbstractFirTreeImplementationConfigurator() 
                     withGetter = true
                 }
             }
+            defaultTrue("isOperatorCall", withGetter = true)
             default("calleeReference", "FirSimpleNamedReference(source, Name.identifier(\"component\$componentIndex\"), null)")
             useTypes(simpleNamedReferenceType, nameType, noReceiverExpressionType)
             optInToInternals()

@@ -33,6 +33,7 @@ data class CallInfo(
     val explicitReceiver: FirExpression?,
     val arguments: List<FirExpression>,
     val isSafeCall: Boolean,
+    val isOperatorCall: Boolean,
     val isPotentialQualifierPart: Boolean,
 
     val typeArguments: List<FirTypeProjection>,
@@ -51,12 +52,12 @@ data class CallInfo(
     fun noStubReceiver(): CallInfo =
         if (stubReceiver == null) this else CallInfo(
             callKind, name, explicitReceiver, arguments,
-            isSafeCall, isPotentialQualifierPart, typeArguments, session,
+            isSafeCall, isOperatorCall, isPotentialQualifierPart, typeArguments, session,
             containingFile, implicitReceiverStack, expectedType, outerCSBuilder, lhs, null
         )
 
     fun replaceWithVariableAccess(): CallInfo =
-        copy(callKind = CallKind.VariableAccess, arguments = emptyList())
+        copy(callKind = CallKind.VariableAccess, arguments = emptyList(), isOperatorCall = false)
 
     fun replaceExplicitReceiver(explicitReceiver: FirExpression?): CallInfo =
         copy(explicitReceiver = explicitReceiver)

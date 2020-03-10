@@ -1327,6 +1327,24 @@ public class FirDiagnosticsWithLightTreeTestGenerated extends AbstractFirDiagnos
         }
     }
 
+    @TestMetadata("compiler/fir/resolve/testData/resolve/operators")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class Operators extends AbstractFirDiagnosticsWithLightTreeTest {
+        private void runTest(String testDataFilePath) throws Exception {
+            KotlinTestUtils.runTest(this::doTest, this, testDataFilePath);
+        }
+
+        public void testAllFilesPresentInOperators() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/fir/resolve/testData/resolve/operators"), Pattern.compile("^([^.]+)\\.kt$"), null, true);
+        }
+
+        @TestMetadata("operatorsInResolution.kt")
+        public void testOperatorsInResolution() throws Exception {
+            runTest("compiler/fir/resolve/testData/resolve/operators/operatorsInResolution.kt");
+        }
+    }
+
     @TestMetadata("compiler/fir/resolve/testData/resolve/overrides")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

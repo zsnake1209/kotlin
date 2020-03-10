@@ -1287,7 +1287,8 @@ class RawFirBuilder(
                             name = Name.identifier("iterator")
                         }
                         explicitReceiver = rangeExpression
-                    },
+                        isOperatorCall = true
+                    }
                 )
                 statements += iteratorVal
                 statements += FirWhileLoopBuilder().apply {
@@ -1388,6 +1389,7 @@ class RawFirBuilder(
                     }
                     explicitReceiver = leftArgument
                     arguments += rightArgument
+                    isOperatorCall = operationToken != IDENTIFIER
                 }
             } else {
                 val firOperation = operationToken.toFirOperation()
@@ -1450,6 +1452,7 @@ class RawFirBuilder(
                             name = conventionCallName
                         }
                         explicitReceiver = argument.toFirExpression("No operand")
+                        isOperatorCall = true
                     }
                 }
                 else -> {
@@ -1539,6 +1542,7 @@ class RawFirBuilder(
                 if (getArgument != null) {
                     arguments += getArgument
                 }
+                isOperatorCall = true
             }
         }
 

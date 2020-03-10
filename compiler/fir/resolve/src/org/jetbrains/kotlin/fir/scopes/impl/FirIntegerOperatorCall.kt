@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.fir.references.FirNamedReference
 import org.jetbrains.kotlin.fir.types.FirTypeProjection
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.builder.buildImplicitTypeRef
+import kotlin.properties.Delegates
 
 @UseExperimental(FirImplementationDetail::class)
 class FirIntegerOperatorCall @FirImplementationDetail constructor(
@@ -34,6 +35,7 @@ class FirIntegerOperatorCall @FirImplementationDetail constructor(
     extensionReceiver: FirExpression,
     arguments: MutableList<FirExpression>,
     calleeReference: FirNamedReference,
+    isOperatorCall: Boolean
 ) : FirFunctionCallImpl(
     source,
     typeRef,
@@ -45,6 +47,7 @@ class FirIntegerOperatorCall @FirImplementationDetail constructor(
     extensionReceiver,
     arguments,
     calleeReference,
+    isOperatorCall
 )
 
 @FirBuilderDsl
@@ -58,6 +61,7 @@ class FirIntegerOperatorCallBuilder : FirQualifiedAccessBuilder, FirCallBuilder,
     override var dispatchReceiver: FirExpression = FirNoReceiverExpression
     override var extensionReceiver: FirExpression = FirNoReceiverExpression
     override val arguments: MutableList<FirExpression> = mutableListOf()
+    var isOperatorCall: Boolean by Delegates.notNull()
     lateinit var calleeReference: FirNamedReference
 
     @UseExperimental(FirImplementationDetail::class)
@@ -73,6 +77,7 @@ class FirIntegerOperatorCallBuilder : FirQualifiedAccessBuilder, FirCallBuilder,
             extensionReceiver,
             arguments,
             calleeReference,
+            isOperatorCall
         )
     }
 

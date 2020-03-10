@@ -49,14 +49,14 @@ fun test() {
     a == b
     c != d
 
-    Example() + Example()
+    Example() <!INAPPLICABLE_CANDIDATE!>+<!> Example()
 
-    a + b
+    a <!INAPPLICABLE_CANDIDATE!>+<!> b
     a - b
-    a[1]
+    <!INAPPLICABLE_CANDIDATE!>a[1]<!>
     a["str"]
 
-    a[1] = "A"
+    <!INAPPLICABLE_CANDIDATE!>a[1] = "A"<!>
     a["str"] = "str"
 
     a.plus(b)
@@ -64,31 +64,31 @@ fun test() {
     a.get(1)
     a.get("str")
 
-    c += d
+    <!INAPPLICABLE_CANDIDATE!>c += d<!>
     c -= d
 
-    a..b
+    a<!INAPPLICABLE_CANDIDATE!>..<!>b
     c..d
 
-    Example()..Example()
+    Example()<!INAPPLICABLE_CANDIDATE!>..<!>Example()
     Example2()..Example2()
 
-    a < b
-    a >= b
+    a <!INAPPLICABLE_CANDIDATE!><<!> b
+    a <!INAPPLICABLE_CANDIDATE!>>=<!> b
     c > d
 
-    a in b
+    a <!INAPPLICABLE_CANDIDATE!>in<!> b
     c in d
 
-    a++
-    a--
+    a<!INAPPLICABLE_CANDIDATE!>++<!>
+    a<!INAPPLICABLE_CANDIDATE!>--<!>
     c++
     c--
 
-    !a
+    <!INAPPLICABLE_CANDIDATE!>!<!>a
     !c
 
-    a()
+    <!INAPPLICABLE_CANDIDATE!>a<!>()
     c()
 
     Example()()
@@ -108,7 +108,7 @@ open class Anc : Base() {
 class Anc2 : Anc()
 
 fun test2() {
-    Anc() + Anc()
-    Anc() - Anc()
-    Anc2() + Anc2()
+    Anc() <!INAPPLICABLE_CANDIDATE!>+<!> Anc()
+    Anc() <!INAPPLICABLE_CANDIDATE!>-<!> Anc()
+    Anc2() <!INAPPLICABLE_CANDIDATE!>+<!> Anc2()
 }

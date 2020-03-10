@@ -377,6 +377,7 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                     name = callName
                 }
                 explicitReceiver = generateResolvedAccessExpression(source, temporaryVariable)
+                isOperatorCall = true
             }
             val resultVar = generateTemporaryVariable(this@BaseFirBuilder.baseSession, source, resultName, resultInitializer)
             val assignment = argument.generateAssignment(

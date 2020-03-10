@@ -13,7 +13,7 @@ fun test() {
     A.foo()
     A.X.foo()
 
-    fun A.invoke() {}
+    operator fun A.invoke() {}
 
     my.xx()
 }

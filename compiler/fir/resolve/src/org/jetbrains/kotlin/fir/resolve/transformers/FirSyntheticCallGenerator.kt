@@ -151,6 +151,7 @@ class FirSyntheticCallGenerator(
         explicitReceiver = null,
         arguments = arguments,
         isSafeCall = false,
+        isOperatorCall = false,
         isPotentialQualifierPart = false,
         typeArguments = emptyList(),
         session = session,

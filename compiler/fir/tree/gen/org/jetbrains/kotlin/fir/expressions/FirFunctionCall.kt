@@ -27,6 +27,7 @@ abstract class FirFunctionCall : FirQualifiedAccessExpression(), FirCall {
     abstract override val extensionReceiver: FirExpression
     abstract override val arguments: List<FirExpression>
     abstract override val calleeReference: FirNamedReference
+    abstract val isOperatorCall: Boolean
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitFunctionCall(this, data)
 

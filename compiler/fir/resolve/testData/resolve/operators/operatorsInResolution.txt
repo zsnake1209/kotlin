@@ -1,0 +1,69 @@
+FILE: operatorsInResolution.kt
+    public final fun takeDouble(x: R|kotlin/Double|): R|kotlin/Unit| {
+    }
+    public final fun takeInt(x: R|kotlin/Int|): R|kotlin/Unit| {
+    }
+    public final class Case_1 : R|kotlin/Any| {
+        public constructor(): R|Case_1| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val bar: R|kotlin/Int| = Int(1)
+            public get(): R|kotlin/Int|
+
+        public final operator fun R|kotlin/Double|.invoke(): R|kotlin/Double| {
+            ^invoke Double(1.0)
+        }
+
+        public final fun test_1(): R|kotlin/Unit| {
+            lval bar: R|kotlin/Double| = Double(2.0)
+            local final operator fun R|kotlin/Int|.invoke(): R|kotlin/Int| {
+                ^invoke Int(1)
+            }
+
+            lval res: R|kotlin/Int| = this@R|/Case_1|.R|/Case_1.bar|.R|<local>/invoke|()
+            <Inapplicable(INAPPLICABLE): [/takeDouble]>#(R|<local>/res|)
+        }
+
+    }
+    public final class Case_2 : R|kotlin/Any| {
+        public constructor(): R|Case_2| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val bar: R|kotlin/Int| = Int(1)
+            public get(): R|kotlin/Int|
+
+        public final fun R|kotlin/Double|.invoke(): R|kotlin/Double| {
+            ^invoke Double(1.0)
+        }
+
+        public final fun test_2(): R|kotlin/Unit| {
+            lval bar: R|kotlin/Double| = Double(2.0)
+            local final operator fun R|kotlin/Int|.invoke(): R|kotlin/Int| {
+                ^invoke Int(1)
+            }
+
+            lval res: R|kotlin/Int| = this@R|/Case_2|.R|/Case_2.bar|.R|<local>/invoke|()
+            R|/takeInt|(R|<local>/res|)
+        }
+
+    }
+    public final class Case_3 : R|kotlin/Any| {
+        public constructor(): R|Case_3| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val bar: R|kotlin/Int| = Int(1)
+            public get(): R|kotlin/Int|
+
+        public final fun R|kotlin/Double|.invoke(): R|kotlin/Double| {
+            ^invoke Double(1.0)
+        }
+
+        public final fun test(): R|kotlin/Unit| {
+            lval bar: R|kotlin/Double| = Double(2.0)
+            <Inapplicable(WRONG_RECEIVER): [/Case_3.invoke]>#()
+        }
+
+    }

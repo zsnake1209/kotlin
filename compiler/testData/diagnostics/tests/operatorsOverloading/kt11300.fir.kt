@@ -7,7 +7,7 @@ class A {
 
 fun main() {
     val a = A()
-    a[1]++
+    <!INAPPLICABLE_CANDIDATE!>a[1]++<!>
     a[1] += 3
-    a[1] = a[1] + 3
+    <!INAPPLICABLE_CANDIDATE!>a[1] = a[1] + 3<!>
 }
