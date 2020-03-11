@@ -152,7 +152,8 @@ class KotlinConstraintSystemCompleter(
         val postponedArguments = getOrderedNotAnalyzedPostponedArguments(topLevelAtoms)
         val hasProperAtom = postponedArguments.any {
             when (it) {
-                is LambdaWithTypeVariableAsExpectedTypeAtom,
+                is LambdaWithTypeVariableAsExpectedTypeAtom ->
+                    it.isReturnArgumentOfAnotherLambda || it.expectedType.constructor == variable
                 is PostponedCallableReferenceAtom -> it.expectedType?.constructor == variable
                 else -> false
             }
