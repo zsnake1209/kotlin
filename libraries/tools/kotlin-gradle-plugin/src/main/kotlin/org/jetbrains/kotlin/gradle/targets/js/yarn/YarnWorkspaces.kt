@@ -21,7 +21,6 @@ class YarnWorkspaces : YarnBasics() {
         subProjects: Collection<KotlinCompilationNpmResolution>,
         skipExecution: Boolean
     ) {
-        check(rootProject == rootProject.rootProject)
         if (!skipExecution) setup(rootProject)
         return resolveWorkspaces(rootProject, subProjects, skipExecution)
     }

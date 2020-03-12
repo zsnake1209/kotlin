@@ -19,7 +19,7 @@ class Yarn : NpmApi {
         else yarnSimple
 
     override fun setup(project: Project) =
-        getDelegate(project.rootProject).setup(project)
+        getDelegate(project).setup(project)
 
     override fun resolveProject(resolvedNpmProject: KotlinCompilationNpmResolution) =
         getDelegate(resolvedNpmProject.project).resolveProject(resolvedNpmProject)

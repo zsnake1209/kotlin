@@ -48,6 +48,7 @@ open class KotlinPackageJsonTask : DefaultTask() {
 
     companion object {
         fun create(compilation: KotlinJsCompilation): TaskProvider<KotlinPackageJsonTask> {
+            println("CREATE PACKAGE")
             val target = compilation.target
             val project = target.project
             val npmProject = compilation.npmProject

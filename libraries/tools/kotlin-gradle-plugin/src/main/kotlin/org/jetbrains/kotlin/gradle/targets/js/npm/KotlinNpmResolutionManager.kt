@@ -89,15 +89,27 @@ class KotlinNpmResolutionManager(private val nodeJsSettings: NodeJsRootExtension
     }
 
     @Incubating
-    fun requireInstalled() = installIfNeeded(requireUpToDateReason = "")
+    fun requireInstalled(): KotlinRootNpmResolution {
+        println("BEFORE requireInstalled")
+        return installIfNeeded(requireUpToDateReason = "")
+    }
 
-    internal fun requireConfiguringState(): KotlinRootNpmResolver =
-        (this.state as? ResolutionState.Configuring ?: error("NPM Dependencies already resolved and installed")).resolver
+    internal fun requireConfiguringState(): KotlinRootNpmResolver {
+        println("REQUIRE $state")
+        return (this.state as? ResolutionState.Configuring ?: error("NPM Dependencies already resolved and installed")).resolver
+    }
 
-    internal fun install() = installIfNeeded(requireNotInstalled = true)
+    internal fun install(): KotlinRootNpmResolution {
+        println("BEFORE install")
 
-    internal fun requireAlreadyInstalled(project: Project, reason: String = ""): KotlinProjectNpmResolution =
-        installIfNeeded(requireUpToDateReason = reason)[project]
+        return installIfNeeded(requireNotInstalled = true)
+    }
+
+    internal fun requireAlreadyInstalled(project: Project, reason: String = ""): KotlinProjectNpmResolution {
+        println("BEFORE requireAlreadyInstalled")
+
+        return installIfNeeded(requireUpToDateReason = reason)[project]
+    }
 
     internal val packageJsonFiles: Collection<File>
         get() = (state as ResolutionState.Configuring).resolver.compilations.map { it.npmProject.packageJsonFile }
@@ -132,6 +144,7 @@ class KotlinNpmResolutionManager(private val nodeJsSettings: NodeJsRootExtension
 
                             val forceUpToDate = upToDate && !forceFullResolve
                             state1.resolver.close(forceUpToDate).also {
+                                println("STATE CHANGED")
                                 this.state = ResolutionState.Installed(it)
                                 state1.resolver.closePlugins(it)
                             }
