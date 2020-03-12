@@ -31,6 +31,7 @@ class ExternalDependenciesGenerator(val symbolTable: SymbolTable, private val ir
         /*
             Deserializing a reference may lead to new unbound references, so we loop until none are left.
          */
+
         lateinit var unbound: List<IrSymbol>
         do {
             unbound = symbolTable.allUnbound

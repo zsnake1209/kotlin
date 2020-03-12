@@ -203,10 +203,16 @@ internal class InsertImplicitCasts(
             initializer = initializer?.cast(declaration.descriptor.type)
         }
 
-    override fun visitField(declaration: IrField): IrStatement =
-        declaration.transformPostfix {
-            initializer?.coerceInnerExpression(descriptor.type)
+    override fun visitField(declaration: IrField): IrStatement {
+        try {
+            typeTranslator.erasureStack.push(declaration.correspondingPropertySymbol?.descriptor ?: declaration.descriptor)
+            return declaration.transformPostfix {
+                initializer?.coerceInnerExpression(descriptor.type)
+            }
+        } finally {
+            typeTranslator.erasureStack.pop()
         }
+    }
 
     override fun visitFunction(declaration: IrFunction): IrStatement =
         typeTranslator.buildWithScope(declaration) {
