@@ -65,6 +65,8 @@ open class KotlinPackageJsonTask : DefaultTask() {
                 task.dependsOn(target.project.provider { task.findDependentTasks() })
             }
 
+            npmInstallTask.dependsOn(packageJsonTask)
+
             compilation.compileKotlinTask.dependsOn(
                 npmInstallTask,
                 packageJsonTask
