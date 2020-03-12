@@ -36,6 +36,16 @@ enum class CallKind(vararg resolutionSequence: ResolutionStage) {
         EagerResolveOfCallableReferences,
         CheckLowPriorityInOverloadResolution
     ),
+    DelegatingConstructorCall(
+        CheckVisibility,
+        MapArguments,
+        CheckExplicitReceiverConsistency,
+        CreateFreshTypeVariableSubstitutorStage,
+        CheckReceivers.Dispatch,
+        CheckReceivers.Extension,
+        CheckArguments,
+        EagerResolveOfCallableReferences
+    ),
     CallableReference(
         CheckVisibility,
         DiscriminateSynthetics,

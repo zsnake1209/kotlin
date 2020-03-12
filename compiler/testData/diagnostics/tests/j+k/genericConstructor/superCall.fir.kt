@@ -9,7 +9,7 @@ public class A<E> {
 
 // FILE: main.kt
 
-class B1(x: List<String>) : <!INAPPLICABLE_CANDIDATE!>A<CharSequence><!>("", x)
+class B1(x: List<String>) : A<CharSequence>("", x)
 class B2(x: List<Int>) : <!INAPPLICABLE_CANDIDATE!>A<CharSequence><!>("", x)
 
 class C : A<CharSequence> {
