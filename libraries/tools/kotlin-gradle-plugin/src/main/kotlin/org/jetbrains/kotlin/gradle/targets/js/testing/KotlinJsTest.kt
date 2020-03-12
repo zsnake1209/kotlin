@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.gradle.utils.newFileProperty
 open class KotlinJsTest :
     KotlinTest(),
     RequiresNpmDependencies {
-    private val nodeJs get() = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs get() = NodeJsRootPlugin.apply(project)
 
     @get:Internal
     internal var testFramework: KotlinJsTestFramework? = null

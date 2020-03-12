@@ -29,7 +29,7 @@ open class NpmProject(val compilation: KotlinJsCompilation) {
         get() = buildNpmProjectName()
 
     val nodeJs
-        get() = NodeJsRootPlugin.apply(project.rootProject)
+        get() = NodeJsRootPlugin.apply(project)
 
     val dir: File
         get() = nodeJs.projectPackagesDir.resolve(name)

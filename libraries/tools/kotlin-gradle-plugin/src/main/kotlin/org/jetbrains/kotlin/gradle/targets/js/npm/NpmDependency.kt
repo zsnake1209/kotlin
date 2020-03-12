@@ -95,7 +95,7 @@ data class NpmDependency(
     // (it can be called since NpmDependency added to configuration that
     // requires resolve to build package.json, in this case we should just skip this call)
     private fun resolveProject(): KotlinCompilationNpmResolution? {
-        val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+        val nodeJs = NodeJsRootPlugin.apply(project)
         return nodeJs.npmResolutionManager.getNpmDependencyResolvedCompilation(this)
     }
 

@@ -27,7 +27,7 @@ import java.io.File
 import javax.inject.Inject
 
 open class KotlinWebpack : DefaultTask(), RequiresNpmDependencies {
-    private val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs = NodeJsRootPlugin.apply(project)
     private val versions = nodeJs.versions
 
     @get:Inject

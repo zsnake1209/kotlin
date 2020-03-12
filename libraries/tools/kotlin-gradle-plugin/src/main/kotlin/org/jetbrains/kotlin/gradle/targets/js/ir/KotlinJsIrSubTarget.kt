@@ -28,7 +28,7 @@ abstract class KotlinJsIrSubTarget(
     private val disambiguationClassifier: String
 ) : KotlinJsSubTargetDsl {
     val project get() = target.project
-    private val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs = NodeJsRootPlugin.apply(project)
 
     abstract val testTaskDescription: String
 

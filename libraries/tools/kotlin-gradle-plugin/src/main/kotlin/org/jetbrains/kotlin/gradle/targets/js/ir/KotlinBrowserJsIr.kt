@@ -65,7 +65,7 @@ open class KotlinBrowserJsIr @Inject constructor(target: KotlinJsIrTarget) :
     ) {
 
         val project = compilation.target.project
-        val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+        val nodeJs = NodeJsRootPlugin.apply(project)
 
         buildVariants.all { buildVariant ->
             val kind = buildVariant.kind
@@ -121,7 +121,7 @@ open class KotlinBrowserJsIr @Inject constructor(target: KotlinJsIrTarget) :
         compilation: KotlinJsIrCompilation
     ) {
         val project = compilation.target.project
-        val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+        val nodeJs = NodeJsRootPlugin.apply(project)
 
         val basePluginConvention = project.convention.plugins["base"] as BasePluginConvention?
 

@@ -13,9 +13,6 @@ import org.jetbrains.kotlin.gradle.tasks.internal.CleanableStore
 import java.io.File
 
 open class NodeJsRootExtension(val rootProject: Project) : ConfigurationPhaseAware<NodeJsEnv>() {
-    init {
-        check(rootProject.rootProject == rootProject)
-    }
 
     private val gradleHome = rootProject.gradle.gradleUserHomeDir.also {
         rootProject.logger.kotlinInfo("Storing cached files in $it")

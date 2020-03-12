@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import java.io.File
 
 open class PackageJsonDukatTask : AbstractDukatTask() {
-    private val nodeJs get() = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs get() = NodeJsRootPlugin.apply(project)
 
     @get:Internal
     val dts by lazy {

@@ -89,7 +89,7 @@ open class KotlinBrowserJs @Inject constructor(target: KotlinJsTarget) :
     ) {
 
         val project = compilation.target.project
-        val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+        val nodeJs = NodeJsRootPlugin.apply(project)
 
         val compileKotlinTask = compilation.compileKotlinTask
 
@@ -153,7 +153,7 @@ open class KotlinBrowserJs @Inject constructor(target: KotlinJsTarget) :
         dceTaskProvider: TaskProvider<KotlinJsDceTask>
     ) {
         val project = compilation.target.project
-        val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+        val nodeJs = NodeJsRootPlugin.apply(project)
 
         val compileKotlinTask = compilation.compileKotlinTask
 

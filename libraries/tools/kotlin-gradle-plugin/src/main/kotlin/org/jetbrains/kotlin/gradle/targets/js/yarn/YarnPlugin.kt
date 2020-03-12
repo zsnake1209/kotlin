@@ -12,9 +12,6 @@ import org.jetbrains.kotlin.gradle.tasks.CleanDataTask
 
 open class YarnPlugin : Plugin<Project> {
     override fun apply(project: Project): Unit = project.run {
-        check(project == project.rootProject) {
-            "YarnPlugin can be applied only to root project"
-        }
 
         val nodeJs = NodeJsRootPlugin.apply(this)
 
@@ -32,9 +29,8 @@ open class YarnPlugin : Plugin<Project> {
 
     companion object {
         fun apply(project: Project): YarnRootExtension {
-            val rootProject = project.rootProject
-            rootProject.plugins.apply(YarnPlugin::class.java)
-            return rootProject.extensions.getByName(YarnRootExtension.YARN) as YarnRootExtension
+            project.plugins.apply(YarnPlugin::class.java)
+            return project.extensions.getByName(YarnRootExtension.YARN) as YarnRootExtension
         }
     }
 }

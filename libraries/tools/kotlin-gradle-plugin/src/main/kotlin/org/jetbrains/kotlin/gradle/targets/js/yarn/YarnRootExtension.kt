@@ -12,9 +12,6 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.tasks.internal.CleanableStore
 
 open class YarnRootExtension(val project: Project) : ConfigurationPhaseAware<YarnEnv>() {
-    init {
-        check(project == project.rootProject)
-    }
 
     private val gradleHome = project.gradle.gradleUserHomeDir.also {
         project.logger.kotlinInfo("Storing cached files in $it")
@@ -55,9 +52,8 @@ open class YarnRootExtension(val project: Project) : ConfigurationPhaseAware<Yar
         const val YARN: String = "kotlinYarn"
 
         operator fun get(project: Project): YarnRootExtension {
-            val rootProject = project.rootProject
-            rootProject.plugins.apply(YarnPlugin::class.java)
-            return rootProject.extensions.getByName(YARN) as YarnRootExtension
+            project.plugins.apply(YarnPlugin::class.java)
+            return project.extensions.getByName(YARN) as YarnRootExtension
         }
     }
 }

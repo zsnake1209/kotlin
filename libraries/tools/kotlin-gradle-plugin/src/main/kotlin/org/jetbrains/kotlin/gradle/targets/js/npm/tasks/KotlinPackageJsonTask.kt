@@ -6,8 +6,10 @@
 package org.jetbrains.kotlin.gradle.targets.js.npm.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.plugins.BasePlugin
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
@@ -49,9 +51,8 @@ open class KotlinPackageJsonTask : DefaultTask() {
             val target = compilation.target
             val project = target.project
             val npmProject = compilation.npmProject
-            val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+            val nodeJs = NodeJsRootPlugin.apply(project)
 
-            val rootClean = project.rootProject.tasks.getByName(BasePlugin.CLEAN_TASK_NAME)
             val npmInstallTask = nodeJs.npmInstallTask
             val packageJsonTaskName = npmProject.packageJsonTaskName
             val packageJsonTask = project.registerTask<KotlinPackageJsonTask>(packageJsonTaskName) { task ->
@@ -61,10 +62,7 @@ open class KotlinPackageJsonTask : DefaultTask() {
                 task.group = NodeJsRootPlugin.TASKS_GROUP_NAME
 
                 task.dependsOn(target.project.provider { task.findDependentTasks() })
-                task.mustRunAfter(rootClean)
             }
-
-            npmInstallTask.mustRunAfter(rootClean, packageJsonTask)
 
             compilation.compileKotlinTask.dependsOn(
                 npmInstallTask,

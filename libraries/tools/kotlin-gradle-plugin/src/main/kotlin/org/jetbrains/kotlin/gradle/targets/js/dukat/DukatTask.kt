@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.RequiresNpmDependencies
 import java.io.File
 
 abstract class AbstractDukatTask : AbstractTask(), RequiresNpmDependencies {
-    private val nodeJs get() = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs get() = NodeJsRootPlugin.apply(project)
 
     @get:Internal
     override lateinit var compilation: KotlinJsCompilation

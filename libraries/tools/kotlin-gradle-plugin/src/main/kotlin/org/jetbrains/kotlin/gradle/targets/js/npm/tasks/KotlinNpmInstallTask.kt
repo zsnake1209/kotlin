@@ -10,15 +10,11 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
-import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import java.io.File
 
 open class KotlinNpmInstallTask : DefaultTask() {
-    init {
-        check(project == project.rootProject)
-    }
 
-    private val nodeJs get() = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs get() = NodeJsRootPlugin.apply(project)
     private val resolutionManager get() = nodeJs.npmResolutionManager
 
     @Suppress("unused")

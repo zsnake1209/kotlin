@@ -25,7 +25,7 @@ import java.io.File
 class KotlinMocha(override val compilation: KotlinJsCompilation) :
     KotlinJsTestFramework {
     private val project: Project = compilation.target.project
-    private val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs = NodeJsRootPlugin.apply(project)
     private val versions = nodeJs.versions
 
     override val settingsState: String

@@ -33,7 +33,7 @@ import java.io.File
 class KotlinKarma(override val compilation: KotlinJsCompilation) :
     KotlinJsTestFramework {
     private val project: Project = compilation.target.project
-    private val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+    private val nodeJs = NodeJsRootPlugin.apply(project)
     private val versions = nodeJs.versions
 
     private val config: KarmaConfig = KarmaConfig()

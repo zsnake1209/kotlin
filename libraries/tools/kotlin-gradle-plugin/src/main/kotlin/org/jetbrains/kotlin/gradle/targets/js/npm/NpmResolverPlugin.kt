@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 class NpmResolverPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val project = target
-        val nodeJs = NodeJsRootPlugin.apply(project.rootProject)
+        val nodeJs = NodeJsRootPlugin.apply(project)
         nodeJs.npmResolutionManager.requireConfiguringState().addProject(project)
     }
 
