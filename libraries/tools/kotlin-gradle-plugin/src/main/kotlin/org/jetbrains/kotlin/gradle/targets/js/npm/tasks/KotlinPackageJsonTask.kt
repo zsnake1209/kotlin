@@ -56,23 +56,28 @@ open class KotlinPackageJsonTask : DefaultTask() {
 
             val npmInstallTask = nodeJs.npmInstallTask
             val packageJsonTaskName = npmProject.packageJsonTaskName
-            val packageJsonTask = project.registerTask<KotlinPackageJsonTask>(packageJsonTaskName) { task ->
-                task.nodeJs = nodeJs
-                task.compilation = compilation
-                task.description = "Create package.json file for $compilation"
-                task.group = NodeJsRootPlugin.TASKS_GROUP_NAME
+            val packageJsonTask = project.tasks
+                .withType(KotlinPackageJsonTask::class.java)
+                .matching { it.name == packageJsonTaskName }
 
-                task.dependsOn(target.project.provider { task.findDependentTasks() })
-            }
+            return if (packageJsonTask.isEmpty()) {
+                val packageJsonTask = project.registerTask<KotlinPackageJsonTask>(packageJsonTaskName) { task ->
+                    task.nodeJs = nodeJs
+                    task.compilation = compilation
+                    task.description = "Create package.json file for $compilation"
+                    task.group = NodeJsRootPlugin.TASKS_GROUP_NAME
 
-            npmInstallTask.dependsOn(packageJsonTask)
+                    task.dependsOn(target.project.provider { task.findDependentTasks() })
+                }
 
-            compilation.compileKotlinTask.dependsOn(
-                npmInstallTask,
+                npmInstallTask.dependsOn(packageJsonTask)
+
+                compilation.compileKotlinTask.dependsOn(
+                    npmInstallTask,
+                    packageJsonTask
+                )
                 packageJsonTask
-            )
-
-            return packageJsonTask
+            } else packageJsonTask.named(packageJsonTaskName)
         }
     }
 }
