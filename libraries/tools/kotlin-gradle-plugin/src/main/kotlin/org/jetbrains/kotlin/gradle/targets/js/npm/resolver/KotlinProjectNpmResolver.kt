@@ -90,7 +90,6 @@ internal class KotlinProjectNpmResolver(
     }
 
     fun close(): KotlinProjectNpmResolution {
-        check(!closed)
         closed = true
 
         return KotlinProjectNpmResolution(

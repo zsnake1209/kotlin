@@ -47,6 +47,12 @@ internal class KotlinRootNpmResolver internal constructor(
         projectResolvers[target] = KotlinProjectNpmResolver(target, this)
     }
 
+    @Synchronized
+    fun addProject(project: Project, target: KotlinProjectNpmResolver) {
+        check(!closed) { alreadyResolvedMessage("add new project: $target") }
+        projectResolvers[project] = target
+    }
+
     operator fun get(project: Project) = projectResolvers[project] ?: error("$project is not configured for JS usage")
 
     val compilations: Collection<KotlinJsCompilation>

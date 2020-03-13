@@ -62,8 +62,8 @@ internal class KotlinCompilationNpmResolver(
 
     @Synchronized
     fun resolve(skipWriting: Boolean = false): KotlinCompilationNpmResolution {
-        check(!closed) { "$this already closed" }
-        check(resolution == null) { "$this already resolved" }
+//        check(!closed) { "$this already closed" }
+//        check(resolution == null) { "$this already resolved" }
 
         return packageJsonProducer.createPackageJson(skipWriting).also {
             resolution = it
@@ -80,7 +80,7 @@ internal class KotlinCompilationNpmResolver(
 
     @Synchronized
     fun close(): KotlinCompilationNpmResolution? {
-        check(!closed) { "$this already closed" }
+//        check(!closed) { "$this already closed" }
         val resolution = getResolutionOrResolveIfForced()
         closed = true
         return resolution
