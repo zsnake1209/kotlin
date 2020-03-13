@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.typeUtil.replaceArgumentsWithStarProjections
 import org.jetbrains.kotlin.types.typesApproximation.approximateCapturedTypes
 import java.util.*
-import kotlin.collections.ArrayDeque
 
 class TypeTranslator(
     private val symbolTable: ReferenceSymbolTable,

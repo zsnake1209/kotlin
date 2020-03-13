@@ -34,7 +34,7 @@ import org.jetbrains.kotlin.types.KotlinType
 
 class DeclarationGenerator(override val context: GeneratorContext) : Generator {
 
-    val typeTranslator = context.typeTranslator
+    private val typeTranslator = context.typeTranslator
 
     fun KotlinType.toIrType() = typeTranslator.translateType(this)
 
