@@ -115,21 +115,12 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
         )
     }
 
-    private fun <T> withErasedTypeTranslator(descriptor: PropertyDescriptor, b: () -> T): T {
-        try {
-            context.typeTranslator.erasureStack.push(descriptor)
-            return b()
-        } finally {
-            context.typeTranslator.erasureStack.pop()
-        }
-    }
-
     private fun generateDelegateFieldForProperty(
         propertyDescriptor: PropertyDescriptor,
         kPropertyType: KotlinType,
         ktDelegate: KtPropertyDelegate
     ): IrField {
-        return withErasedTypeTranslator(propertyDescriptor) {
+        return context.typeTranslator.withTypeErasure(propertyDescriptor) {
             val delegateType = getDelegatedPropertyDelegateType(propertyDescriptor, ktDelegate)
             val delegateDescriptor = createPropertyDelegateDescriptor(propertyDescriptor, delegateType, kPropertyType)
 
@@ -180,7 +171,7 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
         ktDelegate: KtPropertyDelegate,
         propertyDescriptor: PropertyDescriptor
     ): IntermediateValue {
-        return withErasedTypeTranslator(propertyDescriptor) {
+        return context.typeTranslator.withTypeErasure(propertyDescriptor) {
             // TODO: do not erase type here
             val thisValue = createThisValueForDelegate(thisClass, ktDelegate)
             BackingFieldLValue(

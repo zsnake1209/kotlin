@@ -33,7 +33,7 @@ class TypeTranslator(
     private val enterTableScope: Boolean = false
 ) {
 
-    val erasureStack = Stack<PropertyDescriptor>()
+    private val erasureStack = Stack<PropertyDescriptor>()
 
     private val typeApproximatorForNI = TypeApproximator(builtIns)
     lateinit var constantValueGenerator: ConstantValueGenerator
@@ -49,6 +49,15 @@ class TypeTranslator(
         typeParametersResolver.leaveTypeParameterScope()
         if (enterTableScope) {
             symbolTable.leaveScope(irElement.descriptor)
+        }
+    }
+
+    fun <T> withTypeErasure(propertyDescriptor: PropertyDescriptor, b: () -> T): T {
+        try {
+            erasureStack.push(propertyDescriptor)
+            return b()
+        } finally {
+            erasureStack.pop()
         }
     }
 
