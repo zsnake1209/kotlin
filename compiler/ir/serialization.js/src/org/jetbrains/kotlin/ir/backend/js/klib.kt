@@ -135,8 +135,14 @@ fun generateKLib(
 
     val expectDescriptorToSymbol = mutableMapOf<DeclarationDescriptor, IrSymbol>()
 
+    val deserializer = JsIrLinker(emptyLoggingContext, psi2IrContext.irBuiltIns, psi2IrContext.symbolTable)
+
+    val deserializedModuleFragments = sortDependencies(allDependencies.getFullList(), depsDescriptors.descriptors).map {
+        deserializer.deserializeOnlyHeaderModule(depsDescriptors.getModuleDescriptor(it))
+    }
+
     val moduleFragment = psi2IrContext.generateModuleFragmentWithPlugins(project, files,
-        deserializer = null, expectDescriptorToSymbol = expectDescriptorToSymbol)
+        deserializer = deserializer, expectDescriptorToSymbol = expectDescriptorToSymbol)
 
     moduleFragment.acceptVoid(ManglerChecker(JsManglerIr, Ir2DescriptorManglerAdapter(JsManglerDesc)))
 
@@ -196,10 +202,8 @@ fun loadIr(
             val deserializer = JsIrLinker(emptyLoggingContext, irBuiltIns, symbolTable)
 
             val deserializedModuleFragments = sortDependencies(allDependencies.getFullList(), depsDescriptors.descriptors).map {
-                deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))!!
+                deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it))
             }
-
-            deserializer.initializeExpectActualLinker()
 
             val moduleFragment = psi2IrContext.generateModuleFragmentWithPlugins(project, mainModule.files, deserializer)
 
@@ -235,10 +239,10 @@ fun loadIr(
 
                 deserializer.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it), strategy)
             }
-            deserializer.initializeExpectActualLinker()
+            deserializer.postProcess()
             val moduleFragment = deserializedModuleFragments.last()
 
-            val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
+            val irProviders = listOf(deserializer)
             ExternalDependenciesGenerator(symbolTable, irProviders).generateUnboundSymbolsAsDependencies()
 
             return IrModuleInfo(moduleFragment, deserializedModuleFragments, irBuiltIns, symbolTable, deserializer)
@@ -265,12 +269,12 @@ private fun runAnalysisAndPreparePsi2Ir(depsDescriptors: ModulesStructure): Gene
 fun GeneratorContext.generateModuleFragmentWithPlugins(
     project: Project,
     files: List<KtFile>,
-    deserializer: IrDeserializer? = null,
+    deserializer: IrDeserializer,
     expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>? = null
 ): IrModuleFragment {
-    val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
     val signaturer = IdSignatureDescriptor(JsManglerDesc)
     val psi2Ir = Psi2IrTranslator(languageVersionSettings, configuration, signaturer)
+    val psi2irModuleGenerator = psi2Ir.createModuleGenerator(this)
 
     for (extension in IrGenerationExtension.getInstances(project)) {
         psi2Ir.addPostprocessingStep { module ->
@@ -288,25 +292,9 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
         }
     }
 
-    val moduleFragment =
-        psi2Ir.generateModuleFragment(
-            this,
-            files,
-            irProviders,
-            expectDescriptorToSymbol
-        )
-    return moduleFragment
+    deserializer.init(psi2irModuleGenerator.moduleFragment)
+    return psi2Ir.generateModuleFragment(psi2irModuleGenerator, files, listOf(deserializer), expectDescriptorToSymbol)
 }
-
-fun GeneratorContext.generateModuleFragment(files: List<KtFile>, deserializer: IrDeserializer? = null, expectDescriptorToSymbol: MutableMap<DeclarationDescriptor, IrSymbol>? = null): IrModuleFragment {
-    val irProviders = generateTypicalIrProviderList(moduleDescriptor, irBuiltIns, symbolTable, deserializer)
-    val mangler = JsManglerDesc
-    val signaturer = IdSignatureDescriptor(mangler)
-    return Psi2IrTranslator(
-        languageVersionSettings, configuration, signaturer
-    ).generateModuleFragment(this, files, irProviders, expectDescriptorToSymbol)
-}
-
 
 private fun createBuiltIns(storageManager: StorageManager) = object : KotlinBuiltIns(storageManager) {}
 internal val JsFactories = KlibMetadataFactories(::createBuiltIns, DynamicTypeDeserializer)
