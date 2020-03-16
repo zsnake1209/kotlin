@@ -835,10 +835,10 @@ abstract class IrFileDeserializer(val logger: LoggingContext, val builtIns: IrBu
             -> IrConstImpl.long(start, end, type, proto.long)
             STRING
             -> IrConstImpl.string(start, end, type, deserializeString(proto.string))
-            FLOAT
-            -> IrConstImpl.float(start, end, type, proto.float)
-            DOUBLE
-            -> IrConstImpl.double(start, end, type, proto.double)
+            FLOAT_BITS
+            -> IrConstImpl.float(start, end, type, java.lang.Float.intBitsToFloat(proto.floatBits))
+            DOUBLE_BITS
+            -> IrConstImpl.double(start, end, type, java.lang.Double.longBitsToDouble(proto.doubleBits))
             VALUE_NOT_SET
             -> error("Const deserialization error: ${proto.valueCase} ")
         }
