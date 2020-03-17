@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.gradle.targets.js.ir
 
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsOptions
 import org.jetbrains.kotlin.gradle.plugin.*
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinTasksProvider
 import org.jetbrains.kotlin.gradle.testing.internal.kotlinTestRegistry
 import org.jetbrains.kotlin.gradle.testing.testTaskName
 import org.jetbrains.kotlin.gradle.utils.klibModuleName
+import org.jetbrains.kotlin.gradle.utils.setArchiveExtensionCompatible
 
 open class KotlinJsIrTargetConfigurator(kotlinPluginVersion: String) :
     KotlinOnlyTargetConfigurator<KotlinJsIrCompilation, KotlinJsIrTarget>(true, true, kotlinPluginVersion),
@@ -54,10 +56,11 @@ open class KotlinJsIrTargetConfigurator(kotlinPluginVersion: String) :
         return KotlinJsIrSourceSetProcessor(tasksProvider, compilation, kotlinPluginVersion)
     }
 
-    override fun createArchiveTasks(target: KotlinJsIrTarget): Zip {
+    override fun createArchiveTasks(target: KotlinJsIrTarget): TaskProvider<out Zip> {
         return super.createArchiveTasks(target).apply {
             // not archiveExtension because it is since Gradle 5.1 only
-            extension = KLIB_TYPE
+
+            configure { it.setArchiveExtensionCompatible { KLIB_TYPE } }
         }
     }
 
