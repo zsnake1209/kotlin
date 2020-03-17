@@ -1,0 +1,42 @@
+FILE: repeatedModifiers.kt
+    public final class NoModifiers : R|kotlin/Any| {
+        public constructor(): R|NoModifiers| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    public open class RepeatedModifier : R|kotlin/Any| {
+        public constructor(): R|RepeatedModifier| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    public open class OpenModifier : R|kotlin/Any| {
+        public constructor(): R|OpenModifier| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final enum class RepeatedModifierOnMember : R|kotlin/Enum<OpenModifier.RepeatedModifierOnMember>| {
+            private constructor(): R|OpenModifier.RepeatedModifierOnMember| {
+                super<R|kotlin/Enum<OpenModifier.RepeatedModifierOnMember>|>()
+            }
+
+            public final static fun values(): R|kotlin/Array<OpenModifier.RepeatedModifierOnMember>| {
+            }
+
+            public final static fun valueOf(value: R|kotlin/String|): R|OpenModifier.RepeatedModifierOnMember| {
+            }
+
+        }
+
+        public final fun foo(): R|kotlin/Unit| {
+            local open class RepeatedModifierInFunctionBody : R|kotlin/Any| {
+                public constructor(): R|OpenModifier.RepeatedModifierInFunctionBody| {
+                    super<R|kotlin/Any|>()
+                }
+
+            }
+
+        }
+
+    }
