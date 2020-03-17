@@ -151,6 +151,7 @@ class ConstraintIncorporator(
         otherVariable: TypeVariableMarker,
         otherConstraint: Constraint
     ) {
+        val isBaseNonGenericType = baseConstraint.type.argumentsCount() == 0
         val (type, needApproximation) = when (otherConstraint.kind) {
             ConstraintKind.EQUALITY -> {
                 otherConstraint.type to true
@@ -165,12 +166,10 @@ class ConstraintIncorporator(
                  *      incorporatedConstraint = Approx(CapturedType(out Number)) <: TypeVariable(A) => Nothing <: TypeVariable(A)
                  * TODO: implement this for generics
                  */
-                if (baseConstraint.kind == ConstraintKind.LOWER && baseConstraint.type.argumentsCount() == 0) {
-                    /*
-                     * baseConstraint is not null => constraining type after substitution = Nothing – it's default constraint, so we can not add it
-                     * baseConstraint is nullable => constraining type after substitution = Nothing? or Nothing! – it's useful constraint in terms of nullability
-                     */
-                    if (baseConstraint.type.isNullableType()) nothingType() to false else return
+                if (baseConstraint.kind == ConstraintKind.LOWER && isBaseNonGenericType) {
+                    nothingType() to false
+                } else if (baseConstraint.kind == ConstraintKind.UPPER && isBaseNonGenericType) {
+                    otherConstraint.type to false
                 } else {
                     createCapturedType(
                         createTypeArgument(otherConstraint.type, TypeVariance.OUT),
@@ -190,12 +189,10 @@ class ConstraintIncorporator(
                  *      incorporatedConstraint = TypeVariable(A) <: Approx(CapturedType(in Number)) => TypeVariable(A) <: Any?
                  * TODO: implement this for generics
                  */
-                if (baseConstraint.kind == ConstraintKind.UPPER && baseConstraint.type.argumentsCount() == 0) {
-                    /*
-                     * baseConstraint is not null or flexible => constraining type after substitution = Any or Any! – it's useful constraint in terms of nullability
-                     * baseConstraint is nullable => constraining type after substitution = Any? – it's default constraint, so we can not add it
-                     */
-                    if (baseConstraint.type.isDefinitelyNotNullType() || baseConstraint.type.isFlexible()) nullableAnyType() to false else return
+                if (baseConstraint.kind == ConstraintKind.UPPER && isBaseNonGenericType) {
+                    nullableAnyType() to false
+                } else if (baseConstraint.kind == ConstraintKind.LOWER && isBaseNonGenericType) {
+                    otherConstraint.type to false
                 } else {
                     createCapturedType(
                         createTypeArgument(otherConstraint.type, TypeVariance.IN),
