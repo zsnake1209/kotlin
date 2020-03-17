@@ -113,48 +113,98 @@ class ConstraintIncorporator(
         }
     }
 
+    private fun Context.approximateIfNeededAndAddNewConstraint(
+        baseConstraint: Constraint,
+        type: KotlinTypeMarker,
+        targetVariable: TypeVariableMarker,
+        otherVariable: TypeVariableMarker,
+        otherConstraint: Constraint,
+        needApproximation: Boolean = true
+    ) {
+        val substitutedType = baseConstraint.type.substitute(this, otherVariable, type)
+
+        if (baseConstraint.kind == ConstraintKind.LOWER || baseConstraint.kind == ConstraintKind.EQUALITY) {
+            addNewConstraint(
+                targetVariable,
+                baseConstraint,
+                otherVariable,
+                otherConstraint,
+                if (needApproximation) approximateCapturedTypes(substitutedType, toSuper = false) else substitutedType,
+                isSubtype = true
+            )
+        }
+        if (baseConstraint.kind == ConstraintKind.UPPER || baseConstraint.kind == ConstraintKind.EQUALITY) {
+            addNewConstraint(
+                targetVariable,
+                baseConstraint,
+                otherVariable,
+                otherConstraint,
+                if (needApproximation) approximateCapturedTypes(substitutedType, toSuper = true) else substitutedType,
+                isSubtype = false
+            )
+        }
+    }
+
     private fun Context.generateNewConstraint(
         targetVariable: TypeVariableMarker,
         baseConstraint: Constraint,
         otherVariable: TypeVariableMarker,
         otherConstraint: Constraint
     ) {
-
-        val baseConstraintType = baseConstraint.type
-
-        val typeForApproximation = when (otherConstraint.kind) {
+        val isBaseNonGenericType = baseConstraint.type.argumentsCount() == 0
+        val (type, needApproximation) = when (otherConstraint.kind) {
             ConstraintKind.EQUALITY -> {
-                baseConstraintType.substitute(this, otherVariable, otherConstraint.type)
+                otherConstraint.type to true
             }
             ConstraintKind.UPPER -> {
-                val temporaryCapturedType = createCapturedType(
-                    createTypeArgument(otherConstraint.type, TypeVariance.OUT),
-                    listOf(otherConstraint.type),
-                    null,
-                    CaptureStatus.FOR_INCORPORATION
-                )
-                baseConstraintType.substitute(this, otherVariable, temporaryCapturedType)
+                /*
+                 * Creating a captured type isn't needed due to its future approximation to `Nothing` or itself
+                 * Example:
+                 *      targetVariable = TypeVariable(A)
+                 *      baseConstraint = LOWER(TypeVariable(B))
+                 *      otherConstraint = UPPER(Number)
+                 *      incorporatedConstraint = Approx(CapturedType(out Number)) <: TypeVariable(A) => Nothing <: TypeVariable(A)
+                 * TODO: implement this for generics
+                 */
+                if (baseConstraint.kind == ConstraintKind.LOWER && isBaseNonGenericType) {
+                    nothingType() to false
+                } else if (baseConstraint.kind == ConstraintKind.UPPER && isBaseNonGenericType) {
+                    otherConstraint.type to false
+                } else {
+                    createCapturedType(
+                        createTypeArgument(otherConstraint.type, TypeVariance.OUT),
+                        listOf(otherConstraint.type),
+                        null,
+                        CaptureStatus.FOR_INCORPORATION
+                    ) to true
+                }
             }
             ConstraintKind.LOWER -> {
-                val temporaryCapturedType = createCapturedType(
-                    createTypeArgument(otherConstraint.type, TypeVariance.IN),
-                    emptyList(),
-                    otherConstraint.type,
-                    CaptureStatus.FOR_INCORPORATION
-                )
-
-                baseConstraintType.substitute(this, otherVariable, temporaryCapturedType)
+                /*
+                 * Creating a captured type isn't needed due to its future approximation to `Any?` or itself
+                 * Example:
+                 *      targetVariable = TypeVariable(A)
+                 *      baseConstraint = UPPER(TypeVariable(B))
+                 *      otherConstraint = LOWER(Number)
+                 *      incorporatedConstraint = TypeVariable(A) <: Approx(CapturedType(in Number)) => TypeVariable(A) <: Any?
+                 * TODO: implement this for generics
+                 */
+                if (baseConstraint.kind == ConstraintKind.UPPER && isBaseNonGenericType) {
+                    nullableAnyType() to false
+                } else if (baseConstraint.kind == ConstraintKind.LOWER && isBaseNonGenericType) {
+                    otherConstraint.type to false
+                } else {
+                    createCapturedType(
+                        createTypeArgument(otherConstraint.type, TypeVariance.IN),
+                        emptyList(),
+                        otherConstraint.type,
+                        CaptureStatus.FOR_INCORPORATION
+                    ) to true
+                }
             }
         }
 
-        if (baseConstraint.kind != ConstraintKind.UPPER) {
-            val generatedConstraintType = approximateCapturedTypes(typeForApproximation, toSuper = false)
-            addNewConstraint(targetVariable, baseConstraint, otherVariable, otherConstraint, generatedConstraintType, isSubtype = true)
-        }
-        if (baseConstraint.kind != ConstraintKind.LOWER) {
-            val generatedConstraintType = approximateCapturedTypes(typeForApproximation, toSuper = true)
-            addNewConstraint(targetVariable, baseConstraint, otherVariable, otherConstraint, generatedConstraintType, isSubtype = false)
-        }
+        approximateIfNeededAndAddNewConstraint(baseConstraint, type, targetVariable, otherVariable, otherConstraint, needApproximation)
     }
 
     private fun Context.addNewConstraint(
