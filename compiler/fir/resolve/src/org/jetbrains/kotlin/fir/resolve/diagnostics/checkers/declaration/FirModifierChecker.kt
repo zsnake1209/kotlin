@@ -5,20 +5,14 @@
 
 package org.jetbrains.kotlin.fir.resolve.diagnostics.checkers.declaration
 
-import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
-import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.diagnostics.Errors
+import org.jetbrains.kotlin.fir.*
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
-import org.jetbrains.kotlin.fir.psi
 import org.jetbrains.kotlin.fir.resolve.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.resolve.diagnostics.onSource
-import org.jetbrains.kotlin.fir.toFirSourceElement
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
-import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtClassOrObject
-import org.jetbrains.kotlin.psi.KtModifierList
-import org.jetbrains.kotlin.psi.KtModifierListOwner
 
 object FirModifierChecker : FirDeclarationChecker<FirDeclaration>() {
 
@@ -73,66 +67,59 @@ object FirModifierChecker : FirDeclarationChecker<FirDeclaration>() {
         }
 
     private fun checkCompatibilityType(
-        firstNode: ASTNode,
-        secondNode: ASTNode,
-        modifiersOwner: PsiElement,
+        firstModifier: FirModifier<*>,
+        secondModifier: FirModifier<*>,
+        modifiersOwner: FirDeclaration,
         reporter: DiagnosticReporter,
-        reportedNodes: MutableSet<ASTNode>
+        reportedNodes: MutableSet<FirModifier<*>>
     ) {
-        val firstKeyword = firstNode.elementType as KtModifierKeywordToken
-        val secondKeyword = secondNode.elementType as KtModifierKeywordToken
-        when (val compatibilityType = deduceCompatibilityType(firstKeyword, secondKeyword)) {
+        val firstToken = firstModifier.token
+        val secondToken = secondModifier.token
+        when (val compatibilityType = deduceCompatibilityType(firstToken, secondToken)) {
             CompatibilityType.COMPATIBLE -> {}
             CompatibilityType.REPEATED ->
-                if (reportedNodes.add(secondNode)) reporter.reportRepeatedModifier(secondNode.psi, secondKeyword)
+                if (reportedNodes.add(secondModifier)) reporter.reportRepeatedModifier(secondModifier.psi, secondToken)
             CompatibilityType.REDUNDANT_2_TO_1 ->
-                reporter.reportRedundantModifier(secondNode.psi, secondKeyword, firstKeyword)
+                reporter.reportRedundantModifier(secondModifier.psi, secondToken, firstToken)
             CompatibilityType.REDUNDANT_1_TO_2 ->
-                reporter.reportRedundantModifier(firstNode.psi, firstKeyword, secondKeyword)
+                reporter.reportRedundantModifier(firstModifier.psi, firstToken, secondToken)
             CompatibilityType.DEPRECATED -> {
-                reporter.reportDeprecatedModifierPair(firstNode.psi, firstKeyword, secondKeyword)
-                reporter.reportDeprecatedModifierPair(secondNode.psi, secondKeyword, firstKeyword)
+                reporter.reportDeprecatedModifierPair(firstModifier.psi, firstToken, secondToken)
+                reporter.reportDeprecatedModifierPair(secondModifier.psi, secondToken, firstToken)
             }
             CompatibilityType.INCOMPATIBLE, CompatibilityType.COMPATIBLE_FOR_CLASSES -> {
                 if (compatibilityType == CompatibilityType.COMPATIBLE_FOR_CLASSES && modifiersOwner is KtClassOrObject) {
                     return
                 }
-                if (reportedNodes.add(firstNode)) reporter.reportIncompatibleModifiers(firstNode.psi, firstKeyword, secondKeyword)
-                if (reportedNodes.add(secondNode)) reporter.reportIncompatibleModifiers(secondNode.psi, secondKeyword, firstKeyword)
+                if (reportedNodes.add(firstModifier)) reporter.reportIncompatibleModifiers(firstModifier.psi, firstToken, secondToken)
+                if (reportedNodes.add(secondModifier)) reporter.reportIncompatibleModifiers(secondModifier.psi, secondToken, firstToken)
             }
         }
     }
 
-    private val MODIFIER_KEYWORD_SET = TokenSet.orSet(KtTokens.SOFT_KEYWORDS, TokenSet.create(KtTokens.IN_KEYWORD, KtTokens.FUN_KEYWORD))
-
     private fun checkModifiers(
-        list: KtModifierList,
+        list: FirModifierList,
+        owner: FirDeclaration,
         reporter: DiagnosticReporter
     ) {
-        if (list.stub != null) return
+        val reportedNodes = hashSetOf<FirModifier<*>>()
 
-        val reportedNodes = hashSetOf<ASTNode>()
-
-        val modifiers = list.node.getChildren(MODIFIER_KEYWORD_SET)
-        for (secondKeyword in modifiers) {
-            for (firstKeyword in modifiers) {
-                if (firstKeyword == secondKeyword) {
+        val modifiers = list.modifiers
+        for (secondModifier in modifiers) {
+            for (firstModifier in modifiers) {
+                if (firstModifier == secondModifier) {
                     break
                 }
-                checkCompatibilityType(firstKeyword, secondKeyword, list.owner, reporter, reportedNodes)
+                checkCompatibilityType(firstModifier, secondModifier, owner, reporter, reportedNodes)
             }
             // TODO
         }
     }
 
-    private var lastPsiElement: PsiElement? = null
-
     override fun check(declaration: FirDeclaration, reporter: DiagnosticReporter) {
-        val psiElement = declaration.source?.psi ?: return
-        if (psiElement !== lastPsiElement && psiElement is KtModifierListOwner) {
-            val modifierList = psiElement.modifierList
-            modifierList?.let { checkModifiers(modifierList, reporter) }
-            lastPsiElement = psiElement
+        val modifierList = declaration.source.getModifierList()
+        if (modifierList != null) {
+            checkModifiers(modifierList, declaration, reporter)
         }
     }
 
