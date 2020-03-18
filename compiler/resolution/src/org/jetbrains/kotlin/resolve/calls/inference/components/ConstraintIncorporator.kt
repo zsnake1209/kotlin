@@ -151,7 +151,8 @@ class ConstraintIncorporator(
         otherVariable: TypeVariableMarker,
         otherConstraint: Constraint
     ) {
-        val isBaseNonGenericType = baseConstraint.type.argumentsCount() == 0
+        val isBaseNonGenericAndCapturedType = baseConstraint.type.argumentsCount() == 0
+        val isOtherCapturedType = otherConstraint.type.isCapturedType()
         val (type, needApproximation) = when (otherConstraint.kind) {
             ConstraintKind.EQUALITY -> {
                 otherConstraint.type to true
@@ -164,11 +165,11 @@ class ConstraintIncorporator(
                  *      baseConstraint = LOWER(TypeVariable(B))
                  *      otherConstraint = UPPER(Number)
                  *      incorporatedConstraint = Approx(CapturedType(out Number)) <: TypeVariable(A) => Nothing <: TypeVariable(A)
-                 * TODO: implement this for generics
+                 * TODO: implement this for generics and captured types
                  */
-                if (baseConstraint.kind == ConstraintKind.LOWER && isBaseNonGenericType) {
+                if (baseConstraint.kind == ConstraintKind.LOWER && isBaseNonGenericAndCapturedType && !isOtherCapturedType) {
                     nothingType() to false
-                } else if (baseConstraint.kind == ConstraintKind.UPPER && isBaseNonGenericType) {
+                } else if (baseConstraint.kind == ConstraintKind.UPPER && isBaseNonGenericAndCapturedType && !isOtherCapturedType) {
                     otherConstraint.type to false
                 } else {
                     createCapturedType(
@@ -187,11 +188,11 @@ class ConstraintIncorporator(
                  *      baseConstraint = UPPER(TypeVariable(B))
                  *      otherConstraint = LOWER(Number)
                  *      incorporatedConstraint = TypeVariable(A) <: Approx(CapturedType(in Number)) => TypeVariable(A) <: Any?
-                 * TODO: implement this for generics
+                 * TODO: implement this for generics and captured types
                  */
-                if (baseConstraint.kind == ConstraintKind.UPPER && isBaseNonGenericType) {
+                if (baseConstraint.kind == ConstraintKind.UPPER && isBaseNonGenericAndCapturedType && !isOtherCapturedType) {
                     nullableAnyType() to false
-                } else if (baseConstraint.kind == ConstraintKind.LOWER && isBaseNonGenericType) {
+                } else if (baseConstraint.kind == ConstraintKind.LOWER && isBaseNonGenericAndCapturedType && !isOtherCapturedType) {
                     otherConstraint.type to false
                 } else {
                     createCapturedType(
