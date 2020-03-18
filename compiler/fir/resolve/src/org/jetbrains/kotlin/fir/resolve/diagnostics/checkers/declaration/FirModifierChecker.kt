@@ -6,9 +6,10 @@
 package org.jetbrains.kotlin.fir.resolve.diagnostics.checkers.declaration
 
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.fir.*
-import org.jetbrains.kotlin.fir.declarations.FirDeclaration
+import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.resolve.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.resolve.diagnostics.onSource
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
@@ -117,7 +118,11 @@ object FirModifierChecker : FirDeclarationChecker<FirDeclaration>() {
     }
 
     override fun check(declaration: FirDeclaration, reporter: DiagnosticReporter) {
-        val modifierList = declaration.source.getModifierList()
+        val source = declaration.source ?: return
+        when {
+            declaration !is FirClass<*> && source.elementType == KtNodeTypes.CLASS -> return
+        }
+        val modifierList = source.getModifierList()
         if (modifierList != null) {
             checkModifiers(modifierList, declaration, reporter)
         }
