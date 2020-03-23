@@ -18,12 +18,6 @@ convention.getPlugin(MavenPluginConvention::class.java).also {
     it.conf2ScopeMappings.addMapping(MavenPlugin.RUNTIME_PRIORITY, archives, Conf2ScopeMappingContainer.RUNTIME)
 }
 
-dependencies {
-    if (!kotlinBuildProperties.isInJpsBuildIdeaSync) {
-        archives(project(":kotlin-test:kotlin-test-js"))
-    }
-}
-
 node {
     version = "11.9.0"
     download = true
