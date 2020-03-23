@@ -73,6 +73,20 @@ abstract class AbstractDiagnosticCollector(
             visitWithDeclarationAndReceiver(regularClass, regularClass.name, typeRef)
         }
 
+        override fun visitSealedClass(sealedClass: FirSealedClass) {
+            val typeRef = buildResolvedTypeRef {
+                type = sealedClass.defaultType()
+            }
+            visitWithDeclarationAndReceiver(sealedClass, sealedClass.name, typeRef)
+        }
+
+        override fun visitAnonymousObject(anonymousObject: FirAnonymousObject) {
+            val typeRef = buildResolvedTypeRef {
+                type = anonymousObject.defaultType()
+            }
+            visitWithDeclarationAndReceiver(anonymousObject, null, typeRef)
+        }
+
         override fun visitSimpleFunction(simpleFunction: FirSimpleFunction) {
             visitWithDeclarationAndReceiver(simpleFunction, simpleFunction.name, simpleFunction.receiverTypeRef)
         }

@@ -5,5 +5,5 @@ fun foo() {
     fun A.foo() {}
     (fun A.foo() {})
 
-    run(fun foo() {})
+    run(<!OTHER_ERROR!>fun foo() {}<!>)
 }

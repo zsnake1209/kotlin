@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.expressions.impl
 
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
+import org.jetbrains.kotlin.fir.diagnostics.FirStubDiagnostic
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirErrorExpression
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -22,7 +23,7 @@ internal class FirErrorExpressionImpl(
     override val source: FirSourceElement?,
     override val diagnostic: ConeDiagnostic,
 ) : FirErrorExpression() {
-    override var typeRef: FirTypeRef = FirErrorTypeRefImpl(source, diagnostic)
+    override var typeRef: FirTypeRef = FirErrorTypeRefImpl(source, FirStubDiagnostic(diagnostic))
     override val annotations: List<FirAnnotationCall> get() = emptyList()
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {

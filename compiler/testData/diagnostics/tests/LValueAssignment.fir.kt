@@ -14,7 +14,7 @@ class C() : B() {
         this.c = 34
         super.c = 3535 //repeat for 'c'
 
-        getInt() = 12
+        <!OTHER_ERROR!>getInt()<!> = 12
     }
 
     fun foo1(c: C) {
@@ -42,27 +42,27 @@ fun cannotBe() {
     var i: Int = 5
 
     <!UNRESOLVED_REFERENCE!>z<!> = 30;
-    "" = "";
-    foo() = Unit;
+    <!OTHER_ERROR!>""<!> = "";
+    <!OTHER_ERROR!>foo()<!> = Unit;
 
-    (i as Int) = 34
-    (i is Int) = false
-    A() = A()
-    5 = 34
+    (<!OTHER_ERROR!>i as Int<!>) = 34
+    (<!OTHER_ERROR!>i is Int<!>) = false
+    <!OTHER_ERROR!>A()<!> = A()
+    <!OTHER_ERROR!>5<!> = 34
 }
 
 fun canBe(i0: Int, j: Int) {
     var i = i0
-    (label@ i) = 34
+    (<!OTHER_ERROR!>label@ i<!>) = 34
 
-    (label@ j) = 34 //repeat for j
+    (<!OTHER_ERROR!>label@ j<!>) = 34 //repeat for j
 
     val a = A()
-    (l@ a.a) = 3894
+    (<!OTHER_ERROR!>l@ a.a<!>) = 3894
 }
 
 fun canBe2(j: Int) {
-    (label@ j) = 34
+    (<!OTHER_ERROR!>label@ j<!>) = 34
 }
 
 class A() {
@@ -77,11 +77,11 @@ class Test() {
         <!VARIABLE_EXPECTED!>getInt()<!> += 343
         (f@ <!VARIABLE_EXPECTED!>getInt()<!>) += 343
 
-        1++
-        (r@ 1)++
+        <!OTHER_ERROR!>1<!>++
+        (<!OTHER_ERROR!>r@ 1<!>)++
 
-        getInt()++
-        (m@ getInt())++
+        <!OTHER_ERROR!>getInt()<!>++
+        (<!OTHER_ERROR!>m@ getInt()<!>)++
 
         this<!UNRESOLVED_REFERENCE!>++<!>
 
@@ -106,7 +106,7 @@ class Test() {
         <!VARIABLE_EXPECTED!>b<!> += 34
 
         a++
-        (l@ a)++
+        (<!OTHER_ERROR!>l@ a<!>)++
         (a)++
     }
 

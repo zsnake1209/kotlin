@@ -15,7 +15,7 @@ fun main() {
 }
 
 //KT-351 Distinguish statement and expression positions
-val w = while (true) {}
+val w = <!OTHER_ERROR!>while (true) {}<!>
 
 fun foo() {
     var z = 2
@@ -152,12 +152,12 @@ fun bar(a: Unit) {}
 
 fun testStatementInExpressionContext() {
     var z = 34
-    val a1: Unit = z = 334
+    val a1: Unit = <!OTHER_ERROR!>z = 334<!>
     val f = for (i in 1..10) {}
-    if (true) return z = 34
-    return while (true) {}
+    if (true) return <!OTHER_ERROR!>z = 34<!>
+    return <!OTHER_ERROR!>while (true) {}<!>
 }
 
 fun testStatementInExpressionContext2() {
-    val a2: Unit = while(true) {}
+    val a2: Unit = <!OTHER_ERROR!>while(true) {}<!>
 }
