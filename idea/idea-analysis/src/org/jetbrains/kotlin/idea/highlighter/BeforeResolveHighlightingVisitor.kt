@@ -16,7 +16,9 @@ import org.jetbrains.kotlin.kdoc.parser.KDocKnownTag
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocLink
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.KtExpressionWithLabel
+import org.jetbrains.kotlin.psi.KtLambdaExpression
+import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
@@ -53,10 +55,7 @@ internal class BeforeResolveHighlightingVisitor(holder: AnnotationHolder) : High
         if (ApplicationManager.getApplication().isUnitTestMode) return
 
         val functionLiteral = lambdaExpression.functionLiteral
-        val lBrace = functionLiteral.lBrace
-        if (lBrace != null) {
-            createInfoAnnotation(lBrace, null).textAttributes = KotlinHighlightingColors.FUNCTION_LITERAL_BRACES_AND_ARROW
-        }
+        createInfoAnnotation(functionLiteral.lBrace, null).textAttributes = KotlinHighlightingColors.FUNCTION_LITERAL_BRACES_AND_ARROW
 
         val closingBrace = functionLiteral.rBrace
         if (closingBrace != null) {

@@ -54,10 +54,7 @@ projectTest {
     workingDir = rootDir
 }
 
-// TODO(lmr): We are running into a NO_EXPECTED_TYPE compiler error during test generation here, but it looks like it's from an
-// issue that has been around for a while. Let's circle back and fix this issue ASAP.
+val generateAndroidTests by generator("org.jetbrains.kotlin.android.tests.CodegenTestsOnAndroidGenerator")
 
-// val generateAndroidTests by generator("org.jetbrains.kotlin.android.tests.CodegenTestsOnAndroidGenerator")
-
-// generateAndroidTests.workingDir = rootDir
-// generateAndroidTests.dependsOn(rootProject.tasks.named("dist"))
+generateAndroidTests.workingDir = rootDir
+generateAndroidTests.dependsOn(rootProject.tasks.named("dist"))

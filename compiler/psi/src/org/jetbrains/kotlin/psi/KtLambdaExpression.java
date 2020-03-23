@@ -64,7 +64,7 @@ public class KtLambdaExpression extends LazyParseablePsiElement implements KtExp
         return this;
     }
 
-    @Nullable
+    @NotNull
     public ASTNode getLeftCurlyBrace() {
         return getFunctionLiteral().getNode().findChildByType(KtTokens.LBRACE);
     }

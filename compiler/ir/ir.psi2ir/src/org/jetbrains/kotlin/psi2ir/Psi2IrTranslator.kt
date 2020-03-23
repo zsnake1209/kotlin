@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.psi2ir.generators.*
 import org.jetbrains.kotlin.psi2ir.transformations.insertImplicitCasts
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -73,11 +72,6 @@ class Psi2IrTranslator(
     ): IrModuleFragment {
         val moduleGenerator = ModuleGenerator(context)
         val irModule = moduleGenerator.generateModuleFragmentWithoutDependencies(ktFiles)
-
-        if(ktFiles.size > 0)
-            SyntheticIrExtension.getInstances(ktFiles.first().project).forEach {
-                it.interceptModuleFragment(context, ktFiles, irModule)
-            }
 
         expectDescriptorToSymbol ?. let { referenceExpectsForUsedActuals(it, context.symbolTable, irModule) }
         irModule.patchDeclarationParents()

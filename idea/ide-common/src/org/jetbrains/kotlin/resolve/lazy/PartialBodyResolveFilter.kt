@@ -440,7 +440,6 @@ class PartialBodyResolveFilter(
                     super.visitBinaryExpression(expression)
                 }
             }
-
         })
         return result
     }

@@ -718,15 +718,13 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
     @Override
     public KotlinTypeInfo visitQualifiedExpression(@NotNull KtQualifiedExpression expression, ExpressionTypingContext context) {
         CallExpressionResolver callExpressionResolver = components.callExpressionResolver;
-        KotlinTypeInfo result = callExpressionResolver.getQualifiedExpressionTypeInfo(expression, context);
-        return result;
+        return callExpressionResolver.getQualifiedExpressionTypeInfo(expression, context);
     }
 
     @Override
     public KotlinTypeInfo visitCallExpression(@NotNull KtCallExpression expression, ExpressionTypingContext context) {
         CallExpressionResolver callExpressionResolver = components.callExpressionResolver;
-        KotlinTypeInfo result = callExpressionResolver.getCallExpressionTypeInfo(expression, context);
-        return result;
+        return callExpressionResolver.getCallExpressionTypeInfo(expression, context);
     }
 
     @Override
@@ -1550,7 +1548,7 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
 
         OverloadResolutionResults<FunctionDescriptor> resolutionResults;
         if (left != null) {
-            ExpressionReceiver receiver = safeGetExpressionReceiver(facade, left, context.replaceContextDependency(INDEPENDENT).replaceExpectedType(NO_EXPECTED_TYPE));
+            ExpressionReceiver receiver = safeGetExpressionReceiver(facade, left, context);
             resolutionResults = components.callResolver.resolveBinaryCall(contextWithDataFlow, receiver, binaryExpression, name);
         }
         else {
@@ -1744,9 +1742,7 @@ public class BasicExpressionTypingVisitor extends ExpressionTypingVisitor {
                 .replaceContextDependency(INDEPENDENT));
         KotlinType arrayType = ExpressionTypingUtils.safeGetType(arrayTypeInfo);
 
-        ExpressionTypingContext context = oldContext.replaceDataFlowInfo(arrayTypeInfo.getDataFlowInfo())
-                .replaceExpectedType(NO_EXPECTED_TYPE)
-                .replaceContextDependency(INDEPENDENT);
+        ExpressionTypingContext context = oldContext.replaceDataFlowInfo(arrayTypeInfo.getDataFlowInfo());
         ExpressionReceiver receiver = ExpressionReceiver.Companion.create(arrayExpression, arrayType, context.trace.getBindingContext());
         if (!isGet) assert rightHandSide != null;
 

@@ -63,8 +63,4 @@ class PhaseConfig(
             disable(phase)
         }
     }
-
-    fun mapPhases(callback: (CompilerPhase<*, *, *>) -> CompilerPhase<*, *, *>): PhaseConfig {
-        return PhaseConfig(compoundPhase = callback(compoundPhase))
-    }
 }

@@ -32,7 +32,6 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffsetSkippingComments
 import org.jetbrains.kotlin.psi2ir.deparenthesize
-import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.psi2ir.intermediate.IntermediateValue
 import org.jetbrains.kotlin.psi2ir.intermediate.createTemporaryVariableInBlock
 import org.jetbrains.kotlin.psi2ir.intermediate.setExplicitReceiverValue
@@ -295,11 +294,6 @@ class StatementGenerator(
         entry.expression!!.genExpr()
 
     override fun visitSimpleNameExpression(expression: KtSimpleNameExpression, data: Nothing?): IrExpression {
-
-        for (extension in SyntheticIrExtension.getInstances(expression.project)) {
-            return extension.visitSimpleNameExpression(this, expression) ?: continue
-        }
-
         val resolvedCall = getResolvedCall(expression)
 
         if (resolvedCall != null) {
@@ -332,10 +326,6 @@ class StatementGenerator(
         )
 
     override fun visitCallExpression(expression: KtCallExpression, data: Nothing?): IrStatement {
-        for (extension in SyntheticIrExtension.getInstances(expression.project)) {
-            return extension.visitCallExpression(this, expression) ?: continue
-        }
-
         val resolvedCall = getResolvedCall(expression) ?: return ErrorExpressionGenerator(this).generateErrorCall(expression)
 
         if (resolvedCall is VariableAsFunctionResolvedCall) {

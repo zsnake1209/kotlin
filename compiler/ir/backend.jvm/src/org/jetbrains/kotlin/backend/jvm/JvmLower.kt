@@ -27,23 +27,6 @@ import org.jetbrains.kotlin.load.java.JavaVisibilities
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.name.NameUtils
 
-private fun makePatchParentsPhase(number: Int) = namedIrFilePhase(
-    lower = object : SameTypeCompilerPhase<CommonBackendContext, IrFile> {
-        override fun invoke(
-            phaseConfig: PhaseConfig,
-            phaserState: PhaserState<IrFile>,
-            context: CommonBackendContext,
-            input: IrFile
-        ): IrFile {
-            input.acceptVoid(PatchDeclarationParentsVisitor())
-            return input
-        }
-    },
-    name = "PatchParents$number",
-    description = "Patch parent references in IrFile, pass $number",
-    nlevels = 0
-)
-
 private val validateIrBeforeLowering = makeCustomPhase<JvmBackendContext, IrModuleFragment>(
     { context, module -> validationCallback(context, module) },
     name = "ValidateIrBeforeLowering",
@@ -265,8 +248,6 @@ private val jvmFilePhases =
 
         sharedVariablesPhase then
 
-        makePatchParentsPhase(1) then
-
         enumWhenPhase then
         singletonReferencesPhase then
 
@@ -301,8 +282,6 @@ private val jvmFilePhases =
         innerClassesPhase then
         innerClassConstructorCallsPhase then
 
-        makePatchParentsPhase(2) then
-
         enumClassPhase then
         objectClassPhase then
         staticInitializersPhase then
@@ -326,9 +305,7 @@ private val jvmFilePhases =
 
         mainMethodGenerationPhase then
         renameFieldsPhase then
-        fakeInliningLocalVariablesLowering then
-
-        makePatchParentsPhase(3)
+        fakeInliningLocalVariablesLowering
 
 val jvmPhases = namedIrModulePhase(
     name = "IrLowering",

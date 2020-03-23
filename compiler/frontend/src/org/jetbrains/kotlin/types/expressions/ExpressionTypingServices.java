@@ -209,46 +209,7 @@ public class ExpressionTypingServices {
 
         return r;
     }
-
-/*
-    private fun createValueParameterDescriptors(
-            function: KtFunction,
-            functionDescriptor:SimpleFunctionDescriptorImpl,
-            innerScope: LexicalWritableScope,
-            trace: BindingTrace,
-            expectedFunctionType: KotlinType
-    ): List<ValueParameterDescriptor> {
-        val expectedValueParameters = expectedFunctionType.getValueParameters(functionDescriptor)
-        val expectedParameterTypes = expectedValueParameters?.map { it.type.removeParameterNameAnnotation() }
-        if (expectedValueParameters != null) {
-            if (expectedValueParameters.size == 1 && function is KtFunctionLiteral && function.getValueParameterList() == null) {
-                // it parameter for lambda
-                val valueParameterDescriptor = expectedValueParameters.single()
-                val it = ValueParameterDescriptorImpl(
-                        functionDescriptor, null, 0, Annotations.EMPTY, Name.identifier("it"),
-                        expectedParameterTypes!!.single(), valueParameterDescriptor.declaresDefaultValue(),
-                        valueParameterDescriptor.isCrossinline, valueParameterDescriptor.isNoinline,
-                        valueParameterDescriptor.varargElementType, SourceElement.NO_SOURCE
-                )
-                trace.record(BindingContext.AUTO_CREATED_IT, it)
-                return listOf(it)
-            }
-            if (function.valueParameters.size != expectedValueParameters.size) {
-                trace.report(EXPECTED_PARAMETERS_NUMBER_MISMATCH.on(function, expectedParameterTypes!!.size, expectedParameterTypes))
-            }
-        }
-
-        trace.recordScope(innerScope, function.valueParameterList)
-
-        return resolveValueParameters(
-                functionDescriptor,
-                innerScope,
-                function.valueParameters,
-                trace,
-                expectedParameterTypes
-        )
-    }
-*/
+    
     @NotNull
     public KotlinType getBodyExpressionType(
             @NotNull BindingTrace trace,
