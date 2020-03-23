@@ -9,10 +9,7 @@ package org.jetbrains.kotlin.gradle.plugin.cocoapods
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectSet
 import org.gradle.api.Project
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.*
 import java.io.File
 
 open class CocoapodsExtension(private val project: Project) {
@@ -20,19 +17,15 @@ open class CocoapodsExtension(private val project: Project) {
     val version: String
         get() = project.version.toString()
 
-    private lateinit var _podfile: File
-
-    @get:Internal
-    val podfile: File
-        get() = _podfile
+    @Optional
+    @InputFile
+    var podfile: File? = null
 
     /**
      * Configure path to the Podfile.
      */
     fun podfile(path: String) {
-        val podFile = project.file(path)
-        check(podFile.exists()) { "Podfile with path $path is not found!" }
-        _podfile = podFile
+        podfile = project.file(path)
     }
 
     /**
