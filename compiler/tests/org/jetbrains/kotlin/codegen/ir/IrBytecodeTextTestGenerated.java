@@ -2574,6 +2574,16 @@ public class IrBytecodeTextTestGenerated extends AbstractIrBytecodeTextTest {
             runTest("compiler/testData/codegen/bytecodeText/inline/inlineArgumentSlots.kt");
         }
 
+        @TestMetadata("inlineOnlyWithSyntheticLineNumber.kt")
+        public void testInlineOnlyWithSyntheticLineNumber() throws Exception {
+            runTest("compiler/testData/codegen/bytecodeText/inline/inlineOnlyWithSyntheticLineNumber.kt");
+        }
+
+        @TestMetadata("inlineOnlyWithoutSyntheticLineNumber.kt")
+        public void testInlineOnlyWithoutSyntheticLineNumber() throws Exception {
+            runTest("compiler/testData/codegen/bytecodeText/inline/inlineOnlyWithoutSyntheticLineNumber.kt");
+        }
+
         @TestMetadata("inlineReturnsNothing1.kt")
         public void testInlineReturnsNothing1() throws Exception {
             runTest("compiler/testData/codegen/bytecodeText/inline/inlineReturnsNothing1.kt");

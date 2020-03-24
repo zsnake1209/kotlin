@@ -647,7 +647,10 @@ public class FunctionCodegen {
                     KtDeclarationWithBody declaration = ((ClosureGenerationStrategy) strategy).getDeclaration();
                     BindingContext bindingContext = typeMapper.getBindingContext();
                     if (declaration instanceof KtFunctionLiteral && isLambdaPassedToInlineOnly((KtFunction) declaration, bindingContext)) {
-                        lineNumber = LOCAL_VARIABLE_INLINE_ARGUMENT_SYNTHETIC_LINE_NUMBER;
+                        LanguageVersionSettings languageVersionSettings = parentCodegen.state.getLanguageVersionSettings();
+                        if (languageVersionSettings.supportsFeature(LanguageFeature.GenerateSyntheticLineNumbers)) {
+                            lineNumber = LOCAL_VARIABLE_INLINE_ARGUMENT_SYNTHETIC_LINE_NUMBER;
+                        }
                     }
                 }
                 lambdaFakeIndex = newFakeTempIndex(mv, frameMap, lineNumber);
