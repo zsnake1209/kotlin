@@ -104,17 +104,13 @@ abstract class YarnBasics : NpmApi {
             ?: return
 
         val entryRegistry = YarnEntryRegistry(yarnLock)
-        val visited = mutableMapOf<NpmDependency, NpmDependency>()
+        val visited = mutableSetOf<NpmDependency>()
 
         fun resolveRecursively(src: NpmDependency): NpmDependency {
-            val copy = visited[src]
-            if (copy != null) {
-                src.resolvedVersion = copy.resolvedVersion
-                src.integrity = copy.integrity
-                src.dependencies.addAll(copy.dependencies)
+            if (src in visited) {
                 return src
             }
-            visited[src] = src
+            visited.add(src)
 
             val deps = entryRegistry.find(src.key, src.version)
 
