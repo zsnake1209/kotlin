@@ -347,15 +347,13 @@ open class KotlinCocoapodsPlugin : Plugin<Project> {
             it.group = TASK_GROUP
             it.description = "Called on Gradle sync, depends on Cinterop tasks for every used pod"
 
-            cocoapodsExtension.podfile?.let { _ ->
-                kotlinExtension.supportedTargets().all { target ->
-                    target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops.all { interop ->
-                        val interopTaskProvider = project.tasks.named(interop.interopProcessingTaskName)
-                        it.dependsOn(interopTaskProvider)
-                    }
+            kotlinExtension.supportedTargets().all { target ->
+                target.compilations.getByName(KotlinCompilation.MAIN_COMPILATION_NAME).cinterops.all { interop ->
+                    val interopTaskProvider = project.tasks.named(interop.interopProcessingTaskName)
+                    it.dependsOn(interopTaskProvider)
                 }
-
             }
+
         }
     }
 
