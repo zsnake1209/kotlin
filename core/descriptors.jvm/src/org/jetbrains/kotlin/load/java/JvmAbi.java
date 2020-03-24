@@ -58,14 +58,21 @@ public final class JvmAbi {
      */
     public static final int LOCAL_VARIABLE_INLINE_ARGUMENT_SYNTHETIC_LINE_NUMBER = 65100;
 
-    public static final List<Integer> SYNTHETIC_MARKER_LINE_NUMBERS = CollectionsKt.listOf(
-            LOCAL_VARIABLE_INLINE_ARGUMENT_SYNTHETIC_LINE_NUMBER
-    );
+    /*
+        This is the upper bound for synthetic local variables.
+        Note that this number can be updated only in 1.x versions of Kotlin.
+     */
+    private static final int LOCAL_VARIABLE_LAST_SYNTHETIC_LINE_NUMBER = 65120;
 
     public static final String LOCAL_VARIABLE_NAME_PREFIX_INLINE_ARGUMENT = "$i$a$";
     public static final String LOCAL_VARIABLE_NAME_PREFIX_INLINE_FUNCTION = "$i$f$";
 
     public static final String IMPL_SUFFIX_FOR_INLINE_CLASS_MEMBERS = "-impl";
+
+    public static boolean isSyntheticMarkerLineNumber(int lineNumber) {
+        return lineNumber >= LOCAL_VARIABLE_INLINE_ARGUMENT_SYNTHETIC_LINE_NUMBER
+                && lineNumber <= LOCAL_VARIABLE_LAST_SYNTHETIC_LINE_NUMBER;
+    }
 
     /**
      * @param baseName JVM name of the property getter since Kotlin 1.4, or Kotlin name of the property otherwise.

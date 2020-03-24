@@ -33,7 +33,7 @@ private fun createLineNumberSequence(node: MethodNode, classSMAP: SMAP): Sequenc
     return InsnSequence(node.instructions.first, null).filterIsInstance<LineNumberNode>().map { lineNumber ->
         val mapping = RangeMapping(lineNumber.line, lineNumber.line, 1)
 
-        if (lineNumber.line in JvmAbi.SYNTHETIC_MARKER_LINE_NUMBERS) {
+        if (JvmAbi.isSyntheticMarkerLineNumber(lineNumber.line)) {
             return@map mapping
         }
 
