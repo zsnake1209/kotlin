@@ -12,6 +12,10 @@ import org.jetbrains.kotlin.fir.analysis.collectors.components.*
 import org.jetbrains.kotlin.fir.analysis.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnostic
 import org.jetbrains.kotlin.fir.declarations.*
+import org.jetbrains.kotlin.fir.expressions.FirBreakExpression
+import org.jetbrains.kotlin.fir.expressions.FirContinueExpression
+import org.jetbrains.kotlin.fir.expressions.FirErrorLoop
+import org.jetbrains.kotlin.fir.expressions.FirLoopJump
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.fir.resolve.SessionHolder
 import org.jetbrains.kotlin.fir.resolve.collectImplicitReceivers
@@ -64,6 +68,20 @@ abstract class AbstractDiagnosticCollector(
         override fun visitElement(element: FirElement) {
             element.runComponents()
             element.acceptChildren(this)
+        }
+
+        private fun visitJump(loopJump: FirLoopJump) {
+            loopJump.runComponents()
+            loopJump.acceptChildren(this)
+            loopJump.target.labeledElement.takeIf { it is FirErrorLoop }?.accept(this)
+        }
+
+        override fun visitBreakExpression(breakExpression: FirBreakExpression) {
+            visitJump(breakExpression)
+        }
+
+        override fun visitContinueExpression(continueExpression: FirContinueExpression) {
+            visitJump(continueExpression)
         }
 
         override fun visitRegularClass(regularClass: FirRegularClass) {
