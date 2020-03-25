@@ -22,8 +22,8 @@ sealed class AbstractFirDiagnosticFactory<E : FirSourceElement, D : FirDiagnosti
     }
 }
 
-class FirDiagnosticFactory0<E : FirSourceElement>(
-    name: String, severity: Severity, override val psiDiagnosticFactory: DiagnosticFactory0<PsiElement>
+class FirDiagnosticFactory0<E : FirSourceElement, P: PsiElement>(
+    name: String, severity: Severity, override val psiDiagnosticFactory: DiagnosticFactory0<P>
 ) : AbstractFirDiagnosticFactory<E, FirSimpleDiagnostic<E>>(name, severity) {
     fun on(element: E): FirSimpleDiagnostic<E> {
         return when (element) {

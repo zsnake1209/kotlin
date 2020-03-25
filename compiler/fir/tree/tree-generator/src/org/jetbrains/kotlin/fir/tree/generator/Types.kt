@@ -65,7 +65,7 @@ val pureAbstractElementType = generatedType("FirPureAbstractElement")
 val effectDeclarationType = type("fir.contracts.description", "ConeEffectDeclaration")
 val emptyContractDescriptionType = generatedType("contracts.impl", "FirEmptyContractDescription")
 val coneDiagnosticType = generatedType("diagnostics", "ConeDiagnostic")
-val firStubDiagnosticType = generatedType("diagnostics", "FirStubDiagnostic")
+val coneStubDiagnosticType = generatedType("diagnostics", "ConeStubDiagnostic")
 
 val dslBuilderAnnotationType = generatedType("builder", "FirBuilderDsl")
 val firImplementationDetailType = generatedType("FirImplementationDetail")

@@ -5,10 +5,12 @@
 
 package org.jetbrains.kotlin.fir.analysis.diagnostics
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.symbols.AbstractFirBasedSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.psi.KtDeclaration
 
 object FirErrors {
     val UNRESOLVED_REFERENCE by error1<FirSourceElement, String?>()
@@ -30,8 +32,11 @@ object FirErrors {
     val TYPE_MISMATCH by error2<FirSourceElement, ConeKotlinType, ConeKotlinType>()
     val VARIABLE_EXPECTED by error0<FirSourceElement>()
     val RETURN_NOT_ALLOWED by error0<FirSourceElement>()
-    val CONSTRUCTOR_IN_OBJECT by error0<FirSourceElement>()
     val SUPER_IS_NOT_AN_EXPRESSION by error0<FirSourceElement>()
 
     val INAPPLICABLE_INFIX_MODIFIER by existing<FirSourceElement, String>(Errors.INAPPLICABLE_INFIX_MODIFIER)
+    val CONSTRUCTOR_IN_INTERFACE by existing<FirSourceElement, KtDeclaration>(Errors.CONSTRUCTOR_IN_INTERFACE)
+    val CONSTRUCTOR_IN_OBJECT by existing<FirSourceElement, KtDeclaration>(Errors.CONSTRUCTOR_IN_OBJECT)
+    val NON_PRIVATE_CONSTRUCTOR_IN_ENUM by existing<FirSourceElement, PsiElement>(Errors.NON_PRIVATE_CONSTRUCTOR_IN_ENUM)
+    val NON_PRIVATE_CONSTRUCTOR_IN_SEALED by existing<FirSourceElement, PsiElement>(Errors.NON_PRIVATE_CONSTRUCTOR_IN_SEALED)
 }

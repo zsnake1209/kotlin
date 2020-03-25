@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.fir.FirSourceElement
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-fun <E : FirSourceElement> warning0(): DiagnosticFactory0DelegateProvider<E> {
+fun <E : FirSourceElement> warning0(): DiagnosticFactory0DelegateProvider<E, PsiElement> {
     return DiagnosticFactory0DelegateProvider(Severity.WARNING, null)
 }
 
@@ -27,7 +27,7 @@ fun <E : FirSourceElement, A, B, C> warning3(): DiagnosticFactory3DelegateProvid
     return DiagnosticFactory3DelegateProvider(Severity.WARNING, null)
 }
 
-fun <E : FirSourceElement> error0(): DiagnosticFactory0DelegateProvider<E> {
+fun <E : FirSourceElement> error0(): DiagnosticFactory0DelegateProvider<E, PsiElement> {
     return DiagnosticFactory0DelegateProvider(Severity.ERROR, null)
 }
 
@@ -47,7 +47,9 @@ fun <E : FirSourceElement, A, B, C> error3(): DiagnosticFactory3DelegateProvider
  * Note that those functions can be applicable only for factories
  *   that takes `PsiElement` as first type parameter
  */
-fun <E : FirSourceElement> existing(psiDiagnosticFactory: DiagnosticFactory0<PsiElement>): DiagnosticFactory0DelegateProvider<E> {
+fun <E : FirSourceElement, P : PsiElement> existing(
+    psiDiagnosticFactory: DiagnosticFactory0<P>
+): DiagnosticFactory0DelegateProvider<E, P> {
     return DiagnosticFactory0DelegateProvider(Severity.ERROR, psiDiagnosticFactory)
 }
 
@@ -65,12 +67,12 @@ fun <E : FirSourceElement, A, B, C> existing(psiDiagnosticFactory: DiagnosticFac
 
 // ------------------------------ Providers ------------------------------
 
-class DiagnosticFactory0DelegateProvider<E : FirSourceElement>(
+class DiagnosticFactory0DelegateProvider<E : FirSourceElement, P : PsiElement>(
     private val severity: Severity,
-    private val psiDiagnosticFactory: DiagnosticFactory0<PsiElement>?
+    private val psiDiagnosticFactory: DiagnosticFactory0<P>?
 ) {
-    operator fun provideDelegate(thisRef: Any?, prop: KProperty<*>): ReadOnlyProperty<Any?, FirDiagnosticFactory0<E>> {
-        val psiFactory = psiDiagnosticFactory ?: DiagnosticFactory0.create<PsiElement>(severity).apply {
+    operator fun provideDelegate(thisRef: Any?, prop: KProperty<*>): ReadOnlyProperty<Any?, FirDiagnosticFactory0<E, P>> {
+        val psiFactory = psiDiagnosticFactory ?: DiagnosticFactory0.create<P>(severity).apply {
             initializeName(prop.name)
         }
         return DummyDelegate(FirDiagnosticFactory0(prop.name, severity, psiFactory))
