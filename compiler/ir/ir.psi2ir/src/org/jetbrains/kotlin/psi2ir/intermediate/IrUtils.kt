@@ -65,25 +65,13 @@ fun computeSubstitution(propertyDescriptor: PropertyDescriptor, accessorFunction
 
     if (accessorFunctionDescriptor !is SimpleFunctionDescriptor) return accessorFunctionDescriptor
 
-    val collectedTypeParameters = ArrayList<TypeConstructor>(propertyDescriptor.typeParametersCount)
-
-    tailrec fun collectTypeParameterMapping(classDescriptor: ClassDescriptor) {
-        classDescriptor.declaredTypeParameters.forEach { collectedTypeParameters.add(it.typeConstructor) }
-        val parentClass = classDescriptor.containingDeclaration as? ClassDescriptor ?: return
-        collectTypeParameterMapping(parentClass)
-    }
-
-    collectTypeParameterMapping(accessorFunctionDescriptor.containingDeclaration as ClassDescriptor)
-
+    val classDescriptor = accessorFunctionDescriptor.containingDeclaration as ClassDescriptor
+    val collectedTypeParameters = classDescriptor.typeConstructor.parameters.map { it.typeConstructor }
     assert(collectedTypeParameters.size == propertyDescriptor.typeParametersCount)
 
-    val subExtensionReceiver = propertyDescriptor.extensionReceiverParameter!!
+    val typeArguments = propertyDescriptor.extensionReceiverParameter!!.type.arguments
+    assert(typeArguments.size == collectedTypeParameters.size)
 
-    val subType = subExtensionReceiver.type.unwrap()
-
-    assert(subType.arguments.size == collectedTypeParameters.size)
-
-    val typeSubstitutor = TypeSubstitutor.create(collectedTypeParameters.zip(subType.arguments).toMap())
-
+    val typeSubstitutor = TypeSubstitutor.create(collectedTypeParameters.zip(typeArguments).toMap())
     return accessorFunctionDescriptor.substitute(typeSubstitutor) ?: error("Cannot substitute descriptor for $accessorFunctionDescriptor")
 }
