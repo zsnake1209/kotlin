@@ -27,8 +27,8 @@ class FirDiagnosticFactory0<E : FirSourceElement, P : PsiElement>(
 ) : AbstractFirDiagnosticFactory<E, FirSimpleDiagnostic<E>>(name, severity) {
     fun on(element: E): FirSimpleDiagnostic<E> {
         return when (element) {
-            is FirPsiSourceElement<*> -> FirPsiSimpleDiagnostic(
-                element as FirPsiSourceElement<P>, severity, this as FirDiagnosticFactory0<FirPsiSourceElement<P>, P>
+            is FirPsiSourceElement -> FirPsiSimpleDiagnostic(
+                element, severity, this as FirDiagnosticFactory0<FirPsiSourceElement, P>
             )
             is FirLightSourceElement -> FirLightSimpleDiagnostic(element, severity, this)
             else -> incorrectElement(element)
@@ -41,8 +41,8 @@ class FirDiagnosticFactory1<E : FirSourceElement, P : PsiElement, A>(
 ) : AbstractFirDiagnosticFactory<E, FirDiagnosticWithParameters1<E, A>>(name, severity) {
     fun on(element: E, a: A): FirDiagnosticWithParameters1<E, A> {
         return when (element) {
-            is FirPsiSourceElement<*> -> FirPsiDiagnosticWithParameters1(
-                element as FirPsiSourceElement<P>, a, severity, this as FirDiagnosticFactory1<FirPsiSourceElement<P>, P, A>
+            is FirPsiSourceElement -> FirPsiDiagnosticWithParameters1(
+                element, a, severity, this as FirDiagnosticFactory1<FirPsiSourceElement, P, A>
             )
             is FirLightSourceElement -> FirLightDiagnosticWithParameters1(element, a, severity, this)
             else -> incorrectElement(element)
@@ -55,8 +55,8 @@ class FirDiagnosticFactory2<E : FirSourceElement, P : PsiElement, A, B>(
 ) : AbstractFirDiagnosticFactory<E, FirDiagnosticWithParameters2<E, A, B>>(name, severity) {
     fun on(element: E, a: A, b: B): FirDiagnosticWithParameters2<E, A, B> {
         return when (element) {
-            is FirPsiSourceElement<*> -> FirPsiDiagnosticWithParameters2(
-                element as FirPsiSourceElement<P>, a, b, severity, this as FirDiagnosticFactory2<FirPsiSourceElement<P>, P, A, B>
+            is FirPsiSourceElement -> FirPsiDiagnosticWithParameters2(
+                element, a, b, severity, this as FirDiagnosticFactory2<FirPsiSourceElement, P, A, B>
             )
             is FirLightSourceElement -> FirLightDiagnosticWithParameters2(element, a, b, severity, this)
             else -> incorrectElement(element)
@@ -69,8 +69,8 @@ class FirDiagnosticFactory3<E : FirSourceElement, P : PsiElement, A, B, C>(
 ) : AbstractFirDiagnosticFactory<E, FirDiagnosticWithParameters3<E, A, B, C>>(name, severity) {
     fun on(element: E, a: A, b: B, c: C): FirDiagnosticWithParameters3<E, A, B, C> {
         return when (element) {
-            is FirPsiSourceElement<*> -> FirPsiDiagnosticWithParameters3(
-                element as FirPsiSourceElement<P>, a, b, c, severity, this as FirDiagnosticFactory3<FirPsiSourceElement<P>, P, A, B, C>
+            is FirPsiSourceElement -> FirPsiDiagnosticWithParameters3(
+                element, a, b, c, severity, this as FirDiagnosticFactory3<FirPsiSourceElement, P, A, B, C>
             )
             is FirLightSourceElement -> FirLightDiagnosticWithParameters3(element, a, b, c, severity, this)
             else -> incorrectElement(element)

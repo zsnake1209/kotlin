@@ -46,52 +46,52 @@ sealed class FirDiagnosticWithParameters3<out E : FirSourceElement, A, B, C> : F
 
 interface FirPsiDiagnostic<P : PsiElement> {
     fun asPsiBasedDiagnostic(): Diagnostic
-    val element: FirPsiSourceElement<P>
+    val element: FirPsiSourceElement
 }
 
 data class FirPsiSimpleDiagnostic<P : PsiElement>(
-    override val element: FirPsiSourceElement<P>,
+    override val element: FirPsiSourceElement,
     override val severity: Severity,
-    override val factory: FirDiagnosticFactory0<FirPsiSourceElement<P>, P>
-) : FirSimpleDiagnostic<FirPsiSourceElement<P>>(), FirPsiDiagnostic<P> {
+    override val factory: FirDiagnosticFactory0<FirPsiSourceElement, P>
+) : FirSimpleDiagnostic<FirPsiSourceElement>(), FirPsiDiagnostic<P> {
     override fun asPsiBasedDiagnostic(): Diagnostic {
-        return factory.psiDiagnosticFactory.on(element.psi)
+        return factory.psiDiagnosticFactory.on(element.psi as P)
     }
 }
 
 data class FirPsiDiagnosticWithParameters1<P : PsiElement, A>(
-    override val element: FirPsiSourceElement<P>,
+    override val element: FirPsiSourceElement,
     override val a: A,
     override val severity: Severity,
-    override val factory: FirDiagnosticFactory1<FirPsiSourceElement<P>, P, A>
-) : FirDiagnosticWithParameters1<FirPsiSourceElement<P>, A>(), FirPsiDiagnostic<P> {
+    override val factory: FirDiagnosticFactory1<FirPsiSourceElement, P, A>
+) : FirDiagnosticWithParameters1<FirPsiSourceElement, A>(), FirPsiDiagnostic<P> {
     override fun asPsiBasedDiagnostic(): Diagnostic {
-        return factory.psiDiagnosticFactory.on(element.psi, a)
+        return factory.psiDiagnosticFactory.on(element.psi as P, a)
     }
 }
 
 data class FirPsiDiagnosticWithParameters2<P : PsiElement, A, B>(
-    override val element: FirPsiSourceElement<P>,
+    override val element: FirPsiSourceElement,
     override val a: A,
     override val b: B,
     override val severity: Severity,
-    override val factory: FirDiagnosticFactory2<FirPsiSourceElement<P>, P, A, B>
-) : FirDiagnosticWithParameters2<FirPsiSourceElement<P>, A, B>(), FirPsiDiagnostic<P> {
+    override val factory: FirDiagnosticFactory2<FirPsiSourceElement, P, A, B>
+) : FirDiagnosticWithParameters2<FirPsiSourceElement, A, B>(), FirPsiDiagnostic<P> {
     override fun asPsiBasedDiagnostic(): Diagnostic {
-        return factory.psiDiagnosticFactory.on(element.psi, a, b)
+        return factory.psiDiagnosticFactory.on(element.psi as P, a, b)
     }
 }
 
 data class FirPsiDiagnosticWithParameters3<P : PsiElement, A, B, C>(
-    override val element: FirPsiSourceElement<P>,
+    override val element: FirPsiSourceElement,
     override val a: A,
     override val b: B,
     override val c: C,
     override val severity: Severity,
-    override val factory: FirDiagnosticFactory3<FirPsiSourceElement<P>, P, A, B, C>
-) : FirDiagnosticWithParameters3<FirPsiSourceElement<P>, A, B, C>(), FirPsiDiagnostic<P> {
+    override val factory: FirDiagnosticFactory3<FirPsiSourceElement, P, A, B, C>
+) : FirDiagnosticWithParameters3<FirPsiSourceElement, A, B, C>(), FirPsiDiagnostic<P> {
     override fun asPsiBasedDiagnostic(): Diagnostic {
-        return factory.psiDiagnosticFactory.on(element.psi, a, b, c)
+        return factory.psiDiagnosticFactory.on(element.psi as P, a, b, c)
     }
 }
 

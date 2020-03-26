@@ -53,7 +53,7 @@ class RawFirBuilder(
         return file.accept(Visitor(), Unit) as FirFile
     }
 
-    override fun PsiElement.toFirSourceElement(): FirPsiSourceElement<*> {
+    override fun PsiElement.toFirSourceElement(): FirPsiSourceElement {
         return this.toFirPsiSourceElement()
     }
 
@@ -1477,7 +1477,7 @@ class RawFirBuilder(
 
         private fun splitToCalleeAndReceiver(
             calleeExpression: KtExpression?,
-            defaultSource: FirPsiSourceElement<*>,
+            defaultSource: FirPsiSourceElement,
         ): Pair<FirNamedReference, FirExpression?> {
             return when (calleeExpression) {
                 is KtSimpleNameExpression -> buildSimpleNamedReference {
@@ -1537,7 +1537,7 @@ class RawFirBuilder(
         override fun visitArrayAccessExpression(expression: KtArrayAccessExpression, data: Unit): FirElement {
             val arrayExpression = expression.arrayExpression
             return buildFunctionCall {
-                val source: FirPsiSourceElement<*>
+                val source: FirPsiSourceElement
                 val getArgument = context.arraySetArgument.remove(expression)
                 if (getArgument != null) {
                     calleeReference = buildSimpleNamedReference {
