@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.analysis.diagnostics
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.diagnostics.Errors
+import org.jetbrains.kotlin.fir.FirConstructorSourceElement
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.symbols.AbstractFirBasedSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
@@ -39,10 +40,10 @@ object FirErrors {
     val SUPER_IS_NOT_AN_EXPRESSION by error0<FirSourceElement, PsiElement>()
 
     val INAPPLICABLE_INFIX_MODIFIER by existing<FirSourceElement, PsiElement, String>(Errors.INAPPLICABLE_INFIX_MODIFIER)
-    val CONSTRUCTOR_IN_OBJECT by existing<FirSourceElement, KtDeclaration>(Errors.CONSTRUCTOR_IN_OBJECT)
-    val CONSTRUCTOR_IN_INTERFACE by existing<FirSourceElement, KtDeclaration>(Errors.CONSTRUCTOR_IN_INTERFACE)
-    val NON_PRIVATE_CONSTRUCTOR_IN_ENUM by existing<FirSourceElement, PsiElement>(Errors.NON_PRIVATE_CONSTRUCTOR_IN_ENUM)
-    val NON_PRIVATE_CONSTRUCTOR_IN_SEALED by existing<FirSourceElement, PsiElement>(Errors.NON_PRIVATE_CONSTRUCTOR_IN_SEALED)
+    val CONSTRUCTOR_IN_OBJECT by existing<FirConstructorSourceElement, KtDeclaration>(Errors.CONSTRUCTOR_IN_OBJECT)
+    val CONSTRUCTOR_IN_INTERFACE by existing<FirConstructorSourceElement, KtDeclaration>(Errors.CONSTRUCTOR_IN_INTERFACE)
+    val NON_PRIVATE_CONSTRUCTOR_IN_ENUM by existing<FirConstructorSourceElement, PsiElement>(Errors.NON_PRIVATE_CONSTRUCTOR_IN_ENUM)
+    val NON_PRIVATE_CONSTRUCTOR_IN_SEALED by existing<FirConstructorSourceElement, PsiElement>(Errors.NON_PRIVATE_CONSTRUCTOR_IN_SEALED)
 
     val REPEATED_MODIFIER by error1<FirSourceElement, PsiElement, KtModifierKeywordToken>()
     val REDUNDANT_MODIFIER by error2<FirSourceElement, PsiElement, KtModifierKeywordToken, KtModifierKeywordToken>()

@@ -11,17 +11,27 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.util.diff.FlyweightCapableTreeStructure
 import org.jetbrains.kotlin.KtNodeTypes
-import org.jetbrains.kotlin.psi.KtModifierListOwner
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
-sealed class FirSourceElement {
-    abstract val elementType: IElementType
-    abstract val startOffset: Int
-    abstract val endOffset: Int
+interface FirSourceElement {
+    val elementType: IElementType
+    val startOffset: Int
+    val endOffset: Int
 }
 
-class FirPsiSourceElement<P : PsiElement>(val psi: P) : FirSourceElement() {
+abstract class FirAbstractSourceElement : FirSourceElement
+
+interface FirClassSourceElement : FirSourceElement
+
+interface FirNamedFunctionSourceElement : FirSourceElement
+
+interface FirPropertySourceElement : FirSourceElement
+
+interface FirConstructorSourceElement : FirSourceElement
+
+open class FirPsiSourceElement<P : PsiElement>(val psi: P) : FirAbstractSourceElement() {
     override val elementType: IElementType
         get() = psi.node.elementType
 
@@ -32,34 +42,80 @@ class FirPsiSourceElement<P : PsiElement>(val psi: P) : FirSourceElement() {
         get() = psi.endOffset
 }
 
-class FirLightSourceElement(
+class FirPsiClassElement<P : KtClassOrObject>(psi: P) : FirPsiSourceElement<P>(psi), FirClassSourceElement
+
+class FirPsiNamedFunctionElement<P : KtNamedFunction>(psi: P) : FirPsiSourceElement<P>(psi), FirNamedFunctionSourceElement
+
+class FirPsiPropertyElement<P : KtProperty>(psi: P) : FirPsiSourceElement<P>(psi), FirPropertySourceElement
+
+class FirPsiConstructorElement<P : KtConstructor<*>>(psi: P) : FirPsiSourceElement<P>(psi), FirConstructorSourceElement
+
+open class FirLightSourceElement(
     val element: LighterASTNode,
     override val startOffset: Int,
     override val endOffset: Int,
     val tree: FlyweightCapableTreeStructure<LighterASTNode>
-) : FirSourceElement() {
+) : FirAbstractSourceElement() {
     override val elementType: IElementType
         get() = element.tokenType
 }
+
+class FirLightClassElement(
+    element: LighterASTNode,
+    startOffset: Int, endOffset: Int,
+    tree: FlyweightCapableTreeStructure<LighterASTNode>
+) : FirLightSourceElement(element, startOffset, endOffset, tree), FirClassSourceElement
+
+class FirLightNamedFunctionElement(
+    element: LighterASTNode,
+    startOffset: Int, endOffset: Int,
+    tree: FlyweightCapableTreeStructure<LighterASTNode>
+) : FirLightSourceElement(element, startOffset, endOffset, tree), FirNamedFunctionSourceElement
+
+class FirLightPropertyElement(
+    element: LighterASTNode,
+    startOffset: Int, endOffset: Int,
+    tree: FlyweightCapableTreeStructure<LighterASTNode>
+) : FirLightSourceElement(element, startOffset, endOffset, tree), FirPropertySourceElement
+
+class FirLightConstructorElement(
+    element: LighterASTNode,
+    startOffset: Int, endOffset: Int,
+    tree: FlyweightCapableTreeStructure<LighterASTNode>
+) : FirLightSourceElement(element, startOffset, endOffset, tree), FirConstructorSourceElement
 
 val FirSourceElement?.psi: PsiElement? get() = (this as? FirPsiSourceElement<*>)?.psi
 
 val FirElement.psi: PsiElement? get() = (source as? FirPsiSourceElement<*>)?.psi
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun PsiElement.toFirPsiSourceElement(): FirPsiSourceElement<*> = FirPsiSourceElement(this)
+fun PsiElement.toFirPsiSourceElement(): FirPsiSourceElement<*> = when (this) {
+    is KtClassOrObject -> FirPsiClassElement(this)
+    is KtNamedFunction -> FirPsiNamedFunctionElement(this)
+    is KtProperty -> FirPsiPropertyElement(this)
+    is KtConstructor<*> -> FirPsiConstructorElement(this)
+    else -> FirPsiSourceElement(this)
+}
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun LighterASTNode.toFirLightSourceElement(
+fun LighterASTNode.toFirLightSourceElement(
     startOffset: Int, endOffset: Int,
     tree: FlyweightCapableTreeStructure<LighterASTNode>
-): FirLightSourceElement = FirLightSourceElement(this, startOffset, endOffset, tree)
+): FirLightSourceElement = when (this.tokenType) {
+    KtNodeTypes.CLASS, KtNodeTypes.OBJECT_DECLARATION ->
+        FirLightClassElement(this, startOffset, endOffset, tree)
+    KtNodeTypes.PRIMARY_CONSTRUCTOR, KtNodeTypes.SECONDARY_CONSTRUCTOR ->
+        FirLightConstructorElement(this, startOffset, endOffset, tree)
+    KtNodeTypes.FUN ->
+        FirLightNamedFunctionElement(this, startOffset, endOffset, tree)
+    KtNodeTypes.PROPERTY ->
+        FirLightPropertyElement(this, startOffset, endOffset, tree)
+    else ->
+        FirLightSourceElement(this, startOffset, endOffset, tree)
+}
 
 val FirSourceElement?.lightNode: LighterASTNode? get() = (this as? FirLightSourceElement)?.element
 
 fun FirSourceElement?.getModifierList(): FirModifierList? {
     return when (this) {
-        null -> null
         is FirPsiSourceElement<*> -> (psi as? KtModifierListOwner)?.modifierList?.let { FirPsiModifierList(it) }
         is FirLightSourceElement -> {
             val kidsRef = Ref<Array<LighterASTNode?>>()
@@ -67,5 +123,6 @@ fun FirSourceElement?.getModifierList(): FirModifierList? {
             val modifierListNode = kidsRef.get().find { it?.tokenType == KtNodeTypes.MODIFIER_LIST } ?: return null
             FirLightModifierList(modifierListNode, tree)
         }
+        else -> null
     }
 }
