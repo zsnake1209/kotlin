@@ -65,6 +65,31 @@ fun computeSubstitution(propertyDescriptor: PropertyDescriptor, accessorFunction
 
     if (accessorFunctionDescriptor !is SimpleFunctionDescriptor) return accessorFunctionDescriptor
 
+    /**
+     * Consider java class like
+     * O.java
+     * class O<T1> {
+     *   class I<T2> {
+     *     public String getFoo() { ... }
+     *   }
+     * }
+     *
+     * k.kt
+     * fun f(i: O<String>.I<Int>) = i.foo
+     *
+     *
+     * for that case front end creates synthetic property foo
+     * private val <T1', T2'> O<T1'>.I<T2'>.foo get() = this.getFoo()
+     *
+     * So to get substituted descriptor for getFoo() we need to extract substitution from extension receiver type.
+     * To do so map Tx parameters onto Tx' arguments like
+     * T1' -> String
+     * T2' -> Int
+     * into
+     * T1 -> String
+     * T2 -> Int
+     */
+
     val classDescriptor = accessorFunctionDescriptor.containingDeclaration as ClassDescriptor
     val collectedTypeParameters = classDescriptor.typeConstructor.parameters.map { it.typeConstructor }
     assert(collectedTypeParameters.size == propertyDescriptor.typeParametersCount)
