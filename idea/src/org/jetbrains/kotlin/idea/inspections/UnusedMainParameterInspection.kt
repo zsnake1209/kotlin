@@ -9,8 +9,10 @@ import com.intellij.codeInspection.IntentionWrapper
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.caches.resolve.analyzeWithContent
+import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.idea.quickfix.RemoveUnusedFunctionParameterFix
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtParameter
@@ -23,6 +25,7 @@ class UnusedMainParameterInspection : AbstractKotlinInspection() {
         parameterVisitor(fun(parameter: KtParameter) {
             val function = parameter.ownerFunction as? KtNamedFunction ?: return
             if (function.name != "main") return
+            if (!function.languageVersionSettings.supportsFeature(LanguageFeature.WarningOnMainUnusedParameter)) return
             val context = function.analyzeWithContent()
             if (context[UNUSED_MAIN_PARAMETER, parameter] == true) {
                 holder.registerProblem(
