@@ -10,8 +10,9 @@ import org.jetbrains.kotlin.diagnostics.*
 import org.jetbrains.kotlin.fir.FirLightSourceElement
 import org.jetbrains.kotlin.fir.FirPsiSourceElement
 import org.jetbrains.kotlin.fir.FirSourceElement
+import org.jetbrains.kotlin.fir.FirSourceElementHelper
 
-sealed class AbstractFirDiagnosticFactory<out E : FirSourceElement, D : FirDiagnostic<E>>(
+sealed class AbstractFirDiagnosticFactory<out E : FirSourceElementHelper, D : FirDiagnostic<E>>(
     val name: String,
     val severity: Severity,
 ) {
@@ -22,7 +23,7 @@ sealed class AbstractFirDiagnosticFactory<out E : FirSourceElement, D : FirDiagn
     }
 }
 
-class FirDiagnosticFactory0<E : FirSourceElement, P : PsiElement>(
+class FirDiagnosticFactory0<E : FirSourceElementHelper, P : PsiElement>(
     name: String, severity: Severity, override val psiDiagnosticFactory: DiagnosticFactory0<P>
 ) : AbstractFirDiagnosticFactory<E, FirSimpleDiagnostic<E>>(name, severity) {
     fun on(element: E): FirSimpleDiagnostic<E> {
@@ -36,7 +37,7 @@ class FirDiagnosticFactory0<E : FirSourceElement, P : PsiElement>(
     }
 }
 
-class FirDiagnosticFactory1<E : FirSourceElement, P : PsiElement, A>(
+class FirDiagnosticFactory1<E : FirSourceElementHelper, P : PsiElement, A>(
     name: String, severity: Severity, override val psiDiagnosticFactory: DiagnosticFactory1<P, A>
 ) : AbstractFirDiagnosticFactory<E, FirDiagnosticWithParameters1<E, A>>(name, severity) {
     fun on(element: E, a: A): FirDiagnosticWithParameters1<E, A> {
@@ -50,7 +51,7 @@ class FirDiagnosticFactory1<E : FirSourceElement, P : PsiElement, A>(
     }
 }
 
-class FirDiagnosticFactory2<E : FirSourceElement, P : PsiElement, A, B>(
+class FirDiagnosticFactory2<E : FirSourceElementHelper, P : PsiElement, A, B>(
     name: String, severity: Severity, override val psiDiagnosticFactory: DiagnosticFactory2<P, A, B>
 ) : AbstractFirDiagnosticFactory<E, FirDiagnosticWithParameters2<E, A, B>>(name, severity) {
     fun on(element: E, a: A, b: B): FirDiagnosticWithParameters2<E, A, B> {
@@ -64,7 +65,7 @@ class FirDiagnosticFactory2<E : FirSourceElement, P : PsiElement, A, B>(
     }
 }
 
-class FirDiagnosticFactory3<E : FirSourceElement, P : PsiElement, A, B, C>(
+class FirDiagnosticFactory3<E : FirSourceElementHelper, P : PsiElement, A, B, C>(
     name: String, severity: Severity, override val psiDiagnosticFactory: DiagnosticFactory3<P, A, B, C>
 ) : AbstractFirDiagnosticFactory<E, FirDiagnosticWithParameters3<E, A, B, C>>(name, severity) {
     fun on(element: E, a: A, b: B, c: C): FirDiagnosticWithParameters3<E, A, B, C> {
@@ -78,6 +79,6 @@ class FirDiagnosticFactory3<E : FirSourceElement, P : PsiElement, A, B, C>(
     }
 }
 
-private fun incorrectElement(element: FirSourceElement): Nothing {
+private fun incorrectElement(element: FirSourceElementHelper): Nothing {
     throw IllegalArgumentException("Unknown element type: ${element::class}")
 }

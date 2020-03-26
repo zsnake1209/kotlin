@@ -10,32 +10,32 @@ import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.fir.FirLightSourceElement
 import org.jetbrains.kotlin.fir.FirPsiSourceElement
-import org.jetbrains.kotlin.fir.FirSourceElement
+import org.jetbrains.kotlin.fir.FirSourceElementHelper
 
 // ------------------------------ diagnostics ------------------------------
 
-sealed class FirDiagnostic<out E : FirSourceElement> {
+sealed class FirDiagnostic<out E : FirSourceElementHelper> {
     abstract val element: E
     abstract val severity: Severity
     abstract val factory: AbstractFirDiagnosticFactory<*, *>
 }
 
-sealed class FirSimpleDiagnostic<out E : FirSourceElement> : FirDiagnostic<E>() {
+sealed class FirSimpleDiagnostic<out E : FirSourceElementHelper> : FirDiagnostic<E>() {
     abstract override val factory: FirDiagnosticFactory0<*, *>
 }
 
-sealed class FirDiagnosticWithParameters1<out E : FirSourceElement, A> : FirDiagnostic<E>() {
+sealed class FirDiagnosticWithParameters1<out E : FirSourceElementHelper, A> : FirDiagnostic<E>() {
     abstract val a: A
     abstract override val factory: FirDiagnosticFactory1<*, *, A>
 }
 
-sealed class FirDiagnosticWithParameters2<out E : FirSourceElement, A, B> : FirDiagnostic<E>() {
+sealed class FirDiagnosticWithParameters2<out E : FirSourceElementHelper, A, B> : FirDiagnostic<E>() {
     abstract val a: A
     abstract val b: B
     abstract override val factory: FirDiagnosticFactory2<*, *, A, B>
 }
 
-sealed class FirDiagnosticWithParameters3<out E : FirSourceElement, A, B, C> : FirDiagnostic<E>() {
+sealed class FirDiagnosticWithParameters3<out E : FirSourceElementHelper, A, B, C> : FirDiagnostic<E>() {
     abstract val a: A
     abstract val b: B
     abstract val c: C
