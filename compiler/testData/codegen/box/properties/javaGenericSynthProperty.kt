@@ -26,6 +26,10 @@ public class JOuter<O1, O2> {
         return new JInner<Box<O1>, O2>(new Box(s1), s2);
     }
 
+    public JStatic<?, Box<O2>> staticInstance() {
+        return new JStatic<O1, Box<O2>>(o1, new Box(o2));
+    }
+
     public class JInner<I1, I2> {
 
         public I1 i1;
@@ -48,6 +52,22 @@ public class JOuter<O1, O2> {
             return s1 + s2;
         }
     }
+
+    public static class JStatic<S1, S2> {
+        public S1 ss1;
+        public S2 ss2;
+
+        public JStatic(S1 a1, S2 a2) {
+            this.ss1 = a1;
+            this.ss2 = a2;
+        }
+
+        public String getQux() {
+            String s1 = (String)ss1;
+            String s2 = ((Box<String>)ss2).f;
+            return s1 + s2;
+        }
+    }
 }
 
 // FILE: kotlin.kt
@@ -57,10 +77,13 @@ fun box(): String {
     val o = JOuter<String, String>("1", "2")
 
     val r1 = o.instance("3", "4").foo
-    if (r1 != "13") return "FAIL: $r1"
+    if (r1 != "13") return "FAIL1: $r1"
 
     val r2 = o.instance("5", "6").bar
-    if (r2 != "26") return "FAIL: $r2"
+    if (r2 != "26") return "FAIL2: $r2"
+
+    val r3 = o.staticInstance().qux
+    if (r3 != "12") return "FAIL3: $r3"
 
     return "OK"
 }
