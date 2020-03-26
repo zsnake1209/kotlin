@@ -35,7 +35,8 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedValueArgument
 import org.jetbrains.kotlin.resolve.calls.tasks.isDynamic
 import org.jetbrains.kotlin.resolve.calls.util.FakeCallableDescriptorForObject
 import org.jetbrains.kotlin.resolve.descriptorUtil.classValueType
-import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import java.util.*
 
 class CallGenerator(statementGenerator: StatementGenerator) : StatementGeneratorExtension(statementGenerator) {
@@ -211,7 +212,7 @@ class CallGenerator(statementGenerator: StatementGenerator) : StatementGenerator
                         IrStatementOrigin.GET_PROPERTY,
                         superQualifierSymbol
                     ).apply {
-                        context.callToSubstitutedDescriptorMap[this] = getMethodDescriptor
+                        context.callToSubstitutedDescriptorMap[this] = computeSubstitution(descriptor, getMethodDescriptor)
                         putTypeArguments(call.typeArguments) { it.toIrType() }
                         dispatchReceiver = dispatchReceiverValue?.load()
                         extensionReceiver = extensionReceiverValue?.load()

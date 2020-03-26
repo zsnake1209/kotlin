@@ -16,10 +16,13 @@
 
 package org.jetbrains.kotlin.psi2ir.intermediate
 
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
+import org.jetbrains.kotlin.ir.expressions.typeParametersCount
+import org.jetbrains.kotlin.types.TypeConstructor
+import org.jetbrains.kotlin.types.TypeSubstitutor
 
 fun IrVariable.defaultLoad(): IrExpression =
     IrGetValueImpl(startOffset, endOffset, type, symbol)
@@ -48,3 +51,39 @@ fun CallReceiver.adjustForCallee(callee: CallableMemberDescriptor): CallReceiver
                 withDispatchAndExtensionReceivers(newDispatchReceiverValue, newExtensionReceiverValue)
             }
     }
+
+
+fun computeSubstitution(propertyDescriptor: PropertyDescriptor, accessorFunctionDescriptor: FunctionDescriptor): FunctionDescriptor {
+    if (propertyDescriptor.original == propertyDescriptor) return accessorFunctionDescriptor
+
+    // Compute substituted accessor descriptor in case of Synthetic Java property `Java: getFoo() -> Kotlin: foo`
+    if (propertyDescriptor !is SyntheticPropertyDescriptor) return accessorFunctionDescriptor
+
+    if (propertyDescriptor.extensionReceiverParameter == null || propertyDescriptor.dispatchReceiverParameter != null) {
+        return accessorFunctionDescriptor
+    }
+
+    if (accessorFunctionDescriptor !is SimpleFunctionDescriptor) return accessorFunctionDescriptor
+
+    val collectedTypeParameters = ArrayList<TypeConstructor>(propertyDescriptor.typeParametersCount)
+
+    tailrec fun collectTypeParameterMapping(classDescriptor: ClassDescriptor) {
+        classDescriptor.declaredTypeParameters.forEach { collectedTypeParameters.add(it.typeConstructor) }
+        val parentClass = classDescriptor.containingDeclaration as? ClassDescriptor ?: return
+        collectTypeParameterMapping(parentClass)
+    }
+
+    collectTypeParameterMapping(accessorFunctionDescriptor.containingDeclaration as ClassDescriptor)
+
+    assert(collectedTypeParameters.size == propertyDescriptor.typeParametersCount)
+
+    val subExtensionReceiver = propertyDescriptor.extensionReceiverParameter!!
+
+    val subType = subExtensionReceiver.type.unwrap()
+
+    assert(subType.arguments.size == collectedTypeParameters.size)
+
+    val typeSubstitutor = TypeSubstitutor.create(collectedTypeParameters.zip(subType.arguments).toMap())
+
+    return accessorFunctionDescriptor.substitute(typeSubstitutor) ?: error("Cannot substitute descriptor for $accessorFunctionDescriptor")
+}
