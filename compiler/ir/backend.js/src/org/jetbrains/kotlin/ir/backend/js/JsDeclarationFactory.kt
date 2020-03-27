@@ -48,11 +48,11 @@ class JsDeclarationFactory(mapping: JsMapping) : DeclarationFactory {
                 val fieldType = outerClass.defaultType
                 val visibility = Visibilities.PROTECTED
 
-                createPropertyWithBackingField(name, visibility, innerClass, fieldType, DeclarationFactory.FIELD_FOR_OUTER_THIS)
+                createPropertyWithBackingField(name, visibility, innerClass, fieldType, false, DeclarationFactory.FIELD_FOR_OUTER_THIS)
             }
         }
 
-    private fun createPropertyWithBackingField(name: Name, visibility: Visibility, parent: IrClass, fieldType: IrType, origin: IrDeclarationOrigin): IrField {
+    private fun createPropertyWithBackingField(name: Name, visibility: Visibility, parent: IrClass, fieldType: IrType, isFakeOverride: Boolean, origin: IrDeclarationOrigin): IrField {
         val descriptor = WrappedFieldDescriptor()
         val symbol = IrFieldSymbolImpl(descriptor)
 
@@ -67,7 +67,7 @@ class JsDeclarationFactory(mapping: JsMapping) : DeclarationFactory {
             isFinal = true,
             isExternal = false,
             isStatic = false,
-            isFakeOverride = origin == IrDeclarationOrigin.FAKE_OVERRIDE
+            isFakeOverride = isFakeOverride
         ).also {
             descriptor.bind(it)
             it.parent = parent
@@ -144,6 +144,6 @@ class JsDeclarationFactory(mapping: JsMapping) : DeclarationFactory {
 
         val name = Name.identifier("INSTANCE")
 
-        return createPropertyWithBackingField(name, Visibilities.PUBLIC, singleton, singleton.defaultType, origin)
+        return createPropertyWithBackingField(name, Visibilities.PUBLIC, singleton, singleton.defaultType, false, origin)
     }
 }
