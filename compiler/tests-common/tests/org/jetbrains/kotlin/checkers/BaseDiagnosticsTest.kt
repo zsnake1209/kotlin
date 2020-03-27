@@ -20,7 +20,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Conditions
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.containers.ContainerUtil
@@ -33,6 +32,7 @@ import org.jetbrains.kotlin.checkers.diagnostics.TextDiagnostic
 import org.jetbrains.kotlin.checkers.diagnostics.factories.DebugInfoDiagnosticFactory0
 import org.jetbrains.kotlin.checkers.diagnostics.factories.SyntaxErrorDiagnosticFactory
 import org.jetbrains.kotlin.checkers.utils.CheckerTestUtil
+import org.jetbrains.kotlin.checkers.utils.DiagnosticsRenderingConfiguration
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.LanguageFeature
@@ -55,7 +55,6 @@ import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowValueFactoryImpl
 import org.jetbrains.kotlin.test.InTextDirectivesUtils.isDirectiveDefined
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.KotlinBaseTest
-import org.jetbrains.kotlin.test.util.trimTrailingWhitespacesAndAddNewlineAtEOF
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.junit.Assert
 import java.io.File
@@ -261,8 +260,11 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
                 ktFile,
                 markDynamicCalls,
                 dynamicCallDescriptors,
-                newInferenceEnabled,
-                languageVersionSettings,
+                DiagnosticsRenderingConfiguration(
+                    platform = null,
+                    withNewInference,
+                    languageVersionSettings,
+                ),
                 DataFlowValueFactoryImpl(languageVersionSettings),
                 moduleDescriptor,
                 this.diagnosedRangesToDiagnosticNames
