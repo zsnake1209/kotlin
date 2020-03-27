@@ -130,7 +130,7 @@ object FirModifierChecker : FirDeclarationChecker<FirDeclaration>() {
     }
 
     private fun checkModifiers(
-        list: FirModifierList,
+        list: FirModifierListSourceElement,
         owner: FirDeclaration,
         reporter: DiagnosticReporter
     ) {
