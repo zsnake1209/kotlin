@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectedActualResolver
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 // `doRemove` means should expect-declaration be removed from IR
 class ExpectDeclarationRemover(val symbolTable: ReferenceSymbolTable, private val doRemove: Boolean) : IrElementVisitorVoid {
@@ -76,7 +77,7 @@ class ExpectDeclarationRemover(val symbolTable: ReferenceSymbolTable, private va
             return
         }
 
-        if (!function.descriptor.isActual) return
+        if (!function.symbol.trueDescriptor.isActual) return
 
         val index = declaration.index
 
@@ -99,14 +100,15 @@ class ExpectDeclarationRemover(val symbolTable: ReferenceSymbolTable, private va
         }
     }
 
+    // !!!!!! TODO: avoid using descriptors !!!!!!
     private fun IrFunction.findActualForExpected(): IrFunction? =
-        descriptor.findActualForExpect()?.let { symbolTable.referenceFunction(it).owner }
+        symbol.trueDescriptor.findActualForExpect()?.let { symbolTable.referenceFunction(it).owner }
 
     private fun IrFunction.findExpectForActual(): IrFunction? =
-        descriptor.findExpectForActual()?.let { symbolTable.referenceFunction(it).owner }
+        symbol.trueDescriptor.findExpectForActual()?.let { symbolTable.referenceFunction(it).owner }
 
     private fun IrClass.findActualForExpected(): IrClass? =
-        descriptor.findActualForExpect()?.let { symbolTable.referenceClass(it).owner }
+        symbol.trueDescriptor.findActualForExpect()?.let { symbolTable.referenceClass(it).owner }
 
     private inline fun <reified T : MemberDescriptor> T.findActualForExpect() = with(ExpectedActualResolver) {
         val descriptor = this@findActualForExpect
