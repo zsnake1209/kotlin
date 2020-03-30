@@ -144,6 +144,6 @@ class JsDeclarationFactory(mapping: JsMapping) : DeclarationFactory {
 
         val name = Name.identifier("INSTANCE")
 
-        return createPropertyWithBackingField(name, Visibilities.PUBLIC, singleton, singleton.defaultType, false, origin)
+        return createPropertyWithBackingField(name, Visibilities.PUBLIC, singleton, singleton.defaultType, origin)
     }
 }
