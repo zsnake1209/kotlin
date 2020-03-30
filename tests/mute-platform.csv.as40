@@ -1,0 +1,2 @@
+Test key, Issue, State (optional: MUTE or FAIL)
+org.jetbrains.kotlin.idea.codeInsight.gradle.GradleKtsImportTest.testError, KT-37864
