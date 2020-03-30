@@ -110,6 +110,18 @@ public class SteppingTestGenerated extends AbstractSteppingTest {
     }
 
     @Test
+    @TestMetadata("simpleDefaultArg.kt")
+    public void testSimpleDefaultArg() throws Exception {
+        runTest("compiler/testData/debug/stepping/simpleDefaultArg.kt");
+    }
+
+    @Test
+    @TestMetadata("simpleDefaultArgWithInline.kt")
+    public void testSimpleDefaultArgWithInline() throws Exception {
+        runTest("compiler/testData/debug/stepping/simpleDefaultArgWithInline.kt");
+    }
+
+    @Test
     @TestMetadata("simpleInlineDefaultArg.kt")
     public void testSimpleInlineDefaultArg() throws Exception {
         runTest("compiler/testData/debug/stepping/simpleInlineDefaultArg.kt");
