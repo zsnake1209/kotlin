@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.fir.firEffectiveVisibility
 import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.fir.visitors.compose
+import org.jetbrains.kotlin.fir.visitors.transformSingle
 
 class FirStatusResolveTransformer : FirAbstractTreeTransformer<FirDeclarationStatus?>(phase = FirResolvePhase.STATUS) {
     private val classes = mutableListOf<FirRegularClass>()
@@ -54,7 +55,7 @@ class FirStatusResolveTransformer : FirAbstractTreeTransformer<FirDeclarationSta
     override fun transformRegularClass(regularClass: FirRegularClass, data: FirDeclarationStatus?): CompositeTransformResult<FirStatement> {
         regularClass.transformStatus(this, regularClass.resolveStatus(regularClass.status, containingClass, isLocal = false))
         return storeClass(regularClass) {
-            regularClass.typeParameters.forEach { transformDeclaration(it, data) }
+            regularClass.typeParameters.forEach { it.transformSingle(this, data) as FirTypeParameter }
             transformDeclaration(regularClass, data)
         } as CompositeTransformResult<FirStatement>
     }
@@ -100,6 +101,13 @@ class FirStatusResolveTransformer : FirAbstractTreeTransformer<FirDeclarationSta
         data: FirDeclarationStatus?
     ): CompositeTransformResult<FirStatement> {
         return transformDeclaration(valueParameter, data) as CompositeTransformResult<FirStatement>
+    }
+
+    override fun transformTypeParameter(
+        typeParameter: FirTypeParameter,
+        data: FirDeclarationStatus?
+    ): CompositeTransformResult<FirDeclaration> {
+        return transformDeclaration(typeParameter, data)
     }
 
     override fun transformBlock(block: FirBlock, data: FirDeclarationStatus?): CompositeTransformResult<FirStatement> {

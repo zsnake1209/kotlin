@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.resolve.calls
 
+import org.jetbrains.kotlin.fir.declarations.FirTypeParameterRefsOwner
 import org.jetbrains.kotlin.fir.declarations.FirTypeParametersOwner
 import org.jetbrains.kotlin.fir.renderWithType
 import org.jetbrains.kotlin.fir.resolve.inference.TypeParameterBasedTypeVariable
@@ -20,7 +21,7 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.SimpleConstraintSystem
 internal object CreateFreshTypeVariableSubstitutorStage : ResolutionStage() {
     override suspend fun check(candidate: Candidate, sink: CheckerSink, callInfo: CallInfo) {
         val declaration = candidate.symbol.fir
-        if (declaration !is FirTypeParametersOwner || declaration.typeParameters.isEmpty()) {
+        if (declaration !is FirTypeParameterRefsOwner || declaration.typeParameters.isEmpty()) {
             candidate.substitutor = ConeSubstitutor.Empty
             candidate.freshVariables = emptyList()
             return
@@ -67,7 +68,7 @@ internal object CreateFreshTypeVariableSubstitutorStage : ResolutionStage() {
                 )
                 is FirStarProjection -> csBuilder.addEqualityConstraint(
                     freshVariable.defaultType,
-                    typeParameter.bounds.firstOrNull()?.coneTypeUnsafe()
+                    typeParameter.symbol.fir.bounds.firstOrNull()?.coneTypeUnsafe()
                         ?: sink.components.session.builtinTypes.nullableAnyType.type,
                     SimpleConstraintSystemConstraintPosition
                 )
@@ -81,7 +82,7 @@ internal object CreateFreshTypeVariableSubstitutorStage : ResolutionStage() {
 }
 
 fun createToFreshVariableSubstitutorAndAddInitialConstraints(
-    declaration: FirTypeParametersOwner,
+    declaration: FirTypeParameterRefsOwner,
     candidate: Candidate,
     csBuilder: ConstraintSystemOperation
 ): Pair<ConeSubstitutor, List<ConeTypeVariable>> {
@@ -108,7 +109,7 @@ fun createToFreshVariableSubstitutorAndAddInitialConstraints(
         val freshVariable = freshTypeVariables[index]
         //val position = DeclaredUpperBoundConstraintPosition(typeParameter)
 
-        for (upperBound in typeParameter.bounds) {
+        for (upperBound in typeParameter.symbol.fir.bounds) {
             freshVariable.addSubtypeConstraint(upperBound.coneTypeUnsafe()/*, position*/)
         }
     }
