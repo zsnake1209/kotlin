@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.scopes
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirClass
+import org.jetbrains.kotlin.fir.declarations.FirRegularClass
 import org.jetbrains.kotlin.fir.declarations.classId
 import org.jetbrains.kotlin.fir.resolve.*
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
@@ -28,9 +29,22 @@ class KotlinScopeProvider(
 ) : FirScopeProvider() {
 
 
-    private fun substitutor(symbol: FirRegularClassSymbol, type: ConeClassLikeType, useSiteSession: FirSession): ConeSubstitutor {
-        if (type.typeArguments.isEmpty()) return ConeSubstitutor.Empty
-        val originalSubstitution = createSubstitution(symbol.fir.typeParameters, type.typeArguments, useSiteSession)
+    private fun substitutor(
+        derivedClass: FirClass<*>,
+        baseSymbol: FirRegularClassSymbol,
+        type: ConeClassLikeType,
+        useSiteSession: FirSession
+    ): ConeSubstitutor {
+        if (type.typeArguments.isEmpty()) {
+            return if (derivedClass is FirRegularClass && derivedClass.classKind != ClassKind.OBJECT &&
+                derivedClass.classKind != ClassKind.ENUM_ENTRY
+            ) {
+                ConeSubstitutor.Empty
+            } else {
+                ConeSubstitutor.StubForObjects
+            }
+        }
+        val originalSubstitution = createSubstitution(baseSymbol.fir.typeParameters, type.typeArguments, useSiteSession)
         return substitutorByMap(originalSubstitution)
     }
 
@@ -50,7 +64,7 @@ class KotlinScopeProvider(
                     val symbol = useSiteSuperType.lookupTag.toSymbol(useSiteSession)
                     if (symbol is FirRegularClassSymbol) {
                         symbol.fir.scope(
-                            substitutor(symbol, useSiteSuperType, useSiteSession),
+                            substitutor(klass, symbol, useSiteSuperType, useSiteSession),
                             useSiteSession, scopeSession, skipPrivateMembers = true, klass.classId
                         )
                     } else {

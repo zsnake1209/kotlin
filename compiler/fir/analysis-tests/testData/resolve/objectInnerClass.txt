@@ -77,8 +77,8 @@ FILE: objectInnerClass.kt
             }
 
             public final fun foo(): R|kotlin/Unit| {
-                this@R|/anonymous|.R|/Case2.Base.baseFun|()
-                lval x: R|B| = this@R|/anonymous|.R|/Case2.Base.property|
+                this@R|/anonymous|.R|FakeOverride</anonymous.baseFun: R|kotlin/Unit|>|()
+                lval x: R|B| = this@R|/anonymous|.R|FakeOverride</anonymous.property: R|B|>|
                 this@R|/anonymous|.R|/anonymous.zoo|()
                 (this@R|/Case2|, this@R|/anonymous|).R|/Case2.hoo|()
             }
@@ -113,8 +113,8 @@ FILE: objectInnerClass.kt
 
         public final fun caseForChild(): R|kotlin/Unit| {
             lval child: R|anonymous| = this@R|/Case2|.R|/Case2.x|
-            R|<local>/child|.R|/Case2.Base.baseFun|()
-            R|<local>/child|.R|/Case2.Base.property|
+            R|<local>/child|.R|FakeOverride</anonymous.baseFun: R|kotlin/Unit|>|()
+            R|<local>/child|.R|FakeOverride</anonymous.property: R|B|>|
             (this@R|/Case2|, R|<local>/child|).R|/Case2.hoo|()
         }
 

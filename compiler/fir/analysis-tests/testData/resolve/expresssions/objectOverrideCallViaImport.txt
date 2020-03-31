@@ -9,7 +9,12 @@ FILE: objectOverrideCallViaImport.kt
             super<R|kotlin/Any|>()
         }
 
+        public final fun bar(): R|kotlin/Unit| {
+            this@R|/Derived|.R|FakeOverride</Derived.foo: R|kotlin/Unit|>|()
+        }
+
     }
     public final fun test(): R|kotlin/Unit| {
-        R|/Base.foo|()
+        R|FakeOverride</Derived.foo: R|kotlin/Unit|>|()
+        Q|Derived|.R|FakeOverride</Derived.foo: R|kotlin/Unit|>|()
     }

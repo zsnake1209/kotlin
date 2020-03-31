@@ -118,8 +118,11 @@ class FirClassSubstitutionScope(
             it.returnTypeRef.coneTypeUnsafe<ConeKotlinType>().substitute(newSubstitutor)
         }
 
-        if (newReceiverType == null && newReturnType == null && newParameterTypes.all { it == null } &&
-            newTypeParameters === member.typeParameters) {
+        if (substitutor != ConeSubstitutor.StubForObjects &&
+            newReceiverType == null && newReturnType == null &&
+            newParameterTypes.all { it == null } &&
+            newTypeParameters === member.typeParameters
+        ) {
             return original
         }
 
@@ -182,7 +185,7 @@ class FirClassSubstitutionScope(
         val returnType = typeCalculator.tryCalculateReturnType(member).type
         val newReturnType = returnType.substitute()
 
-        if (newReceiverType == null && newReturnType == null) {
+        if (substitutor != ConeSubstitutor.StubForObjects && newReceiverType == null && newReturnType == null) {
             return original
         }
 
@@ -195,7 +198,10 @@ class FirClassSubstitutionScope(
         if (skipPrivateMembers && member.visibility == Visibilities.PRIVATE) return original
 
         val returnType = typeCalculator.tryCalculateReturnType(member).type
-        val newReturnType = returnType.substitute() ?: return original
+        val newReturnType = returnType.substitute()
+        if (substitutor != ConeSubstitutor.StubForObjects && newReturnType == null) {
+            return original
+        }
 
         return createFakeOverrideField(session, member, original, newReturnType, derivedClassId)
     }
@@ -212,7 +218,7 @@ class FirClassSubstitutionScope(
             it.returnTypeRef.coneTypeUnsafe<ConeKotlinType>().substitute()
         }
 
-        if (newReturnType == null && newParameterTypes.all { it == null }) {
+        if (substitutor != ConeSubstitutor.StubForObjects && newReturnType == null && newParameterTypes.all { it == null }) {
             return original
         }
 

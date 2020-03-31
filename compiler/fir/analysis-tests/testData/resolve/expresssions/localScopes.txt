@@ -33,7 +33,7 @@ FILE: localScopes.kt
         }
 
         R|<local>/anonymous|.R|/anonymous.baz|()
-        R|<local>/anonymous|.R|/Bar.foo|()
+        R|<local>/anonymous|.R|FakeOverride</anonymous.foo: R|kotlin/Unit|>|()
         local final class DerivedLocal : R|BaseLocal| {
             public[local] constructor(): R|DerivedLocal| {
                 super<R|BaseLocal|>()

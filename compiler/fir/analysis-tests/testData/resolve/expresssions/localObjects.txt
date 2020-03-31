@@ -27,7 +27,7 @@ FILE: localObjects.kt
 
         }
 
-        R|<local>/b|.R|/Foo.foo|()
+        R|<local>/b|.R|FakeOverride</anonymous.foo: R|kotlin/Int|>|()
         local final object B : R|kotlin/Any| {
             private constructor(): R|B| {
                 super<R|kotlin/Any|>()

@@ -12,7 +12,7 @@ abstract class ConeSubstitutor : TypeSubstitutorMarker {
     open fun substituteOrSelf(type: ConeKotlinType): ConeKotlinType = substituteOrNull(type) ?: type
     abstract fun substituteOrNull(type: ConeKotlinType): ConeKotlinType?
 
-    object Empty : ConeSubstitutor() {
+    open class EmptySubstitutor internal constructor() : ConeSubstitutor() {
         override fun substituteOrSelf(type: ConeKotlinType): ConeKotlinType {
             return type
         }
@@ -20,10 +20,9 @@ abstract class ConeSubstitutor : TypeSubstitutorMarker {
         override fun substituteOrNull(type: ConeKotlinType): ConeKotlinType? {
             return null
         }
-
     }
-}
 
-fun ConeSubstitutor.substituteOrNull(type: ConeKotlinType?): ConeKotlinType? {
-    return type?.let { substituteOrNull(it) }
+    object Empty : EmptySubstitutor()
+
+    object StubForObjects : EmptySubstitutor()
 }
