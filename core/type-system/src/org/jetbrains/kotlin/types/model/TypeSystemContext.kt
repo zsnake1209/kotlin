@@ -22,6 +22,7 @@ interface RawTypeMarker : FlexibleTypeMarker
 interface StubTypeMarker : SimpleTypeMarker
 
 interface TypeArgumentListMarker
+interface AnnotationListMarker
 
 interface TypeVariableMarker
 interface TypeVariableTypeConstructorMarker : TypeConstructorMarker
@@ -56,7 +57,13 @@ interface TypeSystemBuiltInsContext {
 
 interface TypeSystemTypeFactoryContext {
     fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker
-    fun createSimpleType(constructor: TypeConstructorMarker, arguments: List<TypeArgumentMarker>, nullable: Boolean): SimpleTypeMarker
+    fun createSimpleType(
+        constructor: TypeConstructorMarker,
+        arguments: List<TypeArgumentMarker>,
+        nullable: Boolean,
+        annotationList: AnnotationListMarker? = null
+    ): SimpleTypeMarker
+
     fun createTypeArgument(type: KotlinTypeMarker, variance: TypeVariance): TypeArgumentMarker
     fun createStarProjection(typeParameter: TypeParameterMarker): TypeArgumentMarker
 
@@ -87,6 +94,8 @@ interface TypeSystemCommonSuperTypesContext : TypeSystemContext, TypeSystemTypeF
             )
 
     fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean
+
+    fun SimpleTypeMarker.hasExtensionFunctionAnnotation(): Boolean
 
     fun SimpleTypeMarker.typeDepth(): Int
 

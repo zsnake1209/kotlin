@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.fir.resolve.*
 import org.jetbrains.kotlin.fir.resolve.calls.NoSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.AbstractConeSubstitutor
@@ -50,10 +51,12 @@ interface ConeInferenceContext : TypeSystemInferenceExtensionContext, ConeTypeCo
         return coneFlexibleOrSimpleType(this, lowerBound, upperBound)
     }
 
+    // TODO: implement propagation of annotations to a creating type
     override fun createSimpleType(
         constructor: TypeConstructorMarker,
         arguments: List<TypeArgumentMarker>,
-        nullable: Boolean
+        nullable: Boolean,
+        annotationList: AnnotationListMarker?
     ): SimpleTypeMarker {
         require(constructor is FirClassifierSymbol<*>)
         return when (constructor) {
@@ -94,6 +97,11 @@ interface ConeInferenceContext : TypeSystemInferenceExtensionContext, ConeTypeCo
         require(this is ConeKotlinType)
         return this is ConeCapturedType /*|| this is ConeTypeVariable // TODO */
                 || this is ConeTypeParameterType
+    }
+
+    override fun SimpleTypeMarker.hasExtensionFunctionAnnotation(): Boolean {
+        require(this is ConeKotlinType)
+        return this.hasAnnotation(KotlinBuiltIns.FQ_NAMES.extensionFunctionType)
     }
 
     override fun KotlinTypeMarker.typeDepth() = when (this) {

@@ -16,12 +16,13 @@
 
 package org.jetbrains.kotlin.resolve.calls
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationFqNameList
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.AbstractFlexibilityChecker.hasDifferentFlexibilityAtDepth
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker.hasPathByNotMarkedNullableNodes
 import org.jetbrains.kotlin.types.checker.SimpleClassicTypeSystemContext
 import org.jetbrains.kotlin.types.model.*
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 object NewCommonSuperTypeCalculator {
     // TODO: Bridge for old calls
@@ -332,8 +333,13 @@ object NewCommonSuperTypeCalculator {
 
             arguments.add(argument)
         }
-        return createSimpleType(constructor, arguments, nullable = false)
+        return createSimpleType(constructor, arguments, nullable = false, annotationList = calculateAnnotationsForCommonSuperType(types))
     }
+
+    private fun TypeSystemCommonSuperTypesContext.calculateAnnotationsForCommonSuperType(types: List<SimpleTypeMarker>) =
+        if (types.all { it.hasExtensionFunctionAnnotation() }) {
+            AnnotationFqNameList(listOf(KotlinBuiltIns.FQ_NAMES.extensionFunctionType))
+        } else null
 
     private fun TypeSystemCommonSuperTypesContext.uncaptureFromSubtyping(typeArgument: TypeArgumentMarker): TypeArgumentMarker {
         val capturedType = typeArgument.getType().asSimpleType()?.asCapturedType() ?: return typeArgument
