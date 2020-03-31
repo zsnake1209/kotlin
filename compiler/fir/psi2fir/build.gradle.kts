@@ -13,6 +13,7 @@ dependencies {
     compile(project(":core:descriptors"))
     compile(project(":compiler:fir:tree"))
     compile(project(":compiler:ir.tree"))
+    compile("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.2")
 
     compileOnly(intellijCoreDep()) { includeJars("intellij-core", "guava", rootProject = rootProject) }
 

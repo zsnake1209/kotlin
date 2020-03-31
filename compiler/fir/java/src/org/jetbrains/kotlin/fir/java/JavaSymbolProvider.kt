@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.fir.declarations.FirRegularClass
 import org.jetbrains.kotlin.fir.declarations.FirTypeParameter
 import org.jetbrains.kotlin.fir.declarations.addDefaultBoundIfNecessary
 import org.jetbrains.kotlin.fir.declarations.builder.FirTypeParameterBuilder
+import org.jetbrains.kotlin.fir.declarations.builder.buildConstructedClassTypeParameterRef
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
 import org.jetbrains.kotlin.fir.java.declarations.*
 import org.jetbrains.kotlin.fir.resolve.AbstractFirSymbolProvider
@@ -247,7 +248,7 @@ class JavaSymbolProvider(
                                     false,
                                 )
                             }
-                            typeParameters += classTypeParameters
+                            typeParameters += classTypeParameters.map { buildConstructedClassTypeParameterRef { symbol = it.symbol } }
                         }
                     }
 

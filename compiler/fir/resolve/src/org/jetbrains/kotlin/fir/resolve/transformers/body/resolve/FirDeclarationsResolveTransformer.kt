@@ -337,9 +337,11 @@ class FirDeclarationsResolveTransformer(transformer: FirBodyResolveTransformer) 
         prepareLocalClassForBodyResolve(anonymousObject)
         return withScopeCleanup(topLevelScopes) {
             val type = anonymousObject.defaultType()
-            anonymousObject.resultType = buildResolvedTypeRef {
-                source = anonymousObject.source
-                this.type = type
+            if (anonymousObject.typeRef !is FirResolvedTypeRef) {
+                anonymousObject.resultType = buildResolvedTypeRef {
+                    source = anonymousObject.source
+                    this.type = type
+                }
             }
             val result = withLabelAndReceiverType(null, anonymousObject, type) {
                 transformDeclaration(anonymousObject, data)
