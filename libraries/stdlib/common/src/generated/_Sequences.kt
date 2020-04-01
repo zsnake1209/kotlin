@@ -775,6 +775,40 @@ public fun <T, R> Sequence<T>.flatMap(transform: (T) -> Sequence<R>): Sequence<R
 }
 
 /**
+ * Returns a single sequence of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original sequence.
+ *
+ * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+public fun <T, R> Sequence<T>.flatMapIndexed(transform: (index: Int, T) -> Sequence<R>): Sequence<R> {
+    return sequence {
+        var index = 0
+        for (element in this@flatMapIndexed) {
+            val result = transform(checkIndexOverflow(index++), element)
+            for (r in result) yield(r)
+        }
+    }
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original sequence, to the given [destination].
+ *
+ * The operation is _terminal_.
+ */
+@kotlin.internal.InlineOnly
+public inline fun <T, R, C : MutableCollection<in R>> Sequence<T>.flatMapIndexedTo(destination: C, transform: (index: Int, T) -> Sequence<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(checkIndexOverflow(index++), element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
  * Appends all elements yielded from results of [transform] function being invoked on each element of original sequence, to the given [destination].
  *
  * The operation is _terminal_.

@@ -9318,6 +9318,231 @@ public inline fun <R> CharArray.flatMap(transform: (Char) -> Iterable<R>): List<
 }
 
 /**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <T, R> Array<out T>.flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R> ByteArray.flatMapIndexed(transform: (index: Int, Byte) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R> ShortArray.flatMapIndexed(transform: (index: Int, Short) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R> IntArray.flatMapIndexed(transform: (index: Int, Int) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R> LongArray.flatMapIndexed(transform: (index: Int, Long) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R> FloatArray.flatMapIndexed(transform: (index: Int, Float) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R> DoubleArray.flatMapIndexed(transform: (index: Int, Double) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R> BooleanArray.flatMapIndexed(transform: (index: Int, Boolean) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R> CharArray.flatMapIndexed(transform: (index: Int, Char) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <T, R, C : MutableCollection<in R>> Array<out T>.flatMapIndexedTo(destination: C, transform: (index: Int, T) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R, C : MutableCollection<in R>> ByteArray.flatMapIndexedTo(destination: C, transform: (index: Int, Byte) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R, C : MutableCollection<in R>> ShortArray.flatMapIndexedTo(destination: C, transform: (index: Int, Short) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R, C : MutableCollection<in R>> IntArray.flatMapIndexedTo(destination: C, transform: (index: Int, Int) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R, C : MutableCollection<in R>> LongArray.flatMapIndexedTo(destination: C, transform: (index: Int, Long) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R, C : MutableCollection<in R>> FloatArray.flatMapIndexedTo(destination: C, transform: (index: Int, Float) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R, C : MutableCollection<in R>> DoubleArray.flatMapIndexedTo(destination: C, transform: (index: Int, Double) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R, C : MutableCollection<in R>> BooleanArray.flatMapIndexedTo(destination: C, transform: (index: Int, Boolean) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each element
+ * and its index in the original array, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <R, C : MutableCollection<in R>> CharArray.flatMapIndexedTo(destination: C, transform: (index: Int, Char) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
  * Appends all elements yielded from results of [transform] function being invoked on each element of original array, to the given [destination].
  */
 public inline fun <T, R, C : MutableCollection<in R>> Array<out T>.flatMapTo(destination: C, transform: (T) -> Iterable<R>): C {

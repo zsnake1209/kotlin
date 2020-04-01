@@ -47,6 +47,31 @@ public inline fun <K, V, R> Map<out K, V>.flatMap(transform: (Map.Entry<K, V>) -
 }
 
 /**
+ * Returns a single list of all elements yielded from results of [transform] function being invoked on each entry
+ * and its index in the original map.
+ * 
+ * @sample samples.collections.Collections.Transformations.flatMap
+ */
+@kotlin.internal.InlineOnly
+public inline fun <K, V, R> Map<out K, V>.flatMapIndexed(transform: (index: Int, Map.Entry<K, V>) -> Iterable<R>): List<R> {
+    return flatMapIndexedTo(ArrayList<R>(), transform)
+}
+
+/**
+ * Appends all elements yielded from results of [transform] function being invoked on each entry
+ * and its index in the original map, to the given [destination].
+ */
+@kotlin.internal.InlineOnly
+public inline fun <K, V, R, C : MutableCollection<in R>> Map<out K, V>.flatMapIndexedTo(destination: C, transform: (index: Int, Map.Entry<K, V>) -> Iterable<R>): C {
+    var index = 0
+    for (element in this) {
+        val list = transform(index++, element)
+        destination.addAll(list)
+    }
+    return destination
+}
+
+/**
  * Appends all elements yielded from results of [transform] function being invoked on each entry of original map, to the given [destination].
  */
 public inline fun <K, V, R, C : MutableCollection<in R>> Map<out K, V>.flatMapTo(destination: C, transform: (Map.Entry<K, V>) -> Iterable<R>): C {
