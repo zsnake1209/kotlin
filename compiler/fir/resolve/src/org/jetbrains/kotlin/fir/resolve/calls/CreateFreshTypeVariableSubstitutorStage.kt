@@ -5,9 +5,10 @@
 
 package org.jetbrains.kotlin.fir.resolve.calls
 
+import org.jetbrains.kotlin.fir.declarations.FirTypeParameter
 import org.jetbrains.kotlin.fir.declarations.FirTypeParameterRefsOwner
-import org.jetbrains.kotlin.fir.declarations.FirTypeParametersOwner
 import org.jetbrains.kotlin.fir.renderWithType
+import org.jetbrains.kotlin.fir.resolve.inference.InferenceComponents
 import org.jetbrains.kotlin.fir.resolve.inference.TypeParameterBasedTypeVariable
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
@@ -61,11 +62,26 @@ internal object CreateFreshTypeVariableSubstitutorStage : ResolutionStage() {
 
             //
             when (val typeArgument = candidate.typeArgumentMapping[index]) {
-                is FirTypeProjectionWithVariance -> csBuilder.addEqualityConstraint(
-                    freshVariable.defaultType,
-                    typeArgument.typeRef.coneTypeUnsafe(),
-                    SimpleConstraintSystemConstraintPosition // TODO
-                )
+                is FirTypeProjectionWithVariance -> {
+
+                    val type = typeArgument.typeRef.coneTypeUnsafe<ConeKotlinType>()
+
+                    val constraintType = if (typeParameter.symbol.fir.shouldBeFlexible(sink.components)) {
+                        coneFlexibleOrSimpleType(
+                            sink.components.ctx,
+                            type.withNullability(ConeNullability.NOT_NULL).lowerBoundIfFlexible(),
+                            type.withNullability(ConeNullability.NULLABLE).upperBoundIfFlexible()
+                        )
+                    } else {
+                        type
+                    }
+
+                    csBuilder.addEqualityConstraint(
+                        freshVariable.defaultType,
+                        constraintType,
+                        SimpleConstraintSystemConstraintPosition // TODO
+                    )
+                }
                 is FirStarProjection -> csBuilder.addEqualityConstraint(
                     freshVariable.defaultType,
                     typeParameter.symbol.fir.bounds.firstOrNull()?.coneTypeUnsafe()
@@ -79,6 +95,17 @@ internal object CreateFreshTypeVariableSubstitutorStage : ResolutionStage() {
         }
     }
 
+}
+
+
+fun FirTypeParameter.shouldBeFlexible(components: InferenceComponents): Boolean {
+    with(components.ctx) {
+        return bounds.any {
+            val bound = it.coneTypeUnsafe<ConeKotlinType>()
+            bound.hasFlexibleNullability() ||
+                    (bound as? ConeTypeParameterType)?.lookupTag?.typeParameterSymbol?.fir?.shouldBeFlexible(components) ?: false
+        }
+    }
 }
 
 fun createToFreshVariableSubstitutorAndAddInitialConstraints(
