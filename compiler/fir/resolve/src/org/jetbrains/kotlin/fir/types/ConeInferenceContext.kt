@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 import org.jetbrains.kotlin.types.AbstractTypeChecker
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
-import org.jetbrains.kotlin.types.checker.NewCapturedType
 import org.jetbrains.kotlin.types.model.*
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
@@ -51,12 +50,12 @@ interface ConeInferenceContext : TypeSystemInferenceExtensionContext, ConeTypeCo
         return coneFlexibleOrSimpleType(this, lowerBound, upperBound)
     }
 
-    // TODO: implement propagation of annotations to a creating type
+    // TODO: implement taking into account `isExtensionFunction`
     override fun createSimpleType(
         constructor: TypeConstructorMarker,
         arguments: List<TypeArgumentMarker>,
         nullable: Boolean,
-        annotationList: AnnotationListMarker?
+        isExtensionFunction: Boolean
     ): SimpleTypeMarker {
         require(constructor is FirClassifierSymbol<*>)
         return when (constructor) {
@@ -99,7 +98,7 @@ interface ConeInferenceContext : TypeSystemInferenceExtensionContext, ConeTypeCo
                 || this is ConeTypeParameterType
     }
 
-    override fun SimpleTypeMarker.hasExtensionFunctionAnnotation(): Boolean {
+    override fun SimpleTypeMarker.isExtensionFunction(): Boolean {
         require(this is ConeKotlinType)
         return this.hasAnnotation(KotlinBuiltIns.FQ_NAMES.extensionFunctionType)
     }

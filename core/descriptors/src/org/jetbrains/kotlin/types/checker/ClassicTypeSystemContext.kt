@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
-import org.jetbrains.kotlin.descriptors.annotations.AnnotationFqNameList
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.annotations.BuiltInAnnotationDescriptor
 import org.jetbrains.kotlin.name.FqName
@@ -436,13 +435,12 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext, TypeSy
         constructor: TypeConstructorMarker,
         arguments: List<TypeArgumentMarker>,
         nullable: Boolean,
-        annotationList: AnnotationListMarker?
+        isExtensionFunction: Boolean
     ): SimpleTypeMarker {
         require(constructor is TypeConstructor, constructor::errorMessage)
-        require(annotationList is AnnotationFqNameList?)
 
-        val annotations = if (annotationList != null) {
-            Annotations.create(annotationList.map { BuiltInAnnotationDescriptor(builtIns, it, emptyMap()) })
+        val annotations = if (isExtensionFunction) {
+            Annotations.create(listOf(BuiltInAnnotationDescriptor(builtIns, FQ_NAMES.extensionFunctionType, emptyMap())))
         } else Annotations.EMPTY
 
         @Suppress("UNCHECKED_CAST")
@@ -466,8 +464,8 @@ interface ClassicTypeSystemContext : TypeSystemInferenceExtensionContext, TypeSy
                 this is NewCapturedType
     }
 
-    override fun SimpleTypeMarker.hasExtensionFunctionAnnotation(): Boolean {
-        require(this is SimpleType)
+    override fun SimpleTypeMarker.isExtensionFunction(): Boolean {
+        require(this is SimpleType, this::errorMessage)
         return this.hasAnnotation(FQ_NAMES.extensionFunctionType)
     }
 
@@ -709,4 +707,8 @@ fun requireOrDescribe(condition: Boolean, value: Any?) {
         } else ""
         "Unexpected: value = '$value'$typeInfo"
     }
+}
+
+fun handleTypeAttributes() {
+
 }

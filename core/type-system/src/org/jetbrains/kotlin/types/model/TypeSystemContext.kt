@@ -22,7 +22,6 @@ interface RawTypeMarker : FlexibleTypeMarker
 interface StubTypeMarker : SimpleTypeMarker
 
 interface TypeArgumentListMarker
-interface AnnotationListMarker
 
 interface TypeVariableMarker
 interface TypeVariableTypeConstructorMarker : TypeConstructorMarker
@@ -61,7 +60,7 @@ interface TypeSystemTypeFactoryContext {
         constructor: TypeConstructorMarker,
         arguments: List<TypeArgumentMarker>,
         nullable: Boolean,
-        annotationList: AnnotationListMarker? = null
+        isExtensionFunction: Boolean = false
     ): SimpleTypeMarker
 
     fun createTypeArgument(type: KotlinTypeMarker, variance: TypeVariance): TypeArgumentMarker
@@ -95,7 +94,7 @@ interface TypeSystemCommonSuperTypesContext : TypeSystemContext, TypeSystemTypeF
 
     fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean
 
-    fun SimpleTypeMarker.hasExtensionFunctionAnnotation(): Boolean
+    fun SimpleTypeMarker.isExtensionFunction(): Boolean
 
     fun SimpleTypeMarker.typeDepth(): Int
 

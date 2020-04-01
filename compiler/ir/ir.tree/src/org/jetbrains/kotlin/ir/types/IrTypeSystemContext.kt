@@ -222,12 +222,12 @@ interface IrTypeSystemContext : TypeSystemContext, TypeSystemCommonSuperTypesCon
         return IrDynamicTypeImpl(null, emptyList(), Variance.INVARIANT)
     }
 
-    // TODO: implement propagation of annotations to a creating type or make sure that it isn't necessary
+    // TODO: implement taking into account `isExtensionFunction`
     override fun createSimpleType(
         constructor: TypeConstructorMarker,
         arguments: List<TypeArgumentMarker>,
         nullable: Boolean,
-        annotationList: AnnotationListMarker?
+        isExtensionFunction: Boolean
     ): SimpleTypeMarker = IrSimpleTypeImpl(constructor as IrClassifierSymbol, nullable, arguments.map { it as IrTypeArgument }, emptyList())
 
     private fun TypeVariance.convertVariance(): Variance {
@@ -245,7 +245,7 @@ interface IrTypeSystemContext : TypeSystemContext, TypeSystemCommonSuperTypesCon
 
     override fun KotlinTypeMarker.canHaveUndefinedNullability() = this is IrSimpleType && classifier is IrTypeParameterSymbol
 
-    override fun SimpleTypeMarker.hasExtensionFunctionAnnotation(): Boolean {
+    override fun SimpleTypeMarker.isExtensionFunction(): Boolean {
         require(this is IrSimpleType)
         return this.hasAnnotation(KotlinBuiltIns.FQ_NAMES.extensionFunctionType)
     }

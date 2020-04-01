@@ -17,7 +17,6 @@
 package org.jetbrains.kotlin.descriptors.annotations
 
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.types.model.AnnotationListMarker
 
 interface Annotated {
     val annotations: Annotations
@@ -96,8 +95,6 @@ class CompositeAnnotations(
 
     override fun iterator() = delegates.asSequence().flatMap { it.asSequence() }.iterator()
 }
-
-class AnnotationFqNameList(elements: List<FqName>) : List<FqName> by elements, AnnotationListMarker
 
 fun composeAnnotations(first: Annotations, second: Annotations) =
     when {
