@@ -449,7 +449,7 @@ class NewMultiplatformIT : BaseGradleIT() {
         }
 
     @Test
-    fun testResourceProcessing() = with(Project("sample-lib", directoryPrefix = "new-mpp-lib-and-app")) {
+    fun testResourceProcessing() = with(Project("sample-lib", gradleVersion, "new-mpp-lib-and-app")) {
         val targetsWithResources = listOf("jvm6", "nodeJs", "wasm32", nativeHostTargetName)
         val processResourcesTasks =
             targetsWithResources.map { ":${it}ProcessResources" }
@@ -654,10 +654,10 @@ class NewMultiplatformIT : BaseGradleIT() {
         }
 
     @Test
-    fun testLibWithTests() = doTestLibWithTests(Project("new-mpp-lib-with-tests", gradleVersion))
+    fun testLibWithTests() = doTestLibWithTests(Project("new-mpp-lib-with-tests"))
 
     @Test
-    fun testLibWithTestsKotlinDsl() = with(Project("new-mpp-lib-with-tests", gradleVersion)) {
+    fun testLibWithTestsKotlinDsl() = with(Project("new-mpp-lib-with-tests")) {
         setupWorkingDir()
         gradleBuildScript().delete()
         projectDir.resolve("build.gradle.kts.alternative").renameTo(projectDir.resolve("build.gradle.kts"))
