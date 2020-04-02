@@ -708,7 +708,3 @@ fun requireOrDescribe(condition: Boolean, value: Any?) {
         "Unexpected: value = '$value'$typeInfo"
     }
 }
-
-fun handleTypeAttributes() {
-
-}

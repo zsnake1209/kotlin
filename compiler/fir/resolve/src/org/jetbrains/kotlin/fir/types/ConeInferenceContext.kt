@@ -98,9 +98,10 @@ interface ConeInferenceContext : TypeSystemInferenceExtensionContext, ConeTypeCo
                 || this is ConeTypeParameterType
     }
 
+    // TODO: implement checking for extension function
     override fun SimpleTypeMarker.isExtensionFunction(): Boolean {
         require(this is ConeKotlinType)
-        return this.hasAnnotation(KotlinBuiltIns.FQ_NAMES.extensionFunctionType)
+        return false
     }
 
     override fun KotlinTypeMarker.typeDepth() = when (this) {
