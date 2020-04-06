@@ -296,8 +296,7 @@ class KotlinGradleProjectResolverExtension : AbstractProjectResolverExtension() 
         val moduleNamePrefix = GradleProjectResolverUtil.getModuleId(resolverCtx, gradleModule)
         resolverCtx.getExtraProject(gradleModule, KotlinGradleModel::class.java)?.let { gradleModel ->
             KotlinGradleFUSLogger.populateGradleUserDir(gradleModel.gradleUserHome)
-            ideModule.pureKotlinSourceFolders =
-                gradleModel.kotlinTaskProperties.flatMap { it.value.pureKotlinSourceFolders ?: emptyList() }.map { it.absolutePath }
+            ideModule.pureKotlinSourceFolders = gradleModel.kotlinTaskProperties.collectPureKotlinSourceFolders()
             val gradleSourceSets = ideModule.children.filter { it.data is GradleSourceSetData } as Collection<DataNode<GradleSourceSetData>>
             for (gradleSourceSetNode in gradleSourceSets) {
                 val propertiesForSourceSet =

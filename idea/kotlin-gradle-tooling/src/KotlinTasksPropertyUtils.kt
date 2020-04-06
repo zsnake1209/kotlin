@@ -94,6 +94,9 @@ fun KotlinTaskPropertiesBySourceSet.acknowledgeTask(compileTask: Task) {
         getKotlinTaskProperties(compileTask)
 }
 
+fun KotlinTaskPropertiesBySourceSet.collectPureKotlinSourceFolders() =
+    this.flatMap { it.value.pureKotlinSourceFolders ?: emptyList() }.map { it.absolutePath }
+
 fun getKotlinTaskProperties(compileTask: Task): KotlinTaskPropertiesImpl {
     return KotlinTaskPropertiesImpl(
         compileTask.getIsIncremental(),

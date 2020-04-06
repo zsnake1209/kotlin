@@ -62,12 +62,21 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         val coroutinesState = getCoroutinesState(project)
         reportUnresolvedDependencies(targets)
         val kotlinNativeHome = KotlinNativeHomeEvaluator.getKotlinNativeHome(project) ?: NO_KOTLIN_NATIVE_HOME
+
+        val extraProperties = HashMap<String, KotlinTaskProperties>()
+        project.getAllTasks(false)[project]?.forEach { compileTask ->
+            if (compileTask.javaClass.name !in AbstractKotlinGradleModelBuilder.kotlinCompileTaskClasses) return@forEach
+
+            extraProperties.acknowledgeTask(compileTask)
+        }
+
         return KotlinMPPGradleModelImpl(
             filterOrphanSourceSets(sourceSetMap, targets, project),
             targets,
             ExtraFeaturesImpl(coroutinesState, isHMPPEnabled(project), isNativeDependencyPropagationEnabled(project)),
             kotlinNativeHome,
-            dependencyMapper.toDependencyMap()
+            dependencyMapper.toDependencyMap(),
+            extraProperties
         )
     }
 

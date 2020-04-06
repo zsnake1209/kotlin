@@ -94,6 +94,7 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtensionComp
         if (mppModel == null) {
             return super.populateModuleContentRoots(gradleModule, ideModule)
         } else {
+            ideModule.pureKotlinSourceFolders = mppModel.kotlinTaskProperties.collectPureKotlinSourceFolders()
             if (!nativeDebugAdvertised && mppModel.kotlinNativeHome.isNotEmpty()) {
                 nativeDebugAdvertised = true
                 suggestNativeDebug(resolverCtx.projectPath)
