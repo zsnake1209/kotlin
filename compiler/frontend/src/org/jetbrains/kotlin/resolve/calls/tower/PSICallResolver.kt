@@ -212,7 +212,7 @@ class PSICallResolver(
             val resolvedCalls = result.allCandidates.map { (candidate, diagnostics) ->
                 val system = candidate.getSystem()
                 val resultingSubstitutor =
-                    system.asReadOnlyStorage().buildResultingSubstitutor(system as TypeSystemInferenceExtensionContext)
+                    system.asReadOnlyStorage().buildResultingSubstitutor(system.baseContext)
 
                 kotlinToResolvedCallTransformer.transformToResolvedCall<D>(
                     candidate.resolvedCall, null, resultingSubstitutor, diagnostics
