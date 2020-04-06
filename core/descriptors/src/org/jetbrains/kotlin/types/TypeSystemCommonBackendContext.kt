@@ -39,7 +39,7 @@ interface TypeSystemCommonBackendContext {
     fun KotlinTypeMarker.getSubstitutedUnderlyingType(): KotlinTypeMarker?
 
     fun KotlinTypeMarker.isMarkedNullable(): Boolean = with(baseContext) {
-        this is SimpleTypeMarker && isMarkedNullable()
+        this@isMarkedNullable is SimpleTypeMarker && isMarkedNullable()
     }
 
     fun KotlinTypeMarker.makeNullable(): KotlinTypeMarker =
