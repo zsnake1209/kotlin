@@ -310,33 +310,6 @@ abstract class KotlinIrLinker(
             return moduleDeserializer.moduleDependencies.firstOrNull { idSignature in it }
         }
 
-//        private fun getStateForID(isSignature: IdSignature): DeserializationState<*> {
-//            if (isSignature.isLocal) return fileLocalDeserializationState
-//            if (isGlobalIdSignature(isSignature)) return globalDeserializationState
-//            return getModuleForTopLevelId(isSignature)?.moduleDeserializationState ?: handleNoModuleDeserializerFound(isSignature)
-//        }
-
-//        private fun findDeserializationState(idSignature: IdSignature): DeserializationState<*> {
-//            if (idSignature.hasTopLevel) {
-//                val topLevelSignature = idSignature.topLevelSignature()
-//
-//                val topLevelDeserializationState = getStateForID(topLevelSignature)
-//
-//                if (topLevelSignature !in topLevelDeserializationState) {
-//                    topLevelDeserializationState.addIdSignature(topLevelSignature)
-//                }
-//
-//                // If topLevel declaration is module-public and current declaration iы not (e.g. value parameter)
-//                // they should be processed via different tables
-//                if (idSignature.isLocal) return fileLocalDeserializationState
-//
-//                return topLevelDeserializationState
-//            }
-//
-//            assert(idSignature.isLocal)
-//            return fileLocalDeserializationState
-//        }
-
         private fun findModuleDeserializer(idSig: IdSignature): IrModuleDeserializer {
             assert(idSig.isPublic)
 
@@ -368,42 +341,9 @@ abstract class KotlinIrLinker(
             return findModuleDeserializer(idSignature).deserializeIrSymbol(idSignature, symbolKind)
         }
 
-//        private fun deserializeIrSymbolData3(idSignature: IdSignature, symbolKind: BinarySymbolData.SymbolKind): IrSymbol {
-//            val deserializationState = findDeserializationState(idSignature)
-//
-//            val symbol = deserializationState.deserializedSymbols.getOrPut(idSignature) {
-//                val descriptor = resolveSpecialSignature(idSignature)
-//
-//                // TODO: move this logic out there
-//                postProcessPlatformSpecificDeclaration(idSignature, descriptor) {
-//                    val fdState = getStateForID(it)
-//                    assert(it.isPublic && it.topLevelSignature() == it)
-//                    if (it !in fdState) fdState.addIdSignature(it)
-//                }
-//
-//                val symbol = referenceDeserializedSymbol(symbolKind, idSignature, descriptor).let {
-//                    if (expectUniqIdToActualUniqId[idSignature] != null) wrapInDelegatedSymbol(it) else it
-//                }
-//
-//                if (idSignature in expectUniqIdToActualUniqId.keys) expectSymbols[idSignature] = symbol
-//                if (idSignature in expectUniqIdToActualUniqId.values) actualSymbols[idSignature] = symbol
-//
-//                symbol
-//            }
-//            if (symbol.descriptor is ClassDescriptor &&
-//                symbol.descriptor !is WrappedDeclarationDescriptor<*> &&
-//                symbol.descriptor.module.isForwardDeclarationModule
-//            ) {
-//                forwardDeclarations.add(symbol)
-//            }
-//
-//            return symbol
-//        }
-
         override fun deserializeIrSymbolToDeclare(code: Long): Pair<IrSymbol, IdSignature> {
             val symbolData = parseSymbolData(code)
             val signature = deserializeIdSignature(symbolData.signatureId)
-//                return Pair(deserializeIrSymbolData(signature, symbolData.kind), signature)
             return Pair(deserializeIrSymbolData(signature, symbolData.kind), signature)
         }
 
@@ -412,7 +352,6 @@ abstract class KotlinIrLinker(
         override fun deserializeIrSymbol(code: Long): IrSymbol {
             val symbolData = parseSymbolData(code)
             val signature = deserializeIdSignature(symbolData.signatureId)
-//                return deserializeIrSymbolData(signature, symbolData.kind)
             return deserializeIrSymbolData(signature, symbolData.kind)
         }
 
