@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.idea.scripting.gradle
 
 import com.intellij.openapi.components.*
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -36,6 +37,7 @@ class GradleScriptInputsWatcher(val project: Project) : PersistentStateComponent
         } else {
             cachedGradleProjectsRoots = roots
         }
+        debug { "save gradle project roots after import: ${roots.joinToString()}" }
     }
 
     private fun computeGradleProjectRoots(project: Project): Set<String> {
@@ -45,6 +47,7 @@ class GradleScriptInputsWatcher(val project: Project) : PersistentStateComponent
         val projectSettings = gradleSettings.getLinkedProjectsSettings().filterIsInstance<GradleProjectSettings>().firstOrNull()
             ?: return setOf()
 
+        debug { "compute gradle project roots" }
         return projectSettings.modules.takeIf { it.isNotEmpty() } ?: setOf(projectSettings.externalProjectPath)
     }
 
@@ -53,7 +56,9 @@ class GradleScriptInputsWatcher(val project: Project) : PersistentStateComponent
     }
 
     fun areRelatedFilesUpToDate(file: VirtualFile, timeStamp: Long): Boolean {
-        return storage.lastModifiedTimeStampExcept(file.path) < timeStamp
+        val result = storage.lastModifiedTimeStampExcept(file.path) < timeStamp
+        debug { "areRelatedFilesUpToDate: file=${file.path} ts=$timeStamp upToDate=$result" }
+        return result
     }
 
     class Storage {
@@ -64,6 +69,7 @@ class GradleScriptInputsWatcher(val project: Project) : PersistentStateComponent
         }
 
         fun fileChanged(filePath: String, ts: Long) {
+            debug { "fileChanged: $filePath $ts" }
             lastModifiedFiles.fileChanged(ts, filePath)
         }
     }
@@ -81,6 +87,7 @@ class GradleScriptInputsWatcher(val project: Project) : PersistentStateComponent
     }
 
     fun clearState() {
+        debug { "clear related files timestamps storage" }
         storage = Storage()
     }
 

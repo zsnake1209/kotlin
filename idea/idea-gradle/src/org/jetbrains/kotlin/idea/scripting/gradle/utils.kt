@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.idea.scripting.gradle
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.registry.Registry
@@ -89,4 +90,12 @@ fun kotlinDslScriptsModelImportSupported(currentGradleVersion: String): Boolean 
 
 fun useScriptConfigurationFromImportOnly(): Boolean {
     return Registry.`is`("kotlin.gradle.scripts.useIdeaProjectImport", false)
+}
+
+internal val LOG = Logger.getInstance("#org.jetbrains.kotlin.idea.gradle.script")
+
+internal fun debug(message: () -> String) {
+    if (LOG.isDebugEnabled) {
+        LOG.debug("[KOTLIN SCRIPT] " + message())
+    }
 }
