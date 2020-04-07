@@ -8,7 +8,9 @@ package org.jetbrains.kotlin.idea.util
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.Project
 import com.intellij.util.ExceptionUtil
+import org.jetbrains.annotations.Nls
 import java.util.concurrent.CancellationException
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -19,14 +21,19 @@ import java.util.concurrent.TimeoutException
  */
 object ProgressIndicatorUtils {
     @JvmStatic
-    fun <T> awaitWithCheckCanceled(future: Future<T>) {
-        val indicator =
-            ProgressManager.getInstance().progressIndicator
+    fun <T> underModalProgress(
+        project: Project,
+        @Nls progressTitle: String,
+        computable: () -> T
+    ): T = com.intellij.openapi.actionSystem.ex.ActionUtil.underModalProgress(project, progressTitle, computable)
+
+    @JvmStatic
+    fun <T> awaitWithCheckCanceled(future: Future<T>): T {
+        val indicator = ProgressManager.getInstance().progressIndicator
         while (true) {
             checkCancelledEvenWithPCEDisabled(indicator)
             try {
-                future[10, TimeUnit.MILLISECONDS]
-                return
+                return future[10, TimeUnit.MILLISECONDS]
             } catch (ignore: TimeoutException) {
             } catch (e: Throwable) {
                 val cause = e.cause

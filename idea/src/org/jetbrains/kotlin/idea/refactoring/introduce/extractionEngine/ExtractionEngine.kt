@@ -27,6 +27,7 @@ import com.intellij.ui.awt.RelativePoint
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.refactoring.checkConflictsInteractively
 import org.jetbrains.kotlin.idea.refactoring.introduce.showErrorHint
+import org.jetbrains.kotlin.idea.util.ProgressIndicatorUtils
 import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
 import javax.swing.event.HyperlinkEvent
 
@@ -58,7 +59,10 @@ class ExtractionEngine(
     ) {
         val project = extractionData.project
 
-        val analysisResult = helper.adjustExtractionData(extractionData).performAnalysis()
+        val adjustExtractionData = helper.adjustExtractionData(extractionData)
+        val analysisResult = ProgressIndicatorUtils.underModalProgress(project, "Analyze extraction data...") {
+            adjustExtractionData.performAnalysis()
+        }
 
         if (ApplicationManager.getApplication()!!.isUnitTestMode && analysisResult.status != AnalysisResult.Status.SUCCESS) {
             throw BaseRefactoringProcessor.ConflictsInTestsException(analysisResult.messages.map { it.renderMessage() })

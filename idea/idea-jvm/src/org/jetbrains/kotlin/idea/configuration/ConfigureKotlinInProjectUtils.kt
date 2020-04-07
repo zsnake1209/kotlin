@@ -5,7 +5,9 @@
 
 package org.jetbrains.kotlin.idea.configuration
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -41,6 +43,8 @@ import org.jetbrains.kotlin.idea.versions.hasKotlinJsKjsmFile
 import org.jetbrains.kotlin.idea.vfilefinder.IDEVirtualFileFinder
 import org.jetbrains.kotlin.resolve.jvm.modules.KOTLIN_STDLIB_MODULE_NAME
 import org.jetbrains.kotlin.utils.ifEmpty
+
+private val LOG = Logger.getInstance("#org.jetbrains.kotlin.idea.configuration.ConfigureKotlinInProjectUtils")
 
 data class RepositoryDescription(val id: String, val name: String, val url: String, val bintrayUrl: String?, val isSnapshot: Boolean)
 
@@ -116,8 +120,13 @@ fun isModuleConfigured(moduleSourceRootGroup: ModuleSourceRootGroup): Boolean {
 /**
  * Returns a list of modules which contain sources in Kotlin.
  * Note that this method is expensive and should not be called more often than strictly necessary.
+ *
+ * DO NOT CALL THIS ON AWT THREAD
  */
 fun getModulesWithKotlinFiles(project: Project): Collection<Module> {
+    if (!ApplicationManager.getApplication().isUnitTestMode && ApplicationManager.getApplication().isDispatchThread) {
+        LOG.error("getModulesWithKotlinFiles could be a heavy operation and should not be call on AWT thread")
+    }
     if (!runReadAction {
             !project.isDisposed &&
                     FileTypeIndex.containsFileOfType(KotlinFileType.INSTANCE, GlobalSearchScope.projectScope(project))

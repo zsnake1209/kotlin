@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.idea.facet.toApiVersion
 import org.jetbrains.kotlin.idea.framework.ui.CreateLibraryDialogWithModules
 import org.jetbrains.kotlin.idea.framework.ui.FileUIUtils
 import org.jetbrains.kotlin.idea.quickfix.askUpdateRuntime
+import org.jetbrains.kotlin.idea.util.ProgressIndicatorUtils.underModalProgress
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.idea.util.projectStructure.sdk
 import org.jetbrains.kotlin.idea.versions.LibraryJarDescriptor
@@ -68,10 +69,13 @@ abstract class KotlinWithLibraryConfigurator protected constructor() : KotlinPro
         val defaultPathToJar = getDefaultPathToJarFile(project)
         val showPathToJarPanel = needToChooseJarPath(project)
 
-        var nonConfiguredModules = if (!ApplicationManager.getApplication().isUnitTestMode)
-            getCanBeConfiguredModules(project, this)
-        else
+        var nonConfiguredModules = if (!ApplicationManager.getApplication().isUnitTestMode) {
+            underModalProgress(project, KotlinJvmBundle.message("lookup.modules.configurations.progress.text")) {
+                getCanBeConfiguredModules(project, this)
+            }
+        } else {
             listOf(*ModuleManager.getInstance(project).modules)
+        }
         nonConfiguredModules -= excludeModules
 
         var modulesToConfigure = nonConfiguredModules
