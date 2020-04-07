@@ -9,9 +9,6 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.KotlinMangler
 
-// The code here is intentionally copy-pasted from DeclarationStubGenerator with
-// minor changes.
-// "Find descriptor by IdSignature" task appears to be common and should be unified later.
 class DescriptorByIdSignatureFinder(private val moduleDescriptor: ModuleDescriptor, private val mangler: KotlinMangler.DescriptorMangler) {
     fun findDescriptorBySignature(signature: IdSignature): DeclarationDescriptor? = when (signature) {
         is IdSignature.AccessorSignature -> findDescriptorForAccessorSignature(signature)
