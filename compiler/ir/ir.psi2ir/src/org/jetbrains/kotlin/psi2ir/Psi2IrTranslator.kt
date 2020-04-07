@@ -43,7 +43,7 @@ class Psi2IrTranslator(
         postprocessingSteps.add(step)
     }
 
-    // NOTE: used only for test propose
+    // NOTE: used only for test purpose
     fun generateModule(
         moduleDescriptor: ModuleDescriptor,
         ktFiles: Collection<KtFile>,
