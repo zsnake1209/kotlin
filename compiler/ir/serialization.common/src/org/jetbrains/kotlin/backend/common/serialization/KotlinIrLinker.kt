@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.backend.common.serialization.proto.IrStatement as Pr
 import org.jetbrains.kotlin.backend.common.serialization.proto.IrType as ProtoType
 
 abstract class KotlinIrLinker(
+    private val currentModule: ModuleDescriptor?,
     val logger: LoggingContext,
     val builtIns: IrBuiltIns,
     val symbolTable: SymbolTable,
@@ -487,12 +488,7 @@ abstract class KotlinIrLinker(
     }
 
     private fun findDeserializedDeclarationForSymbol(symbol: IrSymbol): DeclarationDescriptor? {
-        require(symbol.isPublicApi)
-
-        val signature = symbol.signature
-
-        // This is Native specific. Try to eliminate.
-        if (!signature.shouldBeDeserialized()) return null
+        require(symbol.isPublicApi || symbol.descriptor.module === currentModule)
 
         val descriptor = symbol.descriptor
 
@@ -507,7 +503,11 @@ abstract class KotlinIrLinker(
 
     override fun getDeclaration(symbol: IrSymbol): IrDeclaration? {
 
-        if (!symbol.isPublicApi) return null
+        if (!symbol.isPublicApi) {
+            val descriptor = symbol.descriptor
+            if (descriptor is WrappedDeclarationDescriptor<*>) return null
+            if (descriptor.module !== currentModule) return null
+        }
 
         if (!symbol.isBound) {
             findDeserializedDeclarationForSymbol(symbol) ?: return null

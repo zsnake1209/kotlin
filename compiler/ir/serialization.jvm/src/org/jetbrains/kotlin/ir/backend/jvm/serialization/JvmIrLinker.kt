@@ -22,8 +22,8 @@ import org.jetbrains.kotlin.library.IrLibrary
 import org.jetbrains.kotlin.load.java.descriptors.*
 import org.jetbrains.kotlin.name.Name
 
-class JvmIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable, private val stubGenerator: DeclarationStubGenerator, private val manglerDesc: JvmManglerDesc) :
-    KotlinIrLinker(logger, builtIns, symbolTable, emptyList()) {
+class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable, private val stubGenerator: DeclarationStubGenerator, private val manglerDesc: JvmManglerDesc) :
+    KotlinIrLinker(currentModule, logger, builtIns, symbolTable, emptyList()) {
 
     override val functionalInteraceFactory: IrAbstractFunctionFactory = IrFunctionFactory(builtIns, symbolTable)
 
