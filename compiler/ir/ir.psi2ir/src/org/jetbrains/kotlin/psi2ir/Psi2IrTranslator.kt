@@ -85,6 +85,9 @@ class Psi2IrTranslator(
 
         postprocessingSteps.forEach { it.invoke(irModule) }
 
+        // TODO: remove it once plugin API improved
+        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
+
         return irModule
     }
 
