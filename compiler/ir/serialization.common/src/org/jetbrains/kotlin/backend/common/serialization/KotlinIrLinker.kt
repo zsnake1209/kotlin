@@ -316,7 +316,7 @@ abstract class KotlinIrLinker(
 
             val topLevelSig = idSig.topLevelSignature()
             if (topLevelSig in moduleDeserializer) return moduleDeserializer
-            return moduleDeserializer.moduleDependencies.singleOrNull { topLevelSig in it } ?: handleNoModuleDeserializerFound(idSig)
+            return moduleDeserializer.moduleDependencies.firstOrNull { topLevelSig in it } ?: handleNoModuleDeserializerFound(idSig)
         }
 
         private fun referenceIrSymbolData(symbol: IrSymbol, signature: IdSignature) {
