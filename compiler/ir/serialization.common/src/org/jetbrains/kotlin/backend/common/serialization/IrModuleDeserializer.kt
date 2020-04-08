@@ -248,12 +248,23 @@ open class CurrentModuleDeserializer(
 
         assert(descriptor !is WrappedDeclarationDescriptor<*>)
 
+        val accessor = descriptor as? PropertyAccessorDescriptor
+
         val parent = descriptor.containingDeclaration ?: error("Expect non-root declaration $descriptor")
         val parentDeclaration = declareIrSymbolImpl(referenceParentDescriptor(parent)) as IrDeclarationContainer
 
         val declaredDeclaration = declareIrDeclaration(symbol).also {
             it.parent = parentDeclaration
-            parentDeclaration.declarations.add(it)
+            if (accessor != null) {
+                val property = accessor.correspondingProperty
+                val irProperty = declareIrSymbolImpl(referenceParentDescriptor(property)) as IrProperty
+                val irAccessor = it as IrSimpleFunction
+                irAccessor.correspondingPropertySymbol = irProperty.symbol
+                if (accessor === property.getter) irProperty.getter = irAccessor
+                if (accessor === property.setter) irProperty.setter = irAccessor
+            } else {
+                parentDeclaration.declarations.add(it)
+            }
         }
 
         return declaredDeclaration as IrSymbolOwner
