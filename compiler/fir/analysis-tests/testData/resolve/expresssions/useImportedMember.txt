@@ -1,0 +1,128 @@
+FILE: useImportedMember.kt
+    public abstract interface I<G> : R|kotlin/Any| {
+        public open fun <T> R|T|.fromInterface(): R|T| {
+            ^fromInterface this@R|/I.fromInterface|
+        }
+
+        public open fun genericFromSuper(g: R|G|): R|G| {
+            ^genericFromSuper R|<local>/g|
+        }
+
+    }
+    public open class BaseClass : R|kotlin/Any| {
+        public constructor(): R|BaseClass| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val <T> R|T|.fromClass: R|T|
+            public get(): R|T| {
+                ^ this@R|/BaseClass.fromClass|
+            }
+
+    }
+    public final object C : R|BaseClass|, R|I<kotlin/String>| {
+        private constructor(): R|C| {
+            super<R|BaseClass|>()
+        }
+
+        public final fun f(s: R|kotlin/Int|): R|kotlin/Int| {
+            ^f Int(1)
+        }
+
+        public final fun f(s: R|kotlin/String|): R|kotlin/Int| {
+            ^f Int(2)
+        }
+
+        public final fun R|kotlin/Boolean|.f(): R|kotlin/Int| {
+            ^f Int(3)
+        }
+
+        public final var p: R|kotlin/Int| = Int(4)
+            public get(): R|kotlin/Int|
+            public set(value: R|kotlin/Int|): R|kotlin/Unit|
+
+        public final val R|kotlin/Int|.ext: R|kotlin/Int|
+            public get(): R|kotlin/Int| {
+                ^ Int(6)
+            }
+
+        public final fun <T> g1(t: R|T|): R|T| {
+            ^g1 R|<local>/t|
+        }
+
+        public final val <T> R|T|.g2: R|T|
+            public get(): R|T| {
+                ^ this@R|/C.g2|
+            }
+
+    }
+    public final fun box(): R|kotlin/String| {
+        when () {
+            !=(R|/C.f|(Int(1)), Int(1)) ->  {
+                ^box String(1)
+            }
+        }
+
+        when () {
+            !=(R|/C.f|(String(s)), Int(2)) ->  {
+                ^box String(2)
+            }
+        }
+
+        when () {
+            !=(Boolean(true).R|/C.f|(), Int(3)) ->  {
+                ^box String(3)
+            }
+        }
+
+        when () {
+            !=(R|/C.p|, Int(4)) ->  {
+                ^box String(4)
+            }
+        }
+
+        R|/C.p| = Int(5)
+        when () {
+            !=(R|/C.p|, Int(5)) ->  {
+                ^box String(5)
+            }
+        }
+
+        when () {
+            !=(IntegerLiteral(5).R|/C.ext|, Int(6)) ->  {
+                ^box String(6)
+            }
+        }
+
+        when () {
+            !=(R|/C.g1|<R|kotlin/String|>(String(7)), String(7)) ->  {
+                ^box String(7)
+            }
+        }
+
+        when () {
+            !=(String(8).R|/C.g2|<R|kotlin/String|>, String(8)) ->  {
+                ^box String(8)
+            }
+        }
+
+        when () {
+            !=(Int(9).R|FakeOverride</C.fromInterface: R|T|>|<R|kotlin/Int|>(), Int(9)) ->  {
+                ^box String(9)
+            }
+        }
+
+        when () {
+            !=(String(10).R|FakeOverride</C.fromClass: R|T|>|<R|kotlin/String|>, String(10)) ->  {
+                ^box String(10)
+            }
+        }
+
+        when () {
+            !=(R|FakeOverride</C.genericFromSuper: R|kotlin/String|>|(String(11)), String(11)) ->  {
+                ^box String(11)
+            }
+        }
+
+        ^box String(OK)
+    }

@@ -1116,6 +1116,11 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
             runTest("compiler/fir/analysis-tests/testData/resolve/expresssions/typeAliasConstructor.kt");
         }
 
+        @TestMetadata("useImportedMember.kt")
+        public void testUseImportedMember() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/expresssions/useImportedMember.kt");
+        }
+
         @TestMetadata("vararg.kt")
         public void testVararg() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/expresssions/vararg.kt");
