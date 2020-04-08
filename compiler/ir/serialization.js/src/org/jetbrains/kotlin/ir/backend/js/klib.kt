@@ -137,7 +137,7 @@ fun generateKLib(
 
     val expectDescriptorToSymbol = mutableMapOf<DeclarationDescriptor, IrSymbol>()
 
-    val irLinker = JsIrLinker(emptyLoggingContext, psi2IrContext.irBuiltIns, psi2IrContext.symbolTable, serializedIrFiles)
+    val irLinker = JsIrLinker(psi2IrContext.moduleDescriptor, emptyLoggingContext, psi2IrContext.irBuiltIns, psi2IrContext.symbolTable, serializedIrFiles)
 
     val deserializedModuleFragments = sortDependencies(allDependencies.getFullList(), depsDescriptors.descriptors).map {
         irLinker.deserializeOnlyHeaderModule(depsDescriptors.getModuleDescriptor(it), it)
@@ -200,7 +200,7 @@ fun loadIr(
             val irBuiltIns = psi2IrContext.irBuiltIns
             val symbolTable = psi2IrContext.symbolTable
 
-            val irLinker = JsIrLinker(emptyLoggingContext, irBuiltIns, symbolTable, null)
+            val irLinker = JsIrLinker(psi2IrContext.moduleDescriptor, emptyLoggingContext, irBuiltIns, symbolTable, null)
 
             val deserializedModuleFragments = sortDependencies(allDependencies.getFullList(), depsDescriptors.descriptors).map {
                 irLinker.deserializeIrModuleHeader(depsDescriptors.getModuleDescriptor(it), it)
@@ -229,7 +229,7 @@ fun loadIr(
             typeTranslator.constantValueGenerator = constantValueGenerator
             constantValueGenerator.typeTranslator = typeTranslator
             val irBuiltIns = IrBuiltIns(moduleDescriptor.builtIns, typeTranslator, signaturer, symbolTable)
-            val irLinker = JsIrLinker(emptyLoggingContext, irBuiltIns, symbolTable, null)
+            val irLinker = JsIrLinker(null, emptyLoggingContext, irBuiltIns, symbolTable, null)
 
             val deserializedModuleFragments = sortDependencies(allDependencies.getFullList(), depsDescriptors.descriptors).map {
                 val strategy =

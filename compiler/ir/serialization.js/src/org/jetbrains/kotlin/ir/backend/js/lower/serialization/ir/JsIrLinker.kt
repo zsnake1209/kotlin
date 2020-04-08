@@ -20,8 +20,8 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.library.IrLibrary
 import org.jetbrains.kotlin.library.SerializedIrFile
 
-class JsIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable, private val icData: List<SerializedIrFile>? = null) :
-    KotlinIrLinker(logger, builtIns, symbolTable, emptyList()) {
+class JsIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable, private val icData: List<SerializedIrFile>? = null) :
+    KotlinIrLinker(currentModule, logger, builtIns, symbolTable, emptyList()) {
 
     override val functionalInteraceFactory: IrAbstractFunctionFactory = IrFunctionFactory(builtIns, symbolTable)
 
