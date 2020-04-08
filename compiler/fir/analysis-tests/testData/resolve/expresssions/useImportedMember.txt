@@ -58,68 +58,68 @@ FILE: useImportedMember.kt
     }
     public final fun box(): R|kotlin/String| {
         when () {
-            !=(R|/C.f|(Int(1)), Int(1)) ->  {
+            !=(Q|C|.R|/C.f|(Int(1)), Int(1)) ->  {
                 ^box String(1)
             }
         }
 
         when () {
-            !=(R|/C.f|(String(s)), Int(2)) ->  {
+            !=(Q|C|.R|/C.f|(String(s)), Int(2)) ->  {
                 ^box String(2)
             }
         }
 
         when () {
-            !=(Boolean(true).R|/C.f|(), Int(3)) ->  {
+            !=((Q|C|, Boolean(true)).R|/C.f|(), Int(3)) ->  {
                 ^box String(3)
             }
         }
 
         when () {
-            !=(R|/C.p|, Int(4)) ->  {
+            !=(Q|C|.R|/C.p|, Int(4)) ->  {
                 ^box String(4)
             }
         }
 
-        R|/C.p| = Int(5)
+        Q|C|.R|/C.p| = Int(5)
         when () {
-            !=(R|/C.p|, Int(5)) ->  {
+            !=(Q|C|.R|/C.p|, Int(5)) ->  {
                 ^box String(5)
             }
         }
 
         when () {
-            !=(IntegerLiteral(5).R|/C.ext|, Int(6)) ->  {
+            !=((Q|C|, IntegerLiteral(5)).R|/C.ext|, Int(6)) ->  {
                 ^box String(6)
             }
         }
 
         when () {
-            !=(R|/C.g1|<R|kotlin/String|>(String(7)), String(7)) ->  {
+            !=(Q|C|.R|/C.g1|<R|kotlin/String|>(String(7)), String(7)) ->  {
                 ^box String(7)
             }
         }
 
         when () {
-            !=(String(8).R|/C.g2|<R|kotlin/String|>, String(8)) ->  {
+            !=((Q|C|, String(8)).R|/C.g2|<R|kotlin/String|>, String(8)) ->  {
                 ^box String(8)
             }
         }
 
         when () {
-            !=(Int(9).R|FakeOverride</C.fromInterface: R|T|>|<R|kotlin/Int|>(), Int(9)) ->  {
+            !=((Q|C|, Int(9)).R|FakeOverride</C.fromInterface: R|T|>|<R|kotlin/Int|>(), Int(9)) ->  {
                 ^box String(9)
             }
         }
 
         when () {
-            !=(String(10).R|FakeOverride</C.fromClass: R|T|>|<R|kotlin/String|>, String(10)) ->  {
+            !=((Q|C|, String(10)).R|FakeOverride</C.fromClass: R|T|>|<R|kotlin/String|>, String(10)) ->  {
                 ^box String(10)
             }
         }
 
         when () {
-            !=(R|FakeOverride</C.genericFromSuper: R|kotlin/String|>|(String(11)), String(11)) ->  {
+            !=(Q|C|.R|FakeOverride</C.genericFromSuper: R|kotlin/String|>|(String(11)), String(11)) ->  {
                 ^box String(11)
             }
         }
