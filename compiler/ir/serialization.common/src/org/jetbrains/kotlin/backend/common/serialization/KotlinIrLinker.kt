@@ -472,12 +472,6 @@ abstract class KotlinIrLinker(
         }
     }
 
-    /**
-     * Check that descriptor shouldn't be processed by some backend-specific logic.
-     * For example, it is the case for Native interop libraries where there is no IR in libraries.
-     */
-    protected open fun IdSignature.shouldBeDeserialized(): Boolean = true
-
     private fun deserializeAllReachableTopLevels() {
         while (modulesWithReachableTopLevels.isNotEmpty()) {
             val moduleDeserializer = modulesWithReachableTopLevels.first()
@@ -488,7 +482,7 @@ abstract class KotlinIrLinker(
     }
 
     private fun findDeserializedDeclarationForSymbol(symbol: IrSymbol): DeclarationDescriptor? {
-        require(symbol.isPublicApi || symbol.descriptor.module === currentModule)
+        assert(symbol.isPublicApi || symbol.descriptor.module === currentModule || platformSpecificSymbol(symbol))
 
         val descriptor = symbol.descriptor
 
@@ -501,12 +495,16 @@ abstract class KotlinIrLinker(
         return descriptor
     }
 
+    protected open fun platformSpecificSymbol(symbol: IrSymbol): Boolean = false
+
     override fun getDeclaration(symbol: IrSymbol): IrDeclaration? {
 
         if (!symbol.isPublicApi) {
             val descriptor = symbol.descriptor
             if (descriptor is WrappedDeclarationDescriptor<*>) return null
-            if (descriptor.module !== currentModule) return null
+            if (!platformSpecificSymbol(symbol)) {
+                if (descriptor.module !== currentModule) return null
+            }
         }
 
         if (!symbol.isBound) {

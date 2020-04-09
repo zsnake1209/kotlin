@@ -62,12 +62,16 @@ object JvmBackendFacade {
             val kotlinLibrary = (it.getCapability(KlibModuleOrigin.CAPABILITY) as? DeserializedKlibModuleOrigin)?.library
             irLinker.deserializeIrModuleHeader(it, kotlinLibrary)
         }
-        val irProviders = listOf(irLinker, stubGenerator)
+//        val irProviders = listOf(irLinker, stubGenerator)
+        val irProviders = listOf(irLinker)
 
         stubGenerator.setIrProviders(irProviders)
 
         val irModuleFragment = psi2ir.generateModuleFragment(psi2irContext, files, irProviders, expectDescriptorToSymbol = null, pluginExtensions)
         irLinker.postProcess()
+
+        stubGenerator.unboundSymbolGeneration = true
+
         // We need to compile all files we reference in Klibs
         irModuleFragment.files.addAll(dependencies.flatMap { it.files })
 
