@@ -10,9 +10,11 @@ import org.jetbrains.kotlin.backend.common.serialization.*
 import org.jetbrains.kotlin.backend.common.serialization.encodings.BinarySymbolData
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.konan.KlibModuleOrigin
+import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.impl.IrModuleFragmentImpl
 import org.jetbrains.kotlin.ir.descriptors.*
+import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.DeclarationStubGenerator
 import org.jetbrains.kotlin.ir.util.IdSignature
@@ -20,6 +22,7 @@ import org.jetbrains.kotlin.ir.util.IrExtensionGenerator
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.library.IrLibrary
 import org.jetbrains.kotlin.load.java.descriptors.*
+import org.jetbrains.kotlin.load.java.lazy.descriptors.LazyJavaPackageFragment
 import org.jetbrains.kotlin.name.Name
 
 class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable, private val stubGenerator: DeclarationStubGenerator, private val manglerDesc: JvmManglerDesc) :
@@ -45,8 +48,9 @@ class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, buil
 
     private fun DeclarationDescriptor.isJavaDescriptor(): Boolean {
         if (this is PackageFragmentDescriptor) {
-            return fqName.startsWith(Name.identifier("java"))
+            return this is LazyJavaPackageFragment || fqName.startsWith(Name.identifier("java"))
         }
+
         return this is JavaClassDescriptor || this is JavaCallableMemberDescriptor || (containingDeclaration?.isJavaDescriptor() == true)
     }
 
@@ -54,6 +58,23 @@ class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, buil
         if (this is PropertyAccessorDescriptor) return correspondingProperty.isCleanDescriptor()
         return this is DeserializedDescriptor
     }
+
+    override fun platformSpecificSymbol(symbol: IrSymbol): Boolean {
+        return symbol.descriptor.isJavaDescriptor()
+    }
+
+    private fun declareJavaFieldStub(symbol: IrFieldSymbol): IrField {
+        return with(stubGenerator) {
+            val old = stubGenerator.unboundSymbolGeneration
+            try {
+                stubGenerator.unboundSymbolGeneration = true
+                generateFieldStub(symbol.descriptor)
+            } finally {
+                stubGenerator.unboundSymbolGeneration = old
+            }
+        }
+    }
+
 
     override fun createCurrentModuleDeserializer(moduleFragment: IrModuleFragment, dependencies: Collection<IrModuleDeserializer>, extensions: Collection<IrExtensionGenerator>): IrModuleDeserializer =
         JvmCurrentModuleDeserializer(moduleFragment, dependencies, extensions)
@@ -65,7 +86,11 @@ class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, buil
 
             if (descriptor.isJavaDescriptor()) {
                 // Wrap java declaration with lazy ir
-                stubGenerator.generateMemberStub(descriptor)
+                if (symbol is IrFieldSymbol) {
+                    declareJavaFieldStub(symbol)
+                } else {
+                    stubGenerator.generateMemberStub(descriptor)
+                }
                 return
             }
 
@@ -107,8 +132,12 @@ class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, buil
         }
 
         override fun declareIrSymbol(symbol: IrSymbol) {
-            assert(symbol.isPublicApi)
-            stubGenerator.generateMemberStub(symbol.descriptor)
+            assert(symbol.isPublicApi || symbol.descriptor.isJavaDescriptor())
+            if (symbol is IrFieldSymbol) {
+                declareJavaFieldStub(symbol)
+            } else {
+                stubGenerator.generateMemberStub(symbol.descriptor)
+            }
         }
 
         override fun addModuleReachableTopLevel(idSig: IdSignature) {
