@@ -68,14 +68,10 @@ fun compile(
 
     val irFiles = allModules.flatMap { it.files }
 
+    deserializer.postProcess()
+
     moduleFragment.files.clear()
     moduleFragment.files += irFiles
-
-    // Create stubs
-    ExternalDependenciesGenerator(symbolTable, irProviders).generateUnboundSymbolsAsDependencies()
-    moduleFragment.patchDeclarationParents()
-
-    deserializer.postProcess()
 
     symbolTable.lazyWrapper.stubGenerator = DeclarationStubGenerator(moduleDescriptor, symbolTable, irBuiltIns.languageVersionSettings)
 
