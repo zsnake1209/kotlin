@@ -45,15 +45,15 @@ abstract class IrModuleDeserializer(val moduleDescriptor: ModuleDescriptor) {
 
     open val klib: IrLibrary get() = error("Unsupported operation")
 
-    abstract fun addModuleReachableTopLevel(idSig: IdSignature)
-
     open fun init() = init(this)
 
     open fun init(delegate: IrModuleDeserializer) {}
 
-    abstract fun deserializeReachableDeclarations()
+    open fun addModuleReachableTopLevel(idSig: IdSignature) { error("Unsupported Operation (sig: $idSig") }
 
-    abstract fun postProcess()
+    open fun deserializeReachableDeclarations() { error("Unsupported Operation") }
+
+    open fun postProcess() {}
 
     abstract val moduleFragment: IrModuleFragment
 
@@ -269,16 +269,6 @@ open class CurrentModuleDeserializer(
 
         return declaredDeclaration as IrSymbolOwner
     }
-
-    override fun addModuleReachableTopLevel(idSig: IdSignature) {
-        TODO("Not yet implemented")
-    }
-
-    override fun deserializeReachableDeclarations() {
-        TODO("Not yet implemented")
-    }
-
-    override fun postProcess() {}
 
     companion object {
         private const val offset = UNDEFINED_OFFSET
