@@ -30,6 +30,8 @@ class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, buil
 
     override val functionalInteraceFactory: IrAbstractFunctionFactory = IrFunctionFactory(builtIns, symbolTable)
 
+    private val javaName = Name.identifier("java")
+
     override fun isBuiltInModule(moduleDescriptor: ModuleDescriptor): Boolean =
         moduleDescriptor.name.asString() == "<built-ins module>"
 
@@ -48,7 +50,7 @@ class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, buil
 
     private fun DeclarationDescriptor.isJavaDescriptor(): Boolean {
         if (this is PackageFragmentDescriptor) {
-            return this is LazyJavaPackageFragment || fqName.startsWith(Name.identifier("java"))
+            return this is LazyJavaPackageFragment || fqName.startsWith(javaName)
         }
 
         return this is JavaClassDescriptor || this is JavaCallableMemberDescriptor || (containingDeclaration?.isJavaDescriptor() == true)
@@ -105,6 +107,8 @@ class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, buil
 
     private inner class MetadataJVMModuleDeserializer(moduleDescriptor: ModuleDescriptor, dependencies: List<IrModuleDeserializer>) :
         IrModuleDeserializer(moduleDescriptor) {
+
+        // TODO: implement proper check whether `idSig` belongs to this module
         override fun contains(idSig: IdSignature): Boolean = true
 
         private val descriptorFinder = DescriptorByIdSignatureFinder(moduleDescriptor, manglerDesc)
@@ -139,16 +143,6 @@ class JvmIrLinker(currentModule: ModuleDescriptor?, logger: LoggingContext, buil
                 stubGenerator.generateMemberStub(symbol.descriptor)
             }
         }
-
-        override fun addModuleReachableTopLevel(idSig: IdSignature) {
-            error("Unsupported (sig: $idSig)")
-        }
-
-        override fun deserializeReachableDeclarations() {
-            error("Unsupported")
-        }
-
-        override fun postProcess() {}
 
         override val moduleFragment: IrModuleFragment = IrModuleFragmentImpl(moduleDescriptor, builtIns, emptyList())
         override val moduleDependencies: Collection<IrModuleDeserializer> = dependencies
