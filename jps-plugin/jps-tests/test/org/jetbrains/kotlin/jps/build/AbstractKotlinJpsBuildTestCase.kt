@@ -37,7 +37,7 @@ import java.io.IOException
 abstract class AbstractKotlinJpsBuildTestCase : BaseKotlinJpsBuildTestCase() {
     protected lateinit var workDir: File
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     override fun doGetProjectDir(): File? {
         return workDir
     }

@@ -49,7 +49,7 @@ class KtLightClassForInterfaceDefaultImpls(classOrObject: KtClassOrObject)
     override fun hasTypeParameters(): Boolean = false
     override fun isInheritor(baseClass: PsiClass, checkDeep: Boolean): Boolean = false
 
-    @Throws(IncorrectOperationException::class)
+    @kotlin.jvm.Throws(IncorrectOperationException::class)
     override fun setName(name: String): PsiElement {
         throw IncorrectOperationException("Impossible to rename DefaultImpls")
     }

@@ -21,9 +21,9 @@ import java.rmi.RemoteException
 
 interface RemoteOperationsTracer : Remote {
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun before(id: String)
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun after(id: String)
 }

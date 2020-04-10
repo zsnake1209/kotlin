@@ -21,12 +21,12 @@ import java.rmi.RemoteException
 
 interface RemoteInputStream : Remote {
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun close()
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun read(length: Int): ByteArray
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun read(): Int
 }

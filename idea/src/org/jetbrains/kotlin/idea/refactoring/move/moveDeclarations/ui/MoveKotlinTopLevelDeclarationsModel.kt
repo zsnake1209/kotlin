@@ -236,10 +236,10 @@ internal class MoveKotlinTopLevelDeclarationsModel(
     }
 
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     override fun computeModelResult() = computeModelResult(throwOnConflicts = false)
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     override fun computeModelResult(throwOnConflicts: Boolean): ModelResultWithFUSData {
 
         verifyBeforeRun()

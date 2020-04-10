@@ -14,19 +14,19 @@ abstract class KotlinBaseTest<F : KotlinBaseTest.TestFile> : KtUsefulTestCase() 
     @JvmField
     protected var coroutinesPackage: String = ""
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     override fun setUp() {
         coroutinesPackage = ""
         super.setUp()
     }
 
-    @Throws(java.lang.Exception::class)
+    @kotlin.jvm.Throws(java.lang.Exception::class)
     protected open fun doTestWithCoroutinesPackageReplacement(filePath: String, coroutinesPackage: String) {
         this.coroutinesPackage = coroutinesPackage
         doTest(filePath)
     }
 
-    @Throws(java.lang.Exception::class)
+    @kotlin.jvm.Throws(java.lang.Exception::class)
     protected open fun doTest(filePath: String) {
         val file = File(filePath)
         var expectedText = KotlinTestUtils.doLoadFile(file)
@@ -38,7 +38,7 @@ abstract class KotlinBaseTest<F : KotlinBaseTest.TestFile> : KtUsefulTestCase() 
 
     protected abstract fun createTestFilesFromFile(file: File, expectedText: String): List<F>
 
-    @Throws(java.lang.Exception::class)
+    @kotlin.jvm.Throws(java.lang.Exception::class)
     protected open fun doMultiFileTest(
         wholeFile: File,
         files: List<F>

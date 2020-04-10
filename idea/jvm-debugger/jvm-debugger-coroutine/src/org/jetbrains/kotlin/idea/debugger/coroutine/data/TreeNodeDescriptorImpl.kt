@@ -26,7 +26,7 @@ class CoroutineDescriptorImpl(val infoData: CoroutineInfoData) : NodeDescriptorI
 
     override fun getName() = infoData.key.name
 
-    @Throws(EvaluateException::class)
+    @kotlin.jvm.Throws(EvaluateException::class)
     override fun calcRepresentation(context: EvaluationContextImpl?, labelListener: DescriptorLabelListener): String {
         val thread = infoData.activeThread
         val name = thread?.name()?.substringBefore(" @${infoData.key.name}") ?: ""

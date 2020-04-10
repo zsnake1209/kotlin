@@ -42,7 +42,7 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinPla
 
     override fun getTypeReference() = null
 
-    @Throws(IncorrectOperationException::class)
+    @kotlin.jvm.Throws(IncorrectOperationException::class)
     override fun setTypeReference(typeRef: KtTypeReference?) = throw IncorrectOperationException("setTypeReference to constructor")
 
     override fun getColon() = findChildByType<PsiElement>(KtTokens.COLON)
@@ -77,7 +77,7 @@ abstract class KtConstructor<T : KtConstructor<T>> : KtDeclarationStub<KotlinPla
 
     override fun getIdentifyingElement(): PsiElement? = getConstructorKeyword()
 
-    @Throws(IncorrectOperationException::class)
+    @kotlin.jvm.Throws(IncorrectOperationException::class)
     override fun setName(name: String): PsiElement = throw IncorrectOperationException("setName to constructor")
 
     override fun getPresentation() = ItemPresentationProviders.getItemPresentation(this)

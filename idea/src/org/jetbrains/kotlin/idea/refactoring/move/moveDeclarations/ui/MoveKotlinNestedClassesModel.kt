@@ -49,10 +49,10 @@ internal class MoveKotlinNestedClassesModel(
         return targetClass
     }
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     override fun computeModelResult() = computeModelResult(throwOnConflicts = false)
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     override fun computeModelResult(throwOnConflicts: Boolean): ModelResultWithFUSData {
         val elementsToMove = selectedElementsToMove
         val target = KotlinMoveTargetForExistingElement(getCheckedTargetClass())

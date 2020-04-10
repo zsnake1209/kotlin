@@ -147,7 +147,7 @@ abstract class AbstractGradleMultiplatformWizardTest : ProjectWizardTestCase<Abs
         }
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     private fun Project.createProjectSubFile(relativePath: String): VirtualFile {
         val f = File(basePath!!, relativePath)
         FileUtil.ensureExists(f.parentFile)

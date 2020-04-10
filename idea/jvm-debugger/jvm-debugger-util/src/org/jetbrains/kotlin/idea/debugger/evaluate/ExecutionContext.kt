@@ -65,7 +65,7 @@ sealed class BaseExecutionContext(val evaluationContext: EvaluationContextImpl) 
         if (suspendContext.suspendPolicy == EventRequest.SUSPEND_EVENT_THREAD) ObjectReference.INVOKE_SINGLE_THREADED else 0
     }
 
-    @Throws(EvaluateException::class)
+    @kotlin.jvm.Throws(EvaluateException::class)
     fun invokeMethod(obj: ObjectReference, method: Method, args: List<Value?>, invocationOptions: Int = 0): Value? {
         return debugProcess.invokeInstanceMethod(evaluationContext, obj, method, args, invocationOptions)
     }
@@ -78,17 +78,17 @@ sealed class BaseExecutionContext(val evaluationContext: EvaluationContextImpl) 
         return debugProcess.invokeMethod(evaluationContext, type, method, args)
     }
 
-    @Throws(EvaluateException::class)
+    @kotlin.jvm.Throws(EvaluateException::class)
     fun newInstance(type: ClassType, constructor: Method, args: List<Value?>): ObjectReference {
         return debugProcess.newInstance(evaluationContext, type, constructor, args)
     }
 
-    @Throws(EvaluateException::class)
+    @kotlin.jvm.Throws(EvaluateException::class)
     fun newInstance(arrayType: ArrayType, dimension: Int): ArrayReference {
         return debugProcess.newInstance(arrayType, dimension)
     }
 
-    @Throws(EvaluateException::class)
+    @kotlin.jvm.Throws(EvaluateException::class)
     fun findClass(name: String, classLoader: ClassLoaderReference? = null): ReferenceType? {
         debugProcess.findClass(evaluationContext, name, classLoader)?.let { return it }
 
@@ -110,7 +110,7 @@ sealed class BaseExecutionContext(val evaluationContext: EvaluationContextImpl) 
         return null
     }
 
-    @Throws(EvaluateException::class)
+    @kotlin.jvm.Throws(EvaluateException::class)
     fun findClass(asmType: Type, classLoader: ClassLoaderReference? = null): ReferenceType? {
         if (asmType.sort != Type.OBJECT && asmType.sort != Type.ARRAY) {
             return null

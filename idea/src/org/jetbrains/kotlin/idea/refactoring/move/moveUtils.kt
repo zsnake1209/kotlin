@@ -665,7 +665,7 @@ fun collectOuterInstanceReferences(member: KtNamedDeclaration): List<OuterInstan
     return result
 }
 
-@Throws(IncorrectOperationException::class)
+@kotlin.jvm.Throws(IncorrectOperationException::class)
 internal fun getOrCreateDirectory(path: String, project: Project): PsiDirectory {
 
     File(path).toPsiDirectory(project)?.let { return it }

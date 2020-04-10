@@ -106,7 +106,7 @@ internal abstract class MoveKotlinNestedClassesToUpperLevelModel(
         return target as? KtFile ?: target as? KtClassOrObject
     }
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     private fun getTargetContainerWithValidation(): PsiElement {
 
         if (className.isEmpty()) {
@@ -160,7 +160,7 @@ internal abstract class MoveKotlinNestedClassesToUpperLevelModel(
         return targetContainer ?: throw ConfigurationException(KotlinBundle.message("text.invalid.target.specified"))
     }
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     private fun getMoveTarget(): Pair<KotlinMoveTarget, MoveRefactoringDestination> {
         val target = getTargetContainerWithValidation()
         return if (target is PsiDirectory) {
@@ -185,10 +185,10 @@ internal abstract class MoveKotlinNestedClassesToUpperLevelModel(
         }
     }
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     override fun computeModelResult() = computeModelResult(throwOnConflicts = false)
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     override fun computeModelResult(throwOnConflicts: Boolean): ModelResultWithFUSData {
 
         val moveTarget = getMoveTarget()

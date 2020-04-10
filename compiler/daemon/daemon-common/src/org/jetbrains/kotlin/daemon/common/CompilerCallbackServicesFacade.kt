@@ -36,97 +36,97 @@ import java.rmi.RemoteException
 )
 interface CompilerCallbackServicesFacade : Remote {
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun hasIncrementalCaches(): Boolean
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun hasLookupTracker(): Boolean
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun hasCompilationCanceledStatus(): Boolean
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun hasExpectActualTracker(): Boolean
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun hasIncrementalResultsConsumer(): Boolean
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun hasIncrementalDataProvider(): Boolean
 
     // ----------------------------------------------------
     // IncrementalCache
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalCache_getObsoletePackageParts(target: TargetId): Collection<String>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalCache_getObsoleteMultifileClassFacades(target: TargetId): Collection<String>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalCache_getPackagePartData(target: TargetId, partInternalName: String): JvmPackagePartProto?
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalCache_getModuleMappingData(target: TargetId): ByteArray?
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalCache_registerInline(target: TargetId, fromPath: String, jvmSignature: String, toPath: String)
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalCache_getClassFilePath(target: TargetId, internalClassName: String): String
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalCache_close(target: TargetId)
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalCache_getMultifileFacadeParts(target: TargetId, internalName: String): Collection<String>?
 
     // ----------------------------------------------------
     // LookupTracker
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun lookupTracker_requiresPosition(): Boolean
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun lookupTracker_record(lookups: Collection<LookupInfo>)
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun lookupTracker_isDoNothing(): Boolean
 
     // ----------------------------------------------------
     // CompilationCanceledStatus
-    @Throws(RemoteException::class, RmiFriendlyCompilationCanceledException::class)
+    @kotlin.jvm.Throws(RemoteException::class, RmiFriendlyCompilationCanceledException::class)
     fun compilationCanceledStatus_checkCanceled(): Void?
 
     // ---------------------------------------------------
     // ExpectActualTracker
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun expectActualTracker_report(expectedFilePath: String, actualFilePath: String)
 
     // ---------------------------------------------------
     // IncrementalResultsConsumer (js)
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalResultsConsumer_processHeader(headerMetadata: ByteArray)
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalResultsConsumer_processPackagePart(sourceFilePath: String, packagePartMetadata: ByteArray, binaryAst: ByteArray, inlineData: ByteArray)
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalResultsConsumer_processInlineFunctions(functions: Collection<JsInlineFunctionHash>)
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalResultsConsumer_processPackageMetadata(packageName: String, metadata: ByteArray)
 
     // ---------------------------------------------------
     // IncrementalDataProvider (js)
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalDataProvider_getHeaderMetadata(): ByteArray
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalDataProvider_getCompiledPackageParts(): Collection<CompiledPackagePart>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalDataProvider_getMetadataVersion(): IntArray
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun incrementalDataProvider_getPackageMetadata(): Collection<PackageMetadata>
 }
 

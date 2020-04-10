@@ -51,7 +51,7 @@ abstract class AbstractQuickFixTest : KotlinLightCodeInsightFixtureTestCase(), Q
         }
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doTest(beforeFileName: String) {
         val beforeFileText = FileUtil.loadFile(File(beforeFileName))
         withCustomCompilerOptions(beforeFileText, project, module) {
@@ -201,7 +201,7 @@ abstract class AbstractQuickFixTest : KotlinLightCodeInsightFixtureTestCase(), Q
         }
     }
 
-    @Throws(ClassNotFoundException::class)
+    @kotlin.jvm.Throws(ClassNotFoundException::class)
     private fun checkForUnexpectedActions() {
         val text = myFixture.editor.document.text
         val actionHint = ActionHint.parse(myFixture.file, text)

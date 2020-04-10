@@ -18,7 +18,7 @@ import java.io.File
  * the last KtBinaryExpression of xxx.kt file
  */
 abstract class AbstractConcatenatedStringGeneratorTest : KotlinLightCodeInsightFixtureTestCase() {
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doTest(path: String) {
         myFixture.configureByFile(fileName())
         val expression = myFixture.file.collectDescendantsOfType<KtBinaryExpression>().lastOrNull()

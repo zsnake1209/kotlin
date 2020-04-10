@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.Serv
 
 interface Client<ServerType : ServerBase> : Serializable, AutoCloseable {
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     suspend fun connectToServer()
 
     suspend fun sendMessage(msg: AnyMessage<out ServerType>): Int // returns message unique id
@@ -222,7 +222,7 @@ abstract class DefaultAuthorizableClient<ServerType : ServerBase>(
 
     }
 
-    @Throws(ClassNotFoundException::class, IOException::class)
+    @kotlin.jvm.Throws(ClassNotFoundException::class, IOException::class)
     private fun readObject(aInputStream: ObjectInputStream) {
         aInputStream.defaultReadObject()
         println("connecting...")
@@ -230,7 +230,7 @@ abstract class DefaultAuthorizableClient<ServerType : ServerBase>(
         println("connectED")
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     private fun writeObject(aOutputStream: ObjectOutputStream) {
         aOutputStream.defaultWriteObject()
     }

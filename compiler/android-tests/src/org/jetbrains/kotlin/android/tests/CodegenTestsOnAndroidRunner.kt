@@ -142,7 +142,7 @@ class CodegenTestsOnAndroidRunner private constructor(private val pathManager: P
             gradleRunner.build()
         }
 
-        @Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
+        @kotlin.jvm.Throws(IOException::class, SAXException::class, ParserConfigurationException::class)
         private fun parseSingleReportInFolder(folder: File): List<TestCase> {
             val files = folder.listFiles()!!
             assert(files.size == 1) {
@@ -164,14 +164,14 @@ class CodegenTestsOnAndroidRunner private constructor(private val pathManager: P
 
                 if (failure.length == 0) {
                     object : TestCase(name) {
-                        @Throws(Throwable::class)
+                        @kotlin.jvm.Throws(Throwable::class)
                         override fun runTest() {
 
                         }
                     }
                 } else {
                     object : TestCase(name) {
-                        @Throws(Throwable::class)
+                        @kotlin.jvm.Throws(Throwable::class)
                         override fun runTest() {
                             Assert.fail(failure.item(0).textContent)
                         }

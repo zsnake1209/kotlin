@@ -44,7 +44,7 @@ abstract class AbstractIntentionTest : KotlinLightCodeInsightFixtureTestCase() {
 
     protected open fun intentionTextDirectiveName(): String = "INTENTION_TEXT"
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     private fun createIntention(testDataFile: File): IntentionAction {
         val candidateFiles = Lists.newArrayList<File>()
 
@@ -74,7 +74,7 @@ abstract class AbstractIntentionTest : KotlinLightCodeInsightFixtureTestCase() {
         return Class.forName(className).newInstance() as IntentionAction
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doTest(path: String) {
         val mainFile = File(path)
         val mainFileName = FileUtil.getNameWithoutExtension(mainFile)
@@ -142,7 +142,7 @@ abstract class AbstractIntentionTest : KotlinLightCodeInsightFixtureTestCase() {
         }
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     private fun doTestFor(mainFilePath: String, pathToFiles: Map<String, PsiFile>, intentionAction: IntentionAction, fileText: String) {
         val isApplicableString = InTextDirectivesUtils.findStringWithPrefixes(fileText, "// ${isApplicableDirectiveName()}: ")
         val isApplicableExpected = isApplicableString == null || isApplicableString == "true"

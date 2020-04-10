@@ -69,7 +69,7 @@ object LoopbackNetworkInterface {
         override fun equals(other: Any?): Boolean = other === this || super.equals(other)
         override fun hashCode(): Int = super.hashCode()
 
-        @Throws(IOException::class)
+        @kotlin.jvm.Throws(IOException::class)
         override fun createServerSocket(port: Int): ServerSocket = ServerSocket(port, SERVER_SOCKET_BACKLOG_SIZE, InetAddress.getByName(null))
     }
 
@@ -79,7 +79,7 @@ object LoopbackNetworkInterface {
 
         abstract protected fun socketCreate(host: String, port: Int): SocketType
 
-        @Throws(IOException::class)
+        @kotlin.jvm.Throws(IOException::class)
         fun createSocket(host: String, port: Int): SocketType {
             var attemptsLeft = SOCKET_CONNECT_ATTEMPTS
             while (true) {

@@ -66,7 +66,7 @@ class K2JSTranslator @JvmOverloads constructor(
 
     private val incrementalResults = config.configuration.get(JSConfigurationKeys.INCREMENTAL_RESULTS_CONSUMER)
 
-    @Throws(TranslationException::class)
+    @kotlin.jvm.Throws(TranslationException::class)
     @JvmOverloads
     fun translate(
         reporter: JsConfig.Reporter,
@@ -81,7 +81,7 @@ class K2JSTranslator @JvmOverloads constructor(
         return translateUnits(reporter, units, mainCallParameters, analysisResult)
     }
 
-    @Throws(TranslationException::class)
+    @kotlin.jvm.Throws(TranslationException::class)
     @JvmOverloads
     fun translateUnits(
         reporter: JsConfig.Reporter,
@@ -144,7 +144,7 @@ class K2JSTranslator @JvmOverloads constructor(
         }
     }
 
-    @Throws(TranslationException::class)
+    @kotlin.jvm.Throws(TranslationException::class)
     private fun translate(
         reporter: JsConfig.Reporter,
         files: List<KtFile>,

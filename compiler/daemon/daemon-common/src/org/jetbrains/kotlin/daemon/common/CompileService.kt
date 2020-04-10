@@ -68,45 +68,45 @@ interface CompileService : Remote {
     }
 
     // TODO: remove!
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun checkCompilerId(expectedCompilerId: CompilerId): Boolean
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun getUsedMemory(): CallResult<Long>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun getDaemonOptions(): CallResult<DaemonOptions>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun getDaemonInfo(): CallResult<String>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun getDaemonJVMOptions(): CallResult<DaemonJVMOptions>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun registerClient(aliveFlagPath: String?): CallResult<Nothing>
 
     // TODO: consider adding another client alive checking mechanism, e.g. socket/port
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun getClients(): CallResult<List<String>>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun leaseCompileSession(aliveFlagPath: String?): CallResult<Int>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun releaseCompileSession(sessionId: Int): CallResult<Nothing>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun shutdown(): CallResult<Nothing>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun scheduleShutdown(graceful: Boolean): CallResult<Boolean>
 
     // TODO: consider adding async version of shutdown and release
 
     @Deprecated("The usages should be replaced with `compile` method", ReplaceWith("compile"))
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun remoteCompile(
             sessionId: Int,
             targetPlatform: TargetPlatform,
@@ -119,7 +119,7 @@ interface CompileService : Remote {
     ): CallResult<Int>
 
     @Deprecated("The usages should be replaced with `compile` method", ReplaceWith("compile"))
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun remoteIncrementalCompile(
             sessionId: Int,
             targetPlatform: TargetPlatform,
@@ -131,7 +131,7 @@ interface CompileService : Remote {
             operationsTracer: RemoteOperationsTracer?
     ): CallResult<Int>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun compile(
             sessionId: Int,
             compilerArguments: Array<out String>,
@@ -140,17 +140,17 @@ interface CompileService : Remote {
             compilationResults: CompilationResults?
     ): CallResult<Int>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun classesFqNamesByFiles(
         sessionId: Int,
         sourceFiles: Set<File>
     ): CallResult<Set<String>>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun clearJarCache()
 
     @Deprecated("The usages should be replaced with other `leaseReplSession` method", ReplaceWith("leaseReplSession"))
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun leaseReplSession(
             aliveFlagPath: String?,
             targetPlatform: CompileService.TargetPlatform,
@@ -166,18 +166,18 @@ interface CompileService : Remote {
             operationsTracer: RemoteOperationsTracer?
     ): CallResult<Int>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun releaseReplSession(sessionId: Int): CallResult<Nothing>
 
     @Deprecated("The usages should be replaced with `replCheck` method", ReplaceWith("replCheck"))
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun remoteReplLineCheck(
             sessionId: Int,
             codeLine: ReplCodeLine
     ): CallResult<ReplCheckResult>
 
     @Deprecated("The usages should be replaced with `replCompile` method", ReplaceWith("replCompile"))
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun remoteReplLineCompile(
             sessionId: Int,
             codeLine: ReplCodeLine,
@@ -185,14 +185,14 @@ interface CompileService : Remote {
     ): CallResult<ReplCompileResult>
 
     @Deprecated("Evaluation on daemon is not supported")
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun remoteReplLineEval(
             sessionId: Int,
             codeLine: ReplCodeLine,
             history: List<ReplCodeLine>?
     ): CallResult<ReplEvalResult>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun leaseReplSession(
             aliveFlagPath: String?,
             compilerArguments: Array<out String>,
@@ -202,17 +202,17 @@ interface CompileService : Remote {
             templateClassName: String
     ): CallResult<Int>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun replCreateState(sessionId: Int): CallResult<ReplStateFacade>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun replCheck(
             sessionId: Int,
             replStateId: Int,
             codeLine: ReplCodeLine
     ): CallResult<ReplCheckResult>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun replCompile(
             sessionId: Int,
             replStateId: Int,

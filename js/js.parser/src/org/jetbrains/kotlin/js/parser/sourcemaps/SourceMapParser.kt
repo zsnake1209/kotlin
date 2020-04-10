@@ -21,12 +21,12 @@ import java.io.IOException
 import java.io.StringReader
 
 object SourceMapParser {
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     fun parse(file: File): SourceMapParseResult {
         return parse(file.readText(Charsets.UTF_8))
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     fun parse(content: String): SourceMapParseResult {
         val jsonObject = try {
             parseJson(content)
@@ -37,7 +37,7 @@ object SourceMapParser {
         return parse(jsonObject)
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     private fun parse(jsonObject: JsonNode): SourceMapParseResult {
         if (jsonObject !is JsonObject) return SourceMapError("Top-level object expected")
 

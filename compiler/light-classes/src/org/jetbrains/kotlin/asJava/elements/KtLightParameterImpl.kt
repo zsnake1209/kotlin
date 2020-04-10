@@ -69,7 +69,7 @@ internal class KtLightParameterImpl(
 
     override fun isValid(): Boolean = method.isValid
 
-    @Throws(IncorrectOperationException::class)
+    @kotlin.jvm.Throws(IncorrectOperationException::class)
     override fun setName(@NonNls name: String): PsiElement {
         kotlinOrigin?.setName(name)
         return this

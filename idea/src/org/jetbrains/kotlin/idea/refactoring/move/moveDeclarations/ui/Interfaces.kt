@@ -18,9 +18,9 @@ internal class ModelResultWithFUSData(
 )
 
 internal interface Model {
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     fun computeModelResult(throwOnConflicts: Boolean = false): ModelResultWithFUSData
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     fun computeModelResult(): ModelResultWithFUSData
 }

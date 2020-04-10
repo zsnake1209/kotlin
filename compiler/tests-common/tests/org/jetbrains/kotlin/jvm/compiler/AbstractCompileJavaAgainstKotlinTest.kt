@@ -44,17 +44,17 @@ import org.jetbrains.kotlin.test.util.RecursiveDescriptorComparator.validateAndC
 
 abstract class AbstractCompileJavaAgainstKotlinTest : TestCaseWithTmpdir() {
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     protected fun doTestWithJavac(ktFilePath: String) {
         doTest(ktFilePath, true)
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     protected fun doTestWithoutJavac(ktFilePath: String) {
         doTest(ktFilePath, false)
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     protected fun doTest(ktFilePath: String, useJavac: Boolean) {
         Assert.assertTrue(ktFilePath.endsWith(".kt"))
         val ktFile = File(ktFilePath)
@@ -95,7 +95,7 @@ abstract class AbstractCompileJavaAgainstKotlinTest : TestCaseWithTmpdir() {
 
     open fun updateConfiguration(configuration: CompilerConfiguration) {}
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     fun compileKotlinWithJava(
         javaFiles: List<File>,
         ktFiles: List<File>,

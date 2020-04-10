@@ -23,7 +23,7 @@ fun Any.loadPropertyFromResources(propFileName: String, property: String): Strin
     return props[property] as String
 }
 
-@Throws(IOException::class)
+@kotlin.jvm.Throws(IOException::class)
 fun Project.probeRemoteFileLength(url: String, probingTimeoutMs: Int = 0): Long? {
     val connection = URL(url).openConnection()
     if (connection !is HttpURLConnection) {

@@ -22,18 +22,18 @@ import java.rmi.RemoteException
 
 interface ReplStateFacade : Remote {
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun getId(): Int
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun getHistorySize(): Int
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun historyGet(index: Int): ILineId
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun historyReset(): List<ILineId>
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun historyResetTo(id: ILineId): List<ILineId>
 }
