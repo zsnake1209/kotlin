@@ -42,3 +42,6 @@ fun AnnotationDescriptor.argumentValue(parameterName: String): ConstantValue<*>?
     DeprecationLevel.ERROR
 )
 val JVM_FIELD_ANNOTATION_FQ_NAME = FqName("kotlin.jvm.JvmField")
+
+@JvmField
+val JVM_THROWS_ANNOTATION_FQ_NAME = FqName("kot")
