@@ -134,15 +134,7 @@ class FirClassSubstitutionScope(
     ): Pair<List<FirTypeParameter>, ConeSubstitutor> {
         if (member.typeParameters.isEmpty()) return Pair(member.typeParameters, substitutor)
         val newTypeParameters = member.typeParameters.map { originalParameter ->
-            FirTypeParameterBuilder().apply {
-                source = originalParameter.source
-                session = originalParameter.session
-                name = originalParameter.name
-                symbol = FirTypeParameterSymbol()
-                variance = originalParameter.variance
-                isReified = originalParameter.isReified
-                annotations += originalParameter.annotations
-            }
+            originalParameter.copyToBuilder()
         }
 
         val substitutionMapForNewParameters = member.typeParameters.zip(newTypeParameters).map {
@@ -224,6 +216,18 @@ class FirClassSubstitutionScope(
     }
 
     companion object {
+        private fun FirTypeParameter.copyToBuilder(): FirTypeParameterBuilder {
+            return FirTypeParameterBuilder().apply {
+                source = this@copyToBuilder.source
+                session = this@copyToBuilder.session
+                name = this@copyToBuilder.name
+                symbol = FirTypeParameterSymbol()
+                variance = this@copyToBuilder.variance
+                isReified = this@copyToBuilder.isReified
+                annotations += this@copyToBuilder.annotations
+            }
+        }
+
         private fun createFakeOverrideFunction(
             fakeOverrideSymbol: FirFunctionSymbol<FirSimpleFunction>,
             session: FirSession,
@@ -261,13 +265,7 @@ class FirClassSubstitutionScope(
                     }
                 }
 
-                // TODO: Fix the hack for org.jetbrains.kotlin.fir.backend.Fir2IrVisitor.addFakeOverrides
-                // We might have added baseFunction.typeParameters in case new ones are null
-                // But it fails at org.jetbrains.kotlin.ir.AbstractIrTextTestCase.IrVerifier.elementsAreUniqueChecker
-                // because it shares the same declarations of type parameters between two different two functions
-                if (newTypeParameters != null) {
-                    typeParameters += newTypeParameters
-                }
+                typeParameters += newTypeParameters ?: baseFunction.typeParameters.map { it.copyToBuilder().build() }
             }
 
         }
@@ -317,9 +315,7 @@ class FirClassSubstitutionScope(
                 status = baseProperty.status
                 resolvePhase = baseProperty.resolvePhase
                 annotations += baseProperty.annotations
-                if (newTypeParameters != null) {
-                    typeParameters += newTypeParameters
-                }
+                typeParameters += newTypeParameters ?: baseProperty.typeParameters.map { it.copyToBuilder().build() }
             }
             return symbol
         }
