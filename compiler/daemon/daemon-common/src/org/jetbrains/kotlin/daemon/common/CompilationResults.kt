@@ -21,7 +21,7 @@ import java.rmi.Remote
 import java.rmi.RemoteException
 
 interface CompilationResults : Remote {
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     fun add(compilationResultCategory: Int, value: Serializable)
 }
 

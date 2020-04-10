@@ -22,7 +22,7 @@ import java.io.IOException
 
 @RunWith(JUnit3WithIdeaConfigurationRunner::class)
 open class ConfigureKotlinInTempDirTest : AbstractConfigureKotlinInTempDirTest() {
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     fun testNoKotlincExistsNoSettingsRuntime10() {
         val application = ApplicationManager.getApplication() as ApplicationImpl
         application.isSaveAllowed = true

@@ -28,12 +28,12 @@ import org.junit.Assert
 import java.io.File
 
 abstract class AbstractLoadJavaClsStubTest : TestCaseWithTmpdir() {
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doTestCompiledKotlin(ktFileName: String) {
         doTestCompiledKotlin(ktFileName, ConfigurationKind.JDK_ONLY, false)
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     private fun doTestCompiledKotlin(ktFileName: String, configurationKind: ConfigurationKind, useTypeTableInSerializer: Boolean) {
         val ktFile = File(ktFileName)
 

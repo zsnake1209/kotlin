@@ -24,7 +24,7 @@ internal class GradleCompilationResults(
 
     var icLogLines: List<String>? = null
 
-    @Throws(RemoteException::class)
+    @kotlin.jvm.Throws(RemoteException::class)
     override fun add(compilationResultCategory: Int, value: Serializable) {
         when (compilationResultCategory) {
             CompilationResultCategory.IC_COMPILE_ITERATION.code -> {

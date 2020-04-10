@@ -48,7 +48,7 @@ import javax.swing.DefaultListModel
 import javax.swing.JList
 import kotlin.math.min
 
-@Throws(IntroduceRefactoringException::class)
+@kotlin.jvm.Throws(IntroduceRefactoringException::class)
 fun selectElement(
     editor: Editor,
     file: KtFile,
@@ -56,7 +56,7 @@ fun selectElement(
     callback: (PsiElement?) -> Unit
 ) = selectElement(editor, file, true, elementKinds, callback)
 
-@Throws(IntroduceRefactoringException::class)
+@kotlin.jvm.Throws(IntroduceRefactoringException::class)
 fun selectElement(
     editor: Editor,
     file: KtFile,
@@ -98,7 +98,7 @@ fun selectElement(
     }
 }
 
-@Throws(IntroduceRefactoringException::class)
+@kotlin.jvm.Throws(IntroduceRefactoringException::class)
 fun getSmartSelectSuggestions(
     file: PsiFile,
     offset: Int,
@@ -176,7 +176,7 @@ fun getSmartSelectSuggestions(
     return elements
 }
 
-@Throws(IntroduceRefactoringException::class)
+@kotlin.jvm.Throws(IntroduceRefactoringException::class)
 private fun smartSelectElement(
     editor: Editor,
     file: PsiFile,
@@ -265,7 +265,7 @@ fun getExpressionShortText(element: KtElement): String {
     return trimmedText
 }
 
-@Throws(IntroduceRefactoringException::class)
+@kotlin.jvm.Throws(IntroduceRefactoringException::class)
 private fun findElement(
     file: KtFile,
     startOffset: Int,

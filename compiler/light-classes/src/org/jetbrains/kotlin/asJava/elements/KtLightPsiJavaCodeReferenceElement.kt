@@ -61,10 +61,10 @@ private class LazyPsiReferenceDelegate(
 
     override fun getCanonicalText(): String = delegate?.canonicalText ?: "<no-text>"
 
-    @Throws(IncorrectOperationException::class)
+    @kotlin.jvm.Throws(IncorrectOperationException::class)
     override fun handleElementRename(newElementName: String): PsiElement = delegate?.handleElementRename(newElementName) ?: element
 
-    @Throws(IncorrectOperationException::class)
+    @kotlin.jvm.Throws(IncorrectOperationException::class)
     override fun bindToElement(element: PsiElement): PsiElement =
         delegate?.bindToElement(element) ?: throw IncorrectOperationException("can't rename LazyPsiReferenceDelegate")
 

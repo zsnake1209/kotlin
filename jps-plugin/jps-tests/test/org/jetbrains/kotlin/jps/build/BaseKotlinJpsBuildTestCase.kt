@@ -22,13 +22,13 @@ import org.jetbrains.kotlin.compilerRunner.JpsKotlinCompilerRunner
 import org.jetbrains.kotlin.test.runTest
 
 abstract class BaseKotlinJpsBuildTestCase : JpsBuildTestCase() {
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     override fun setUp() {
         super.setUp()
         System.setProperty("kotlin.jps.tests", "true")
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     override fun tearDown() {
         System.clearProperty("kotlin.jps.tests")
         super.tearDown()

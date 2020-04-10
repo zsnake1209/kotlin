@@ -30,7 +30,7 @@ internal class TCServiceMessageOutputStreamHandler(
     private val buffer = ByteArrayOutputStream()
     private var overflowInsideMessage: Boolean = false
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     override fun close() {
         closed = true
         flushLine()
@@ -62,7 +62,7 @@ internal class TCServiceMessageOutputStreamHandler(
         append()
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     override fun write(b: Int) {
         // helpfully will be inlined at runtime
         write(byteArrayOf(b.toByte()), 0, 1)

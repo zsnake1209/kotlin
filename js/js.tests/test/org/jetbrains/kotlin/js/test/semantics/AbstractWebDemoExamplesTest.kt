@@ -29,7 +29,7 @@ abstract class AbstractWebDemoExamplesTest(relativePath: String) : BasicBoxTest(
         testChecker.checkStdout(jsFiles, expectedResult)
     }
 
-    @Throws(ScriptException::class, V8ScriptException::class)
+    @kotlin.jvm.Throws(ScriptException::class, V8ScriptException::class)
     protected fun runMainAndCheckOutput(fileName: String, expectedResult: String, vararg args: String) {
         doTest(pathToTestDir + fileName, expectedResult, MainCallParameters.mainWithArguments(Lists.newArrayList(*args)))
     }

@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption
 object GeneratorsFileUtil {
     @JvmStatic
     @JvmOverloads
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     fun writeFileIfContentChanged(file: File, newText: String, logNotChanged: Boolean = true) {
         val parentFile = file.parentFile
         if (!parentFile.exists()) {

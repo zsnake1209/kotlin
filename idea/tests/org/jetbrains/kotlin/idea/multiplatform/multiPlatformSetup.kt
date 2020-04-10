@@ -200,7 +200,7 @@ private fun AbstractMultiModuleTest.createModule(name: String): Module {
     val root = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(moduleDir)
     TestCase.assertNotNull(root)
     object : WriteCommandAction.Simple<Unit>(module.project) {
-        @Throws(Throwable::class)
+        @kotlin.jvm.Throws(Throwable::class)
         override fun run() {
             root!!.refresh(false, true)
         }

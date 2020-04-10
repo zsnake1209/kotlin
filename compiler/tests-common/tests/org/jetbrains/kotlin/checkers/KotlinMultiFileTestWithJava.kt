@@ -24,7 +24,7 @@ abstract class KotlinMultiFileTestWithJava<M : KotlinBaseTest.TestModule, F : Ko
     protected lateinit var javaFilesDir: File
     private var kotlinSourceRoot: File? = null
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     public override fun setUp() {
         super.setUp()
         // TODO: do not create temporary directory for tests without Java sources
@@ -108,7 +108,7 @@ abstract class KotlinMultiFileTestWithJava<M : KotlinBaseTest.TestModule, F : Ko
         return File(filePath)
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     public override fun doTest(filePath: String) {
         val file = createTestFileFromPath(filePath)
         val expectedText = KotlinTestUtils.doLoadFile(file)

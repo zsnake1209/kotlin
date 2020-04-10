@@ -351,7 +351,7 @@ class KotlinPluginUpdater : Disposable {
             var approve: Boolean = true
         }
 
-        @Throws(IOException::class, ResponseParseException::class)
+        @kotlin.jvm.Throws(IOException::class, ResponseParseException::class)
         fun fetchPluginReleaseDate(pluginId: PluginId, version: String, channel: String?): LocalDate? {
             val url = "https://plugins.jetbrains.com/api/plugins/${pluginId.idString}/updates?version=$version"
 

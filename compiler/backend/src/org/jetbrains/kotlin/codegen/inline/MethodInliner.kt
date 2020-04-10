@@ -1058,7 +1058,7 @@ class MethodInliner(
                 override fun newFrame(nLocals: Int, nStack: Int): Frame<SourceValue> {
 
                     return object : Frame<SourceValue>(nLocals, nStack) {
-                        @Throws(AnalyzerException::class)
+                        @kotlin.jvm.Throws(AnalyzerException::class)
                         override fun execute(insn: AbstractInsnNode, interpreter: Interpreter<SourceValue>) {
                             // This can be a void non-local return from a non-void method; Frame#execute would throw and do nothing else.
                             if (insn.opcode == Opcodes.RETURN) return

@@ -681,7 +681,7 @@ internal abstract class CompositeRefactoringRunner(
     }
 }
 
-@Throws(ConfigurationException::class)
+@kotlin.jvm.Throws(ConfigurationException::class)
 fun KtElement?.validateElement(errorMessage: String) {
     if (this == null) throw ConfigurationException(errorMessage)
 

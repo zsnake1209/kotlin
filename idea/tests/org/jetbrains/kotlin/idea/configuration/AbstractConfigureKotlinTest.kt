@@ -35,7 +35,7 @@ abstract class AbstractConfigureKotlinTest : PlatformTestCase() {
         VfsRootAccess.allowRootAccess(KotlinTestUtils.getHomeDirectory())
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     override fun tearDown() {
         VfsRootAccess.disallowRootAccess(KotlinTestUtils.getHomeDirectory())
         PathMacros.getInstance().removeMacro(TEMP_DIR_MACRO_KEY)
@@ -43,7 +43,7 @@ abstract class AbstractConfigureKotlinTest : PlatformTestCase() {
         super.tearDown()
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     override fun initApplication() {
         super.initApplication()
 

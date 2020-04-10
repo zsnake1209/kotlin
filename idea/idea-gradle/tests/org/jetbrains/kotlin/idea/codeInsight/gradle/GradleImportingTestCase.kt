@@ -205,7 +205,7 @@ abstract class GradleImportingTestCase : ExternalSystemImportingTestCase() {
 
     override fun getExternalSystemId(): ProjectSystemId = GradleConstants.SYSTEM_ID
 
-    @Throws(IOException::class, URISyntaxException::class)
+    @kotlin.jvm.Throws(IOException::class, URISyntaxException::class)
     private fun configureWrapper() {
         val distributionUri = AbstractModelBuilderTest.DistributionLocator().getDistributionFor(GradleVersion.version(gradleVersion))
 

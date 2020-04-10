@@ -70,7 +70,7 @@ internal class KotlinAwareMoveFilesOrDirectoriesModel(
         }
     }
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     override fun computeModelResult() = computeModelResult(throwOnConflicts = false)
 
     private fun checkModel() {
@@ -94,7 +94,7 @@ internal class KotlinAwareMoveFilesOrDirectoriesModel(
         }
     }
 
-    @Throws(ConfigurationException::class)
+    @kotlin.jvm.Throws(ConfigurationException::class)
     override fun computeModelResult(throwOnConflicts: Boolean): ModelResultWithFUSData {
 
         checkModel()

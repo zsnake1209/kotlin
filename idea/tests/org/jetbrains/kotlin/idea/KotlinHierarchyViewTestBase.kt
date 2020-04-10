@@ -18,7 +18,7 @@ import java.io.IOException
 abstract class KotlinHierarchyViewTestBase : KotlinLightCodeInsightFixtureTestCase() {
     private val hierarchyFixture = HierarchyViewTestFixture()
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected open fun doHierarchyTest(
         treeStructureComputable: Computable<out HierarchyTreeStructure>,
         vararg fileNames: String
@@ -28,7 +28,7 @@ abstract class KotlinHierarchyViewTestBase : KotlinLightCodeInsightFixtureTestCa
         doHierarchyTestCompat(hierarchyFixture, treeStructureComputable, expectedStructure)
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     private fun loadExpectedStructure(): String {
         val verificationFilePath = testDataPath + "/" + getTestName(false) + "_verification.xml"
         return FileUtil.loadFile(File(verificationFilePath))

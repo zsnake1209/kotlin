@@ -46,43 +46,43 @@ Test accept more than one file, file extension should be .java or .kt
 abstract class AbstractHierarchyTest : KotlinHierarchyViewTestBase() {
     protected var folderName: String? = null
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doTypeClassHierarchyTest(folderName: String) {
         this.folderName = folderName
         doHierarchyTest(typeHierarchyStructure, *filesToConfigure)
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doSuperClassHierarchyTest(folderName: String) {
         this.folderName = folderName
         doHierarchyTest(superTypesHierarchyStructure, *filesToConfigure)
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doSubClassHierarchyTest(folderName: String) {
         this.folderName = folderName
         doHierarchyTest(subTypesHierarchyStructure, *filesToConfigure)
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doCallerHierarchyTest(folderName: String) {
         this.folderName = folderName
         doHierarchyTest(callerHierarchyStructure, *filesToConfigure)
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doCallerJavaHierarchyTest(folderName: String) {
         this.folderName = folderName
         doHierarchyTest(callerJavaHierarchyStructure, *filesToConfigure)
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doCalleeHierarchyTest(folderName: String) {
         this.folderName = folderName
         doHierarchyTest(calleeHierarchyStructure, *filesToConfigure)
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     protected fun doOverrideHierarchyTest(folderName: String) {
         this.folderName = folderName
         doHierarchyTest(overrideHierarchyStructure, *filesToConfigure)
@@ -188,7 +188,7 @@ abstract class AbstractHierarchyTest : KotlinHierarchyViewTestBase() {
             return ArrayUtil.toStringArray(files)
         }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     override fun doHierarchyTest(
         treeStructureComputable: Computable<out HierarchyTreeStructure>,
         vararg fileNames: String

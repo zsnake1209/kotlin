@@ -41,7 +41,7 @@ class KotlinCompilerAdapter : Javac13() {
 
     override fun getSupportedFileExtensions(): Array<String> = super.getSupportedFileExtensions() + KOTLIN_EXTENSIONS
 
-    @Throws(BuildException::class)
+    @kotlin.jvm.Throws(BuildException::class)
     override fun execute(): Boolean {
         if (javac.isForkedJavac) {
             javac.log("<withKotlin> task does not yet support the fork mode", MSG_ERR)

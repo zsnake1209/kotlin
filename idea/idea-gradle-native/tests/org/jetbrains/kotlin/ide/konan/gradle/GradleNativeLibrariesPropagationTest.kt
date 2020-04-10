@@ -113,7 +113,7 @@ class GradleNativeLibrariesPropagationTest : TestCaseWithFakeKotlinNative() {
 
     companion object {
         @Parameterized.Parameters(name = "{index}: with Gradle-{0}")
-        @Throws(Throwable::class)
+        @kotlin.jvm.Throws(Throwable::class)
         @JvmStatic
         fun data() = listOf(arrayOf("4.10.2"))
     }

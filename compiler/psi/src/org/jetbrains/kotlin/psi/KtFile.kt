@@ -248,7 +248,7 @@ open class KtFile(viewProvider: FileViewProvider, val isCompiled: Boolean) :
     override fun getAnnotationEntries(): List<KtAnnotationEntry> =
         fileAnnotationList?.annotationEntries ?: emptyList()
 
-    @Throws(IncorrectOperationException::class)
+    @kotlin.jvm.Throws(IncorrectOperationException::class)
     override fun setName(name: String): PsiElement {
         val result = super.setName(name)
         val willBeScript = name.endsWith(KotlinParserDefinition.STD_SCRIPT_EXT)

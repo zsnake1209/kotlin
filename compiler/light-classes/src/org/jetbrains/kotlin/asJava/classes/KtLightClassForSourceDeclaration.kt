@@ -278,7 +278,7 @@ abstract class KtLightClassForSourceDeclaration(
         return qualifiedName != null && thisDescriptor != null && checkSuperTypeByFQName(thisDescriptor, qualifiedName, checkDeep)
     }
 
-    @Throws(IncorrectOperationException::class)
+    @kotlin.jvm.Throws(IncorrectOperationException::class)
     override fun setName(@NonNls name: String): PsiElement {
         kotlinOrigin.setName(name)
         return this

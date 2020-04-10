@@ -115,7 +115,7 @@ class ReplFromTerminal(
         return evalResult
     }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     private fun oneCommand(command: String): Boolean {
         val split = splitCommand(command)
         if (split.isNotEmpty() && command == "help") {

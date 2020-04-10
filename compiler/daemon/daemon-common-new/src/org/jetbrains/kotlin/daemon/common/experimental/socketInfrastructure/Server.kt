@@ -180,14 +180,14 @@ interface Server<out T : ServerBase> : ServerBase {
 fun <T> runBlockingWithTimeout(timeout: Long = AUTH_TIMEOUT_IN_MILLISECONDS, block: suspend () -> T) =
     runBlocking { runWithTimeout(timeout = timeout) { block() } }
 
-//@Throws(TimeoutException::class)
+//@kotlin.jvm.Throws(TimeoutException::class)
 suspend fun <T> runWithTimeout(
     timeout: Long = AUTH_TIMEOUT_IN_MILLISECONDS,
     unit: TimeUnit = TimeUnit.MILLISECONDS,
     block: suspend CoroutineScope.() -> T
 ): T? = withTimeoutOrNull(unit.toMillis(timeout)) { block() }
 
-//@Throws(ConnectionResetException::class)
+//@kotlin.jvm.Throws(ConnectionResetException::class)
 suspend fun tryAcquireHandshakeMessage(input: ByteReadChannelWrapper, log: Logger): Boolean {
     val bytes = runWithTimeout {
         input.nextBytes()
@@ -199,7 +199,7 @@ suspend fun tryAcquireHandshakeMessage(input: ByteReadChannelWrapper, log: Logge
 }
 
 
-//@Throws(ConnectionResetException::class)
+//@kotlin.jvm.Throws(ConnectionResetException::class)
 suspend fun trySendHandshakeMessage(output: ByteWriteChannelWrapper, log: Logger): Boolean {
     runWithTimeout {
         output.writeBytesAndLength(FIRST_HANDSHAKE_BYTE_TOKEN.size, FIRST_HANDSHAKE_BYTE_TOKEN)

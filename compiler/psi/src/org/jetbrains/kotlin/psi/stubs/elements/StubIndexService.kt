@@ -57,13 +57,13 @@ open class StubIndexService protected constructor() {
         return KotlinFileStubImpl(file, file.packageFqNameByTree.asString(), file.isScriptByTree)
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     open fun serializeFileStub(stub: KotlinFileStub, dataStream: StubOutputStream) {
         dataStream.writeName(stub.getPackageFqName().asString())
         dataStream.writeBoolean(stub.isScript())
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     open fun deserializeFileStub(dataStream: StubInputStream): KotlinFileStub {
         val packageFqNameAsString = dataStream.readName()
         val isScript = dataStream.readBoolean()

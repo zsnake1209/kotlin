@@ -57,7 +57,7 @@ abstract class AbstractFirTypeEnhancementTest : KtUsefulTestCase() {
             return environment.project
         }
 
-    @Throws(Exception::class)
+    @kotlin.jvm.Throws(Exception::class)
     override fun setUp() {
         super.setUp()
         javaFilesDir = KotlinTestUtils.tmpDirForTest(this)

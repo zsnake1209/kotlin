@@ -29,7 +29,7 @@ object LoopbackNetworkInterfaceKtor {
         override fun equals(other: Any?): Boolean = other === this || super.equals(other)
         override fun hashCode(): Int = super.hashCode()
 
-        @Throws(IOException::class)
+        @kotlin.jvm.Throws(IOException::class)
         fun createServerSocket(port: Int) =
             aSocket(selectorMgr)
                 .tcp()

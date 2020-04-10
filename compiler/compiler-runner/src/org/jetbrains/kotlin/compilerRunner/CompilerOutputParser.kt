@@ -40,14 +40,14 @@ object CompilerOutputParser {
         // In this case, we want to read everything from this stream and report it as an IDE error.
         val stringBuilder = StringBuilder()
         val wrappingReader = object : Reader() {
-            @Throws(IOException::class)
+            @kotlin.jvm.Throws(IOException::class)
             override fun read(cbuf: CharArray, off: Int, len: Int): Int {
                 val read = reader.read(cbuf, off, len)
                 stringBuilder.append(cbuf, off, len)
                 return read
             }
 
-            @Throws(IOException::class)
+            @kotlin.jvm.Throws(IOException::class)
             override fun close() {
                 // Do nothing:
                 // If the SAX parser sees a syntax error, it throws an exception
@@ -93,7 +93,7 @@ object CompilerOutputParser {
         private var line: Int = 0
         private var column: Int = 0
 
-        @Throws(SAXException::class)
+        @kotlin.jvm.Throws(SAXException::class)
         override fun startElement(uri: String, localName: String, qName: String, attributes: Attributes) {
             tags.push(qName)
 
@@ -104,7 +104,7 @@ object CompilerOutputParser {
             column = safeParseInt(attributes.getValue("column"), -1)
         }
 
-        @Throws(SAXException::class)
+        @kotlin.jvm.Throws(SAXException::class)
         override fun characters(ch: CharArray?, start: Int, length: Int) {
             if (tags.size == 1) {
                 // We're directly inside the root tag: <MESSAGES>
@@ -118,7 +118,7 @@ object CompilerOutputParser {
             }
         }
 
-        @Throws(SAXException::class)
+        @kotlin.jvm.Throws(SAXException::class)
         override fun endElement(uri: String?, localName: String, qName: String) {
             if (tags.size == 1) {
                 // We're directly inside the root tag: <MESSAGES>

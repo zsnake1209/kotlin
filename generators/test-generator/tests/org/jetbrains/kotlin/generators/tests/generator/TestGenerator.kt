@@ -48,7 +48,7 @@ class TestGenerator(
         }
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     fun generateAndSave() {
         val out = StringBuilder()
         val p = Printer(out)

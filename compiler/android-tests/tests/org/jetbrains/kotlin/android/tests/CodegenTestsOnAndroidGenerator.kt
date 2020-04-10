@@ -200,7 +200,7 @@ class CodegenTestsOnAndroidGenerator private constructor(private val pathManager
         }
     }
 
-    @Throws(IOException::class)
+    @kotlin.jvm.Throws(IOException::class)
     private fun processFiles(
         files: Array<File>,
         holders: MutableMap<ConfigurationKey, FilesWriter>
@@ -290,7 +290,7 @@ class CodegenTestsOnAndroidGenerator private constructor(private val pathManager
 
         @JvmOverloads
         @JvmStatic
-        @Throws(Throwable::class)
+        @kotlin.jvm.Throws(Throwable::class)
         fun generate(pathManager: PathManager, skipSdkDirWriting: Boolean = false) {
             CodegenTestsOnAndroidGenerator(pathManager).prepareAndroidModuleAndGenerateTests(skipSdkDirWriting)
         }
@@ -299,7 +299,7 @@ class CodegenTestsOnAndroidGenerator private constructor(private val pathManager
             return text.contains("fun box()")
         }
 
-        @Throws(IOException::class)
+        @kotlin.jvm.Throws(IOException::class)
         internal fun writeAndroidSkdToLocalProperties(pathManager: PathManager) {
             val sdkRoot = KotlinTestUtils.getAndroidSdkSystemIndependentPath()
             println("Writing android sdk to local.properties: $sdkRoot")
