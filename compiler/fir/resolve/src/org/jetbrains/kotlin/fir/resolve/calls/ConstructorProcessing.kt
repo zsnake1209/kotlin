@@ -117,8 +117,9 @@ private fun FirTypeAliasSymbol.findSAMConstructorForTypeAlias(
         session
     ) { newReturnType, newParameterTypes, newTypeParameters ->
         FirClassSubstitutionScope.createFakeOverrideFunction(
-            session, this, namedSymbol, null,
-            newReturnType, newParameterTypes, newTypeParameters
+            session, this, namedSymbol,
+            FirClassSubstitutionScope.FakeOverrideElements(returnType = newReturnType, typeParameters = newTypeParameters),
+            newParameterTypes
         ).fir
     } ?: return null
 

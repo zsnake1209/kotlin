@@ -97,34 +97,51 @@ class FirClassSubstitutionScope(
         return substitutor.substituteOrNull(this)
     }
 
+    class FakeOverrideElements(
+        val typeParameters: List<FirTypeParameter> = emptyList(),
+        val substitutor: ConeSubstitutor = ConeSubstitutor.Empty,
+        val receiverType: ConeKotlinType? = null,
+        val returnType: ConeKotlinType? = null
+    ) {
+        fun isRedundant(originalTypeParameters: List<FirTypeParameter>): Boolean {
+            return receiverType == null && returnType == null && typeParameters === originalTypeParameters
+        }
+    }
+
+    private fun createFakeOverrideElementsByCallableMember(
+        callableMember: FirCallableMemberDeclaration<*>
+    ): FakeOverrideElements? {
+        if (substitutor == ConeSubstitutor.Empty) return null
+        if (skipPrivateMembers && callableMember.visibility == Visibilities.PRIVATE) return null
+
+        val (newTypeParameters, newSubstitutor) = createNewTypeParametersAndSubstitutor(callableMember)
+
+        val receiverType = callableMember.receiverTypeRef?.coneTypeUnsafe<ConeKotlinType>()
+        val newReceiverType = receiverType?.substitute(newSubstitutor)
+
+        val returnType = typeCalculator.tryCalculateReturnType(callableMember).type
+        val newReturnType = returnType.substitute(newSubstitutor)
+        return FakeOverrideElements(newTypeParameters, newSubstitutor, newReceiverType, newReturnType)
+    }
+
     private fun createFakeOverrideFunction(original: FirFunctionSymbol<*>): FirFunctionSymbol<*> {
-        if (substitutor == ConeSubstitutor.Empty) return original
         val member = when (original) {
             is FirNamedFunctionSymbol -> original.fir
             is FirConstructorSymbol -> return original
             else -> throw AssertionError("Should not be here")
         }
-        if (skipPrivateMembers && member.visibility == Visibilities.PRIVATE) return original
-
-        val (newTypeParameters, newSubstitutor) = createNewTypeParametersAndSubstitutor(member)
-
-        val receiverType = member.receiverTypeRef?.coneTypeUnsafe<ConeKotlinType>()
-        val newReceiverType = receiverType?.substitute(newSubstitutor)
-
-        val returnType = typeCalculator.tryCalculateReturnType(member).type
-        val newReturnType = returnType.substitute(newSubstitutor)
+        val fakeOverrideElements = createFakeOverrideElementsByCallableMember(member) ?: return original
 
         val newParameterTypes = member.valueParameters.map {
-            it.returnTypeRef.coneTypeUnsafe<ConeKotlinType>().substitute(newSubstitutor)
+            it.returnTypeRef.coneTypeUnsafe<ConeKotlinType>().substitute(fakeOverrideElements.substitutor)
         }
 
-        if (newReceiverType == null && newReturnType == null && newParameterTypes.all { it == null } &&
-            newTypeParameters === member.typeParameters) {
+        if (fakeOverrideElements.isRedundant(member.typeParameters) && newParameterTypes.all { it == null }) {
             return original
         }
 
         return createFakeOverrideFunction(
-            session, member, original, newReceiverType, newReturnType, newParameterTypes, newTypeParameters, derivedClassId
+            session, member, original, fakeOverrideElements, newParameterTypes, derivedClassId
         )
     }
 
@@ -164,25 +181,13 @@ class FirClassSubstitutionScope(
     }
 
     private fun createFakeOverrideProperty(original: FirPropertySymbol): FirPropertySymbol {
-        if (substitutor == ConeSubstitutor.Empty) return original
         val member = original.fir
-        if (skipPrivateMembers && member.visibility == Visibilities.PRIVATE) return original
-
-        val (newTypeParameters, newSubstitutor) = createNewTypeParametersAndSubstitutor(member)
-
-        val receiverType = member.receiverTypeRef?.coneTypeUnsafe<ConeKotlinType>()
-        val newReceiverType = receiverType?.substitute(newSubstitutor)
-
-        val returnType = typeCalculator.tryCalculateReturnType(member).type
-        val newReturnType = returnType.substitute(newSubstitutor)
-
-        if (newReceiverType == null &&
-            newReturnType == null && newTypeParameters === member.typeParameters
-        ) {
+        val fakeOverrideElements = createFakeOverrideElementsByCallableMember(member) ?: return original
+        if (fakeOverrideElements.isRedundant(member.typeParameters)) {
             return original
         }
 
-        return createFakeOverrideProperty(session, member, original, newReceiverType, newReturnType, newTypeParameters, derivedClassId)
+        return createFakeOverrideProperty(session, member, original, fakeOverrideElements, derivedClassId)
     }
 
     private fun createFakeOverrideField(original: FirFieldSymbol): FirFieldSymbol {
@@ -232,18 +237,16 @@ class FirClassSubstitutionScope(
             fakeOverrideSymbol: FirFunctionSymbol<FirSimpleFunction>,
             session: FirSession,
             baseFunction: FirSimpleFunction,
-            newReceiverType: ConeKotlinType? = null,
-            newReturnType: ConeKotlinType? = null,
+            fakeOverrideElements: FakeOverrideElements? = null,
             newParameterTypes: List<ConeKotlinType?>? = null,
-            newTypeParameters: List<FirTypeParameter>? = null
         ): FirSimpleFunction {
             // TODO: consider using here some light-weight functions instead of pseudo-real FirMemberFunctionImpl
             // As second alternative, we can invent some light-weight kind of FirRegularClass
             return buildSimpleFunction {
                 source = baseFunction.source
                 this.session = session
-                returnTypeRef = baseFunction.returnTypeRef.withReplacedReturnType(newReturnType)
-                receiverTypeRef = baseFunction.receiverTypeRef?.withReplacedConeType(newReceiverType)
+                returnTypeRef = baseFunction.returnTypeRef.withReplacedReturnType(fakeOverrideElements?.returnType)
+                receiverTypeRef = baseFunction.receiverTypeRef?.withReplacedConeType(fakeOverrideElements?.receiverType)
                 name = baseFunction.name
                 status = baseFunction.status
                 symbol = fakeOverrideSymbol
@@ -265,7 +268,7 @@ class FirClassSubstitutionScope(
                     }
                 }
 
-                typeParameters += newTypeParameters ?: baseFunction.typeParameters.map { it.copyToBuilder().build() }
+                typeParameters += fakeOverrideElements?.typeParameters ?: baseFunction.typeParameters.map { it.copyToBuilder().build() }
             }
 
         }
@@ -274,10 +277,8 @@ class FirClassSubstitutionScope(
             session: FirSession,
             baseFunction: FirSimpleFunction,
             baseSymbol: FirNamedFunctionSymbol,
-            newReceiverType: ConeKotlinType? = null,
-            newReturnType: ConeKotlinType? = null,
+            fakeOverrideElements: FakeOverrideElements? = null,
             newParameterTypes: List<ConeKotlinType?>? = null,
-            newTypeParameters: List<FirTypeParameter>? = null,
             derivedClassId: ClassId? = null
         ): FirNamedFunctionSymbol {
             val symbol = FirNamedFunctionSymbol(
@@ -285,7 +286,7 @@ class FirClassSubstitutionScope(
                 isFakeOverride = true, overriddenSymbol = baseSymbol
             )
             createFakeOverrideFunction(
-                symbol, session, baseFunction, newReceiverType, newReturnType, newParameterTypes, newTypeParameters
+                symbol, session, baseFunction, fakeOverrideElements, newParameterTypes
             )
             return symbol
         }
@@ -294,9 +295,7 @@ class FirClassSubstitutionScope(
             session: FirSession,
             baseProperty: FirProperty,
             baseSymbol: FirPropertySymbol,
-            newReceiverType: ConeKotlinType? = null,
-            newReturnType: ConeKotlinType? = null,
-            newTypeParameters: List<FirTypeParameter>? = null,
+            fakeOverrideElements: FakeOverrideElements? = null,
             derivedClassId: ClassId? = null
         ): FirPropertySymbol {
             val symbol = FirPropertySymbol(
@@ -306,8 +305,8 @@ class FirClassSubstitutionScope(
             buildProperty {
                 source = baseProperty.source
                 this.session = session
-                returnTypeRef = baseProperty.returnTypeRef.withReplacedReturnType(newReturnType)
-                receiverTypeRef = baseProperty.receiverTypeRef?.withReplacedConeType(newReceiverType)
+                returnTypeRef = baseProperty.returnTypeRef.withReplacedReturnType(fakeOverrideElements?.returnType)
+                receiverTypeRef = baseProperty.receiverTypeRef?.withReplacedConeType(fakeOverrideElements?.receiverType)
                 name = baseProperty.name
                 isVar = baseProperty.isVar
                 this.symbol = symbol
@@ -315,7 +314,7 @@ class FirClassSubstitutionScope(
                 status = baseProperty.status
                 resolvePhase = baseProperty.resolvePhase
                 annotations += baseProperty.annotations
-                typeParameters += newTypeParameters ?: baseProperty.typeParameters.map { it.copyToBuilder().build() }
+                typeParameters += fakeOverrideElements?.typeParameters ?: baseProperty.typeParameters.map { it.copyToBuilder().build() }
             }
             return symbol
         }
@@ -353,7 +352,7 @@ class FirClassSubstitutionScope(
         ): FirAccessorSymbol {
             val functionSymbol = FirNamedFunctionSymbol(baseSymbol.accessorId)
             val function = createFakeOverrideFunction(
-                functionSymbol, session, baseProperty.getter.delegate, null, newReturnType, newParameterTypes
+                functionSymbol, session, baseProperty.getter.delegate, FakeOverrideElements(returnType = newReturnType), newParameterTypes
             )
             return buildSyntheticProperty {
                 this.session = session
