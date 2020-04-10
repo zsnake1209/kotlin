@@ -88,7 +88,6 @@ interface IrBuilderExtension {
 
     fun IrClass.contributeFunction(
         descriptor: FunctionDescriptor,
-        declareNew: Boolean = false,
         bodyGen: IrBlockBodyBuilder.(IrFunction) -> Unit
     ) {
         val f: IrSimpleFunction = declareSimpleFunctionWithExternalOverrides(descriptor)
