@@ -29,7 +29,8 @@ abstract class IrBindableSymbolBase<out D : DeclarationDescriptor, B : IrSymbolO
     IrBindableSymbol<D, B>, IrSymbolBase<D>(descriptor, uniqId) {
 
     init {
-	// TODO: This was commented before by google, if this fails, try commenting it out again.
+	    // Commented out because Compose violates these assertions, TODO: reconcile upstream.
+        /*
         assert(isOriginalDescriptor(descriptor)) {
             "Substituted descriptor $descriptor for ${descriptor.original}"
         }
@@ -39,6 +40,7 @@ abstract class IrBindableSymbolBase<out D : DeclarationDescriptor, B : IrSymbolO
                 "Substituted containing declaration: $containingDeclaration\nfor descriptor: $descriptor"
             }
         }
+         */
     }
 
     private fun isOriginalDescriptor(descriptor: DeclarationDescriptor): Boolean =
