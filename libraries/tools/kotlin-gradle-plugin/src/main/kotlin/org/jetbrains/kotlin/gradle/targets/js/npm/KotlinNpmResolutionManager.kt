@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.resolver.KotlinCompilationNpmR
 import org.jetbrains.kotlin.gradle.targets.js.npm.resolver.KotlinProjectNpmResolver
 import org.jetbrains.kotlin.gradle.targets.js.npm.resolver.KotlinRootNpmResolver
 import org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinPackageJsonTask
-import java.io.File
 
 /**
  * # NPM resolution state manager
@@ -98,9 +97,6 @@ class KotlinNpmResolutionManager(private val nodeJsSettings: NodeJsRootExtension
 
     internal fun requireAlreadyInstalled(project: Project, reason: String = ""): KotlinProjectNpmResolution =
         installIfNeeded(requireUpToDateReason = reason)[project]
-
-    internal val packageJsonFiles: Collection<File>
-        get() = (state as ResolutionState.Configuring).resolver.compilations.map { it.npmProject.packageJsonFile }
 
     /**
      * @param requireUpToDateReason Check that project already resolved,
