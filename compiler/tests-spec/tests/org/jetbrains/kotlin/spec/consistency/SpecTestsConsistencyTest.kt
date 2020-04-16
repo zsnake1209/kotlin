@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.spec.utils.spec.SpecSentencesStorage
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
-import kotlin.io.walkTopDown
 
 @TestDataPath("\$PROJECT_ROOT/compiler/tests-spec/testData/")
 @RunWith(com.intellij.testFramework.Parameterized::class)
@@ -55,26 +54,28 @@ class SpecTestsConsistencyTest : TestCase() {
         val file = File("${GeneralConfiguration.SPEC_TESTDATA_PATH}/${testFilePath.replace("$", "/")}")
         val specSentences = specSentencesStorage.getLatest() ?: return
         val test = parseLinkedSpecTest(file.canonicalPath, mapOf("main" to file.readText()))
-        val sectionsPath = setOf(*test.place.sections.toTypedArray(), test.place.paragraphNumber).joinToString()
-        val sentenceNumber = test.place.sentenceNumber
-        val paragraphSentences = specSentences[sectionsPath]
+        if (test.mainLink != null) { //todo add check for relevant links also
+            val sectionsPath = setOf(*test.mainLink.sections.toTypedArray(), test.mainLink.paragraphNumber).joinToString()
+            val sentenceNumber = test.mainLink.sentenceNumber
+            val paragraphSentences = specSentences[sectionsPath]
 
-        if (paragraphSentences != null && paragraphSentences.size >= sentenceNumber) {
-            val specSentencesForCurrentTest =
-                specSentencesStorage[test.specVersion] ?: throw Exception("spec ${test.specVersion} not found")
-            val paragraphForTestSentences =
-                specSentencesForCurrentTest[sectionsPath] ?: throw Exception("$sectionsPath not found")
-            if (paragraphForTestSentences.size < sentenceNumber) {
-                fail("Sentence #$sentenceNumber not found (${file.path})")
+            if (paragraphSentences != null && paragraphSentences.size >= sentenceNumber) {
+                val specSentencesForCurrentTest =
+                    specSentencesStorage[test.specVersion] ?: throw Exception("spec ${test.specVersion} not found")
+                val paragraphForTestSentences =
+                    specSentencesForCurrentTest[sectionsPath] ?: throw Exception("$sectionsPath not found")
+                if (paragraphForTestSentences.size < sentenceNumber) {
+                    fail("Sentence #$sentenceNumber not found (${file.path})")
+                }
+                val expectedSentence = paragraphForTestSentences[sentenceNumber - 1]
+                val actualSentence = paragraphSentences[sentenceNumber - 1]
+                val locationSentenceText = "$sectionsPath paragraph, $sentenceNumber sentence"
+
+                println("Comparing versions: ${test.specVersion} (for expected) and ${specSentencesStorage.latestSpecVersion} (for actual)")
+                println("Expected location: $locationSentenceText")
+
+                assertEquals(expectedSentence, actualSentence)
             }
-            val expectedSentence = paragraphForTestSentences[sentenceNumber - 1]
-            val actualSentence = paragraphSentences[sentenceNumber - 1]
-            val locationSentenceText = "$sectionsPath paragraph, $sentenceNumber sentence"
-
-            println("Comparing versions: ${test.specVersion} (for expected) and ${specSentencesStorage.latestSpecVersion} (for actual)")
-            println("Expected location: $locationSentenceText")
-
-            assertEquals(expectedSentence, actualSentence)
         }
     }
 }
