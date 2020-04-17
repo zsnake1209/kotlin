@@ -92,6 +92,7 @@ class Psi2IrTranslator(
     }
 
     private fun postprocess(context: GeneratorContext, irElement: IrModuleFragment) {
+        generateSyntheticDeclarations(irElement, context)
         insertImplicitCasts(irElement, context)
         generateAnnotationsForDeclarations(context, irElement)
 
@@ -101,5 +102,10 @@ class Psi2IrTranslator(
     private fun generateAnnotationsForDeclarations(context: GeneratorContext, irElement: IrElement) {
         val annotationGenerator = AnnotationGenerator(context)
         irElement.acceptVoid(annotationGenerator)
+    }
+
+    private fun generateSyntheticDeclarations(moduleFragment: IrModuleFragment, context: GeneratorContext) {
+        val generator = SyntheticDeclarationsGenerator(moduleFragment, context)
+        moduleFragment.files.forEach { it.symbol.descriptor.accept(generator, null) }
     }
 }
