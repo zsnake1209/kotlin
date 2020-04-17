@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.backend.jvm.codegen
 
+import org.jetbrains.kotlin.backend.common.ir.ir2string
 import org.jetbrains.kotlin.backend.common.ir.isMethodOfAny
 import org.jetbrains.kotlin.backend.common.ir.isTopLevel
 import org.jetbrains.kotlin.backend.common.lower.allOverridden
@@ -12,12 +13,10 @@ import org.jetbrains.kotlin.backend.common.lower.parentsWithSelf
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.ir.getJvmNameFromAnnotation
-import org.jetbrains.kotlin.backend.jvm.ir.hasJvmDefault
 import org.jetbrains.kotlin.backend.jvm.ir.isCompiledToJvmDefault
 import org.jetbrains.kotlin.backend.jvm.ir.propertyIfAccessor
 import org.jetbrains.kotlin.backend.jvm.lower.*
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.codegen.JvmCodegenUtil
 import org.jetbrains.kotlin.codegen.replaceValueParametersIn
 import org.jetbrains.kotlin.codegen.signature.BothSignatureWriter
@@ -350,19 +349,33 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
 
     // Copied from KotlinTypeMapper.findSuperDeclaration.
     private fun findSuperDeclaration(function: IrSimpleFunction, isSuperCall: Boolean): IrSimpleFunction {
+        //NB: we also can try to generate non-super virtual calls to most specific (possibly abstract) declaration
+        val mostSpecificDeclarationForSuperCall = if (isSuperCall) {
+            function.resolveFakeOverride()?.also {
+                // If most specific overrides declared in class return it otherwise it could be more specific synthetic override...
+                if (!it.parentAsClass.isJvmInterface) return it
+                //...if there is no additional synthetic override in class return most specific declaration as is...
+                if (it.isMethodOfAny() || it.isCompiledToJvmDefault(context.state.jvmDefaultMode)) return it
+                //..otherwise we should try to find this synthetic override...
+            }
+        } else null
+
         var current = function
         while (current.isFakeOverride) {
             // TODO: probably isJvmInterface instead of isInterface, here and in KotlinTypeMapper
             val classCallable = current.overriddenSymbols.firstOrNull { !it.owner.parentAsClass.isInterface }?.owner
-            if (classCallable != null) {
+            if (classCallable != null && (!isSuperCall || classCallable.overrides(
+                    mostSpecificDeclarationForSuperCall
+                        ?: error("More specific non-abstract declaration for super call doesn't exists for ${ir2string(function)}")
+                ))
+            ) {
                 current = classCallable
                 continue
             }
-            if (isSuperCall && !current.parentAsClass.isInterface &&
-                current.resolveFakeOverride()?.run {
-                    isMethodOfAny() || !isCompiledToJvmDefault(context.state.jvmDefaultMode)
-                } == true
-            ) {
+
+            if (isSuperCall && !current.parentAsClass.isInterface) {
+                //..overrides for most specific declaration doesn't come from super class so it comes from one of super interfaces.
+                // This means there would be synthetic declaration in class for `current`
                 return current
             }
 
