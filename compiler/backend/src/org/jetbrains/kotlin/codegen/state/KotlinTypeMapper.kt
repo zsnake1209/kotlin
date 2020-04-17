@@ -460,8 +460,8 @@ class KotlinTypeMapper @JvmOverloads constructor(
                     (declarationFunctionDescriptor.isCompiledToJvmDefault(jvmDefaultMode) && !isAccessor(descriptor))
                 ) {
                     invokeOpcode = INVOKESPECIAL
-                    signature = mapSignatureSkipGeneric(functionDescriptor)
-                    returnKotlinType = functionDescriptor.returnType
+                    signature = mapSignatureSkipGeneric(functionDescriptor.original)
+                    returnKotlinType = functionDescriptor.original.returnType
                     owner = thisClass
                     isInterfaceMember = true
                 } else {
