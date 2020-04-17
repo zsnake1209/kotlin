@@ -116,6 +116,24 @@ open class SymbolTable(val signaturer: IdSignatureComposer) : ReferenceSymbolTab
             return createOwner(symbol)
         }
 
+        inline fun declareIfNotExists(d: D, createSymbol: () -> S, createOwner: (S) -> B): B {
+            @Suppress("UNCHECKED_CAST")
+            val d0 = d.original as D
+            assert(d0 === d) {
+                "Non-original descriptor in declaration: $d\n\tExpected: $d0"
+            }
+            val existing = get(d0)
+            val symbol = if (existing == null) {
+                val new = createSymbol()
+                set(d0, new)
+                new
+            } else {
+                if (!existing.isBound) unboundSymbols.remove(existing)
+                existing
+            }
+            return if (symbol.isBound) symbol.owner else createOwner(symbol)
+        }
+
         inline fun declare(sig: IdSignature, d: D, createSymbol: () -> S, createOwner: (S) -> B): B {
             @Suppress("UNCHECKED_CAST")
             val d0 = d.original as D
@@ -381,6 +399,10 @@ open class SymbolTable(val signaturer: IdSignatureComposer) : ReferenceSymbolTab
         )
     }
 
+    fun declareClassIfNotExists(descriptor: ClassDescriptor, classFactory: (IrClassSymbol) -> IrClass): IrClass {
+        return classSymbolTable.declareIfNotExists(descriptor, { createClassSymbol(descriptor) }, classFactory)
+    }
+
     fun declareClassFromLinker(descriptor: ClassDescriptor, sig: IdSignature, factory: (IrClassSymbol) -> IrClass): IrClass {
         return classSymbolTable.run {
             if (sig.isPublic) {
@@ -425,6 +447,13 @@ open class SymbolTable(val signaturer: IdSignatureComposer) : ReferenceSymbolTab
             constructorFactory
         )
 
+    fun declareConstructorIfNotExists(descriptor: ClassConstructorDescriptor, constructorFactory: (IrConstructorSymbol) -> IrConstructor): IrConstructor =
+        constructorSymbolTable.declareIfNotExists(
+            descriptor,
+            { createConstructorSymbol(descriptor) },
+            constructorFactory
+        )
+
     override fun referenceConstructor(descriptor: ClassConstructorDescriptor) =
         constructorSymbolTable.referenced(descriptor) { createConstructorSymbol(descriptor) }
 
@@ -464,6 +493,10 @@ open class SymbolTable(val signaturer: IdSignatureComposer) : ReferenceSymbolTab
             { createEnumEntrySymbol(descriptor) },
             factory
         )
+
+    fun declareEnumEntryIfNotExists(descriptor: ClassDescriptor, factory: (IrEnumEntrySymbol) -> IrEnumEntry): IrEnumEntry {
+        return enumEntrySymbolTable.declareIfNotExists(descriptor, { createEnumEntrySymbol(descriptor) }, factory)
+    }
 
     fun declareEnumEntryFromLinker(
         descriptor: ClassDescriptor,
@@ -574,6 +607,9 @@ open class SymbolTable(val signaturer: IdSignatureComposer) : ReferenceSymbolTab
             propertyFactory
         )
 
+    fun declarePropertyIfNotExists(descriptor: PropertyDescriptor, propertyFactory: (IrPropertySymbol) -> IrProperty): IrProperty =
+        propertySymbolTable.declareIfNotExists(descriptor, { createPropertySymbol(descriptor) }, propertyFactory)
+
     fun declarePropertyFromLinker(descriptor: PropertyDescriptor, sig: IdSignature, factory: (IrPropertySymbol) -> IrProperty): IrProperty {
         return propertySymbolTable.run {
             if (sig.isPublic) {
@@ -627,6 +663,9 @@ open class SymbolTable(val signaturer: IdSignatureComposer) : ReferenceSymbolTab
     fun declareTypeAlias(descriptor: TypeAliasDescriptor, factory: (IrTypeAliasSymbol) -> IrTypeAlias): IrTypeAlias =
         typeAliasSymbolTable.declare(descriptor, { createTypeAliasSymbol(descriptor) }, factory)
 
+    fun declareTypeAliasIfNotExists(descriptor: TypeAliasDescriptor, factory: (IrTypeAliasSymbol) -> IrTypeAlias): IrTypeAlias =
+        typeAliasSymbolTable.declareIfNotExists(descriptor, { createTypeAliasSymbol(descriptor) }, factory)
+
     val unboundTypeAliases: Set<IrTypeAliasSymbol> get() = typeAliasSymbolTable.unboundSymbols
 
     private fun createSimpleFunctionSymbol(descriptor: FunctionDescriptor): IrSimpleFunctionSymbol {
@@ -650,6 +689,13 @@ open class SymbolTable(val signaturer: IdSignatureComposer) : ReferenceSymbolTab
             { createSimpleFunctionSymbol(descriptor) },
             functionFactory
         )
+    }
+
+    fun declareSimpleFunctionIfNotExists(
+        descriptor: FunctionDescriptor,
+        functionFactory: (IrSimpleFunctionSymbol) -> IrSimpleFunction
+    ): IrSimpleFunction {
+        return simpleFunctionSymbolTable.declareIfNotExists(descriptor, { createSimpleFunctionSymbol(descriptor) }, functionFactory)
     }
 
     fun declareSimpleFunctionFromLinker(
