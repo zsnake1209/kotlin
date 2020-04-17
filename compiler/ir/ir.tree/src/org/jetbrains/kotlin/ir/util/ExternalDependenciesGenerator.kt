@@ -43,40 +43,43 @@ class ExternalDependenciesGenerator(
             Deserializing a reference may lead to new unbound references, so we loop until none are left.
          */
         lateinit var unbound: List<IrSymbol>
+        var changed: Boolean
         do {
             unbound = symbolTable.allUnbound
+            changed = false
 
             for (symbol in unbound) {
                 // Symbol could get bound as a side effect of deserializing other symbols.
                 if (!symbol.isBound) {
                     irProviders.getDeclaration(symbol)
+                    changed = changed || symbol.isBound
                 }
-                assert(symbol.isBound) { "$symbol unbound even after deserialization attempt" }
+//                assert(symbol.isBound) { "$symbol unbound even after deserialization attempt" }
             }
-        } while (unbound.isNotEmpty())
+        } while (unbound.isNotEmpty() && changed)
     }
 
-    private val SymbolTable.allUnbound: List<IrSymbol>
-        get() {
-            val r = mutableListOf<IrSymbol>()
-            r.addAll(unboundClasses)
-            r.addAll(unboundConstructors)
-            r.addAll(unboundEnumEntries)
-            r.addAll(unboundFields)
-            r.addAll(unboundSimpleFunctions)
-            r.addAll(unboundProperties)
-            r.addAll(unboundTypeAliases)
-            if (!languageVersionSettings.supportsFeature(LanguageFeature.NewInference)) {
-                r.addAll(unboundTypeParameters)
-            }
-            return r
-        }
+//    private val SymbolTable.allUnbound: List<IrSymbol>
+//        get() {
+//            val r = mutableListOf<IrSymbol>()
+//            r.addAll(unboundClasses)
+//            r.addAll(unboundConstructors)
+//            r.addAll(unboundEnumEntries)
+//            r.addAll(unboundFields)
+//            r.addAll(unboundSimpleFunctions)
+//            r.addAll(unboundProperties)
+//            r.addAll(unboundTypeAliases)
+//            if (!languageVersionSettings.supportsFeature(LanguageFeature.NewInference)) {
+//                r.addAll(unboundTypeParameters)
+//            }
+//            return r
+//        }
 }
 
-fun List<IrProvider>.getDeclaration(symbol: IrSymbol): IrDeclaration =
+fun List<IrProvider>.getDeclaration(symbol: IrSymbol): IrDeclaration? =
     firstNotNullResult { provider ->
         provider.getDeclaration(symbol)
-    } ?: error("Could not find declaration for unbound symbol $symbol")
+    } //?: error("Could not find declaration for unbound symbol $symbol")
 
 // In most cases, IrProviders list consist of an optional deserializer and a DeclarationStubGenerator.
 fun generateTypicalIrProviderList(

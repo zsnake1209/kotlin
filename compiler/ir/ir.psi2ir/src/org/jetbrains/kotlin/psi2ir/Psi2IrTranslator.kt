@@ -81,13 +81,16 @@ class Psi2IrTranslator(
 
         irModule.patchDeclarationParents()
         expectDescriptorToSymbol?.let { referenceExpectsForUsedActuals(it, context.symbolTable, irModule) }
-        postprocess(context, irModule)
+        postprocess(context, irModule, pluginExtensions)
 
         irProviders.filterIsInstance<IrDeserializer>().forEach { it.init(irModule, pluginExtensions) }
 
         moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
 
+        // TODO WIP: set stub generator here
+//        assert(context.symbolTable.allUnbound.isEmpty())
         postprocessingSteps.forEach { it.invoke(irModule) }
+//        assert(context.symbolTable.allUnbound.isEmpty())
 
         // TODO: remove it once plugin API improved
         moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
@@ -95,7 +98,8 @@ class Psi2IrTranslator(
         return irModule
     }
 
-    private fun postprocess(context: GeneratorContext, irElement: IrModuleFragment) {
+    private fun postprocess(context: GeneratorContext, irElement: IrModuleFragment, plugins: Collection<IrExtensionGenerator>) {
+        generateSyntheticDeclarations(irElement, context, plugins)
         insertImplicitCasts(irElement, context)
         generateAnnotationsForDeclarations(context, irElement)
 
@@ -105,5 +109,10 @@ class Psi2IrTranslator(
     private fun generateAnnotationsForDeclarations(context: GeneratorContext, irElement: IrElement) {
         val annotationGenerator = AnnotationGenerator(context)
         irElement.acceptVoid(annotationGenerator)
+    }
+
+    private fun generateSyntheticDeclarations(moduleFragment: IrModuleFragment, context: GeneratorContext, plugins: Collection<IrExtensionGenerator>) {
+        val generator = SyntheticDeclarationsGenerator(moduleFragment, context, plugins)
+        moduleFragment.files.forEach { it.symbol.descriptor.accept(generator, null) }
     }
 }
