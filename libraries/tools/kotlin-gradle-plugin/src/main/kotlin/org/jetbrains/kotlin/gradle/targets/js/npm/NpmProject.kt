@@ -70,6 +70,9 @@ open class NpmProject(val compilation: KotlinJsCompilation) {
             .resolve(PublishingPackageJsonTask.NAME)
             .resolve(PACKAGE_JSON)
 
+    val publishingPackageJsonTaskName: String
+        get() = compilation.disambiguateName(PublishingPackageJsonTask.NAME)
+
     internal val modules = NpmProjectModules(dir)
 
     private val rootNodeModules: NpmProjectModules?

@@ -6,11 +6,17 @@
 package org.jetbrains.kotlin.gradle.targets.js.npm
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.targets.js.npm.resolved.KotlinCompilationNpmResolution
 import java.io.File
+import javax.inject.Inject
 
-open class PublishingPackageJsonTask(
+open class PublishingPackageJsonTask
+@Inject
+constructor(
     private val compilationResolution: KotlinCompilationNpmResolution
 ) : DefaultTask() {
 
@@ -27,7 +33,6 @@ open class PublishingPackageJsonTask(
                 )
             }
 
-    @get:Internal
     private val realExternalDependencies: Collection<NpmDependency>
         get() = compilationResolution.externalNpmDependencies
 
