@@ -39,6 +39,7 @@ object JvmBackendFacade {
         val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = extensions)
         val pluginExtensions = IrGenerationExtension.getInstances(state.project)
         val functionFactory = IrFunctionFactory(psi2irContext.irBuiltIns, psi2irContext.symbolTable)
+        psi2irContext.irBuiltIns.functionFactory = functionFactory
 
         for (extension in pluginExtensions) {
             psi2ir.addPostprocessingStep { module ->
