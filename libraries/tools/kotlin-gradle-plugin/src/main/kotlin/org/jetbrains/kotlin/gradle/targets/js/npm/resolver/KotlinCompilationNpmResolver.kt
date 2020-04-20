@@ -14,6 +14,8 @@ import org.gradle.api.initialization.IncludedBuild
 import org.gradle.api.internal.artifacts.DefaultProjectComponentIdentifier
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
@@ -25,6 +27,7 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.NpmProject.Companion.PACKAGE_J
 import org.jetbrains.kotlin.gradle.targets.js.npm.plugins.CompilationResolverPlugin
 import org.jetbrains.kotlin.gradle.targets.js.npm.resolved.KotlinCompilationNpmResolution
 import org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinPackageJsonTask
+import org.jetbrains.kotlin.gradle.tasks.registerTask
 import org.jetbrains.kotlin.gradle.utils.CompositeProjectComponentArtifactMetadata
 import org.jetbrains.kotlin.gradle.utils.`is`
 import org.jetbrains.kotlin.gradle.utils.topRealPath
@@ -44,6 +47,23 @@ internal class KotlinCompilationNpmResolver(
     val target get() = compilation.target
     val project get() = target.project
     val packageJsonTaskHolder = KotlinPackageJsonTask.create(compilation)
+
+    val publishingPackageJsonTaskHolder: TaskProvider<PublishingPackageJsonTask> =
+        project.registerTask<PublishingPackageJsonTask>(
+            npmProject.publishingPackageJsonTaskName,
+            listOf(nodeJs, npmProject)
+        ) {
+            it.dependsOn(nodeJs.npmInstallTask)
+            it.dependsOn(packageJsonTaskHolder)
+        }.also { packageJsonTask ->
+            project.tasks
+                .withType(Zip::class.java)
+                .named(npmProject.target.artifactsTaskName)
+                .configure {
+                    it.from(packageJsonTask)
+                }
+        }
+
     val plugins: List<CompilationResolverPlugin> = projectResolver.resolver.plugins.flatMap {
         it.createCompilationResolverPlugins(this)
     }

@@ -6,10 +6,10 @@
 package org.jetbrains.kotlin.gradle.targets.js.npm.resolved
 
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.bundling.Zip
-import org.jetbrains.kotlin.gradle.targets.js.npm.*
-import org.jetbrains.kotlin.gradle.tasks.registerTask
+import org.jetbrains.kotlin.gradle.targets.js.npm.GradleNodeModule
+import org.jetbrains.kotlin.gradle.targets.js.npm.NpmDependency
+import org.jetbrains.kotlin.gradle.targets.js.npm.NpmProject
+import org.jetbrains.kotlin.gradle.targets.js.npm.PackageJson
 
 /**
  * Resolved [NpmProject]
@@ -22,18 +22,4 @@ class KotlinCompilationNpmResolution(
     val externalGradleDependencies: Collection<GradleNodeModule>,
     val externalNpmDependencies: Collection<NpmDependency>,
     val packageJson: PackageJson
-) {
-    val publishingPackageJsonTaskHolder: TaskProvider<PublishingPackageJsonTask> =
-        project.registerTask<PublishingPackageJsonTask>(
-            npmProject.publishingPackageJsonTaskName,
-            listOf(this)
-        ) {
-        }.also { packageJsonTask ->
-            project.tasks
-                .withType(Zip::class.java)
-                .named(npmProject.target.artifactsTaskName)
-                .configure {
-                    it.from(packageJsonTask)
-                }
-        }
-}
+)
