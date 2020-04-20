@@ -51,6 +51,12 @@ class PackageJson(
     val bundledDependencies = mutableListOf<String>()
         get() = field ?: mutableListOf()
 
+    val allDependencies =
+        devDependencies +
+                dependencies +
+                peerDependencies +
+                optionalDependencies
+
     companion object {
         fun scopedName(name: String): ScopedName = if (name.contains("/")) ScopedName(
             scope = name.substringBeforeLast("/").removePrefix("@"),

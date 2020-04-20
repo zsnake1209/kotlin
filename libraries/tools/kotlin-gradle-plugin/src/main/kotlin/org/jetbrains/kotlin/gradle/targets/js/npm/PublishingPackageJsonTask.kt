@@ -28,13 +28,16 @@ open class PublishingPackageJsonTask(
     val externalDependencies: Collection<String>
         get() = producer.inputs.externalDependencies
 
+    @Input
+    var skipOnEmptyNpmDependencies: Boolean = false
+
     @get:OutputFile
     val packageJson: File
-        get() = compilationResolver.npmProject.packageJsonFile
+        get() = compilationResolver.npmProject.publishingPackageJson
 
     @TaskAction
     fun resolve() {
-        producer.createPublishingPackageJson()
+        producer.createPublishingPackageJson(skipOnEmptyNpmDependencies)
     }
 
     companion object {

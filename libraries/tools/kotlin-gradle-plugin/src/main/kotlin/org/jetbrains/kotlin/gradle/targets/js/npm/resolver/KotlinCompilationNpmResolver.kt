@@ -334,11 +334,14 @@ internal class KotlinCompilationNpmResolver(
             )
         }
 
-        fun createPublishingPackageJson(): File {
-            return packageJsonWithNpmDeps().let { packageJson ->
+        fun createPublishingPackageJson(skipOnEmptyNpmDeps: Boolean) {
+            packageJsonWithNpmDeps().let { packageJson ->
                 val packageJsonFile = npmProject.publishingPackageJson
+                if (skipOnEmptyNpmDeps && packageJson.allDependencies.isEmpty()) {
+                    return
+                }
+
                 packageJson.saveTo(packageJsonFile)
-                packageJsonFile
             }
         }
 
