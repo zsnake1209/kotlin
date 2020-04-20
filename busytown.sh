@@ -92,3 +92,8 @@ rm -rf libraries/tools/kotlin-test-js-runner/node_modules/
 echo "tar'ing result m2.tar"
 tar cf $OUT_DIR/m2.tar -C $OUT_DIR m2
 mv $OUT_DIR/m2.tar $DIST_DIR
+cp -r dist/artifacts/ideaPlugin/Kotlin $OUT_DIR/Kotlin
+tar cf $OUT_DIR/Kotlin.tar -C $OUT_DIR Kotlin
+mv $OUT_DIR/Kotlin.tar $DIST_DIR
+
+
