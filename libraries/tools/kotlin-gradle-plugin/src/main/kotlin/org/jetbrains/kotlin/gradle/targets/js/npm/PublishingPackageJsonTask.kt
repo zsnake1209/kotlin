@@ -6,41 +6,64 @@
 package org.jetbrains.kotlin.gradle.targets.js.npm
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-import org.jetbrains.kotlin.gradle.targets.js.npm.resolver.KotlinCompilationNpmResolver
 import java.io.File
 
 open class PublishingPackageJsonTask(
     private val nodeJs: NodeJsRootExtension,
     private val compilation: KotlinJsCompilation
 ) : DefaultTask() {
-    private val compilationResolver
-        get() = nodeJs.npmResolutionManager.requireConfiguringState()[project][compilation]
+    private val compilationResolution
+        get() = nodeJs.npmResolutionManager.requireInstalled()[project][compilation]
 
-    private val producer: KotlinCompilationNpmResolver.PackageJsonProducer
-        get() = compilationResolver.packageJsonProducer
+    private val npmProject = compilation.npmProject
 
-    @get:Input
-    val externalDependencies: Collection<String>
-        get() = producer.inputs.externalDependencies
+    @get:Nested
+    internal val externalDependencies: Collection<NestedNpmDependency>
+        get() = compilationResolution.externalNpmDependencies
+            .map {
+                NestedNpmDependency(
+                    scope = it.scope,
+                    name = it.name,
+                    version = it.version
+                )
+            }
+
+    @get:Internal
+    private val realExternalDependencies: Collection<NpmDependency>
+        get() = compilationResolution.externalNpmDependencies
 
     @Input
     var skipOnEmptyNpmDependencies: Boolean = false
 
     @get:OutputFile
     val packageJson: File
-        get() = compilationResolver.npmProject.publishingPackageJson
+        get() = compilation.npmProject.publishingPackageJson
 
     @TaskAction
     fun resolve() {
-        producer.createPublishingPackageJson(skipOnEmptyNpmDependencies)
+        packageJsonWithNpmDeps(npmProject, realExternalDependencies).let { packageJson ->
+            val packageJsonFile = npmProject.publishingPackageJson
+            if (skipOnEmptyNpmDependencies && packageJson.allDependencies.isEmpty()) {
+                return
+            }
+
+            packageJson.saveTo(packageJsonFile)
+        }
     }
 
     companion object {
         val NAME = "publishingPackageJson"
     }
 }
+
+internal data class NestedNpmDependency(
+    @Input
+    val scope: NpmDependency.Scope,
+    @Input
+    val name: String,
+    @Input
+    val version: String
+)

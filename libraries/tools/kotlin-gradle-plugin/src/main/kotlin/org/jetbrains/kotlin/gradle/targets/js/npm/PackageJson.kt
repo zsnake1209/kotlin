@@ -87,3 +87,50 @@ fun fromSrcPackageJson(packageJson: File?): PackageJson? =
     packageJson?.reader()?.use {
         Gson().fromJson(it, PackageJson::class.java)
     }
+
+fun packageJsonWithNpmDeps(
+    npmProject: NpmProject,
+    npmDependencies: Collection<NpmDependency>
+): PackageJson {
+    val compilation = npmProject.compilation
+
+    val packageJson = PackageJson(
+        npmProject.name,
+        fixSemver(compilation.target.project.version.toString())
+    )
+
+    packageJson.main = npmProject.main
+
+    val dependencies = mutableMapOf<String, String>()
+
+    npmDependencies.forEach {
+        val module = it.key
+        dependencies[it.key] = chooseVersion(dependencies[module], it.version)
+    }
+
+    npmDependencies.forEach {
+        val dependency = dependencies.getValue(it.key)
+        when (it.scope) {
+            NpmDependency.Scope.NORMAL -> packageJson.dependencies[it.key] = dependency
+            NpmDependency.Scope.DEV -> packageJson.devDependencies[it.key] = dependency
+            NpmDependency.Scope.OPTIONAL -> packageJson.optionalDependencies[it.key] = dependency
+            NpmDependency.Scope.PEER -> packageJson.peerDependencies[it.key] = dependency
+        }
+    }
+
+    compilation.packageJsonHandlers.forEach {
+        it(packageJson)
+    }
+
+    return packageJson
+}
+
+// TODO: real versions conflict resolution
+private fun chooseVersion(oldVersion: String?, newVersion: String): String {
+    // https://yarnpkg.com/lang/en/docs/dependency-versions/#toc-x-ranges
+    if (oldVersion == "*") {
+        return newVersion
+    }
+
+    return oldVersion ?: newVersion
+}

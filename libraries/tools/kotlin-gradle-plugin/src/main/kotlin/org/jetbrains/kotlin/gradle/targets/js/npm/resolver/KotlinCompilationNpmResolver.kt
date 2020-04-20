@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.disambiguateName
 import org.jetbrains.kotlin.gradle.plugin.usesPlatformOf
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.npm.*
-import org.jetbrains.kotlin.gradle.targets.js.npm.NpmDependency.Scope.*
 import org.jetbrains.kotlin.gradle.targets.js.npm.NpmProject.Companion.PACKAGE_JSON
 import org.jetbrains.kotlin.gradle.targets.js.npm.plugins.CompilationResolverPlugin
 import org.jetbrains.kotlin.gradle.targets.js.npm.resolved.KotlinCompilationNpmResolution
@@ -301,7 +300,10 @@ internal class KotlinCompilationNpmResolver(
             }
                 .filterNotNull()
 
-            val packageJson = packageJsonWithNpmDeps()
+            val packageJson = packageJsonWithNpmDeps(
+                npmProject,
+                externalNpmDependencies
+            )
 
             compositeDependencies.forEach {
                 packageJson.dependencies[it.name] = it.version
@@ -334,49 +336,6 @@ internal class KotlinCompilationNpmResolver(
             )
         }
 
-        fun createPublishingPackageJson(skipOnEmptyNpmDeps: Boolean) {
-            packageJsonWithNpmDeps().let { packageJson ->
-                val packageJsonFile = npmProject.publishingPackageJson
-                if (skipOnEmptyNpmDeps && packageJson.allDependencies.isEmpty()) {
-                    return
-                }
-
-                packageJson.saveTo(packageJsonFile)
-            }
-        }
-
-        private fun packageJsonWithNpmDeps(): PackageJson {
-            val packageJson = PackageJson(
-                npmProject.name,
-                fixSemver(project.version.toString())
-            )
-
-            packageJson.main = npmProject.main
-
-            val dependencies = mutableMapOf<String, String>()
-
-            externalNpmDependencies.forEach {
-                val module = it.key
-                dependencies[it.key] = chooseVersion(dependencies[module], it.version)
-            }
-
-            externalNpmDependencies.forEach {
-                val dependency = dependencies.getValue(it.key)
-                when (it.scope) {
-                    NORMAL -> packageJson.dependencies[it.key] = dependency
-                    DEV -> packageJson.devDependencies[it.key] = dependency
-                    OPTIONAL -> packageJson.optionalDependencies[it.key] = dependency
-                    PEER -> packageJson.peerDependencies[it.key] = dependency
-                }
-            }
-
-            compilation.packageJsonHandlers.forEach {
-                it(packageJson)
-            }
-
-            return packageJson
-        }
-
         private fun CompositeDependency.getPackages(): List<File> {
             val packages = includedBuild
                 .projectDir
@@ -386,16 +345,6 @@ internal class KotlinCompilationNpmResolver(
                 ?.map { packages.resolve(it) }
                 ?.map { it.resolve(PACKAGE_JSON) }
                 ?: emptyList()
-        }
-
-        // TODO: real versions conflict resolution
-        private fun chooseVersion(oldVersion: String?, newVersion: String): String {
-            // https://yarnpkg.com/lang/en/docs/dependency-versions/#toc-x-ranges
-            if (oldVersion == "*") {
-                return newVersion
-            }
-
-            return oldVersion ?: newVersion
         }
     }
 }
