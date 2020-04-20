@@ -7,18 +7,14 @@ package org.jetbrains.kotlin.gradle.targets.js.npm
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+import org.jetbrains.kotlin.gradle.targets.js.npm.resolved.KotlinCompilationNpmResolution
 import java.io.File
 
 open class PublishingPackageJsonTask(
-    private val nodeJs: NodeJsRootExtension,
-    private val compilation: KotlinJsCompilation
+    private val compilationResolution: KotlinCompilationNpmResolution
 ) : DefaultTask() {
-    private val compilationResolution
-        get() = nodeJs.npmResolutionManager.requireInstalled()[project][compilation]
 
-    private val npmProject = compilation.npmProject
+    private val npmProject = compilationResolution.npmProject
 
     @get:Nested
     internal val externalDependencies: Collection<NestedNpmDependency>
@@ -40,7 +36,7 @@ open class PublishingPackageJsonTask(
 
     @get:OutputFile
     val packageJson: File
-        get() = compilation.npmProject.publishingPackageJson
+        get() = npmProject.publishingPackageJson
 
     @TaskAction
     fun resolve() {

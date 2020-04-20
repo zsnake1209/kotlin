@@ -1,15 +1,14 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.gradle.targets.js.npm.resolved
 
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.targets.js.npm.GradleNodeModule
-import org.jetbrains.kotlin.gradle.targets.js.npm.NpmDependency
-import org.jetbrains.kotlin.gradle.targets.js.npm.NpmProject
-import org.jetbrains.kotlin.gradle.targets.js.npm.PackageJson
+import org.gradle.api.tasks.TaskProvider
+import org.jetbrains.kotlin.gradle.targets.js.npm.*
+import org.jetbrains.kotlin.gradle.tasks.registerTask
 
 /**
  * Resolved [NpmProject]
@@ -22,4 +21,10 @@ class KotlinCompilationNpmResolution(
     val externalGradleDependencies: Collection<GradleNodeModule>,
     val externalNpmDependencies: Collection<NpmDependency>,
     val packageJson: PackageJson
-)
+) {
+    val publishingPackageJsonTaskHolder: TaskProvider<PublishingPackageJsonTask> =
+        project.registerTask(
+            PublishingPackageJsonTask.NAME,
+            listOf(this)
+        ) {}
+}
