@@ -83,10 +83,13 @@ class Psi2IrTranslator(
 
         moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
 
+        // TODO WIP: set stub generator here
+        assert(context.symbolTable.allUnbound.isEmpty())
         postprocessingSteps.forEach { it.invoke(irModule) }
+        assert(context.symbolTable.allUnbound.isEmpty())
 
         // TODO: remove it once plugin API improved
-        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
+//        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
 
         return irModule
     }

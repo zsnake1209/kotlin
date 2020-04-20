@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.backend.common.lower.irThrow
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrAnonymousInitializerImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrBranchImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
@@ -19,11 +20,9 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.impl.IrAnonymousInitializerSymbolImpl
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.patchDeclarationParents
-import org.jetbrains.kotlin.ir.util.referenceFunction
-import org.jetbrains.kotlin.ir.util.withScope
+import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.util.OperatorNameConventions
@@ -56,9 +55,8 @@ open class SerializerIrGenerator(val irClass: IrClass, final override val compil
         lateinit var prop: IrProperty
 
         // how to (auto)create backing field and getter/setter?
-        compilerContext.symbolTable.withScope(irClass.descriptor) {
+        compilerContext.symbolTable.withReferenceScope(irClass.descriptor) {
 
-            introduceValueParameter(thisAsReceiverParameter)
             prop = generateSimplePropertyWithBackingField(thisAsReceiverParameter.symbol, desc, irClass)
 
             localSerializersFieldsDescriptors.forEach {
@@ -66,13 +64,18 @@ open class SerializerIrGenerator(val irClass: IrClass, final override val compil
             }
         }
 
-        compilerContext.symbolTable.declareAnonymousInitializer(
-            irClass.startOffset, irClass.endOffset, SERIALIZABLE_PLUGIN_ORIGIN, irClass.descriptor
-        ).buildWithScope { initIrBody ->
-            initIrBody.parent = irClass
+        val annonimousInit = irClass.run {
+            val symbol = IrAnonymousInitializerSymbolImpl(descriptor)
+            IrAnonymousInitializerImpl(startOffset, endOffset, SERIALIZABLE_PLUGIN_ORIGIN, symbol).also {
+                it.parent = this
+                declarations.add(it)
+            }
+        }
+
+        annonimousInit.buildWithScope { initIrBody ->
             val ctor = irClass.declarations.filterIsInstance<IrConstructor>().find { it.isPrimary }
                 ?: throw AssertionError("Serializer must have primary constructor")
-            compilerContext.symbolTable.withScope(initIrBody.descriptor) {
+            compilerContext.symbolTable.withReferenceScope(initIrBody.descriptor) {
                 initIrBody.body =
                     DeclarationIrBuilder(compilerContext, initIrBody.symbol, initIrBody.startOffset, initIrBody.endOffset).irBlockBody {
                         val localDesc = irTemporary(

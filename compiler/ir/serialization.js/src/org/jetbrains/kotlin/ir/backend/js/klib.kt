@@ -303,7 +303,7 @@ fun GeneratorContext.generateModuleFragmentWithPlugins(
                     moduleDescriptor,
                     bindingContext,
                     languageVersionSettings,
-                    symbolTable,
+                    symbolTable.lazyWrapper,
                     typeTranslator,
                     irBuiltIns
                 )

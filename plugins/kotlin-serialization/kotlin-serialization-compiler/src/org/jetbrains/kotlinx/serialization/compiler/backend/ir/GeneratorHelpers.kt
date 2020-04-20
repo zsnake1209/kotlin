@@ -11,12 +11,11 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.IrPropertyImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrTypeParameterImpl
-import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
+import org.jetbrains.kotlin.ir.declarations.impl.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.symbols.impl.IrPropertySymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
@@ -50,50 +49,54 @@ interface IrBuilderExtension {
 
     private fun IrClass.declareSimpleFunctionWithExternalOverrides(descriptor: FunctionDescriptor): IrSimpleFunction {
         val functionSymbol = compilerContext.symbolTable.referenceSimpleFunction(descriptor)
-        val function = if (functionSymbol.isBound) functionSymbol.owner else {
-            compilerContext.symbolTable.declareSimpleFunction(
-                    startOffset,
-                    endOffset,
-                    SERIALIZABLE_PLUGIN_ORIGIN,
-                    descriptor
-            ).also {
-                it.parent = this
-                addMember(it)
-            }
-        }
-        return function.also { f ->
-            f.overriddenSymbols = descriptor.overriddenDescriptors.map {
-                compilerContext.symbolTable.referenceSimpleFunction(it.original)
-            }
-        }
+        assert(functionSymbol.isBound)
+        val function = functionSymbol.owner
+//        val function = if (functionSymbol.isBound) functionSymbol.owner else {
+//            compilerContext.symbolTable.declareSimpleFunction(
+//                    startOffset,
+//                    endOffset,
+//                    SERIALIZABLE_PLUGIN_ORIGIN,
+//                    descriptor
+//            ).also {
+//                it.parent = this
+//                addMember(it)
+//            }
+//        }
+//        return function.also { f ->
+//            f.overriddenSymbols = descriptor.overriddenDescriptors.map {
+//                compilerContext.symbolTable.referenceSimpleFunction(it.original)
+//            }
+//        }
+        return function
     }
 
-    private fun createFunctionGenerator(): FunctionGenerator = with(compilerContext) {
-        return FunctionGenerator(
-            DeclarationGenerator(
-                GeneratorContext(
-                    Psi2IrConfiguration(),
-                    moduleDescriptor,
-                    bindingContext,
-                    languageVersionSettings,
-                    symbolTable,
-                    GeneratorExtensions(),
-                    typeTranslator,
-                    typeTranslator.constantValueGenerator,
-                    irBuiltIns
-                )
-            )
-        )
-    }
+//    private fun createFunctionGenerator(): FunctionGenerator = with(compilerContext) {
+//        return FunctionGenerator(
+//            DeclarationGenerator(
+//                GeneratorContext(
+//                    Psi2IrConfiguration(),
+//                    moduleDescriptor,
+//                    bindingContext,
+//                    languageVersionSettings,
+//                    symbolTable,
+//                    GeneratorExtensions(),
+//                    typeTranslator,
+//                    typeTranslator.constantValueGenerator,
+//                    irBuiltIns
+//                )
+//            )
+//        )
+//    }
 
     fun IrClass.contributeFunction(
         descriptor: FunctionDescriptor,
         bodyGen: IrBlockBodyBuilder.(IrFunction) -> Unit
     ) {
         val f: IrSimpleFunction = declareSimpleFunctionWithExternalOverrides(descriptor)
-        f.buildWithScope {
-            createFunctionGenerator().generateFunctionParameterDeclarationsAndReturnType(f, null, null)
-        }
+        // TODO: default parameters
+//        f.buildWithScope {
+//            createFunctionGenerator().generateFunctionParameterDeclarationsAndReturnType(f, null, null)
+//        }
 
         f.body = DeclarationIrBuilder(compilerContext, f.symbol, this.startOffset, this.endOffset).irBlockBody(
             this.startOffset,
@@ -108,22 +111,23 @@ interface IrBuilderExtension {
         bodyGen: IrBlockBodyBuilder.(IrConstructor) -> Unit
     ) {
         val ctorSymbol = compilerContext.symbolTable.referenceConstructor(descriptor)
-        val c = if (ctorSymbol.isBound) {
-            ctorSymbol.owner
-        } else {
-            compilerContext.symbolTable.declareConstructor(
-                this.startOffset,
-                this.endOffset,
-                SERIALIZABLE_PLUGIN_ORIGIN,
-                descriptor
-            ).also {
-                it.parent = this
-                addMember(it)
-            }
-        }
+        val c = ctorSymbol.owner
+//        val c = if (ctorSymbol.isBound) {
+//            ctorSymbol.owner
+//        } else {
+//            compilerContext.symbolTable.declareConstructor(
+//                this.startOffset,
+//                this.endOffset,
+//                SERIALIZABLE_PLUGIN_ORIGIN,
+//                descriptor
+//            ).also {
+//                it.parent = this
+//                addMember(it)
+//            }
+//        }
 
-        c.returnType = descriptor.returnType.toIrType()
-        if (declareNew || overwriteValueParameters)
+//        c.returnType = descriptor.returnType.toIrType()
+        if (overwriteValueParameters)
             c.createParameterDeclarations(
             receiver = null,
             overwriteValueParameters = overwriteValueParameters,
@@ -141,7 +145,9 @@ interface IrBuilderExtension {
         vararg args: IrExpression,
         typeHint: IrType? = null
     ): IrMemberAccessExpression {
-        val returnType = typeHint ?: callee.run { if (isBound) owner.returnType else descriptor.returnType!!.toIrType() }
+//        val returnType = typeHint ?: callee.run { if (isBound) owner.returnType else descriptor.returnType!!.toIrType() }
+        assert(callee.isBound)
+        val returnType = typeHint ?: callee.run { owner.returnType }
         val call = irCall(callee, type = returnType)
         call.dispatchReceiver = dispatchReceiver
         args.forEachIndexed(call::putValueArgument)
@@ -203,7 +209,7 @@ interface IrBuilderExtension {
 
     fun <T : IrDeclaration> T.buildWithScope(builder: (T) -> Unit): T =
         also { irDeclaration ->
-            compilerContext.symbolTable.withScope(irDeclaration.descriptor) {
+            compilerContext.symbolTable.withReferenceScope(irDeclaration.descriptor) {
                 builder(irDeclaration)
             }
         }
@@ -268,15 +274,14 @@ interface IrBuilderExtension {
         propertyDescriptor: PropertyDescriptor,
         propertyParent: IrClass
     ): IrProperty {
-        val symbol = compilerContext.symbolTable.referenceProperty(propertyDescriptor)
-        val irProperty = if (symbol.isBound) symbol.owner else {
-            compilerContext.symbolTable.declareProperty(propertyParent.startOffset, propertyParent.endOffset, SERIALIZABLE_PLUGIN_ORIGIN, propertyDescriptor) {
-                IrPropertyImpl(propertyParent.startOffset, propertyParent.endOffset, SERIALIZABLE_PLUGIN_ORIGIN, it)
-            }.also {
-                it.parent = propertyParent
-                propertyParent.addMember(it)
-            }
+        val irProperty = compilerContext.symbolTable.referenceProperty(propertyDescriptor) {
+            error("Has to be declared $propertyDescriptor")
+//            IrPropertyImpl(propertyParent.startOffset, propertyParent.endOffset, SERIALIZABLE_PLUGIN_ORIGIN, IrPropertySymbolImpl(propertyDescriptor)).also {
+//                it.parent = propertyParent
+//                propertyParent.addMember(it)
+//            }
         }
+
         irProperty.backingField = generatePropertyBackingField(propertyDescriptor, irProperty).apply {
             parent = propertyParent
             correspondingPropertySymbol = irProperty.symbol
@@ -293,13 +298,15 @@ interface IrBuilderExtension {
         propertyDescriptor: PropertyDescriptor,
         originProperty: IrProperty
     ): IrField {
-        return compilerContext.symbolTable.declareField(
-            originProperty.startOffset,
-            originProperty.endOffset,
-            SERIALIZABLE_PLUGIN_ORIGIN,
-            propertyDescriptor,
-            propertyDescriptor.type.toIrType()
-        )
+        val fieldSymbol = compilerContext.symbolTable.referenceField(propertyDescriptor)
+//        assert(fieldSymbol.isBound)
+//        return fieldSymbol.owner
+        if (fieldSymbol.isBound) return fieldSymbol.owner
+
+        return originProperty.run {
+            // TODO: type parameters
+            IrFieldImpl(startOffset, endOffset, SERIALIZABLE_PLUGIN_ORIGIN, fieldSymbol, propertyDescriptor.type.toIrType())
+        }
     }
 
     fun generatePropertyAccessor(
@@ -307,20 +314,37 @@ interface IrBuilderExtension {
         fieldSymbol: IrFieldSymbol
     ): IrSimpleFunction {
         val symbol = compilerContext.symbolTable.referenceSimpleFunction(descriptor)
-
-        val declaration = if (symbol.isBound) symbol.owner.also { generateOverriddenFunctionSymbols(it, compilerContext.symbolTable) } else compilerContext.symbolTable.declareSimpleFunctionWithOverrides(fieldSymbol.owner.startOffset,
-                fieldSymbol.owner.endOffset,
-                SERIALIZABLE_PLUGIN_ORIGIN, descriptor)
-
-        return declaration.buildWithScope { irAccessor ->
-            irAccessor.createParameterDeclarations(receiver = null)
-            irAccessor.returnType = irAccessor.descriptor.returnType!!.toIrType()
-            irAccessor.body = when (descriptor) {
-                is PropertyGetterDescriptor -> generateDefaultGetterBody(descriptor, irAccessor)
-                is PropertySetterDescriptor -> generateDefaultSetterBody(descriptor, irAccessor)
-                else -> throw AssertionError("Should be getter or setter: $descriptor")
-            }
+        assert(symbol.isBound)
+        val irAccessor = symbol.owner
+        irAccessor.body = when (descriptor) {
+            is PropertyGetterDescriptor -> generateDefaultGetterBody(descriptor, irAccessor)
+            is PropertySetterDescriptor -> generateDefaultSetterBody(descriptor, irAccessor)
+            else -> throw AssertionError("Should be getter or setter: $descriptor")
         }
+
+        return irAccessor
+//
+//        val declaration = if (symbol.isBound) symbol.owner else {
+//            IrFunctionImpl(
+//                fieldSymbol.owner.startOffset,
+//                fieldSymbol.owner.endOffset,
+//                SERIALIZABLE_PLUGIN_ORIGIN,
+//                descriptor,
+//                descriptor.returnType!!.toIrType()
+//            )
+//        }
+//
+//        generateOverriddenFunctionSymbols(declaration, compilerContext.symbolTable)
+//
+//        return declaration.buildWithScope { irAccessor ->
+//            irAccessor.createParameterDeclarations(receiver = null)
+//            irAccessor.returnType = irAccessor.descriptor.returnType!!.toIrType()
+//            irAccessor.body = when (descriptor) {
+//                is PropertyGetterDescriptor -> generateDefaultGetterBody(descriptor, irAccessor)
+//                is PropertySetterDescriptor -> generateDefaultSetterBody(descriptor, irAccessor)
+//                else -> throw AssertionError("Should be getter or setter: $descriptor")
+//            }
+//        }
     }
 
     private fun generateDefaultGetterBody(
@@ -686,11 +710,15 @@ interface IrBuilderExtension {
                 compilerContext.symbolTable.referenceConstructor(serializerClass.unsubstitutedPrimaryConstructor!!)
             }
             // Return type should be correctly substituted
-            val substitutedReturnType = if (ctor.isBound) {
-                val ctorDecl = ctor.owner
-                val typeParameters = ctorDecl.parentAsClass.typeParameters
-                ctor.owner.returnType.substitute(typeParameters, typeArgs)
-            } else ctor.descriptor.returnType.replace(typeArgs.map { it.toKotlinType().asTypeProjection() }).toIrType()
+            assert(ctor.isBound)
+            val ctorDecl = ctor.owner
+            val typeParameters = ctorDecl.parentAsClass.typeParameters
+            val substitutedReturnType = ctorDecl.returnType.substitute(typeParameters, typeArgs)
+//            val substitutedReturnType = if (ctor.isBound) {
+//                val ctorDecl = ctor.owner
+//                val typeParameters = ctorDecl.parentAsClass.typeParameters
+//                ctor.owner.returnType.substitute(typeParameters, typeArgs)
+//            } else ctor.descriptor.returnType.replace(typeArgs.map { it.toKotlinType().asTypeProjection() }).toIrType()
             return irInvoke(null, ctor, typeArguments = typeArgs, valueArguments = args, returnTypeHint = substitutedReturnType)
         }
     }
