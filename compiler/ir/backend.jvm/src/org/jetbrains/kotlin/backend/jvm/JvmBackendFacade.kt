@@ -49,7 +49,7 @@ object JvmBackendFacade {
                         psi2irContext.moduleDescriptor,
                         psi2irContext.bindingContext,
                         psi2irContext.languageVersionSettings,
-                        psi2irContext.symbolTable,
+                        psi2irContext.symbolTable.lazyWrapper,
                         psi2irContext.typeTranslator,
                         psi2irContext.irBuiltIns
                     )

@@ -18,6 +18,7 @@
 
 package org.jetbrains.kotlin.ir.util
 
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.*
@@ -923,3 +924,24 @@ inline fun <T, D : DeclarationDescriptor> SymbolTable.withScope(owner: D, block:
     leaveScope(owner)
     return result
 }
+
+inline fun <T, D : DeclarationDescriptor> ReferenceSymbolTable.withReferenceScope(owner: D, block: ReferenceSymbolTable.(D) -> T): T {
+    enterScope(owner)
+    val result = block(owner)
+    leaveScope(owner)
+    return result
+}
+
+val SymbolTable.allUnbound: List<IrSymbol>
+    get() {
+        val r = mutableListOf<IrSymbol>()
+        r.addAll(unboundClasses)
+        r.addAll(unboundConstructors)
+        r.addAll(unboundEnumEntries)
+        r.addAll(unboundFields)
+        r.addAll(unboundSimpleFunctions)
+        r.addAll(unboundProperties)
+        r.addAll(unboundTypeAliases)
+        r.addAll(unboundTypeParameters)
+        return r
+    }
