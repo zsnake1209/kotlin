@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -301,12 +301,7 @@ internal class KotlinCompilationNpmResolver(
             }
                 .filterNotNull()
 
-            val packageJson = PackageJson(
-                npmProject.name,
-                fixSemver(project.version.toString())
-            )
-
-            packageJson.main = npmProject.main
+            val packageJson = packageJsonWithNpmDeps()
 
             compositeDependencies.forEach {
                 packageJson.dependencies[it.name] = it.version
@@ -319,6 +314,41 @@ internal class KotlinCompilationNpmResolver(
             importedExternalGradleDependencies.forEach {
                 packageJson.dependencies[it.name] = fileVersion(it.path)
             }
+
+            compilation.packageJsonHandlers.forEach {
+                it(packageJson)
+            }
+
+            if (!skipWriting) {
+                packageJson.saveTo(npmProject.packageJsonFile)
+            }
+
+            return KotlinCompilationNpmResolution(
+                project,
+                npmProject,
+                resolvedInternalDependencies,
+                compositeDependencies,
+                importedExternalGradleDependencies,
+                externalNpmDependencies,
+                packageJson
+            )
+        }
+
+        fun createPublishingPackageJson(): File {
+            return packageJsonWithNpmDeps().let { packageJson ->
+                val packageJsonFile = npmProject.publishingPackageJson
+                packageJson.saveTo(packageJsonFile)
+                packageJsonFile
+            }
+        }
+
+        private fun packageJsonWithNpmDeps(): PackageJson {
+            val packageJson = PackageJson(
+                npmProject.name,
+                fixSemver(project.version.toString())
+            )
+
+            packageJson.main = npmProject.main
 
             val dependencies = mutableMapOf<String, String>()
 
@@ -341,19 +371,7 @@ internal class KotlinCompilationNpmResolver(
                 it(packageJson)
             }
 
-            if (!skipWriting) {
-                packageJson.saveTo(npmProject.packageJsonFile)
-            }
-
-            return KotlinCompilationNpmResolution(
-                project,
-                npmProject,
-                resolvedInternalDependencies,
-                compositeDependencies,
-                importedExternalGradleDependencies,
-                externalNpmDependencies,
-                packageJson
-            )
+            return packageJson
         }
 
         private fun CompositeDependency.getPackages(): List<File> {

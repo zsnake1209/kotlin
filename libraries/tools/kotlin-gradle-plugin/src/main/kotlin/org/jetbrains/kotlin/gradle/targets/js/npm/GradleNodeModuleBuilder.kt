@@ -39,7 +39,6 @@ internal class GradleNodeModuleBuilder(
     fun rebuild(): File? {
         if (files.isEmpty()) return null
 
-
         val packageJson = fromSrcPackageJson(srcPackageJsonFile)?.apply {
             // Gson set nulls reflectively no matter on default values and non-null types
             @Suppress("USELESS_ELVIS")
