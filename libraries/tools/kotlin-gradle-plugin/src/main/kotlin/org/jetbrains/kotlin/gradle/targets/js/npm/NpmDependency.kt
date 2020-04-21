@@ -127,6 +127,9 @@ data class NpmDependency(
     override fun getReason(): String? = reason
 }
 
+internal fun String.isFileVersion() =
+    startsWith(FILE_VERSION_PREFIX)
+
 internal fun fileVersion(directory: File): String =
     "$FILE_VERSION_PREFIX${directory.canonicalPath}"
 

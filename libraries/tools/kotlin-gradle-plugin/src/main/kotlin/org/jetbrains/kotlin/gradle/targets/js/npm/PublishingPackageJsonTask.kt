@@ -52,7 +52,31 @@ constructor(
                 return
             }
 
+            packageJson.apply {
+                listOf(
+                    dependencies,
+                    peerDependencies,
+                    optionalDependencies
+                ).forEach { it.processDependencies() }
+            }
+
+            packageJson.devDependencies.clear()
+
             packageJson.saveTo(npmProject.publishingPackageJson)
+        }
+    }
+
+    private fun MutableMap<String, String>.processDependencies() {
+        val newDependencies = mutableMapOf<String, String>()
+        filterNot { (_, version) -> version.isFileVersion() }
+            .forEach { (key, version) ->
+                newDependencies[key] = version
+            }
+
+        clear()
+
+        newDependencies.forEach { (key, version) ->
+            this[key] = version
         }
     }
 
