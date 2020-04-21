@@ -57,12 +57,14 @@ internal class KotlinCompilationNpmResolver(
             it.dependsOn(nodeJs.npmInstallTask)
             it.dependsOn(packageJsonTaskHolder)
         }.also { packageJsonTask ->
-            project.tasks
-                .withType(Zip::class.java)
-                .named(npmProject.target.artifactsTaskName)
-                .configure {
-                    it.from(packageJsonTask)
-                }
+            if (compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME) {
+                project.tasks
+                    .withType(Zip::class.java)
+                    .named(npmProject.target.artifactsTaskName)
+                    .configure {
+                        it.from(packageJsonTask)
+                    }
+            }
         }
 
     val plugins: List<CompilationResolverPlugin> = projectResolver.resolver.plugins.flatMap {
