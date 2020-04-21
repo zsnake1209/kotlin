@@ -48,12 +48,11 @@ constructor(
     @TaskAction
     fun resolve() {
         packageJsonWithNpmDeps(npmProject, realExternalDependencies).let { packageJson ->
-            val packageJsonFile = npmProject.publishingPackageJson
             if (skipOnEmptyNpmDependencies && packageJson.skipRequired()) {
                 return
             }
 
-            packageJson.saveTo(packageJsonFile)
+            packageJson.saveTo(npmProject.publishingPackageJson)
         }
     }
 
