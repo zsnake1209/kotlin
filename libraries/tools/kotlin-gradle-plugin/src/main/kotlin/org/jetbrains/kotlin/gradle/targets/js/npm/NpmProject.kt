@@ -67,7 +67,7 @@ open class NpmProject(val compilation: KotlinJsCompilation) {
     val publishingPackageJson: File
         get() = project.buildDir
             .resolve("tmp")
-            .resolve(PublishingPackageJsonTask.NAME)
+            .resolve(publishingPackageJsonTaskName)
             .resolve(PACKAGE_JSON)
 
     val publishingPackageJsonTaskName: String

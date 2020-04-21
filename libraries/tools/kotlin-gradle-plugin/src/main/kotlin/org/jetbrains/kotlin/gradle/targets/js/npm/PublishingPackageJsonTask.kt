@@ -49,13 +49,20 @@ constructor(
     fun resolve() {
         packageJsonWithNpmDeps(npmProject, realExternalDependencies).let { packageJson ->
             val packageJsonFile = npmProject.publishingPackageJson
-            if (skipOnEmptyNpmDependencies && packageJson.allDependencies.isEmpty()) {
+            if (skipOnEmptyNpmDependencies && packageJson.skipRequired()) {
                 return
             }
 
             packageJson.saveTo(packageJsonFile)
         }
     }
+
+    private fun PackageJson.skipRequired() =
+        dependencies.isEmpty() &&
+                peerDependencies.isEmpty() &&
+                optionalDependencies.isEmpty() &&
+                optionalDependencies.isEmpty() &&
+                bundledDependencies.isEmpty()
 
     companion object {
         val NAME = "publishingPackageJson"

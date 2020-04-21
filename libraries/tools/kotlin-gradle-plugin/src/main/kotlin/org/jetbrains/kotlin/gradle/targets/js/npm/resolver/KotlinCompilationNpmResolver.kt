@@ -53,6 +53,7 @@ internal class KotlinCompilationNpmResolver(
             npmProject.publishingPackageJsonTaskName,
             listOf(nodeJs, npmProject)
         ) {
+            it.skipOnEmptyNpmDependencies = true
             it.dependsOn(nodeJs.npmInstallTask)
             it.dependsOn(packageJsonTaskHolder)
         }.also { packageJsonTask ->
