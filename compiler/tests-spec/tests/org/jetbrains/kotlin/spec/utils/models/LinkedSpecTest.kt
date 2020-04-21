@@ -68,8 +68,8 @@ class LinkedSpecTest(
         testArea == TestArea.valueOf(pathMatcher.group("testArea").withUnderscores())
                 && testType == TestType.fromValue(pathMatcher.group("testType"))!!
                 && sections == pathMatcher.group("sections").splitByPathSeparator()
-                && mainLink!!.paragraphNumber == pathMatcher.group("paragraphNumber").toInt()
-                && mainLink!!.sentenceNumber == pathMatcher.group("sentenceNumber").toInt()
+                && mainLink?.paragraphNumber == pathMatcher.group("paragraphNumber").toInt()
+                && mainLink.sentenceNumber == pathMatcher.group("sentenceNumber").toInt()
                 && testNumber == pathMatcher.group("testNumber").toInt()
 
     private fun getUnspecifiedBehaviourText(): String? {
@@ -100,12 +100,10 @@ class LinkedSpecTest(
         super.getIssuesText()?.let { append(it + ls) }
     }
 
-    private fun Set<SpecPlace>.buildToString(): String {
-        val builder = StringBuilder()
-        this.forEach {
-            builder.append("${sections.joinToString()} -> paragraph: ${it.paragraphNumber} -> sentence: ${it.sentenceNumber}$ls")
+    private fun Set<SpecPlace>.buildToString(): String = buildString {
+        this@buildToString.forEach {
+            append("${sections.joinToString()} -> paragraph: ${it.paragraphNumber} -> sentence: ${it.sentenceNumber}$ls")
         }
-        return builder.toString()
     }
 
 }
