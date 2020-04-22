@@ -9,10 +9,11 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.util.IrExtensionGenerator
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 
-class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragment, private val context: GeneratorContext) : DeclarationDescriptorVisitor<Unit, IrDeclarationContainer?> {
+class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragment, private val context: GeneratorContext, private val pluginProviders: Collection<IrExtensionGenerator>) : DeclarationDescriptorVisitor<Unit, IrDeclarationContainer?> {
 
     private val generator = StandaloneDeclarationGenerator(context)
     private val symbolTable = context.symbolTable
@@ -29,6 +30,17 @@ class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragm
 
     private fun MemberScope.declareMemberScope(container: IrDeclarationContainer) {
         DescriptorUtils.getAllDescriptors(this).forEach { it.accept(this@SyntheticDeclarationsGenerator, container) }
+    }
+
+    private inline fun <S : IrSymbol, R : IrDeclaration> generateOrDefault(symbol: S, onDefault: (S) -> R): R {
+        for (p in pluginProviders) {
+            p.declare(symbol)?.let {
+                @Suppress("UNCHECKED_CAST")
+                return it as R
+            }
+        }
+
+        return onDefault(symbol)
     }
 
     private val visited = mutableSetOf<PackageFragmentDescriptor>()
@@ -51,7 +63,9 @@ class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragm
     }
 
     private fun createFunctionStub(descriptor: FunctionDescriptor, symbol: IrSimpleFunctionSymbol): IrSimpleFunction {
-        return generator.generateSimpleFunction(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        return generateOrDefault(symbol) {
+            generator.generateSimpleFunction(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        }
     }
 
     override fun visitFunctionDescriptor(descriptor: FunctionDescriptor, data: IrDeclarationContainer?) {
@@ -69,12 +83,16 @@ class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragm
 
     private fun createClassStub(descriptor: ClassDescriptor, symbol: IrClassSymbol): IrClass {
         assert(!DescriptorUtils.isEnumEntry(descriptor))
-        return generator.generateClass(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        return generateOrDefault(symbol) {
+            generator.generateClass(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        }
     }
 
     private fun createEnumEntruStub(descriptor: ClassDescriptor, symbol: IrEnumEntrySymbol): IrEnumEntry {
         assert(DescriptorUtils.isEnumEntry(descriptor))
-        return generator.generateEnumEntry(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        return generateOrDefault(symbol) {
+            generator.generateEnumEntry(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        }
     }
 
     override fun visitClassDescriptor(descriptor: ClassDescriptor, data: IrDeclarationContainer?) {
@@ -93,7 +111,9 @@ class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragm
     }
 
     private fun declareTypeAliasStub(descriptor: TypeAliasDescriptor, symbol: IrTypeAliasSymbol): IrTypeAlias {
-        return generator.generateTypeAlias(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        return generateOrDefault(symbol) {
+            generator.generateTypeAlias(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        }
     }
 
     override fun visitTypeAliasDescriptor(descriptor: TypeAliasDescriptor, data: IrDeclarationContainer?) {
@@ -109,7 +129,9 @@ class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragm
     }
 
     private fun createConstructorStub(descriptor: ClassConstructorDescriptor, symbol: IrConstructorSymbol): IrConstructor {
-        return generator.generateConstructor(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        return generateOrDefault(symbol) {
+            generator.generateConstructor(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        }
     }
 
     override fun visitConstructorDescriptor(constructorDescriptor: ConstructorDescriptor, data: IrDeclarationContainer?) {
@@ -121,11 +143,13 @@ class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragm
     }
 
     override fun visitScriptDescriptor(scriptDescriptor: ScriptDescriptor, data: IrDeclarationContainer?) {
-        error("Unreachable execution $scriptDescriptor")
+        assert(symbolTable.referenceScript(scriptDescriptor).isBound) { "Script $scriptDescriptor isn't declared" }
     }
 
     private fun createPropertyStub(descriptor: PropertyDescriptor, symbol: IrPropertySymbol): IrProperty {
-        return generator.generateProperty(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        return generateOrDefault(symbol) {
+            generator.generateProperty(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
+        }
     }
 
     private fun declareAccessor(accessorDescriptor: PropertyAccessorDescriptor, property: IrProperty): IrSimpleFunction {
@@ -143,8 +167,8 @@ class SyntheticDeclarationsGenerator(private val irModuleFragment: IrModuleFragm
         if (descriptor.visibility != Visibilities.INVISIBLE_FAKE) {
             symbolTable.declarePropertyIfNotExists(descriptor) {
                 createPropertyStub(descriptor, it).insertDeclaration(data).also { p ->
-                    descriptor.getter?.let { p.getter = declareAccessor(it, p) }
-                    descriptor.setter?.let { p.setter = declareAccessor(it, p) }
+                    descriptor.getter?.let { g -> p.getter = declareAccessor(g, p) }
+                    descriptor.setter?.let { s -> p.setter = declareAccessor(s, p) }
                 }
             }
         }

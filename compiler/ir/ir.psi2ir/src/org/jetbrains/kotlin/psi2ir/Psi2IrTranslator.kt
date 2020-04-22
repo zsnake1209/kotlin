@@ -77,7 +77,7 @@ class Psi2IrTranslator(
 
         irModule.patchDeclarationParents()
         expectDescriptorToSymbol?.let { referenceExpectsForUsedActuals(it, context.symbolTable, irModule) }
-        postprocess(context, irModule)
+        postprocess(context, irModule, pluginExtensions)
 
         irProviders.filterIsInstance<IrDeserializer>().forEach { it.init(irModule, pluginExtensions) }
 
@@ -94,8 +94,8 @@ class Psi2IrTranslator(
         return irModule
     }
 
-    private fun postprocess(context: GeneratorContext, irElement: IrModuleFragment) {
-        generateSyntheticDeclarations(irElement, context)
+    private fun postprocess(context: GeneratorContext, irElement: IrModuleFragment, plugins: Collection<IrExtensionGenerator>) {
+        generateSyntheticDeclarations(irElement, context, plugins)
         insertImplicitCasts(irElement, context)
         generateAnnotationsForDeclarations(context, irElement)
 
@@ -107,8 +107,8 @@ class Psi2IrTranslator(
         irElement.acceptVoid(annotationGenerator)
     }
 
-    private fun generateSyntheticDeclarations(moduleFragment: IrModuleFragment, context: GeneratorContext) {
-        val generator = SyntheticDeclarationsGenerator(moduleFragment, context)
+    private fun generateSyntheticDeclarations(moduleFragment: IrModuleFragment, context: GeneratorContext, plugins: Collection<IrExtensionGenerator>) {
+        val generator = SyntheticDeclarationsGenerator(moduleFragment, context, plugins)
         moduleFragment.files.forEach { it.symbol.descriptor.accept(generator, null) }
     }
 }
