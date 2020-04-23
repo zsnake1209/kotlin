@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -35,3 +35,10 @@ import kotlin.experimental.ExperimentalTypeInference
 @SinceKotlin("1.3")
 @ExperimentalTypeInference
 public annotation class BuilderInference
+
+
+//TODO: @Target
+@Retention(AnnotationRetention.BINARY)
+@SinceKotlin("1.4")
+@ExperimentalTypeInference
+public annotation class OverloadResolutionByLambdaReturnType
