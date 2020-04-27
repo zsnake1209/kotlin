@@ -6,12 +6,10 @@
 package org.jetbrains.kotlin.gradle.targets.js
 
 import org.gradle.api.Named
-import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.AttributeDisambiguationRule
 import org.gradle.api.attributes.AttributesSchema
 import org.gradle.api.attributes.MultipleCandidatesDetails
-import org.jetbrains.kotlin.gradle.targets.metadata.isKotlinGranularMetadataEnabled
 import java.io.Serializable
 
 // For Gradle attributes
@@ -32,11 +30,9 @@ enum class KotlinJsCompilerAttribute : Named, Serializable {
             KotlinJsCompilerAttribute::class.java
         )
 
-        fun setupAttributesMatchingStrategy(project: Project, attributesSchema: AttributesSchema) {
+        fun setupAttributesMatchingStrategy(attributesSchema: AttributesSchema) {
             attributesSchema.attribute(jsCompilerAttribute) { strategy ->
-                if (project.isKotlinGranularMetadataEnabled) {
-                    strategy.disambiguationRules.add(KotlinJsCompilerDisambiguationRule::class.java)
-                }
+                strategy.disambiguationRules.add(KotlinJsCompilerDisambiguationRule::class.java)
             }
         }
     }
@@ -44,6 +40,10 @@ enum class KotlinJsCompilerAttribute : Named, Serializable {
 
 private class KotlinJsCompilerDisambiguationRule : AttributeDisambiguationRule<KotlinJsCompilerAttribute> {
     override fun execute(details: MultipleCandidatesDetails<KotlinJsCompilerAttribute>) {
-        TODO()
+        with(details) {
+            if (consumerValue == null) {
+                closestMatch(KotlinJsCompilerAttribute.legacy)
+            }
+        }
     }
 }
