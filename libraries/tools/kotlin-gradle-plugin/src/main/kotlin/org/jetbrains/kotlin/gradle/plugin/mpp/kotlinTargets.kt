@@ -113,7 +113,7 @@ abstract class AbstractKotlinTarget(
                     adhocVariant.addVariantsFromConfiguration(configuration) { configurationVariantDetails ->
                         val mavenScope = when (kotlinUsageContext.usage.name) {
                             "java-api-jars" -> "compile"
-                            JAVA_RUNTIME_JARS -> "runtime"
+                            "java-runtime-jars" -> "runtime"
                             else -> error("unexpected usage value '${kotlinUsageContext.usage.name}'")
                         }
                         configurationVariantDetails.mapToMavenScope(mavenScope)
@@ -221,8 +221,7 @@ abstract class AbstractKotlinTarget(
 internal fun KotlinTarget.disambiguateName(simpleName: String) =
     lowerCamelCaseName(targetName, simpleName)
 
-internal fun javaApiUsageForMavenScoping() =
-    Usage.JAVA_API_JARS
+internal fun javaApiUsageForMavenScoping() = "java-api-jars"
 
 abstract class KotlinOnlyTarget<T : KotlinCompilation<*>>(
     project: Project,

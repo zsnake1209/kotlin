@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.gradle.plugin.mpp
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurablePublishArtifact
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.metadata.KotlinMetadataTargetConfigurator
@@ -28,7 +27,7 @@ open class KotlinMetadataTarget @Inject constructor(project: Project) :
             val usageContexts = mutableSetOf<DefaultKotlinUsageContext>()
 
             // This usage value is only needed for Maven scope mapping. Don't replace it with a custom Kotlin Usage value
-            val javaApiUsage = project.usageByName(Usage.JAVA_API_JARS)
+            val javaApiUsage = project.usageByName("java-api-jars")
 
             usageContexts += run {
                 val allMetadataJar = project.tasks.getByName(KotlinMetadataTargetConfigurator.ALL_METADATA_JAR_NAME)
