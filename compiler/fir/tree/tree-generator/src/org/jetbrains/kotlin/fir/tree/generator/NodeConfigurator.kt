@@ -389,7 +389,7 @@ object NodeConfigurator : AbstractFieldConfigurator<FirTreeBuilder>(FirTreeBuild
 
         file.configure {
             +fieldList(import)
-            +declarations
+            +declarations.withTransform()
             +stringField("name")
             +field("packageFqName", fqNameType)
         }
