@@ -554,11 +554,7 @@ class DelegatedPropertyResolver(
         if (languageVersionSettings.supportsFeature(LanguageFeature.OperatorProvideDelegate)) {
             val traceForProvideDelegate = TemporaryBindingTrace.create(traceToResolveDelegatedProperty, "Trace to resolve provide delegate")
 
-            val contextForProvideDelegate = createContextForProvideDelegateMethod(
-                scopeForDelegate, delegateDataFlow, traceForProvideDelegate, InferenceSessionForExistingCandidates
-            )
-
-            val substitutionMap = buildSubstitutionMapOfNonFixedVariables(delegateType)
+            val substitutionMap: Map<UnwrappedType, UnwrappedType>? = buildSubstitutionMapOfNonFixedVariables(delegateType)
             val nonFixedVariablesToStubTypesSubstitutor =
                 if (substitutionMap != null)
                     NewTypeSubstitutorByConstructorMap(substitutionMap.mapKeys { it.key.constructor })
@@ -566,6 +562,10 @@ class DelegatedPropertyResolver(
                     EmptySubstitutor
 
             val delegateTypeWithoutNonFixedVariables = nonFixedVariablesToStubTypesSubstitutor.safeSubstitute(delegateType.unwrap())
+
+            val contextForProvideDelegate = createContextForProvideDelegateMethod(
+                scopeForDelegate, delegateDataFlow, traceForProvideDelegate, InferenceSessionForExistingCandidates(substitutionMap != null)
+            )
 
             val provideDelegateResults = getProvideDelegateMethod(
                 variableDescriptor, delegateExpression, delegateTypeWithoutNonFixedVariables, contextForProvideDelegate
@@ -576,6 +576,10 @@ class DelegatedPropertyResolver(
                 if (provideDelegateDescriptor.isOperator) {
                     delegateType = inverseSubstitution(provideDelegateDescriptor.returnType, substitutionMap) ?: return null
                     delegateDataFlow = provideDelegateResults.resultingCall.dataFlowInfoForArguments.resultInfo
+                }
+                if (substitutionMap == null) {
+                    traceForProvideDelegate.record(PROVIDE_DELEGATE_RESOLVED_CALL, variableDescriptor, provideDelegateResults.resultingCall)
+                    traceForProvideDelegate.commit() // otherwise we have to reanalyze provideDelegate with good delegate type
                 }
             }
         }
@@ -597,6 +601,9 @@ class DelegatedPropertyResolver(
     }
 
     private fun buildSubstitutionMapOfNonFixedVariables(type: KotlinType): Map<UnwrappedType, UnwrappedType>? {
+        // This is an exception for delegated properties that return just type variable
+        if (type.constructor is NewTypeVariableConstructor) return null
+
         var substitutionMap: MutableMap<UnwrappedType, UnwrappedType>? = null
         type.contains { innerType ->
             val constructor = innerType.constructor
