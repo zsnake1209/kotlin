@@ -65,7 +65,9 @@ class SimpleCandidateFactory(
 
     init {
         val baseSystem = NewConstraintSystemImpl(callComponents.constraintInjector, callComponents.builtIns)
-        baseSystem.addSubsystemFromArgument(kotlinCall.explicitReceiver)
+        if (!inferenceSession.resolveReceiverIndependently()) {
+            baseSystem.addSubsystemFromArgument(kotlinCall.explicitReceiver)
+        }
         baseSystem.addSubsystemFromArgument(kotlinCall.dispatchReceiverForInvokeExtension)
         for (argument in kotlinCall.argumentsInParenthesis) {
             baseSystem.addSubsystemFromArgument(argument)

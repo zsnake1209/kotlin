@@ -136,4 +136,6 @@ object InferenceSessionForExistingCandidates : InferenceSession {
 
         return KotlinConstraintSystemCompleter.ConstraintSystemCompletionMode.PARTIAL
     }
+
+    override fun resolveReceiverIndependently(): Boolean = true
 }

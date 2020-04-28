@@ -43,3 +43,35 @@ class StubType(
     @TypeRefinement
     override fun refine(kotlinTypeRefiner: KotlinTypeRefiner) = this
 }
+
+class StubType2(
+    private val originalTypeVariable: TypeConstructor,
+    override val isMarkedNullable: Boolean,
+    override val constructor: TypeConstructor =
+        ErrorUtils.createErrorTypeConstructor("Constructor for non fixed type: $originalTypeVariable"),
+    override val memberScope: MemberScope =
+        ErrorUtils.createErrorScope("Scope for non fixed type: $originalTypeVariable")
+) : SimpleType() {
+
+    override val arguments: List<TypeProjection>
+        get() = emptyList()
+
+    override val annotations: Annotations
+        get() = Annotations.EMPTY
+
+    override fun replaceAnnotations(newAnnotations: Annotations): SimpleType = this
+
+    override fun makeNullableAsSpecified(newNullability: Boolean): SimpleType {
+        return if (newNullability == isMarkedNullable)
+            this
+        else
+            StubType2(originalTypeVariable, newNullability, constructor, memberScope)
+    }
+
+    override fun toString(): String {
+        return "NonFixed: $originalTypeVariable"
+    }
+
+    @TypeRefinement
+    override fun refine(kotlinTypeRefiner: KotlinTypeRefiner) = this
+}
