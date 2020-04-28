@@ -39,6 +39,8 @@ interface FirClass<F : FirClass<F>> : FirClassLikeDeclaration<F>, FirStatement, 
 
     fun replaceSuperTypeRefs(newSuperTypeRefs: List<FirTypeRef>)
 
+    fun <D> transformSuperTypeRefs(transformer: FirTransformer<D>, data: D): FirClass<F>
+
     fun <D> transformDeclarations(transformer: FirTransformer<D>, data: D): FirClass<F>
 
     override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirClass<F>
