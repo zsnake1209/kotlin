@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.util.IrDeserializer
 import org.jetbrains.kotlin.ir.util.IrExtensionGenerator
-import org.jetbrains.kotlin.ir.util.SymbolTable
+import org.jetbrains.kotlin.ir.util.ReferenceSymbolTable
 import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -30,7 +30,7 @@ open class IrPluginContext(
     @Deprecated("FrontEnd API shouldn't be accessed in Ir plugin environment")
     val bindingContext: BindingContext,
     val languageVersionSettings: LanguageVersionSettings,
-    val symbolTable: SymbolTable,
+    val symbolTable: ReferenceSymbolTable,
     @Deprecated("FrontEnd API shouldn't be accessed in Ir plugin environment")
     val typeTranslator: TypeTranslator,
     override val irBuiltIns: IrBuiltIns,
