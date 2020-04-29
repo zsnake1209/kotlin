@@ -117,7 +117,7 @@ class KotlinConstraintSystemCompleter(
             if (postponedArguments.isEmpty() && !isThereAnyReadyForFixationVariable)
                 break
 
-            // Stage 1: analyze postponed arguments fix fixed parameter types
+            // Stage 1: analyze postponed arguments with fixed parameter types
             if (analyzeArgumentWithFixedParameterTypes(postponedArguments, analyze))
                 continue
 
