@@ -491,6 +491,7 @@ abstract class KotlinIrLinker(
         moduleDeserializer.declareIrSymbol(symbol)
 
         deserializeAllReachableTopLevels()
+        if (!symbol.isBound) return null
         return descriptor
     }
 

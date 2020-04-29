@@ -216,7 +216,8 @@ open class CurrentModuleDeserializer(
     }
 
     override fun declareIrSymbol(symbol: IrSymbol) {
-        declareIrSymbolImpl(symbol)
+        // TODO: remove it
+//        declareIrSymbolImpl(symbol)
     }
 
     private fun referenceParentDescriptor(descriptor: DeclarationDescriptor): IrSymbol {
