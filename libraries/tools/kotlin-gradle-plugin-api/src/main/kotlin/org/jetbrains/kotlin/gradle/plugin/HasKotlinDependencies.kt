@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -10,7 +10,6 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.util.ConfigureUtil
-import java.io.File
 
 interface KotlinDependencyHandler {
     fun api(dependencyNotation: Any): Dependency?
@@ -53,17 +52,6 @@ interface KotlinDependencyHandler {
         project(listOf("path", "configuration").zip(listOfNotNull(path, configuration)).toMap())
 
     fun project(notation: Map<String, Any?>): ProjectDependency
-
-    fun npm(name: String, version: String = "*"): Dependency
-
-    fun npm(name: String, directory: File): Dependency
-
-    fun npm(directory: File): Dependency
-
-    @Deprecated(
-        message = "Use npm(name, version) instead. Name like in package.json"
-    )
-    fun npm(org: String? = null, packageName: String, version: String = "*"): Dependency
 }
 
 interface HasKotlinDependencies {
