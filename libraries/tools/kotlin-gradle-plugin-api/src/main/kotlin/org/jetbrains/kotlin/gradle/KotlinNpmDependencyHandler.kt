@@ -9,7 +9,7 @@ import org.gradle.api.artifacts.Dependency
 import java.io.File
 
 interface KotlinNpmDependencyHandler {
-    fun npm(name: String, version: String = "*"): Dependency
+    fun npm(name: String, version: String): Dependency
 
     fun npm(name: String, directory: File): Dependency
 

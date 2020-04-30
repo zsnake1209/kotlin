@@ -12,7 +12,7 @@ import org.gradle.api.reflect.TypeOf
 import java.io.File
 
 interface NpmDependencyExtension {
-    operator fun invoke(name: String, version: String = "*"): NpmDependency
+    operator fun invoke(name: String, version: String): NpmDependency
 
     operator fun invoke(name: String, directory: File): NpmDependency
 
