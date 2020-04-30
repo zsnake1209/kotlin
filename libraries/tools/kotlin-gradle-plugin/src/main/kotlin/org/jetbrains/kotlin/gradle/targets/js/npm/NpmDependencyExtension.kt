@@ -63,9 +63,6 @@ fun Project.addNpmDependencyExtension() {
         private fun withName(name: String, vararg args: Any?): NpmDependency {
             val arg = if (args.size > 1) args[1] else null
             return when (arg) {
-                null -> invoke(
-                    name = name
-                )
                 is String -> invoke(
                     name = name,
                     version = arg
