@@ -9,10 +9,8 @@ import com.intellij.codeInsight.hints.*
 import com.intellij.lang.Language
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
-import com.intellij.ui.layout.panel
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.KotlinLanguage
-import javax.swing.JPanel
 
 @Suppress("UnstableApiUsage")
 class KotlinCodeVisionProvider : InlayHintsProvider<KotlinCodeVisionProvider.KotlinCodeVisionSettings> {
@@ -28,28 +26,7 @@ class KotlinCodeVisionProvider : InlayHintsProvider<KotlinCodeVisionProvider.Kot
         return language is KotlinLanguage
     }
 
-    override fun createConfigurable(settings: KotlinCodeVisionSettings): ImmediateConfigurable = object : ImmediateConfigurable {
-        override fun createComponent(listener: ChangeListener): JPanel {
-            return panel {}
-        }
-
-        override val cases: List<ImmediateConfigurable.Case>
-            get() = listOf(
-                ImmediateConfigurable.Case(
-                    KotlinBundle.message("hints.title.codevision.usages"),
-                    "usages",
-                    settings::showUsages
-                ),
-                ImmediateConfigurable.Case(
-                    KotlinBundle.message("hints.title.codevision.inheritors"),
-                    "inheritors",
-                    settings::showInheritors
-                )
-            )
-
-        override val mainCheckboxText: String
-            get() = KotlinBundle.message("hints.title.codevision.show.hints.for")
-    }
+    override fun createConfigurable(settings: KotlinCodeVisionSettings): ImmediateConfigurable = createImmediateConfigurable(settings)
 
     override fun createSettings(): KotlinCodeVisionSettings {
         return KotlinCodeVisionSettings()

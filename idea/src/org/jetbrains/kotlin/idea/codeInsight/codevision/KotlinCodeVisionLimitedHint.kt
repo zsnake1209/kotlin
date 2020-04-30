@@ -5,10 +5,8 @@
 
 package org.jetbrains.kotlin.idea.codeInsight.codevision
 
-import com.intellij.codeInsight.hints.settings.InlayHintsConfigurable
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationAction
 import com.intellij.internal.statistic.eventLog.FeatureUsageData
-import com.intellij.internal.statistic.service.fus.collectors.FUCounterUsageLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.idea.KotlinBundle
@@ -63,7 +61,7 @@ class Usages(usagesNum: Int, limitReached: Boolean) :
     KotlinCodeVisionLimitedHint(usagesNum, limitReached, USAGES_KEY, USAGES_TOO_MANY_KEY) {
 
     override fun onClick(editor: Editor, element: PsiElement, event: MouseEvent?) {
-        FUCounterUsageLogger.getInstance().logEvent(editor.project, FUS_GROUP_ID, USAGES_CLICKED_EVENT_ID)
+        logUsageStatistics(editor.project, FUS_GROUP_ID, USAGES_CLICKED_EVENT_ID)
         GotoDeclarationAction.startFindUsages(editor, editor.project!!, element)
     }
 }
@@ -73,7 +71,7 @@ class FunctionOverrides(overridesNum: Int, limitReached: Boolean) :
 
     override fun onClick(editor: Editor, element: PsiElement, event: MouseEvent?) {
         val data = FeatureUsageData().addData(FUD_KEY, FUD_FUNCTION)
-        FUCounterUsageLogger.getInstance().logEvent(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
+        logUsageStatistics(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
         val navigationHandler = OVERRIDDEN_FUNCTION.navigationHandler
         navigationHandler.navigate(event, (element as KtFunction).nameIdentifier)
     }
@@ -84,7 +82,7 @@ class FunctionImplementations(implNum: Int, limitReached: Boolean) :
 
     override fun onClick(editor: Editor, element: PsiElement, event: MouseEvent?) {
         val data = FeatureUsageData().addData(FUD_KEY, FUD_FUNCTION)
-        FUCounterUsageLogger.getInstance().logEvent(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
+        logUsageStatistics(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
         val navigationHandler = OVERRIDDEN_FUNCTION.navigationHandler
         navigationHandler.navigate(event, (element as KtFunction).nameIdentifier)
     }
@@ -95,7 +93,7 @@ class PropertyOverrides(overridesNum: Int, limitReached: Boolean) :
 
     override fun onClick(editor: Editor, element: PsiElement, event: MouseEvent?) {
         val data = FeatureUsageData().addData(FUD_KEY, FUD_PROPERTY)
-        FUCounterUsageLogger.getInstance().logEvent(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
+        logUsageStatistics(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
         val navigationHandler = OVERRIDDEN_PROPERTY.navigationHandler
         navigationHandler.navigate(event, (element as KtProperty).nameIdentifier)
     }
@@ -106,7 +104,7 @@ class ClassInheritors(inheritorsNum: Int, limitReached: Boolean) :
 
     override fun onClick(editor: Editor, element: PsiElement, event: MouseEvent?) {
         val data = FeatureUsageData().addData(FUD_KEY, FUD_CLASS)
-        FUCounterUsageLogger.getInstance().logEvent(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
+        logUsageStatistics(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
         val navigationHandler = SUBCLASSED_CLASS.navigationHandler
         navigationHandler.navigate(event, (element as KtClass).nameIdentifier)
     }
@@ -117,7 +115,7 @@ class InterfaceImplementations(implNum: Int, limitReached: Boolean) :
 
     override fun onClick(editor: Editor, element: PsiElement, event: MouseEvent?) {
         val data = FeatureUsageData().addData(FUD_KEY, "interface")
-        FUCounterUsageLogger.getInstance().logEvent(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
+        logUsageStatistics(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
         val navigationHandler = SUBCLASSED_CLASS.navigationHandler
         navigationHandler.navigate(event, (element as KtClass).nameIdentifier)
     }
@@ -126,7 +124,7 @@ class InterfaceImplementations(implNum: Int, limitReached: Boolean) :
 class SettingsHint : KotlinCodeVisionHint(SETTINGS_FORMAT) {
     override fun onClick(editor: Editor, element: PsiElement, event: MouseEvent?) {
         val project = element.project
-        FUCounterUsageLogger.getInstance().logEvent(project, FUS_GROUP_ID, SETTING_CLICKED_EVENT_ID)
-        InlayHintsConfigurable.showSettingsDialogForLanguage(project, element.language)
+        logUsageStatistics(project, FUS_GROUP_ID, SETTING_CLICKED_EVENT_ID)
+        CodeVisionInlayHintsConfigurable.showSettingsDialogForLanguage(project, element.language)
     }
 }
