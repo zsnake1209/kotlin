@@ -112,5 +112,6 @@ The Kotlin plugin provides language support in IntelliJ IDEA and Android Studio.
 
       <completion.ml.model implementation="org.jetbrains.kotlin.idea.completion.ml.KotlinMLRankingProvider"/>
       <completion.ml.contextFeatures language="kotlin" implementationClass="org.jetbrains.kotlin.idea.completion.ml.KotlinContextFeatureProvider"/>
+      <codeInsight.inlayProvider language="kotlin" implementationClass="org.jetbrains.kotlin.idea.codeInsight.codevision.KotlinCodeVisionProvider"/>
     </extensions>
 </idea-plugin>
