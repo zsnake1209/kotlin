@@ -10,6 +10,7 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.util.ConfigureUtil
+import java.io.File
 
 interface KotlinDependencyHandler {
     fun api(dependencyNotation: Any): Dependency?
@@ -52,6 +53,31 @@ interface KotlinDependencyHandler {
         project(listOf("path", "configuration").zip(listOfNotNull(path, configuration)).toMap())
 
     fun project(notation: Map<String, Any?>): ProjectDependency
+
+    fun npm(name: String, version: String): Dependency
+
+    fun npm(name: String, directory: File): Dependency
+
+    fun npm(directory: File): Dependency
+
+    @Deprecated(
+        message = "Use npm(name, version) instead. Name like in package.json"
+    )
+    fun npm(org: String? = null, packageName: String, version: String = "*"): Dependency
+
+    fun devNpm(name: String, version: String): Dependency
+
+    fun devNpm(name: String, directory: File): Dependency
+
+    fun devNpm(directory: File): Dependency
+
+    fun optionalNpm(name: String, version: String): Dependency
+
+    fun optionalNpm(name: String, directory: File): Dependency
+
+    fun optionalNpm(directory: File): Dependency
+
+    fun peerNpm(name: String, version: String): Dependency
 }
 
 interface HasKotlinDependencies {

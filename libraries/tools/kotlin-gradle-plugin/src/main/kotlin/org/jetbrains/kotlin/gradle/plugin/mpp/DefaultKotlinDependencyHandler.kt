@@ -9,7 +9,6 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
-import org.jetbrains.kotlin.gradle.KotlinNpmDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.HasKotlinDependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.targets.js.npm.NpmDependency
@@ -20,8 +19,7 @@ import java.io.File
 class DefaultKotlinDependencyHandler(
     val parent: HasKotlinDependencies,
     val project: Project
-) : KotlinDependencyHandler,
-    KotlinNpmDependencyHandler {
+) : KotlinDependencyHandler {
     override fun api(dependencyNotation: Any): Dependency? =
         addDependencyByAnyNotation(parent.apiConfigurationName, dependencyNotation)
 
@@ -131,6 +129,35 @@ class DefaultKotlinDependencyHandler(
         devNpm(
             name = moduleName(directory),
             directory = directory
+        )
+
+    override fun optionalNpm(name: String, version: String): NpmDependency =
+        NpmDependency(
+            project = project,
+            name = name,
+            version = version,
+            scope = NpmDependency.Scope.OPTIONAL
+        )
+
+    override fun optionalNpm(name: String, directory: File): NpmDependency =
+        directoryNpmDependency(
+            name = name,
+            directory = directory,
+            scope = NpmDependency.Scope.OPTIONAL
+        )
+
+    override fun optionalNpm(directory: File): NpmDependency =
+        optionalNpm(
+            name = moduleName(directory),
+            directory = directory
+        )
+
+    override fun peerNpm(name: String, version: String): NpmDependency =
+        NpmDependency(
+            project = project,
+            name = name,
+            version = version,
+            scope = NpmDependency.Scope.PEER
         )
 
     private fun directoryNpmDependency(

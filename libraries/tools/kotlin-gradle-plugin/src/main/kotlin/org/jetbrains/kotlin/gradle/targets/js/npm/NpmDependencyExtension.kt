@@ -9,6 +9,7 @@ import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.reflect.TypeOf
+import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
 import java.io.File
 
 interface NpmDependencyExtension {
@@ -20,14 +21,31 @@ interface NpmDependencyExtension {
 }
 
 fun Project.addNpmDependencyExtension() {
-    val dependencies = this.dependencies as ExtensionAware
+    val extensions = (dependencies as ExtensionAware).extensions
 
-    val npmDependencyExtension: NpmDependencyExtension = object : NpmDependencyExtension, Closure<NpmDependency>(dependencies) {
+    NpmDependency.Scope.values()
+        .forEach { scope ->
+            val extension = scope.name
+                .removePrefix(NpmDependency.Scope.NORMAL.name)
+                .toLowerCase()
+
+            extensions
+                .add(
+                    TypeOf.typeOf(NpmDependencyExtension::class.java),
+                    lowerCamelCaseName(extension, "npm"),
+                    createNpmDependencyExtension(scope)
+                )
+        }
+}
+
+private fun Project.createNpmDependencyExtension(scope: NpmDependency.Scope): NpmDependencyExtension {
+    return object : NpmDependencyExtension, Closure<NpmDependency>(dependencies) {
         override operator fun invoke(name: String, version: String): NpmDependency =
             NpmDependency(
-                project = this@addNpmDependencyExtension,
+                project = this@createNpmDependencyExtension,
                 name = name,
-                version = version
+                version = version,
+                scope = scope
             )
 
         override operator fun invoke(name: String, directory: File): NpmDependency {
@@ -86,12 +104,4 @@ fun Project.addNpmDependencyExtension() {
             )
         }
     }
-
-    dependencies
-        .extensions
-        .add(
-            TypeOf.typeOf(NpmDependencyExtension::class.java),
-            "npm",
-            npmDependencyExtension
-        )
 }
