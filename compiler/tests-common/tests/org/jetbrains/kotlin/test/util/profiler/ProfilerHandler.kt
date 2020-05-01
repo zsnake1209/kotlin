@@ -1,13 +1,9 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.idea.perf.profilers
-
-import org.jetbrains.kotlin.idea.perf.profilers.async.AsyncProfilerHandler
-import org.jetbrains.kotlin.idea.perf.profilers.yk.YKProfilerHandler
-import org.jetbrains.kotlin.idea.testFramework.logMessage
+package org.jetbrains.kotlin.test.util.profiler
 
 interface ProfilerHandler {
     fun startProfiling(activityName: String, options: List<String> = emptyList())
@@ -35,6 +31,10 @@ object DummyProfilerHandler : ProfilerHandler {
     override fun startProfiling(activityName: String, options: List<String>) {}
 
     override fun stopProfiling(snapshotsPath: String, activityName: String, options: List<String>) {}
+}
+
+internal fun logMessage(message: () -> String) {
+    println("-- ${message()}")
 }
 
 internal fun <T> doOrLog(message: String, block: () -> T?): T? {

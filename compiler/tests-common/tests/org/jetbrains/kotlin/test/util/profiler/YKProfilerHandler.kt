@@ -3,11 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.idea.perf.profilers.yk
+package org.jetbrains.kotlin.test.util.profiler
 
-import org.jetbrains.kotlin.idea.perf.profilers.ProfilerHandler
-import org.jetbrains.kotlin.idea.perf.profilers.doOrThrow
-import org.jetbrains.kotlin.idea.testFramework.logMessage
 import java.lang.management.ManagementFactory
 import java.lang.reflect.Method
 import java.nio.file.Files

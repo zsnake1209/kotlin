@@ -1,16 +1,13 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.idea.perf.profilers.async
+package org.jetbrains.kotlin.test.util.profiler
 
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.containers.ContainerUtil
-import org.jetbrains.kotlin.idea.perf.profilers.ProfilerHandler
-import org.jetbrains.kotlin.idea.perf.profilers.doOrThrow
-import org.jetbrains.kotlin.idea.testFramework.logMessage
 import java.io.File
 import java.lang.reflect.Method
 import java.nio.file.Files

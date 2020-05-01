@@ -6,9 +6,9 @@
 package org.jetbrains.kotlin.idea.perf
 
 import org.jetbrains.kotlin.idea.perf.WholeProjectPerformanceTest.Companion.nsToMs
-import org.jetbrains.kotlin.idea.perf.profilers.*
 import org.jetbrains.kotlin.idea.testFramework.logMessage
 import org.jetbrains.kotlin.idea.testFramework.suggestOsNeutralFileName
+import org.jetbrains.kotlin.test.util.profiler.*
 import org.jetbrains.kotlin.util.PerformanceCounter
 import java.io.*
 import kotlin.system.measureNanoTime
