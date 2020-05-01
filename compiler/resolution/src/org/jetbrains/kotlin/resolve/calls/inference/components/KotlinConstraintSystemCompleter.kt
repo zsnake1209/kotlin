@@ -121,16 +121,12 @@ class KotlinConstraintSystemCompleter(
             if (analyzeArgumentWithFixedParameterTypes(postponedArguments, analyze))
                 continue
 
-            val postponedArgumentsWithRevisableTypeVariableExpectedType = postponedArguments
-                .filter { it.expectedType?.constructor is TypeVariableTypeConstructor }
-                .filterIsInstance<PostponedAtomWithRevisableExpectedType>()
+            val postponedArgumentsWithRevisableType = postponedArguments.filterIsInstance<PostponedAtomWithRevisableExpectedType>()
             val dependencyProvider =
                 TypeVariableDependencyInformationProvider(notFixedTypeVariables, postponedArguments, topLevelType, this)
 
             // Stage 2: collect parameter types from constraints and lambda parameters' declaration
-            collectParameterTypesAndBuildNewExpectedTypes(
-                postponedArgumentsWithRevisableTypeVariableExpectedType, completionMode, dependencyProvider
-            )
+            collectParameterTypesAndBuildNewExpectedTypes(postponedArgumentsWithRevisableType, completionMode, dependencyProvider)
 
             if (completionMode == ConstraintSystemCompletionMode.FULL) {
                 // Stage 3: fix variables for parameter types of all postponed arguments
@@ -149,7 +145,7 @@ class KotlinConstraintSystemCompleter(
                 }
 
                 // Stage 4: create atoms with revised expected types if needed
-                for (argument in postponedArgumentsWithRevisableTypeVariableExpectedType) {
+                for (argument in postponedArgumentsWithRevisableType) {
                     transformToAtomWithNewFunctionalExpectedType(argument, diagnosticsHolder)
                 }
             }
