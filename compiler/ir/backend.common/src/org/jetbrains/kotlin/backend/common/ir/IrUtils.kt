@@ -489,7 +489,7 @@ val IrFunction.allParameters: List<IrValueParameter>
         explicitParameters
     }
 
-fun IrClass.addFakeOverrides(implementedMembers: List<IrSimpleFunction> = emptyList()) {
+fun IrClass.addFakeOverridesViaIncorrectHeuristic(implementedMembers: List<IrSimpleFunction> = emptyList()) {
     fun IrDeclaration.toList() = when (this) {
         is IrSimpleFunction -> listOf(this)
         is IrProperty -> listOfNotNull(getter, setter)
@@ -523,7 +523,7 @@ fun IrClass.addFakeOverrides(implementedMembers: List<IrSimpleFunction> = emptyL
                 IrDeclarationOrigin.FAKE_OVERRIDE,
                 IrSimpleFunctionSymbolImpl(descriptor),
                 irFunction.name,
-                Visibilities.INHERITED,
+                Visibilities.PUBLIC,
                 irFunction.modality,
                 irFunction.returnType,
                 isInline = irFunction.isInline,
@@ -535,7 +535,7 @@ fun IrClass.addFakeOverrides(implementedMembers: List<IrSimpleFunction> = emptyL
                 isOperator = irFunction.isOperator
             ).apply {
                 descriptor.bind(this)
-                parent = this@addFakeOverrides
+                parent = this@addFakeOverridesViaIncorrectHeuristic
                 overriddenSymbols = overriddenFunctions.map { it.symbol }
                 copyParameterDeclarationsFrom(irFunction)
                 copyAttributes(irFunction)
