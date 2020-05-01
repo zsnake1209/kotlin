@@ -15557,6 +15557,11 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         public void testTostring() throws Exception {
             runTest("compiler/testData/codegen/box/intrinsics/tostring.kt");
         }
+
+        @TestMetadata("trimMarginWithBlankString.kt")
+        public void testTrimMarginWithBlankString() throws Exception {
+            runTest("compiler/testData/codegen/box/intrinsics/trimMarginWithBlankString.kt");
+        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/ir")
