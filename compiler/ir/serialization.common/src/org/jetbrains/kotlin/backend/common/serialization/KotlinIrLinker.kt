@@ -512,11 +512,11 @@ abstract class KotlinIrLinker(
         }
 
         // TODO: we do have serializations for those, but let's just create a stub for now.
-        if (!symbol.isBound && (symbol.descriptor.isExpectMember || symbol.descriptor.containingDeclaration?.isExpectMember == true))
+        if (!symbol.isBound && (symbol.trueDescriptor.isExpectMember || symbol.trueDescriptor.containingDeclaration?.isExpectMember == true))
             return null
 
         assert(symbol.isBound) {
-            "getDeclaration: symbol $symbol is unbound, descriptor = ${symbol.descriptor}, signature = ${symbol.signature}"
+            "getDeclaration: symbol $symbol is unbound, descriptor = ${symbol.trueDescriptor}, signature = ${symbol.signature}"
         }
 
         return symbol.owner as IrDeclaration
