@@ -56,6 +56,7 @@ const val FUD_KEY = "location"
 const val FUD_FUNCTION = "function"
 const val FUD_PROPERTY = "property"
 const val FUD_CLASS = "class"
+const val FUD_INTERFACE = "interface"
 
 class Usages(usagesNum: Int, limitReached: Boolean) :
     KotlinCodeVisionLimitedHint(usagesNum, limitReached, USAGES_KEY, USAGES_TOO_MANY_KEY) {
@@ -114,7 +115,7 @@ class InterfaceImplementations(implNum: Int, limitReached: Boolean) :
     KotlinCodeVisionLimitedHint(implNum, limitReached, IMPLEMENTATIONS_KEY, IMPLEMENTATIONS_TO_MANY_KEY) {
 
     override fun onClick(editor: Editor, element: PsiElement, event: MouseEvent?) {
-        val data = FeatureUsageData().addData(FUD_KEY, "interface")
+        val data = FeatureUsageData().addData(FUD_KEY, FUD_INTERFACE)
         logUsageStatistics(editor.project, FUS_GROUP_ID, INHERITORS_CLICKED_EVENT_ID, data)
         val navigationHandler = SUBCLASSED_CLASS.navigationHandler
         navigationHandler.navigate(event, (element as KtClass).nameIdentifier)
