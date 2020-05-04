@@ -10,20 +10,20 @@ import com.intellij.debugger.engine.evaluation.EvaluateException
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl
 import com.intellij.openapi.project.Project
+import com.sun.jdi.ObjectReference
 import com.sun.jdi.Value
-import org.jetbrains.kotlin.idea.debugger.coroutine.proxy.ContinuationHolder
 
 class ContinuationValueDescriptorImpl(
     project: Project,
-    val continuation: ContinuationHolder,
+    val continuation: ObjectReference,
     val fieldName: String,
-    val variableName: String
+    private val variableName: String
 ) : ValueDescriptorImpl(project) {
     override fun calcValueName() = variableName
 
     override fun calcValue(evaluationContext: EvaluationContextImpl?): Value? {
         val field = continuation.referenceType()?.fieldByName(fieldName) ?: return null
-        return continuation.field(field)
+        return continuation.getValue(field)
     }
 
     override fun getDescriptorEvaluation(context: DebuggerContext?) =

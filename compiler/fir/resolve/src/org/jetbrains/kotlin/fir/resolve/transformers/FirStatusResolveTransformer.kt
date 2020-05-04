@@ -9,14 +9,11 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
-import org.jetbrains.kotlin.fir.FirEffectiveVisibility
-import org.jetbrains.kotlin.fir.FirElement
-import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.*
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirStatement
-import org.jetbrains.kotlin.fir.firEffectiveVisibility
 import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.fir.visitors.compose
@@ -40,8 +37,9 @@ fun <F : FirClass<F>> F.runStatusResolveForLocalClass(session: FirSession): F {
     return this.transform<F, Nothing?>(transformer, null).single
 }
 
-private class FirStatusResolveTransformer(override val session: FirSession) :
-    FirAbstractTreeTransformer<FirDeclarationStatus?>(phase = FirResolvePhase.STATUS) {
+private class FirStatusResolveTransformer(
+    override val session: FirSession
+) : FirAbstractTreeTransformer<FirDeclarationStatus?>(phase = FirResolvePhase.STATUS) {
     private val classes = mutableListOf<FirClass<*>>()
 
     private val containingClass: FirClass<*>? get() = classes.lastOrNull()
@@ -54,13 +52,39 @@ private class FirStatusResolveTransformer(override val session: FirSession) :
     }
 
     private inline fun storeClass(
-        klass: FirRegularClass,
+        klass: FirClass<*>,
         computeResult: () -> CompositeTransformResult<FirDeclaration>
     ): CompositeTransformResult<FirDeclaration> {
         classes += klass
         val result = computeResult()
         classes.removeAt(classes.lastIndex)
         return result
+    }
+
+    override fun transformDeclaration(declaration: FirDeclaration, data: FirDeclarationStatus?): CompositeTransformResult<FirDeclaration> {
+        declaration.replaceResolvePhase(transformerPhase)
+        return when (declaration) {
+            is FirCallableDeclaration<*> -> {
+                when (declaration) {
+                    is FirProperty -> {
+                        declaration.getter?.let { transformPropertyAccessor(it, data) }
+                        declaration.setter?.let { transformPropertyAccessor(it, data) }
+                    }
+                    is FirFunction<*> -> {
+                        for (valueParameter in declaration.valueParameters) {
+                            transformValueParameter(valueParameter, data)
+                        }
+                    }
+                }
+                declaration.compose()
+            }
+            is FirPropertyAccessor -> {
+                declaration.compose()
+            }
+            else -> {
+                transformElement(declaration, data)
+            }
+        }
     }
 
     override fun transformTypeAlias(typeAlias: FirTypeAlias, data: FirDeclarationStatus?): CompositeTransformResult<FirDeclaration> {
@@ -74,6 +98,15 @@ private class FirStatusResolveTransformer(override val session: FirSession) :
         return storeClass(regularClass) {
             regularClass.typeParameters.forEach { it.transformSingle(this, data) }
             transformDeclaration(regularClass, data)
+        } as CompositeTransformResult<FirStatement>
+    }
+
+    override fun transformAnonymousObject(
+        anonymousObject: FirAnonymousObject,
+        data: FirDeclarationStatus?
+    ): CompositeTransformResult<FirStatement> {
+        return storeClass(anonymousObject) {
+            transformDeclaration(anonymousObject, data)
         } as CompositeTransformResult<FirStatement>
     }
 
@@ -135,7 +168,7 @@ private class FirStatusResolveTransformer(override val session: FirSession) :
 private val <F : FirClass<F>> FirClass<F>.effectiveVisibility: FirEffectiveVisibility
     get() = when (this) {
         is FirRegularClass -> status.effectiveVisibility
-        is FirAnonymousObject -> FirEffectiveVisibility.Local
+        is FirAnonymousObject -> FirEffectiveVisibilityImpl.Local
         else -> error("Unknown kind of class: ${this::class}")
     }
 
@@ -151,13 +184,20 @@ fun FirDeclaration.resolveStatus(
     containingClass: FirClass<*>?,
     isLocal: Boolean
 ): FirDeclarationStatus {
-    if (status.visibility == Visibilities.UNKNOWN || status.modality == null) {
+    if (status.visibility == Visibilities.UNKNOWN || status.modality == null ||
+        status.effectiveVisibility == FirEffectiveVisibility.Default
+    ) {
         val visibility = when (status.visibility) {
-            Visibilities.UNKNOWN -> if (isLocal) Visibilities.LOCAL else resolveVisibility(containingClass)
+            Visibilities.UNKNOWN -> when {
+                isLocal -> Visibilities.LOCAL
+                this is FirConstructor && containingClass is FirAnonymousObject -> Visibilities.PRIVATE
+                else -> resolveVisibility(containingClass)
+            }
             else -> status.visibility
         }
         val modality = status.modality ?: resolveModality(containingClass)
-        val containerEffectiveVisibility = containingClass?.effectiveVisibility ?: FirEffectiveVisibility.Public
+        val containerEffectiveVisibility = containingClass?.effectiveVisibility?.takeIf { it !is FirEffectiveVisibility.Default }
+            ?: FirEffectiveVisibilityImpl.Public
         val effectiveVisibility =
             visibility.firEffectiveVisibility(session, this as? FirMemberDeclaration).lowerBound(containerEffectiveVisibility)
         return (status as FirDeclarationStatusImpl).resolved(visibility, effectiveVisibility, modality)

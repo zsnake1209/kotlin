@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import proguard.gradle.ProGuardTask
 
 buildscript {
-
     val cacheRedirectorEnabled = findProperty("cacheRedirectorEnabled")?.toString()?.toBoolean() == true
 
     kotlinBootstrapFrom(BootstrapOption.BintrayBootstrap(kotlinBuildProperties.kotlinBootstrapVersion!!, cacheRedirectorEnabled))
@@ -65,7 +64,11 @@ val configuredJdks: List<JdkId> =
 
 val defaultSnapshotVersion: String by extra
 val buildNumber by extra(findProperty("build.number")?.toString() ?: defaultSnapshotVersion)
-val kotlinVersion by extra(findProperty("deployVersion")?.toString() ?: buildNumber)
+val kotlinVersion by extra(
+        findProperty("deployVersion")?.toString()?.let { deploySnapshotStr ->
+            if (deploySnapshotStr != "default.snapshot") deploySnapshotStr else defaultSnapshotVersion
+        } ?: buildNumber
+)
 
 val kotlinLanguageVersion by extra("1.4")
 
@@ -181,7 +184,7 @@ extra["versions.kotlinx-collections-immutable-jvm"] = immutablesVersion
 extra["versions.ktor-network"] = "1.0.1"
 
 if (!project.hasProperty("versions.kotlin-native")) {
-    extra["versions.kotlin-native"] = "1.4-M2-dev-15123"
+    extra["versions.kotlin-native"] = "1.4-M3-dev-15453"
 }
 
 val intellijUltimateEnabled by extra(project.kotlinBuildProperties.intellijUltimateEnabled)
@@ -260,6 +263,7 @@ extra["compilerModules"] = arrayOf(
     ":core:type-system",
     ":compiler:fir:cones",
     ":compiler:fir:resolve",
+    ":compiler:fir:fir-serialization",
     ":compiler:fir:tree",
     ":compiler:fir:raw-fir:fir-common",
     ":compiler:fir:raw-fir:psi2fir",
@@ -355,7 +359,7 @@ allprojects {
         maven("https://jetbrains.bintray.com/intellij-third-party-dependencies")
         maven("https://dl.google.com/dl/android/maven2")
         bootstrapKotlinRepo?.let(::maven)
-        internalKotlinRepo?.let(::maven)
+        internalBootstrapRepo?.let(::maven)
     }
 
     configureJvmProject(javaHome!!, jvmTarget!!)
@@ -418,6 +422,9 @@ allprojects {
         register("listRuntimeJar") { listConfigurationContents("runtimeJar") }
 
         register("listDistJar") { listConfigurationContents("distJar") }
+
+        // Aggregate task for build related checks
+        register("checkBuild")
     }
 
     afterEvaluate {
@@ -453,9 +460,6 @@ allprojects {
             configurations.findByName("kotlinCompilerPluginClasspath")
                 ?.exclude("org.jetbrains.kotlin", "kotlin-scripting-compiler-embeddable")
         }
-
-        // Aggregate task for build related checks
-        tasks.register("checkBuild")
 
         apply(from = "$rootDir/gradle/cacheRedirector.gradle.kts")
     }
@@ -611,6 +615,7 @@ tasks {
         dependsOn("nativeCompilerTest")
         dependsOn("firCompilerTest")
 
+        dependsOn(":kotlin-daemon-tests:test")
         dependsOn("scriptingTest")
         dependsOn(":kotlin-build-common:test")
         dependsOn(":compiler:incremental-compilation-impl:test")
@@ -747,6 +752,14 @@ tasks {
 
     register("check") {
         dependsOn("test")
+    }
+
+    named("checkBuild") {
+        if (kotlinBuildProperties.isTeamcityBuild) {
+            doFirst {
+                println("##teamcity[setParameter name='bootstrap.kotlin.version' value='$bootstrapKotlinVersion']")
+            }
+        }
     }
 }
 

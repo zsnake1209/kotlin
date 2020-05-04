@@ -191,13 +191,13 @@ class DeclarationsConverter(
     /**
      * @see org.jetbrains.kotlin.parsing.KotlinParsing.parseModifierList
      */
-    private fun convertModifierList(modifiers: LighterASTNode): Modifier {
+    private fun convertModifierList(modifiers: LighterASTNode, isInClass: Boolean = false): Modifier {
         val modifier = Modifier()
         modifiers.forEachChildren {
             when (it.tokenType) {
                 ANNOTATION -> modifier.annotations += convertAnnotation(it)
                 ANNOTATION_ENTRY -> modifier.annotations += convertAnnotationEntry(it)
-                is KtModifierKeywordToken -> modifier.addModifier(it)
+                is KtModifierKeywordToken -> modifier.addModifier(it, isInClass)
             }
         }
         return modifier
@@ -343,7 +343,7 @@ class DeclarationsConverter(
         var typeParameterList: LighterASTNode? = null
         classNode.forEachChildren {
             when (it.tokenType) {
-                MODIFIER_LIST -> modifiers = convertModifierList(it)
+                MODIFIER_LIST -> modifiers = convertModifierList(it, isInClass = true)
                 CLASS_KEYWORD -> classKind = ClassKind.CLASS
                 INTERFACE_KEYWORD -> classKind = ClassKind.INTERFACE
                 OBJECT_KEYWORD -> classKind = ClassKind.OBJECT
@@ -378,8 +378,8 @@ class DeclarationsConverter(
                     isActual = modifiers.hasActual()
                     isInner = modifiers.isInner()
                     isCompanion = modifiers.isCompanion() && classKind == ClassKind.OBJECT
-                    isData = modifiers.isDataClass() && classKind != ClassKind.OBJECT
-                    isInline = modifiers.hasInline()
+                    isData = modifiers.isDataClass()
+                    isInline = modifiers.isInlineClass()
                 }
 
                 val classBuilder = if (status.modality == Modality.SEALED) {
@@ -1405,7 +1405,7 @@ class DeclarationsConverter(
         if (type.asText.isEmpty()) {
             return buildErrorTypeRef { diagnostic = ConeSimpleDiagnostic("Unwrapped type is null", DiagnosticKind.Syntax) }
         }
-        var typeModifiers = TypeModifier() //TODO what with suspend?
+        var typeModifiers = TypeModifier()
         var firType: FirTypeRef = buildErrorTypeRef { diagnostic = ConeSimpleDiagnostic("Incomplete code", DiagnosticKind.Syntax) }
         var afterLPar = false
         type.forEachChildren {
@@ -1415,7 +1415,7 @@ class DeclarationsConverter(
                 MODIFIER_LIST -> if (!afterLPar || typeModifiers.hasNoAnnotations()) typeModifiers = convertTypeModifierList(it)
                 USER_TYPE -> firType = convertUserType(it)
                 NULLABLE_TYPE -> firType = convertNullableType(it)
-                FUNCTION_TYPE -> firType = convertFunctionType(it)
+                FUNCTION_TYPE -> firType = convertFunctionType(it, isSuspend = typeModifiers.hasSuspend)
                 DYNAMIC_TYPE -> firType = buildDynamicTypeRef {
                     source = type.toFirSourceElement()
                     isMarkedNullable = false
@@ -1529,7 +1529,7 @@ class DeclarationsConverter(
     /**
      * @see org.jetbrains.kotlin.parsing.KotlinParsing.parseFunctionType
      */
-    private fun convertFunctionType(functionType: LighterASTNode, isNullable: Boolean = false): FirTypeRef {
+    private fun convertFunctionType(functionType: LighterASTNode, isNullable: Boolean = false, isSuspend: Boolean = false): FirTypeRef {
         var receiverTypeReference: FirTypeRef? = null
         lateinit var returnTypeReference: FirTypeRef
         val valueParametersList = mutableListOf<ValueParameter>()
@@ -1550,6 +1550,7 @@ class DeclarationsConverter(
             if (receiverTypeReference != null) {
                 annotations += extensionFunctionAnnotation
             }
+            this.isSuspend = isSuspend
         }
     }
 

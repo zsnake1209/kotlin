@@ -15,13 +15,12 @@ import org.jetbrains.kotlin.backend.jvm.serialization.JvmIdSignatureDescriptor
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.descriptors.konan.DeserializedKlibModuleOrigin
 import org.jetbrains.kotlin.descriptors.konan.KlibModuleOrigin
-import org.jetbrains.kotlin.descriptors.konan.klibModuleOrigin
-import org.jetbrains.kotlin.descriptors.konan.kotlinLibrary
 import org.jetbrains.kotlin.idea.MainFunctionDetector
 import org.jetbrains.kotlin.ir.backend.jvm.serialization.EmptyLoggingContext
 import org.jetbrains.kotlin.ir.backend.jvm.serialization.JvmIrLinker
 import org.jetbrains.kotlin.ir.backend.jvm.serialization.JvmManglerDesc
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.*
@@ -35,7 +34,7 @@ object JvmBackendFacade {
         val mangler = JvmManglerDesc(MainFunctionDetector(state.bindingContext, state.languageVersionSettings))
         val signaturer = JvmIdSignatureDescriptor(mangler)
         val psi2ir = Psi2IrTranslator(state.languageVersionSettings, signaturer = signaturer)
-        val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, extensions = extensions)
+        val psi2irContext = psi2ir.createGeneratorContext(state.module, state.bindingContext, JvmNameProvider, extensions = extensions)
         val pluginExtensions = IrGenerationExtension.getInstances(state.project)
 
         for (extension in pluginExtensions) {
@@ -57,7 +56,9 @@ object JvmBackendFacade {
         val stubGenerator = DeclarationStubGenerator(
             psi2irContext.moduleDescriptor, psi2irContext.symbolTable, psi2irContext.irBuiltIns.languageVersionSettings, extensions
         )
-        val irLinker = JvmIrLinker(psi2irContext.moduleDescriptor, EmptyLoggingContext, psi2irContext.irBuiltIns, psi2irContext.symbolTable, stubGenerator, mangler)
+        val irLinker = JvmIrLinker(
+            psi2irContext.moduleDescriptor, EmptyLoggingContext, psi2irContext.irBuiltIns, psi2irContext.symbolTable, stubGenerator, mangler
+        )
         val dependencies = psi2irContext.moduleDescriptor.allDependencyModules.map {
             val kotlinLibrary = (it.getCapability(KlibModuleOrigin.CAPABILITY) as? DeserializedKlibModuleOrigin)?.library
             irLinker.deserializeIrModuleHeader(it, kotlinLibrary)
@@ -66,7 +67,8 @@ object JvmBackendFacade {
 
         stubGenerator.setIrProviders(irProviders)
 
-        val irModuleFragment = psi2ir.generateModuleFragment(psi2irContext, files, irProviders, expectDescriptorToSymbol = null, pluginExtensions)
+        val irModuleFragment =
+            psi2ir.generateModuleFragment(psi2irContext, files, irProviders, expectDescriptorToSymbol = null, pluginExtensions)
         irLinker.postProcess()
 
         stubGenerator.unboundSymbolGeneration = true
@@ -86,10 +88,12 @@ object JvmBackendFacade {
         sourceManager: PsiSourceManager,
         phaseConfig: PhaseConfig,
         irProviders: List<IrProvider>,
-        extensions: JvmGeneratorExtensions
+        extensions: JvmGeneratorExtensions,
+        createCodegen: (IrClass, JvmBackendContext, IrFunction?) -> ClassCodegen? = { _, _, _ -> null },
     ) {
         val context = JvmBackendContext(
-            state, sourceManager, irModuleFragment.irBuiltins, irModuleFragment, symbolTable, phaseConfig, extensions.classNameOverride
+            state, sourceManager, irModuleFragment.irBuiltins, irModuleFragment,
+            symbolTable, phaseConfig, extensions.classNameOverride, createCodegen
         )
         /* JvmBackendContext creates new unbound symbols, have to resolve them. */
         ExternalDependenciesGenerator(symbolTable, irProviders, state.languageVersionSettings).generateUnboundSymbolsAsDependencies()

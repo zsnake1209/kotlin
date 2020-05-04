@@ -76,7 +76,7 @@ class FirIntegerLiteralTypeScope(private val session: FirSession, val isUnsigned
         FirILTTypeRefPlaceHolder(isUnsigned),
         receiverTypeRef = null,
         ALL_OPERATORS.getValue(name),
-        FirResolvedDeclarationStatusImpl(Visibilities.PUBLIC, FirEffectiveVisibility.Public, Modality.FINAL),
+        FirResolvedDeclarationStatusImpl(Visibilities.PUBLIC, FirEffectiveVisibilityImpl.Public, Modality.FINAL),
         symbol
     ).apply {
         resolvePhase = FirResolvePhase.BODY_RESOLVE
@@ -137,7 +137,10 @@ class FirIntegerOperator @FirImplementationDetail constructor(
     }
 }
 
-class FirILTTypeRefPlaceHolder(isUnsigned: Boolean) : FirResolvedTypeRef() {
+class FirILTTypeRefPlaceHolder(
+    isUnsigned: Boolean,
+    override val isSuspend: Boolean = false
+) : FirResolvedTypeRef() {
     override val source: FirSourceElement? get() = null
     override val annotations: List<FirAnnotationCall> get() = emptyList()
     override var type: ConeIntegerLiteralType = ConeIntegerLiteralTypeImpl(0, isUnsigned)

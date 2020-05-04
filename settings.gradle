@@ -69,6 +69,7 @@ include ":kotlin-build-common",
         ":kotlin-daemon",
         ":kotlin-daemon-client",
         ":kotlin-daemon-client-new",
+        ":kotlin-daemon-tests",
         ":kotlin-preloader",
         ":kotlin-runner",
         ":compiler:container",
@@ -88,6 +89,7 @@ include ":kotlin-build-common",
         ":compiler:fir:fir2ir",
         ":compiler:fir:fir2ir:jvm-backend",
         ":compiler:fir:resolve",
+        ":compiler:fir:fir-serialization",
         ":compiler:fir:java",
         ":compiler:fir:modularized-tests",
         ":compiler:fir:dump",
@@ -406,6 +408,7 @@ project(':daemon-common').projectDir = "$rootDir/compiler/daemon/daemon-common" 
 project(':daemon-common-new').projectDir = "$rootDir/compiler/daemon/daemon-common-new" as File
 project(':kotlin-daemon-client').projectDir = "$rootDir/compiler/daemon/daemon-client" as File
 project(':kotlin-daemon-client-new').projectDir = "$rootDir/compiler/daemon/daemon-client-new" as File
+project(':kotlin-daemon-tests').projectDir = "$rootDir/compiler/daemon/daemon-tests" as File
 project(':kotlin-compiler-runner').projectDir = "$rootDir/compiler/compiler-runner" as File
 project(':kotlin-ant').projectDir = "$rootDir/ant" as File
 project(':compiler:ir.tree').projectDir = "$rootDir/compiler/ir/ir.tree" as File

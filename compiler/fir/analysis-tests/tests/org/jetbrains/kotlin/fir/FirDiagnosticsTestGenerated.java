@@ -228,6 +228,11 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
         runTest("compiler/fir/analysis-tests/testData/resolve/javaStaticScopeInheritance.kt");
     }
 
+    @TestMetadata("labelAndReceiverForInfix.kt")
+    public void testLabelAndReceiverForInfix() throws Exception {
+        runTest("compiler/fir/analysis-tests/testData/resolve/labelAndReceiverForInfix.kt");
+    }
+
     @TestMetadata("lambdaArgInScopeFunction.kt")
     public void testLambdaArgInScopeFunction() throws Exception {
         runTest("compiler/fir/analysis-tests/testData/resolve/lambdaArgInScopeFunction.kt");
@@ -584,6 +589,16 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
             runTest("compiler/fir/analysis-tests/testData/resolve/callResolution/companionInvoke.kt");
         }
 
+        @TestMetadata("debugExpressionType.kt")
+        public void testDebugExpressionType() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/callResolution/debugExpressionType.kt");
+        }
+
+        @TestMetadata("debugInfoCall.kt")
+        public void testDebugInfoCall() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/callResolution/debugInfoCall.kt");
+        }
+
         @TestMetadata("invokeAmbiguity.kt")
         public void testInvokeAmbiguity() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/callResolution/invokeAmbiguity.kt");
@@ -787,6 +802,11 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
             KotlinTestUtils.runTest(this::doTest, this, testDataFilePath);
         }
 
+        @TestMetadata("abstractSuperCall.kt")
+        public void testAbstractSuperCall() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/abstractSuperCall.kt");
+        }
+
         public void testAllFilesPresentInDiagnostics() throws Exception {
             KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/fir/analysis-tests/testData/resolve/diagnostics"), Pattern.compile("^([^.]+)\\.kt$"), null, true);
         }
@@ -804,6 +824,11 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
         @TestMetadata("notASupertype.kt")
         public void testNotASupertype() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/notASupertype.kt");
+        }
+
+        @TestMetadata("qualifiedSupertypeExtendedByOtherSupertype.kt")
+        public void testQualifiedSupertypeExtendedByOtherSupertype() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/qualifiedSupertypeExtendedByOtherSupertype.kt");
         }
 
         @TestMetadata("redundantModifier.kt")
@@ -1623,6 +1648,11 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
         public void testMultipleJavaClassesInOneFile() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/problems/multipleJavaClassesInOneFile.kt");
         }
+
+        @TestMetadata("safeCallInvoke.kt")
+        public void testSafeCallInvoke() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/problems/safeCallInvoke.kt");
+        }
     }
 
     @TestMetadata("compiler/fir/analysis-tests/testData/resolve/properties")
@@ -2138,9 +2168,44 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
             KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/fir/analysis-tests/testData/resolve/visibility"), Pattern.compile("^([^.]+)\\.kt$"), null, true);
         }
 
+        @TestMetadata("exposedFunctionParameterType.kt")
+        public void testExposedFunctionParameterType() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/visibility/exposedFunctionParameterType.kt");
+        }
+
+        @TestMetadata("exposedFunctionReturnType.kt")
+        public void testExposedFunctionReturnType() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/visibility/exposedFunctionReturnType.kt");
+        }
+
+        @TestMetadata("exposedPropertyType.kt")
+        public void testExposedPropertyType() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/visibility/exposedPropertyType.kt");
+        }
+
+        @TestMetadata("exposedSupertype.kt")
+        public void testExposedSupertype() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/visibility/exposedSupertype.kt");
+        }
+
+        @TestMetadata("exposedTypeAlias.kt")
+        public void testExposedTypeAlias() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/visibility/exposedTypeAlias.kt");
+        }
+
+        @TestMetadata("exposedTypeParameters.kt")
+        public void testExposedTypeParameters() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/visibility/exposedTypeParameters.kt");
+        }
+
         @TestMetadata("protectedInCompanion.kt")
         public void testProtectedInCompanion() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/visibility/protectedInCompanion.kt");
+        }
+
+        @TestMetadata("singletonConstructors.kt")
+        public void testSingletonConstructors() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/visibility/singletonConstructors.kt");
         }
     }
 }

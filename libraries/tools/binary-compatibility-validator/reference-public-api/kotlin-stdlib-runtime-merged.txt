@@ -51,6 +51,13 @@ public abstract interface annotation class kotlin/ExtensionFunctionType : java/l
 public abstract interface class kotlin/Function {
 }
 
+public final class kotlin/KotlinNothingValueException : java/lang/RuntimeException {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/Throwable;)V
+	public fun <init> (Ljava/lang/Throwable;)V
+}
+
 public class kotlin/KotlinNullPointerException : java/lang/NullPointerException {
 	public fun <init> ()V
 	public fun <init> (Ljava/lang/String;)V
@@ -667,6 +674,7 @@ public abstract class kotlin/collections/AbstractSet : kotlin/collections/Abstra
 }
 
 public final class kotlin/collections/ArrayDeque : kotlin/collections/AbstractMutableList {
+	public static final field Companion Lkotlin/collections/ArrayDeque$Companion;
 	public fun <init> ()V
 	public fun <init> (I)V
 	public fun <init> (Ljava/util/Collection;)V
@@ -1549,14 +1557,23 @@ public final class kotlin/collections/ArraysKt {
 	public static final fun reduceRightOrNull ([ZLkotlin/jvm/functions/Function2;)Ljava/lang/Boolean;
 	public static final fun requireNoNulls ([Ljava/lang/Object;)[Ljava/lang/Object;
 	public static final fun reverse ([B)V
+	public static final fun reverse ([BII)V
 	public static final fun reverse ([C)V
+	public static final fun reverse ([CII)V
 	public static final fun reverse ([D)V
+	public static final fun reverse ([DII)V
 	public static final fun reverse ([F)V
+	public static final fun reverse ([FII)V
 	public static final fun reverse ([I)V
+	public static final fun reverse ([III)V
 	public static final fun reverse ([J)V
+	public static final fun reverse ([JII)V
 	public static final fun reverse ([Ljava/lang/Object;)V
+	public static final fun reverse ([Ljava/lang/Object;II)V
 	public static final fun reverse ([S)V
+	public static final fun reverse ([SII)V
 	public static final fun reverse ([Z)V
+	public static final fun reverse ([ZII)V
 	public static final fun reversed ([B)Ljava/util/List;
 	public static final fun reversed ([C)Ljava/util/List;
 	public static final fun reversed ([D)Ljava/util/List;
@@ -1685,6 +1702,7 @@ public final class kotlin/collections/ArraysKt {
 	public static final fun sort ([III)V
 	public static final fun sort ([J)V
 	public static final fun sort ([JII)V
+	public static final fun sort ([Ljava/lang/Comparable;II)V
 	public static final fun sort ([Ljava/lang/Object;)V
 	public static final fun sort ([Ljava/lang/Object;II)V
 	public static final fun sort ([S)V
@@ -1695,18 +1713,27 @@ public final class kotlin/collections/ArraysKt {
 	public static synthetic fun sort$default ([FIIILjava/lang/Object;)V
 	public static synthetic fun sort$default ([IIIILjava/lang/Object;)V
 	public static synthetic fun sort$default ([JIIILjava/lang/Object;)V
+	public static synthetic fun sort$default ([Ljava/lang/Comparable;IIILjava/lang/Object;)V
 	public static synthetic fun sort$default ([Ljava/lang/Object;IIILjava/lang/Object;)V
 	public static synthetic fun sort$default ([SIIILjava/lang/Object;)V
 	public static final fun sortBy ([Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
 	public static final fun sortByDescending ([Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
 	public static final fun sortDescending ([B)V
+	public static final fun sortDescending ([BII)V
 	public static final fun sortDescending ([C)V
+	public static final fun sortDescending ([CII)V
 	public static final fun sortDescending ([D)V
+	public static final fun sortDescending ([DII)V
 	public static final fun sortDescending ([F)V
+	public static final fun sortDescending ([FII)V
 	public static final fun sortDescending ([I)V
+	public static final fun sortDescending ([III)V
 	public static final fun sortDescending ([J)V
+	public static final fun sortDescending ([JII)V
 	public static final fun sortDescending ([Ljava/lang/Comparable;)V
+	public static final fun sortDescending ([Ljava/lang/Comparable;II)V
 	public static final fun sortDescending ([S)V
+	public static final fun sortDescending ([SII)V
 	public static final fun sortWith ([Ljava/lang/Object;Ljava/util/Comparator;)V
 	public static final fun sortWith ([Ljava/lang/Object;Ljava/util/Comparator;II)V
 	public static synthetic fun sortWith$default ([Ljava/lang/Object;Ljava/util/Comparator;IIILjava/lang/Object;)V
@@ -2478,6 +2505,72 @@ public abstract class kotlin/collections/UShortIterator : java/util/Iterator, ko
 	public fun remove ()V
 }
 
+public final class kotlin/collections/builders/ListBuilder : kotlin/collections/AbstractMutableList, java/util/List, java/util/RandomAccess, kotlin/jvm/internal/markers/KMutableList {
+	public fun <init> ()V
+	public fun <init> (I)V
+	public fun add (ILjava/lang/Object;)V
+	public fun add (Ljava/lang/Object;)Z
+	public fun addAll (ILjava/util/Collection;)Z
+	public fun addAll (Ljava/util/Collection;)Z
+	public final fun build ()Ljava/util/List;
+	public fun clear ()V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun get (I)Ljava/lang/Object;
+	public fun getSize ()I
+	public fun hashCode ()I
+	public fun indexOf (Ljava/lang/Object;)I
+	public fun isEmpty ()Z
+	public fun iterator ()Ljava/util/Iterator;
+	public fun lastIndexOf (Ljava/lang/Object;)I
+	public fun listIterator ()Ljava/util/ListIterator;
+	public fun listIterator (I)Ljava/util/ListIterator;
+	public fun remove (Ljava/lang/Object;)Z
+	public fun removeAll (Ljava/util/Collection;)Z
+	public fun removeAt (I)Ljava/lang/Object;
+	public fun retainAll (Ljava/util/Collection;)Z
+	public fun set (ILjava/lang/Object;)Ljava/lang/Object;
+	public fun subList (II)Ljava/util/List;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class kotlin/collections/builders/MapBuilder : java/util/Map, kotlin/jvm/internal/markers/KMutableMap {
+	public fun <init> ()V
+	public fun <init> (I)V
+	public final fun build ()Ljava/util/Map;
+	public fun clear ()V
+	public fun containsKey (Ljava/lang/Object;)Z
+	public fun containsValue (Ljava/lang/Object;)Z
+	public final fun entrySet ()Ljava/util/Set;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun getEntries ()Ljava/util/Set;
+	public fun getKeys ()Ljava/util/Set;
+	public fun getSize ()I
+	public fun getValues ()Ljava/util/Collection;
+	public fun hashCode ()I
+	public fun isEmpty ()Z
+	public final fun keySet ()Ljava/util/Set;
+	public fun put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun putAll (Ljava/util/Map;)V
+	public fun remove (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun size ()I
+	public fun toString ()Ljava/lang/String;
+	public final fun values ()Ljava/util/Collection;
+}
+
+public final class kotlin/collections/builders/SetBuilder : kotlin/collections/AbstractMutableSet, java/util/Set, kotlin/jvm/internal/markers/KMutableSet {
+	public fun <init> ()V
+	public fun <init> (I)V
+	public fun add (Ljava/lang/Object;)Z
+	public final fun build ()Ljava/util/Set;
+	public fun clear ()V
+	public fun contains (Ljava/lang/Object;)Z
+	public fun getSize ()I
+	public fun isEmpty ()Z
+	public fun iterator ()Ljava/util/Iterator;
+	public fun remove (Ljava/lang/Object;)Z
+}
+
 public final class kotlin/collections/unsigned/UArraysKt {
 	public static final fun asList--ajY-9A ([I)Ljava/util/List;
 	public static final fun asList-GBYM_sE ([B)Ljava/util/List;
@@ -2612,12 +2705,24 @@ public final class kotlin/collections/unsigned/UArraysKt {
 	public static final fun sliceArray-tAntMlw ([ILkotlin/ranges/IntRange;)[I
 	public static final fun sliceArray-xo_DsdI ([BLjava/util/Collection;)[B
 	public static final fun sort--ajY-9A ([I)V
+	public static final fun sort--nroSd4 ([JII)V
+	public static synthetic fun sort--nroSd4$default ([JIIILjava/lang/Object;)V
+	public static final fun sort-4UcCI2c ([BII)V
+	public static synthetic fun sort-4UcCI2c$default ([BIIILjava/lang/Object;)V
+	public static final fun sort-Aa5vz7o ([SII)V
+	public static synthetic fun sort-Aa5vz7o$default ([SIIILjava/lang/Object;)V
 	public static final fun sort-GBYM_sE ([B)V
 	public static final fun sort-QwZRm1k ([J)V
+	public static final fun sort-oBK06Vg ([III)V
+	public static synthetic fun sort-oBK06Vg$default ([IIIILjava/lang/Object;)V
 	public static final fun sort-rL5Bavg ([S)V
 	public static final fun sortDescending--ajY-9A ([I)V
+	public static final fun sortDescending--nroSd4 ([JII)V
+	public static final fun sortDescending-4UcCI2c ([BII)V
+	public static final fun sortDescending-Aa5vz7o ([SII)V
 	public static final fun sortDescending-GBYM_sE ([B)V
 	public static final fun sortDescending-QwZRm1k ([J)V
+	public static final fun sortDescending-oBK06Vg ([III)V
 	public static final fun sortDescending-rL5Bavg ([S)V
 	public static final fun sorted--ajY-9A ([I)Ljava/util/List;
 	public static final fun sorted-GBYM_sE ([B)Ljava/util/List;
@@ -3411,6 +3516,10 @@ public final class kotlin/jvm/internal/FloatSpreadBuilder : kotlin/jvm/internal/
 	public final fun add (F)V
 	public synthetic fun getSize (Ljava/lang/Object;)I
 	public final fun toArray ()[F
+}
+
+public abstract interface class kotlin/jvm/internal/FunctionAdapter {
+	public abstract fun getFunctionDelegate ()Lkotlin/Function;
 }
 
 public abstract interface class kotlin/jvm/internal/FunctionBase : kotlin/Function {

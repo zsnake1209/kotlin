@@ -173,17 +173,37 @@ internal class CallAndReferenceGenerator(
                     }
                 }
             }
+            var superQualifierSymbol: IrClassSymbol? = null
+            if (qualifiedAccess.dispatchReceiver is FirQualifiedAccess) {
+                val dispatchReceiverReference = (qualifiedAccess.dispatchReceiver as FirQualifiedAccess).calleeReference
+                if (dispatchReceiverReference is FirSuperReference) {
+                    val coneSuperType = dispatchReceiverReference.superTypeRef.coneTypeSafe<ConeClassLikeType>()
+                    (coneSuperType?.lookupTag?.toSymbol(session) as? FirClassSymbol<*>)?.let {
+                        superQualifierSymbol = classifierStorage.getIrClassSymbol(it)
+                    }
+                }
+            }
             when (symbol) {
                 is IrConstructorSymbol -> IrConstructorCallImpl.fromSymbolOwner(startOffset, endOffset, type, symbol)
-                is IrSimpleFunctionSymbol -> IrCallImpl(
-                    startOffset, endOffset, type, symbol, origin = qualifiedAccess.calleeReference.statementOrigin()
-                )
+                is IrSimpleFunctionSymbol -> {
+                    IrCallImpl(
+                        startOffset, endOffset, type, symbol,
+                        origin = qualifiedAccess.calleeReference.statementOrigin(),
+                        superQualifierSymbol = superQualifierSymbol
+                    )
+                }
                 is IrPropertySymbol -> {
                     val getter = symbol.owner.getter
                     val backingField = symbol.owner.backingField
                     when {
-                        getter != null -> IrCallImpl(startOffset, endOffset, type, getter.symbol, origin = IrStatementOrigin.GET_PROPERTY)
-                        backingField != null -> IrGetFieldImpl(startOffset, endOffset, backingField.symbol, type)
+                        getter != null -> IrCallImpl(
+                            startOffset, endOffset, type, getter.symbol, origin = IrStatementOrigin.GET_PROPERTY,
+                            superQualifierSymbol = superQualifierSymbol
+                        )
+                        backingField != null -> IrGetFieldImpl(
+                            startOffset, endOffset, backingField.symbol, type,
+                            superQualifierSymbol = superQualifierSymbol
+                        )
                         else -> IrErrorCallExpressionImpl(
                             startOffset, endOffset, type,
                             description = "No getter or backing field found for ${qualifiedAccess.calleeReference.render()}"
@@ -192,7 +212,8 @@ internal class CallAndReferenceGenerator(
                 }
                 is IrFieldSymbol -> IrGetFieldImpl(
                     startOffset, endOffset, symbol, type,
-                    origin = IrStatementOrigin.GET_PROPERTY.takeIf { qualifiedAccess.calleeReference !is FirDelegateFieldReference }
+                    origin = IrStatementOrigin.GET_PROPERTY.takeIf { qualifiedAccess.calleeReference !is FirDelegateFieldReference },
+                    superQualifierSymbol = superQualifierSymbol
                 )
                 is IrValueSymbol -> IrGetValueImpl(
                     startOffset, endOffset, type, symbol,
