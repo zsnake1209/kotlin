@@ -72,6 +72,9 @@ object FirErrors {
     val REDUNDANT_MODIFIER by error2<FirSourceElement, PsiElement, KtModifierKeywordToken, KtModifierKeywordToken>()
     val DEPRECATED_MODIFIER_PAIR by error2<FirSourceElement, PsiElement, KtModifierKeywordToken, KtModifierKeywordToken>()
     val INCOMPATIBLE_MODIFIERS by error2<FirSourceElement, PsiElement, KtModifierKeywordToken, KtModifierKeywordToken>()
+
+    val LEAKING_THIS_IN_CONSTRUCTOR by existing<FirSourceElement, PsiElement, String>(Errors.POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR)
+
 }
 
 

@@ -684,6 +684,8 @@ public class DefaultErrorMessages {
 
         MAP.put(NON_PRIVATE_CONSTRUCTOR_IN_ENUM, "Constructor must be private in enum class");
         MAP.put(NON_PRIVATE_CONSTRUCTOR_IN_SEALED, "Constructor must be private in sealed class");
+        MAP.put(POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR, "Possible leaking this in constructor {0}", STRING);
+
 
         MAP.put(INLINE_CLASS_NOT_TOP_LEVEL, "Inline classes are only allowed on top level");
         MAP.put(INLINE_CLASS_NOT_FINAL, "Inline classes can be only final");

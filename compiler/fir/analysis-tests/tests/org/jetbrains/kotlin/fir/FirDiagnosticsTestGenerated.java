@@ -865,10 +865,47 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
         public void testSuperclassNotAccessibleFromInterface() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/superclassNotAccessibleFromInterface.kt");
         }
-
         @TestMetadata("valOnAnnotationParameter.kt")
         public void testValOnAnnotationParameter() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/valOnAnnotationParameter.kt");
+        }
+
+        @TestMetadata("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class LeakingThis extends AbstractFirDiagnosticsTest {
+            private void runTest(String testDataFilePath) throws Exception {
+                KotlinTestUtils.runTest(this::doTest, this, testDataFilePath);
+            }
+
+            public void testAllFilesPresentInLeakingThis() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis"), Pattern.compile("^([^.]+)\\.kt$"), null, true);
+            }
+
+            @TestMetadata("manyInitSections.kt")
+            public void testManyInitSections() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/manyInitSections.kt");
+            }
+
+            @TestMetadata("memberCallInInitNeg.kt")
+            public void testMemberCallInInitNeg() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/memberCallInInitNeg.kt");
+            }
+
+            @TestMetadata("memberCallInInitPos.kt")
+            public void testMemberCallInInitPos() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/memberCallInInitPos.kt");
+            }
+
+            @TestMetadata("simpleInitNeg.kt")
+            public void testSimpleInitNeg() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/simpleInitNeg.kt");
+            }
+
+            @TestMetadata("simpleInitPos.kt")
+            public void testSimpleInitPos() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/simpleInitPos.kt");
+            }
         }
     }
 

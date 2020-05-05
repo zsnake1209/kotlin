@@ -1,0 +1,30 @@
+FILE: memberCallInInitPos.kt
+    public final class C : R|kotlin/Any| {
+        public constructor(): R|C| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val p1: R|kotlin/String| = String(kek)
+            public get(): R|kotlin/String|
+
+        public final val p2: R|kotlin/Int|
+            public get(): R|kotlin/Int|
+
+        public final val p3: R|kotlin/String|
+            public get(): R|kotlin/String|
+
+        init {
+            this@R|/C|.R|/C.memberCall1|()
+            this@R|/C|.R|/C.p3| = String(ura)
+            this@R|/C|.R|/C.p2| = this@R|/C|.R|/C.p3|.R|kotlin/String.length|
+        }
+
+        public final fun memberCall1(): R|kotlin/Unit| {
+            this@R|/C|.R|/C.memberCall2|()
+        }
+
+        public final fun memberCall2(): R|kotlin/Unit| {
+            this@R|/C|.R|/C.p3|.R|kotlin/String.length|
+        }
+
+    }

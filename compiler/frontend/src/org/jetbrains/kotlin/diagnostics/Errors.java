@@ -339,6 +339,7 @@ public interface Errors {
 
     DiagnosticFactory0<PsiElement> NON_PRIVATE_CONSTRUCTOR_IN_ENUM = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<PsiElement> NON_PRIVATE_CONSTRUCTOR_IN_SEALED = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory1<PsiElement, String> POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR = DiagnosticFactory1.create(WARNING);
 
     // Inline classes
 

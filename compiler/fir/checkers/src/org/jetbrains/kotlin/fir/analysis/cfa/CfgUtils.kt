@@ -35,7 +35,7 @@ fun <D> ControlFlowGraph.traverse(
             TraverseDirection.Forward -> node.previousNodes
             TraverseDirection.Backward -> node.followingNodes
         }
-        if (!previousNodes.all { it in visitedNodes }) {
+        if (node != initialNode && !previousNodes.all { it in visitedNodes }) {
             if (!delayedNodes.add(node)) {
                 throw IllegalArgumentException("Infinite loop")
             }
@@ -43,6 +43,7 @@ fun <D> ControlFlowGraph.traverse(
         }
 
         node.accept(visitor, data)
+        visitedNodes.add(node)
 
         val followingNodes = when (direction) {
             TraverseDirection.Forward -> node.followingNodes

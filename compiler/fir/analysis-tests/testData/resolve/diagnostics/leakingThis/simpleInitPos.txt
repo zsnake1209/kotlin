@@ -1,0 +1,23 @@
+FILE: simpleInitPos.kt
+    public final class A : R|kotlin/Any| {
+        public constructor(): R|A| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val p1: R|kotlin/String| = String(kek)
+            public get(): R|kotlin/String|
+
+        public final val p2: R|kotlin/Int|
+            public get(): R|kotlin/Int|
+
+        public final val p3: R|kotlin/String|
+            public get(): R|kotlin/String|
+
+        init {
+            this@R|/A|.R|/A.p1|.R|kotlin/String.length|
+            this@R|/A|.R|/A.p3|.R|kotlin/String.length|
+            this@R|/A|.R|/A.p2| = this@R|/A|.R|/A.p3|.R|kotlin/String.length|
+            this@R|/A|.R|/A.p3| = R|java/lang/String.String|(String(asa))
+        }
+
+    }
