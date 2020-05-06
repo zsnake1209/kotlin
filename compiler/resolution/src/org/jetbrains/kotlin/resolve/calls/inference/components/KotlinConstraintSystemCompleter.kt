@@ -270,7 +270,7 @@ class KotlinConstraintSystemCompleter(
                 TYPE_VARIABLE_NAME_PREFIX_FOR_CR_PARAMETER_TYPE + (index + 1)
             )
             else -> throw IllegalStateException("Unsupported postponed argument type of $argument")
-        }.apply { getBuilder().registerVariable(this) }
+        }.also { getBuilder().registerVariable(it) }
     }
 
     private fun Context.createTypeVariableForReturnType(argument: PostponedAtomWithRevisableExpectedType): NewTypeVariable {
@@ -287,7 +287,7 @@ class KotlinConstraintSystemCompleter(
                 TYPE_VARIABLE_NAME_FOR_CR_RETURN_TYPE
             )
             else -> throw IllegalStateException("Unsupported postponed argument type of $argument")
-        }.apply { getBuilder().registerVariable(this) }
+        }.also { getBuilder().registerVariable(it) }
     }
 
     private fun Context.createTypeVariablesForParameters(
