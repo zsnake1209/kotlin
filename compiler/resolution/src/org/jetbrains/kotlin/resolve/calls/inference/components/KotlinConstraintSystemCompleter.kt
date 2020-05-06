@@ -244,8 +244,6 @@ class KotlinConstraintSystemCompleter(
         postponedArguments: List<PostponedResolvedAtom>,
         diagnosticsHolder: KotlinDiagnosticsHolder
     ): Boolean {
-        var wasFixedSomeVariable = false
-
         while (true) {
             val variableForFixation = getVariableReadyForFixation(
                 completionMode,
@@ -255,23 +253,20 @@ class KotlinConstraintSystemCompleter(
                 postponedArguments
             ) ?: break
 
-            if (variableForFixation.hasProperConstraint || completionMode == ConstraintSystemCompletionMode.FULL) {
-                val variableWithConstraints = notFixedTypeVariables.getValue(variableForFixation.variable)
+            if (!variableForFixation.hasProperConstraint && completionMode != ConstraintSystemCompletionMode.FULL)
+                break
 
-                if (variableForFixation.hasProperConstraint) {
-                    fixVariable(this, variableWithConstraints, topLevelAtoms)
-                    wasFixedSomeVariable = true
-                } else {
-                    processVariableWhenNotEnoughInformation(this, variableWithConstraints, topLevelAtoms, diagnosticsHolder)
-                }
+            val variableWithConstraints = notFixedTypeVariables.getValue(variableForFixation.variable)
 
-                continue
+            if (variableForFixation.hasProperConstraint) {
+                fixVariable(this, variableWithConstraints, topLevelAtoms)
+                return true
+            } else {
+                processVariableWhenNotEnoughInformation(this, variableWithConstraints, topLevelAtoms, diagnosticsHolder)
             }
-
-            break
         }
 
-        return wasFixedSomeVariable
+        return false
     }
 
     private fun processVariableWhenNotEnoughInformation(

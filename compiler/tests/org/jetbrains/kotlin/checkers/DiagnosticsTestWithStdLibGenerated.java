@@ -3128,6 +3128,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
                     runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/moreSpecificOutputType.kt");
                 }
 
+                @TestMetadata("rerunStagesAfterFixationInFullMode.kt")
+                public void testRerunStagesAfterFixationInFullMode() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/rerunStagesAfterFixationInFullMode.kt");
+                }
+
                 @TestMetadata("rerunStagesAfterFixationInPartialMode.kt")
                 public void testRerunStagesAfterFixationInPartialMode() throws Exception {
                     runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/rerunStagesAfterFixationInPartialMode.kt");

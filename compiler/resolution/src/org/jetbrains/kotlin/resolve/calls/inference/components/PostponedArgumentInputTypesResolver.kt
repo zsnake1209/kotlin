@@ -244,7 +244,7 @@ class PostponedArgumentInputTypesResolver(
 
         val atom = argument.atom
         val parametersFromConstraints = parameterTypesInfo.parametersFromConstraints
-        val parametersFromDeclaration = getDeclaredParametersWrtExtensionFunctionsPresence(parameterTypesInfo)
+        val parametersFromDeclaration = getDeclaredParametersConsideringExtensionFunctionsPresence(parameterTypesInfo)
         val areAllParameterTypesSpecified = !parametersFromDeclaration.isNullOrEmpty() && parametersFromDeclaration.all { it != null }
         val isExtensionFunction = parameterTypesInfo.annotations.hasExtensionFunctionAnnotation()
         val parametersFromDeclarations = parameterTypesInfo.parametersFromDeclarationOfRelatedLambdas.orEmpty() + parametersFromDeclaration
@@ -252,8 +252,7 @@ class PostponedArgumentInputTypesResolver(
         /*
          * We shouldn't create synthetic functional type if all lambda's parameter types are specified explicitly
          *
-         * TODO: extension function with explicitly specified receiver
-         * TODO: wrt anonymous functions – see info about need for analysis in partial mode in `collectParameterTypesAndBuildNewExpectedTypes`
+         * TODO: regarding anonymous functions: see info about need for analysis in partial mode in `collectParameterTypesAndBuildNewExpectedTypes`
          */
         if (areAllParameterTypesSpecified && !isExtensionFunction && !isAnonymousFunction(argument))
             return null
@@ -398,7 +397,7 @@ class PostponedArgumentInputTypesResolver(
         }
     }
 
-    private fun getDeclaredParametersWrtExtensionFunctionsPresence(parameterTypesInfo: ParameterTypesInfo): List<UnwrappedType?>? {
+    private fun getDeclaredParametersConsideringExtensionFunctionsPresence(parameterTypesInfo: ParameterTypesInfo): List<UnwrappedType?>? {
         val (parametersFromDeclaration, _, parametersFromConstraints, annotations) = parameterTypesInfo
 
         if (parametersFromConstraints.isNullOrEmpty() || parametersFromDeclaration.isNullOrEmpty())
