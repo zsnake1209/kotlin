@@ -109,6 +109,10 @@ class KotlinConstraintSystemCompleter(
         completion@ while (true) {
             val postponedArguments = getOrderedNotAnalyzedPostponedArguments(topLevelAtoms)
 
+            // Stage 1: analyze postponed arguments with fixed parameter types
+            if (analyzeArgumentWithFixedParameterTypes(postponedArguments, analyze))
+                continue
+
             val isThereAnyReadyForFixationVariable = isThereAnyReadyForFixationVariable(
                 completionMode, topLevelAtoms, topLevelType, collectVariablesFromContext, postponedArguments
             )
@@ -116,10 +120,6 @@ class KotlinConstraintSystemCompleter(
             // If there aren't any postponed arguments and ready for fixation variables, then completion isn't needed: nothing to do
             if (postponedArguments.isEmpty() && !isThereAnyReadyForFixationVariable)
                 break
-
-            // Stage 1: analyze postponed arguments with fixed parameter types
-            if (analyzeArgumentWithFixedParameterTypes(postponedArguments, analyze))
-                continue
 
             val postponedArgumentsWithRevisableType = postponedArguments.filterIsInstance<PostponedAtomWithRevisableExpectedType>()
             val dependencyProvider =
@@ -134,7 +134,7 @@ class KotlinConstraintSystemCompleter(
                     val expectedType =
                         argument.run { safeAs<PostponedAtomWithRevisableExpectedType>()?.revisedExpectedType ?: expectedType }
 
-                    if (expectedType != null && expectedType.isBuiltinFunctionalTypeOrSubtype) {
+                    if (expectedType != null && expectedType.isFunctionOrKFunctionTypeWithAnySuspendability) {
                         val wasFixedSomeVariable = fixNextReadyVariableForParameterType(
                             expectedType, postponedArguments, topLevelType, topLevelAtoms, dependencyProvider
                         )
@@ -500,7 +500,7 @@ class KotlinConstraintSystemCompleter(
         argument: PostponedAtomWithRevisableExpectedType,
         diagnosticsHolder: KotlinDiagnosticsHolder
     ) {
-        val revisedExpectedType = argument.revisedExpectedType?.takeIf { it.isBuiltinFunctionalTypeOrSubtype } ?: return
+        val revisedExpectedType = argument.revisedExpectedType?.takeIf { it.isFunctionOrKFunctionTypeWithAnySuspendability } ?: return
 
         when (argument) {
             is PostponedCallableReferenceAtom -> {

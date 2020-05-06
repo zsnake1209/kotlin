@@ -69,6 +69,9 @@ val KotlinType.isKSuspendFunctionType: Boolean
 val KotlinType.isFunctionOrSuspendFunctionType: Boolean
     get() = isFunctionType || isSuspendFunctionType
 
+val KotlinType.isFunctionOrKFunctionTypeWithAnySuspendability: Boolean
+    get() = isFunctionType || isSuspendFunctionType || isKFunctionType || isKSuspendFunctionType
+
 val KotlinType.isBuiltinFunctionalType: Boolean
     get() = constructor.declarationDescriptor?.isBuiltinFunctionalClassDescriptor == true
 

@@ -181,17 +181,17 @@ fun test1() {
     takeLambdasWithInverselyDependentTypeParameters({ <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>it<!> }, { x: Number -> x }, { x: Int -> x })
 
     // Inferring lambda parameter types by subtypes of functional type
-    select(A2(), { a, b, c -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>a<!>; <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String")!>b<!>; <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Float")!>c<!> })
-    select(A3(), { <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>it<!> }, { a -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>a<!> })
-    select(A3(), <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>)
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Int, kotlin.String, kotlin.Float) -> kotlin.Float")!>select(A2(), { a, b, c -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>a<!>; <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String")!>b<!>; <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Float")!>c<!> })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Number) -> java.io.Serializable")!>select(A3(), { <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>it<!> }, { a -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>a<!> })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction<kotlin.Any>")!>select(A3(), <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>)<!>
     // Should be error as `A3::foo1` is `KFunction2`, but the remaining arguments are `KFuncion1` or `Function1`
-    select(A3(), <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>, { <!CANNOT_INFER_PARAMETER_TYPE!>a<!> -> <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, DEBUG_INFO_EXPRESSION_TYPE("[ERROR : <Unknown lambda parameter type>]")!>a<!> }, { <!CANNOT_INFER_PARAMETER_TYPE!>it<!> -> <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, DEBUG_INFO_EXPRESSION_TYPE("[ERROR : <Unknown lambda parameter type>]")!>it<!> })
+    <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function<kotlin.Any>")!>select(A3(), <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>, { <!CANNOT_INFER_PARAMETER_TYPE!>a<!> -> <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, DEBUG_INFO_EXPRESSION_TYPE("[ERROR : <Unknown lambda parameter type>]")!>a<!> }, { <!CANNOT_INFER_PARAMETER_TYPE!>it<!> -> <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, DEBUG_INFO_EXPRESSION_TYPE("[ERROR : <Unknown lambda parameter type>]")!>it<!> })<!>
     // It's OK because `A3::foo2` is from companion of `A3`
-    select(A3(), <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction1<kotlin.Int, kotlin.Unit>")!>A3::foo2<!>, { a -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>a<!> }, { it -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>it<!> })
-    select(A4(), { x: Number -> "" })
-    select(A5<Int, Int>(), { x: Number, y: Int -> "" })
-    select(A2(), id { a, b, c -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>a<!>; <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String")!>b<!>; <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Float")!>c<!> })
-    select(id(A3()), { <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>it<!> }, { a -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>a<!> })
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Int) -> kotlin.Any")!>select(A3(), <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction1<kotlin.Int, kotlin.Unit>")!>A3::foo2<!>, { a -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>a<!> }, { it -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>it<!> })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Int) -> {Comparable<*> & java.io.Serializable}")!>select(A4(), { x: Number -> "" })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Int, kotlin.Int) -> {Comparable<*> & java.io.Serializable}")!>select(A5<Int, Int>(), { x: Number, y: Int -> "" })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Int, kotlin.String, kotlin.Float) -> kotlin.Float")!>select(A2(), id { a, b, c -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>a<!>; <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.String")!>b<!>; <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Float")!>c<!> })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Number) -> java.io.Serializable")!>select(id(A3()), { <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>it<!> }, { a -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>a<!> })<!>
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction<kotlin.Any>")!>select(A3(), id(<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>))<!>
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function<kotlin.Any>")!>select(A3(), <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>, id { <!CANNOT_INFER_PARAMETER_TYPE!>a<!> -> <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, DEBUG_INFO_EXPRESSION_TYPE("[ERROR : <Unknown lambda parameter type>]")!>a<!> }, { <!CANNOT_INFER_PARAMETER_TYPE!>it<!> -> <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, DEBUG_INFO_EXPRESSION_TYPE("[ERROR : <Unknown lambda parameter type>]")!>it<!> })<!>
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function<kotlin.Any>")!>select(A3(), <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>, { <!CANNOT_INFER_PARAMETER_TYPE!>a<!> -> <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, DEBUG_INFO_EXPRESSION_TYPE("[ERROR : <Unknown lambda parameter type>]")!>a<!> }, id { <!CANNOT_INFER_PARAMETER_TYPE!>it<!> -> <!DEBUG_INFO_ELEMENT_WITH_ERROR_TYPE, DEBUG_INFO_EXPRESSION_TYPE("[ERROR : <Unknown lambda parameter type>]")!>it<!> })<!>
@@ -200,10 +200,10 @@ fun test1() {
     // If lambdas' parameters are specified explicitly, we don't report an error, because there is proper CST – Function<Unit>
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function<kotlin.Any>")!>select(id(A3()), id(<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>), { a: Number -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>a<!> })<!>
     <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Function<kotlin.Any>")!>select(id(A3()), id(<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.reflect.KFunction2<A3, kotlin.Int, kotlin.Unit>")!>A3::foo1<!>), id { a: Number -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>a<!> })<!>
-    select(A4(), id { x: Number -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>x<!> })
-    select(id(A5<Int, Int>()), id { x: Number, y: Int -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>x<!>;<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>y<!> })
-    select(id(A5<Int, Int>()), id { x, y -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>x<!>;<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>y<!> })
-    select(id(<!DEBUG_INFO_EXPRESSION_TYPE("A5<kotlin.Number, kotlin.Int>")!>A5()<!>), id { x: Number, y: Int -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>x<!>;<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>y<!> })
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Int) -> kotlin.Number")!>select(A4(), id { x: Number -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>x<!> })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Int, kotlin.Int) -> {Comparable<*> & Number}")!>select(id(A5<Int, Int>()), id { x: Number, y: Int -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>x<!>;<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>y<!> })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Int, kotlin.Int) -> {Comparable<*> & Number}")!>select(id(A5<Int, Int>()), id { x, y -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>x<!>;<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>y<!> })<!>
+    <!DEBUG_INFO_EXPRESSION_TYPE("(kotlin.Number, kotlin.Int) -> {Comparable<*> & Number}")!>select(id(<!DEBUG_INFO_EXPRESSION_TYPE("A5<kotlin.Number, kotlin.Int>")!>A5()<!>), id { x: Number, y: Int -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>x<!>;<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>y<!> })<!>
     val x55: Function2<Number, Int, Float> = select(id(A5()), id { x, y -> <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Number")!>x<!>;<!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Int")!>y<!>; 1f })
 
     // Diffrerent lambda's parameters with proper CST
