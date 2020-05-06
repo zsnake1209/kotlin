@@ -503,18 +503,12 @@ class KotlinConstraintSystemCompleter(
         val revisedExpectedType = argument.revisedExpectedType?.takeIf { it.isFunctionOrKFunctionTypeWithAnySuspendability } ?: return
 
         when (argument) {
-            is PostponedCallableReferenceAtom -> {
+            is PostponedCallableReferenceAtom ->
                 CallableReferenceWithRevisedExpectedTypeAtom(argument.atom, revisedExpectedType).also {
                     argument.setAnalyzedResults(null, listOf(it))
                 }
-            }
-            is LambdaWithTypeVariableAsExpectedTypeAtom -> {
-                val returnTypeVariableConstructor = revisedExpectedType.getReturnTypeFromFunctionType().constructor
-                val returnTypeVariable =
-                    notFixedTypeVariables[returnTypeVariableConstructor]?.typeVariable as? TypeVariableForLambdaReturnType ?: return
-
-                argument.transformToResolvedLambda(getBuilder(), diagnosticsHolder, revisedExpectedType, returnTypeVariable)
-            }
+            is LambdaWithTypeVariableAsExpectedTypeAtom ->
+                argument.transformToResolvedLambda(getBuilder(), diagnosticsHolder, revisedExpectedType)
             else -> throw IllegalStateException("Unsupported postponed argument type of $argument")
         }
     }
