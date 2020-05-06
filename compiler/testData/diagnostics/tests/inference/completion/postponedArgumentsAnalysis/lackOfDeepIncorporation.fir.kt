@@ -8,21 +8,21 @@ class Foo<out A> {
     fun <B, R> foo1(other1: Foo<B>, function: (A, B) -> R) {
         val x = product<R>(
             other1.product(
-                bar {  b -> { a -> function(<!DEBUG_INFO_EXPRESSION_TYPE("A")!>a<!>, <!DEBUG_INFO_EXPRESSION_TYPE("B")!>b<!>) } }
+                bar {  b -> { a -> function(a, b) } }
             )
         )
-        <!DEBUG_INFO_EXPRESSION_TYPE("Foo<R>")!>x<!>
+        x
     }
 
     fun <B, C, R> foo2(other1: Foo<B>, other2: Foo<C>, function: (A, B, C) -> R) {
         val x = product<R>(
             other1.product(
                 other2.product(
-                    bar {  c -> { b -> { a -> function(<!DEBUG_INFO_EXPRESSION_TYPE("A")!>a<!>, <!DEBUG_INFO_EXPRESSION_TYPE("B")!>b<!>, <!DEBUG_INFO_EXPRESSION_TYPE("C")!>c<!>) } } }
+                    bar {  c -> { b -> { a -> function(a, b, c) } } }
                 )
             )
         )
-        <!DEBUG_INFO_EXPRESSION_TYPE("Foo<R>")!>x<!>
+        x
     }
 
     fun <B, C, D, E, R> foo3(other1: Foo<B>, other2: Foo<C>, other3: Foo<D>, other4: Foo<E>, function: (A, B, C, D) -> R) {
@@ -30,12 +30,12 @@ class Foo<out A> {
             other1.product(
                 other2.product(
                     other3.product(
-                        <!TYPE_MISMATCH, TYPE_MISMATCH!>bar { d -> { c -> { b -> { a -> function(<!DEBUG_INFO_EXPRESSION_TYPE("A")!>a<!>, <!DEBUG_INFO_EXPRESSION_TYPE("B")!>b<!>, <!DEBUG_INFO_EXPRESSION_TYPE("C")!>c<!>, <!DEBUG_INFO_EXPRESSION_TYPE("D")!>d<!>) } } } }<!>
+                        bar { d -> { c -> { b -> { a -> function(a, b, c, d) } } } }
                     )
                 )
             )
         )
-        <!DEBUG_INFO_EXPRESSION_TYPE("Foo<R>")!>x<!>
+        x
     }
 
     fun <B, C, D, E, R> foo4(other1: Foo<B>, other2: Foo<C>, other3: Foo<D>, other4: Foo<E>, function: (A, B, C, D, E) -> R) {
@@ -43,14 +43,14 @@ class Foo<out A> {
             other1.product(
                 other2.product(
                     other3.product(
-                        <!TYPE_MISMATCH, TYPE_MISMATCH!>other4.product(
-                            bar { e -> { d -> { c -> { b -> { a -> function(<!DEBUG_INFO_EXPRESSION_TYPE("A")!>a<!>, <!DEBUG_INFO_EXPRESSION_TYPE("B")!>b<!>, <!DEBUG_INFO_EXPRESSION_TYPE("C")!>c<!>, <!DEBUG_INFO_EXPRESSION_TYPE("D")!>d<!>, <!DEBUG_INFO_EXPRESSION_TYPE("E")!>e<!>) } } } } }
-                        )<!>
+                        other4.product(
+                            bar { e -> { d -> { c -> { b -> { a -> function(a, b, c, d, e) } } } } }
+                        )
                     )
                 )
             )
         )
-        <!DEBUG_INFO_EXPRESSION_TYPE("Foo<R>")!>x<!>
+        x
     }
 
     companion object {
