@@ -185,6 +185,11 @@ sealed class AbstractPostponedCallableReferenceAtom(
         get() = extractInputOutputTypesFromCallableReferenceExpectedType(expectedType)?.outputType
 }
 
+class CallableReferenceWithRevisedExpectedTypeAtom(
+    atom: CallableReferenceKotlinCallArgument,
+    expectedType: UnwrappedType?,
+) : AbstractPostponedCallableReferenceAtom(atom, expectedType)
+
 class PostponedCallableReferenceAtom(
     eagerCallableReferenceAtom: EagerCallableReferenceAtom
 ) : AbstractPostponedCallableReferenceAtom(eagerCallableReferenceAtom.atom, eagerCallableReferenceAtom.expectedType), PostponedAtomWithRevisableExpectedType {

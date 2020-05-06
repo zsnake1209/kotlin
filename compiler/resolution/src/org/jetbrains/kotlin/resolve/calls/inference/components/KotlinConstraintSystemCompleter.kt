@@ -504,7 +504,7 @@ class KotlinConstraintSystemCompleter(
 
         when (argument) {
             is PostponedCallableReferenceAtom -> {
-                PostponedCallableReferenceAtom(EagerCallableReferenceAtom(argument.atom, revisedExpectedType)).also {
+                CallableReferenceWithRevisedExpectedTypeAtom(argument.atom, revisedExpectedType).also {
                     argument.setAnalyzedResults(null, listOf(it))
                 }
             }
@@ -515,6 +515,7 @@ class KotlinConstraintSystemCompleter(
 
                 argument.transformToResolvedLambda(getBuilder(), diagnosticsHolder, revisedExpectedType, returnTypeVariable)
             }
+            else -> throw IllegalStateException("Unsupported postponed argument type of $argument")
         }
     }
 
