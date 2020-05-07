@@ -26,19 +26,42 @@ abstract class ComponentTypeRegistry<K : Any, V : Any> {
         return ComponentArrayAccessor(kClass, getId(kClass))
     }
 
+    fun <T : V, KK : K> generateNullableAccessor(kClass: KClass<KK>): NullableComponentArrayAccessor<K, V, T> {
+        return NullableComponentArrayAccessor(kClass, getId(kClass))
+    }
+
     fun <T : K> getId(kClass: KClass<T>): Int {
         return idPerType.getOrPut(kClass) { idPerType.size }
     }
 }
 
 
-class ComponentArrayAccessor<K : Any, V : Any, T : V>(
-    private val key: KClass<out K>,
-    private val id: Int
-) : ReadOnlyProperty<ComponentArrayOwner<K, V>, V> {
-    override fun getValue(thisRef: ComponentArrayOwner<K, V>, property: KProperty<*>): T {
+abstract class AbstractComponentArrayAccessor<K : Any, V : Any, T : V>(
+    protected val key: KClass<out K>,
+    protected val id: Int
+) {
+    protected fun extractValue(thisRef: ComponentArrayOwner<K, V>): T? {
         @Suppress("UNCHECKED_CAST")
-        return thisRef.componentArray[id] as T? ?: error("No '$key'($id) component in session: $thisRef")
+        return thisRef.componentArray[id] as T?
+    }
+}
+
+
+class ComponentArrayAccessor<K : Any, V : Any, T : V>(
+    key: KClass<out K>,
+    id: Int
+) : AbstractComponentArrayAccessor<K, V, T>(key, id), ReadOnlyProperty<ComponentArrayOwner<K, V>, V> {
+    override fun getValue(thisRef: ComponentArrayOwner<K, V>, property: KProperty<*>): T {
+        return extractValue(thisRef) ?: error("No '$key'($id) component in array owner: $thisRef")
+    }
+}
+
+class NullableComponentArrayAccessor<K : Any, V : Any, T : V>(
+    key: KClass<out K>,
+    id: Int
+) : AbstractComponentArrayAccessor<K, V, T>(key, id), ReadOnlyProperty<ComponentArrayOwner<K, V>, V?> {
+    override fun getValue(thisRef: ComponentArrayOwner<K, V>, property: KProperty<*>): T? {
+        return extractValue(thisRef)
     }
 }
 
@@ -62,6 +85,6 @@ class ComponentArray<T : Any> {
 
     operator fun get(index: Int): T? {
         @Suppress("UNCHECKED_CAST")
-        return data.getOrNull(index) as T
+        return data.getOrNull(index) as T?
     }
 }
