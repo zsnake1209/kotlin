@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.name.ClassId
 
-
 internal class BaseClassMembersContext(private val classDeclaration: FirRegularClass) {
     val isClassNotRelevantForChecker: Boolean
         get() = propsDeclList.isEmpty()
@@ -56,14 +55,15 @@ internal class BackwardCfgVisitor(
 
     val initContextNodes = mutableListOf<InitializeContextNode>()
 
-    var lastAssignmentContextNode: InitializeContextNode? = null
-    var lastAssignRValue: FirExpression? = null
-    var isInRvalueOfAssignment: Boolean = false
-    var lastAssignmentAffectingNodes = mutableListOf<InitializeContextNode>()
 
-    var isInPropertyInitializer = false
-    var lastPropertyInitializerAffectingNodes = mutableListOf<InitializeContextNode>()
-    var lastPropertyInitializerContextNode: InitializeContextNode? = null
+    private var lastAssignmentContextNode: InitializeContextNode? = null
+    private var lastAssignRValue: FirExpression? = null
+    private var isInRvalueOfAssignment: Boolean = false
+    private var lastAssignmentAffectingNodes = mutableListOf<InitializeContextNode>()
+
+    private var isInPropertyInitializer = false
+    private var lastPropertyInitializerAffectingNodes = mutableListOf<InitializeContextNode>()
+    private var lastPropertyInitializerContextNode: InitializeContextNode? = null
 
     override fun visitNode(node: CFGNode<*>) {
         initContextNodes.add(checkAndBuildNodeContext(cfgNode = node))

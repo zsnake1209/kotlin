@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirDeclarationChecker
 import org.jetbrains.kotlin.fir.analysis.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
-import org.jetbrains.kotlin.fir.declarations.FirConstructor
 import org.jetbrains.kotlin.fir.declarations.FirRegularClass
 import org.jetbrains.kotlin.fir.declarations.modality
 import org.jetbrains.kotlin.fir.resolve.dfa.cfg.ConstExpressionNode
@@ -53,22 +52,23 @@ object LeakingThisChecker : FirDeclarationChecker<FirRegularClass>() {
     private fun runCheck(classMembersContext: BaseClassMembersContext, reporter: DiagnosticReporter) {
         if (classMembersContext.isClassNotRelevantForChecker)
             return
-        val initializedProps = mutableSetOf<FirVariableSymbol<*>>()
-
+        val initializedProperties = mutableSetOf<FirVariableSymbol<*>>()
+        val reportedProperties = mutableSetOf<FirVariableSymbol<*>>()
         checkContextNodes(
             classMembersContext.classInitContextNodes.asReversed(),
-            initializedProps,
+            initializedProperties,
+            reportedProperties,
             0,
             2,
             reporter,
             classMembersContext.classId
         )
-
     }
 
     private fun checkContextNodes(
         contextNodes: MutableList<InitializeContextNode>,
-        initializedProps: MutableSet<FirVariableSymbol<*>>,
+        initializedProperties: MutableSet<FirVariableSymbol<*>>,
+        reportedProperties: MutableSet<FirVariableSymbol<*>>,
         memberCallLevel: Int,
         maxMemberCallLevel: Int,
         reporter: DiagnosticReporter, classId: ClassId
@@ -77,22 +77,24 @@ object LeakingThisChecker : FirDeclarationChecker<FirRegularClass>() {
             when (initContextNode.nodeType) {
                 ContextNodeType.ASSINGMENT_OR_INITIALIZER -> {
                     if (initContextNode.affectingNodes.all {
-                            it.cfgNode is ConstExpressionNode // TODO: add visitConstNode?
+                            it.cfgNode is ConstExpressionNode
                                     || (it.nodeType == ContextNodeType.UNRESOLVABLE_FUN_CALL)
                                     || (it.nodeType == ContextNodeType.PROPERTY_QUALIFIED_ACCESS
                                     && it.firstAccessedProperty.callableId.classId == classId
-                                    && initializedProps.contains(it.firstAccessedProperty))
+                                    && initializedProperties.contains(it.firstAccessedProperty))
                         }) {
                         initContextNode.confirmInitForCandidate()
-                        initializedProps.add(initContextNode.initCandidate)
+                        initializedProperties.add(initContextNode.initCandidate)
                     }
                 }
                 ContextNodeType.PROPERTY_QUALIFIED_ACCESS -> {
                     if (initContextNode.accessedProperties.any {
-                            it !in initializedProps
-                        })
-                    // TODO: report p1.length not p1 exactly
+                            it !in initializedProperties && it !in reportedProperties
+                        }
+                    ) {
                         reporter.report(initContextNode.cfgNode.fir.source)
+                        reportedProperties.add(initContextNode.firstAccessedProperty)
+                    }
                 }
                 ContextNodeType.RESOLVABLE_MEMBER_CALL -> {
                     if (memberCallLevel < maxMemberCallLevel) {
@@ -100,10 +102,11 @@ object LeakingThisChecker : FirDeclarationChecker<FirRegularClass>() {
                         val memberCfg =
                             (initContextNode.cfgNode as FunctionCallNode).fir.calleeReference.resolvedSymbolAsNamedFunction?.fir?.controlFlowGraphReference?.controlFlowGraph
                         memberCfg?.traverse(TraverseDirection.Backward, memberBodyVisitor)
-
+                        memberCfg?.enterNode
                         checkContextNodes(
                             memberBodyVisitor.initContextNodes,
-                            initializedProps,
+                            initializedProperties,
+                            reportedProperties,
                             memberCallLevel + 1,
                             maxMemberCallLevel,
                             reporter,

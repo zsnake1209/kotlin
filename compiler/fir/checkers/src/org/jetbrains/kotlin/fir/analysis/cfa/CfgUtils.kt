@@ -5,10 +5,7 @@
 
 package org.jetbrains.kotlin.fir.analysis.cfa
 
-import org.jetbrains.kotlin.fir.resolve.dfa.cfg.CFGNode
-import org.jetbrains.kotlin.fir.resolve.dfa.cfg.ControlFlowGraph
-import org.jetbrains.kotlin.fir.resolve.dfa.cfg.ControlFlowGraphVisitor
-import org.jetbrains.kotlin.fir.resolve.dfa.cfg.ControlFlowGraphVisitorVoid
+import org.jetbrains.kotlin.fir.resolve.dfa.cfg.*
 
 enum class TraverseDirection {
     Forward, Backward
@@ -35,7 +32,7 @@ fun <D> ControlFlowGraph.traverse(
             TraverseDirection.Forward -> node.previousNodes
             TraverseDirection.Backward -> node.followingNodes
         }
-        if (node != initialNode && !previousNodes.all { it in visitedNodes }) {
+        if (node != initialNode && previousNodes.all { it !is StubNode } && !previousNodes.all { it in visitedNodes }) {
             if (!delayedNodes.add(node)) {
                 throw IllegalArgumentException("Infinite loop")
             }
@@ -51,7 +48,8 @@ fun <D> ControlFlowGraph.traverse(
         }
 
         followingNodes.forEach {
-            stack.addFirst(it)
+            if (it !is StubNode)
+                stack.addFirst(it)
         }
     }
 }

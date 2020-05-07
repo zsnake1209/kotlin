@@ -898,6 +898,11 @@ public class FirDiagnosticsWithLightTreeTestGenerated extends AbstractFirDiagnos
                 runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/memberCallInInitPos.kt");
             }
 
+            @TestMetadata("propertyInit.kt")
+            public void testPropertyInit() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/propertyInit.kt");
+            }
+
             @TestMetadata("simpleInitNeg.kt")
             public void testSimpleInitNeg() throws Exception {
                 runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/simpleInitNeg.kt");
@@ -906,6 +911,11 @@ public class FirDiagnosticsWithLightTreeTestGenerated extends AbstractFirDiagnos
             @TestMetadata("simpleInitPos.kt")
             public void testSimpleInitPos() throws Exception {
                 runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/simpleInitPos.kt");
+            }
+
+            @TestMetadata("simplePropertyInit.kt")
+            public void testSimplePropertyInit() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/simplePropertyInit.kt");
             }
         }
 

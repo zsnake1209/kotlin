@@ -1,0 +1,33 @@
+FILE: propertyInit.kt
+    public final class D : R|kotlin/Any| {
+        public constructor(): R|D| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val p1: R|kotlin/String| = this@R|/D|.R|/D.memberCall1|()
+            public get(): R|kotlin/String|
+
+        public final val p2: R|kotlin/String|
+            public get(): R|kotlin/String|
+
+        init {
+            this@R|/D|.R|/D.p2| = String(dsadsa)
+        }
+
+        private final fun memberCall1(): R|kotlin/String| {
+            ^memberCall1 this@R|/D|.R|/D.memberCall2|()
+        }
+
+        private final fun memberCall2(): R|kotlin/String| {
+            when () {
+                !=(this@R|/D|.R|/D.p2|.R|kotlin/String.length|, Int(0)) ->  {
+                    ^memberCall2 this@R|/D|.R|/D.p2|.R|kotlin/String.plus|(String(sadsa))
+                }
+                else ->  {
+                    ^memberCall2 String(empty)
+                }
+            }
+
+        }
+
+    }

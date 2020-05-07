@@ -1,0 +1,158 @@
+digraph propertyInit_kt {
+    graph [nodesep=3]
+    node [shape=box penwidth=2]
+    edge [penwidth=2]
+
+    subgraph cluster_0 {
+        color=red
+        0 [label="Enter function <init>" style="filled" fillcolor=red];
+        2 [label="Delegated constructor call: super<R|kotlin/Any|>()"];
+        1 [label="Exit function <init>" style="filled" fillcolor=red];
+    }
+    0 -> {2};
+    2 -> {1};
+
+    subgraph cluster_1 {
+        color=red
+        18 [label="Enter function memberCall1" style="filled" fillcolor=red];
+        20 [label="Function call: this@R|/D|.R|/D.memberCall2|()"];
+        21 [label="Jump: ^memberCall1 this@R|/D|.R|/D.memberCall2|()"];
+        22 [label="Stub" style="filled" fillcolor=gray];
+        19 [label="Exit function memberCall1" style="filled" fillcolor=red];
+    }
+    18 -> {20};
+    20 -> {21};
+    21 -> {19};
+    21 -> {22} [style=dotted];
+    22 -> {19} [style=dotted];
+
+    subgraph cluster_2 {
+        color=red
+        23 [label="Enter function memberCall2" style="filled" fillcolor=red];
+        subgraph cluster_3 {
+            color=blue
+            25 [label="Enter when"];
+            subgraph cluster_4 {
+                color=blue
+                27 [label="Enter when branch condition "];
+                28 [label="Access variable R|/D.p2|"];
+                29 [label="Access variable R|kotlin/String.length|"];
+                30 [label="Const: Int(0)"];
+                31 [label="Operator !="];
+                32 [label="Exit when branch condition"];
+            }
+            subgraph cluster_5 {
+                color=blue
+                42 [label="Enter when branch condition else"];
+                43 [label="Exit when branch condition"];
+            }
+            44 [label="Enter when branch result"];
+            subgraph cluster_6 {
+                color=blue
+                45 [label="Enter block"];
+                46 [label="Const: String(empty)"];
+                47 [label="Jump: ^memberCall2 String(empty)"];
+                48 [label="Stub" style="filled" fillcolor=gray];
+                49 [label="Exit block" style="filled" fillcolor=gray];
+            }
+            50 [label="Exit when branch result" style="filled" fillcolor=gray];
+            33 [label="Enter when branch result"];
+            subgraph cluster_7 {
+                color=blue
+                34 [label="Enter block"];
+                35 [label="Access variable R|/D.p2|"];
+                36 [label="Const: String(sadsa)"];
+                37 [label="Function call: this@R|/D|.R|/D.p2|.R|kotlin/String.plus|(...)"];
+                38 [label="Jump: ^memberCall2 this@R|/D|.R|/D.p2|.R|kotlin/String.plus|(String(sadsa))"];
+                39 [label="Stub" style="filled" fillcolor=gray];
+                40 [label="Exit block" style="filled" fillcolor=gray];
+            }
+            41 [label="Exit when branch result" style="filled" fillcolor=gray];
+            26 [label="Exit when" style="filled" fillcolor=gray];
+        }
+        24 [label="Exit function memberCall2" style="filled" fillcolor=red];
+    }
+    23 -> {25};
+    25 -> {27};
+    26 -> {24} [style=dotted];
+    27 -> {28};
+    28 -> {29};
+    29 -> {30};
+    30 -> {31};
+    31 -> {32};
+    32 -> {33 42};
+    33 -> {34};
+    34 -> {35};
+    35 -> {36};
+    36 -> {37};
+    37 -> {38};
+    38 -> {24};
+    38 -> {39} [style=dotted];
+    39 -> {40} [style=dotted];
+    40 -> {41} [style=dotted];
+    41 -> {26} [style=dotted];
+    42 -> {43};
+    43 -> {44};
+    44 -> {45};
+    45 -> {46};
+    46 -> {47};
+    47 -> {24};
+    47 -> {48} [style=dotted];
+    48 -> {49} [style=dotted];
+    49 -> {50} [style=dotted];
+    50 -> {26} [style=dotted];
+
+    subgraph cluster_8 {
+        color=red
+        51 [label="Enter class D" style="filled" fillcolor=red];
+        subgraph cluster_9 {
+            color=blue
+            8 [label="Enter function getter" style="filled" fillcolor=red];
+            9 [label="Exit function getter" style="filled" fillcolor=red];
+        }
+        subgraph cluster_10 {
+            color=blue
+            3 [label="Enter function getter" style="filled" fillcolor=red];
+            4 [label="Exit function getter" style="filled" fillcolor=red];
+        }
+        subgraph cluster_11 {
+            color=blue
+            5 [label="Enter property" style="filled" fillcolor=red];
+            7 [label="Function call: this@R|/D|.R|/D.memberCall1|()"];
+            6 [label="Exit property" style="filled" fillcolor=red];
+        }
+        subgraph cluster_12 {
+            color=blue
+            10 [label="Enter property" style="filled" fillcolor=red];
+            11 [label="Exit property" style="filled" fillcolor=red];
+        }
+        subgraph cluster_13 {
+            color=blue
+            12 [label="Enter init block" style="filled" fillcolor=red];
+            subgraph cluster_14 {
+                color=blue
+                14 [label="Enter block"];
+                15 [label="Const: String(dsadsa)"];
+                16 [label="Assignment: R|/D.p2|"];
+                17 [label="Exit block"];
+            }
+            13 [label="Exit init block" style="filled" fillcolor=red];
+        }
+        52 [label="Exit class D" style="filled" fillcolor=red];
+    }
+    51 -> {5} [color=green];
+    5 -> {7};
+    6 -> {10} [color=green];
+    7 -> {6};
+    3 -> {4};
+    10 -> {11};
+    11 -> {12} [color=green];
+    8 -> {9};
+    12 -> {14};
+    13 -> {52} [color=green];
+    14 -> {15};
+    15 -> {16};
+    16 -> {17};
+    17 -> {13};
+
+}
