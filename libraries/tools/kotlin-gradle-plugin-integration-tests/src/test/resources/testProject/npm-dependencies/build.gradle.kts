@@ -19,13 +19,14 @@ kotlin.sourceSets {
             implementation(npm("file-dependency", projectDir.resolve("file-dependency")))
             implementation(npm(projectDir.resolve("file-dependency-2")))
             implementation(npm(projectDir.resolve("file-dependency-3")))
+            implementation(devNpm("42", "0.0.1"))
         }
     }
 
     getByName("test") {
         dependencies {
             implementation(kotlin("test-js"))
-            implementation(npm("mocha"))
+            implementation(npm("mocha", "*"))
         }
     }
 }
