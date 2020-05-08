@@ -384,12 +384,15 @@ class ReplCompletionAndErrorsAnalysisTest : TestCase() {
                 emptyList()
             }
 
-            val (errorsSequence, resultType) = if (doErrorCheck) {
+            val analysisResult = if (doErrorCheck) {
                 val codeLineForErrorCheck = nextCodeLine(snippetText)
                 compiler.analyze(codeLineForErrorCheck, SourceCode.Position(0, 0), compilationConfiguration).valueOrNull()
             } else {
                 null
-            } ?: ReplAnalyzerResult()
+            }?: ReplAnalyzerResult()
+
+            val errorsSequence = analysisResult[ReplAnalyzerResult.analysisDiagnostics]!!
+            val resultType = analysisResult[ReplAnalyzerResult.renderedResultType]
 
             if (doCompile) {
                 val codeLineForCompilation = nextCodeLine(snippetText)
