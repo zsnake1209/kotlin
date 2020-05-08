@@ -46,7 +46,6 @@ internal class BaseClassMembersContext(private val classDeclaration: FirRegularC
         classCfg.traverse(TraverseDirection.Backward, visitor)
         classInitContextNodes.addAll(visitor.initContextNodes)
     }
-
 }
 
 internal class BackwardCfgVisitor(
@@ -155,6 +154,7 @@ internal class BackwardCfgVisitor(
             lastPropertyInitializerAffectingNodes = mutableListOf()
 
         } else {
+            isInPropertyInitializer = false
             visitNode(node)
         }
     }
@@ -204,7 +204,7 @@ internal class BackwardCfgVisitor(
             context.affectedNodes.add(lastAssignmentContextNode!!)
 
         if (checkIfInPropertyInitializer(context)) {
-            context.affectedNodes.add(lastAssignmentContextNode!!)
+            context.affectedNodes.add(lastPropertyInitializerContextNode!!)
         }
 
         return context
@@ -224,7 +224,7 @@ internal class BackwardCfgVisitor(
     }
 
     private fun checkIfInPropertyInitializer(contextNode: InitializeContextNode) =
-        if (isInPropertyInitializer) {
+        if (contextNode.cfgNode !is PropertyInitializerExitNode && isInPropertyInitializer) {
             lastPropertyInitializerAffectingNodes.add(contextNode)
             true
         } else false

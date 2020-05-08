@@ -25,23 +25,18 @@ import org.jetbrains.kotlin.name.ClassId
 object LeakingThisChecker : FirDeclarationChecker<FirRegularClass>() {
 
     override fun check(declaration: FirRegularClass, context: CheckerContext, reporter: DiagnosticReporter) {
-        val classDeclarationContext = when (declaration.modality) {
+        when (declaration.modality) {
             Modality.FINAL -> {
                 if (!declaration.hasClassSomeParents())
-                    collectDataForSimpleClassAnalysis(
-                        declaration
+                    runCheck(
+                        collectDataForSimpleClassAnalysis(declaration),
+                        reporter
                     )
-                else
-                    TODO()
             }
-            else -> TODO()
+            else -> {
+
+            }
         }
-
-        runCheck(
-            classDeclarationContext,
-            reporter
-        )
-
     }
 
     private fun collectDataForSimpleClassAnalysis(classDeclaration: FirRegularClass): BaseClassMembersContext =
