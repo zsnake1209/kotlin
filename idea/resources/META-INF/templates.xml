@@ -1,0 +1,37 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+    <liveTemplateContext implementation="org.jetbrains.kotlin.idea.liveTemplates.KotlinTemplateContextType$Generic"/>
+    <liveTemplateContext implementation="org.jetbrains.kotlin.idea.liveTemplates.KotlinTemplateContextType$TopLevel"/>
+    <liveTemplateContext implementation="org.jetbrains.kotlin.idea.liveTemplates.KotlinTemplateContextType$Statement"/>
+    <liveTemplateContext implementation="org.jetbrains.kotlin.idea.liveTemplates.KotlinTemplateContextType$Class"/>
+    <liveTemplateContext implementation="org.jetbrains.kotlin.idea.liveTemplates.KotlinTemplateContextType$Expression"/>
+    <liveTemplateContext implementation="org.jetbrains.kotlin.idea.liveTemplates.KotlinTemplateContextType$Comment"/>
+    <liveTemplateContext implementation="org.jetbrains.kotlin.idea.liveTemplates.KotlinTemplateContextType$ObjectDeclaration"/>
+
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.AnyVariableMacro"/>
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.SuitableVariableMacro"/>
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.FunctionParametersMacro"/>
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.AnonymousSuperMacro"/>
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.SuggestVariableNameMacro"/>
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.KotlinClassNameMacro"/>
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.KotlinFunctionNameMacro"/>
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.KotlinPackageNameMacro"/>
+    <liveTemplateMacro implementation="org.jetbrains.kotlin.idea.liveTemplates.macro.KotlinMainArgumentsMacro"/>
+
+    <internalFileTemplate name="Kotlin File"/>
+    <internalFileTemplate name="Kotlin Class"/>
+    <internalFileTemplate name="Kotlin Enum"/>
+    <internalFileTemplate name="Kotlin Interface"/>
+    <internalFileTemplate name="Kotlin Worksheet"/>
+    <internalFileTemplate name="Kotlin Script"/>
+
+
+    <codeInsight.template.postfixTemplateProvider language="kotlin"
+                                                  implementationClass="org.jetbrains.kotlin.idea.codeInsight.postfix.KtPostfixTemplateProvider"/>
+
+    <createFromTemplateHandler implementation="org.jetbrains.kotlin.idea.actions.KotlinCreateFromTemplateHandler"/>
+    <defaultTemplatePropertiesProvider implementation="org.jetbrains.kotlin.idea.actions.KotlinDefaultTemplatePropertiesProvider"
+                                       order="last"/>
+
+  </extensions>
+</idea-plugin>

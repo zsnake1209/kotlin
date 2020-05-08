@@ -1,0 +1,16 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+
+    <projectService serviceImplementation="org.jetbrains.kotlin.idea.compiler.configuration.KotlinCommonCompilerArgumentsHolder"/>
+
+    <projectService serviceImplementation="org.jetbrains.kotlin.idea.compiler.configuration.Kotlin2JvmCompilerArgumentsHolder"/>
+
+    <projectService serviceImplementation="org.jetbrains.kotlin.idea.compiler.configuration.Kotlin2JsCompilerArgumentsHolder"/>
+
+    <projectService serviceImplementation="org.jetbrains.kotlin.idea.compiler.configuration.KotlinCompilerSettings"/>
+
+    <projectService serviceImplementation="org.jetbrains.kotlin.idea.compiler.configuration.KotlinCompilerWorkspaceSettings"/>
+
+    <library.type implementation="org.jetbrains.kotlin.idea.framework.JSLibraryType"/>
+  </extensions>
+</idea-plugin>

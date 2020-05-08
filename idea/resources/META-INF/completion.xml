@@ -1,0 +1,27 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+    <completion.contributor language="kotlin"
+                            id="KotlinCompletionContributor"
+                            order="first"
+                            implementationClass="org.jetbrains.kotlin.idea.completion.KotlinCompletionContributor"/>
+    <completion.contributor language="kotlin"
+                            implementationClass="org.jetbrains.kotlin.idea.completion.KDocCompletionContributor"/>
+
+    <completion.confidence language="kotlin" implementationClass="com.intellij.codeInsight.completion.UnfocusedNameIdentifier"/>
+    <completion.confidence language="kotlin" implementationClass="com.intellij.codeInsight.completion.AlwaysFocusLookup" order="last"/>
+    <completion.confidence language="kotlin"
+                           implementationClass="org.jetbrains.kotlin.idea.completion.confidence.EnableAutopopupInStringTemplate"/>
+    <completion.confidence language="kotlin" implementationClass="com.intellij.codeInsight.completion.SkipAutopopupInStrings"/>
+
+    <lookup.charFilter implementation="org.jetbrains.kotlin.idea.completion.KotlinCompletionCharFilter"/>
+    <lookup.actionProvider implementation="org.jetbrains.kotlin.idea.completion.KotlinExcludeFromCompletionLookupActionProvider"/>
+
+    <statistician key="completion" implementationClass="org.jetbrains.kotlin.idea.completion.KotlinCompletionStatistician"/>
+    <statistician key="proximity" implementationClass="org.jetbrains.kotlin.idea.completion.KotlinProximityStatistician"/>
+
+    <weigher key="completion" implementationClass="org.jetbrains.kotlin.idea.completion.KotlinLookupElementProximityWeigher"
+             id="kotlin.proximity" order="after proximity"/>
+
+    <projectService serviceImplementation="org.jetbrains.kotlin.idea.completion.CompletionBindingContextProvider"/>
+  </extensions>
+</idea-plugin>

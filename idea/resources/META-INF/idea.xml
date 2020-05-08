@@ -1,0 +1,97 @@
+<idea-plugin>
+  <!-- Here should come all idea-related stuff which doesn't depend on resolve (editor-related comes to editor.xml) -->
+  <extensions defaultExtensionNs="com.intellij">
+    <sdkType implementation="org.jetbrains.kotlin.idea.framework.KotlinSdkType"/>
+    <facetType implementation="org.jetbrains.kotlin.idea.facet.KotlinFacetTypeImpl"/>
+
+    <postStartupActivity implementation="org.jetbrains.kotlin.idea.framework.CreateKotlinSdkActivity"/>
+
+    <projectService serviceImplementation="org.jetbrains.kotlin.idea.parameterInfo.custom.KotlinCodeHintsModel"/>
+
+    <applicationService serviceImplementation="org.jetbrains.kotlin.idea.KotlinPluginUpdater"/>
+
+    <iconProvider implementation="org.jetbrains.kotlin.idea.KotlinIconProvider"/>
+    <applicationService serviceInterface="org.jetbrains.kotlin.idea.KotlinIconProviderService"
+                        serviceImplementation="org.jetbrains.kotlin.idea.KotlinIdeFileIconProviderService"/>
+
+    <itemPresentationProvider implementationClass="org.jetbrains.kotlin.idea.presentation.KtFunctionPresenter"
+                              forClass="org.jetbrains.kotlin.psi.KtFunction"/>
+    <itemPresentationProvider implementationClass="org.jetbrains.kotlin.idea.presentation.KtDefaultDeclarationPresenter"
+                              forClass="org.jetbrains.kotlin.psi.KtClass"/>
+    <itemPresentationProvider implementationClass="org.jetbrains.kotlin.idea.presentation.KtDefaultDeclarationPresenter"
+                              forClass="org.jetbrains.kotlin.psi.KtObjectDeclaration"/>
+    <itemPresentationProvider implementationClass="org.jetbrains.kotlin.idea.presentation.KtDefaultDeclarationPresenter"
+                              forClass="org.jetbrains.kotlin.psi.KtProperty"/>
+    <itemPresentationProvider implementationClass="org.jetbrains.kotlin.idea.presentation.KtDefaultDeclarationPresenter"
+                              forClass="org.jetbrains.kotlin.psi.KtParameter"/>
+    <itemPresentationProvider implementationClass="org.jetbrains.kotlin.idea.presentation.KtDefaultDeclarationPresenter"
+                              forClass="org.jetbrains.kotlin.psi.KtTypeAlias"/>
+
+    <navbar implementation="org.jetbrains.kotlin.idea.navigationToolbar.KotlinNavBarModelExtension" order="first"/>
+
+    <projectService serviceImplementation="org.jetbrains.kotlin.idea.codeInsight.KotlinCodeInsightWorkspaceSettings"/>
+    <applicationService serviceImplementation="org.jetbrains.kotlin.idea.codeInsight.KotlinCodeInsightSettings"/>
+
+    <lang.substitutor language="kotlin" order="last" implementationClass="org.jetbrains.kotlin.idea.KotlinLanguageSubstitutor"/>
+
+    <project.converterProvider implementation="org.jetbrains.kotlin.idea.roots.KotlinNonJvmSourceRootConverterProvider"/>
+    <orderEnumerationHandlerFactory implementation="org.jetbrains.kotlin.idea.roots.KotlinNonJvmOrderEnumerationHandler$Factory"/>
+
+    <projectStructure.sourceRootEditHandler implementation="org.jetbrains.kotlin.idea.roots.ui.KotlinModuleSourceRootEditHandler$Source"/>
+    <projectStructure.sourceRootEditHandler
+        implementation="org.jetbrains.kotlin.idea.roots.ui.KotlinModuleSourceRootEditHandler$TestSource"/>
+    <projectStructure.sourceRootEditHandler implementation="org.jetbrains.kotlin.idea.roots.ui.KotlinModuleSourceRootEditHandler$Resource"/>
+    <projectStructure.sourceRootEditHandler
+        implementation="org.jetbrains.kotlin.idea.roots.ui.KotlinModuleSourceRootEditHandler$TestResource"/>
+
+    <spellchecker.support implementationClass="org.jetbrains.kotlin.idea.codeInsight.spellchecker.KotlinSpellcheckingStrategy"
+                          language="kotlin"/>
+
+    <colorSettingsPage implementation="org.jetbrains.kotlin.idea.highlighter.KotlinColorSettingsPage"/>
+    <additionalTextAttributes scheme="Default" file="colorScheme/Default_Kotlin.xml"/>
+    <additionalTextAttributes scheme="Darcula" file="colorScheme/Darcula_Kotlin.xml"/>
+
+    <lang.namesValidator language="kotlin" implementationClass="org.jetbrains.kotlin.idea.refactoring.KotlinNamesValidator"/>
+
+
+    <projectConfigurable instance="org.jetbrains.kotlin.idea.compiler.configuration.KotlinCompilerConfigurableTab"
+                         id="project.kotlinCompiler"
+                         displayName="Kotlin Compiler"
+                         parentId="project.propCompiler"/>
+
+    <applicationConfigurable groupId="language" displayName="Kotlin" id="preferences.language.Kotlin"
+                             instance="org.jetbrains.kotlin.idea.configuration.KotlinLanguageConfiguration"/>
+
+    <errorHandler implementation="org.jetbrains.kotlin.idea.reporter.KotlinReportSubmitter"/>
+
+    <registryKey key="kotlin.experimental.project.wizard"
+                 description="Enable new Kotlin project wizard"
+                 defaultValue="true"
+                 restartRequired="false"/>
+    <moduleBuilder builderClass="org.jetbrains.kotlin.tools.projectWizard.wizard.NewProjectWizardModuleBuilder"/>
+    <jbProtocolCommand implementation="org.jetbrains.kotlin.tools.projectWizard.wizard.OpenNewProjectWizardProtocolCommand"/>
+
+    <!-- - - - - - - - -->
+
+    <projectService serviceInterface="org.jetbrains.kotlin.load.kotlin.VirtualFileFinderFactory"
+                    serviceImplementation="org.jetbrains.kotlin.idea.vfilefinder.IDEVirtualFileFinderFactory"/>
+
+    <projectService serviceInterface="org.jetbrains.kotlin.load.kotlin.MetadataFinderFactory"
+                    serviceImplementation="org.jetbrains.kotlin.idea.vfilefinder.IDEVirtualFileFinderFactory"/>
+  </extensions>
+
+  <extensions defaultExtensionNs="org.jetbrains.kotlin">
+    <projectConfigurator implementation="org.jetbrains.kotlin.idea.configuration.KotlinJavaModuleConfigurator"/>
+    <projectConfigurator implementation="org.jetbrains.kotlin.idea.configuration.KotlinJsModuleConfigurator"/>
+
+    <idePlatformKind implementation="org.jetbrains.kotlin.platform.impl.JvmIdePlatformKind"/>
+    <idePlatformKind implementation="org.jetbrains.kotlin.platform.impl.JsIdePlatformKind"/>
+
+    <idePlatformKindTooling implementation="org.jetbrains.kotlin.idea.core.platform.impl.JvmIdePlatformKindTooling"/>
+    <idePlatformKindTooling implementation="org.jetbrains.kotlin.idea.core.platform.impl.JsIdePlatformKindTooling"/>
+    <versionInfoProvider implementation="org.jetbrains.kotlin.idea.facet.KotlinVersionInfoProviderByModuleDependencies"/>
+
+  </extensions>
+
+  <resource-bundle>messages.KotlinBundle</resource-bundle>
+</idea-plugin>

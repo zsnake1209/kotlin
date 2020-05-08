@@ -1,0 +1,159 @@
+<idea-plugin>
+  <actions>
+    <action id="Kotlin.NewFile" class="org.jetbrains.kotlin.idea.actions.NewKotlinFileAction">
+      <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewGroup1"/>
+    </action>
+    <action id="Kotlin.NewScript" class="org.jetbrains.kotlin.idea.actions.NewKotlinScriptAction">
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
+    </action>
+    <action id="Kotlin.NewWorksheet" class="org.jetbrains.kotlin.idea.actions.NewKotlinWorksheetAction">
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
+    </action>
+
+    <group id="ConvertJavaToKotlinGroup">
+      <separator/>
+      <action id="ConvertJavaToKotlin" class="org.jetbrains.kotlin.idea.actions.JavaToKotlinAction">
+        <keyboard-shortcut keymap="$default" first-keystroke="control alt shift K"/>
+      </action>
+      <add-to-group group-id="CodeMenu" anchor="last"/>
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+      <add-to-group group-id="EditorTabPopupMenu" anchor="last"/>
+    </group>
+
+    <group id="KotlinToolsGroup" popup="true" icon="/org/jetbrains/kotlin/idea/icons/kotlin13.png"
+           class="org.jetbrains.kotlin.idea.actions.KotlinActionGroup">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </group>
+
+    <action id="KotlinConfigureUpdates" class="org.jetbrains.kotlin.idea.actions.ConfigurePluginUpdatesAction">
+      <add-to-group group-id="KotlinToolsGroup"/>
+    </action>
+
+    <action id="DecompileKotlinToJava" class="org.jetbrains.kotlin.idea.actions.DecompileKotlinToJavaAction">
+      <add-to-group group-id="KotlinToolsGroup"/>
+    </action>
+
+    <action id="CopyKotlinProjectInformation" class="org.jetbrains.kotlin.idea.actions.internal.CopyKotlinProjectOverviewAction">
+    </action>
+
+    <action id="KotlinCodeMigration" class="org.jetbrains.kotlin.idea.migration.CodeMigrationAction">
+      <!-- TODO: Not assigned to any group because there should be a panel for filling migration options -->
+    </action>
+
+    <action id="KotlinCodeMigrationToggle" class="org.jetbrains.kotlin.idea.migration.CodeMigrationToggleAction">
+      <add-to-group group-id="KotlinToolsGroup"/>
+    </action>
+
+    <action id="ExtractFunction" class="org.jetbrains.kotlin.idea.refactoring.introduce.extractFunction.ExtractFunctionAction"
+            use-shortcut-of="ExtractMethod">
+      <add-to-group group-id="IntroduceActionsGroup" anchor="after" relative-to-action="ExtractMethod"/>
+    </action>
+
+    <action id="IntroduceProperty" class="org.jetbrains.kotlin.idea.refactoring.introduce.introduceProperty.IntroducePropertyAction"
+            use-shortcut-of="IntroduceField">
+      <add-to-group group-id="IntroduceActionsGroup" anchor="after" relative-to-action="IntroduceField"/>
+    </action>
+
+    <group id="InternalKotlin" internal="true">
+      <separator/>
+
+      <action id="DumbModeTremble" class="org.jetbrains.kotlin.idea.actions.internal.DumbModeTrembleAction"/>
+
+      <group id="KotlinRefactoringTesting" popup="true">
+        <action id="TestMoveRefactiringAction"
+                class="org.jetbrains.kotlin.idea.actions.internal.refactoringTesting.MoveRefactoringAction"/>
+      </group>
+
+      <group id="KotlinInternalGroup" popup="true">
+        <group id="KotlinCompletionBenchmarkGroup" popup="true">
+          <action id="TopLevelCompletionBenchmarkAction"
+                  class="org.jetbrains.kotlin.idea.actions.internal.benchmark.TopLevelCompletionBenchmarkAction"/>
+
+          <action id="LocalCompletionBenchmarkAction"
+                  class="org.jetbrains.kotlin.idea.actions.internal.benchmark.LocalCompletionBenchmarkAction"/>
+        </group>
+
+        <action id="HighlightingBenchmarkAction"
+                class="org.jetbrains.kotlin.idea.actions.internal.benchmark.HighlightingBenchmarkAction"/>
+
+        <action id="CacheResetOnProcessCanceledToggleAction"
+                class="org.jetbrains.kotlin.idea.actions.internal.CacheResetOnProcessCanceledToggleAction"/>
+
+        <action id="CheckComponentsUsageSearchAction" class="org.jetbrains.kotlin.idea.actions.internal.CheckComponentsUsageSearchAction"/>
+
+        <action id="FindImplicitNothingAction" class="org.jetbrains.kotlin.idea.actions.internal.FindImplicitNothingAction"/>
+
+        <action id="PrintOutNotPropertyMatches" class="org.jetbrains.kotlin.idea.actions.internal.SearchNotPropertyCandidatesAction"/>
+
+        <action id="StoredExceptionsThrowToggleAction"
+                class="org.jetbrains.kotlin.idea.actions.internal.StoredExceptionsThrowToggleAction"/>
+
+        <action id="MultiplatformCompositeAnalysisToggleAction"
+                class="org.jetbrains.kotlin.idea.actions.internal.MultiplatformCompositeAnalysisToggleAction"/>
+
+        <action id="CopyAsDiagnosticTest" class="org.jetbrains.kotlin.idea.actions.internal.CopyAsDiagnosticTestAction"/>
+
+        <action id="KotlinFormattingSettingsStatusAction"
+                class="org.jetbrains.kotlin.idea.actions.internal.KotlinFormattingSettingsStatusAction"/>
+
+        <!--        <action id="ShowFirAction" class="org.jetbrains.kotlin.idea.actions.internal.ShowFirAction"
+                text="Show RAW FIR Explorer"/> -->
+      </group>
+      <separator/>
+
+      <add-to-group group-id="Internal" anchor="last"/>
+    </group>
+
+    <action id="KotlinThrowException" class="org.jetbrains.kotlin.idea.actions.internal.KotlinThrowExceptionAction"/>
+
+    <action id="ExtractFunctionToScope"
+            class="org.jetbrains.kotlin.idea.refactoring.introduce.extractFunction.ExtractFunctionToScopeAction">
+      <keyboard-shortcut keymap="$default" first-keystroke="control alt shift M"/>
+      <add-to-group group-id="IntroduceActionsGroup" anchor="after" relative-to-action="ExtractFunction"/>
+    </action>
+
+    <action id="IntroduceTypeParameter"
+            class="org.jetbrains.kotlin.idea.refactoring.introduce.introduceTypeParameter.IntroduceTypeParameterAction">
+      <add-to-group group-id="IntroduceActionsGroup" anchor="after" relative-to-action="ExtractFunctionToScope"/>
+    </action>
+
+    <action id="IntroduceTypeAlias" class="org.jetbrains.kotlin.idea.refactoring.introduce.introduceTypeAlias.IntroduceTypeAliasAction">
+      <keyboard-shortcut keymap="$default" first-keystroke="control alt shift A"/>
+      <add-to-group group-id="IntroduceActionsGroup" anchor="after" relative-to-action="IntroduceTypeParameter"/>
+    </action>
+
+    <action id="KotlinShellExecute" class="com.intellij.openapi.actionSystem.EmptyAction">
+      <keyboard-shortcut first-keystroke="control ENTER" keymap="$default"/>
+    </action>
+
+    <group id="KotlinGenerateGroup">
+      <action id="KotlinGenerateTestMethod"
+              class="org.jetbrains.kotlin.idea.actions.generate.KotlinGenerateTestSupportActionBase$Test"/>
+      <action id="KotlinGenerateSetUpMethod"
+              class="org.jetbrains.kotlin.idea.actions.generate.KotlinGenerateTestSupportActionBase$SetUp"/>
+      <action id="KotlinGenerateTearDownMethod"
+              class="org.jetbrains.kotlin.idea.actions.generate.KotlinGenerateTestSupportActionBase$TearDown"/>
+      <action id="KotlinGenerateDataMethod"
+              class="org.jetbrains.kotlin.idea.actions.generate.KotlinGenerateTestSupportActionBase$Data"/>
+      <separator/>
+      <action id="KotlinGenerateSecondaryConstructor"
+              class="org.jetbrains.kotlin.idea.actions.generate.KotlinGenerateSecondaryConstructorAction"/>
+      <action id="KotlinGenerateEqualsAndHashCode"
+              class="org.jetbrains.kotlin.idea.actions.generate.KotlinGenerateEqualsAndHashcodeAction"/>
+      <action id="KotlinGenerateToString"
+              class="org.jetbrains.kotlin.idea.actions.generate.KotlinGenerateToStringAction"/>
+
+      <add-to-group group-id="GenerateGroup" anchor="first"/>
+    </group>
+
+    <action id="Kotlin.RunScratch" class="org.jetbrains.kotlin.idea.scratch.actions.RunScratchAction">
+      <keyboard-shortcut first-keystroke="control alt W" keymap="$default"/>
+      <add-to-group group-id="RunContextPopupGroup" anchor="last"/>
+    </action>
+    <action id="Kotlin.ClearScratch" class="org.jetbrains.kotlin.idea.scratch.actions.ClearScratchAction">
+    </action>
+    <action id="Kotlin.StopScratch" class="org.jetbrains.kotlin.idea.scratch.actions.StopScratchAction">
+    </action>
+  </actions>
+
+</idea-plugin>
