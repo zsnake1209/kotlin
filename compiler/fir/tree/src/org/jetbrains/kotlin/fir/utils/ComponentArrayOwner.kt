@@ -18,4 +18,9 @@ abstract class ComponentArrayOwner<K : Any, V : Any> : AbstractArrayMapOwner<K, 
     final override fun registerComponent(tClass: KClass<out K>, value: V) {
         arrayMap[typeRegistry.getId(tClass)] = value
     }
+
+    protected operator fun get(key: KClass<out K>): V {
+        val id = typeRegistry.getId(key)
+        return arrayMap[id] ?: error("No '$key'($id) component in array: $this")
+    }
 }
