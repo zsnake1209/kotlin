@@ -83,10 +83,10 @@ class KJvmReplCompilerWithIdeServices(hostConfiguration: ScriptingHostConfigurat
                 val resultRenderedType = resultProperty?.let {
                     DescriptorRenderer.SHORT_NAMES_IN_TYPES.renderType(it.type)
                 }
-                return ReplAnalyzerResult(
-                    messageCollector.diagnostics.toAnalyzeResultSequence(),
-                    resultRenderedType,
-                ).asSuccess()
+                return ReplAnalyzerResult {
+                    analysisDiagnostics(messageCollector.diagnostics.toAnalyzeResultSequence())
+                    renderedResultType(resultRenderedType)
+                }.asSuccess()
             }
         }
     }
