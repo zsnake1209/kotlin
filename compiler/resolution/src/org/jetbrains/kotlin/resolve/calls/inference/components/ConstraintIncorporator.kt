@@ -232,8 +232,10 @@ class ConstraintIncorporator(
 
         val inputTypePosition = baseConstraint.position.from.safeAs<OnlyInputTypeConstraintPosition>()
 
-        val isNullabilityConstraint =
-            (isUsefulForNullabilityConstraint && newConstraint.isNullableNothing()) || otherConstraint.isNullabilityConstraint
+        val isNewConstraintUsefulForNullability = isUsefulForNullabilityConstraint && newConstraint.isNullableNothing()
+        val isOtherConstraintUsefulForNullability = otherConstraint.isNullabilityConstraint && otherConstraint.type.isNullableNothing()
+        val isNullabilityConstraint = isNewConstraintUsefulForNullability || isOtherConstraintUsefulForNullability
+
         val constraintContext = ConstraintContext(kind, derivedFrom, inputTypePosition, isNullabilityConstraint)
 
         addNewIncorporatedConstraint(targetVariable, newConstraint, constraintContext)
