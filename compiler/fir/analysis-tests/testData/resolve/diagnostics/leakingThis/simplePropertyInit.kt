@@ -9,6 +9,6 @@ class D {
     }
 
     private fun memberCall1(): Int {
-        return < !POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR!>p2<!>.length
+        return <!POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR!>p2<!>.length
     }
 }

@@ -12,7 +12,7 @@ class D {
     }
 
     private fun memberCall2(): String {
-        if ( < !POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR!>p2<!>.length != 0){
+        if ( <!POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR!>p2<!>.length != 0){
             return p2 + "sadsa"
         }  else {
             return "empty"

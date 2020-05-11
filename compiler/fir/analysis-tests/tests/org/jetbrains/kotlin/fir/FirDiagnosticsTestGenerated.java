@@ -865,6 +865,7 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
         public void testSuperclassNotAccessibleFromInterface() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/superclassNotAccessibleFromInterface.kt");
         }
+
         @TestMetadata("valOnAnnotationParameter.kt")
         public void testValOnAnnotationParameter() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/valOnAnnotationParameter.kt");
@@ -880,6 +881,11 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
 
             public void testAllFilesPresentInLeakingThis() throws Exception {
                 KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis"), Pattern.compile("^([^.]+)\\.kt$"), null, true);
+            }
+
+            @TestMetadata("inlineAndLambdas.kt")
+            public void testInlineAndLambdas() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/diagnostics/leakingThis/inlineAndLambdas.kt");
             }
 
             @TestMetadata("manyInitSections.kt")

@@ -1,0 +1,35 @@
+FILE: inlineAndLambdas.kt
+    public final class A : R|kotlin/Any| {
+        public constructor(): R|A| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val p1: R|kotlin/String| = String(asa)
+            public get(): R|kotlin/String|
+
+        public final val p2: R|kotlin/String|
+            public get(): R|kotlin/String|
+
+        init {
+            this@R|/A|.R|/A.inLineCatch|(<L> = inLineCatch@fun <anonymous>(): R|kotlin/Int| <kind=UNKNOWN>  {
+                ^ this@R|/A|.R|/A.p1|.R|kotlin/String.length|
+            }
+            )
+            this@R|/A|.R|/A.p2| = String(dsadsa)
+        }
+
+        private final inline fun inLineCatch(f: R|() -> kotlin/Int|): R|kotlin/Unit| {
+            this@R|/A|.R|/A.p2|.R|kotlin/String.length|
+            R|<local>/f|.R|FakeOverride<kotlin/Function0.invoke: R|kotlin/Int|>|()
+        }
+
+        private final fun notInline(f: R|() -> kotlin/Int|): R|kotlin/Unit| {
+            this@R|/A|.R|/A.memberCall1|()
+            R|<local>/f|.R|FakeOverride<kotlin/Function0.invoke: R|kotlin/Int|>|()
+            this@R|/A|.R|/A.memberCall1|()
+        }
+
+        private final fun memberCall1(): R|kotlin/Unit| {
+        }
+
+    }

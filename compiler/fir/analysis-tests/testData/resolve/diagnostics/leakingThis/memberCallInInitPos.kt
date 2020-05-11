@@ -14,8 +14,9 @@ class C {
         memberCall2()
     }
 
-    fun memberCall2(){
-        <!POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR!>p3<!>.length
+    fun memberCall2() {
+        if (p3?.length > 0)
+            <!POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR!>p3<!>.length
     }
 
 }

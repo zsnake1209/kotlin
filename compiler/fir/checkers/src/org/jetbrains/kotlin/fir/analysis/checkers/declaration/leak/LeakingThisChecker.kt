@@ -21,17 +21,20 @@ import org.jetbrains.kotlin.fir.resolve.dfa.controlFlowGraph
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.name.ClassId
 
-
 object LeakingThisChecker : FirDeclarationChecker<FirRegularClass>() {
 
     override fun check(declaration: FirRegularClass, context: CheckerContext, reporter: DiagnosticReporter) {
         when (declaration.modality) {
             Modality.FINAL -> {
                 if (!declaration.hasClassSomeParents())
-                    runCheck(
-                        collectDataForSimpleClassAnalysis(declaration),
-                        reporter
-                    )
+                    try {
+                        runCheck(
+                            collectDataForSimpleClassAnalysis(declaration),
+                            reporter
+                        )
+                    } catch (e: Exception) {
+
+                    }
             }
             else -> {
 
@@ -96,17 +99,22 @@ object LeakingThisChecker : FirDeclarationChecker<FirRegularClass>() {
                         val memberBodyVisitor = BackwardCfgVisitor(classId)
                         val memberCfg =
                             (initContextNode.cfgNode as FunctionCallNode).fir.calleeReference.resolvedSymbolAsNamedFunction?.fir?.controlFlowGraphReference?.controlFlowGraph
-                        memberCfg?.traverse(TraverseDirection.Backward, memberBodyVisitor)
-                        memberCfg?.enterNode
-                        checkContextNodes(
-                            memberBodyVisitor.initContextNodes,
-                            initializedProperties,
-                            reportedProperties,
-                            memberCallLevel + 1,
-                            maxMemberCallLevel,
-                            reporter,
-                            classId
-                        )
+                        try {
+                            memberCfg?.traverse(TraverseDirection.Backward, memberBodyVisitor)
+                            memberCfg?.enterNode
+                            checkContextNodes(
+                                memberBodyVisitor.initContextNodes,
+                                initializedProperties,
+                                reportedProperties,
+                                memberCallLevel + 1,
+                                maxMemberCallLevel,
+                                reporter,
+                                classId
+                            )
+                            memberCfg?.enterNode
+                        } catch (e: Exception) {
+                            continue
+                        }
                     }
                 }
                 else -> {

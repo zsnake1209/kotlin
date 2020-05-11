@@ -24,7 +24,12 @@ FILE: memberCallInInitPos.kt
         }
 
         public final fun memberCall2(): R|kotlin/Unit| {
-            this@R|/C|.R|/C.p3|.R|kotlin/String.length|
+            when () {
+                CMP(>, this@R|/C|.R|/C.p3|?.R|kotlin/String.length|.R|kotlin/Int.compareTo|(Int(0))) ->  {
+                    this@R|/C|.R|/C.p3|.R|kotlin/String.length|
+                }
+            }
+
         }
 
     }

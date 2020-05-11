@@ -21,18 +21,21 @@ import org.jetbrains.kotlin.name.ClassId
 internal class BaseClassMembersContext(private val classDeclaration: FirRegularClass) {
     val isClassNotRelevantForChecker: Boolean
         get() = propsDeclList.isEmpty()
-    val isCfgAvailable: Boolean
-        get() = classDeclaration.controlFlowGraphReference.controlFlowGraph != null
     val classId: ClassId
         get() = classDeclaration.symbol.classId
-
     val classInitContextNodes = mutableListOf<InitializeContextNode>()
+
+    private val isCfgAvailable: Boolean
+        get() = classDeclaration.controlFlowGraphReference.controlFlowGraph != null
 
     private val classCfg: ControlFlowGraph
         get() = classDeclaration.controlFlowGraphReference.controlFlowGraph!!
 
     private val propsDeclList = mutableListOf<FirProperty>()
     private val anonymousInitializer = mutableListOf<FirAnonymousInitializer>()
+
+//    private val highOrderFunctions
+
 
     init {
         if (isCfgAvailable)
@@ -42,9 +45,16 @@ internal class BaseClassMembersContext(private val classDeclaration: FirRegularC
                     is FirProperty -> propsDeclList.add(declaration)
                 }
             }
-        val visitor = BackwardCfgVisitor(classDeclaration.symbol.classId)
-        classCfg.traverse(TraverseDirection.Backward, visitor)
-        classInitContextNodes.addAll(visitor.initContextNodes)
+        try {
+            val visitor = BackwardCfgVisitor(classDeclaration.symbol.classId)
+            classCfg.traverse(
+                TraverseDirection.Backward,
+                visitor
+            )
+            classInitContextNodes.addAll(visitor.initContextNodes)
+        } catch (e: Exception) {
+            throw e
+        }
     }
 }
 
@@ -63,6 +73,9 @@ internal class BackwardCfgVisitor(
     private var isInPropertyInitializer = false
     private var lastPropertyInitializerAffectingNodes = mutableListOf<InitializeContextNode>()
     private var lastPropertyInitializerContextNode: InitializeContextNode? = null
+
+
+    private var isLastNodeSafeCallEnter = false
 
     override fun visitNode(node: CFGNode<*>) {
         initContextNodes.add(checkAndBuildNodeContext(cfgNode = node))
@@ -173,10 +186,20 @@ internal class BackwardCfgVisitor(
             )
             initContextNodes.add(lastPropertyInitializerContextNode!!)
         } else {
+            isInPropertyInitializer = true
             visitNode(node)
         }
     }
 //        TODO: lambda
+
+    override fun visitEnterSafeCallNode(node: EnterSafeCallNode) {
+        isLastNodeSafeCallEnter = true
+        visitNode(node)
+    }
+
+    override fun visitExitSafeCallNode(node: ExitSafeCallNode) {
+        visitNode(node)
+    }
 
     private fun checkAndBuildNodeContext(
         cfgNode: CFGNode<*>,
@@ -200,6 +223,7 @@ internal class BackwardCfgVisitor(
             isInitialized
         )
 // TODO: if variable
+
         if (checkIfInRvalueOfAssignment(context))
             context.affectedNodes.add(lastAssignmentContextNode!!)
 
@@ -207,13 +231,15 @@ internal class BackwardCfgVisitor(
             context.affectedNodes.add(lastPropertyInitializerContextNode!!)
         }
 
+        checkIfSafeCallOnProperty(context)
+
         return context
     }
 
-    private fun checkIfInRvalueOfAssignment(contextNode: InitializeContextNode): Boolean {
+    private fun checkIfInRvalueOfAssignment(context: InitializeContextNode): Boolean {
         if (isInRvalueOfAssignment) {
-            lastAssignmentAffectingNodes.add(contextNode)
-            if (contextNode.cfgNode.fir == lastAssignRValue) {
+            lastAssignmentAffectingNodes.add(context)
+            if (context.cfgNode.fir == lastAssignRValue) {
                 isInRvalueOfAssignment = false
                 lastAssignmentContextNode?.affectingNodes = lastAssignmentAffectingNodes
                 lastAssignmentAffectingNodes = mutableListOf()
@@ -223,9 +249,17 @@ internal class BackwardCfgVisitor(
         return false
     }
 
-    private fun checkIfInPropertyInitializer(contextNode: InitializeContextNode) =
-        if (contextNode.cfgNode !is PropertyInitializerExitNode && isInPropertyInitializer) {
-            lastPropertyInitializerAffectingNodes.add(contextNode)
+    private fun checkIfSafeCallOnProperty(context: InitializeContextNode){
+        if(isLastNodeSafeCallEnter && context.cfgNode !is EnterSafeCallNode) {
+            if(context.nodeType == ContextNodeType.PROPERTY_QUALIFIED_ACCESS)
+                context.nodeType = ContextNodeType.PROPERTY_SAFE_QUALIFIED_ACCESS
+            isLastNodeSafeCallEnter = false
+        }
+    }
+
+    private fun checkIfInPropertyInitializer(context: InitializeContextNode) =
+        if (context.cfgNode !is PropertyInitializerExitNode && isInPropertyInitializer) {
+            lastPropertyInitializerAffectingNodes.add(context)
             true
         } else false
 }
