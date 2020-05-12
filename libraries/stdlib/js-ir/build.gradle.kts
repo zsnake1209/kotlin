@@ -59,7 +59,10 @@ val jsMainSources by task<Sync> {
         "libraries/stdlib/js/src/generated/**",
 
         // JS-specific optimized version of emptyArray() already defined
-        "core/builtins/src/kotlin/ArrayIntrinsics.kt"
+        "core/builtins/src/kotlin/ArrayIntrinsics.kt",
+
+        // IR-specific version is defined in libraries/stdlib/js-ir/runtime/arrays.kt
+        "libraries/stdlib/js/runtime/arrayUtils.kt"
     )
 
     sources.forEach { path ->
