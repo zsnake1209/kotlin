@@ -120,7 +120,7 @@ digraph inlineAndLambdas_kt {
     25 -> {26};
     26 -> {27};
     27 -> {28};
-    28 -> {29 29} [color=green];
+    28 -> {29} [color=green];
     28 -> {16} [color=red];
     29 -> {30};
     30 -> {31};
