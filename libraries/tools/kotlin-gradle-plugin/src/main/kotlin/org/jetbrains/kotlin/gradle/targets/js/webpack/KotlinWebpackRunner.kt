@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the license/LICENSE.txt file.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.gradle.targets.js.webpack
@@ -17,6 +17,7 @@ internal data class KotlinWebpackRunner(
     val configFile: File,
     val execHandleFactory: ExecHandleFactory,
     val tool: String,
+    val args: List<String>,
     val config: KotlinWebpackConfig
 ) {
     fun execute() = npmProject.project.execWithProgress("webpack") {
@@ -42,6 +43,8 @@ internal data class KotlinWebpackRunner(
         if (config.showProgress) {
             args.add("--progress")
         }
+
+        args.addAll(this.args)
 
         npmProject.useTool(execFactory, tool, *args.toTypedArray())
     }

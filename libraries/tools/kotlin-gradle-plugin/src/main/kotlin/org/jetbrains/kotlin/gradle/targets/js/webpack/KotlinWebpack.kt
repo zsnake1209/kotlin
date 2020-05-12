@@ -118,6 +118,9 @@ open class KotlinWebpack : DefaultTask(), RequiresNpmDependencies {
     var bin: String = "webpack/bin/webpack.js"
 
     @Input
+    var args: MutableList<String> = mutableListOf()
+
+    @Input
     var sourceMaps: Boolean = true
 
     @Input
@@ -136,6 +139,7 @@ open class KotlinWebpack : DefaultTask(), RequiresNpmDependencies {
         configFile,
         execHandleFactory,
         bin,
+        args,
         KotlinWebpackConfig(
             mode = mode,
             entry = entry,
