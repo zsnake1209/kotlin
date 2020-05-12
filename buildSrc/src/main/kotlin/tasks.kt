@@ -94,8 +94,10 @@ fun Project.projectTest(
         "-XX:+HeapDumpOnOutOfMemoryError",
         "-XX:+UseCodeCacheFlushing",
         "-XX:ReservedCodeCacheSize=128m",
-        "-Djna.nosys=true"
+        "-Djna.nosys=true",
+        "-XX:CICompilerCount=2"
     )
+
 
     maxHeapSize = "1600m"
     systemProperty("idea.is.unit.test", "true")
@@ -135,7 +137,10 @@ fun Project.projectTest(
     if (parallel) {
         maxParallelForks =
             project.findProperty("kotlin.test.maxParallelForks")?.toString()?.toInt()
-                ?: Math.max(Runtime.getRuntime().availableProcessors() / if (kotlinBuildProperties.isTeamcityBuild) 2 else 4, 1)
+                ?: Math.max((Runtime.getRuntime().availableProcessors() / if (kotlinBuildProperties.isTeamcityBuild) 2 else 4), 1)
+        if (kotlinBuildProperties.isTeamcityBuild) {
+            maxParallelForks = maxParallelForks + 1
+        }
     }
     body()
 }
