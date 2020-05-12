@@ -1,11 +1,12 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the license/LICENSE.txt file.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.gradle.targets.js.webpack
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Incubating
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.plugins.BasePluginConvention
@@ -126,6 +127,10 @@ open class KotlinWebpack : DefaultTask(), RequiresNpmDependencies {
     @Input
     var devtool: KotlinWebpackConfig.Devtool = KotlinWebpackConfig.Devtool.EVAL_SOURCE_MAP
 
+    @Incubating
+    @Internal
+    var generateConfigOnly: Boolean = false
+
     private fun createRunner() = KotlinWebpackRunner(
         compilation.npmProject,
         configFile,
@@ -158,6 +163,11 @@ open class KotlinWebpack : DefaultTask(), RequiresNpmDependencies {
         nodeJs.npmResolutionManager.checkRequiredDependencies(this)
 
         val runner = createRunner()
+
+        if (generateConfigOnly) {
+            runner.config.save(configFile)
+            return
+        }
 
         if (project.gradle.startParameter.isContinuous) {
             val continuousRunner = runner
