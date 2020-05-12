@@ -6,6 +6,9 @@ plugins {
 }
 
 val kotlinVersion: String by rootProject.extra
+val isFirPlugin: Boolean
+    get() = rootProject.findProperty("idea.fir.plugin") != null
+
 
 repositories {
     maven("https://jetbrains.bintray.com/markdown")
@@ -190,7 +193,12 @@ tasks.named<Copy>("processResources") {
     val defaultPluginVersion = "$kotlinVersion-${currentIde.displayVersion}-$pluginPatchNumber"
     val pluginVersion = findProperty("pluginVersion") as String? ?: defaultPluginVersion
 
-    inputs.property("pluginVersion", pluginVersion)
+    if (isFirPlugin) {
+        filesMatching("META-INF/.xml") { exclude() }
+        filesMatching("META-INF/fir-plugin.xml") { name = "plugin.xml" }
+    } else {
+        filesMatching("META-INF/fir-plugin.xml") { exclude() }
+    }
 
     filesMatching("META-INF/plugin.xml") {
         filter<ReplaceTokens>("tokens" to mapOf("snapshot" to pluginVersion))
