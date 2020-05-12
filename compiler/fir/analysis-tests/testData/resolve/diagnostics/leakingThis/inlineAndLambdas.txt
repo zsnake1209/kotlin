@@ -16,6 +16,10 @@ FILE: inlineAndLambdas.kt
             }
             )
             this@R|/A|.R|/A.p2| = String(dsadsa)
+            this@R|/A|.R|/A.notInline|(<L> = notInline@fun <anonymous>(): R|kotlin/Int| {
+                ^ this@R|/A|.R|/A.p1|.R|kotlin/String.length|
+            }
+            )
         }
 
         private final inline fun inLineCatch(f: R|() -> kotlin/Int|): R|kotlin/Unit| {

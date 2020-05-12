@@ -7,11 +7,11 @@ class A {
     init {
         inLineCatch { p1.length }
         p2 = "dsadsa"
-//        notInline { p1.length }
+        notInline { p1.length }
     }
 
     private inline fun inLineCatch(f: () -> Int){
-        <!POSSIBLE_LEAKING_THIS_IN_CONSTRUCTOR!>p2<!>.length
+        p2.length
         f()
     }
     // todo
