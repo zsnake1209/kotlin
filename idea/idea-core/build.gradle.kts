@@ -29,8 +29,6 @@ dependencies {
     compile(commonDep("org.jetbrains.kotlinx", "kotlinx-coroutines-core")) { isTransitive = false }
     compile(commonDep("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")) { isTransitive = false }
 
-    compile(project(":idea:idea-frontend-fir"))
-
     compileOnly(intellijDep())
 
     Platform[192].orHigher {
