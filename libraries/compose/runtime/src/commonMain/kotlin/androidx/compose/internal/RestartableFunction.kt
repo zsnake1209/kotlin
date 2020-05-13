@@ -32,7 +32,8 @@ import androidx.compose.Stable
  */
 @Stable
 class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-        P17, P18, P19, P20, P21, R>(val key: Int, private val tracked: Boolean) : Function0<R>,
+        P17, P18, P19, P20, P21, R >(val key: Int, private val tracked: Boolean)
+    /*Function0<R>,
     Function1<Composer<*>, R>,
     Function2<P1, Composer<*>, R>,
     Function3<P1, P2, Composer<*>, R>,
@@ -49,18 +50,13 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     Function14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer<*>, R>,
     Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer<*>, R>,
     Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, Composer<*>, R>,
-    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-            Composer<*>, R>,
-    Function18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
-            Composer<*>, R>,
-    Function19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            Composer<*>, R>,
-    Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            P19, Composer<*>, R>,
-    Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            P19, P20, Composer<*>, R>,
-    Function22<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            P19, P20, P21, Composer<*>, R> {
+    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, Composer<*>, R>,
+    Function18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, Composer<*>, R>,
+    Function19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, Composer<*>, R>,
+    Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, Composer<*>, R>,
+    Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, Composer<*>, R>,
+    Function22<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, Composer<*>, R>*/ {
+
     private var _block: Any? = null
     private var scope: RecomposeScope? = null
     private var scopes: MutableList<RecomposeScope>? = null
@@ -123,9 +119,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         }
     }
 
-    override fun invoke(): R = error("Expected a composer")
+    operator fun invoke(): R = error("Expected a composer")
 
-    override fun invoke(c: Composer<*>): R {
+    operator fun invoke(c: Composer<*>): R {
         c.startRestartGroup(key)
         trackRead(c)
         val result = (_block as (c: Composer<*>) -> R)(c)
@@ -133,7 +129,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(p1: P1, c: Composer<*>): R {
+    operator fun invoke(p1: P1, c: Composer<*>): R {
         c.startRestartGroup(key)
         trackRead(c)
         val result = (_block as (p1: P1, c: Composer<*>) -> R)(p1, c)
@@ -141,7 +137,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, c: Composer<*>): R {
+    operator fun invoke(p1: P1, p2: P2, c: Composer<*>): R {
         c.startRestartGroup(key)
         trackRead(c)
         val result = (_block as (p1: P1, p2: P2, c: Composer<*>) -> R)(p1, p2, c)
@@ -149,7 +145,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>): R {
+    operator fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>): R {
         c.startRestartGroup(key)
         trackRead(c)
         val result = (_block as (p1: P1, p2: P2, p3: P3, c: Composer<*>) -> R)(p1, p2, p3, c)
@@ -157,7 +153,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, c: Composer<*>): R {
+    operator fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, c: Composer<*>): R {
         c.startRestartGroup(key)
         trackRead(c)
         val result = (_block as (p1: P1, p2: P2, p3: P3, p4: P4, c: Composer<*>) -> R)(
@@ -171,7 +167,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, c: Composer<*>): R {
+    operator fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, c: Composer<*>): R {
         c.startRestartGroup(key)
         trackRead(c)
         val result = (_block as (p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, c: Composer<*>) -> R)(
@@ -187,7 +183,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, c: Composer<*>): R {
+    operator fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, c: Composer<*>): R {
         c.startRestartGroup(key)
         trackRead(c)
         val result = (_block as (
@@ -213,7 +209,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -250,7 +246,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -290,7 +286,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -333,7 +329,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -379,7 +375,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -428,7 +424,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -480,7 +476,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -535,7 +531,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -593,7 +589,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -654,7 +650,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -718,7 +714,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -785,7 +781,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -875,7 +871,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -969,7 +965,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -1067,7 +1063,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 
-    override fun invoke(
+    operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,

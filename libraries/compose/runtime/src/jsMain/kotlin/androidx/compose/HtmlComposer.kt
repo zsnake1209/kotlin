@@ -60,7 +60,7 @@ object HtmlElementApplierAdapter : ApplyAdapter<Node> {
     override fun Node.end(instance: Node, parent: Node) {}
 }
 
-val composer get() = HtmlComposition(currentComposerNonNull as HtmlComposer)
+//val composer get() = HtmlComposition(currentComposerNonNull as HtmlComposer)
 
 class HtmlComposition(val cc: HtmlComposer) {
     inline fun <V : Node> emit(
