@@ -29,6 +29,8 @@ sourceSets {
     "main" { projectDefault() }
 }
 
+publish()
+
 runtimeJar()
 sourcesJar()
 javadocJar()
