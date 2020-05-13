@@ -26,7 +26,6 @@ publish()
 
 runtimeJar(rewriteDefaultJarDepsToShadedCompiler())
 
-runtimeJar()
 sourcesJar()
 javadocJar()
 testsJar()
