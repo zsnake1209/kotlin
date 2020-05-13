@@ -8,9 +8,6 @@ plugins {
 dependencies {
     // TODO: Check for unnecessary deps
 
-    compileOnly(project(":kotlin-gradle-plugin"))
-    compileOnly(project(":kotlin-gradle-plugin-api"))
-
     compileOnly(intellijCoreDep()) { includeJars("intellij-core", "asm-all", rootProject = rootProject) }
     compileOnly(project(":compiler:plugin-api"))
     compileOnly(project(":compiler:cli-common"))

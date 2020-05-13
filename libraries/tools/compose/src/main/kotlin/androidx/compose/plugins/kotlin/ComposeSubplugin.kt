@@ -26,7 +26,7 @@ class ComposeGradlePlugin : Plugin<Project> {
 class ComposeKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
     companion object {
         const val COMPOSE_GROUP_NAME = "org.jetbrains.kotlin"
-        const val COMPOSE_ARTIFACT_NAME = "compose-compiler-plugin-ij193"
+        const val COMPOSE_ARTIFACT_NAME = "compose-compiler-plugin"
     }
 
     override fun isApplicable(project: Project, task: AbstractCompile): Boolean =
