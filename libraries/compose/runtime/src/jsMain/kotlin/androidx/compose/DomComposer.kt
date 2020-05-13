@@ -15,6 +15,12 @@ class DomComposer(
     Applier(root, DomApplierAdapter),
     recomposer
 ) {
+    fun compose(composable: DomComposer.() -> Unit) {
+        composeRoot {
+            composable()
+        }
+    }
+
     inline fun <T : Node> emit(
         key: Any,
         /*crossinline*/

@@ -16,7 +16,7 @@ fun main() {
             override fun recomposeSync() = Unit
             override fun scheduleChangesDispatch() = Unit
         }
-        val composer = HtmlComposer(document, document.body!!, recomposer)
+        val composer = DomComposer(document, document.body!!, recomposer)
         window.setInterval(
             {
                 composer.compose {
@@ -31,19 +31,19 @@ fun main() {
 
 var counter = 0
 
-fun HtmlComposition.render() {
+fun DomComposer.render() {
     println("frame")
     counter++
 
     val name = "Ivan ${counter / 2}"
     call(
         100,
-        { cc.changed(name) },
+        { changed(name) },
         { helloWorld(name) }
     )
 }
 
-fun HtmlComposition.helloWorld(name: String) {
+fun DomComposer.helloWorld(name: String) {
     println("rendering")
     span {
         text("Hello, ")
