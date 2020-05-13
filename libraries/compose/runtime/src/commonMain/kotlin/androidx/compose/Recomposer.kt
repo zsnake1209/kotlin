@@ -25,63 +25,91 @@ abstract class Recomposer {
          *
          * @return true if there're pending changes in this thread, false otherwise
          */
+        @Deprecated(
+            "Use the Recomposer instance fun instead",
+            ReplaceWith(
+                "Recomposer.current().hasPendingChanges()",
+                "androidx.compose.Recomposer"
+            )
+        )
         fun hasPendingChanges() = current().hasPendingChanges()
 
-        internal fun current(): Recomposer {
+        /**
+         * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
+         */
+        @TestOnly
+        fun current(): Recomposer {
             require(isMainThread()) {
                 "No Recomposer for this Thread"
             }
-            return threadRecomposer.get() ?: error("No Recomposer for this Thread")
+            return threadRecomposer.get()
         }
 
-        internal fun recompose(component: Component, composer: Composer<*>) =
-            current().recompose(component, composer)
-
-        // TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
-        private val threadRecomposer: ThreadLocal<Recomposer> = object : ThreadLocal<Recomposer>() {
-            override fun initialValue(): Recomposer? = createRecomposer()
-        }
+        private val threadRecomposer = ThreadLocal { createRecomposer() }
     }
 
     private val composers = mutableSetOf<Composer<*>>()
 
-    @Suppress("PLUGIN_WARNING")
-    private fun recompose(component: Component, composer: Composer<*>) {
-        composer.runWithCurrent {
-            val composerWasComposing = composer.isComposing
+    @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR")
+    internal fun recompose(composable: @Composable () -> Unit, composer: Composer<*>) {
+        val composerWasComposing = composer.isComposing
+        val prevComposer = currentComposerInternal
+        try {
             try {
                 composer.isComposing = true
-                trace("Compose:recompose") {
-                    composer.startRoot()
-                    composer.startGroup(invocation)
-                    component()
-                    composer.endGroup()
-                    composer.endRoot()
+                currentComposerInternal = composer
+                FrameManager.composing {
+                    trace("Compose:recompose") {
+                        var complete = false
+                        try {
+                            composer.startRoot()
+                            composer.startGroup(invocation)
+                            invokeComposable(composer, composable)
+                            composer.endGroup()
+                            composer.endRoot()
+                            complete = true
+                        } finally {
+                            if (!complete) composer.abortRoot()
+                        }
+                    }
                 }
-                composer.applyChanges()
-                FrameManager.nextFrame()
             } finally {
                 composer.isComposing = composerWasComposing
             }
+            // TODO(b/143755743)
+            if (!composerWasComposing) {
+                FrameManager.nextFrame()
+            }
+            composer.applyChanges()
+            if (!composerWasComposing) {
+                FrameManager.nextFrame()
+            }
+        } finally {
+            currentComposerInternal = prevComposer
         }
     }
 
     private fun performRecompose(composer: Composer<*>): Boolean {
         if (composer.isComposing) return false
-        return composer.runWithCurrent {
-            var hadChanges: Boolean
-            try {
-                composer.isComposing = true
-                hadChanges = composer.recompose()
-                composer.applyChanges()
-            } finally {
-                composer.isComposing = false
+        val prevComposer = currentComposerInternal
+        val hadChanges: Boolean
+        try {
+            currentComposerInternal = composer
+            composer.isComposing = true
+            hadChanges = FrameManager.composing {
+                composer.recompose()
             }
-            hadChanges
+            composer.applyChanges()
+        } finally {
+            composer.isComposing = false
+            currentComposerInternal = prevComposer
         }
+        return hadChanges
     }
 
-    internal abstract fun hasPendingChanges(): Boolean
+    abstract fun hasPendingChanges(): Boolean
+
+    internal fun hasInvalidations() = composers.toTypedArray().any { it.hasInvalidations() }
 
     internal fun scheduleRecompose(composer: Composer<*>) {
         composers.add(composer)
@@ -97,9 +125,21 @@ abstract class Recomposer {
     protected fun dispatchRecomposes() {
         val cs = composers.toTypedArray()
         composers.clear()
+
+        // Ensure any committed frames in other threads are visible.
+        FrameManager.nextFrame()
+
         cs.forEach { performRecompose(it) }
+
+        // Ensure any changes made during composition are now visible to other threads.
         FrameManager.nextFrame()
     }
-}
 
-internal expect fun createRecomposer(): Recomposer
+    /**
+     * Used to recompose changes from [scheduleChangesDispatch] immediately without waiting.
+     *
+     * This is supposed to be used in tests only.
+     */
+    @TestOnly
+    abstract fun recomposeSync()
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package androidx.compose
 
-internal data class JoinedKey(
-    val left: Any?,
-    val right: Any?
-)
+@OptIn(ExperimentalStdlibApi::class)
+internal inline infix fun Int.ror(other: Int) = this.rotateRight(other)
 
-fun isJoinedKey(key: Any?) = key is JoinedKey
-fun joinedKeyLeft(key: Any?): Any? = when (key) {
-    is JoinedKey -> key.left
-    else -> null
-}
-
-fun joinedKeyRight(key: Any?): Any? = when (key) {
-    is JoinedKey -> key.right
-    else -> null
-}
+@OptIn(ExperimentalStdlibApi::class)
+internal inline infix fun Int.rol(other: Int) = this.rotateLeft(other)

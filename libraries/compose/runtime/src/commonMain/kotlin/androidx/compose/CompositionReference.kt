@@ -24,11 +24,10 @@ package androidx.compose
  * through the two compositions as if they were not separate.
  *
  * @see compositionReference
- * @see Compose.composeInto
  */
 interface CompositionReference {
     fun <T> getAmbient(key: Ambient<T>): T
-    fun invalidate(sync: Boolean)
-    fun <T> invalidateConsumers(key: Ambient<T>)
+    fun invalidate()
     fun <N> registerComposer(composer: Composer<N>)
+    fun getAmbientScope(): AmbientMap
 }

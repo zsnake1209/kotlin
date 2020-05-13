@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,14 @@
 package androidx.compose
 
 /**
- * This is a special function which kotlin will inline into a number representing the source location of the caller. At the moment,
- * this is just hardcoded to a constant, but we will implement the source location inlining in the future. Until this happens, effects
- * will be UNSAFE to use inside of conditional logic.
+ * When applied to a composable function [Direct] will prevent code from being generated which
+ * allow this function's execution to be skipped or restarted. This may be desirable for small
+ * functions which just directly call another composable function and have very little machinery
+ * in them directly.
  */
-@Suppress("NOTHING_TO_INLINE")
-inline fun sourceLocation(): Int = 0
+@MustBeDocumented
+@Retention(AnnotationRetention.BINARY)
+@Target(
+    AnnotationTarget.FUNCTION
+)
+annotation class Direct

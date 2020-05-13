@@ -30,8 +30,6 @@ package androidx.compose
  * is called from within another [Composable] function.  This "context" can be used to store
  * information from previous executions of the function that happened at the same logical point of
  * the tree.
- *
- * @see Component
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
@@ -46,13 +44,17 @@ package androidx.compose
     AnnotationTarget.FUNCTION,
 
     // type declarations
-    // var foo: @Composable() () -> Unit = { ... }
+    // var foo: @Composable () -> Unit = { ... }
     // parameter types
-    // foo: @Composable() () -> Unit
+    // foo: @Composable () -> Unit
     AnnotationTarget.TYPE,
 
     // composable types inside of type signatures
-    // foo: (@Composable() () -> Unit) -> Unit
-    AnnotationTarget.TYPE_PARAMETER
+    // foo: (@Composable () -> Unit) -> Unit
+    AnnotationTarget.TYPE_PARAMETER,
+
+    // composable property declarations
+    // @Composable val foo: Int get() { ... }
+    AnnotationTarget.PROPERTY
 )
 annotation class Composable

@@ -17,18 +17,21 @@
 package androidx.compose
 
 /**
- * Effects are positionally memoized which means that the "resolving" of them depends on execution order and the fact that the
- * resolve happens inside of composition. As a result, we want to use a DslMarker to try and prevent common mistakes of people
- * trying to resolve effects outside of composition.
- *
- * For example, the following should be illegal:
- *
- *     +onCommit {
- *       val x = +state { 123 }
- *     }
- *
- * The `+state` call is illegal because the onCommit callback does not execute during composition, but it would compile without
- * any error if @EffectsDsl wasn't used.
+ * A StaticValueHolder holds a value that will never change.
  */
-@DslMarker
-annotation class EffectsDsl
+internal data class StaticValueHolder<T>(override val value: T) : State<T>
+
+/**
+ * A lazy value holder is static value holder for which the value is produced by the valueProducer
+ * parameter which is called once and the result is remembered for the life of LazyValueHolder.
+ */
+internal class LazyValueHolder<T>(valueProducer: (() -> T)?) : State<T> {
+    @Suppress("UNCHECKED_CAST")
+    private val current by lazy {
+        val fn = valueProducer
+        if (fn == null) null as T
+        else fn()
+    }
+
+    override val value: T get() = current
+}

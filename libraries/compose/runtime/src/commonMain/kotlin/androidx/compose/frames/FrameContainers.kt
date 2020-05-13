@@ -41,8 +41,6 @@ class ModelList<T> : MutableList<T>, Framed {
                 this
             ) as ArrayContainer<T>
 
-    fun asMutable(): MutableList<T> = writable.list
-
     override val size: Int get() = readable.list.size
     override fun add(element: T): Boolean = writable.list.add(element)
     override fun add(index: Int, element: T) = writable.list.add(index, element)
@@ -55,13 +53,10 @@ class ModelList<T> : MutableList<T>, Framed {
     override fun get(index: Int): T = readable.list.get(index)
     override fun indexOf(element: T): Int = readable.list.indexOf(element)
     override fun isEmpty(): Boolean = readable.list.isEmpty()
-    override fun iterator(): MutableIterator<T> =
-        immutableIterator(readable.list.iterator())
+    override fun iterator(): MutableIterator<T> = ModelListIterator(this, 0)
     override fun lastIndexOf(element: T): Int = readable.list.lastIndexOf(element)
-    override fun listIterator(): MutableListIterator<T> =
-        immutableListIterator(readable.list.listIterator())
-    override fun listIterator(index: Int): MutableListIterator<T> =
-        immutableListIterator(readable.list.listIterator(index))
+    override fun listIterator(): MutableListIterator<T> = ModelListIterator(this, 0)
+    override fun listIterator(index: Int): MutableListIterator<T> = ModelListIterator(this, index)
     override fun remove(element: T): Boolean = writable.list.remove(element)
     override fun removeAll(elements: Collection<T>): Boolean = writable.list.removeAll(elements)
     override fun removeAt(index: Int): T = writable.list.removeAt(index)
@@ -82,6 +77,43 @@ class ModelList<T> : MutableList<T>, Framed {
         }
 
         override fun create() = ArrayContainer<T>()
+    }
+
+    private class ModelListIterator<T>(val modelList: ModelList<T>, val index: Int) :
+        MutableIterator<T>,
+        MutableListIterator<T> {
+
+        private var nextCount = 0
+        private var readId = currentFrame().id
+        private var currentIterator = modelList.readable.list.listIterator(index)
+
+        private fun ensureMutable(): ModelListIterator<T> {
+            val currentId = currentFrame().id
+            when (readId) {
+                currentId -> {
+                    // Convert list to being writable
+                    currentIterator = modelList.writable.list.listIterator(index)
+                    repeat(-nextCount) { currentIterator.previous() }
+                    repeat(nextCount) { currentIterator.next() }
+                    readId = -1
+                }
+                -1 -> {
+                    // Nothing to do as the currentIterator is mutable
+                }
+                else -> error("Cannot mutate a list using an iterator created in a different frame")
+            }
+            return this
+        }
+
+        override fun hasNext(): Boolean = currentIterator.hasNext()
+        override fun next(): T = currentIterator.next().also { nextCount++ }
+        override fun remove() = ensureMutable().currentIterator.remove()
+        override fun hasPrevious(): Boolean = currentIterator.hasPrevious()
+        override fun nextIndex(): Int = currentIterator.nextIndex().also { nextCount++ }
+        override fun previous(): T = currentIterator.previous().also { nextCount-- }
+        override fun previousIndex(): Int = currentIterator.previousIndex().also { nextCount-- }
+        override fun add(element: T) = ensureMutable().currentIterator.add(element)
+        override fun set(element: T) = ensureMutable().currentIterator.set(element)
     }
 }
 
@@ -111,8 +143,6 @@ class ModelMap<K, V> : MutableMap<K, V>, Framed {
             myFirst,
             this
         ) as MapContainer<K, V>
-
-    fun asMutable(): MutableMap<K, V> = writable.map
 
     override val size: Int get() = readable.map.size
     override fun containsKey(key: K): Boolean = readable.map.containsKey(key)
@@ -153,7 +183,9 @@ fun <K, V> modelMapOf(vararg pairs: Pair<K, V>) = ModelMap<K, V>().apply { putAl
 private fun error(): Nothing =
     error("Model sub-collection, iterators, lists and sets are immutable, use asMutable() first")
 
-private fun <T> immutableSet(set: MutableSet<T>): MutableSet<T> = object : MutableSet<T> by set {
+private class ImmutableSetImpl<T>(
+    private val set: MutableSet<T>
+) : MutableSet<T> by set {
     override fun add(element: T): Boolean = error()
     override fun addAll(elements: Collection<T>): Boolean = error()
     override fun clear() = error()
@@ -164,26 +196,35 @@ private fun <T> immutableSet(set: MutableSet<T>): MutableSet<T> = object : Mutab
     override fun retainAll(elements: Collection<T>): Boolean = error()
 }
 
-// TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
-private fun <T> immutableIterator(
-    iterator: MutableIterator<T>
-): MutableIterator<T> = object : MutableIterator<T> by iterator {
+private fun <T> immutableSet(set: MutableSet<T>): MutableSet<T> = ImmutableSetImpl(set)
+
+private class ImmutableIteratorImpl<T>(
+    private val iterator: MutableIterator<T>
+) : MutableIterator<T> by iterator {
     override fun remove() = error()
 }
 
 // TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
-private fun <T> immutableListIterator(
-    iterator: MutableListIterator<T>
-): MutableListIterator<T> = object : MutableListIterator<T> by iterator {
+private fun <T> immutableIterator(
+    iterator: MutableIterator<T>
+): MutableIterator<T> = ImmutableIteratorImpl(iterator)
+
+private class ImmutableListIteratorImpl<T>(
+    private val iterator: MutableListIterator<T>
+) : MutableListIterator<T> by iterator {
     override fun add(element: T) = error()
     override fun remove() = error()
     override fun set(element: T) = error()
 }
 
 // TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
-private fun <T> immutableCollection(
-    collection: MutableCollection<T>
-): MutableCollection<T> = object : MutableCollection<T> by collection {
+private fun <T> immutableListIterator(
+    iterator: MutableListIterator<T>
+): MutableListIterator<T> = ImmutableListIteratorImpl(iterator)
+
+private class ImmutableCollectionImpl<T>(
+    private val collection: MutableCollection<T>
+) : MutableCollection<T> by collection {
     override fun add(element: T): Boolean = error()
     override fun addAll(elements: Collection<T>): Boolean = error()
     override fun clear() = error()
@@ -193,3 +234,8 @@ private fun <T> immutableCollection(
     override fun removeAll(elements: Collection<T>): Boolean = error()
     override fun retainAll(elements: Collection<T>): Boolean = error()
 }
+
+// TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
+private fun <T> immutableCollection(
+    collection: MutableCollection<T>
+): MutableCollection<T> = ImmutableCollectionImpl(collection)

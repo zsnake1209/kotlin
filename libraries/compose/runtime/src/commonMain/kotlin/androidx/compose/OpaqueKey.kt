@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,8 @@
 
 package androidx.compose
 
-internal expect val currentComposerNonNull: Composer<*>
-internal expect var currentComposer: Composer<*>?
-
-internal expect fun createComposer(root: Any, context: Context, recomposer: Recomposer): Composer<*>
-expect fun <T> Composer<*>.runWithCurrent(block: () -> T): T
-
-@PublishedApi
-internal val invocation = Any()
-
-@PublishedApi
-internal val provider = Any()
-
-@PublishedApi
-internal val consumer = Any()
-
-@PublishedApi
-internal val reference = Any()
+/**
+ * @param key This [String] should be hardcoded on the compile-time which allows the hashcode
+ * implementation of this class to always be the same and survive the process recreation.
+ */
+internal data class OpaqueKey(val key: String)

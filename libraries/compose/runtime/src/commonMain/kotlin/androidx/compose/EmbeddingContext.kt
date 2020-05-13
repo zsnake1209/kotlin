@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,15 @@
 
 package androidx.compose
 
-internal data class JoinedKey(
-    val left: Any?,
-    val right: Any?
-)
+import kotlin.coroutines.CoroutineContext
 
-fun isJoinedKey(key: Any?) = key is JoinedKey
-fun joinedKeyLeft(key: Any?): Any? = when (key) {
-    is JoinedKey -> key.left
-    else -> null
-}
+// Mapped to android.content.Context on Android.
+expect abstract class EmbeddingUIContext
 
-fun joinedKeyRight(key: Any?): Any? = when (key) {
-    is JoinedKey -> key.right
-    else -> null
+// Universal embedding context used for embedding Compose on the particular platform.
+internal interface EmbeddingContext<T> {
+    // Actual type here is not relevant for Compose runtime.
+    val componentRoot: T
+    val coroutineContext: CoroutineContext
+    val uiContext: EmbeddingUIContext
 }

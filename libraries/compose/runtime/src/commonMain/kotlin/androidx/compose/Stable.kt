@@ -16,12 +16,8 @@
 
 package androidx.compose
 
-/**
- * @suppress
- */
-@Target(
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.CLASS,
-    AnnotationTarget.ANNOTATION_CLASS
-)
-annotation class Stateful
+@MustBeDocumented
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.BINARY)
+@StableMarker
+annotation class Stable

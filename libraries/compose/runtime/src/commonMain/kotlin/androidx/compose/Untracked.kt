@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,14 @@
 
 package androidx.compose
 
-annotation class HiddenAttribute
+/**
+ * When applied to a function expression [Untracked] will disable lambda optimizations such as
+ * tracking execution of composable function expressions or remembering a function expression
+ * value based on its capture variables.
+ */
+@MustBeDocumented
+@Retention(AnnotationRetention.BINARY)
+@Target(
+    AnnotationTarget.FUNCTION
+)
+annotation class Untracked

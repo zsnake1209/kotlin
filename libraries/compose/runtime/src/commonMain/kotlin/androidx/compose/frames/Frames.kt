@@ -16,23 +16,31 @@
 
 package androidx.compose.frames
 
-import androidx.compose.BitSet
 import androidx.compose.ThreadLocal
 import androidx.compose.synchronized
 
 class FrameAborted(val frame: Frame) : RuntimeException("Frame aborted")
 
 /**
+ * Frame id of 0 is reserved as invalid and no state record with frame 0 is considered valid.
+ *
+ * The value 0 was chosen as it is the default value of the Int frame id type and records initially
+ * created will naturally have a frame id of 0. If this wasn't considered invalid adding such a
+ * record to a framed object will make the state record immediately visible to all frames instead of
+ * being born invalid. Using 0 ensures all state records are created invalid and must be explicitly
+ * marked as valid in for a frame.
+ */
+private const val INVALID_FRAME = 0
+
+/**
  * The frame records are created with frame ID CREATION_FRAME when not in a frame.
  * This allows framed object to be created in the in static initializers when a
  * frame could not have been created yet.
  *
- * The value 2 was chosen because it must be greater than 0, as 0 is reserved to
- * indicated an invalid frame (in order to avoid an uninitialized record begin
- * treated a valid record) and 1 is odd and treated as a speculation frame. That
- * leaves 2 as the lowest valid frame.
+ * The value 1 was chosen because it must be greater than 0, as 0 is reserved to
+ * indicated an invalid frame therefore 1 is the lowest valid frame.
  */
-private const val CREATION_FRAME = 2
+private const val CREATION_FRAME = 1
 
 /**
  * Base implementation of a frame record
@@ -67,21 +75,33 @@ interface Record {
     fun create(): Record
 }
 
+/**
+ * Interface implemented by all model objects. Used by this module to maintain the state records
+ * of a model object.
+ */
 interface Framed {
+    /**
+     * The first state record in a linked list of state records.
+     */
     val firstFrameRecord: Record
+
+    /**
+     * Add a new state record to the beginning of a list. After this call [firstFrameRecord] should
+     * be [value].
+     */
     fun prependFrameRecord(value: Record)
 }
 
 typealias FrameReadObserver = (read: Any) -> Unit
-typealias FrameWriteObserver = (write: Any) -> Unit
-typealias FrameCommitObserver = (committed: Set<Any>) -> Unit
+typealias FrameWriteObserver = (write: Any, isNew: Boolean) -> Unit
+typealias FrameCommitObserver = (committed: Set<Any>, frame: Frame) -> Unit
 
 private val threadFrame = ThreadLocal<Frame>()
 
 /**
  * Information about a frame including the frame id and whether or not it is read only.
  */
-class Frame(
+class Frame internal constructor(
     /**
      * The id of the frame. This value is monotonically increasing for each frame created.
      */
@@ -91,7 +111,7 @@ class Frame(
      * A set of all the frames that should be treated as invalid. That is the set of all frames open
      * or aborted.
      */
-    internal val invalid: BitSet,
+    internal val invalid: FrameIdSet,
 
     /**
      * True if the frame is read only
@@ -101,22 +121,21 @@ class Frame(
     /**
      * Observe a frame read
      */
-    readObserver: FrameReadObserver?,
+    internal val readObserver: FrameReadObserver?,
 
     /**
      * Observe a frame write
      */
-    internal val writeObserver: FrameWriteObserver?
+    internal val writeObserver: FrameWriteObserver?,
+
+    /**
+     * The reference to the thread local list of observers from [threadReadObservers].
+     * We store it here to save on an additional ThreadLocal.get() call during
+     * the every model read.
+     */
+    internal var threadReadObservers: MutableList<FrameReadObserver>
 ) {
     internal val modified = if (readOnly) null else HashSet<Framed>()
-
-    internal val readObservers = mutableListOf<FrameReadObserver>()
-
-    init {
-        if (readObserver != null) {
-            readObservers += readObserver
-        }
-    }
 
     /**
      * True if any change to a frame object will throw.
@@ -125,15 +144,28 @@ class Frame(
         get() = modified == null
 
     /**
-     * Add a [FrameReadObserver] during execution of the [block].
+     * Whether there are any pending changes in this frame.
      */
-    fun observeReads(readObserver: FrameReadObserver, block: () -> Unit) {
-        try {
-            readObservers += readObserver
-            block()
-        } finally {
-            readObservers -= readObserver
-        }
+    fun hasPendingChanges(): Boolean = (modified?.size ?: 0) > 0
+}
+
+/**
+ * Holds the thread local list of [FrameReadObserver]s not associated with any specific [Frame].
+ * They survives [Frame]s switch.
+ */
+private val threadReadObservers = ThreadLocal { mutableListOf<FrameReadObserver>() }
+
+/**
+ * [FrameReadObserver] will be called for every frame read happened on the current
+ * thread during execution of the [block].
+ */
+fun observeAllReads(readObserver: FrameReadObserver, block: () -> Unit) {
+    val observers = threadReadObservers.get()
+    try {
+        observers.add(readObserver)
+        block()
+    } finally {
+        observers.remove(readObserver)
     }
 }
 
@@ -150,48 +182,37 @@ fun currentFrame(): Frame {
 
 val inFrame: Boolean get() = threadFrame.get() != null
 
-// A global synchronization object
+// A global synchronization object. This synchronization object should be taken before modifying any
+// of the fields below.
 private val sync = Any()
 
 // The following variables should only be written when sync is taken
-private val openFrames = BitSet()
-private val abortedFrames = BitSet()
-private var maxFrameId = CREATION_FRAME
+private var openFrames = FrameIdSet.EMPTY
 
-/**
- * Return the frames that are currently open or aborted which should be considered invalid for any
- * new frames
- */
-private fun currentInvalid(): BitSet {
-    return BitSet().apply {
-        or(openFrames)
-        or(abortedFrames)
-    }
-}
-
-private fun BitSet.copy(): BitSet {
-    return BitSet().apply { or(this@copy) }
-}
+// The first frame created must be at least on more than the CREATION_FRAME so objects
+// created ouside a frame (that use the CREATION_FRAME as there id) and modified in the first
+// frame will be seen as modified.
+private var maxFrameId = CREATION_FRAME + 1
 
 private fun open(
     readOnly: Boolean,
-    speculative: Boolean,
     readObserver: FrameReadObserver?,
     writeObserver: FrameWriteObserver?
 ): Frame {
     validateNotInFrame()
+    val threadReadObservers = threadReadObservers.get()
     synchronized(sync) {
-        maxFrameId += 2
-        val id = if (speculative) maxFrameId or 1 else maxFrameId
-        val invalid = currentInvalid()
+        val id = maxFrameId++
+        val invalid = openFrames
         val frame = Frame(
             id = id,
             invalid = invalid,
             readOnly = readOnly,
             readObserver = readObserver,
-            writeObserver = writeObserver
+            writeObserver = writeObserver,
+            threadReadObservers = threadReadObservers
         )
-        openFrames.set(id)
+        openFrames = openFrames.set(id)
         threadFrame.set(frame)
         return frame
     }
@@ -204,29 +225,19 @@ private fun open(
  * @return the newly created frame's data
  */
 fun open(readOnly: Boolean = false) =
-    open(readOnly, false, null, null)
+    open(readOnly, null, null)
 
 /**
  * Open a frame with observers
  */
 fun open(readObserver: FrameReadObserver? = null, writeObserver: FrameWriteObserver? = null) =
-    open(false, false, readObserver, writeObserver)
-
-/**
- * Open a speculative frame. A speculative frame can only be aborted and can be used to
- * speculate on how a set of framed objects might react to changes. This allows, for example,
- * expensive calculations to be pre-calculated on a separate thread and later replayed on
- * the primary thread without affecting the primary thread.
- */
-fun speculate() = open(false, true, null, null)
+    open(false, readObserver, writeObserver)
 
 /*
  * Commits the pending frame if there one is open. Intended to be used in a `finally` clause
  */
 fun commitHandler() = threadFrame.get()?.let {
-    commit(
-        it
-    )
+    commit(it)
 }
 
 /**
@@ -266,14 +277,12 @@ fun commit(frame: Frame) {
     // should only be done after first determining that there are no colliding writes in the commit.
 
     // A write is considered colliding if any write occurred on the object in a frame committed
-    // since the frame was last opened. There are two trivial cases that can be dismissed
-    // immediately, first, if the frame is read-only, no writes occurred. Second, if no other frame
-    // was opened while the current frame was open.
+    // since the frame was last opened. There is a trivial cases that can be dismissed immediately,
+    // no writes occurred.
     val modified = frame.modified
+    val id = frame.id
     val listeners = synchronized(sync) {
-        if (!openFrames[frame.id]) throw IllegalStateException("Frame not open")
-        if (frame.id and 1 != 0)
-            throw IllegalStateException("Speculative frames cannot be committed")
+        if (!openFrames.get(id)) throw IllegalStateException("Frame not open")
         if (modified == null || modified.size == 0) {
             closeFrame(frame)
             emptyList()
@@ -289,10 +298,9 @@ fun commit(frame: Frame) {
             // to a record are considered atomic. Additionally, if the field values can be merged
             // (e.g. using a conflict-free data type) this could also be allowed here.
 
-            val current = currentInvalid()
-            val nextFrame = maxFrameId + 1
-            val start = frame.invalid.copy().apply { set(frame.id) }
-            val id = frame.id
+            val current = openFrames
+            val nextFrame = maxFrameId
+            val start = frame.invalid.set(id)
             for (framed in frame.modified) {
                 val first = framed.firstFrameRecord
                 if (readable(
@@ -310,7 +318,7 @@ fun commit(frame: Frame) {
     }
     if (modified != null)
         for (commitListener in listeners) {
-            commitListener(modified)
+            commitListener(modified, frame)
         }
 }
 
@@ -318,7 +326,7 @@ fun commit(frame: Frame) {
  * Throw an exception if a frame is not open
  */
 private fun validateOpen(frame: Frame) {
-    if (!openFrames[frame.id]) throw IllegalStateException("Frame not open")
+    if (!openFrames.get(frame.id)) throw IllegalStateException("Frame not open")
 }
 
 /**
@@ -350,12 +358,25 @@ fun abortHandler() {
  * Abort the given frame.
  */
 fun abortHandler(frame: Frame) {
-    synchronized(sync) {
-        validateOpen(frame)
-        if (frame.id and 1 == 0)
-            abortedFrames.set(frame.id)
-        closeFrame(frame)
+    validateOpen(frame)
+
+    // Mark all state records created in this frame as invalid
+    frame.modified?.let { modified ->
+        val id = frame.id
+        for (framed in modified) {
+            var current: Record? = framed.firstFrameRecord
+            while (current != null) {
+                if (current.frameId == id) {
+                    current.frameId = INVALID_FRAME
+                    break
+                }
+                current = current.next
+            }
+        }
     }
+
+    // The frame can now be closed.
+    closeFrame(frame)
 }
 
 /**
@@ -373,44 +394,40 @@ fun suspend(): Frame {
  */
 fun restore(frame: Frame) {
     validateNotInFrame()
-    synchronized(sync) {
-        validateOpen(frame)
-        threadFrame.set(frame)
-    }
+    validateOpen(frame)
+    frame.threadReadObservers = threadReadObservers.get()
+    threadFrame.set(frame)
 }
 
 private fun closeFrame(frame: Frame) {
     synchronized(sync) {
-        openFrames.clear(frame.id)
+        openFrames = openFrames.clear(frame.id)
     }
     threadFrame.set(null)
 }
 
-private fun speculationFrame(candidateFrame: Int, currentFrame: Int) =
-    candidateFrame != currentFrame && (candidateFrame and 1 == 1)
-
-private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Boolean {
+private fun valid(currentFrame: Int, candidateFrame: Int, invalid: FrameIdSet): Boolean {
     // A candidate frame is valid if the it is less than or equal to the current frame
     // and it wasn't specifically marked as invalid when the frame started.
     //
-    // All frames open or aborted at the start of the current frame are considered invalid
-    // for a frame (they have not been committed and therefore are considered invalid).
+    // All frames open at the start of the current frame are considered invalid for a frame (they
+    // have not been committed and therefore are considered invalid).
     //
     // All frames born after the current frame are considered invalid since they occur after the
     // current frame was open.
-    return candidateFrame != 0 && candidateFrame <= currentFrame &&
-            !speculationFrame(candidateFrame, currentFrame) && !invalid.get(
-        candidateFrame
-    )
+    //
+    // INVALID_FRAME is reserved as an invalid frame.
+    return candidateFrame != INVALID_FRAME && candidateFrame <= currentFrame &&
+            !invalid.get(candidateFrame)
 }
 
 // Determine if the given data is valid for the frame.
-private fun valid(data: Record, frame: Int, invalid: BitSet): Boolean {
+private fun valid(data: Record, frame: Int, invalid: FrameIdSet): Boolean {
     return valid(frame, data.frameId, invalid)
 }
 
-private fun <T : Record> readable(r: T, id: Int, invalid: BitSet): T {
-    // The readable record valid record with the highest frameId
+private fun <T : Record> readable(r: T, id: Int, invalid: FrameIdSet): T {
+    // The readable record is the valid record with the highest frameId
     var current: Record? = r
     var candidate: Record? = null
     while (current != null) {
@@ -428,17 +445,22 @@ private fun <T : Record> readable(r: T, id: Int, invalid: BitSet): T {
 }
 
 fun <T : Record> T.readable(framed: Framed): T {
-    return this.readable(currentFrame(), framed)
-}
-
-fun <T : Record> T.readable(frame: Frame, framed: Framed): T {
-    frame.readObservers.forEach { it(framed) }
+    val frame = currentFrame()
+    // invoke the observer associated with the current frame.
+    frame.readObserver?.invoke(framed)
+    // invoke the thread local observers.
+    val observers = frame.threadReadObservers
+    if (observers.isNotEmpty()) {
+        for (observer in observers) {
+            observer(framed)
+        }
+    }
     return readable(this, frame.id, frame.invalid)
 }
 
 fun _readable(r: Record, framed: Framed): Record = r.readable(framed)
 fun _writable(r: Record, framed: Framed): Record = r.writable(framed)
-fun _created(framed: Framed) = threadFrame.get()?.writeObserver?.let { it(framed) }
+fun _created(framed: Framed) = threadFrame.get()?.writeObserver?.let { it(framed, true) }
 
 fun <T : Record> T.writable(framed: Framed): T {
     return this.writable(framed, currentFrame())
@@ -449,16 +471,15 @@ fun <T : Record> T.writable(framed: Framed): T {
  * created in an aborted frame. It is also true if the record is valid in the previous frame and is
  * obscured by another record also valid in the previous frame record.
  */
-private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
+private fun used(framed: Framed, id: Int, invalid: FrameIdSet): Record? {
     var current: Record? = framed.firstFrameRecord
     var validRecord: Record? = null
     while (current != null) {
         val currentId = current.frameId
-        if (speculationFrame(
-                currentId,
-                id
-            ) || abortedFrames[currentId])
+        if (currentId == INVALID_FRAME) {
+            // Any frames that were marked invalid by an aborted frame can be used immediately.
             return current
+        }
         if (valid(current, id - 1, invalid)) {
             if (validRecord == null) {
                 validRecord = current
@@ -493,12 +514,13 @@ fun <T : Record> T.writable(framed: Framed, frame: Frame): T {
     if (readData.frameId == frame.id) return readData
 
     // The first write to an framed in frame
-    frame.writeObserver?.let { it(framed) }
+    frame.writeObserver?.let { it(framed, false) }
 
-    // Otherwise, make a copy of the readable data and mark it as born in this frame, making it writable.
+    // Otherwise, make a copy of the readable data and mark it as born in this frame, making it
+    // writable.
     val newData = synchronized(framed) {
         // Calling used() on a framed object might return the same record for each thread calling
-        // used() therefore selecting the record to reuse should guarded.
+        // used() therefore selecting the record to reuse should be guarded.
 
         // Note: setting the frameId to Int.MAX_VALUE will make it invalid for all frames. This
         // means we can release the lock on the object as used() will no longer select it. Using id
@@ -521,3 +543,16 @@ fun <T : Record> T.writable(framed: Framed, frame: Frame): T {
 
     return newData
 }
+
+/**
+ * Returns the current record without notifying any [Frame.readObserver]s.
+ */
+@PublishedApi
+internal fun <T : Record> current(r: T, frame: Frame) = readable(r, frame.id, frame.invalid)
+
+/**
+ * Provides a [block] with the current record, without notifying any [Frame.readObserver]s.
+ *
+ * @see [Record.readable]
+ */
+inline fun <T : Record> T.withCurrent(block: (r: T) -> Unit) = block(current(this, currentFrame()))

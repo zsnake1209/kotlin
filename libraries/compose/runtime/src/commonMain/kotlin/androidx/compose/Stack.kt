@@ -29,6 +29,8 @@ internal class Stack<T> {
     fun isEmpty() = backing.isEmpty()
     fun isNotEmpty() = !isEmpty()
     fun clear() = backing.clear()
+    @Suppress("UNCHECKED_CAST")
+    fun toArray(): Array<T> = Array<Any?>(backing.size) { backing[it] } as Array<T>
 }
 
 internal class IntStack {
@@ -45,6 +47,7 @@ internal class IntStack {
     }
 
     fun pop(): Int = slots[--tos]
+    fun peekOr(default: Int): Int = if (tos > 0) peek() else default
     fun peek() = slots[tos - 1]
     fun peek(index: Int) = slots[index]
     fun isEmpty() = tos == 0
