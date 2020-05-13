@@ -14,6 +14,10 @@ dependencies {
     runtime(kotlinStdlib())
 
     compileOnly(project(":kotlin-compiler-embeddable", "runtimeJar"))
+
+    embedded(project(":compose-compiler-plugin")) {
+        isTransitive = false
+    }
 }
 
 sourceSets {
@@ -24,7 +28,6 @@ publish()
 
 runtimeJar(rewriteDefaultJarDepsToShadedCompiler({}), {})
 
-runtimeJar()
 sourcesJar()
 javadocJar()
 testsJar()
