@@ -29,6 +29,8 @@ sourceSets {
     "main" { projectDefault() }
 }
 
+publish()
+
 runtimeJar()
 sourcesJar()
 javadocJar()
@@ -36,16 +38,4 @@ testsJar()
 
 projectTest {
     workingDir = rootDir
-}
-
-apply(from = "$rootDir/gradle/kotlinPluginPublication.gradle.kts")
-
-pluginBundle {
-    plugins {
-        create("composePlugin") {
-            id = "org.jetbrains.compose.plugin"
-            description = "Kotlin compiler plugin for Compose"
-            displayName = "Kotlin compiler plugin for Compose"
-        }
-    }
 }
