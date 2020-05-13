@@ -16,4 +16,5 @@ pluginManagement {
 rootProject.name = 'kjscompose'
 
 include('runtime')
+include('example-no-compiler')
 include('example')
