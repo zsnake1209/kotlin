@@ -1,0 +1,16 @@
+plugins {
+    id 'org.jetbrains.kotlin.js' version '1.4.0-dev-8300' apply false
+    id 'org.jetbrains.kotlin.multiplatform' version '1.4.0-dev-8300' apply false
+}
+
+allprojects {
+    group 'org.jb.k.js.compose'
+    version '1.0-SNAPSHOT'
+
+    repositories {
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-dev' }
+        jcenter()
+        mavenCentral()
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+}
