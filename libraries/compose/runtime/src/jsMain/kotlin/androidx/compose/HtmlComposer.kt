@@ -4,27 +4,50 @@ import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.get
 
-class HtmlComposer(
+typealias DomUpdater<T> = ComposerUpdater<Node, T>
+
+class DomComposer(
     val document: Document,
     val root: Node,
     recomposer: Recomposer
 ) : Composer<Node>(
     SlotTable(),
-    Applier(root, HtmlElementApplierAdapter),
+    Applier(root, DomApplierAdapter),
     recomposer
 ) {
-    val rootComposition: HtmlComposition = HtmlComposition(this)
+    inline fun <T : Node> emit(
+        key: Any,
+        /*crossinline*/
+        ctor: () -> T,
+        update: DomUpdater<T>.() -> Unit
+    ) {
+        startNode(key)
+        val node = if (inserting) ctor().also { emitNode(it) }
+        else useNode() as T
+        DomUpdater(this, node).update()
+        endNode()
+    }
 
-    fun compose(composition: HtmlComposition.() -> Unit) {
-        composeRoot {
-            rootComposition.composition()
-        }
+    inline fun emit(
+        key: Any,
+        /*crossinline*/
+        ctor: () -> Node,
+        update: DomUpdater<Node>.() -> Unit,
+        children: () -> Unit
+    ) {
+        startNode(key)
+        val node = if (inserting) ctor().also { emitNode(it) }
+        else useNode()
+        DomUpdater(this, node).update()
+        children()
+        endNode()
     }
 }
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-object HtmlElementApplierAdapter : ApplyAdapter<Node> {
+object DomApplierAdapter : ApplyAdapter<Node> {
     override fun Node.start(instance: Node) {}
+
     override fun Node.insertAt(index: Int, instance: Node) {
         insertBefore(instance, childNodes[index])
     }
@@ -60,65 +83,29 @@ object HtmlElementApplierAdapter : ApplyAdapter<Node> {
     override fun Node.end(instance: Node, parent: Node) {}
 }
 
-//val composer get() = HtmlComposition(currentComposerNonNull as HtmlComposer)
-
-class HtmlComposition(val cc: HtmlComposer) {
-    inline fun <V : Node> emit(
-        key: Any,
-        noinline factory: () -> V,
-        block: HtmlComposition.() -> Unit
-    ) {
-        cc.startNode(key)
-        cc.emitNode(factory)
-        block()
-        cc.endNode()
-    }
-
-    inline fun <V : Node, reified A1> emit(
-        key: Any,
-        noinline factory: () -> V,
-        a1: A1,
-        noinline set1: V.(A1) -> Unit
-    ) {
-        cc.startNode(key)
-        cc.emitNode(factory)
-        if (cc.changed(a1)) {
-            cc.apply(a1, set1)
-        }
-        cc.endNode()
-    }
-
-    inline fun call(
-        key: Any,
-        invalid: Composer<Node>.() -> Boolean,
-        block: () -> Unit
-    ) = with(cc) {
-        startGroup(key)
-        if (invalid() || inserting) {
-            startGroup(invocation)
-            block()
-            endGroup()
-        } else {
-            (cc as Composer<*>).skipCurrentGroup()
-        }
-        endGroup()
-    }
-}
-
 class SourceLocation(val name: String) {
     override fun toString(): String = "SL $name"
 }
 
 val linear = SourceLocation("linear")
-inline fun HtmlComposition.span(noinline onClick: (() -> Unit)? = null, block: HtmlComposition.() -> Unit) {
-    emit(linear, {
-        cc.document.createElement("span").also {
-            if (onClick != null) it.addEventListener("click", { onClick() })
-        }
-    }, block)
+fun DomComposer.span(onClick: (() -> Unit)? = null, block: DomComposer.() -> Unit) {
+    emit(
+        linear,
+        {
+            document.createElement("span").also {
+                if (onClick != null) it.addEventListener("click", { onClick() })
+            }
+        },
+        {},
+        { block() }
+    )
 }
 
 val text = SourceLocation("text")
-inline fun HtmlComposition.text(value: String) {
-    emit(text, { cc.document.createTextNode(value) }, value, { textContent = it })
+fun DomComposer.text(value: String) {
+    emit(
+        text,
+        { document.createTextNode(value) },
+        { update(value) { textContent = it } }
+    )
 }
