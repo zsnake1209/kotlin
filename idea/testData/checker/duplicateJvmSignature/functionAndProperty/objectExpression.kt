@@ -1,5 +1,3 @@
-// FIR_COMPARISON
-
 fun foo() =
     object {
         <error>val x</error> = 1

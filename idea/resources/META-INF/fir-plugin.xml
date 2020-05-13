@@ -37,7 +37,6 @@ The Kotlin FIR plugin provides language support in IntelliJ IDEA and Android Stu
   <depends>com.intellij.modules.idea</depends>
   <depends>com.intellij.modules.java</depends>
   <depends optional="true" config-file="kotlin-copyright.xml">com.intellij.copyright</depends>
-  <depends optional="true" config-file="injection.xml">org.intellij.intelliLang</depends>
   <!-- CIDR-PLUGIN-PLACEHOLDER-END -->
 
   <xi:include href="indexes.xml" xpointer="xpointer(/idea-plugin/*)"/>
@@ -75,6 +74,8 @@ The Kotlin FIR plugin provides language support in IntelliJ IDEA and Android Stu
   <extensions defaultExtensionNs="com.intellij">
     <projectService serviceImplementation="org.jetbrains.kotlin.resolve.jvm.KotlinJavaPsiFacade"/>
     <projectService serviceImplementation="org.jetbrains.kotlin.idea.caches.project.LibraryModificationTracker"/>
+    <highlightRangeExtension implementation="org.jetbrains.kotlin.idea.highlighter.KotlinFirPsiChecker"/>
+    <annotator language="kotlin" implementationClass="org.jetbrains.kotlin.idea.highlighter.KotlinFirPsiChecker"/>
 
     <applicationService
         serviceInterface="org.jetbrains.kotlin.platform.DefaultIdeTargetPlatformKindProvider"

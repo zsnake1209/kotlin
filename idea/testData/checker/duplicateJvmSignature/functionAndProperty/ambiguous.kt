@@ -1,5 +1,3 @@
-// FIR_COMPARISON
-
 package a.b
 
 class String
