@@ -12,6 +12,8 @@ dependencies {
     compileOnly(project(":kotlin-gradle-plugin-api"))
 
     runtime(kotlinStdlib())
+
+    compileOnly(project(":kotlin-compiler-embeddable", "runtimeJar"))
 }
 
 sourceSets {
@@ -19,6 +21,8 @@ sourceSets {
 }
 
 publish()
+
+runtimeJar(rewriteDefaultJarDepsToShadedCompiler({}), {})
 
 runtimeJar()
 sourcesJar()
