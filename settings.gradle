@@ -305,7 +305,8 @@ include ":kotlin-build-common",
         ":kotlin-serialization",
         ":kotlin-serialization-unshaded",
         ":kotlin-serialization:plugin-marker",
-        ":compose-compiler-plugin"
+        ":compose-compiler-plugin",
+        ":compose-gradle-plugin"
 
 if (buildProperties.includeCidrPlugins) {
     logger.info("Including CIDR modules in settings.gradle")
@@ -525,6 +526,7 @@ project(':kotlinx-serialization-ide-plugin').projectDir = file("$rootDir/plugins
 project(':kotlin-serialization').projectDir = file("$rootDir/libraries/tools/kotlin-serialization")
 project(':kotlin-serialization-unshaded').projectDir = file("$rootDir/libraries/tools/kotlin-serialization-unshaded")
 project(':kotlin-serialization:plugin-marker').projectDir = file("$rootDir/libraries/tools/kotlin-serialization/plugin-marker")
+project(':compose-gradle-plugin').projectDir = file("$rootDir/libraries/tools/compose")
 
 project(':compose-compiler-plugin').projectDir = file("$rootDir/plugins/compose-compiler")
 
