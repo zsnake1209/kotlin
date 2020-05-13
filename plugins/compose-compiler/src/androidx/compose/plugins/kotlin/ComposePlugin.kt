@@ -50,6 +50,10 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
 }
 
 class ComposeComponentRegistrar : ComponentRegistrar {
+//    init {
+//        println(MockProject::class.java)
+//    }
+
     override fun registerProjectComponents(
         project: MockProject,
         configuration: CompilerConfiguration

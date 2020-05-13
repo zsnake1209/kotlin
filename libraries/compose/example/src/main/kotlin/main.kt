@@ -2,7 +2,7 @@ import androidx.compose.*
 import kotlin.browser.document
 import kotlin.browser.window
 
-@Composable
+//@Composable
 //fun App() {
 //    Div {
 //        Text("Hello, world!")
