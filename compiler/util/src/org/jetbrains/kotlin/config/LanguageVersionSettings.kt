@@ -145,12 +145,12 @@ enum class LanguageFeature(
 
     MultiPlatformProjects(sinceVersion = null, defaultState = State.DISABLED),
 
-    NewInference(sinceVersion = KOTLIN_1_4),
+    NewInference(sinceVersion = KOTLIN_1_4, defaultState = State.DISABLED),
     // In the next block, features can be enabled only along with new inference
-    SamConversionForKotlinFunctions(sinceVersion = KOTLIN_1_4),
-    SamConversionPerArgument(sinceVersion = KOTLIN_1_4),
-    FunctionReferenceWithDefaultValueAsOtherType(sinceVersion = KOTLIN_1_4),
-    NonStrictOnlyInputTypesChecks(sinceVersion = KOTLIN_1_4),
+    SamConversionForKotlinFunctions(sinceVersion = KOTLIN_1_4, defaultState = State.DISABLED),
+    SamConversionPerArgument(sinceVersion = KOTLIN_1_4, defaultState = State.DISABLED),
+    FunctionReferenceWithDefaultValueAsOtherType(sinceVersion = KOTLIN_1_4, defaultState = State.DISABLED),
+    NonStrictOnlyInputTypesChecks(sinceVersion = KOTLIN_1_4, defaultState = State.DISABLED),
     SuspendConversion(sinceVersion = KOTLIN_1_4, defaultState = State.DISABLED),
 
     BooleanElvisBoundSmartCasts(sinceVersion = KOTLIN_1_3, defaultState = State.DISABLED), // see KT-26357 for details
