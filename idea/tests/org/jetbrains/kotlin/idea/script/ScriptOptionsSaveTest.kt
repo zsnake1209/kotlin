@@ -20,17 +20,18 @@ class ScriptOptionsSaveTest : KotlinLightCodeInsightFixtureTestCase() {
     fun testSaveAutoReload() {
         val project = myFixture.project
         val settings = KotlinScriptingSettings.getInstance(project)
-        val initialAutoReload = settings.isAutoReloadEnabled
+        val definition = ScriptDefinitionsManager.getInstance(project).getAllDefinitions().first()
+        val initialAutoReload = settings.autoReloadConfigurations(definition)
 
-        settings.isAutoReloadEnabled = !initialAutoReload
+        settings.setAutoReloadConfigurations(0, definition, !initialAutoReload)
 
         assertEquals(
             "isAutoReloadEnabled should be set to true",
-            "<KotlinScriptingSettings><option name=\"isAutoReloadEnabled\" value=\"true\" /></KotlinScriptingSettings>",
-            XMLOutputter().outputString(settings.state)
+            "true",
+            XMLOutputter().outputString(settings.state).substringAfter("<autoReloadConfigurations>").substringBefore("</autoReloadConfigurations>")
         )
 
-        settings.isAutoReloadEnabled = initialAutoReload
+        settings.setAutoReloadConfigurations(0, definition, initialAutoReload)
     }
 
     fun testSaveScriptDefinitionOff() {
@@ -41,7 +42,7 @@ class ScriptOptionsSaveTest : KotlinLightCodeInsightFixtureTestCase() {
 
         val initialIsEnabled = settings.isScriptDefinitionEnabled(scriptDefinition)
 
-        settings.setEnabled(scriptDefinition, !initialIsEnabled)
+        settings.setEnabled(-1, scriptDefinition, !initialIsEnabled)
 
         assertEquals(
             "scriptDefinition should be off",
@@ -49,7 +50,7 @@ class ScriptOptionsSaveTest : KotlinLightCodeInsightFixtureTestCase() {
             XMLOutputter().outputString(settings.state).replace("scriptDefinition .*\">".toRegex(), "scriptDefinition>")
         )
 
-        settings.setEnabled(scriptDefinition, initialIsEnabled)
+        settings.setEnabled(-1, scriptDefinition, initialIsEnabled)
     }
 
     override fun getProjectDescriptor(): LightProjectDescriptor {

@@ -36,7 +36,7 @@ abstract class AbstractScriptDefinitionsOrderTest : AbstractScriptConfigurationT
                 .find { it.name == definitionName }
                 ?: error("Unknown script definition name in SCRIPT DEFINITIONS directive: name=$definitionName, all={${allDefinitions.joinToString { it.name }}}")
             when (action) {
-                "off" -> KotlinScriptingSettings.getInstance(project).setEnabled(scriptDefinition, false)
+                "off" -> KotlinScriptingSettings.getInstance(project).setEnabled(allDefinitions.indexOf(scriptDefinition), scriptDefinition, false)
                 else -> KotlinScriptingSettings.getInstance(project).setOrder(scriptDefinition, action.toInt())
             }
         }

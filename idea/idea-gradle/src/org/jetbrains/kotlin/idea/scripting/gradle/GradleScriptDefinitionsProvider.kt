@@ -32,13 +32,12 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
 import kotlin.script.dependencies.Environment
 import kotlin.script.dependencies.ScriptContents
-import kotlin.script.experimental.api.ScriptCompilationConfiguration
+import kotlin.script.experimental.api.*
 import kotlin.script.experimental.dependencies.DependenciesResolver
 import kotlin.script.experimental.dependencies.DependenciesResolver.ResolveResult
 import kotlin.script.experimental.dependencies.ScriptReport
 import kotlin.script.experimental.host.ScriptingHostConfiguration
 import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
-import kotlin.script.experimental.location.ScriptExpectedLocation
 import kotlin.script.templates.standard.ScriptTemplateWithArgs
 
 class GradleScriptDefinitionsContributor(private val project: Project) : ScriptDefinitionSourceAsContributor {
@@ -236,17 +235,12 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
             additionalResolverClasspath(gradleLibDir)
         ).map {
             it.asLegacyOrNull<KotlinScriptDefinitionFromAnnotatedTemplate>()?.let { legacyDef ->
-                @Suppress("DEPRECATION")
-                if (legacyDef.scriptExpectedLocations.contains(ScriptExpectedLocation.Project)) null
-                else {
-                    // Expand scope for old gradle script definition
-                    ScriptDefinition.FromLegacy(
-                        it.hostConfiguration,
-                        GradleKotlinScriptDefinitionFromAnnotatedTemplate(
-                            legacyDef
-                        )
-                    )
-                }
+                // Expand scope for old gradle script definition
+                GradleKotlinScriptDefinitionWrapper(
+                    it.hostConfiguration,
+                    legacyDef,
+                    getGradleVersion(project, projectSettings)
+                )
             } ?: it
         }
     }
@@ -309,10 +303,3 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
     }
 }
 
-class GradleKotlinScriptDefinitionFromAnnotatedTemplate(
-    base: KotlinScriptDefinitionFromAnnotatedTemplate
-) : KotlinScriptDefinitionFromAnnotatedTemplate(base.template, base.environment, base.templateClasspath) {
-    @Suppress("DEPRECATION")
-    override val scriptExpectedLocations: List<ScriptExpectedLocation>
-        get() = listOf(ScriptExpectedLocation.Project)
-}
