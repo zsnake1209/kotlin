@@ -2,6 +2,7 @@ package org.jetbrains.uast.test.kotlin
 
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiModifier
 import com.intellij.testFramework.RunAll
 import com.intellij.testFramework.UsefulTestCase
@@ -12,6 +13,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.test.testFramework.KtUsefulTestCase
 import org.jetbrains.kotlin.utils.addToStdlib.assertedCast
 import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.kotlin.utils.sure
 import org.jetbrains.uast.*
 import org.jetbrains.uast.expressions.UInjectionHost
@@ -261,6 +263,34 @@ class KotlinUastApiTest : AbstractKotlinUastTest() {
                 override fun visitCallExpression(node: UCallExpression): Boolean {
                     node.returnType
                     return false
+                }
+            })
+        }
+    }
+
+    @Test
+    fun testEnumCallIdentifier() {
+        doTest("EnumValuesConstructors") { _, file ->
+            val enumEntry = file.findElementByTextFromPsi<UElement>("(\"system\")")
+            enumEntry.accept(object : AbstractUastVisitor() {
+                override fun visitCallExpression(node: UCallExpression): Boolean {
+                    val methodIdentifier = node.methodIdentifier
+                    assertEquals("SYSTEM", methodIdentifier?.name)
+                    return super.visitCallExpression(node)
+                }
+            })
+        }
+    }
+
+    @Test
+    fun testEnumCallWithBodyIdentifier() {
+        doTest("EnumValueMembers") { _, file ->
+            val enumEntry = file.findElementByTextFromPsi<UElement>("(\"foo\")")
+            enumEntry.accept(object : AbstractUastVisitor() {
+                override fun visitCallExpression(node: UCallExpression): Boolean {
+                    val methodIdentifier = node.methodIdentifier
+                    assertEquals("SHEET", methodIdentifier?.name)
+                    return super.visitCallExpression(node)
                 }
             })
         }
@@ -540,11 +570,43 @@ class KotlinUastApiTest : AbstractKotlinUastTest() {
                 "bar",
                 localFunction.methodName
             )
-            assertNull(localFunction.resolve())
+            val localFunctionResolved = localFunction.resolve()
+            assertNotNull(localFunctionResolved)
             val receiver = localFunction.receiver ?: kfail("receiver expected")
             assertEquals("UReferenceExpression", receiver.asLogString())
-            val uParameter = (receiver as UReferenceExpression).resolve().toUElement() ?: kfail("uelement expected")
-            assertEquals("ULambdaExpression", uParameter.asLogString())
+            val uVariable = (receiver as UReferenceExpression).resolve().toUElement() ?: kfail("uelement expected")
+            assertEquals("ULocalVariable (name = bar)", uVariable.asLogString())
+            assertEquals((uVariable as ULocalVariable).uastInitializer, localFunctionResolved.toUElement())
+        }
+    }
+
+    @Test
+    fun testLocalConstructorCall() {
+        doTest("LocalDeclarations") { _, file ->
+            val localFunction = file.findElementByTextFromPsi<UElement>("bar() == Local()").
+                findElementByText<UCallExpression>("Local()")
+            assertEquals(
+                "UIdentifier (Identifier (Local))",
+                localFunction.methodIdentifier?.asLogString()
+            )
+            assertEquals(
+                "Local",
+                localFunction.methodIdentifier?.name
+            )
+            assertEquals(
+                "<init>",
+                localFunction.methodName
+            )
+            val localFunctionResolved = localFunction.resolve()
+            assertNotNull(localFunctionResolved)
+            val classReference = localFunction.classReference ?: kfail("classReference expected")
+            assertEquals("USimpleNameReferenceExpression (identifier = <init>, resolvesTo = Local)", classReference.asLogString())
+            val localClass = classReference.resolve().toUElement() ?: kfail("uelement expected")
+            assertEquals("UClass (name = Local)", localClass.asLogString())
+            assertEquals(localClass, localFunctionResolved.toUElement())
+            val localPrimaryConstructor = localFunctionResolved.toUElementOfType<UMethod>() ?: kfail("constructor expected")
+            assertTrue(localPrimaryConstructor.isConstructor)
+            assertEquals(localClass, localPrimaryConstructor.uastParent)
         }
     }
 
@@ -600,6 +662,7 @@ class KotlinUastApiTest : AbstractKotlinUastTest() {
             assertEquals("""
                 function1 -> PsiType:void
                 function2 -> PsiType:T
+                function2CharSequence -> PsiType:T extends PsiType:CharSequence
                 function3 -> PsiType:void
                 function4 -> PsiType:T
                 function5 -> PsiType:int
@@ -609,7 +672,48 @@ class KotlinUastApiTest : AbstractKotlinUastTest() {
                 function9 -> PsiType:T
                 function10 -> PsiType:T
                 function11 -> PsiType:T
-            """.trimIndent(), methods.joinToString("\n") { m -> m.name + " -> " + m.returnType.toString() })
+                function11CharSequence -> PsiType:T extends PsiType:CharSequence
+            """.trimIndent(), methods.joinToString("\n") { m ->
+                buildString {
+                    append(m.name).append(" -> ")
+                    append(m.returnType)
+                    m.returnType.safeAs<PsiClassType>()?.resolve()?.extendsList?.referencedTypes?.takeIf { it.isNotEmpty() }?.let { e ->
+                        append(" extends ")
+                        append(e.joinToString { it.toString() })
+                    }
+
+                }
+            })
+            for (method in methods.drop(3)) {
+                assertEquals("assert return types comparable for '${method.name}'", method.returnType, method.returnType)
+            }
+        }
+    }
+
+    @Test
+    fun testReifiedParameters() {
+        doTest("ReifiedParameters") { _, file ->
+            val methods = file.classes.flatMap { it.methods.asIterable() }
+
+            for (method in methods) {
+                assertNotNull("method ${method.name} should have source", method.sourcePsi)
+                assertEquals("method ${method.name} should be equals to converted from sourcePsi", method, method.sourcePsi.toUElement())
+                assertEquals("method ${method.name} should be equals to converted from javaPsi", method, method.javaPsi.toUElement())
+
+                for (parameter in method.uastParameters) {
+                    assertNotNull("parameter ${parameter.name} should have source", parameter.sourcePsi)
+                    assertEquals(
+                        "parameter ${parameter.name} of method ${method.name} should be equals to converted from sourcePsi",
+                        parameter,
+                        parameter.sourcePsi.toUElementOfType<UParameter>()
+                    )
+                    assertEquals(
+                        "parameter ${parameter.name} of method ${method.name} should be equals to converted from javaPsi",
+                        parameter,
+                        parameter.javaPsi.toUElement()
+                    )
+                }
+            }
         }
     }
 

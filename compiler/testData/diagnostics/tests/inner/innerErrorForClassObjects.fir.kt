@@ -5,15 +5,15 @@ class TestSome<P> {
 }
 
 class Test {
-    companion object : InnerClass() {
-        val a = object: InnerClass() {
+    companion object : <!UNRESOLVED_REFERENCE!>InnerClass<!>() {
+        val a = object: <!UNRESOLVED_REFERENCE!>InnerClass<!>() {
         }
 
         fun more(): InnerClass {
             val b = InnerClass()
 
-            val testVal = inClass
-            foo()
+            val testVal = <!UNRESOLVED_REFERENCE!>inClass<!>
+            <!UNRESOLVED_REFERENCE!>foo<!>()
 
             return b
         }

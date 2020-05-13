@@ -286,17 +286,17 @@ public inline fun String.Companion.format(format: String, vararg args: Any?): St
 
 /**
  * Uses this string as a format string and returns a string obtained by substituting the specified arguments,
- * using the specified locale.
+ * using the specified locale. If [locale] is `null` then no localization is applied.
  */
 @kotlin.internal.InlineOnly
-public inline fun String.format(locale: Locale, vararg args: Any?): String = java.lang.String.format(locale, this, *args)
+public inline fun String.format(locale: Locale?, vararg args: Any?): String = java.lang.String.format(locale, this, *args)
 
 /**
  * Uses the provided [format] as a format string and returns a string obtained by substituting the specified arguments,
- * using the specified locale.
+ * using the specified locale. If [locale] is `null` then no localization is applied.
  */
 @kotlin.internal.InlineOnly
-public inline fun String.Companion.format(locale: Locale, format: String, vararg args: Any?): String =
+public inline fun String.Companion.format(locale: Locale?, format: String, vararg args: Any?): String =
     java.lang.String.format(locale, format, *args)
 
 /**

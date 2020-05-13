@@ -18,8 +18,8 @@ package org.jetbrains.kotlin.ir.declarations.impl
 
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.Visibility
-import org.jetbrains.kotlin.ir.declarations.IrConstructor
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.carriers.ConstructorCarrier
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.symbols.IrConstructorSymbol
 import org.jetbrains.kotlin.ir.types.IrType
@@ -32,21 +32,22 @@ class IrConstructorImpl(
     endOffset: Int,
     origin: IrDeclarationOrigin,
     override val symbol: IrConstructorSymbol,
-    name: Name,
-    visibility: Visibility,
+    name: Name = symbol.descriptor.name,
+    visibility: Visibility = symbol.descriptor.visibility,
     returnType: IrType,
-    isInline: Boolean,
-    isExternal: Boolean,
-    override val isPrimary: Boolean,
-    isExpect: Boolean
+    isInline: Boolean = symbol.descriptor.isInline,
+    isExternal: Boolean = symbol.descriptor.isEffectivelyExternal(),
+    override val isPrimary: Boolean = symbol.descriptor.isPrimary,
+    isExpect: Boolean = symbol.descriptor.isExpect
 ) :
-    IrFunctionBase(
+    IrFunctionBase<ConstructorCarrier>(
         startOffset, endOffset, origin, name,
         visibility,
         isInline, isExternal, isExpect,
         returnType
     ),
-    IrConstructor {
+    IrConstructor,
+    ConstructorCarrier {
 
     constructor(
         startOffset: Int,

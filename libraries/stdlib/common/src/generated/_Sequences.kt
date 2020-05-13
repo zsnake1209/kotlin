@@ -375,6 +375,8 @@ public fun <T> Sequence<T>.dropWhile(predicate: (T) -> Boolean): Sequence<T> {
  * Returns a sequence containing only elements matching the given [predicate].
  *
  * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 public fun <T> Sequence<T>.filter(predicate: (T) -> Boolean): Sequence<T> {
     return FilteringSequence(this, true, predicate)
@@ -430,6 +432,8 @@ public inline fun <reified R, C : MutableCollection<in R>> Sequence<*>.filterIsI
  * Returns a sequence containing all elements not matching the given [predicate].
  *
  * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 public fun <T> Sequence<T>.filterNot(predicate: (T) -> Boolean): Sequence<T> {
     return FilteringSequence(this, false, predicate)
@@ -439,6 +443,8 @@ public fun <T> Sequence<T>.filterNot(predicate: (T) -> Boolean): Sequence<T> {
  * Returns a sequence containing all elements that are not `null`.
  *
  * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Filtering.filterNotNull
  */
 public fun <T : Any> Sequence<T?>.filterNotNull(): Sequence<T> {
     @Suppress("UNCHECKED_CAST")
@@ -720,7 +726,7 @@ public fun <T, C : MutableCollection<in T>> Sequence<T>.toCollection(destination
 }
 
 /**
- * Returns a [HashSet] of all elements.
+ * Returns a new [HashSet] of all elements.
  *
  * The operation is _terminal_.
  */
@@ -738,7 +744,7 @@ public fun <T> Sequence<T>.toList(): List<T> {
 }
 
 /**
- * Returns a [MutableList] filled with all elements of this sequence.
+ * Returns a new [MutableList] filled with all elements of this sequence.
  *
  * The operation is _terminal_.
  */
@@ -975,6 +981,7 @@ public fun <T> Sequence<T>.withIndex(): Sequence<IndexedValue<T>> {
 /**
  * Returns a sequence containing only distinct elements from the given sequence.
  * 
+ * Among equal elements of the given sequence, only the first one will be present in the resulting sequence.
  * The elements in the resulting sequence are in the same order as they were in the source sequence.
  *
  * The operation is _intermediate_ and _stateful_.
@@ -989,6 +996,7 @@ public fun <T> Sequence<T>.distinct(): Sequence<T> {
  * Returns a sequence containing only elements from the given sequence
  * having distinct keys returned by the given [selector] function.
  * 
+ * Among elements of the given sequence with equal keys, only the first one will be present in the resulting sequence.
  * The elements in the resulting sequence are in the same order as they were in the source sequence.
  *
  * The operation is _intermediate_ and _stateful_.
@@ -1000,7 +1008,7 @@ public fun <T, K> Sequence<T>.distinctBy(selector: (T) -> K): Sequence<T> {
 }
 
 /**
- * Returns a mutable set containing all distinct elements from the given sequence.
+ * Returns a new [MutableSet] containing all distinct elements from the given sequence.
  * 
  * The returned set preserves the element iteration order of the original sequence.
  *
@@ -1070,7 +1078,12 @@ public inline fun <T> Sequence<T>.count(predicate: (T) -> Boolean): Int {
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with [initial] value and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns the specified [initial] value if the sequence is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
  *
  * The operation is _terminal_.
  */
@@ -1083,6 +1096,9 @@ public inline fun <T, R> Sequence<T>.fold(initial: R, operation: (acc: R, T) -> 
 /**
  * Accumulates value starting with [initial] value and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original sequence.
+ * 
+ * Returns the specified [initial] value if the sequence is empty.
+ * 
  * @param [operation] function that takes the index of an element, current accumulator value
  * and the element itself, and calculates the next accumulator value.
  *
@@ -1107,7 +1123,7 @@ public inline fun <T> Sequence<T>.forEach(action: (T) -> Unit): Unit {
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  *
  * The operation is _terminal_.
  */
@@ -1349,7 +1365,29 @@ public fun <T> Sequence<T>.onEach(action: (T) -> Unit): Sequence<T> {
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element.
+ * Returns a sequence which performs the given [action] on each element of the original sequence as they pass through it.
+ * @param [action] function that takes the index of an element and the element itself
+ * and performs the action on the element.
+ *
+ * The operation is _intermediate_ and _stateless_.
+ */
+@SinceKotlin("1.4")
+public fun <T> Sequence<T>.onEachIndexed(action: (index: Int, T) -> Unit): Sequence<T> {
+    return mapIndexed { index, element ->
+        action(index, element)
+        element
+    }
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Throws an exception if this sequence is empty. If the sequence can be empty in an expected way,
+ * please use [reduceOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  *
  * The operation is _terminal_.
  * 
@@ -1368,8 +1406,12 @@ public inline fun <S, T : S> Sequence<T>.reduce(operation: (acc: S, T) -> S): S 
 /**
  * Accumulates value starting with the first element and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original sequence.
- * @param [operation] function that takes the index of an element, current accumulator value
- * and the element itself and calculates the next accumulator value.
+ * 
+ * Throws an exception if this sequence is empty. If the sequence can be empty in an expected way,
+ * please use [reduceIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
  *
  * The operation is _terminal_.
  * 
@@ -1387,7 +1429,38 @@ public inline fun <S, T : S> Sequence<T>.reduceIndexed(operation: (index: Int, a
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element. Returns null if the sequence is empty.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element with its index in the original sequence.
+ * 
+ * Returns `null` if the sequence is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
+ *
+ * The operation is _terminal_.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceOrNull
+ */
+@SinceKotlin("1.4")
+public inline fun <S, T : S> Sequence<T>.reduceIndexedOrNull(operation: (index: Int, acc: S, T) -> S): S? {
+    val iterator = this.iterator()
+    if (!iterator.hasNext()) return null
+    var index = 1
+    var accumulator: S = iterator.next()
+    while (iterator.hasNext()) {
+        accumulator = operation(checkIndexOverflow(index++), accumulator, iterator.next())
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns `null` if the sequence is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  *
  * The operation is _terminal_.
  * 
@@ -1403,6 +1476,178 @@ public inline fun <S, T : S> Sequence<T>.reduceOrNull(operation: (acc: S, T) -> 
         accumulator = operation(accumulator, iterator.next())
     }
     return accumulator
+}
+
+/**
+ * Returns a sequence containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting sequence.
+ * The [initial] value should also be immutable (or should not be mutated)
+ * as it may be passed to [operation] function later because of sequence's lazy nature.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ *
+ * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+public fun <T, R> Sequence<T>.runningFold(initial: R, operation: (acc: R, T) -> R): Sequence<R> {
+    return sequence {
+        yield(initial)
+        var accumulator = initial
+        for (element in this@runningFold) {
+            accumulator = operation(accumulator, element)
+            yield(accumulator)
+        }
+    }
+}
+
+/**
+ * Returns a sequence containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original sequence and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting sequence.
+ * The [initial] value should also be immutable (or should not be mutated)
+ * as it may be passed to [operation] function later because of sequence's lazy nature.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ *
+ * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+public fun <T, R> Sequence<T>.runningFoldIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): Sequence<R> {
+    return sequence {
+        yield(initial)
+        var index = 0
+        var accumulator = initial
+        for (element in this@runningFoldIndexed) {
+            accumulator = operation(checkIndexOverflow(index++), accumulator, element)
+            yield(accumulator)
+        }
+    }
+}
+
+/**
+ * Returns a sequence containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with the first element of this sequence.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting sequence.
+ * 
+ * @param [operation] function that takes current accumulator value and the element, and calculates the next accumulator value.
+ *
+ * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public fun <S, T : S> Sequence<T>.runningReduce(operation: (acc: S, T) -> S): Sequence<S> {
+    return sequence {
+        val iterator = iterator()
+        if (iterator.hasNext()) {
+            var accumulator: S = iterator.next()
+            yield(accumulator)
+            while (iterator.hasNext()) {
+                accumulator = operation(accumulator, iterator.next())
+                yield(accumulator)
+            }
+        }
+    }
+}
+
+/**
+ * Returns a sequence containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original sequence and current accumulator value that starts with the first element of this sequence.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting sequence.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ *
+ * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+public fun <S, T : S> Sequence<T>.runningReduceIndexed(operation: (index: Int, acc: S, T) -> S): Sequence<S> {
+    return sequence {
+        val iterator = iterator()
+        if (iterator.hasNext()) {
+            var accumulator: S = iterator.next()
+            yield(accumulator)
+            var index = 1
+            while (iterator.hasNext()) {
+                accumulator = operation(checkIndexOverflow(index++), accumulator, iterator.next())
+                yield(accumulator)
+            }
+        }
+    }
+}
+
+/**
+ * Returns a sequence containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting sequence.
+ * The [initial] value should also be immutable (or should not be mutated)
+ * as it may be passed to [operation] function later because of sequence's lazy nature.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ *
+ * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public fun <T, R> Sequence<T>.scan(initial: R, operation: (acc: R, T) -> R): Sequence<R> {
+    return runningFold(initial, operation)
+}
+
+/**
+ * Returns a sequence containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original sequence and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting sequence.
+ * The [initial] value should also be immutable (or should not be mutated)
+ * as it may be passed to [operation] function later because of sequence's lazy nature.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ *
+ * The operation is _intermediate_ and _stateless_.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public fun <T, R> Sequence<T>.scanIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): Sequence<R> {
+    return runningFoldIndexed(initial, operation)
+}
+
+@Deprecated("Use runningReduce instead.", ReplaceWith("runningReduce(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public fun <S, T : S> Sequence<T>.scanReduce(operation: (acc: S, T) -> S): Sequence<S> {
+    return runningReduce(operation)
+}
+
+@Deprecated("Use runningReduceIndexed instead.", ReplaceWith("runningReduceIndexed(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public fun <S, T : S> Sequence<T>.scanReduceIndexed(operation: (index: Int, acc: S, T) -> S): Sequence<S> {
+    return runningReduceIndexed(operation)
 }
 
 /**
@@ -1574,6 +1819,8 @@ public inline fun <T> Sequence<T>.minusElement(element: T): Sequence<T> {
  * while *second* list contains elements for which [predicate] yielded `false`.
  *
  * The operation is _terminal_.
+ * 
+ * @sample samples.collections.Sequences.Transformations.partition
  */
 public inline fun <T> Sequence<T>.partition(predicate: (T) -> Boolean): Pair<List<T>, List<T>> {
     val first = ArrayList<T>()

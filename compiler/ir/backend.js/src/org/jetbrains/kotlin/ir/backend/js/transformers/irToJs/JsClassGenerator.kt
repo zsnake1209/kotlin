@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.ir.backend.js.export.isExported
 import org.jetbrains.kotlin.ir.backend.js.utils.*
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.expressions.IrClassReference
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.types.IrType
@@ -33,6 +34,7 @@ class JsClassGenerator(private val irClass: IrClass, val context: JsGenerationCo
     fun generate(): JsStatement {
         assert(!irClass.descriptor.isExpect)
 
+        maybeGeneratePrimaryConstructor()
         val transformer = IrDeclarationToJsTransformer()
 
         // Properties might be lowered out of classes
@@ -55,7 +57,7 @@ class JsClassGenerator(private val irClass: IrClass, val context: JsGenerationCo
                 is IrField -> {
                 }
                 else -> {
-                    error("Unexpected declaration in class: ${declaration.descriptor}")
+                    error("Unexpected declaration in class: ${declaration.render()}")
                 }
             }
         }
@@ -70,7 +72,7 @@ class JsClassGenerator(private val irClass: IrClass, val context: JsGenerationCo
                 if (property.visibility != Visibilities.PUBLIC)
                     continue
 
-                if (property.origin == IrDeclarationOrigin.FAKE_OVERRIDE)
+                if (property.isFakeOverride)
                     continue
 
                 fun IrSimpleFunction.accessorRef(): JsNameRef? =
@@ -111,13 +113,16 @@ class JsClassGenerator(private val irClass: IrClass, val context: JsGenerationCo
 
     private fun generateMemberFunction(declaration: IrSimpleFunction): JsStatement? {
 
-        val translatedFunction = declaration.run { if (isReal) accept(IrFunctionToJsTransformer(), context) else null }
-        assert(!declaration.isStaticMethodOfClass)
-
         val memberName = context.getNameForMemberFunction(declaration.realOverrideTarget)
         val memberRef = JsNameRef(memberName, classPrototypeRef)
 
-        translatedFunction?.let { return jsAssignment(memberRef, it.apply { name = null }).makeStmt() }
+        if (declaration.isReal && declaration.body != null) {
+            val translatedFunction = declaration.accept(IrFunctionToJsTransformer(), context)
+
+            assert(!declaration.isStaticMethodOfClass)
+
+            return jsAssignment(memberRef, translatedFunction.apply { name = null }).makeStmt()
+        }
 
         // do not generate code like
         // interface I { foo() = "OK" }
@@ -140,6 +145,15 @@ class JsClassGenerator(private val irClass: IrClass, val context: JsGenerationCo
         }
 
         return null
+    }
+
+    private fun maybeGeneratePrimaryConstructor() {
+        if (!irClass.declarations.any { it is IrConstructor }) {
+            val func = JsFunction(emptyScope, JsBlock(), "Ctor for ${irClass.name}")
+            func.name = className
+            classBlock.statements += func.makeStmt()
+            classModel.preDeclarationBlock.statements += generateInheritanceCode()
+        }
     }
 
     private fun generateInheritanceCode(): List<JsStatement> {
@@ -176,6 +190,8 @@ class JsClassGenerator(private val irClass: IrClass, val context: JsGenerationCo
 
         metadataLiteral.propertyInitializers += generateSuperClasses()
 
+        metadataLiteral.propertyInitializers += generateAssociatedKeyProperties()
+
         if (isCoroutineClass()) {
             metadataLiteral.propertyInitializers += generateSuspendArity()
         }
@@ -191,19 +207,44 @@ class JsClassGenerator(private val irClass: IrClass, val context: JsGenerationCo
     }
 
     private fun generateSuperClasses(): JsPropertyInitializer {
-        val functionTypeOrSubtype = irClass.defaultType.isFunctionTypeOrSubtype()
         return JsPropertyInitializer(
             JsNameRef(Namer.METADATA_INTERFACES),
             JsArrayLiteral(
                 irClass.superTypes.mapNotNull {
                     val symbol = it.classifierOrFail as IrClassSymbol
+                    val isFunctionType = it.run { isFunctionOrKFunction() || isSuspendFunctionOrKFunction() }
                     // TODO: make sure that there is a test which breaks when isExternal is used here instead of isEffectivelyExternal
-                    if (symbol.isInterface && !functionTypeOrSubtype && !symbol.isEffectivelyExternal) {
+                    if (symbol.isInterface && !isFunctionType && !symbol.isEffectivelyExternal) {
                         JsNameRef(context.getNameForClass(symbol.owner))
                     } else null
                 }
             )
         )
+    }
+
+    private fun generateAssociatedKeyProperties(): List<JsPropertyInitializer> {
+        var result = emptyList<JsPropertyInitializer>()
+
+        context.getAssociatedObjectKey(irClass)?.let { key ->
+            result = result + JsPropertyInitializer(JsStringLiteral("associatedObjectKey"), JsIntLiteral(key))
+        }
+
+        val associatedObjects = irClass.annotations.mapNotNull { annotation ->
+            val annotationClass = annotation.symbol.owner.constructedClass
+            context.getAssociatedObjectKey(annotationClass)?.let { key ->
+                annotation.associatedObject()?.let { obj ->
+                    context.staticContext.backendContext.mapping.objectToGetInstanceFunction[obj]?.let { factory ->
+                        JsPropertyInitializer(JsIntLiteral(key), context.staticContext.getNameForStaticFunction(factory).makeRef())
+                    }
+                }
+            }
+        }
+
+        if (associatedObjects.isNotEmpty()) {
+            result = result + JsPropertyInitializer(JsStringLiteral("associatedObjects"), JsObjectLiteral(associatedObjects))
+        }
+
+        return result
     }
 }
 

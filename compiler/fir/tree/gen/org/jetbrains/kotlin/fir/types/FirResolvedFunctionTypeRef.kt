@@ -20,10 +20,13 @@ abstract class FirResolvedFunctionTypeRef : FirResolvedTypeRef(), FirFunctionTyp
     abstract override val annotations: List<FirAnnotationCall>
     abstract override val type: ConeKotlinType
     abstract override val delegatedTypeRef: FirTypeRef?
+    abstract override val isSuspend: Boolean
     abstract override val isMarkedNullable: Boolean
     abstract override val receiverTypeRef: FirTypeRef?
     abstract override val valueParameters: List<FirValueParameter>
     abstract override val returnTypeRef: FirTypeRef
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitResolvedFunctionTypeRef(this, data)
+
+    abstract override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirResolvedFunctionTypeRef
 }

@@ -56,7 +56,7 @@ abstract class MultiplePluginVersionGradleImportingTestCase : GradleImportingTes
             File("libraries/tools/kotlin-gradle-plugin/build/libs").listFiles()?.map { it.name }?.firstOrNull { it.contains("-original.jar") }?.replace(
                 "kotlin-gradle-plugin-",
                 ""
-            )?.replace("-original.jar", "") ?: "1.4-SNAPSHOT"
+            )?.replace("-original.jar", "") ?: "1.4.255-SNAPSHOT"
 
         @JvmStatic
         @Parameterized.Parameters(name = "{index}: Gradle-{0}, KotlinGradlePlugin-{1}")
@@ -75,17 +75,15 @@ abstract class MultiplePluginVersionGradleImportingTestCase : GradleImportingTes
     fun repositories(useKts: Boolean, useMaster: Boolean): String {
         val flatDirs = arrayOf(
             "libraries/tools/kotlin-gradle-plugin/build/libs",
-            "libraries/tools/kotlin-gradle-plugin/build/libs",
             "prepare/compiler-client-embeddable/build/libs",
             "prepare/compiler-embeddable/build/libs",
             "libraries/tools/kotlin-gradle-plugin-api/build/libs",
             "compiler/compiler-runner/build/libs",
             "libraries/tools/kotlin-gradle-plugin-model/build/libs",
-            "plugins/scripting/scripting-compiler-embeddable/build/libs",
-            "konan/utils/build/libs"
+            "plugins/scripting/scripting-compiler-embeddable/build/libs"
         )
         val customRepositories = arrayOf("https://dl.bintray.com/kotlin/kotlin-dev", "http://dl.bintray.com/kotlin/kotlin-eap")
-        val customMavenRepositories = customRepositories.map { if (useKts) "maven { setUrl(\"$it\") }" else "maven { url '$it' } " }.joinToString("\n")
+        val customMavenRepositories = customRepositories.map { if (useKts) "maven(\"$it\")" else "maven { url '$it' } " }.joinToString("\n")
         val baseFolder = File(".").absolutePath.replace("\\", "/")
         val quote = if (useKts) '"' else '\''
         val flatDirRepositories = if (useMaster)
@@ -116,7 +114,6 @@ abstract class MultiplePluginVersionGradleImportingTestCase : GradleImportingTes
                 classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$gradleKotlinPluginVersion")
                 classpath("org.jetbrains.kotlin:kotlin-compiler-embeddable:$gradleKotlinPluginVersion")
                 classpath("org.jetbrains.kotlin:kotlin-gradle-plugin-api:$gradleKotlinPluginVersion")
-                classpath("org.jetbrains.kotlin:kotlin-native-utils:$gradleKotlinPluginVersion")
                 classpath("org.jetbrains.kotlin:kotlin-compiler-runner:$gradleKotlinPluginVersion")
                 classpath("org.jetbrains.kotlin:kotlin-compiler-client-embeddable:$gradleKotlinPluginVersion")
                 classpath("org.jetbrains.kotlin:kotlin-gradle-plugin-model:$gradleKotlinPluginVersion")

@@ -38,10 +38,14 @@ import org.jetbrains.kotlin.resolve.diagnostics.Diagnostics
 import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticsElementsCache
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.resolve.lazy.ResolveSession
+import org.jetbrains.kotlin.storage.CancellableSimpleLock
+import org.jetbrains.kotlin.storage.guarded
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.util.slicedMap.ReadOnlySlice
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
+import org.jetbrains.kotlin.utils.checkWithAttachment
 import java.util.*
+import java.util.concurrent.locks.ReentrantLock
 
 internal class PerFileAnalysisCache(val file: KtFile, componentProvider: ComponentProvider) {
     private val globalContext = componentProvider.get<GlobalContext>()
@@ -52,44 +56,63 @@ internal class PerFileAnalysisCache(val file: KtFile, componentProvider: Compone
 
     private val cache = HashMap<PsiElement, AnalysisResult>()
     private var fileResult: AnalysisResult? = null
+    private val lock = ReentrantLock()
+    private val guardLock = CancellableSimpleLock(lock) {
+        ProgressIndicatorProvider.checkCanceled()
+    }
 
-    fun getAnalysisResults(element: KtElement): AnalysisResult {
-        assert(element.containingKtFile == file) { "Wrong file. Expected $file, but was ${element.containingKtFile}" }
+    private fun check(element: KtElement) {
+        checkWithAttachment(element.containingFile == file, {
+            "Expected $file, but was ${element.containingFile} for ${if (element.isValid) "valid" else "invalid"} $element "
+        }) {
+            it.withAttachment("element.kt", element.text)
+            it.withAttachment("file.kt", element.containingFile.text)
+            it.withAttachment("original.kt", file.text)
+        }
+    }
 
-        val analyzableParent = KotlinResolveDataProvider.findAnalyzableParent(element)
+    internal fun fetchAnalysisResults(element: KtElement): AnalysisResult? {
+        check(element)
 
-        return synchronized(this) {
-            ProgressIndicatorProvider.checkCanceled()
+        if (lock.tryLock()) {
+            try {
+                updateFileResultFromCache()
 
+                return fileResult?.takeIf { file.inBlockModifications.isEmpty() }
+            } finally {
+                lock.unlock()
+            }
+        }
+        return null
+    }
+
+    internal fun getAnalysisResults(element: KtElement): AnalysisResult {
+        check(element)
+
+        val analyzableParent = KotlinResolveDataProvider.findAnalyzableParent(element) ?: return AnalysisResult.EMPTY
+
+        return guardLock.guarded {
             // step 1: perform incremental analysis IF it is applicable
-            getIncrementalAnalysisResult()?.let { return it }
+            getIncrementalAnalysisResult()?.let { return@guarded it }
 
             // cache does not contain AnalysisResult per each kt/psi element
             // instead it looks up analysis for its parents - see lookUp(analyzableElement)
 
             // step 2: return result if it is cached
             lookUp(analyzableParent)?.let {
-                return@synchronized it
+                return@guarded it
             }
 
             // step 3: perform analyze of analyzableParent as nothing has been cached yet
             val result = analyze(analyzableParent)
             cache[analyzableParent] = result
 
-            return@synchronized result
+            return@guarded result
         }
     }
 
     private fun getIncrementalAnalysisResult(): AnalysisResult? {
-        // move fileResult from cache if it is stored there
-        if (fileResult == null && cache.containsKey(file)) {
-            fileResult = cache[file]
-
-            // drop existed results for entire cache:
-            // if incremental analysis is applicable it will produce a single value for file
-            // otherwise those results are potentially stale
-            cache.clear()
-        }
+        updateFileResultFromCache()
 
         val inBlockModifications = file.inBlockModifications
         if (inBlockModifications.isNotEmpty()) {
@@ -139,6 +162,18 @@ internal class PerFileAnalysisCache(val file: KtFile, componentProvider: Compone
             }
         }
         return fileResult
+    }
+
+    private fun updateFileResultFromCache() {
+        // move fileResult from cache if it is stored there
+        if (fileResult == null && cache.containsKey(file)) {
+            fileResult = cache[file]
+
+            // drop existed results for entire cache:
+            // if incremental analysis is applicable it will produce a single value for file
+            // otherwise those results are potentially stale
+            cache.clear()
+        }
     }
 
     private fun lookUp(analyzableElement: KtElement): AnalysisResult? {
@@ -335,7 +370,7 @@ private object KotlinResolveDataProvider {
         KtTypeAlias::class.java
     )
 
-    fun findAnalyzableParent(element: KtElement): KtElement {
+    fun findAnalyzableParent(element: KtElement): KtElement? {
         if (element is KtFile) return element
 
         val topmostElement = KtPsiUtil.getTopmostParentOfTypes(element, *topmostElementTypes) as KtElement?
@@ -357,7 +392,7 @@ private object KotlinResolveDataProvider {
         // if none of the above worked, take the outermost declaration
             ?: PsiTreeUtil.getTopmostParentOfType(element, KtDeclaration::class.java)
             // if even that didn't work, take the whole file
-            ?: element.containingKtFile
+            ?: element.containingFile as? KtFile
     }
 
     fun analyze(
@@ -383,7 +418,7 @@ private object KotlinResolveDataProvider {
                 allowSliceRewrite = true
             )
 
-            val moduleInfo = analyzableElement.containingKtFile.getModuleInfo()
+            val moduleInfo = analyzableElement.containingFile.getModuleInfo()
 
             val targetPlatform = moduleInfo.platform
 
@@ -404,7 +439,7 @@ private object KotlinResolveDataProvider {
                 trace,
                 targetPlatform,
                 bodyResolveCache,
-                targetPlatform.findAnalyzerServices,
+                targetPlatform.findAnalyzerServices(project),
                 analyzableElement.languageVersionSettings,
                 IdeaModuleStructureOracle()
             ).get<LazyTopDownAnalyzer>()

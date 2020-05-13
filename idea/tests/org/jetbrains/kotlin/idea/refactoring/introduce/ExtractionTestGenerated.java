@@ -220,6 +220,16 @@ public class ExtractionTestGenerated extends AbstractExtractionTest {
             runTest("idea/testData/refactoring/introduceVariable/kt21530_withParam.kt");
         }
 
+        @TestMetadata("kt38449_int.kt")
+        public void testKt38449_int() throws Exception {
+            runTest("idea/testData/refactoring/introduceVariable/kt38449_int.kt");
+        }
+
+        @TestMetadata("kt38449_unit.kt")
+        public void testKt38449_unit() throws Exception {
+            runTest("idea/testData/refactoring/introduceVariable/kt38449_unit.kt");
+        }
+
         @TestMetadata("LoopRange.kt")
         public void testLoopRange() throws Exception {
             runTest("idea/testData/refactoring/introduceVariable/LoopRange.kt");
@@ -2787,6 +2797,11 @@ public class ExtractionTestGenerated extends AbstractExtractionTest {
             KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("idea/testData/refactoring/introduceProperty"), Pattern.compile("^(.+)\\.(kt|kts)$"), null, true);
         }
 
+        @TestMetadata("conflictWithParentClass.kt")
+        public void testConflictWithParentClass() throws Exception {
+            runTest("idea/testData/refactoring/introduceProperty/conflictWithParentClass.kt");
+        }
+
         @TestMetadata("extractExtensionWithInitializer.kt")
         public void testExtractExtensionWithInitializer() throws Exception {
             runTest("idea/testData/refactoring/introduceProperty/extractExtensionWithInitializer.kt");
@@ -2925,6 +2940,11 @@ public class ExtractionTestGenerated extends AbstractExtractionTest {
         @TestMetadata("kt21530.kt")
         public void testKt21530() throws Exception {
             runTest("idea/testData/refactoring/introduceProperty/kt21530.kt");
+        }
+
+        @TestMetadata("kt24615.kt")
+        public void testKt24615() throws Exception {
+            runTest("idea/testData/refactoring/introduceProperty/kt24615.kt");
         }
 
         @TestMetadata("primaryConstructorParameterReference.kt")

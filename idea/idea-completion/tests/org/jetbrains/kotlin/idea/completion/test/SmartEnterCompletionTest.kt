@@ -116,8 +116,8 @@ class SmartEnterCompletionTest : KotlinLightCodeInsightFixtureTestCase() {
 
             fun test() {
                 foo(
-                        1 +
-                                2,
+                    1 +
+                            2
                 )<caret>
             }
             """

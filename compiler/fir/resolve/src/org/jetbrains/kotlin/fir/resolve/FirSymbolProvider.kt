@@ -7,13 +7,19 @@ package org.jetbrains.kotlin.fir.resolve
 
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSessionComponent
+import org.jetbrains.kotlin.fir.FirSymbolOwner
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.scopes.FirScope
-import org.jetbrains.kotlin.fir.scopes.ProcessorAction
 import org.jetbrains.kotlin.fir.scopes.impl.declaredMemberScope
+import org.jetbrains.kotlin.fir.scopes.impl.nestedClassifierScope
+import org.jetbrains.kotlin.fir.symbols.AbstractFirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTag
 import org.jetbrains.kotlin.fir.symbols.ConeClassifierLookupTag
 import org.jetbrains.kotlin.fir.symbols.ConeClassifierLookupTagWithFixedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.*
+import org.jetbrains.kotlin.fir.types.ConeLookupTagBasedType
+import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.fir.types.coneTypeSafe
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -60,18 +66,24 @@ abstract class FirSymbolProvider : FirSessionComponent {
     }
 }
 
+fun FirSession.getNestedClassifierScope(lookupTag: ConeClassLikeLookupTag): FirScope? =
+    when (lookupTag) {
+        is ConeClassLookupTagWithFixedSymbol -> nestedClassifierScope(lookupTag.symbol.fir)
+        else -> firSymbolProvider.getNestedClassifierScope(lookupTag.classId)
+    }
+
 fun FirSymbolProvider.getClassDeclaredCallableSymbols(classId: ClassId, name: Name): List<FirCallableSymbol<*>> {
     val classSymbol = getClassLikeSymbolByFqName(classId) as? FirRegularClassSymbol ?: return emptyList()
     val declaredMemberScope = declaredMemberScope(classSymbol.fir)
     val result = mutableListOf<FirCallableSymbol<*>>()
-    val processor: (FirCallableSymbol<*>) -> ProcessorAction = {
-        result.add(it)
-        ProcessorAction.NEXT
-    }
-
-    declaredMemberScope.processFunctionsByName(name, processor)
-    declaredMemberScope.processPropertiesByName(name, processor)
+    declaredMemberScope.processFunctionsByName(name, result::add)
+    declaredMemberScope.processPropertiesByName(name, result::add)
+    if (name == classId.shortClassName) declaredMemberScope.processDeclaredConstructors(result::add)
 
     return result
 }
 
+inline fun <reified T : AbstractFirBasedSymbol<*>> FirSymbolProvider.getSymbolByTypeRef(typeRef: FirTypeRef): T? {
+    val lookupTag = typeRef.coneTypeSafe<ConeLookupTagBasedType>()?.lookupTag ?: return null
+    return getSymbolByLookupTag(lookupTag) as? T
+}

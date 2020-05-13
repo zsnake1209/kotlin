@@ -22,11 +22,13 @@ import org.jetbrains.kotlin.fir.visitors.*
  * DO NOT MODIFY IT MANUALLY
  */
 
-abstract class FirTypeParameter : FirPureAbstractElement(), FirNamedDeclaration, FirSymbolOwner<FirTypeParameter>, FirAnnotationContainer {
+abstract class FirTypeParameter : FirPureAbstractElement(), FirTypeParameterRef, FirDeclaration, FirSymbolOwner<FirTypeParameter>, FirAnnotationContainer {
     abstract override val source: FirSourceElement?
     abstract override val session: FirSession
     abstract override val resolvePhase: FirResolvePhase
-    abstract override val name: Name
+    abstract override val origin: FirDeclarationOrigin
+    abstract override val attributes: FirDeclarationAttributes
+    abstract val name: Name
     abstract override val symbol: FirTypeParameterSymbol
     abstract val variance: Variance
     abstract val isReified: Boolean
@@ -34,4 +36,8 @@ abstract class FirTypeParameter : FirPureAbstractElement(), FirNamedDeclaration,
     abstract override val annotations: List<FirAnnotationCall>
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitTypeParameter(this, data)
+
+    abstract override fun replaceResolvePhase(newResolvePhase: FirResolvePhase)
+
+    abstract override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirTypeParameter
 }

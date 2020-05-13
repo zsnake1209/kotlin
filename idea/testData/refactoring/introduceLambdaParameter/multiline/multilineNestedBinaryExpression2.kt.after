@@ -1,10 +1,10 @@
 fun foo(i: Int) { }
 
 fun test(
-        i: () -> Int = {
-            (1 + 2
-                    - 3)
-        }
+    i: () -> Int = {
+        (1 + 2
+                - 3)
+    }
 ) {
     foo(i())
 }

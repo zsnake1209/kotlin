@@ -1792,6 +1792,8 @@ public inline fun UShortArray.dropWhile(predicate: (UShort) -> Boolean): List<US
 
 /**
  * Returns a list containing only elements matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -1802,6 +1804,8 @@ public inline fun UIntArray.filter(predicate: (UInt) -> Boolean): List<UInt> {
 
 /**
  * Returns a list containing only elements matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -1812,6 +1816,8 @@ public inline fun ULongArray.filter(predicate: (ULong) -> Boolean): List<ULong> 
 
 /**
  * Returns a list containing only elements matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -1822,6 +1828,8 @@ public inline fun UByteArray.filter(predicate: (UByte) -> Boolean): List<UByte> 
 
 /**
  * Returns a list containing only elements matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -1940,6 +1948,8 @@ public inline fun <C : MutableCollection<in UShort>> UShortArray.filterIndexedTo
 
 /**
  * Returns a list containing all elements not matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -1950,6 +1960,8 @@ public inline fun UIntArray.filterNot(predicate: (UInt) -> Boolean): List<UInt> 
 
 /**
  * Returns a list containing all elements not matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -1960,6 +1972,8 @@ public inline fun ULongArray.filterNot(predicate: (ULong) -> Boolean): List<ULon
 
 /**
  * Returns a list containing all elements not matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -1970,6 +1984,8 @@ public inline fun UByteArray.filterNot(predicate: (UByte) -> Boolean): List<UByt
 
 /**
  * Returns a list containing all elements not matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -2599,6 +2615,70 @@ public inline fun UShortArray.reverse(): Unit {
 }
 
 /**
+ * Reverses elements of the array in the specified range in-place.
+ * 
+ * @param fromIndex the start of the range (inclusive) to reverse.
+ * @param toIndex the end of the range (exclusive) to reverse.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.reverse(fromIndex: Int, toIndex: Int): Unit {
+    storage.reverse(fromIndex, toIndex)
+}
+
+/**
+ * Reverses elements of the array in the specified range in-place.
+ * 
+ * @param fromIndex the start of the range (inclusive) to reverse.
+ * @param toIndex the end of the range (exclusive) to reverse.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.reverse(fromIndex: Int, toIndex: Int): Unit {
+    storage.reverse(fromIndex, toIndex)
+}
+
+/**
+ * Reverses elements of the array in the specified range in-place.
+ * 
+ * @param fromIndex the start of the range (inclusive) to reverse.
+ * @param toIndex the end of the range (exclusive) to reverse.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.reverse(fromIndex: Int, toIndex: Int): Unit {
+    storage.reverse(fromIndex, toIndex)
+}
+
+/**
+ * Reverses elements of the array in the specified range in-place.
+ * 
+ * @param fromIndex the start of the range (inclusive) to reverse.
+ * @param toIndex the end of the range (exclusive) to reverse.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.reverse(fromIndex: Int, toIndex: Int): Unit {
+    storage.reverse(fromIndex, toIndex)
+}
+
+/**
  * Returns a list with elements in reversed order.
  */
 @SinceKotlin("1.3")
@@ -2684,6 +2764,106 @@ public inline fun UByteArray.reversedArray(): UByteArray {
 @kotlin.internal.InlineOnly
 public inline fun UShortArray.reversedArray(): UShortArray {
     return UShortArray(storage.reversedArray())
+}
+
+/**
+ * Randomly shuffles elements in this array in-place.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UIntArray.shuffle(): Unit {
+    shuffle(Random)
+}
+
+/**
+ * Randomly shuffles elements in this array in-place.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun ULongArray.shuffle(): Unit {
+    shuffle(Random)
+}
+
+/**
+ * Randomly shuffles elements in this array in-place.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UByteArray.shuffle(): Unit {
+    shuffle(Random)
+}
+
+/**
+ * Randomly shuffles elements in this array in-place.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UShortArray.shuffle(): Unit {
+    shuffle(Random)
+}
+
+/**
+ * Randomly shuffles elements in this array in-place using the specified [random] instance as the source of randomness.
+ * 
+ * See: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UIntArray.shuffle(random: Random): Unit {
+    for (i in lastIndex downTo 1) {
+        val j = random.nextInt(i + 1)
+        val copy = this[i]
+        this[i] = this[j]
+        this[j] = copy
+    }
+}
+
+/**
+ * Randomly shuffles elements in this array in-place using the specified [random] instance as the source of randomness.
+ * 
+ * See: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun ULongArray.shuffle(random: Random): Unit {
+    for (i in lastIndex downTo 1) {
+        val j = random.nextInt(i + 1)
+        val copy = this[i]
+        this[i] = this[j]
+        this[j] = copy
+    }
+}
+
+/**
+ * Randomly shuffles elements in this array in-place using the specified [random] instance as the source of randomness.
+ * 
+ * See: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UByteArray.shuffle(random: Random): Unit {
+    for (i in lastIndex downTo 1) {
+        val j = random.nextInt(i + 1)
+        val copy = this[i]
+        this[i] = this[j]
+        this[j] = copy
+    }
+}
+
+/**
+ * Randomly shuffles elements in this array in-place using the specified [random] instance as the source of randomness.
+ * 
+ * See: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UShortArray.shuffle(random: Random): Unit {
+    for (i in lastIndex downTo 1) {
+        val j = random.nextInt(i + 1)
+        val copy = this[i]
+        this[i] = this[j]
+        this[j] = copy
+    }
 }
 
 /**
@@ -3015,9 +3195,10 @@ public inline fun ShortArray.asUShortArray(): UShortArray {
  * i.e. contain the same number of the same elements in the same order.
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public infix fun UIntArray.contentEquals(other: UIntArray): Boolean {
-    return storage.contentEquals(other.storage)
+    return this.contentEquals(other)
 }
 
 /**
@@ -3025,9 +3206,10 @@ public infix fun UIntArray.contentEquals(other: UIntArray): Boolean {
  * i.e. contain the same number of the same elements in the same order.
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public infix fun ULongArray.contentEquals(other: ULongArray): Boolean {
-    return storage.contentEquals(other.storage)
+    return this.contentEquals(other)
 }
 
 /**
@@ -3035,9 +3217,10 @@ public infix fun ULongArray.contentEquals(other: ULongArray): Boolean {
  * i.e. contain the same number of the same elements in the same order.
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public infix fun UByteArray.contentEquals(other: UByteArray): Boolean {
-    return storage.contentEquals(other.storage)
+    return this.contentEquals(other)
 }
 
 /**
@@ -3045,45 +3228,126 @@ public infix fun UByteArray.contentEquals(other: UByteArray): Boolean {
  * i.e. contain the same number of the same elements in the same order.
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public infix fun UShortArray.contentEquals(other: UShortArray): Boolean {
-    return storage.contentEquals(other.storage)
+    return this.contentEquals(other)
+}
+
+/**
+ * Returns `true` if the two specified arrays are *structurally* equal to one another,
+ * i.e. contain the same number of the same elements in the same order.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public infix fun UIntArray?.contentEquals(other: UIntArray?): Boolean {
+    return this?.storage.contentEquals(other?.storage)
+}
+
+/**
+ * Returns `true` if the two specified arrays are *structurally* equal to one another,
+ * i.e. contain the same number of the same elements in the same order.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public infix fun ULongArray?.contentEquals(other: ULongArray?): Boolean {
+    return this?.storage.contentEquals(other?.storage)
+}
+
+/**
+ * Returns `true` if the two specified arrays are *structurally* equal to one another,
+ * i.e. contain the same number of the same elements in the same order.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public infix fun UByteArray?.contentEquals(other: UByteArray?): Boolean {
+    return this?.storage.contentEquals(other?.storage)
+}
+
+/**
+ * Returns `true` if the two specified arrays are *structurally* equal to one another,
+ * i.e. contain the same number of the same elements in the same order.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public infix fun UShortArray?.contentEquals(other: UShortArray?): Boolean {
+    return this?.storage.contentEquals(other?.storage)
 }
 
 /**
  * Returns a hash code based on the contents of this array as if it is [List].
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public fun UIntArray.contentHashCode(): Int {
-    return storage.contentHashCode()
+    return this.contentHashCode()
 }
 
 /**
  * Returns a hash code based on the contents of this array as if it is [List].
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public fun ULongArray.contentHashCode(): Int {
-    return storage.contentHashCode()
+    return this.contentHashCode()
 }
 
 /**
  * Returns a hash code based on the contents of this array as if it is [List].
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public fun UByteArray.contentHashCode(): Int {
-    return storage.contentHashCode()
+    return this.contentHashCode()
 }
 
 /**
  * Returns a hash code based on the contents of this array as if it is [List].
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public fun UShortArray.contentHashCode(): Int {
-    return storage.contentHashCode()
+    return this.contentHashCode()
+}
+
+/**
+ * Returns a hash code based on the contents of this array as if it is [List].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UIntArray?.contentHashCode(): Int {
+    return this?.storage.contentHashCode()
+}
+
+/**
+ * Returns a hash code based on the contents of this array as if it is [List].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun ULongArray?.contentHashCode(): Int {
+    return this?.storage.contentHashCode()
+}
+
+/**
+ * Returns a hash code based on the contents of this array as if it is [List].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UByteArray?.contentHashCode(): Int {
+    return this?.storage.contentHashCode()
+}
+
+/**
+ * Returns a hash code based on the contents of this array as if it is [List].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UShortArray?.contentHashCode(): Int {
+    return this?.storage.contentHashCode()
 }
 
 /**
@@ -3092,9 +3356,10 @@ public fun UShortArray.contentHashCode(): Int {
  * @sample samples.collections.Arrays.ContentOperations.contentToString
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public fun UIntArray.contentToString(): String {
-    return joinToString(", ", "[", "]")
+    return this.contentToString()
 }
 
 /**
@@ -3103,9 +3368,10 @@ public fun UIntArray.contentToString(): String {
  * @sample samples.collections.Arrays.ContentOperations.contentToString
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public fun ULongArray.contentToString(): String {
-    return joinToString(", ", "[", "]")
+    return this.contentToString()
 }
 
 /**
@@ -3114,9 +3380,10 @@ public fun ULongArray.contentToString(): String {
  * @sample samples.collections.Arrays.ContentOperations.contentToString
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public fun UByteArray.contentToString(): String {
-    return joinToString(", ", "[", "]")
+    return this.contentToString()
 }
 
 /**
@@ -3125,9 +3392,54 @@ public fun UByteArray.contentToString(): String {
  * @sample samples.collections.Arrays.ContentOperations.contentToString
  */
 @SinceKotlin("1.3")
+@kotlin.internal.LowPriorityInOverloadResolution
 @ExperimentalUnsignedTypes
 public fun UShortArray.contentToString(): String {
-    return joinToString(", ", "[", "]")
+    return this.contentToString()
+}
+
+/**
+ * Returns a string representation of the contents of the specified array as if it is [List].
+ * 
+ * @sample samples.collections.Arrays.ContentOperations.contentToString
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UIntArray?.contentToString(): String {
+    return this?.joinToString(", ", "[", "]") ?: "null"
+}
+
+/**
+ * Returns a string representation of the contents of the specified array as if it is [List].
+ * 
+ * @sample samples.collections.Arrays.ContentOperations.contentToString
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun ULongArray?.contentToString(): String {
+    return this?.joinToString(", ", "[", "]") ?: "null"
+}
+
+/**
+ * Returns a string representation of the contents of the specified array as if it is [List].
+ * 
+ * @sample samples.collections.Arrays.ContentOperations.contentToString
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UByteArray?.contentToString(): String {
+    return this?.joinToString(", ", "[", "]") ?: "null"
+}
+
+/**
+ * Returns a string representation of the contents of the specified array as if it is [List].
+ * 
+ * @sample samples.collections.Arrays.ContentOperations.contentToString
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UShortArray?.contentToString(): String {
+    return this?.joinToString(", ", "[", "]") ?: "null"
 }
 
 /**
@@ -3333,8 +3645,11 @@ public inline fun UShortArray.copyOf(newSize: Int): UShortArray {
 /**
  * Returns a new array which is a copy of the specified range of the original array.
  * 
- * @param fromIndex the start of the range (inclusive), must be in `0..array.size`
- * @param toIndex the end of the range (exclusive), must be in `fromIndex..array.size`
+ * @param fromIndex the start of the range (inclusive) to copy.
+ * @param toIndex the end of the range (exclusive) to copy.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -3346,8 +3661,11 @@ public inline fun UIntArray.copyOfRange(fromIndex: Int, toIndex: Int): UIntArray
 /**
  * Returns a new array which is a copy of the specified range of the original array.
  * 
- * @param fromIndex the start of the range (inclusive), must be in `0..array.size`
- * @param toIndex the end of the range (exclusive), must be in `fromIndex..array.size`
+ * @param fromIndex the start of the range (inclusive) to copy.
+ * @param toIndex the end of the range (exclusive) to copy.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -3359,8 +3677,11 @@ public inline fun ULongArray.copyOfRange(fromIndex: Int, toIndex: Int): ULongArr
 /**
  * Returns a new array which is a copy of the specified range of the original array.
  * 
- * @param fromIndex the start of the range (inclusive), must be in `0..array.size`
- * @param toIndex the end of the range (exclusive), must be in `fromIndex..array.size`
+ * @param fromIndex the start of the range (inclusive) to copy.
+ * @param toIndex the end of the range (exclusive) to copy.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -3372,8 +3693,11 @@ public inline fun UByteArray.copyOfRange(fromIndex: Int, toIndex: Int): UByteArr
 /**
  * Returns a new array which is a copy of the specified range of the original array.
  * 
- * @param fromIndex the start of the range (inclusive), must be in `0..array.size`
- * @param toIndex the end of the range (exclusive), must be in `fromIndex..array.size`
+ * @param fromIndex the start of the range (inclusive) to copy.
+ * @param toIndex the end of the range (exclusive) to copy.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -3385,8 +3709,8 @@ public inline fun UShortArray.copyOfRange(fromIndex: Int, toIndex: Int): UShortA
 /**
  * Fills this array or its subrange with the specified [element] value.
  * 
- * @param fromIndex the start of the range (inclusive), 0 by default.
- * @param toIndex the end of the range (exclusive), size of this array by default.
+ * @param fromIndex the start of the range (inclusive) to fill, 0 by default.
+ * @param toIndex the end of the range (exclusive) to fill, size of this array by default.
  * 
  * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
  * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
@@ -3400,8 +3724,8 @@ public fun UIntArray.fill(element: UInt, fromIndex: Int = 0, toIndex: Int = size
 /**
  * Fills this array or its subrange with the specified [element] value.
  * 
- * @param fromIndex the start of the range (inclusive), 0 by default.
- * @param toIndex the end of the range (exclusive), size of this array by default.
+ * @param fromIndex the start of the range (inclusive) to fill, 0 by default.
+ * @param toIndex the end of the range (exclusive) to fill, size of this array by default.
  * 
  * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
  * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
@@ -3415,8 +3739,8 @@ public fun ULongArray.fill(element: ULong, fromIndex: Int = 0, toIndex: Int = si
 /**
  * Fills this array or its subrange with the specified [element] value.
  * 
- * @param fromIndex the start of the range (inclusive), 0 by default.
- * @param toIndex the end of the range (exclusive), size of this array by default.
+ * @param fromIndex the start of the range (inclusive) to fill, 0 by default.
+ * @param toIndex the end of the range (exclusive) to fill, size of this array by default.
  * 
  * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
  * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
@@ -3430,8 +3754,8 @@ public fun UByteArray.fill(element: UByte, fromIndex: Int = 0, toIndex: Int = si
 /**
  * Fills this array or its subrange with the specified [element] value.
  * 
- * @param fromIndex the start of the range (inclusive), 0 by default.
- * @param toIndex the end of the range (exclusive), size of this array by default.
+ * @param fromIndex the start of the range (inclusive) to fill, 0 by default.
+ * @param toIndex the end of the range (exclusive) to fill, size of this array by default.
  * 
  * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
  * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
@@ -3642,7 +3966,7 @@ public inline operator fun UShortArray.plus(elements: UShortArray): UShortArray 
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 public fun UIntArray.sort(): Unit {
-    if (size > 1) sortArray(this)
+    if (size > 1) sortArray(this, 0, size)
 }
 
 /**
@@ -3653,7 +3977,7 @@ public fun UIntArray.sort(): Unit {
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 public fun ULongArray.sort(): Unit {
-    if (size > 1) sortArray(this)
+    if (size > 1) sortArray(this, 0, size)
 }
 
 /**
@@ -3664,7 +3988,7 @@ public fun ULongArray.sort(): Unit {
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 public fun UByteArray.sort(): Unit {
-    if (size > 1) sortArray(this)
+    if (size > 1) sortArray(this, 0, size)
 }
 
 /**
@@ -3675,7 +3999,139 @@ public fun UByteArray.sort(): Unit {
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
 public fun UShortArray.sort(): Unit {
-    if (size > 1) sortArray(this)
+    if (size > 1) sortArray(this, 0, size)
+}
+
+/**
+ * Sorts a range in the array in-place.
+ * 
+ * @param fromIndex the start of the range (inclusive) to sort, 0 by default.
+ * @param toIndex the end of the range (exclusive) to sort, size of this array by default.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UIntArray.sort(fromIndex: Int = 0, toIndex: Int = size): Unit {
+    AbstractList.checkRangeIndexes(fromIndex, toIndex, size)
+    sortArray(this, fromIndex, toIndex)
+}
+
+/**
+ * Sorts a range in the array in-place.
+ * 
+ * @param fromIndex the start of the range (inclusive) to sort, 0 by default.
+ * @param toIndex the end of the range (exclusive) to sort, size of this array by default.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun ULongArray.sort(fromIndex: Int = 0, toIndex: Int = size): Unit {
+    AbstractList.checkRangeIndexes(fromIndex, toIndex, size)
+    sortArray(this, fromIndex, toIndex)
+}
+
+/**
+ * Sorts a range in the array in-place.
+ * 
+ * @param fromIndex the start of the range (inclusive) to sort, 0 by default.
+ * @param toIndex the end of the range (exclusive) to sort, size of this array by default.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UByteArray.sort(fromIndex: Int = 0, toIndex: Int = size): Unit {
+    AbstractList.checkRangeIndexes(fromIndex, toIndex, size)
+    sortArray(this, fromIndex, toIndex)
+}
+
+/**
+ * Sorts a range in the array in-place.
+ * 
+ * @param fromIndex the start of the range (inclusive) to sort, 0 by default.
+ * @param toIndex the end of the range (exclusive) to sort, size of this array by default.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UShortArray.sort(fromIndex: Int = 0, toIndex: Int = size): Unit {
+    AbstractList.checkRangeIndexes(fromIndex, toIndex, size)
+    sortArray(this, fromIndex, toIndex)
+}
+
+/**
+ * Sorts elements of the array in the specified range in-place.
+ * The elements are sorted descending according to their natural sort order.
+ * 
+ * @param fromIndex the start of the range (inclusive) to sort.
+ * @param toIndex the end of the range (exclusive) to sort.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UIntArray.sortDescending(fromIndex: Int, toIndex: Int): Unit {
+    sort(fromIndex, toIndex)
+    reverse(fromIndex, toIndex)
+}
+
+/**
+ * Sorts elements of the array in the specified range in-place.
+ * The elements are sorted descending according to their natural sort order.
+ * 
+ * @param fromIndex the start of the range (inclusive) to sort.
+ * @param toIndex the end of the range (exclusive) to sort.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun ULongArray.sortDescending(fromIndex: Int, toIndex: Int): Unit {
+    sort(fromIndex, toIndex)
+    reverse(fromIndex, toIndex)
+}
+
+/**
+ * Sorts elements of the array in the specified range in-place.
+ * The elements are sorted descending according to their natural sort order.
+ * 
+ * @param fromIndex the start of the range (inclusive) to sort.
+ * @param toIndex the end of the range (exclusive) to sort.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UByteArray.sortDescending(fromIndex: Int, toIndex: Int): Unit {
+    sort(fromIndex, toIndex)
+    reverse(fromIndex, toIndex)
+}
+
+/**
+ * Sorts elements of the array in the specified range in-place.
+ * The elements are sorted descending according to their natural sort order.
+ * 
+ * @param fromIndex the start of the range (inclusive) to sort.
+ * @param toIndex the end of the range (exclusive) to sort.
+ * 
+ * @throws IndexOutOfBoundsException if [fromIndex] is less than zero or [toIndex] is greater than the size of this array.
+ * @throws IllegalArgumentException if [fromIndex] is greater than [toIndex].
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+public fun UShortArray.sortDescending(fromIndex: Int, toIndex: Int): Unit {
+    sort(fromIndex, toIndex)
+    reverse(fromIndex, toIndex)
 }
 
 /**
@@ -3836,6 +4292,158 @@ public fun Array<out UShort>.toUShortArray(): UShortArray {
 @kotlin.internal.InlineOnly
 public inline fun ShortArray.toUShortArray(): UShortArray {
     return UShortArray(this.copyOf())
+}
+
+/**
+ * Returns a [Map] where keys are elements from the given array and values are
+ * produced by the [valueSelector] function applied to each element.
+ * 
+ * If any two elements are equal, the last one gets added to the map.
+ * 
+ * The returned map preserves the entry iteration order of the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.associateWith
+ */
+@SinceKotlin("1.4")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <V> UIntArray.associateWith(valueSelector: (UInt) -> V): Map<UInt, V> {
+    val result = LinkedHashMap<UInt, V>(mapCapacity(size).coerceAtLeast(16))
+    return associateWithTo(result, valueSelector)
+}
+
+/**
+ * Returns a [Map] where keys are elements from the given array and values are
+ * produced by the [valueSelector] function applied to each element.
+ * 
+ * If any two elements are equal, the last one gets added to the map.
+ * 
+ * The returned map preserves the entry iteration order of the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.associateWith
+ */
+@SinceKotlin("1.4")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <V> ULongArray.associateWith(valueSelector: (ULong) -> V): Map<ULong, V> {
+    val result = LinkedHashMap<ULong, V>(mapCapacity(size).coerceAtLeast(16))
+    return associateWithTo(result, valueSelector)
+}
+
+/**
+ * Returns a [Map] where keys are elements from the given array and values are
+ * produced by the [valueSelector] function applied to each element.
+ * 
+ * If any two elements are equal, the last one gets added to the map.
+ * 
+ * The returned map preserves the entry iteration order of the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.associateWith
+ */
+@SinceKotlin("1.4")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <V> UByteArray.associateWith(valueSelector: (UByte) -> V): Map<UByte, V> {
+    val result = LinkedHashMap<UByte, V>(mapCapacity(size).coerceAtLeast(16))
+    return associateWithTo(result, valueSelector)
+}
+
+/**
+ * Returns a [Map] where keys are elements from the given array and values are
+ * produced by the [valueSelector] function applied to each element.
+ * 
+ * If any two elements are equal, the last one gets added to the map.
+ * 
+ * The returned map preserves the entry iteration order of the original array.
+ * 
+ * @sample samples.collections.Collections.Transformations.associateWith
+ */
+@SinceKotlin("1.4")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <V> UShortArray.associateWith(valueSelector: (UShort) -> V): Map<UShort, V> {
+    val result = LinkedHashMap<UShort, V>(mapCapacity(size).coerceAtLeast(16))
+    return associateWithTo(result, valueSelector)
+}
+
+/**
+ * Populates and returns the [destination] mutable map with key-value pairs for each element of the given array,
+ * where key is the element itself and value is provided by the [valueSelector] function applied to that key.
+ * 
+ * If any two elements are equal, the last one overwrites the former value in the map.
+ * 
+ * @sample samples.collections.Collections.Transformations.associateWithTo
+ */
+@SinceKotlin("1.4")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <V, M : MutableMap<in UInt, in V>> UIntArray.associateWithTo(destination: M, valueSelector: (UInt) -> V): M {
+    for (element in this) {
+        destination.put(element, valueSelector(element))
+    }
+    return destination
+}
+
+/**
+ * Populates and returns the [destination] mutable map with key-value pairs for each element of the given array,
+ * where key is the element itself and value is provided by the [valueSelector] function applied to that key.
+ * 
+ * If any two elements are equal, the last one overwrites the former value in the map.
+ * 
+ * @sample samples.collections.Collections.Transformations.associateWithTo
+ */
+@SinceKotlin("1.4")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <V, M : MutableMap<in ULong, in V>> ULongArray.associateWithTo(destination: M, valueSelector: (ULong) -> V): M {
+    for (element in this) {
+        destination.put(element, valueSelector(element))
+    }
+    return destination
+}
+
+/**
+ * Populates and returns the [destination] mutable map with key-value pairs for each element of the given array,
+ * where key is the element itself and value is provided by the [valueSelector] function applied to that key.
+ * 
+ * If any two elements are equal, the last one overwrites the former value in the map.
+ * 
+ * @sample samples.collections.Collections.Transformations.associateWithTo
+ */
+@SinceKotlin("1.4")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <V, M : MutableMap<in UByte, in V>> UByteArray.associateWithTo(destination: M, valueSelector: (UByte) -> V): M {
+    for (element in this) {
+        destination.put(element, valueSelector(element))
+    }
+    return destination
+}
+
+/**
+ * Populates and returns the [destination] mutable map with key-value pairs for each element of the given array,
+ * where key is the element itself and value is provided by the [valueSelector] function applied to that key.
+ * 
+ * If any two elements are equal, the last one overwrites the former value in the map.
+ * 
+ * @sample samples.collections.Collections.Transformations.associateWithTo
+ */
+@SinceKotlin("1.4")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <V, M : MutableMap<in UShort, in V>> UShortArray.associateWithTo(destination: M, valueSelector: (UShort) -> V): M {
+    for (element in this) {
+        destination.put(element, valueSelector(element))
+    }
+    return destination
 }
 
 /**
@@ -4691,7 +5299,12 @@ public inline fun UShortArray.count(predicate: (UShort) -> Boolean): Int {
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with [initial] value and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4703,7 +5316,12 @@ public inline fun <R> UIntArray.fold(initial: R, operation: (acc: R, UInt) -> R)
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with [initial] value and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4715,7 +5333,12 @@ public inline fun <R> ULongArray.fold(initial: R, operation: (acc: R, ULong) -> 
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with [initial] value and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4727,7 +5350,12 @@ public inline fun <R> UByteArray.fold(initial: R, operation: (acc: R, UByte) -> 
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with [initial] value and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4741,6 +5369,9 @@ public inline fun <R> UShortArray.fold(initial: R, operation: (acc: R, UShort) -
 /**
  * Accumulates value starting with [initial] value and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original array.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
  * @param [operation] function that takes the index of an element, current accumulator value
  * and the element itself, and calculates the next accumulator value.
  */
@@ -4757,6 +5388,9 @@ public inline fun <R> UIntArray.foldIndexed(initial: R, operation: (index: Int, 
 /**
  * Accumulates value starting with [initial] value and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original array.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
  * @param [operation] function that takes the index of an element, current accumulator value
  * and the element itself, and calculates the next accumulator value.
  */
@@ -4773,6 +5407,9 @@ public inline fun <R> ULongArray.foldIndexed(initial: R, operation: (index: Int,
 /**
  * Accumulates value starting with [initial] value and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original array.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
  * @param [operation] function that takes the index of an element, current accumulator value
  * and the element itself, and calculates the next accumulator value.
  */
@@ -4789,6 +5426,9 @@ public inline fun <R> UByteArray.foldIndexed(initial: R, operation: (index: Int,
 /**
  * Accumulates value starting with [initial] value and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original array.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
  * @param [operation] function that takes the index of an element, current accumulator value
  * and the element itself, and calculates the next accumulator value.
  */
@@ -4803,7 +5443,12 @@ public inline fun <R> UShortArray.foldIndexed(initial: R, operation: (index: Int
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with [initial] value and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value, and calculates the next accumulator value.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4818,7 +5463,12 @@ public inline fun <R> UIntArray.foldRight(initial: R, operation: (UInt, acc: R) 
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with [initial] value and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value, and calculates the next accumulator value.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4833,7 +5483,12 @@ public inline fun <R> ULongArray.foldRight(initial: R, operation: (ULong, acc: R
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with [initial] value and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value, and calculates the next accumulator value.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4848,7 +5503,12 @@ public inline fun <R> UByteArray.foldRight(initial: R, operation: (UByte, acc: R
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with [initial] value and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value, and calculates the next accumulator value.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4865,6 +5525,9 @@ public inline fun <R> UShortArray.foldRight(initial: R, operation: (UShort, acc:
 /**
  * Accumulates value starting with [initial] value and applying [operation] from right to left
  * to each element with its index in the original array and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
  * @param [operation] function that takes the index of an element, the element itself
  * and current accumulator value, and calculates the next accumulator value.
  */
@@ -4884,6 +5547,9 @@ public inline fun <R> UIntArray.foldRightIndexed(initial: R, operation: (index: 
 /**
  * Accumulates value starting with [initial] value and applying [operation] from right to left
  * to each element with its index in the original array and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
  * @param [operation] function that takes the index of an element, the element itself
  * and current accumulator value, and calculates the next accumulator value.
  */
@@ -4903,6 +5569,9 @@ public inline fun <R> ULongArray.foldRightIndexed(initial: R, operation: (index:
 /**
  * Accumulates value starting with [initial] value and applying [operation] from right to left
  * to each element with its index in the original array and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
  * @param [operation] function that takes the index of an element, the element itself
  * and current accumulator value, and calculates the next accumulator value.
  */
@@ -4922,6 +5591,9 @@ public inline fun <R> UByteArray.foldRightIndexed(initial: R, operation: (index:
 /**
  * Accumulates value starting with [initial] value and applying [operation] from right to left
  * to each element with its index in the original array and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the array is empty.
+ * 
  * @param [operation] function that takes the index of an element, the element itself
  * and current accumulator value, and calculates the next accumulator value.
  */
@@ -4981,7 +5653,7 @@ public inline fun UShortArray.forEach(action: (UShort) -> Unit): Unit {
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -4994,7 +5666,7 @@ public inline fun UIntArray.forEachIndexed(action: (index: Int, UInt) -> Unit): 
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -5007,7 +5679,7 @@ public inline fun ULongArray.forEachIndexed(action: (index: Int, ULong) -> Unit)
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -5020,7 +5692,7 @@ public inline fun UByteArray.forEachIndexed(action: (index: Int, UByte) -> Unit)
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.3")
 @ExperimentalUnsignedTypes
@@ -5571,7 +6243,106 @@ public inline fun UShortArray.none(predicate: (UShort) -> Boolean): Boolean {
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element.
+ * Performs the given [action] on each element and returns the array itself afterwards.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.onEach(action: (UInt) -> Unit): UIntArray {
+    return apply { for (element in this) action(element) }
+}
+
+/**
+ * Performs the given [action] on each element and returns the array itself afterwards.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.onEach(action: (ULong) -> Unit): ULongArray {
+    return apply { for (element in this) action(element) }
+}
+
+/**
+ * Performs the given [action] on each element and returns the array itself afterwards.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.onEach(action: (UByte) -> Unit): UByteArray {
+    return apply { for (element in this) action(element) }
+}
+
+/**
+ * Performs the given [action] on each element and returns the array itself afterwards.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.onEach(action: (UShort) -> Unit): UShortArray {
+    return apply { for (element in this) action(element) }
+}
+
+/**
+ * Performs the given [action] on each element, providing sequential index with the element,
+ * and returns the array itself afterwards.
+ * @param [action] function that takes the index of an element and the element itself
+ * and performs the action on the element.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.onEachIndexed(action: (index: Int, UInt) -> Unit): UIntArray {
+    return apply { forEachIndexed(action) }
+}
+
+/**
+ * Performs the given [action] on each element, providing sequential index with the element,
+ * and returns the array itself afterwards.
+ * @param [action] function that takes the index of an element and the element itself
+ * and performs the action on the element.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.onEachIndexed(action: (index: Int, ULong) -> Unit): ULongArray {
+    return apply { forEachIndexed(action) }
+}
+
+/**
+ * Performs the given [action] on each element, providing sequential index with the element,
+ * and returns the array itself afterwards.
+ * @param [action] function that takes the index of an element and the element itself
+ * and performs the action on the element.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.onEachIndexed(action: (index: Int, UByte) -> Unit): UByteArray {
+    return apply { forEachIndexed(action) }
+}
+
+/**
+ * Performs the given [action] on each element, providing sequential index with the element,
+ * and returns the array itself afterwards.
+ * @param [action] function that takes the index of an element and the element itself
+ * and performs the action on the element.
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.onEachIndexed(action: (index: Int, UShort) -> Unit): UShortArray {
+    return apply { forEachIndexed(action) }
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -5589,7 +6360,14 @@ public inline fun UIntArray.reduce(operation: (acc: UInt, UInt) -> UInt): UInt {
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -5607,7 +6385,14 @@ public inline fun ULongArray.reduce(operation: (acc: ULong, ULong) -> ULong): UL
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -5625,7 +6410,14 @@ public inline fun UByteArray.reduce(operation: (acc: UByte, UByte) -> UByte): UB
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -5645,8 +6437,12 @@ public inline fun UShortArray.reduce(operation: (acc: UShort, UShort) -> UShort)
 /**
  * Accumulates value starting with the first element and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original array.
- * @param [operation] function that takes the index of an element, current accumulator value
- * and the element itself and calculates the next accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -5666,8 +6462,12 @@ public inline fun UIntArray.reduceIndexed(operation: (index: Int, acc: UInt, UIn
 /**
  * Accumulates value starting with the first element and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original array.
- * @param [operation] function that takes the index of an element, current accumulator value
- * and the element itself and calculates the next accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -5687,8 +6487,12 @@ public inline fun ULongArray.reduceIndexed(operation: (index: Int, acc: ULong, U
 /**
  * Accumulates value starting with the first element and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original array.
- * @param [operation] function that takes the index of an element, current accumulator value
- * and the element itself and calculates the next accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -5708,8 +6512,12 @@ public inline fun UByteArray.reduceIndexed(operation: (index: Int, acc: UByte, U
 /**
  * Accumulates value starting with the first element and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original array.
- * @param [operation] function that takes the index of an element, current accumulator value
- * and the element itself and calculates the next accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -5727,7 +6535,109 @@ public inline fun UShortArray.reduceIndexed(operation: (index: Int, acc: UShort,
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element. Returns null if the array is empty.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element with its index in the original array.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceOrNull
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.reduceIndexedOrNull(operation: (index: Int, acc: UInt, UInt) -> UInt): UInt? {
+    if (isEmpty())
+        return null
+    var accumulator = this[0]
+    for (index in 1..lastIndex) {
+        accumulator = operation(index, accumulator, this[index])
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element with its index in the original array.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceOrNull
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.reduceIndexedOrNull(operation: (index: Int, acc: ULong, ULong) -> ULong): ULong? {
+    if (isEmpty())
+        return null
+    var accumulator = this[0]
+    for (index in 1..lastIndex) {
+        accumulator = operation(index, accumulator, this[index])
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element with its index in the original array.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceOrNull
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.reduceIndexedOrNull(operation: (index: Int, acc: UByte, UByte) -> UByte): UByte? {
+    if (isEmpty())
+        return null
+    var accumulator = this[0]
+    for (index in 1..lastIndex) {
+        accumulator = operation(index, accumulator, this[index])
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element with its index in the original array.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceOrNull
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.reduceIndexedOrNull(operation: (index: Int, acc: UShort, UShort) -> UShort): UShort? {
+    if (isEmpty())
+        return null
+    var accumulator = this[0]
+    for (index in 1..lastIndex) {
+        accumulator = operation(index, accumulator, this[index])
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceOrNull
  */
@@ -5746,7 +6656,13 @@ public inline fun UIntArray.reduceOrNull(operation: (acc: UInt, UInt) -> UInt): 
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element. Returns null if the array is empty.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceOrNull
  */
@@ -5765,7 +6681,13 @@ public inline fun ULongArray.reduceOrNull(operation: (acc: ULong, ULong) -> ULon
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element. Returns null if the array is empty.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceOrNull
  */
@@ -5784,7 +6706,13 @@ public inline fun UByteArray.reduceOrNull(operation: (acc: UByte, UByte) -> UByt
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element. Returns null if the array is empty.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceOrNull
  */
@@ -5803,7 +6731,14 @@ public inline fun UShortArray.reduceOrNull(operation: (acc: UShort, UShort) -> U
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceRightOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -5821,7 +6756,14 @@ public inline fun UIntArray.reduceRight(operation: (UInt, acc: UInt) -> UInt): U
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceRightOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -5839,7 +6781,14 @@ public inline fun ULongArray.reduceRight(operation: (ULong, acc: ULong) -> ULong
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceRightOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -5857,7 +6806,14 @@ public inline fun UByteArray.reduceRight(operation: (UByte, acc: UByte) -> UByte
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceRightOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -5875,10 +6831,14 @@ public inline fun UShortArray.reduceRight(operation: (UShort, acc: UShort) -> US
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left
+ * Accumulates value starting with the last element and applying [operation] from right to left
  * to each element with its index in the original array and current accumulator value.
- * @param [operation] function that takes the index of an element, the element itself
- * and current accumulator value, and calculates the next accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceRightIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -5897,10 +6857,14 @@ public inline fun UIntArray.reduceRightIndexed(operation: (index: Int, UInt, acc
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left
+ * Accumulates value starting with the last element and applying [operation] from right to left
  * to each element with its index in the original array and current accumulator value.
- * @param [operation] function that takes the index of an element, the element itself
- * and current accumulator value, and calculates the next accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceRightIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -5919,10 +6883,14 @@ public inline fun ULongArray.reduceRightIndexed(operation: (index: Int, ULong, a
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left
+ * Accumulates value starting with the last element and applying [operation] from right to left
  * to each element with its index in the original array and current accumulator value.
- * @param [operation] function that takes the index of an element, the element itself
- * and current accumulator value, and calculates the next accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceRightIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -5941,10 +6909,14 @@ public inline fun UByteArray.reduceRightIndexed(operation: (index: Int, UByte, a
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left
+ * Accumulates value starting with the last element and applying [operation] from right to left
  * to each element with its index in the original array and current accumulator value.
- * @param [operation] function that takes the index of an element, the element itself
- * and current accumulator value, and calculates the next accumulator value.
+ * 
+ * Throws an exception if this array is empty. If the array can be empty in an expected way,
+ * please use [reduceRightIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -5963,7 +6935,113 @@ public inline fun UShortArray.reduceRightIndexed(operation: (index: Int, UShort,
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value. Returns null if the array is empty.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element with its index in the original array and current accumulator value.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.reduceRightIndexedOrNull(operation: (index: Int, UInt, acc: UInt) -> UInt): UInt? {
+    var index = lastIndex
+    if (index < 0) return null
+    var accumulator = get(index--)
+    while (index >= 0) {
+        accumulator = operation(index, get(index), accumulator)
+        --index
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element with its index in the original array and current accumulator value.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.reduceRightIndexedOrNull(operation: (index: Int, ULong, acc: ULong) -> ULong): ULong? {
+    var index = lastIndex
+    if (index < 0) return null
+    var accumulator = get(index--)
+    while (index >= 0) {
+        accumulator = operation(index, get(index), accumulator)
+        --index
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element with its index in the original array and current accumulator value.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.reduceRightIndexedOrNull(operation: (index: Int, UByte, acc: UByte) -> UByte): UByte? {
+    var index = lastIndex
+    if (index < 0) return null
+    var accumulator = get(index--)
+    while (index >= 0) {
+        accumulator = operation(index, get(index), accumulator)
+        --index
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element with its index in the original array and current accumulator value.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.reduceRightIndexedOrNull(operation: (index: Int, UShort, acc: UShort) -> UShort): UShort? {
+    var index = lastIndex
+    if (index < 0) return null
+    var accumulator = get(index--)
+    while (index >= 0) {
+        accumulator = operation(index, get(index), accumulator)
+        --index
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
  */
@@ -5982,7 +7060,13 @@ public inline fun UIntArray.reduceRightOrNull(operation: (UInt, acc: UInt) -> UI
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value. Returns null if the array is empty.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
  */
@@ -6001,7 +7085,13 @@ public inline fun ULongArray.reduceRightOrNull(operation: (ULong, acc: ULong) ->
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value. Returns null if the array is empty.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
  */
@@ -6020,7 +7110,13 @@ public inline fun UByteArray.reduceRightOrNull(operation: (UByte, acc: UByte) ->
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value. Returns null if the array is empty.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns `null` if the array is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
  */
@@ -6036,6 +7132,642 @@ public inline fun UShortArray.reduceRightOrNull(operation: (UShort, acc: UShort)
         accumulator = operation(get(index--), accumulator)
     }
     return accumulator
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UIntArray.runningFold(initial: R, operation: (acc: R, UInt) -> R): List<R> {
+    if (isEmpty()) return listOf(initial)
+    val result = ArrayList<R>(size + 1).apply { add(initial) }
+    var accumulator = initial
+    for (element in this) {
+        accumulator = operation(accumulator, element)
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> ULongArray.runningFold(initial: R, operation: (acc: R, ULong) -> R): List<R> {
+    if (isEmpty()) return listOf(initial)
+    val result = ArrayList<R>(size + 1).apply { add(initial) }
+    var accumulator = initial
+    for (element in this) {
+        accumulator = operation(accumulator, element)
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UByteArray.runningFold(initial: R, operation: (acc: R, UByte) -> R): List<R> {
+    if (isEmpty()) return listOf(initial)
+    val result = ArrayList<R>(size + 1).apply { add(initial) }
+    var accumulator = initial
+    for (element in this) {
+        accumulator = operation(accumulator, element)
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UShortArray.runningFold(initial: R, operation: (acc: R, UShort) -> R): List<R> {
+    if (isEmpty()) return listOf(initial)
+    val result = ArrayList<R>(size + 1).apply { add(initial) }
+    var accumulator = initial
+    for (element in this) {
+        accumulator = operation(accumulator, element)
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UIntArray.runningFoldIndexed(initial: R, operation: (index: Int, acc: R, UInt) -> R): List<R> {
+    if (isEmpty()) return listOf(initial)
+    val result = ArrayList<R>(size + 1).apply { add(initial) }
+    var accumulator = initial
+    for (index in indices) {
+        accumulator = operation(index, accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> ULongArray.runningFoldIndexed(initial: R, operation: (index: Int, acc: R, ULong) -> R): List<R> {
+    if (isEmpty()) return listOf(initial)
+    val result = ArrayList<R>(size + 1).apply { add(initial) }
+    var accumulator = initial
+    for (index in indices) {
+        accumulator = operation(index, accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UByteArray.runningFoldIndexed(initial: R, operation: (index: Int, acc: R, UByte) -> R): List<R> {
+    if (isEmpty()) return listOf(initial)
+    val result = ArrayList<R>(size + 1).apply { add(initial) }
+    var accumulator = initial
+    for (index in indices) {
+        accumulator = operation(index, accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UShortArray.runningFoldIndexed(initial: R, operation: (index: Int, acc: R, UShort) -> R): List<R> {
+    if (isEmpty()) return listOf(initial)
+    val result = ArrayList<R>(size + 1).apply { add(initial) }
+    var accumulator = initial
+    for (index in indices) {
+        accumulator = operation(index, accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with the first element of this array.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.runningReduce(operation: (acc: UInt, UInt) -> UInt): List<UInt> {
+    if (isEmpty()) return emptyList()
+    var accumulator = this[0]
+    val result = ArrayList<UInt>(size).apply { add(accumulator) }
+    for (index in 1 until size) {
+        accumulator = operation(accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with the first element of this array.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.runningReduce(operation: (acc: ULong, ULong) -> ULong): List<ULong> {
+    if (isEmpty()) return emptyList()
+    var accumulator = this[0]
+    val result = ArrayList<ULong>(size).apply { add(accumulator) }
+    for (index in 1 until size) {
+        accumulator = operation(accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with the first element of this array.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.runningReduce(operation: (acc: UByte, UByte) -> UByte): List<UByte> {
+    if (isEmpty()) return emptyList()
+    var accumulator = this[0]
+    val result = ArrayList<UByte>(size).apply { add(accumulator) }
+    for (index in 1 until size) {
+        accumulator = operation(accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with the first element of this array.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.runningReduce(operation: (acc: UShort, UShort) -> UShort): List<UShort> {
+    if (isEmpty()) return emptyList()
+    var accumulator = this[0]
+    val result = ArrayList<UShort>(size).apply { add(accumulator) }
+    for (index in 1 until size) {
+        accumulator = operation(accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with the first element of this array.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.runningReduceIndexed(operation: (index: Int, acc: UInt, UInt) -> UInt): List<UInt> {
+    if (isEmpty()) return emptyList()
+    var accumulator = this[0]
+    val result = ArrayList<UInt>(size).apply { add(accumulator) }
+    for (index in 1 until size) {
+        accumulator = operation(index, accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with the first element of this array.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.runningReduceIndexed(operation: (index: Int, acc: ULong, ULong) -> ULong): List<ULong> {
+    if (isEmpty()) return emptyList()
+    var accumulator = this[0]
+    val result = ArrayList<ULong>(size).apply { add(accumulator) }
+    for (index in 1 until size) {
+        accumulator = operation(index, accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with the first element of this array.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.runningReduceIndexed(operation: (index: Int, acc: UByte, UByte) -> UByte): List<UByte> {
+    if (isEmpty()) return emptyList()
+    var accumulator = this[0]
+    val result = ArrayList<UByte>(size).apply { add(accumulator) }
+    for (index in 1 until size) {
+        accumulator = operation(index, accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with the first element of this array.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.runningReduceIndexed(operation: (index: Int, acc: UShort, UShort) -> UShort): List<UShort> {
+    if (isEmpty()) return emptyList()
+    var accumulator = this[0]
+    val result = ArrayList<UShort>(size).apply { add(accumulator) }
+    for (index in 1 until size) {
+        accumulator = operation(index, accumulator, this[index])
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UIntArray.scan(initial: R, operation: (acc: R, UInt) -> R): List<R> {
+    return runningFold(initial, operation)
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> ULongArray.scan(initial: R, operation: (acc: R, ULong) -> R): List<R> {
+    return runningFold(initial, operation)
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UByteArray.scan(initial: R, operation: (acc: R, UByte) -> R): List<R> {
+    return runningFold(initial, operation)
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UShortArray.scan(initial: R, operation: (acc: R, UShort) -> R): List<R> {
+    return runningFold(initial, operation)
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UIntArray.scanIndexed(initial: R, operation: (index: Int, acc: R, UInt) -> R): List<R> {
+    return runningFoldIndexed(initial, operation)
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> ULongArray.scanIndexed(initial: R, operation: (index: Int, acc: R, ULong) -> R): List<R> {
+    return runningFoldIndexed(initial, operation)
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UByteArray.scanIndexed(initial: R, operation: (index: Int, acc: R, UByte) -> R): List<R> {
+    return runningFoldIndexed(initial, operation)
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original array and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun <R> UShortArray.scanIndexed(initial: R, operation: (index: Int, acc: R, UShort) -> R): List<R> {
+    return runningFoldIndexed(initial, operation)
+}
+
+@Deprecated("Use runningReduce instead.", ReplaceWith("runningReduce(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.scanReduce(operation: (acc: UInt, UInt) -> UInt): List<UInt> {
+    return runningReduce(operation)
+}
+
+@Deprecated("Use runningReduce instead.", ReplaceWith("runningReduce(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.scanReduce(operation: (acc: ULong, ULong) -> ULong): List<ULong> {
+    return runningReduce(operation)
+}
+
+@Deprecated("Use runningReduce instead.", ReplaceWith("runningReduce(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.scanReduce(operation: (acc: UByte, UByte) -> UByte): List<UByte> {
+    return runningReduce(operation)
+}
+
+@Deprecated("Use runningReduce instead.", ReplaceWith("runningReduce(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.scanReduce(operation: (acc: UShort, UShort) -> UShort): List<UShort> {
+    return runningReduce(operation)
+}
+
+@Deprecated("Use runningReduceIndexed instead.", ReplaceWith("runningReduceIndexed(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UIntArray.scanReduceIndexed(operation: (index: Int, acc: UInt, UInt) -> UInt): List<UInt> {
+    return runningReduceIndexed(operation)
+}
+
+@Deprecated("Use runningReduceIndexed instead.", ReplaceWith("runningReduceIndexed(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun ULongArray.scanReduceIndexed(operation: (index: Int, acc: ULong, ULong) -> ULong): List<ULong> {
+    return runningReduceIndexed(operation)
+}
+
+@Deprecated("Use runningReduceIndexed instead.", ReplaceWith("runningReduceIndexed(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UByteArray.scanReduceIndexed(operation: (index: Int, acc: UByte, UByte) -> UByte): List<UByte> {
+    return runningReduceIndexed(operation)
+}
+
+@Deprecated("Use runningReduceIndexed instead.", ReplaceWith("runningReduceIndexed(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+@ExperimentalUnsignedTypes
+@kotlin.internal.InlineOnly
+public inline fun UShortArray.scanReduceIndexed(operation: (index: Int, acc: UShort, UShort) -> UShort): List<UShort> {
+    return runningReduceIndexed(operation)
 }
 
 /**

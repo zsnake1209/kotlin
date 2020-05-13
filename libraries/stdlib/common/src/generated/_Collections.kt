@@ -699,6 +699,8 @@ public inline fun <T> Iterable<T>.dropWhile(predicate: (T) -> Boolean): List<T> 
 
 /**
  * Returns a list containing only elements matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 public inline fun <T> Iterable<T>.filter(predicate: (T) -> Boolean): List<T> {
     return filterTo(ArrayList<T>(), predicate)
@@ -742,6 +744,8 @@ public inline fun <reified R, C : MutableCollection<in R>> Iterable<*>.filterIsI
 
 /**
  * Returns a list containing all elements not matching the given [predicate].
+ * 
+ * @sample samples.collections.Collections.Filtering.filter
  */
 public inline fun <T> Iterable<T>.filterNot(predicate: (T) -> Boolean): List<T> {
     return filterNotTo(ArrayList<T>(), predicate)
@@ -749,6 +753,8 @@ public inline fun <T> Iterable<T>.filterNot(predicate: (T) -> Boolean): List<T> 
 
 /**
  * Returns a list containing all elements that are not `null`.
+ * 
+ * @sample samples.collections.Collections.Filtering.filterNotNull
  */
 public fun <T : Any> Iterable<T?>.filterNotNull(): List<T> {
     return filterNotNullTo(ArrayList<T>())
@@ -898,6 +904,19 @@ public fun <T> Iterable<T>.reversed(): List<T> {
     val list = toMutableList()
     list.reverse()
     return list
+}
+
+/**
+ * Randomly shuffles elements in this list in-place using the specified [random] instance as the source of randomness.
+ * 
+ * See: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+ */
+@SinceKotlin("1.3")
+public fun <T> MutableList<T>.shuffle(random: Random): Unit {
+    for (i in lastIndex downTo 1) {
+        val j = random.nextInt(i + 1)
+        this[j] = this.set(i, this[j])
+    }
 }
 
 /**
@@ -1204,7 +1223,7 @@ public fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(destination
 }
 
 /**
- * Returns a [HashSet] of all elements.
+ * Returns a new [HashSet] of all elements.
  */
 public fun <T> Iterable<T>.toHashSet(): HashSet<T> {
     return toCollection(HashSet<T>(mapCapacity(collectionSizeOrDefault(12))))
@@ -1225,7 +1244,7 @@ public fun <T> Iterable<T>.toList(): List<T> {
 }
 
 /**
- * Returns a [MutableList] filled with all elements of this collection.
+ * Returns a new [MutableList] filled with all elements of this collection.
  */
 public fun <T> Iterable<T>.toMutableList(): MutableList<T> {
     if (this is Collection<T>)
@@ -1234,7 +1253,7 @@ public fun <T> Iterable<T>.toMutableList(): MutableList<T> {
 }
 
 /**
- * Returns a [MutableList] filled with all elements of this collection.
+ * Returns a new [MutableList] filled with all elements of this collection.
  */
 public fun <T> Collection<T>.toMutableList(): MutableList<T> {
     return ArrayList(this)
@@ -1442,6 +1461,7 @@ public fun <T> Iterable<T>.withIndex(): Iterable<IndexedValue<T>> {
 /**
  * Returns a list containing only distinct elements from the given collection.
  * 
+ * Among equal elements of the given collection, only the first one will be present in the resulting list.
  * The elements in the resulting list are in the same order as they were in the source collection.
  * 
  * @sample samples.collections.Collections.Transformations.distinctAndDistinctBy
@@ -1454,6 +1474,7 @@ public fun <T> Iterable<T>.distinct(): List<T> {
  * Returns a list containing only elements from the given collection
  * having distinct keys returned by the given [selector] function.
  * 
+ * Among elements of the given collection with equal keys, only the first one will be present in the resulting list.
  * The elements in the resulting list are in the same order as they were in the source collection.
  * 
  * @sample samples.collections.Collections.Transformations.distinctAndDistinctBy
@@ -1494,7 +1515,7 @@ public infix fun <T> Iterable<T>.subtract(other: Iterable<T>): Set<T> {
 }
 
 /**
- * Returns a mutable set containing all distinct elements from the given collection.
+ * Returns a new [MutableSet] containing all distinct elements from the given collection.
  * 
  * The returned set preserves the element iteration order of the original collection.
  */
@@ -1581,7 +1602,12 @@ public inline fun <T> Iterable<T>.count(predicate: (T) -> Boolean): Int {
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from left to right to current accumulator value and each element.
+ * Accumulates value starting with [initial] value and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns the specified [initial] value if the collection is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
  */
 public inline fun <T, R> Iterable<T>.fold(initial: R, operation: (acc: R, T) -> R): R {
     var accumulator = initial
@@ -1592,6 +1618,9 @@ public inline fun <T, R> Iterable<T>.fold(initial: R, operation: (acc: R, T) -> 
 /**
  * Accumulates value starting with [initial] value and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original collection.
+ * 
+ * Returns the specified [initial] value if the collection is empty.
+ * 
  * @param [operation] function that takes the index of an element, current accumulator value
  * and the element itself, and calculates the next accumulator value.
  */
@@ -1603,7 +1632,12 @@ public inline fun <T, R> Iterable<T>.foldIndexed(initial: R, operation: (index: 
 }
 
 /**
- * Accumulates value starting with [initial] value and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with [initial] value and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the list is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value, and calculates the next accumulator value.
  */
 public inline fun <T, R> List<T>.foldRight(initial: R, operation: (T, acc: R) -> R): R {
     var accumulator = initial
@@ -1619,6 +1653,9 @@ public inline fun <T, R> List<T>.foldRight(initial: R, operation: (T, acc: R) ->
 /**
  * Accumulates value starting with [initial] value and applying [operation] from right to left
  * to each element with its index in the original list and current accumulator value.
+ * 
+ * Returns the specified [initial] value if the list is empty.
+ * 
  * @param [operation] function that takes the index of an element, the element itself
  * and current accumulator value, and calculates the next accumulator value.
  */
@@ -1645,7 +1682,7 @@ public inline fun <T> Iterable<T>.forEach(action: (T) -> Unit): Unit {
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun <T> Iterable<T>.forEachIndexed(action: (index: Int, T) -> Unit): Unit {
     var index = 0
@@ -1858,7 +1895,25 @@ public inline fun <T, C : Iterable<T>> C.onEach(action: (T) -> Unit): C {
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element.
+ * Performs the given [action] on each element, providing sequential index with the element,
+ * and returns the collection itself afterwards.
+ * @param [action] function that takes the index of an element and the element itself
+ * and performs the action on the element.
+ */
+@SinceKotlin("1.4")
+public inline fun <T, C : Iterable<T>> C.onEachIndexed(action: (index: Int, T) -> Unit): C {
+    return apply { forEachIndexed(action) }
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Throws an exception if this collection is empty. If the collection can be empty in an expected way,
+ * please use [reduceOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -1875,8 +1930,12 @@ public inline fun <S, T : S> Iterable<T>.reduce(operation: (acc: S, T) -> S): S 
 /**
  * Accumulates value starting with the first element and applying [operation] from left to right
  * to current accumulator value and each element with its index in the original collection.
- * @param [operation] function that takes the index of an element, current accumulator value
- * and the element itself and calculates the next accumulator value.
+ * 
+ * Throws an exception if this collection is empty. If the collection can be empty in an expected way,
+ * please use [reduceIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduce
  */
@@ -1892,7 +1951,36 @@ public inline fun <S, T : S> Iterable<T>.reduceIndexed(operation: (index: Int, a
 }
 
 /**
- * Accumulates value starting with the first element and applying [operation] from left to right to current accumulator value and each element. Returns null if the collection is empty.
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element with its index in the original collection.
+ * 
+ * Returns `null` if the collection is empty.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value and the element itself,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceOrNull
+ */
+@SinceKotlin("1.4")
+public inline fun <S, T : S> Iterable<T>.reduceIndexedOrNull(operation: (index: Int, acc: S, T) -> S): S? {
+    val iterator = this.iterator()
+    if (!iterator.hasNext()) return null
+    var index = 1
+    var accumulator: S = iterator.next()
+    while (iterator.hasNext()) {
+        accumulator = operation(checkIndexOverflow(index++), accumulator, iterator.next())
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the first element and applying [operation] from left to right
+ * to current accumulator value and each element.
+ * 
+ * Returns `null` if the collection is empty.
+ * 
+ * @param [operation] function that takes current accumulator value and an element,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceOrNull
  */
@@ -1909,7 +1997,14 @@ public inline fun <S, T : S> Iterable<T>.reduceOrNull(operation: (acc: S, T) -> 
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Throws an exception if this list is empty. If the list can be empty in an expected way,
+ * please use [reduceRightOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -1925,10 +2020,14 @@ public inline fun <S, T : S> List<T>.reduceRight(operation: (T, acc: S) -> S): S
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left
+ * Accumulates value starting with the last element and applying [operation] from right to left
  * to each element with its index in the original list and current accumulator value.
- * @param [operation] function that takes the index of an element, the element itself
- * and current accumulator value, and calculates the next accumulator value.
+ * 
+ * Throws an exception if this list is empty. If the list can be empty in an expected way,
+ * please use [reduceRightIndexedOrNull] instead. It returns `null` when its receiver is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRight
  */
@@ -1945,7 +2044,37 @@ public inline fun <S, T : S> List<T>.reduceRightIndexed(operation: (index: Int, 
 }
 
 /**
- * Accumulates value starting with last element and applying [operation] from right to left to each element and current accumulator value. Returns null if the list is empty.
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element with its index in the original list and current accumulator value.
+ * 
+ * Returns `null` if the list is empty.
+ * 
+ * @param [operation] function that takes the index of an element, the element itself and current accumulator value,
+ * and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
+ */
+@SinceKotlin("1.4")
+public inline fun <S, T : S> List<T>.reduceRightIndexedOrNull(operation: (index: Int, T, acc: S) -> S): S? {
+    val iterator = listIterator(size)
+    if (!iterator.hasPrevious())
+        return null
+    var accumulator: S = iterator.previous()
+    while (iterator.hasPrevious()) {
+        val index = iterator.previousIndex()
+        accumulator = operation(index, iterator.previous(), accumulator)
+    }
+    return accumulator
+}
+
+/**
+ * Accumulates value starting with the last element and applying [operation] from right to left
+ * to each element and current accumulator value.
+ * 
+ * Returns `null` if the list is empty.
+ * 
+ * @param [operation] function that takes an element and current accumulator value,
+ * and calculates the next accumulator value.
  * 
  * @sample samples.collections.Collections.Aggregates.reduceRightOrNull
  */
@@ -1960,6 +2089,156 @@ public inline fun <S, T : S> List<T>.reduceRightOrNull(operation: (T, acc: S) ->
         accumulator = operation(iterator.previous(), accumulator)
     }
     return accumulator
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+public inline fun <T, R> Iterable<T>.runningFold(initial: R, operation: (acc: R, T) -> R): List<R> {
+    val estimatedSize = collectionSizeOrDefault(9)
+    if (estimatedSize == 0) return listOf(initial)
+    val result = ArrayList<R>(estimatedSize + 1).apply { add(initial) }
+    var accumulator = initial
+    for (element in this) {
+        accumulator = operation(accumulator, element)
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original collection and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningFold
+ */
+@SinceKotlin("1.4")
+public inline fun <T, R> Iterable<T>.runningFoldIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): List<R> {
+    val estimatedSize = collectionSizeOrDefault(9)
+    if (estimatedSize == 0) return listOf(initial)
+    val result = ArrayList<R>(estimatedSize + 1).apply { add(initial) }
+    var index = 0
+    var accumulator = initial
+    for (element in this) {
+        accumulator = operation(index++, accumulator, element)
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with the first element of this collection.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and the element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public inline fun <S, T : S> Iterable<T>.runningReduce(operation: (acc: S, T) -> S): List<S> {
+    val iterator = this.iterator()
+    if (!iterator.hasNext()) return emptyList()
+    var accumulator: S = iterator.next()
+    val result = ArrayList<S>(collectionSizeOrDefault(10)).apply { add(accumulator) }
+    while (iterator.hasNext()) {
+        accumulator = operation(accumulator, iterator.next())
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original collection and current accumulator value that starts with the first element of this collection.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.runningReduce
+ */
+@SinceKotlin("1.4")
+public inline fun <S, T : S> Iterable<T>.runningReduceIndexed(operation: (index: Int, acc: S, T) -> S): List<S> {
+    val iterator = this.iterator()
+    if (!iterator.hasNext()) return emptyList()
+    var accumulator: S = iterator.next()
+    val result = ArrayList<S>(collectionSizeOrDefault(10)).apply { add(accumulator) }
+    var index = 1
+    while (iterator.hasNext()) {
+        accumulator = operation(index++, accumulator, iterator.next())
+        result.add(accumulator)
+    }
+    return result
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public inline fun <T, R> Iterable<T>.scan(initial: R, operation: (acc: R, T) -> R): List<R> {
+    return runningFold(initial, operation)
+}
+
+/**
+ * Returns a list containing successive accumulation values generated by applying [operation] from left to right
+ * to each element, its index in the original collection and current accumulator value that starts with [initial] value.
+ * 
+ * Note that `acc` value passed to [operation] function should not be mutated;
+ * otherwise it would affect the previous value in resulting list.
+ * 
+ * @param [operation] function that takes the index of an element, current accumulator value
+ * and the element itself, and calculates the next accumulator value.
+ * 
+ * @sample samples.collections.Collections.Aggregates.scan
+ */
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public inline fun <T, R> Iterable<T>.scanIndexed(initial: R, operation: (index: Int, acc: R, T) -> R): List<R> {
+    return runningFoldIndexed(initial, operation)
+}
+
+@Deprecated("Use runningReduce instead.", ReplaceWith("runningReduce(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public inline fun <S, T : S> Iterable<T>.scanReduce(operation: (acc: S, T) -> S): List<S> {
+    return runningReduce(operation)
+}
+
+@Deprecated("Use runningReduceIndexed instead.", ReplaceWith("runningReduceIndexed(operation)"))
+@SinceKotlin("1.3")
+@ExperimentalStdlibApi
+public inline fun <S, T : S> Iterable<T>.scanReduceIndexed(operation: (index: Int, acc: S, T) -> S): List<S> {
+    return runningReduceIndexed(operation)
 }
 
 /**
@@ -2102,6 +2381,8 @@ public inline fun <T> Iterable<T>.minusElement(element: T): List<T> {
  * Splits the original collection into pair of lists,
  * where *first* list contains elements for which [predicate] yielded `true`,
  * while *second* list contains elements for which [predicate] yielded `false`.
+ * 
+ * @sample samples.collections.Iterables.Operations.partition
  */
 public inline fun <T> Iterable<T>.partition(predicate: (T) -> Boolean): Pair<List<T>, List<T>> {
     val first = ArrayList<T>()

@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.gradle.plugin.MULTIPLE_KOTLIN_PLUGINS_SPECIFIC_PROJE
 import org.jetbrains.kotlin.gradle.scripting.internal.ScriptingGradleSubplugin
 import org.jetbrains.kotlin.gradle.tasks.USING_JVM_INCREMENTAL_COMPILATION_MESSAGE
 import org.jetbrains.kotlin.gradle.util.*
+import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.junit.Test
 import java.io.File
 import java.util.zip.ZipFile
@@ -451,18 +452,18 @@ class KotlinGradleIT : BaseGradleIT() {
         }
 
         // check the arguments are always passed if specified explicitly
-        updateBuildGradle("1.0", "1.0")
+        updateBuildGradle("1.2", "1.2")
         project.build("clean", "compileKotlin") {
             assertSuccessful()
-            assertContains("-language-version 1.0")
-            assertContains("-api-version 1.0")
+            assertContains("-language-version 1.2")
+            assertContains("-api-version 1.2")
         }
 
-        updateBuildGradle("1.1", "1.1")
+        updateBuildGradle("1.3", "1.3")
         project.build("clean", "compileKotlin") {
             assertSuccessful()
-            assertContains("-language-version 1.1")
-            assertContains("-api-version 1.1")
+            assertContains("-language-version 1.3")
+            assertContains("-api-version 1.3")
         }
     }
 
@@ -789,7 +790,7 @@ class KotlinGradleIT : BaseGradleIT() {
         val projects = listOf(
             Project("simpleProject"),
             Project("kotlin2JsNoOutputFileProject"),
-            Project("sample-app", directoryPrefix = "new-mpp-lib-and-app")
+            Project("sample-app", GradleVersionRequired.FOR_MPP_SUPPORT, "new-mpp-lib-and-app")
         )
 
         projects.forEach {
@@ -819,7 +820,7 @@ class KotlinGradleIT : BaseGradleIT() {
     }
 
     @Test
-    fun testKt29971() = with(Project("kt-29971", GradleVersionRequired.AtLeast("5.0"))) {
+    fun testKt29971() = with(Project("kt-29971", GradleVersionRequired.FOR_MPP_SUPPORT)) {
         build("jvm-app:build") {
             assertSuccessful()
             assertTasksExecuted(":jvm-app:compileKotlin")
@@ -827,7 +828,7 @@ class KotlinGradleIT : BaseGradleIT() {
     }
 
     @Test
-    fun testDetectingDifferentClassLoaders() = with(Project("kt-27059-pom-rewriting", GradleVersionRequired.AtLeast("4.10.2"))) {
+    fun testDetectingDifferentClassLoaders() = with(Project("kt-27059-pom-rewriting", GradleVersionRequired.FOR_MPP_SUPPORT)) {
         setupWorkingDir()
 
         val originalRootBuildScript = gradleBuildScript().readText()
@@ -893,7 +894,7 @@ class KotlinGradleIT : BaseGradleIT() {
     }
 
     @Test
-    fun testNewModelInOldJvmPlugin() = with(Project("new-model-in-old-plugin", GradleVersionRequired.AtLeast("4.10.2"))) {
+    fun testNewModelInOldJvmPlugin() = with(Project("new-model-in-old-plugin", GradleVersionRequired.AtLeast("5.0"))) {
         setupWorkingDir()
         gradleBuildScript().modify(::transformBuildScriptWithPluginsDsl)
 
@@ -1001,6 +1002,30 @@ class KotlinGradleIT : BaseGradleIT() {
         // KT-31124
         build {
             assertNotContains(ScriptingGradleSubplugin.MISCONFIGURATION_MESSAGE_SUFFIX)
+        }
+    }
+
+    @Test
+    fun testKtKt35942InternalsFromMainInTestViaTransitiveDeps() = with(Project("kt-35942-jvm", GradleVersionRequired.FOR_MPP_SUPPORT)) {
+        build(":lib1:compileTestKotlin") {
+            assertSuccessful()
+            assertTasksExecuted(":lib1:compileKotlin", ":lib2:jar")
+        }
+    }
+
+    @Test
+    fun testKtKt35942InternalsFromMainInTestViaTransitiveDepsAndroid() = with(
+        Project("kt-35942-android", GradleVersionRequired.FOR_MPP_SUPPORT)
+    ) {
+        build(
+            ":lib1:compileDebugUnitTestKotlin",
+            options = defaultBuildOptions().copy(
+                androidGradlePluginVersion = AGPVersion.v3_2_0,
+                androidHome = KotlinTestUtils.findAndroidSdk(),
+            ),
+        ) {
+            assertSuccessful()
+            assertTasksExecuted(":lib1:compileDebugKotlin")
         }
     }
 }

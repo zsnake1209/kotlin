@@ -3,8 +3,8 @@ internal enum class Color : Runnable {
 
     override fun run() {
         println(
-                "name()=" + name +
-                        ", toString()=" + toString()
+            "name()=" + name +
+                    ", toString()=" + toString()
         )
     }
 }

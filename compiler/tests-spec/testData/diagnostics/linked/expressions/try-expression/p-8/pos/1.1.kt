@@ -1,3 +1,4 @@
+// FIR_IDENTICAL
 // !LANGUAGE: +NewInference
 // !DIAGNOSTICS: -ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE -UNUSED_VALUE -UNUSED_EXPRESSION
 // SKIP_TXT
@@ -5,7 +6,7 @@
 /*
  * KOTLIN DIAGNOSTICS SPEC TEST (POSITIVE)
  *
- * SPEC VERSION: 0.1-218
+ * SPEC VERSION: 0.1-296
  * PLACE: expressions, try-expression -> paragraph 8 -> sentence 1
  * RELEVANT PLACES: expressions, try-expression -> paragraph 9 -> sentence 1
  * NUMBER: 1

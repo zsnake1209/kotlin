@@ -8,12 +8,15 @@ package org.jetbrains.kotlin.idea.debugger.test
 import com.intellij.debugger.actions.MethodSmartStepTarget
 import com.intellij.debugger.engine.*
 import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
+import com.intellij.debugger.engine.events.SuspendContextCommandImpl
 import com.intellij.debugger.impl.DebuggerContextImpl
 import com.intellij.debugger.impl.JvmSteppingCommandProvider
 import com.intellij.debugger.impl.PositionUtil
 import com.intellij.execution.process.ProcessOutputTypes
 import com.sun.jdi.request.StepRequest
 import org.jetbrains.kotlin.idea.debugger.stepping.*
+import org.jetbrains.kotlin.idea.debugger.stepping.filter.KotlinOrdinaryMethodFilter
+import org.jetbrains.kotlin.idea.debugger.stepping.filter.KotlinLambdaMethodFilter
 import org.jetbrains.kotlin.idea.debugger.stepping.smartStepInto.KotlinLambdaSmartStepTarget
 import org.jetbrains.kotlin.idea.debugger.stepping.smartStepInto.KotlinMethodSmartStepTarget
 import org.jetbrains.kotlin.idea.debugger.stepping.smartStepInto.KotlinSmartStepIntoHandler
@@ -21,7 +24,6 @@ import org.jetbrains.kotlin.idea.debugger.test.util.SteppingInstruction
 import org.jetbrains.kotlin.idea.debugger.test.util.SteppingInstructionKind
 import org.jetbrains.kotlin.idea.debugger.test.util.renderSourcePosition
 import org.jetbrains.kotlin.idea.util.application.runReadAction
-import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 import org.jetbrains.kotlin.psi.psiUtil.getElementTextWithContext
 import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
 
@@ -149,20 +151,26 @@ abstract class KotlinDescriptorTestCaseWithStepping : KotlinDescriptorTestCase()
         val stepTargets = KotlinSmartStepIntoHandler().findSmartStepTargets(position)
         stepTargets.mapNotNull { stepTarget ->
             when (stepTarget) {
-                is KotlinLambdaSmartStepTarget ->
-                    KotlinLambdaMethodFilter(
-                        stepTarget.getLambda(), stepTarget.getCallingExpressionLines()!!, stepTarget.isInline, stepTarget.isSuspend
-                    )
-                is KotlinMethodSmartStepTarget ->
-                    KotlinBasicStepMethodFilter(
-                        stepTarget.declaration?.createSmartPointer(),
-                        stepTarget.isInvoke,
-                        stepTarget.targetMethodName,
-                        stepTarget.getCallingExpressionLines()!!
-                    )
+                is KotlinLambdaSmartStepTarget -> KotlinLambdaMethodFilter(stepTarget)
+                is KotlinMethodSmartStepTarget -> KotlinOrdinaryMethodFilter(stepTarget)
                 is MethodSmartStepTarget -> BasicStepMethodFilter(stepTarget.method, stepTarget.getCallingExpressionLines())
                 else -> null
             }
+        }
+    }
+
+    protected fun SuspendContextImpl.runActionInSuspendCommand(action: SuspendContextImpl.() -> Unit) {
+        if (myInProgress) {
+            action()
+        } else {
+            val command = object : SuspendContextCommandImpl(this) {
+                override fun contextAction(suspendContext: SuspendContextImpl) {
+                    action(suspendContext)
+                }
+            }
+
+            // Try to execute the action inside a command if we aren't already inside it.
+            debuggerSession.process.managerThread?.invoke(command) ?: command.contextAction(this)
         }
     }
 }

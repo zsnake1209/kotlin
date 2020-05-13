@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.generators.*
@@ -35,7 +36,7 @@ typealias Psi2IrPostprocessingStep = (IrModuleFragment) -> Unit
 class Psi2IrTranslator(
     val languageVersionSettings: LanguageVersionSettings,
     val configuration: Psi2IrConfiguration = Psi2IrConfiguration(),
-    val mangler: KotlinMangler? = null
+    val signaturer: IdSignatureComposer
 ) {
     private val postprocessingSteps = SmartList<Psi2IrPostprocessingStep>()
 
@@ -43,13 +44,15 @@ class Psi2IrTranslator(
         postprocessingSteps.add(step)
     }
 
+    // NOTE: used only for test purpose
     fun generateModule(
         moduleDescriptor: ModuleDescriptor,
         ktFiles: Collection<KtFile>,
         bindingContext: BindingContext,
-        generatorExtensions: GeneratorExtensions
+        generatorExtensions: GeneratorExtensions,
+        nameProvider: NameProvider = NameProvider.DEFAULT
     ): IrModuleFragment {
-        val context = createGeneratorContext(moduleDescriptor, bindingContext, extensions = generatorExtensions)
+        val context = createGeneratorContext(moduleDescriptor, bindingContext, nameProvider, extensions = generatorExtensions)
         val irProviders = generateTypicalIrProviderList(
             moduleDescriptor, context.irBuiltIns, context.symbolTable, extensions = generatorExtensions
         )
@@ -59,10 +62,13 @@ class Psi2IrTranslator(
     fun createGeneratorContext(
         moduleDescriptor: ModuleDescriptor,
         bindingContext: BindingContext,
-        symbolTable: SymbolTable = SymbolTable(mangler),
+        nameProvider: NameProvider = NameProvider.DEFAULT,
+        symbolTable: SymbolTable = SymbolTable(signaturer, nameProvider),
         extensions: GeneratorExtensions = GeneratorExtensions()
     ): GeneratorContext =
-        GeneratorContext(configuration, moduleDescriptor, bindingContext, languageVersionSettings, symbolTable, extensions)
+        createGeneratorContext(
+            configuration, moduleDescriptor, bindingContext, languageVersionSettings, symbolTable, extensions
+        )
 
     fun generateModuleFragment(
         context: GeneratorContext,
@@ -73,24 +79,28 @@ class Psi2IrTranslator(
         val moduleGenerator = ModuleGenerator(context)
         val irModule = moduleGenerator.generateModuleFragmentWithoutDependencies(ktFiles)
 
-        expectDescriptorToSymbol ?. let { referenceExpectsForUsedActuals(it, context.symbolTable, irModule) }
         irModule.patchDeclarationParents()
+        expectDescriptorToSymbol?.let { referenceExpectsForUsedActuals(it, context.symbolTable, irModule) }
         postprocess(context, irModule)
-        // do not generate unbound symbols before postprocessing,
-        // since plugins must work with non-lazy IR
-        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
-        irModule.computeUniqIdForDeclarations(context.symbolTable)
 
+        irProviders.filterIsInstance<IrDeserializer>().forEach { it.init(irModule) }
+
+        moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
+
+        assert(context.symbolTable.allUnbound.isEmpty())
+        postprocessingSteps.forEach { it.invoke(irModule) }
+//        assert(context.symbolTable.allUnbound.isEmpty()) // TODO: fix IrPluginContext to make it not produce additional external reference
+
+        // TODO: remove it once plugin API improved
         moduleGenerator.generateUnboundSymbolsAsDependencies(irProviders)
 
         return irModule
     }
 
     private fun postprocess(context: GeneratorContext, irElement: IrModuleFragment) {
+        generateSyntheticDeclarations(irElement, context)
         insertImplicitCasts(irElement, context)
         generateAnnotationsForDeclarations(context, irElement)
-
-        postprocessingSteps.forEach { it(irElement) }
 
         irElement.patchDeclarationParents()
     }
@@ -98,5 +108,10 @@ class Psi2IrTranslator(
     private fun generateAnnotationsForDeclarations(context: GeneratorContext, irElement: IrElement) {
         val annotationGenerator = AnnotationGenerator(context)
         irElement.acceptVoid(annotationGenerator)
+    }
+
+    private fun generateSyntheticDeclarations(moduleFragment: IrModuleFragment, context: GeneratorContext) {
+        val generator = IrSyntheticDeclarationGenerator(context)
+        moduleFragment.acceptChildrenVoid(generator)
     }
 }

@@ -1,5 +1,5 @@
 @Deprecated(
-        """Ph'nglui mglw'nafh
+    """Ph'nglui mglw'nafh
   Cthulhu R'lyeh wgah'nagl fhtagn.
   'In His House at R'lyeh
   Dead Cthulhu waits dreaming,

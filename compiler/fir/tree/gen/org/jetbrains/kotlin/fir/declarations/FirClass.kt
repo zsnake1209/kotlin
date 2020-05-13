@@ -21,10 +21,13 @@ import org.jetbrains.kotlin.fir.visitors.*
  * DO NOT MODIFY IT MANUALLY
  */
 
-interface FirClass<F : FirClass<F>> : FirClassLikeDeclaration<F>, FirStatement, FirAnnotationContainer {
+interface FirClass<F : FirClass<F>> : FirClassLikeDeclaration<F>, FirStatement, FirAnnotationContainer, FirTypeParameterRefsOwner {
     override val source: FirSourceElement?
     override val session: FirSession
     override val resolvePhase: FirResolvePhase
+    override val origin: FirDeclarationOrigin
+    override val attributes: FirDeclarationAttributes
+    override val typeParameters: List<FirTypeParameterRef>
     override val symbol: FirClassSymbol<F>
     val classKind: ClassKind
     val superTypeRefs: List<FirTypeRef>
@@ -34,5 +37,13 @@ interface FirClass<F : FirClass<F>> : FirClassLikeDeclaration<F>, FirStatement, 
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitClass(this, data)
 
+    override fun replaceResolvePhase(newResolvePhase: FirResolvePhase)
+
     fun replaceSuperTypeRefs(newSuperTypeRefs: List<FirTypeRef>)
+
+    fun <D> transformSuperTypeRefs(transformer: FirTransformer<D>, data: D): FirClass<F>
+
+    fun <D> transformDeclarations(transformer: FirTransformer<D>, data: D): FirClass<F>
+
+    override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirClass<F>
 }

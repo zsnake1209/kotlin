@@ -226,6 +226,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             runTest("compiler/testData/diagnostics/testsWithStdLib/annotations/targetuse.kt");
         }
 
+        @TestMetadata("throws.kt")
+        public void testThrows() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/annotations/throws.kt");
+        }
+
         @TestMetadata("TransientOnDelegate.kt")
         public void testTransientOnDelegate() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithStdLib/annotations/TransientOnDelegate.kt");
@@ -741,6 +746,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             @TestMetadata("localFun_LL13.kt")
             public void testLocalFun_LL13() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/annotations/jvmStatic/localFun_LL13.kt");
+            }
+
+            @TestMetadata("mainInObject.kt")
+            public void testMainInObject() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/annotations/jvmStatic/mainInObject.kt");
             }
 
             @TestMetadata("property.kt")
@@ -1361,6 +1371,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
                 runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/extensionReceiver_after.kt");
             }
 
+            @TestMetadata("externalArguments.kt")
+            public void testExternalArguments() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/externalArguments.kt");
+            }
+
             @TestMetadata("intersectingInfo.kt")
             public void testIntersectingInfo() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/intersectingInfo.kt");
@@ -1509,6 +1524,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
                     KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/when"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true);
                 }
 
+                @TestMetadata("kt36818.kt")
+                public void testKt36818() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/when/kt36818.kt");
+                }
+
                 @TestMetadata("withSubject.kt")
                 public void testWithSubject() throws Exception {
                     runTest("compiler/testData/diagnostics/testsWithStdLib/contracts/smartcasts/when/withSubject.kt");
@@ -1568,6 +1588,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/allowResultInReturnType_1_4.kt");
         }
 
+        @TestMetadata("basicBuildListBuildMap.kt")
+        public void testBasicBuildListBuildMap() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/basicBuildListBuildMap.kt");
+        }
+
         @TestMetadata("callableReferences.kt")
         public void testCallableReferences() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/callableReferences.kt");
@@ -1616,6 +1641,21 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
         @TestMetadata("kt28658.kt")
         public void testKt28658() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/kt28658.kt");
+        }
+
+        @TestMetadata("kt36947.kt")
+        public void testKt36947() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/kt36947.kt");
+        }
+
+        @TestMetadata("kt37309.kt")
+        public void testKt37309() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/kt37309.kt");
+        }
+
+        @TestMetadata("kt38179.kt")
+        public void testKt38179() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/kt38179.kt");
         }
 
         @TestMetadata("lambdaExpectedType.kt")
@@ -1882,6 +1922,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/applyInsideCoroutine.kt");
             }
 
+            @TestMetadata("builderInferenceForMaterializeWithExpectedType.kt")
+            public void testBuilderInferenceForMaterializeWithExpectedType() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/builderInferenceForMaterializeWithExpectedType.kt");
+            }
+
             @TestMetadata("callableReferenceToASuspendFunction.kt")
             public void testCallableReferenceToASuspendFunction() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/callableReferenceToASuspendFunction.kt");
@@ -1900,6 +1945,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             @TestMetadata("correctMember.kt")
             public void testCorrectMember() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/correctMember.kt");
+            }
+
+            @TestMetadata("doubleColonExpressionToClassWithParameters.kt")
+            public void testDoubleColonExpressionToClassWithParameters() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/doubleColonExpressionToClassWithParameters.kt");
             }
 
             @TestMetadata("elvisOperatorAgainstFlexibleType.kt")
@@ -1952,14 +2002,54 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt15516.kt");
             }
 
+            @TestMetadata("kt32097.kt")
+            public void testKt32097() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt32097.kt");
+            }
+
+            @TestMetadata("kt32203.kt")
+            public void testKt32203() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt32203.kt");
+            }
+
             @TestMetadata("kt32271.kt")
             public void testKt32271() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt32271.kt");
             }
 
+            @TestMetadata("kt33542.kt")
+            public void testKt33542() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt33542.kt");
+            }
+
+            @TestMetadata("kt35306.kt")
+            public void testKt35306() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt35306.kt");
+            }
+
             @TestMetadata("kt35684.kt")
             public void testKt35684() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt35684.kt");
+            }
+
+            @TestMetadata("kt36202.kt")
+            public void testKt36202() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt36202.kt");
+            }
+
+            @TestMetadata("kt36220.kt")
+            public void testKt36220() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt36220.kt");
+            }
+
+            @TestMetadata("kt38420.kt")
+            public void testKt38420() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt38420.kt");
+            }
+
+            @TestMetadata("kt38667.kt")
+            public void testKt38667() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/kt38667.kt");
             }
 
             @TestMetadata("nestedLambdaInferenceWithListMap.kt")
@@ -1970,6 +2060,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             @TestMetadata("nestedSuspendCallInsideLambda.kt")
             public void testNestedSuspendCallInsideLambda() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/nestedSuspendCallInsideLambda.kt");
+            }
+
+            @TestMetadata("qualifiedResolvedExpressionInsideBuilderInference.kt")
+            public void testQualifiedResolvedExpressionInsideBuilderInference() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/qualifiedResolvedExpressionInsideBuilderInference.kt");
             }
 
             @TestMetadata("recursiveGenerators.kt")
@@ -2831,9 +2926,29 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             runTest("compiler/testData/diagnostics/testsWithStdLib/inference/kt35847.kt");
         }
 
+        @TestMetadata("kt36249.kt")
+        public void testKt36249() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/inference/kt36249.kt");
+        }
+
+        @TestMetadata("kt37627.kt")
+        public void testKt37627() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/inference/kt37627.kt");
+        }
+
+        @TestMetadata("kt38143.kt")
+        public void testKt38143() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/inference/kt38143.kt");
+        }
+
         @TestMetadata("kt4975.kt")
         public void testKt4975() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithStdLib/inference/kt4975.kt");
+        }
+
+        @TestMetadata("recursiveFlexibleAssertions.kt")
+        public void testRecursiveFlexibleAssertions() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/inference/recursiveFlexibleAssertions.kt");
         }
 
         @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/inference/annotationsForResolve")
@@ -2846,6 +2961,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
 
             public void testAllFilesPresentInAnnotationsForResolve() throws Exception {
                 KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/testsWithStdLib/inference/annotationsForResolve"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true);
+            }
+
+            @TestMetadata("checkLowPriorityIsResolvedSuccessfully.kt")
+            public void testCheckLowPriorityIsResolvedSuccessfully() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/inference/annotationsForResolve/checkLowPriorityIsResolvedSuccessfully.kt");
             }
 
             @TestMetadata("exactAnnotation.kt")
@@ -2959,6 +3079,82 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             }
         }
 
+        @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/inference/completion")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class Completion extends AbstractDiagnosticsTestWithStdLib {
+            private void runTest(String testDataFilePath) throws Exception {
+                KotlinTestUtils.runTest(this::doTest, this, testDataFilePath);
+            }
+
+            public void testAllFilesPresentInCompletion() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/testsWithStdLib/inference/completion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true);
+            }
+
+            @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis")
+            @TestDataPath("$PROJECT_ROOT")
+            @RunWith(JUnit3RunnerWithInners.class)
+            public static class PostponedArgumentsAnalysis extends AbstractDiagnosticsTestWithStdLib {
+                private void runTest(String testDataFilePath) throws Exception {
+                    KotlinTestUtils.runTest(this::doTest, this, testDataFilePath);
+                }
+
+                public void testAllFilesPresentInPostponedArgumentsAnalysis() throws Exception {
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true);
+                }
+
+                @TestMetadata("callableReferences.kt")
+                public void testCallableReferences() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/callableReferences.kt");
+                }
+
+                @TestMetadata("complexInterdependentInputOutputTypes.kt")
+                public void testComplexInterdependentInputOutputTypes() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/complexInterdependentInputOutputTypes.kt");
+                }
+
+                @TestMetadata("deepLambdas.kt")
+                public void testDeepLambdas() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/deepLambdas.kt");
+                }
+
+                @TestMetadata("fixIndependentVariables.kt")
+                public void testFixIndependentVariables() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/fixIndependentVariables.kt");
+                }
+
+                @TestMetadata("fixInputTypeToMoreSpecificType.kt")
+                public void testFixInputTypeToMoreSpecificType() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/fixInputTypeToMoreSpecificType.kt");
+                }
+
+                @TestMetadata("fixReceiverToMoreSpecificType.kt")
+                public void testFixReceiverToMoreSpecificType() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/fixReceiverToMoreSpecificType.kt");
+                }
+
+                @TestMetadata("moreSpecificOutputType.kt")
+                public void testMoreSpecificOutputType() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/moreSpecificOutputType.kt");
+                }
+
+                @TestMetadata("rerunStagesAfterFixationInFullMode.kt")
+                public void testRerunStagesAfterFixationInFullMode() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/rerunStagesAfterFixationInFullMode.kt");
+                }
+
+                @TestMetadata("rerunStagesAfterFixationInPartialMode.kt")
+                public void testRerunStagesAfterFixationInPartialMode() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/rerunStagesAfterFixationInPartialMode.kt");
+                }
+
+                @TestMetadata("suspendFunctions.kt")
+                public void testSuspendFunctions() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/inference/completion/postponedArgumentsAnalysis/suspendFunctions.kt");
+                }
+            }
+        }
+
         @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/inference/delegates")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
@@ -2984,6 +3180,24 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             @TestMetadata("kt32249.kt")
             public void testKt32249() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/inference/delegates/kt32249.kt");
+            }
+        }
+
+        @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/inference/nothingType")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class NothingType extends AbstractDiagnosticsTestWithStdLib {
+            private void runTest(String testDataFilePath) throws Exception {
+                KotlinTestUtils.runTest(this::doTest, this, testDataFilePath);
+            }
+
+            public void testAllFilesPresentInNothingType() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/testsWithStdLib/inference/nothingType"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), true);
+            }
+
+            @TestMetadata("dontInferToNullableNothingInDelegates.kt")
+            public void testDontInferToNullableNothingInDelegates() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/inference/nothingType/dontInferToNullableNothingInDelegates.kt");
             }
         }
     }
@@ -3240,11 +3454,6 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
         public void testNoReflectionInClassPath() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithStdLib/reflection/noReflectionInClassPath.kt");
         }
-
-        @TestMetadata("typeOfWithNonReifiedParameter.kt")
-        public void testTypeOfWithNonReifiedParameter() throws Exception {
-            runTest("compiler/testData/diagnostics/testsWithStdLib/reflection/typeOfWithNonReifiedParameter.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/regression")
@@ -3304,9 +3513,34 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             runTest("compiler/testData/diagnostics/testsWithStdLib/regression/kt34391.kt");
         }
 
+        @TestMetadata("kt37554.kt")
+        public void testKt37554() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/regression/kt37554.kt");
+        }
+
+        @TestMetadata("kt37706.kt")
+        public void testKt37706() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/regression/kt37706.kt");
+        }
+
+        @TestMetadata("kt37727.kt")
+        public void testKt37727() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/regression/kt37727.kt");
+        }
+
+        @TestMetadata("kt37735.kt")
+        public void testKt37735() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/regression/kt37735.kt");
+        }
+
         @TestMetadata("kt9820_javaFunctionTypeInheritor.kt")
         public void testKt9820_javaFunctionTypeInheritor() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithStdLib/regression/kt9820_javaFunctionTypeInheritor.kt");
+        }
+
+        @TestMetadata("kt-37497.kt")
+        public void testKt_37497() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/regression/kt-37497.kt");
         }
     }
 

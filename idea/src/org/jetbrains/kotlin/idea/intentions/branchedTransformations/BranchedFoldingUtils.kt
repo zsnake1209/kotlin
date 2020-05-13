@@ -183,7 +183,7 @@ object BranchedFoldingUtils {
 
     fun canFoldToReturn(expression: KtExpression?): Boolean = getFoldableReturnNumber(expression) > 0
 
-    fun foldToAssignment(expression: KtExpression) {
+    fun tryFoldToAssignment(expression: KtExpression) {
         var lhs: KtExpression? = null
         var op: String? = null
         val psiFactory = KtPsiFactory(expression)
@@ -192,9 +192,10 @@ object BranchedFoldingUtils {
                 lhs = left!!.copy() as KtExpression
                 op = operationReference.text
             }
+
             val rhs = right!!
             if (rhs is KtLambdaExpression && this.parent !is KtBlockExpression) {
-                replace(psiFactory.createExpressionByPattern("{ $0 }", rhs))
+                replace(psiFactory.createSingleStatementBlock(rhs))
             } else {
                 replace(rhs)
             }
@@ -214,7 +215,9 @@ object BranchedFoldingUtils {
             }
         }
         lift(expression)
-        expression.replace(psiFactory.createExpressionByPattern("$0 $1 $2", lhs!!, op!!, expression))
+        if (lhs != null && op != null) {
+            expression.replace(psiFactory.createExpressionByPattern("$0 $1 $2", lhs!!, op!!, expression))
+        }
     }
 
     fun foldToReturn(expression: KtExpression): KtExpression {

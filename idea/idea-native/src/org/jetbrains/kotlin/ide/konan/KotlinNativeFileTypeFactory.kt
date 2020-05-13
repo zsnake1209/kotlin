@@ -5,14 +5,12 @@
 
 package org.jetbrains.kotlin.ide.konan
 
-import com.intellij.ide.highlighter.ArchiveFileType
 import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
-import org.jetbrains.kotlin.library.KLIB_FILE_EXTENSION
 
+// BUNCH: 192
 class KotlinNativeFileTypeFactory : FileTypeFactory() {
     override fun createFileTypes(consumer: FileTypeConsumer) {
-        consumer.consume(ArchiveFileType.INSTANCE, KLIB_FILE_EXTENSION)
         consumer.consume(NativeDefinitionsFileType, KOTLIN_NATIVE_DEFINITIONS_FILE_EXTENSION)
     }
 }

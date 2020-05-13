@@ -14,15 +14,13 @@ import org.jetbrains.kotlin.fir.FirModuleBasedSession
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSessionBase
 import org.jetbrains.kotlin.fir.FirSessionProvider
+import org.jetbrains.kotlin.fir.extensions.FirExtensionsService
 import org.jetbrains.kotlin.fir.java.deserialization.KotlinDeserializedJvmSymbolsProvider
 import org.jetbrains.kotlin.fir.resolve.FirProvider
 import org.jetbrains.kotlin.fir.resolve.FirSymbolProvider
 import org.jetbrains.kotlin.fir.resolve.calls.ConeCallConflictResolverFactory
 import org.jetbrains.kotlin.fir.resolve.calls.jvm.JvmCallConflictResolverFactory
-import org.jetbrains.kotlin.fir.resolve.impl.FirCompositeSymbolProvider
-import org.jetbrains.kotlin.fir.resolve.impl.FirDependenciesSymbolProviderImpl
-import org.jetbrains.kotlin.fir.resolve.impl.FirLibrarySymbolProviderImpl
-import org.jetbrains.kotlin.fir.resolve.impl.FirProviderImpl
+import org.jetbrains.kotlin.fir.resolve.impl.*
 import org.jetbrains.kotlin.fir.resolve.scopes.wrapScopeWithJvmMapped
 import org.jetbrains.kotlin.fir.scopes.KotlinScopeProvider
 import org.jetbrains.kotlin.fir.scopes.impl.FirDeclaredMemberScopeProvider
@@ -95,7 +93,6 @@ class FirLibrarySession private constructor(
             FirSymbolProvider::class,
             FirCompositeSymbolProvider(
                 listOf(
-                    FirLibrarySymbolProviderImpl(this, kotlinScopeProvider),
                     KotlinDeserializedJvmSymbolsProvider(
                         this, sessionProvider.project,
                         packagePartProvider,
@@ -104,6 +101,8 @@ class FirLibrarySession private constructor(
                         javaClassFinder,
                         kotlinScopeProvider
                     ),
+                    FirBuiltinSymbolProvider(this, kotlinScopeProvider),
+                    FirClonableSymbolProvider(this, kotlinScopeProvider),
                     javaSymbolProvider,
                     FirDependenciesSymbolProviderImpl(this)
                 )
@@ -114,6 +113,11 @@ class FirLibrarySession private constructor(
         registerComponent(
             FirCorrespondingSupertypesCache::class,
             FirCorrespondingSupertypesCache(this)
+        )
+
+        registerComponent(
+            FirExtensionsService::class,
+            FirExtensionsService(this)
         )
 
         sessionProvider.sessionCache[moduleInfo] = this

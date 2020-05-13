@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
-import org.jetbrains.kotlin.fir.FirControlFlowGraphOwner
-import org.jetbrains.kotlin.fir.FirPureAbstractElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
@@ -25,10 +23,12 @@ import org.jetbrains.kotlin.fir.visitors.*
  * DO NOT MODIFY IT MANUALLY
  */
 
-abstract class FirProperty : FirPureAbstractElement(), FirVariable<FirProperty>, FirControlFlowGraphOwner, FirTypeParametersOwner, FirCallableMemberDeclaration<FirProperty> {
+abstract class FirProperty : FirVariable<FirProperty>(), FirTypeParametersOwner, FirCallableMemberDeclaration<FirProperty> {
     abstract override val source: FirSourceElement?
     abstract override val session: FirSession
     abstract override val resolvePhase: FirResolvePhase
+    abstract override val origin: FirDeclarationOrigin
+    abstract override val attributes: FirDeclarationAttributes
     abstract override val returnTypeRef: FirTypeRef
     abstract override val receiverTypeRef: FirTypeRef?
     abstract override val name: Name
@@ -40,8 +40,8 @@ abstract class FirProperty : FirPureAbstractElement(), FirVariable<FirProperty>,
     abstract override val getter: FirPropertyAccessor?
     abstract override val setter: FirPropertyAccessor?
     abstract override val annotations: List<FirAnnotationCall>
-    abstract override val controlFlowGraphReference: FirControlFlowGraphReference
     abstract override val containerSource: DeserializedContainerSource?
+    abstract val controlFlowGraphReference: FirControlFlowGraphReference
     abstract override val symbol: FirPropertySymbol
     abstract val backingFieldSymbol: FirBackingFieldSymbol
     abstract val isLocal: Boolean
@@ -50,17 +50,27 @@ abstract class FirProperty : FirPureAbstractElement(), FirVariable<FirProperty>,
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitProperty(this, data)
 
+    abstract override fun replaceResolvePhase(newResolvePhase: FirResolvePhase)
+
+    abstract override fun replaceReturnTypeRef(newReturnTypeRef: FirTypeRef)
+
+    abstract override fun replaceReceiverTypeRef(newReceiverTypeRef: FirTypeRef?)
+
     abstract override fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D): FirProperty
 
     abstract override fun <D> transformReceiverTypeRef(transformer: FirTransformer<D>, data: D): FirProperty
 
     abstract override fun <D> transformInitializer(transformer: FirTransformer<D>, data: D): FirProperty
 
+    abstract override fun <D> transformDelegate(transformer: FirTransformer<D>, data: D): FirProperty
+
     abstract override fun <D> transformGetter(transformer: FirTransformer<D>, data: D): FirProperty
 
     abstract override fun <D> transformSetter(transformer: FirTransformer<D>, data: D): FirProperty
 
-    abstract override fun <D> transformControlFlowGraphReference(transformer: FirTransformer<D>, data: D): FirProperty
+    abstract override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirProperty
+
+    abstract fun <D> transformControlFlowGraphReference(transformer: FirTransformer<D>, data: D): FirProperty
 
     abstract override fun <D> transformStatus(transformer: FirTransformer<D>, data: D): FirProperty
 

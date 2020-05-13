@@ -56,7 +56,13 @@ interface TypeSystemBuiltInsContext {
 
 interface TypeSystemTypeFactoryContext {
     fun createFlexibleType(lowerBound: SimpleTypeMarker, upperBound: SimpleTypeMarker): KotlinTypeMarker
-    fun createSimpleType(constructor: TypeConstructorMarker, arguments: List<TypeArgumentMarker>, nullable: Boolean): SimpleTypeMarker
+    fun createSimpleType(
+        constructor: TypeConstructorMarker,
+        arguments: List<TypeArgumentMarker>,
+        nullable: Boolean,
+        isExtensionFunction: Boolean = false
+    ): SimpleTypeMarker
+
     fun createTypeArgument(type: KotlinTypeMarker, variance: TypeVariance): TypeArgumentMarker
     fun createStarProjection(typeParameter: TypeParameterMarker): TypeArgumentMarker
 
@@ -87,6 +93,8 @@ interface TypeSystemCommonSuperTypesContext : TypeSystemContext, TypeSystemTypeF
             )
 
     fun KotlinTypeMarker.canHaveUndefinedNullability(): Boolean
+
+    fun SimpleTypeMarker.isExtensionFunction(): Boolean
 
     fun SimpleTypeMarker.typeDepth(): Int
 
@@ -124,6 +132,8 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
 
     fun KotlinTypeMarker.isUnit(): Boolean
 
+    fun KotlinTypeMarker.isBuiltinFunctionalTypeOrSubtype(): Boolean
+
     fun KotlinTypeMarker.withNullability(nullable: Boolean): KotlinTypeMarker
 
 
@@ -154,6 +164,7 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
 
     fun CapturedTypeMarker.typeConstructorProjection(): TypeArgumentMarker
     fun CapturedTypeMarker.typeParameter(): TypeParameterMarker?
+    fun CapturedTypeMarker.withNotNullProjection(): KotlinTypeMarker
 
     fun DefinitelyNotNullTypeMarker.original(): SimpleTypeMarker
 
@@ -164,6 +175,11 @@ interface TypeSystemInferenceExtensionContext : TypeSystemContext, TypeSystemBui
 
 
     fun TypeVariableMarker.defaultType(): SimpleTypeMarker
+
+    fun createTypeWithAlternativeForIntersectionResult(
+        firstCandidate: KotlinTypeMarker,
+        secondCandidate: KotlinTypeMarker
+    ): KotlinTypeMarker
 }
 
 
@@ -195,6 +211,7 @@ interface TypeSystemContext : TypeSystemOptimizationContext {
 
     fun CapturedTypeMarker.typeConstructor(): CapturedTypeConstructorMarker
     fun CapturedTypeMarker.captureStatus(): CaptureStatus
+    fun CapturedTypeMarker.isProjectionNotNull(): Boolean
     fun CapturedTypeConstructorMarker.projection(): TypeArgumentMarker
 
     fun KotlinTypeMarker.argumentsCount(): Int

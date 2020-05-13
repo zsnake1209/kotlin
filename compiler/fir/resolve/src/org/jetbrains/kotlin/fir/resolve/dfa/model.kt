@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.modality
 import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
-import org.jetbrains.kotlin.fir.resolve.dfa.Operation
 import org.jetbrains.kotlin.fir.symbols.AbstractFirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
@@ -41,6 +40,7 @@ class RealVariable(
     val identifier: Identifier,
     val isThisReference: Boolean,
     val explicitReceiverVariable: DataFlowVariable?,
+    val originalType: ConeKotlinType,
     variableIndexForDebug: Int
 ) : DataFlowVariable(variableIndexForDebug) {
     override val isStable: Boolean by lazy {
@@ -51,6 +51,8 @@ class RealVariable(
                     property.isLocal -> true
                     property.isVar -> false
                     property.modality != Modality.FINAL -> false
+                    property.receiverTypeRef != null -> false
+                    property.getter != null -> false
                     // TODO: getters, delegates
                     else -> true
                 }
@@ -140,13 +142,13 @@ abstract class TypeStatement : Statement<TypeStatement>() {
 
 class MutableTypeStatement(
     override val variable: RealVariable,
-    override val exactType: MutableSet<ConeKotlinType> = HashSet(),
-    override val exactNotType: MutableSet<ConeKotlinType> = HashSet()
+    override val exactType: MutableSet<ConeKotlinType> = linkedSetOf(),
+    override val exactNotType: MutableSet<ConeKotlinType> = linkedSetOf()
 ) : TypeStatement() {
     override fun plus(other: TypeStatement): MutableTypeStatement = MutableTypeStatement(
         variable,
-        HashSet(exactType).apply { addAll(other.exactType) },
-        HashSet(exactNotType).apply { addAll(other.exactNotType) }
+        LinkedHashSet(exactType).apply { addAll(other.exactType) },
+        LinkedHashSet(exactNotType).apply { addAll(other.exactNotType) }
     )
 
     override val isEmpty: Boolean
@@ -155,8 +157,8 @@ class MutableTypeStatement(
     override fun invert(): TypeStatement {
         return MutableTypeStatement(
             variable,
-            HashSet(exactNotType),
-            HashSet(exactType)
+            LinkedHashSet(exactNotType),
+            LinkedHashSet(exactType)
         )
     }
 
@@ -165,7 +167,7 @@ class MutableTypeStatement(
         exactNotType += info.exactNotType
     }
 
-    fun copy(): MutableTypeStatement = MutableTypeStatement(variable, HashSet(exactType), HashSet(exactNotType))
+    fun copy(): MutableTypeStatement = MutableTypeStatement(variable, LinkedHashSet(exactType), LinkedHashSet(exactNotType))
 }
 
 class Implication(
@@ -206,18 +208,16 @@ infix fun DataFlowVariable.notEq(constant: Boolean?): OperationStatement {
 
 infix fun OperationStatement.implies(effect: Statement<*>): Implication = Implication(this, effect)
 
-infix fun RealVariable.typeEq(types: MutableSet<ConeKotlinType>): TypeStatement = MutableTypeStatement(this, types, HashSet())
 infix fun RealVariable.typeEq(type: ConeKotlinType): TypeStatement =
     if (type !is ConeClassErrorType) {
-        MutableTypeStatement(this, HashSet<ConeKotlinType>().apply { this += type }, HashSet())
+        MutableTypeStatement(this, linkedSetOf<ConeKotlinType>().apply { this += type }, HashSet())
     } else {
         MutableTypeStatement(this)
     }
 
-infix fun RealVariable.typeNotEq(types: MutableSet<ConeKotlinType>): TypeStatement = MutableTypeStatement(this, HashSet(), types)
 infix fun RealVariable.typeNotEq(type: ConeKotlinType): TypeStatement =
     if (type !is ConeClassErrorType) {
-        MutableTypeStatement(this, HashSet(), HashSet<ConeKotlinType>().apply { this += type })
+        MutableTypeStatement(this, linkedSetOf(), LinkedHashSet<ConeKotlinType>().apply { this += type })
     } else {
         MutableTypeStatement(this)
     }

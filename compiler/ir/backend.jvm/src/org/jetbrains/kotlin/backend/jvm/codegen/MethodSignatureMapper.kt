@@ -1,10 +1,11 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.backend.jvm.codegen
 
+import org.jetbrains.kotlin.backend.common.ir.isMethodOfAny
 import org.jetbrains.kotlin.backend.common.ir.isTopLevel
 import org.jetbrains.kotlin.backend.common.lower.allOverridden
 import org.jetbrains.kotlin.backend.common.lower.parentsWithSelf
@@ -12,7 +13,9 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
 import org.jetbrains.kotlin.backend.jvm.ir.getJvmNameFromAnnotation
 import org.jetbrains.kotlin.backend.jvm.ir.hasJvmDefault
+import org.jetbrains.kotlin.backend.jvm.ir.isCompiledToJvmDefault
 import org.jetbrains.kotlin.backend.jvm.ir.propertyIfAccessor
+import org.jetbrains.kotlin.backend.jvm.lower.*
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.codegen.AsmUtil
 import org.jetbrains.kotlin.codegen.JvmCodegenUtil
@@ -89,30 +92,15 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
             return mangleMemberNameIfRequired(accessorName, function)
         }
 
-        val functionName = workaroundPropertyAccessorName(function) ?: function.name.asString()
-        return mangleMemberNameIfRequired(functionName, function)
-    }
-
-    // This is a dirty hack which is needed to correctly map names of property accessors whose correspondingPropertySymbol was lost.
-    // The reason it's needed is that it sometimes gets lost during DeepCopyIrTreeWithSymbols because that algorithm doesn't copy
-    // the link to the property when transforming a simple function. This can be fixed but might require a lot of changes in backends,
-    // and will likely be unneeded as soon as we have proper properties in the IR (IrProperty which is a declaration parent).
-    // TODO: remove this hack as soon as IrProperty is a declaration parent
-    private fun workaroundPropertyAccessorName(function: IrFunction): String? {
-        val name = function.name.asString()
-        val ifGetter = name.removeSurrounding("<get-", ">")
-        if (ifGetter != name) return JvmAbi.getterName(ifGetter)
-        val ifSetter = name.removeSurrounding("<set-", ">")
-        if (ifSetter != name) return JvmAbi.setterName(ifSetter)
-        return null
+        return mangleMemberNameIfRequired(function.name.asString(), function)
     }
 
     private fun mangleMemberNameIfRequired(name: String, function: IrFunction): String {
         val newName = JvmCodegenUtil.sanitizeNameIfNeeded(name, context.state.languageVersionSettings)
 
         if (function.isTopLevel) {
-            if (Visibilities.isPrivate(function.visibility) && newName != "<clinit>" &&
-                (function.parent as? IrClass)?.attributeOwnerId in context.multifileFacadeForPart
+            if (Visibilities.isPrivate(function.suspendFunctionOriginal().visibility) &&
+                newName != "<clinit>" && (function.parent as? IrClass)?.attributeOwnerId in context.multifileFacadeForPart
             ) {
                 return "$newName$${function.parentAsClass.name.asString()}"
             }
@@ -158,7 +146,9 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
         }
 
         val typeMappingModeFromAnnotation =
-            typeSystem.extractTypeMappingModeFromAnnotation(declaration.suppressWildcardsMode(), returnType, isAnnotationMethod)
+            typeSystem.extractTypeMappingModeFromAnnotation(
+                declaration.suppressWildcardsMode(), returnType, isAnnotationMethod, mapTypeAliases = false
+            )
         if (typeMappingModeFromAnnotation != null) {
             return typeMapper.mapType(returnType, typeMappingModeFromAnnotation, sw)
         }
@@ -178,8 +168,8 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
     private fun forceBoxedReturnType(function: IrFunction): Boolean {
         if (isBoxMethodForInlineClass(function)) return true
 
-        return isJvmPrimitive(function.returnType) &&
-                function is IrSimpleFunction && function.allOverridden().any { !isJvmPrimitive(it.returnType) }
+        return isJvmPrimitiveOrInlineClass(function.returnType) &&
+                function is IrSimpleFunction && function.allOverridden().any { !isJvmPrimitiveOrInlineClass(it.returnType) }
     }
 
     private fun isBoxMethodForInlineClass(function: IrFunction): Boolean =
@@ -187,10 +177,8 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
                 function.origin == JvmLoweredDeclarationOrigin.SYNTHETIC_INLINE_CLASS_MEMBER &&
                 function.name.asString() == "box-impl"
 
-    private fun isJvmPrimitive(type: IrType): Boolean {
-        if (type.isPrimitiveType()) return true
-        return type.getClass()?.isInline == true && AsmUtil.isPrimitive(typeMapper.mapType(type))
-    }
+    private fun isJvmPrimitiveOrInlineClass(type: IrType): Boolean =
+        type.isPrimitiveType() || type.getClass()?.isInline == true
 
     fun mapSignatureSkipGeneric(function: IrFunction): JvmMethodSignature =
         mapSignature(function, true)
@@ -206,13 +194,6 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
             ) {
                 return mapSignature(function.initialSignatureFunction!!, skipGenericSignature)
             }
-        }
-
-        if (function.isSuspend && function.origin != JvmLoweredDeclarationOrigin.SUSPEND_FUNCTION_VIEW &&
-            function.origin != JvmLoweredDeclarationOrigin.FOR_INLINE_STATE_MACHINE_TEMPLATE_CAPTURES_CROSSINLINE_VIEW &&
-            (function.parent as? IrClass)?.origin != JvmLoweredDeclarationOrigin.FUNCTION_REFERENCE_IMPL
-        ) {
-            return mapSignature(function.suspendFunctionView(context, false), skipGenericSignature)
         }
 
         val sw = if (skipGenericSignature) JvmSignatureWriter() else BothSignatureWriter(BothSignatureWriter.Mode.METHOD)
@@ -265,7 +246,9 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
         }
 
         val mode = with(typeSystem) {
-            extractTypeMappingModeFromAnnotation(declaration.suppressWildcardsMode(), type, isForAnnotationParameter = false)
+            extractTypeMappingModeFromAnnotation(
+                declaration.suppressWildcardsMode(), type, isForAnnotationParameter = false, mapTypeAliases = false
+            )
                 ?: if (declaration.isMethodWithDeclarationSiteWildcards && type.argumentsCount() != 0) {
                     TypeMappingMode.GENERIC_ARGUMENT // Render all wildcards
                 } else {
@@ -299,10 +282,18 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
             if (valueArgumentsCount > 0) (getValueArgument(0) as? IrConst<*>)?.value as? Boolean ?: true else null
         }
 
+    private fun IrFunctionAccessExpression.computeCalleeParent(): IrClass {
+        if (this is IrCall) {
+            superQualifierSymbol?.let { return it.owner }
+        }
+        return dispatchReceiver?.type?.classOrNull?.owner
+            ?: symbol.owner.parentAsClass // Static call or type parameter
+    }
+
     fun mapToCallableMethod(caller: IrFunction, expression: IrFunctionAccessExpression): IrCallableMethod {
-        val callee = expression.symbol.owner.getOrCreateSuspendFunctionViewIfNeeded(context)
-        val calleeParent = callee.parentAsClass
-        val owner = typeMapper.mapClass(calleeParent)
+        val callee = expression.symbol.owner
+        val calleeParent = expression.computeCalleeParent()
+        val owner = typeMapper.mapOwner(calleeParent)
 
         if (callee !is IrSimpleFunction) {
             check(callee is IrConstructor) { "Function must be a simple function or a constructor: ${callee.render()}" }
@@ -332,6 +323,8 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
         // Do not remap special builtin methods when called from a bridge. The bridges are there to provide the
         // remapped name or signature and forward to the actually declared method.
         if (caller.origin == IrDeclarationOrigin.BRIDGE || caller.origin == IrDeclarationOrigin.BRIDGE_SPECIAL) return null
+        // Do not remap calls to static replacements of inline class methods, since they have completely different signatures.
+        if (callee.origin == JvmLoweredDeclarationOrigin.STATIC_INLINE_CLASS_REPLACEMENT) return null
         val overriddenSpecialBuiltinFunction = callee.descriptor.original.getOverriddenBuiltinReflectingJvmDescriptor()
         if (overriddenSpecialBuiltinFunction != null && !superCall) {
             return mapSignatureSkipGeneric(context.referenceFunction(overriddenSpecialBuiltinFunction.original).owner)
@@ -350,7 +343,11 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
                 current = classCallable
                 continue
             }
-            if (isSuperCall && !current.hasJvmDefault() && !current.parentAsClass.isInterface) {
+            if (isSuperCall && !current.parentAsClass.isInterface &&
+                current.resolveFakeOverride()?.run {
+                    isMethodOfAny() || !isCompiledToJvmDefault(context.state.jvmDefaultMode)
+                } == true
+            ) {
                 return current
             }
 

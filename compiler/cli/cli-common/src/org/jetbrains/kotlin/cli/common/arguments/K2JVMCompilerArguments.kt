@@ -70,7 +70,7 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
     @Argument(
         value = "-jvm-target",
         valueDescription = "<version>",
-        description = "Target version of the generated JVM bytecode (1.6, 1.8, 9, 10, 11, 12 or 13), default is 1.6"
+        description = "Target version of the generated JVM bytecode (1.6, 1.8, 9, 10, 11, 12, 13 or 14), default is 1.6"
     )
     var jvmTarget: String? by NullableStringFreezableVar(JvmTarget.DEFAULT.description)
 
@@ -92,6 +92,20 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
         description = "Check that names of local classes and anonymous objects are the same in the IR backend as in the old backend"
     )
     var irCheckLocalNames: Boolean by FreezableVar(false)
+
+    @Argument(
+        value = "-Xallow-jvm-ir-dependencies",
+        description = "When not using the IR backend, do not report errors on those classes in dependencies, " +
+                "which were compiled by the IR backend"
+    )
+    var allowJvmIrDependencies: Boolean by FreezableVar(false)
+
+    @Argument(
+        value = "-Xir-binary-with-stable-abi",
+        description = "When using the IR backend, produce binaries which can be read by non-IR backend.\n" +
+                "The author is responsible for verifying that the resulting binaries do indeed have the correct ABI"
+    )
+    var isIrWithStableAbi: Boolean by FreezableVar(false)
 
     @Argument(value = "-Xmodule-path", valueDescription = "<path>", description = "Paths where to find Java 9+ modules")
     var javaModulePath: String? by NullableStringFreezableVar(null)
@@ -256,13 +270,30 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
 
     @Argument(
         value = "-Xjvm-default",
-        valueDescription = "{disable|enable|compatibility}",
-        description = "Allow to use '@JvmDefault' annotation for JVM default method support.\n" +
-                "-Xjvm-default=disable         Prohibit usages of @JvmDefault\n" +
-                "-Xjvm-default=enable          Allow usages of @JvmDefault; only generate the default method\n" +
-                "                              in the interface (annotating an existing method can break binary compatibility)\n" +
-                "-Xjvm-default=compatibility   Allow usages of @JvmDefault; generate a compatibility accessor\n" +
-                "                              in the 'DefaultImpls' class in addition to the interface method"
+        valueDescription = "{all|all-compatibility|disable|enable|compatibility}",
+        description = """Emit JVM default methods for interface declarations with bodies.
+-Xjvm-default=all-compatibility  Generate both a default method in the interface, and a compatibility accessor
+                                 in the DefaultImpls class.
+                                 In case of inheritance from a Kotlin interface compiled in the old scheme
+                                 (DefaultImpls, no default methods), the compatibility accessor in DefaultImpls
+                                 will delegate to the DefaultImpls method of the superinterface. Otherwise the
+                                 compatibility accessor will invoke the default method on the interface, with
+                                 standard JVM runtime resolution semantics.
+                                 Note that if interface delegation is used, all interface methods are delegated.
+                                 The only exception are methods annotated with the deprecated @JvmDefault annotation.
+-Xjvm-default=all                Generate default methods for all interface declarations with bodies.
+                                 Do not generate DefaultImpls classes at all.
+                                 BREAKS BINARY COMPATIBILITY if some client code relies on the presence of
+                                 DefaultImpls classes. Also prohibits the produced binaries to be read by Kotlin
+                                 compilers earlier than 1.4.
+                                 Note that if interface delegation is used, all interface methods are delegated.
+                                 The only exception are methods annotated with the deprecated @JvmDefault annotation.
+-Xjvm-default=disable            Do not generate JVM default methods and prohibit @JvmDefault annotation usage.
+-Xjvm-default=enable             Allow usages of @JvmDefault; only generate the default method
+                                 for annotated method in the interface
+                                 (annotating an existing method can break binary compatibility)
+-Xjvm-default=compatibility      Allow usages of @JvmDefault; generate a compatibility accessor
+                                 in the 'DefaultImpls' class in addition to the default interface method"""
     )
     var jvmDefault: String by FreezableVar(JvmDefaultMode.DEFAULT.description)
 
@@ -302,6 +333,25 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
     )
     var emitJvmTypeAnnotations: Boolean by FreezableVar(false)
 
+    @Argument(
+        value = "-Xklib",
+        valueDescription = "<path>",
+        description = "Paths to cross-platform libraries in .klib format"
+    )
+    var klibLibraries: String? by NullableStringFreezableVar(null)
+
+    @Argument(
+        value = "-Xno-optimized-callable-references",
+        description = "Do not use optimized callable reference superclasses available from 1.4"
+    )
+    var noOptimizedCallableReferences: Boolean by FreezableVar(false)
+
+    @Argument(
+        value = "-Xno-kotlin-nothing-value-exception",
+        description = "Do not use KotlinNothingValueException available since 1.4"
+    )
+    var noKotlinNothingValueException: Boolean by FreezableVar(false)
+
     override fun configureAnalysisFlags(collector: MessageCollector): MutableMap<AnalysisFlag<*>, Any> {
         val result = super.configureAnalysisFlags(collector)
         result[JvmAnalysisFlags.strictMetadataVersionSemantics] = strictMetadataVersionSemantics
@@ -310,16 +360,18 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
             supportCompatqualCheckerFrameworkAnnotations
         )
         result[AnalysisFlags.ignoreDataFlowInAssert] = JVMAssertionsMode.fromString(assertionsMode) != JVMAssertionsMode.LEGACY
-        JvmDefaultMode.fromStringOrNull(jvmDefault)?.let { result[JvmAnalysisFlags.jvmDefaultMode] = it }
-            ?: collector.report(
-                CompilerMessageSeverity.ERROR,
-                "Unknown @JvmDefault mode: $jvmDefault, " +
-                        "supported modes: ${JvmDefaultMode.values().map { it.description }}"
-            )
+        JvmDefaultMode.fromStringOrNull(jvmDefault)?.let {
+            result[JvmAnalysisFlags.jvmDefaultMode] = it
+        } ?: collector.report(
+            CompilerMessageSeverity.ERROR,
+            "Unknown @JvmDefault mode: $jvmDefault, " +
+                    "supported modes: ${JvmDefaultMode.values().map { it.description }}"
+        )
         result[JvmAnalysisFlags.inheritMultifileParts] = inheritMultifileParts
         result[JvmAnalysisFlags.sanitizeParentheses] = sanitizeParentheses
         result[JvmAnalysisFlags.suppressMissingBuiltinsError] = suppressMissingBuiltinsError
         result[JvmAnalysisFlags.irCheckLocalNames] = irCheckLocalNames
+        result[AnalysisFlags.reportErrorsOnIrDependencies] = !useIR && !useFir && !allowJvmIrDependencies
         return result
     }
 
@@ -329,5 +381,19 @@ class K2JVMCompilerArguments : CommonCompilerArguments() {
             result[LanguageFeature.StrictJavaNullabilityAssertions] = LanguageFeature.State.ENABLED
         }
         return result
+    }
+
+    override fun checkIrSupport(languageVersionSettings: LanguageVersionSettings, collector: MessageCollector) {
+        if (!useIR) return
+
+        if (languageVersionSettings.languageVersion < LanguageVersion.KOTLIN_1_3
+            || languageVersionSettings.apiVersion < ApiVersion.KOTLIN_1_3
+        ) {
+            collector.report(
+                CompilerMessageSeverity.STRONG_WARNING,
+                "IR backend does not support language or API version lower than 1.3. " +
+                        "This can lead to unexpected behavior or compilation failures"
+            )
+        }
     }
 }

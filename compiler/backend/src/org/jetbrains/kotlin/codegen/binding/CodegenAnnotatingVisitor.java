@@ -16,6 +16,7 @@ import kotlin.collections.CollectionsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.FunctionTypesKt;
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.builtins.ReflectionTypes;
 import org.jetbrains.kotlin.cfg.WhenChecker;
 import org.jetbrains.kotlin.codegen.*;
@@ -32,7 +33,6 @@ import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor;
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor;
 import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil;
 import org.jetbrains.kotlin.load.java.JvmAbi;
-import org.jetbrains.kotlin.load.java.sam.SamConstructorDescriptor;
 import org.jetbrains.kotlin.name.ClassId;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.psi.*;
@@ -53,6 +53,7 @@ import org.jetbrains.kotlin.resolve.constants.EnumValue;
 import org.jetbrains.kotlin.resolve.constants.NullValue;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
 import org.jetbrains.kotlin.resolve.jvm.RuntimeAssertionsOnDeclarationBodyChecker;
+import org.jetbrains.kotlin.resolve.sam.SamConstructorDescriptor;
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExpressionReceiver;
 import org.jetbrains.kotlin.resolve.scopes.receivers.ReceiverValue;
 import org.jetbrains.kotlin.resolve.scopes.receivers.TransientReceiver;
@@ -357,6 +358,33 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
         classStack.pop();
     }
 
+    private boolean isAdaptedCallableReference(
+            @NotNull KtCallableReferenceExpression expression,
+            @NotNull ResolvedCall<?> resolvedCall,
+            boolean isSuspendConversion
+    ) {
+        if (isSuspendConversion) return true;
+
+        CallableDescriptor resultingDescriptor = resolvedCall.getResultingDescriptor();
+        if (!(resultingDescriptor instanceof FunctionDescriptor)) return false;
+        FunctionDescriptor functionDescriptor = (FunctionDescriptor) resultingDescriptor;
+
+        // Callable reference is adapted if:
+        // - adapter arguments mapping is present in value arguments of corresponding resolved call;
+        // - return type is not Unit, and expected return type is Unit.
+
+        if (!resolvedCall.getValueArguments().isEmpty()) return true;
+
+        KotlinType callableReferenceType = bindingContext.getType(expression);
+        if (callableReferenceType != null) {
+            KotlinType callableReferenceReturnType = CollectionsKt.last(callableReferenceType.getArguments()).getType();
+            KotlinType functionReturnType = functionDescriptor.getReturnType();
+            return functionReturnType != null &&
+                   KotlinBuiltIns.isUnit(callableReferenceReturnType) && !KotlinBuiltIns.isUnit(functionReturnType);
+        }
+        return false;
+    }
+
     @Override
     public void visitCallableReferenceExpression(@NotNull KtCallableReferenceExpression expression) {
         ResolvedCall<?> referencedFunction = CallUtilKt.getResolvedCall(expression.getCallableReference(), bindingContext);
@@ -376,11 +404,20 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
         Collection<KotlinType> supertypes;
 
         if (target instanceof FunctionDescriptor) {
+            FunctionDescriptor targetFunction = (FunctionDescriptor) target;
             callableDescriptor = bindingContext.get(FUNCTION, expression);
             if (callableDescriptor == null) return;
 
+            KotlinType functionReferenceType = bindingContext.getType(expression);
+            boolean isSuspendConversion =
+                    !targetFunction.isSuspend() &&
+                    functionReferenceType != null &&
+                    FunctionTypesKt.isKSuspendFunctionType(functionReferenceType);
+
             supertypes = runtimeTypes.getSupertypesForFunctionReference(
-                    (FunctionDescriptor) target, (AnonymousFunctionDescriptor) callableDescriptor, receiverType != null
+                    targetFunction, (AnonymousFunctionDescriptor) callableDescriptor, receiverType != null,
+                    isAdaptedCallableReference(expression, referencedFunction, isSuspendConversion),
+                    isSuspendConversion
             );
         }
         else if (target instanceof PropertyDescriptor) {
@@ -797,7 +834,7 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
 
             if (valueArgument == null || newResolvedCall.getExpectedTypeForSamConvertedArgument(valueArgument) == null) continue;
 
-            valueParametersWithSAMConversion.add(valueParameter.getOriginal());
+            valueParametersWithSAMConversion.add(valueParameter);
         }
         writeSamValueForValueParameters(valueParametersWithSAMConversion, newResolvedCall.getValueArgumentsByIndex());
 
@@ -852,6 +889,19 @@ class CodegenAnnotatingVisitor extends KtVisitorVoid {
         withinUninitializedClass(call, () -> super.visitConstructorDelegationCall(call));
 
         checkSamCall(call);
+    }
+
+    @Override
+    public void visitParameter(@NotNull KtParameter parameter) {
+        PsiElement parent = parameter.getParent(); // KtParameterList
+        if (parent != null && parent.getParent() instanceof KtConstructor<?>) {
+            KtExpression defaultValue = parameter.getDefaultValue();
+            if (defaultValue != null) {
+                withinUninitializedClass(defaultValue, () -> defaultValue.accept(this));
+            }
+        } else {
+            super.visitParameter(parameter);
+        }
     }
 
     private void withinUninitializedClass(@NotNull KtElement element, @NotNull Runnable operation) {

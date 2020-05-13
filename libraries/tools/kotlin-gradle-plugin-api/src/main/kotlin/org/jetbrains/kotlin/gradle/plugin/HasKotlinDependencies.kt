@@ -10,6 +10,7 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.util.ConfigureUtil
+import java.io.File
 
 interface KotlinDependencyHandler {
     fun api(dependencyNotation: Any): Dependency?
@@ -21,20 +22,29 @@ interface KotlinDependencyHandler {
     fun implementation(dependencyNotation: Any): Dependency?
     fun implementation(dependencyNotation: String, configure: ExternalModuleDependency.() -> Unit): ExternalModuleDependency
     fun <T : Dependency> implementation(dependency: T, configure: T.() -> Unit): T
-    fun implementation(dependencyNotation: String, configure: Closure<*>) = implementation(dependencyNotation) { ConfigureUtil.configure(configure, this) }
-    fun <T : Dependency> implementation(dependency: T, configure: Closure<*>) = implementation(dependency) { ConfigureUtil.configure(configure, this) }
+    fun implementation(dependencyNotation: String, configure: Closure<*>) =
+        implementation(dependencyNotation) { ConfigureUtil.configure(configure, this) }
+
+    fun <T : Dependency> implementation(dependency: T, configure: Closure<*>) =
+        implementation(dependency) { ConfigureUtil.configure(configure, this) }
 
     fun compileOnly(dependencyNotation: Any): Dependency?
     fun compileOnly(dependencyNotation: String, configure: ExternalModuleDependency.() -> Unit): ExternalModuleDependency
     fun <T : Dependency> compileOnly(dependency: T, configure: T.() -> Unit): T
-    fun compileOnly(dependencyNotation: String, configure: Closure<*>) = compileOnly(dependencyNotation) { ConfigureUtil.configure(configure, this) }
-    fun <T : Dependency> compileOnly(dependency: T, configure: Closure<*>) = compileOnly(dependency) { ConfigureUtil.configure(configure, this) }
+    fun compileOnly(dependencyNotation: String, configure: Closure<*>) =
+        compileOnly(dependencyNotation) { ConfigureUtil.configure(configure, this) }
+
+    fun <T : Dependency> compileOnly(dependency: T, configure: Closure<*>) =
+        compileOnly(dependency) { ConfigureUtil.configure(configure, this) }
 
     fun runtimeOnly(dependencyNotation: Any): Dependency?
     fun runtimeOnly(dependencyNotation: String, configure: ExternalModuleDependency.() -> Unit): ExternalModuleDependency
     fun <T : Dependency> runtimeOnly(dependency: T, configure: T.() -> Unit): T
-    fun runtimeOnly(dependencyNotation: String, configure: Closure<*>) = runtimeOnly(dependencyNotation) { ConfigureUtil.configure(configure, this) }
-    fun <T : Dependency> runtimeOnly(dependency: T, configure: Closure<*>) = runtimeOnly(dependency) { ConfigureUtil.configure(configure, this) }
+    fun runtimeOnly(dependencyNotation: String, configure: Closure<*>) =
+        runtimeOnly(dependencyNotation) { ConfigureUtil.configure(configure, this) }
+
+    fun <T : Dependency> runtimeOnly(dependency: T, configure: Closure<*>) =
+        runtimeOnly(dependency) { ConfigureUtil.configure(configure, this) }
 
     fun kotlin(simpleModuleName: String): ExternalModuleDependency = kotlin(simpleModuleName, null)
     fun kotlin(simpleModuleName: String, version: String?): ExternalModuleDependency
@@ -46,10 +56,28 @@ interface KotlinDependencyHandler {
 
     fun npm(name: String, version: String = "*"): Dependency
 
+    fun npm(name: String, directory: File): Dependency
+
+    fun npm(directory: File): Dependency
+
     @Deprecated(
         message = "Use npm(name, version) instead. Name like in package.json"
     )
     fun npm(org: String? = null, packageName: String, version: String = "*"): Dependency
+
+    fun devNpm(name: String, version: String = "*"): Dependency
+
+    fun devNpm(name: String, directory: File): Dependency
+
+    fun devNpm(directory: File): Dependency
+
+    fun optionalNpm(name: String, version: String = "*"): Dependency
+
+    fun optionalNpm(name: String, directory: File): Dependency
+
+    fun optionalNpm(directory: File): Dependency
+
+    fun peerNpm(name: String, version: String = "*"): Dependency
 }
 
 interface HasKotlinDependencies {

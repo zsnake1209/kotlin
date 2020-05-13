@@ -12,6 +12,7 @@ import com.intellij.psi.impl.compiled.ClsClassImpl
 import com.intellij.psi.impl.compiled.ClsFileImpl
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.SmartList
 import org.jetbrains.kotlin.asJava.KotlinAsJavaSupport
 import org.jetbrains.kotlin.asJava.builder.ClsWrapperStubPsiFactory
 import org.jetbrains.kotlin.asJava.classes.*
@@ -34,7 +35,6 @@ import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.utils.sure
-import java.util.*
 
 class IDEKotlinAsJavaSupport(private val project: Project) : KotlinAsJavaSupport() {
     private val psiManager: PsiManager = PsiManager.getInstance(project)
@@ -151,19 +151,6 @@ class IDEKotlinAsJavaSupport(private val project: Project) : KotlinAsJavaSupport
         return KtLightClassForScript.create(script)
     }
 
-    private fun withFakeLightClasses(
-        lightClassForFacade: KtLightClassForFacade
-    ): List<PsiClass> {
-        val lightClasses = ArrayList<PsiClass>()
-        lightClasses.add(lightClassForFacade)
-        if (lightClassForFacade.files.size > 1) {
-            lightClasses.addAll(lightClassForFacade.files.map {
-                FakeLightClassForFileOfPackage(lightClassForFacade, it)
-            })
-        }
-        return lightClasses
-    }
-
     override fun getFacadeClasses(facadeFqName: FqName, scope: GlobalSearchScope): Collection<PsiClass> {
         val filesByModule = findFilesForFacade(facadeFqName, scope).groupBy(PsiElement::getModuleInfoPreferringJvmPlatform)
 
@@ -215,24 +202,20 @@ class IDEKotlinAsJavaSupport(private val project: Project) : KotlinAsJavaSupport
         facadeFqName: FqName,
         facadeFiles: List<KtFile>,
         moduleInfo: IdeaModuleInfo
-    ): List<PsiClass> {
-        val (clsFiles, _) = facadeFiles.partition { it is KtClsFile }
-        val facadesFromCls = clsFiles.mapNotNull { createLightClassForDecompiledKotlinFile(it as KtClsFile) }
-        val facadesFromSources = createFacadesForSourceFiles(moduleInfo, facadeFqName)
-        return facadesFromSources + facadesFromCls
+    ): List<PsiClass> = SmartList<PsiClass>().apply {
+
+        tryCreateFacadesForSourceFiles(moduleInfo, facadeFqName)?.let { sourcesFacade ->
+            add(sourcesFacade)
+        }
+
+        facadeFiles.filterIsInstance<KtClsFile>().mapNotNullTo(this) {
+            createLightClassForDecompiledKotlinFile(it)
+        }
     }
 
-    private fun createFacadesForSourceFiles(
-        moduleInfo: IdeaModuleInfo,
-        facadeFqName: FqName
-    ): List<PsiClass> {
-        if (moduleInfo !is ModuleSourceInfo && moduleInfo !is PlatformModuleInfo) return listOf()
-
-        val lightClassForFacade = KtLightClassForFacade.createForFacade(
-            psiManager, facadeFqName, moduleInfo.contentScope()
-        )
-
-        return if (lightClassForFacade !== null) withFakeLightClasses(lightClassForFacade) else emptyList()
+    private fun tryCreateFacadesForSourceFiles(moduleInfo: IdeaModuleInfo, facadeFqName: FqName): PsiClass? {
+        if (moduleInfo !is ModuleSourceInfo && moduleInfo !is PlatformModuleInfo) return null
+        return KtLightClassForFacade.createForFacade(psiManager, facadeFqName, moduleInfo.contentScope())
     }
 
     override fun findFilesForFacade(facadeFqName: FqName, scope: GlobalSearchScope): Collection<KtFile> {
@@ -263,8 +246,8 @@ class IDEKotlinAsJavaSupport(private val project: Project) : KotlinAsJavaSupport
     private fun findCorrespondingLightClass(
         decompiledClassOrObject: KtClassOrObject,
         rootLightClassForDecompiledFile: KtLightClassForDecompiledDeclaration
-    ): KtLightClassForDecompiledDeclaration {
-        val relativeFqName = getClassRelativeName(decompiledClassOrObject)
+    ): KtLightClassForDecompiledDeclaration? {
+        val relativeFqName = getClassRelativeName(decompiledClassOrObject) ?: return null
         val iterator = relativeFqName.pathSegments().iterator()
         val base = iterator.next()
         assert(rootLightClassForDecompiledFile.name == base.asString()) {
@@ -284,8 +267,8 @@ class IDEKotlinAsJavaSupport(private val project: Project) : KotlinAsJavaSupport
         return current
     }
 
-    private fun getClassRelativeName(decompiledClassOrObject: KtClassOrObject): FqName {
-        val name = decompiledClassOrObject.nameAsName!!
+    private fun getClassRelativeName(decompiledClassOrObject: KtClassOrObject): FqName? {
+        val name = decompiledClassOrObject.nameAsName ?: return null
         val parent = PsiTreeUtil.getParentOfType(
             decompiledClassOrObject,
             KtClassOrObject::class.java,
@@ -295,7 +278,7 @@ class IDEKotlinAsJavaSupport(private val project: Project) : KotlinAsJavaSupport
             assert(decompiledClassOrObject.isTopLevel())
             return FqName.topLevel(name)
         }
-        return getClassRelativeName(parent).child(name)
+        return getClassRelativeName(parent)?.child(name)
     }
 
     private fun createLightClassForDecompiledKotlinFile(file: KtClsFile): KtLightClassForDecompiledDeclaration? {

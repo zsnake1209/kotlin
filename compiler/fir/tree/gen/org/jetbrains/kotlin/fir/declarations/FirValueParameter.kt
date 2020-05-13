@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
-import org.jetbrains.kotlin.fir.FirPureAbstractElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSourceElement
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
@@ -21,10 +20,12 @@ import org.jetbrains.kotlin.fir.visitors.*
  * DO NOT MODIFY IT MANUALLY
  */
 
-abstract class FirValueParameter : FirPureAbstractElement(), FirVariable<FirValueParameter> {
+abstract class FirValueParameter : FirVariable<FirValueParameter>() {
     abstract override val source: FirSourceElement?
     abstract override val session: FirSession
     abstract override val resolvePhase: FirResolvePhase
+    abstract override val origin: FirDeclarationOrigin
+    abstract override val attributes: FirDeclarationAttributes
     abstract override val returnTypeRef: FirTypeRef
     abstract override val receiverTypeRef: FirTypeRef?
     abstract override val name: Name
@@ -44,15 +45,25 @@ abstract class FirValueParameter : FirPureAbstractElement(), FirVariable<FirValu
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitValueParameter(this, data)
 
+    abstract override fun replaceResolvePhase(newResolvePhase: FirResolvePhase)
+
+    abstract override fun replaceReturnTypeRef(newReturnTypeRef: FirTypeRef)
+
+    abstract override fun replaceReceiverTypeRef(newReceiverTypeRef: FirTypeRef?)
+
     abstract override fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D): FirValueParameter
 
     abstract override fun <D> transformReceiverTypeRef(transformer: FirTransformer<D>, data: D): FirValueParameter
 
     abstract override fun <D> transformInitializer(transformer: FirTransformer<D>, data: D): FirValueParameter
 
+    abstract override fun <D> transformDelegate(transformer: FirTransformer<D>, data: D): FirValueParameter
+
     abstract override fun <D> transformGetter(transformer: FirTransformer<D>, data: D): FirValueParameter
 
     abstract override fun <D> transformSetter(transformer: FirTransformer<D>, data: D): FirValueParameter
+
+    abstract override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirValueParameter
 
     abstract override fun <D> transformOtherChildren(transformer: FirTransformer<D>, data: D): FirValueParameter
 }

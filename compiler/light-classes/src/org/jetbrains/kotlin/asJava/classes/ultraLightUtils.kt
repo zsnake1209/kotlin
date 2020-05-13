@@ -18,6 +18,7 @@ import com.intellij.psi.impl.compiled.StubBuildingVisitor
 import com.intellij.psi.impl.light.*
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.BitUtil.isSet
+import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.UltraLightClassModifierExtension
@@ -248,7 +249,12 @@ private fun KtUltraLightClass.lightMethod(
     val name = if (descriptor is ConstructorDescriptor) name else support.typeMapper.mapFunctionName(descriptor, OwnerKind.IMPLEMENTATION)
 
     val accessFlags: Int by lazyPub {
-        val asmFlags = AsmUtil.getMethodAsmFlags(descriptor, OwnerKind.IMPLEMENTATION, support.deprecationResolver)
+        val asmFlags = AsmUtil.getMethodAsmFlags(
+            descriptor,
+            OwnerKind.IMPLEMENTATION,
+            support.deprecationResolver,
+            support.typeMapper.jvmDefaultMode,
+        )
         packMethodFlags(asmFlags, JvmCodegenUtil.isJvmInterface(kotlinOrigin.resolve() as? ClassDescriptor))
     }
 
@@ -359,14 +365,32 @@ private fun toQualifiedName(userType: KtUserType): FqName? {
 
 internal fun ConstantValue<*>.createPsiLiteral(parent: PsiElement): PsiExpression? {
     val asString = asStringForPsiLiteral(parent)
-    val instance = PsiElementFactory.SERVICE.getInstance(parent.project)
-    return instance.createExpressionFromText(asString, parent)
+    val instance = PsiElementFactory.getInstance(parent.project)
+    return try {
+        instance.createExpressionFromText(asString, parent)
+    } catch (_: IncorrectOperationException) {
+        null
+    }
+}
+
+private fun escapeString(str: String): String = buildString {
+    str.forEach { char ->
+        val escaped = when (char) {
+            '\n' -> "\\n"
+            '\r' -> "\\r"
+            '\t' -> "\\t"
+            '\"' -> "\\\""
+            '\\' -> "\\\\"
+            else -> "$char"
+        }
+        append(escaped)
+    }
 }
 
 private fun ConstantValue<*>.asStringForPsiLiteral(parent: PsiElement): String =
     when (this) {
         is NullValue -> "null"
-        is StringValue -> "\"$value\""
+        is StringValue -> "\"${escapeString(value)}\""
         is KClassValue -> {
             val value = (value as KClassValue.Value.NormalClass).value
             val arrayPart = "[]".repeat(value.arrayNestedness)
@@ -418,8 +442,8 @@ inline fun <T> runReadAction(crossinline runnable: () -> T): T {
     return ApplicationManager.getApplication().runReadAction(Computable { runnable() })
 }
 
-fun KtClassOrObject.safeIsLocal(): Boolean = runReadAction { this.isLocal }
+inline fun KtClassOrObject.safeIsLocal(): Boolean = runReadAction { this.isLocal }
 
-fun KtFile.safeIsScript() = runReadAction { this.isScript() }
+inline fun KtFile.safeIsScript() = runReadAction { this.isScript() }
 
-fun KtFile.safeScript() = runReadAction { this.script }
+inline fun KtFile.safeScript() = runReadAction { this.script }

@@ -132,6 +132,11 @@ public class IrCompileJavaAgainstKotlinTestGenerated extends AbstractIrCompileJa
             runTest("compiler/testData/compileJavaAgainstKotlin/class/kt4050.kt");
         }
 
+        @TestMetadata("MapImpl.kt")
+        public void testMapImpl() throws Exception {
+            runTest("compiler/testData/compileJavaAgainstKotlin/class/MapImpl.kt");
+        }
+
         @TestMetadata("Simple.kt")
         public void testSimple() throws Exception {
             runTest("compiler/testData/compileJavaAgainstKotlin/class/Simple.kt");
@@ -470,6 +475,11 @@ public class IrCompileJavaAgainstKotlinTestGenerated extends AbstractIrCompileJa
             @TestMetadata("GenericSubstitution.kt")
             public void testGenericSubstitution() throws Exception {
                 runTest("compiler/testData/compileJavaAgainstKotlin/method/throws/GenericSubstitution.kt");
+            }
+
+            @TestMetadata("KotlinThrows.kt")
+            public void testKotlinThrows() throws Exception {
+                runTest("compiler/testData/compileJavaAgainstKotlin/method/throws/KotlinThrows.kt");
             }
 
             @TestMetadata("TopLevel.kt")

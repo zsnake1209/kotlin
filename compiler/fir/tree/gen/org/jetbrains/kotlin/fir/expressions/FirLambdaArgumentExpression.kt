@@ -22,4 +22,8 @@ abstract class FirLambdaArgumentExpression : FirWrappedArgumentExpression() {
     abstract override val isSpread: Boolean
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitLambdaArgumentExpression(this, data)
+
+    abstract override fun replaceTypeRef(newTypeRef: FirTypeRef)
+
+    abstract override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirLambdaArgumentExpression
 }

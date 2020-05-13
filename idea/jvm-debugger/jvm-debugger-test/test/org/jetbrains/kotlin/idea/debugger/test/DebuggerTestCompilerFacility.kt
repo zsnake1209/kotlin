@@ -10,6 +10,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
+import com.intellij.openapi.roots.libraries.ui.OrderRoot
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
@@ -19,7 +20,6 @@ import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
 import org.jetbrains.kotlin.cli.common.output.writeAllTo
 import org.jetbrains.kotlin.cli.jvm.compiler.findMainClass
 import org.jetbrains.kotlin.codegen.ClassBuilderFactories
-import org.jetbrains.kotlin.codegen.CodegenTestCase.TestFile
 import org.jetbrains.kotlin.codegen.CodegenTestUtil
 import org.jetbrains.kotlin.codegen.DefaultCodegenFactory
 import org.jetbrains.kotlin.codegen.KotlinCodegenFacade
@@ -29,17 +29,18 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
-import org.jetbrains.kotlin.idea.debugger.test.util.patchDexTests
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.test.KotlinBaseTest.TestFile
 import org.jetbrains.kotlin.test.MockLibraryUtil
 import org.jetbrains.kotlin.test.testFramework.KtUsefulTestCase
 import java.io.File
 
-class DebuggerTestCompilerFacility(files: List<TestFile>, private val jvmTarget: JvmTarget, private val applyDexPatch: Boolean) {
+class DebuggerTestCompilerFacility(files: List<TestFile>, private val jvmTarget: JvmTarget) {
     private val kotlinStdlibPath = ForTestCompileRuntime.runtimeJarForTests().absolutePath
 
     private val mainFiles: TestFilesByLanguage
     private val libraryFiles: TestFilesByLanguage
+    private val mavenArtifacts = mutableListOf<String>()
 
     init {
         val splitFiles = splitByTarget(files)
@@ -62,6 +63,15 @@ class DebuggerTestCompilerFacility(files: List<TestFile>, private val jvmTarget:
         compileLibrary(libraryFiles, srcDir, classesDir)
     }
 
+    fun addDependencies(libraryPaths: List<String>) {
+        for (libraryPath in libraryPaths) {
+            mavenArtifacts.add(libraryPath)
+        }
+    }
+
+    fun kotlinStdlibInMavenArtifacts() =
+        mavenArtifacts.find { it.contains(Regex("""kotlin-stdlib-\d+\.\d+\.\d+(\-\w+)?""")) }
+
     fun compileLibrary(srcDir: File, classesDir: File) {
         compileLibrary(this.libraryFiles, srcDir, classesDir)
 
@@ -73,26 +83,25 @@ class DebuggerTestCompilerFacility(files: List<TestFile>, private val jvmTarget:
         resources.copy(classesDir)
         (kotlin + java).copy(srcDir)
 
+        if (kotlinStdlibInMavenArtifacts() == null)
+            mavenArtifacts.add(kotlinStdlibPath)
+
         if (kotlin.isNotEmpty()) {
             MockLibraryUtil.compileKotlin(
                 srcDir.absolutePath,
                 classesDir,
                 listOf("-jvm-target", jvmTarget.description),
-                kotlinStdlibPath
+                *(mavenArtifacts.toTypedArray())
             )
         }
 
         if (java.isNotEmpty()) {
             CodegenTestUtil.compileJava(
                 java.map { File(srcDir, it.name).absolutePath },
-                listOf(kotlinStdlibPath, classesDir.absolutePath),
+                mavenArtifacts + classesDir.absolutePath,
                 listOf("-g"),
                 classesDir
             )
-        }
-
-        if (applyDexPatch) {
-            patchDexTests(classesDir)
         }
     }
 
@@ -136,10 +145,6 @@ class DebuggerTestCompilerFacility(files: List<TestFile>, private val jvmTarget:
                 listOf("-g"),
                 classesDir
             )
-        }
-
-        if (applyDexPatch) {
-            patchDexTests(classesDir)
         }
 
         return mainClassName

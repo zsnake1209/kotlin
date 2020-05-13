@@ -1,6 +1,6 @@
 internal annotation class Anon(
-        val stringArray: Array<String>, val intArray: IntArray,  // string
-        val string: String
+    val stringArray: Array<String>, val intArray: IntArray,  // string
+    val string: String
 )
 
 @Anon(string = "a", stringArray = ["a", "b"], intArray = [1, 2])

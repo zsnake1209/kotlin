@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.resolve.calls.components.CallableReferenceResolver
+import org.jetbrains.kotlin.resolve.calls.components.KotlinResolutionCallbacks
 import org.jetbrains.kotlin.resolve.calls.components.NewConstraintSystemImpl
 import org.jetbrains.kotlin.resolve.calls.components.TypeArgumentsToParametersMapper
 import org.jetbrains.kotlin.resolve.calls.inference.NewConstraintSystem
@@ -28,7 +29,9 @@ import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage
 import org.jetbrains.kotlin.resolve.calls.inference.model.NewConstraintSystemImpl
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.resolve.calls.tower.*
+import org.jetbrains.kotlin.resolve.constants.IntegerValueTypeConstant
 import org.jetbrains.kotlin.types.TypeSubstitutor
+import org.jetbrains.kotlin.types.UnwrappedType
 
 
 abstract class ResolutionPart {
@@ -65,6 +68,7 @@ fun KotlinDiagnosticsHolder.addDiagnosticIfNotNull(diagnostic: KotlinCallDiagnos
  */
 class KotlinResolutionCandidate(
     val callComponents: KotlinCallComponents,
+    val resolutionCallbacks: KotlinResolutionCallbacks,
     val callableReferenceResolver: CallableReferenceResolver,
     val scopeTower: ImplicitScopeTower,
     private val baseSystem: ConstraintStorage,
@@ -182,12 +186,23 @@ class MutableResolvedCallAtom(
     override lateinit var knownParametersSubstitutor: TypeSubstitutor
     lateinit var argumentToCandidateParameter: Map<KotlinCallArgument, ValueParameterDescriptor>
     private var samAdapterMap: HashMap<KotlinCallArgument, SamConversionDescription>? = null
+    private var suspendAdapterMap: HashMap<KotlinCallArgument, UnwrappedType>? = null
+    private var signedUnsignedConstantConversions: HashMap<KotlinCallArgument, IntegerValueTypeConstant>? = null
 
     val hasSamConversion: Boolean
         get() = samAdapterMap != null
 
+    val hasSuspendConversion: Boolean
+        get() = suspendAdapterMap != null
+
     override val argumentsWithConversion: Map<KotlinCallArgument, SamConversionDescription>
         get() = samAdapterMap ?: emptyMap()
+
+    override val argumentsWithSuspendConversion: Map<KotlinCallArgument, UnwrappedType>
+        get() = suspendAdapterMap ?: emptyMap()
+
+    override val argumentsWithConstantConversion: Map<KotlinCallArgument, IntegerValueTypeConstant>
+        get() = signedUnsignedConstantConversions ?: emptyMap()
 
     fun registerArgumentWithSamConversion(argument: KotlinCallArgument, samConversionDescription: SamConversionDescription) {
         if (samAdapterMap == null)
@@ -195,6 +210,21 @@ class MutableResolvedCallAtom(
 
         samAdapterMap!![argument] = samConversionDescription
     }
+
+    fun registerArgumentWithSuspendConversion(argument: KotlinCallArgument, convertedType: UnwrappedType) {
+        if (suspendAdapterMap == null)
+            suspendAdapterMap = hashMapOf()
+
+        suspendAdapterMap!![argument] = convertedType
+    }
+
+    fun registerArgumentWithConstantConversion(argument: KotlinCallArgument, convertedConstant: IntegerValueTypeConstant) {
+        if (signedUnsignedConstantConversions == null)
+            signedUnsignedConstantConversions = hashMapOf()
+
+        signedUnsignedConstantConversions!![argument] = convertedConstant
+    }
+
 
     override public fun setAnalyzedResults(subResolvedAtoms: List<ResolvedAtom>) {
         super.setAnalyzedResults(subResolvedAtoms)

@@ -1,18 +1,11 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the license/LICENSE.txt file.
- */
-
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-description = "Kotlin Daemon New"
+description = "Kotlin Daemon"
 
 plugins {
     kotlin("jvm")
     id("jps-compatible")
 }
-
-jvmTarget = "1.8"
 
 val ktorExcludesForDaemon : List<Pair<String, String>> by rootProject.extra
 
@@ -49,11 +42,7 @@ sourceSets {
 
 publish()
 
-noDefaultJar()
-
-runtimeJar(tasks.register<ShadowJar>("shadowJar")) {
-    from(mainSourceSet.output)
-}
+runtimeJar()
 
 sourcesJar()
 

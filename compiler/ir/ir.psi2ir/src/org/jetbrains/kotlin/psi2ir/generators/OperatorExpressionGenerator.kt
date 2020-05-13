@@ -45,9 +45,7 @@ import org.jetbrains.kotlin.resolve.checkers.PrimitiveNumericComparisonInfo
 import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.intersectTypes
-import org.jetbrains.kotlin.types.typeUtil.isPrimitiveNumberType
-import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
-import org.jetbrains.kotlin.types.typeUtil.makeNullable
+import org.jetbrains.kotlin.types.typeUtil.*
 
 
 class OperatorExpressionGenerator(statementGenerator: StatementGenerator) : StatementGeneratorExtension(statementGenerator) {
@@ -62,9 +60,8 @@ class OperatorExpressionGenerator(statementGenerator: StatementGenerator) : Stat
 
     fun generatePrefixExpression(expression: KtPrefixExpression): IrExpression {
         val ktOperator = expression.operationReference.getReferencedNameElementType()
-        val irOperator = getPrefixOperator(ktOperator)
 
-        return when (irOperator) {
+        return when (val irOperator = getPrefixOperator(ktOperator)) {
             null -> throw AssertionError("Unexpected prefix operator: $ktOperator")
 
             in INCREMENT_DECREMENT_OPERATORS ->
@@ -78,9 +75,8 @@ class OperatorExpressionGenerator(statementGenerator: StatementGenerator) : Stat
 
     fun generatePostfixExpression(expression: KtPostfixExpression): IrExpression {
         val ktOperator = expression.operationReference.getReferencedNameElementType()
-        val irOperator = getPostfixOperator(ktOperator)
 
-        return when (irOperator) {
+        return when (val irOperator = getPostfixOperator(ktOperator)) {
             null -> throw AssertionError("Unexpected postfix operator: $ktOperator")
 
             in INCREMENT_DECREMENT_OPERATORS ->
@@ -130,9 +126,7 @@ class OperatorExpressionGenerator(statementGenerator: StatementGenerator) : Stat
             return generateBinaryOperatorAsCall(expression, null)
         }
 
-        val irOperator = getInfixOperator(ktOperator)
-
-        return when (irOperator) {
+        return when (val irOperator = getInfixOperator(ktOperator)) {
             null -> throw AssertionError("Unexpected infix operator: $ktOperator")
             IrStatementOrigin.EQ -> AssignmentGenerator(statementGenerator).generateAssignment(expression)
             in AUGMENTED_ASSIGNMENTS -> AssignmentGenerator(statementGenerator).generateAugmentedAssignment(expression, irOperator)
@@ -319,7 +313,9 @@ class OperatorExpressionGenerator(statementGenerator: StatementGenerator) : Stat
         val comparisonInfo = getPrimitiveNumericComparisonInfo(expression)
         val comparisonType = comparisonInfo?.comparisonType
 
-        val eqeqSymbol = context.irBuiltIns.ieee754equalsFunByOperandType[kotlinTypeToIrType(comparisonType)?.classifierOrNull] ?: context.irBuiltIns.eqeqSymbol
+        val eqeqSymbol =
+            context.irBuiltIns.ieee754equalsFunByOperandType[kotlinTypeToIrType(comparisonType)?.classifierOrNull]
+                ?: context.irBuiltIns.eqeqSymbol
 
         val irEquals = primitiveOp2(
             expression.startOffsetSkippingComments, expression.endOffset,
@@ -357,7 +353,8 @@ class OperatorExpressionGenerator(statementGenerator: StatementGenerator) : Stat
         if (comparisonInfo != null) {
             val comparisonType = comparisonInfo.comparisonType
             val eqeqSymbol =
-                context.irBuiltIns.ieee754equalsFunByOperandType[kotlinTypeToIrType(comparisonType)?.classifierOrNull] ?: context.irBuiltIns.eqeqSymbol
+                context.irBuiltIns.ieee754equalsFunByOperandType[kotlinTypeToIrType(comparisonType)?.classifierOrNull] ?: context.irBuiltIns
+                    .eqeqSymbol
             primitiveOp2(
                 startOffset, endOffset,
                 eqeqSymbol,
@@ -453,7 +450,10 @@ class OperatorExpressionGenerator(statementGenerator: StatementGenerator) : Stat
             val comparisonType = comparisonInfo.comparisonType
             primitiveOp2(
                 startOffset, endOffset,
-                getComparisonOperatorSymbol(origin, kotlinTypeToIrType(comparisonType) ?: error("$comparisonType expected to be primitive")),
+                getComparisonOperatorSymbol(
+                    origin,
+                    kotlinTypeToIrType(comparisonType) ?: error("$comparisonType expected to be primitive")
+                ),
                 context.irBuiltIns.booleanType,
                 origin,
                 ktLeft.generateAsPrimitiveNumericComparisonOperand(comparisonInfo.leftPrimitiveType, comparisonInfo.comparisonType),
@@ -491,7 +491,7 @@ class OperatorExpressionGenerator(statementGenerator: StatementGenerator) : Stat
         }[primitiveNumericType.classifierOrFail]!!
 
     private fun generateExclExclOperator(expression: KtPostfixExpression, origin: IrStatementOrigin): IrExpression {
-        val ktArgument = expression.baseExpression!!
+        val ktArgument = KtPsiUtil.deparenthesize(expression.baseExpression!!)!!
         val irArgument = ktArgument.genExpr()
         val ktOperator = expression.operationReference
 

@@ -11,10 +11,13 @@ import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnostic
+import org.jetbrains.kotlin.fir.analysis.diagnostics.FirPsiDiagnostic
 import org.jetbrains.kotlin.fir.declarations.FirFile
+import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
+import org.jetbrains.kotlin.fir.extensions.extensionsService
+import org.jetbrains.kotlin.fir.extensions.registerExtensions
 import org.jetbrains.kotlin.fir.java.FirProjectSessionProvider
-import org.jetbrains.kotlin.fir.psi
-import org.jetbrains.kotlin.fir.resolve.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.idea.caches.project.ModuleSourceInfo
 import org.jetbrains.kotlin.idea.caches.project.getModuleInfo
 import org.jetbrains.kotlin.psi.KtElement
@@ -31,10 +34,13 @@ interface FirModuleResolveState {
     fun getSession(project: Project, moduleInfo: ModuleSourceInfo): FirSession {
         sessionProvider.getSession(moduleInfo)?.let { return it }
         return synchronized(moduleInfo.module) {
-            sessionProvider.getSession(moduleInfo) ?: FirIdeJavaModuleBasedSession(
+            val session = sessionProvider.getSession(moduleInfo) ?: FirIdeJavaModuleBasedSession(
                 project, moduleInfo, sessionProvider, moduleInfo.contentScope()
             ).also { moduleBasedSession ->
                 sessionProvider.sessionCache[moduleInfo] = moduleBasedSession
+            }
+            session.also {
+                it.extensionsService.registerExtensions(FirExtensionRegistrar.RegisteredExtensions.EMPTY)
             }
         }
     }
@@ -49,7 +55,7 @@ interface FirModuleResolveState {
 
     fun record(psi: KtElement, diagnostic: Diagnostic)
 
-    fun setDiagnosticsForFile(file: KtFile, fir: FirFile, diagnostics: Iterable<ConeDiagnostic> = emptyList())
+    fun setDiagnosticsForFile(file: KtFile, fir: FirFile, diagnostics: Iterable<FirDiagnostic<*>> = emptyList())
 }
 
 class FirModuleResolveStateImpl(override val sessionProvider: FirProjectSessionProvider) : FirModuleResolveState {
@@ -91,9 +97,11 @@ class FirModuleResolveStateImpl(override val sessionProvider: FirProjectSessionP
         list += diagnostic
     }
 
-    override fun setDiagnosticsForFile(file: KtFile, fir: FirFile, diagnostics: Iterable<ConeDiagnostic>) {
+    override fun setDiagnosticsForFile(file: KtFile, fir: FirFile, diagnostics: Iterable<FirDiagnostic<*>>) {
         for (diagnostic in diagnostics) {
-            (diagnostic.source.psi as? KtElement)?.let { record(it, diagnostic.diagnostic) }
+            require(diagnostic is FirPsiDiagnostic<*>)
+            val psi = diagnostic.element.psi as? KtElement ?: continue
+            record(psi, diagnostic.asPsiBasedDiagnostic())
         }
 
         diagnosedFiles[file] = file.modificationStamp

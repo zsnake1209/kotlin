@@ -21,12 +21,18 @@ interface FirTypedDeclaration : FirDeclaration, FirAnnotationContainer {
     override val source: FirSourceElement?
     override val session: FirSession
     override val resolvePhase: FirResolvePhase
+    override val origin: FirDeclarationOrigin
+    override val attributes: FirDeclarationAttributes
     override val annotations: List<FirAnnotationCall>
     val returnTypeRef: FirTypeRef
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R = visitor.visitTypedDeclaration(this, data)
 
+    override fun replaceResolvePhase(newResolvePhase: FirResolvePhase)
+
     fun replaceReturnTypeRef(newReturnTypeRef: FirTypeRef)
+
+    override fun <D> transformAnnotations(transformer: FirTransformer<D>, data: D): FirTypedDeclaration
 
     fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D): FirTypedDeclaration
 }

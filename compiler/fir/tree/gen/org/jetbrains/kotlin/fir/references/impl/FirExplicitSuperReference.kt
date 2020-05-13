@@ -15,9 +15,10 @@ import org.jetbrains.kotlin.fir.visitors.*
  * DO NOT MODIFY IT MANUALLY
  */
 
-class FirExplicitSuperReference(
+internal class FirExplicitSuperReference(
     override val source: FirSourceElement?,
-    override var superTypeRef: FirTypeRef
+    override val labelName: String?,
+    override var superTypeRef: FirTypeRef,
 ) : FirSuperReference() {
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         superTypeRef.accept(visitor, data)

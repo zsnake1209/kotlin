@@ -137,7 +137,8 @@ internal open class GradleCompilerRunner(protected val task: Task) {
             outputFiles = environment.outputFiles.toList(),
             taskPath = task.path,
             buildReportMode = environment.buildReportMode,
-            kotlinScriptExtensions = environment.kotlinScriptExtensions
+            kotlinScriptExtensions = environment.kotlinScriptExtensions,
+            allWarningsAsErrors = compilerArgs.allWarningsAsErrors
         )
         TaskLoggers.put(task.path, task.logger)
         runCompilerAsync(workArgs)
@@ -169,6 +170,7 @@ internal open class GradleCompilerRunner(protected val task: Task) {
 
         @Volatile
         private var cachedGradle = WeakReference<Gradle>(null)
+
         @Volatile
         private var cachedModulesInfo: IncrementalModuleInfo? = null
 

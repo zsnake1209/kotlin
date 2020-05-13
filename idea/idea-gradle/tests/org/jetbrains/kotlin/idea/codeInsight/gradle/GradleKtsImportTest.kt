@@ -6,12 +6,17 @@
 package org.jetbrains.kotlin.idea.codeInsight.gradle
 
 import com.intellij.openapi.vfs.LocalFileSystem
+import junit.framework.AssertionFailedError
+import org.jetbrains.kotlin.idea.KotlinIdeaGradleBundle
 import org.jetbrains.kotlin.idea.core.script.ScriptConfigurationManager
 import org.jetbrains.kotlin.idea.core.script.applySuggestedScriptConfiguration
-import org.jetbrains.kotlin.idea.core.script.configuration.cache.ScriptConfigurationCacheScope
+import org.jetbrains.kotlin.idea.core.script.configuration.loader.DefaultScriptConfigurationLoader
+import org.jetbrains.kotlin.idea.core.script.configuration.loader.ScriptConfigurationLoadingContext
 import org.jetbrains.kotlin.idea.core.script.configuration.utils.areSimilar
 import org.jetbrains.kotlin.idea.core.script.configuration.utils.getKtFile
 import org.jetbrains.kotlin.idea.core.script.hasSuggestedScriptConfiguration
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.scripting.definitions.ScriptDefinition
 import org.jetbrains.kotlin.scripting.resolve.ScriptCompilationConfigurationWrapper
 import org.jetbrains.kotlin.test.JUnitParameterizedWithIdeaConfigurationRunner
 import org.jetbrains.kotlin.test.RunnerFactoryWithMuteInDatabase
@@ -50,6 +55,22 @@ class GradleKtsImportTest : GradleImportingTestCase() {
 
     @Test
     @TargetVersions("6.0.1+")
+    fun testError() {
+        configureByFiles()
+
+        val result = try {
+            importProject()
+        } catch (e: AssertionFailedError) {
+            e
+        }
+
+        assert(result is AssertionFailedError) { "Exception should be thrown" }
+        assert((result as AssertionFailedError).message?.contains(KotlinIdeaGradleBundle.message("title.kotlin.build.script")) == true)
+        checkConfiguration("build.gradle.kts")
+    }
+
+    @Test
+    @TargetVersions("6.0.1+")
     fun testCompositeBuild() {
         configureByFiles()
         importProject()
@@ -70,16 +91,33 @@ class GradleKtsImportTest : GradleImportingTestCase() {
     private fun checkConfiguration(vararg files: String) {
         val scripts = files.map {
             KtsFixture(it).also { kts ->
-                assertTrue(scriptConfigurationManager.hasConfiguration(kts.psiFile))
+                assertTrue("Configuration for ${kts.file.path} is missing", scriptConfigurationManager.hasConfiguration(kts.psiFile))
                 kts.imported = scriptConfigurationManager.getConfiguration(kts.psiFile)!!
             }
         }
 
         // reload configuration and check this it is not changed
         scripts.forEach {
-            scriptConfigurationManager.updater.postponeConfigurationReload(ScriptConfigurationCacheScope.File(it.psiFile))
-            val reloadedConfiguration = scriptConfigurationManager.getConfiguration(it.psiFile)!!
-            assertTrue(areSimilar(it.imported, reloadedConfiguration))
+            val reloadedConfiguration = scriptConfigurationManager.forceReloadConfiguration(
+                it.virtualFile,
+                object : DefaultScriptConfigurationLoader(it.psiFile.project) {
+                    override fun shouldRunInBackground(scriptDefinition: ScriptDefinition) = false
+                    override fun loadDependencies(
+                        isFirstLoad: Boolean,
+                        ktFile: KtFile,
+                        scriptDefinition: ScriptDefinition,
+                        context: ScriptConfigurationLoadingContext
+                    ): Boolean {
+                        val vFile = ktFile.originalFile.virtualFile
+                        val result = getConfigurationThroughScriptingApi(ktFile, vFile, scriptDefinition)
+                        context.saveNewConfiguration(vFile, result)
+                        return true
+                    }
+                }
+            )
+            requireNotNull(reloadedConfiguration)
+            // todo: script configuration can have different accessors, need investigation
+            // assertTrue(areSimilar(it.imported, reloadedConfiguration))
             it.assertNoSuggestedConfiguration()
         }
 

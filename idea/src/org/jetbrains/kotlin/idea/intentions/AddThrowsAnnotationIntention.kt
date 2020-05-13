@@ -1,34 +1,39 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.idea.intentions
 
 import com.intellij.openapi.editor.Editor
+import org.jetbrains.kotlin.config.ApiVersion
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithVisibility
 import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.caches.resolve.resolveToCall
 import org.jetbrains.kotlin.idea.core.ShortenReferences
 import org.jetbrains.kotlin.idea.core.replaced
+import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.idea.project.platform
+import org.jetbrains.kotlin.idea.refactoring.fqName.fqName
 import org.jetbrains.kotlin.idea.util.addAnnotation
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfTypesAndPredicate
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.annotations.JVM_THROWS_ANNOTATION_FQ_NAME
+import org.jetbrains.kotlin.resolve.annotations.KOTLIN_THROWS_ANNOTATION_FQ_NAME
 import org.jetbrains.kotlin.resolve.calls.callUtil.getType
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.getAbbreviatedType
 
 class AddThrowsAnnotationIntention : SelfTargetingIntention<KtThrowExpression>(
-    KtThrowExpression::class.java, "Add '@Throws' annotation"
+    KtThrowExpression::class.java, KotlinBundle.lazyMessage("add.throws.annotation")
 ) {
-
     override fun isApplicableTo(element: KtThrowExpression, caretOffset: Int): Boolean {
         if (!element.platform.isJvm()) return false
         val containingDeclaration = element.getContainingDeclaration() ?: return false
@@ -64,7 +69,11 @@ class AddThrowsAnnotationIntention : SelfTargetingIntention<KtThrowExpression>(
         if (annotationEntry == null || annotationEntry.valueArguments.isEmpty()) {
             annotationEntry?.delete()
             val whiteSpaceText = if (containingDeclaration is KtPropertyAccessor) " " else "\n"
-            containingDeclaration.addAnnotation(throwsAnnotationFqName, annotationArgumentText, whiteSpaceText)
+            val annotationFqName = KOTLIN_THROWS_ANNOTATION_FQ_NAME.takeIf {
+                element.languageVersionSettings.apiVersion >= ApiVersion.KOTLIN_1_4
+            } ?: JVM_THROWS_ANNOTATION_FQ_NAME
+
+            containingDeclaration.addAnnotation(annotationFqName, annotationArgumentText, whiteSpaceText)
         } else {
             val factory = KtPsiFactory(element)
             val argument = annotationEntry.valueArguments.firstOrNull()
@@ -91,8 +100,6 @@ class AddThrowsAnnotationIntention : SelfTargetingIntention<KtThrowExpression>(
     }
 }
 
-private val throwsAnnotationFqName = FqName("kotlin.jvm.Throws")
-
 private fun KtThrowExpression.getContainingDeclaration(): KtDeclaration? {
     val parent = getParentOfTypesAndPredicate(
         true,
@@ -110,23 +117,21 @@ private fun KtDeclaration.findThrowsAnnotation(context: BindingContext): KtAnnot
     val annotationEntries = this.annotationEntries + (parent as? KtProperty)?.annotationEntries.orEmpty()
     return annotationEntries.find {
         val typeReference = it.typeReference ?: return@find false
-        context[BindingContext.TYPE, typeReference]?.constructor?.declarationDescriptor?.fqNameSafe == throwsAnnotationFqName
+        val fqName = context[BindingContext.TYPE, typeReference]?.fqName ?: return@find false
+        fqName == KOTLIN_THROWS_ANNOTATION_FQ_NAME || fqName == JVM_THROWS_ANNOTATION_FQ_NAME
     }
 }
 
-private fun ValueArgument.hasType(type: KotlinType, context: BindingContext): Boolean {
-    val argumentExpression = getArgumentExpression()
-    val expressions = when (argumentExpression) {
+private fun ValueArgument.hasType(type: KotlinType, context: BindingContext): Boolean =
+    when (val argumentExpression = getArgumentExpression()) {
         is KtClassLiteralExpression -> listOf(argumentExpression)
         is KtCollectionLiteralExpression -> argumentExpression.getInnerExpressions().filterIsInstance(KtClassLiteralExpression::class.java)
         is KtCallExpression -> argumentExpression.valueArguments.mapNotNull { it.getArgumentExpression() as? KtClassLiteralExpression }
         else -> emptyList()
-    }
-    return expressions.any { it.getType(context)?.arguments?.firstOrNull()?.type == type }
-}
+    }.any { it.getType(context)?.arguments?.firstOrNull()?.type == type }
 
-private fun KtPsiFactory.createCollectionLiteral(expressions: List<KtExpression>, lastExpression: String): KtCollectionLiteralExpression {
-    return buildExpression {
+private fun KtPsiFactory.createCollectionLiteral(expressions: List<KtExpression>, lastExpression: String): KtCollectionLiteralExpression =
+    buildExpression {
         appendFixedText("[")
         expressions.forEach {
             appendExpression(it)
@@ -135,4 +140,3 @@ private fun KtPsiFactory.createCollectionLiteral(expressions: List<KtExpression>
         appendFixedText(lastExpression)
         appendFixedText("]")
     } as KtCollectionLiteralExpression
-}

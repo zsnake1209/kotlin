@@ -6,7 +6,7 @@ import kotlin.contracts.*
 
 fun callsAndInverts(b: Boolean, block: () -> Unit): Boolean {
     contract {
-        <!INAPPLICABLE_CANDIDATE!>callsInPlace<!>(block, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         returns(true) implies (!b)
         returns(false) implies b
     }
@@ -22,7 +22,7 @@ fun smartcastAndInitialization(x: Any?) {
 
     if (callsAndInverts(x !is String) { y = 42 }) {
         println(y)
-        x.<!UNRESOLVED_REFERENCE!>length<!>
+        x.length
     } else {
         println(y)
         x.<!UNRESOLVED_REFERENCE!>length<!>
@@ -35,7 +35,7 @@ fun inPresenceOfLazy(x: Any?, unknownBoolean: Boolean) {
 
     if (unknownBoolean && callsAndInverts(x !is String) { y = 42 }) {
         println(y)
-        x.<!UNRESOLVED_REFERENCE!>length<!>
+        x.length
     }
     else {
         println(y)
@@ -47,7 +47,7 @@ fun inPresenceOfLazy(x: Any?, unknownBoolean: Boolean) {
 fun isPresenceOfLazy2(x: Any?, unknownBoolean: Boolean) {
     val y: Int
     if (unknownBoolean && callsAndInverts(x !is String) { y = 42 }) {
-        x.<!UNRESOLVED_REFERENCE!>length<!>
+        x.length
     }
     else {
         println(y)
@@ -59,7 +59,7 @@ fun isPresenceOfLazy2(x: Any?, unknownBoolean: Boolean) {
 fun isPresenceOfLazy3(x: Any?, unknownBoolean: Boolean) {
     val y: Int
     if (unknownBoolean && callsAndInverts(x !is String) { y = 42 }) {
-        x.<!UNRESOLVED_REFERENCE!>length<!>
+        x.length
     }
     else {
         x.<!UNRESOLVED_REFERENCE!>length<!>

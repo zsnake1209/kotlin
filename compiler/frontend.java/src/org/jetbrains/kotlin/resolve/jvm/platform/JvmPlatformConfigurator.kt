@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.resolve.sam.SamConversionResolver
-import org.jetbrains.kotlin.load.java.sam.JvmSamConversionTransformer
+import org.jetbrains.kotlin.load.java.sam.JvmSamConversionOracle
 import org.jetbrains.kotlin.resolve.PlatformConfiguratorBase
 import org.jetbrains.kotlin.resolve.checkers.BigFunctionTypeAvailabilityChecker
 import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
@@ -39,7 +39,8 @@ object JvmPlatformConfigurator : PlatformConfiguratorBase(
         BadInheritedJavaSignaturesChecker,
         JvmMultifileClassStateChecker,
         SynchronizedOnInlineMethodChecker,
-        DefaultCheckerInTailrec
+        DefaultCheckerInTailrec,
+        FunctionDelegateMemberNameClashChecker,
     ),
 
     additionalCallCheckers = listOf(
@@ -102,10 +103,10 @@ object JvmPlatformConfigurator : PlatformConfiguratorBase(
         container.useImpl<InlinePlatformCompatibilityChecker>()
         container.useImpl<JvmModuleAccessibilityChecker>()
         container.useImpl<JvmModuleAccessibilityChecker.ClassifierUsage>()
-        container.useImpl<JvmTypeSpecificityComparator>()
+        container.useImpl<JvmTypeSpecificityComparatorDelegate>()
         container.useImpl<JvmPlatformOverloadsSpecificityComparator>()
         container.useImpl<JvmDefaultSuperCallChecker>()
-        container.useImpl<JvmSamConversionTransformer>()
+        container.useImpl<JvmSamConversionOracle>()
         container.useInstance(FunctionWithBigAritySupport.LanguageVersionDependent)
         container.useInstance(GenericArrayClassLiteralSupport.Enabled)
         container.useInstance(JavaActualAnnotationArgumentExtractor())

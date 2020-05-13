@@ -20,6 +20,7 @@ import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptorBase
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.runInEdtAndWait
 import org.jetbrains.kotlin.idea.inspections.gradle.DifferentKotlinGradleVersionInspection
 import org.jetbrains.kotlin.idea.inspections.runInspection
 import org.jetbrains.plugins.gradle.tooling.annotation.TargetVersions
@@ -54,7 +55,7 @@ class GradleInspectionTest : GradleImportingTestCase() {
         val problems = getInspectionResultFromTestDataProject()
 
         Assert.assertEquals(1, problems.size)
-        Assert.assertEquals("Plugin version (1.1.0-beta-17) is not the same as library version (1.1.0-beta-22)", problems.single())
+        Assert.assertEquals("Plugin version (1.3.20) is not the same as library version (1.3.30)", problems.single())
     }
 
     @Test
@@ -62,7 +63,7 @@ class GradleInspectionTest : GradleImportingTestCase() {
         val problems = getInspectionResultFromTestDataProject()
 
         Assert.assertEquals(1, problems.size)
-        Assert.assertEquals("Plugin version (1.1.0-beta-17) is not the same as library version (1.1.0-beta-22)", problems.single())
+        Assert.assertEquals("Plugin version (1.3.20) is not the same as library version (1.3.30)", problems.single())
     }
 
     @Test
@@ -166,17 +167,18 @@ class GradleInspectionTest : GradleImportingTestCase() {
 
     private fun getInspectionResult(tool: LocalInspectionTool, file: VirtualFile): List<String> {
         val resultRef = Ref<List<String>>()
-        invokeTestRunnable {
-            val presentation = runInspection(tool, myProject, listOf(file))
+        runInEdtAndWait {
+            invokeTestRunnable {
+                val presentation = runInspection(tool, myProject, listOf(file))
 
-            val foundProblems = presentation.problemElements
-                .values
-                .mapNotNull { it as? ProblemDescriptorBase }
-                .map { it.descriptionTemplate }
+                val foundProblems = presentation.problemElements
+                    .values
+                    .mapNotNull { it as? ProblemDescriptorBase }
+                    .map { it.descriptionTemplate }
 
-            resultRef.set(foundProblems)
+                resultRef.set(foundProblems)
+            }
         }
-
         return resultRef.get()
     }
 

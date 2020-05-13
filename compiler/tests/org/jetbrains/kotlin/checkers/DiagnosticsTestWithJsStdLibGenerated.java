@@ -28,6 +28,11 @@ public class DiagnosticsTestWithJsStdLibGenerated extends AbstractDiagnosticsTes
         KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/testsWithJsStdLib"), Pattern.compile("^(.+)\\.kt$"), null, true);
     }
 
+    @TestMetadata("funConstructorCallJS.kt")
+    public void testFunConstructorCallJS() throws Exception {
+        runTest("compiler/testData/diagnostics/testsWithJsStdLib/funConstructorCallJS.kt");
+    }
+
     @TestMetadata("implementingFunction.kt")
     public void testImplementingFunction() throws Exception {
         runTest("compiler/testData/diagnostics/testsWithJsStdLib/implementingFunction.kt");
@@ -51,6 +56,11 @@ public class DiagnosticsTestWithJsStdLibGenerated extends AbstractDiagnosticsTes
     @TestMetadata("runtimeAnnotations.kt")
     public void testRuntimeAnnotations() throws Exception {
         runTest("compiler/testData/diagnostics/testsWithJsStdLib/runtimeAnnotations.kt");
+    }
+
+    @TestMetadata("unsafeCastFunctionOnDynamicType.kt")
+    public void testUnsafeCastFunctionOnDynamicType() throws Exception {
+        runTest("compiler/testData/diagnostics/testsWithJsStdLib/unsafeCastFunctionOnDynamicType.kt");
     }
 
     @TestMetadata("wrongMultipleInheritance.kt")
@@ -415,11 +425,6 @@ public class DiagnosticsTestWithJsStdLibGenerated extends AbstractDiagnosticsTes
             KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/testsWithJsStdLib/module"), Pattern.compile("^(.+)\\.kt$"), null, true);
         }
 
-        @TestMetadata("coroutineProhibitedMigration.kt")
-        public void testCoroutineProhibitedMigration() throws Exception {
-            runTest("compiler/testData/diagnostics/testsWithJsStdLib/module/coroutineProhibitedMigration.kt");
-        }
-
         @TestMetadata("dualModuleFromUmd.kt")
         public void testDualModuleFromUmd() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithJsStdLib/module/dualModuleFromUmd.kt");
@@ -679,6 +684,11 @@ public class DiagnosticsTestWithJsStdLibGenerated extends AbstractDiagnosticsTes
         @TestMetadata("extensionFunctionArgumentOrReturnType.kt")
         public void testExtensionFunctionArgumentOrReturnType() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithJsStdLib/native/extensionFunctionArgumentOrReturnType.kt");
+        }
+
+        @TestMetadata("externalFunInterface.kt")
+        public void testExternalFunInterface() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithJsStdLib/native/externalFunInterface.kt");
         }
 
         @TestMetadata("externalInterfaceNested.kt")
@@ -1063,6 +1073,11 @@ public class DiagnosticsTestWithJsStdLibGenerated extends AbstractDiagnosticsTes
         @TestMetadata("reflectionApi.kt")
         public void testReflectionApi() throws Exception {
             runTest("compiler/testData/diagnostics/testsWithJsStdLib/reflection/reflectionApi.kt");
+        }
+
+        @TestMetadata("typeOfWithNonReifiedParameter.kt")
+        public void testTypeOfWithNonReifiedParameter() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithJsStdLib/reflection/typeOfWithNonReifiedParameter.kt");
         }
     }
 }

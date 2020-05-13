@@ -253,12 +253,11 @@ public abstract class AnnotationCodegen {
         jvm8.put(KotlinTarget.TYPE, ElementType.TYPE_USE);
 
         annotationTargetMaps.put(JvmTarget.JVM_1_6, jvm6);
-        annotationTargetMaps.put(JvmTarget.JVM_1_8, jvm8);
-        annotationTargetMaps.put(JvmTarget.JVM_9, jvm8);
-        annotationTargetMaps.put(JvmTarget.JVM_10, jvm8);
-        annotationTargetMaps.put(JvmTarget.JVM_11, jvm8);
-        annotationTargetMaps.put(JvmTarget.JVM_12, jvm8);
-        annotationTargetMaps.put(JvmTarget.JVM_13, jvm8);
+        for (JvmTarget target : JvmTarget.values()) {
+            if (target != JvmTarget.JVM_1_6) {
+                annotationTargetMaps.put(target, jvm8);
+            }
+        }
     }
 
     private void generateTargetAnnotation(
@@ -675,9 +674,9 @@ public abstract class AnnotationCodegen {
             return;
         }
 
-        Iterable<TypePathInfo> infos =
-                new TypeAnnotationCollector().collectTypeAnnotations(type, TypeReference.METHOD_FORMAL_PARAMETER);
-        for (TypePathInfo info : infos) {
+        Iterable<TypePathInfo<AnnotationDescriptor>> infos =
+                new PsiTypeAnnotationCollector().collectTypeAnnotations(type);
+        for (TypePathInfo<AnnotationDescriptor> info : infos) {
             for (AnnotationDescriptor annotationDescriptor : info.getAnnotations()) {
                 genAnnotation(annotationDescriptor, info.getPath(), true);
             }

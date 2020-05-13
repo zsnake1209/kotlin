@@ -9,6 +9,7 @@ import kotlin.internal.RequireKotlin
 import kotlin.internal.RequireKotlinVersionKind
 
 /**
+ *
  * Specifies that a JVM default method should be generated for non-abstract Kotlin interface member.
  *
  * Usages of this annotation require an explicit compilation argument to be specified:

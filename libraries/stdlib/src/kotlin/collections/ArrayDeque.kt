@@ -5,10 +5,6 @@
 
 package kotlin.collections
 
-private val emptyElementData = emptyArray<Any?>()
-private const val maxArraySize = Int.MAX_VALUE - 8
-private const val defaultMinCapacity = 10
-
 /**
  * Resizable-array implementation of the deque data structure.
  *
@@ -69,17 +65,6 @@ public class ArrayDeque<E> : AbstractMutableList<E> {
 
         val newCapacity = newCapacity(elementData.size, minCapacity)
         copyElements(newCapacity)
-    }
-
-    // made internal for testing
-    internal fun newCapacity(oldCapacity: Int, minCapacity: Int): Int {
-        // overflow-conscious
-        var newCapacity = oldCapacity + (oldCapacity shr 1)
-        if (newCapacity - minCapacity < 0)
-            newCapacity = minCapacity
-        if (newCapacity - maxArraySize > 0)
-            newCapacity = if (minCapacity > maxArraySize) Int.MAX_VALUE else maxArraySize
-        return newCapacity
     }
 
     /**
@@ -544,18 +529,39 @@ public class ArrayDeque<E> : AbstractMutableList<E> {
         size = 0
     }
 
+    internal companion object {
+        private val emptyElementData = emptyArray<Any?>()
+        private const val maxArraySize = Int.MAX_VALUE - 8
+        private const val defaultMinCapacity = 10
+
+        internal fun newCapacity(oldCapacity: Int, minCapacity: Int): Int {
+            // overflow-conscious
+            var newCapacity = oldCapacity + (oldCapacity shr 1)
+            if (newCapacity - minCapacity < 0)
+                newCapacity = minCapacity
+            if (newCapacity - maxArraySize > 0)
+                newCapacity = if (minCapacity > maxArraySize) Int.MAX_VALUE else maxArraySize
+            return newCapacity
+        }
+    }
+
     // For testing only
     internal fun internalStructure(structure: (head: Int, elements: Array<Any?>) -> Unit) {
         val tail = internalIndex(size)
 
         if (isEmpty()) {
             structure(head, emptyArray())
-        } else if (head < tail) {
-            @Suppress("UNCHECKED_CAST")
-            structure(head, elementData.sliceArray(head until tail))
+            return
+        }
+
+        val elements = arrayOfNulls<Any?>(size)
+        if (head < tail) {
+            elementData.copyInto(elements, startIndex = head, endIndex = tail)
+            structure(head, elements)
         } else {
-            @Suppress("UNCHECKED_CAST")
-            structure(head - elementData.size, elementData.sliceArray(head until elementData.size).plus(elements = elementData.sliceArray(0 until tail)))
+            elementData.copyInto(elements, startIndex = head)
+            elementData.copyInto(elements, elementData.size - head, startIndex = 0, endIndex = tail)
+            structure(head - elementData.size, elements)
         }
     }
 }

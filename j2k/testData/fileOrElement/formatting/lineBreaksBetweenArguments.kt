@@ -3,9 +3,9 @@ internal class F {
 
     fun f2(array: IntArray) {
         f1(
-                1, 2,
-                3, 4,
-                *array
+            1, 2,
+            3, 4,
+            *array
         )
     }
 }
