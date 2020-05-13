@@ -53,17 +53,16 @@ object JvmBackendFacade {
             stubGenerator,
             mangler
         )
-        ///???
-//        val irProviders = generateTypicalIrProviderList(
-//            psi2irContext.moduleDescriptor, psi2irContext.irBuiltIns, psi2irContext.symbolTable,
-//            extensions = extensions
-//        ) + irLinker
 
         val dependencies = psi2irContext.moduleDescriptor.allDependencyModules.map {
             val kotlinLibrary = (it.getCapability(KlibModuleOrigin.CAPABILITY) as? DeserializedKlibModuleOrigin)?.library
             irLinker.deserializeIrModuleHeader(it, kotlinLibrary)
         }
-        val irProviders = listOf(irLinker)
+
+        val irProviders = generateTypicalIrProviderList(
+            psi2irContext.moduleDescriptor, psi2irContext.irBuiltIns, psi2irContext.symbolTable, irLinker,
+            extensions = extensions
+        )
 
         stubGenerator.setIrProviders(irProviders)
 
