@@ -44,6 +44,7 @@ import org.jetbrains.kotlin.types.TypeConstructor;
 import org.jetbrains.kotlin.types.TypeUtils;
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker;
 import org.jetbrains.kotlin.types.expressions.typeInfoFactory.TypeInfoFactoryKt;
+import org.jetbrains.kotlin.types.typeUtil.TypeUtilsKt;
 import org.jetbrains.kotlin.util.OperatorNameConventions;
 
 import java.util.Collection;
@@ -287,8 +288,8 @@ public class DataFlowAnalyzer {
             @NotNull Ref<Boolean> hasError,
             boolean reportErrorForTypeMismatch
     ) {
-        if (noExpectedType(c.expectedType) || !c.expectedType.getConstructor().isDenotable() ||
-            kotlinTypeChecker.isSubtypeOf(expressionType, c.expectedType)) {
+        if (/*noExpectedType(c.expectedType) || */TypeUtilsKt.contains(c.expectedType, TypeUtils::noExpectedType) || !c.expectedType.getConstructor().isDenotable() ||
+                                                  kotlinTypeChecker.isSubtypeOf(expressionType, c.expectedType)) {
             return expressionType;
         }
 

@@ -428,10 +428,11 @@ public class TypeUtils {
             SmartSet<KotlinType> visited
     ) {
         if (type == null) return false;
-        if (visited != null && visited.contains(type)) return false;
 
         UnwrappedType unwrappedType = type.unwrap();
         if (isSpecialType.invoke(unwrappedType)) return true;
+
+        if (visited != null && visited.contains(type)) return false;
 
         if (visited == null) {
             visited = SmartSet.create();
