@@ -151,7 +151,8 @@ fun generateSymbols(pluginContext: IrPluginContext) {
     lateinit var unbound: List<IrSymbol>
     val visited = mutableSetOf<IrSymbol>()
     do {
-        unbound = pluginContext.symbolTable.allUnbound
+        // FIXME: Cast
+        unbound = (pluginContext.symbolTable as SymbolTable).allUnbound
 
         for (symbol in unbound) {
             if (visited.contains(symbol)) {

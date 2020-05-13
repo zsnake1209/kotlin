@@ -80,7 +80,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
-import org.jetbrains.kotlin.psi2ir.findFirstFunction
+import org.jetbrains.kotlin.ir.util.findFirstFunction
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.inline.InlineUtil
@@ -341,6 +341,7 @@ class ComposeObservePatcher(
                         blockParameterType.toIrType(),
                         fn.symbol,
                         0,
+                        null,
                         IrStatementOrigin.LAMBDA
                     )
                 }

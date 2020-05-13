@@ -26,7 +26,7 @@ import androidx.compose.plugins.kotlin.isEmitInline
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.ir.copyTo
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
-import org.jetbrains.kotlin.backend.jvm.ir.isInlineParameter
+import org.jetbrains.kotlin.backend.common.lower.inline.isInlineParameter
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
@@ -80,7 +80,7 @@ import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
-import org.jetbrains.kotlin.psi2ir.findFirstFunction
+import org.jetbrains.kotlin.ir.util.findFirstFunction
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.inline.InlineUtil
@@ -373,7 +373,7 @@ class ComposerParamTransformer(
             generateSymbols(context)
             fn.dispatchReceiverParameter = dispatchReceiverParameter?.copyTo(fn)
             fn.extensionReceiverParameter = extensionReceiverParameter?.copyTo(fn)
-            valueParameters.mapTo(fn.valueParameters) { p ->
+            fn.valueParameters = valueParameters.map { p ->
                 // Composable lambdas will always have `IrGet`s of all of their parameters
                 // generated, since they are passed into the restart lambda. This causes an
                 // interesting corner case with "anonymous parameters" of composable functions.
@@ -396,7 +396,7 @@ class ComposerParamTransformer(
                 }
                 p.copyTo(fn, name = dexSafeName(p.name))
             }
-            annotations.mapTo(fn.annotations) { a -> a }
+            fn.annotations = annotations.map { a -> a }
             fn.metadata = metadata
             fn.body = body?.deepCopyWithSymbols(this)
         }
@@ -450,7 +450,7 @@ class ComposerParamTransformer(
             // The overridden symbols might also be composable functions, so we want to make sure
             // and transform them as well
             if (this is IrOverridableDeclaration<*>) {
-                overriddenSymbols.mapTo(fn.overriddenSymbols) {
+                fn.overriddenSymbols = overriddenSymbols.map {
                     it as IrSimpleFunctionSymbol
                     val owner = it.owner
                     val newOwner = owner.withComposerParamIfNeeded()
@@ -469,7 +469,7 @@ class ComposerParamTransformer(
                 fn.annotations.findAnnotation(DescriptorUtils.JVM_NAME) == null
             ) {
                 val name = JvmAbi.getterName(descriptor.correspondingProperty.name.identifier)
-                fn.annotations.add(jvmNameAnnotation(name))
+                fn.annotations += jvmNameAnnotation(name)
                 fn.correspondingPropertySymbol?.owner?.getter = fn
             }
 
@@ -478,7 +478,7 @@ class ComposerParamTransformer(
                 fn.annotations.findAnnotation(DescriptorUtils.JVM_NAME) == null
             ) {
                 val name = JvmAbi.setterName(descriptor.correspondingProperty.name.identifier)
-                fn.annotations.add(jvmNameAnnotation(name))
+                fn.annotations += jvmNameAnnotation(name)
                 fn.correspondingPropertySymbol?.owner?.setter = fn
             }
 

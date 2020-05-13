@@ -245,7 +245,8 @@ class ComposerLambdaMemoization(
                             endOffset,
                             expression.type,
                             expression.symbol,
-                            expression.typeArgumentsCount).copyAttributes(expression).apply {
+                            expression.typeArgumentsCount,
+                            null).copyAttributes(expression).apply {
                             this.dispatchReceiver = tempDispatchReceiver?.let { irGet(it) }
                             this.extensionReceiver = tempExtensionReceiver?.let { irGet(it) }
                         },

@@ -57,11 +57,10 @@ open class TryCatchComposableChecker : CallChecker, StorageComponentContainerCon
                 val parent = walker.parent
                 if (parent is KtTryExpression) {
                     if (walker == parent.tryBlock)
-                        trace.reportFromPlugin(
+                        trace.report(
                             ComposeErrors.ILLEGAL_TRY_CATCH_AROUND_COMPOSABLE.on(
                                 parent.tryKeyword!!
-                            ),
-                            ComposeDefaultErrorMessages
+                            )
                         )
                 }
                 walker = try { walker.parent } catch (e: Throwable) { null }

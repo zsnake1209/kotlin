@@ -69,7 +69,7 @@ import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi2ir.findFirstFunction
+import org.jetbrains.kotlin.ir.util.findFirstFunction
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.Variance
@@ -187,7 +187,7 @@ class DeepCopyIrTreeWithSymbolsPreservingMetadata(
             newFn = super.visitSimpleFunction(newFn).also { fn ->
                 context.irProviders.getDeclaration(newFnClass)
                 fn.parent = newFnClass.owner
-                ownerFn.overriddenSymbols.mapTo(fn.overriddenSymbols) { it }
+                fn.overriddenSymbols = ownerFn.overriddenSymbols.map { it }
                 fn.dispatchReceiverParameter = ownerFn.dispatchReceiverParameter
                 fn.extensionReceiverParameter = ownerFn.extensionReceiverParameter
                 newDescriptor.valueParameters.forEach { p ->
@@ -299,7 +299,7 @@ class DeepCopyIrTreeWithSymbolsPreservingMetadata(
     private fun IrElement.copyMetadataFrom(owner: IrMetadataSourceOwner) {
         when (this) {
             is IrPropertyImpl -> metadata = owner.metadata
-            is IrFunctionBase -> metadata = owner.metadata
+            is IrFunctionBase<*> -> metadata = owner.metadata
             is IrClassImpl -> metadata = owner.metadata
         }
     }

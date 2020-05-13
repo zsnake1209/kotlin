@@ -275,10 +275,11 @@ abstract class AbstractComposeLowering(
         extensionReceiverParameter = descriptor.extensionReceiverParameter?.irValueParameter()
 
         assert(valueParameters.isEmpty())
-        descriptor.valueParameters.mapTo(valueParameters) { it.irValueParameter() }
+        valueParameters = descriptor.valueParameters.map { it.irValueParameter()}
 
         assert(typeParameters.isEmpty())
-        descriptor.typeParameters.mapTo(typeParameters) { it.irTypeParameter() }
+        typeParameters = descriptor.typeParameters.map { it.irTypeParameter()}
+
     }
 
     protected fun IrBuilderWithScope.irLambdaExpression(
@@ -323,7 +324,8 @@ abstract class AbstractComposeLowering(
                 type = type,
                 symbol = symbol,
                 typeArgumentsCount = descriptor.typeParametersCount,
-                origin = IrStatementOrigin.LAMBDA
+                origin = IrStatementOrigin.LAMBDA,
+                reflectionTarget = null
             )
         }
     }
@@ -672,7 +674,8 @@ abstract class AbstractComposeLowering(
                     type,
                     function.symbol,
                     function.typeParameters.size,
-                    IrStatementOrigin.LAMBDA
+                    reflectionTarget = null,
+                    IrStatementOrigin.LAMBDA,
                 )
             )
         )

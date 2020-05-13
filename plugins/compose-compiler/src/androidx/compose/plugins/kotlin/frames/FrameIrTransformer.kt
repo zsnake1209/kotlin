@@ -680,7 +680,7 @@ class IrClassBuilder(
     }
 
     fun addInterface(interfaceDescriptor: ClassDescriptor) {
-        irClass.superTypes.add(interfaceDescriptor.defaultType.toIrType())
+        irClass.superTypes += interfaceDescriptor.defaultType.toIrType()
     }
 
     fun initializer(
@@ -721,7 +721,7 @@ class IrClassBuilder(
             parent = it
         }
         it.descriptor.getAllSuperclassesWithoutAny().forEach { superClass ->
-            it.superTypes.add(superClass.defaultType.toIrType())
+            it.superTypes += superClass.defaultType.toIrType()
         }
         IrClassBuilder(pluginContext, it, it.descriptor, languageVersionSettings).block(it)
     }
@@ -763,10 +763,10 @@ class IrClassBuilder(
         extensionReceiverParameter = descriptor.extensionReceiverParameter?.irValueParameter()
 
         assert(valueParameters.isEmpty())
-        descriptor.valueParameters.mapTo(valueParameters) { it.irValueParameter() }
+        valueParameters = descriptor.valueParameters.map { it.irValueParameter() }
 
         assert(typeParameters.isEmpty())
-        descriptor.typeParameters.mapTo(typeParameters) {
+        typeParameters = descriptor.typeParameters.map {
             IrTypeParameterImpl(
                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                 IrDeclarationOrigin.DEFINED,

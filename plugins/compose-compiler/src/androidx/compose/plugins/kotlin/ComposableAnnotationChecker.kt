@@ -257,10 +257,10 @@ open class ComposableAnnotationChecker : CallChecker, DeclarationChecker,
                         localFcs = true
                         if (!isInlineLambda && composability != Composability.MARKED) {
                             // Report error on composable element to make it obvious which invocation is offensive
-                            trace.reportFromPlugin(
+                            trace.report(
                                 ComposeErrors.COMPOSABLE_INVOCATION_IN_NON_COMPOSABLE
                                     .on(reportElement),
-                                ComposeDefaultErrorMessages
+//                                ComposeDefaultErrorMessages
                             )
                         }
                     }
@@ -270,10 +270,9 @@ open class ComposableAnnotationChecker : CallChecker, DeclarationChecker,
                     localFcs = true
                     if (!isInlineLambda && composability != Composability.MARKED) {
                         // Report error on composable element to make it obvious which invocation is offensive
-                        trace.reportFromPlugin(
+                        trace.report(
                             ComposeErrors.COMPOSABLE_INVOCATION_IN_NON_COMPOSABLE
-                                .on(reportElement),
-                            ComposeDefaultErrorMessages
+                                .on(reportElement)
                         )
                     }
                 }
@@ -288,10 +287,10 @@ open class ComposableAnnotationChecker : CallChecker, DeclarationChecker,
                 else -> element
             }
             if (localFcs) {
-                trace.reportFromPlugin(
-                    ComposeErrors.COMPOSABLE_INVOCATION_IN_NON_COMPOSABLE.on(reportElement),
-                    ComposeDefaultErrorMessages
-                )
+//                trace.reportFromPlugin(
+//                    ComposeErrors.COMPOSABLE_INVOCATION_IN_NON_COMPOSABLE.on(reportElement),
+//                    ComposeDefaultErrorMessages
+//                )
             }
         }
         if (localFcs && composability == Composability.NOT_COMPOSABLE)

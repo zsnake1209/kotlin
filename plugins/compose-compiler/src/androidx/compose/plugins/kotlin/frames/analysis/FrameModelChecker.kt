@@ -40,9 +40,8 @@ open class FrameModelChecker : DeclarationChecker, StorageComponentContainerCont
             if (declaration.hasModifier(KtTokens.OPEN_KEYWORD) ||
                 declaration.hasModifier(KtTokens.ABSTRACT_KEYWORD)) {
                 val element = (declaration as? KtClass)?.nameIdentifier ?: declaration
-                context.trace.reportFromPlugin(
-                    ComposeErrors.OPEN_MODEL.on(element),
-                    ComposeDefaultErrorMessages
+                context.trace.report(
+                    ComposeErrors.OPEN_MODEL.on(element)
                 )
             }
         }
