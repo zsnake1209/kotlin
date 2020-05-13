@@ -93,11 +93,18 @@ fun Project.projectTest(
         "-ea",
         "-XX:+HeapDumpOnOutOfMemoryError",
         "-XX:+UseCodeCacheFlushing",
-        "-XX:ReservedCodeCacheSize=128m",
+        "-XX:ReservedCodeCacheSize=256m",
         "-Djna.nosys=true",
-        "-XX:CICompilerCount=2"
+            "-XX:CICompilerCount=1",
+    "-XX:TieredStopAtLevel=1"
+
     )
 
+
+//    "-XX:CICompilerCount=2",
+//    "-XX:TieredStopAtLevel=3"
+    project.findProperty("kotlin.test.ci")?.let { jvmArgs("$it") }
+    project.findProperty("kotlin.test.tier")?.let { jvmArgs("$it") }
 
     maxHeapSize = "1600m"
     systemProperty("idea.is.unit.test", "true")
