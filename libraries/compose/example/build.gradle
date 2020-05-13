@@ -8,10 +8,16 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    compilerPlugins
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-js"
     implementation project(":runtime")
     testImplementation "org.jetbrains.kotlin:kotlin-test-js"
+
+    compilerPlugins "org.jetbrains.kotlin:compose-compiler-plugin-ij193:1.4.255-SNAPSHOT"
 }
 
 kotlin {
@@ -19,5 +25,14 @@ kotlin {
         browser {
             binaries.executable()
         }
+    }
+}
+
+compileKotlinJs {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xplugin=" + configurations.compilerPlugins.files.join(":")
+        ]
+        println(freeCompilerArgs)
     }
 }
