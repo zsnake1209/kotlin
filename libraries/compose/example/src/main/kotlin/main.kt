@@ -11,17 +11,21 @@ import kotlin.browser.window
 
 fun main() {
     window.addEventListener("load", {
-        val recomposer = object: Recomposer() {
-            override fun scheduleChangesDispatch() {
-            }
+        val recomposer = object : Recomposer() {
+            override fun hasPendingChanges(): Boolean = false
+            override fun recomposeSync() = Unit
+            override fun scheduleChangesDispatch() = Unit
         }
         val composer = HtmlComposer(document, document.body!!, recomposer)
-        window.setInterval({
-            composer.compose {
-                render()
-            }
-            composer.applyChanges()
-        }, 1000)
+        window.setInterval(
+            {
+                composer.compose {
+                    render()
+                }
+                composer.applyChanges()
+            },
+            1000
+        )
     })
 }
 
