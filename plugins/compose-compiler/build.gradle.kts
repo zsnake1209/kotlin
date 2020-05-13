@@ -8,6 +8,9 @@ plugins {
 dependencies {
     // TODO: Check for unnecessary deps
 
+    compileOnly(project(":kotlin-gradle-plugin"))
+    compileOnly(project(":kotlin-gradle-plugin-api"))
+
     compileOnly(intellijCoreDep()) { includeJars("intellij-core", "asm-all", rootProject = rootProject) }
     compileOnly(project(":compiler:plugin-api"))
     compileOnly(project(":compiler:cli-common"))
@@ -36,3 +39,13 @@ projectTest {
 }
 
 apply(from = "$rootDir/gradle/kotlinPluginPublication.gradle.kts")
+
+pluginBundle {
+    plugins {
+        create("composePlugin") {
+            id = "org.jetbrains.compose.plugin"
+            description = "Kotlin compiler plugin for Compose"
+            displayName = "Kotlin compiler plugin for Compose"
+        }
+    }
+}
