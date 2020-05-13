@@ -145,7 +145,6 @@ abstract class AbstractComposeLowering(
     private val symbolTable get() = context.symbolTable
 
     fun referenceFunction(descriptor: CallableDescriptor): IrFunctionSymbol {
-        TODO()
         return symbolRemapper.getReferencedFunction(symbolTable.referenceFunction(descriptor))
     }
 

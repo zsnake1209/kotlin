@@ -33,9 +33,7 @@ import org.jetbrains.kotlin.types.TypeUtils.UNIT_EXPECTED_TYPE
 import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 
 object ComposeFqNames {
-//    val Composable: FqName = ComposeUtils.composeFqName("Composable")
-    val Composable: FqName get() = TODO() // ComposeUtils.composeFqName("Composable")
-
+    val Composable = ComposeUtils.composeFqName("Composable")
     val CurrentComposerIntrinsic = ComposeUtils.composeFqName("<get-currentComposer>")
     val Pivotal = ComposeUtils.composeFqName("Pivotal")
     val Direct = ComposeUtils.composeFqName("Direct")

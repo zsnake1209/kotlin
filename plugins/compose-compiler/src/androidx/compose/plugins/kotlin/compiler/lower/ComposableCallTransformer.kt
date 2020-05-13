@@ -72,7 +72,6 @@ class ComposableCallTransformer(
     ModuleLoweringPass {
 
     override fun lower(module: IrModuleFragment) {
-        TODO("Updated compiler")
         module.transformChildrenVoid(this)
     }
 
