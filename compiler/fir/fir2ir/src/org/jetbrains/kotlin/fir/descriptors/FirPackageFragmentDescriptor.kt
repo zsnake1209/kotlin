@@ -7,11 +7,47 @@ package org.jetbrains.kotlin.fir.descriptors
 
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.FirSourceElement
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
+import org.jetbrains.kotlin.fir.declarations.FirDeclarationAttributes
+import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
+import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.visitors.FirTransformer
+import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 
-open class FirPackageFragmentDescriptor(override val fqName: FqName, val moduleDescriptor: ModuleDescriptor) : PackageFragmentDescriptor {
+open class FirPackageFragmentDescriptor(
+    override val fqName: FqName,
+    val moduleDescriptor: ModuleDescriptor,
+    override val session: FirSession
+) : FirDeclaration, PackageFragmentDescriptor {
+    override val source: FirSourceElement?
+        get() = null
+
+    override val resolvePhase: FirResolvePhase
+        get() = FirResolvePhase.BODY_RESOLVE
+
+    override val origin: FirDeclarationOrigin
+        get() = FirDeclarationOrigin.Source
+
+    override val attributes: FirDeclarationAttributes = FirDeclarationAttributes()
+
+    override fun replaceResolvePhase(newResolvePhase: FirResolvePhase) {
+
+    }
+
+    override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
+
+    }
+
+    override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
+        return this
+    }
+
     override fun getContainingDeclaration(): ModuleDescriptor {
         return moduleDescriptor
     }
