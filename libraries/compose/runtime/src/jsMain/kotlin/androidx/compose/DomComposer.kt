@@ -1,3 +1,8 @@
+/*
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
 package androidx.compose
 
 import org.w3c.dom.Document
@@ -9,13 +14,9 @@ typealias DomUpdater<T> = ComposerUpdater<Node, T>
 class DomComposer(
     val document: Document,
     val root: Node,
+    slotTabe: SlotTable,
     recomposer: Recomposer
-) : Composer<Node>(
-    SlotTable(),
-    Applier(root, DomApplierAdapter),
-    recomposer
-) {
-
+) : Composer<Node>(slotTabe, Applier(root, DomApplierAdapter), recomposer) {
     fun compose(composable: @Composable () -> Unit) {
         composeRoot {
             invokeComposable(this, composable)

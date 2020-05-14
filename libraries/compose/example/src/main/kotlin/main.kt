@@ -7,6 +7,8 @@ import androidx.compose.*
 import kotlin.browser.document
 import kotlin.browser.window
 
+var counter = 0
+
 fun main() {
     window.addEventListener("load", {
         val recomposer = object : Recomposer() {
@@ -14,21 +16,24 @@ fun main() {
             override fun recomposeSync() = Unit
             override fun scheduleChangesDispatch() = Unit
         }
-        val composer = DomComposer(document, document.body!!, recomposer)
+
+        val composition = compositionFor(document, recomposer, null) { st, r ->
+            DomComposer(document, document.body!!, st, r)
+        }
+
         window.setInterval(
             {
                 counter++
-                composer.compose {
+                composition.setContent {
                     HelloWorld("Ivan ${counter / 2}", counter % 5)
                 }
-                composer.applyChanges()
             },
             1000
         )
+
+
     })
 }
-
-var counter = 0
 
 @Composable
 fun HelloWorld(name: String, i: Int) {

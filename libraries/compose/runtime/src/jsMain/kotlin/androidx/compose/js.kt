@@ -129,7 +129,7 @@ internal actual object Trace {
     var level = 0
 
     actual fun beginSection(name: String) {
-        console.log("  ".repeat(level) + name + "{")
+        console.log("  ".repeat(level) + name + " {")
         level++
     }
 
