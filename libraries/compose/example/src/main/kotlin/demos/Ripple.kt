@@ -38,6 +38,8 @@ fun RippleDemo() {
     var t by state { 0.0 }
     var ripple by state<Ripple?> { null }
 
+    Div { Text("Click somewhere on page") }
+
     fun tick(newt: Double) {
         t = newt
         val ripple0 = ripple

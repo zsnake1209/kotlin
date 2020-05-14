@@ -40,6 +40,8 @@ fun Demos() {
     var currentDemo: Demo by state { mainMenu }
 
     if (currentDemo == mainMenu) {
+        Div { Text("Compose for Web Demos: ${currentDemo.title}") }
+
         for (demo in allDemos) {
             Div {
                 Button(onClick = { currentDemo = demo }) {
@@ -53,6 +55,8 @@ fun Demos() {
                 Text("Back")
             }
         }
+        Div { Text("Demo: ${currentDemo.title}") }
+
         Div {
             currentDemo.content()
         }
