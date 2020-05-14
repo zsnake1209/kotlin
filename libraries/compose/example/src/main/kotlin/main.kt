@@ -21,25 +21,18 @@ fun main() {
             DomComposer(document, document.body!!, st, r)
         }
 
-        window.setInterval(
-            {
-                println("tick")
-                counter++
-                composition.setContent {
-                    HelloWorld("Ivan ${counter / 2}", counter % 3)
-                }
-            },
-            1000
-        )
+        composition.setContent {
+            HelloWorld("world")
+        }
     })
 }
 
 @Composable
-fun HelloWorld(name: String, i: Int) {
-    repeat(i) {
-        Span {
-            Text("Hello 123, ")
-            Text("world $name!")
-        }
+fun HelloWorld(name: String) {
+    var x by state { 1 }
+
+    Span(onClick = { x++ }) {
+        Text("Hello ${x}, ")
+        Text("world $name!")
     }
 }
