@@ -21,6 +21,7 @@ fun main() {
             DomComposer(document, document.body!!, st, r)
         }
 
+        FrameManager.ensureStarted()
         composition.setContent {
             HelloWorld("world")
         }
