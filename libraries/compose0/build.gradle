@@ -15,7 +15,7 @@ repositories {
 }
 
 kotlin {
-    js(IR) {
+    js(LEGACY) {
         browser {
             binaries.executable()
         }
@@ -47,5 +47,13 @@ kotlin {
                 implementation kotlin('test-js')
             }
         }
+    }
+}
+
+compileKotlinJs {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xir-produce-js",
+        ]
     }
 }
