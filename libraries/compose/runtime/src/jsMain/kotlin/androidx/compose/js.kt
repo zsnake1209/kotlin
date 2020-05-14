@@ -15,10 +15,9 @@
  */
 package androidx.compose
 
-import kotlin.js.Date
-
 import org.w3c.dom.Window
 import kotlin.browser.window
+import kotlin.js.Date
 
 actual typealias EmbeddingUIContext = Window
 
@@ -40,6 +39,7 @@ actual open class WeakReference<T> : Reference<T> {
     constructor() {
         value_ = null
     }
+
     actual constructor(referent: T) : this(referent, null)
 
     override fun get(): T? = value_
@@ -77,6 +77,7 @@ actual class BuildableMap<K, V>() : Map<K, V> by HashMap<K, V>() {
         TODO()
     }
 }
+
 internal actual fun <K, V> buildableMapOf(): BuildableMap<K, V> = BuildableMap<K, V>()
 
 actual class Looper
@@ -85,6 +86,7 @@ internal actual fun isMainThread(): Boolean = true
 
 internal actual class Handler {
     actual constructor(looper: Looper) {}
+
     actual fun postAtFrontOfQueue(block: () -> Unit): Boolean {
         window.setTimeout(block, 0)
         return true
@@ -100,17 +102,21 @@ internal actual object Choreographer {
     private val cancelled = mutableSetOf<ChoreographerFrameCallback>()
 
     actual fun postFrameCallback(callback: ChoreographerFrameCallback) {
-        postFrameCallbackDelayed(0, callback)
+        window.requestAnimationFrame { ts -> doFrame(callback, ts) }
     }
-    actual fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback) {
-        window.setTimeout({
-                       if (callback !in cancelled) {
-                           callback.doFrame(Date().getTime().toLong())
-                       } else {
-                           cancelled.remove(callback)
-                       }
-                   }, delayMillis.toInt())
+
+//    actual fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback) {
+//        window.setTimeout({ doFrame(callback, ts) }, delayMillis.toInt())
+//    }
+
+    private fun doFrame(callback: ChoreographerFrameCallback, ts: Double): Any {
+        return if (callback !in cancelled) {
+            callback.doFrame(ts.toLong())
+        } else {
+            cancelled.remove(callback)
+        }
     }
+
     actual fun removeFrameCallback(callback: ChoreographerFrameCallback) {
         cancelled += callback
     }

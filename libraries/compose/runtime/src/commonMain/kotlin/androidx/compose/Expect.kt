@@ -87,7 +87,7 @@ internal expect fun createRecomposer(): Recomposer
 
 internal expect object Choreographer {
     fun postFrameCallback(callback: ChoreographerFrameCallback)
-    fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)
+//    fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)
     fun removeFrameCallback(callback: ChoreographerFrameCallback)
 }
 
