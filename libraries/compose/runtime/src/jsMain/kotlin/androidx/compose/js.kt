@@ -134,34 +134,13 @@ internal actual object Trace {
     }
 }
 
-interface Runnable {
-    fun run()
-}
-
 internal class JSRecomposer : Recomposer() {
-
     private var frameScheduled = false
-
-    inner class Callback : Runnable {
-        var cancelled: Boolean = false
-
-        override fun run() {
-            if (cancelled) return
-            frameScheduled = false
-            dispatchRecomposes()
-        }
-    }
-
-    private val frameCallback = Callback()
-
-    init {
-        window.setTimeout({ Callback().run() }, 0)
-    }
 
     override fun scheduleChangesDispatch() {
         if (!frameScheduled) {
             frameScheduled = true
-            window.setTimeout({ Callback().run() }, 0)
+            window.setTimeout({ recomposeSync() }, 0)
         }
     }
 
@@ -169,8 +148,8 @@ internal class JSRecomposer : Recomposer() {
 
     override fun recomposeSync() {
         if (frameScheduled) {
-            frameCallback.cancelled = true
-            frameCallback.run()
+            frameScheduled = false
+            dispatchRecomposes()
         }
     }
 }
