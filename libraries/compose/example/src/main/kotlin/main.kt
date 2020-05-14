@@ -4,6 +4,8 @@
  */
 
 import androidx.compose.*
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.events.Event
 import kotlin.browser.document
 import kotlin.browser.window
 
@@ -26,10 +28,76 @@ fun main() {
 
 @Composable
 fun HelloWorld(name: String) {
-    var x by state { 1 }
+    var t by state { 0 }
 
-    Span(onClick = { x++ }) {
-        Text("Hello ${x}, ")
-        Text("world $name!")
+    fun tick() {
+        t++
+        window.requestAnimationFrame { tick() }
     }
+
+    tick()
+
+    Div {
+        Ripple(100, 100, t/100, 0.5f)
+    }
+}
+
+
+val div = SourceLocation("div")
+
+@Composable
+fun Div(onClick: ((Event) -> Unit)? = null, block: @Composable () -> Unit) {
+    val composer = (currentComposer as DomComposer)
+    composer.emit(
+        div,
+        {
+            composer.document.createElement("div").also {
+                if (onClick != null) it.addEventListener("click", onClick)
+                with((it as HTMLElement).style) {
+                    position = "absolute"
+                    width = "100%"
+                    height = "100%"
+                }
+            }
+        },
+        {
+
+        },
+        { block() }
+    )
+}
+
+val ripple = SourceLocation("Ripple")
+
+@Composable
+fun Ripple(x: Int, y: Int, radius: Int, a: Float) {
+    val composer = (currentComposer as DomComposer)
+    composer.emit(
+        ripple,
+        { composer.document.createElement("div") },
+        {
+            val node = node as HTMLElement
+            node.style.background = "rgba(0,0,0,$a)"
+
+            update(x) { node.style.left = "${x}px" }
+            update(y) { node.style.top = "${x}px" }
+            update(radius) {
+                node.style.borderRadius = "${radius}px"
+                node.style.width = "${radius}px"
+                node.style.height = "${radius}px"
+            }
+        }
+    )
+}
+
+val text = SourceLocation("text")
+
+@Composable
+fun Text(value: String) {
+    val composer = (currentComposer as DomComposer)
+    composer.emit(
+        text,
+        { composer.document.createTextNode(value) },
+        { update(value) { textContent = it } }
+    )
 }
