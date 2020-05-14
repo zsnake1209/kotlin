@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
+package demos.ripple
+
 import androidx.compose.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
@@ -22,7 +24,7 @@ fun main() {
 
         FrameManager.ensureStarted()
         composition.setContent {
-            HelloWorld("world")
+            RippleDemo()
         }
     })
 }
@@ -32,7 +34,7 @@ class Ripple(val x: Double, val y: Double, val t0: Double)
 val n = 1000
 
 @Composable
-fun HelloWorld(name: String) {
+fun RippleDemo() {
     var t by state { 0.0 }
     var ripple by state<Ripple?> { null }
 
