@@ -98,10 +98,15 @@ import kotlin.browser.window
 //        "Next player: ${if (xIsNext) "X" else "O"}"
 //    }
 //
-//    Div {
+//    Div(className = "game") {
 //        Div {
 //            Board(value = current.squares, onClick = { handleClick(it) })
 //        }
+//
+//        Div {
+//            Text(status)
+//        }
+//
 //        Div {
 //            moves.forEachIndexed { index, it ->
 //                Div {
@@ -110,10 +115,6 @@ import kotlin.browser.window
 //                    }
 //                }
 //            }
-//        }
-//
-//        Div {
-//            Text(status)
 //        }
 //    }
 //}
@@ -128,7 +129,7 @@ import kotlin.browser.window
 //        listOf(2, 5, 8),
 //        listOf(0, 4, 8),
 //        listOf(2, 4, 6)
-//    );
+//    )
 //    lines.forEachIndexed { index, item ->
 //        val (a, b, c) = lines[index]
 //        if (squares[a] != null && squares[a] == squares[b] && squares[a] == squares[c]) {
@@ -136,7 +137,7 @@ import kotlin.browser.window
 //        }
 //    }
 //
-//    return null;
+//    return null
 //}
 //
 //class HistoryItem(val squares: List<String?>)
