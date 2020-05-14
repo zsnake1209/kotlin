@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.codegen.forTestCompile.ForTestCompileRuntime
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.idea.actions.KOTLIN_WORKSHEET_EXTENSION
 import org.jetbrains.kotlin.idea.core.script.ScriptConfigurationManager
+import org.jetbrains.kotlin.idea.core.script.ScriptDefinitionsManager
 import org.jetbrains.kotlin.idea.debugger.coroutine.util.logger
 import org.jetbrains.kotlin.idea.highlighter.KotlinHighlightingUtil
 import org.jetbrains.kotlin.idea.scratch.actions.ClearScratchAction
@@ -37,12 +38,15 @@ import org.jetbrains.kotlin.idea.test.PluginTestCaseBase
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.parsing.KotlinParserDefinition.Companion.STD_SCRIPT_SUFFIX
 import org.jetbrains.kotlin.test.InTextDirectivesUtils
+import org.jetbrains.kotlin.test.JUnit3WithIdeaConfigurationRunner
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.MockLibraryUtil
 import org.jetbrains.kotlin.utils.PathUtil
 import org.junit.Assert
+import org.junit.runner.RunWith
 import java.io.File
 
+@RunWith(JUnit3WithIdeaConfigurationRunner::class)
 abstract class AbstractScratchRunActionTest : FileEditorManagerTestCase() {
 
     fun doRightPreviewPanelOutputTest(fileName: String) {
@@ -151,10 +155,24 @@ abstract class AbstractScratchRunActionTest : FileEditorManagerTestCase() {
             configureScratchByText(sourceFile.name, fileText)
         }
 
+        waitForDefinitions()
+
         if (!KotlinHighlightingUtil.shouldHighlight(myFixture.file)) error("Highlighting for scratch file is switched off")
 
         launchScratch()
         waitUntilScratchFinishes(isRepl)
+    }
+
+    private fun waitForDefinitions() {
+        val timeout = 10000
+        val start = System.currentTimeMillis()
+        while (!ScriptDefinitionsManager.getInstance(project).isReady()) {
+            if ((System.currentTimeMillis() - start) > timeout) {
+                LOG.warn("Waiting timeout $timeout ms is exceed")
+                break
+            }
+            Thread.sleep(100)
+        }
     }
 
     private fun getExpectedFile(fileName: String, isRepl: Boolean, suffix: String): File {
