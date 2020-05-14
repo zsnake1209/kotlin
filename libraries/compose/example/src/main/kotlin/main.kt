@@ -23,22 +23,20 @@ fun main() {
 
         window.setInterval(
             {
+                println("tick")
                 counter++
                 composition.setContent {
-                    HelloWorld("Ivan ${counter / 2}", counter % 5)
+                    HelloWorld("Ivan ${counter / 2}", counter % 3)
                 }
             },
             1000
         )
-
-
     })
 }
 
 @Composable
 fun HelloWorld(name: String, i: Int) {
     repeat(i) {
-        println("rendering")
         Span {
             Text("Hello 123, ")
             Text("world $name!")

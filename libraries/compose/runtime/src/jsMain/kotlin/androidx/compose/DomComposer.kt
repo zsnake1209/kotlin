@@ -62,7 +62,7 @@ object DomApplierAdapter : ApplyAdapter<Node> {
 
     override fun Node.removeAt(index: Int, count: Int) {
         for (i in index..index + count)
-            removeChild(childNodes[index]!!)
+            childNodes[index]?.let { removeChild(it) }
     }
 
     override fun Node.move(from: Int, to: Int, count: Int) {
