@@ -46,10 +46,10 @@ fun animate(
     var t by state { t0 }
     val clock = remember { Clock.listen { t = it } }
 
-    if (t > t1) {
+    if (t <= t1) {
+        frame((t - t0) / length)
+    } else {
         clock.dispose()
         onEnd()
     }
-
-    frame((t - t0) / length)
 }

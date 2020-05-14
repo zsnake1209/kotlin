@@ -3,28 +3,25 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-import androidx.compose.*
+import androidx.compose.Composable
+import androidx.compose.getValue
+import androidx.compose.setValue
+import androidx.compose.state
 import demos.ripple.RippleDemo
-import demos.tictactoe.TicTacToeGame
-import demos.tictactoe.Div
 import demos.tictactoe.Button
+import demos.tictactoe.Div
 import demos.tictactoe.Text
+import demos.tictactoe.TicTacToeGame
+import html.onLoad
+import html.setContent
 import kotlin.browser.document
-import kotlin.browser.window
 
 fun main() {
-    window.addEventListener("load", {
-        val recomposer = JSRecomposer()
-
-        val composition = compositionFor(document, recomposer, null) { st, r ->
-            DomComposer(document, document.body!!, st, r)
-        }
-
-        FrameManager.ensureStarted()
-        composition.setContent {
+    onLoad {
+        document.body?.setContent {
             Demos()
         }
-    })
+    }
 }
 
 class Demo(val title: String, val content: @Composable () -> Unit)
@@ -40,7 +37,7 @@ fun Demos() {
     var currentDemo: Demo by state { mainMenu }
 
     if (currentDemo == mainMenu) {
-        Div { Text("Compose for Web Demos: ${currentDemo.title}") }
+        Div { Text("Compose for Web Demos:") }
 
         for (demo in allDemos) {
             Div {

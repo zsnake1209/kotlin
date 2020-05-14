@@ -1,16 +1,17 @@
 package ui
 
 import androidx.compose.*
+import androidx.compose.frames.ModelList
 import html.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.MouseEvent
 
 @Composable
 fun Rippable() {
-    var ripples by state { listOf<RippleEffect>() }
+    val ripples = ModelList<RippleEffect>()
 
     fun addRipple(e: MouseEvent) {
-        ripples += RippleEffect(e.offsetX, e.offsetY, dispose = { ripples -= it })
+        ripples += RippleEffect(e.offsetX, e.offsetY, onEnd = { ripples -= it })
     }
 
     Div(onClick = { addRipple(it as MouseEvent) }) {
@@ -23,12 +24,12 @@ fun Rippable() {
 class RippleEffect(
     val x: Double,
     val y: Double,
-    val dispose: (RippleEffect) -> Unit,
+    val onEnd: (RippleEffect) -> Unit,
 ) {
     @Composable
     fun render() = animate(
         length = 1000.0,
-        onEnd = { dispose(this) }
+        onEnd = { onEnd(this) }
     ) { t ->
         Ripple(x, y, t * 200, (1 - t).toFloat())
     }
