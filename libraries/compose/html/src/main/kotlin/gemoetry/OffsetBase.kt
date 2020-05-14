@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ui
+package gemoetry
 
 /**
  * Base class for [Size] and [Offset], which are both ways to describe

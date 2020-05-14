@@ -15,7 +15,7 @@
  */
 
 @file:Suppress("NOTHING_TO_INLINE")
-package ui
+package utils
 
 /**
  * Packs two Float values into one Long value for use in inline classes.

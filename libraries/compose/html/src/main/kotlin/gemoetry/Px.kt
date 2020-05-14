@@ -15,14 +15,17 @@
  */
 @file:Suppress("NOTHING_TO_INLINE")
 
-package ui
+package gemoetry
 
 import androidx.compose.Immutable
+import ui.*
+import utils.lerp
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
+import utils.*
 /**
  * Dimension value represented in pixels (px). Component APIs specify their
  * dimensions such as line thickness in DP with Dp objects, while drawing and layout are done

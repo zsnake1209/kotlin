@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package ui
+package gemoetry
 
+import utils.lerp
+import utils.toStringAsFixed
 import kotlin.math.truncate
 
 /** A radius for either circular or elliptical shapes. */

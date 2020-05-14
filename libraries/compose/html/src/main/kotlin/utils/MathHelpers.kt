@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ui
+package utils
 
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong

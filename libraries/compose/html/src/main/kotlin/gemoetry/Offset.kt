@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package ui
+package gemoetry
 
 import androidx.compose.Immutable
+import utils.lerp
+import utils.toStringAsFixed
 import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.math.truncate
+import utils.*
 
 /**
  * Constructs an Offset from the given relative x and y offsets

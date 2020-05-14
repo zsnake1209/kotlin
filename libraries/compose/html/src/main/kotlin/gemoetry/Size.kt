@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package ui
+package gemoetry
 
 import androidx.compose.Immutable
+import utils.*
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
@@ -265,8 +266,10 @@ inline class Size(@PublishedApi internal val value: Long) {
      *
      * See also [Rect.center].
      */
-    fun center(origin: Offset = Offset.zero): Offset = Offset(origin.dx + width / 2.0f, origin.dy +
-            height / 2.0f)
+    fun center(origin: Offset = Offset.zero): Offset = Offset(
+        origin.dx + width / 2.0f, origin.dy +
+                height / 2.0f
+    )
 
     /**
      * The offset to the center of the right edge of the rectangle described by the

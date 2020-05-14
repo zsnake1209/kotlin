@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package ui
+package gemoetry
 
+import utils.toStringAsFixed
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
+import utils.*
 
 // TODO(mount): Normalize this class. There are many methods that can be extension functions.
 /**
