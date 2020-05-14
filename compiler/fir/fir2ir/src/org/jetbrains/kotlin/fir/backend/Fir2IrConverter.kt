@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.backend.storages.Fir2IrClassifierStorage
 import org.jetbrains.kotlin.fir.backend.storages.Fir2IrDeclarationStorage
+import org.jetbrains.kotlin.fir.backend.storages.Fir2IrSymbolStorage
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.descriptors.FirModuleDescriptor
 import org.jetbrains.kotlin.fir.psi
@@ -169,7 +170,7 @@ class Fir2IrConverter(
             generatorExtensions: GeneratorExtensions
         ): Fir2IrResult {
             val moduleDescriptor = FirModuleDescriptor(session)
-            val symbolTable = SymbolTable(signaturer)
+            val symbolTable = Fir2IrSymbolStorage(FirSignatureComposer())
             val constantValueGenerator = ConstantValueGenerator(moduleDescriptor, symbolTable)
             val typeTranslator = TypeTranslator(symbolTable, languageVersionSettings, moduleDescriptor.builtIns)
             constantValueGenerator.typeTranslator = typeTranslator

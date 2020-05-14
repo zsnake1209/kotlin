@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.backend.storages.Fir2IrClassifierStorage
 import org.jetbrains.kotlin.fir.backend.storages.Fir2IrDeclarationStorage
+import org.jetbrains.kotlin.fir.backend.storages.Fir2IrSymbolStorage
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.synthetic.FirSyntheticProperty
 import org.jetbrains.kotlin.fir.expressions.FirConstExpression
@@ -441,16 +442,14 @@ fun FirClass<*>.getPrimaryConstructorIfAny(): FirConstructor? =
     declarations.filterIsInstance<FirConstructor>().firstOrNull()?.takeIf { it.isPrimary }
 
 internal fun IrDeclarationParent.declareThisReceiverParameter(
-    symbolTable: SymbolTable,
+    symbolTable: Fir2IrSymbolStorage,
     thisType: IrType,
     thisOrigin: IrDeclarationOrigin,
     startOffset: Int = this.startOffset,
     endOffset: Int = this.endOffset
 ): IrValueParameter {
     val receiverDescriptor = WrappedReceiverParameterDescriptor()
-    return symbolTable.declareValueParameter(
-        startOffset, endOffset, thisOrigin, receiverDescriptor, thisType
-    ) { symbol ->
+    return symbolTable.declareValueParameter(receiverDescriptor) { symbol ->
         IrValueParameterImpl(
             startOffset, endOffset, thisOrigin, symbol,
             Name.special("<this>"), -1, thisType,

@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.backend
 
 import org.jetbrains.kotlin.KtNodeTypes
-import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.*
@@ -101,7 +100,7 @@ class Fir2IrVisitor(
     override fun visitEnumEntry(enumEntry: FirEnumEntry, data: Any?): IrElement {
         val irEnumEntry = classifierStorage.getCachedIrEnumEntry(enumEntry)!!
         val correspondingClass = irEnumEntry.correspondingClass ?: return irEnumEntry
-        declarationStorage.enterScope(irEnumEntry.descriptor)
+        declarationStorage.enterScope(enumEntry)
         classifierStorage.putEnumEntryClassInScope(enumEntry, correspondingClass)
         converter.processAnonymousObjectMembers(enumEntry.initializer as FirAnonymousObject, correspondingClass)
         conversionScope.withParent(correspondingClass) {
@@ -113,7 +112,7 @@ class Fir2IrVisitor(
                 )
             )
         }
-        declarationStorage.leaveScope(irEnumEntry.descriptor)
+        declarationStorage.leaveScope(enumEntry)
         return irEnumEntry
     }
 
@@ -232,15 +231,15 @@ class Fir2IrVisitor(
     // ==================================================================================
 
     override fun visitReturnExpression(returnExpression: FirReturnExpression, data: Any?): IrElement {
-        val irTarget = conversionScope.returnTarget(returnExpression)
+        val target = returnExpression.target
         return returnExpression.convertWithOffsets { startOffset, endOffset ->
             val result = returnExpression.result
-            val descriptor = irTarget.descriptor
             IrReturnImpl(
                 startOffset, endOffset, irBuiltIns.nothingType,
-                when (descriptor) {
-                    is ClassConstructorDescriptor -> symbolTable.referenceConstructor(descriptor)
-                    else -> symbolTable.referenceSimpleFunction(descriptor)
+                when (target) {
+                    is FirConstructor -> symbolTable.referenceConstructor(target)
+                    is FirSimpleFunction -> symbolTable.referenceSimpleFunction(target)
+                    else -> throw AssertionError("Should not be here: $target")
                 },
                 convertToIrExpression(result)
             )

@@ -7,12 +7,14 @@ package org.jetbrains.kotlin.fir.descriptors
 
 import org.jetbrains.kotlin.builtins.BuiltInsPackageFragment
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.name.FqName
 
 class FirBuiltInsPackageFragment(
     fqName: FqName,
-    moduleDescriptor: ModuleDescriptor
-) : FirPackageFragmentDescriptor(fqName, moduleDescriptor), BuiltInsPackageFragment {
+    moduleDescriptor: ModuleDescriptor,
+    session: FirSession
+) : FirPackageFragmentDescriptor(fqName, moduleDescriptor, session), BuiltInsPackageFragment {
     override val isFallback: Boolean
         get() = false
 }

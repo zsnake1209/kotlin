@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.backend
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.backend.storages.Fir2IrClassifierStorage
 import org.jetbrains.kotlin.fir.backend.storages.Fir2IrDeclarationStorage
+import org.jetbrains.kotlin.fir.backend.storages.Fir2IrSymbolStorage
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.SymbolTable
@@ -15,7 +16,7 @@ import org.jetbrains.kotlin.ir.util.SymbolTable
 class Fir2IrComponentsStorage(
     override val session: FirSession,
     override val scopeSession: ScopeSession,
-    override val symbolTable: SymbolTable,
+    override val symbolTable: Fir2IrSymbolStorage,
     override val irBuiltIns: IrBuiltIns
 ) : Fir2IrComponents {
     override lateinit var classifierStorage: Fir2IrClassifierStorage

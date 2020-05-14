@@ -46,13 +46,13 @@ internal class ClassMemberGenerator(
     private fun <T : IrDeclaration> applyParentFromStackTo(declaration: T): T = conversionScope.applyParentFromStackTo(declaration)
 
     fun convertClassContent(irClass: IrClass, klass: FirClass<*>) {
-        declarationStorage.enterScope(irClass.descriptor)
+        declarationStorage.enterScope(klass)
         conversionScope.withClass(irClass) {
             val primaryConstructor = klass.getPrimaryConstructorIfAny()
             val irPrimaryConstructor = primaryConstructor?.let { declarationStorage.getCachedIrConstructor(it)!! }
             if (irPrimaryConstructor != null) {
                 with(declarationStorage) {
-                    enterScope(irPrimaryConstructor.descriptor)
+                    enterScope(primaryConstructor)
                     irPrimaryConstructor.valueParameters.forEach { symbolTable.introduceValueParameter(it) }
                     irPrimaryConstructor.putParametersInScope(primaryConstructor)
                     convertFunctionContent(irPrimaryConstructor, primaryConstructor)
@@ -81,10 +81,10 @@ internal class ClassMemberGenerator(
             }
             annotationGenerator.generate(irClass, klass)
             if (irPrimaryConstructor != null) {
-                declarationStorage.leaveScope(irPrimaryConstructor.descriptor)
+                declarationStorage.leaveScope(primaryConstructor)
             }
         }
-        declarationStorage.leaveScope(irClass.descriptor)
+        declarationStorage.leaveScope(klass)
     }
 
     fun <T : IrFunction> convertFunctionContent(irFunction: T, firFunction: FirFunction<*>?): T {
@@ -94,7 +94,7 @@ internal class ClassMemberGenerator(
                 if (irFunction !is IrConstructor || !irFunction.isPrimary) {
                     // Scope for primary constructor should be entered before class declaration processing
                     with(declarationStorage) {
-                        enterScope(descriptor)
+                        enterScope(firFunction)
                         irFunction.valueParameters.forEach { symbolTable.introduceValueParameter(it) }
                         irFunction.putParametersInScope(firFunction)
                     }
@@ -149,7 +149,7 @@ internal class ClassMemberGenerator(
             }
             if (irFunction !is IrConstructor || !irFunction.isPrimary) {
                 // Scope for primary constructor should be left after class declaration
-                declarationStorage.leaveScope(descriptor)
+                declarationStorage.leaveScope(firFunction)
             }
         }
         return irFunction
@@ -180,12 +180,12 @@ internal class ClassMemberGenerator(
     ) {
         val irField = backingField ?: return
         conversionScope.withParent(irField) {
-            declarationStorage.enterScope(descriptor)
+            declarationStorage.enterScope(property)
             // NB: initializer can be already converted
             if (initializer == null && initializerExpression != null) {
                 initializer = IrExpressionBodyImpl(visitor.convertToIrExpression(initializerExpression))
             }
-            declarationStorage.leaveScope(descriptor)
+            declarationStorage.leaveScope(property)
         }
         annotationGenerator.generate(irField, property)
     }
@@ -202,9 +202,9 @@ internal class ClassMemberGenerator(
             convertFunctionContent(this, propertyAccessor)
             if (isDefault) {
                 conversionScope.withParent(this) {
-                    declarationStorage.enterScope(descriptor)
+                    declarationStorage.enterScope(propertyAccessor)
                     val backingField = correspondingProperty.backingField
-                    val fieldSymbol = symbolTable.referenceField(correspondingProperty.descriptor)
+                    val fieldSymbol = symbolTable.referenceField(property)
                     val declaration = this
                     if (backingField != null) {
                         body = IrBlockBodyImpl(
@@ -224,7 +224,7 @@ internal class ClassMemberGenerator(
                             )
                         )
                     }
-                    declarationStorage.leaveScope(descriptor)
+                    declarationStorage.leaveScope(propertyAccessor)
                 }
             }
         }
