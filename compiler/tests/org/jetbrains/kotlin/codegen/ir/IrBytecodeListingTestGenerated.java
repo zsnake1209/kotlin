@@ -476,6 +476,11 @@ public class IrBytecodeListingTestGenerated extends AbstractIrBytecodeListingTes
             runTest("compiler/testData/codegen/bytecodeListing/specialBridges/contains.kt");
         }
 
+        @TestMetadata("noDefaultImplsOnEmptySubInterface.kt")
+        public void testNoDefaultImplsOnEmptySubInterface() throws Exception {
+            runTest("compiler/testData/codegen/bytecodeListing/specialBridges/noDefaultImplsOnEmptySubInterface.kt");
+        }
+
         @TestMetadata("noSpecialBridgeIfPresentInSuperClass.kt")
         public void testNoSpecialBridgeIfPresentInSuperClass() throws Exception {
             runTest("compiler/testData/codegen/bytecodeListing/specialBridges/noSpecialBridgeIfPresentInSuperClass.kt");
