@@ -19,7 +19,7 @@ fun main() {
             {
                 counter++
                 composer.compose {
-                    HelloWorld("Ivan ${counter / 2}", counter)
+                    HelloWorld("Ivan ${counter / 2}", counter % 5)
                 }
                 composer.applyChanges()
             },
@@ -35,7 +35,7 @@ fun HelloWorld(name: String, i: Int) {
     repeat(i) {
         println("rendering")
         Span {
-            Text("Hello, ")
+            Text("Hello 123, ")
             Text("world $name!")
         }
     }

@@ -126,12 +126,16 @@ actual interface ChoreographerFrameCallback {
 }
 
 internal actual object Trace {
+    var level = 0
+
     actual fun beginSection(name: String) {
-        // Do nothing.
+        console.log("  ".repeat(level) + name + "{")
+        level++
     }
 
     actual fun endSection() {
-        // Do nothing.
+        level--
+        console.log("  ".repeat(level) + "}")
     }
 }
 
