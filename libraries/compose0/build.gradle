@@ -1,0 +1,51 @@
+plugins {
+    id 'org.jetbrains.kotlin.multiplatform' version '1.4.255-SNAPSHOT'
+    id 'org.jetbrains.compose.plugin' version '1.4.255-SNAPSHOT'
+}
+
+group 'org.jb.k.js.compose'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-dev' }
+    jcenter()
+    mavenCentral()
+    maven { url 'https://plugins.gradle.org/m2/' }
+}
+
+kotlin {
+    js(IR) {
+        browser {
+            binaries.executable()
+        }
+    }
+
+    sourceSets {
+        commonMain{
+            kotlin.srcDir('../compose/runtime/src/commonMain/kotlin')
+
+            dependencies {
+                implementation kotlin('stdlib-common')
+            }
+        }
+        commonTest.dependencies {
+            implementation kotlin('test-common')
+            implementation kotlin('test-annotations-common')
+        }
+        jsMain {
+            kotlin.srcDir('../compose/runtime/src/jsMain/kotlin')
+            kotlin.srcDir('../compose/example/src/main/kotlin')
+            resources.srcDir('../compose/example/src/main/resources')
+
+            dependencies {
+                implementation kotlin('stdlib-js')
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation kotlin('test-js')
+            }
+        }
+    }
+}

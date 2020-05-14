@@ -1,13 +1,11 @@
+/*
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
+ */
+
 import androidx.compose.*
 import kotlin.browser.document
 import kotlin.browser.window
-
-//@Composable
-//fun App() {
-//    Div {
-//        Text("Hello, world!")
-//    }
-//}
 
 fun main() {
     window.addEventListener("load", {
@@ -19,8 +17,9 @@ fun main() {
         val composer = DomComposer(document, document.body!!, recomposer)
         window.setInterval(
             {
+                counter++
                 composer.compose {
-                    render()
+                    HelloWorld("Ivan ${counter / 2}")
                 }
                 composer.applyChanges()
             },
@@ -31,22 +30,11 @@ fun main() {
 
 var counter = 0
 
-fun DomComposer.render() {
-    println("frame")
-    counter++
-
-    val name = "Ivan ${counter / 2}"
-    call(
-        100,
-        { changed(name) },
-        { helloWorld(name) }
-    )
-}
-
-fun DomComposer.helloWorld(name: String) {
+@Composable
+fun HelloWorld(name: String) {
     println("rendering")
-    span {
-        text("Hello, ")
-        text("world $name!")
+    Span {
+        Text("Hello, ")
+        Text("world $name!")
     }
 }
