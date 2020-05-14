@@ -19,6 +19,7 @@ import com.intellij.util.containers.ConcurrentFactoryMap
 import org.jetbrains.kotlin.idea.caches.project.getAllProjectSdks
 import org.jetbrains.kotlin.idea.core.script.LOG
 import org.jetbrains.kotlin.idea.core.script.ScriptConfigurationManager
+import org.jetbrains.kotlin.idea.core.script.debug
 import org.jetbrains.kotlin.idea.util.getProjectJdkTableSafe
 import org.jetbrains.kotlin.scripting.resolve.ScriptCompilationConfigurationWrapper
 import java.io.File
@@ -85,7 +86,9 @@ abstract class ScriptClassRootsCache(
     }
 
     fun getScriptConfiguration(file: VirtualFile): ScriptCompilationConfigurationWrapper? {
-        return scriptsDependenciesCache[file]?.scriptConfiguration
+        val scriptConfiguration = scriptsDependenciesCache[file]?.scriptConfiguration
+        debug(file) { "script configuration = $scriptConfiguration" }
+        return scriptConfiguration
     }
 
     fun hasNotCachedRoots(roots: ScriptClassRootsStorage.Companion.ScriptClassRoots): Boolean {
