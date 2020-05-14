@@ -18,6 +18,7 @@ package androidx.compose
 import kotlin.js.Date
 
 import org.w3c.dom.Window
+import kotlin.browser.window
 
 actual typealias EmbeddingUIContext = Window
 
@@ -82,16 +83,10 @@ actual class Looper
 
 internal actual fun isMainThread(): Boolean = true
 
-external fun setTimeout(
-    handler: dynamic,
-    timeout: Int = definedExternally,
-    vararg arguments: Any?
-): Int
-
 internal actual class Handler {
     actual constructor(looper: Looper) {}
     actual fun postAtFrontOfQueue(block: () -> Unit): Boolean {
-        setTimeout(block, 0)
+        window.setTimeout(block, 0)
         return true
     }
 }
@@ -108,7 +103,7 @@ internal actual object Choreographer {
         postFrameCallbackDelayed(0, callback)
     }
     actual fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback) {
-        setTimeout({
+        window.setTimeout({
                        if (callback !in cancelled) {
                            callback.doFrame(Date().getTime().toLong())
                        } else {
@@ -160,13 +155,13 @@ internal class JSRecomposer : Recomposer() {
     private val frameCallback = Callback()
 
     init {
-        setTimeout({ Callback() }, 0)
+        window.setTimeout({ Callback().run() }, 0)
     }
 
     override fun scheduleChangesDispatch() {
         if (!frameScheduled) {
             frameScheduled = true
-            setTimeout({ Callback() }, 0)
+            window.setTimeout({ Callback().run() }, 0)
         }
     }
 

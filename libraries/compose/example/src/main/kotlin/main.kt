@@ -11,11 +11,7 @@ var counter = 0
 
 fun main() {
     window.addEventListener("load", {
-        val recomposer = object : Recomposer() {
-            override fun hasPendingChanges(): Boolean = false
-            override fun recomposeSync() = Unit
-            override fun scheduleChangesDispatch() = Unit
-        }
+        val recomposer = JSRecomposer()
 
         val composition = compositionFor(document, recomposer, null) { st, r ->
             DomComposer(document, document.body!!, st, r)
