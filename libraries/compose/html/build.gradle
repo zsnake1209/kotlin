@@ -1,0 +1,23 @@
+plugins {
+    id 'org.jetbrains.kotlin.js'
+//    id 'org.jetbrains.compose.plugin'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-js"
+    implementation project(":runtime")
+    testImplementation "org.jetbrains.kotlin:kotlin-test-js"
+}
+
+kotlin {
+    js {
+        browser {
+            binaries.executable()
+        }
+    }
+}

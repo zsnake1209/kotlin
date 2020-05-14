@@ -266,7 +266,8 @@ abstract class KotlinIrLinker(
         }
 
         private fun resolveSignatureIndex(idSig: IdSignature): Int {
-            return reversedSignatureIndex[idSig] ?: error("Not found Idx for $idSig")
+            return reversedSignatureIndex[idSig]
+                ?: error("Not found Idx for $idSig")
         }
 
         private fun readDeclaration(index: Int): CodedInputStream =
