@@ -3,9 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.fir.backend
+package org.jetbrains.kotlin.fir.backend.storages
 
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.fir.backend.*
+import org.jetbrains.kotlin.fir.backend.ConversionTypeOrigin
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.resolve.firProvider
 import org.jetbrains.kotlin.fir.resolve.toSymbol

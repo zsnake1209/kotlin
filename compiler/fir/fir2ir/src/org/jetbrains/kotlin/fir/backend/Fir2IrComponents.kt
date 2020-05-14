@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.fir.backend
 
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.backend.storages.Fir2IrClassifierStorage
+import org.jetbrains.kotlin.fir.backend.storages.Fir2IrDeclarationStorage
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.SymbolTable

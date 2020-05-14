@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.fir.backend
 
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.backend.storages.Fir2IrClassifierStorage
+import org.jetbrains.kotlin.fir.backend.storages.Fir2IrDeclarationStorage
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.descriptors.FirModuleDescriptor
 import org.jetbrains.kotlin.fir.psi
