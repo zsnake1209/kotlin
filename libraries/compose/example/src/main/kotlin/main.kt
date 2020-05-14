@@ -6,6 +6,7 @@
 import androidx.compose.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
+import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.browser.window
 
@@ -26,19 +27,44 @@ fun main() {
     })
 }
 
+class Ripple(val x: Double, val y: Double, val t0: Double)
+
+val n = 1000
+
 @Composable
 fun HelloWorld(name: String) {
-    var t by state { 0 }
+    var t by state { 0.0 }
+    var ripple by state<Ripple?> { null }
 
-    fun tick() {
-        t++
-        window.requestAnimationFrame { tick() }
+    fun tick(newt: Double) {
+        t = newt
+        val ripple0 = ripple
+        if (ripple0 == null) return
+
+        console.log(t, ripple0.t0, t - ripple0.t0)
+        if (t - ripple0.t0 > n) ripple = null
+        else {
+            window.requestAnimationFrame {
+                FrameManager.framed {
+                    tick(it)
+                }
+            }
+        }
     }
 
-    tick()
+    fun addRipple(e: MouseEvent) {
+        t = window.performance.now()
+        ripple = Ripple(e.x, e.y, t)
+        tick(t)
+    }
 
-    Div {
-        Ripple(100, 100, t/100, 0.5f)
+    Div(onClick = { addRipple(it as MouseEvent) }) {
+//        Text(t.toString())
+    }
+
+    ripple?.let {
+        val dt = t - it.t0
+        Ripple(it.x, it.y, dt / 5.0, (1-dt/n.toDouble()).toFloat())
     }
 }
 
@@ -70,21 +96,28 @@ fun Div(onClick: ((Event) -> Unit)? = null, block: @Composable () -> Unit) {
 val ripple = SourceLocation("Ripple")
 
 @Composable
-fun Ripple(x: Int, y: Int, radius: Int, a: Float) {
+fun Ripple(x: Double, y: Double, radius: Double, a: Float) {
     val composer = (currentComposer as DomComposer)
     composer.emit(
         ripple,
         { composer.document.createElement("div") },
         {
             val node = node as HTMLElement
-            node.style.background = "rgba(0,0,0,$a)"
 
-            update(x) { node.style.left = "${x}px" }
-            update(y) { node.style.top = "${x}px" }
+            node.style.position = "absolute"
+            node.style.background = "rgba(0,0,0,$a)"
+            node.style.transform = "transform: translate3d(0);"
+            node.style.asDynamic().pointerEvents = "none"
+
+            val rx = x - radius
+            val ry = y - radius
+
+            update(rx) { node.style.left = "${rx}px" }
+            update(ry) { node.style.top = "${ry}px" }
             update(radius) {
                 node.style.borderRadius = "${radius}px"
-                node.style.width = "${radius}px"
-                node.style.height = "${radius}px"
+                node.style.width = "${radius*2}px"
+                node.style.height = "${radius*2}px"
             }
         }
     )
