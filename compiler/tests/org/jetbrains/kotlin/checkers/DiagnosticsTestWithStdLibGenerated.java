@@ -2951,6 +2951,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
             runTest("compiler/testData/diagnostics/testsWithStdLib/inference/recursiveFlexibleAssertions.kt");
         }
 
+        @TestMetadata("smartcastAfterCastingToStarProjection.kt")
+        public void testSmartcastAfterCastingToStarProjection() throws Exception {
+            runTest("compiler/testData/diagnostics/testsWithStdLib/inference/smartcastAfterCastingToStarProjection.kt");
+        }
+
         @TestMetadata("compiler/testData/diagnostics/testsWithStdLib/inference/annotationsForResolve")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
