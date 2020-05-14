@@ -27,33 +27,24 @@ import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.common.peek
 import org.jetbrains.kotlin.backend.common.pop
 import org.jetbrains.kotlin.backend.common.push
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.irBlock
-import org.jetbrains.kotlin.ir.builders.irBoolean
-import org.jetbrains.kotlin.ir.builders.irCall
-import org.jetbrains.kotlin.ir.builders.irGet
-import org.jetbrains.kotlin.ir.builders.irInt
-import org.jetbrains.kotlin.ir.builders.irReturn
-import org.jetbrains.kotlin.ir.builders.irTemporary
-import org.jetbrains.kotlin.ir.declarations.IrDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
-import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
-import org.jetbrains.kotlin.ir.declarations.IrVariable
-import org.jetbrains.kotlin.ir.declarations.copyAttributes
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
-import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
-import org.jetbrains.kotlin.ir.expressions.IrFunctionReference
-import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
+import org.jetbrains.kotlin.ir.builders.*
+import org.jetbrains.kotlin.ir.builders.declarations.addValueParameter
+import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.descriptors.WrappedSimpleFunctionDescriptor
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionReferenceImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
+import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
+import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.getDeclaration
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
@@ -359,7 +350,7 @@ class ComposerLambdaMemoization(
         )
 
         context.irProviders.getDeclaration(restartFactorySymbol)
-        return irBuilder.irCall(restartFactorySymbol).apply {
+        val call = irBuilder.irCall(restartFactorySymbol).apply {
             var index = 0
 
             // first parameter is the composer parameter if we are ina  composable context
@@ -389,6 +380,78 @@ class ComposerLambdaMemoization(
             // block parameter
             putValueArgument(index, expression)
         }
+
+        val callVar = irBuilder.scope.createTemporaryVariable(call)
+
+        val numberOfParameters = expression.function.valueParameters.count() + 1
+
+        val restartableFunctionClass: IrClass =
+            getTopLevelClass(composeInternalFqName("RestartableFunction")).owner
+
+        val invokeSymbol = restartableFunctionClass.declarations.find {
+            it is IrSimpleFunction &&
+                    it.name == Name.identifier("invoke") &&
+                    it.valueParameters.size == numberOfParameters
+        } as IrSimpleFunction
+
+
+        val descriptor = WrappedSimpleFunctionDescriptor()
+        val lambda = IrFunctionImpl(
+            startOffset = UNDEFINED_OFFSET,
+            endOffset = UNDEFINED_OFFSET,
+            origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA,
+            symbol = IrSimpleFunctionSymbolImpl(descriptor),
+            name = Name.identifier("WRAPPER_LAMBDA"),
+            visibility = Visibilities.LOCAL,
+            modality = Modality.FINAL,
+            returnType = context.irBuiltIns.unitType,
+            isInline = false,
+            isExternal = false,
+            isTailrec = false,
+            isSuspend = false,
+            isOperator = false,
+            isExpect = false,
+            isFakeOverride = false
+        ).also { fn ->
+            fn.parent = irBuilder.parent
+            descriptor.bind(fn)
+            val localIrBuilder = DeclarationIrBuilder(context, fn.symbol)
+
+            repeat(numberOfParameters) {
+                fn.addValueParameter(
+                    "p$it",
+                    context.irBuiltIns.anyNType
+                )
+            }
+
+            fn.body = localIrBuilder.irBlockBody {
+                +(irCall(invokeSymbol).apply {
+                    dispatchReceiver = irGet(callVar)
+                    repeat(numberOfParameters) { i ->
+                        putValueArgument(i, irGet(fn.valueParameters[i]))
+                    }
+                })
+            }
+        }
+
+        val type = context.irBuiltIns.function(numberOfParameters).owner.defaultType
+        return irBlock(
+            type,
+            origin = IrStatementOrigin.LAMBDA,
+            statements = listOf<IrStatement>(
+                callVar,
+                lambda,
+                IrFunctionReferenceImpl(
+                    UNDEFINED_OFFSET,
+                    UNDEFINED_OFFSET,
+                    type,
+                    lambda.symbol,
+                    lambda.typeParameters.size,
+                    reflectionTarget = null,
+                    IrStatementOrigin.LAMBDA,
+            )
+        )
+    )
     }
 
     private fun rememberExpression(

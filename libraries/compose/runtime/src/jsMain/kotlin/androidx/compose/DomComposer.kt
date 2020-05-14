@@ -15,9 +15,10 @@ class DomComposer(
     Applier(root, DomApplierAdapter),
     recomposer
 ) {
-    fun compose(composable: DomComposer.() -> Unit) {
+
+    fun compose(composable: @Composable () -> Unit) {
         composeRoot {
-            composable()
+            invokeComposable(this, composable)
         }
     }
 
@@ -91,4 +92,31 @@ object DomApplierAdapter : ApplyAdapter<Node> {
 
 class SourceLocation(val name: String) {
     override fun toString(): String = "SL $name"
+}
+
+val linear = SourceLocation("linear")
+@Composable
+fun Span(onClick: (() -> Unit)? = null,  block: @Composable () -> Unit) {
+    val composer = (currentComposer as DomComposer)
+    composer.emit(
+        linear,
+        {
+            composer.document.createElement("span").also {
+                if (onClick != null) it.addEventListener("click", { onClick() })
+            }
+        },
+        {},
+        { block() }
+    )
+}
+
+val text = SourceLocation("text")
+@Composable
+fun Text(value: String) {
+    val composer = (currentComposer as DomComposer)
+    composer.emit(
+        text,
+        { composer.document.createTextNode(value) },
+        { update(value) { textContent = it } }
+    )
 }
