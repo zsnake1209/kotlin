@@ -33,19 +33,17 @@ import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.types.*
-import org.jetbrains.kotlin.ir.types.impl.originalKotlinType
 import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.load.kotlin.FileBasedKotlinClass
-import org.jetbrains.kotlin.load.kotlin.KotlinJvmBinarySourceElement
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
-import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
 import org.jetbrains.kotlin.synthetic.isVisibleOutside
 import org.jetbrains.kotlin.types.TypeSystemCommonBackendContext
 import org.jetbrains.kotlin.types.isNullabilityFlexible
 import org.jetbrains.kotlin.types.model.KotlinTypeMarker
-import org.jetbrains.org.objectweb.asm.*
+import org.jetbrains.org.objectweb.asm.AnnotationVisitor
+import org.jetbrains.org.objectweb.asm.Type
+import org.jetbrains.org.objectweb.asm.TypePath
 import java.lang.annotation.RetentionPolicy
 
 abstract class AnnotationCodegen(
@@ -237,8 +235,10 @@ abstract class AnnotationCodegen(
                 val callee = value.symbol.owner
                 when {
                     callee.parentAsClass.isAnnotationClass -> {
-                        val internalAnnName = typeMapper.mapType(callee.returnType).descriptor
+                        val annotationClassType = callee.returnType
+                        val internalAnnName = typeMapper.mapType(annotationClassType).descriptor
                         val visitor = annotationVisitor.visitAnnotation(name, internalAnnName)
+                        annotationClassType.classOrNull?.owner?.let(innerClassConsumer::addInnerClassInfoFromAnnotation)
                         genAnnotationArguments(value, visitor)
                         visitor.visitEnd()
                     }
@@ -246,9 +246,10 @@ abstract class AnnotationCodegen(
                 }
             }
             is IrGetEnumValue -> {
-                val enumClassInternalName = typeMapper.mapClass(value.symbol.owner.parentAsClass).descriptor
-                val enumEntryName = value.symbol.owner.name
-                annotationVisitor.visitEnum(name, enumClassInternalName, enumEntryName.asString())
+                val enumEntry = value.symbol.owner
+                val enumClass = enumEntry.parentAsClass
+                innerClassConsumer.addInnerClassInfoFromAnnotation(enumClass)
+                annotationVisitor.visitEnum(name, typeMapper.mapClass(enumClass).descriptor, enumEntry.name.asString())
             }
             is IrVararg -> { // array constructor
                 val visitor = annotationVisitor.visitArray(name)
@@ -258,7 +259,9 @@ abstract class AnnotationCodegen(
                 visitor.visitEnd()
             }
             is IrClassReference -> {
-                annotationVisitor.visit(name, typeMapper.mapType(value.classType))
+                val classType = value.classType
+                classType.classOrNull?.owner?.let(innerClassConsumer::addInnerClassInfoFromAnnotation)
+                annotationVisitor.visit(name, typeMapper.mapType(classType))
             }
             is IrErrorExpression -> error("Don't know how to compile annotation value ${ir2string(value)}")
             else -> error("Unsupported compile-time value ${ir2string(value)}")
