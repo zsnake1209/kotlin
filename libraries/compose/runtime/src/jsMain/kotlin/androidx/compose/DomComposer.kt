@@ -92,26 +92,3 @@ object DomApplierAdapter : ApplyAdapter<Node> {
 class SourceLocation(val name: String) {
     override fun toString(): String = "SL $name"
 }
-
-val linear = SourceLocation("linear")
-fun DomComposer.span(onClick: (() -> Unit)? = null, block: DomComposer.() -> Unit) {
-    emit(
-        linear,
-        {
-            document.createElement("span").also {
-                if (onClick != null) it.addEventListener("click", { onClick() })
-            }
-        },
-        {},
-        { block() }
-    )
-}
-
-val text = SourceLocation("text")
-fun DomComposer.text(value: String) {
-    emit(
-        text,
-        { document.createTextNode(value) },
-        { update(value) { textContent = it } }
-    )
-}
