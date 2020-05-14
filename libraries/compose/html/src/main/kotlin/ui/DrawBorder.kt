@@ -18,6 +18,8 @@ package ui
 
 import androidx.compose.Composable
 import androidx.compose.remember
+import html.StyleBuilder
+import html.css
 
 /**
  * Returns a [Modifier] that adds border with appearance specified with a [border] and a [shape]
@@ -128,4 +130,14 @@ data class DrawBorder internal constructor(
     private val shape: Shape,
     private val borderWidth: Dp,
     private val brush: Brush
-) : DrawModifier
+) : DrawModifier {
+    override fun apply(styleBuilder: StyleBuilder) {
+        when (shape) {
+            RectangleShape -> {
+                brush as SolidColor
+                styleBuilder.style.border = "${borderWidth.css()} solid ${brush.value.css()}"
+            }
+            else -> error("")
+        }
+    }
+}

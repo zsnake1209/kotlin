@@ -11,11 +11,12 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-js"
     implementation project(":runtime")
+    implementation project(":html")
     testImplementation "org.jetbrains.kotlin:kotlin-test-js"
 }
 
 kotlin {
-    js {
+    js(IR) {
         browser {
             binaries.executable()
         }

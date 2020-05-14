@@ -17,6 +17,8 @@
 package ui
 
 import androidx.compose.Immutable
+import html.StyleBuilder
+import html.css
 
 /**
  * Apply additional space along each edge of the content in [Dp]: [start], [top], [end] and
@@ -108,7 +110,10 @@ private data class PaddingModifier(
     val bottom: Dp = 0.dp,
     val rtlAware: Boolean
 ) : LayoutModifier {
-
+    override fun apply(styleBuilder: StyleBuilder) {
+        styleBuilder.style.padding =
+            "${top.css()} ${end.css()} ${bottom.css()} ${start.css()}"
+    }
 }
 
 /**

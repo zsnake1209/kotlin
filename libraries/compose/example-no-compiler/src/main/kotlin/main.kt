@@ -1,13 +1,12 @@
-import androidx.compose.*
+import androidx.compose.Composable
+import androidx.compose.DomComposer
+import androidx.compose.Recomposer
+import html.Div
+import html.Text
+import html._composer
+import ui.*
 import kotlin.browser.document
 import kotlin.browser.window
-
-@Composable
-//fun App() {
-//    Div {
-//        Text("Hello, world!")
-//    }
-//}
 
 fun main() {
     window.addEventListener("load", {
@@ -17,21 +16,22 @@ fun main() {
             override fun scheduleChangesDispatch() = Unit
         }
         val composer = DomComposer(document, document.body!!, recomposer)
-        window.setInterval(
-            {
-                composer.compose {
-                    render()
-                }
-                composer.applyChanges()
-            },
-            1000
-        )
+//        window.setInterval(
+//            {
+        composer.compose {
+            render()
+        }
+        composer.applyChanges()
+//            },
+//            1000
+//        )
     })
 }
 
 var counter = 0
 
 fun DomComposer.render() {
+    _composer = this
     println("frame")
     counter++
 
@@ -39,14 +39,17 @@ fun DomComposer.render() {
     call(
         100,
         { changed(name) },
-        { helloWorld(name) }
+        { HelloWorld() }
     )
 }
 
-fun DomComposer.helloWorld(name: String) {
-    println("rendering")
-    span {
-        text("Hello, ")
-        text("world $name!")
+@Composable
+fun HelloWorld() {
+    Div(
+        Modifier.padding(5.dp)
+            .drawBackground(Color.Red)
+            .padding(5.dp)
+    ) {
+        Text("Hello, world!")
     }
 }

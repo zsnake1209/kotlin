@@ -16,6 +16,9 @@
 
 package ui
 
+import html.StyleBuilder
+import html.StyleModifier
+
 /**
  * A [Modifier.Element] that controls the drawing order for the children of the same layout
  * parent. A child with larger [zIndex] will be drawn after all the children with smaller [zIndex].
@@ -27,7 +30,7 @@ package ui
  *
  * @see [Modifier.zIndex]
  */
-interface ZIndexModifier : Modifier.Element {
+interface ZIndexModifier : Modifier.Element, StyleModifier {
     val zIndex: Float
 }
 
@@ -44,4 +47,8 @@ interface ZIndexModifier : Modifier.Element {
  */
 fun Modifier.zIndex(zIndex: Float): Modifier = this + SimpleZIndexModifier(zIndex)
 
-private data class SimpleZIndexModifier(override val zIndex: Float) : ZIndexModifier
+private data class SimpleZIndexModifier(override val zIndex: Float) : ZIndexModifier {
+    override fun apply(styleBuilder: StyleBuilder) {
+        styleBuilder.style.zIndex = zIndex.toString()
+    }
+}

@@ -16,6 +16,8 @@
 
 package ui
 
+import html.StyleBuilder
+
 /**
  * [Modifier] that changes the [LayoutDirection] of the wrapped layout to [LayoutDirection.Ltr].
  */
@@ -32,4 +34,8 @@ private val RtlModifier = LayoutDirectionModifier(LayoutDirection.Rtl)
 
 private data class LayoutDirectionModifier(
     val prescribedLayoutDirection: LayoutDirection
-) : LayoutModifier
+) : LayoutModifier {
+    override fun apply(styleBuilder: StyleBuilder) {
+        TODO("Not yet implemented")
+    }
+}

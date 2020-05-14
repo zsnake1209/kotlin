@@ -20,6 +20,4 @@ package ui
 /**
  * Defines a generic shape.
  */
-interface Shape {
-
-}
+interface Shape

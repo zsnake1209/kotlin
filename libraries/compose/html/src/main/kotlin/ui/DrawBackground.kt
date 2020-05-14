@@ -16,7 +16,8 @@
 
 package ui
 
-import utils.*
+import html.StyleBuilder
+import html.css
 
 /**
  * Draws [shape] with a solid [color] behind the content.
@@ -34,32 +35,15 @@ fun Modifier.drawBackground(
 //    colorFilter: ColorFilter? = null,
 //    blendMode: BlendMode = CanvasScope.DefaultBlendMode
 ) = this + DrawBackground(
-                shape,
-
-            )
-
-/**
- * Draws [shape] with [brush] behind the content.
- *
- * @sample androidx.ui.foundation.samples.DrawBackgroundShapedBrush
- *
- * @param brush brush to paint background with
- * @param shape desired shape of the background
- */
-fun Modifier.drawBackground(
-    brush: Brush,
-    shape: Shape = RectangleShape,
-    alpha: Float = 1f,
-    style: DrawStyle = Fill,
-//    colorFilter: ColorFilter? = null,
-//    blendMode: BlendMode = CanvasScope.DefaultBlendMode
-) = this + DrawBackground(
-                shape,
-
-            )
+    shape,
+    color
+)
 
 private data class DrawBackground internal constructor(
     private val shape: Shape,
+    private val color: Color,
 ) : DrawModifier {
-
+    override fun apply(styleBuilder: StyleBuilder) {
+        styleBuilder.style.backgroundColor = color.css()
+    }
 }

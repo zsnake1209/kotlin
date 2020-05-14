@@ -16,6 +16,9 @@
 
 package ui
 
+import html.StyleBuilder
+import html.css
+
 /**
  * Declare the preferred width of the content to be exactly [width]dp. The incoming measurement
  * [Constraints] may override this value, forcing the content to be either smaller or larger.
@@ -330,7 +333,9 @@ fun Modifier.defaultMinSizeConstraints(
 ) = this + UnspecifiedConstraintsModifier(minWidth, minHeight)
 
 private data class FillModifier(private val direction: Direction) : LayoutModifier {
-
+    override fun apply(styleBuilder: StyleBuilder) {
+        TODO()
+    }
 }
 
 private data class SizeModifier(
@@ -340,30 +345,44 @@ private data class SizeModifier(
     private val maxHeight: Dp = Dp.Unspecified,
     private val enforceIncoming: Boolean
 ) : LayoutModifier {
-    private val Density.targetConstraints
-        get() = Constraints(
-            minWidth = if (minWidth != Dp.Unspecified) minWidth.toIntPx() else 0.ipx,
-            minHeight = if (minHeight != Dp.Unspecified) minHeight.toIntPx() else 0.ipx,
-            maxWidth = if (maxWidth != Dp.Unspecified) maxWidth.toIntPx() else IntPx.Infinity,
-            maxHeight = if (maxHeight != Dp.Unspecified) maxHeight.toIntPx() else IntPx.Infinity
-        )
-
-
-
+    override fun apply(styleBuilder: StyleBuilder) {
+        if (minWidth != Dp.Unspecified) styleBuilder.style.minWidth = minWidth.css()
+        if (maxWidth != Dp.Unspecified) styleBuilder.style.width = maxWidth.css()
+        if (minHeight != Dp.Unspecified) styleBuilder.style.minHeight = minHeight.css()
+        if (maxHeight != Dp.Unspecified) styleBuilder.style.height = maxHeight.css()
+    }
 }
 
 private data class AlignmentModifier(
     private val alignment: Alignment,
     private val direction: Direction
 ) : LayoutModifier {
+    override fun apply(styleBuilder: StyleBuilder) {
+        styleBuilder.style.display = "flex"
 
+        when (alignment.horizontalBias) {
+            -1f -> styleBuilder.style.justifyContent = "start"
+            0f -> styleBuilder.style.justifyContent = "center"
+            1f -> styleBuilder.style.justifyContent = "end"
+            else -> error("Unsupported verticalBias: ${alignment.horizontalBias}")
+        }
+
+        when (alignment.verticalBias) {
+            -1f -> styleBuilder.style.alignItems = "start"
+            0f -> styleBuilder.style.alignSelf = "center"
+            1f -> styleBuilder.style.alignSelf = "end"
+            else -> error("Unsupported verticalBias: ${alignment.verticalBias}")
+        }
+    }
 }
 
 private data class UnspecifiedConstraintsModifier(
     val minWidth: Dp = Dp.Unspecified,
     val minHeight: Dp = Dp.Unspecified
 ) : LayoutModifier {
-
+    override fun apply(styleBuilder: StyleBuilder) {
+        TODO()
+    }
 }
 
 internal enum class Direction {

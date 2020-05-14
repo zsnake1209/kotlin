@@ -16,61 +16,10 @@
 
 package ui
 
+import html.StyleModifier
+
 
 /**
  * A [Modifier.Element] that draws into the space of the layout.
  */
-interface DrawModifier : Modifier.Element {
-
-}
-
-/**
- * Draw into a [Canvas] behind the modified content.
- */
-fun Modifier.drawBehind(
-) = this + DrawBackgroundModifier()
-
-/**
- * Creates a [DrawModifier] that calls [onDraw] before the contents of the layout.
- */
-@Deprecated(
-    "Replaced by Modifier.drawBehind",
-    replaceWith = ReplaceWith(
-        "Modifier.drawBehind(onDraw)",
-        "androidx.ui.core.drawBehind",
-        "androidx.ui.core.Modifier"
-    )
-)
-fun draw(
-): DrawModifier = DrawBackgroundModifier()
-
-private class DrawBackgroundModifier(
-
-) : DrawModifier {
-}
-
-/**
- * Creates a [DrawModifier] that allows the developer to draw before or after the layout's
- * contents. It also allows the modifier to adjust the layout's canvas.
- */
-// TODO: Inline this function -- it breaks with current compiler
-/*inline*/ fun Modifier.drawWithContent(
-
-): Modifier = this + object : DrawModifier {
-
-}
-
-/**
- * Creates a [DrawModifier] that allows the developer to draw before or after the layout's
- * contents. It also allows the modifier to adjust the layout's canvas.
- */
-@Deprecated(
-    "Replaced by Modifier.drawWithContent",
-    ReplaceWith(
-        "Modifier.drawWithContent(onDraw)",
-        "androidx.ui.core.Modifier"
-    )
-)
-/*inline*/ fun drawWithContent(
-
-): DrawModifier = Modifier.drawWithContent() as DrawModifier
+interface DrawModifier : Modifier.Element, StyleModifier

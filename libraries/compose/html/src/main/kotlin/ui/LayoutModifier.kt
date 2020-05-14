@@ -16,6 +16,9 @@
 
 package ui
 
+import html.StyleBuilder
+import html.StyleModifier
+
 /**
  * A [Modifier.Element] that changes how its wrapped content is measured and laid out.
  * It has the same measurement and layout functionality as the [androidx.ui.core.Layout]
@@ -25,4 +28,4 @@ package ui
  *
  * @see androidx.ui.core.Layout
  */
-interface LayoutModifier : Modifier.Element
+interface LayoutModifier : Modifier.Element, StyleModifier

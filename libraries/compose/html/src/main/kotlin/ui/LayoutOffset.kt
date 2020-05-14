@@ -16,6 +16,9 @@
 
 package ui
 
+import html.StyleBuilder
+import html.css
+
 /**
  * Offset the content by ([x]dp, [y]dp). The offsets can be positive as well as non positive.
  *
@@ -25,5 +28,8 @@ package ui
 fun Modifier.offset(x: Dp = 0.dp, y: Dp = 0.dp) = this + OffsetModifier(x, y)
 
 private data class OffsetModifier(val x: Dp, val y: Dp) : LayoutModifier {
-
+    override fun apply(styleBuilder: StyleBuilder) {
+        styleBuilder.style.left = x.css()
+        styleBuilder.style.top = y.css()
+    }
 }
