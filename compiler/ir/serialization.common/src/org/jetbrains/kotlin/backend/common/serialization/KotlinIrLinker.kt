@@ -64,6 +64,8 @@ abstract class KotlinIrLinker(
     protected val deserializersForModules = mutableMapOf<ModuleDescriptor, IrModuleDeserializer>()
 
     abstract val fakeOverrideBuilder: FakeOverrideBuilder
+    abstract val fakeOverrideChecker: FakeOverrideChecker
+
     private val haveSeen = mutableSetOf<IrSymbol>()
 
     abstract inner class BasicIrModuleDeserializer(moduleDescriptor: ModuleDescriptor, override val klib: IrLibrary, override val strategy: DeserializationStrategy) :
@@ -563,6 +565,7 @@ abstract class KotlinIrLinker(
         deserializersForModules.values.forEach {
             it.postProcess {
                 fakeOverrideBuilder.provideFakeOverrides(it)
+                fakeOverrideChecker.check(it)
             }
         }
         finalizeExpectActualLinker()
