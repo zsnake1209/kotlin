@@ -38,6 +38,14 @@ class ComposeKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
         androidProjectHandler: Any?,
         kotlinCompilation: KotlinCompilation<*>?
     ): List<SubpluginOption> {
+        if (project.findProperty("kotlin.compose.disable.runtime.sources") == null) {
+            addRuntimeSourcesHack(project)
+        }
+
+        return emptyList()
+    }
+
+    private fun addRuntimeSourcesHack(project: Project) {
         val d = project.dependencies.create("org.jetbrains.kotlin:compose-js-runtime-sources:1.4.255-SNAPSHOT:sources")
         val c = project.configurations.detachedConfiguration(d)
         val archive = c.resolve().first()
@@ -61,8 +69,6 @@ class ComposeKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
                 }
             }
         }
-
-        return emptyList()
     }
 
     override fun getPluginArtifact(): SubpluginArtifact =
