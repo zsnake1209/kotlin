@@ -4,77 +4,96 @@ import androidx.compose.Composable
 import androidx.compose.DomComposer
 import androidx.compose.SourceLocation
 import androidx.compose.currentComposer
-import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.css.CSSStyleDeclaration
 import org.w3c.dom.events.Event
 
-
-val div = SourceLocation("div")
-
-@Composable
-fun Div(className: String? = null, onClick: ((Event) -> Unit)? = null, block: @Composable () -> Unit) {
-    val composer = (currentComposer as DomComposer)
-
-    composer.emit(
-        div,
-        {
-            composer.document.createElement("div").also {
-                it.addEventListener("click", onClick)
-            }
-        },
-        {
-            update(className) { (node as Element).className = className ?: "" }
-        },
-        { block() }
-    )
-}
-
 val button = SourceLocation("button")
+val div = SourceLocation("div")
+val largeDiv = SourceLocation("largeDiv")
 
 @Composable
-fun Button(className: String? = null, onClick: ((Event) -> Unit)? = null, block: @Composable () -> Unit) {
+fun Div(
+    className: String? = null,
+    onClick: ((Event) -> Unit)? = null,
+    block: @Composable () -> Unit
+) {
+    Html(
+        "div",
+        button,
+        className = className,
+        onClick = onClick,
+        block = block
+    )
+}
+
+@Composable
+fun Button(
+    className: String? = null,
+    onClick: ((Event) -> Unit)? = null,
+    block: @Composable () -> Unit
+) {
+    Html(
+        "button",
+        button,
+        onClick = onClick,
+        className = className,
+        block = block,
+    )
+}
+
+val element = SourceLocation("element")
+
+@Composable
+fun Html(
+    tagName: String,
+    sourceLocation: SourceLocation = element,
+    className: String? = null,
+    setStyle: (CSSStyleDeclaration.() -> Unit)? = null,
+    onClick: ((Event) -> Unit)? = null,
+    block: @Composable () -> Unit
+) {
     val composer = (currentComposer as DomComposer)
 
     composer.emit(
-        button,
+        sourceLocation,
         {
-            composer.document.createElement("button").also {
-                it.addEventListener("click", onClick)
+            val element = composer.document.createElement(tagName) as HTMLElement
+            if (onClick != null) {
+                element.addEventListener("click", onClick)
             }
+            if (setStyle != null) {
+                element.style.setStyle()
+            }
+            element.className = className ?: ""
+            element
         },
         {
-            update(className) { (node as Element).className = className ?: "" }
+            val element = node as HTMLElement
+            update(className) { element.className = className ?: "" }
+            update(setStyle) { if (setStyle != null) element.style.setStyle() }
         },
         { block() }
     )
 }
-
-val largeDiv = SourceLocation("largeDiv")
 
 @Composable
 fun LargeDiv(
     onClick: ((Event) -> Unit)? = null,
     block: @Composable () -> Unit
 ) {
-    val composer = (currentComposer as DomComposer)
-    composer.emit(
+    Html(
+        "div",
         largeDiv,
-        {
-            composer.document.createElement("div").also {
-                if (onClick != null) it.addEventListener("click", onClick)
-                with((it as HTMLElement).style) {
-                    position = "absolute"
-                    width = "500px"
-                    height = "500px"
-                    border ="1px solid black"
-                    asDynamic().overflow = "hidden"
-                }
-            }
+        setStyle = {
+            position = "absolute"
+            width = "500px"
+            height = "500px"
+            border ="1px solid black"
+            asDynamic().overflow = "hidden"
         },
-        {
-
-        },
-        { block() }
+        onClick = onClick,
+        block = block
     )
 }
 

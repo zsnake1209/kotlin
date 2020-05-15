@@ -33,22 +33,22 @@ fun Demos() {
     var currentDemo: Demo by state { mainMenu }
 
     if (currentDemo == mainMenu) {
-        Div { Text("Compose for Web Demos:") }
+        Html("h1") { Text("Compose for Web Demos:") }
 
         for (demo in allDemos) {
             Div {
-                Button(onClick = { currentDemo = demo }) {
+                Button(onClick = { currentDemo = demo }, className = "nav") {
                     Text(demo.title)
                 }
             }
         }
     } else {
         Div {
-            Button(onClick = { currentDemo = mainMenu }) {
-                Text("Back")
+            Button(onClick = { currentDemo = mainMenu }, className = "nav") {
+                Text("⬅ Back")
             }
         }
-        Div { Text("Demo: ${currentDemo.title}") }
+        Html("h1") { Text("Demo: ${currentDemo.title}") }
 
         Div {
             currentDemo.content()
