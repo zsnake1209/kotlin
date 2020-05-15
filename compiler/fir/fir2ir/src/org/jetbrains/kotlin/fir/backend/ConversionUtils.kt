@@ -295,7 +295,9 @@ internal fun IrClass.findMatchingOverriddenSymbolsFromSupertypes(
     for (superType in superTypes) {
         val superTypeClass = superType.classOrNull
         if (superTypeClass is IrClassSymbolImpl) {
-            superTypeClass.owner.findMatchingOverriddenSymbolsFromThisAndSupertypes(irBuiltIns, target, result, visited)
+            if (superTypeClass.isBound) {
+                superTypeClass.owner.findMatchingOverriddenSymbolsFromThisAndSupertypes(irBuiltIns, target, result, visited)
+            }
         }
     }
     return result

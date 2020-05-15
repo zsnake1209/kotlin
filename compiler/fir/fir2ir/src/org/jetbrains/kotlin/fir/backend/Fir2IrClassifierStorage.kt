@@ -35,6 +35,8 @@ class Fir2IrClassifierStorage(
 
     private val classCache = mutableMapOf<FirRegularClass, IrClass>()
 
+    private val externalClassSymbolCache = mutableMapOf<FirRegularClass, IrClassSymbol>()
+
     private val typeParameterCache = mutableMapOf<FirTypeParameter, IrTypeParameter>()
 
     private val typeParameterCacheForSetter = mutableMapOf<FirTypeParameter, IrTypeParameter>()
@@ -359,15 +361,11 @@ class Fir2IrClassifierStorage(
             val irClass = createIrClass(firClass)
             return symbolTable.referenceClass(irClass.descriptor)
         }
-        // TODO: remove all this code and change to unbound symbol creation
         // This is were external class created...
-        val classId = firClassSymbol.classId
-        val parentId = classId.outerClassId
-        val irParent = declarationStorage.findIrParent(classId.packageFqName, parentId, firClassSymbol)
-        val irClass = createIrClass(firClass, irParent)
-        declarationStorage.addDeclarationsToExternalClass(firClass as FirRegularClass, irClass)
-
-        return symbolTable.referenceClass(irClass.descriptor)
+        return externalClassSymbolCache.getOrPut(firClass as FirRegularClass) {
+            val descriptor = WrappedClassDescriptor()
+            symbolTable.referenceClass(descriptor)
+        }
     }
 
     fun getIrTypeParameterSymbol(
