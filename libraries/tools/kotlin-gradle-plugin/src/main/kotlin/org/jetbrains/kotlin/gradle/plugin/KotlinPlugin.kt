@@ -764,7 +764,7 @@ internal open class KotlinAndroidPlugin(
 
             val version = loadAndroidPluginVersion()
             if (version != null) {
-                val minimalVersion = "3.0.0"
+                val minimalVersion = "3.2.0"
                 if (compareVersionNumbers(version, minimalVersion) < 0) {
                     throw IllegalStateException("Kotlin: Unsupported version of com.android.tools.build:gradle plugin: version $minimalVersion or higher should be used with kotlin-android plugin")
                 }
