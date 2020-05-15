@@ -8,6 +8,7 @@ import androidx.compose.getValue
 import androidx.compose.setValue
 import androidx.compose.state
 import demos.ripple.RippleDemo
+import demos.tictactoe.Counter
 import demos.tictactoe.TicTacToeView
 import html.*
 import kotlin.browser.document
@@ -25,7 +26,8 @@ class Demo(val title: String, val content: @Composable () -> Unit)
 val mainMenu = Demo("") {}
 val allDemos: List<Demo> = listOf(
     Demo("Ripple") { RippleDemo() },
-    Demo("Tic-tac-toe") { TicTacToeView() }
+    Demo("Tic-tac-toe") { TicTacToeView() },
+    Demo("Simple counter") { Counter() }
 )
 
 @Composable
