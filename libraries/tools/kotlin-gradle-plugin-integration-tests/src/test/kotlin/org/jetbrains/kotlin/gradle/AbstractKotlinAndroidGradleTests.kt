@@ -408,14 +408,6 @@ open class KotlinAndroid32GradleIT : KotlinAndroid3GradleIT() {
             assertTasksUpToDate(javacTasks + kaptTasks)
         }
     }
-}
-
-class KotlinAndroid30GradleIT : KotlinAndroid3GradleIT() {
-    override val androidGradlePluginVersion: AGPVersion
-        get() = AGPVersion.v3_0_0
-
-    override val defaultGradleVersion: GradleVersionRequired
-        get() = GradleVersionRequired.Until("4.10.2")
 
     @Test
     fun testOmittedStdlibVersion() = Project("AndroidProject").run {
@@ -723,29 +715,6 @@ fun getSomething() = 10
     fun testAndroidExtensionsSpecificFeatures() {
         val project = Project("AndroidExtensionsSpecificFeatures")
         val options = defaultBuildOptions().copy(incremental = false)
-
-        if (this is KotlinAndroid30GradleIT) {
-            project.setupWorkingDir()
-            project.gradleBuildScript("app").modify {
-                """
-                def projectEvaluated = false
-
-                configurations.all { configuration ->
-                    incoming.beforeResolve {
-                        if (!projectEvaluated) {
-                            throw new RuntimeException("${'$'}configuration resolved during project configuration phase.")
-                        }
-                    }
-                }
-
-                $it
-
-                afterEvaluate {
-                    projectEvaluated = true
-                }
-                """.trimIndent()
-            }
-        }
 
         project.build("assemble", options = options) {
             assertFailed()
