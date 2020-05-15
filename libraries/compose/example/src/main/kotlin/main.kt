@@ -8,12 +8,8 @@ import androidx.compose.getValue
 import androidx.compose.setValue
 import androidx.compose.state
 import demos.ripple.RippleDemo
-import demos.tictactoe.Button
-import demos.tictactoe.Div
-import demos.tictactoe.Text
-import demos.tictactoe.TicTacToeGame
-import html.onLoad
-import html.setContent
+import demos.tictactoe.TicTacToeView
+import html.*
 import kotlin.browser.document
 
 fun main() {
@@ -29,7 +25,7 @@ class Demo(val title: String, val content: @Composable () -> Unit)
 val mainMenu = Demo("") {}
 val allDemos: List<Demo> = listOf(
     Demo("Ripple") { RippleDemo() },
-    Demo("Tic-tac-toe") { TicTacToeGame() }
+    Demo("Tic-tac-toe") { TicTacToeView() }
 )
 
 @Composable

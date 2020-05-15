@@ -3,6 +3,7 @@ package ui
 import androidx.compose.*
 import androidx.compose.frames.ModelList
 import html.Div
+import html.LargeDiv
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.MouseEvent
 
@@ -14,7 +15,7 @@ fun Rippable() {
         ripples += RippleEffect(e.offsetX, e.offsetY, onEnd = { ripples -= it })
     }
 
-    Div(onClick = { addRipple(it as MouseEvent) }) {
+    LargeDiv(onClick = { addRipple(it as MouseEvent) }) {
         ripples.forEach {
             it.render()
         }
