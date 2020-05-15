@@ -8,4 +8,12 @@ sourceSets {
 }
 
 publish()
-sourcesJar()
+sourcesJar {
+    into("commonMain") {
+        from(projectDir.resolve("../compose/runtime/src/commonMain"))
+    }
+
+    into("jsMain") {
+        from(projectDir.resolve("../compose/runtime/src/jsMain"))
+    }
+}

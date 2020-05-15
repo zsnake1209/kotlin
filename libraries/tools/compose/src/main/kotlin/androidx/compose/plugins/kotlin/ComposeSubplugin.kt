@@ -38,7 +38,7 @@ class ComposeKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
         androidProjectHandler: Any?,
         kotlinCompilation: KotlinCompilation<*>?
     ): List<SubpluginOption> {
-        val d = project.dependencies.create("org.jetbrains.kotlin:compose-js-runtime-sources:1.4.255-SNAPSHOT")
+        val d = project.dependencies.create("org.jetbrains.kotlin:compose-js-runtime-sources:1.4.255-SNAPSHOT:sources")
         val c = project.configurations.detachedConfiguration(d)
         val archive = c.resolve().first()
         val dest = project.buildDir.resolve("compose-js-runtime-src")
@@ -54,10 +54,10 @@ class ComposeKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
             (project.extensions.findByName("kotlin") as KotlinProjectExtension).apply {
                 sourceSets.findByName("commonMain").also { ss ->
-                    ss!!.kotlin.srcDir(dest.resolve("commonMain").absolutePath)
+                    ss!!.kotlin.srcDir(dest.resolve("commonMain/kotlin").absolutePath)
                 }
                 sourceSets.findByName("jsMain").also { ss ->
-                    ss!!.kotlin.srcDir(dest.resolve("jsMain").absolutePath)
+                    ss!!.kotlin.srcDir(dest.resolve("jsMain/kotlin").absolutePath)
                 }
             }
         }
