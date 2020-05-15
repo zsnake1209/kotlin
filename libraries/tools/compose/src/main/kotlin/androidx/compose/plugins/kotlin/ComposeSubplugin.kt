@@ -8,10 +8,8 @@ package androidx.compose.plugins.kotlin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.AbstractCompile
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
-import org.jetbrains.kotlin.gradle.plugin.KotlinGradleSubplugin
-import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
-import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.plugin.*
 
 class ComposeGradlePlugin : Plugin<Project> {
     companion object {
@@ -40,6 +38,30 @@ class ComposeKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
         androidProjectHandler: Any?,
         kotlinCompilation: KotlinCompilation<*>?
     ): List<SubpluginOption> {
+        val d = project.dependencies.create("org.jetbrains.kotlin:compose-js-runtime-sources:1.4.255-SNAPSHOT")
+        val c = project.configurations.detachedConfiguration(d)
+        val archive = c.resolve().first()
+        val dest = project.buildDir.resolve("compose-js-runtime-src")
+
+        dest.resolve("commonMain").mkdirs()
+        dest.resolve("jsMain").mkdirs()
+
+        project.copy {
+            it.from(project.zipTree(archive))
+            it.into(dest)
+        }
+
+        project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+            (project.extensions.findByName("kotlin") as KotlinProjectExtension).apply {
+                sourceSets.findByName("commonMain").also { ss ->
+                    ss!!.kotlin.srcDir(dest.resolve("commonMain").absolutePath)
+                }
+                sourceSets.findByName("jsMain").also { ss ->
+                    ss!!.kotlin.srcDir(dest.resolve("jsMain").absolutePath)
+                }
+            }
+        }
+
         return emptyList()
     }
 

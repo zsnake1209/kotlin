@@ -293,6 +293,7 @@ include ":kotlin-build-common",
         ":include:kotlin-compiler",
         ":plugins:jvm-abi-gen",
         ":plugins:jvm-abi-gen-embeddable",
+        "compose-js-runtime-sources",
 
         // plugin markers:
         ':kotlin-gradle-plugin:plugin-marker',
@@ -527,6 +528,7 @@ project(':kotlin-serialization').projectDir = file("$rootDir/libraries/tools/kot
 project(':kotlin-serialization-unshaded').projectDir = file("$rootDir/libraries/tools/kotlin-serialization-unshaded")
 project(':kotlin-serialization:plugin-marker').projectDir = file("$rootDir/libraries/tools/kotlin-serialization/plugin-marker")
 project(':compose-gradle-plugin').projectDir = file("$rootDir/libraries/tools/compose")
+project(':compose-js-runtime-sources').projectDir = file("$rootDir/libraries/compose-js-runtime-sources")
 
 project(':compose-compiler-plugin').projectDir = file("$rootDir/plugins/compose-compiler")
 
