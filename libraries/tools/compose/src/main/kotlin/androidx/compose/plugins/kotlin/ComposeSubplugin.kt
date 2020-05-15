@@ -46,7 +46,9 @@ class ComposeKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
     }
 
     private fun addRuntimeSourcesHack(project: Project) {
-        val d = project.dependencies.create("org.jetbrains.kotlin:compose-js-runtime-sources:1.4.255-SNAPSHOT:sources")
+        val version = project.getKotlinPluginVersion()
+
+        val d = project.dependencies.create("org.jetbrains.kotlin:compose-js-runtime-sources:$version:sources")
         val c = project.configurations.detachedConfiguration(d)
         val archive = c.resolve().first()
         val dest = project.buildDir.resolve("compose-js-runtime-src")
