@@ -106,8 +106,16 @@ fun replaceWithCustomHighlighter(parentDisposable: Disposable, fromImplementatio
     }
 }
 
-fun logMessage(message: () -> String) {
+inline fun gradleMessage(block: () -> String) {
+    print("#gradle ${block()}")
+}
+
+inline fun logMessage(message: () -> String) {
     println("-- ${message()}")
+}
+
+inline fun tcMessage(block: () -> String) {
+    println("##teamcity[${block()}]")
 }
 
 fun logMessage(t: Throwable, message: () -> String) {
