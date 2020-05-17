@@ -8,17 +8,16 @@ package org.jetbrains.kotlin.idea.perf
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.testFramework.UsefulTestCase
 import org.jetbrains.kotlin.idea.perf.util.ExternalProject
-import org.jetbrains.kotlin.idea.perf.util.enableSingleInspection
 import org.jetbrains.kotlin.idea.perf.util.lastPathSegment
 import org.jetbrains.kotlin.idea.perf.util.statisticSuite
 import org.jetbrains.kotlin.test.JUnit3RunnerWithInners
 import org.junit.runner.RunWith
 
-@RunWith(JUnit3RunnerWithInners::class)
 /**
  * Run the only specified exceptions on the selected files in Kotling project.
  * Used for 'The Kotlin sources: kt files heavy inspections' graph.
  */
+@RunWith(JUnit3RunnerWithInners::class)
 class AHeavyInspectionsPerformanceTest : UsefulTestCase() {
     val listOfFiles = arrayOf(
         "libraries/tools/kotlin-gradle-plugin-integration-tests/src/test/kotlin/org/jetbrains/kotlin/gradle/NewMultiplatformIT.kt",

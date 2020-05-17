@@ -14,6 +14,13 @@ import com.intellij.profile.codeInspection.ProjectInspectionProfileManager
 
 class ProfileTools {
     companion object {
+        internal fun enableAllInspections(project: Project) {
+            InspectionProfileImpl.INIT_INSPECTIONS = true
+            val profile = InspectionProfileImpl("all-inspections")
+            profile.enableAllTools(project)
+            replaceProfile(project, profile)
+        }
+
         internal fun enableSingleInspection(project: Project, inspectionName: String) {
             InspectionProfileImpl.INIT_INSPECTIONS = true
             val profile = InspectionProfileImpl("$inspectionName-only")
@@ -45,6 +52,3 @@ class ProfileTools {
         }
     }
 }
-
-fun Statistic.ProjectScope.enableSingleInspection(inspectionName: String) =
-    ProfileTools.enableSingleInspection(this.project, inspectionName)

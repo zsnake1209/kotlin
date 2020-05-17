@@ -10,7 +10,6 @@ import com.intellij.codeInsight.daemon.DaemonCodeAnalyzerSettings
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
 import com.intellij.ide.startup.impl.StartupManagerImpl
-import com.intellij.idea.IdeaTestApplication
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.EditorFactory
@@ -18,20 +17,25 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ex.ProjectManagerEx
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.JavaAwareProjectJdkTableImpl
 import com.intellij.openapi.startup.StartupManager
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
+import com.intellij.psi.impl.PsiDocumentManagerBase
 import com.intellij.testFramework.RunAll
 import com.intellij.testFramework.TestDataProvider
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
+import com.intellij.testFramework.runInEdtAndWait
 import com.intellij.util.ArrayUtilRt
 import com.intellij.util.ThrowableRunnable
 import com.intellij.util.indexing.UnindexedFilesUpdater
+import org.jetbrains.kotlin.idea.core.script.ScriptConfigurationManager
 import org.jetbrains.kotlin.idea.framework.KotlinSdkType
 import org.jetbrains.kotlin.idea.perf.Stats
 import org.jetbrains.kotlin.idea.perf.TestApplicationManager
@@ -65,6 +69,22 @@ class Statistic {
             val editor = EditorFactory.getInstance().getEditors(document).first()
             PsiDocumentManager.getInstance(project).commitAllDocuments()
             return CodeInsightTestFixtureImpl.instantiateAndRun(psiFile, editor, ArrayUtilRt.EMPTY_INT_ARRAY, true)
+        }
+
+        fun rollbackChanges(vararg file: VirtualFile) {
+            val fileDocumentManager = FileDocumentManager.getInstance()
+            runInEdtAndWait {
+                fileDocumentManager.reloadFiles(*file)
+            }
+
+            ProjectManagerEx.getInstanceEx().openProjects.forEach { project ->
+                val psiDocumentManagerBase = PsiDocumentManager.getInstance(project) as PsiDocumentManagerBase
+
+                runInEdtAndWait {
+                    psiDocumentManagerBase.clearUncommittedDocuments()
+                    psiDocumentManagerBase.commitAllDocuments()
+                }
+            }
         }
     }
 
@@ -166,19 +186,37 @@ class Statistic {
 
     class ProjectScope(val config: ProjectScopeConfig, val app: ApplicationScope) : AutoCloseable {
         val project: Project = initProject(config, app)
+        val openFiles = mutableListOf<VirtualFile>()
 
-        fun highlight(editorFile: EditorFile?) =
+        fun highlight(editorFile: PsiFile?) =
             editorFile?.let {
-                highlightFile(project, editorFile.psiFile)
+                highlightFile(project, editorFile)
             } ?: throw IllegalStateException("editor isn't ready for highlight")
 
+        fun enableSingleInspection(inspectionName: String) =
+            ProfileTools.enableSingleInspection(this.project, inspectionName)
+
+        fun enableAllInspections() =
+            ProfileTools.enableAllInspections(this.project)
 
         fun editor(path: String) =
-            Fixture.openFileInEditor(project, path)
+            Fixture.openFileInEditor(project, path).psiFile.also { openFiles.add(it.virtualFile) }
 
-        fun close(editorFile: EditorFile?) {
+        fun editorWithFile(path: String): Fixture {
+            val fixture = Fixture.openFixture(project, path)
+            openFiles.add(fixture.vFile)
+            if (Fixture.isAKotlinScriptFile(path)) {
+                ScriptConfigurationManager.updateScriptDependenciesSynchronously(fixture.psiFile)
+            }
+            return fixture
+        }
+
+        fun rollbackChanges() =
+            rollbackChanges(*openFiles.toTypedArray())
+
+        fun close(editorFile: PsiFile?) {
             commitAllDocuments()
-            editorFile?.psiFile?.virtualFile?.let {
+            editorFile?.virtualFile?.let {
                 FileEditorManager.getInstance(project).closeFile(it)
             }
         }
@@ -237,6 +275,7 @@ class Statistic {
             }
         }
     }
+
 }
 
 fun UsefulTestCase.statisticSuite(
