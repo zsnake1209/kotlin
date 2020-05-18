@@ -436,6 +436,9 @@ class UnusedSymbolInspection : AbstractKotlinInspection() {
             if (referenceUsed) return true
         }
 
+        if (declaration is KtCallableDeclaration && referenceUsed)
+            return true
+
         if (declaration is KtSecondaryConstructor) {
             val containingClass = declaration.containingClass()
             if (containingClass != null && ReferencesSearch.search(KotlinReferencesSearchParameters(containingClass, useScope)).any {
