@@ -264,7 +264,7 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
         context: PsiElement?
     ): ULambdaExpression? {
         val resolutionFacade = (context as? KtElement)?.getResolutionFacade()
-        val validator = (context as? KtElement)?.let { nameValidator(it) } ?: { true }
+        val validator = (context as? KtElement)?.let { usedNamesFilter(it) } ?: { true }
 
         val newLambdaStatements = if (body is UBlockExpression) {
             body.expressions.mapNotNull { member ->
@@ -303,7 +303,7 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
 
     /*override*/ fun createLocalVariable(suggestedName: String?, type: PsiType?, initializer: UExpression, immutable: Boolean, context: PsiElement?): ULocalVariable? {
         val resolutionFacade = (context as? KtElement)?.getResolutionFacade()
-        val validator = (context as? KtElement)?.let { nameValidator(it) } ?: { true }
+        val validator = (context as? KtElement)?.let { usedNamesFilter(it) } ?: { true }
         val ktype = resolutionFacade?.let { type?.resolveToKotlinType(it) }
 
         val function = psiFactory.createFunction(
@@ -331,7 +331,7 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
     }
 }
 
-private fun nameValidator(context: KtElement): (String) -> Boolean {
+private fun usedNamesFilter(context: KtElement): (String) -> Boolean {
     val scope = context.getResolutionScope()
-    return  { name: String ->  scope.findClassifier(Name.identifier(name), NoLookupLocation.FROM_IDE) == null }
+    return { name: String -> scope.findClassifier(Name.identifier(name), NoLookupLocation.FROM_IDE) == null }
 }
