@@ -55,9 +55,14 @@ class KotlinUastCodeGenerationPlugin : UastCodeGenerationPlugin {
         val psiFactory = KtPsiFactory(oldPsi.project)
         val oldParentPsi = oldPsi.parent
         val (updOldPsi, updNewPsi) = when {
-            oldParentPsi is KtStringTemplateExpression && oldParentPsi.entries.size == 1 -> oldParentPsi to newPsi
-            oldPsi is KtStringTemplateEntry && newPsi !is KtStringTemplateEntry && newPsi is KtExpression -> oldPsi to psiFactory.createBlockStringTemplateEntry(newPsi)
-            else -> oldPsi to newPsi
+            oldParentPsi is KtStringTemplateExpression && oldParentPsi.entries.size == 1 ->
+                oldParentPsi to newPsi
+
+            oldPsi is KtStringTemplateEntry && newPsi !is KtStringTemplateEntry && newPsi is KtExpression ->
+                oldPsi to psiFactory.createBlockStringTemplateEntry(newPsi)
+
+            else ->
+                oldPsi to newPsi
         }
 
         return when (val replaced = updOldPsi.replace(updNewPsi)?.safeAs<KtElement>()?.let { ShortenReferences.DEFAULT.process(it) }) {
@@ -87,7 +92,14 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
         }
     }
 
-    override fun createCallExpression(receiver: UExpression?, methodName: String, parameters: List<UExpression>, expectedReturnType: PsiType?, kind: UastCallKind, context: PsiElement?): UCallExpression? {
+    override fun createCallExpression(
+        receiver: UExpression?,
+        methodName: String,
+        parameters: List<UExpression>,
+        expectedReturnType: PsiType?,
+        kind: UastCallKind,
+        context: PsiElement?
+    ): UCallExpression? {
         if (kind != UastCallKind.METHOD_CALL) return null
 
         val typeParams = (context as? KtElement)?.let { kontext ->
@@ -98,11 +110,11 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
         val name = methodName.quoteIfNeeded()
         val methodCall = psiFactory.createExpression(
             buildString {
-                if(receiver != null)
+                if (receiver != null)
                     append("a.")
                 append(name)
-                if(typeParams != null){
-                    append(typeParams.joinToString(", ", "<" , ">") { type ->
+                if (typeParams != null) {
+                    append(typeParams.joinToString(", ", "<", ">") { type ->
                         type.fqName?.asString() ?: ""
                     })
                 }
@@ -128,7 +140,7 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
     }
 
     /*override*/ fun createNullLiteral(context: PsiElement?): ULiteralExpression {
-       return psiFactory.createExpression("null").toUElementOfType<ULiteralExpression>()!!
+        return psiFactory.createExpression("null").toUElementOfType<ULiteralExpression>()!!
     }
 
     @Deprecated("use version with context parameter")
@@ -137,7 +149,12 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
         return createIfExpression(condition, thenBranch, elseBranch, null)
     }
 
-    /*override*/ fun createIfExpression(condition: UExpression, thenBranch: UExpression, elseBranch: UExpression?, context: PsiElement?): UIfExpression? {
+    /*override*/ fun createIfExpression(
+        condition: UExpression,
+        thenBranch: UExpression,
+        elseBranch: UExpression?,
+        context: PsiElement?
+    ): UIfExpression? {
         val conditionPsi = condition.sourcePsi as? KtExpression ?: return null
         val thenBranchPsi = thenBranch.sourcePsi as? KtExpression ?: return null
         val elseBranchPsi = elseBranch?.sourcePsi as? KtExpression
@@ -190,11 +207,21 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
     }
 
     @Deprecated("use version with context parameter")
-    override fun createBinaryExpression(leftOperand: UExpression, rightOperand: UExpression, operator: UastBinaryOperator): UBinaryExpression? {
+    override fun createBinaryExpression(
+        leftOperand: UExpression,
+        rightOperand: UExpression,
+        operator: UastBinaryOperator
+    ): UBinaryExpression? {
         logger<KotlinUastElementFactory>().error("Please switch caller to the version with a context parameter")
         return createBinaryExpression(leftOperand, rightOperand, operator, null)
     }
-    /*override*/ fun createBinaryExpression(leftOperand: UExpression, rightOperand: UExpression, operator: UastBinaryOperator, context: PsiElement?): UBinaryExpression? {
+
+    /*override*/ fun createBinaryExpression(
+        leftOperand: UExpression,
+        rightOperand: UExpression,
+        operator: UastBinaryOperator,
+        context: PsiElement?
+    ): UBinaryExpression? {
         val binaryExpression = joinBinaryExpression(leftOperand, rightOperand, operator) ?: return null
         return KotlinUBinaryExpression(binaryExpression, null)
     }
@@ -214,16 +241,25 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
     }
 
     @Deprecated("use version with context parameter")
-    override fun createFlatBinaryExpression(leftOperand: UExpression, rightOperand: UExpression, operator: UastBinaryOperator): UPolyadicExpression? {
+    override fun createFlatBinaryExpression(
+        leftOperand: UExpression,
+        rightOperand: UExpression,
+        operator: UastBinaryOperator
+    ): UPolyadicExpression? {
         logger<KotlinUastElementFactory>().error("Please switch caller to the version with a context parameter")
         return createFlatBinaryExpression(leftOperand, rightOperand, operator, null)
     }
 
-    /*override*/ fun createFlatBinaryExpression(leftOperand: UExpression, rightOperand: UExpression, operator: UastBinaryOperator, context: PsiElement?): UPolyadicExpression? {
+    /*override*/ fun createFlatBinaryExpression(
+        leftOperand: UExpression,
+        rightOperand: UExpression,
+        operator: UastBinaryOperator,
+        context: PsiElement?
+    ): UPolyadicExpression? {
 
-        fun unwrapParentheses(exp: KtExpression?){
-            if(exp !is KtParenthesizedExpression) return
-            if(!KtPsiUtil.areParenthesesUseless(exp)) return
+        fun unwrapParentheses(exp: KtExpression?) {
+            if (exp !is KtParenthesizedExpression) return
+            if (!KtPsiUtil.areParenthesesUseless(exp)) return
             exp.expression?.let { exp.replace(it) }
         }
 
@@ -241,7 +277,9 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
     }
 
     /*override*/ fun createBlockExpression(expressions: List<UExpression>, context: PsiElement?): UBlockExpression? {
-        val block = psiFactory.createBlock(expressions.flatMap { it.toSourcePsiFakeAware() }.joinToString(separator = "\n") { it.text ?: "" })
+        val block = psiFactory.createBlock(
+            expressions.flatMap { it.toSourcePsiFakeAware() }.joinToString(separator = "\n") { it.text ?: "" }
+        )
         return KotlinUBlockExpression(block, null)
     }
 
@@ -301,7 +339,13 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
         return createLambdaExpression(parameters, body, null)
     }
 
-    /*override*/ fun createLocalVariable(suggestedName: String?, type: PsiType?, initializer: UExpression, immutable: Boolean, context: PsiElement?): ULocalVariable? {
+    /*override*/ fun createLocalVariable(
+        suggestedName: String?,
+        type: PsiType?,
+        initializer: UExpression,
+        immutable: Boolean,
+        context: PsiElement?
+    ): ULocalVariable? {
         val resolutionFacade = (context as? KtElement)?.getResolutionFacade()
         val validator = (context as? KtElement)?.let { usedNamesFilter(it) } ?: { true }
         val ktype = resolutionFacade?.let { type?.resolveToKotlinType(it) }
@@ -313,7 +357,7 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
                 append(" ")
                 append(suggestedName ?: ktype?.let { KotlinNameSuggester.suggestNamesByType(it, validator).firstOrNull() })
                     ?: KotlinNameSuggester.suggestNameByName("v", validator)
-                ktype?.fqName?.toString()?.let { append(": ").append(it)}
+                ktype?.fqName?.toString()?.let { append(": ").append(it) }
                 append(" = null")
                 append("}")
             }
@@ -325,7 +369,12 @@ class KotlinUastElementFactory(project: Project) : UastElementFactory {
     }
 
     @Deprecated("use version with context parameter")
-    override fun createLocalVariable(suggestedName: String?, type: PsiType?, initializer: UExpression, immutable: Boolean): ULocalVariable? {
+    override fun createLocalVariable(
+        suggestedName: String?,
+        type: PsiType?,
+        initializer: UExpression,
+        immutable: Boolean
+    ): ULocalVariable? {
         logger<KotlinUastElementFactory>().error("Please switch caller to the version with a context parameter")
         return createLocalVariable(suggestedName, type, initializer, immutable, null)
     }
