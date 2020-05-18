@@ -44,7 +44,6 @@ import org.jetbrains.kotlin.idea.test.invalidateLibraryCache
 import org.jetbrains.kotlin.idea.testFramework.*
 import org.jetbrains.kotlin.idea.util.getProjectJdkTableSafe
 import java.io.File
-import java.nio.file.Paths
 
 class Statistic {
     companion object {
