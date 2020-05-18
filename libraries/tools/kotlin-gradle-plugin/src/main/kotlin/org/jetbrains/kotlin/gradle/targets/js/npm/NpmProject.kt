@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the license/LICENSE.txt file.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.gradle.targets.js.npm
@@ -68,10 +68,15 @@ open class NpmProject(val compilation: KotlinJsCompilation) {
     private val rootNodeModules: NpmProjectModules?
         get() = NpmProjectModules(nodeJs.rootPackageDir)
 
-    fun useTool(exec: ExecSpec, tool: String, vararg args: String) {
+    fun useTool(
+        exec: ExecSpec,
+        tool: String,
+        nodeArgs: List<String> = listOf(),
+        args: List<String>
+    ) {
         exec.workingDir = dir
         exec.executable = nodeJs.environment.nodeExecutable
-        exec.args = listOf(require(tool)) + args
+        exec.args = nodeArgs + require(tool) + args
     }
 
     /**
