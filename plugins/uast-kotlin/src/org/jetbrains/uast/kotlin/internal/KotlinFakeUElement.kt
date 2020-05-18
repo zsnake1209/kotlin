@@ -9,12 +9,10 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.uast.UElement
 
 interface KotlinFakeUElement {
-
     fun unwrapToSourcePsi(): List<PsiElement>
-
 }
 
-fun UElement.toSourcePsiFakeAware():List<PsiElement> {
-    if(this is KotlinFakeUElement) return this.unwrapToSourcePsi()
+fun UElement.toSourcePsiFakeAware(): List<PsiElement> {
+    if (this is KotlinFakeUElement) return this.unwrapToSourcePsi()
     return listOfNotNull(this.sourcePsi)
 }
