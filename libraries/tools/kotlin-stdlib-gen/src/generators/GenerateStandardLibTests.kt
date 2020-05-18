@@ -1,12 +1,13 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package generators
 
-import java.io.*
 import templates.*
+import templates.tests.*
+import java.io.File
 import kotlin.system.exitProcess
 
 /**
@@ -17,22 +18,12 @@ import kotlin.system.exitProcess
  * at runtime.
  */
 fun main(args: Array<String>) {
-    val templateGroups = sequenceOf<MemberTemplateGroupBase>(
-        Elements,
-        Filtering,
-        Ordering,
-        ArrayOps,
-        Snapshots,
-        Mapping,
-        SetOps,
-        Aggregates,
-        Guards,
-        Generators,
-        StringJoinOps,
-        SequenceOps,
-        RangeOps,
-        Numeric,
-        ComparableOps
+    val templateGroups = sequenceOf<TestTemplateGroupBase>(
+        AggregatesTest,
+        NumbersTest,
+        ComparablesTest,
+        ElementsTest,
+        ArraysTest
     )
 
     COPYRIGHT_NOTICE = readCopyrightNoticeFromProfile { Thread.currentThread().contextClassLoader.getResourceAsStream("apache.xml").reader() }
@@ -42,10 +33,9 @@ fun main(args: Array<String>) {
     when (args.size) {
         1 -> {
             val baseDir = File(args.first())
-            targetBaseDirs[KotlinTarget.Common] = baseDir.resolveExistingDir("libraries/stdlib/common/src/generated")
-            targetBaseDirs[KotlinTarget.JVM] = baseDir.resolveExistingDir("libraries/stdlib/jvm/src/generated")
-            targetBaseDirs[KotlinTarget.JS] = baseDir.resolveExistingDir("libraries/stdlib/js/src/generated")
-            targetBaseDirs[KotlinTarget.JS_IR] = baseDir.resolveExistingDir("libraries/stdlib/js-ir/src/generated")
+            targetBaseDirs[KotlinTarget.Common] = baseDir.resolveExistingDir("libraries/stdlib/test/generated")
+            targetBaseDirs[KotlinTarget.JVM] = baseDir.resolveExistingDir("libraries/stdlib/jvm/test/generated")
+            targetBaseDirs[KotlinTarget.JS] = baseDir.resolveExistingDir("libraries/stdlib/js/test/generated")
         }
         2 -> {
             val (targetName, targetDir) = args
@@ -61,18 +51,12 @@ fun main(args: Array<String>) {
         }
     }
 
-    templateGroups.groupByFileAndWrite(targetsToGenerate = targetBaseDirs.keys) { (target, source) ->
+    templateGroups.groupByFileAndWriteTest(targetsToGenerate = targetBaseDirs.keys) { (target, source) ->
         val targetDir = targetBaseDirs[target] ?: error("Target $target directory is not configured")
         val platformSuffix = when (val platform = target.platform) {
             Platform.Common -> ""
-            else -> platform.name.toLowerCase().capitalize()
+            else -> platform.name
         }
-        targetDir.resolve("_${source.name.capitalize()}$platformSuffix.kt")
+        targetDir.resolve("_${source.name.capitalize() + platformSuffix}Test.kt")
     }
-}
-
-fun File.resolveExistingDir(subpath: String) = resolve(subpath).also { it.requireExistingDir() }
-
-fun File.requireExistingDir() {
-    require(isDirectory) { "Directory $this doesn't exist"}
 }

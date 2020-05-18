@@ -25,3 +25,24 @@ enum class SourceFile(jvmClassName: String? = null, val multifile: Boolean = tru
 
     val jvmClassName = jvmClassName ?: (name.capitalize() + "Kt")
 }
+
+enum class TestSourceFile(val packageName: String? = null) {
+
+    Arrays(packageName = "test.collections"),
+    UArrays(packageName = "test.collections"),
+    Collections(packageName = "test.collections"),
+    UCollections(packageName = "test.collections"),
+    Sets(packageName = "test.collections"),
+    Maps(packageName = "test.collections"),
+    Sequences(packageName = "test.sequences"),
+    USequences(packageName = "test.sequences"),
+    Ranges(packageName = "test.ranges"),
+    URanges(packageName = "test.ranges"),
+    Comparisons(packageName = "test.comparisons"),
+    UComparisons(packageName = "test.unsigned"),
+    Strings(packageName = "test.text"),
+    Primitives(packageName = "test.numbers"),
+    Unsigned(packageName = "test.unsigned"),
+    Misc(),
+    ;
+}

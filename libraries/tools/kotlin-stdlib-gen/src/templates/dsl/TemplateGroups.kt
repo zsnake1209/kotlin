@@ -10,22 +10,20 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.full.isSubtypeOf
 
 
-typealias TemplateGroup = () -> Sequence<MemberTemplate>
+typealias TemplateGroup<TBuilder> = () -> Sequence<MemberTemplate<TBuilder>>
 
-fun templateGroupOf(vararg templates: MemberTemplate): TemplateGroup = { templates.asSequence() }
+abstract class TemplateGroupBase<TBuilder> : TemplateGroup<TBuilder> {
 
-abstract class TemplateGroupBase : TemplateGroup {
-
-    override fun invoke(): Sequence<MemberTemplate> = sequence {
+    override fun invoke(): Sequence<MemberTemplate<TBuilder>> = sequence {
         with(this@TemplateGroupBase) {
             this::class.members.filter { it.name.startsWith("f_") }.forEach {
                 require(it.parameters.size == 1) { "Member $it violates naming convention" }
+                @Suppress("UNCHECKED_CAST")
                 when {
                     it.returnType.isSubtypeOf(typeMemberTemplate) ->
-                        yield(it.call(this) as MemberTemplate)
+                        yield(it.call(this) as MemberTemplate<TBuilder>)
                     it.returnType.isSubtypeOf(typeIterableOfMemberTemplates) ->
-                        @Suppress("UNCHECKED_CAST")
-                        yieldAll(it.call(this) as Iterable<MemberTemplate>)
+                        yieldAll(it.call(this) as Iterable<MemberTemplate<TBuilder>>)
                     else ->
                         error("Member $it violates naming convention")
                 }
@@ -35,15 +33,18 @@ abstract class TemplateGroupBase : TemplateGroup {
         if (defaultActions.isEmpty()) this else onEach { t -> defaultActions.forEach(t::builder) }
     }
 
-    private val defaultActions = mutableListOf<MemberBuildAction>()
+    private val defaultActions = mutableListOf<BuildAction<TBuilder>>()
 
-    fun defaultBuilder(builderAction: MemberBuildAction) {
+    fun defaultBuilder(builderAction: BuildAction<TBuilder>) {
         defaultActions += builderAction
     }
 
     companion object {
-        private val typeMemberTemplate = MemberTemplate::class.createType()
+        private val typeMemberTemplate = MemberTemplate::class.createType(arguments = listOf(KTypeProjection.STAR))
         private val typeIterableOfMemberTemplates = Iterable::class.createType(arguments = listOf(KTypeProjection.invariant(typeMemberTemplate)))
     }
 
 }
+
+typealias MemberTemplateGroupBase = TemplateGroupBase<MemberBuilder>
+typealias TestTemplateGroupBase = TemplateGroupBase<TestBuilder>
