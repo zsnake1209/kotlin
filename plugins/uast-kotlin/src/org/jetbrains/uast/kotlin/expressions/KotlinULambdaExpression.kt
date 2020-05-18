@@ -61,12 +61,13 @@ class KotlinULambdaExpression(
 
     override val valueParameters by lz {
 
-        sourcePsi.valueParameters.mapIndexed { i, p ->
+        val explicitParameters = sourcePsi.valueParameters.mapIndexed { i, p ->
             KotlinUParameter(UastKotlinPsiParameter.create(p, sourcePsi, this, i), p, this)
-        }.takeIf { it.isNotEmpty() }?.let { return@lz it }
+        }
+        if (explicitParameters.isNotEmpty()) return@lz explicitParameters
 
-        val descriptor = sourcePsi.analyze()[FUNCTION, sourcePsi.functionLiteral] ?: return@lz emptyList()
-        descriptor.valueParameters.mapIndexed { i, p ->
+        val functionDescriptor = sourcePsi.analyze()[FUNCTION, sourcePsi.functionLiteral] ?: return@lz emptyList()
+        functionDescriptor.valueParameters.mapIndexed { i, p ->
             KotlinUParameter(
                 UastKotlinPsiParameterBase(
                     p.name.asString(),
