@@ -464,6 +464,18 @@ public class TypeUtils {
         return false;
     }
 
+    public static boolean containsSpecialType(KotlinType type, @Nullable SimpleType specialType) {
+        if (specialType != null && !(specialType instanceof TypeUtils.SpecialType)) {
+            throw new IllegalStateException(type + " isn't a special type");
+        }
+        if (type == null) return false;
+        if (type instanceof TypeUtils.SpecialType && (specialType == null || type == specialType)) return true;
+        for (TypeProjection projection : type.getArguments()) {
+            if (!projection.isStarProjection() && containsSpecialType(projection.getType(), specialType)) return true;
+        }
+        return false;
+    }
+
     @NotNull
     public static TypeProjection makeStarProjection(@NotNull TypeParameterDescriptor parameterDescriptor) {
         return new StarProjectionImpl(parameterDescriptor);
