@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.idea.scripting.gradle
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.project.Project
@@ -82,51 +80,8 @@ fun useScriptConfigurationFromImportOnly(): Boolean {
     return Registry.`is`("kotlin.gradle.scripts.useIdeaProjectImport", false)
 }
 
-fun getGradleVersion(project: Project, settings: GradleProjectSettings): String {
-    val localVersion = GradleLocalSettings.getInstance(project).getGradleVersion(settings.externalProjectPath)
-    if (localVersion != null) return localVersion
-
-    return settings.resolveGradleVersion().version
-}
-
 fun getGradleProjectSettings(project: Project): Collection<GradleProjectSettings> =
     (ExternalSystemApiUtil.getSettings(project, GradleConstants.SYSTEM_ID) as GradleSettings).linkedProjectsSettings
-
-class RootsIndex<T : Any> {
-    internal val tree = TreeMap<String, T>()
-    var values: Collection<T> = listOf()
-        internal set
-
-    fun findRoot(path: String): T? {
-        // race condition can be ignored
-        val values = values
-        val size = values.size
-        if (size == 0) return null
-        if (size == 1) return values.single() // we can omit prefix check
-        return tree.floorEntry(path).takeIf { path.startsWith(it.key) }?.value
-    }
-
-    internal inline fun update(updater: (insert: (prefix: String, value: T) -> Unit) -> Unit) {
-        synchronized(this) {
-            updater { prefix, value -> tree[prefix] = value }
-            values = tree.values
-        }
-    }
-
-    @Synchronized
-    operator fun set(prefix: String, value: T) {
-        val moreCommon = tree.lowerKey(prefix)
-        check(moreCommon == null || !prefix.startsWith(moreCommon)) {
-            "Cannot add root `${prefix}`. More common root already added: `$moreCommon`"
-        }
-
-        tree[prefix] = value
-        values = tree.values
-    }
-
-    @Synchronized
-    fun remove(prefix: String) = tree.remove(prefix)
-}
 
 private val logger = Logger.getInstance("#org.jetbrains.kotlin.idea.scripting.gradle")
 

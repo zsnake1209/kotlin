@@ -47,6 +47,8 @@ class KotlinDslSyncListener : ExternalSystemTaskNotificationListenerAdapter() {
             sync.workingDir = workingDir
             saveScriptModels(project, sync)
         }
+    }
+
     override fun onFailure(id: ExternalSystemTaskId, e: Exception) {
         if (id.type != ExternalSystemTaskType.RESOLVE_PROJECT) return
         if (id.projectSystemId != GRADLE_SYSTEM_ID) return
@@ -58,19 +60,6 @@ class KotlinDslSyncListener : ExternalSystemTaskNotificationListenerAdapter() {
     }
 
     override fun onCancel(id: ExternalSystemTaskId) {
-        if (id.type != ExternalSystemTaskType.RESOLVE_PROJECT) return
-        if (id.projectSystemId != GRADLE_SYSTEM_ID) return
-
-        val project = id.findProject() ?: return
-
-        val cancelled = project.kotlinGradleDslSync.remove(id)
-        if (cancelled != null) {
-            GradleBuildRootsManager.getInstance(project).markImportingInProgress(cancelled.workingDir, false)
-        }
-    }
-}
-
-    override fun onCancel(id: ExternalSystemTaskId) {
         if (!isGradleProjectImport(id)) return
 
         gradleState.isSyncInProgress = false
@@ -79,7 +68,10 @@ class KotlinDslSyncListener : ExternalSystemTaskNotificationListenerAdapter() {
 
         val project = id.findProject() ?: return
 
-        project.kotlinGradleDslSync.remove(id)
+        val cancelled = project.kotlinGradleDslSync.remove(id)
+        if (cancelled != null) {
+            GradleBuildRootsManager.getInstance(project).markImportingInProgress(cancelled.workingDir, false)
+        }
     }
 
     private fun isGradleProjectImport(id: ExternalSystemTaskId): Boolean {
