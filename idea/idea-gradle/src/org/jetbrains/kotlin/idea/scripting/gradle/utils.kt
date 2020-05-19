@@ -15,35 +15,20 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.gradle.util.GradleVersion
+import org.jetbrains.kotlin.idea.scripting.gradle.roots.GradleBuildRoot
+import org.jetbrains.kotlin.idea.scripting.gradle.roots.GradleBuildRootsManager
 import org.jetbrains.kotlin.idea.util.application.runReadAction
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtScriptInitializer
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
-import org.jetbrains.plugins.gradle.settings.GradleLocalSettings
 import org.jetbrains.plugins.gradle.settings.GradleProjectSettings
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 import org.jetbrains.plugins.gradle.util.GradleConstants
-import java.util.*
 
 private val sections = arrayListOf("buildscript", "plugins", "initscript", "pluginManagement")
 
 fun isGradleKotlinScript(virtualFile: VirtualFile) = virtualFile.name.endsWith(".gradle.kts")
-
-fun isInAffectedGradleProjectFiles(project: Project, filePath: String): Boolean {
-    if (filePath.endsWith("/gradle.properties")) return true
-    if (filePath.endsWith("/gradle-wrapper.properties")) return true
-
-    if (filePath.endsWith(".gradle") || filePath.endsWith(".gradle.kts")) {
-        if (ApplicationManager.getApplication().isUnitTestModeWithoutAffectedGradleProjectFilesCheck) {
-            return true
-        }
-
-        return filePath.substringBeforeLast("/") in project.service<GradleScriptInputsWatcher>().getGradleProjectsRoots()
-    }
-
-    return false
-}
 
 fun getGradleScriptInputsStamp(
     project: Project,
@@ -81,7 +66,8 @@ fun getGradleScriptInputsStamp(
                     }
                 }
 
-            GradleKotlinScriptConfigurationInputs(result.toString(), givenTimeStamp)
+            val buildRoot = GradleBuildRootsManager.getInstance(project).findScriptBuildRoot(file)?.root as? GradleBuildRoot.Linked
+            GradleKotlinScriptConfigurationInputs(result.toString(), givenTimeStamp, buildRoot?.pathPrefix)
         } else null
     }
 }
@@ -103,10 +89,8 @@ fun getGradleVersion(project: Project, settings: GradleProjectSettings): String 
     return settings.resolveGradleVersion().version
 }
 
-fun getGradleProjectSettings(project: Project): Collection<GradleProjectSettings> {
-    val gradleSettings = ExternalSystemApiUtil.getSettings(project, GradleConstants.SYSTEM_ID) as GradleSettings
-    return gradleSettings.getLinkedProjectsSettings()
-}
+fun getGradleProjectSettings(project: Project): Collection<GradleProjectSettings> =
+    (ExternalSystemApiUtil.getSettings(project, GradleConstants.SYSTEM_ID) as GradleSettings).linkedProjectsSettings
 
 class RootsIndex<T : Any> {
     internal val tree = TreeMap<String, T>()
