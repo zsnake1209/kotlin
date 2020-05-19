@@ -44,7 +44,7 @@ internal fun MethodNode.acceptWithStateMachine(
     val languageVersionSettings = state.languageVersionSettings
     assert(languageVersionSettings.isReleaseCoroutines()) { "Experimental coroutines are unsupported in JVM_IR backend" }
     val element = if (irFunction.isSuspend)
-        irFunction.symbol.descriptor.psiElement ?: classCodegen.irClass.descriptor.psiElement
+        irFunction.psiElement ?: classCodegen.irClass.psiElement
     else
         classCodegen.context.suspendLambdaToOriginalFunctionMap[classCodegen.irClass.attributeOwnerId]!!.symbol.descriptor.psiElement
     val visitor = CoroutineTransformerMethodVisitor(
