@@ -38,6 +38,7 @@ import org.jetbrains.kotlin.idea.core.script.ScriptConfigurationManager
 import org.jetbrains.kotlin.idea.framework.KotlinSdkType
 import org.jetbrains.kotlin.idea.perf.Stats.Companion.WARM_UP
 import org.jetbrains.kotlin.idea.perf.Stats.Companion.runAndMeasure
+import org.jetbrains.kotlin.idea.test.PluginTestCaseBase
 import org.jetbrains.kotlin.idea.test.invalidateLibraryCache
 import org.jetbrains.kotlin.idea.testFramework.*
 import org.jetbrains.kotlin.idea.testFramework.Fixture.Companion.cleanupCaches
@@ -74,12 +75,12 @@ abstract class AbstractPerformanceProjectsTest : UsefulTestCase() {
 
             val javaSdk = JavaSdk.getInstance()
             jdk18 = javaSdk.createJdk("1.8", homePath)
-            val internal = javaSdk.createJdk("IDEA jdk", homePath)
 
-            val jdkTable = getProjectJdkTableSafe()
-            jdkTable.addJdk(jdk18, testRootDisposable)
-            jdkTable.addJdk(internal, testRootDisposable)
-            KotlinSdkType.setUpIfNeeded()
+            PluginTestCaseBase.addJdk(testRootDisposable) { jdk18 }
+            PluginTestCaseBase.addJdk(testRootDisposable) {
+                javaSdk.createJdk("IDEA jdk", homePath)
+            }
+            KotlinSdkType.setUpIfNeeded(testRootDisposable)
         }
 
         GradleProcessOutputInterceptor.install(testRootDisposable)

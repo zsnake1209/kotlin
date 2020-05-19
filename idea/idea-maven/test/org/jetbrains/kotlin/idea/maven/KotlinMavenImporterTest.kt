@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.idea.framework.CommonLibraryKind
 import org.jetbrains.kotlin.idea.framework.JSLibraryKind
 import org.jetbrains.kotlin.idea.framework.KotlinSdkType
 import org.jetbrains.kotlin.idea.project.languageVersionSettings
+import org.jetbrains.kotlin.idea.test.PluginTestCaseBase
 import org.jetbrains.kotlin.idea.util.getProjectJdkTableSafe
 import org.jetbrains.kotlin.platform.CommonPlatforms
 import org.jetbrains.kotlin.platform.TargetPlatform
@@ -2526,18 +2527,14 @@ class KotlinMavenImporterTest : MavenImportingTestCase() {
     }
 
     fun testJDKImport() {
-        object : WriteAction<Unit>() {
-            override fun run(result: Result<Unit>) {
-                val jdk = JavaSdk.getInstance().createJdk("myJDK", "my/path/to/jdk")
-                getProjectJdkTableSafe().addJdk(jdk)
-            }
-        }.execute()
+        PluginTestCaseBase.addJdk(testRootDisposable) {
+            JavaSdk.getInstance().createJdk("myJDK", "my/path/to/jdk")
+        }
 
-        try {
-            createProjectSubDirs("src/main/kotlin", "src/main/kotlin.jvm", "src/test/kotlin", "src/test/kotlin.jvm")
+        createProjectSubDirs("src/main/kotlin", "src/main/kotlin.jvm", "src/test/kotlin", "src/test/kotlin.jvm")
 
-            importProject(
-                """
+        importProject(
+            """
                 <groupId>test</groupId>
                 <artifactId>project</artifactId>
                 <version>1.0.0</version>
@@ -2574,23 +2571,16 @@ class KotlinMavenImporterTest : MavenImportingTestCase() {
                     </plugins>
                 </build>
                 """
-            )
+        )
 
-            assertModules("project")
-            assertImporterStatePresent()
+        assertModules("project")
+        assertImporterStatePresent()
 
-            val moduleSDK = ModuleRootManager.getInstance(getModule("project")).sdk!!
-            Assert.assertTrue(moduleSDK.sdkType is JavaSdk)
-            Assert.assertEquals("myJDK", moduleSDK.name)
-            Assert.assertEquals("my/path/to/jdk", moduleSDK.homePath)
-        } finally {
-            object : WriteAction<Unit>() {
-                override fun run(result: Result<Unit>) {
-                    val jdkTable = getProjectJdkTableSafe()
-                    jdkTable.removeJdk(jdkTable.findJdk("myJDK")!!)
-                }
-            }.execute()
-        }
+        val moduleSDK = ModuleRootManager.getInstance(getModule("project")).sdk!!
+        Assert.assertTrue(moduleSDK.sdkType is JavaSdk)
+        Assert.assertEquals("myJDK", moduleSDK.name)
+        Assert.assertEquals("my/path/to/jdk", moduleSDK.homePath)
+
     }
 
     fun testProductionOnTestDependency() {
