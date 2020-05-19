@@ -362,8 +362,10 @@ open class SymbolTable(
         }
     }
 
-    override fun referenceClass(descriptor: ClassDescriptor) =
+    override fun referenceClass(descriptor: ClassDescriptor): IrClassSymbol =
         classSymbolTable.referenced(descriptor) { createClassSymbol(descriptor) }
+
+    fun referenceClass(klass: IrClass): IrClassSymbol = referenceClass(klass.descriptor)
 
     override fun referenceClassFromLinker(descriptor: ClassDescriptor, sig: IdSignature): IrClassSymbol =
         classSymbolTable.run {
@@ -396,8 +398,11 @@ open class SymbolTable(
             constructorFactory
         )
 
-    override fun referenceConstructor(descriptor: ClassConstructorDescriptor) =
+    override fun referenceConstructor(descriptor: ClassConstructorDescriptor): IrConstructorSymbol =
         constructorSymbolTable.referenced(descriptor) { createConstructorSymbol(descriptor) }
+
+    fun referenceConstructor(constructor: IrConstructor): IrConstructorSymbol =
+        referenceConstructor(constructor.descriptor)
 
     fun declareConstructorFromLinker(
         descriptor: ClassConstructorDescriptor,
@@ -456,8 +461,11 @@ open class SymbolTable(
         }
     }
 
-    override fun referenceEnumEntry(descriptor: ClassDescriptor) =
+    override fun referenceEnumEntry(descriptor: ClassDescriptor): IrEnumEntrySymbol =
         enumEntrySymbolTable.referenced(descriptor) { createEnumEntrySymbol(descriptor) }
+
+    fun referenceEnumEntry(enumEntry: IrEnumEntry): IrEnumEntrySymbol =
+        referenceEnumEntry(enumEntry.descriptor)
 
     override fun referenceEnumEntryFromLinker(descriptor: ClassDescriptor, sig: IdSignature) =
         enumEntrySymbolTable.run {
@@ -516,8 +524,11 @@ open class SymbolTable(
         }
     }
 
-    override fun referenceField(descriptor: PropertyDescriptor) =
+    override fun referenceField(descriptor: PropertyDescriptor): IrFieldSymbol =
         fieldSymbolTable.referenced(descriptor) { createFieldSymbol(descriptor) }
+
+    fun referenceField(field: IrField): IrFieldSymbol =
+        referenceField(field.descriptor)
 
     override fun referenceFieldFromLinker(descriptor: PropertyDescriptor, sig: IdSignature) =
         fieldSymbolTable.run {
@@ -583,6 +594,9 @@ open class SymbolTable(
 
     override fun referenceProperty(descriptor: PropertyDescriptor): IrPropertySymbol =
         propertySymbolTable.referenced(descriptor) { createPropertySymbol(descriptor) }
+
+    fun referenceProperty(property: IrProperty): IrPropertySymbol =
+        referenceProperty(property.descriptor)
 
     override fun referencePropertyFromLinker(descriptor: PropertyDescriptor, sig: IdSignature): IrPropertySymbol =
         propertySymbolTable.run {
@@ -666,8 +680,11 @@ open class SymbolTable(
         }
     }
 
-    override fun referenceSimpleFunction(descriptor: FunctionDescriptor) =
+    override fun referenceSimpleFunction(descriptor: FunctionDescriptor): IrSimpleFunctionSymbol =
         simpleFunctionSymbolTable.referenced(descriptor) { createSimpleFunctionSymbol(descriptor) }
+
+    fun referenceSimpleFunction(function: IrSimpleFunction): IrSimpleFunctionSymbol =
+        referenceSimpleFunction(function.descriptor)
 
     override fun referenceSimpleFunctionFromLinker(descriptor: FunctionDescriptor, sig: IdSignature): IrSimpleFunctionSymbol {
         return simpleFunctionSymbolTable.run {
@@ -761,15 +778,21 @@ open class SymbolTable(
         valueParameterSymbolTable.introduceLocal(irValueParameter.descriptor, irValueParameter.symbol)
     }
 
-    override fun referenceValueParameter(descriptor: ParameterDescriptor) =
+    override fun referenceValueParameter(descriptor: ParameterDescriptor): IrValueParameterSymbol =
         valueParameterSymbolTable.referenced(descriptor) {
             throw AssertionError("Undefined parameter referenced: $descriptor\n${valueParameterSymbolTable.dump()}")
         }
+
+    fun referenceValueParameter(valueParameter: IrValueParameter): IrValueParameterSymbol =
+        referenceValueParameter(valueParameter.descriptor)
 
     override fun referenceTypeParameter(classifier: TypeParameterDescriptor): IrTypeParameterSymbol =
         scopedTypeParameterSymbolTable.get(classifier) ?: globalTypeParameterSymbolTable.referenced(classifier) {
             createTypeParameterSymbol(classifier)
         }
+
+    fun referenceTypeParameter(typeParameter: IrTypeParameter): IrTypeParameterSymbol =
+        referenceTypeParameter(typeParameter.descriptor)
 
     override fun referenceTypeParameterFromLinker(classifier: TypeParameterDescriptor, sig: IdSignature): IrTypeParameterSymbol {
         require(sig.isLocal)
@@ -806,8 +829,11 @@ open class SymbolTable(
             initializer = irInitializerExpression
         }
 
-    override fun referenceVariable(descriptor: VariableDescriptor) =
+    override fun referenceVariable(descriptor: VariableDescriptor): IrVariableSymbol =
         variableSymbolTable.referenced(descriptor) { throw AssertionError("Undefined variable referenced: $descriptor") }
+
+    fun referenceVariable(variable: IrVariable): IrVariableSymbol =
+        referenceVariable(variable.descriptor)
 
     fun declareLocalDelegatedProperty(
         startOffset: Int,
