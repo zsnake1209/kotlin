@@ -1,5 +1,5 @@
-
 // FILE: test.kt
+
 fun box(): String {
     run { "O" + "K" }
     run {
@@ -9,8 +9,8 @@ fun box(): String {
 }
 
 // LINENUMBERS
-// test.kt:4
-// test.kt:5
-// test.kt:6
-// test.kt:5
-// test.kt:8
+// test.kt:4 box
+// test.kt:5 box
+// test.kt:6 box
+// test.kt:5 box
+// test.kt:8 box

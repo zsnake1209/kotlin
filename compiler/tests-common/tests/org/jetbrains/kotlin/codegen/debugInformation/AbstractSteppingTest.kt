@@ -9,6 +9,7 @@ import com.sun.jdi.VirtualMachine
 import com.sun.jdi.event.Event
 import com.sun.jdi.event.LocatableEvent
 import junit.framework.TestCase
+import org.jetbrains.kotlin.test.TargetBackend
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import java.io.File
@@ -20,6 +21,8 @@ abstract class AbstractSteppingTest : AbstractDebugTest() {
 
     companion object {
         const val LINENUMBER_PREFIX = "// LINENUMBERS"
+        const val JVM_LINENUMBER_PREFIX = "$LINENUMBER_PREFIX JVM"
+        const val JVM_IR_LINENUMBER_PREFIX = "$LINENUMBER_PREFIX JVM_IR"
         var proxyPort = 0
         lateinit var process: Process
         lateinit var virtualMachine: VirtualMachine
@@ -47,17 +50,37 @@ abstract class AbstractSteppingTest : AbstractDebugTest() {
         loggedItems.add(event)
     }
 
+    private fun readExpectations(wholeFile: File): String {
+        val expected = mutableListOf<String>()
+        val lines = wholeFile.readLines().dropWhile { !it.startsWith(LINENUMBER_PREFIX) }
+        var currentBackend = TargetBackend.ANY
+        for (line in lines) {
+            if (line.startsWith(LINENUMBER_PREFIX)) {
+                currentBackend = when (line) {
+                    LINENUMBER_PREFIX -> TargetBackend.ANY
+                    JVM_LINENUMBER_PREFIX -> TargetBackend.JVM
+                    JVM_IR_LINENUMBER_PREFIX -> TargetBackend.JVM_IR
+                    else -> error("Expected JVM backend")
+                }
+                continue
+            }
+            if (currentBackend == TargetBackend.ANY || currentBackend == backend) {
+                expected.add(line.drop(3).trim())
+            }
+        }
+        return expected.joinToString("\n")
+    }
+
     override fun checkResult(wholeFile: File, loggedItems: List<Any>) {
-        val expectedLineNumbers = wholeFile
-            .readLines()
-            .dropWhile { !it.startsWith(LINENUMBER_PREFIX) }
-            .drop(1)
-            .map { it.drop(3).trim() }
-            .joinToString("\n")
+        val expectedLineNumbers = readExpectations(wholeFile)
         val actualLineNumbers = loggedItems
+            .filter {
+                val location = (it as LocatableEvent).location()
+                !location.method().isSynthetic
+            }
             .map { event ->
                 val location = (event as LocatableEvent).location()
-                "${location.sourceName()}:${location.lineNumber()}"
+                "${location.sourceName()}:${location.lineNumber()} ${location.method().name()}"
             }
         TestCase.assertEquals(expectedLineNumbers, actualLineNumbers.joinToString("\n"))
     }
