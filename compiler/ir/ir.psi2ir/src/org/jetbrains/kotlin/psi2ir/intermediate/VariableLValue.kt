@@ -49,7 +49,7 @@ class VariableLValue(
         IrSetVariableImpl(
             startOffset, endOffset,
             context.irBuiltIns.unitType,
-            symbol.assertedCast<IrVariableSymbol> { "Not a variable: ${symbol.descriptor}" },
+            symbol.assertedCast<IrVariableSymbol> { "Not a variable: ${symbol.owner}" },
             irExpression, origin
         )
 

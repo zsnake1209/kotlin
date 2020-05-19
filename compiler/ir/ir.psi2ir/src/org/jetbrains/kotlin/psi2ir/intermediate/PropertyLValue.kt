@@ -82,7 +82,7 @@ class FieldPropertyLValue(
 
     override fun load(): IrExpression =
         callReceiver.call { dispatchReceiverValue, extensionReceiverValue ->
-            assert(extensionReceiverValue == null) { "Field can't have an extension receiver: ${field.descriptor}" }
+            assert(extensionReceiverValue == null) { "Field can't have an extension receiver: ${field.owner}" }
             IrGetFieldImpl(
                 startOffset, endOffset,
                 field,
@@ -95,7 +95,7 @@ class FieldPropertyLValue(
 
     override fun store(irExpression: IrExpression) =
         callReceiver.call { dispatchReceiverValue, extensionReceiverValue ->
-            assert(extensionReceiverValue == null) { "Field can't have an extension receiver: ${field.descriptor}" }
+            assert(extensionReceiverValue == null) { "Field can't have an extension receiver: ${field.owner}" }
             IrSetFieldImpl(
                 startOffset, endOffset,
                 field,

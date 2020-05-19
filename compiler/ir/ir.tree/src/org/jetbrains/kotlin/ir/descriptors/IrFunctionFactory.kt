@@ -237,7 +237,7 @@ class IrFunctionFactory(private val irBuiltIns: IrBuiltIns, private val symbolTa
     }
 
     private val kotlinReflectPackageFragment: IrPackageFragment by lazy {
-        irBuiltIns.kPropertyClass.descriptor.let {
+        irBuiltIns.builtIns.kProperty.let {
             symbolTable.declareExternalPackageFragment(it.containingDeclaration as PackageFragmentDescriptor)
         }
     }

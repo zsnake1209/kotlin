@@ -43,7 +43,7 @@ class IrLazyEnumEntryImpl(
         symbol.bind(this)
     }
 
-    override val name: Name = symbol.descriptor.name
+    override val name: Name = descriptor.name
 
     override var correspondingClass: IrClass? = null
 

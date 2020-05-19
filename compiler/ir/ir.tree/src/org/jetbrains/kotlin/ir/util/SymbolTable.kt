@@ -247,7 +247,7 @@ open class SymbolTable(
             currentScope = currentScope?.parent
 
             if (currentScope != null && unboundSymbols.isNotEmpty()) {
-                throw AssertionError("Local scope contains unbound symbols: ${unboundSymbols.joinToString { it.descriptor.toString() }}")
+                throw AssertionError("Local scope contains unbound symbols: ${unboundSymbols.joinToString { it.toString() }}")
             }
         }
 
@@ -485,7 +485,7 @@ open class SymbolTable(
                 type = type,
                 descriptor = descriptor,
                 symbol = it,
-                visibility = visibility ?: it.descriptor.visibility,
+                visibility = visibility ?: descriptor.visibility,
             ).apply {
                 metadata = MetadataSource.Property(it.descriptor)
             }
@@ -505,7 +505,7 @@ open class SymbolTable(
         type: IrType,
         irInitializer: IrExpressionBody?
     ): IrField =
-        declareField(startOffset, endOffset, origin, descriptor, type).apply {
+        declareField(startOffset, endOffset, origin, descriptor, type, descriptor.visibility).apply {
             initializer = irInitializer
         }
 
