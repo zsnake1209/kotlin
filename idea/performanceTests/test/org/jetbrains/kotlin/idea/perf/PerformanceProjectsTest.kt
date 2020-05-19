@@ -321,11 +321,6 @@ class PerformanceProjectsTest : AbstractPerformanceProjectsTest() {
         return {
             val fixture = Fixture.openFixture(project, fileName)
 
-            // Note: Kotlin scripts require dependencies to be loaded
-            if (isAKotlinScriptFile(fileName)) {
-                ScriptConfigurationManager.updateScriptDependenciesSynchronously(fixture.psiFile)
-            }
-
             resetTimestamp()
             it.setUpValue = fixture
         }
