@@ -320,6 +320,24 @@ open class SymbolTable(
         return signaturer.composeSignature(descriptor)?.let { IrClassPublicSymbolImpl(descriptor, it) } ?: IrClassSymbolImpl(descriptor)
     }
 
+    @Suppress("UNUSED")
+    @Deprecated("Used in kotlin-native/BuiltInFictitiousFunctionIrClassFactory")
+    fun declareClass(
+        startOffset: Int, endOffset: Int, origin: IrDeclarationOrigin, descriptor: ClassDescriptor
+    ): IrClass {
+        return classSymbolTable.declare(
+            descriptor,
+            { createClassSymbol(descriptor) },
+            {
+                IrClassImpl(
+                    startOffset, endOffset, origin, it, descriptor,
+                    nameProvider.nameForDeclaration(descriptor),
+                    visibility = descriptor.visibility, modality = descriptor.modality,
+                ).apply { metadata = MetadataSource.Class(it.descriptor) }
+            }
+        )
+    }
+
     fun declareClass(
         descriptor: ClassDescriptor, classFactory: (IrClassSymbol) -> IrClass
     ): IrClass {
