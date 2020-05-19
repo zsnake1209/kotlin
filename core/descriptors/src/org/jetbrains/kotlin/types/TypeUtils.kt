@@ -120,8 +120,6 @@ fun KotlinTypeChecker.equalTypesOrNulls(type1: KotlinType?, type2: KotlinType?):
 
 fun KotlinType.containsError() = ErrorUtils.containsErrorType(this)
 
-fun KotlinType.containsSpecialType(specialType: SimpleType? = null) = TypeUtils.containsSpecialType(this, specialType)
-
 fun List<KotlinType>.defaultProjections(): List<TypeProjection> = map(::TypeProjectionImpl)
 
 fun KotlinType.isDefaultBound(): Boolean = KotlinBuiltIns.isDefaultBound(getSupertypeRepresentative())

@@ -126,7 +126,7 @@ internal class FunctionsTypingVisitor(facade: ExpressionTypingInternals) : Expre
 
             if (newInferenceEnabled) {
                 // We should avoid type checking for types containing `NO_EXPECTED_TYPE`, the error will be report later if needed
-                if (!context.expectedType.containsSpecialType(NO_EXPECTED_TYPE)) {
+                if (!context.expectedType.contains { it === NO_EXPECTED_TYPE }) {
                     /*
                      * We do type checking without converted vararg type as the new inference create expected type with raw vararg type (see KotlinResolutionCallbacksImpl.kt)
                      * Example:

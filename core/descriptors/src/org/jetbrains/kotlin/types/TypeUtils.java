@@ -428,9 +428,11 @@ public class TypeUtils {
             SmartSet<KotlinType> visited
     ) {
         if (type == null) return false;
-        if (visited != null && visited.contains(type)) return false;
 
         UnwrappedType unwrappedType = type.unwrap();
+
+        if (noExpectedType(type)) return isSpecialType.invoke(unwrappedType);
+        if (visited != null && visited.contains(type)) return false;
         if (isSpecialType.invoke(unwrappedType)) return true;
 
         if (visited == null) {
@@ -460,18 +462,6 @@ public class TypeUtils {
 
         for (TypeProjection projection : type.getArguments()) {
             if (!projection.isStarProjection() && contains(projection.getType(), isSpecialType, visited)) return true;
-        }
-        return false;
-    }
-
-    public static boolean containsSpecialType(KotlinType type, @Nullable SimpleType specialType) {
-        if (specialType != null && !(specialType instanceof TypeUtils.SpecialType)) {
-            throw new IllegalStateException(type + " isn't a special type");
-        }
-        if (type == null) return false;
-        if (type instanceof TypeUtils.SpecialType && (specialType == null || type == specialType)) return true;
-        for (TypeProjection projection : type.getArguments()) {
-            if (!projection.isStarProjection() && containsSpecialType(projection.getType(), specialType)) return true;
         }
         return false;
     }

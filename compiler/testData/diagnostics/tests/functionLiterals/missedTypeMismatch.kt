@@ -39,5 +39,4 @@ fun main() {
     val a21: () -> () -> () -> Int = <!TYPE_MISMATCH!>fun() = fun() = {}<!>
 
     fun foo(x: Any?) {}
-    val x = foo(fun(vararg p: Int) {})
 }
