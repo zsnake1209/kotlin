@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.fir
 
 import com.intellij.openapi.extensions.Extensions
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiElementFinder
 import com.intellij.psi.search.GlobalSearchScope
@@ -15,6 +16,9 @@ import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.TopDownAnalyzerFacadeForJVM
+import org.jetbrains.kotlin.fir.analysis.collectors.AbstractDiagnosticCollector
+import org.jetbrains.kotlin.fir.analysis.collectors.FirDiagnosticsCollector
+import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnostic
 import org.jetbrains.kotlin.fir.builder.RawFirBuilder
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.dump.MultiModuleHtmlFirDump
@@ -23,6 +27,7 @@ import org.jetbrains.kotlin.fir.resolve.firProvider
 import org.jetbrains.kotlin.fir.resolve.impl.FirProviderImpl
 import org.jetbrains.kotlin.fir.resolve.transformers.FirTotalResolveTransformer
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
+import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintStream
@@ -69,10 +74,45 @@ class FirResolveModularizedTotalKotlinTest : AbstractModularizedTest() {
         //println("Raw FIR up, files: ${firFiles.size}")
 
         bench.processFiles(firFiles, totalTransformer.transformers)
+        val diagnostics = collectDiagnostics(firFiles)
+        val fileDocumentManager = FileDocumentManager.getInstance()
+        for ((file, list) in diagnostics) {
+            if (list.isNotEmpty()) {
+                println("For ${file.name}: ")
+                for (diagnostic in list) {
+                    val element = diagnostic.element as FirPsiSourceElement<*>
+                    val psi = element.psi
+                    val document = fileDocumentManager.getDocument(psi.containingFile.virtualFile)
+                    val line = (document?.getLineNumber(psi.startOffset) ?: 0)
+                    val char = psi.startOffset - (document?.getLineStartOffset(line) ?: 0)
+                    println("$line:$char: ${diagnostic.factory.name}")
+                }
+            }
+        }
 
         val disambiguatedName = moduleData.disambiguatedName()
         dumpFir(disambiguatedName, moduleData, firFiles)
         dumpFirHtml(disambiguatedName, moduleData, firFiles)
+    }
+
+    private fun collectDiagnostics(firFiles: List<FirFile>): Map<FirFile, List<FirDiagnostic<*>>> {
+        val collectors = mutableMapOf<FirSession, AbstractDiagnosticCollector>()
+        val result = mutableMapOf<FirFile, List<FirDiagnostic<*>>>()
+        for (firFile in firFiles) {
+            val session = firFile.session
+            val collector = collectors.computeIfAbsent(session) { createCollector(session) }
+            try {
+                result[firFile] = collector.collectDiagnostics(firFile).toList()
+            } catch (e: Throwable) {
+                println("Exception in file: ${firFile.name}")
+                e.printStackTrace()
+            }
+        }
+        return result
+    }
+
+    private fun createCollector(session: FirSession): AbstractDiagnosticCollector {
+        return FirDiagnosticsCollector.create(session)
     }
 
     private fun dumpFir(disambiguatedName: String, moduleData: ModuleData, firFiles: List<FirFile>) {
