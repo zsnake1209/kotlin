@@ -37,11 +37,6 @@ class IrFileImpl(
 
     constructor(
         fileEntry: SourceManager.FileEntry,
-        symbol: IrFileSymbol
-    ) : this(fileEntry, symbol, symbol.descriptor.fqName)
-
-    constructor(
-        fileEntry: SourceManager.FileEntry,
         packageFragmentDescriptor: PackageFragmentDescriptor
     ) : this(fileEntry, IrFileSymbolImpl(packageFragmentDescriptor), packageFragmentDescriptor.fqName)
 
