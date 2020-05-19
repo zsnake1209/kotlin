@@ -98,7 +98,7 @@ class IrSourceCompilerForInline(
         asmMethod: Method
     ): SMAPAndMethodNode {
         assert(callableDescriptor == callee.symbol.descriptor.original) { "Expected $callableDescriptor got ${callee.descriptor.original}" }
-        return ClassCodegen.getOrCreate(callee.parentAsClass, codegen.context).generateMethodNode(callee)
+        return codegen.context.getClassCodegen(callee.parentAsClass).generateMethodNode(callee)
     }
 
     override fun hasFinallyBlocks() = data.hasFinallyBlocks()

@@ -218,6 +218,8 @@ class ExpressionCodegen(
         val endLabel = markNewLabel()
         writeLocalVariablesInTable(info, endLabel)
         writeParameterInLocalVariableTable(startLabel, endLabel)
+        // Local classes cannot be referenced outside of this function, and we should never be generating it again.
+        closureReifiedMarkers.keys.forEach(context::forgetClassCodegen)
     }
 
     private fun generateFakeContinuationConstructorIfNeeded() {
@@ -701,9 +703,9 @@ class ExpressionCodegen(
     override fun visitClass(declaration: IrClass, data: BlockInfo): PromisedValue {
         if (declaration.origin != JvmLoweredDeclarationOrigin.CONTINUATION_CLASS) {
             closureReifiedMarkers.getOrPut(declaration) {
-                val inner = ClassCodegen.getOrCreate(declaration, context, generateSequence(this) { it.inlinedInto }.last().irFunction)
-                inner.generate()
-                inner.reifiedTypeParametersUsages
+                val innerClass = context.getClassCodegen(declaration, generateSequence(this) { it.inlinedInto }.last().irFunction)
+                innerClass.generate()
+                innerClass.reifiedTypeParametersUsages
             }
         }
         return unitValue
