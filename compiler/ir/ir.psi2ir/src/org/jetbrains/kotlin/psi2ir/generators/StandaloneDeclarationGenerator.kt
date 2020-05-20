@@ -98,7 +98,7 @@ class StandaloneDeclarationGenerator(private val context: GeneratorContext) {
 
     fun generateEnumEntry(startOffset: Int, endOffset: Int, origin: IrDeclarationOrigin, descriptor: ClassDescriptor, symbol: IrEnumEntrySymbol): IrEnumEntry {
         // TODO: corresponging class?
-        val irEntry = IrEnumEntryImpl(startOffset, endOffset, origin, symbol)
+        val irEntry = IrEnumEntryImpl(startOffset, endOffset, origin, symbol, descriptor.name)
 
         return irEntry
     }

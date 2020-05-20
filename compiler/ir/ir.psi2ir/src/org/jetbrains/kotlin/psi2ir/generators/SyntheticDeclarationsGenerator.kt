@@ -76,10 +76,9 @@ class SyntheticDeclarationsGenerator(context: GeneratorContext) : DeclarationDes
         return generator.generateClass(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
     }
 
-    private fun createEnumEntruStub(descriptor: ClassDescriptor, symbol: IrEnumEntrySymbol): IrEnumEntry {
+    private fun createEnumEntryStub(descriptor: ClassDescriptor, symbol: IrEnumEntrySymbol): IrEnumEntry {
         assert(DescriptorUtils.isEnumEntry(descriptor))
         return generator.generateEnumEntry(offset, offset, IrDeclarationOrigin.DEFINED, descriptor, symbol)
-
     }
 
     override fun visitClassDescriptor(descriptor: ClassDescriptor, data: IrDeclarationContainer?) {
@@ -87,7 +86,7 @@ class SyntheticDeclarationsGenerator(context: GeneratorContext) : DeclarationDes
 
         if (DescriptorUtils.isEnumEntry(descriptor)) {
             symbolTable.declareEnumEntryIfNotExists(descriptor) {
-                createEnumEntruStub(descriptor, it).insertDeclaration(data)
+                createEnumEntryStub(descriptor, it).insertDeclaration(data)
             }
         } else {
             symbolTable.declareClassIfNotExists(descriptor) {
