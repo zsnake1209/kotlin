@@ -21,6 +21,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             Renderers.commaSeparated(Renderers.NAME)
         )
         put(
+            ErrorsNative.MISSING_EXCEPTION_IN_THROWS_ON_SUSPEND,
+            "@Throws on suspend declaration must have {0} (or any of its superclasses) listed",
+            Renderers.STRING
+        )
+        put(
             ErrorsNative.INAPPLICABLE_SHARED_IMMUTABLE_PROPERTY,
             "@SharedImmutable is applicable only to val with backing field or to property with delegation"
         )

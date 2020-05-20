@@ -6,9 +6,13 @@
 package org.jetbrains.kotlin.resolve.konan.diagnostics
 
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
+import org.jetbrains.kotlin.lexer.KtTokens.SUSPEND_KEYWORD
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils
@@ -17,11 +21,22 @@ import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
+import org.jetbrains.kotlin.resolve.constants.KClassValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.firstArgument
 import org.jetbrains.kotlin.utils.DFS
 
 object NativeThrowsChecker : DeclarationChecker {
     private val throwsFqName = KOTLIN_THROWS_ANNOTATION_FQ_NAME
+
+    private val cancellableExceptionClassId = ClassId.topLevel(FqName("kotlin.coroutines.cancellation.CancellationException"))
+
+    // Note: can't use subtyping, because CancellationException can be missing (e.g. for common code).
+    private val cancellableExceptionAndSupersClassIds = sequenceOf(
+        KotlinBuiltIns.FQ_NAMES.throwable,
+        FqName("kotlin.Exception"),
+        FqName("kotlin.RuntimeException"),
+        FqName("kotlin.IllegalStateException")
+    ).map { ClassId.topLevel(it) }.toSet() + cancellableExceptionClassId
 
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
         val throwsAnnotation = descriptor.annotations.findAnnotation(throwsFqName)
@@ -29,8 +44,21 @@ object NativeThrowsChecker : DeclarationChecker {
 
         if (!checkInheritance(declaration, descriptor, context, throwsAnnotation, reportLocation)) return
 
-        if (throwsAnnotation != null && throwsAnnotation.getVariadicArguments().isEmpty()) {
+        if (throwsAnnotation == null) return
+
+        val classes = throwsAnnotation.getVariadicArguments()
+        if (classes.isEmpty()) {
             context.trace.report(ErrorsNative.THROWS_LIST_EMPTY.on(reportLocation))
+            return
+        }
+
+        if (declaration.hasModifier(SUSPEND_KEYWORD) && classes.none { it.isGlobalClassWithId(cancellableExceptionAndSupersClassIds) }) {
+            context.trace.report(
+                ErrorsNative.MISSING_EXCEPTION_IN_THROWS_ON_SUSPEND.on(
+                    reportLocation,
+                    cancellableExceptionClassId.relativeClassName.asString()
+                )
+            )
         }
     }
 
@@ -97,5 +125,11 @@ object NativeThrowsChecker : DeclarationChecker {
         ThrowsFilter(throwsAnnotation?.getVariadicArguments()?.toSet())
 
     private data class ThrowsFilter(val classes: Set<ConstantValue<*>>?)
+
+    private fun ConstantValue<*>.isGlobalClassWithId(classIds: Set<ClassId>): Boolean =
+        this is KClassValue && when (val value = this.value) {
+            is KClassValue.Value.NormalClass -> value.classId in classIds
+            is KClassValue.Value.LocalClass -> false
+        }
 
 }
