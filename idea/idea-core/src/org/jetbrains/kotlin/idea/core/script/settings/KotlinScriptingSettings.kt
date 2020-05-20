@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.idea.core.script.ScriptDefinitionsManager
 import org.jetbrains.kotlin.idea.core.script.settings.KotlinScriptingSettings.KotlinScriptDefinitionValue.Companion.DEFAULT
 import org.jetbrains.kotlin.idea.util.application.getServiceSafe
 import org.jetbrains.kotlin.scripting.definitions.ScriptDefinition
+import org.jetbrains.kotlin.scripting.resolve.KotlinScriptDefinitionFromAnnotatedTemplate
 
 @State(
     name = "KotlinScriptingSettings",
@@ -77,12 +78,35 @@ class KotlinScriptingSettings : PersistentStateComponent<Element> {
     }
 
     fun setAutoReloadConfigurations(order: Int, scriptDefinition: ScriptDefinition, autoReloadScriptDependencies: Boolean) {
-        scriptDefinitions[scriptDefinition.toKey()] =
-            scriptDefinitions[scriptDefinition.toKey()]?.copy(autoReloadConfigurations = autoReloadScriptDependencies)
-                ?: KotlinScriptDefinitionValue(
-                    order,
-                    autoReloadConfigurations = autoReloadScriptDependencies
-                )
+            scriptDefinitions[scriptDefinition.toKey()] =
+                scriptDefinitions[scriptDefinition.toKey()]?.copy(autoReloadConfigurations = autoReloadScriptDependencies)
+                    ?: KotlinScriptDefinitionValue(
+                        order,
+                        autoReloadConfigurations = autoReloadScriptDependencies
+                    )
+    }
+
+    private fun isGradleScriptDefinition(definition: ScriptDefinition, project: Project): List<ScriptDefinition> {
+        /*val gradleScriptDefinitions = isGradleScriptDefinition(definition, project)
+        if (gradleScriptDefinitions.isNotEmpty()) {
+            // TODO: enable all gradle definitions
+            for (scriptDefinition in gradleScriptDefinitions) {
+                scriptDefinitions[scriptDefinition.toKey()] =
+                    scriptDefinitions[scriptDefinition.toKey()]?.copy(autoReloadConfigurations = autoReloadScriptDependencies)
+                        ?: KotlinScriptDefinitionValue(
+                            order,
+                            autoReloadConfigurations = autoReloadScriptDependencies
+                        )
+            }
+        }*/
+        val pattern = definition.asLegacyOrNull<KotlinScriptDefinitionFromAnnotatedTemplate>()?.scriptFilePattern ?: return emptyList()
+        if (pattern.matches("build.gradle.kts") || pattern.matches("setings.gradle.kts") || pattern.matches("init.gradle.kts")) {
+            return ScriptDefinitionsManager.getInstance(project).getAllDefinitions().filter {
+                val pattern = definition.asLegacyOrNull<KotlinScriptDefinitionFromAnnotatedTemplate>()?.scriptFilePattern ?: return@filter false
+                pattern.matches("build.gradle.kts") || pattern.matches("setings.gradle.kts") || pattern.matches("init.gradle.kts")
+            }
+        }
+        return emptyList()
     }
 
     fun getScriptDefinitionOrder(scriptDefinition: ScriptDefinition): Int? {
