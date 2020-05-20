@@ -33,6 +33,8 @@ import org.jetbrains.kotlin.scripting.definitions.ScriptDefinition
 import org.jetbrains.kotlin.scripting.definitions.findScriptDefinition
 import org.jetbrains.kotlin.scripting.resolve.ScriptCompilationConfigurationWrapper
 import org.jetbrains.kotlin.scripting.resolve.ScriptReportSink
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.script.experimental.api.ScriptDiagnostic
@@ -120,6 +122,14 @@ class DefaultScriptingSupport(project: Project) : DefaultScriptingSupportBase(pr
         val scriptDefinition = file.findScriptDefinition() ?: return
 
         val (async, sync) = loaders.partition { it.shouldRunInBackground(scriptDefinition) }
+
+        debug(file) {
+            val exception = Exception("Print trace")
+            val stringWriter = StringWriter()
+            val writer = PrintWriter(stringWriter)
+            exception.printStackTrace(writer)
+            stringWriter.toString()
+        }
 
         val syncLoader = sync.firstOrNull { it.loadDependencies(isFirstLoad, file, scriptDefinition, loadingContext) }
         if (syncLoader == null) {
