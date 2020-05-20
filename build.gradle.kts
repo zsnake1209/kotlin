@@ -721,6 +721,9 @@ tasks {
             ":idea:idea-android:test",
             ":kotlin-annotation-processing:test"
         )
+        if (Ide.AS() && Platform[193].orHigher() && project.rootDir.resolve("kotlin-ultimate").exists()) {
+            dependsOn(":kotlin-ultimate:ide:android-studio-native:test")
+        }
     }
 
     register("plugins-tests") {
