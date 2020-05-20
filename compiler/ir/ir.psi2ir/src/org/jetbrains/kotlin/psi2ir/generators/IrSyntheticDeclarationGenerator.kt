@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -34,12 +35,12 @@ class IrSyntheticDeclarationGenerator(context: GeneratorContext) : IrElementVisi
     }
 
     private fun ensureMemberScope(irClass: IrClass) {
-        val declaredDescriptors = irClass.declarations.map { it.descriptor }
-        val contributedDescriptors = collectDescriptors(irClass.descriptor)
+        val declaredDescriptors = irClass.declarations.mapNotNull { (it as? IrSymbolOwner)?.symbol?.trueDescriptor }
+        val contributedDescriptors = collectDescriptors(irClass.symbol.trueDescriptor)
 
         contributedDescriptors.removeAll(declaredDescriptors)
 
-        symbolTable.withScope(irClass.descriptor) {
+        symbolTable.withScope(irClass.symbol.trueDescriptor) {
             contributedDescriptors.forEach { it.accept(descriptorGenerator, irClass) }
         }
     }
