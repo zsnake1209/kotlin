@@ -18,10 +18,14 @@ abstract class AbstractFirOldFrontendDiagnosticsTest : AbstractFirDiagnosticsTes
         }
     }
 
-    private fun prepareTestDataFile(originalFilePath: String, firTestDataFile: File) {
+    protected fun prepareTestDataFile(originalFilePath: String, firTestDataFile: File) {
         if (!firTestDataFile.exists()) {
             KotlinTestUtils.assertEqualsToFile(firTestDataFile, loadTestDataWithoutDiagnostics(File(originalFilePath)))
         }
+    }
+
+    protected open fun compareAndMergeFirAndOriginalFile(oldFile: File, testDataFile: File) {
+        compareAndMergeFirFileAndOldFrontendFile(oldFile, testDataFile)
     }
 
     override fun analyzeAndCheck(testDataFile: File, files: List<TestFile>) {
@@ -46,7 +50,7 @@ abstract class AbstractFirOldFrontendDiagnosticsTest : AbstractFirDiagnosticsTes
             checkDiagnostics(testDataFile, testFiles, allFirFiles)
             if (testDataFile.absolutePath.endsWith(".fir.kt")) {
                 val oldFrontendTestDataFile = File(testDataFile.absolutePath.replace(".fir.kt", ".kt"))
-                compareAndMergeFirFileAndOldFrontendFile(oldFrontendTestDataFile, testDataFile)
+                compareAndMergeFirAndOriginalFile(oldFrontendTestDataFile, testDataFile)
             }
 
             val needDump = testFiles.any { "FIR_DUMP" in it.directives }

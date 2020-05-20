@@ -67,12 +67,12 @@ fun main(args: Array<String>) {
     testGroup("compiler/tests", "compiler/testData") {
         testClass<AbstractDiagnosticsTestWithFirValidation>(suiteTestClassName = "DiagnosticsTestGenerated") {
             model("diagnostics/tests", pattern = "^(.*)\\.kts?$", excludedPattern = excludedFirTestdataPattern)
-            model("codegen/box/diagnostics")
+            model("codegen/box/diagnostics", excludedPattern = excludedFirTestdataPattern)
         }
 
         testClass<AbstractDiagnosticsUsingJavacTest> {
             model("diagnostics/tests", excludedPattern = excludedFirTestdataPattern)
-            model("codegen/box/diagnostics")
+            model("codegen/box/diagnostics", excludedPattern = excludedFirTestdataPattern)
         }
 
         testClass<AbstractJavacDiagnosticsTest> {
@@ -182,13 +182,23 @@ fun main(args: Array<String>) {
         GeneratePrimitiveVsObjectEqualityTestData.main(emptyArray<String>())
 
         testClass<AbstractBlackBoxCodegenTest> {
-            model("codegen/box", targetBackend = TargetBackend.JVM)
+            model(
+                "codegen/box",
+                targetBackend = TargetBackend.JVM,
+                excludedPattern = excludedFirTestdataPattern
+            )
         }
 
         testClass<AbstractLightAnalysisModeTest> {
             // "ranges/stepped" is excluded because it contains hundreds of generated tests and only have a box() method.
             // There isn't much to be gained from running light analysis tests on them.
-            model("codegen/box", targetBackend = TargetBackend.JVM, skipIgnored = true, excludeDirs = listOf("ranges/stepped"))
+            model(
+                "codegen/box",
+                targetBackend = TargetBackend.JVM,
+                skipIgnored = true,
+                excludeDirs = listOf("ranges/stepped"),
+                excludedPattern = excludedFirTestdataPattern
+            )
         }
 
         testClass<AbstractKapt3BuilderModeBytecodeShapeTest> {
@@ -416,7 +426,7 @@ fun main(args: Array<String>) {
         }
 
         testClass<AbstractIrBlackBoxCodegenTest> {
-            model("codegen/box", targetBackend = TargetBackend.JVM_IR, excludeDirs = listOf("oldLanguageVersions"))
+            model("codegen/box", targetBackend = TargetBackend.JVM_IR, excludeDirs = listOf("oldLanguageVersions"), excludedPattern = excludedFirTestdataPattern)
         }
 
         testClass<AbstractIrBlackBoxAgainstJavaCodegenTest> {
@@ -516,7 +526,20 @@ fun main(args: Array<String>) {
         additionalRunnerArguments = listOf("\"// IGNORE_BACKEND_FIR: \"")
     ) {
         testClass<AbstractFirBlackBoxCodegenTest> {
-            model("codegen/box", targetBackend = TargetBackend.JVM_IR, excludeDirs = listOf("oldLanguageVersions"))
+            model(
+                "codegen/box",
+                targetBackend = TargetBackend.JVM_IR,
+                excludeDirs = listOf("oldLanguageVersions"),
+                excludedPattern = excludedFirTestdataPattern
+            )
+        }
+        testClass<AbstractFirBlackBoxDiagnosticsTest> {
+            model(
+                "codegen/box",
+                targetBackend = TargetBackend.ANY_IR,
+                excludeDirs = listOf("oldLanguageVersions"),
+                excludedPattern = excludedFirTestdataPattern
+            )
         }
     }
 

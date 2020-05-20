@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.codegen.ir;
+package org.jetbrains.kotlin.fir;
 
 import com.intellij.testFramework.TestDataPath;
 import org.jetbrains.kotlin.test.JUnit3RunnerWithInners;
@@ -20,125 +20,25 @@ import java.util.regex.Pattern;
 @TestMetadata("compiler/testData/codegen/box")
 @TestDataPath("$PROJECT_ROOT")
 @RunWith(JUnit3RunnerWithInners.class)
-public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenTest {
+public class FirBlackBoxDiagnosticsTestGenerated extends AbstractFirBlackBoxDiagnosticsTest {
     private void runTest(String testDataFilePath) throws Exception {
-        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
     }
 
     public void testAllFilesPresentInBox() throws Exception {
-        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true, "oldLanguageVersions");
+        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true, "oldLanguageVersions");
     }
 
     @TestMetadata("compiler/testData/codegen/box/annotations")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Annotations extends AbstractFirBlackBoxCodegenTest {
+    public static class Annotations extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInAnnotations() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/annotations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("annotatedAnnotationParameter.kt")
-        public void testAnnotatedAnnotationParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotatedAnnotationParameter.kt");
-        }
-
-        @TestMetadata("annotatedEnumEntry.kt")
-        public void testAnnotatedEnumEntry() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotatedEnumEntry.kt");
-        }
-
-        @TestMetadata("annotatedObjectLiteral.kt")
-        public void testAnnotatedObjectLiteral() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotatedObjectLiteral.kt");
-        }
-
-        @TestMetadata("annotationProperty.kt")
-        public void testAnnotationProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotationProperty.kt");
-        }
-
-        @TestMetadata("annotationWithKotlinProperty.kt")
-        public void testAnnotationWithKotlinProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotationWithKotlinProperty.kt");
-        }
-
-        @TestMetadata("annotationWithKotlinPropertyFromInterfaceCompanion.kt")
-        public void testAnnotationWithKotlinPropertyFromInterfaceCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotationWithKotlinPropertyFromInterfaceCompanion.kt");
-        }
-
-        @TestMetadata("annotationsOnDefault.kt")
-        public void testAnnotationsOnDefault() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotationsOnDefault.kt");
-        }
-
-        @TestMetadata("annotationsOnLateinitAccessors.kt")
-        public void testAnnotationsOnLateinitAccessors() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotationsOnLateinitAccessors.kt");
-        }
-
-        @TestMetadata("annotationsOnLateinitFields.kt")
-        public void testAnnotationsOnLateinitFields() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotationsOnLateinitFields.kt");
-        }
-
-        @TestMetadata("annotationsOnNonExistentAccessors.kt")
-        public void testAnnotationsOnNonExistentAccessors() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotationsOnNonExistentAccessors.kt");
-        }
-
-        @TestMetadata("annotationsOnTypeAliases.kt")
-        public void testAnnotationsOnTypeAliases() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/annotationsOnTypeAliases.kt");
-        }
-
-        @TestMetadata("constValInAnnotation.kt")
-        public void testConstValInAnnotation() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/constValInAnnotation.kt");
-        }
-
-        @TestMetadata("defaultParameterValues.kt")
-        public void testDefaultParameterValues() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/defaultParameterValues.kt");
-        }
-
-        @TestMetadata("delegatedPropertySetter.kt")
-        public void testDelegatedPropertySetter() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/delegatedPropertySetter.kt");
-        }
-
-        @TestMetadata("fileClassWithFileAnnotation.kt")
-        public void testFileClassWithFileAnnotation() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/fileClassWithFileAnnotation.kt");
-        }
-
-        @TestMetadata("jvmAnnotationFlags.kt")
-        public void testJvmAnnotationFlags() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/jvmAnnotationFlags.kt");
-        }
-
-        @TestMetadata("kotlinPropertyFromClassObjectAsParameter.kt")
-        public void testKotlinPropertyFromClassObjectAsParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/kotlinPropertyFromClassObjectAsParameter.kt");
-        }
-
-        @TestMetadata("kotlinTopLevelPropertyAsParameter.kt")
-        public void testKotlinTopLevelPropertyAsParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/kotlinTopLevelPropertyAsParameter.kt");
-        }
-
-        @TestMetadata("kt10136.kt")
-        public void testKt10136() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/kt10136.kt");
-        }
-
-        @TestMetadata("mustBeDocumented.kt")
-        public void testMustBeDocumented() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/mustBeDocumented.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/annotations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("nestedAnnotation.kt")
@@ -146,24 +46,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/annotations/nestedAnnotation.kt");
         }
 
-        @TestMetadata("nestedClassPropertyAsParameter.kt")
-        public void testNestedClassPropertyAsParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/nestedClassPropertyAsParameter.kt");
-        }
-
         @TestMetadata("nestedClassesInAnnotations.kt")
         public void testNestedClassesInAnnotations() throws Exception {
             runTest("compiler/testData/codegen/box/annotations/nestedClassesInAnnotations.kt");
-        }
-
-        @TestMetadata("parameterAnnotationInDefaultImpls.kt")
-        public void testParameterAnnotationInDefaultImpls() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/parameterAnnotationInDefaultImpls.kt");
-        }
-
-        @TestMetadata("parameterWithPrimitiveType.kt")
-        public void testParameterWithPrimitiveType() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/parameterWithPrimitiveType.kt");
         }
 
         @TestMetadata("parameters.kt")
@@ -171,119 +56,34 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/annotations/parameters.kt");
         }
 
-        @TestMetadata("propertyWithPropertyInInitializerAsParameter.kt")
-        public void testPropertyWithPropertyInInitializerAsParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/propertyWithPropertyInInitializerAsParameter.kt");
-        }
-
         @TestMetadata("resolveWithLowPriorityAnnotation.kt")
         public void testResolveWithLowPriorityAnnotation() throws Exception {
             runTest("compiler/testData/codegen/box/annotations/resolveWithLowPriorityAnnotation.kt");
         }
 
-        @TestMetadata("singleAssignmentToVarargInAnnotation.kt")
-        public void testSingleAssignmentToVarargInAnnotation() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/singleAssignmentToVarargInAnnotation.kt");
-        }
-
-        @TestMetadata("syntheticMethodForJvmStaticProperty.kt")
-        public void testSyntheticMethodForJvmStaticProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/syntheticMethodForJvmStaticProperty.kt");
-        }
-
-        @TestMetadata("syntheticMethodForProperty.kt")
-        public void testSyntheticMethodForProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/syntheticMethodForProperty.kt");
-        }
-
-        @TestMetadata("typeAnnotationOnJdk6.kt")
-        public void testTypeAnnotationOnJdk6() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/typeAnnotationOnJdk6.kt");
-        }
-
-        @TestMetadata("useTypeParameterAnnotationFromJava.kt")
-        public void testUseTypeParameterAnnotationFromJava() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/useTypeParameterAnnotationFromJava.kt");
-        }
-
-        @TestMetadata("useTypeUseAnnotationFromJava.kt")
-        public void testUseTypeUseAnnotationFromJava() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/useTypeUseAnnotationFromJava.kt");
-        }
-
-        @TestMetadata("varargInAnnotationParameter.kt")
-        public void testVarargInAnnotationParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/annotations/varargInAnnotationParameter.kt");
-        }
-
         @TestMetadata("compiler/testData/codegen/box/annotations/annotatedLambda")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class AnnotatedLambda extends AbstractFirBlackBoxCodegenTest {
+        public static class AnnotatedLambda extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInAnnotatedLambda() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/annotations/annotatedLambda"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("funExpression.kt")
-            public void testFunExpression() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/annotatedLambda/funExpression.kt");
-            }
-
-            @TestMetadata("lambda.kt")
-            public void testLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/annotatedLambda/lambda.kt");
-            }
-
-            @TestMetadata("samFunExpression.kt")
-            public void testSamFunExpression() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/annotatedLambda/samFunExpression.kt");
-            }
-
-            @TestMetadata("samFunReference.kt")
-            public void testSamFunReference() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/annotatedLambda/samFunReference.kt");
-            }
-
-            @TestMetadata("samLambda.kt")
-            public void testSamLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/annotatedLambda/samLambda.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/annotations/annotatedLambda"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/annotations/typeAnnotations")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class TypeAnnotations extends AbstractFirBlackBoxCodegenTest {
+        public static class TypeAnnotations extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInTypeAnnotations() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/annotations/typeAnnotations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("implicitReturn.kt")
-            public void testImplicitReturn() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/typeAnnotations/implicitReturn.kt");
-            }
-
-            @TestMetadata("methodParameters.kt")
-            public void testMethodParameters() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/typeAnnotations/methodParameters.kt");
-            }
-
-            @TestMetadata("typeAnnotationTarget6.kt")
-            public void testTypeAnnotationTarget6() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/typeAnnotations/typeAnnotationTarget6.kt");
-            }
-
-            @TestMetadata("typeUseAnnotation.kt")
-            public void testTypeUseAnnotation() throws Exception {
-                runTest("compiler/testData/codegen/box/annotations/typeAnnotations/typeUseAnnotation.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/annotations/typeAnnotations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -291,13 +91,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/argumentOrder")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ArgumentOrder extends AbstractFirBlackBoxCodegenTest {
+    public static class ArgumentOrder extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInArgumentOrder() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/argumentOrder"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/argumentOrder"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("argumentOrderInObjectSuperCall.kt")
@@ -369,13 +169,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/arrays")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Arrays extends AbstractFirBlackBoxCodegenTest {
+    public static class Arrays extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInArrays() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("arrayConstructorWithNonInlineLambda.kt")
@@ -573,11 +373,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/arrays/kt1291.kt");
         }
 
-        @TestMetadata("kt17134.kt")
-        public void testKt17134() throws Exception {
-            runTest("compiler/testData/codegen/box/arrays/kt17134.kt");
-        }
-
         @TestMetadata("kt238.kt")
         public void testKt238() throws Exception {
             runTest("compiler/testData/codegen/box/arrays/kt238.kt");
@@ -621,11 +416,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt594.kt")
         public void testKt594() throws Exception {
             runTest("compiler/testData/codegen/box/arrays/kt594.kt");
-        }
-
-        @TestMetadata("kt602.kt")
-        public void testKt602() throws Exception {
-            runTest("compiler/testData/codegen/box/arrays/kt602.kt");
         }
 
         @TestMetadata("kt7009.kt")
@@ -688,17 +478,12 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/arrays/stdlib.kt");
         }
 
-        @TestMetadata("varargsWithJava.kt")
-        public void testVarargsWithJava() throws Exception {
-            runTest("compiler/testData/codegen/box/arrays/varargsWithJava.kt");
-        }
-
         @TestMetadata("compiler/testData/codegen/box/arrays/arraysOfInlineClass")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ArraysOfInlineClass extends AbstractFirBlackBoxCodegenTest {
+        public static class ArraysOfInlineClass extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("accessArrayOfInlineClass.kt")
@@ -712,7 +497,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             public void testAllFilesPresentInArraysOfInlineClass() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/arraysOfInlineClass"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/arraysOfInlineClass"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("arrayOfInlineClassOfArrayOfInlineClass.kt")
@@ -724,13 +509,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/arrays/forInReversed")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInReversed extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInReversed extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInReversed() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/forInReversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/forInReversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("reversedArrayOriginalUpdatedInLoopBody.kt")
@@ -757,13 +542,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/arrays/multiDecl")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class MultiDecl extends AbstractFirBlackBoxCodegenTest {
+        public static class MultiDecl extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMultiDecl() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/multiDecl"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/multiDecl"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("kt15560.kt")
@@ -809,13 +594,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/arrays/multiDecl/int")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Int extends AbstractFirBlackBoxCodegenTest {
+            public static class Int extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInInt() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/multiDecl/int"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/multiDecl/int"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -842,13 +627,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/arrays/multiDecl/long")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Long extends AbstractFirBlackBoxCodegenTest {
+            public static class Long extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInLong() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/multiDecl/long"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/arrays/multiDecl/long"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -877,13 +662,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/assert")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Assert extends AbstractFirBlackBoxCodegenTest {
+    public static class Assert extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInAssert() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/assert"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/assert"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("alwaysDisable.kt")
@@ -899,127 +684,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/assert/jvm")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Jvm extends AbstractFirBlackBoxCodegenTest {
+        public static class Jvm extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInJvm() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/assert/jvm"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("assertionsEnabledBeforeClassInitializers.kt")
-            public void testAssertionsEnabledBeforeClassInitializers() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/assertionsEnabledBeforeClassInitializers.kt");
-            }
-
-            @TestMetadata("classAssertions.kt")
-            public void testClassAssertions() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/classAssertions.kt");
-            }
-
-            @TestMetadata("classAssertionsForCompanion.kt")
-            public void testClassAssertionsForCompanion() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/classAssertionsForCompanion.kt");
-            }
-
-            @TestMetadata("classAssertionsForInnerClasses.kt")
-            public void testClassAssertionsForInnerClasses() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/classAssertionsForInnerClasses.kt");
-            }
-
-            @TestMetadata("classAssertionsForLocalClasses.kt")
-            public void testClassAssertionsForLocalClasses() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/classAssertionsForLocalClasses.kt");
-            }
-
-            @TestMetadata("classAssertionsForNestedClasses.kt")
-            public void testClassAssertionsForNestedClasses() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/classAssertionsForNestedClasses.kt");
-            }
-
-            @TestMetadata("interfaceAssertionsDisabled.kt")
-            public void testInterfaceAssertionsDisabled() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/interfaceAssertionsDisabled.kt");
-            }
-
-            @TestMetadata("interfaceAssertionsEnabled.kt")
-            public void testInterfaceAssertionsEnabled() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/interfaceAssertionsEnabled.kt");
-            }
-
-            @TestMetadata("lambdaNotEvaluated.kt")
-            public void testLambdaNotEvaluated() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/lambdaNotEvaluated.kt");
-            }
-
-            @TestMetadata("localAnonymousFunction.kt")
-            public void testLocalAnonymousFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/localAnonymousFunction.kt");
-            }
-
-            @TestMetadata("localClass.kt")
-            public void testLocalClass() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/localClass.kt");
-            }
-
-            @TestMetadata("localFunction.kt")
-            public void testLocalFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/localFunction.kt");
-            }
-
-            @TestMetadata("localLambda.kt")
-            public void testLocalLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/localLambda.kt");
-            }
-
-            @TestMetadata("localObject.kt")
-            public void testLocalObject() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/localObject.kt");
-            }
-
-            @TestMetadata("noUnnecessaryClassInitialization.kt")
-            public void testNoUnnecessaryClassInitialization() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/noUnnecessaryClassInitialization.kt");
-            }
-
-            @TestMetadata("nonLocalReturn.kt")
-            public void testNonLocalReturn() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/nonLocalReturn.kt");
-            }
-
-            @TestMetadata("ordinary.kt")
-            public void testOrdinary() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/ordinary.kt");
-            }
-
-            @TestMetadata("superClassInitializer.kt")
-            public void testSuperClassInitializer() throws Exception {
-                runTest("compiler/testData/codegen/box/assert/jvm/superClassInitializer.kt");
-            }
-
-            @TestMetadata("suspendFunctionAssertionDisabled.kt")
-            public void testSuspendFunctionAssertionDisabled_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/assert/jvm/suspendFunctionAssertionDisabled.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("suspendFunctionAssertionsEnabled.kt")
-            public void testSuspendFunctionAssertionsEnabled_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/assert/jvm/suspendFunctionAssertionsEnabled.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("suspendLambdaAssertionsDisabled.kt")
-            public void testSuspendLambdaAssertionsDisabled_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/assert/jvm/suspendLambdaAssertionsDisabled.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("suspendLambdaAssertionsEnabled.kt")
-            public void testSuspendLambdaAssertionsEnabled_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/assert/jvm/suspendLambdaAssertionsEnabled.kt", "kotlin.coroutines");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/assert/jvm"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -1027,13 +702,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/binaryOp")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class BinaryOp extends AbstractFirBlackBoxCodegenTest {
+    public static class BinaryOp extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInBinaryOp() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/binaryOp"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/binaryOp"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("bitwiseOp.kt")
@@ -1069,26 +744,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compareBoxedChars.kt")
         public void testCompareBoxedChars() throws Exception {
             runTest("compiler/testData/codegen/box/binaryOp/compareBoxedChars.kt");
-        }
-
-        @TestMetadata("compareWithBoxedDouble.kt")
-        public void testCompareWithBoxedDouble() throws Exception {
-            runTest("compiler/testData/codegen/box/binaryOp/compareWithBoxedDouble.kt");
-        }
-
-        @TestMetadata("compareWithBoxedLong.kt")
-        public void testCompareWithBoxedLong() throws Exception {
-            runTest("compiler/testData/codegen/box/binaryOp/compareWithBoxedLong.kt");
-        }
-
-        @TestMetadata("compareWithBoxedNotNullDouble.kt")
-        public void testCompareWithBoxedNotNullDouble() throws Exception {
-            runTest("compiler/testData/codegen/box/binaryOp/compareWithBoxedNotNullDouble.kt");
-        }
-
-        @TestMetadata("compareWithBoxedNotNullLong.kt")
-        public void testCompareWithBoxedNotNullLong() throws Exception {
-            runTest("compiler/testData/codegen/box/binaryOp/compareWithBoxedNotNullLong.kt");
         }
 
         @TestMetadata("divisionByZero.kt")
@@ -1170,13 +825,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/boxingOptimization")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class BoxingOptimization extends AbstractFirBlackBoxCodegenTest {
+    public static class BoxingOptimization extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInBoxingOptimization() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/boxingOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/boxingOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("boxedIntegersCmp.kt")
@@ -1224,19 +879,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/boxingOptimization/intCompareTo.kt");
         }
 
-        @TestMetadata("kClassEquals.kt")
-        public void testKClassEquals() throws Exception {
-            runTest("compiler/testData/codegen/box/boxingOptimization/kClassEquals.kt");
-        }
-
         @TestMetadata("kt15871.kt")
         public void testKt15871() throws Exception {
             runTest("compiler/testData/codegen/box/boxingOptimization/kt15871.kt");
-        }
-
-        @TestMetadata("kt17748.kt")
-        public void testKt17748() throws Exception {
-            runTest("compiler/testData/codegen/box/boxingOptimization/kt17748.kt");
         }
 
         @TestMetadata("kt19767.kt")
@@ -1247,11 +892,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt19767_2.kt")
         public void testKt19767_2() throws Exception {
             runTest("compiler/testData/codegen/box/boxingOptimization/kt19767_2.kt");
-        }
-
-        @TestMetadata("kt19767_3.kt")
-        public void testKt19767_3() throws Exception {
-            runTest("compiler/testData/codegen/box/boxingOptimization/kt19767_3.kt");
         }
 
         @TestMetadata("kt19767_chain.kt")
@@ -1272,11 +912,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt5844.kt")
         public void testKt5844() throws Exception {
             runTest("compiler/testData/codegen/box/boxingOptimization/kt5844.kt");
-        }
-
-        @TestMetadata("kt6047.kt")
-        public void testKt6047() throws Exception {
-            runTest("compiler/testData/codegen/box/boxingOptimization/kt6047.kt");
         }
 
         @TestMetadata("kt6842.kt")
@@ -1338,9 +973,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/bridges")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Bridges extends AbstractFirBlackBoxCodegenTest {
+    public static class Bridges extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         @TestMetadata("abstractOverrideBridge.kt")
@@ -1349,17 +984,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         public void testAllFilesPresentInBridges() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/bridges"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("bridgeInInterface.kt")
-        public void testBridgeInInterface() throws Exception {
-            runTest("compiler/testData/codegen/box/bridges/bridgeInInterface.kt");
-        }
-
-        @TestMetadata("bridgeInInterfaceWithProperties.kt")
-        public void testBridgeInInterfaceWithProperties() throws Exception {
-            runTest("compiler/testData/codegen/box/bridges/bridgeInInterfaceWithProperties.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/bridges"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("complexMultiInheritance.kt")
@@ -1512,11 +1137,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/bridges/noBridgeOnMutableCollectionInheritance.kt");
         }
 
-        @TestMetadata("objectClone.kt")
-        public void testObjectClone() throws Exception {
-            runTest("compiler/testData/codegen/box/bridges/objectClone.kt");
-        }
-
         @TestMetadata("overrideAbstractProperty.kt")
         public void testOverrideAbstractProperty() throws Exception {
             runTest("compiler/testData/codegen/box/bridges/overrideAbstractProperty.kt");
@@ -1592,11 +1212,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/bridges/strListContains.kt");
         }
 
-        @TestMetadata("strListRemove.kt")
-        public void testStrListRemove() throws Exception {
-            runTest("compiler/testData/codegen/box/bridges/strListRemove.kt");
-        }
-
         @TestMetadata("traitImplInheritsTraitImpl.kt")
         public void testTraitImplInheritsTraitImpl() throws Exception {
             runTest("compiler/testData/codegen/box/bridges/traitImplInheritsTraitImpl.kt");
@@ -1625,9 +1240,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/bridges/substitutionInSuperClass")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class SubstitutionInSuperClass extends AbstractFirBlackBoxCodegenTest {
+        public static class SubstitutionInSuperClass extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("abstractFun.kt")
@@ -1636,7 +1251,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             public void testAllFilesPresentInSubstitutionInSuperClass() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/bridges/substitutionInSuperClass"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/bridges/substitutionInSuperClass"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("boundedTypeArguments.kt")
@@ -1694,13 +1309,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/builderInference")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class BuilderInference extends AbstractFirBlackBoxCodegenTest {
+    public static class BuilderInference extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInBuilderInference() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builderInference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builderInference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("lackOfNullCheckOnNullableInsideBuild.kt")
@@ -1712,23 +1327,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/builtinStubMethods")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class BuiltinStubMethods extends AbstractFirBlackBoxCodegenTest {
+    public static class BuiltinStubMethods extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
-        }
-
-        @TestMetadata("abstractMember.kt")
-        public void testAbstractMember() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/abstractMember.kt");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInBuiltinStubMethods() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builtinStubMethods"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("Collection.kt")
-        public void testCollection() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/Collection.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builtinStubMethods"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("customReadOnlyIterator.kt")
@@ -1736,122 +1341,12 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/builtinStubMethods/customReadOnlyIterator.kt");
         }
 
-        @TestMetadata("delegationToArrayList.kt")
-        public void testDelegationToArrayList() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/delegationToArrayList.kt");
-        }
-
-        @TestMetadata("immutableRemove.kt")
-        public void testImmutableRemove() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/immutableRemove.kt");
-        }
-
-        @TestMetadata("implementationInTrait.kt")
-        public void testImplementationInTrait() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/implementationInTrait.kt");
-        }
-
-        @TestMetadata("inheritedImplementations.kt")
-        public void testInheritedImplementations() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/inheritedImplementations.kt");
-        }
-
-        @TestMetadata("Iterator.kt")
-        public void testIterator() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/Iterator.kt");
-        }
-
-        @TestMetadata("IteratorWithRemove.kt")
-        public void testIteratorWithRemove() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/IteratorWithRemove.kt");
-        }
-
-        @TestMetadata("List.kt")
-        public void testList() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/List.kt");
-        }
-
-        @TestMetadata("ListIterator.kt")
-        public void testListIterator() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/ListIterator.kt");
-        }
-
-        @TestMetadata("ListWithAllImplementations.kt")
-        public void testListWithAllImplementations() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/ListWithAllImplementations.kt");
-        }
-
-        @TestMetadata("ListWithAllInheritedImplementations.kt")
-        public void testListWithAllInheritedImplementations() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/ListWithAllInheritedImplementations.kt");
-        }
-
-        @TestMetadata("manyTypeParametersWithUpperBounds.kt")
-        public void testManyTypeParametersWithUpperBounds() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/manyTypeParametersWithUpperBounds.kt");
-        }
-
-        @TestMetadata("Map.kt")
-        public void testMap() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/Map.kt");
-        }
-
-        @TestMetadata("MapEntry.kt")
-        public void testMapEntry() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/MapEntry.kt");
-        }
-
-        @TestMetadata("MapEntryWithSetValue.kt")
-        public void testMapEntryWithSetValue() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/MapEntryWithSetValue.kt");
-        }
-
-        @TestMetadata("MapWithAllImplementations.kt")
-        public void testMapWithAllImplementations() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/MapWithAllImplementations.kt");
-        }
-
-        @TestMetadata("nonTrivialSubstitution.kt")
-        public void testNonTrivialSubstitution() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/nonTrivialSubstitution.kt");
-        }
-
-        @TestMetadata("nonTrivialUpperBound.kt")
-        public void testNonTrivialUpperBound() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/nonTrivialUpperBound.kt");
-        }
-
-        @TestMetadata("substitutedIterable.kt")
-        public void testSubstitutedIterable() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/substitutedIterable.kt");
-        }
-
-        @TestMetadata("SubstitutedList.kt")
-        public void testSubstitutedList() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/SubstitutedList.kt");
-        }
-
-        @TestMetadata("substitutedListWithExtraSuperInterface.kt")
-        public void testSubstitutedListWithExtraSuperInterface() throws Exception {
-            runTest("compiler/testData/codegen/box/builtinStubMethods/substitutedListWithExtraSuperInterface.kt");
-        }
-
         @TestMetadata("compiler/testData/codegen/box/builtinStubMethods/extendJavaCollections")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ExtendJavaCollections extends AbstractFirBlackBoxCodegenTest {
+        public static class ExtendJavaCollections extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
-            }
-
-            @TestMetadata("abstractList.kt")
-            public void testAbstractList() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/extendJavaCollections/abstractList.kt");
-            }
-
-            @TestMetadata("abstractMap.kt")
-            public void testAbstractMap() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/extendJavaCollections/abstractMap.kt");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("abstractSet.kt")
@@ -1860,7 +1355,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             public void testAllFilesPresentInExtendJavaCollections() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builtinStubMethods/extendJavaCollections"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builtinStubMethods/extendJavaCollections"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("arrayList.kt")
@@ -1877,71 +1372,31 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             public void testHashSet() throws Exception {
                 runTest("compiler/testData/codegen/box/builtinStubMethods/extendJavaCollections/hashSet.kt");
             }
-
-            @TestMetadata("mapEntry.kt")
-            public void testMapEntry() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/extendJavaCollections/mapEntry.kt");
-            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/builtinStubMethods/mapGetOrDefault")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class MapGetOrDefault extends AbstractFirBlackBoxCodegenTest {
+        public static class MapGetOrDefault extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMapGetOrDefault() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builtinStubMethods/mapGetOrDefault"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("noTypeSafeBridge.kt")
-            public void testNoTypeSafeBridge() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/mapGetOrDefault/noTypeSafeBridge.kt");
-            }
-
-            @TestMetadata("typeSafeBridge.kt")
-            public void testTypeSafeBridge() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/mapGetOrDefault/typeSafeBridge.kt");
-            }
-
-            @TestMetadata("typeSafeBridgeNotNullAny.kt")
-            public void testTypeSafeBridgeNotNullAny() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/mapGetOrDefault/typeSafeBridgeNotNullAny.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builtinStubMethods/mapGetOrDefault"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/builtinStubMethods/mapRemove")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class MapRemove extends AbstractFirBlackBoxCodegenTest {
+        public static class MapRemove extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMapRemove() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builtinStubMethods/mapRemove"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("noDefaultImpls.kt")
-            public void testNoDefaultImpls() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/mapRemove/noDefaultImpls.kt");
-            }
-
-            @TestMetadata("readOnlyMap.kt")
-            public void testReadOnlyMap() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/mapRemove/readOnlyMap.kt");
-            }
-
-            @TestMetadata("typeSafeBridge.kt")
-            public void testTypeSafeBridge() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/mapRemove/typeSafeBridge.kt");
-            }
-
-            @TestMetadata("typeSafeBridgeNotNullAny.kt")
-            public void testTypeSafeBridgeNotNullAny() throws Exception {
-                runTest("compiler/testData/codegen/box/builtinStubMethods/mapRemove/typeSafeBridgeNotNullAny.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/builtinStubMethods/mapRemove"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -1949,23 +1404,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/callableReference")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class CallableReference extends AbstractFirBlackBoxCodegenTest {
+    public static class CallableReference extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInCallableReference() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("builtinFunctionReferenceOwner.kt")
-        public void testBuiltinFunctionReferenceOwner() throws Exception {
-            runTest("compiler/testData/codegen/box/callableReference/builtinFunctionReferenceOwner.kt");
-        }
-
-        @TestMetadata("classesAreSynthetic.kt")
-        public void testClassesAreSynthetic() throws Exception {
-            runTest("compiler/testData/codegen/box/callableReference/classesAreSynthetic.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("kt37604.kt")
@@ -1978,26 +1423,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/callableReference/nested.kt");
         }
 
-        @TestMetadata("optimizedSuperclasses_after.kt")
-        public void testOptimizedSuperclasses_after() throws Exception {
-            runTest("compiler/testData/codegen/box/callableReference/optimizedSuperclasses_after.kt");
-        }
-
-        @TestMetadata("optimizedSuperclasses_before.kt")
-        public void testOptimizedSuperclasses_before() throws Exception {
-            runTest("compiler/testData/codegen/box/callableReference/optimizedSuperclasses_before.kt");
-        }
-
         @TestMetadata("compiler/testData/codegen/box/callableReference/adaptedReferences")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class AdaptedReferences extends AbstractFirBlackBoxCodegenTest {
+        public static class AdaptedReferences extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInAdaptedReferences() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/adaptedReferences"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/adaptedReferences"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("bothWithCoercionToUnit.kt")
@@ -2070,29 +1505,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/callableReference/adaptedReferences/manyDefaultsAndVararg.kt");
             }
 
-            @TestMetadata("noAdaptedReferencesIfNoOptimizedReferencesEnabled.kt")
-            public void testNoAdaptedReferencesIfNoOptimizedReferencesEnabled() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/adaptedReferences/noAdaptedReferencesIfNoOptimizedReferencesEnabled.kt");
-            }
-
             @TestMetadata("noNameClashForReferencesToSameFunction.kt")
             public void testNoNameClashForReferencesToSameFunction() throws Exception {
                 runTest("compiler/testData/codegen/box/callableReference/adaptedReferences/noNameClashForReferencesToSameFunction.kt");
-            }
-
-            @TestMetadata("noReflectionForAdaptedCallableReferences.kt")
-            public void testNoReflectionForAdaptedCallableReferences() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/adaptedReferences/noReflectionForAdaptedCallableReferences.kt");
-            }
-
-            @TestMetadata("noReflectionForAdaptedCallableReferencesWithSuspendConversion.kt")
-            public void testNoReflectionForAdaptedCallableReferencesWithSuspendConversion() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/adaptedReferences/noReflectionForAdaptedCallableReferencesWithSuspendConversion.kt");
-            }
-
-            @TestMetadata("reflectionForVarargAsArray.kt")
-            public void testReflectionForVarargAsArray() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/adaptedReferences/reflectionForVarargAsArray.kt");
             }
 
             @TestMetadata("simpleDefaultArgument.kt")
@@ -2103,11 +1518,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("simpleEmptyVararg.kt")
             public void testSimpleEmptyVararg() throws Exception {
                 runTest("compiler/testData/codegen/box/callableReference/adaptedReferences/simpleEmptyVararg.kt");
-            }
-
-            @TestMetadata("toStringNoReflect.kt")
-            public void testToStringNoReflect() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/adaptedReferences/toStringNoReflect.kt");
             }
 
             @TestMetadata("unboundReferences.kt")
@@ -2133,9 +1543,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/callableReference/adaptedReferences/suspendConversion")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class SuspendConversion extends AbstractFirBlackBoxCodegenTest {
+            public static class SuspendConversion extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 @TestMetadata("adaptedWithCoercionToUnit.kt")
@@ -2154,7 +1564,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 }
 
                 public void testAllFilesPresentInSuspendConversion() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/adaptedReferences/suspendConversion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/adaptedReferences/suspendConversion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("bound.kt")
@@ -2212,9 +1622,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/callableReference/bound")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Bound extends AbstractFirBlackBoxCodegenTest {
+        public static class Bound extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("adapted.kt")
@@ -2223,7 +1633,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             public void testAllFilesPresentInBound() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/bound"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/bound"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("array.kt")
@@ -2234,11 +1644,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("arrayGetIntrinsic.kt")
             public void testArrayGetIntrinsic() throws Exception {
                 runTest("compiler/testData/codegen/box/callableReference/bound/arrayGetIntrinsic.kt");
-            }
-
-            @TestMetadata("boundJvmFieldInInterfaceCompanion.kt")
-            public void testBoundJvmFieldInInterfaceCompanion() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/bound/boundJvmFieldInInterfaceCompanion.kt");
             }
 
             @TestMetadata("boundReferenceToOverloadedFunction.kt")
@@ -2286,11 +1691,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/callableReference/bound/genericValOnLHS.kt");
             }
 
-            @TestMetadata("javaField.kt")
-            public void testJavaField() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/bound/javaField.kt");
-            }
-
             @TestMetadata("kCallableNameIntrinsic.kt")
             public void testKCallableNameIntrinsic() throws Exception {
                 runTest("compiler/testData/codegen/box/callableReference/bound/kCallableNameIntrinsic.kt");
@@ -2304,11 +1704,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("kt15446.kt")
             public void testKt15446() throws Exception {
                 runTest("compiler/testData/codegen/box/callableReference/bound/kt15446.kt");
-            }
-
-            @TestMetadata("localUnitFunction.kt")
-            public void testLocalUnitFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/bound/localUnitFunction.kt");
             }
 
             @TestMetadata("multiCase.kt")
@@ -2336,11 +1731,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/callableReference/bound/receiverEvaluatedOnce.kt");
             }
 
-            @TestMetadata("referenceToGetSetMethodsFromVararg.kt")
-            public void testReferenceToGetSetMethodsFromVararg() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/bound/referenceToGetSetMethodsFromVararg.kt");
-            }
-
             @TestMetadata("simpleFunction.kt")
             public void testSimpleFunction() throws Exception {
                 runTest("compiler/testData/codegen/box/callableReference/bound/simpleFunction.kt");
@@ -2356,21 +1746,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/callableReference/bound/smartCastForExtensionReceiver.kt");
             }
 
-            @TestMetadata("syntheticExtensionOnLHS.kt")
-            public void testSyntheticExtensionOnLHS() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/bound/syntheticExtensionOnLHS.kt");
-            }
-
             @TestMetadata("compiler/testData/codegen/box/callableReference/bound/equals")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Equals extends AbstractFirBlackBoxCodegenTest {
+            public static class Equals extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInEquals() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/bound/equals"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/bound/equals"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("nullableReceiverInEquals.kt")
@@ -2398,13 +1783,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/callableReference/equality")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Equality extends AbstractFirBlackBoxCodegenTest {
+        public static class Equality extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInEquality() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/equality"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/equality"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("capturedDefaults.kt")
@@ -2471,9 +1856,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/callableReference/function")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Function extends AbstractFirBlackBoxCodegenTest {
+        public static class Function extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("abstractClassMember.kt")
@@ -2482,7 +1867,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             public void testAllFilesPresentInFunction() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/function"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/function"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("argumentTypes.kt")
@@ -2635,11 +2020,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/callableReference/function/innerConstructorFromTopLevelOneStringArg.kt");
             }
 
-            @TestMetadata("javaCollectionsStaticMethod.kt")
-            public void testJavaCollectionsStaticMethod() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/function/javaCollectionsStaticMethod.kt");
-            }
-
             @TestMetadata("kt21787.kt")
             public void testKt21787() throws Exception {
                 runTest("compiler/testData/codegen/box/callableReference/function/kt21787.kt");
@@ -2695,11 +2075,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/callableReference/function/specialCalls.kt");
             }
 
-            @TestMetadata("staticFunctionReference.kt")
-            public void testStaticFunctionReference() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/function/staticFunctionReference.kt");
-            }
-
             @TestMetadata("topLevelFromClass.kt")
             public void testTopLevelFromClass() throws Exception {
                 runTest("compiler/testData/codegen/box/callableReference/function/topLevelFromClass.kt");
@@ -2748,13 +2123,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/callableReference/function/local")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Local extends AbstractFirBlackBoxCodegenTest {
+            public static class Local extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInLocal() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/function/local"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/function/local"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("captureOuter.kt")
@@ -2862,9 +2237,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/callableReference/property")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Property extends AbstractFirBlackBoxCodegenTest {
+        public static class Property extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("accessViaSubclass.kt")
@@ -2873,7 +2248,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             public void testAllFilesPresentInProperty() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/property"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/property"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("delegated.kt")
@@ -3020,43 +2395,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/callableReference/serializability")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Serializability extends AbstractFirBlackBoxCodegenTest {
+        public static class Serializability extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
-            }
-
-            @TestMetadata("adaptedReferences.kt")
-            public void testAdaptedReferences() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/serializability/adaptedReferences.kt");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSerializability() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/serializability"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("boundWithNotSerializableReceiver.kt")
-            public void testBoundWithNotSerializableReceiver() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/serializability/boundWithNotSerializableReceiver.kt");
-            }
-
-            @TestMetadata("boundWithSerializableReceiver.kt")
-            public void testBoundWithSerializableReceiver() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/serializability/boundWithSerializableReceiver.kt");
-            }
-
-            @TestMetadata("noReflect.kt")
-            public void testNoReflect() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/serializability/noReflect.kt");
-            }
-
-            @TestMetadata("reflectedIsNotSerialized.kt")
-            public void testReflectedIsNotSerialized() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/serializability/reflectedIsNotSerialized.kt");
-            }
-
-            @TestMetadata("withReflect.kt")
-            public void testWithReflect() throws Exception {
-                runTest("compiler/testData/codegen/box/callableReference/serializability/withReflect.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/callableReference/serializability"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -3064,13 +2409,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/casts")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Casts extends AbstractFirBlackBoxCodegenTest {
+    public static class Casts extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInCasts() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/casts"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/casts"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("as.kt")
@@ -3096,11 +2441,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("asSafeForConstants.kt")
         public void testAsSafeForConstants() throws Exception {
             runTest("compiler/testData/codegen/box/casts/asSafeForConstants.kt");
-        }
-
-        @TestMetadata("asThrowsNpe_1_4.kt")
-        public void testAsThrowsNpe_1_4() throws Exception {
-            runTest("compiler/testData/codegen/box/casts/asThrowsNpe_1_4.kt");
         }
 
         @TestMetadata("asUnit.kt")
@@ -3178,11 +2518,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/casts/unitAsAny.kt");
         }
 
-        @TestMetadata("unitAsInt.kt")
-        public void testUnitAsInt() throws Exception {
-            runTest("compiler/testData/codegen/box/casts/unitAsInt.kt");
-        }
-
         @TestMetadata("unitAsSafeAny.kt")
         public void testUnitAsSafeAny() throws Exception {
             runTest("compiler/testData/codegen/box/casts/unitAsSafeAny.kt");
@@ -3196,13 +2531,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/casts/functions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Functions extends AbstractFirBlackBoxCodegenTest {
+        public static class Functions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInFunctions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/casts/functions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/casts/functions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("asFunKBig.kt")
@@ -3223,11 +2558,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("isFunKSmall.kt")
             public void testIsFunKSmall() throws Exception {
                 runTest("compiler/testData/codegen/box/casts/functions/isFunKSmall.kt");
-            }
-
-            @TestMetadata("javaTypeIsFunK.kt")
-            public void testJavaTypeIsFunK() throws Exception {
-                runTest("compiler/testData/codegen/box/casts/functions/javaTypeIsFunK.kt");
             }
 
             @TestMetadata("reifiedAsFunKBig.kt")
@@ -3274,23 +2604,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/casts/literalExpressionAsGenericArgument")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class LiteralExpressionAsGenericArgument extends AbstractFirBlackBoxCodegenTest {
+        public static class LiteralExpressionAsGenericArgument extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInLiteralExpressionAsGenericArgument() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/casts/literalExpressionAsGenericArgument"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/casts/literalExpressionAsGenericArgument"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("binaryExpressionCast.kt")
             public void testBinaryExpressionCast() throws Exception {
                 runTest("compiler/testData/codegen/box/casts/literalExpressionAsGenericArgument/binaryExpressionCast.kt");
-            }
-
-            @TestMetadata("javaBox.kt")
-            public void testJavaBox() throws Exception {
-                runTest("compiler/testData/codegen/box/casts/literalExpressionAsGenericArgument/javaBox.kt");
             }
 
             @TestMetadata("labeledExpressionCast.kt")
@@ -3322,13 +2647,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/casts/mutableCollections")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class MutableCollections extends AbstractFirBlackBoxCodegenTest {
+        public static class MutableCollections extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMutableCollections() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/casts/mutableCollections"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/casts/mutableCollections"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("asWithMutable.kt")
@@ -3339,11 +2664,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("isWithMutable.kt")
             public void testIsWithMutable() throws Exception {
                 runTest("compiler/testData/codegen/box/casts/mutableCollections/isWithMutable.kt");
-            }
-
-            @TestMetadata("mutabilityMarkerInterfaces.kt")
-            public void testMutabilityMarkerInterfaces() throws Exception {
-                runTest("compiler/testData/codegen/box/casts/mutableCollections/mutabilityMarkerInterfaces.kt");
             }
 
             @TestMetadata("reifiedAsWithMutable.kt")
@@ -3376,13 +2696,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/checkcastOptimization")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class CheckcastOptimization extends AbstractFirBlackBoxCodegenTest {
+    public static class CheckcastOptimization extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInCheckcastOptimization() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/checkcastOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/checkcastOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("kt19128.kt")
@@ -3399,13 +2719,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/classLiteral")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ClassLiteral extends AbstractFirBlackBoxCodegenTest {
+    public static class ClassLiteral extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInClassLiteral() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classLiteral"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classLiteral"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("bareArray.kt")
@@ -3413,26 +2733,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/classLiteral/bareArray.kt");
         }
 
-        @TestMetadata("primitiveKClassEquality.kt")
-        public void testPrimitiveKClassEquality() throws Exception {
-            runTest("compiler/testData/codegen/box/classLiteral/primitiveKClassEquality.kt");
-        }
-
         @TestMetadata("compiler/testData/codegen/box/classLiteral/bound")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Bound extends AbstractFirBlackBoxCodegenTest {
+        public static class Bound extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInBound() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classLiteral/bound"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("javaIntrinsicWithSideEffect.kt")
-            public void testJavaIntrinsicWithSideEffect() throws Exception {
-                runTest("compiler/testData/codegen/box/classLiteral/bound/javaIntrinsicWithSideEffect.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classLiteral/bound"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("primitives.kt")
@@ -3459,53 +2769,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/classLiteral/java")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Java extends AbstractFirBlackBoxCodegenTest {
+        public static class Java extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInJava() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classLiteral/java"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("java.kt")
-            public void testJava() throws Exception {
-                runTest("compiler/testData/codegen/box/classLiteral/java/java.kt");
-            }
-
-            @TestMetadata("javaObjectType.kt")
-            public void testJavaObjectType() throws Exception {
-                runTest("compiler/testData/codegen/box/classLiteral/java/javaObjectType.kt");
-            }
-
-            @TestMetadata("javaObjectTypeReified.kt")
-            public void testJavaObjectTypeReified() throws Exception {
-                runTest("compiler/testData/codegen/box/classLiteral/java/javaObjectTypeReified.kt");
-            }
-
-            @TestMetadata("javaPrimitiveType.kt")
-            public void testJavaPrimitiveType() throws Exception {
-                runTest("compiler/testData/codegen/box/classLiteral/java/javaPrimitiveType.kt");
-            }
-
-            @TestMetadata("javaPrimitiveTypeReified.kt")
-            public void testJavaPrimitiveTypeReified() throws Exception {
-                runTest("compiler/testData/codegen/box/classLiteral/java/javaPrimitiveTypeReified.kt");
-            }
-
-            @TestMetadata("javaReified.kt")
-            public void testJavaReified() throws Exception {
-                runTest("compiler/testData/codegen/box/classLiteral/java/javaReified.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classLiteral/java"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("kt11943.kt")
             public void testKt11943() throws Exception {
                 runTest("compiler/testData/codegen/box/classLiteral/java/kt11943.kt");
-            }
-
-            @TestMetadata("objectSuperConstructorCall.kt")
-            public void testObjectSuperConstructorCall() throws Exception {
-                runTest("compiler/testData/codegen/box/classLiteral/java/objectSuperConstructorCall.kt");
             }
         }
     }
@@ -3513,23 +2788,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/classes")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Classes extends AbstractFirBlackBoxCodegenTest {
+    public static class Classes extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInClasses() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("boxPrimitiveTypeInClinitOfClassObject.kt")
         public void testBoxPrimitiveTypeInClinitOfClassObject() throws Exception {
             runTest("compiler/testData/codegen/box/classes/boxPrimitiveTypeInClinitOfClassObject.kt");
-        }
-
-        @TestMetadata("classCompanionInitializationWithJava.kt")
-        public void testClassCompanionInitializationWithJava() throws Exception {
-            runTest("compiler/testData/codegen/box/classes/classCompanionInitializationWithJava.kt");
         }
 
         @TestMetadata("classNamedAsOldPackageFacade.kt")
@@ -3565,11 +2835,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("classObjectNotOfEnum.kt")
         public void testClassObjectNotOfEnum() throws Exception {
             runTest("compiler/testData/codegen/box/classes/classObjectNotOfEnum.kt");
-        }
-
-        @TestMetadata("classObjectToString.kt")
-        public void testClassObjectToString() throws Exception {
-            runTest("compiler/testData/codegen/box/classes/classObjectToString.kt");
         }
 
         @TestMetadata("classObjectWithPrivateGenericMember.kt")
@@ -3697,11 +2962,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/classes/innerClass.kt");
         }
 
-        @TestMetadata("interfaceCompanionInitializationWithJava.kt")
-        public void testInterfaceCompanionInitializationWithJava() throws Exception {
-            runTest("compiler/testData/codegen/box/classes/interfaceCompanionInitializationWithJava.kt");
-        }
-
         @TestMetadata("kt1018.kt")
         public void testKt1018() throws Exception {
             runTest("compiler/testData/codegen/box/classes/kt1018.kt");
@@ -3710,11 +2970,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt1120.kt")
         public void testKt1120() throws Exception {
             runTest("compiler/testData/codegen/box/classes/kt1120.kt");
-        }
-
-        @TestMetadata("kt1134.kt")
-        public void testKt1134() throws Exception {
-            runTest("compiler/testData/codegen/box/classes/kt1134.kt");
         }
 
         @TestMetadata("kt1157.kt")
@@ -3797,11 +3052,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/classes/kt2224.kt");
         }
 
-        @TestMetadata("kt2288.kt")
-        public void testKt2288() throws Exception {
-            runTest("compiler/testData/codegen/box/classes/kt2288.kt");
-        }
-
         @TestMetadata("kt2384.kt")
         public void testKt2384() throws Exception {
             runTest("compiler/testData/codegen/box/classes/kt2384.kt");
@@ -3815,11 +3065,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt2391.kt")
         public void testKt2391() throws Exception {
             runTest("compiler/testData/codegen/box/classes/kt2391.kt");
-        }
-
-        @TestMetadata("kt2395.kt")
-        public void testKt2395() throws Exception {
-            runTest("compiler/testData/codegen/box/classes/kt2395.kt");
         }
 
         @TestMetadata("kt2417.kt")
@@ -4002,11 +3247,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/classes/kt8011a.kt");
         }
 
-        @TestMetadata("kt903.kt")
-        public void testKt903() throws Exception {
-            runTest("compiler/testData/codegen/box/classes/kt903.kt");
-        }
-
         @TestMetadata("kt940.kt")
         public void testKt940() throws Exception {
             runTest("compiler/testData/codegen/box/classes/kt940.kt");
@@ -4115,13 +3355,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/classes/inner")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Inner extends AbstractFirBlackBoxCodegenTest {
+        public static class Inner extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInInner() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classes/inner"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/classes/inner"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("extensionWithOuter.kt")
@@ -4164,13 +3404,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/closures")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Closures extends AbstractFirBlackBoxCodegenTest {
+    public static class Closures extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInClosures() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("anonymousObjectAsLastExpressionInLambda.kt")
@@ -4358,19 +3598,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/closures/localReturnWithAutolabel.kt");
         }
 
-        @TestMetadata("noRefToOuter.kt")
-        public void testNoRefToOuter() throws Exception {
-            runTest("compiler/testData/codegen/box/closures/noRefToOuter.kt");
-        }
-
         @TestMetadata("recursiveClosure.kt")
         public void testRecursiveClosure() throws Exception {
             runTest("compiler/testData/codegen/box/closures/recursiveClosure.kt");
-        }
-
-        @TestMetadata("refsAreSerializable.kt")
-        public void testRefsAreSerializable() throws Exception {
-            runTest("compiler/testData/codegen/box/closures/refsAreSerializable.kt");
         }
 
         @TestMetadata("simplestClosure.kt")
@@ -4381,11 +3611,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("simplestClosureAndBoxing.kt")
         public void testSimplestClosureAndBoxing() throws Exception {
             runTest("compiler/testData/codegen/box/closures/simplestClosureAndBoxing.kt");
-        }
-
-        @TestMetadata("staticLambda.kt")
-        public void testStaticLambda() throws Exception {
-            runTest("compiler/testData/codegen/box/closures/staticLambda.kt");
         }
 
         @TestMetadata("subclosuresWithinInitializers.kt")
@@ -4401,13 +3626,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/closures/captureInSuperConstructorCall")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class CaptureInSuperConstructorCall extends AbstractFirBlackBoxCodegenTest {
+        public static class CaptureInSuperConstructorCall extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCaptureInSuperConstructorCall() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures/captureInSuperConstructorCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures/captureInSuperConstructorCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("constructorParameterAndLocalCapturedInLambdaInLocalClass.kt")
@@ -4574,13 +3799,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/closures/captureOuterProperty")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class CaptureOuterProperty extends AbstractFirBlackBoxCodegenTest {
+        public static class CaptureOuterProperty extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCaptureOuterProperty() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures/captureOuterProperty"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures/captureOuterProperty"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("captureFunctionInProperty.kt")
@@ -4627,17 +3852,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/closures/capturedVarsOptimization")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class CapturedVarsOptimization extends AbstractFirBlackBoxCodegenTest {
+        public static class CapturedVarsOptimization extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCapturedVarsOptimization() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures/capturedVarsOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures/capturedVarsOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("capturedInCrossinline.kt")
@@ -4699,13 +3924,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/closures/closureInsideClosure")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ClosureInsideClosure extends AbstractFirBlackBoxCodegenTest {
+        public static class ClosureInsideClosure extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInClosureInsideClosure() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures/closureInsideClosure"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/closures/closureInsideClosure"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("localFunInsideLocalFun.kt")
@@ -4743,56 +3968,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/collectionLiterals")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class CollectionLiterals extends AbstractFirBlackBoxCodegenTest {
+    public static class CollectionLiterals extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInCollectionLiterals() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/collectionLiterals"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("collectionLiteralsInArgumentPosition.kt")
-        public void testCollectionLiteralsInArgumentPosition() throws Exception {
-            runTest("compiler/testData/codegen/box/collectionLiterals/collectionLiteralsInArgumentPosition.kt");
-        }
-
-        @TestMetadata("collectionLiteralsWithConstants.kt")
-        public void testCollectionLiteralsWithConstants() throws Exception {
-            runTest("compiler/testData/codegen/box/collectionLiterals/collectionLiteralsWithConstants.kt");
-        }
-
-        @TestMetadata("collectionLiteralsWithVarargs.kt")
-        public void testCollectionLiteralsWithVarargs() throws Exception {
-            runTest("compiler/testData/codegen/box/collectionLiterals/collectionLiteralsWithVarargs.kt");
-        }
-
-        @TestMetadata("defaultAnnotationParameterValues.kt")
-        public void testDefaultAnnotationParameterValues() throws Exception {
-            runTest("compiler/testData/codegen/box/collectionLiterals/defaultAnnotationParameterValues.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/collectionLiterals"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/collections")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Collections extends AbstractFirBlackBoxCodegenTest {
+    public static class Collections extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInCollections() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/collections"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("charSequence.kt")
-        public void testCharSequence() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/charSequence.kt");
-        }
-
-        @TestMetadata("implementCollectionThroughKotlin.kt")
-        public void testImplementCollectionThroughKotlin() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/implementCollectionThroughKotlin.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/collections"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("inSetWithSmartCast.kt")
@@ -4800,102 +3995,22 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/collections/inSetWithSmartCast.kt");
         }
 
-        @TestMetadata("inheritFromHashtable.kt")
-        public void testInheritFromHashtable() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/inheritFromHashtable.kt");
-        }
-
-        @TestMetadata("irrelevantImplCharSequence.kt")
-        public void testIrrelevantImplCharSequence() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/irrelevantImplCharSequence.kt");
-        }
-
-        @TestMetadata("irrelevantImplCharSequenceKotlin.kt")
-        public void testIrrelevantImplCharSequenceKotlin() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/irrelevantImplCharSequenceKotlin.kt");
-        }
-
-        @TestMetadata("irrelevantImplMutableList.kt")
-        public void testIrrelevantImplMutableList() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/irrelevantImplMutableList.kt");
-        }
-
-        @TestMetadata("irrelevantImplMutableListKotlin.kt")
-        public void testIrrelevantImplMutableListKotlin() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/irrelevantImplMutableListKotlin.kt");
-        }
-
-        @TestMetadata("irrelevantImplMutableListSubstitution.kt")
-        public void testIrrelevantImplMutableListSubstitution() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/irrelevantImplMutableListSubstitution.kt");
-        }
-
-        @TestMetadata("irrelevantRemoveAtOverrideInJava.kt")
-        public void testIrrelevantRemoveAtOverrideInJava() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/irrelevantRemoveAtOverrideInJava.kt");
-        }
-
-        @TestMetadata("irrelevantSizeOverrideInJava.kt")
-        public void testIrrelevantSizeOverrideInJava() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/irrelevantSizeOverrideInJava.kt");
-        }
-
-        @TestMetadata("mutableList.kt")
-        public void testMutableList() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/mutableList.kt");
-        }
-
-        @TestMetadata("noStubsInJavaSuperClass.kt")
-        public void testNoStubsInJavaSuperClass() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/noStubsInJavaSuperClass.kt");
-        }
-
-        @TestMetadata("platformValueContains.kt")
-        public void testPlatformValueContains() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/platformValueContains.kt");
-        }
-
-        @TestMetadata("readOnlyList.kt")
-        public void testReadOnlyList() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/readOnlyList.kt");
-        }
-
-        @TestMetadata("readOnlyMap.kt")
-        public void testReadOnlyMap() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/readOnlyMap.kt");
-        }
-
-        @TestMetadata("removeAtInt.kt")
-        public void testRemoveAtInt() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/removeAtInt.kt");
-        }
-
         @TestMetadata("removeClash.kt")
         public void testRemoveClash() throws Exception {
             runTest("compiler/testData/codegen/box/collections/removeClash.kt");
-        }
-
-        @TestMetadata("strList.kt")
-        public void testStrList() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/strList.kt");
-        }
-
-        @TestMetadata("toArrayInJavaClass.kt")
-        public void testToArrayInJavaClass() throws Exception {
-            runTest("compiler/testData/codegen/box/collections/toArrayInJavaClass.kt");
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/compatibility")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Compatibility extends AbstractFirBlackBoxCodegenTest {
+    public static class Compatibility extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInCompatibility() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/compatibility"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/compatibility"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("privateCompanionObject.kt")
@@ -4907,13 +4022,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/constants")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Constants extends AbstractFirBlackBoxCodegenTest {
+    public static class Constants extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInConstants() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/constants"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/constants"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("comparisonFalse.kt")
@@ -4970,111 +4085,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/constructorCall")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ConstructorCall extends AbstractFirBlackBoxCodegenTest {
+    public static class ConstructorCall extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInConstructorCall() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/constructorCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("breakInConstructorArguments.kt")
-        public void testBreakInConstructorArguments() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/breakInConstructorArguments.kt");
-        }
-
-        @TestMetadata("continueInConstructorArguments.kt")
-        public void testContinueInConstructorArguments() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/continueInConstructorArguments.kt");
-        }
-
-        @TestMetadata("earlyReturnInConstructorArguments.kt")
-        public void testEarlyReturnInConstructorArguments() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/earlyReturnInConstructorArguments.kt");
-        }
-
-        @TestMetadata("inlineFunInConstructorCallEvaluationOrder.kt")
-        public void testInlineFunInConstructorCallEvaluationOrder() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/inlineFunInConstructorCallEvaluationOrder.kt");
-        }
-
-        @TestMetadata("inlineFunInConstructorCallWithDisabledNormalization.kt")
-        public void testInlineFunInConstructorCallWithDisabledNormalization() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/inlineFunInConstructorCallWithDisabledNormalization.kt");
-        }
-
-        @TestMetadata("inlineFunInConstructorCallWithEnabledNormalization.kt")
-        public void testInlineFunInConstructorCallWithEnabledNormalization() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/inlineFunInConstructorCallWithEnabledNormalization.kt");
-        }
-
-        @TestMetadata("inlineFunInConstructorCallWithStrictNormalization.kt")
-        public void testInlineFunInConstructorCallWithStrictNormalization() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/inlineFunInConstructorCallWithStrictNormalization.kt");
-        }
-
-        @TestMetadata("inlineFunInInnerClassConstructorCall.kt")
-        public void testInlineFunInInnerClassConstructorCall() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/inlineFunInInnerClassConstructorCall.kt");
-        }
-
-        @TestMetadata("inlineFunInLocalClassConstructorCall.kt")
-        public void testInlineFunInLocalClassConstructorCall() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/inlineFunInLocalClassConstructorCall.kt");
-        }
-
-        @TestMetadata("loopInInlineFunInSuperConstructorCallWithEnabledNormalization.kt")
-        public void testLoopInInlineFunInSuperConstructorCallWithEnabledNormalization() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/loopInInlineFunInSuperConstructorCallWithEnabledNormalization.kt");
-        }
-
-        @TestMetadata("loopInInlineFunInSuperConstructorCallWithEnabledNormalizationSince13.kt")
-        public void testLoopInInlineFunInSuperConstructorCallWithEnabledNormalizationSince13() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/loopInInlineFunInSuperConstructorCallWithEnabledNormalizationSince13.kt");
-        }
-
-        @TestMetadata("loopInInlineFunWithEnabledNormalization.kt")
-        public void testLoopInInlineFunWithEnabledNormalization() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/loopInInlineFunWithEnabledNormalization.kt");
-        }
-
-        @TestMetadata("nestedConstructorCallWithJumpOutInConstructorArguments.kt")
-        public void testNestedConstructorCallWithJumpOutInConstructorArguments() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/nestedConstructorCallWithJumpOutInConstructorArguments.kt");
-        }
-
-        @TestMetadata("nonLocalReturnInConstructorArguments.kt")
-        public void testNonLocalReturnInConstructorArguments() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/nonLocalReturnInConstructorArguments.kt");
-        }
-
-        @TestMetadata("possiblyPoppedUnitializedValueInArguments.kt")
-        public void testPossiblyPoppedUnitializedValueInArguments() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/possiblyPoppedUnitializedValueInArguments.kt");
-        }
-
-        @TestMetadata("regularConstructorCallEvaluationOrder.kt")
-        public void testRegularConstructorCallEvaluationOrder() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/regularConstructorCallEvaluationOrder.kt");
-        }
-
-        @TestMetadata("tryCatchInConstructorCallEvaluationOrder.kt")
-        public void testTryCatchInConstructorCallEvaluationOrder() throws Exception {
-            runTest("compiler/testData/codegen/box/constructorCall/tryCatchInConstructorCallEvaluationOrder.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/constructorCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/contracts")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Contracts extends AbstractFirBlackBoxCodegenTest {
+    public static class Contracts extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInContracts() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/contracts"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/contracts"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("constructorArgument.kt")
@@ -5091,13 +4121,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/controlStructures")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ControlStructures extends AbstractFirBlackBoxCodegenTest {
+    public static class ControlStructures extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInControlStructures() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("bottles.kt")
@@ -5345,11 +4375,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/controlStructures/kt2416.kt");
         }
 
-        @TestMetadata("kt2423.kt")
-        public void testKt2423() throws Exception {
-            runTest("compiler/testData/codegen/box/controlStructures/kt2423.kt");
-        }
-
         @TestMetadata("kt2577.kt")
         public void testKt2577() throws Exception {
             runTest("compiler/testData/codegen/box/controlStructures/kt2577.kt");
@@ -5388,11 +4413,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt3280.kt")
         public void testKt3280() throws Exception {
             runTest("compiler/testData/codegen/box/controlStructures/kt3280.kt");
-        }
-
-        @TestMetadata("kt3574.kt")
-        public void testKt3574() throws Exception {
-            runTest("compiler/testData/codegen/box/controlStructures/kt3574.kt");
         }
 
         @TestMetadata("kt416.kt")
@@ -5485,21 +4505,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/controlStructures/tryCatchFinallyChain.kt");
         }
 
-        @TestMetadata("tryFinallyGeneric.kt")
-        public void testTryFinallyGeneric() throws Exception {
-            runTest("compiler/testData/codegen/box/controlStructures/tryFinallyGeneric.kt");
-        }
-
         @TestMetadata("compiler/testData/codegen/box/controlStructures/breakContinueInExpressions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class BreakContinueInExpressions extends AbstractFirBlackBoxCodegenTest {
+        public static class BreakContinueInExpressions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInBreakContinueInExpressions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/breakContinueInExpressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/breakContinueInExpressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("breakFromOuter.kt")
@@ -5596,13 +4611,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/controlStructures/forInArray")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInArray extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInArray extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInArray() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInArray"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInArray"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInArraySpecializedToUntil.kt")
@@ -5659,13 +4674,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/controlStructures/forInArrayWithIndex")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInArrayWithIndex extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInArrayWithIndex extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInArrayWithIndex() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInArrayWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInArrayWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInArrayOfObjectArrayWithIndex.kt")
@@ -5772,13 +4787,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/controlStructures/forInCharSequenceWithIndex")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInCharSequenceWithIndex extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInCharSequenceWithIndex extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInCharSequenceWithIndex() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInCharSequenceWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInCharSequenceWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInCharSeqWithIndexStops.kt")
@@ -5855,13 +4870,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/controlStructures/forInIterableWithIndex")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInIterableWithIndex extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInIterableWithIndex extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInIterableWithIndex() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInIterableWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInIterableWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInEmptyListWithIndex.kt")
@@ -5909,11 +4924,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/controlStructures/forInIterableWithIndex/forInListWithIndexNoIndexVar.kt");
             }
 
-            @TestMetadata("forInListWithIndexThrowsCME.kt")
-            public void testForInListWithIndexThrowsCME() throws Exception {
-                runTest("compiler/testData/codegen/box/controlStructures/forInIterableWithIndex/forInListWithIndexThrowsCME.kt");
-            }
-
             @TestMetadata("forInListWithIndexWithExplicitlyTypedIndexVariable.kt")
             public void testForInListWithIndexWithExplicitlyTypedIndexVariable() throws Exception {
                 runTest("compiler/testData/codegen/box/controlStructures/forInIterableWithIndex/forInListWithIndexWithExplicitlyTypedIndexVariable.kt");
@@ -5923,13 +4933,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/controlStructures/forInSequenceWithIndex")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInSequenceWithIndex extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInSequenceWithIndex extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInSequenceWithIndex() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInSequenceWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/forInSequenceWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInEmptySequenceWithIndex.kt")
@@ -5977,11 +4987,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/controlStructures/forInSequenceWithIndex/forInSequenceWithIndexNoIndexVarCheckSideEffects.kt");
             }
 
-            @TestMetadata("forInSequenceWithIndexThrowsCME.kt")
-            public void testForInSequenceWithIndexThrowsCME() throws Exception {
-                runTest("compiler/testData/codegen/box/controlStructures/forInSequenceWithIndex/forInSequenceWithIndexThrowsCME.kt");
-            }
-
             @TestMetadata("forInSequenceWithIndexWithExplicitlyTypedIndexVariable.kt")
             public void testForInSequenceWithIndexWithExplicitlyTypedIndexVariable() throws Exception {
                 runTest("compiler/testData/codegen/box/controlStructures/forInSequenceWithIndex/forInSequenceWithIndexWithExplicitlyTypedIndexVariable.kt");
@@ -5991,13 +4996,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/controlStructures/returnsNothing")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ReturnsNothing extends AbstractFirBlackBoxCodegenTest {
+        public static class ReturnsNothing extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInReturnsNothing() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/returnsNothing"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/returnsNothing"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("ifElse.kt")
@@ -6029,13 +5034,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/controlStructures/tryCatchInExpressions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class TryCatchInExpressions extends AbstractFirBlackBoxCodegenTest {
+        public static class TryCatchInExpressions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInTryCatchInExpressions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/tryCatchInExpressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/controlStructures/tryCatchInExpressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("catch.kt")
@@ -6193,13 +5198,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/coroutines")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Coroutines extends AbstractFirBlackBoxCodegenTest {
+    public static class Coroutines extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         @TestMetadata("32defaultParametersInSuspend.kt")
@@ -6213,12 +5218,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         public void testAllFilesPresentInCoroutines() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("asyncException.kt")
-        public void testAsyncException_1_3() throws Exception {
-            runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/asyncException.kt", "kotlin.coroutines");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("asyncIteratorNullMerge_1_3.kt")
@@ -6234,11 +5234,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("asyncIterator_1_3.kt")
         public void testAsyncIterator_1_3() throws Exception {
             runTest("compiler/testData/codegen/box/coroutines/asyncIterator_1_3.kt");
-        }
-
-        @TestMetadata("async.kt")
-        public void testAsync_1_3() throws Exception {
-            runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/async.kt", "kotlin.coroutines");
         }
 
         @TestMetadata("await.kt")
@@ -6291,11 +5286,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/coroutineContextInInlinedLambda.kt", "kotlin.coroutines");
         }
 
-        @TestMetadata("coroutineToString.kt")
-        public void testCoroutineToString() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/coroutineToString.kt");
-        }
-
         @TestMetadata("createCoroutineSafe.kt")
         public void testCreateCoroutineSafe_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/createCoroutineSafe.kt", "kotlin.coroutines");
@@ -6309,11 +5299,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("crossInlineWithCapturedOuterReceiver.kt")
         public void testCrossInlineWithCapturedOuterReceiver_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/crossInlineWithCapturedOuterReceiver.kt", "kotlin.coroutines");
-        }
-
-        @TestMetadata("defaultParametersInSuspendWithJvmOverloads.kt")
-        public void testDefaultParametersInSuspendWithJvmOverloads() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/defaultParametersInSuspendWithJvmOverloads.kt");
         }
 
         @TestMetadata("defaultParametersInSuspend.kt")
@@ -6381,11 +5366,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/handleResultSuspended.kt", "kotlin.coroutines");
         }
 
-        @TestMetadata("illegalState.kt")
-        public void testIllegalState() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/illegalState.kt");
-        }
-
         @TestMetadata("indirectInlineUsedAsNonInline.kt")
         public void testIndirectInlineUsedAsNonInline_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/indirectInlineUsedAsNonInline.kt", "kotlin.coroutines");
@@ -6394,16 +5374,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("inlineFunInGenericClass.kt")
         public void testInlineFunInGenericClass_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/inlineFunInGenericClass.kt", "kotlin.coroutines");
-        }
-
-        @TestMetadata("inlineFunctionInMultifileClassUnoptimized.kt")
-        public void testInlineFunctionInMultifileClassUnoptimized_1_3() throws Exception {
-            runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/inlineFunctionInMultifileClassUnoptimized.kt", "kotlin.coroutines");
-        }
-
-        @TestMetadata("inlineFunctionInMultifileClass.kt")
-        public void testInlineFunctionInMultifileClass_1_3() throws Exception {
-            runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/inlineFunctionInMultifileClass.kt", "kotlin.coroutines");
         }
 
         @TestMetadata("inlineGenericFunCalledFromSubclass.kt")
@@ -6631,11 +5601,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendCoroutineFromStateMachine.kt", "kotlin.coroutines");
         }
 
-        @TestMetadata("suspendCovariantJavaOverrides.kt")
-        public void testSuspendCovariantJavaOverrides() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/suspendCovariantJavaOverrides.kt");
-        }
-
         @TestMetadata("suspendDefaultImpl.kt")
         public void testSuspendDefaultImpl_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendDefaultImpl.kt", "kotlin.coroutines");
@@ -6654,11 +5619,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("suspendFunImportedFromObject.kt")
         public void testSuspendFunImportedFromObject_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendFunImportedFromObject.kt", "kotlin.coroutines");
-        }
-
-        @TestMetadata("suspendImplBridge.kt")
-        public void testSuspendImplBridge() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/suspendImplBridge.kt");
         }
 
         @TestMetadata("suspendInCycle.kt")
@@ -6681,19 +5641,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendInTheMiddleOfObjectConstruction.kt", "kotlin.coroutines");
         }
 
-        @TestMetadata("suspendJavaOverrides.kt")
-        public void testSuspendJavaOverrides() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/suspendJavaOverrides.kt");
-        }
-
         @TestMetadata("suspendLambdaWithArgumentRearrangement.kt")
         public void testSuspendLambdaWithArgumentRearrangement_1_3() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendLambdaWithArgumentRearrangement.kt", "kotlin.coroutines");
-        }
-
-        @TestMetadata("suspendReturningPlatformType.kt")
-        public void testSuspendReturningPlatformType() throws Exception {
-            runTest("compiler/testData/codegen/box/coroutines/suspendReturningPlatformType.kt");
         }
 
         @TestMetadata("suspensionInsideSafeCallWithElvis.kt")
@@ -6749,17 +5699,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/bridges")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Bridges extends AbstractFirBlackBoxCodegenTest {
+        public static class Bridges extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInBridges() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/bridges"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/bridges"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("interfaceSpecialization.kt")
@@ -6781,17 +5731,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/controlFlow")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ControlFlow extends AbstractFirBlackBoxCodegenTest {
+        public static class ControlFlow extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInControlFlow() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/controlFlow"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/controlFlow"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("breakFinally.kt")
@@ -6903,70 +5853,30 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/debug")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Debug extends AbstractFirBlackBoxCodegenTest {
+        public static class Debug extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInDebug() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/debug"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("debuggerMetadata.kt")
-            public void testDebuggerMetadata() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/debug/debuggerMetadata.kt");
-            }
-
-            @TestMetadata("debuggerMetadata_ir.kt")
-            public void testDebuggerMetadata_ir() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/debug/debuggerMetadata_ir.kt");
-            }
-
-            @TestMetadata("elvisLineNumber.kt")
-            public void testElvisLineNumber() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/debug/elvisLineNumber.kt");
-            }
-
-            @TestMetadata("firstSuspensionPoint.kt")
-            public void testFirstSuspensionPoint() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/debug/firstSuspensionPoint.kt");
-            }
-
-            @TestMetadata("fqName.kt")
-            public void testFqName() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/debug/fqName.kt");
-            }
-
-            @TestMetadata("multipleSuspendCallsOnSameLine.kt")
-            public void testMultipleSuspendCallsOnSameLine() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/debug/multipleSuspendCallsOnSameLine.kt");
-            }
-
-            @TestMetadata("runtimeDebugMetadata.kt")
-            public void testRuntimeDebugMetadata() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/debug/runtimeDebugMetadata.kt");
-            }
-
-            @TestMetadata("throwsOnSameLine.kt")
-            public void testThrowsOnSameLine() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/debug/throwsOnSameLine.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/debug"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/coroutines/featureIntersection")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class FeatureIntersection extends AbstractFirBlackBoxCodegenTest {
+        public static class FeatureIntersection extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInFeatureIntersection() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("breakWithNonEmptyStack.kt")
@@ -7047,27 +5957,22 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class CallableReference extends AbstractFirBlackBoxCodegenTest {
+            public static class CallableReference extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInCallableReference() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("bigArity.kt")
                 public void testBigArity_1_3() throws Exception {
                     runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/bigArity.kt", "kotlin.coroutines");
-                }
-
-                @TestMetadata("fromJava.kt")
-                public void testFromJava() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/fromJava.kt");
                 }
 
                 @TestMetadata("longArgs.kt")
@@ -7078,13 +5983,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/bound")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Bound extends AbstractFirBlackBoxCodegenTest {
+                public static class Bound extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInBound() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/bound"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/bound"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("emptyLHS.kt")
@@ -7096,18 +6001,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Function extends AbstractFirBlackBoxCodegenTest {
+                public static class Function extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInFunction() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                    }
-
-                    @TestMetadata("genericCallableReferenceArguments.kt")
-                    public void testGenericCallableReferenceArguments() throws Exception {
-                        runTest("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function/genericCallableReferenceArguments.kt");
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("genericCallableReferencesWithNullableTypes.kt")
@@ -7115,21 +6015,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         runTest("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function/genericCallableReferencesWithNullableTypes.kt");
                     }
 
-                    @TestMetadata("getArityViaFunctionImpl.kt")
-                    public void testGetArityViaFunctionImpl() throws Exception {
-                        runTest("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function/getArityViaFunctionImpl.kt");
-                    }
-
                     @TestMetadata("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function/local")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Local extends AbstractFirBlackBoxCodegenTest {
+                    public static class Local extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInLocal() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function/local"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/callableReference/function/local"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("equalsHashCode.kt")
@@ -7143,17 +6038,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/coroutines/featureIntersection/tailrec")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Tailrec extends AbstractFirBlackBoxCodegenTest {
+            public static class Tailrec extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInTailrec() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/tailrec"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/featureIntersection/tailrec"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("controlFlowIf.kt")
@@ -7226,17 +6121,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/inlineClasses")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class InlineClasses extends AbstractFirBlackBoxCodegenTest {
+        public static class InlineClasses extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInInlineClasses() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/inlineClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/inlineClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("boxReturnValueOfSuspendFunctionReference.kt")
@@ -7428,17 +6323,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/intLikeVarSpilling")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class IntLikeVarSpilling extends AbstractFirBlackBoxCodegenTest {
+        public static class IntLikeVarSpilling extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInIntLikeVarSpilling() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/intLikeVarSpilling"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/intLikeVarSpilling"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("complicatedMerge.kt")
@@ -7471,19 +6366,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/intLikeVarSpilling/sameIconst1ManyVars.kt", "kotlin.coroutines");
             }
 
-            @TestMetadata("usedInArrayStore.kt")
-            public void testUsedInArrayStore_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/intLikeVarSpilling/usedInArrayStore.kt", "kotlin.coroutines");
-            }
-
             @TestMetadata("usedInMethodCall.kt")
             public void testUsedInMethodCall_1_3() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/intLikeVarSpilling/usedInMethodCall.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("usedInPutfield.kt")
-            public void testUsedInPutfield_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/intLikeVarSpilling/usedInPutfield.kt", "kotlin.coroutines");
             }
 
             @TestMetadata("usedInVarStore.kt")
@@ -7495,17 +6380,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/intrinsicSemantics")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class IntrinsicSemantics extends AbstractFirBlackBoxCodegenTest {
+        public static class IntrinsicSemantics extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInIntrinsicSemantics() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/intrinsicSemantics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/intrinsicSemantics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("coroutineContextReceiverNotIntrinsic.kt")
@@ -7552,71 +6437,46 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/javaInterop")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class JavaInterop extends AbstractFirBlackBoxCodegenTest {
+        public static class JavaInterop extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInJavaInterop() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/javaInterop"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("objectWithSeveralSuspends.kt")
-            public void testObjectWithSeveralSuspends_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/javaInterop/objectWithSeveralSuspends.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("returnLambda.kt")
-            public void testReturnLambda_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/javaInterop/returnLambda.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("returnObject.kt")
-            public void testReturnObject_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/javaInterop/returnObject.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("severalCaptures.kt")
-            public void testSeveralCaptures_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/javaInterop/severalCaptures.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("suspendInlineWithCrossinline.kt")
-            public void testSuspendInlineWithCrossinline_1_3() throws Exception {
-                runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/javaInterop/suspendInlineWithCrossinline.kt", "kotlin.coroutines");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/javaInterop"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/coroutines/localFunctions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class LocalFunctions extends AbstractFirBlackBoxCodegenTest {
+        public static class LocalFunctions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInLocalFunctions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/localFunctions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/localFunctions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("compiler/testData/codegen/box/coroutines/localFunctions/anonymous")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Anonymous extends AbstractFirBlackBoxCodegenTest {
+            public static class Anonymous extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInAnonymous() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/localFunctions/anonymous"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/localFunctions/anonymous"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("simple.kt")
@@ -7628,17 +6488,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/coroutines/localFunctions/named")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Named extends AbstractFirBlackBoxCodegenTest {
+            public static class Named extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInNamed() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/localFunctions/named"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/localFunctions/named"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("capturedParameters.kt")
@@ -7671,11 +6531,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/localFunctions/named/nestedLocals.kt", "kotlin.coroutines");
                 }
 
-                @TestMetadata("rec.kt")
-                public void testRec() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/localFunctions/named/rec.kt");
-                }
-
                 @TestMetadata("simpleSuspensionPoint.kt")
                 public void testSimpleSuspensionPoint_1_3() throws Exception {
                     runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/localFunctions/named/simpleSuspensionPoint.kt", "kotlin.coroutines");
@@ -7701,17 +6556,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/multiModule")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class MultiModule extends AbstractFirBlackBoxCodegenTest {
+        public static class MultiModule extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMultiModule() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/multiModule"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/multiModule"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("inlineCrossModule.kt")
@@ -7749,11 +6604,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/multiModule/inlineTailCall.kt", "kotlin.coroutines");
             }
 
-            @TestMetadata("inlineWithJava.kt")
-            public void testInlineWithJava() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/multiModule/inlineWithJava.kt");
-            }
-
             @TestMetadata("simple.kt")
             public void testSimple_1_3() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/multiModule/simple.kt", "kotlin.coroutines");
@@ -7763,17 +6613,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/redundantLocalsElimination")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class RedundantLocalsElimination extends AbstractFirBlackBoxCodegenTest {
+        public static class RedundantLocalsElimination extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInRedundantLocalsElimination() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/redundantLocalsElimination"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/redundantLocalsElimination"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("ktor_receivedMessage.kt")
@@ -7785,45 +6635,30 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/reflect")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Reflect extends AbstractFirBlackBoxCodegenTest {
+        public static class Reflect extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInReflect() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/reflect"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("bigArity.kt")
-            public void testBigArity() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/reflect/bigArity.kt");
-            }
-
-            @TestMetadata("callSuspend.kt")
-            public void testCallSuspend() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/reflect/callSuspend.kt");
-            }
-
-            @TestMetadata("callSuspendBy.kt")
-            public void testCallSuspendBy() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/reflect/callSuspendBy.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/reflect"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/coroutines/stackUnwinding")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class StackUnwinding extends AbstractFirBlackBoxCodegenTest {
+        public static class StackUnwinding extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInStackUnwinding() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/stackUnwinding"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/stackUnwinding"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("exception.kt")
@@ -7860,13 +6695,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/suspendConversion")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class SuspendConversion extends AbstractFirBlackBoxCodegenTest {
+        public static class SuspendConversion extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSuspendConversion() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/suspendConversion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/suspendConversion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("onArgument.kt")
@@ -7878,17 +6713,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class SuspendFunctionAsCoroutine extends AbstractFirBlackBoxCodegenTest {
+        public static class SuspendFunctionAsCoroutine extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSuspendFunctionAsCoroutine() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("dispatchResume.kt")
@@ -7924,11 +6759,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("noinlineTwoReceivers.kt")
             public void testNoinlineTwoReceivers_1_3() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine/noinlineTwoReceivers.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("openFunWithJava.kt")
-            public void testOpenFunWithJava() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/suspendFunctionAsCoroutine/openFunWithJava.kt");
             }
 
             @TestMetadata("operators.kt")
@@ -7985,17 +6815,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/suspendFunctionTypeCall")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class SuspendFunctionTypeCall extends AbstractFirBlackBoxCodegenTest {
+        public static class SuspendFunctionTypeCall extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSuspendFunctionTypeCall() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/suspendFunctionTypeCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/suspendFunctionTypeCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("localVal.kt")
@@ -8027,32 +6857,22 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/tailCallOptimizations")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class TailCallOptimizations extends AbstractFirBlackBoxCodegenTest {
+        public static class TailCallOptimizations extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInTailCallOptimizations() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/tailCallOptimizations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("also.kt")
-            public void testAlso() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/also.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/tailCallOptimizations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("crossinline.kt")
             public void testCrossinline_1_3() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/tailCallOptimizations/crossinline.kt", "kotlin.coroutines");
-            }
-
-            @TestMetadata("inlineWithStateMachine.kt")
-            public void testInlineWithStateMachine() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/inlineWithStateMachine.kt");
             }
 
             @TestMetadata("inlineWithoutStateMachine.kt")
@@ -8065,116 +6885,21 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/tailCallOptimizations/innerObjectRetransformation.kt", "kotlin.coroutines");
             }
 
-            @TestMetadata("interfaceDelegation.kt")
-            public void testInterfaceDelegation() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/interfaceDelegation.kt");
-            }
-
-            @TestMetadata("simple.kt")
-            public void testSimple() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/simple.kt");
-            }
-
-            @TestMetadata("tailCallIfReturnUnit.kt")
-            public void testTailCallIfReturnUnit() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/tailCallIfReturnUnit.kt");
-            }
-
-            @TestMetadata("tailCallIntrinsics.kt")
-            public void testTailCallIntrinsics() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/tailCallIntrinsics.kt");
-            }
-
-            @TestMetadata("tailSuspendUnitFun.kt")
-            public void testTailSuspendUnitFun() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/tailSuspendUnitFun.kt");
-            }
-
-            @TestMetadata("tryCatchTailCall.kt")
-            public void testTryCatchTailCall() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/tryCatchTailCall.kt");
-            }
-
             @TestMetadata("tryCatch.kt")
             public void testTryCatch_1_3() throws Exception {
                 runTestWithPackageReplacement("compiler/testData/codegen/box/coroutines/tailCallOptimizations/tryCatch.kt", "kotlin.coroutines");
             }
 
-            @TestMetadata("unreachable.kt")
-            public void testUnreachable() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unreachable.kt");
-            }
-
-            @TestMetadata("whenUnit.kt")
-            public void testWhenUnit() throws Exception {
-                runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/whenUnit.kt");
-            }
-
             @TestMetadata("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Unit extends AbstractFirBlackBoxCodegenTest {
+            public static class Unit extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInUnit() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("functionReference.kt")
-                public void testFunctionReference() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/functionReference.kt");
-                }
-
-                @TestMetadata("override.kt")
-                public void testOverride() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override.kt");
-                }
-
-                @TestMetadata("override2.kt")
-                public void testOverride2() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override2.kt");
-                }
-
-                @TestMetadata("override3.kt")
-                public void testOverride3() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override3.kt");
-                }
-
-                @TestMetadata("override4.kt")
-                public void testOverride4() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override4.kt");
-                }
-
-                @TestMetadata("override5.kt")
-                public void testOverride5() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override5.kt");
-                }
-
-                @TestMetadata("override6.kt")
-                public void testOverride6() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/override6.kt");
-                }
-
-                @TestMetadata("overrideCrossinline.kt")
-                public void testOverrideCrossinline() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/overrideCrossinline.kt");
-                }
-
-                @TestMetadata("overrideOverriden.kt")
-                public void testOverrideOverriden() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/overrideOverriden.kt");
-                }
-
-                @TestMetadata("reflection.kt")
-                public void testReflection() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/reflection.kt");
-                }
-
-                @TestMetadata("simple.kt")
-                public void testSimple() throws Exception {
-                    runTest("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit/simple.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/tailCallOptimizations/unit"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
         }
@@ -8182,17 +6907,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/tailOperations")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class TailOperations extends AbstractFirBlackBoxCodegenTest {
+        public static class TailOperations extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInTailOperations() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/tailOperations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/tailOperations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("suspendWithIf.kt")
@@ -8219,17 +6944,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/unitTypeReturn")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class UnitTypeReturn extends AbstractFirBlackBoxCodegenTest {
+        public static class UnitTypeReturn extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInUnitTypeReturn() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/unitTypeReturn"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/unitTypeReturn"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("coroutineNonLocalReturn.kt")
@@ -8266,17 +6991,17 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/coroutines/varSpilling")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class VarSpilling extends AbstractFirBlackBoxCodegenTest {
+        public static class VarSpilling extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInVarSpilling() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/varSpilling"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/coroutines/varSpilling"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("kt19475.kt")
@@ -8299,13 +7024,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/dataClasses")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class DataClasses extends AbstractFirBlackBoxCodegenTest {
+    public static class DataClasses extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInDataClasses() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("arrayParams.kt")
@@ -8331,11 +7056,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("genericParam.kt")
         public void testGenericParam() throws Exception {
             runTest("compiler/testData/codegen/box/dataClasses/genericParam.kt");
-        }
-
-        @TestMetadata("kt5002.kt")
-        public void testKt5002() throws Exception {
-            runTest("compiler/testData/codegen/box/dataClasses/kt5002.kt");
         }
 
         @TestMetadata("mixedParams.kt")
@@ -8378,11 +7098,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/dataClasses/twoVarParams.kt");
         }
 
-        @TestMetadata("typeParameterWithNonTrivialBound.kt")
-        public void testTypeParameterWithNonTrivialBound() throws Exception {
-            runTest("compiler/testData/codegen/box/dataClasses/typeParameterWithNonTrivialBound.kt");
-        }
-
         @TestMetadata("unitComponent.kt")
         public void testUnitComponent() throws Exception {
             runTest("compiler/testData/codegen/box/dataClasses/unitComponent.kt");
@@ -8391,13 +7106,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/dataClasses/copy")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Copy extends AbstractFirBlackBoxCodegenTest {
+        public static class Copy extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCopy() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses/copy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses/copy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("constructorWithDefaultParam.kt")
@@ -8444,23 +7159,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/dataClasses/equals")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Equals extends AbstractFirBlackBoxCodegenTest {
+        public static class Equals extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInEquals() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses/equals"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses/equals"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("alreadyDeclared.kt")
             public void testAlreadyDeclared() throws Exception {
                 runTest("compiler/testData/codegen/box/dataClasses/equals/alreadyDeclared.kt");
-            }
-
-            @TestMetadata("alreadyDeclaredWrongSignature.kt")
-            public void testAlreadyDeclaredWrongSignature() throws Exception {
-                runTest("compiler/testData/codegen/box/dataClasses/equals/alreadyDeclaredWrongSignature.kt");
             }
 
             @TestMetadata("genericarray.kt")
@@ -8492,28 +7202,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/dataClasses/hashCode")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class HashCode extends AbstractFirBlackBoxCodegenTest {
+        public static class HashCode extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInHashCode() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses/hashCode"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses/hashCode"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("alreadyDeclared.kt")
             public void testAlreadyDeclared() throws Exception {
                 runTest("compiler/testData/codegen/box/dataClasses/hashCode/alreadyDeclared.kt");
-            }
-
-            @TestMetadata("alreadyDeclaredWrongSignature.kt")
-            public void testAlreadyDeclaredWrongSignature() throws Exception {
-                runTest("compiler/testData/codegen/box/dataClasses/hashCode/alreadyDeclaredWrongSignature.kt");
-            }
-
-            @TestMetadata("array.kt")
-            public void testArray() throws Exception {
-                runTest("compiler/testData/codegen/box/dataClasses/hashCode/array.kt");
             }
 
             @TestMetadata("boolean.kt")
@@ -8570,23 +7270,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/dataClasses/toString")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ToString extends AbstractFirBlackBoxCodegenTest {
+        public static class ToString extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInToString() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses/toString"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/dataClasses/toString"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("alreadyDeclared.kt")
             public void testAlreadyDeclared() throws Exception {
                 runTest("compiler/testData/codegen/box/dataClasses/toString/alreadyDeclared.kt");
-            }
-
-            @TestMetadata("alreadyDeclaredWrongSignature.kt")
-            public void testAlreadyDeclaredWrongSignature() throws Exception {
-                runTest("compiler/testData/codegen/box/dataClasses/toString/alreadyDeclaredWrongSignature.kt");
             }
 
             @TestMetadata("arrayParams.kt")
@@ -8619,13 +7314,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/deadCodeElimination")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class DeadCodeElimination extends AbstractFirBlackBoxCodegenTest {
+    public static class DeadCodeElimination extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInDeadCodeElimination() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/deadCodeElimination"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/deadCodeElimination"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("emptyVariableRange.kt")
@@ -8652,13 +7347,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/defaultArguments")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class DefaultArguments extends AbstractFirBlackBoxCodegenTest {
+    public static class DefaultArguments extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInDefaultArguments() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("callDefaultFromInitializer.kt")
@@ -8691,16 +7386,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/defaultArguments/inheritedFromInterfaceViaAbstractSuperclass.kt");
         }
 
-        @TestMetadata("kt36972_companion.kt")
-        public void testKt36972_companion() throws Exception {
-            runTest("compiler/testData/codegen/box/defaultArguments/kt36972_companion.kt");
-        }
-
-        @TestMetadata("kt36972_object.kt")
-        public void testKt36972_object() throws Exception {
-            runTest("compiler/testData/codegen/box/defaultArguments/kt36972_object.kt");
-        }
-
         @TestMetadata("kt6382.kt")
         public void testKt6382() throws Exception {
             runTest("compiler/testData/codegen/box/defaultArguments/kt6382.kt");
@@ -8721,16 +7406,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/defaultArguments/simpleFromOtherFile.kt");
         }
 
-        @TestMetadata("superCallCheck.kt")
-        public void testSuperCallCheck() throws Exception {
-            runTest("compiler/testData/codegen/box/defaultArguments/superCallCheck.kt");
-        }
-
-        @TestMetadata("superCallHandlerOrder.kt")
-        public void testSuperCallHandlerOrder() throws Exception {
-            runTest("compiler/testData/codegen/box/defaultArguments/superCallHandlerOrder.kt");
-        }
-
         @TestMetadata("useNextParamInLambda.kt")
         public void testUseNextParamInLambda() throws Exception {
             runTest("compiler/testData/codegen/box/defaultArguments/useNextParamInLambda.kt");
@@ -8744,13 +7419,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/defaultArguments/constructor")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Constructor extends AbstractFirBlackBoxCodegenTest {
+        public static class Constructor extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInConstructor() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/constructor"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/constructor"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("annotation.kt")
@@ -8761,11 +7436,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("annotationWithEmptyArray.kt")
             public void testAnnotationWithEmptyArray() throws Exception {
                 runTest("compiler/testData/codegen/box/defaultArguments/constructor/annotationWithEmptyArray.kt");
-            }
-
-            @TestMetadata("checkIfConstructorIsSynthetic.kt")
-            public void testCheckIfConstructorIsSynthetic() throws Exception {
-                runTest("compiler/testData/codegen/box/defaultArguments/constructor/checkIfConstructorIsSynthetic.kt");
             }
 
             @TestMetadata("defArgs1.kt")
@@ -8828,11 +7498,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/defaultArguments/constructor/kt3060.kt");
             }
 
-            @TestMetadata("manyArgs.kt")
-            public void testManyArgs() throws Exception {
-                runTest("compiler/testData/codegen/box/defaultArguments/constructor/manyArgs.kt");
-            }
-
             @TestMetadata("objectExpressionDelegatingToSecondaryConstructor.kt")
             public void testObjectExpressionDelegatingToSecondaryConstructor() throws Exception {
                 runTest("compiler/testData/codegen/box/defaultArguments/constructor/objectExpressionDelegatingToSecondaryConstructor.kt");
@@ -8842,13 +7507,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/defaultArguments/convention")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Convention extends AbstractFirBlackBoxCodegenTest {
+        public static class Convention extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInConvention() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/convention"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/convention"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("incWithDefaultInGetter.kt")
@@ -8864,11 +7529,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("kt16520.kt")
             public void testKt16520() throws Exception {
                 runTest("compiler/testData/codegen/box/defaultArguments/convention/kt16520.kt");
-            }
-
-            @TestMetadata("kt16520_old.kt")
-            public void testKt16520_old() throws Exception {
-                runTest("compiler/testData/codegen/box/defaultArguments/convention/kt16520_old.kt");
             }
 
             @TestMetadata("kt9140.kt")
@@ -8890,9 +7550,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/defaultArguments/function")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Function extends AbstractFirBlackBoxCodegenTest {
+        public static class Function extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("abstractClass.kt")
@@ -8901,7 +7561,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             public void testAllFilesPresentInFunction() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/function"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/function"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("complexInheritance.kt")
@@ -9038,13 +7698,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/defaultArguments/private")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Private extends AbstractFirBlackBoxCodegenTest {
+        public static class Private extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInPrivate() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/private"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/private"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("memberExtensionFunction.kt")
@@ -9071,13 +7731,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/defaultArguments/signature")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Signature extends AbstractFirBlackBoxCodegenTest {
+        public static class Signature extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSignature() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/signature"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/defaultArguments/signature"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("kt2789.kt")
@@ -9100,9 +7760,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/delegatedProperty")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class DelegatedProperty extends AbstractFirBlackBoxCodegenTest {
+    public static class DelegatedProperty extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         @TestMetadata("accessTopLevelDelegatedPropertyInClinit.kt")
@@ -9111,7 +7771,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         public void testAllFilesPresentInDelegatedProperty() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("beforeDeclarationContainerOptimization.kt")
@@ -9264,19 +7924,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/delegatedProperty/kt9712.kt");
         }
 
-        @TestMetadata("privateSetterKPropertyIsNotMutable.kt")
-        public void testPrivateSetterKPropertyIsNotMutable() throws Exception {
-            runTest("compiler/testData/codegen/box/delegatedProperty/privateSetterKPropertyIsNotMutable.kt");
-        }
-
         @TestMetadata("privateVar.kt")
         public void testPrivateVar() throws Exception {
             runTest("compiler/testData/codegen/box/delegatedProperty/privateVar.kt");
-        }
-
-        @TestMetadata("propertyMetadataShouldBeCached.kt")
-        public void testPropertyMetadataShouldBeCached() throws Exception {
-            runTest("compiler/testData/codegen/box/delegatedProperty/propertyMetadataShouldBeCached.kt");
         }
 
         @TestMetadata("protectedVarWithPrivateSet.kt")
@@ -9292,11 +7942,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("setAsExtensionFunInClass.kt")
         public void testSetAsExtensionFunInClass() throws Exception {
             runTest("compiler/testData/codegen/box/delegatedProperty/setAsExtensionFunInClass.kt");
-        }
-
-        @TestMetadata("stackOverflowOnCallFromGetValue.kt")
-        public void testStackOverflowOnCallFromGetValue() throws Exception {
-            runTest("compiler/testData/codegen/box/delegatedProperty/stackOverflowOnCallFromGetValue.kt");
         }
 
         @TestMetadata("topLevelVal.kt")
@@ -9342,13 +7987,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/delegatedProperty/local")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Local extends AbstractFirBlackBoxCodegenTest {
+        public static class Local extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInLocal() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty/local"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty/local"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("capturedLocalVal.kt")
@@ -9435,13 +8080,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/delegatedProperty/optimizedDelegatedProperties")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class OptimizedDelegatedProperties extends AbstractFirBlackBoxCodegenTest {
+        public static class OptimizedDelegatedProperties extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInOptimizedDelegatedProperties() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty/optimizedDelegatedProperties"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty/optimizedDelegatedProperties"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("definedInSources.kt")
@@ -9478,13 +8123,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/delegatedProperty/provideDelegate")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ProvideDelegate extends AbstractFirBlackBoxCodegenTest {
+        public static class ProvideDelegate extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInProvideDelegate() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty/provideDelegate"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegatedProperty/provideDelegate"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("delegatedPropertyWithIdProvideDelegate.kt")
@@ -9532,11 +8177,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/delegatedProperty/provideDelegate/inlineProvideDelegate.kt");
             }
 
-            @TestMetadata("jvmStaticInObject.kt")
-            public void testJvmStaticInObject() throws Exception {
-                runTest("compiler/testData/codegen/box/delegatedProperty/provideDelegate/jvmStaticInObject.kt");
-            }
-
             @TestMetadata("kt15437.kt")
             public void testKt15437() throws Exception {
                 runTest("compiler/testData/codegen/box/delegatedProperty/provideDelegate/kt15437.kt");
@@ -9582,48 +8222,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/delegation")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Delegation extends AbstractFirBlackBoxCodegenTest {
+    public static class Delegation extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInDelegation() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("byMiddleInterface.kt")
-        public void testByMiddleInterface() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/byMiddleInterface.kt");
-        }
-
-        @TestMetadata("defaultOverride.kt")
-        public void testDefaultOverride() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/defaultOverride.kt");
-        }
-
-        @TestMetadata("delegationToMap.kt")
-        public void testDelegationToMap() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/delegationToMap.kt");
-        }
-
-        @TestMetadata("delegationToVal.kt")
-        public void testDelegationToVal() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/delegationToVal.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/delegation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("delegationWithPrivateConstructor.kt")
         public void testDelegationWithPrivateConstructor() throws Exception {
             runTest("compiler/testData/codegen/box/delegation/delegationWithPrivateConstructor.kt");
-        }
-
-        @TestMetadata("diamond.kt")
-        public void testDiamond() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/diamond.kt");
-        }
-
-        @TestMetadata("diamond2.kt")
-        public void testDiamond2() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/diamond2.kt");
         }
 
         @TestMetadata("genericProperty.kt")
@@ -9636,29 +8246,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/delegation/hiddenSuperOverrideIn1.0.kt");
         }
 
-        @TestMetadata("inClassDeclaration.kt")
-        public void testInClassDeclaration() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/inClassDeclaration.kt");
-        }
-
         @TestMetadata("kt8154.kt")
         public void testKt8154() throws Exception {
             runTest("compiler/testData/codegen/box/delegation/kt8154.kt");
-        }
-
-        @TestMetadata("mixed.kt")
-        public void testMixed() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/mixed.kt");
-        }
-
-        @TestMetadata("simple.kt")
-        public void testSimple() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/simple.kt");
-        }
-
-        @TestMetadata("simple1.0.kt")
-        public void testSimple1_0() throws Exception {
-            runTest("compiler/testData/codegen/box/delegation/simple1.0.kt");
         }
 
         @TestMetadata("withDefaultParameters.kt")
@@ -9670,13 +8260,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/destructuringDeclInLambdaParam")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class DestructuringDeclInLambdaParam extends AbstractFirBlackBoxCodegenTest {
+    public static class DestructuringDeclInLambdaParam extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInDestructuringDeclInLambdaParam() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/destructuringDeclInLambdaParam"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/destructuringDeclInLambdaParam"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("extensionComponents.kt")
@@ -9723,37 +8313,37 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/diagnostics")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Diagnostics extends AbstractFirBlackBoxCodegenTest {
+    public static class Diagnostics extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInDiagnostics() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/diagnostics/functions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Functions extends AbstractFirBlackBoxCodegenTest {
+        public static class Functions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInFunctions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("compiler/testData/codegen/box/diagnostics/functions/inference")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Inference extends AbstractFirBlackBoxCodegenTest {
+            public static class Inference extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInInference() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions/inference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions/inference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("kt6176.kt")
@@ -9765,25 +8355,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/diagnostics/functions/invoke")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Invoke extends AbstractFirBlackBoxCodegenTest {
+            public static class Invoke extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInInvoke() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions/invoke"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions/invoke"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("compiler/testData/codegen/box/diagnostics/functions/invoke/onObjects")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class OnObjects extends AbstractFirBlackBoxCodegenTest {
+                public static class OnObjects extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInOnObjects() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions/invoke/onObjects"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions/invoke/onObjects"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("invokeOnClassObject1.kt")
@@ -9841,13 +8431,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/diagnostics/functions/tailRecursion")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class TailRecursion extends AbstractFirBlackBoxCodegenTest {
+            public static class TailRecursion extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInTailRecursion() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions/tailRecursion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/functions/tailRecursion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("defaultArgs.kt")
@@ -9873,11 +8463,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("defaultArgsWithSideEffects2.kt")
                 public void testDefaultArgsWithSideEffects2() throws Exception {
                     runTest("compiler/testData/codegen/box/diagnostics/functions/tailRecursion/defaultArgsWithSideEffects2.kt");
-                }
-
-                @TestMetadata("defaultArgsWithSideEffectsOld.kt")
-                public void testDefaultArgsWithSideEffectsOld() throws Exception {
-                    runTest("compiler/testData/codegen/box/diagnostics/functions/tailRecursion/defaultArgsWithSideEffectsOld.kt");
                 }
 
                 @TestMetadata("extensionTailCall.kt")
@@ -10060,13 +8645,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/diagnostics/vararg")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Vararg extends AbstractFirBlackBoxCodegenTest {
+        public static class Vararg extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInVararg() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/vararg"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/diagnostics/vararg"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("kt4172.kt")
@@ -10079,13 +8664,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/elvis")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Elvis extends AbstractFirBlackBoxCodegenTest {
+    public static class Elvis extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInElvis() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/elvis"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/elvis"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("genericElvisWithMoreSpecificLHS.kt")
@@ -10127,9 +8712,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/enum")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Enum extends AbstractFirBlackBoxCodegenTest {
+    public static class Enum extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         @TestMetadata("abstractMethodInEnum.kt")
@@ -10143,27 +8728,12 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         public void testAllFilesPresentInEnum() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/enum"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("annotatedParameter.kt")
-        public void testAnnotatedParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/enum/annotatedParameter.kt");
-        }
-
-        @TestMetadata("annotatedParameter2.kt")
-        public void testAnnotatedParameter2() throws Exception {
-            runTest("compiler/testData/codegen/box/enum/annotatedParameter2.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/enum"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("asReturnExpression.kt")
         public void testAsReturnExpression() throws Exception {
             runTest("compiler/testData/codegen/box/enum/asReturnExpression.kt");
-        }
-
-        @TestMetadata("classForEnumEntry.kt")
-        public void testClassForEnumEntry() throws Exception {
-            runTest("compiler/testData/codegen/box/enum/classForEnumEntry.kt");
         }
 
         @TestMetadata("companionObjectInEnum.kt")
@@ -10381,16 +8951,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/enum/manyDefaultParameters.kt");
         }
 
-        @TestMetadata("modifierFlags.kt")
-        public void testModifierFlags() throws Exception {
-            runTest("compiler/testData/codegen/box/enum/modifierFlags.kt");
-        }
-
-        @TestMetadata("noClassForSimpleEnum.kt")
-        public void testNoClassForSimpleEnum() throws Exception {
-            runTest("compiler/testData/codegen/box/enum/noClassForSimpleEnum.kt");
-        }
-
         @TestMetadata("objectInEnum.kt")
         public void testObjectInEnum() throws Exception {
             runTest("compiler/testData/codegen/box/enum/objectInEnum.kt");
@@ -10439,13 +8999,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/enum/defaultCtor")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class DefaultCtor extends AbstractFirBlackBoxCodegenTest {
+        public static class DefaultCtor extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInDefaultCtor() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/enum/defaultCtor"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/enum/defaultCtor"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("constructorWithDefaultArguments.kt")
@@ -10483,101 +9043,31 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/evaluate")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Evaluate extends AbstractFirBlackBoxCodegenTest {
+    public static class Evaluate extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInEvaluate() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/evaluate"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("char.kt")
-        public void testChar() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/char.kt");
-        }
-
-        @TestMetadata("divide.kt")
-        public void testDivide() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/divide.kt");
-        }
-
-        @TestMetadata("intrinsics.kt")
-        public void testIntrinsics() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/intrinsics.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/evaluate"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("kt9443.kt")
         public void testKt9443() throws Exception {
             runTest("compiler/testData/codegen/box/evaluate/kt9443.kt");
         }
-
-        @TestMetadata("maxValue.kt")
-        public void testMaxValue() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/maxValue.kt");
-        }
-
-        @TestMetadata("maxValueByte.kt")
-        public void testMaxValueByte() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/maxValueByte.kt");
-        }
-
-        @TestMetadata("maxValueInt.kt")
-        public void testMaxValueInt() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/maxValueInt.kt");
-        }
-
-        @TestMetadata("minus.kt")
-        public void testMinus() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/minus.kt");
-        }
-
-        @TestMetadata("mod.kt")
-        public void testMod() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/mod.kt");
-        }
-
-        @TestMetadata("multiply.kt")
-        public void testMultiply() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/multiply.kt");
-        }
-
-        @TestMetadata("parenthesized.kt")
-        public void testParenthesized() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/parenthesized.kt");
-        }
-
-        @TestMetadata("plus.kt")
-        public void testPlus() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/plus.kt");
-        }
-
-        @TestMetadata("simpleCallBinary.kt")
-        public void testSimpleCallBinary() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/simpleCallBinary.kt");
-        }
-
-        @TestMetadata("unaryMinus.kt")
-        public void testUnaryMinus() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/unaryMinus.kt");
-        }
-
-        @TestMetadata("unaryPlus.kt")
-        public void testUnaryPlus() throws Exception {
-            runTest("compiler/testData/codegen/box/evaluate/unaryPlus.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/exclExcl")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ExclExcl extends AbstractFirBlackBoxCodegenTest {
+    public static class ExclExcl extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInExclExcl() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/exclExcl"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/exclExcl"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("genericNull.kt")
@@ -10594,13 +9084,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/extensionFunctions")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ExtensionFunctions extends AbstractFirBlackBoxCodegenTest {
+    public static class ExtensionFunctions extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInExtensionFunctions() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/extensionFunctions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/extensionFunctions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("executionOrder.kt")
@@ -10727,9 +9217,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/extensionProperties")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ExtensionProperties extends AbstractFirBlackBoxCodegenTest {
+    public static class ExtensionProperties extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         @TestMetadata("accessorForPrivateSetter.kt")
@@ -10738,17 +9228,12 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         public void testAllFilesPresentInExtensionProperties() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/extensionProperties"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/extensionProperties"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("genericValForPrimitiveType.kt")
         public void testGenericValForPrimitiveType() throws Exception {
             runTest("compiler/testData/codegen/box/extensionProperties/genericValForPrimitiveType.kt");
-        }
-
-        @TestMetadata("genericValMultipleUpperBounds.kt")
-        public void testGenericValMultipleUpperBounds() throws Exception {
-            runTest("compiler/testData/codegen/box/extensionProperties/genericValMultipleUpperBounds.kt");
         }
 
         @TestMetadata("genericVarForPrimitiveType.kt")
@@ -10815,41 +9300,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/external")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class External extends AbstractFirBlackBoxCodegenTest {
+    public static class External extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInExternal() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/external"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("jvmStaticExternal.kt")
-        public void testJvmStaticExternal() throws Exception {
-            runTest("compiler/testData/codegen/box/external/jvmStaticExternal.kt");
-        }
-
-        @TestMetadata("jvmStaticExternalPrivate.kt")
-        public void testJvmStaticExternalPrivate() throws Exception {
-            runTest("compiler/testData/codegen/box/external/jvmStaticExternalPrivate.kt");
-        }
-
-        @TestMetadata("withDefaultArg.kt")
-        public void testWithDefaultArg() throws Exception {
-            runTest("compiler/testData/codegen/box/external/withDefaultArg.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/external"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/fakeOverride")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class FakeOverride extends AbstractFirBlackBoxCodegenTest {
+    public static class FakeOverride extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInFakeOverride() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fakeOverride"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fakeOverride"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("diamondFunction.kt")
@@ -10876,13 +9346,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/fieldRename")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class FieldRename extends AbstractFirBlackBoxCodegenTest {
+    public static class FieldRename extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInFieldRename() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fieldRename"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fieldRename"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("constructorAndClassObject.kt")
@@ -10899,28 +9369,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         public void testGenericPropertyWithItself() throws Exception {
             runTest("compiler/testData/codegen/box/fieldRename/genericPropertyWithItself.kt");
         }
-
-        @TestMetadata("jvmFieldNoClash1.kt")
-        public void testJvmFieldNoClash1() throws Exception {
-            runTest("compiler/testData/codegen/box/fieldRename/jvmFieldNoClash1.kt");
-        }
-
-        @TestMetadata("jvmFieldNoClash2.kt")
-        public void testJvmFieldNoClash2() throws Exception {
-            runTest("compiler/testData/codegen/box/fieldRename/jvmFieldNoClash2.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/finally")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Finally extends AbstractFirBlackBoxCodegenTest {
+    public static class Finally extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInFinally() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/finally"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/finally"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("breakAndOuterFinally.kt")
@@ -10951,11 +9411,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt31923_return.kt")
         public void testKt31923_return() throws Exception {
             runTest("compiler/testData/codegen/box/finally/kt31923_return.kt");
-        }
-
-        @TestMetadata("kt31923_wrong.kt")
-        public void testKt31923_wrong() throws Exception {
-            runTest("compiler/testData/codegen/box/finally/kt31923_wrong.kt");
         }
 
         @TestMetadata("kt3549.kt")
@@ -11037,93 +9492,38 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/fullJdk")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class FullJdk extends AbstractFirBlackBoxCodegenTest {
+    public static class FullJdk extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInFullJdk() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fullJdk"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("charBuffer.kt")
-        public void testCharBuffer() throws Exception {
-            runTest("compiler/testData/codegen/box/fullJdk/charBuffer.kt");
-        }
-
-        @TestMetadata("ifInWhile.kt")
-        public void testIfInWhile() throws Exception {
-            runTest("compiler/testData/codegen/box/fullJdk/ifInWhile.kt");
-        }
-
-        @TestMetadata("intCountDownLatchExtension.kt")
-        public void testIntCountDownLatchExtension() throws Exception {
-            runTest("compiler/testData/codegen/box/fullJdk/intCountDownLatchExtension.kt");
-        }
-
-        @TestMetadata("kt31757.kt")
-        public void testKt31757() throws Exception {
-            runTest("compiler/testData/codegen/box/fullJdk/kt31757.kt");
-        }
-
-        @TestMetadata("kt434.kt")
-        public void testKt434() throws Exception {
-            runTest("compiler/testData/codegen/box/fullJdk/kt434.kt");
-        }
-
-        @TestMetadata("platformTypeAssertionStackTrace.kt")
-        public void testPlatformTypeAssertionStackTrace() throws Exception {
-            runTest("compiler/testData/codegen/box/fullJdk/platformTypeAssertionStackTrace.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fullJdk"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/fullJdk/native")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Native extends AbstractFirBlackBoxCodegenTest {
+        public static class Native extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInNative() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fullJdk/native"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("nativePropertyAccessors.kt")
-            public void testNativePropertyAccessors() throws Exception {
-                runTest("compiler/testData/codegen/box/fullJdk/native/nativePropertyAccessors.kt");
-            }
-
-            @TestMetadata("simpleNative.kt")
-            public void testSimpleNative() throws Exception {
-                runTest("compiler/testData/codegen/box/fullJdk/native/simpleNative.kt");
-            }
-
-            @TestMetadata("topLevel.kt")
-            public void testTopLevel() throws Exception {
-                runTest("compiler/testData/codegen/box/fullJdk/native/topLevel.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fullJdk/native"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/fullJdk/regressions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Regressions extends AbstractFirBlackBoxCodegenTest {
+        public static class Regressions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInRegressions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fullJdk/regressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("kt15112.kt")
-            public void testKt15112() throws Exception {
-                runTest("compiler/testData/codegen/box/fullJdk/regressions/kt15112.kt");
-            }
-
-            @TestMetadata("kt1770.kt")
-            public void testKt1770() throws Exception {
-                runTest("compiler/testData/codegen/box/fullJdk/regressions/kt1770.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/fullJdk/regressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -11131,13 +9531,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/funInterface")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class FunInterface extends AbstractFirBlackBoxCodegenTest {
+    public static class FunInterface extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInFunInterface() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/funInterface"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/funInterface"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("basicFunInterface.kt")
@@ -11208,13 +9608,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/funInterface/equality")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Equality extends AbstractFirBlackBoxCodegenTest {
+        public static class Equality extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInEquality() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/funInterface/equality"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/funInterface/equality"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("functionReferencesBound.kt")
@@ -11247,13 +9647,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/functions")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Functions extends AbstractFirBlackBoxCodegenTest {
+    public static class Functions extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInFunctions() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("coerceVoidToArray.kt")
@@ -11264,11 +9664,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("coerceVoidToObject.kt")
         public void testCoerceVoidToObject() throws Exception {
             runTest("compiler/testData/codegen/box/functions/coerceVoidToObject.kt");
-        }
-
-        @TestMetadata("dataLocalVariable.kt")
-        public void testDataLocalVariable() throws Exception {
-            runTest("compiler/testData/codegen/box/functions/dataLocalVariable.kt");
         }
 
         @TestMetadata("defaultargs.kt")
@@ -11479,28 +9874,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/functions/bigArity")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class BigArity extends AbstractFirBlackBoxCodegenTest {
+        public static class BigArity extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInBigArity() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions/bigArity"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("callFromJava.kt")
-            public void testCallFromJava() throws Exception {
-                runTest("compiler/testData/codegen/box/functions/bigArity/callFromJava.kt");
-            }
-
-            @TestMetadata("callFunViaVararg.kt")
-            public void testCallFunViaVararg() throws Exception {
-                runTest("compiler/testData/codegen/box/functions/bigArity/callFunViaVararg.kt");
-            }
-
-            @TestMetadata("callWithIncorrectNumberOfArguments.kt")
-            public void testCallWithIncorrectNumberOfArguments() throws Exception {
-                runTest("compiler/testData/codegen/box/functions/bigArity/callWithIncorrectNumberOfArguments.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions/bigArity"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("function255.kt")
@@ -11528,11 +9908,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/functions/bigArity/invokeMemberCallableReference.kt");
             }
 
-            @TestMetadata("javaLambda.kt")
-            public void testJavaLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/functions/bigArity/javaLambda.kt");
-            }
-
             @TestMetadata("subclass.kt")
             public void testSubclass() throws Exception {
                 runTest("compiler/testData/codegen/box/functions/bigArity/subclass.kt");
@@ -11542,13 +9917,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/functions/functionExpression")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class FunctionExpression extends AbstractFirBlackBoxCodegenTest {
+        public static class FunctionExpression extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInFunctionExpression() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions/functionExpression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions/functionExpression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("functionExpression.kt")
@@ -11585,13 +9960,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/functions/invoke")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Invoke extends AbstractFirBlackBoxCodegenTest {
+        public static class Invoke extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInInvoke() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions/invoke"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions/invoke"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("castFunctionToExtension.kt")
@@ -11622,11 +9997,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("invokeOnExprByConvention.kt")
             public void testInvokeOnExprByConvention() throws Exception {
                 runTest("compiler/testData/codegen/box/functions/invoke/invokeOnExprByConvention.kt");
-            }
-
-            @TestMetadata("invokeOnSyntheticProperty.kt")
-            public void testInvokeOnSyntheticProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/functions/invoke/invokeOnSyntheticProperty.kt");
             }
 
             @TestMetadata("kt3189.kt")
@@ -11673,13 +10043,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/functions/localFunctions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class LocalFunctions extends AbstractFirBlackBoxCodegenTest {
+        public static class LocalFunctions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInLocalFunctions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions/localFunctions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/functions/localFunctions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("callInlineLocalInLambda.kt")
@@ -11822,56 +10192,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/hashPMap")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class HashPMap extends AbstractFirBlackBoxCodegenTest {
+    public static class HashPMap extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInHashPMap() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/hashPMap"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("empty.kt")
-        public void testEmpty() throws Exception {
-            runTest("compiler/testData/codegen/box/hashPMap/empty.kt");
-        }
-
-        @TestMetadata("manyNumbers.kt")
-        public void testManyNumbers() throws Exception {
-            runTest("compiler/testData/codegen/box/hashPMap/manyNumbers.kt");
-        }
-
-        @TestMetadata("rewriteWithDifferent.kt")
-        public void testRewriteWithDifferent() throws Exception {
-            runTest("compiler/testData/codegen/box/hashPMap/rewriteWithDifferent.kt");
-        }
-
-        @TestMetadata("rewriteWithEqual.kt")
-        public void testRewriteWithEqual() throws Exception {
-            runTest("compiler/testData/codegen/box/hashPMap/rewriteWithEqual.kt");
-        }
-
-        @TestMetadata("simplePlusGet.kt")
-        public void testSimplePlusGet() throws Exception {
-            runTest("compiler/testData/codegen/box/hashPMap/simplePlusGet.kt");
-        }
-
-        @TestMetadata("simplePlusMinus.kt")
-        public void testSimplePlusMinus() throws Exception {
-            runTest("compiler/testData/codegen/box/hashPMap/simplePlusMinus.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/hashPMap"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/ieee754")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Ieee754 extends AbstractFirBlackBoxCodegenTest {
+    public static class Ieee754 extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInIeee754() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ieee754"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ieee754"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("anyToReal.kt")
@@ -12123,13 +10463,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/increment")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Increment extends AbstractFirBlackBoxCodegenTest {
+    public static class Increment extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInIncrement() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/increment"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/increment"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("arrayElement.kt")
@@ -12251,18 +10591,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/inference")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Inference extends AbstractFirBlackBoxCodegenTest {
+    public static class Inference extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInInference() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("builderInference.kt")
-        public void testBuilderInference() throws Exception {
-            runTest("compiler/testData/codegen/box/inference/builderInference.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inference"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("builderInferenceLeakingVariable.kt")
@@ -12300,11 +10635,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/inference/kt10822.kt");
         }
 
-        @TestMetadata("kt32429.kt")
-        public void testKt32429() throws Exception {
-            runTest("compiler/testData/codegen/box/inference/kt32429.kt");
-        }
-
         @TestMetadata("kt35684.kt")
         public void testKt35684() throws Exception {
             runTest("compiler/testData/codegen/box/inference/kt35684.kt");
@@ -12329,13 +10659,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/inlineClasses")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class InlineClasses extends AbstractFirBlackBoxCodegenTest {
+    public static class InlineClasses extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInInlineClasses() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("annotatedMemberExtensionProperty.kt")
@@ -12396,16 +10726,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("callComputablePropertyInsideInlineClass.kt")
         public void testCallComputablePropertyInsideInlineClass() throws Exception {
             runTest("compiler/testData/codegen/box/inlineClasses/callComputablePropertyInsideInlineClass.kt");
-        }
-
-        @TestMetadata("callSpecializedEqualsViaReflection.kt")
-        public void testCallSpecializedEqualsViaReflection() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/callSpecializedEqualsViaReflection.kt");
-        }
-
-        @TestMetadata("callSpeciallyOverriddenPropertyOfInlineClass.kt")
-        public void testCallSpeciallyOverriddenPropertyOfInlineClass() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/callSpeciallyOverriddenPropertyOfInlineClass.kt");
         }
 
         @TestMetadata("callableReferencesWithInlineClasses.kt")
@@ -12481,11 +10801,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("checkUnboxingResultFromTypeVariable.kt")
         public void testCheckUnboxingResultFromTypeVariable() throws Exception {
             runTest("compiler/testData/codegen/box/inlineClasses/checkUnboxingResultFromTypeVariable.kt");
-        }
-
-        @TestMetadata("classLiteralOnInlineClass.kt")
-        public void testClassLiteralOnInlineClass() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/classLiteralOnInlineClass.kt");
         }
 
         @TestMetadata("computablePropertyInsideInlineClass.kt")
@@ -12648,11 +10963,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/inlineClasses/inlineClassFunctionInvoke.kt");
         }
 
-        @TestMetadata("inlineClassImplementsCollection.kt")
-        public void testInlineClassImplementsCollection() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/inlineClassImplementsCollection.kt");
-        }
-
         @TestMetadata("inlineClassInStringTemplate.kt")
         public void testInlineClassInStringTemplate() throws Exception {
             runTest("compiler/testData/codegen/box/inlineClasses/inlineClassInStringTemplate.kt");
@@ -12731,36 +11041,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("iterateOverListOfInlineClassValues.kt")
         public void testIterateOverListOfInlineClassValues() throws Exception {
             runTest("compiler/testData/codegen/box/inlineClasses/iterateOverListOfInlineClassValues.kt");
-        }
-
-        @TestMetadata("javaClassIntrinsicOnInlineClasses.kt")
-        public void testJavaClassIntrinsicOnInlineClasses() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/javaClassIntrinsicOnInlineClasses.kt");
-        }
-
-        @TestMetadata("javaPrimitiveTypeIC.kt")
-        public void testJavaPrimitiveTypeIC() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/javaPrimitiveTypeIC.kt");
-        }
-
-        @TestMetadata("jvmFieldInInlineClassCompanion.kt")
-        public void testJvmFieldInInlineClassCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/jvmFieldInInlineClassCompanion.kt");
-        }
-
-        @TestMetadata("jvmStaticFunInInlineClassCompanion.kt")
-        public void testJvmStaticFunInInlineClassCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/jvmStaticFunInInlineClassCompanion.kt");
-        }
-
-        @TestMetadata("jvmStaticPropertyAccessorInInlineClassCompanion.kt")
-        public void testJvmStaticPropertyAccessorInInlineClassCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/jvmStaticPropertyAccessorInInlineClassCompanion.kt");
-        }
-
-        @TestMetadata("jvmStaticVarInInlineClassCompanion.kt")
-        public void testJvmStaticVarInInlineClassCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/jvmStaticVarInInlineClassCompanion.kt");
         }
 
         @TestMetadata("kt25246.kt")
@@ -12878,21 +11158,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/inlineClasses/kt28585.kt");
         }
 
-        @TestMetadata("kt28879.kt")
-        public void testKt28879() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/kt28879.kt");
-        }
-
-        @TestMetadata("kt28920_javaObjectType.kt")
-        public void testKt28920_javaObjectType() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/kt28920_javaObjectType.kt");
-        }
-
-        @TestMetadata("kt28920_javaPrimitiveType.kt")
-        public void testKt28920_javaPrimitiveType() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/kt28920_javaPrimitiveType.kt");
-        }
-
         @TestMetadata("kt33119.kt")
         public void testKt33119() throws Exception {
             runTest("compiler/testData/codegen/box/inlineClasses/kt33119.kt");
@@ -12916,16 +11181,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("mangledSuperCalls.kt")
         public void testMangledSuperCalls() throws Exception {
             runTest("compiler/testData/codegen/box/inlineClasses/mangledSuperCalls.kt");
-        }
-
-        @TestMetadata("mapInlineClassesWithSuppressWildcardsMode.kt")
-        public void testMapInlineClassesWithSuppressWildcardsMode() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/mapInlineClassesWithSuppressWildcardsMode.kt");
-        }
-
-        @TestMetadata("mappingOfBoxedFlexibleInlineClassType.kt")
-        public void testMappingOfBoxedFlexibleInlineClassType() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/mappingOfBoxedFlexibleInlineClassType.kt");
         }
 
         @TestMetadata("noAssertionsOnInlineClassBasedOnNullableType.kt")
@@ -13068,11 +11323,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/inlineClasses/useInlineFunctionInsideInlineClass.kt");
         }
 
-        @TestMetadata("useOfInlineClassWithGenericMethodFromJava.kt")
-        public void testUseOfInlineClassWithGenericMethodFromJava() throws Exception {
-            runTest("compiler/testData/codegen/box/inlineClasses/useOfInlineClassWithGenericMethodFromJava.kt");
-        }
-
         @TestMetadata("useThisInsideInlineClass.kt")
         public void testUseThisInsideInlineClass() throws Exception {
             runTest("compiler/testData/codegen/box/inlineClasses/useThisInsideInlineClass.kt");
@@ -13086,13 +11336,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/boxReturnValueInLambda")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class BoxReturnValueInLambda extends AbstractFirBlackBoxCodegenTest {
+        public static class BoxReturnValueInLambda extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInBoxReturnValueInLambda() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/boxReturnValueInLambda"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/boxReturnValueInLambda"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("boxAny.kt")
@@ -13159,13 +11409,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/boxReturnValueOnOverride")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class BoxReturnValueOnOverride extends AbstractFirBlackBoxCodegenTest {
+        public static class BoxReturnValueOnOverride extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInBoxReturnValueOnOverride() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/boxReturnValueOnOverride"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/boxReturnValueOnOverride"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("covariantOverrideChainErasedToAny.kt")
@@ -13297,13 +11547,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/callableReferences")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class CallableReferences extends AbstractFirBlackBoxCodegenTest {
+        public static class CallableReferences extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCallableReferences() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/callableReferences"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/callableReferences"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("boundInlineClassExtensionFun.kt")
@@ -13405,9 +11655,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/contextsAndAccessors")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ContextsAndAccessors extends AbstractFirBlackBoxCodegenTest {
+        public static class ContextsAndAccessors extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("accessPrivateInlineClassCompanionMethod.kt")
@@ -13460,13 +11710,8 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/inlineClasses/contextsAndAccessors/accessPrivateInlineClassMethodFromLambda2.kt");
             }
 
-            @TestMetadata("accessPrivateStaticInlineClassCompanionMethod.kt")
-            public void testAccessPrivateStaticInlineClassCompanionMethod() throws Exception {
-                runTest("compiler/testData/codegen/box/inlineClasses/contextsAndAccessors/accessPrivateStaticInlineClassCompanionMethod.kt");
-            }
-
             public void testAllFilesPresentInContextsAndAccessors() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/contextsAndAccessors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/contextsAndAccessors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("captureInlineClassInstanceInLambda.kt")
@@ -13528,13 +11773,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/defaultParameterValues")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class DefaultParameterValues extends AbstractFirBlackBoxCodegenTest {
+        public static class DefaultParameterValues extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInDefaultParameterValues() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/defaultParameterValues"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/defaultParameterValues"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("defaultConstructorParameterValuesOfInlineClassType.kt")
@@ -13601,13 +11846,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/functionNameMangling")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class FunctionNameMangling extends AbstractFirBlackBoxCodegenTest {
+        public static class FunctionNameMangling extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInFunctionNameMangling() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/functionNameMangling"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/functionNameMangling"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("anonymousObjectInFunctionWithMangledName.kt")
@@ -13628,11 +11873,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("genericFunctionsDoNotClash.kt")
             public void testGenericFunctionsDoNotClash() throws Exception {
                 runTest("compiler/testData/codegen/box/inlineClasses/functionNameMangling/genericFunctionsDoNotClash.kt");
-            }
-
-            @TestMetadata("genericSignatureOfFunctionWithMangledName.kt")
-            public void testGenericSignatureOfFunctionWithMangledName() throws Exception {
-                runTest("compiler/testData/codegen/box/inlineClasses/functionNameMangling/genericSignatureOfFunctionWithMangledName.kt");
             }
 
             @TestMetadata("localClassInFunctionWithMangledName.kt")
@@ -13680,11 +11920,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/inlineClasses/functionNameMangling/reflectionForFunctionWithMangledName.kt");
             }
 
-            @TestMetadata("reflectionForLocalClassInFunctionWithMangledName.kt")
-            public void testReflectionForLocalClassInFunctionWithMangledName() throws Exception {
-                runTest("compiler/testData/codegen/box/inlineClasses/functionNameMangling/reflectionForLocalClassInFunctionWithMangledName.kt");
-            }
-
             @TestMetadata("reflectionForPropertyOfInlineClassType.kt")
             public void testReflectionForPropertyOfInlineClassType() throws Exception {
                 runTest("compiler/testData/codegen/box/inlineClasses/functionNameMangling/reflectionForPropertyOfInlineClassType.kt");
@@ -13704,13 +11939,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/hiddenConstructor")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class HiddenConstructor extends AbstractFirBlackBoxCodegenTest {
+        public static class HiddenConstructor extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInHiddenConstructor() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/hiddenConstructor"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/hiddenConstructor"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("constructorReferencedFromOtherFile1.kt")
@@ -13782,13 +12017,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/interfaceDelegation")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class InterfaceDelegation extends AbstractFirBlackBoxCodegenTest {
+        public static class InterfaceDelegation extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInInterfaceDelegation() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/interfaceDelegation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/interfaceDelegation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("interfaceImplementationByDelegation.kt")
@@ -13835,13 +12070,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/interfaceMethodCalls")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class InterfaceMethodCalls extends AbstractFirBlackBoxCodegenTest {
+        public static class InterfaceMethodCalls extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInInterfaceMethodCalls() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/interfaceMethodCalls"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/interfaceMethodCalls"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("complexGenericMethodWithInlineClassOverride.kt")
@@ -13903,13 +12138,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/inlineClasses/propertyDelegation")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class PropertyDelegation extends AbstractFirBlackBoxCodegenTest {
+        public static class PropertyDelegation extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInPropertyDelegation() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/propertyDelegation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/inlineClasses/propertyDelegation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("captureLocalVarDelegatedToInlineClass.kt")
@@ -13930,11 +12165,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("delegateCompanionVarToInlineClass.kt")
             public void testDelegateCompanionVarToInlineClass() throws Exception {
                 runTest("compiler/testData/codegen/box/inlineClasses/propertyDelegation/delegateCompanionVarToInlineClass.kt");
-            }
-
-            @TestMetadata("delegateJvmStaticCompanionVarToInlineClass.kt")
-            public void testDelegateJvmStaticCompanionVarToInlineClass() throws Exception {
-                runTest("compiler/testData/codegen/box/inlineClasses/propertyDelegation/delegateJvmStaticCompanionVarToInlineClass.kt");
             }
 
             @TestMetadata("delegateLocalVarToInlineClass.kt")
@@ -13972,13 +12202,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/innerNested")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class InnerNested extends AbstractFirBlackBoxCodegenTest {
+    public static class InnerNested extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInInnerNested() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/innerNested"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/innerNested"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("createNestedClass.kt")
@@ -14009,16 +12239,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("innerGeneric.kt")
         public void testInnerGeneric() throws Exception {
             runTest("compiler/testData/codegen/box/innerNested/innerGeneric.kt");
-        }
-
-        @TestMetadata("innerGenericClassFromJava.kt")
-        public void testInnerGenericClassFromJava() throws Exception {
-            runTest("compiler/testData/codegen/box/innerNested/innerGenericClassFromJava.kt");
-        }
-
-        @TestMetadata("innerJavaClass.kt")
-        public void testInnerJavaClass() throws Exception {
-            runTest("compiler/testData/codegen/box/innerNested/innerJavaClass.kt");
         }
 
         @TestMetadata("innerLabeledThis.kt")
@@ -14096,21 +12316,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/innerNested/protectedNestedClass.kt");
         }
 
-        @TestMetadata("protectedNestedClassFromJava.kt")
-        public void testProtectedNestedClassFromJava() throws Exception {
-            runTest("compiler/testData/codegen/box/innerNested/protectedNestedClassFromJava.kt");
-        }
-
         @TestMetadata("compiler/testData/codegen/box/innerNested/superConstructorCall")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class SuperConstructorCall extends AbstractFirBlackBoxCodegenTest {
+        public static class SuperConstructorCall extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSuperConstructorCall() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/innerNested/superConstructorCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/innerNested/superConstructorCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("deepInnerHierarchy.kt")
@@ -14131,11 +12346,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("innerExtendsInnerWithProperOuterCapture.kt")
             public void testInnerExtendsInnerWithProperOuterCapture() throws Exception {
                 runTest("compiler/testData/codegen/box/innerNested/superConstructorCall/innerExtendsInnerWithProperOuterCapture.kt");
-            }
-
-            @TestMetadata("innerExtendsOuter.kt")
-            public void testInnerExtendsOuter() throws Exception {
-                runTest("compiler/testData/codegen/box/innerNested/superConstructorCall/innerExtendsOuter.kt");
             }
 
             @TestMetadata("kt11833_1.kt")
@@ -14223,25 +12433,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/instructions")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Instructions extends AbstractFirBlackBoxCodegenTest {
+    public static class Instructions extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInInstructions() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/instructions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/instructions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/instructions/swap")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Swap extends AbstractFirBlackBoxCodegenTest {
+        public static class Swap extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSwap() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/instructions/swap"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/instructions/swap"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("swapRefToSharedVarInt.kt")
@@ -14259,23 +12469,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/intrinsics")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Intrinsics extends AbstractFirBlackBoxCodegenTest {
+    public static class Intrinsics extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInIntrinsics() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/intrinsics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/intrinsics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("charToInt.kt")
         public void testCharToInt() throws Exception {
             runTest("compiler/testData/codegen/box/intrinsics/charToInt.kt");
-        }
-
-        @TestMetadata("defaultObjectMapping.kt")
-        public void testDefaultObjectMapping() throws Exception {
-            runTest("compiler/testData/codegen/box/intrinsics/defaultObjectMapping.kt");
         }
 
         @TestMetadata("ea35953.kt")
@@ -14286,21 +12491,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("incWithLabel.kt")
         public void testIncWithLabel() throws Exception {
             runTest("compiler/testData/codegen/box/intrinsics/incWithLabel.kt");
-        }
-
-        @TestMetadata("javaObjectType.kt")
-        public void testJavaObjectType() throws Exception {
-            runTest("compiler/testData/codegen/box/intrinsics/javaObjectType.kt");
-        }
-
-        @TestMetadata("javaPrimitiveType.kt")
-        public void testJavaPrimitiveType() throws Exception {
-            runTest("compiler/testData/codegen/box/intrinsics/javaPrimitiveType.kt");
-        }
-
-        @TestMetadata("javaPrimitiveType_UnitAndNothing.kt")
-        public void testJavaPrimitiveType_UnitAndNothing() throws Exception {
-            runTest("compiler/testData/codegen/box/intrinsics/javaPrimitiveType_UnitAndNothing.kt");
         }
 
         @TestMetadata("kt10131.kt")
@@ -14333,11 +12523,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/intrinsics/kt12125_inc_2.kt");
         }
 
-        @TestMetadata("kt5937.kt")
-        public void testKt5937() throws Exception {
-            runTest("compiler/testData/codegen/box/intrinsics/kt5937.kt");
-        }
-
         @TestMetadata("kt8666.kt")
         public void testKt8666() throws Exception {
             runTest("compiler/testData/codegen/box/intrinsics/kt8666.kt");
@@ -14346,11 +12531,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("longRangeWithExplicitDot.kt")
         public void testLongRangeWithExplicitDot() throws Exception {
             runTest("compiler/testData/codegen/box/intrinsics/longRangeWithExplicitDot.kt");
-        }
-
-        @TestMetadata("monitorEnterMonitorExit.kt")
-        public void testMonitorEnterMonitorExit() throws Exception {
-            runTest("compiler/testData/codegen/box/intrinsics/monitorEnterMonitorExit.kt");
         }
 
         @TestMetadata("nonShortCircuitAnd.kt")
@@ -14402,13 +12582,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/ir")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Ir extends AbstractFirBlackBoxCodegenTest {
+    public static class Ir extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInIr() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ir"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ir"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("anonymousObjectInForLoopIteratorAndBody.kt")
@@ -14456,11 +12636,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/ir/kt25405.kt");
         }
 
-        @TestMetadata("kt29833.kt")
-        public void testKt29833() throws Exception {
-            runTest("compiler/testData/codegen/box/ir/kt29833.kt");
-        }
-
         @TestMetadata("objectClass.kt")
         public void testObjectClass() throws Exception {
             runTest("compiler/testData/codegen/box/ir/objectClass.kt");
@@ -14474,13 +12649,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ir/closureConversion")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ClosureConversion extends AbstractFirBlackBoxCodegenTest {
+        public static class ClosureConversion extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInClosureConversion() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ir/closureConversion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ir/closureConversion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("closureConversion1.kt")
@@ -14527,13 +12702,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ir/primitiveNumberComparisons")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class PrimitiveNumberComparisons extends AbstractFirBlackBoxCodegenTest {
+        public static class PrimitiveNumberComparisons extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInPrimitiveNumberComparisons() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ir/primitiveNumberComparisons"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ir/primitiveNumberComparisons"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("comparableToDouble.kt")
@@ -14560,13 +12735,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ir/serializationRegressions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class SerializationRegressions extends AbstractFirBlackBoxCodegenTest {
+        public static class SerializationRegressions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSerializationRegressions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ir/serializationRegressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ir/serializationRegressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("deepGenericDelegatedProperty.kt")
@@ -14614,133 +12789,38 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/javaInterop")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class JavaInterop extends AbstractFirBlackBoxCodegenTest {
+    public static class JavaInterop extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInJavaInterop() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("genericSamProjectedOut.kt")
-        public void testGenericSamProjectedOut() throws Exception {
-            runTest("compiler/testData/codegen/box/javaInterop/genericSamProjectedOut.kt");
-        }
-
-        @TestMetadata("genericSamProjectedOutWithNewInference.kt")
-        public void testGenericSamProjectedOutWithNewInference() throws Exception {
-            runTest("compiler/testData/codegen/box/javaInterop/genericSamProjectedOutWithNewInference.kt");
-        }
-
-        @TestMetadata("lambdaInstanceOf.kt")
-        public void testLambdaInstanceOf() throws Exception {
-            runTest("compiler/testData/codegen/box/javaInterop/lambdaInstanceOf.kt");
-        }
-
-        @TestMetadata("protectedField.kt")
-        public void testProtectedField() throws Exception {
-            runTest("compiler/testData/codegen/box/javaInterop/protectedField.kt");
-        }
-
-        @TestMetadata("samTypeParameter.kt")
-        public void testSamTypeParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/javaInterop/samTypeParameter.kt");
-        }
-
-        @TestMetadata("samUnboundTypeParameter.kt")
-        public void testSamUnboundTypeParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/javaInterop/samUnboundTypeParameter.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/javaInterop/generics")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Generics extends AbstractFirBlackBoxCodegenTest {
+        public static class Generics extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInGenerics() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop/generics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("allWildcardsOnClass.kt")
-            public void testAllWildcardsOnClass() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/generics/allWildcardsOnClass.kt");
-            }
-
-            @TestMetadata("covariantOverrideWithDeclarationSiteProjection.kt")
-            public void testCovariantOverrideWithDeclarationSiteProjection() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/generics/covariantOverrideWithDeclarationSiteProjection.kt");
-            }
-
-            @TestMetadata("invariantArgumentsNoWildcard.kt")
-            public void testInvariantArgumentsNoWildcard() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/generics/invariantArgumentsNoWildcard.kt");
-            }
-
-            @TestMetadata("javaNestedSamInterface.kt")
-            public void testJavaNestedSamInterface() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/generics/javaNestedSamInterface.kt");
-            }
-
-            @TestMetadata("propertyVarianceConflict.kt")
-            public void testPropertyVarianceConflict() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/generics/propertyVarianceConflict.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop/generics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/javaInterop/notNullAssertions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class NotNullAssertions extends AbstractFirBlackBoxCodegenTest {
+        public static class NotNullAssertions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInNotNullAssertions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop/notNullAssertions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("destructuringAssignmentWithNullabilityAssertionOnExtensionReceiver_lv12.kt")
-            public void testDestructuringAssignmentWithNullabilityAssertionOnExtensionReceiver_lv12() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/destructuringAssignmentWithNullabilityAssertionOnExtensionReceiver_lv12.kt");
-            }
-
-            @TestMetadata("errorMessage.kt")
-            public void testErrorMessage() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/errorMessage.kt");
-            }
-
-            @TestMetadata("extensionReceiverParameter.kt")
-            public void testExtensionReceiverParameter() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/extensionReceiverParameter.kt");
-            }
-
-            @TestMetadata("functionAssertion.kt")
-            public void testFunctionAssertion() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/functionAssertion.kt");
-            }
-
-            @TestMetadata("functionWithBigArity.kt")
-            public void testFunctionWithBigArity() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/functionWithBigArity.kt");
-            }
-
-            @TestMetadata("incWithNullabilityAssertionOnExtensionReceiver.kt")
-            public void testIncWithNullabilityAssertionOnExtensionReceiver() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/incWithNullabilityAssertionOnExtensionReceiver.kt");
-            }
-
-            @TestMetadata("incWithNullabilityAssertionOnExtensionReceiverInPrivateOperator.kt")
-            public void testIncWithNullabilityAssertionOnExtensionReceiverInPrivateOperator() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/incWithNullabilityAssertionOnExtensionReceiverInPrivateOperator.kt");
-            }
-
-            @TestMetadata("localEntities.kt")
-            public void testLocalEntities() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/localEntities.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop/notNullAssertions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("mapPut.kt")
@@ -14748,96 +12828,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/mapPut.kt");
             }
 
-            @TestMetadata("nonNullableTypeParameter.kt")
-            public void testNonNullableTypeParameter() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/nonNullableTypeParameter.kt");
-            }
-
-            @TestMetadata("nullabilityAssertionOnExtensionReceiver.kt")
-            public void testNullabilityAssertionOnExtensionReceiver() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/nullabilityAssertionOnExtensionReceiver.kt");
-            }
-
-            @TestMetadata("nullabilityAssertionOnInlineFunExtensionReceiver.kt")
-            public void testNullabilityAssertionOnInlineFunExtensionReceiver() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/nullabilityAssertionOnInlineFunExtensionReceiver.kt");
-            }
-
-            @TestMetadata("nullabilityAssertionOnMemberExtensionReceiver.kt")
-            public void testNullabilityAssertionOnMemberExtensionReceiver() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/nullabilityAssertionOnMemberExtensionReceiver.kt");
-            }
-
-            @TestMetadata("nullabilityAssertionOnPrivateMemberExtensionReceiver.kt")
-            public void testNullabilityAssertionOnPrivateMemberExtensionReceiver() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/nullabilityAssertionOnPrivateMemberExtensionReceiver.kt");
-            }
-
-            @TestMetadata("nullableTypeParameter.kt")
-            public void testNullableTypeParameter() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/nullableTypeParameter.kt");
-            }
-
-            @TestMetadata("paramAssertionMessage.kt")
-            public void testParamAssertionMessage() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/paramAssertionMessage.kt");
-            }
-
-            @TestMetadata("staticCallErrorMessage.kt")
-            public void testStaticCallErrorMessage() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/staticCallErrorMessage.kt");
-            }
-
             @TestMetadata("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class EnhancedNullability extends AbstractFirBlackBoxCodegenTest {
+            public static class EnhancedNullability extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInEnhancedNullability() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("inFunctionWithExpressionBody.kt")
-                public void testInFunctionWithExpressionBody() throws Exception {
-                    runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability/inFunctionWithExpressionBody.kt");
-                }
-
-                @TestMetadata("inFunctionWithExpressionBodyWithJavaGeneric.kt")
-                public void testInFunctionWithExpressionBodyWithJavaGeneric() throws Exception {
-                    runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability/inFunctionWithExpressionBodyWithJavaGeneric.kt");
-                }
-
-                @TestMetadata("inLambdaReturnWithExpectedType.kt")
-                public void testInLambdaReturnWithExpectedType() throws Exception {
-                    runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability/inLambdaReturnWithExpectedType.kt");
-                }
-
-                @TestMetadata("inLocalFunctionWithExpressionBody.kt")
-                public void testInLocalFunctionWithExpressionBody() throws Exception {
-                    runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability/inLocalFunctionWithExpressionBody.kt");
-                }
-
-                @TestMetadata("inLocalVariableInitializer.kt")
-                public void testInLocalVariableInitializer() throws Exception {
-                    runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability/inLocalVariableInitializer.kt");
-                }
-
-                @TestMetadata("inMemberPropertyInitializer.kt")
-                public void testInMemberPropertyInitializer() throws Exception {
-                    runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability/inMemberPropertyInitializer.kt");
-                }
-
-                @TestMetadata("inPropertyGetterWithExpressionBody.kt")
-                public void testInPropertyGetterWithExpressionBody() throws Exception {
-                    runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability/inPropertyGetterWithExpressionBody.kt");
-                }
-
-                @TestMetadata("inTopLevelPropertyInitializer.kt")
-                public void testInTopLevelPropertyInitializer() throws Exception {
-                    runTest("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability/inTopLevelPropertyInitializer.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop/notNullAssertions/enhancedNullability"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
         }
@@ -14845,13 +12845,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/javaInterop/objectMethods")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ObjectMethods extends AbstractFirBlackBoxCodegenTest {
+        public static class ObjectMethods extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInObjectMethods() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop/objectMethods"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/javaInterop/objectMethods"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("cloneCallsConstructor.kt")
@@ -14869,16 +12869,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/javaInterop/objectMethods/cloneCallsSuperAndModifies.kt");
             }
 
-            @TestMetadata("cloneHashSet.kt")
-            public void testCloneHashSet() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/objectMethods/cloneHashSet.kt");
-            }
-
-            @TestMetadata("cloneHierarchy.kt")
-            public void testCloneHierarchy() throws Exception {
-                runTest("compiler/testData/codegen/box/javaInterop/objectMethods/cloneHierarchy.kt");
-            }
-
             @TestMetadata("cloneableClassWithoutClone.kt")
             public void testCloneableClassWithoutClone() throws Exception {
                 runTest("compiler/testData/codegen/box/javaInterop/objectMethods/cloneableClassWithoutClone.kt");
@@ -14889,13 +12879,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/jdk")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Jdk extends AbstractFirBlackBoxCodegenTest {
+    public static class Jdk extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInJdk() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jdk"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jdk"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("arrayList.kt")
@@ -14917,459 +12907,54 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         public void testKt1397() throws Exception {
             runTest("compiler/testData/codegen/box/jdk/kt1397.kt");
         }
-
-        @TestMetadata("removeIf.kt")
-        public void testRemoveIf() throws Exception {
-            runTest("compiler/testData/codegen/box/jdk/removeIf.kt");
-        }
-
-        @TestMetadata("stream.kt")
-        public void testStream() throws Exception {
-            runTest("compiler/testData/codegen/box/jdk/stream.kt");
-        }
-
-        @TestMetadata("streamBackwardCompatibility.kt")
-        public void testStreamBackwardCompatibility() throws Exception {
-            runTest("compiler/testData/codegen/box/jdk/streamBackwardCompatibility.kt");
-        }
-
-        @TestMetadata("useStream.kt")
-        public void testUseStream() throws Exception {
-            runTest("compiler/testData/codegen/box/jdk/useStream.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/jvm8")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Jvm8 extends AbstractFirBlackBoxCodegenTest {
+    public static class Jvm8 extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInJvm8() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("bridgeInClass.kt")
-        public void testBridgeInClass() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/bridgeInClass.kt");
-        }
-
-        @TestMetadata("bridgeInInterface.kt")
-        public void testBridgeInInterface() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/bridgeInInterface.kt");
-        }
-
-        @TestMetadata("capturedSuperCall.kt")
-        public void testCapturedSuperCall() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/capturedSuperCall.kt");
-        }
-
-        @TestMetadata("defaultArgs.kt")
-        public void testDefaultArgs() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/defaultArgs.kt");
-        }
-
-        @TestMetadata("inlineFromAnotherFile.kt")
-        public void testInlineFromAnotherFile() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/inlineFromAnotherFile.kt");
-        }
-
-        @TestMetadata("inlineFromStdlib.kt")
-        public void testInlineFromStdlib() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/inlineFromStdlib.kt");
-        }
-
-        @TestMetadata("kt11969.kt")
-        public void testKt11969() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt11969.kt");
-        }
-
-        @TestMetadata("kt14243.kt")
-        public void testKt14243() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt14243.kt");
-        }
-
-        @TestMetadata("kt14243_2.kt")
-        public void testKt14243_2() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt14243_2.kt");
-        }
-
-        @TestMetadata("kt14243_prop.kt")
-        public void testKt14243_prop() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt14243_prop.kt");
-        }
-
-        @TestMetadata("kt16581.kt")
-        public void testKt16581() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt16581.kt");
-        }
-
-        @TestMetadata("kt16581_2.kt")
-        public void testKt16581_2() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt16581_2.kt");
-        }
-
-        @TestMetadata("kt16588.kt")
-        public void testKt16588() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt16588.kt");
-        }
-
-        @TestMetadata("kt29242.kt")
-        public void testKt29242() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt29242.kt");
-        }
-
-        @TestMetadata("kt33054.kt")
-        public void testKt33054() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt33054.kt");
-        }
-
-        @TestMetadata("kt6301.kt")
-        public void testKt6301() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt6301.kt");
-        }
-
-        @TestMetadata("kt6301_2.kt")
-        public void testKt6301_2() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/kt6301_2.kt");
-        }
-
-        @TestMetadata("oneImplementation.kt")
-        public void testOneImplementation() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/oneImplementation.kt");
-        }
-
-        @TestMetadata("oneImplementation2.kt")
-        public void testOneImplementation2() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/oneImplementation2.kt");
-        }
-
-        @TestMetadata("simpleCall.kt")
-        public void testSimpleCall() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/simpleCall.kt");
-        }
-
-        @TestMetadata("simpleProperty.kt")
-        public void testSimpleProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/simpleProperty.kt");
-        }
-
-        @TestMetadata("treeMapBridge.kt")
-        public void testTreeMapBridge() throws Exception {
-            runTest("compiler/testData/codegen/box/jvm8/treeMapBridge.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/jvm8/defaults")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Defaults extends AbstractFirBlackBoxCodegenTest {
+        public static class Defaults extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
-            }
-
-            @TestMetadata("accessor.kt")
-            public void testAccessor() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/accessor.kt");
-            }
-
-            @TestMetadata("accessorFromCompanion.kt")
-            public void testAccessorFromCompanion() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/accessorFromCompanion.kt");
-            }
-
-            @TestMetadata("accessorsFromDefaultImpls.kt")
-            public void testAccessorsFromDefaultImpls() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/accessorsFromDefaultImpls.kt");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInDefaults() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("bridgeInClass.kt")
-            public void testBridgeInClass() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/bridgeInClass.kt");
-            }
-
-            @TestMetadata("bridgeInInterface.kt")
-            public void testBridgeInInterface() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/bridgeInInterface.kt");
-            }
-
-            @TestMetadata("bridgeInInterface2.kt")
-            public void testBridgeInInterface2() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/bridgeInInterface2.kt");
-            }
-
-            @TestMetadata("bridgeInInterfaceWithProperties.kt")
-            public void testBridgeInInterfaceWithProperties() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/bridgeInInterfaceWithProperties.kt");
-            }
-
-            @TestMetadata("bridgeInInterfaceWithProperties2.kt")
-            public void testBridgeInInterfaceWithProperties2() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/bridgeInInterfaceWithProperties2.kt");
-            }
-
-            @TestMetadata("bridgeWithJava.kt")
-            public void testBridgeWithJava() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/bridgeWithJava.kt");
-            }
-
-            @TestMetadata("callableReference.kt")
-            public void testCallableReference() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/callableReference.kt");
-            }
-
-            @TestMetadata("capturedSuperCall.kt")
-            public void testCapturedSuperCall() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/capturedSuperCall.kt");
-            }
-
-            @TestMetadata("defaultArgs.kt")
-            public void testDefaultArgs() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/defaultArgs.kt");
-            }
-
-            @TestMetadata("defaultArgsViaAnonymousObject.kt")
-            public void testDefaultArgsViaAnonymousObject() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/defaultArgsViaAnonymousObject.kt");
-            }
-
-            @TestMetadata("diamond.kt")
-            public void testDiamond() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/diamond.kt");
-            }
-
-            @TestMetadata("inheritedFunctionWithDefaultParameters.kt")
-            public void testInheritedFunctionWithDefaultParameters() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/inheritedFunctionWithDefaultParameters.kt");
-            }
-
-            @TestMetadata("inline.kt")
-            public void testInline() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/inline.kt");
-            }
-
-            @TestMetadata("inlineProperty.kt")
-            public void testInlineProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/inlineProperty.kt");
-            }
-
-            @TestMetadata("kt11969.kt")
-            public void testKt11969() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/kt11969.kt");
-            }
-
-            @TestMetadata("kt14243.kt")
-            public void testKt14243() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/kt14243.kt");
-            }
-
-            @TestMetadata("kt14243_2.kt")
-            public void testKt14243_2() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/kt14243_2.kt");
-            }
-
-            @TestMetadata("kt14243_prop.kt")
-            public void testKt14243_prop() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/kt14243_prop.kt");
-            }
-
-            @TestMetadata("oneImplementation.kt")
-            public void testOneImplementation() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/oneImplementation.kt");
-            }
-
-            @TestMetadata("oneImplementation2.kt")
-            public void testOneImplementation2() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/oneImplementation2.kt");
-            }
-
-            @TestMetadata("privateDefaultFromDefaultImpl.kt")
-            public void testPrivateDefaultFromDefaultImpl() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/privateDefaultFromDefaultImpl.kt");
-            }
-
-            @TestMetadata("privateInDefaultImpls.kt")
-            public void testPrivateInDefaultImpls() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/privateInDefaultImpls.kt");
-            }
-
-            @TestMetadata("simpleCall.kt")
-            public void testSimpleCall() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/simpleCall.kt");
-            }
-
-            @TestMetadata("simpleProperty.kt")
-            public void testSimpleProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/simpleProperty.kt");
-            }
-
-            @TestMetadata("superCall.kt")
-            public void testSuperCall() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/defaults/superCall.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("compiler/testData/codegen/box/jvm8/defaults/allCompatibility")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class AllCompatibility extends AbstractFirBlackBoxCodegenTest {
+            public static class AllCompatibility extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
-                }
-
-                @TestMetadata("accessor.kt")
-                public void testAccessor() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/accessor.kt");
-                }
-
-                @TestMetadata("accessorFromCompanion.kt")
-                public void testAccessorFromCompanion() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/accessorFromCompanion.kt");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInAllCompatibility() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/allCompatibility"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("bridge.kt")
-                public void testBridge() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridge.kt");
-                }
-
-                @TestMetadata("bridge2.kt")
-                public void testBridge2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridge2.kt");
-                }
-
-                @TestMetadata("bridge3.kt")
-                public void testBridge3() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridge3.kt");
-                }
-
-                @TestMetadata("bridgeInClass.kt")
-                public void testBridgeInClass() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeInClass.kt");
-                }
-
-                @TestMetadata("bridgeInInterface.kt")
-                public void testBridgeInInterface() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeInInterface.kt");
-                }
-
-                @TestMetadata("bridgeInInterface2.kt")
-                public void testBridgeInInterface2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeInInterface2.kt");
-                }
-
-                @TestMetadata("bridgeInInterfaceWithProperties.kt")
-                public void testBridgeInInterfaceWithProperties() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeInInterfaceWithProperties.kt");
-                }
-
-                @TestMetadata("bridgeInInterfaceWithProperties2.kt")
-                public void testBridgeInInterfaceWithProperties2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeInInterfaceWithProperties2.kt");
-                }
-
-                @TestMetadata("bridgeWithJava.kt")
-                public void testBridgeWithJava() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeWithJava.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties.kt")
-                public void testBridgeWithProperties() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeWithProperties.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties2.kt")
-                public void testBridgeWithProperties2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeWithProperties2.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties3.kt")
-                public void testBridgeWithProperties3() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/bridgeWithProperties3.kt");
-                }
-
-                @TestMetadata("callStackTrace.kt")
-                public void testCallStackTrace() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/callStackTrace.kt");
-                }
-
-                @TestMetadata("defaultArgs.kt")
-                public void testDefaultArgs() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/defaultArgs.kt");
-                }
-
-                @TestMetadata("defaultArgsViaAnonymousObject.kt")
-                public void testDefaultArgsViaAnonymousObject() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/defaultArgsViaAnonymousObject.kt");
-                }
-
-                @TestMetadata("inheritedFunctionWithDefaultParameters.kt")
-                public void testInheritedFunctionWithDefaultParameters() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/inheritedFunctionWithDefaultParameters.kt");
-                }
-
-                @TestMetadata("inheritedJvmDefault.kt")
-                public void testInheritedJvmDefault() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/inheritedJvmDefault.kt");
-                }
-
-                @TestMetadata("interfaceExtension.kt")
-                public void testInterfaceExtension() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/interfaceExtension.kt");
-                }
-
-                @TestMetadata("kt14243.kt")
-                public void testKt14243() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/kt14243.kt");
-                }
-
-                @TestMetadata("kt14243_2.kt")
-                public void testKt14243_2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/kt14243_2.kt");
-                }
-
-                @TestMetadata("privateFunInInterface.kt")
-                public void testPrivateFunInInterface() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/privateFunInInterface.kt");
-                }
-
-                @TestMetadata("propertyAnnotation.kt")
-                public void testPropertyAnnotation() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/propertyAnnotation.kt");
-                }
-
-                @TestMetadata("simpleFunction.kt")
-                public void testSimpleFunction() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/simpleFunction.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/allCompatibility"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/delegationBy")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class DelegationBy extends AbstractFirBlackBoxCodegenTest {
+                public static class DelegationBy extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInDelegationBy() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/delegationBy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                    }
-
-                    @TestMetadata("simple.kt")
-                    public void testSimple() throws Exception {
-                        runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/delegationBy/simple.kt");
-                    }
-
-                    @TestMetadata("simpleProperty.kt")
-                    public void testSimpleProperty() throws Exception {
-                        runTest("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/delegationBy/simpleProperty.kt");
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/allCompatibility/delegationBy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
                 }
             }
@@ -15377,256 +12962,51 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/jvm8/defaults/compatibility")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Compatibility extends AbstractFirBlackBoxCodegenTest {
+            public static class Compatibility extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInCompatibility() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/compatibility"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("bridge.kt")
-                public void testBridge() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/bridge.kt");
-                }
-
-                @TestMetadata("bridge2.kt")
-                public void testBridge2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/bridge2.kt");
-                }
-
-                @TestMetadata("bridge3.kt")
-                public void testBridge3() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/bridge3.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties.kt")
-                public void testBridgeWithProperties() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/bridgeWithProperties.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties2.kt")
-                public void testBridgeWithProperties2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/bridgeWithProperties2.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties3.kt")
-                public void testBridgeWithProperties3() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/bridgeWithProperties3.kt");
-                }
-
-                @TestMetadata("defaultArgs.kt")
-                public void testDefaultArgs() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/defaultArgs.kt");
-                }
-
-                @TestMetadata("defaultArgsViaAnonymousObject.kt")
-                public void testDefaultArgsViaAnonymousObject() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/defaultArgsViaAnonymousObject.kt");
-                }
-
-                @TestMetadata("inheritedFunctionWithDefaultParameters.kt")
-                public void testInheritedFunctionWithDefaultParameters() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/inheritedFunctionWithDefaultParameters.kt");
-                }
-
-                @TestMetadata("inheritedJvmDefault.kt")
-                public void testInheritedJvmDefault() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/inheritedJvmDefault.kt");
-                }
-
-                @TestMetadata("interfaceExtension.kt")
-                public void testInterfaceExtension() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/interfaceExtension.kt");
-                }
-
-                @TestMetadata("propertyAnnotation.kt")
-                public void testPropertyAnnotation() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/propertyAnnotation.kt");
-                }
-
-                @TestMetadata("simpleFunction.kt")
-                public void testSimpleFunction() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/compatibility/simpleFunction.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/compatibility"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
 
             @TestMetadata("compiler/testData/codegen/box/jvm8/defaults/delegationBy")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class DelegationBy extends AbstractFirBlackBoxCodegenTest {
+            public static class DelegationBy extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInDelegationBy() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/delegationBy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("simple.kt")
-                public void testSimple() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/delegationBy/simple.kt");
-                }
-
-                @TestMetadata("simpleProperty.kt")
-                public void testSimpleProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/delegationBy/simpleProperty.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/delegationBy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
 
             @TestMetadata("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class NoDefaultImpls extends AbstractFirBlackBoxCodegenTest {
+            public static class NoDefaultImpls extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
-                }
-
-                @TestMetadata("accessor.kt")
-                public void testAccessor() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/accessor.kt");
-                }
-
-                @TestMetadata("accessorFromCompanion.kt")
-                public void testAccessorFromCompanion() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/accessorFromCompanion.kt");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInNoDefaultImpls() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("bridge.kt")
-                public void testBridge() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridge.kt");
-                }
-
-                @TestMetadata("bridge2.kt")
-                public void testBridge2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridge2.kt");
-                }
-
-                @TestMetadata("bridge3.kt")
-                public void testBridge3() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridge3.kt");
-                }
-
-                @TestMetadata("bridgeInClass.kt")
-                public void testBridgeInClass() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeInClass.kt");
-                }
-
-                @TestMetadata("bridgeInInterface.kt")
-                public void testBridgeInInterface() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeInInterface.kt");
-                }
-
-                @TestMetadata("bridgeInInterface2.kt")
-                public void testBridgeInInterface2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeInInterface2.kt");
-                }
-
-                @TestMetadata("bridgeInInterfaceWithProperties.kt")
-                public void testBridgeInInterfaceWithProperties() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeInInterfaceWithProperties.kt");
-                }
-
-                @TestMetadata("bridgeInInterfaceWithProperties2.kt")
-                public void testBridgeInInterfaceWithProperties2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeInInterfaceWithProperties2.kt");
-                }
-
-                @TestMetadata("bridgeWithJava.kt")
-                public void testBridgeWithJava() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeWithJava.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties.kt")
-                public void testBridgeWithProperties() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeWithProperties.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties2.kt")
-                public void testBridgeWithProperties2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeWithProperties2.kt");
-                }
-
-                @TestMetadata("bridgeWithProperties3.kt")
-                public void testBridgeWithProperties3() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/bridgeWithProperties3.kt");
-                }
-
-                @TestMetadata("defaultArgs.kt")
-                public void testDefaultArgs() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/defaultArgs.kt");
-                }
-
-                @TestMetadata("defaultArgsViaAnonymousObject.kt")
-                public void testDefaultArgsViaAnonymousObject() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/defaultArgsViaAnonymousObject.kt");
-                }
-
-                @TestMetadata("inheritedFunctionWithDefaultParameters.kt")
-                public void testInheritedFunctionWithDefaultParameters() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/inheritedFunctionWithDefaultParameters.kt");
-                }
-
-                @TestMetadata("inheritedJvmDefault.kt")
-                public void testInheritedJvmDefault() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/inheritedJvmDefault.kt");
-                }
-
-                @TestMetadata("interfaceExtension.kt")
-                public void testInterfaceExtension() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/interfaceExtension.kt");
-                }
-
-                @TestMetadata("kt14243.kt")
-                public void testKt14243() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/kt14243.kt");
-                }
-
-                @TestMetadata("kt14243_2.kt")
-                public void testKt14243_2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/kt14243_2.kt");
-                }
-
-                @TestMetadata("privateFunInInterface.kt")
-                public void testPrivateFunInInterface() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/privateFunInInterface.kt");
-                }
-
-                @TestMetadata("propertyAnnotation.kt")
-                public void testPropertyAnnotation() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/propertyAnnotation.kt");
-                }
-
-                @TestMetadata("simpleFunction.kt")
-                public void testSimpleFunction() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/simpleFunction.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/delegationBy")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class DelegationBy extends AbstractFirBlackBoxCodegenTest {
+                public static class DelegationBy extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInDelegationBy() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/delegationBy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                    }
-
-                    @TestMetadata("simple.kt")
-                    public void testSimple() throws Exception {
-                        runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/delegationBy/simple.kt");
-                    }
-
-                    @TestMetadata("simpleProperty.kt")
-                    public void testSimpleProperty() throws Exception {
-                        runTest("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/delegationBy/simpleProperty.kt");
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/noDefaultImpls/delegationBy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
                 }
             }
@@ -15634,46 +13014,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/jvm8/defaults/noDelegation")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class NoDelegation extends AbstractFirBlackBoxCodegenTest {
+            public static class NoDelegation extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInNoDelegation() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/noDelegation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("noDelegationToDefaultMethodInClass.kt")
-                public void testNoDelegationToDefaultMethodInClass() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDelegation/noDelegationToDefaultMethodInClass.kt");
-                }
-
-                @TestMetadata("noDelegationToDefaultMethodInInterface.kt")
-                public void testNoDelegationToDefaultMethodInInterface() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDelegation/noDelegationToDefaultMethodInInterface.kt");
-                }
-
-                @TestMetadata("noDelegationToDefaultMethodInInterface2.kt")
-                public void testNoDelegationToDefaultMethodInInterface2() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/noDelegation/noDelegationToDefaultMethodInInterface2.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/noDelegation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
 
             @TestMetadata("compiler/testData/codegen/box/jvm8/defaults/reflection")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Reflection extends AbstractFirBlackBoxCodegenTest {
+            public static class Reflection extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInReflection() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/reflection"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("propertyAnnotations.kt")
-                public void testPropertyAnnotations() throws Exception {
-                    runTest("compiler/testData/codegen/box/jvm8/defaults/reflection/propertyAnnotations.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/defaults/reflection"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
         }
@@ -15681,86 +13041,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/jvm8/interfaceFlag")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class InterfaceFlag extends AbstractFirBlackBoxCodegenTest {
+        public static class InterfaceFlag extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInInterfaceFlag() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/interfaceFlag"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("superCall.kt")
-            public void testSuperCall() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/interfaceFlag/superCall.kt");
-            }
-
-            @TestMetadata("superCallIndirect.kt")
-            public void testSuperCallIndirect() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/interfaceFlag/superCallIndirect.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/interfaceFlag"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/jvm8/javaDefaults")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class JavaDefaults extends AbstractFirBlackBoxCodegenTest {
+        public static class JavaDefaults extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInJavaDefaults() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/javaDefaults"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("capturedSuperCall.kt")
-            public void testCapturedSuperCall() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/capturedSuperCall.kt");
-            }
-
-            @TestMetadata("defaultMethodCallFromInterface.kt")
-            public void testDefaultMethodCallFromInterface() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/defaultMethodCallFromInterface.kt");
-            }
-
-            @TestMetadata("defaultMethodCallViaClass.kt")
-            public void testDefaultMethodCallViaClass() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/defaultMethodCallViaClass.kt");
-            }
-
-            @TestMetadata("defaultMethodCallViaInterface.kt")
-            public void testDefaultMethodCallViaInterface() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/defaultMethodCallViaInterface.kt");
-            }
-
-            @TestMetadata("defaultMethodOverride.kt")
-            public void testDefaultMethodOverride() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/defaultMethodOverride.kt");
-            }
-
-            @TestMetadata("dontDelegateToDefaultMethods.kt")
-            public void testDontDelegateToDefaultMethods() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/dontDelegateToDefaultMethods.kt");
-            }
-
-            @TestMetadata("inheritKotlin.kt")
-            public void testInheritKotlin() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/inheritKotlin.kt");
-            }
-
-            @TestMetadata("invokeDefaultViaSuper.kt")
-            public void testInvokeDefaultViaSuper() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/invokeDefaultViaSuper.kt");
-            }
-
-            @TestMetadata("longChainOfKotlinExtendsFromJavaWithDefault.kt")
-            public void testLongChainOfKotlinExtendsFromJavaWithDefault() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/longChainOfKotlinExtendsFromJavaWithDefault.kt");
-            }
-
-            @TestMetadata("samOnInterfaceWithDefaultMethod.kt")
-            public void testSamOnInterfaceWithDefaultMethod() throws Exception {
-                runTest("compiler/testData/codegen/box/jvm8/javaDefaults/samOnInterfaceWithDefaultMethod.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvm8/javaDefaults"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -15768,248 +13068,38 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/jvmField")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class JvmField extends AbstractFirBlackBoxCodegenTest {
+    public static class JvmField extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInJvmField() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmField"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("annotationCompanion.kt")
-        public void testAnnotationCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/annotationCompanion.kt");
-        }
-
-        @TestMetadata("annotationCompanionWithJava.kt")
-        public void testAnnotationCompanionWithJava() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/annotationCompanionWithJava.kt");
-        }
-
-        @TestMetadata("captureClassFields.kt")
-        public void testCaptureClassFields() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/captureClassFields.kt");
-        }
-
-        @TestMetadata("capturePackageFields.kt")
-        public void testCapturePackageFields() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/capturePackageFields.kt");
-        }
-
-        @TestMetadata("checkNoAccessors.kt")
-        public void testCheckNoAccessors() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/checkNoAccessors.kt");
-        }
-
-        @TestMetadata("clashWithJavaSuperClassField.kt")
-        public void testClashWithJavaSuperClassField() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/clashWithJavaSuperClassField.kt");
-        }
-
-        @TestMetadata("classFieldReference.kt")
-        public void testClassFieldReference() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/classFieldReference.kt");
-        }
-
-        @TestMetadata("classFieldReflection.kt")
-        public void testClassFieldReflection() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/classFieldReflection.kt");
-        }
-
-        @TestMetadata("compoundAccess.kt")
-        public void testCompoundAccess() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/compoundAccess.kt");
-        }
-
-        @TestMetadata("constructorProperty.kt")
-        public void testConstructorProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/constructorProperty.kt");
-        }
-
-        @TestMetadata("fileOrder.kt")
-        public void testFileOrder() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/fileOrder.kt");
-        }
-
-        @TestMetadata("fileOrderWithCopying.kt")
-        public void testFileOrderWithCopying() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/fileOrderWithCopying.kt");
-        }
-
-        @TestMetadata("initializersOrder.kt")
-        public void testInitializersOrder() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/initializersOrder.kt");
-        }
-
-        @TestMetadata("interfaceCompanion.kt")
-        public void testInterfaceCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/interfaceCompanion.kt");
-        }
-
-        @TestMetadata("interfaceCompanionWithJava.kt")
-        public void testInterfaceCompanionWithJava() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/interfaceCompanionWithJava.kt");
-        }
-
-        @TestMetadata("publicField.kt")
-        public void testPublicField() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/publicField.kt");
-        }
-
-        @TestMetadata("publicFieldJava.kt")
-        public void testPublicFieldJava() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/publicFieldJava.kt");
-        }
-
-        @TestMetadata("simpleMemberProperty.kt")
-        public void testSimpleMemberProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/simpleMemberProperty.kt");
-        }
-
-        @TestMetadata("superCall.kt")
-        public void testSuperCall() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/superCall.kt");
-        }
-
-        @TestMetadata("superCall2.kt")
-        public void testSuperCall2() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/superCall2.kt");
-        }
-
-        @TestMetadata("topLevelFieldReference.kt")
-        public void testTopLevelFieldReference() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/topLevelFieldReference.kt");
-        }
-
-        @TestMetadata("topLevelFieldReflection.kt")
-        public void testTopLevelFieldReflection() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/topLevelFieldReflection.kt");
-        }
-
-        @TestMetadata("visibility.kt")
-        public void testVisibility() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/visibility.kt");
-        }
-
-        @TestMetadata("writeFieldReference.kt")
-        public void testWriteFieldReference() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmField/writeFieldReference.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmField"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/jvmName")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class JvmName extends AbstractFirBlackBoxCodegenTest {
+    public static class JvmName extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInJvmName() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmName"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("annotationProperties.kt")
-        public void testAnnotationProperties() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/annotationProperties.kt");
-        }
-
-        @TestMetadata("callableReference.kt")
-        public void testCallableReference() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/callableReference.kt");
-        }
-
-        @TestMetadata("clashingErasure.kt")
-        public void testClashingErasure() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/clashingErasure.kt");
-        }
-
-        @TestMetadata("classMembers.kt")
-        public void testClassMembers() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/classMembers.kt");
-        }
-
-        @TestMetadata("fakeJvmNameInJava.kt")
-        public void testFakeJvmNameInJava() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/fakeJvmNameInJava.kt");
-        }
-
-        @TestMetadata("functionName.kt")
-        public void testFunctionName() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/functionName.kt");
-        }
-
-        @TestMetadata("functionWithDefault.kt")
-        public void testFunctionWithDefault() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/functionWithDefault.kt");
-        }
-
-        @TestMetadata("loadJvmName.kt")
-        public void testLoadJvmName() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/loadJvmName.kt");
-        }
-
-        @TestMetadata("multifileClass.kt")
-        public void testMultifileClass() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/multifileClass.kt");
-        }
-
-        @TestMetadata("multifileClassWithLocalClass.kt")
-        public void testMultifileClassWithLocalClass() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/multifileClassWithLocalClass.kt");
-        }
-
-        @TestMetadata("multifileClassWithLocalGeneric.kt")
-        public void testMultifileClassWithLocalGeneric() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/multifileClassWithLocalGeneric.kt");
-        }
-
-        @TestMetadata("propertyAccessorsUseSite.kt")
-        public void testPropertyAccessorsUseSite() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/propertyAccessorsUseSite.kt");
-        }
-
-        @TestMetadata("propertyName.kt")
-        public void testPropertyName() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/propertyName.kt");
-        }
-
-        @TestMetadata("propertySyntheticMethod.kt")
-        public void testPropertySyntheticMethod() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/propertySyntheticMethod.kt");
-        }
-
-        @TestMetadata("renamedFileClass.kt")
-        public void testRenamedFileClass() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmName/renamedFileClass.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmName"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/jvmName/fileFacades")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class FileFacades extends AbstractFirBlackBoxCodegenTest {
+        public static class FileFacades extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInFileFacades() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmName/fileFacades"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("differentFiles.kt")
-            public void testDifferentFiles() throws Exception {
-                runTest("compiler/testData/codegen/box/jvmName/fileFacades/differentFiles.kt");
-            }
-
-            @TestMetadata("javaAnnotationOnFileFacade.kt")
-            public void testJavaAnnotationOnFileFacade() throws Exception {
-                runTest("compiler/testData/codegen/box/jvmName/fileFacades/javaAnnotationOnFileFacade.kt");
-            }
-
-            @TestMetadata("simple.kt")
-            public void testSimple() throws Exception {
-                runTest("compiler/testData/codegen/box/jvmName/fileFacades/simple.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmName/fileFacades"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -16017,322 +13107,52 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/jvmOverloads")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class JvmOverloads extends AbstractFirBlackBoxCodegenTest {
+    public static class JvmOverloads extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInJvmOverloads() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmOverloads"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("companionObject.kt")
-        public void testCompanionObject() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/companionObject.kt");
-        }
-
-        @TestMetadata("constructorWithTypeParams.kt")
-        public void testConstructorWithTypeParams() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/constructorWithTypeParams.kt");
-        }
-
-        @TestMetadata("defaultsNotAtEnd.kt")
-        public void testDefaultsNotAtEnd() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/defaultsNotAtEnd.kt");
-        }
-
-        @TestMetadata("doubleParameters.kt")
-        public void testDoubleParameters() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/doubleParameters.kt");
-        }
-
-        @TestMetadata("extensionMethod.kt")
-        public void testExtensionMethod() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/extensionMethod.kt");
-        }
-
-        @TestMetadata("generics.kt")
-        public void testGenerics() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/generics.kt");
-        }
-
-        @TestMetadata("innerClass.kt")
-        public void testInnerClass() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/innerClass.kt");
-        }
-
-        @TestMetadata("manyParameters.kt")
-        public void testManyParameters() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/manyParameters.kt");
-        }
-
-        @TestMetadata("multifileClass.kt")
-        public void testMultifileClass() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/multifileClass.kt");
-        }
-
-        @TestMetadata("multipleDefaultParameters.kt")
-        public void testMultipleDefaultParameters() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/multipleDefaultParameters.kt");
-        }
-
-        @TestMetadata("noRedundantVarargs.kt")
-        public void testNoRedundantVarargs() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/noRedundantVarargs.kt");
-        }
-
-        @TestMetadata("nonDefaultParameter.kt")
-        public void testNonDefaultParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/nonDefaultParameter.kt");
-        }
-
-        @TestMetadata("primaryConstructor.kt")
-        public void testPrimaryConstructor() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/primaryConstructor.kt");
-        }
-
-        @TestMetadata("primaryConstructorWithAllDefaults.kt")
-        public void testPrimaryConstructorWithAllDefaults() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/primaryConstructorWithAllDefaults.kt");
-        }
-
-        @TestMetadata("privateClass.kt")
-        public void testPrivateClass() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/privateClass.kt");
-        }
-
-        @TestMetadata("secondaryConstructor.kt")
-        public void testSecondaryConstructor() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/secondaryConstructor.kt");
-        }
-
-        @TestMetadata("simple.kt")
-        public void testSimple() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/simple.kt");
-        }
-
-        @TestMetadata("simpleJavaCall.kt")
-        public void testSimpleJavaCall() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/simpleJavaCall.kt");
-        }
-
-        @TestMetadata("typeParameters.kt")
-        public void testTypeParameters() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/typeParameters.kt");
-        }
-
-        @TestMetadata("varargs.kt")
-        public void testVarargs() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmOverloads/varargs.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmOverloads"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/jvmPackageName")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class JvmPackageName extends AbstractFirBlackBoxCodegenTest {
+    public static class JvmPackageName extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInJvmPackageName() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmPackageName"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("metadataField.kt")
-        public void testMetadataField() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmPackageName/metadataField.kt");
-        }
-
-        @TestMetadata("multifileClass.kt")
-        public void testMultifileClass() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmPackageName/multifileClass.kt");
-        }
-
-        @TestMetadata("rootPackage.kt")
-        public void testRootPackage() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmPackageName/rootPackage.kt");
-        }
-
-        @TestMetadata("simple.kt")
-        public void testSimple() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmPackageName/simple.kt");
-        }
-
-        @TestMetadata("withJvmName.kt")
-        public void testWithJvmName() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmPackageName/withJvmName.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmPackageName"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/jvmStatic")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class JvmStatic extends AbstractFirBlackBoxCodegenTest {
+    public static class JvmStatic extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInJvmStatic() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmStatic"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("annotations.kt")
-        public void testAnnotations() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/annotations.kt");
-        }
-
-        @TestMetadata("closure.kt")
-        public void testClosure() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/closure.kt");
-        }
-
-        @TestMetadata("companionObject.kt")
-        public void testCompanionObject() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/companionObject.kt");
-        }
-
-        @TestMetadata("convention.kt")
-        public void testConvention() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/convention.kt");
-        }
-
-        @TestMetadata("default.kt")
-        public void testDefault() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/default.kt");
-        }
-
-        @TestMetadata("defaultCrossFile.kt")
-        public void testDefaultCrossFile() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/defaultCrossFile.kt");
-        }
-
-        @TestMetadata("enumCompanion.kt")
-        public void testEnumCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/enumCompanion.kt");
-        }
-
-        @TestMetadata("explicitObject.kt")
-        public void testExplicitObject() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/explicitObject.kt");
-        }
-
-        @TestMetadata("funAccess.kt")
-        public void testFunAccess() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/funAccess.kt");
-        }
-
-        @TestMetadata("importStaticMemberFromObject.kt")
-        public void testImportStaticMemberFromObject() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/importStaticMemberFromObject.kt");
-        }
-
-        @TestMetadata("inline.kt")
-        public void testInline() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/inline.kt");
-        }
-
-        @TestMetadata("inlinePropertyAccessors.kt")
-        public void testInlinePropertyAccessors() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/inlinePropertyAccessors.kt");
-        }
-
-        @TestMetadata("interfaceCompanion.kt")
-        public void testInterfaceCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/interfaceCompanion.kt");
-        }
-
-        @TestMetadata("jvmNameForAccessor.kt")
-        public void testJvmNameForAccessor() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/jvmNameForAccessor.kt");
-        }
-
-        @TestMetadata("kt21246.kt")
-        public void testKt21246() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/kt21246.kt");
-        }
-
-        @TestMetadata("kt21246a.kt")
-        public void testKt21246a() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/kt21246a.kt");
-        }
-
-        @TestMetadata("kt9897_static.kt")
-        public void testKt9897_static() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/kt9897_static.kt");
-        }
-
-        @TestMetadata("object.kt")
-        public void testObject() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/object.kt");
-        }
-
-        @TestMetadata("postfixInc.kt")
-        public void testPostfixInc() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/postfixInc.kt");
-        }
-
-        @TestMetadata("prefixInc.kt")
-        public void testPrefixInc() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/prefixInc.kt");
-        }
-
-        @TestMetadata("privateMethod.kt")
-        public void testPrivateMethod() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/privateMethod.kt");
-        }
-
-        @TestMetadata("privateSetter.kt")
-        public void testPrivateSetter() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/privateSetter.kt");
-        }
-
-        @TestMetadata("propertyAccess.kt")
-        public void testPropertyAccess() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/propertyAccess.kt");
-        }
-
-        @TestMetadata("propertyAccessorsCompanion.kt")
-        public void testPropertyAccessorsCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/propertyAccessorsCompanion.kt");
-        }
-
-        @TestMetadata("propertyAccessorsObject.kt")
-        public void testPropertyAccessorsObject() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/propertyAccessorsObject.kt");
-        }
-
-        @TestMetadata("propertyAsDefault.kt")
-        public void testPropertyAsDefault() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/propertyAsDefault.kt");
-        }
-
-        @TestMetadata("propertyGetterDelegatesToAnother.kt")
-        public void testPropertyGetterDelegatesToAnother() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/propertyGetterDelegatesToAnother.kt");
-        }
-
-        @TestMetadata("simple.kt")
-        public void testSimple() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/simple.kt");
-        }
-
-        @TestMetadata("syntheticAccessor.kt")
-        public void testSyntheticAccessor() throws Exception {
-            runTest("compiler/testData/codegen/box/jvmStatic/syntheticAccessor.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/jvmStatic"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/labels")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Labels extends AbstractFirBlackBoxCodegenTest {
+    public static class Labels extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInLabels() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/labels"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/labels"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("controlLabelClashesWithFuncitonName.kt")
@@ -16379,13 +13199,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/lazyCodegen")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class LazyCodegen extends AbstractFirBlackBoxCodegenTest {
+    public static class LazyCodegen extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInLazyCodegen() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/lazyCodegen"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/lazyCodegen"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("exceptionInFieldInitializer.kt")
@@ -16436,13 +13256,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/lazyCodegen/optimizations")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Optimizations extends AbstractFirBlackBoxCodegenTest {
+        public static class Optimizations extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInOptimizations() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/lazyCodegen/optimizations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/lazyCodegen/optimizations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("negateConstantCompare.kt")
@@ -16495,13 +13315,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/localClasses")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class LocalClasses extends AbstractFirBlackBoxCodegenTest {
+    public static class LocalClasses extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInLocalClasses() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/localClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/localClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("anonymousObjectInExtension.kt")
@@ -16673,23 +13493,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/mangling")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Mangling extends AbstractFirBlackBoxCodegenTest {
+    public static class Mangling extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInMangling() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/mangling"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("field.kt")
-        public void testField() throws Exception {
-            runTest("compiler/testData/codegen/box/mangling/field.kt");
-        }
-
-        @TestMetadata("fun.kt")
-        public void testFun() throws Exception {
-            runTest("compiler/testData/codegen/box/mangling/fun.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/mangling"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("internal.kt")
@@ -16705,11 +13515,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("internalOverrideSuperCall.kt")
         public void testInternalOverrideSuperCall() throws Exception {
             runTest("compiler/testData/codegen/box/mangling/internalOverrideSuperCall.kt");
-        }
-
-        @TestMetadata("noOverrideWithJava.kt")
-        public void testNoOverrideWithJava() throws Exception {
-            runTest("compiler/testData/codegen/box/mangling/noOverrideWithJava.kt");
         }
 
         @TestMetadata("parentheses.kt")
@@ -16731,13 +13536,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/mixedNamedPosition")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class MixedNamedPosition extends AbstractFirBlackBoxCodegenTest {
+    public static class MixedNamedPosition extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInMixedNamedPosition() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/mixedNamedPosition"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/mixedNamedPosition"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("defaults.kt")
@@ -16759,13 +13564,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/multiDecl")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class MultiDecl extends AbstractFirBlackBoxCodegenTest {
+    public static class MultiDecl extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInMultiDecl() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("ComplexInitializer.kt")
@@ -16841,13 +13646,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/multiDecl/forIterator")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForIterator extends AbstractFirBlackBoxCodegenTest {
+        public static class ForIterator extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForIterator() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forIterator"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forIterator"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("MultiDeclFor.kt")
@@ -16878,13 +13683,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/multiDecl/forIterator/longIterator")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class LongIterator extends AbstractFirBlackBoxCodegenTest {
+            public static class LongIterator extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInLongIterator() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forIterator/longIterator"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forIterator/longIterator"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -16912,13 +13717,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForRange extends AbstractFirBlackBoxCodegenTest {
+        public static class ForRange extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForRange() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("MultiDeclFor.kt")
@@ -16959,13 +13764,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class ExplicitRangeTo extends AbstractFirBlackBoxCodegenTest {
+            public static class ExplicitRangeTo extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInExplicitRangeTo() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("MultiDeclFor.kt")
@@ -16996,13 +13801,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo/int")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Int extends AbstractFirBlackBoxCodegenTest {
+                public static class Int extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInInt() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo/int"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo/int"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -17029,13 +13834,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo/long")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Long extends AbstractFirBlackBoxCodegenTest {
+                public static class Long extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInLong() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo/long"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeTo/long"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -17063,13 +13868,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class ExplicitRangeToWithDot extends AbstractFirBlackBoxCodegenTest {
+            public static class ExplicitRangeToWithDot extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInExplicitRangeToWithDot() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("MultiDeclFor.kt")
@@ -17100,13 +13905,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot/int")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Int extends AbstractFirBlackBoxCodegenTest {
+                public static class Int extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInInt() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot/int"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot/int"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -17133,13 +13938,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot/long")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Long extends AbstractFirBlackBoxCodegenTest {
+                public static class Long extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInLong() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot/long"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/explicitRangeToWithDot/long"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -17167,13 +13972,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange/int")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Int extends AbstractFirBlackBoxCodegenTest {
+            public static class Int extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInInt() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/int"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/int"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -17200,13 +14005,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/multiDecl/forRange/long")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Long extends AbstractFirBlackBoxCodegenTest {
+            public static class Long extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInLong() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/long"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiDecl/forRange/long"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("MultiDeclForComponentExtensions.kt")
@@ -17235,140 +14040,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/multifileClasses")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class MultifileClasses extends AbstractFirBlackBoxCodegenTest {
+    public static class MultifileClasses extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInMultifileClasses() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multifileClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("callMultifileClassMemberFromOtherPackage.kt")
-        public void testCallMultifileClassMemberFromOtherPackage() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/callMultifileClassMemberFromOtherPackage.kt");
-        }
-
-        @TestMetadata("callsToMultifileClassFromOtherPackage.kt")
-        public void testCallsToMultifileClassFromOtherPackage() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/callsToMultifileClassFromOtherPackage.kt");
-        }
-
-        @TestMetadata("constPropertyReferenceFromMultifileClass.kt")
-        public void testConstPropertyReferenceFromMultifileClass() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/constPropertyReferenceFromMultifileClass.kt");
-        }
-
-        @TestMetadata("genericProperty.kt")
-        public void testGenericProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/genericProperty.kt");
-        }
-
-        @TestMetadata("inlineMultifileClassMemberFromOtherPackage.kt")
-        public void testInlineMultifileClassMemberFromOtherPackage() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/inlineMultifileClassMemberFromOtherPackage.kt");
-        }
-
-        @TestMetadata("kt16077.kt")
-        public void testKt16077() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/kt16077.kt");
-        }
-
-        @TestMetadata("multifileClassPartsInitialization.kt")
-        public void testMultifileClassPartsInitialization() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/multifileClassPartsInitialization.kt");
-        }
-
-        @TestMetadata("multifileClassWith2Files.kt")
-        public void testMultifileClassWith2Files() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/multifileClassWith2Files.kt");
-        }
-
-        @TestMetadata("multifileClassWithCrossCall.kt")
-        public void testMultifileClassWithCrossCall() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/multifileClassWithCrossCall.kt");
-        }
-
-        @TestMetadata("multifileClassWithPrivate.kt")
-        public void testMultifileClassWithPrivate() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/multifileClassWithPrivate.kt");
-        }
-
-        @TestMetadata("privateConstVal.kt")
-        public void testPrivateConstVal() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/privateConstVal.kt");
-        }
-
-        @TestMetadata("samePartNameDifferentFacades.kt")
-        public void testSamePartNameDifferentFacades() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/samePartNameDifferentFacades.kt");
-        }
-
-        @TestMetadata("sealedClassHierarchy.kt")
-        public void testSealedClassHierarchy() throws Exception {
-            runTest("compiler/testData/codegen/box/multifileClasses/sealedClassHierarchy.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multifileClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/multifileClasses/optimized")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Optimized extends AbstractFirBlackBoxCodegenTest {
+        public static class Optimized extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInOptimized() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multifileClasses/optimized"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("callInInlineLambda.kt")
-            public void testCallInInlineLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/callInInlineLambda.kt");
-            }
-
-            @TestMetadata("callableRefToConstVal.kt")
-            public void testCallableRefToConstVal() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/callableRefToConstVal.kt");
-            }
-
-            @TestMetadata("callableRefToFun.kt")
-            public void testCallableRefToFun() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/callableRefToFun.kt");
-            }
-
-            @TestMetadata("callableRefToInternalConstValInline.kt")
-            public void testCallableRefToInternalConstValInline() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/callableRefToInternalConstValInline.kt");
-            }
-
-            @TestMetadata("callableRefToPrivateConstVal.kt")
-            public void testCallableRefToPrivateConstVal() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/callableRefToPrivateConstVal.kt");
-            }
-
-            @TestMetadata("callableReferencesToSameFunctionsFromDifferentPackages.kt")
-            public void testCallableReferencesToSameFunctionsFromDifferentPackages() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/callableReferencesToSameFunctionsFromDifferentPackages.kt");
-            }
-
-            @TestMetadata("callableReferencesToSamePropertiesFromDifferentPackages.kt")
-            public void testCallableReferencesToSamePropertiesFromDifferentPackages() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/callableReferencesToSamePropertiesFromDifferentPackages.kt");
-            }
-
-            @TestMetadata("calls.kt")
-            public void testCalls() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/calls.kt");
-            }
-
-            @TestMetadata("internalFunction.kt")
-            public void testInternalFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/internalFunction.kt");
-            }
-
-            @TestMetadata("overlappingFuns.kt")
-            public void testOverlappingFuns() throws Exception {
-                runTest("compiler/testData/codegen/box/multifileClasses/optimized/overlappingFuns.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multifileClasses/optimized"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -17376,33 +14066,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/multiplatform")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Multiplatform extends AbstractFirBlackBoxCodegenTest {
+    public static class Multiplatform extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInMultiplatform() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("expectClassInJvmMultifileFacade.kt")
-        public void testExpectClassInJvmMultifileFacade() throws Exception {
-            runTest("compiler/testData/codegen/box/multiplatform/expectClassInJvmMultifileFacade.kt");
-        }
-
-        @TestMetadata("noArgActualConstructor.kt")
-        public void testNoArgActualConstructor() throws Exception {
-            runTest("compiler/testData/codegen/box/multiplatform/noArgActualConstructor.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("optionalExpectation.kt")
         public void testOptionalExpectation() throws Exception {
             runTest("compiler/testData/codegen/box/multiplatform/optionalExpectation.kt");
-        }
-
-        @TestMetadata("optionalExpectationJvm.kt")
-        public void testOptionalExpectationJvm() throws Exception {
-            runTest("compiler/testData/codegen/box/multiplatform/optionalExpectationJvm.kt");
         }
 
         @TestMetadata("starImportOfExpectEnumWithActualTypeAlias.kt")
@@ -17413,18 +14088,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/multiplatform/defaultArguments")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class DefaultArguments extends AbstractFirBlackBoxCodegenTest {
+        public static class DefaultArguments extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInDefaultArguments() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/defaultArguments"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("annotations.kt")
-            public void testAnnotations() throws Exception {
-                runTest("compiler/testData/codegen/box/multiplatform/defaultArguments/annotations.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/defaultArguments"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("bothInExpectAndActual.kt")
@@ -17502,11 +14172,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/multiplatform/defaultArguments/inlineFunctionWithDefaultLambda.kt");
             }
 
-            @TestMetadata("jvmOverloads.kt")
-            public void testJvmOverloads() throws Exception {
-                runTest("compiler/testData/codegen/box/multiplatform/defaultArguments/jvmOverloads.kt");
-            }
-
             @TestMetadata("kt23239.kt")
             public void testKt23239() throws Exception {
                 runTest("compiler/testData/codegen/box/multiplatform/defaultArguments/kt23239.kt");
@@ -17541,13 +14206,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/multiplatform/multiModule")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class MultiModule extends AbstractFirBlackBoxCodegenTest {
+        public static class MultiModule extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMultiModule() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/multiModule"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/multiModule"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("expectActualLink.kt")
@@ -17570,18 +14235,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/nonLocalReturns")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class NonLocalReturns extends AbstractFirBlackBoxCodegenTest {
+    public static class NonLocalReturns extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInNonLocalReturns() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/nonLocalReturns"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("kt6895.kt")
-        public void testKt6895() throws Exception {
-            runTest("compiler/testData/codegen/box/nonLocalReturns/kt6895.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/nonLocalReturns"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("kt9644let.kt")
@@ -17598,28 +14258,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         public void testReturnInsideTwoLambdas() throws Exception {
             runTest("compiler/testData/codegen/box/nonLocalReturns/returnInsideTwoLambdas.kt");
         }
-
-        @TestMetadata("use.kt")
-        public void testUse() throws Exception {
-            runTest("compiler/testData/codegen/box/nonLocalReturns/use.kt");
-        }
-
-        @TestMetadata("useWithException.kt")
-        public void testUseWithException() throws Exception {
-            runTest("compiler/testData/codegen/box/nonLocalReturns/useWithException.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/nothingValue")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class NothingValue extends AbstractFirBlackBoxCodegenTest {
+    public static class NothingValue extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInNothingValue() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/nothingValue"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/nothingValue"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("inNestedCall.kt")
@@ -17636,38 +14286,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/nullCheckOptimization")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class NullCheckOptimization extends AbstractFirBlackBoxCodegenTest {
+    public static class NullCheckOptimization extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInNullCheckOptimization() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/nullCheckOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("exclExclThrowsKnpe_1_3.kt")
-        public void testExclExclThrowsKnpe_1_3() throws Exception {
-            runTest("compiler/testData/codegen/box/nullCheckOptimization/exclExclThrowsKnpe_1_3.kt");
-        }
-
-        @TestMetadata("exclExclThrowsNpe.kt")
-        public void testExclExclThrowsNpe() throws Exception {
-            runTest("compiler/testData/codegen/box/nullCheckOptimization/exclExclThrowsNpe.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/nullCheckOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("isNullable.kt")
         public void testIsNullable() throws Exception {
             runTest("compiler/testData/codegen/box/nullCheckOptimization/isNullable.kt");
-        }
-
-        @TestMetadata("javaNullCheckThrowsIse_1_3.kt")
-        public void testJavaNullCheckThrowsIse_1_3() throws Exception {
-            runTest("compiler/testData/codegen/box/nullCheckOptimization/javaNullCheckThrowsIse_1_3.kt");
-        }
-
-        @TestMetadata("javaNullCheckThrowsNpe.kt")
-        public void testJavaNullCheckThrowsNpe() throws Exception {
-            runTest("compiler/testData/codegen/box/nullCheckOptimization/javaNullCheckThrowsNpe.kt");
         }
 
         @TestMetadata("kt22410.kt")
@@ -17680,16 +14310,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/nullCheckOptimization/kt7774.kt");
         }
 
-        @TestMetadata("parameterNullCheckThrowsIae_1_3.kt")
-        public void testParameterNullCheckThrowsIae_1_3() throws Exception {
-            runTest("compiler/testData/codegen/box/nullCheckOptimization/parameterNullCheckThrowsIae_1_3.kt");
-        }
-
-        @TestMetadata("parameterNullCheckThrowsNpe.kt")
-        public void testParameterNullCheckThrowsNpe() throws Exception {
-            runTest("compiler/testData/codegen/box/nullCheckOptimization/parameterNullCheckThrowsNpe.kt");
-        }
-
         @TestMetadata("primitiveCheckWithSideEffect.kt")
         public void testPrimitiveCheckWithSideEffect() throws Exception {
             runTest("compiler/testData/codegen/box/nullCheckOptimization/primitiveCheckWithSideEffect.kt");
@@ -17699,23 +14319,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         public void testTrivialInstanceOf() throws Exception {
             runTest("compiler/testData/codegen/box/nullCheckOptimization/trivialInstanceOf.kt");
         }
-
-        @TestMetadata("varModifiedAfterCheck.kt")
-        public void testVarModifiedAfterCheck() throws Exception {
-            runTest("compiler/testData/codegen/box/nullCheckOptimization/varModifiedAfterCheck.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/objectIntrinsics")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ObjectIntrinsics extends AbstractFirBlackBoxCodegenTest {
+    public static class ObjectIntrinsics extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInObjectIntrinsics() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objectIntrinsics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objectIntrinsics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("objects.kt")
@@ -17727,13 +14342,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/objects")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Objects extends AbstractFirBlackBoxCodegenTest {
+    public static class Objects extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInObjects() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objects"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objects"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("anonymousObjectPropertyInitialization.kt")
@@ -17821,11 +14436,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/objects/kt11117.kt");
         }
 
-        @TestMetadata("kt1136.kt")
-        public void testKt1136() throws Exception {
-            runTest("compiler/testData/codegen/box/objects/kt1136.kt");
-        }
-
         @TestMetadata("kt1186.kt")
         public void testKt1186() throws Exception {
             runTest("compiler/testData/codegen/box/objects/kt1186.kt");
@@ -17899,11 +14509,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt535.kt")
         public void testKt535() throws Exception {
             runTest("compiler/testData/codegen/box/objects/kt535.kt");
-        }
-
-        @TestMetadata("kt560.kt")
-        public void testKt560() throws Exception {
-            runTest("compiler/testData/codegen/box/objects/kt560.kt");
         }
 
         @TestMetadata("kt694.kt")
@@ -18094,13 +14699,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/objects/companionObjectAccess")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class CompanionObjectAccess extends AbstractFirBlackBoxCodegenTest {
+        public static class CompanionObjectAccess extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCompanionObjectAccess() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objects/companionObjectAccess"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objects/companionObjectAccess"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("kt27117.kt")
@@ -18186,9 +14791,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/objects/companionObjectAccess/multipleCompanionsWithAccessors")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class MultipleCompanionsWithAccessors extends AbstractFirBlackBoxCodegenTest {
+            public static class MultipleCompanionsWithAccessors extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 @TestMetadata("accessFromInlineLambda.kt")
@@ -18197,7 +14802,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 }
 
                 public void testAllFilesPresentInMultipleCompanionsWithAccessors() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objects/companionObjectAccess/multipleCompanionsWithAccessors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objects/companionObjectAccess/multipleCompanionsWithAccessors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("anonymousObjectInPropertyInitializer.kt")
@@ -18259,13 +14864,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/objects/companionObjectAccess/primitiveCompanion")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class PrimitiveCompanion extends AbstractFirBlackBoxCodegenTest {
+            public static class PrimitiveCompanion extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInPrimitiveCompanion() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objects/companionObjectAccess/primitiveCompanion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/objects/companionObjectAccess/primitiveCompanion"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("byteCompanionObject.kt")
@@ -18309,13 +14914,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/operatorConventions")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class OperatorConventions extends AbstractFirBlackBoxCodegenTest {
+    public static class OperatorConventions extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInOperatorConventions() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/operatorConventions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/operatorConventions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("annotatedAssignment.kt")
@@ -18421,13 +15026,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/operatorConventions/compareTo")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class CompareTo extends AbstractFirBlackBoxCodegenTest {
+        public static class CompareTo extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCompareTo() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/operatorConventions/compareTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/operatorConventions/compareTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("boolean.kt")
@@ -18485,18 +15090,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/optimizations")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Optimizations extends AbstractFirBlackBoxCodegenTest {
+    public static class Optimizations extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInOptimizations() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/optimizations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("hashCode.kt")
-        public void testHashCode() throws Exception {
-            runTest("compiler/testData/codegen/box/optimizations/hashCode.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/optimizations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("kt20844.kt")
@@ -18508,13 +15108,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/package")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Package extends AbstractFirBlackBoxCodegenTest {
+    public static class Package extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInPackage() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/package"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/package"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("boxPrimitiveTypeInClinit.kt")
@@ -18540,11 +15140,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("invokespecial.kt")
         public void testInvokespecial() throws Exception {
             runTest("compiler/testData/codegen/box/package/invokespecial.kt");
-        }
-
-        @TestMetadata("mainInFiles.kt")
-        public void testMainInFiles() throws Exception {
-            runTest("compiler/testData/codegen/box/package/mainInFiles.kt");
         }
 
         @TestMetadata("nullablePrimitiveNoFieldInitializer.kt")
@@ -18581,80 +15176,30 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/parametersMetadata")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ParametersMetadata extends AbstractFirBlackBoxCodegenTest {
+    public static class ParametersMetadata extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         private void runTestWithPackageReplacement(String testDataFilePath, String packageName) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(filePath -> doTestWithCoroutinesPackageReplacement(filePath, packageName), TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInParametersMetadata() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/parametersMetadata"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("defaultImpls.kt")
-        public void testDefaultImpls() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/defaultImpls.kt");
-        }
-
-        @TestMetadata("delegation.kt")
-        public void testDelegation() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/delegation.kt");
-        }
-
-        @TestMetadata("enum.kt")
-        public void testEnum() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/enum.kt");
-        }
-
-        @TestMetadata("extensionFunction.kt")
-        public void testExtensionFunction() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/extensionFunction.kt");
-        }
-
-        @TestMetadata("function.kt")
-        public void testFunction() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/function.kt");
-        }
-
-        @TestMetadata("inlineClassMethodParameterModifiers.kt")
-        public void testInlineClassMethodParameterModifiers() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/inlineClassMethodParameterModifiers.kt");
-        }
-
-        @TestMetadata("inlineClassMethodParameterNames.kt")
-        public void testInlineClassMethodParameterNames() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/inlineClassMethodParameterNames.kt");
-        }
-
-        @TestMetadata("innerClass.kt")
-        public void testInnerClass() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/innerClass.kt");
-        }
-
-        @TestMetadata("superParams.kt")
-        public void testSuperParams() throws Exception {
-            runTest("compiler/testData/codegen/box/parametersMetadata/superParams.kt");
-        }
-
-        @TestMetadata("suspendFunction.kt")
-        public void testSuspendFunction_1_3() throws Exception {
-            runTestWithPackageReplacement("compiler/testData/codegen/box/parametersMetadata/suspendFunction.kt", "kotlin.coroutines");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/parametersMetadata"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/platformTypes")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class PlatformTypes extends AbstractFirBlackBoxCodegenTest {
+    public static class PlatformTypes extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInPlatformTypes() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/platformTypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/platformTypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("inferenceFlexibleTToNullable.kt")
@@ -18662,26 +15207,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/platformTypes/inferenceFlexibleTToNullable.kt");
         }
 
-        @TestMetadata("unsafeNullCheck.kt")
-        public void testUnsafeNullCheck() throws Exception {
-            runTest("compiler/testData/codegen/box/platformTypes/unsafeNullCheck.kt");
-        }
-
-        @TestMetadata("unsafeNullCheckWithPrimitive.kt")
-        public void testUnsafeNullCheckWithPrimitive() throws Exception {
-            runTest("compiler/testData/codegen/box/platformTypes/unsafeNullCheckWithPrimitive.kt");
-        }
-
         @TestMetadata("compiler/testData/codegen/box/platformTypes/primitives")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Primitives extends AbstractFirBlackBoxCodegenTest {
+        public static class Primitives extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInPrimitives() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/platformTypes/primitives"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/platformTypes/primitives"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("assign.kt")
@@ -18709,19 +15244,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/platformTypes/primitives/equals.kt");
             }
 
-            @TestMetadata("equalsNull.kt")
-            public void testEqualsNull() throws Exception {
-                runTest("compiler/testData/codegen/box/platformTypes/primitives/equalsNull.kt");
-            }
-
             @TestMetadata("hashCode.kt")
             public void testHashCode() throws Exception {
                 runTest("compiler/testData/codegen/box/platformTypes/primitives/hashCode.kt");
-            }
-
-            @TestMetadata("identityEquals.kt")
-            public void testIdentityEquals() throws Exception {
-                runTest("compiler/testData/codegen/box/platformTypes/primitives/identityEquals.kt");
             }
 
             @TestMetadata("inc.kt")
@@ -18794,71 +15319,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/polymorphicSignature")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class PolymorphicSignature extends AbstractFirBlackBoxCodegenTest {
+    public static class PolymorphicSignature extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInPolymorphicSignature() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/polymorphicSignature"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("anonymousSubclass.kt")
-        public void testAnonymousSubclass() throws Exception {
-            runTest("compiler/testData/codegen/box/polymorphicSignature/anonymousSubclass.kt");
-        }
-
-        @TestMetadata("invoke.kt")
-        public void testInvoke() throws Exception {
-            runTest("compiler/testData/codegen/box/polymorphicSignature/invoke.kt");
-        }
-
-        @TestMetadata("invokeExact.kt")
-        public void testInvokeExact() throws Exception {
-            runTest("compiler/testData/codegen/box/polymorphicSignature/invokeExact.kt");
-        }
-
-        @TestMetadata("invokeExactWithInlineClass.kt")
-        public void testInvokeExactWithInlineClass() throws Exception {
-            runTest("compiler/testData/codegen/box/polymorphicSignature/invokeExactWithInlineClass.kt");
-        }
-
-        @TestMetadata("nullArgument.kt")
-        public void testNullArgument() throws Exception {
-            runTest("compiler/testData/codegen/box/polymorphicSignature/nullArgument.kt");
-        }
-
-        @TestMetadata("varargOfObjects_after.kt")
-        public void testVarargOfObjects_after() throws Exception {
-            runTest("compiler/testData/codegen/box/polymorphicSignature/varargOfObjects_after.kt");
-        }
-
-        @TestMetadata("varargOfObjects_before.kt")
-        public void testVarargOfObjects_before() throws Exception {
-            runTest("compiler/testData/codegen/box/polymorphicSignature/varargOfObjects_before.kt");
-        }
-
-        @TestMetadata("voidReturnType.kt")
-        public void testVoidReturnType() throws Exception {
-            runTest("compiler/testData/codegen/box/polymorphicSignature/voidReturnType.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/polymorphicSignature"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/primitiveTypes")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class PrimitiveTypes extends AbstractFirBlackBoxCodegenTest {
+    public static class PrimitiveTypes extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInPrimitiveTypes() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/primitiveTypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("comparisonWithNaN.kt")
-        public void testComparisonWithNaN() throws Exception {
-            runTest("compiler/testData/codegen/box/primitiveTypes/comparisonWithNaN.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/primitiveTypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("comparisonWithNullCallsFun.kt")
@@ -18959,11 +15439,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt242.kt")
         public void testKt242() throws Exception {
             runTest("compiler/testData/codegen/box/primitiveTypes/kt242.kt");
-        }
-
-        @TestMetadata("kt243.kt")
-        public void testKt243() throws Exception {
-            runTest("compiler/testData/codegen/box/primitiveTypes/kt243.kt");
         }
 
         @TestMetadata("kt248.kt")
@@ -19121,11 +15596,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/primitiveTypes/nullableCharBoolean.kt");
         }
 
-        @TestMetadata("number.kt")
-        public void testNumber() throws Exception {
-            runTest("compiler/testData/codegen/box/primitiveTypes/number.kt");
-        }
-
         @TestMetadata("numberEqualsHashCodeToString.kt")
         public void testNumberEqualsHashCodeToString() throws Exception {
             runTest("compiler/testData/codegen/box/primitiveTypes/numberEqualsHashCodeToString.kt");
@@ -19154,13 +15624,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/primitiveTypes/equalityWithObject")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class EqualityWithObject extends AbstractFirBlackBoxCodegenTest {
+        public static class EqualityWithObject extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInEqualityWithObject() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/primitiveTypes/equalityWithObject"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/primitiveTypes/equalityWithObject"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("boxedEqPrimitiveEvaluationOrder.kt")
@@ -19206,13 +15676,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/primitiveTypes/equalityWithObject/generated")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Generated extends AbstractFirBlackBoxCodegenTest {
+            public static class Generated extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInGenerated() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/primitiveTypes/equalityWithObject/generated"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/primitiveTypes/equalityWithObject/generated"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("boxedEqPrimitiveBoolean.kt")
@@ -19311,13 +15781,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/private")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Private extends AbstractFirBlackBoxCodegenTest {
+    public static class Private extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInPrivate() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/private"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/private"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("arrayConvention.kt")
@@ -19334,13 +15804,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/privateConstructors")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class PrivateConstructors extends AbstractFirBlackBoxCodegenTest {
+    public static class PrivateConstructors extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInPrivateConstructors() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/privateConstructors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/privateConstructors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("base.kt")
@@ -19378,11 +15848,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/privateConstructors/secondary.kt");
         }
 
-        @TestMetadata("synthetic.kt")
-        public void testSynthetic() throws Exception {
-            runTest("compiler/testData/codegen/box/privateConstructors/synthetic.kt");
-        }
-
         @TestMetadata("withArguments.kt")
         public void testWithArguments() throws Exception {
             runTest("compiler/testData/codegen/box/privateConstructors/withArguments.kt");
@@ -19412,9 +15877,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/properties")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Properties extends AbstractFirBlackBoxCodegenTest {
+    public static class Properties extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         @TestMetadata("accessToPrivateProperty.kt")
@@ -19428,7 +15893,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         public void testAllFilesPresentInProperties() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("augmentedAssignmentsAndIncrements.kt")
@@ -19476,29 +15941,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/properties/classPrivateArtificialFieldInsideNested.kt");
         }
 
-        @TestMetadata("collectionSize.kt")
-        public void testCollectionSize() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/collectionSize.kt");
-        }
-
-        @TestMetadata("commonPropertiesKJK.kt")
-        public void testCommonPropertiesKJK() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/commonPropertiesKJK.kt");
-        }
-
         @TestMetadata("companionFieldInsideLambda.kt")
         public void testCompanionFieldInsideLambda() throws Exception {
             runTest("compiler/testData/codegen/box/properties/companionFieldInsideLambda.kt");
-        }
-
-        @TestMetadata("companionObjectAccessor.kt")
-        public void testCompanionObjectAccessor() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/companionObjectAccessor.kt");
-        }
-
-        @TestMetadata("companionObjectPropertiesFromJava.kt")
-        public void testCompanionObjectPropertiesFromJava() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/companionObjectPropertiesFromJava.kt");
         }
 
         @TestMetadata("companionPrivateField.kt")
@@ -19566,21 +16011,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/properties/initOrderMultiModule.kt");
         }
 
-        @TestMetadata("javaGenericSynthProperty.kt")
-        public void testJavaGenericSynthProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/javaGenericSynthProperty.kt");
-        }
-
-        @TestMetadata("javaPropertyBoxedGetter.kt")
-        public void testJavaPropertyBoxedGetter() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/javaPropertyBoxedGetter.kt");
-        }
-
-        @TestMetadata("javaPropertyBoxedSetter.kt")
-        public void testJavaPropertyBoxedSetter() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/javaPropertyBoxedSetter.kt");
-        }
-
         @TestMetadata("kt10715.kt")
         public void testKt10715() throws Exception {
             runTest("compiler/testData/codegen/box/properties/kt10715.kt");
@@ -19611,11 +16041,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/properties/kt1170.kt");
         }
 
-        @TestMetadata("kt12200.kt")
-        public void testKt12200() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/kt12200.kt");
-        }
-
         @TestMetadata("kt1398.kt")
         public void testKt1398() throws Exception {
             runTest("compiler/testData/codegen/box/properties/kt1398.kt");
@@ -19624,11 +16049,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt1417.kt")
         public void testKt1417() throws Exception {
             runTest("compiler/testData/codegen/box/properties/kt1417.kt");
-        }
-
-        @TestMetadata("kt1482_2279.kt")
-        public void testKt1482_2279() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/kt1482_2279.kt");
         }
 
         @TestMetadata("kt1714.kt")
@@ -19766,29 +16186,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/properties/privatePropertyWithoutBackingField.kt");
         }
 
-        @TestMetadata("protectedJavaFieldInInline.kt")
-        public void testProtectedJavaFieldInInline() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/protectedJavaFieldInInline.kt");
-        }
-
-        @TestMetadata("protectedJavaProperty.kt")
-        public void testProtectedJavaProperty() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/protectedJavaProperty.kt");
-        }
-
-        @TestMetadata("protectedJavaPropertyInCompanion.kt")
-        public void testProtectedJavaPropertyInCompanion() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/protectedJavaPropertyInCompanion.kt");
-        }
-
         @TestMetadata("sideEffectInTopLevelInitializerMultiModule.kt")
         public void testSideEffectInTopLevelInitializerMultiModule() throws Exception {
             runTest("compiler/testData/codegen/box/properties/sideEffectInTopLevelInitializerMultiModule.kt");
-        }
-
-        @TestMetadata("substituteJavaSuperField.kt")
-        public void testSubstituteJavaSuperField() throws Exception {
-            runTest("compiler/testData/codegen/box/properties/substituteJavaSuperField.kt");
         }
 
         @TestMetadata("twoAnnotatedExtensionPropertiesWithoutBackingFields.kt")
@@ -19804,52 +16204,27 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/properties/const")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Const extends AbstractFirBlackBoxCodegenTest {
+        public static class Const extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInConst() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/const"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/const"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("anotherFile.kt")
             public void testAnotherFile() throws Exception {
                 runTest("compiler/testData/codegen/box/properties/const/anotherFile.kt");
             }
-
-            @TestMetadata("constFlags.kt")
-            public void testConstFlags() throws Exception {
-                runTest("compiler/testData/codegen/box/properties/const/constFlags.kt");
-            }
-
-            @TestMetadata("constValInAnnotationDefault.kt")
-            public void testConstValInAnnotationDefault() throws Exception {
-                runTest("compiler/testData/codegen/box/properties/const/constValInAnnotationDefault.kt");
-            }
-
-            @TestMetadata("fpNonConstValProperlyInitialized.kt")
-            public void testFpNonConstValProperlyInitialized() throws Exception {
-                runTest("compiler/testData/codegen/box/properties/const/fpNonConstValProperlyInitialized.kt");
-            }
-
-            @TestMetadata("interfaceCompanion.kt")
-            public void testInterfaceCompanion() throws Exception {
-                runTest("compiler/testData/codegen/box/properties/const/interfaceCompanion.kt");
-            }
-
-            @TestMetadata("nonConstValsAreProperlyInitialized.kt")
-            public void testNonConstValsAreProperlyInitialized() throws Exception {
-                runTest("compiler/testData/codegen/box/properties/const/nonConstValsAreProperlyInitialized.kt");
-            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/properties/lateinit")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Lateinit extends AbstractFirBlackBoxCodegenTest {
+        public static class Lateinit extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             @TestMetadata("accessor.kt")
@@ -19868,7 +16243,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             }
 
             public void testAllFilesPresentInLateinit() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/lateinit"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/lateinit"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("exceptionField.kt")
@@ -19921,21 +16296,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/properties/lateinit/simpleVar.kt");
             }
 
-            @TestMetadata("visibility.kt")
-            public void testVisibility() throws Exception {
-                runTest("compiler/testData/codegen/box/properties/lateinit/visibility.kt");
-            }
-
             @TestMetadata("compiler/testData/codegen/box/properties/lateinit/isInitializedAndDeinitialize")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class IsInitializedAndDeinitialize extends AbstractFirBlackBoxCodegenTest {
+            public static class IsInitializedAndDeinitialize extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInIsInitializedAndDeinitialize() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/lateinit/isInitializedAndDeinitialize"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/lateinit/isInitializedAndDeinitialize"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("companionObjectField.kt")
@@ -19973,11 +16343,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     runTest("compiler/testData/codegen/box/properties/lateinit/isInitializedAndDeinitialize/sideEffects.kt");
                 }
 
-                @TestMetadata("simpleIsInitialized.kt")
-                public void testSimpleIsInitialized() throws Exception {
-                    runTest("compiler/testData/codegen/box/properties/lateinit/isInitializedAndDeinitialize/simpleIsInitialized.kt");
-                }
-
                 @TestMetadata("topLevelProperty.kt")
                 public void testTopLevelProperty() throws Exception {
                     runTest("compiler/testData/codegen/box/properties/lateinit/isInitializedAndDeinitialize/topLevelProperty.kt");
@@ -19987,13 +16352,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/properties/lateinit/local")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Local extends AbstractFirBlackBoxCodegenTest {
+            public static class Local extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInLocal() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/lateinit/local"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/lateinit/local"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("capturedLocalLateinit.kt")
@@ -20035,9 +16400,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/properties/lateinit/topLevel")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class TopLevel extends AbstractFirBlackBoxCodegenTest {
+            public static class TopLevel extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 @TestMetadata("accessorException.kt")
@@ -20051,7 +16416,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 }
 
                 public void testAllFilesPresentInTopLevel() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/lateinit/topLevel"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/properties/lateinit/topLevel"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("topLevelLateinit.kt")
@@ -20075,18 +16440,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/publishedApi")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class PublishedApi extends AbstractFirBlackBoxCodegenTest {
+    public static class PublishedApi extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInPublishedApi() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/publishedApi"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("noMangling.kt")
-        public void testNoMangling() throws Exception {
-            runTest("compiler/testData/codegen/box/publishedApi/noMangling.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/publishedApi"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("simple.kt")
@@ -20103,13 +16463,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/ranges")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Ranges extends AbstractFirBlackBoxCodegenTest {
+    public static class Ranges extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInRanges() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("forByteProgressionWithIntIncrement.kt")
@@ -20162,11 +16522,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/ranges/forInStringVarUpdatedInLoopBody.kt");
         }
 
-        @TestMetadata("forInStringWithCustomIterator.kt")
-        public void testForInStringWithCustomIterator() throws Exception {
-            runTest("compiler/testData/codegen/box/ranges/forInStringWithCustomIterator.kt");
-        }
-
         @TestMetadata("forIntRange.kt")
         public void testForIntRange() throws Exception {
             runTest("compiler/testData/codegen/box/ranges/forIntRange.kt");
@@ -20200,13 +16555,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/contains")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Contains extends AbstractFirBlackBoxCodegenTest {
+        public static class Contains extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInContains() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/contains"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/contains"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("comparisonWithRangeBoundEliminated.kt")
@@ -20367,13 +16722,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/ranges/contains/generated")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Generated extends AbstractFirBlackBoxCodegenTest {
+            public static class Generated extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInGenerated() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/contains/generated"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/contains/generated"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("arrayIndices.kt")
@@ -20451,13 +16806,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/evaluationOrder")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class EvaluationOrder extends AbstractFirBlackBoxCodegenTest {
+        public static class EvaluationOrder extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInEvaluationOrder() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInDownTo.kt")
@@ -20508,25 +16863,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/ranges/evaluationOrder/stepped")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Stepped extends AbstractFirBlackBoxCodegenTest {
+            public static class Stepped extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInStepped() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder/stepped"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder/stepped"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInDownTo")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class ForInDownTo extends AbstractFirBlackBoxCodegenTest {
+                public static class ForInDownTo extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInForInDownTo() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInDownTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInDownTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("forInDownToReversedStep.kt")
@@ -20573,13 +16928,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInRangeLiteral")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class ForInRangeLiteral extends AbstractFirBlackBoxCodegenTest {
+                public static class ForInRangeLiteral extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInForInRangeLiteral() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInRangeLiteral"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInRangeLiteral"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("forInRangeLiteralReversedStep.kt")
@@ -20626,13 +16981,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInUntil")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class ForInUntil extends AbstractFirBlackBoxCodegenTest {
+                public static class ForInUntil extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInForInUntil() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInUntil"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/evaluationOrder/stepped/forInUntil"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("forInUntilReversedStep.kt")
@@ -20681,13 +17036,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/expression")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Expression extends AbstractFirBlackBoxCodegenTest {
+        public static class Expression extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInExpression() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/expression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/expression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("emptyDownto.kt")
@@ -20844,13 +17199,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/forInDownTo")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInDownTo extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInDownTo extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInDownTo() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInDownTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInDownTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forIntInDownTo.kt")
@@ -20882,13 +17237,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/forInIndices")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInIndices extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInIndices extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInIndices() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInIndices"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInIndices"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInArrayListIndices.kt")
@@ -20990,13 +17345,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/forInProgressionWithIndex")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInProgressionWithIndex extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInProgressionWithIndex extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInProgressionWithIndex() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInProgressionWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInProgressionWithIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInDownToWithIndex.kt")
@@ -21073,13 +17428,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/forInReversed")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInReversed extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInReversed extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInReversed() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInReversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInReversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInReversedArrayIndices.kt")
@@ -21176,13 +17531,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/forInUntil")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForInUntil extends AbstractFirBlackBoxCodegenTest {
+        public static class ForInUntil extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForInUntil() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInUntil"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forInUntil"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInUntilChar.kt")
@@ -21259,13 +17614,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/forWithPossibleOverflow")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ForWithPossibleOverflow extends AbstractFirBlackBoxCodegenTest {
+        public static class ForWithPossibleOverflow extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInForWithPossibleOverflow() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forWithPossibleOverflow"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/forWithPossibleOverflow"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forInDownToCharMinValue.kt")
@@ -21337,185 +17692,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/javaInterop")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class JavaInterop extends AbstractFirBlackBoxCodegenTest {
+        public static class JavaInterop extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInJavaInterop() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/javaInterop"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("javaArrayOfInheritedNotNull.kt")
-            public void testJavaArrayOfInheritedNotNull() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaArrayOfInheritedNotNull.kt");
-            }
-
-            @TestMetadata("javaArrayOfInheritedNotNullFailFast.kt")
-            public void testJavaArrayOfInheritedNotNullFailFast() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaArrayOfInheritedNotNullFailFast.kt");
-            }
-
-            @TestMetadata("javaArrayOfMaybeNullable.kt")
-            public void testJavaArrayOfMaybeNullable() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaArrayOfMaybeNullable.kt");
-            }
-
-            @TestMetadata("javaArrayOfMaybeNullableWithNotNullLoopVariable.kt")
-            public void testJavaArrayOfMaybeNullableWithNotNullLoopVariable() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaArrayOfMaybeNullableWithNotNullLoopVariable.kt");
-            }
-
-            @TestMetadata("javaArrayOfMaybeNullableWithNotNullLoopVariableFailFast.kt")
-            public void testJavaArrayOfMaybeNullableWithNotNullLoopVariableFailFast() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaArrayOfMaybeNullableWithNotNullLoopVariableFailFast.kt");
-            }
-
-            @TestMetadata("javaCollectionOfExplicitNotNull.kt")
-            public void testJavaCollectionOfExplicitNotNull() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfExplicitNotNull.kt");
-            }
-
-            @TestMetadata("javaCollectionOfExplicitNotNullFailFast.kt")
-            public void testJavaCollectionOfExplicitNotNullFailFast() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfExplicitNotNullFailFast.kt");
-            }
-
-            @TestMetadata("javaCollectionOfExplicitNullable.kt")
-            public void testJavaCollectionOfExplicitNullable() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfExplicitNullable.kt");
-            }
-
-            @TestMetadata("javaCollectionOfInheritedNotNull.kt")
-            public void testJavaCollectionOfInheritedNotNull() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfInheritedNotNull.kt");
-            }
-
-            @TestMetadata("javaCollectionOfInheritedNotNullFailFast.kt")
-            public void testJavaCollectionOfInheritedNotNullFailFast() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfInheritedNotNullFailFast.kt");
-            }
-
-            @TestMetadata("javaCollectionOfMaybeNullable.kt")
-            public void testJavaCollectionOfMaybeNullable() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfMaybeNullable.kt");
-            }
-
-            @TestMetadata("javaCollectionOfMaybeNullableWithNotNullLoopVariable.kt")
-            public void testJavaCollectionOfMaybeNullableWithNotNullLoopVariable() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfMaybeNullableWithNotNullLoopVariable.kt");
-            }
-
-            @TestMetadata("javaCollectionOfMaybeNullableWithNotNullLoopVariableFailFast.kt")
-            public void testJavaCollectionOfMaybeNullableWithNotNullLoopVariableFailFast() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfMaybeNullableWithNotNullLoopVariableFailFast.kt");
-            }
-
-            @TestMetadata("javaCollectionOfNotNullFromStdlib.kt")
-            public void testJavaCollectionOfNotNullFromStdlib() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfNotNullFromStdlib.kt");
-            }
-
-            @TestMetadata("javaCollectionOfNotNullFromStdlibToTypedArray.kt")
-            public void testJavaCollectionOfNotNullFromStdlibToTypedArray() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfNotNullFromStdlibToTypedArray.kt");
-            }
-
-            @TestMetadata("javaCollectionOfNotNullToTypedArray.kt")
-            public void testJavaCollectionOfNotNullToTypedArray() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfNotNullToTypedArray.kt");
-            }
-
-            @TestMetadata("javaCollectionOfNotNullToTypedArrayFailFast.kt")
-            public void testJavaCollectionOfNotNullToTypedArrayFailFast() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaCollectionOfNotNullToTypedArrayFailFast.kt");
-            }
-
-            @TestMetadata("javaIteratorOfNotNull.kt")
-            public void testJavaIteratorOfNotNull() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaIteratorOfNotNull.kt");
-            }
-
-            @TestMetadata("javaIteratorOfNotNullFailFast.kt")
-            public void testJavaIteratorOfNotNullFailFast() throws Exception {
-                runTest("compiler/testData/codegen/box/ranges/javaInterop/javaIteratorOfNotNullFailFast.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/javaInterop"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("compiler/testData/codegen/box/ranges/javaInterop/withIndex")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class WithIndex extends AbstractFirBlackBoxCodegenTest {
+            public static class WithIndex extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInWithIndex() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/javaInterop/withIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("javaArrayOfInheritedNotNullWithIndex.kt")
-                public void testJavaArrayOfInheritedNotNullWithIndex() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaArrayOfInheritedNotNullWithIndex.kt");
-                }
-
-                @TestMetadata("javaArrayOfInheritedNotNullWithIndexFailFast.kt")
-                public void testJavaArrayOfInheritedNotNullWithIndexFailFast() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaArrayOfInheritedNotNullWithIndexFailFast.kt");
-                }
-
-                @TestMetadata("javaArrayOfMaybeNullableWithIndex.kt")
-                public void testJavaArrayOfMaybeNullableWithIndex() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaArrayOfMaybeNullableWithIndex.kt");
-                }
-
-                @TestMetadata("javaArrayOfMaybeNullableWithIndexWithNotNullLoopVariable.kt")
-                public void testJavaArrayOfMaybeNullableWithIndexWithNotNullLoopVariable() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaArrayOfMaybeNullableWithIndexWithNotNullLoopVariable.kt");
-                }
-
-                @TestMetadata("javaArrayOfMaybeNullableWithIndexWithNotNullLoopVariableFailFast.kt")
-                public void testJavaArrayOfMaybeNullableWithIndexWithNotNullLoopVariableFailFast() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaArrayOfMaybeNullableWithIndexWithNotNullLoopVariableFailFast.kt");
-                }
-
-                @TestMetadata("javaCollectionOfExplicitNotNullWithIndex.kt")
-                public void testJavaCollectionOfExplicitNotNullWithIndex() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaCollectionOfExplicitNotNullWithIndex.kt");
-                }
-
-                @TestMetadata("javaCollectionOfExplicitNotNullWithIndexFailFast.kt")
-                public void testJavaCollectionOfExplicitNotNullWithIndexFailFast() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaCollectionOfExplicitNotNullWithIndexFailFast.kt");
-                }
-
-                @TestMetadata("javaCollectionOfExplicitNullableWithIndex.kt")
-                public void testJavaCollectionOfExplicitNullableWithIndex() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaCollectionOfExplicitNullableWithIndex.kt");
-                }
-
-                @TestMetadata("javaCollectionOfMaybeNullableWithIndex.kt")
-                public void testJavaCollectionOfMaybeNullableWithIndex() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaCollectionOfMaybeNullableWithIndex.kt");
-                }
-
-                @TestMetadata("javaCollectionOfMaybeNullableWithIndexWithNotNullLoopVariable.kt")
-                public void testJavaCollectionOfMaybeNullableWithIndexWithNotNullLoopVariable() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaCollectionOfMaybeNullableWithIndexWithNotNullLoopVariable.kt");
-                }
-
-                @TestMetadata("javaCollectionOfMaybeNullableWithIndexWithNotNullLoopVariableFailFast.kt")
-                public void testJavaCollectionOfMaybeNullableWithIndexWithNotNullLoopVariableFailFast() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaCollectionOfMaybeNullableWithIndexWithNotNullLoopVariableFailFast.kt");
-                }
-
-                @TestMetadata("javaIteratorOfNotNullWithIndex.kt")
-                public void testJavaIteratorOfNotNullWithIndex() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaIteratorOfNotNullWithIndex.kt");
-                }
-
-                @TestMetadata("javaIteratorOfNotNullWithIndexFailFast.kt")
-                public void testJavaIteratorOfNotNullWithIndexFailFast() throws Exception {
-                    runTest("compiler/testData/codegen/box/ranges/javaInterop/withIndex/javaIteratorOfNotNullWithIndexFailFast.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/javaInterop/withIndex"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
         }
@@ -21523,13 +17718,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/literal")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Literal extends AbstractFirBlackBoxCodegenTest {
+        public static class Literal extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInLiteral() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/literal"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/literal"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("emptyDownto.kt")
@@ -21686,13 +17881,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/nullableLoopParameter")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class NullableLoopParameter extends AbstractFirBlackBoxCodegenTest {
+        public static class NullableLoopParameter extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInNullableLoopParameter() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/nullableLoopParameter"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/nullableLoopParameter"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("progressionExpression.kt")
@@ -21714,37 +17909,37 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/stepped")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Stepped extends AbstractFirBlackBoxCodegenTest {
+        public static class Stepped extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInStepped() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Expression extends AbstractFirBlackBoxCodegenTest {
+            public static class Expression extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInExpression() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/downTo")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class DownTo extends AbstractFirBlackBoxCodegenTest {
+                public static class DownTo extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInDownTo() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/downTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/downTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("emptyProgression.kt")
@@ -21830,13 +18025,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/downTo/nestedStep")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                    public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInNestedStep() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/downTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/downTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("stepOneThenStepOne.kt")
@@ -21883,13 +18078,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/downTo/reversed")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                    public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInReversed() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/downTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/downTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("reversedThenStep.kt")
@@ -21927,13 +18122,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class RangeTo extends AbstractFirBlackBoxCodegenTest {
+                public static class RangeTo extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInRangeTo() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("emptyProgression.kt")
@@ -22019,13 +18214,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo/nestedStep")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                    public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInNestedStep() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("stepOneThenStepOne.kt")
@@ -22072,13 +18267,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo/reversed")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                    public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInReversed() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/rangeTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("reversedThenStep.kt")
@@ -22116,13 +18311,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/until")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Until extends AbstractFirBlackBoxCodegenTest {
+                public static class Until extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInUntil() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/until"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/until"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("emptyProgression.kt")
@@ -22213,13 +18408,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/until/nestedStep")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                    public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInNestedStep() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/until/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/until/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("stepOneThenStepOne.kt")
@@ -22266,13 +18461,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/expression/until/reversed")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                    public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInReversed() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/until/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/expression/until/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("reversedThenStep.kt")
@@ -22311,25 +18506,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Literal extends AbstractFirBlackBoxCodegenTest {
+            public static class Literal extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInLiteral() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/downTo")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class DownTo extends AbstractFirBlackBoxCodegenTest {
+                public static class DownTo extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInDownTo() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/downTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/downTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("emptyProgression.kt")
@@ -22415,13 +18610,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/downTo/nestedStep")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                    public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInNestedStep() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/downTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/downTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("stepOneThenStepOne.kt")
@@ -22468,13 +18663,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/downTo/reversed")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                    public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInReversed() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/downTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/downTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("reversedThenStep.kt")
@@ -22512,13 +18707,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class RangeTo extends AbstractFirBlackBoxCodegenTest {
+                public static class RangeTo extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInRangeTo() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("emptyProgression.kt")
@@ -22604,13 +18799,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo/nestedStep")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                    public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInNestedStep() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("stepOneThenStepOne.kt")
@@ -22657,13 +18852,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo/reversed")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                    public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInReversed() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/rangeTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("reversedThenStep.kt")
@@ -22701,13 +18896,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/until")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Until extends AbstractFirBlackBoxCodegenTest {
+                public static class Until extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInUntil() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/until"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/until"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("emptyProgression.kt")
@@ -22798,13 +18993,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/until/nestedStep")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                    public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInNestedStep() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/until/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/until/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("stepOneThenStepOne.kt")
@@ -22851,13 +19046,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/literal/until/reversed")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                    public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInReversed() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/until/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/literal/until/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("reversedThenStep.kt")
@@ -22896,37 +19091,37 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Unsigned extends AbstractFirBlackBoxCodegenTest {
+            public static class Unsigned extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInUnsigned() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Expression extends AbstractFirBlackBoxCodegenTest {
+                public static class Expression extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInExpression() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class DownTo extends AbstractFirBlackBoxCodegenTest {
+                    public static class DownTo extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInDownTo() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("emptyProgression.kt")
@@ -23012,13 +19207,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo/nestedStep")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                        public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInNestedStep() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("stepOneThenStepOne.kt")
@@ -23065,13 +19260,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo/reversed")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                        public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInReversed() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/downTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("reversedThenStep.kt")
@@ -23109,13 +19304,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class RangeTo extends AbstractFirBlackBoxCodegenTest {
+                    public static class RangeTo extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInRangeTo() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("emptyProgression.kt")
@@ -23201,13 +19396,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo/nestedStep")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                        public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInNestedStep() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("stepOneThenStepOne.kt")
@@ -23254,13 +19449,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo/reversed")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                        public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInReversed() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/rangeTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("reversedThenStep.kt")
@@ -23298,13 +19493,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Until extends AbstractFirBlackBoxCodegenTest {
+                    public static class Until extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInUntil() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("emptyProgression.kt")
@@ -23395,13 +19590,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until/nestedStep")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                        public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInNestedStep() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("stepOneThenStepOne.kt")
@@ -23448,13 +19643,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until/reversed")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                        public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInReversed() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/expression/until/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("reversedThenStep.kt")
@@ -23493,25 +19688,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class Literal extends AbstractFirBlackBoxCodegenTest {
+                public static class Literal extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInLiteral() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
 
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class DownTo extends AbstractFirBlackBoxCodegenTest {
+                    public static class DownTo extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInDownTo() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("emptyProgression.kt")
@@ -23597,13 +19792,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo/nestedStep")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                        public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInNestedStep() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("stepOneThenStepOne.kt")
@@ -23650,13 +19845,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo/reversed")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                        public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInReversed() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/downTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("reversedThenStep.kt")
@@ -23694,13 +19889,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class RangeTo extends AbstractFirBlackBoxCodegenTest {
+                    public static class RangeTo extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInRangeTo() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("emptyProgression.kt")
@@ -23786,13 +19981,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo/nestedStep")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                        public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInNestedStep() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("stepOneThenStepOne.kt")
@@ -23839,13 +20034,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo/reversed")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                        public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInReversed() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/rangeTo/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("reversedThenStep.kt")
@@ -23883,13 +20078,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                     @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until")
                     @TestDataPath("$PROJECT_ROOT")
                     @RunWith(JUnit3RunnerWithInners.class)
-                    public static class Until extends AbstractFirBlackBoxCodegenTest {
+                    public static class Until extends AbstractFirBlackBoxDiagnosticsTest {
                         private void runTest(String testDataFilePath) throws Exception {
-                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                         }
 
                         public void testAllFilesPresentInUntil() throws Exception {
-                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                         }
 
                         @TestMetadata("emptyProgression.kt")
@@ -23980,13 +20175,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until/nestedStep")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class NestedStep extends AbstractFirBlackBoxCodegenTest {
+                        public static class NestedStep extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInNestedStep() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until/nestedStep"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("stepOneThenStepOne.kt")
@@ -24033,13 +20228,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                         @TestMetadata("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until/reversed")
                         @TestDataPath("$PROJECT_ROOT")
                         @RunWith(JUnit3RunnerWithInners.class)
-                        public static class Reversed extends AbstractFirBlackBoxCodegenTest {
+                        public static class Reversed extends AbstractFirBlackBoxDiagnosticsTest {
                             private void runTest(String testDataFilePath) throws Exception {
-                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                             }
 
                             public void testAllFilesPresentInReversed() throws Exception {
-                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/stepped/unsigned/literal/until/reversed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                             }
 
                             @TestMetadata("reversedThenStep.kt")
@@ -24080,13 +20275,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/ranges/unsigned")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Unsigned extends AbstractFirBlackBoxCodegenTest {
+        public static class Unsigned extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInUnsigned() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/unsigned"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/unsigned"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("inMixedUnsignedRange.kt")
@@ -24112,13 +20307,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/ranges/unsigned/expression")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Expression extends AbstractFirBlackBoxCodegenTest {
+            public static class Expression extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInExpression() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/unsigned/expression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/unsigned/expression"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("emptyDownto.kt")
@@ -24275,13 +20470,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/ranges/unsigned/literal")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Literal extends AbstractFirBlackBoxCodegenTest {
+            public static class Literal extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInLiteral() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/unsigned/literal"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/unsigned/literal"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("emptyDownto.kt")
@@ -24438,13 +20633,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/ranges/unsigned/nullableLoopParameter")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class NullableLoopParameter extends AbstractFirBlackBoxCodegenTest {
+            public static class NullableLoopParameter extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInNullableLoopParameter() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/unsigned/nullableLoopParameter"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/ranges/unsigned/nullableLoopParameter"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("progressionExpression.kt")
@@ -24468,25 +20663,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/reflection")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Reflection extends AbstractFirBlackBoxCodegenTest {
+    public static class Reflection extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInReflection() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/annotations")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Annotations extends AbstractFirBlackBoxCodegenTest {
+        public static class Annotations extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInAnnotations() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/annotations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/annotations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("annotationRetentionAnnotation.kt")
@@ -24494,34 +20689,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/annotations/annotationRetentionAnnotation.kt");
             }
 
-            @TestMetadata("annotationsOnJavaMembers.kt")
-            public void testAnnotationsOnJavaMembers() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/annotations/annotationsOnJavaMembers.kt");
-            }
-
-            @TestMetadata("classLiteralWithVoidDefault.kt")
-            public void testClassLiteralWithVoidDefault() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/annotations/classLiteralWithVoidDefault.kt");
-            }
-
             @TestMetadata("findAnnotation.kt")
             public void testFindAnnotation() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/annotations/findAnnotation.kt");
-            }
-
-            @TestMetadata("genericExtensionProperty.kt")
-            public void testGenericExtensionProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/annotations/genericExtensionProperty.kt");
-            }
-
-            @TestMetadata("hasAnnotation.kt")
-            public void testHasAnnotation() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/annotations/hasAnnotation.kt");
-            }
-
-            @TestMetadata("localClassLiteral.kt")
-            public void testLocalClassLiteral() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/annotations/localClassLiteral.kt");
             }
 
             @TestMetadata("localClassParameterAnnotation.kt")
@@ -24549,11 +20719,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/annotations/propertyWithoutBackingField.kt");
             }
 
-            @TestMetadata("retentions.kt")
-            public void testRetentions() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/annotations/retentions.kt");
-            }
-
             @TestMetadata("setparam.kt")
             public void testSetparam() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/annotations/setparam.kt");
@@ -24562,11 +20727,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("simpleClassAnnotation.kt")
             public void testSimpleClassAnnotation() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/annotations/simpleClassAnnotation.kt");
-            }
-
-            @TestMetadata("simpleConstructorAnnotation.kt")
-            public void testSimpleConstructorAnnotation() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/annotations/simpleConstructorAnnotation.kt");
             }
 
             @TestMetadata("simpleFunAnnotation.kt")
@@ -24587,33 +20747,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/annotations/onTypes")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class OnTypes extends AbstractFirBlackBoxCodegenTest {
+            public static class OnTypes extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInOnTypes() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/annotations/onTypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("arrayKClass.kt")
-                public void testArrayKClass() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/annotations/onTypes/arrayKClass.kt");
-                }
-
-                @TestMetadata("classLiteralWithExpectedType.kt")
-                public void testClassLiteralWithExpectedType() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/annotations/onTypes/classLiteralWithExpectedType.kt");
-                }
-
-                @TestMetadata("differentArgumentTypes.kt")
-                public void testDifferentArgumentTypes() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/annotations/onTypes/differentArgumentTypes.kt");
-                }
-
-                @TestMetadata("differentPositions.kt")
-                public void testDifferentPositions() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/annotations/onTypes/differentPositions.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/annotations/onTypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
         }
@@ -24621,18 +20761,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/builtins")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Builtins extends AbstractFirBlackBoxCodegenTest {
+        public static class Builtins extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInBuiltins() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/builtins"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("collections.kt")
-            public void testCollections() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/builtins/collections.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/builtins"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("enumNameOrdinal.kt")
@@ -24649,13 +20784,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/call")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Call extends AbstractFirBlackBoxCodegenTest {
+        public static class Call extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCall() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/call"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/call"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("bigArity.kt")
@@ -24663,39 +20798,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/call/bigArity.kt");
             }
 
-            @TestMetadata("callInstanceJavaMethod.kt")
-            public void testCallInstanceJavaMethod() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/callInstanceJavaMethod.kt");
-            }
-
-            @TestMetadata("callPrivateJavaMethod.kt")
-            public void testCallPrivateJavaMethod() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/callPrivateJavaMethod.kt");
-            }
-
-            @TestMetadata("callStaticJavaMethod.kt")
-            public void testCallStaticJavaMethod() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/callStaticJavaMethod.kt");
-            }
-
-            @TestMetadata("cannotCallEnumConstructor.kt")
-            public void testCannotCallEnumConstructor() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/cannotCallEnumConstructor.kt");
-            }
-
-            @TestMetadata("disallowNullValueForNotNullField.kt")
-            public void testDisallowNullValueForNotNullField() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/disallowNullValueForNotNullField.kt");
-            }
-
             @TestMetadata("equalsHashCodeToString.kt")
             public void testEqualsHashCodeToString() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/call/equalsHashCodeToString.kt");
-            }
-
-            @TestMetadata("exceptionHappened.kt")
-            public void testExceptionHappened() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/exceptionHappened.kt");
             }
 
             @TestMetadata("fakeOverride.kt")
@@ -24708,24 +20813,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/call/fakeOverrideSubstituted.kt");
             }
 
-            @TestMetadata("incorrectNumberOfArguments.kt")
-            public void testIncorrectNumberOfArguments() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/incorrectNumberOfArguments.kt");
-            }
-
             @TestMetadata("innerClassConstructor.kt")
             public void testInnerClassConstructor() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/call/innerClassConstructor.kt");
-            }
-
-            @TestMetadata("jvmStatic.kt")
-            public void testJvmStatic() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/jvmStatic.kt");
-            }
-
-            @TestMetadata("jvmStaticInObjectIncorrectReceiver.kt")
-            public void testJvmStaticInObjectIncorrectReceiver() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/jvmStaticInObjectIncorrectReceiver.kt");
             }
 
             @TestMetadata("localClassMember.kt")
@@ -24738,11 +20828,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/call/memberOfGenericClass.kt");
             }
 
-            @TestMetadata("privateProperty.kt")
-            public void testPrivateProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/privateProperty.kt");
-            }
-
             @TestMetadata("propertyAccessors.kt")
             public void testPropertyAccessors() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/call/propertyAccessors.kt");
@@ -24751,16 +20836,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("propertyGetterAndGetFunctionDifferentReturnType.kt")
             public void testPropertyGetterAndGetFunctionDifferentReturnType() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/call/propertyGetterAndGetFunctionDifferentReturnType.kt");
-            }
-
-            @TestMetadata("protectedMembers.kt")
-            public void testProtectedMembers() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/protectedMembers.kt");
-            }
-
-            @TestMetadata("returnUnit.kt")
-            public void testReturnUnit() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/call/returnUnit.kt");
             }
 
             @TestMetadata("simpleConstructor.kt")
@@ -24781,13 +20856,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/call/bound")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Bound extends AbstractFirBlackBoxCodegenTest {
+            public static class Bound extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInBound() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/call/bound"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/call/bound"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("companionObjectPropertyAccessors.kt")
@@ -24808,31 +20883,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("innerClassConstructor.kt")
                 public void testInnerClassConstructor() throws Exception {
                     runTest("compiler/testData/codegen/box/reflection/call/bound/innerClassConstructor.kt");
-                }
-
-                @TestMetadata("javaInstanceField.kt")
-                public void testJavaInstanceField() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/call/bound/javaInstanceField.kt");
-                }
-
-                @TestMetadata("javaInstanceMethod.kt")
-                public void testJavaInstanceMethod() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/call/bound/javaInstanceMethod.kt");
-                }
-
-                @TestMetadata("jvmStaticCompanionObjectPropertyAccessors.kt")
-                public void testJvmStaticCompanionObjectPropertyAccessors() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/call/bound/jvmStaticCompanionObjectPropertyAccessors.kt");
-                }
-
-                @TestMetadata("jvmStaticObjectFunction.kt")
-                public void testJvmStaticObjectFunction() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/call/bound/jvmStaticObjectFunction.kt");
-                }
-
-                @TestMetadata("jvmStaticObjectPropertyAccessors.kt")
-                public void testJvmStaticObjectPropertyAccessors() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/call/bound/jvmStaticObjectPropertyAccessors.kt");
                 }
 
                 @TestMetadata("memberFunction.kt")
@@ -24859,23 +20909,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/call/inlineClasses")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class InlineClasses extends AbstractFirBlackBoxCodegenTest {
+            public static class InlineClasses extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInInlineClasses() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/call/inlineClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/call/inlineClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("constructorWithInlineClassParameters.kt")
                 public void testConstructorWithInlineClassParameters() throws Exception {
                     runTest("compiler/testData/codegen/box/reflection/call/inlineClasses/constructorWithInlineClassParameters.kt");
-                }
-
-                @TestMetadata("fieldAccessors.kt")
-                public void testFieldAccessors() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/call/inlineClasses/fieldAccessors.kt");
                 }
 
                 @TestMetadata("functionsWithInlineClassParameters.kt")
@@ -24891,16 +20936,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("internalPrimaryValOfInlineClass.kt")
                 public void testInternalPrimaryValOfInlineClass() throws Exception {
                     runTest("compiler/testData/codegen/box/reflection/call/inlineClasses/internalPrimaryValOfInlineClass.kt");
-                }
-
-                @TestMetadata("jvmStaticFieldInObject.kt")
-                public void testJvmStaticFieldInObject() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/call/inlineClasses/jvmStaticFieldInObject.kt");
-                }
-
-                @TestMetadata("jvmStaticFunction.kt")
-                public void testJvmStaticFunction() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/call/inlineClasses/jvmStaticFunction.kt");
                 }
 
                 @TestMetadata("nonOverridingFunOfInlineClass.kt")
@@ -24938,13 +20973,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/callBy")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class CallBy extends AbstractFirBlackBoxCodegenTest {
+        public static class CallBy extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCallBy() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/callBy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/callBy"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("boundExtensionFunction.kt")
@@ -24955,11 +20990,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("boundExtensionPropertyAcessor.kt")
             public void testBoundExtensionPropertyAcessor() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/callBy/boundExtensionPropertyAcessor.kt");
-            }
-
-            @TestMetadata("boundJvmStaticInObject.kt")
-            public void testBoundJvmStaticInObject() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/callBy/boundJvmStaticInObject.kt");
             }
 
             @TestMetadata("companionObject.kt")
@@ -25007,16 +21037,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/callBy/inlineClassMembers.kt");
             }
 
-            @TestMetadata("jvmStaticInCompanionObject.kt")
-            public void testJvmStaticInCompanionObject() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/callBy/jvmStaticInCompanionObject.kt");
-            }
-
-            @TestMetadata("jvmStaticInObject.kt")
-            public void testJvmStaticInObject() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/callBy/jvmStaticInObject.kt");
-            }
-
             @TestMetadata("manyArgumentsNoneDefaultConstructor.kt")
             public void testManyArgumentsNoneDefaultConstructor() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/callBy/manyArgumentsNoneDefaultConstructor.kt");
@@ -25057,11 +21077,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/callBy/primitiveDefaultValues.kt");
             }
 
-            @TestMetadata("privateMemberFunction.kt")
-            public void testPrivateMemberFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/callBy/privateMemberFunction.kt");
-            }
-
             @TestMetadata("simpleConstructor.kt")
             public void testSimpleConstructor() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/callBy/simpleConstructor.kt");
@@ -25081,13 +21096,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/classLiterals")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ClassLiterals extends AbstractFirBlackBoxCodegenTest {
+        public static class ClassLiterals extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInClassLiterals() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/classLiterals"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/classLiterals"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("annotationClassLiteral.kt")
@@ -25095,34 +21110,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/classLiterals/annotationClassLiteral.kt");
             }
 
-            @TestMetadata("arrays.kt")
-            public void testArrays() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classLiterals/arrays.kt");
-            }
-
-            @TestMetadata("bareArray.kt")
-            public void testBareArray() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classLiterals/bareArray.kt");
-            }
-
-            @TestMetadata("builtinClassLiterals.kt")
-            public void testBuiltinClassLiterals() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classLiterals/builtinClassLiterals.kt");
-            }
-
-            @TestMetadata("genericArrays.kt")
-            public void testGenericArrays() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classLiterals/genericArrays.kt");
-            }
-
             @TestMetadata("genericClass.kt")
             public void testGenericClass() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/classLiterals/genericClass.kt");
-            }
-
-            @TestMetadata("reifiedTypeClassLiteral.kt")
-            public void testReifiedTypeClassLiteral() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classLiterals/reifiedTypeClassLiteral.kt");
             }
 
             @TestMetadata("simpleClassLiteral.kt")
@@ -25134,18 +21124,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/classes")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Classes extends AbstractFirBlackBoxCodegenTest {
+        public static class Classes extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInClasses() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/classes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("classSimpleName.kt")
-            public void testClassSimpleName() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/classSimpleName.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/classes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("companionObject.kt")
@@ -25158,64 +21143,14 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/classes/createInstance.kt");
             }
 
-            @TestMetadata("declaredMembers.kt")
-            public void testDeclaredMembers() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/declaredMembers.kt");
-            }
-
-            @TestMetadata("javaVoid.kt")
-            public void testJavaVoid() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/javaVoid.kt");
-            }
-
-            @TestMetadata("jvmName.kt")
-            public void testJvmName() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/jvmName.kt");
-            }
-
-            @TestMetadata("jvmNameOfStandardClasses.kt")
-            public void testJvmNameOfStandardClasses() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/jvmNameOfStandardClasses.kt");
-            }
-
             @TestMetadata("localClassSimpleName.kt")
             public void testLocalClassSimpleName() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/classes/localClassSimpleName.kt");
             }
 
-            @TestMetadata("nestedClasses.kt")
-            public void testNestedClasses() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/nestedClasses.kt");
-            }
-
-            @TestMetadata("nestedClassesJava.kt")
-            public void testNestedClassesJava() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/nestedClassesJava.kt");
-            }
-
             @TestMetadata("objectInstance.kt")
             public void testObjectInstance() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/classes/objectInstance.kt");
-            }
-
-            @TestMetadata("primitiveKClassEquality.kt")
-            public void testPrimitiveKClassEquality() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/primitiveKClassEquality.kt");
-            }
-
-            @TestMetadata("qualifiedName.kt")
-            public void testQualifiedName() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/qualifiedName.kt");
-            }
-
-            @TestMetadata("qualifiedNameOfStandardClasses.kt")
-            public void testQualifiedNameOfStandardClasses() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/qualifiedNameOfStandardClasses.kt");
-            }
-
-            @TestMetadata("sealedSubclasses.kt")
-            public void testSealedSubclasses() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/classes/sealedSubclasses.kt");
             }
 
             @TestMetadata("starProjectedType.kt")
@@ -25227,13 +21162,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/constructors")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Constructors extends AbstractFirBlackBoxCodegenTest {
+        public static class Constructors extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInConstructors() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/constructors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/constructors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("annotationClass.kt")
@@ -25260,23 +21195,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             public void testPrimaryConstructor() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/constructors/primaryConstructor.kt");
             }
-
-            @TestMetadata("simpleGetConstructors.kt")
-            public void testSimpleGetConstructors() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/constructors/simpleGetConstructors.kt");
-            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/createAnnotation")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class CreateAnnotation extends AbstractFirBlackBoxCodegenTest {
+        public static class CreateAnnotation extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInCreateAnnotation() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/createAnnotation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/createAnnotation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("annotationType.kt")
@@ -25289,34 +21219,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/createAnnotation/arrayOfKClasses.kt");
             }
 
-            @TestMetadata("callByJava.kt")
-            public void testCallByJava() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/createAnnotation/callByJava.kt");
-            }
-
-            @TestMetadata("callByKotlin.kt")
-            public void testCallByKotlin() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/createAnnotation/callByKotlin.kt");
-            }
-
             @TestMetadata("callByWithEmptyVarArg.kt")
             public void testCallByWithEmptyVarArg() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/createAnnotation/callByWithEmptyVarArg.kt");
-            }
-
-            @TestMetadata("callJava.kt")
-            public void testCallJava() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/createAnnotation/callJava.kt");
-            }
-
-            @TestMetadata("callKotlin.kt")
-            public void testCallKotlin() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/createAnnotation/callKotlin.kt");
-            }
-
-            @TestMetadata("createJdkAnnotationInstance.kt")
-            public void testCreateJdkAnnotationInstance() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/createAnnotation/createJdkAnnotationInstance.kt");
             }
 
             @TestMetadata("enumKClassAnnotation.kt")
@@ -25348,156 +21253,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/enclosing")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Enclosing extends AbstractFirBlackBoxCodegenTest {
+        public static class Enclosing extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInEnclosing() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/enclosing"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("anonymousObjectInInlinedLambda.kt")
-            public void testAnonymousObjectInInlinedLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/anonymousObjectInInlinedLambda.kt");
-            }
-
-            @TestMetadata("classInLambda.kt")
-            public void testClassInLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/classInLambda.kt");
-            }
-
-            @TestMetadata("functionExpressionInProperty.kt")
-            public void testFunctionExpressionInProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/functionExpressionInProperty.kt");
-            }
-
-            @TestMetadata("kt11969.kt")
-            public void testKt11969() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/kt11969.kt");
-            }
-
-            @TestMetadata("kt6368.kt")
-            public void testKt6368() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/kt6368.kt");
-            }
-
-            @TestMetadata("kt6691_lambdaInSamConstructor.kt")
-            public void testKt6691_lambdaInSamConstructor() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/kt6691_lambdaInSamConstructor.kt");
-            }
-
-            @TestMetadata("lambdaInClassObject.kt")
-            public void testLambdaInClassObject() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInClassObject.kt");
-            }
-
-            @TestMetadata("lambdaInConstructor.kt")
-            public void testLambdaInConstructor() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInConstructor.kt");
-            }
-
-            @TestMetadata("lambdaInFunction.kt")
-            public void testLambdaInFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInFunction.kt");
-            }
-
-            @TestMetadata("lambdaInLambda.kt")
-            public void testLambdaInLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInLambda.kt");
-            }
-
-            @TestMetadata("lambdaInLocalClassConstructor.kt")
-            public void testLambdaInLocalClassConstructor() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInLocalClassConstructor.kt");
-            }
-
-            @TestMetadata("lambdaInLocalClassSuperCall.kt")
-            public void testLambdaInLocalClassSuperCall() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInLocalClassSuperCall.kt");
-            }
-
-            @TestMetadata("lambdaInLocalFunction.kt")
-            public void testLambdaInLocalFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInLocalFunction.kt");
-            }
-
-            @TestMetadata("lambdaInMemberFunction.kt")
-            public void testLambdaInMemberFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInMemberFunction.kt");
-            }
-
-            @TestMetadata("lambdaInMemberFunctionInLocalClass.kt")
-            public void testLambdaInMemberFunctionInLocalClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInMemberFunctionInLocalClass.kt");
-            }
-
-            @TestMetadata("lambdaInMemberFunctionInNestedClass.kt")
-            public void testLambdaInMemberFunctionInNestedClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInMemberFunctionInNestedClass.kt");
-            }
-
-            @TestMetadata("lambdaInObjectDeclaration.kt")
-            public void testLambdaInObjectDeclaration() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInObjectDeclaration.kt");
-            }
-
-            @TestMetadata("lambdaInObjectExpression.kt")
-            public void testLambdaInObjectExpression() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInObjectExpression.kt");
-            }
-
-            @TestMetadata("lambdaInObjectLiteralSuperCall.kt")
-            public void testLambdaInObjectLiteralSuperCall() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInObjectLiteralSuperCall.kt");
-            }
-
-            @TestMetadata("lambdaInPackage.kt")
-            public void testLambdaInPackage() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInPackage.kt");
-            }
-
-            @TestMetadata("lambdaInPropertyDelegate.kt")
-            public void testLambdaInPropertyDelegate() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInPropertyDelegate.kt");
-            }
-
-            @TestMetadata("lambdaInPropertyGetter.kt")
-            public void testLambdaInPropertyGetter() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInPropertyGetter.kt");
-            }
-
-            @TestMetadata("lambdaInPropertySetter.kt")
-            public void testLambdaInPropertySetter() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/lambdaInPropertySetter.kt");
-            }
-
-            @TestMetadata("localClassInTopLevelFunction.kt")
-            public void testLocalClassInTopLevelFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/localClassInTopLevelFunction.kt");
-            }
-
-            @TestMetadata("objectInLambda.kt")
-            public void testObjectInLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/enclosing/objectInLambda.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/enclosing"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/functions")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Functions extends AbstractFirBlackBoxCodegenTest {
+        public static class Functions extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInFunctions() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/functions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("declaredVsInheritedFunctions.kt")
-            public void testDeclaredVsInheritedFunctions() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/declaredVsInheritedFunctions.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/functions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("enumValuesValueOf.kt")
@@ -25505,49 +21280,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/functions/enumValuesValueOf.kt");
             }
 
-            @TestMetadata("functionFromStdlib.kt")
-            public void testFunctionFromStdlib() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/functionFromStdlib.kt");
-            }
-
-            @TestMetadata("functionReferenceErasedToKFunction.kt")
-            public void testFunctionReferenceErasedToKFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/functionReferenceErasedToKFunction.kt");
-            }
-
             @TestMetadata("genericOverriddenFunction.kt")
             public void testGenericOverriddenFunction() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/functions/genericOverriddenFunction.kt");
-            }
-
-            @TestMetadata("instanceOfFunction.kt")
-            public void testInstanceOfFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/instanceOfFunction.kt");
-            }
-
-            @TestMetadata("isAccessibleOnAllMembers.kt")
-            public void testIsAccessibleOnAllMembers() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/isAccessibleOnAllMembers.kt");
-            }
-
-            @TestMetadata("javaClassGetFunctions.kt")
-            public void testJavaClassGetFunctions() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/javaClassGetFunctions.kt");
-            }
-
-            @TestMetadata("javaMethodsSmokeTest.kt")
-            public void testJavaMethodsSmokeTest() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/javaMethodsSmokeTest.kt");
-            }
-
-            @TestMetadata("platformName.kt")
-            public void testPlatformName() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/platformName.kt");
-            }
-
-            @TestMetadata("privateMemberFunction.kt")
-            public void testPrivateMemberFunction() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/functions/privateMemberFunction.kt");
             }
 
             @TestMetadata("simpleGetFunctions.kt")
@@ -25564,169 +21299,44 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/genericSignature")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class GenericSignature extends AbstractFirBlackBoxCodegenTest {
+        public static class GenericSignature extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInGenericSignature() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/genericSignature"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("covariantOverride.kt")
-            public void testCovariantOverride() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/covariantOverride.kt");
-            }
-
-            @TestMetadata("defaultImplsGenericSignature.kt")
-            public void testDefaultImplsGenericSignature() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/defaultImplsGenericSignature.kt");
-            }
-
-            @TestMetadata("delegatedMembers.kt")
-            public void testDelegatedMembers() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/delegatedMembers.kt");
-            }
-
-            @TestMetadata("functionLiteralGenericSignature.kt")
-            public void testFunctionLiteralGenericSignature() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/functionLiteralGenericSignature.kt");
-            }
-
-            @TestMetadata("genericBackingFieldSignature.kt")
-            public void testGenericBackingFieldSignature() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/genericBackingFieldSignature.kt");
-            }
-
-            @TestMetadata("genericMethodSignature.kt")
-            public void testGenericMethodSignature() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/genericMethodSignature.kt");
-            }
-
-            @TestMetadata("kt11121.kt")
-            public void testKt11121() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/kt11121.kt");
-            }
-
-            @TestMetadata("kt5112.kt")
-            public void testKt5112() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/kt5112.kt");
-            }
-
-            @TestMetadata("kt6106.kt")
-            public void testKt6106() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/kt6106.kt");
-            }
-
-            @TestMetadata("samWrappedLambdaVsReference.kt")
-            public void testSamWrappedLambdaVsReference() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/samWrappedLambdaVsReference.kt");
-            }
-
-            @TestMetadata("signatureOfDeepGenericInner.kt")
-            public void testSignatureOfDeepGenericInner() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/signatureOfDeepGenericInner.kt");
-            }
-
-            @TestMetadata("signatureOfDeepInner.kt")
-            public void testSignatureOfDeepInner() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/signatureOfDeepInner.kt");
-            }
-
-            @TestMetadata("signatureOfDeepInnerLastGeneric.kt")
-            public void testSignatureOfDeepInnerLastGeneric() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/signatureOfDeepInnerLastGeneric.kt");
-            }
-
-            @TestMetadata("signatureOfGenericInnerGenericOuter.kt")
-            public void testSignatureOfGenericInnerGenericOuter() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/signatureOfGenericInnerGenericOuter.kt");
-            }
-
-            @TestMetadata("signatureOfGenericInnerSimpleOuter.kt")
-            public void testSignatureOfGenericInnerSimpleOuter() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/signatureOfGenericInnerSimpleOuter.kt");
-            }
-
-            @TestMetadata("signatureOfSimpleInnerSimpleOuter.kt")
-            public void testSignatureOfSimpleInnerSimpleOuter() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/signatureOfSimpleInnerSimpleOuter.kt");
-            }
-
-            @TestMetadata("suspendFunctionLiteralGenericSignature.kt")
-            public void testSuspendFunctionLiteralGenericSignature() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/genericSignature/suspendFunctionLiteralGenericSignature.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/genericSignature"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/isInstance")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class IsInstance extends AbstractFirBlackBoxCodegenTest {
+        public static class IsInstance extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInIsInstance() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/isInstance"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("isInstanceCastAndSafeCast.kt")
-            public void testIsInstanceCastAndSafeCast() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/isInstance/isInstanceCastAndSafeCast.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/isInstance"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/kClassInAnnotation")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class KClassInAnnotation extends AbstractFirBlackBoxCodegenTest {
+        public static class KClassInAnnotation extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInKClassInAnnotation() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/kClassInAnnotation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("array.kt")
-            public void testArray() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/kClassInAnnotation/array.kt");
-            }
-
-            @TestMetadata("arrayInJava.kt")
-            public void testArrayInJava() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/kClassInAnnotation/arrayInJava.kt");
-            }
-
-            @TestMetadata("basic.kt")
-            public void testBasic() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/kClassInAnnotation/basic.kt");
-            }
-
-            @TestMetadata("basicInJava.kt")
-            public void testBasicInJava() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/kClassInAnnotation/basicInJava.kt");
-            }
-
-            @TestMetadata("checkcast.kt")
-            public void testCheckcast() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/kClassInAnnotation/checkcast.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/kClassInAnnotation"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("forceWrapping.kt")
             public void testForceWrapping() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/kClassInAnnotation/forceWrapping.kt");
-            }
-
-            @TestMetadata("vararg.kt")
-            public void testVararg() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/kClassInAnnotation/vararg.kt");
-            }
-
-            @TestMetadata("varargInJava.kt")
-            public void testVarargInJava() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/kClassInAnnotation/varargInJava.kt");
             }
 
             @TestMetadata("wrappingForCallableReferences.kt")
@@ -25738,304 +21348,64 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/lambdaClasses")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class LambdaClasses extends AbstractFirBlackBoxCodegenTest {
+        public static class LambdaClasses extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInLambdaClasses() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/lambdaClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("parameterNamesAndNullability.kt")
-            public void testParameterNamesAndNullability() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/lambdaClasses/parameterNamesAndNullability.kt");
-            }
-
-            @TestMetadata("reflectOnDefaultWithInlineClassArgument.kt")
-            public void testReflectOnDefaultWithInlineClassArgument() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/lambdaClasses/reflectOnDefaultWithInlineClassArgument.kt");
-            }
-
-            @TestMetadata("reflectOnLambdaInArrayConstructor.kt")
-            public void testReflectOnLambdaInArrayConstructor() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/lambdaClasses/reflectOnLambdaInArrayConstructor.kt");
-            }
-
-            @TestMetadata("reflectOnLambdaInField.kt")
-            public void testReflectOnLambdaInField() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/lambdaClasses/reflectOnLambdaInField.kt");
-            }
-
-            @TestMetadata("reflectOnLambdaInStaticField.kt")
-            public void testReflectOnLambdaInStaticField() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/lambdaClasses/reflectOnLambdaInStaticField.kt");
-            }
-
-            @TestMetadata("reflectOnLambdaInSuspend.kt")
-            public void testReflectOnLambdaInSuspend() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/lambdaClasses/reflectOnLambdaInSuspend.kt");
-            }
-
-            @TestMetadata("reflectOnLambdaInSuspendLambda.kt")
-            public void testReflectOnLambdaInSuspendLambda() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/lambdaClasses/reflectOnLambdaInSuspendLambda.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/lambdaClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/mapping")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Mapping extends AbstractFirBlackBoxCodegenTest {
+        public static class Mapping extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMapping() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("constructor.kt")
-            public void testConstructor() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/constructor.kt");
-            }
-
-            @TestMetadata("constructorWithInlineClassParameters.kt")
-            public void testConstructorWithInlineClassParameters() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/constructorWithInlineClassParameters.kt");
-            }
-
-            @TestMetadata("extensionProperty.kt")
-            public void testExtensionProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/extensionProperty.kt");
-            }
-
-            @TestMetadata("functions.kt")
-            public void testFunctions() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/functions.kt");
-            }
-
-            @TestMetadata("inlineClassPrimaryVal.kt")
-            public void testInlineClassPrimaryVal() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/inlineClassPrimaryVal.kt");
-            }
-
-            @TestMetadata("inlineReifiedFun.kt")
-            public void testInlineReifiedFun() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/inlineReifiedFun.kt");
-            }
-
-            @TestMetadata("interfaceCompanionPropertyWithJvmField.kt")
-            public void testInterfaceCompanionPropertyWithJvmField() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/interfaceCompanionPropertyWithJvmField.kt");
-            }
-
-            @TestMetadata("lateinitProperty.kt")
-            public void testLateinitProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/lateinitProperty.kt");
-            }
-
-            @TestMetadata("mappedClassIsEqualToClassLiteral.kt")
-            public void testMappedClassIsEqualToClassLiteral() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/mappedClassIsEqualToClassLiteral.kt");
-            }
-
-            @TestMetadata("memberProperty.kt")
-            public void testMemberProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/memberProperty.kt");
-            }
-
-            @TestMetadata("methodsFromObject.kt")
-            public void testMethodsFromObject() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/methodsFromObject.kt");
-            }
-
-            @TestMetadata("methodsFromSuperInterface.kt")
-            public void testMethodsFromSuperInterface() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/methodsFromSuperInterface.kt");
-            }
-
-            @TestMetadata("openSuspendFun.kt")
-            public void testOpenSuspendFun() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/openSuspendFun.kt");
-            }
-
-            @TestMetadata("privateProperty.kt")
-            public void testPrivateProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/privateProperty.kt");
-            }
-
-            @TestMetadata("propertyAccessorsWithJvmName.kt")
-            public void testPropertyAccessorsWithJvmName() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/propertyAccessorsWithJvmName.kt");
-            }
-
-            @TestMetadata("syntheticFields.kt")
-            public void testSyntheticFields() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/syntheticFields.kt");
-            }
-
-            @TestMetadata("topLevelFunctionOtherFile.kt")
-            public void testTopLevelFunctionOtherFile() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/topLevelFunctionOtherFile.kt");
-            }
-
-            @TestMetadata("topLevelProperty.kt")
-            public void testTopLevelProperty() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/mapping/topLevelProperty.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("compiler/testData/codegen/box/reflection/mapping/fakeOverrides")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class FakeOverrides extends AbstractFirBlackBoxCodegenTest {
+            public static class FakeOverrides extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInFakeOverrides() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping/fakeOverrides"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("javaFieldGetterSetter.kt")
-                public void testJavaFieldGetterSetter() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/fakeOverrides/javaFieldGetterSetter.kt");
-                }
-
-                @TestMetadata("javaMethod.kt")
-                public void testJavaMethod() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/fakeOverrides/javaMethod.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping/fakeOverrides"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
 
             @TestMetadata("compiler/testData/codegen/box/reflection/mapping/jvmStatic")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class JvmStatic extends AbstractFirBlackBoxCodegenTest {
+            public static class JvmStatic extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInJvmStatic() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping/jvmStatic"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("companionObjectFunction.kt")
-                public void testCompanionObjectFunction() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/jvmStatic/companionObjectFunction.kt");
-                }
-
-                @TestMetadata("objectFunction.kt")
-                public void testObjectFunction() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/jvmStatic/objectFunction.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping/jvmStatic"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
 
             @TestMetadata("compiler/testData/codegen/box/reflection/mapping/types")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Types extends AbstractFirBlackBoxCodegenTest {
+            public static class Types extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInTypes() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping/types"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("annotationConstructorParameters.kt")
-                public void testAnnotationConstructorParameters() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/annotationConstructorParameters.kt");
-                }
-
-                @TestMetadata("array.kt")
-                public void testArray() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/array.kt");
-                }
-
-                @TestMetadata("constructors.kt")
-                public void testConstructors() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/constructors.kt");
-                }
-
-                @TestMetadata("genericArrayElementType.kt")
-                public void testGenericArrayElementType() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/genericArrayElementType.kt");
-                }
-
-                @TestMetadata("inlineClassInSignature.kt")
-                public void testInlineClassInSignature() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/inlineClassInSignature.kt");
-                }
-
-                @TestMetadata("inlineClassPrimaryVal.kt")
-                public void testInlineClassPrimaryVal() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/inlineClassPrimaryVal.kt");
-                }
-
-                @TestMetadata("innerGenericTypeArgument.kt")
-                public void testInnerGenericTypeArgument() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/innerGenericTypeArgument.kt");
-                }
-
-                @TestMetadata("memberFunctions.kt")
-                public void testMemberFunctions() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/memberFunctions.kt");
-                }
-
-                @TestMetadata("overrideAnyWithPrimitive.kt")
-                public void testOverrideAnyWithPrimitive() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/overrideAnyWithPrimitive.kt");
-                }
-
-                @TestMetadata("parameterizedTypeArgument.kt")
-                public void testParameterizedTypeArgument() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/parameterizedTypeArgument.kt");
-                }
-
-                @TestMetadata("parameterizedTypes.kt")
-                public void testParameterizedTypes() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/parameterizedTypes.kt");
-                }
-
-                @TestMetadata("propertyAccessors.kt")
-                public void testPropertyAccessors() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/propertyAccessors.kt");
-                }
-
-                @TestMetadata("rawTypeArgument.kt")
-                public void testRawTypeArgument() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/rawTypeArgument.kt");
-                }
-
-                @TestMetadata("supertypes.kt")
-                public void testSupertypes() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/supertypes.kt");
-                }
-
-                @TestMetadata("suspendFun.kt")
-                public void testSuspendFun() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/suspendFun.kt");
-                }
-
-                @TestMetadata("topLevelFunctions.kt")
-                public void testTopLevelFunctions() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/topLevelFunctions.kt");
-                }
-
-                @TestMetadata("typeParameters.kt")
-                public void testTypeParameters() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/typeParameters.kt");
-                }
-
-                @TestMetadata("unit.kt")
-                public void testUnit() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/unit.kt");
-                }
-
-                @TestMetadata("withNullability.kt")
-                public void testWithNullability() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/mapping/types/withNullability.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/mapping/types"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
         }
@@ -26043,33 +21413,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/methodsFromAny")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class MethodsFromAny extends AbstractFirBlackBoxCodegenTest {
+        public static class MethodsFromAny extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
-            }
-
-            @TestMetadata("adaptedCallableReferencesNotEqualToCallablesFromAPI.kt")
-            public void testAdaptedCallableReferencesNotEqualToCallablesFromAPI() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/methodsFromAny/adaptedCallableReferencesNotEqualToCallablesFromAPI.kt");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMethodsFromAny() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/methodsFromAny"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("builtinFunctionsToString.kt")
-            public void testBuiltinFunctionsToString() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/methodsFromAny/builtinFunctionsToString.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/methodsFromAny"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("callableReferencesEqualToCallablesFromAPI.kt")
             public void testCallableReferencesEqualToCallablesFromAPI() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/methodsFromAny/callableReferencesEqualToCallablesFromAPI.kt");
-            }
-
-            @TestMetadata("classToString.kt")
-            public void testClassToString() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/methodsFromAny/classToString.kt");
             }
 
             @TestMetadata("extensionPropertyReceiverToString.kt")
@@ -26166,13 +21521,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/modifiers")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Modifiers extends AbstractFirBlackBoxCodegenTest {
+        public static class Modifiers extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInModifiers() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/modifiers"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/modifiers"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("callableModality.kt")
@@ -26195,19 +21550,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/modifiers/classVisibility.kt");
             }
 
-            @TestMetadata("classes.kt")
-            public void testClasses() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/modifiers/classes.kt");
-            }
-
             @TestMetadata("functions.kt")
             public void testFunctions() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/modifiers/functions.kt");
-            }
-
-            @TestMetadata("javaVisibility.kt")
-            public void testJavaVisibility() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/modifiers/javaVisibility.kt");
             }
 
             @TestMetadata("properties.kt")
@@ -26224,56 +21569,26 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/multifileClasses")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class MultifileClasses extends AbstractFirBlackBoxCodegenTest {
+        public static class MultifileClasses extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInMultifileClasses() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/multifileClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("callFunctionsInMultifileClass.kt")
-            public void testCallFunctionsInMultifileClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/multifileClasses/callFunctionsInMultifileClass.kt");
-            }
-
-            @TestMetadata("callPropertiesInMultifileClass.kt")
-            public void testCallPropertiesInMultifileClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/multifileClasses/callPropertiesInMultifileClass.kt");
-            }
-
-            @TestMetadata("javaFieldForVarAndConstVal.kt")
-            public void testJavaFieldForVarAndConstVal() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/multifileClasses/javaFieldForVarAndConstVal.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/multifileClasses"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/noReflectAtRuntime")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class NoReflectAtRuntime extends AbstractFirBlackBoxCodegenTest {
+        public static class NoReflectAtRuntime extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInNoReflectAtRuntime() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/noReflectAtRuntime"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("javaClass.kt")
-            public void testJavaClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/noReflectAtRuntime/javaClass.kt");
-            }
-
-            @TestMetadata("javaVoid.kt")
-            public void testJavaVoid() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/noReflectAtRuntime/javaVoid.kt");
-            }
-
-            @TestMetadata("primitiveJavaClass.kt")
-            public void testPrimitiveJavaClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/noReflectAtRuntime/primitiveJavaClass.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/noReflectAtRuntime"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("propertyGetSetName.kt")
@@ -26286,11 +21601,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/noReflectAtRuntime/propertyInstanceof.kt");
             }
 
-            @TestMetadata("reifiedTypeJavaClass.kt")
-            public void testReifiedTypeJavaClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/noReflectAtRuntime/reifiedTypeJavaClass.kt");
-            }
-
             @TestMetadata("simpleClassLiterals.kt")
             public void testSimpleClassLiterals() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/noReflectAtRuntime/simpleClassLiterals.kt");
@@ -26299,23 +21609,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/noReflectAtRuntime/methodsFromAny")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class MethodsFromAny extends AbstractFirBlackBoxCodegenTest {
+            public static class MethodsFromAny extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInMethodsFromAny() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/noReflectAtRuntime/methodsFromAny"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/noReflectAtRuntime/methodsFromAny"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("callableReferences.kt")
                 public void testCallableReferences() throws Exception {
                     runTest("compiler/testData/codegen/box/reflection/noReflectAtRuntime/methodsFromAny/callableReferences.kt");
-                }
-
-                @TestMetadata("classReference.kt")
-                public void testClassReference() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/noReflectAtRuntime/methodsFromAny/classReference.kt");
                 }
 
                 @TestMetadata("delegatedProperty.kt")
@@ -26328,13 +21633,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/parameters")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Parameters extends AbstractFirBlackBoxCodegenTest {
+        public static class Parameters extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInParameters() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/parameters"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/parameters"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("bigArity.kt")
@@ -26347,19 +21652,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/parameters/boundInnerClassConstructor.kt");
             }
 
-            @TestMetadata("boundObjectMemberReferences.kt")
-            public void testBoundObjectMemberReferences() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/parameters/boundObjectMemberReferences.kt");
-            }
-
             @TestMetadata("boundReferences.kt")
             public void testBoundReferences() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/parameters/boundReferences.kt");
-            }
-
-            @TestMetadata("findParameterByName.kt")
-            public void testFindParameterByName() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/parameters/findParameterByName.kt");
             }
 
             @TestMetadata("functionParameterNameAndIndex.kt")
@@ -26372,11 +21667,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/parameters/instanceExtensionReceiverAndValueParameters.kt");
             }
 
-            @TestMetadata("instanceParameterOfFakeOverride.kt")
-            public void testInstanceParameterOfFakeOverride() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/parameters/instanceParameterOfFakeOverride.kt");
-            }
-
             @TestMetadata("isMarkedNullable.kt")
             public void testIsMarkedNullable() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/parameters/isMarkedNullable.kt");
@@ -26385,11 +21675,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("isOptional.kt")
             public void testIsOptional() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/parameters/isOptional.kt");
-            }
-
-            @TestMetadata("javaAnnotationConstructor.kt")
-            public void testJavaAnnotationConstructor() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/parameters/javaAnnotationConstructor.kt");
             }
 
             @TestMetadata("kinds.kt")
@@ -26401,43 +21686,23 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             public void testPropertySetter() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/parameters/propertySetter.kt");
             }
-
-            @TestMetadata("realParameterNames.kt")
-            public void testRealParameterNames() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/parameters/realParameterNames.kt");
-            }
-
-            @TestMetadata("synthesizedParameterNames.kt")
-            public void testSynthesizedParameterNames() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/parameters/synthesizedParameterNames.kt");
-            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/reflection/properties")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Properties extends AbstractFirBlackBoxCodegenTest {
+        public static class Properties extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInProperties() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("allVsDeclared.kt")
             public void testAllVsDeclared() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/properties/allVsDeclared.kt");
-            }
-
-            @TestMetadata("callPrivatePropertyFromGetProperties.kt")
-            public void testCallPrivatePropertyFromGetProperties() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/callPrivatePropertyFromGetProperties.kt");
-            }
-
-            @TestMetadata("declaredVsInheritedProperties.kt")
-            public void testDeclaredVsInheritedProperties() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/declaredVsInheritedProperties.kt");
             }
 
             @TestMetadata("fakeOverridesInSubclass.kt")
@@ -26475,54 +21740,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/properties/invokeKProperty.kt");
             }
 
-            @TestMetadata("javaPropertyInheritedInKotlin.kt")
-            public void testJavaPropertyInheritedInKotlin() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/javaPropertyInheritedInKotlin.kt");
-            }
-
-            @TestMetadata("javaStaticField.kt")
-            public void testJavaStaticField() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/javaStaticField.kt");
-            }
-
-            @TestMetadata("kotlinPropertyInheritedInJava.kt")
-            public void testKotlinPropertyInheritedInJava() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/kotlinPropertyInheritedInJava.kt");
-            }
-
             @TestMetadata("memberAndMemberExtensionWithSameName.kt")
             public void testMemberAndMemberExtensionWithSameName() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/properties/memberAndMemberExtensionWithSameName.kt");
-            }
-
-            @TestMetadata("mutatePrivateJavaInstanceField.kt")
-            public void testMutatePrivateJavaInstanceField() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/mutatePrivateJavaInstanceField.kt");
-            }
-
-            @TestMetadata("mutatePrivateJavaStaticField.kt")
-            public void testMutatePrivateJavaStaticField() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/mutatePrivateJavaStaticField.kt");
-            }
-
-            @TestMetadata("noConflictOnKotlinGetterAndJavaField.kt")
-            public void testNoConflictOnKotlinGetterAndJavaField() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/noConflictOnKotlinGetterAndJavaField.kt");
-            }
-
-            @TestMetadata("overrideKotlinPropertyByJavaMethod.kt")
-            public void testOverrideKotlinPropertyByJavaMethod() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/overrideKotlinPropertyByJavaMethod.kt");
-            }
-
-            @TestMetadata("privateClassVal.kt")
-            public void testPrivateClassVal() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/privateClassVal.kt");
-            }
-
-            @TestMetadata("privateClassVar.kt")
-            public void testPrivateClassVar() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/privateClassVar.kt");
             }
 
             @TestMetadata("privateFakeOverrideFromSuperclass.kt")
@@ -26530,39 +21750,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/properties/privateFakeOverrideFromSuperclass.kt");
             }
 
-            @TestMetadata("privateJvmStaticVarInObject.kt")
-            public void testPrivateJvmStaticVarInObject() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/privateJvmStaticVarInObject.kt");
-            }
-
-            @TestMetadata("privatePropertyCallIsAccessibleOnAccessors.kt")
-            public void testPrivatePropertyCallIsAccessibleOnAccessors() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/privatePropertyCallIsAccessibleOnAccessors.kt");
-            }
-
-            @TestMetadata("privateToThisAccessors.kt")
-            public void testPrivateToThisAccessors() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/privateToThisAccessors.kt");
-            }
-
             @TestMetadata("propertyOfNestedClassAndArrayType.kt")
             public void testPropertyOfNestedClassAndArrayType() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/properties/propertyOfNestedClassAndArrayType.kt");
-            }
-
-            @TestMetadata("protectedClassVar.kt")
-            public void testProtectedClassVar() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/protectedClassVar.kt");
-            }
-
-            @TestMetadata("publicClassValAccessible.kt")
-            public void testPublicClassValAccessible() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/publicClassValAccessible.kt");
-            }
-
-            @TestMetadata("referenceToJavaFieldOfKotlinSubclass.kt")
-            public void testReferenceToJavaFieldOfKotlinSubclass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/properties/referenceToJavaFieldOfKotlinSubclass.kt");
             }
 
             @TestMetadata("simpleGetProperties.kt")
@@ -26573,9 +21763,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/properties/accessors")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Accessors extends AbstractFirBlackBoxCodegenTest {
+            public static class Accessors extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 @TestMetadata("accessorNames.kt")
@@ -26584,7 +21774,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 }
 
                 public void testAllFilesPresentInAccessors() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties/accessors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties/accessors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("extensionPropertyAccessors.kt")
@@ -26611,159 +21801,39 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/properties/getDelegate")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class GetDelegate extends AbstractFirBlackBoxCodegenTest {
+            public static class GetDelegate extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInGetDelegate() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties/getDelegate"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("booleanPropertyNameStartsWithIs.kt")
-                public void testBooleanPropertyNameStartsWithIs() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/booleanPropertyNameStartsWithIs.kt");
-                }
-
-                @TestMetadata("boundExtensionProperty.kt")
-                public void testBoundExtensionProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/boundExtensionProperty.kt");
-                }
-
-                @TestMetadata("boundMemberProperty.kt")
-                public void testBoundMemberProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/boundMemberProperty.kt");
-                }
-
-                @TestMetadata("extensionProperty.kt")
-                public void testExtensionProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/extensionProperty.kt");
-                }
-
-                @TestMetadata("fakeOverride.kt")
-                public void testFakeOverride() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/fakeOverride.kt");
-                }
-
-                @TestMetadata("getExtensionDelegate.kt")
-                public void testGetExtensionDelegate() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/getExtensionDelegate.kt");
-                }
-
-                @TestMetadata("kPropertyForDelegatedProperty.kt")
-                public void testKPropertyForDelegatedProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/kPropertyForDelegatedProperty.kt");
-                }
-
-                @TestMetadata("memberExtensionProperty.kt")
-                public void testMemberExtensionProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/memberExtensionProperty.kt");
-                }
-
-                @TestMetadata("memberProperty.kt")
-                public void testMemberProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/memberProperty.kt");
-                }
-
-                @TestMetadata("nameClashClassAndCompanion.kt")
-                public void testNameClashClassAndCompanion() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/nameClashClassAndCompanion.kt");
-                }
-
-                @TestMetadata("nameClashExtensionProperties.kt")
-                public void testNameClashExtensionProperties() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/nameClashExtensionProperties.kt");
-                }
-
-                @TestMetadata("noSetAccessibleTrue.kt")
-                public void testNoSetAccessibleTrue() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/noSetAccessibleTrue.kt");
-                }
-
-                @TestMetadata("notDelegatedProperty.kt")
-                public void testNotDelegatedProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/notDelegatedProperty.kt");
-                }
-
-                @TestMetadata("overrideDelegatedByDelegated.kt")
-                public void testOverrideDelegatedByDelegated() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/overrideDelegatedByDelegated.kt");
-                }
-
-                @TestMetadata("topLevelProperty.kt")
-                public void testTopLevelProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/getDelegate/topLevelProperty.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties/getDelegate"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
 
             @TestMetadata("compiler/testData/codegen/box/reflection/properties/jvmField")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class JvmField extends AbstractFirBlackBoxCodegenTest {
+            public static class JvmField extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInJvmField() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties/jvmField"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("annotationCompanionWithAnnotation.kt")
-                public void testAnnotationCompanionWithAnnotation() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/jvmField/annotationCompanionWithAnnotation.kt");
-                }
-
-                @TestMetadata("interfaceCompanion.kt")
-                public void testInterfaceCompanion() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/jvmField/interfaceCompanion.kt");
-                }
-
-                @TestMetadata("interfaceCompanionWithAnnotation.kt")
-                public void testInterfaceCompanionWithAnnotation() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/jvmField/interfaceCompanionWithAnnotation.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties/jvmField"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
 
             @TestMetadata("compiler/testData/codegen/box/reflection/properties/localDelegated")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class LocalDelegated extends AbstractFirBlackBoxCodegenTest {
+            public static class LocalDelegated extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInLocalDelegated() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties/localDelegated"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("defaultImpls.kt")
-                public void testDefaultImpls() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/localDelegated/defaultImpls.kt");
-                }
-
-                @TestMetadata("inlineFun.kt")
-                public void testInlineFun() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/localDelegated/inlineFun.kt");
-                }
-
-                @TestMetadata("localAndNonLocal.kt")
-                public void testLocalAndNonLocal() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/localDelegated/localAndNonLocal.kt");
-                }
-
-                @TestMetadata("localDelegatedProperty.kt")
-                public void testLocalDelegatedProperty() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/localDelegated/localDelegatedProperty.kt");
-                }
-
-                @TestMetadata("multiFileClass.kt")
-                public void testMultiFileClass() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/localDelegated/multiFileClass.kt");
-                }
-
-                @TestMetadata("variableOfGenericType.kt")
-                public void testVariableOfGenericType() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/properties/localDelegated/variableOfGenericType.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/properties/localDelegated"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
         }
@@ -26771,18 +21841,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/supertypes")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Supertypes extends AbstractFirBlackBoxCodegenTest {
+        public static class Supertypes extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSupertypes() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/supertypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("builtInClassSupertypes.kt")
-            public void testBuiltInClassSupertypes() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/supertypes/builtInClassSupertypes.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/supertypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("genericSubstitution.kt")
@@ -26795,11 +21860,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/supertypes/isSubclassOfIsSuperclassOf.kt");
             }
 
-            @TestMetadata("primitives.kt")
-            public void testPrimitives() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/supertypes/primitives.kt");
-            }
-
             @TestMetadata("simpleSupertypes.kt")
             public void testSimpleSupertypes() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/supertypes/simpleSupertypes.kt");
@@ -26809,18 +21869,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/typeOf")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class TypeOf extends AbstractFirBlackBoxCodegenTest {
+        public static class TypeOf extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInTypeOf() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("classes.kt")
-            public void testClasses() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/typeOf/classes.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("inlineClasses.kt")
@@ -26846,103 +21901,38 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/typeOf/js")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Js extends AbstractFirBlackBoxCodegenTest {
+            public static class Js extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInJs() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf/js"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf/js"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
             }
 
             @TestMetadata("compiler/testData/codegen/box/reflection/typeOf/noReflect")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class NoReflect extends AbstractFirBlackBoxCodegenTest {
+            public static class NoReflect extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInNoReflect() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf/noReflect"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("classes.kt")
-                public void testClasses() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/classes.kt");
-                }
-
-                @TestMetadata("inlineClasses.kt")
-                public void testInlineClasses() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/inlineClasses.kt");
-                }
-
-                @TestMetadata("typeReferenceEqualsHashCode.kt")
-                public void testTypeReferenceEqualsHashCode() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/typeReferenceEqualsHashCode.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf/noReflect"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters")
                 @TestDataPath("$PROJECT_ROOT")
                 @RunWith(JUnit3RunnerWithInners.class)
-                public static class NonReifiedTypeParameters extends AbstractFirBlackBoxCodegenTest {
+                public static class NonReifiedTypeParameters extends AbstractFirBlackBoxDiagnosticsTest {
                     private void runTest(String testDataFilePath) throws Exception {
-                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                        KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                     }
 
                     public void testAllFilesPresentInNonReifiedTypeParameters() throws Exception {
-                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                    }
-
-                    @TestMetadata("defaultUpperBound.kt")
-                    public void testDefaultUpperBound() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/defaultUpperBound.kt");
-                    }
-
-                    @TestMetadata("equalsOnClassParameters.kt")
-                    public void testEqualsOnClassParameters() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/equalsOnClassParameters.kt");
-                    }
-
-                    @TestMetadata("equalsOnFunctionParameters.kt")
-                    public void testEqualsOnFunctionParameters() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/equalsOnFunctionParameters.kt");
-                    }
-
-                    @TestMetadata("innerGeneric.kt")
-                    public void testInnerGeneric() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/innerGeneric.kt");
-                    }
-
-                    @TestMetadata("simpleClassParameter.kt")
-                    public void testSimpleClassParameter() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/simpleClassParameter.kt");
-                    }
-
-                    @TestMetadata("simpleFunctionParameter.kt")
-                    public void testSimpleFunctionParameter() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/simpleFunctionParameter.kt");
-                    }
-
-                    @TestMetadata("simplePropertyParameter.kt")
-                    public void testSimplePropertyParameter() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/simplePropertyParameter.kt");
-                    }
-
-                    @TestMetadata("typeParameterFlags.kt")
-                    public void testTypeParameterFlags() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/typeParameterFlags.kt");
-                    }
-
-                    @TestMetadata("upperBoundUsesOuterClassParameter.kt")
-                    public void testUpperBoundUsesOuterClassParameter() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/upperBoundUsesOuterClassParameter.kt");
-                    }
-
-                    @TestMetadata("upperBounds.kt")
-                    public void testUpperBounds() throws Exception {
-                        runTest("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters/upperBounds.kt");
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf/noReflect/nonReifiedTypeParameters"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                     }
                 }
             }
@@ -26950,13 +21940,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/typeOf/nonReifiedTypeParameters")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class NonReifiedTypeParameters extends AbstractFirBlackBoxCodegenTest {
+            public static class NonReifiedTypeParameters extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInNonReifiedTypeParameters() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf/nonReifiedTypeParameters"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeOf/nonReifiedTypeParameters"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("defaultUpperBound.kt")
@@ -26967,11 +21957,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 @TestMetadata("equalsOnClassParameters.kt")
                 public void testEqualsOnClassParameters() throws Exception {
                     runTest("compiler/testData/codegen/box/reflection/typeOf/nonReifiedTypeParameters/equalsOnClassParameters.kt");
-                }
-
-                @TestMetadata("equalsOnClassParametersWithReflectAPI.kt")
-                public void testEqualsOnClassParametersWithReflectAPI() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/typeOf/nonReifiedTypeParameters/equalsOnClassParametersWithReflectAPI.kt");
                 }
 
                 @TestMetadata("equalsOnFunctionParameters.kt")
@@ -27019,13 +22004,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/typeParameters")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class TypeParameters extends AbstractFirBlackBoxCodegenTest {
+        public static class TypeParameters extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInTypeParameters() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeParameters"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/typeParameters"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("declarationSiteVariance.kt")
@@ -27047,13 +22032,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reflection/types")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Types extends AbstractFirBlackBoxCodegenTest {
+        public static class Types extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInTypes() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/types"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/types"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("classifierIsClass.kt")
@@ -27066,39 +22051,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/types/classifierIsTypeParameter.kt");
             }
 
-            @TestMetadata("classifiersOfBuiltInTypes.kt")
-            public void testClassifiersOfBuiltInTypes() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/types/classifiersOfBuiltInTypes.kt");
-            }
-
             @TestMetadata("innerGenericArguments.kt")
             public void testInnerGenericArguments() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/types/innerGenericArguments.kt");
-            }
-
-            @TestMetadata("jvmErasureOfClass.kt")
-            public void testJvmErasureOfClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/types/jvmErasureOfClass.kt");
-            }
-
-            @TestMetadata("jvmErasureOfTypeParameter.kt")
-            public void testJvmErasureOfTypeParameter() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/types/jvmErasureOfTypeParameter.kt");
-            }
-
-            @TestMetadata("platformTypeClassifier.kt")
-            public void testPlatformTypeClassifier() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/types/platformTypeClassifier.kt");
-            }
-
-            @TestMetadata("platformTypeNotEqualToKotlinType.kt")
-            public void testPlatformTypeNotEqualToKotlinType() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/types/platformTypeNotEqualToKotlinType.kt");
-            }
-
-            @TestMetadata("platformTypeToString.kt")
-            public void testPlatformTypeToString() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/types/platformTypeToString.kt");
             }
 
             @TestMetadata("typeArguments.kt")
@@ -27111,21 +22066,16 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reflection/types/useSiteVariance.kt");
             }
 
-            @TestMetadata("withNullability.kt")
-            public void testWithNullability() throws Exception {
-                runTest("compiler/testData/codegen/box/reflection/types/withNullability.kt");
-            }
-
             @TestMetadata("compiler/testData/codegen/box/reflection/types/createType")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class CreateType extends AbstractFirBlackBoxCodegenTest {
+            public static class CreateType extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInCreateType() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/types/createType"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/types/createType"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("equality.kt")
@@ -27157,18 +22107,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             @TestMetadata("compiler/testData/codegen/box/reflection/types/subtyping")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)
-            public static class Subtyping extends AbstractFirBlackBoxCodegenTest {
+            public static class Subtyping extends AbstractFirBlackBoxDiagnosticsTest {
                 private void runTest(String testDataFilePath) throws Exception {
-                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                    KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
                 }
 
                 public void testAllFilesPresentInSubtyping() throws Exception {
-                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/types/subtyping"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-                }
-
-                @TestMetadata("platformType.kt")
-                public void testPlatformType() throws Exception {
-                    runTest("compiler/testData/codegen/box/reflection/types/subtyping/platformType.kt");
+                    KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reflection/types/subtyping"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
                 }
 
                 @TestMetadata("simpleGenericTypes.kt")
@@ -27192,28 +22137,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/regressions")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Regressions extends AbstractFirBlackBoxCodegenTest {
+    public static class Regressions extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInRegressions() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/regressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("approximateIntersectionType.kt")
-        public void testApproximateIntersectionType() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/approximateIntersectionType.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/regressions"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("arrayLengthNPE.kt")
         public void testArrayLengthNPE() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/arrayLengthNPE.kt");
-        }
-
-        @TestMetadata("collections.kt")
-        public void testCollections() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/collections.kt");
         }
 
         @TestMetadata("commonSupertypeContravariant.kt")
@@ -27251,11 +22186,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/regressions/generic.kt");
         }
 
-        @TestMetadata("getGenericInterfaces.kt")
-        public void testGetGenericInterfaces() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/getGenericInterfaces.kt");
-        }
-
         @TestMetadata("hashCodeNPE.kt")
         public void testHashCodeNPE() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/hashCodeNPE.kt");
@@ -27264,11 +22194,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("internalTopLevelOtherPackage.kt")
         public void testInternalTopLevelOtherPackage() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/internalTopLevelOtherPackage.kt");
-        }
-
-        @TestMetadata("intersectionAsLastLambda.kt")
-        public void testIntersectionAsLastLambda() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/intersectionAsLastLambda.kt");
         }
 
         @TestMetadata("intersectionOfEqualTypes.kt")
@@ -27296,29 +22221,14 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/regressions/kt1172.kt");
         }
 
-        @TestMetadata("kt1202.kt")
-        public void testKt1202() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt1202.kt");
-        }
-
         @TestMetadata("kt13381.kt")
         public void testKt13381() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt13381.kt");
         }
 
-        @TestMetadata("kt1406.kt")
-        public void testKt1406() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt1406.kt");
-        }
-
         @TestMetadata("kt14447.kt")
         public void testKt14447() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt14447.kt");
-        }
-
-        @TestMetadata("kt1515.kt")
-        public void testKt1515() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt1515.kt");
         }
 
         @TestMetadata("kt15196.kt")
@@ -27329,11 +22239,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt1528.kt")
         public void testKt1528() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt1528.kt");
-        }
-
-        @TestMetadata("kt1568.kt")
-        public void testKt1568() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt1568.kt");
         }
 
         @TestMetadata("Kt1619Test.kt")
@@ -27361,11 +22266,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/regressions/kt18779.kt");
         }
 
-        @TestMetadata("kt1932.kt")
-        public void testKt1932() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt1932.kt");
-        }
-
         @TestMetadata("kt2017.kt")
         public void testKt2017() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt2017.kt");
@@ -27386,11 +22286,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/regressions/kt2246.kt");
         }
 
-        @TestMetadata("kt2318.kt")
-        public void testKt2318() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt2318.kt");
-        }
-
         @TestMetadata("kt24913.kt")
         public void testKt24913() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt24913.kt");
@@ -27404,21 +22299,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt2509.kt")
         public void testKt2509() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt2509.kt");
-        }
-
-        @TestMetadata("kt2593.kt")
-        public void testKt2593() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt2593.kt");
-        }
-
-        @TestMetadata("kt274.kt")
-        public void testKt274() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt274.kt");
-        }
-
-        @TestMetadata("kt3046.kt")
-        public void testKt3046() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt3046.kt");
         }
 
         @TestMetadata("kt3107.kt")
@@ -27476,16 +22356,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/regressions/kt4142.kt");
         }
 
-        @TestMetadata("kt4259.kt")
-        public void testKt4259() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt4259.kt");
-        }
-
-        @TestMetadata("kt4262.kt")
-        public void testKt4262() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt4262.kt");
-        }
-
         @TestMetadata("kt4281.kt")
         public void testKt4281() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt4281.kt");
@@ -27496,34 +22366,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/regressions/kt5056.kt");
         }
 
-        @TestMetadata("kt528.kt")
-        public void testKt528() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt528.kt");
-        }
-
-        @TestMetadata("kt529.kt")
-        public void testKt529() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt529.kt");
-        }
-
-        @TestMetadata("kt533.kt")
-        public void testKt533() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt533.kt");
-        }
-
         @TestMetadata("kt5395.kt")
         public void testKt5395() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt5395.kt");
-        }
-
-        @TestMetadata("kt5445.kt")
-        public void testKt5445() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt5445.kt");
-        }
-
-        @TestMetadata("kt5445_2.kt")
-        public void testKt5445_2() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt5445_2.kt");
         }
 
         @TestMetadata("kt5786_privateWithDefault.kt")
@@ -27551,16 +22396,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/regressions/kt6434_2.kt");
         }
 
-        @TestMetadata("kt6485.kt")
-        public void testKt6485() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt6485.kt");
-        }
-
-        @TestMetadata("kt715.kt")
-        public void testKt715() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt715.kt");
-        }
-
         @TestMetadata("kt7401.kt")
         public void testKt7401() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt7401.kt");
@@ -27569,16 +22404,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("kt789.kt")
         public void testKt789() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/kt789.kt");
-        }
-
-        @TestMetadata("kt864.kt")
-        public void testKt864() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt864.kt");
-        }
-
-        @TestMetadata("kt9345.kt")
-        public void testKt9345() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/kt9345.kt");
         }
 
         @TestMetadata("kt998.kt")
@@ -27599,11 +22424,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("lambdaWrongReturnType.kt")
         public void testLambdaWrongReturnType() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/lambdaWrongReturnType.kt");
-        }
-
-        @TestMetadata("nestedIntersection.kt")
-        public void testNestedIntersection() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/nestedIntersection.kt");
         }
 
         @TestMetadata("noAssertionsWhenNullableTypeParameterReplacedWithIntersectionType.kt")
@@ -27641,11 +22461,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/regressions/objectInsideDelegation.kt");
         }
 
-        @TestMetadata("referenceToSelfInLocal.kt")
-        public void testReferenceToSelfInLocal() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/referenceToSelfInLocal.kt");
-        }
-
         @TestMetadata("resolvedCallForGetOperator.kt")
         public void testResolvedCallForGetOperator() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/resolvedCallForGetOperator.kt");
@@ -27655,48 +22470,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         public void testSupertypeDepth() throws Exception {
             runTest("compiler/testData/codegen/box/regressions/supertypeDepth.kt");
         }
-
-        @TestMetadata("typeCastException.kt")
-        public void testTypeCastException() throws Exception {
-            runTest("compiler/testData/codegen/box/regressions/typeCastException.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/reified")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Reified extends AbstractFirBlackBoxCodegenTest {
+    public static class Reified extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInReified() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reified"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("anonymousObject.kt")
-        public void testAnonymousObject() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/anonymousObject.kt");
-        }
-
-        @TestMetadata("anonymousObjectNoPropagate.kt")
-        public void testAnonymousObjectNoPropagate() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/anonymousObjectNoPropagate.kt");
-        }
-
-        @TestMetadata("anonymousObjectReifiedSupertype.kt")
-        public void testAnonymousObjectReifiedSupertype() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/anonymousObjectReifiedSupertype.kt");
-        }
-
-        @TestMetadata("approximateCapturedTypes.kt")
-        public void testApproximateCapturedTypes() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/approximateCapturedTypes.kt");
-        }
-
-        @TestMetadata("asOnPlatformType.kt")
-        public void testAsOnPlatformType() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/asOnPlatformType.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reified"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("checkcast.kt")
@@ -27709,29 +22494,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/reified/copyToArray.kt");
         }
 
-        @TestMetadata("DIExample.kt")
-        public void testDIExample() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/DIExample.kt");
-        }
-
-        @TestMetadata("defaultJavaClass.kt")
-        public void testDefaultJavaClass() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/defaultJavaClass.kt");
-        }
-
-        @TestMetadata("expectedTypeFromCast.kt")
-        public void testExpectedTypeFromCast() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/expectedTypeFromCast.kt");
-        }
-
         @TestMetadata("filterIsInstance.kt")
         public void testFilterIsInstance() throws Exception {
             runTest("compiler/testData/codegen/box/reified/filterIsInstance.kt");
-        }
-
-        @TestMetadata("innerAnonymousObject.kt")
-        public void testInnerAnonymousObject() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/innerAnonymousObject.kt");
         }
 
         @TestMetadata("instanceof.kt")
@@ -27739,39 +22504,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/reified/instanceof.kt");
         }
 
-        @TestMetadata("isOnPlatformType.kt")
-        public void testIsOnPlatformType() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/isOnPlatformType.kt");
-        }
-
-        @TestMetadata("javaClass.kt")
-        public void testJavaClass() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/javaClass.kt");
-        }
-
-        @TestMetadata("nestedReified.kt")
-        public void testNestedReified() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/nestedReified.kt");
-        }
-
-        @TestMetadata("nestedReifiedSignature.kt")
-        public void testNestedReifiedSignature() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/nestedReifiedSignature.kt");
-        }
-
         @TestMetadata("newArrayInt.kt")
         public void testNewArrayInt() throws Exception {
             runTest("compiler/testData/codegen/box/reified/newArrayInt.kt");
-        }
-
-        @TestMetadata("nonInlineableLambdaInReifiedFunction.kt")
-        public void testNonInlineableLambdaInReifiedFunction() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/nonInlineableLambdaInReifiedFunction.kt");
-        }
-
-        @TestMetadata("recursiveInnerAnonymousObject.kt")
-        public void testRecursiveInnerAnonymousObject() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/recursiveInnerAnonymousObject.kt");
         }
 
         @TestMetadata("recursiveNewArray.kt")
@@ -27779,29 +22514,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/reified/recursiveNewArray.kt");
         }
 
-        @TestMetadata("recursiveNonInlineableLambda.kt")
-        public void testRecursiveNonInlineableLambda() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/recursiveNonInlineableLambda.kt");
-        }
-
         @TestMetadata("reifiedChain.kt")
         public void testReifiedChain() throws Exception {
             runTest("compiler/testData/codegen/box/reified/reifiedChain.kt");
-        }
-
-        @TestMetadata("reifiedInlineFunOfObject.kt")
-        public void testReifiedInlineFunOfObject() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/reifiedInlineFunOfObject.kt");
-        }
-
-        @TestMetadata("reifiedInlineFunOfObjectWithinReified.kt")
-        public void testReifiedInlineFunOfObjectWithinReified() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/reifiedInlineFunOfObjectWithinReified.kt");
-        }
-
-        @TestMetadata("reifiedInlineIntoNonInlineableLambda.kt")
-        public void testReifiedInlineIntoNonInlineableLambda() throws Exception {
-            runTest("compiler/testData/codegen/box/reified/reifiedInlineIntoNonInlineableLambda.kt");
         }
 
         @TestMetadata("reifiedIntersectionType.kt")
@@ -27852,13 +22567,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/reified/arraysReification")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class ArraysReification extends AbstractFirBlackBoxCodegenTest {
+        public static class ArraysReification extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInArraysReification() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reified/arraysReification"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/reified/arraysReification"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("instanceOf.kt")
@@ -27871,19 +22586,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/reified/arraysReification/instanceOfArrays.kt");
             }
 
-            @TestMetadata("jClass.kt")
-            public void testJClass() throws Exception {
-                runTest("compiler/testData/codegen/box/reified/arraysReification/jClass.kt");
-            }
-
             @TestMetadata("jaggedArray.kt")
             public void testJaggedArray() throws Exception {
                 runTest("compiler/testData/codegen/box/reified/arraysReification/jaggedArray.kt");
-            }
-
-            @TestMetadata("jaggedArrayOfNulls.kt")
-            public void testJaggedArrayOfNulls() throws Exception {
-                runTest("compiler/testData/codegen/box/reified/arraysReification/jaggedArrayOfNulls.kt");
             }
 
             @TestMetadata("jaggedDeep.kt")
@@ -27896,13 +22601,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/safeCall")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class SafeCall extends AbstractFirBlackBoxCodegenTest {
+    public static class SafeCall extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSafeCall() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/safeCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/safeCall"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("genericNull.kt")
@@ -27974,115 +22679,25 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/sam")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Sam extends AbstractFirBlackBoxCodegenTest {
+    public static class Sam extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSam() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/sam"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("arrayAsVarargAfterSamArgument.kt")
-        public void testArrayAsVarargAfterSamArgument() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/arrayAsVarargAfterSamArgument.kt");
-        }
-
-        @TestMetadata("arrayAsVarargAfterSamArgumentWithoutSamConversionsPerArgument.kt")
-        public void testArrayAsVarargAfterSamArgumentWithoutSamConversionsPerArgument() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/arrayAsVarargAfterSamArgumentWithoutSamConversionsPerArgument.kt");
-        }
-
-        @TestMetadata("castFromAny.kt")
-        public void testCastFromAny() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/castFromAny.kt");
-        }
-
-        @TestMetadata("inlinedSamWrapper.kt")
-        public void testInlinedSamWrapper() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/inlinedSamWrapper.kt");
-        }
-
-        @TestMetadata("kt17091.kt")
-        public void testKt17091() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/kt17091.kt");
-        }
-
-        @TestMetadata("kt17091_2.kt")
-        public void testKt17091_2() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/kt17091_2.kt");
-        }
-
-        @TestMetadata("kt17091_3.kt")
-        public void testKt17091_3() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/kt17091_3.kt");
-        }
-
-        @TestMetadata("kt17091_4.kt")
-        public void testKt17091_4() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/kt17091_4.kt");
-        }
-
-        @TestMetadata("kt22906.kt")
-        public void testKt22906() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/kt22906.kt");
-        }
-
-        @TestMetadata("kt22906_2.kt")
-        public void testKt22906_2() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/kt22906_2.kt");
-        }
-
-        @TestMetadata("kt24825.kt")
-        public void testKt24825() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/kt24825.kt");
-        }
-
-        @TestMetadata("nonInlinedSamWrapper.kt")
-        public void testNonInlinedSamWrapper() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/nonInlinedSamWrapper.kt");
-        }
-
-        @TestMetadata("nullableSam.kt")
-        public void testNullableSam() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/nullableSam.kt");
-        }
-
-        @TestMetadata("partialSam.kt")
-        public void testPartialSam() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/partialSam.kt");
-        }
-
-        @TestMetadata("partialSamKT.kt")
-        public void testPartialSamKT() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/partialSamKT.kt");
-        }
-
-        @TestMetadata("predicateSamWrapper.kt")
-        public void testPredicateSamWrapper() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/predicateSamWrapper.kt");
-        }
-
-        @TestMetadata("receiverEvaluatedOnce.kt")
-        public void testReceiverEvaluatedOnce() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/receiverEvaluatedOnce.kt");
-        }
-
-        @TestMetadata("recordSubstitutedTypeForCallableSamParameter.kt")
-        public void testRecordSubstitutedTypeForCallableSamParameter() throws Exception {
-            runTest("compiler/testData/codegen/box/sam/recordSubstitutedTypeForCallableSamParameter.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/sam"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("compiler/testData/codegen/box/sam/constructors")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Constructors extends AbstractFirBlackBoxCodegenTest {
+        public static class Constructors extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInConstructors() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/sam/constructors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/sam/constructors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("comparator.kt")
@@ -28090,112 +22705,27 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
                 runTest("compiler/testData/codegen/box/sam/constructors/comparator.kt");
             }
 
-            @TestMetadata("filenameFilter.kt")
-            public void testFilenameFilter() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/filenameFilter.kt");
-            }
-
-            @TestMetadata("kt16790.kt")
-            public void testKt16790() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/kt16790.kt");
-            }
-
-            @TestMetadata("kt19251.kt")
-            public void testKt19251() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/kt19251.kt");
-            }
-
-            @TestMetadata("kt19251_child.kt")
-            public void testKt19251_child() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/kt19251_child.kt");
-            }
-
             @TestMetadata("nonLiteralComparator.kt")
             public void testNonLiteralComparator() throws Exception {
                 runTest("compiler/testData/codegen/box/sam/constructors/nonLiteralComparator.kt");
-            }
-
-            @TestMetadata("nonLiteralFilenameFilter.kt")
-            public void testNonLiteralFilenameFilter() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/nonLiteralFilenameFilter.kt");
-            }
-
-            @TestMetadata("nonLiteralRunnable.kt")
-            public void testNonLiteralRunnable() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/nonLiteralRunnable.kt");
-            }
-
-            @TestMetadata("nonTrivialRunnable.kt")
-            public void testNonTrivialRunnable() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/nonTrivialRunnable.kt");
-            }
-
-            @TestMetadata("runnable.kt")
-            public void testRunnable() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/runnable.kt");
-            }
-
-            @TestMetadata("runnableAccessingClosure1.kt")
-            public void testRunnableAccessingClosure1() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/runnableAccessingClosure1.kt");
-            }
-
-            @TestMetadata("runnableAccessingClosure2.kt")
-            public void testRunnableAccessingClosure2() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/runnableAccessingClosure2.kt");
-            }
-
-            @TestMetadata("samWrappersDifferentFiles.kt")
-            public void testSamWrappersDifferentFiles() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/samWrappersDifferentFiles.kt");
             }
 
             @TestMetadata("sameWrapperClass.kt")
             public void testSameWrapperClass() throws Exception {
                 runTest("compiler/testData/codegen/box/sam/constructors/sameWrapperClass.kt");
             }
-
-            @TestMetadata("syntheticVsReal.kt")
-            public void testSyntheticVsReal() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/constructors/syntheticVsReal.kt");
-            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/sam/equality")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class Equality extends AbstractFirBlackBoxCodegenTest {
+        public static class Equality extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInEquality() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/sam/equality"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-            }
-
-            @TestMetadata("functionReferencesBound.kt")
-            public void testFunctionReferencesBound() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/equality/functionReferencesBound.kt");
-            }
-
-            @TestMetadata("functionReferencesUnbound.kt")
-            public void testFunctionReferencesUnbound() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/equality/functionReferencesUnbound.kt");
-            }
-
-            @TestMetadata("lambdaRuntimeConversion.kt")
-            public void testLambdaRuntimeConversion() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/equality/lambdaRuntimeConversion.kt");
-            }
-
-            @TestMetadata("localFunctionReferences.kt")
-            public void testLocalFunctionReferences() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/equality/localFunctionReferences.kt");
-            }
-
-            @TestMetadata("simpleLambdas.kt")
-            public void testSimpleLambdas() throws Exception {
-                runTest("compiler/testData/codegen/box/sam/equality/simpleLambdas.kt");
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/sam/equality"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
         }
     }
@@ -28203,13 +22733,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/sealed")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Sealed extends AbstractFirBlackBoxCodegenTest {
+    public static class Sealed extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSealed() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/sealed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/sealed"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("objects.kt")
@@ -28226,9 +22756,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/secondaryConstructors")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class SecondaryConstructors extends AbstractFirBlackBoxCodegenTest {
+    public static class SecondaryConstructors extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         @TestMetadata("accessToCompanion.kt")
@@ -28242,7 +22772,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         public void testAllFilesPresentInSecondaryConstructors() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/secondaryConstructors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/secondaryConstructors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("basicNoPrimaryManySinks.kt")
@@ -28360,19 +22890,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/secondaryConstructors/varargs.kt");
         }
 
-        @TestMetadata("withGenerics.kt")
-        public void testWithGenerics() throws Exception {
-            runTest("compiler/testData/codegen/box/secondaryConstructors/withGenerics.kt");
-        }
-
         @TestMetadata("withNonLocalReturn.kt")
         public void testWithNonLocalReturn() throws Exception {
             runTest("compiler/testData/codegen/box/secondaryConstructors/withNonLocalReturn.kt");
-        }
-
-        @TestMetadata("withPrimary.kt")
-        public void testWithPrimary() throws Exception {
-            runTest("compiler/testData/codegen/box/secondaryConstructors/withPrimary.kt");
         }
 
         @TestMetadata("withReturn.kt")
@@ -28385,16 +22905,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/secondaryConstructors/withReturnUnit.kt");
         }
 
-        @TestMetadata("withVarargs.kt")
-        public void testWithVarargs() throws Exception {
-            runTest("compiler/testData/codegen/box/secondaryConstructors/withVarargs.kt");
-        }
-
-        @TestMetadata("withoutPrimary.kt")
-        public void testWithoutPrimary() throws Exception {
-            runTest("compiler/testData/codegen/box/secondaryConstructors/withoutPrimary.kt");
-        }
-
         @TestMetadata("withoutPrimarySimple.kt")
         public void testWithoutPrimarySimple() throws Exception {
             runTest("compiler/testData/codegen/box/secondaryConstructors/withoutPrimarySimple.kt");
@@ -28404,119 +22914,39 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/signatureAnnotations")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class SignatureAnnotations extends AbstractFirBlackBoxCodegenTest {
+    public static class SignatureAnnotations extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSignatureAnnotations() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/signatureAnnotations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("defaultAndNamedCombination.kt")
-        public void testDefaultAndNamedCombination() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultAndNamedCombination.kt");
-        }
-
-        @TestMetadata("defaultBoxTypes.kt")
-        public void testDefaultBoxTypes() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultBoxTypes.kt");
-        }
-
-        @TestMetadata("defaultEnumType.kt")
-        public void testDefaultEnumType() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultEnumType.kt");
-        }
-
-        @TestMetadata("defaultLongLiteral.kt")
-        public void testDefaultLongLiteral() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultLongLiteral.kt");
-        }
-
-        @TestMetadata("defaultMultipleParams.kt")
-        public void testDefaultMultipleParams() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultMultipleParams.kt");
-        }
-
-        @TestMetadata("defaultNull.kt")
-        public void testDefaultNull() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultNull.kt");
-        }
-
-        @TestMetadata("defaultNullableBoxTypes.kt")
-        public void testDefaultNullableBoxTypes() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultNullableBoxTypes.kt");
-        }
-
-        @TestMetadata("defaultOverrides.kt")
-        public void testDefaultOverrides() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultOverrides.kt");
-        }
-
-        @TestMetadata("defaultPrimitiveTypes.kt")
-        public void testDefaultPrimitiveTypes() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultPrimitiveTypes.kt");
-        }
-
-        @TestMetadata("defaultValueInConstructor.kt")
-        public void testDefaultValueInConstructor() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultValueInConstructor.kt");
-        }
-
-        @TestMetadata("defaultWithJavaBase.kt")
-        public void testDefaultWithJavaBase() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultWithJavaBase.kt");
-        }
-
-        @TestMetadata("defaultWithKotlinBase.kt")
-        public void testDefaultWithKotlinBase() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/defaultWithKotlinBase.kt");
-        }
-
-        @TestMetadata("reorderedParameterNames.kt")
-        public void testReorderedParameterNames() throws Exception {
-            runTest("compiler/testData/codegen/box/signatureAnnotations/reorderedParameterNames.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/signatureAnnotations"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/smap")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Smap extends AbstractFirBlackBoxCodegenTest {
+    public static class Smap extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSmap() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/smap"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("chainCalls.kt")
-        public void testChainCalls() throws Exception {
-            runTest("compiler/testData/codegen/box/smap/chainCalls.kt");
-        }
-
-        @TestMetadata("infixCalls.kt")
-        public void testInfixCalls() throws Exception {
-            runTest("compiler/testData/codegen/box/smap/infixCalls.kt");
-        }
-
-        @TestMetadata("simpleCallWithParams.kt")
-        public void testSimpleCallWithParams() throws Exception {
-            runTest("compiler/testData/codegen/box/smap/simpleCallWithParams.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/smap"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/smartCasts")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class SmartCasts extends AbstractFirBlackBoxCodegenTest {
+    public static class SmartCasts extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSmartCasts() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/smartCasts"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/smartCasts"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("falseSmartCast.kt")
@@ -28564,11 +22994,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/smartCasts/kt17725.kt");
         }
 
-        @TestMetadata("kt19058.kt")
-        public void testKt19058() throws Exception {
-            runTest("compiler/testData/codegen/box/smartCasts/kt19058.kt");
-        }
-
         @TestMetadata("kt19100.kt")
         public void testKt19100() throws Exception {
             runTest("compiler/testData/codegen/box/smartCasts/kt19100.kt");
@@ -28598,13 +23023,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/specialBuiltins")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class SpecialBuiltins extends AbstractFirBlackBoxCodegenTest {
+    public static class SpecialBuiltins extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSpecialBuiltins() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/specialBuiltins"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/specialBuiltins"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("bridgeNotEmptyMap.kt")
@@ -28615,11 +23040,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("bridges.kt")
         public void testBridges() throws Exception {
             runTest("compiler/testData/codegen/box/specialBuiltins/bridges.kt");
-        }
-
-        @TestMetadata("collectionImpl.kt")
-        public void testCollectionImpl() throws Exception {
-            runTest("compiler/testData/codegen/box/specialBuiltins/collectionImpl.kt");
         }
 
         @TestMetadata("commonBridgesTarget.kt")
@@ -28667,11 +23087,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/specialBuiltins/irrelevantRemoveAtOverride.kt");
         }
 
-        @TestMetadata("mapGetOrDefault.kt")
-        public void testMapGetOrDefault() throws Exception {
-            runTest("compiler/testData/codegen/box/specialBuiltins/mapGetOrDefault.kt");
-        }
-
         @TestMetadata("maps.kt")
         public void testMaps() throws Exception {
             runTest("compiler/testData/codegen/box/specialBuiltins/maps.kt");
@@ -28705,11 +23120,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("removeSetInt.kt")
         public void testRemoveSetInt() throws Exception {
             runTest("compiler/testData/codegen/box/specialBuiltins/removeSetInt.kt");
-        }
-
-        @TestMetadata("specialBridgeModality.kt")
-        public void testSpecialBridgeModality() throws Exception {
-            runTest("compiler/testData/codegen/box/specialBuiltins/specialBridgeModality.kt");
         }
 
         @TestMetadata("throwable.kt")
@@ -28746,13 +23156,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/statics")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Statics extends AbstractFirBlackBoxCodegenTest {
+    public static class Statics extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInStatics() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/statics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/statics"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("anonymousInitializerIObject.kt")
@@ -28763,21 +23173,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("anonymousInitializerInClassObject.kt")
         public void testAnonymousInitializerInClassObject() throws Exception {
             runTest("compiler/testData/codegen/box/statics/anonymousInitializerInClassObject.kt");
-        }
-
-        @TestMetadata("fields.kt")
-        public void testFields() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/fields.kt");
-        }
-
-        @TestMetadata("functions.kt")
-        public void testFunctions() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/functions.kt");
-        }
-
-        @TestMetadata("hidePrivateByPublic.kt")
-        public void testHidePrivateByPublic() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/hidePrivateByPublic.kt");
         }
 
         @TestMetadata("incInClassObject.kt")
@@ -28800,39 +23195,9 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/statics/inheritedPropertyInObject.kt");
         }
 
-        @TestMetadata("inlineCallsStaticMethod.kt")
-        public void testInlineCallsStaticMethod() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/inlineCallsStaticMethod.kt");
-        }
-
-        @TestMetadata("inlineCallsStaticMethodFromOtherPackage.kt")
-        public void testInlineCallsStaticMethodFromOtherPackage() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/inlineCallsStaticMethodFromOtherPackage.kt");
-        }
-
         @TestMetadata("kt8089.kt")
         public void testKt8089() throws Exception {
             runTest("compiler/testData/codegen/box/statics/kt8089.kt");
-        }
-
-        @TestMetadata("protectedSamConstructor.kt")
-        public void testProtectedSamConstructor() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/protectedSamConstructor.kt");
-        }
-
-        @TestMetadata("protectedStatic.kt")
-        public void testProtectedStatic() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/protectedStatic.kt");
-        }
-
-        @TestMetadata("protectedStatic2.kt")
-        public void testProtectedStatic2() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/protectedStatic2.kt");
-        }
-
-        @TestMetadata("protectedStaticAndInline.kt")
-        public void testProtectedStaticAndInline() throws Exception {
-            runTest("compiler/testData/codegen/box/statics/protectedStaticAndInline.kt");
         }
 
         @TestMetadata("syntheticAccessor.kt")
@@ -28844,13 +23209,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/storeStackBeforeInline")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class StoreStackBeforeInline extends AbstractFirBlackBoxCodegenTest {
+    public static class StoreStackBeforeInline extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInStoreStackBeforeInline() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/storeStackBeforeInline"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/storeStackBeforeInline"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("differentTypes.kt")
@@ -28882,13 +23247,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/strings")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Strings extends AbstractFirBlackBoxCodegenTest {
+    public static class Strings extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInStrings() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/strings"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/strings"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("constInStringTemplate.kt")
@@ -28909,11 +23274,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("interpolation.kt")
         public void testInterpolation() throws Exception {
             runTest("compiler/testData/codegen/box/strings/interpolation.kt");
-        }
-
-        @TestMetadata("javaToStringNPE.kt")
-        public void testJavaToStringNPE() throws Exception {
-            runTest("compiler/testData/codegen/box/strings/javaToStringNPE.kt");
         }
 
         @TestMetadata("kt2592.kt")
@@ -28991,11 +23351,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/strings/stringBuilderAppend.kt");
         }
 
-        @TestMetadata("stringFromJavaPlus.kt")
-        public void testStringFromJavaPlus() throws Exception {
-            runTest("compiler/testData/codegen/box/strings/stringFromJavaPlus.kt");
-        }
-
         @TestMetadata("stringPlusOnlyWorksOnString.kt")
         public void testStringPlusOnlyWorksOnString() throws Exception {
             runTest("compiler/testData/codegen/box/strings/stringPlusOnlyWorksOnString.kt");
@@ -29010,13 +23365,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/super")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Super extends AbstractFirBlackBoxCodegenTest {
+    public static class Super extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSuper() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/super"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/super"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("basicmethodSuperClass.kt")
@@ -29172,13 +23527,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/super/superConstructor")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class SuperConstructor extends AbstractFirBlackBoxCodegenTest {
+        public static class SuperConstructor extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInSuperConstructor() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/super/superConstructor"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/super/superConstructor"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("kt13846.kt")
@@ -29221,77 +23576,22 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/synchronized")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Synchronized extends AbstractFirBlackBoxCodegenTest {
+    public static class Synchronized extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInSynchronized() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/synchronized"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("changeMonitor.kt")
-        public void testChangeMonitor() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/changeMonitor.kt");
-        }
-
-        @TestMetadata("exceptionInMonitorExpression.kt")
-        public void testExceptionInMonitorExpression() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/exceptionInMonitorExpression.kt");
-        }
-
-        @TestMetadata("finally.kt")
-        public void testFinally() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/finally.kt");
-        }
-
-        @TestMetadata("longValue.kt")
-        public void testLongValue() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/longValue.kt");
-        }
-
-        @TestMetadata("nestedDifferentObjects.kt")
-        public void testNestedDifferentObjects() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/nestedDifferentObjects.kt");
-        }
-
-        @TestMetadata("nestedSameObject.kt")
-        public void testNestedSameObject() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/nestedSameObject.kt");
-        }
-
-        @TestMetadata("nonLocalReturn.kt")
-        public void testNonLocalReturn() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/nonLocalReturn.kt");
-        }
-
-        @TestMetadata("objectValue.kt")
-        public void testObjectValue() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/objectValue.kt");
-        }
-
-        @TestMetadata("sync.kt")
-        public void testSync() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/sync.kt");
-        }
-
-        @TestMetadata("value.kt")
-        public void testValue() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/value.kt");
-        }
-
-        @TestMetadata("wait.kt")
-        public void testWait() throws Exception {
-            runTest("compiler/testData/codegen/box/synchronized/wait.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/synchronized"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/syntheticAccessors")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class SyntheticAccessors extends AbstractFirBlackBoxCodegenTest {
+    public static class SyntheticAccessors extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         @TestMetadata("accessorForGenericConstructor.kt")
@@ -29320,7 +23620,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         }
 
         public void testAllFilesPresentInSyntheticAccessors() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/syntheticAccessors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/syntheticAccessors"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("inline.kt")
@@ -29331,16 +23631,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("inlineInOtherClass.kt")
         public void testInlineInOtherClass() throws Exception {
             runTest("compiler/testData/codegen/box/syntheticAccessors/inlineInOtherClass.kt");
-        }
-
-        @TestMetadata("jvmField.kt")
-        public void testJvmField() throws Exception {
-            runTest("compiler/testData/codegen/box/syntheticAccessors/jvmField.kt");
-        }
-
-        @TestMetadata("jvmNameForAccessors.kt")
-        public void testJvmNameForAccessors() throws Exception {
-            runTest("compiler/testData/codegen/box/syntheticAccessors/jvmNameForAccessors.kt");
         }
 
         @TestMetadata("kt10047.kt")
@@ -29387,51 +23677,31 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         public void testSuperCallFromMultipleSubclasses() throws Exception {
             runTest("compiler/testData/codegen/box/syntheticAccessors/superCallFromMultipleSubclasses.kt");
         }
-
-        @TestMetadata("syntheticAccessorNames.kt")
-        public void testSyntheticAccessorNames() throws Exception {
-            runTest("compiler/testData/codegen/box/syntheticAccessors/syntheticAccessorNames.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/throws")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Throws extends AbstractFirBlackBoxCodegenTest {
+    public static class Throws extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInThrows() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/throws"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("delegationAndThrows.kt")
-        public void testDelegationAndThrows() throws Exception {
-            runTest("compiler/testData/codegen/box/throws/delegationAndThrows.kt");
-        }
-
-        @TestMetadata("delegationAndThrows_1_3.kt")
-        public void testDelegationAndThrows_1_3() throws Exception {
-            runTest("compiler/testData/codegen/box/throws/delegationAndThrows_1_3.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/throws"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/toArray")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class ToArray extends AbstractFirBlackBoxCodegenTest {
+    public static class ToArray extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInToArray() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/toArray"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("incorrectToArrayDetection.kt")
-        public void testIncorrectToArrayDetection() throws Exception {
-            runTest("compiler/testData/codegen/box/toArray/incorrectToArrayDetection.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/toArray"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("kt3177-toTypedArray.kt")
@@ -29444,31 +23714,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/toArray/returnToTypedArray.kt");
         }
 
-        @TestMetadata("toArray.kt")
-        public void testToArray() throws Exception {
-            runTest("compiler/testData/codegen/box/toArray/toArray.kt");
-        }
-
-        @TestMetadata("toArrayAlreadyPresent.kt")
-        public void testToArrayAlreadyPresent() throws Exception {
-            runTest("compiler/testData/codegen/box/toArray/toArrayAlreadyPresent.kt");
-        }
-
-        @TestMetadata("toArrayFromJava.kt")
-        public void testToArrayFromJava() throws Exception {
-            runTest("compiler/testData/codegen/box/toArray/toArrayFromJava.kt");
-        }
-
-        @TestMetadata("toArrayShouldBePublic.kt")
-        public void testToArrayShouldBePublic() throws Exception {
-            runTest("compiler/testData/codegen/box/toArray/toArrayShouldBePublic.kt");
-        }
-
-        @TestMetadata("toArrayShouldBePublicWithJava.kt")
-        public void testToArrayShouldBePublicWithJava() throws Exception {
-            runTest("compiler/testData/codegen/box/toArray/toArrayShouldBePublicWithJava.kt");
-        }
-
         @TestMetadata("toTypedArray.kt")
         public void testToTypedArray() throws Exception {
             runTest("compiler/testData/codegen/box/toArray/toTypedArray.kt");
@@ -29478,23 +23723,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/topLevelPrivate")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class TopLevelPrivate extends AbstractFirBlackBoxCodegenTest {
+    public static class TopLevelPrivate extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInTopLevelPrivate() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/topLevelPrivate"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("noPrivateNoAccessorsInMultiFileFacade.kt")
-        public void testNoPrivateNoAccessorsInMultiFileFacade() throws Exception {
-            runTest("compiler/testData/codegen/box/topLevelPrivate/noPrivateNoAccessorsInMultiFileFacade.kt");
-        }
-
-        @TestMetadata("noPrivateNoAccessorsInMultiFileFacade2.kt")
-        public void testNoPrivateNoAccessorsInMultiFileFacade2() throws Exception {
-            runTest("compiler/testData/codegen/box/topLevelPrivate/noPrivateNoAccessorsInMultiFileFacade2.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/topLevelPrivate"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("privateInInlineNested.kt")
@@ -29502,32 +23737,22 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/topLevelPrivate/privateInInlineNested.kt");
         }
 
-        @TestMetadata("privateVisibility.kt")
-        public void testPrivateVisibility() throws Exception {
-            runTest("compiler/testData/codegen/box/topLevelPrivate/privateVisibility.kt");
-        }
-
         @TestMetadata("syntheticAccessor.kt")
         public void testSyntheticAccessor() throws Exception {
             runTest("compiler/testData/codegen/box/topLevelPrivate/syntheticAccessor.kt");
-        }
-
-        @TestMetadata("syntheticAccessorInMultiFile.kt")
-        public void testSyntheticAccessorInMultiFile() throws Exception {
-            runTest("compiler/testData/codegen/box/topLevelPrivate/syntheticAccessorInMultiFile.kt");
         }
     }
 
     @TestMetadata("compiler/testData/codegen/box/trailingComma")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class TrailingComma extends AbstractFirBlackBoxCodegenTest {
+    public static class TrailingComma extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInTrailingComma() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/trailingComma"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/trailingComma"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("noDisambiguation.kt")
@@ -29539,23 +23764,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/traits")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Traits extends AbstractFirBlackBoxCodegenTest {
+    public static class Traits extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
-        }
-
-        @TestMetadata("abstractClassInheritsFromInterface.kt")
-        public void testAbstractClassInheritsFromInterface() throws Exception {
-            runTest("compiler/testData/codegen/box/traits/abstractClassInheritsFromInterface.kt");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInTraits() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/traits"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("defaultImplCall.kt")
-        public void testDefaultImplCall() throws Exception {
-            runTest("compiler/testData/codegen/box/traits/defaultImplCall.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/traits"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("diamondPropertyAccessors.kt")
@@ -29578,11 +23793,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/traits/indirectlyInheritPropertyGetter.kt");
         }
 
-        @TestMetadata("inheritJavaInterface.kt")
-        public void testInheritJavaInterface() throws Exception {
-            runTest("compiler/testData/codegen/box/traits/inheritJavaInterface.kt");
-        }
-
         @TestMetadata("inheritedFun.kt")
         public void testInheritedFun() throws Exception {
             runTest("compiler/testData/codegen/box/traits/inheritedFun.kt");
@@ -29591,11 +23801,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("inheritedVar.kt")
         public void testInheritedVar() throws Exception {
             runTest("compiler/testData/codegen/box/traits/inheritedVar.kt");
-        }
-
-        @TestMetadata("interfaceDefaultImpls.kt")
-        public void testInterfaceDefaultImpls() throws Exception {
-            runTest("compiler/testData/codegen/box/traits/interfaceDefaultImpls.kt");
         }
 
         @TestMetadata("interfaceWithNonAbstractFunIndirect.kt")
@@ -29673,11 +23878,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/traits/multiple.kt");
         }
 
-        @TestMetadata("multipleImplFromJava.kt")
-        public void testMultipleImplFromJava() throws Exception {
-            runTest("compiler/testData/codegen/box/traits/multipleImplFromJava.kt");
-        }
-
         @TestMetadata("noPrivateDelegation.kt")
         public void testNoPrivateDelegation() throws Exception {
             runTest("compiler/testData/codegen/box/traits/noPrivateDelegation.kt");
@@ -29732,18 +23932,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/typeInfo")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class TypeInfo extends AbstractFirBlackBoxCodegenTest {
+    public static class TypeInfo extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInTypeInfo() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/typeInfo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("asInLoop.kt")
-        public void testAsInLoop() throws Exception {
-            runTest("compiler/testData/codegen/box/typeInfo/asInLoop.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/typeInfo"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("ifOrWhenSpecialCall.kt")
@@ -29780,38 +23975,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/typeMapping")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class TypeMapping extends AbstractFirBlackBoxCodegenTest {
+    public static class TypeMapping extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInTypeMapping() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/typeMapping"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("enhancedPrimitiveInReturnType.kt")
-        public void testEnhancedPrimitiveInReturnType() throws Exception {
-            runTest("compiler/testData/codegen/box/typeMapping/enhancedPrimitiveInReturnType.kt");
-        }
-
-        @TestMetadata("enhancedPrimitives.kt")
-        public void testEnhancedPrimitives() throws Exception {
-            runTest("compiler/testData/codegen/box/typeMapping/enhancedPrimitives.kt");
-        }
-
-        @TestMetadata("genericTypeWithNothing.kt")
-        public void testGenericTypeWithNothing() throws Exception {
-            runTest("compiler/testData/codegen/box/typeMapping/genericTypeWithNothing.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/typeMapping"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("kt2831.kt")
         public void testKt2831() throws Exception {
             runTest("compiler/testData/codegen/box/typeMapping/kt2831.kt");
-        }
-
-        @TestMetadata("kt309.kt")
-        public void testKt309() throws Exception {
-            runTest("compiler/testData/codegen/box/typeMapping/kt309.kt");
         }
 
         @TestMetadata("kt3286.kt")
@@ -29843,23 +24018,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         public void testNullableNothing() throws Exception {
             runTest("compiler/testData/codegen/box/typeMapping/nullableNothing.kt");
         }
-
-        @TestMetadata("typeParameterMultipleBounds.kt")
-        public void testTypeParameterMultipleBounds() throws Exception {
-            runTest("compiler/testData/codegen/box/typeMapping/typeParameterMultipleBounds.kt");
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/typealias")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Typealias extends AbstractFirBlackBoxCodegenTest {
+    public static class Typealias extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInTypealias() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/typealias"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/typealias"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("enumEntryQualifier.kt")
@@ -29961,13 +24131,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/unaryOp")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class UnaryOp extends AbstractFirBlackBoxCodegenTest {
+    public static class UnaryOp extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInUnaryOp() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/unaryOp"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/unaryOp"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("call.kt")
@@ -30004,13 +24174,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/unit")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Unit extends AbstractFirBlackBoxCodegenTest {
+    public static class Unit extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInUnit() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/unit"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/unit"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("closureReturnsNullableUnit.kt")
@@ -30072,13 +24242,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/unsignedTypes")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class UnsignedTypes extends AbstractFirBlackBoxCodegenTest {
+    public static class UnsignedTypes extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInUnsignedTypes() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/unsignedTypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/unsignedTypes"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("boxConstValOfUnsignedType.kt")
@@ -30099,11 +24269,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("equalsImplForInlineClassWrappingNullableInlineClass.kt")
         public void testEqualsImplForInlineClassWrappingNullableInlineClass() throws Exception {
             runTest("compiler/testData/codegen/box/unsignedTypes/equalsImplForInlineClassWrappingNullableInlineClass.kt");
-        }
-
-        @TestMetadata("evaluateConstructorOfUnsignedType.kt")
-        public void testEvaluateConstructorOfUnsignedType() throws Exception {
-            runTest("compiler/testData/codegen/box/unsignedTypes/evaluateConstructorOfUnsignedType.kt");
         }
 
         @TestMetadata("forEachIndexedInListOfUInts.kt")
@@ -30270,28 +24435,18 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/vararg")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class Vararg extends AbstractFirBlackBoxCodegenTest {
+    public static class Vararg extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInVararg() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/vararg"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
-        }
-
-        @TestMetadata("assigningArrayToVarargInAnnotation.kt")
-        public void testAssigningArrayToVarargInAnnotation() throws Exception {
-            runTest("compiler/testData/codegen/box/vararg/assigningArrayToVarargInAnnotation.kt");
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/vararg"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("doNotCopyImmediatelyCreatedArrays.kt")
         public void testDoNotCopyImmediatelyCreatedArrays() throws Exception {
             runTest("compiler/testData/codegen/box/vararg/doNotCopyImmediatelyCreatedArrays.kt");
-        }
-
-        @TestMetadata("emptyVarargOfBoxedPrimitiveType.kt")
-        public void testEmptyVarargOfBoxedPrimitiveType() throws Exception {
-            runTest("compiler/testData/codegen/box/vararg/emptyVarargOfBoxedPrimitiveType.kt");
         }
 
         @TestMetadata("kt1978.kt")
@@ -30324,11 +24479,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/vararg/kt796_797.kt");
         }
 
-        @TestMetadata("notInLastPosition.kt")
-        public void testNotInLastPosition() throws Exception {
-            runTest("compiler/testData/codegen/box/vararg/notInLastPosition.kt");
-        }
-
         @TestMetadata("singleAssignmentToVarargsInFunction.kt")
         public void testSingleAssignmentToVarargsInFunction() throws Exception {
             runTest("compiler/testData/codegen/box/vararg/singleAssignmentToVarargsInFunction.kt");
@@ -30344,11 +24494,6 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
             runTest("compiler/testData/codegen/box/vararg/varargInFunParam.kt");
         }
 
-        @TestMetadata("varargInJava.kt")
-        public void testVarargInJava() throws Exception {
-            runTest("compiler/testData/codegen/box/vararg/varargInJava.kt");
-        }
-
         @TestMetadata("varargsAndFunctionLiterals.kt")
         public void testVarargsAndFunctionLiterals() throws Exception {
             runTest("compiler/testData/codegen/box/vararg/varargsAndFunctionLiterals.kt");
@@ -30358,13 +24503,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     @TestMetadata("compiler/testData/codegen/box/when")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
-    public static class When extends AbstractFirBlackBoxCodegenTest {
+    public static class When extends AbstractFirBlackBoxDiagnosticsTest {
         private void runTest(String testDataFilePath) throws Exception {
-            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+            KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
         }
 
         public void testAllFilesPresentInWhen() throws Exception {
-            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/when"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/when"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
         }
 
         @TestMetadata("callProperty.kt")
@@ -30565,13 +24710,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/when/enumOptimization")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class EnumOptimization extends AbstractFirBlackBoxCodegenTest {
+        public static class EnumOptimization extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInEnumOptimization() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/when/enumOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/when/enumOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("bigEnum.kt")
@@ -30668,13 +24813,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/when/stringOptimization")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class StringOptimization extends AbstractFirBlackBoxCodegenTest {
+        public static class StringOptimization extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInStringOptimization() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/when/stringOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/when/stringOptimization"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("duplicatingItems.kt")
@@ -30726,13 +24871,13 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
         @TestMetadata("compiler/testData/codegen/box/when/whenSubjectVariable")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
-        public static class WhenSubjectVariable extends AbstractFirBlackBoxCodegenTest {
+        public static class WhenSubjectVariable extends AbstractFirBlackBoxDiagnosticsTest {
             private void runTest(String testDataFilePath) throws Exception {
-                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.JVM_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
+                KotlinTestUtils.runTestWithCustomIgnoreDirective(this::doTest, TargetBackend.ANY_IR, testDataFilePath, "// IGNORE_BACKEND_FIR: ");
             }
 
             public void testAllFilesPresentInWhenSubjectVariable() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/when/whenSubjectVariable"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.JVM_IR, true);
+                KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/when/whenSubjectVariable"), Pattern.compile("^(.+)\\.kt$"), Pattern.compile("^(.+)\\.fir\\.kts?$"), TargetBackend.ANY_IR, true);
             }
 
             @TestMetadata("captureSubjectVariable.kt")

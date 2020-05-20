@@ -16,7 +16,8 @@ import java.io.File
 fun compareAndMergeFirFileAndOldFrontendFile(
     oldFrontendTestDataFile: File,
     frontendIRTestDataFile: File,
-    compareWithTrimming: Boolean = false
+    compareWithTrimming: Boolean = false,
+    merge: (Boolean) -> Unit
 ) {
     if (oldFrontendTestDataFile.exists() && frontendIRTestDataFile.exists()) {
         val originalLines = oldFrontendTestDataFile.readLines()
@@ -32,6 +33,17 @@ fun compareAndMergeFirFileAndOldFrontendFile(
         } else {
             firLines == originalLines
         }
+
+        merge(sameDumps)
+    }
+}
+
+fun compareAndMergeFirFileAndOldFrontendFile(
+    oldFrontendTestDataFile: File,
+    frontendIRTestDataFile: File,
+    compareWithTrimming: Boolean = false
+) {
+    compareAndMergeFirFileAndOldFrontendFile(oldFrontendTestDataFile, frontendIRTestDataFile, compareWithTrimming) { sameDumps ->
         if (sameDumps) {
             frontendIRTestDataFile.delete()
             val oldFrontendTestDataFilePath = oldFrontendTestDataFile.absolutePath
@@ -45,6 +57,36 @@ fun compareAndMergeFirFileAndOldFrontendFile(
         TestCase.assertFalse(
             "Dumps via FIR & via old FE are the same. " +
                     "\nDeleted .fir.txt dump, added // FIR_IDENTICAL to test source" +
+                    "\nPlease re-run the test now",
+            sameDumps
+        )
+    }
+}
+
+fun compareAndMergeFirFileAndOldFrontendFileForBlackBox(
+    oldFrontendTestDataFile: File,
+    frontendIRTestDataFile: File,
+    compareWithTrimming: Boolean = false
+) {
+    compareAndMergeFirFileAndOldFrontendFile(oldFrontendTestDataFile, frontendIRTestDataFile, compareWithTrimming) { sameDumps ->
+        if (sameDumps) {
+            frontendIRTestDataFile.delete()
+            val oldFrontendTestDataFilePath = oldFrontendTestDataFile.absolutePath
+            val fileWithFirIdentical = if (!oldFrontendTestDataFilePath.endsWith(".txt")) {
+                oldFrontendTestDataFile
+            } else {
+                File(oldFrontendTestDataFilePath.replace(".txt", ".kt"))
+            }
+
+
+            fileWithFirIdentical.writeText(
+                fileWithFirIdentical.readText()
+                    .replace("^// BAD_FIR_RESOLUTION\\s*\n".toRegex(RegexOption.MULTILINE), "")
+            )
+        }
+        TestCase.assertFalse(
+            "Dumps via FIR & via old FE are the same. " +
+                    "\nDeleted .fir.txt dump, removed // BAD_FIR_RESOLUTION from test source" +
                     "\nPlease re-run the test now",
             sameDumps
         )

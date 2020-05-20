@@ -117,7 +117,9 @@ abstract class AbstractFirDiagnosticsTest : AbstractFirBaseDiagnosticsTest() {
                 actualText.append(testFile.expectedText)
             }
         }
-        KotlinTestUtils.assertEqualsToFile(file, actualText.toString())
+        KotlinTestUtils.assertEqualsToFile(file, actualText.toString()) { s ->
+            s.replace(coroutinesPackage, "COROUTINES_PACKAGE")
+        }
     }
 
     protected fun collectDebugInfoDiagnostics(
