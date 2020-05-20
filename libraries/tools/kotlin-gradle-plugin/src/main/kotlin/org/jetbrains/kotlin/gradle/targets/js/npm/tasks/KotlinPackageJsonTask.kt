@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -7,12 +7,16 @@ package org.jetbrains.kotlin.gradle.targets.js.npm.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.BasePlugin
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import org.jetbrains.kotlin.gradle.targets.js.npm.resolver.KotlinCompilationNpmResolver
+import org.jetbrains.kotlin.gradle.targets.js.yarn.yarn
 import org.jetbrains.kotlin.gradle.tasks.registerTask
 import java.io.File
 
@@ -65,6 +69,18 @@ open class KotlinPackageJsonTask : DefaultTask() {
             }
 
             npmInstallTask.mustRunAfter(rootClean, packageJsonTask)
+
+            nodeJs.rootProject.yarn.also { yarn ->
+                val allDependsOn: () -> Unit = { npmInstallTask.dependsOn(packageJsonTask) }
+                if (!yarn.granularWorkspaces) {
+                    allDependsOn()
+                }
+                yarn.onGranularWorkspacesChange { old, new ->
+                    if (old && !new) {
+                        allDependsOn()
+                    }
+                }
+            }
 
             compilation.compileKotlinTask.dependsOn(
                 npmInstallTask,
