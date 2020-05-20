@@ -2184,6 +2184,11 @@ public class FirDiagnosticsTestGenerated extends AbstractFirDiagnosticsTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/fir/analysis-tests/testData/resolve/stdlib/j+k"), Pattern.compile("^([^.]+)\\.kt$"), null, true);
             }
 
+            @TestMetadata("ArrayInGenericArguments.kt")
+            public void testArrayInGenericArguments() throws Exception {
+                runTest("compiler/fir/analysis-tests/testData/resolve/stdlib/j+k/ArrayInGenericArguments.kt");
+            }
+
             @TestMetadata("flexibleWildcard.kt")
             public void testFlexibleWildcard() throws Exception {
                 runTest("compiler/fir/analysis-tests/testData/resolve/stdlib/j+k/flexibleWildcard.kt");
