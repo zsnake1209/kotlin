@@ -1134,62 +1134,21 @@ public inline fun <T> Sequence<T>.forEachIndexed(action: (index: Int, T) -> Unit
     for (item in this) action(checkIndexOverflow(index++), item)
 }
 
-/**
- * Returns the largest element or `null` if there are no elements.
- * 
- * If any of elements is `NaN` returns `NaN`.
- *
- * The operation is _terminal_.
- */
+@Deprecated("Use maxOrNull instead.", ReplaceWith("maxOrNull()"))
 @SinceKotlin("1.1")
 public fun Sequence<Double>.max(): Double? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    var max = iterator.next()
-    if (max.isNaN()) return max
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (e.isNaN()) return e
-        if (max < e) max = e
-    }
-    return max
+    return maxOrNull()
 }
 
-/**
- * Returns the largest element or `null` if there are no elements.
- * 
- * If any of elements is `NaN` returns `NaN`.
- *
- * The operation is _terminal_.
- */
+@Deprecated("Use maxOrNull instead.", ReplaceWith("maxOrNull()"))
 @SinceKotlin("1.1")
 public fun Sequence<Float>.max(): Float? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    var max = iterator.next()
-    if (max.isNaN()) return max
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (e.isNaN()) return e
-        if (max < e) max = e
-    }
-    return max
+    return maxOrNull()
 }
 
-/**
- * Returns the largest element or `null` if there are no elements.
- *
- * The operation is _terminal_.
- */
+@Deprecated("Use maxOrNull instead.", ReplaceWith("maxOrNull()"))
 public fun <T : Comparable<T>> Sequence<T>.max(): T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    var max = iterator.next()
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (max < e) max = e
-    }
-    return max
+    return maxOrNull()
 }
 
 /**
@@ -1217,6 +1176,65 @@ public inline fun <T, R : Comparable<R>> Sequence<T>.maxBy(selector: (T) -> R): 
 }
 
 /**
+ * Returns the largest element or `null` if there are no elements.
+ * 
+ * If any of elements is `NaN` returns `NaN`.
+ *
+ * The operation is _terminal_.
+ */
+@SinceKotlin("1.4")
+public fun Sequence<Double>.maxOrNull(): Double? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    var max = iterator.next()
+    if (max.isNaN()) return max
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (e.isNaN()) return e
+        if (max < e) max = e
+    }
+    return max
+}
+
+/**
+ * Returns the largest element or `null` if there are no elements.
+ * 
+ * If any of elements is `NaN` returns `NaN`.
+ *
+ * The operation is _terminal_.
+ */
+@SinceKotlin("1.4")
+public fun Sequence<Float>.maxOrNull(): Float? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    var max = iterator.next()
+    if (max.isNaN()) return max
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (e.isNaN()) return e
+        if (max < e) max = e
+    }
+    return max
+}
+
+/**
+ * Returns the largest element or `null` if there are no elements.
+ *
+ * The operation is _terminal_.
+ */
+@SinceKotlin("1.4")
+public fun <T : Comparable<T>> Sequence<T>.maxOrNull(): T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    var max = iterator.next()
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (max < e) max = e
+    }
+    return max
+}
+
+/**
  * Returns the first element having the largest value according to the provided [comparator] or `null` if there are no elements.
  *
  * The operation is _terminal_.
@@ -1232,62 +1250,21 @@ public fun <T> Sequence<T>.maxWith(comparator: Comparator<in T>): T? {
     return max
 }
 
-/**
- * Returns the smallest element or `null` if there are no elements.
- * 
- * If any of elements is `NaN` returns `NaN`.
- *
- * The operation is _terminal_.
- */
+@Deprecated("Use minOrNull instead.", ReplaceWith("minOrNull()"))
 @SinceKotlin("1.1")
 public fun Sequence<Double>.min(): Double? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    var min = iterator.next()
-    if (min.isNaN()) return min
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (e.isNaN()) return e
-        if (min > e) min = e
-    }
-    return min
+    return minOrNull()
 }
 
-/**
- * Returns the smallest element or `null` if there are no elements.
- * 
- * If any of elements is `NaN` returns `NaN`.
- *
- * The operation is _terminal_.
- */
+@Deprecated("Use minOrNull instead.", ReplaceWith("minOrNull()"))
 @SinceKotlin("1.1")
 public fun Sequence<Float>.min(): Float? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    var min = iterator.next()
-    if (min.isNaN()) return min
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (e.isNaN()) return e
-        if (min > e) min = e
-    }
-    return min
+    return minOrNull()
 }
 
-/**
- * Returns the smallest element or `null` if there are no elements.
- *
- * The operation is _terminal_.
- */
+@Deprecated("Use minOrNull instead.", ReplaceWith("minOrNull()"))
 public fun <T : Comparable<T>> Sequence<T>.min(): T? {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return null
-    var min = iterator.next()
-    while (iterator.hasNext()) {
-        val e = iterator.next()
-        if (min > e) min = e
-    }
-    return min
+    return minOrNull()
 }
 
 /**
@@ -1312,6 +1289,65 @@ public inline fun <T, R : Comparable<R>> Sequence<T>.minBy(selector: (T) -> R): 
         }
     } while (iterator.hasNext())
     return minElem
+}
+
+/**
+ * Returns the smallest element or `null` if there are no elements.
+ * 
+ * If any of elements is `NaN` returns `NaN`.
+ *
+ * The operation is _terminal_.
+ */
+@SinceKotlin("1.4")
+public fun Sequence<Double>.minOrNull(): Double? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    var min = iterator.next()
+    if (min.isNaN()) return min
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (e.isNaN()) return e
+        if (min > e) min = e
+    }
+    return min
+}
+
+/**
+ * Returns the smallest element or `null` if there are no elements.
+ * 
+ * If any of elements is `NaN` returns `NaN`.
+ *
+ * The operation is _terminal_.
+ */
+@SinceKotlin("1.4")
+public fun Sequence<Float>.minOrNull(): Float? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    var min = iterator.next()
+    if (min.isNaN()) return min
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (e.isNaN()) return e
+        if (min > e) min = e
+    }
+    return min
+}
+
+/**
+ * Returns the smallest element or `null` if there are no elements.
+ *
+ * The operation is _terminal_.
+ */
+@SinceKotlin("1.4")
+public fun <T : Comparable<T>> Sequence<T>.minOrNull(): T? {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return null
+    var min = iterator.next()
+    while (iterator.hasNext()) {
+        val e = iterator.next()
+        if (min > e) min = e
+    }
+    return min
 }
 
 /**
