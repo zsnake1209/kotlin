@@ -6,9 +6,7 @@
 package org.jetbrains.kotlin.fir.backend.generators
 
 import org.jetbrains.kotlin.fir.backend.*
-import org.jetbrains.kotlin.fir.declarations.FirAnonymousFunction
-import org.jetbrains.kotlin.fir.declarations.FirClass
-import org.jetbrains.kotlin.fir.declarations.FirValueParameter
+import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirNoReceiverExpression
 import org.jetbrains.kotlin.fir.psi
@@ -27,10 +25,7 @@ import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrProperty
-import org.jetbrains.kotlin.ir.expressions.IrErrorCallExpression
-import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
@@ -154,10 +149,27 @@ internal class CallAndReferenceGenerator(
         }
     }
 
+
+    private fun FirQualifiedAccess.tryConvertToSamConstructorCall(type: IrType): IrTypeOperatorCall? {
+        val calleeReference = calleeReference as? FirResolvedNamedReference ?: return null
+        val fir = calleeReference.resolvedSymbol.fir
+        if (this is FirFunctionCall && fir is FirSimpleFunction && fir.origin == FirDeclarationOrigin.SamConstructor) {
+            return convertWithOffsets { startOffset, endOffset ->
+                IrTypeOperatorCallImpl(startOffset, endOffset, type, IrTypeOperator.SAM_CONVERSION, type).apply {
+                    argument = visitor.convertToIrExpression(this@tryConvertToSamConstructorCall.argument)
+                }
+            }
+        }
+        return null
+    }
+
     private fun convertToUnsafeIrCall(
         qualifiedAccess: FirQualifiedAccess, typeRef: FirTypeRef, explicitReceiverExpression: IrExpression?, makeNotNull: Boolean = false
     ): IrExpression {
         val type = typeRef.toIrType().let { if (makeNotNull) it.makeNotNull() else it }
+        val samConstructorCall = qualifiedAccess.tryConvertToSamConstructorCall(type)
+        if (samConstructorCall != null) return samConstructorCall
+
         val symbol = qualifiedAccess.calleeReference.toSymbol(
             session,
             classifierStorage,
