@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.asJava.elements.*
 import org.jetbrains.kotlin.codegen.PropertyCodegen
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.idea.KotlinLanguage
@@ -34,7 +35,7 @@ private class KtUltraLightSimpleModifierListField(
     private val support: KtUltraLightSupport,
     private val declaration: KtNamedDeclaration,
     owner: KtLightElement<KtModifierListOwner, PsiModifierListOwner>,
-    private val modifiers: Set<String>
+    private val modifiers: Set<String>,
 ) : KtUltraLightSimpleModifierList(owner, modifiers, support) {
     override fun hasModifierProperty(name: String): Boolean = when (name) {
         PsiModifier.VOLATILE -> hasFieldAnnotation(VOLATILE_ANNOTATION_FQ_NAME)
@@ -59,7 +60,7 @@ internal class KtUltraLightFieldForSourceDeclaration(
     name: String,
     containingClass: KtLightClass,
     support: KtUltraLightSupport,
-    modifiers: Set<String>
+    modifiers: Set<String>,
 ) : KtUltraLightFieldImpl(declaration, name, containingClass, support, modifiers),
     KtLightFieldForSourceDeclarationSupport
 
@@ -68,7 +69,7 @@ internal open class KtUltraLightFieldImpl protected constructor(
     name: String,
     private val containingClass: KtLightClass,
     private val support: KtUltraLightSupport,
-    modifiers: Set<String>
+    modifiers: Set<String>,
 ) : LightFieldBuilder(name, PsiType.NULL, declaration), KtLightField,
     KtUltraLightElementWithNullabilityAnnotation<KtDeclaration, PsiField> {
 
@@ -76,7 +77,8 @@ internal open class KtUltraLightFieldImpl protected constructor(
         KtUltraLightSimpleModifierListField(support, declaration, this, modifiers)
     }
 
-    override fun isEquivalentTo(another: PsiElement?): Boolean = kotlinOrigin == another || (another as? KtLightField)?.kotlinOrigin == kotlinOrigin
+    override fun isEquivalentTo(another: PsiElement?): Boolean =
+        kotlinOrigin == another || (another as? KtLightField)?.kotlinOrigin == kotlinOrigin
 
     override fun getModifierList(): PsiModifierList = modifierList
 
@@ -85,12 +87,14 @@ internal open class KtUltraLightFieldImpl protected constructor(
 
     override fun getLanguage(): Language = KotlinLanguage.INSTANCE
 
-    private val propertyDescriptor: PropertyDescriptor? get() = declaration.resolve() as? PropertyDescriptor
+    private val variableDescriptor: VariableDescriptor?
+        get() = declaration.resolve()
+            ?.let { it as? PropertyDescriptor ?: it as? ValueParameterDescriptor }
 
     private val kotlinType: KotlinType?
         get() = when {
             declaration is KtProperty && declaration.hasDelegate() ->
-                propertyDescriptor?.let {
+                (variableDescriptor as? PropertyDescriptor)?.let {
                     val context = LightClassGenerationSupport.getInstance(project).analyze(declaration)
                     PropertyCodegen.getDelegateTypeForProperty(it, context)
                 }
@@ -124,7 +128,7 @@ internal open class KtUltraLightFieldImpl protected constructor(
                     ?: nonExistent()
             else -> {
                 val kotlinType = declaration.getKotlinType() ?: return@lazyPub PsiType.NULL
-                val descriptor = propertyDescriptor ?: return@lazyPub PsiType.NULL
+                val descriptor = variableDescriptor ?: return@lazyPub PsiType.NULL
 
                 support.mapType(this) { typeMapper, sw ->
                     typeMapper.writeFieldSignature(kotlinType, descriptor, sw)
@@ -152,7 +156,7 @@ internal open class KtUltraLightFieldImpl protected constructor(
         if (!declaration.hasInitializer()) return@lazyPub null
         if (!hasModifierProperty(PsiModifier.FINAL)) return@lazyPub null
         if (!TypeConversionUtil.isPrimitiveAndNotNull(_type) && !_type.equalsToText(CommonClassNames.JAVA_LANG_STRING)) return@lazyPub null
-        propertyDescriptor?.compileTimeInitializer
+        variableDescriptor?.compileTimeInitializer
     }
 
     override fun computeConstantValue(): Any? = _constantInitializer?.value
