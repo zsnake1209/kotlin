@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyExternal
 
-@Suppress("DEPRECATION_ERROR")
 class IrPropertyImpl(
     startOffset: Int,
     endOffset: Int,
@@ -42,11 +41,34 @@ class IrPropertyImpl(
     override val isLateinit: Boolean,
     override val isDelegated: Boolean,
     override val isExternal: Boolean,
-    override val isExpect: Boolean,
+    override val isExpect: Boolean = false,
     override val isFakeOverride: Boolean = origin == IrDeclarationOrigin.FAKE_OVERRIDE
 ) : IrDeclarationBase<PropertyCarrier>(startOffset, endOffset, origin),
     IrProperty,
     PropertyCarrier {
+
+    @Deprecated(
+        "This constructor is left for native compilation purpose only. " +
+                "It takes property attributes from symbol.descriptor " +
+                "Please either provide property attributes or its descriptor explicitly"
+    )
+    constructor(
+        startOffset: Int,
+        endOffset: Int,
+        origin: IrDeclarationOrigin,
+        symbol: IrPropertySymbol,
+        name: Name
+    ) : this(
+        startOffset, endOffset, origin, symbol, name,
+        visibility = symbol.descriptor.visibility,
+        modality = symbol.descriptor.modality,
+        isVar = symbol.descriptor.isVar,
+        isConst = symbol.descriptor.isConst,
+        isLateinit = symbol.descriptor.isLateInit,
+        isDelegated = symbol.descriptor.isDelegated,
+        isExternal = symbol.descriptor.isExternal,
+        isExpect = symbol.descriptor.isExpect
+    )
 
     @Deprecated(message = "Don't use descriptor-based API for IrProperty", level = DeprecationLevel.WARNING)
     constructor(
