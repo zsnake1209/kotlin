@@ -22,7 +22,6 @@ import org.jetbrains.kotlin.scripting.resolve.KotlinScriptDefinitionFromAnnotate
 import org.jetbrains.plugins.gradle.config.GradleSettingsListenerAdapter
 import org.jetbrains.plugins.gradle.settings.DistributionType
 import org.jetbrains.plugins.gradle.settings.GradleExecutionSettings
-import org.jetbrains.plugins.gradle.settings.GradleProjectSettings
 import org.jetbrains.plugins.gradle.settings.GradleSettingsListener
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.io.File
@@ -47,6 +46,64 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
 
     init {
         subscribeToGradleSettingChanges()
+    }
+
+    companion object {
+        private val kotlinDslDependencySelector = Regex("^gradle-(?:kotlin-dsl|core).*\\.jar\$")
+
+        fun getGradleScriptDefinitionsClassPath(project: Project): List<File> {
+            return try {
+                getFullGradleScriptDefinitionsClassPath(project).first
+            } catch (e: Throwable) {
+                emptyList()
+            }
+        }
+
+        private fun getFullGradleScriptDefinitionsClassPath(project: Project): Pair<List<File>, List<File>> {
+            val allLinkedProjectsSettings = getGradleProjectSettings(project)
+
+            // todo: choose gradle project correctly by gradle root dir
+            val currentProjectSettings = allLinkedProjectsSettings.firstOrNull()
+                ?: error(KotlinIdeaGradleBundle.message("error.text.project.isn.t.linked.with.gradle", project.name))
+
+            val gradleExeSettings = ExternalSystemApiUtil.getExecutionSettings<GradleExecutionSettings>(
+                project,
+                currentProjectSettings.externalProjectPath,
+                GradleConstants.SYSTEM_ID
+            )
+
+            val gradleHome = gradleExeSettings.gradleHome
+                ?: error(KotlinIdeaGradleBundle.message("error.text.unable.to.get.gradle.home.directory"))
+
+            val gradleLibDir = File(gradleHome, "lib")
+                .let {
+                    it.takeIf { it.exists() && it.isDirectory }
+                        ?: error(KotlinIdeaGradleBundle.message("error.text.invalid.gradle.libraries.directory", it))
+                }
+
+            val templateClasspath = gradleLibDir
+                /* an inference problem without explicit 'it', TODO: remove when fixed */
+                .listFiles { it -> kotlinDslDependencySelector.matches(it.name) }
+                ?.takeIf { it.isNotEmpty() }
+                ?.asList()
+                ?: error(KotlinIdeaGradleBundle.message("error.text.missing.jars.in.gradle.directory"))
+
+            scriptingDebugLog { "gradle script templates classpath $templateClasspath" }
+
+            val additionalClassPath = kotlinStdlibAndCompiler(gradleLibDir)
+
+            scriptingDebugLog { "gradle script templates additional classpath $templateClasspath" }
+
+            return templateClasspath to additionalClassPath
+        }
+
+        // TODO: check this against kotlin-dsl branch that uses daemon
+        private fun kotlinStdlibAndCompiler(gradleLibDir: File): List<File> {
+            // additionally need compiler jar to load gradle resolver
+            return gradleLibDir.listFiles { file ->
+                file?.name?.startsWith("kotlin-compiler-embeddable") == true || file?.name?.startsWith("kotlin-stdlib") == true
+            }?.firstOrNull()?.let(::listOf).orEmpty()
+        }
     }
 
     private fun subscribeToGradleSettingChanges() {
@@ -74,150 +131,75 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
     // TODO: possibly combine exceptions from every loadGradleTemplates call, be mindful of KT-19276
     override val definitions: Sequence<ScriptDefinition>
         get() {
-            val kotlinDslDependencySelector = Regex("^gradle-(?:kotlin-dsl|core).*\\.jar\$")
-            val kotlinDslAdditionalResolverCp = ::kotlinStdlibAndCompiler
-
             failedToLoad.set(false)
 
-            val kotlinDslTemplates = ArrayList<ScriptDefinition>()
+            try {
+                val allLinkedProjectsSettings = getGradleProjectSettings(project)
 
-            loadGradleTemplates(
-                templateClass = "org.gradle.kotlin.dsl.KotlinInitScript",
-                dependencySelector = kotlinDslDependencySelector,
-                additionalResolverClasspath = kotlinDslAdditionalResolverCp
+                // todo: choose gradle project correctly by gradle root dir
+                val currentProjectSettings = allLinkedProjectsSettings.firstOrNull()
+                    ?: error(KotlinIdeaGradleBundle.message("error.text.project.isn.t.linked.with.gradle", project.name))
 
-            ).let { kotlinDslTemplates.addAll(it) }
+                val projectPath = currentProjectSettings.externalProjectPath
 
-            loadGradleTemplates(
-                templateClass = "org.gradle.kotlin.dsl.KotlinSettingsScript",
-                dependencySelector = kotlinDslDependencySelector,
-                additionalResolverClasspath = kotlinDslAdditionalResolverCp
+                val (templateClasspath, additionalClassPath) = getFullGradleScriptDefinitionsClassPath(project)
 
-            ).let { kotlinDslTemplates.addAll(it) }
+                val kotlinDslTemplates = ArrayList<ScriptDefinition>()
 
-            // KotlinBuildScript should be last because it has wide scriptFilePattern
-            loadGradleTemplates(
-                templateClass = "org.gradle.kotlin.dsl.KotlinBuildScript",
-                dependencySelector = kotlinDslDependencySelector,
-                additionalResolverClasspath = kotlinDslAdditionalResolverCp
-            ).let { kotlinDslTemplates.addAll(it) }
+                loadGradleTemplates(
+                    projectPath,
+                    "org.gradle.kotlin.dsl.KotlinInitScript",
+                    templateClasspath, additionalClassPath
+                ).let { kotlinDslTemplates.addAll(it) }
+
+                loadGradleTemplates(
+                    projectPath,
+                    "org.gradle.kotlin.dsl.KotlinSettingsScript",
+                    templateClasspath, additionalClassPath
+                ).let { kotlinDslTemplates.addAll(it) }
+
+                // KotlinBuildScript should be last because it has wide scriptFilePattern
+                loadGradleTemplates(
+                    projectPath,
+                    "org.gradle.kotlin.dsl.KotlinBuildScript",
+                    templateClasspath, additionalClassPath
+                ).let { kotlinDslTemplates.addAll(it) }
 
 
-            if (kotlinDslTemplates.isNotEmpty()) {
-                return kotlinDslTemplates.distinct().asSequence()
-            }
-
-            val default = tryToLoadOldBuildScriptDefinition()
-            if (default.isNotEmpty()) {
-                return default.distinct().asSequence()
+                if (kotlinDslTemplates.isNotEmpty()) {
+                    return kotlinDslTemplates.distinct().asSequence()
+                }
+            } catch (t: Throwable) {
+                scriptingDebugLog { "error loading gradle script templates ${t.message}" }
+                // TODO: review exception handling
+                failedToLoad.set(true)
+                if (t is IllegalStateException) {
+                    Logger.getInstance(GradleScriptDefinitionsContributor::class.java)
+                        .info("[kts] error loading gradle script templates: ${t.message}")
+                }
+                return sequenceOf(ErrorGradleScriptDefinition(t.message))
             }
 
             return sequenceOf(ErrorGradleScriptDefinition())
         }
 
-    private fun tryToLoadOldBuildScriptDefinition(): List<ScriptDefinition> {
-        failedToLoad.set(false)
-
-        return loadGradleTemplates(
-            templateClass = "org.gradle.script.lang.kotlin.KotlinBuildScript",
-            dependencySelector = Regex("^gradle-(?:script-kotlin|core).*\\.jar\$"),
-            additionalResolverClasspath = { emptyList() }
-        )
-    }
-
-    // TODO: check this against kotlin-dsl branch that uses daemon
-    private fun kotlinStdlibAndCompiler(gradleLibDir: File): List<File> {
-        // additionally need compiler jar to load gradle resolver
-        return gradleLibDir.listFiles { file ->
-                file.name.startsWith("kotlin-compiler-embeddable") || file.name.startsWith("kotlin-stdlib")
-            }
-            .firstOrNull()?.let(::listOf).orEmpty()
-    }
-
     private fun loadGradleTemplates(
-        templateClass: String, dependencySelector: Regex,
-        additionalResolverClasspath: (gradleLibDir: File) -> List<File>
-    ): List<ScriptDefinition> = try {
-        doLoadGradleTemplates(templateClass, dependencySelector, additionalResolverClasspath)
-    } catch (t: Throwable) {
-        scriptingDebugLog { "error loading gradle script templates ${t.message}" }
-        // TODO: review exception handling
-        failedToLoad.set(true)
-        if (t is IllegalStateException) {
-            Logger.getInstance(GradleScriptDefinitionsContributor::class.java)
-                .info("[kts] error loading gradle script templates: ${t.message}")
-        }
-        listOf(
-            ErrorGradleScriptDefinition(
-                t.message
-            )
-        )
-    }
-
-
-    private fun doLoadGradleTemplates(
-        templateClass: String, dependencySelector: Regex,
-        additionalResolverClasspath: (gradleLibDir: File) -> List<File>
+        projectPath: String,
+        templateClass: String,
+        templateClasspath: List<File>,
+        additionalClassPath: List<File>
     ): List<ScriptDefinition> {
-        fun createHostConfiguration(
-            gradleExeSettings: GradleExecutionSettings,
-            projectSettings: GradleProjectSettings
-        ): ScriptingHostConfiguration {
-            val gradleJvmOptions = gradleExeSettings.daemonVmOptions?.let { vmOptions ->
-                CommandLineTokenizer(vmOptions).toList()
-                    .mapNotNull { it?.let { it as? String } }
-                    .filterNot(String::isBlank)
-                    .distinct()
-            } ?: emptyList()
-
-
-            val environment = mapOf(
-                "gradleHome" to gradleExeSettings.gradleHome?.let(::File),
-                "gradleJavaHome" to gradleExeSettings.javaHome,
-
-                "projectRoot" to projectSettings.externalProjectPath.let(::File),
-
-                "gradleOptions" to emptyList<String>(), // There is no option in UI to set project wide gradleOptions
-                "gradleJvmOptions" to gradleJvmOptions,
-                "gradleEnvironmentVariables" to if (gradleExeSettings.isPassParentEnvs) EnvironmentUtil.getEnvironmentMap() else emptyMap()
-            )
-            return ScriptingHostConfiguration(defaultJvmScriptingHostConfiguration) {
-                getEnvironment { environment }
-            }
-        }
-
-        val gradleSettings = ExternalSystemApiUtil.getSettings(project, GradleConstants.SYSTEM_ID)
-        if (gradleSettings.getLinkedProjectsSettings().isEmpty())
-            error(KotlinIdeaGradleBundle.message("error.text.project.isn.t.linked.with.gradle", project.name))
-
-        val projectSettings = gradleSettings.getLinkedProjectsSettings().filterIsInstance<GradleProjectSettings>().firstOrNull()
-            ?: error(KotlinIdeaGradleBundle.message("error.text.project.isn.t.linked.with.gradle", project.name))
-
         val gradleExeSettings = ExternalSystemApiUtil.getExecutionSettings<GradleExecutionSettings>(
             project,
-            projectSettings.externalProjectPath,
+            projectPath,
             GradleConstants.SYSTEM_ID
         )
-
-        val gradleHome = gradleExeSettings.gradleHome
-            ?: error(KotlinIdeaGradleBundle.message("error.text.unable.to.get.gradle.home.directory"))
-
-        val gradleLibDir = File(gradleHome, "lib").let {
-            it.takeIf { it.exists() && it.isDirectory }
-                ?: error(KotlinIdeaGradleBundle.message("error.text.invalid.gradle.libraries.directory", it))
-        }
-        val templateClasspath = gradleLibDir.listFiles { it ->
-            /* an inference problem without explicit 'it', TODO: remove when fixed */
-            dependencySelector.matches(it.name)
-        }.takeIf { it.isNotEmpty() }?.asList() ?: error(KotlinIdeaGradleBundle.message("error.text.missing.jars.in.gradle.directory"))
-
-        scriptingDebugLog { "loading gradle script templates from $templateClasspath" }
-
+        val hostConfiguration = createHostConfiguration(projectPath, gradleExeSettings)
         return loadDefinitionsFromTemplates(
             listOf(templateClass),
             templateClasspath,
-            createHostConfiguration(gradleExeSettings, projectSettings),
-            additionalResolverClasspath(gradleLibDir)
+            hostConfiguration,
+            additionalClassPath
         ).map {
             it.asLegacyOrNull<KotlinScriptDefinitionFromAnnotatedTemplate>()?.let { legacyDef ->
                 @Suppress("DEPRECATION")
@@ -232,6 +214,32 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
                     )
                 }
             } ?: it
+        }
+    }
+
+    private fun createHostConfiguration(
+        projectPath: String,
+        gradleExeSettings: GradleExecutionSettings
+    ): ScriptingHostConfiguration {
+        val gradleJvmOptions = gradleExeSettings.daemonVmOptions?.let { vmOptions ->
+            CommandLineTokenizer(vmOptions).toList()
+                .mapNotNull { it?.let { it as? String } }
+                .filterNot(String::isBlank)
+                .distinct()
+        } ?: emptyList()
+
+        val environment = mapOf(
+            "gradleHome" to gradleExeSettings.gradleHome?.let(::File),
+            "gradleJavaHome" to gradleExeSettings.javaHome,
+
+            "projectRoot" to projectPath.let(::File),
+
+            "gradleOptions" to emptyList<String>(), // There is no option in UI to set project wide gradleOptions
+            "gradleJvmOptions" to gradleJvmOptions,
+            "gradleEnvironmentVariables" to if (gradleExeSettings.isPassParentEnvs) EnvironmentUtil.getEnvironmentMap() else emptyMap()
+        )
+        return ScriptingHostConfiguration(defaultJvmScriptingHostConfiguration) {
+            getEnvironment { environment }
         }
     }
 

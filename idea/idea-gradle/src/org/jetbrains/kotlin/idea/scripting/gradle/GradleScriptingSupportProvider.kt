@@ -153,12 +153,9 @@ class GradleScriptingSupportProvider(val project: Project) : ScriptingSupport.Pr
         return newSupport
     }
 
-    private fun findTemplateClasspath(build: KotlinDslGradleBuildSync): List<String>? {
-        val anyScript = VfsUtil.findFile(Paths.get(build.models.first().file), true)!!
-        // todo: find definition according to build.workingDir
-        val definition = anyScript.findScriptDefinition(project) ?: return null
-        return definition.asLegacyOrNull<KotlinScriptDefinitionFromAnnotatedTemplate>()
-            ?.templateClasspath?.map { it.path }
+    private fun findTemplateClasspath(@Suppress("UNUSED_PARAMETER") build: KotlinDslGradleBuildSync): List<String>? {
+        // TODO: replace project with build.workingDir
+        return GradleScriptDefinitionsContributor.getGradleScriptDefinitionsClassPath(project).map { it.path }
     }
 
     private val unlinkedFilesSupport = object : ScriptingSupport() {
