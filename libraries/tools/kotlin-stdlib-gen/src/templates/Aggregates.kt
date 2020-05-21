@@ -680,7 +680,6 @@ object Aggregates : TemplateGroupBase() {
                     """
                 }
                 specialFor(Maps) {
-                    inlineOnly()
                     body { "return entries.${op}OfWith$orNull(comparator, selector)" }
                 }
             }
