@@ -30,8 +30,8 @@ class GradleScriptInputsWatcher(val project: Project) : PersistentStateComponent
     }
 
     fun saveGradleProjectRootsAfterImport(roots: Set<String>) {
-        val oldRoots = cachedGradleProjectsRoots
-        if (oldRoots != null && oldRoots.isNotEmpty()) {
+        val oldRoots = getGradleProjectsRoots()
+        if (oldRoots.isNotEmpty()) {
             cachedGradleProjectsRoots = oldRoots + roots
         } else {
             cachedGradleProjectsRoots = roots
