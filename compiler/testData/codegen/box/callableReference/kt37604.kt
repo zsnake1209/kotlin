@@ -1,3 +1,4 @@
+// BAD_FIR_RESOLUTION
 // IGNORE_BACKEND_FIR: JVM_IR
 
 fun useUnit(fn: () -> Unit) {

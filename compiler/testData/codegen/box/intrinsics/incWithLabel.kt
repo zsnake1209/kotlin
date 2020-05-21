@@ -1,3 +1,4 @@
+// BAD_FIR_RESOLUTION
 // IGNORE_BACKEND_FIR: JVM_IR
 fun box(): String {
     var x = 1

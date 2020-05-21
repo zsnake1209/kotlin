@@ -1,3 +1,4 @@
+// BAD_FIR_RESOLUTION
 // !LANGUAGE: +MultiPlatformProjects
 // IGNORE_BACKEND_FIR: JVM_IR
 

@@ -1,3 +1,4 @@
+// BAD_FIR_RESOLUTION
 // !LANGUAGE: +SuspendConversion
 // WITH_RUNTIME
 // WITH_COROUTINES

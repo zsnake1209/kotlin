@@ -1,3 +1,4 @@
+// BAD_FIR_RESOLUTION
 // MODULE: lib
 // FILE: f1.kt
 

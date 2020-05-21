@@ -1,3 +1,4 @@
+// BAD_FIR_RESOLUTION
 // IGNORE_BACKEND: JS_IR
 // MODULE: lib
 // FILE: lib.kt

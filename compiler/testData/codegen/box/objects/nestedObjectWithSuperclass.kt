@@ -1,3 +1,4 @@
+// BAD_FIR_RESOLUTION
 open class A (val s: Int) {
     open fun foo(): Int {
         return s
