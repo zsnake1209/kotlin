@@ -269,11 +269,6 @@ object Aggregates : TemplateGroupBase() {
                 annotation("@ExperimentalUnsignedTypes")
 
             doc { "Returns the sum of all values produced by [selector] function applied to each ${f.element} in the ${f.collection}." }
-
-
-            specialFor(ArraysOfUnsigned) {
-                inlineOnly()
-            }
             returns(selectorType)
             body {
                 """
