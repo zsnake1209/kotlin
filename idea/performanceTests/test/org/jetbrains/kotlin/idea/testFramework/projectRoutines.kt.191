@@ -25,6 +25,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.runInEdtAndWait
 import com.intellij.util.ui.UIUtil
 import org.jetbrains.kotlin.idea.parameterInfo.HintType
+import org.jetbrains.kotlin.idea.perf.TestApplicationManager
 import org.jetbrains.kotlin.idea.test.runPostStartupActivitiesOnce
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -74,10 +75,14 @@ fun dispatchAllInvocationEvents() {
 fun loadProjectWithName(path: String, name: String): Project? =
     ProjectManagerEx.getInstanceEx().loadProject(name, path)
 
-fun closeProject(project: Project) {
+fun TestApplicationManager.closeProject(project: Project) {
+    setDataProvider(null)
+    val name = project.name
+    logMessage { "project '$name' is about to be closed" }
     dispatchAllInvocationEvents()
     val projectManagerEx = ProjectManagerEx.getInstanceEx()
     projectManagerEx.forceCloseProjectEx(project, true)
+    logMessage { "project '$name' successfully closed" }
 }
 
 fun runStartupActivities(project: Project) {

@@ -98,7 +98,6 @@ abstract class AbstractPerformanceProjectsTest : UsefulTestCase() {
             }
         } finally {
             closeProject(project)
-            myApplication.setDataProvider(null)
         }
     }
 
@@ -107,15 +106,14 @@ abstract class AbstractPerformanceProjectsTest : UsefulTestCase() {
         RunAll(
             ThrowableRunnable { super.tearDown() },
             ThrowableRunnable {
-                if (myProject != null) {
-                    logMessage { "myProject is about to be closed" }
+                myProject?.let { project ->
+                    logMessage { "project ${project.name} is about to be closed" }
                     DaemonCodeAnalyzerSettings.getInstance().isImportHintEnabled = true // return default value to avoid unnecessary save
-                    (StartupManager.getInstance(project()) as StartupManagerImpl).checkCleared()
-                    (DaemonCodeAnalyzer.getInstance(project()) as DaemonCodeAnalyzerImpl).cleanupAfterTest()
-                    closeProject(project())
-                    myApplication.setDataProvider(null)
+                    (StartupManager.getInstance(project) as StartupManagerImpl).checkCleared()
+                    (DaemonCodeAnalyzer.getInstance(project) as DaemonCodeAnalyzerImpl).cleanupAfterTest()
+                    closeProject(project)
+                    logMessage { "project ${project.name} is closed" }
                     myProject = null
-                    logMessage { "myProject is closed" }
                 }
             }).run()
     }
@@ -124,6 +122,10 @@ abstract class AbstractPerformanceProjectsTest : UsefulTestCase() {
         val lastIndexOf = fileName.lastIndexOf('/')
         return if (lastIndexOf >= 0) fileName.substring(lastIndexOf + 1) else fileName
     }
+
+    protected fun closeProject() = myProject?.let { closeProject(it) }
+
+    private fun closeProject(project: Project) = myApplication.closeProject(project)
 
     protected fun perfOpenProject(
         stats: Stats,
@@ -159,10 +161,7 @@ abstract class AbstractPerformanceProjectsTest : UsefulTestCase() {
 
                     // close all project but last - we're going to return and use it further
                     if (counter < warmUpIterations + iterations - 1) {
-                        myApplication.setDataProvider(null)
-                        logMessage { "project '$name' is about to be closed" }
                         closeProject(project)
-                        logMessage { "project '$name' successfully closed" }
                     }
                     counter++
                 }

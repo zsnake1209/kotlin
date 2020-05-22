@@ -22,6 +22,7 @@ import com.intellij.testFramework.ExtensionTestUtil
 import com.intellij.testFramework.runInEdtAndWait
 import com.intellij.util.ui.UIUtil
 import org.jetbrains.kotlin.idea.parameterInfo.HintType
+import org.jetbrains.kotlin.idea.perf.TestApplicationManager
 import org.jetbrains.kotlin.idea.test.runPostStartupActivitiesOnce
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -70,10 +71,14 @@ fun dispatchAllInvocationEvents() {
 fun loadProjectWithName(path: String, name: String): Project? =
     ProjectManagerEx.getInstanceEx().loadProject(Paths.get(path), name)
 
-fun closeProject(project: Project) {
+fun TestApplicationManager.closeProject(project: Project) {
+    setDataProvider(null)
+    val name = project.name
+    logMessage { "project '$name' is about to be closed" }
     dispatchAllInvocationEvents()
     val projectManagerEx = ProjectManagerEx.getInstanceEx()
     projectManagerEx.forceCloseProjectEx(project, true)
+    logMessage { "project '$name' successfully closed" }
 }
 
 fun runStartupActivities(project: Project) {

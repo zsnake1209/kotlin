@@ -65,38 +65,42 @@ class HighlightWholeProjectPerformanceTest : AbstractPerformanceProjectsTest() {
                         perfGradleBasedProject(projectName, projectPath, stat)
                         //perfJpsBasedProject(projectName, stat)
 
-                        val projectDir = File(projectPath)
-                        val ktFiles = projectDir.allFilesWithExtension("kt").toList()
-                        printStatValue("$suiteName: number of kt files", ktFiles.size)
-                        val topMidLastFiles =
-                            limitedFiles(ktFiles, 10)
-                                .map {
-                                    val path = it.path
-                                    it to path.substring(path.indexOf(projectPath) + projectPath.length + 1)
-                                }
-                        printStatValue("$suiteName: limited number of kt files", topMidLastFiles.size)
+                        try {
+                            val projectDir = File(projectPath)
+                            val ktFiles = projectDir.allFilesWithExtension("kt").toList()
+                            printStatValue("$suiteName: number of kt files", ktFiles.size)
+                            val topMidLastFiles =
+                                limitedFiles(ktFiles, 10)
+                                    .map {
+                                        val path = it.path
+                                        it to path.substring(path.indexOf(projectPath) + projectPath.length + 1)
+                                    }
+                            printStatValue("$suiteName: limited number of kt files", topMidLastFiles.size)
 
-                        topMidLastFiles.forEach {
-                            logMessage { "${it.second} fileSize: ${it.first.length()}" }
-                        }
-
-                        topMidLastFiles.forEachIndexed { idx, file ->
-                            logMessage { "$idx / ${topMidLastFiles.size} : ${file.second} fileSize: ${file.first.length()}" }
-                            try {
-                                // 1x3 it not good enough for statistics, but at least it gives some overview
-                                perfHighlightFile(
-                                    project(),
-                                    fileName = file.second,
-                                    stats = stat,
-                                    warmUpIterations = 1,
-                                    iterations = 3,
-                                    filenameSimplifier = { it },
-                                    tools = if (emptyProfile) emptyArray() else null,
-                                    checkStability = false
-                                )
-                            } catch (e: Throwable) {
-                                // nothing as it is already caught by perfTest
+                            topMidLastFiles.forEach {
+                                logMessage { "${it.second} fileSize: ${it.first.length()}" }
                             }
+
+                            topMidLastFiles.forEachIndexed { idx, file ->
+                                logMessage { "$idx / ${topMidLastFiles.size} : ${file.second} fileSize: ${file.first.length()}" }
+                                try {
+                                    // 1x3 it not good enough for statistics, but at least it gives some overview
+                                    perfHighlightFile(
+                                        project(),
+                                        fileName = file.second,
+                                        stats = stat,
+                                        warmUpIterations = 1,
+                                        iterations = 3,
+                                        filenameSimplifier = { it },
+                                        tools = if (emptyProfile) emptyArray() else null,
+                                        checkStability = false
+                                    )
+                                } catch (e: Throwable) {
+                                    // nothing as it is already caught by perfTest
+                                }
+                            }
+                        } finally {
+                            closeProject()
                         }
                     }
                 }
