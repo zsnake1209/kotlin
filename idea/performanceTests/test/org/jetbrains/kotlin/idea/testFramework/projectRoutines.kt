@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.idea.testFramework
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzerSettings
+import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl
 import com.intellij.ide.startup.impl.StartupManagerImpl
 import com.intellij.lang.LanguageAnnotators
 import com.intellij.lang.LanguageExtensionPoint
@@ -72,12 +75,17 @@ fun loadProjectWithName(path: String, name: String): Project? =
     ProjectManagerEx.getInstanceEx().loadProject(Paths.get(path), name)
 
 fun TestApplicationManager.closeProject(project: Project) {
-    setDataProvider(null)
     val name = project.name
+    DaemonCodeAnalyzerSettings.getInstance().isImportHintEnabled = true // return default value to avoid unnecessary save
+    (StartupManager.getInstance(project) as StartupManagerImpl).checkCleared()
+    (DaemonCodeAnalyzer.getInstance(project) as DaemonCodeAnalyzerImpl).cleanupAfterTest()
+
     logMessage { "project '$name' is about to be closed" }
     dispatchAllInvocationEvents()
     val projectManagerEx = ProjectManagerEx.getInstanceEx()
     projectManagerEx.forceCloseProjectEx(project, true)
+
+    setDataProvider(null)
     logMessage { "project '$name' successfully closed" }
 }
 

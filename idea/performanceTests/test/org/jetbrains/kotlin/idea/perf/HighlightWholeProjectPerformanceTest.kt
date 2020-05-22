@@ -95,7 +95,7 @@ class HighlightWholeProjectPerformanceTest : AbstractPerformanceProjectsTest() {
                                         tools = if (emptyProfile) emptyArray() else null,
                                         checkStability = false
                                     )
-                                } catch (e: Throwable) {
+                                } catch (e: Exception) {
                                     // nothing as it is already caught by perfTest
                                 }
                             }
@@ -104,7 +104,7 @@ class HighlightWholeProjectPerformanceTest : AbstractPerformanceProjectsTest() {
                         }
                     }
                 }
-            } catch (e: Throwable) {
+            } catch (e: Exception) {
                 // don't fail entire test on a single failure
             }
         }

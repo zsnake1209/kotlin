@@ -107,12 +107,7 @@ abstract class AbstractPerformanceProjectsTest : UsefulTestCase() {
             ThrowableRunnable { super.tearDown() },
             ThrowableRunnable {
                 myProject?.let { project ->
-                    logMessage { "project ${project.name} is about to be closed" }
-                    DaemonCodeAnalyzerSettings.getInstance().isImportHintEnabled = true // return default value to avoid unnecessary save
-                    (StartupManager.getInstance(project) as StartupManagerImpl).checkCleared()
-                    (DaemonCodeAnalyzer.getInstance(project) as DaemonCodeAnalyzerImpl).cleanupAfterTest()
                     closeProject(project)
-                    logMessage { "project ${project.name} is closed" }
                     myProject = null
                 }
             }).run()
