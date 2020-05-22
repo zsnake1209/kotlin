@@ -39,7 +39,7 @@ abstract class IrModuleDeserializer(val moduleDescriptor: ModuleDescriptor) {
 
     open fun declareIrSymbol(symbol: IrSymbol) {
         assert(symbol.isPublicApi)
-        assert(symbol.trueDescriptor !is WrappedDeclarationDescriptor<*>)
+        assert(symbol.initialDescriptor !is WrappedDeclarationDescriptor<*>)
         deserializeIrSymbol(symbol.signature, symbol.kind())
     }
 
@@ -232,19 +232,19 @@ open class CurrentModuleDeserializer(
 
     private fun declareIrDeclarationDefault(symbol: IrSymbol): IrDeclaration {
         return when (symbol) {
-            is IrClassSymbol -> symbolTable.declareClass(offset, offset, IrDeclarationOrigin.DEFINED, symbol.trueDescriptor)
-            is IrConstructorSymbol -> symbolTable.declareConstructor(offset, offset, IrDeclarationOrigin.DEFINED, symbol.trueDescriptor)
-            is IrSimpleFunctionSymbol -> symbolTable.declareSimpleFunction(offset, offset, IrDeclarationOrigin.DEFINED, symbol.trueDescriptor)
-            is IrPropertySymbol -> symbolTable.declareProperty(offset, offset, IrDeclarationOrigin.DEFINED, symbol.trueDescriptor)
+            is IrClassSymbol -> symbolTable.declareClass(offset, offset, IrDeclarationOrigin.DEFINED, symbol.initialDescriptor)
+            is IrConstructorSymbol -> symbolTable.declareConstructor(offset, offset, IrDeclarationOrigin.DEFINED, symbol.initialDescriptor)
+            is IrSimpleFunctionSymbol -> symbolTable.declareSimpleFunction(offset, offset, IrDeclarationOrigin.DEFINED, symbol.initialDescriptor)
+            is IrPropertySymbol -> symbolTable.declareProperty(offset, offset, IrDeclarationOrigin.DEFINED, symbol.initialDescriptor)
             is IrTypeAliasSymbol -> TODO("Implement type alias $symbol")
-            is IrEnumEntrySymbol -> symbolTable.declareEnumEntry(offset, offset, IrDeclarationOrigin.DEFINED, symbol.trueDescriptor)
+            is IrEnumEntrySymbol -> symbolTable.declareEnumEntry(offset, offset, IrDeclarationOrigin.DEFINED, symbol.initialDescriptor)
             else -> error("Unexpected symbol $symbol")
         }
     }
 
     private fun declareIrSymbolImpl(symbol: IrSymbol): IrSymbolOwner {
         if (symbol.isBound) return symbol.owner
-        val descriptor = symbol.trueDescriptor
+        val descriptor = symbol.initialDescriptor
 
         assert(descriptor !is WrappedDeclarationDescriptor<*>)
 

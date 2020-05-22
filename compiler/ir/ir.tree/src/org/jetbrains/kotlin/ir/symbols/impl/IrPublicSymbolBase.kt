@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DescriptorWithContainerSource
 
 abstract class IrPublicSymbolBase<out D : DeclarationDescriptor>(
-    override val trueDescriptor: D,
+    override val initialDescriptor: D,
     override val signature: IdSignature,
 ) : IrSymbol
 
@@ -49,7 +49,7 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
     override fun bind(owner: B) {
         if (_owner == null) {
             _owner = owner
-            if (descriptor != trueDescriptor) {
+            if (descriptor != initialDescriptor) {
                 (descriptor as? WrappedDeclarationDescriptor<IrDeclaration>)?.bind(owner as IrDeclaration)
             }
         } else {

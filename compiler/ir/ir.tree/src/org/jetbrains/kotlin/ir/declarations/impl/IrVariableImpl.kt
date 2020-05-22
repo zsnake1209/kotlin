@@ -35,11 +35,11 @@ class IrVariableImpl(
     override val endOffset: Int,
     override var origin: IrDeclarationOrigin,
     override val symbol: IrVariableSymbol,
-    override val name: Name = symbol.trueDescriptor.name,
+    override val name: Name = symbol.initialDescriptor.name,
     override val type: IrType,
-    override val isVar: Boolean = symbol.trueDescriptor.isVar,
-    override val isConst: Boolean = symbol.trueDescriptor.isConst,
-    override val isLateinit: Boolean = symbol.trueDescriptor.isLateInit
+    override val isVar: Boolean = symbol.initialDescriptor.isVar,
+    override val isConst: Boolean = symbol.initialDescriptor.isConst,
+    override val isLateinit: Boolean = symbol.initialDescriptor.isLateInit
 ) : IrVariable {
 
     private var _parent: IrDeclarationParent? = null
@@ -61,10 +61,10 @@ class IrVariableImpl(
         type: IrType
     ) : this(
         startOffset, endOffset, origin, symbol,
-        symbol.trueDescriptor.name, type,
-        isVar = symbol.trueDescriptor.isVar,
-        isConst = symbol.trueDescriptor.isConst,
-        isLateinit = symbol.trueDescriptor.isLateInit
+        symbol.initialDescriptor.name, type,
+        isVar = symbol.initialDescriptor.isVar,
+        isConst = symbol.initialDescriptor.isConst,
+        isLateinit = symbol.initialDescriptor.isLateInit
     )
 
     constructor(

@@ -38,17 +38,17 @@ class IrClassImpl(
     endOffset: Int,
     origin: IrDeclarationOrigin,
     override val symbol: IrClassSymbol,
-    override val name: Name = symbol.trueDescriptor.name,
-    override val kind: ClassKind = symbol.trueDescriptor.kind,
-    visibility: Visibility = symbol.trueDescriptor.visibility,
-    modality: Modality = symbol.trueDescriptor.modality,
-    override val isCompanion: Boolean = symbol.trueDescriptor.isCompanionObject,
-    override val isInner: Boolean = symbol.trueDescriptor.isInner,
-    override val isData: Boolean = symbol.trueDescriptor.isData,
-    override val isExternal: Boolean = symbol.trueDescriptor.isEffectivelyExternal(),
-    override val isInline: Boolean = symbol.trueDescriptor.isInline,
-    override val isExpect: Boolean = symbol.trueDescriptor.isExpect,
-    override val isFun: Boolean = symbol.trueDescriptor.isFun
+    override val name: Name = symbol.initialDescriptor.name,
+    override val kind: ClassKind = symbol.initialDescriptor.kind,
+    visibility: Visibility = symbol.initialDescriptor.visibility,
+    modality: Modality = symbol.initialDescriptor.modality,
+    override val isCompanion: Boolean = symbol.initialDescriptor.isCompanionObject,
+    override val isInner: Boolean = symbol.initialDescriptor.isInner,
+    override val isData: Boolean = symbol.initialDescriptor.isData,
+    override val isExternal: Boolean = symbol.initialDescriptor.isEffectivelyExternal(),
+    override val isInline: Boolean = symbol.initialDescriptor.isInline,
+    override val isExpect: Boolean = symbol.initialDescriptor.isExpect,
+    override val isFun: Boolean = symbol.initialDescriptor.isFun
 ) :
     IrDeclarationBase<ClassCarrier>(startOffset, endOffset, origin),
     IrClass,
@@ -59,21 +59,21 @@ class IrClassImpl(
         endOffset: Int,
         origin: IrDeclarationOrigin,
         symbol: IrClassSymbol,
-        modality: Modality = symbol.trueDescriptor.modality,
-        visibility: Visibility = symbol.trueDescriptor.visibility
+        modality: Modality = symbol.initialDescriptor.modality,
+        visibility: Visibility = symbol.initialDescriptor.visibility
     ) :
             this(
                 startOffset, endOffset, origin, symbol,
-                symbol.trueDescriptor.name, symbol.trueDescriptor.kind,
+                symbol.initialDescriptor.name, symbol.initialDescriptor.kind,
                 visibility,
                 modality = modality,
-                isCompanion = symbol.trueDescriptor.isCompanionObject,
-                isInner = symbol.trueDescriptor.isInner,
-                isData = symbol.trueDescriptor.isData,
-                isExternal = symbol.trueDescriptor.isEffectivelyExternal(),
-                isInline = symbol.trueDescriptor.isInline,
-                isExpect = symbol.trueDescriptor.isExpect,
-                isFun = symbol.trueDescriptor.isFun
+                isCompanion = symbol.initialDescriptor.isCompanionObject,
+                isInner = symbol.initialDescriptor.isInner,
+                isData = symbol.initialDescriptor.isData,
+                isExternal = symbol.initialDescriptor.isEffectivelyExternal(),
+                isInline = symbol.initialDescriptor.isInline,
+                isExpect = symbol.initialDescriptor.isExpect,
+                isFun = symbol.initialDescriptor.isFun
             )
 
     init {

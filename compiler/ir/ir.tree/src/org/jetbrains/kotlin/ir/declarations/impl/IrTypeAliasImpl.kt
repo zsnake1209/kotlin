@@ -71,10 +71,10 @@ class IrTypeAliasImpl(
             IrTypeAliasImpl(
                 startOffset, endOffset,
                 symbol,
-                symbol.trueDescriptor.name,
-                symbol.trueDescriptor.visibility,
+                symbol.initialDescriptor.name,
+                symbol.initialDescriptor.visibility,
                 expandedType,
-                symbol.trueDescriptor.isActual,
+                symbol.initialDescriptor.isActual,
                 origin
             )
     }

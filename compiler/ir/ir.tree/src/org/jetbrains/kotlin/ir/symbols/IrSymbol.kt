@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.types.model.TypeParameterMarker
 interface IrSymbol {
     val owner: IrSymbolOwner
     val descriptor: DeclarationDescriptor
-    val trueDescriptor: DeclarationDescriptor
+    val initialDescriptor: DeclarationDescriptor
     val isBound: Boolean
 
     val signature: IdSignature
@@ -41,7 +41,7 @@ interface IrSymbol {
 interface IrBindableSymbol<out D : DeclarationDescriptor, B : IrSymbolOwner> : IrSymbol {
     override val owner: B
     override val descriptor: D
-    override val trueDescriptor: D
+    override val initialDescriptor: D
 
     fun bind(owner: B)
 }
@@ -92,7 +92,7 @@ interface IrClassifierSymbol :
     IrSymbol, TypeConstructorMarker {
 
     override val descriptor: ClassifierDescriptor
-    override val trueDescriptor: ClassifierDescriptor
+    override val initialDescriptor: ClassifierDescriptor
 
     override fun <D, R> accept(visitor: IrSymbolVisitor<R, D>, data: D): R =
         visitor.visitClassifierSymbol(this, data)
@@ -147,7 +147,7 @@ interface IrReturnTargetSymbol :
     IrSymbol {
 
     override val descriptor: FunctionDescriptor
-    override val trueDescriptor: FunctionDescriptor
+    override val initialDescriptor: FunctionDescriptor
     override val owner: IrReturnTarget
 
     override fun <D, R> accept(visitor: IrSymbolVisitor<R, D>, data: D): R =

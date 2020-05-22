@@ -35,12 +35,12 @@ class IrValueParameterImpl(
     endOffset: Int,
     origin: IrDeclarationOrigin,
     override val symbol: IrValueParameterSymbol,
-    override val name: Name = symbol.trueDescriptor.name,
-    override val index: Int = symbol.trueDescriptor.safeAs<ValueParameterDescriptor>()?.index ?: -1,
+    override val name: Name = symbol.initialDescriptor.name,
+    override val index: Int = symbol.initialDescriptor.safeAs<ValueParameterDescriptor>()?.index ?: -1,
     override val type: IrType,
     override val varargElementType: IrType?,
-    override val isCrossinline: Boolean = symbol.trueDescriptor.safeAs<ValueParameterDescriptor>()?.isCrossinline ?: false,
-    override val isNoinline: Boolean = symbol.trueDescriptor.safeAs<ValueParameterDescriptor>()?.isNoinline ?: false
+    override val isCrossinline: Boolean = symbol.initialDescriptor.safeAs<ValueParameterDescriptor>()?.isCrossinline ?: false,
+    override val isNoinline: Boolean = symbol.initialDescriptor.safeAs<ValueParameterDescriptor>()?.isNoinline ?: false
 ) :
     IrDeclarationBase<ValueParameterCarrier>(startOffset, endOffset, origin),
     IrValueParameter,
@@ -57,12 +57,12 @@ class IrValueParameterImpl(
             this(
                 startOffset, endOffset, origin,
                 symbol,
-                symbol.trueDescriptor.name,
-                symbol.trueDescriptor.safeAs<ValueParameterDescriptor>()?.index ?: -1,
+                symbol.initialDescriptor.name,
+                symbol.initialDescriptor.safeAs<ValueParameterDescriptor>()?.index ?: -1,
                 type,
                 varargElementType,
-                symbol.trueDescriptor.safeAs<ValueParameterDescriptor>()?.isCrossinline ?: false,
-                symbol.trueDescriptor.safeAs<ValueParameterDescriptor>()?.isNoinline ?: false
+                symbol.initialDescriptor.safeAs<ValueParameterDescriptor>()?.isCrossinline ?: false,
+                symbol.initialDescriptor.safeAs<ValueParameterDescriptor>()?.isNoinline ?: false
             )
 
     constructor(

@@ -36,12 +36,12 @@ class IrFieldImpl(
     endOffset: Int,
     origin: IrDeclarationOrigin,
     override val symbol: IrFieldSymbol,
-    override val name: Name = symbol.trueDescriptor.name,
+    override val name: Name = symbol.initialDescriptor.name,
     override val type: IrType,
-    override val visibility: Visibility = symbol.trueDescriptor.visibility,
-    override val isFinal: Boolean = !symbol.trueDescriptor.isVar,
-    override val isExternal: Boolean = symbol.trueDescriptor.isEffectivelyExternal(),
-    override val isStatic: Boolean = symbol.trueDescriptor.dispatchReceiverParameter == null,
+    override val visibility: Visibility = symbol.initialDescriptor.visibility,
+    override val isFinal: Boolean = !symbol.initialDescriptor.isVar,
+    override val isExternal: Boolean = symbol.initialDescriptor.isEffectivelyExternal(),
+    override val isStatic: Boolean = symbol.initialDescriptor.dispatchReceiverParameter == null,
     override val isFakeOverride: Boolean = origin == IrDeclarationOrigin.FAKE_OVERRIDE
 ) : IrDeclarationBase<FieldCarrier>(startOffset, endOffset, origin),
     IrField,
@@ -53,14 +53,14 @@ class IrFieldImpl(
         origin: IrDeclarationOrigin,
         symbol: IrFieldSymbol,
         type: IrType,
-        visibility: Visibility = symbol.trueDescriptor.visibility
+        visibility: Visibility = symbol.initialDescriptor.visibility
     ) :
             this(
                 startOffset, endOffset, origin, symbol,
-                symbol.trueDescriptor.name, type, visibility,
-                isFinal = !symbol.trueDescriptor.isVar,
-                isExternal = symbol.trueDescriptor.isEffectivelyExternal(),
-                isStatic = symbol.trueDescriptor.dispatchReceiverParameter == null,
+                symbol.initialDescriptor.name, type, visibility,
+                isFinal = !symbol.initialDescriptor.isVar,
+                isExternal = symbol.initialDescriptor.isEffectivelyExternal(),
+                isStatic = symbol.initialDescriptor.dispatchReceiverParameter == null,
                 isFakeOverride = origin == IrDeclarationOrigin.FAKE_OVERRIDE
             )
 

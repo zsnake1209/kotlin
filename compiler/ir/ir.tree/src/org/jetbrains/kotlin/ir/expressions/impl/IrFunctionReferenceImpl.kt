@@ -55,7 +55,7 @@ class IrFunctionReferenceImpl(
         type,
         symbol,
         typeArgumentsCount,
-        symbol.trueDescriptor.valueParameters.size,
+        symbol.initialDescriptor.valueParameters.size,
         reflectionTarget,
         origin
     )

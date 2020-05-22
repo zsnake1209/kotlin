@@ -144,7 +144,7 @@ class ClassGenerator(
     private fun KtEnumEntry.hasMemberDeclarations() = declarations.isNotEmpty()
 
     private fun generateFakeOverrideMemberDeclarations(irClass: IrClass, ktClassOrObject: KtPureClassOrObject) {
-        val classDescriptor = irClass.symbol.trueDescriptor
+        val classDescriptor = irClass.symbol.initialDescriptor
 
         classDescriptor.unsubstitutedMemberScope.getContributedDescriptors()
             .filterIsInstance<CallableMemberDescriptor>()
@@ -206,13 +206,13 @@ class ClassGenerator(
             ?: throw AssertionError("Unexpected supertype constructor for delegation: $superTypeConstructorDescriptor")
 
         val propertyDescriptor =
-            CodegenUtil.getDelegatePropertyIfAny(ktDelegateExpression, irClass.symbol.trueDescriptor, context.bindingContext)
+            CodegenUtil.getDelegatePropertyIfAny(ktDelegateExpression, irClass.symbol.initialDescriptor, context.bindingContext)
 
         val irDelegateField: IrField = if (CodegenUtil.isFinalPropertyWithBackingField(propertyDescriptor, context.bindingContext)) {
-            irClass.properties.first { it.symbol.trueDescriptor == propertyDescriptor }.backingField!!
+            irClass.properties.first { it.symbol.initialDescriptor == propertyDescriptor }.backingField!!
         } else {
             val delegateDescriptor =
-                IrImplementingDelegateDescriptorImpl(irClass.symbol.trueDescriptor, delegateType, superType, delegateNumber)
+                IrImplementingDelegateDescriptorImpl(irClass.symbol.initialDescriptor, delegateType, superType, delegateNumber)
             context.symbolTable.declareField(
                 ktDelegateExpression.startOffsetSkippingComments, ktDelegateExpression.endOffset,
                 IrDeclarationOrigin.DELEGATE,
@@ -223,7 +223,7 @@ class ClassGenerator(
             }
         }
 
-        val delegatesMap = DelegationResolver.getDelegates(irClass.symbol.trueDescriptor, superClass, delegateType)
+        val delegatesMap = DelegationResolver.getDelegates(irClass.symbol.initialDescriptor, superClass, delegateType)
         val delegatedMembers = delegatesMap.keys.toList().sortedByRenderer()
 
         for (delegatedMember in delegatedMembers) {
@@ -425,7 +425,7 @@ class ClassGenerator(
     }
 
     private fun generatePrimaryConstructor(irClass: IrClass, ktClassOrObject: KtPureClassOrObject): IrConstructor? {
-        val classDescriptor = irClass.symbol.trueDescriptor
+        val classDescriptor = irClass.symbol.initialDescriptor
         val primaryConstructorDescriptor = classDescriptor.unsubstitutedPrimaryConstructor ?: return null
 
         return FunctionGenerator(declarationGenerator)
@@ -465,7 +465,7 @@ class ClassGenerator(
         }
 
         // generate synthetic nested classes (including companion)
-        irClass.symbol.trueDescriptor
+        irClass.symbol.initialDescriptor
             .unsubstitutedMemberScope
             .getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS, MemberScope.ALL_NAME_FILTER)
             .asSequence()

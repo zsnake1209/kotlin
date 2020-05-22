@@ -60,7 +60,7 @@ class ExpectDeclarationRemover(
 
     private fun shouldRemoveTopLevelDeclaration(declaration: IrDeclaration): Boolean {
         // TODO: rewrite findCompatibleActualForExpected using IR structures instead of descriptors
-        val descriptor = declaration.safeAs<IrSymbolOwner>()?.symbol?.trueDescriptor ?: return false
+        val descriptor = declaration.safeAs<IrSymbolOwner>()?.symbol?.initialDescriptor ?: return false
         return doRemove && descriptor is MemberDescriptor && descriptor.isExpect &&
                 !(keepOptionalAnnotations && descriptor is ClassDescriptor && ExpectedActualDeclarationChecker.shouldGenerateExpectClass(descriptor))
     }
@@ -80,7 +80,7 @@ class ExpectDeclarationRemover(
             return
         }
 
-        if (!function.symbol.trueDescriptor.isActual) return
+        if (!function.symbol.initialDescriptor.isActual) return
 
         val index = declaration.index
 
@@ -105,13 +105,13 @@ class ExpectDeclarationRemover(
 
     // !!!!!! TODO: avoid using descriptors !!!!!!
     private fun IrFunction.findActualForExpected(): IrFunction? =
-        symbol.trueDescriptor.findActualForExpect()?.let { symbolTable.referenceFunction(it).owner }
+        symbol.initialDescriptor.findActualForExpect()?.let { symbolTable.referenceFunction(it).owner }
 
     private fun IrFunction.findExpectForActual(): IrFunction? =
-        symbol.trueDescriptor.findExpectForActual()?.let { symbolTable.referenceFunction(it).owner }
+        symbol.initialDescriptor.findExpectForActual()?.let { symbolTable.referenceFunction(it).owner }
 
     private fun IrClass.findActualForExpected(): IrClass? =
-        symbol.trueDescriptor.findActualForExpect()?.let { symbolTable.referenceClass(it).owner }
+        symbol.initialDescriptor.findActualForExpect()?.let { symbolTable.referenceClass(it).owner }
 
     private inline fun <reified T : MemberDescriptor> T.findActualForExpect() = with(ExpectedActualResolver) {
         val descriptor = this@findActualForExpect

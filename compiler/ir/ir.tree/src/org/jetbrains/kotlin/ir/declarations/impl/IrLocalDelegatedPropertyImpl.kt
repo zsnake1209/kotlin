@@ -32,9 +32,9 @@ class IrLocalDelegatedPropertyImpl(
     endOffset: Int,
     origin: IrDeclarationOrigin,
     override val symbol: IrLocalDelegatedPropertySymbol,
-    override val name: Name = symbol.trueDescriptor.name,
+    override val name: Name = symbol.initialDescriptor.name,
     override val type: IrType,
-    override val isVar: Boolean = symbol.trueDescriptor.isVar
+    override val isVar: Boolean = symbol.initialDescriptor.isVar
 ) :
     IrDeclarationBase<LocalDelegatedPropertyCarrier>(startOffset, endOffset, origin),
     IrLocalDelegatedProperty,
@@ -52,9 +52,9 @@ class IrLocalDelegatedPropertyImpl(
         type: IrType
     ) : this(
         startOffset, endOffset, origin, symbol,
-        symbol.trueDescriptor.name,
+        symbol.initialDescriptor.name,
         type,
-        symbol.trueDescriptor.isVar
+        symbol.initialDescriptor.isVar
     )
 
     @Deprecated("Creates unbound symbol")

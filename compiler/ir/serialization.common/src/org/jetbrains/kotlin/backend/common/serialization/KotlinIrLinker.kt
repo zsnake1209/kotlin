@@ -481,9 +481,9 @@ abstract class KotlinIrLinker(
     }
 
     private fun findDeserializedDeclarationForSymbol(symbol: IrSymbol): DeclarationDescriptor? {
-        assert(symbol.isPublicApi || symbol.trueDescriptor.module === currentModule || platformSpecificSymbol(symbol))
+        assert(symbol.isPublicApi || symbol.initialDescriptor.module === currentModule || platformSpecificSymbol(symbol))
 
-        val descriptor = symbol.trueDescriptor
+        val descriptor = symbol.initialDescriptor
 
         val moduleDeserializer = resolveModuleDeserializer(descriptor.module)
 
@@ -499,7 +499,7 @@ abstract class KotlinIrLinker(
     override fun getDeclaration(symbol: IrSymbol): IrDeclaration? {
 
         if (!symbol.isPublicApi) {
-            val descriptor = symbol.trueDescriptor
+            val descriptor = symbol.initialDescriptor
             if (descriptor is WrappedDeclarationDescriptor<*>) return null
             if (!platformSpecificSymbol(symbol)) {
                 if (descriptor.module !== currentModule) return null
@@ -511,11 +511,11 @@ abstract class KotlinIrLinker(
         }
 
         // TODO: we do have serializations for those, but let's just create a stub for now.
-        if (!symbol.isBound && (symbol.trueDescriptor.isExpectMember || symbol.trueDescriptor.containingDeclaration?.isExpectMember == true))
+        if (!symbol.isBound && (symbol.initialDescriptor.isExpectMember || symbol.initialDescriptor.containingDeclaration?.isExpectMember == true))
             return null
 
         assert(symbol.isBound) {
-            "getDeclaration: symbol $symbol is unbound, descriptor = ${symbol.trueDescriptor}, signature = ${symbol.signature}"
+            "getDeclaration: symbol $symbol is unbound, descriptor = ${symbol.initialDescriptor}, signature = ${symbol.signature}"
         }
 
         return symbol.owner as IrDeclaration
