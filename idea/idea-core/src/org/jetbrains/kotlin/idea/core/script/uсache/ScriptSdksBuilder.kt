@@ -24,10 +24,6 @@ class ScriptSdksBuilder(
 ) {
     private val defaultSdk = getScriptDefaultSdk()
 
-    init {
-        sdks[null] = defaultSdk
-    }
-
     fun build() = ScriptSdks(project, sdks)
 
     fun addAll(other: ScriptSdksBuilder) {
@@ -35,10 +31,11 @@ class ScriptSdksBuilder(
     }
 
     fun addSdk(javaHome: File?): Sdk? {
-        if (javaHome == null) return defaultSdk
-        val canonicalPath = FileUtil.toSystemIndependentName(javaHome.canonicalPath)
+        val canonicalPath = javaHome?.let {
+            FileUtil.toSystemIndependentName(javaHome.canonicalPath)
+        }
         return sdks.getOrPut(canonicalPath) {
-            getScriptSdkByJavaHome(javaHome) ?: defaultSdk
+            javaHome?.let { getScriptSdkByJavaHome(it) } ?: defaultSdk
         }
     }
 
@@ -58,8 +55,7 @@ class ScriptSdksBuilder(
         val sdk = getProjectJdkTableSafe().allJdks
             .find { it.name == sdkName }
             ?.takeIf { it.canBeUsedForScript() }
-            ?: defaultSdk ?: return
-        val homePath = sdk.homePath ?: return
+        val homePath = sdk?.homePath
         sdks[homePath] = sdk
     }
 
