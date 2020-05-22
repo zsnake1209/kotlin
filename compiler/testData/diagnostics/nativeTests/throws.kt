@@ -250,11 +250,21 @@ suspend fun suspendThrowsCancellationException1() {}
 @Throws(CancellationException::class, Exception1::class)
 suspend fun suspendThrowsCancellationException2() {}
 
+typealias CancellationExceptionAlias = CancellationException
+
+@Throws(CancellationExceptionAlias::class)
+suspend fun suspendThrowsCancellationExceptionTypealias() {}
+
 @Throws(IllegalStateException::class)
 suspend fun suspendThrowsIllegalStateException1() {}
 
 @Throws(Exception2::class, IllegalStateException::class)
 suspend fun suspendThrowsIllegalStateException2() {}
+
+typealias IllegalStateExceptionAlias = IllegalStateException
+
+@Throws(IllegalStateExceptionAlias::class)
+suspend fun suspendThrowsIllegalStateExceptionTypealias() {}
 
 @Throws(RuntimeException::class)
 suspend fun suspendThrowsRuntimeException1() {}
@@ -262,11 +272,21 @@ suspend fun suspendThrowsRuntimeException1() {}
 @Throws(RuntimeException::class, Exception3::class)
 suspend fun suspendThrowsRuntimeException2() {}
 
+typealias RuntimeExceptionAlias = RuntimeException
+
+@Throws(RuntimeExceptionAlias::class)
+suspend fun suspendThrowsRuntimeExceptionTypealias() {}
+
 @Throws(Exception::class)
 suspend fun suspendThrowsException1() {}
 
 @Throws(Exception1::class, Exception::class)
 suspend fun suspendThrowsException2() {}
+
+typealias ExceptionAlias = Exception
+
+@Throws(ExceptionAlias::class)
+suspend fun suspendThrowsExceptionTypealias() {}
 
 @Throws(Throwable::class)
 suspend fun suspendThrowsThrowable1() {}
@@ -276,3 +296,8 @@ suspend fun suspendThrowsThrowable2() {}
 
 @Throws(Throwable::class, CancellationException::class)
 suspend fun suspendThrowsThrowable3() {}
+
+typealias ThrowableAlias = Throwable
+
+@Throws(ThrowableAlias::class)
+suspend fun suspendThrowsThrowableTypealias() {}
