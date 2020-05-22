@@ -11,6 +11,8 @@ import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType
 import org.jetbrains.kotlin.idea.core.script.ScriptDefinitionContributor
 import org.jetbrains.kotlin.idea.framework.GRADLE_SYSTEM_ID
 import org.jetbrains.kotlin.idea.scripting.gradle.GradleScriptDefinitionsContributor
+import org.jetbrains.kotlin.idea.scripting.gradle.roots.GradleBuildRootsManager
+import java.lang.Exception
 
 class KotlinDslSyncListener : ExternalSystemTaskNotificationListenerAdapter() {
     private val workingDirs = hashMapOf<ExternalSystemTaskId, String>()
@@ -24,6 +26,7 @@ class KotlinDslSyncListener : ExternalSystemTaskNotificationListenerAdapter() {
 
         val project = id.findProject() ?: return
 
+        GradleBuildRootsManager.getInstance(project).markImportingInProgress(workingDir)
         project.kotlinGradleDslSync[id] = KotlinDslGradleBuildSync(id)
     }
 
@@ -46,16 +49,30 @@ class KotlinDslSyncListener : ExternalSystemTaskNotificationListenerAdapter() {
         }
     }
 
+    override fun onFailure(id: ExternalSystemTaskId, e: Exception) {
+        if (id.type != ExternalSystemTaskType.RESOLVE_PROJECT) return
+        if (id.projectSystemId != GRADLE_SYSTEM_ID) return
+
+        val project = id.findProject() ?: return
+        val sync = project.kotlinGradleDslSync[id] ?: return
+
+        sync.failed = true
+    }
+
     override fun onCancel(id: ExternalSystemTaskId) {
         if (!isGradleProjectImport(id)) return
 
         gradleState.isSyncInProgress = false
 
-        workingDirs.remove(id)
+        val workingDir = workingDirs.remove(id)
 
         val project = id.findProject() ?: return
 
-        project.kotlinGradleDslSync.remove(id)
+        val cancelled = project.kotlinGradleDslSync.remove(id)
+        if (cancelled != null && workingDir != null) {
+            cancelled.workingDir = workingDir
+            GradleBuildRootsManager.getInstance(project).markImportingInProgress(cancelled.workingDir, false)
+        }
     }
 
     private fun isGradleProjectImport(id: ExternalSystemTaskId): Boolean {
