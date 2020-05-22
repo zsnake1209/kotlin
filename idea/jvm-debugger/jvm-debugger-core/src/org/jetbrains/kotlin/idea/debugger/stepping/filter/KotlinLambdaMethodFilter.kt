@@ -20,6 +20,7 @@ import com.intellij.debugger.SourcePosition
 import com.intellij.debugger.engine.BreakpointStepMethodFilter
 import com.intellij.debugger.engine.DebugProcessImpl
 import com.intellij.util.Range
+import com.intellij.util.ThreeState
 import com.sun.jdi.Location
 import org.jetbrains.kotlin.codegen.coroutines.isResumeImplMethodNameFromAnyLanguageSettings
 import org.jetbrains.kotlin.idea.core.util.isMultiLine
@@ -43,7 +44,7 @@ class KotlinLambdaMethodFilter(target: KotlinLambdaSmartStepTarget) : Breakpoint
     init {
         val lambda = target.getLambda()
         val body = lambda.bodyExpression
-        if (body != null && lambda.isMultiLine()) {
+        if (body != null && lambda.isMultiLine() == ThreeState.YES) {
             var firstStatementPosition: SourcePosition? = null
             var lastStatementPosition: SourcePosition? = null
             val statements = (body as? KtBlockExpression)?.statements ?: listOf(body)

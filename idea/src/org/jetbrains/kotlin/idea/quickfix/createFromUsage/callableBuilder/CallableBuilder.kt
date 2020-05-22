@@ -21,6 +21,7 @@ import com.intellij.psi.*
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.ThreeState
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.functions.FunctionClassDescriptor
 import org.jetbrains.kotlin.cfg.pseudocode.Pseudocode
@@ -1127,7 +1128,7 @@ internal fun <D : KtNamedDeclaration> placeDeclarationInContainer(
             if (insertToBlock) {
                 val parent = container.parent
                 if (parent is KtFunctionLiteral) {
-                    if (!parent.isMultiLine()) {
+                    if (parent.isMultiLine() == ThreeState.NO) {
                         parent.addBefore(newLine, container)
                         parent.addAfter(newLine, container)
                     }

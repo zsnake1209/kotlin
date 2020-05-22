@@ -13,6 +13,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.refactoring.BaseRefactoringProcessor
+import com.intellij.util.ThreeState
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.isFunctionType
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -570,7 +571,7 @@ fun ExtractionGeneratorConfiguration.generateDeclaration(
 
         val defaultExpression =
             if (!generatorOptions.inTempFile && defaultValue != null && descriptor.controlFlow.outputValueBoxer
-                    .boxingRequired && lastExpression!!.isMultiLine()
+                    .boxingRequired && lastExpression!!.isMultiLine() == ThreeState.YES
             ) {
                 val varNameValidator = NewDeclarationNameValidator(body, lastExpression, NewDeclarationNameValidator.Target.VARIABLES)
                 val resultVal = KotlinNameSuggester.suggestNamesByType(defaultValue.valueType, varNameValidator, null).first()
@@ -603,7 +604,7 @@ fun ExtractionGeneratorConfiguration.generateDeclaration(
             val bodyExpression = body.statements.singleOrNull()
             val bodyOwner = body.parent as KtDeclarationWithBody
             val useExpressionBodyInspection = UseExpressionBodyInspection()
-            if (bodyExpression != null && !bodyExpression.isMultiLine() && useExpressionBodyInspection.isActiveFor(bodyOwner)) {
+            if (bodyExpression != null && bodyExpression.isMultiLine() == ThreeState.NO && useExpressionBodyInspection.isActiveFor(bodyOwner)) {
                 useExpressionBodyInspection.simplify(bodyOwner, !useExplicitReturnType())
             }
         }

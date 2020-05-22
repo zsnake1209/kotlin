@@ -7,8 +7,10 @@ package org.jetbrains.kotlin.idea.core.util
 
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.ThreeState
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import kotlin.math.abs
@@ -58,7 +60,15 @@ fun PsiElement.getLineCount(): Int {
     return (text ?: "").count { it == '\n' } + 1
 }
 
-fun PsiElement.isMultiLine(): Boolean = getLineCount() > 1
+fun PsiElement.isMultiLine(): ThreeState {
+    val i = getLineCount().takeIf { it >= 0 } ?: return ThreeState.UNSURE
+    return ThreeState.fromBoolean(i > 1)
+}
+
+fun PsiElement.isOneLiner(): ThreeState {
+    val i = getLineCount().takeIf { it >= 0 } ?: return ThreeState.UNSURE
+    return ThreeState.fromBoolean(i == 1)
+}
 
 fun Document.getLineCountInRange(textRange: TextRange): Int = abs(getLineNumber(textRange.startOffset) - getLineNumber(textRange.endOffset))
 

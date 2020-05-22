@@ -15,9 +15,10 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.util.ThreeState
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.core.moveCaret
-import org.jetbrains.kotlin.idea.intentions.branchedTransformations.isOneLiner
+import org.jetbrains.kotlin.idea.core.util.isOneLiner
 import org.jetbrains.kotlin.idea.intentions.loopToCallChain.countUsages
 import org.jetbrains.kotlin.idea.intentions.loopToCallChain.previousStatement
 import org.jetbrains.kotlin.lexer.KtTokens
@@ -32,7 +33,7 @@ class MoveVariableDeclarationIntoWhenInspection : AbstractKotlinInspection(), Cl
         whenExpressionVisitor(fun(expression: KtWhenExpression) {
             val subjectExpression = expression.subjectExpression ?: return
             val property = expression.findDeclarationNear() ?: return
-            if (!property.isOneLiner()) return
+            if (property.isOneLiner() == ThreeState.NO) return
             if (property.initializer?.anyDescendantOfType<KtExpression> {
                     it is KtThrowExpression || it is KtReturnExpression || it is KtBreakExpression || it is KtContinueExpression
                 } == true) return

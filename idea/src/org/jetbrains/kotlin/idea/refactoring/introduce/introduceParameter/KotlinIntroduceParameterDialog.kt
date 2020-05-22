@@ -13,6 +13,7 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.refactoring.ui.NameSuggestionsField
 import com.intellij.refactoring.ui.RefactoringDialog
 import com.intellij.ui.NonFocusableCheckBox
+import com.intellij.util.ThreeState
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.core.util.isMultiLine
 import org.jetbrains.kotlin.idea.KotlinBundle
@@ -245,7 +246,7 @@ class KotlinIntroduceParameterDialog private constructor(
         project.executeCommand(commandName) {
             fun createLambdaForArgument(function: KtFunction): KtExpression {
                 val statement = function.bodyBlockExpression!!.statements.single()
-                val space = if (statement.isMultiLine()) "\n" else " "
+                val space = if (statement.isMultiLine() == ThreeState.YES) "\n" else " "
                 val parameters = function.valueParameters
                 val parametersText = if (parameters.isNotEmpty()) {
                     " " + parameters.asSequence().map { it.name }.joinToString() + " ->"

@@ -10,6 +10,7 @@ import com.intellij.codeInsight.editorActions.moveUpDown.StatementUpDownMover
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.ThreeState
 import org.jetbrains.kotlin.idea.core.util.isMultiLine
 import org.jetbrains.kotlin.idea.formatter.TrailingCommaHelper
 import org.jetbrains.kotlin.idea.formatter.isComma
@@ -552,7 +553,7 @@ class KotlinExpressionMover : AbstractKotlinUpDownMover() {
             }
 
             if (whiteSpaceTestSubject is PsiWhiteSpace) {
-                if (whiteSpaceTestSubject.isMultiLine()) {
+                if (whiteSpaceTestSubject.isMultiLine() == ThreeState.YES) {
                     val nearLine = if (down) sourceRange.endLine else sourceRange.startLine - 1
                     info.toMove = sourceRange
                     info.toMove2 = LineRange(nearLine, nearLine + 1)

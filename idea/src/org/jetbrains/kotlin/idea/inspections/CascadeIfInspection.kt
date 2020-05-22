@@ -9,10 +9,11 @@ import com.intellij.codeInspection.IntentionWrapper
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.util.ThreeState
 import org.jetbrains.kotlin.idea.KotlinBundle
+import org.jetbrains.kotlin.idea.core.util.isOneLiner
 import org.jetbrains.kotlin.idea.intentions.branchedTransformations.intentions.IfToWhenIntention
 import org.jetbrains.kotlin.idea.intentions.branchedTransformations.isElseIf
-import org.jetbrains.kotlin.idea.intentions.branchedTransformations.isOneLiner
 import org.jetbrains.kotlin.idea.intentions.branches
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
@@ -24,7 +25,7 @@ class CascadeIfInspection : AbstractKotlinInspection() {
         ifExpressionVisitor(fun(expression) {
             val branches = expression.branches
             if (branches.size <= 2) return
-            if (expression.isOneLiner()) return
+            if (expression.isOneLiner() == ThreeState.YES) return
 
             if (branches.any {
                     it == null || it.lastBlockStatementOrThis() is KtIfExpression

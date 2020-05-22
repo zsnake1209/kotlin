@@ -15,13 +15,14 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.profile.codeInspection.ProjectInspectionProfileManager
 import com.intellij.psi.PsiElement
+import com.intellij.util.ThreeState
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.idea.KotlinBundle
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.core.canOmitDeclaredType
 import org.jetbrains.kotlin.idea.core.replaced
 import org.jetbrains.kotlin.idea.core.setType
-import org.jetbrains.kotlin.idea.intentions.branchedTransformations.isOneLiner
+import org.jetbrains.kotlin.idea.core.util.isOneLiner
 import org.jetbrains.kotlin.idea.intentions.hasResultingIfWithoutElse
 import org.jetbrains.kotlin.idea.intentions.resultingWhens
 import org.jetbrains.kotlin.idea.util.CommentSaver
@@ -54,7 +55,7 @@ class UseExpressionBodyInspection(private val convertEmptyToUnit: Boolean) : Abs
         return when {
             valueStatement !is KtReturnExpression -> Status(toHighlight, KotlinBundle.message("block.body"), INFORMATION)
             valueStatement.returnedExpression is KtWhenExpression -> Status(toHighlight, KotlinBundle.message("return.when"), INFORMATION)
-            valueStatement.isOneLiner() -> Status(toHighlight, KotlinBundle.message("one.line.return"), GENERIC_ERROR_OR_WARNING)
+            valueStatement.isOneLiner() == ThreeState.YES -> Status(toHighlight, KotlinBundle.message("one.line.return"), GENERIC_ERROR_OR_WARNING)
             else -> Status(toHighlight, KotlinBundle.message("text.return"), INFORMATION)
         }
     }
