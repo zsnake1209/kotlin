@@ -38,7 +38,7 @@ class KotlinJavaMPPSourceSetDataService : AbstractProjectDataService<GradleSourc
         val projectNode = toImport.firstOrNull()?.let { ExternalSystemApiUtil.findParent(it, ProjectKeys.PROJECT) } ?: return
         val targetsByUrl = ExternalSystemApiUtil
             .findAllRecursively(projectNode, KotlinTargetData.KEY)
-            .groupBy { targetNode -> targetNode.data.archiveFile?.let { VfsUtil.getUrlForLibraryRoot(it) } }
+            .groupBy { targetNode -> targetNode.data.artifactFile?.let { VfsUtil.getUrlForLibraryRoot(it) } }
         for (nodeToImport in toImport) {
             if (nodeToImport.kotlinSourceSet != null) continue
             val isTestSourceSet = nodeToImport.data.id.endsWith(":test")

@@ -27,7 +27,7 @@ class KotlinTargetDataService : AbstractProjectDataService<KotlinTargetData, Voi
     ) {
         for (nodeToImport in toImport) {
             val targetData = nodeToImport.data
-            val archiveFile = targetData.archiveFile ?: continue
+            val artifactFile = targetData.artifactFile ?: continue
 
             //TODO(auskov) should be replaced with direct invocation of the method after migration to new API in IDEA 192
             val artifactModel = try {
@@ -44,10 +44,10 @@ class KotlinTargetDataService : AbstractProjectDataService<KotlinTargetData, Voi
                     .invoke(packagingModifiableModel) as ModifiableArtifactModel
             }
 
-            val artifactName = FileUtil.getNameWithoutExtension(archiveFile)
+            val artifactName = FileUtil.getNameWithoutExtension(artifactFile)
             artifactModel.findArtifact(artifactName)?.let { artifactModel.removeArtifact(it) }
             artifactModel.addArtifact(artifactName, JarArtifactType.getInstance()).also {
-                it.outputPath = archiveFile.parent
+                it.outputPath = artifactFile.parent
                 for (moduleId in targetData.moduleIds) {
                     val compilationModuleDataNode = nodeToImport.parent?.findChildModuleById(moduleId) ?: continue
                     val compilationData = compilationModuleDataNode.data

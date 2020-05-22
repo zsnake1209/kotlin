@@ -379,22 +379,22 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
                 compilation.addDependsOnSourceSetsToCompilation(sourceSetMap, isHMPPEnabled)
             }
         }
-        val jar = buildTargetJar(gradleTarget, project)
+        val artifact = buildJarArtifact(gradleTarget, project)
         val testRunTasks = buildTestRunTasks(project, gradleTarget)
         val nativeMainRunTasks =
             if (platform == KotlinPlatform.NATIVE) buildNativeMainRunTasks(gradleTarget)
             else emptyList()
         val artifacts = konanArtifacts(gradleTarget)
         val target = KotlinTargetImpl(
-            gradleTarget.name,
-            targetPresetName,
-            disambiguationClassifier,
-            platform,
-            compilations,
-            testRunTasks,
-            nativeMainRunTasks,
-            jar,
-            artifacts
+            name = gradleTarget.name,
+            presetName = targetPresetName,
+            disambiguationClassifier = disambiguationClassifier,
+            platform = platform,
+            compilations = compilations,
+            testRunTasks = testRunTasks,
+            nativeMainRunTasks = nativeMainRunTasks,
+            artifact = artifact,
+            konanArtifacts = artifacts
         )
         compilations.forEach {
             it.disambiguationClassifier = target.disambiguationClassifier
@@ -515,15 +515,15 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         }.map { KotlinTestRunTaskImpl(it, KotlinCompilation.TEST_COMPILATION_NAME) }
     }
 
-    private fun buildTargetJar(gradleTarget: Named, project: Project): KotlinTargetJar? {
+    private fun buildJarArtifact(gradleTarget: Named, project: Project): KotlinArtifact? {
         val targetClass = gradleTarget.javaClass
         val getArtifactsTaskName = targetClass.getMethodOrNull("getArtifactsTaskName") ?: return null
         val artifactsTaskName = getArtifactsTaskName(gradleTarget) as? String ?: return null
         val jarTask = project.tasks.findByName(artifactsTaskName) ?: return null
         val jarTaskClass = jarTask.javaClass
         val getArchivePath = jarTaskClass.getMethodOrNull("getArchivePath")
-        val archiveFile = getArchivePath?.invoke(jarTask) as? File?
-        return KotlinTargetJarImpl(archiveFile)
+        val archiveFile = getArchivePath?.invoke(jarTask) as? File? ?: return null
+        return KotlinArtifactImpl(archiveFile)
     }
 
     private fun buildCompilation(

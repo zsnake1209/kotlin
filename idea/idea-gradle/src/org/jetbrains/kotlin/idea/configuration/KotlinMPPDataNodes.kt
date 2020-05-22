@@ -62,7 +62,7 @@ class KotlinAndroidSourceSetData @PropertyMapping("sourceSetInfos") constructor(
 class KotlinTargetData @PropertyMapping("externalName") constructor(externalName: String) :
     AbstractNamedData(GradleConstants.SYSTEM_ID, externalName) {
     var moduleIds: Set<String> = emptySet()
-    var archiveFile: File? = null
+    var artifactFile: File? = null
     var konanArtifacts: Collection<KonanArtifactModel>? = null
 
     companion object {

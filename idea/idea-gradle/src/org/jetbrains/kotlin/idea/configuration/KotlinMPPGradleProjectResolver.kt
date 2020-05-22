@@ -279,9 +279,10 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtensionComp
                 projectDataNode.putUserData(MPP_CONFIGURATION_ARTIFACTS, this)
             }
 
-            mppModel.targets.filter { it.jar != null && it.jar!!.archiveFile != null }.forEach { target ->
-                val path = toCanonicalPath(target.jar!!.archiveFile!!.absolutePath)
-                val currentModules = userData[path] ?: ArrayList<String>().apply { userData[path] = this }
+            mppModel.targets.forEach { target ->
+                val artifactFile = target.artifact?.file ?: return@forEach
+                val artifactPath = toCanonicalPath(artifactFile.absolutePath)
+                val currentModules = userData.getOrPut(artifactPath) { mutableListOf() }
                 // Test modules should not be added. Otherwise we could get dependnecy of java.mail on jvmTest
                 val allSourceSets = target.compilations.filter { !it.isTestModule }.flatMap { it.sourceSets }.toSet()
                 val availableViaDependsOn = allSourceSets.flatMap { it.dependsOnSourceSets }.mapNotNull { mppModel.sourceSets[it] }
@@ -309,7 +310,7 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtensionComp
                 if (delegateToAndroidPlugin(target)) continue
                 if (target.name == KotlinTarget.METADATA_TARGET_NAME) continue
                 val targetData = KotlinTargetData(target.name).also {
-                    it.archiveFile = target.jar?.archiveFile
+                    it.artifactFile = target.artifact?.file
                     it.konanArtifacts = target.konanArtifacts
                 }
                 mainModuleNode.createChild(KotlinTargetData.KEY, targetData)

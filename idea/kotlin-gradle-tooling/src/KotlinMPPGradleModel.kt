@@ -135,9 +135,9 @@ interface KotlinPlatformContainer : Serializable {
     fun getSinglePlatform() = platforms.singleOrNull() ?: KotlinPlatform.COMMON
 }
 
-
-interface KotlinTargetJar : Serializable {
-    val archiveFile: File?
+// an artifact that Kotlin modules may depend on
+interface KotlinArtifact : Serializable {
+    val file: File
 }
 
 interface KotlinTarget : Serializable {
@@ -148,7 +148,7 @@ interface KotlinTarget : Serializable {
     val compilations: Collection<KotlinCompilation>
     val testRunTasks: Collection<KotlinTestRunTask>
     val nativeMainRunTasks: Collection<KotlinNativeMainRunTask>
-    val jar: KotlinTargetJar?
+    val artifact: KotlinArtifact?
     val konanArtifacts: List<KonanArtifactModel>
 
     companion object {
