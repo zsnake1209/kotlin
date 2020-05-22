@@ -9,7 +9,9 @@ import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListener
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListenerAdapter
 import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType
+import org.jetbrains.kotlin.idea.core.script.ScriptDefinitionContributor
 import org.jetbrains.kotlin.idea.framework.GRADLE_SYSTEM_ID
+import org.jetbrains.kotlin.idea.scripting.gradle.GradleScriptDefinitionsContributor
 import org.jetbrains.kotlin.idea.scripting.gradle.roots.GradleBuildRootsManager
 import java.util.*
 
@@ -40,6 +42,10 @@ class KotlinDslSyncListener : ExternalSystemTaskNotificationListenerAdapter() {
 
         // project may be null in case of new project
         val project = id.findProject() ?: return
+
+        @Suppress("DEPRECATION")
+        ScriptDefinitionContributor.find<GradleScriptDefinitionsContributor>(project)?.reloadIfNecessary()
+
         saveScriptModels(project, sync)
     }
 

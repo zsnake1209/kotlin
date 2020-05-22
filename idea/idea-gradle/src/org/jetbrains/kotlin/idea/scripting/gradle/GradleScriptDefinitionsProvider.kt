@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.idea.core.script.ScriptDefinitionContributor
 import org.jetbrains.kotlin.idea.core.script.ScriptDefinitionSourceAsContributor
 import org.jetbrains.kotlin.idea.core.script.ScriptDefinitionsManager
 import org.jetbrains.kotlin.idea.core.script.loadDefinitionsFromTemplates
+import org.jetbrains.kotlin.idea.scripting.gradle.importing.KotlinDslSyncListener
 import org.jetbrains.kotlin.scripting.definitions.KotlinScriptDefinitionAdapterFromNewAPIBase
 import org.jetbrains.kotlin.scripting.definitions.ScriptDefinition
 import org.jetbrains.kotlin.scripting.definitions.getEnvironment
@@ -155,6 +156,7 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
     ): List<ScriptDefinition> = try {
         doLoadGradleTemplates(templateClass, dependencySelector, additionalResolverClasspath)
     } catch (t: Throwable) {
+        scriptingDebugLog { "error loading gradle script templates ${t.message}" }
         // TODO: review exception handling
         failedToLoad.set(true)
         if (t is IllegalStateException) {
@@ -225,6 +227,8 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
             dependencySelector.matches(it.name)
         }.takeIf { it.isNotEmpty() }?.asList() ?: error(KotlinIdeaGradleBundle.message("error.text.missing.jars.in.gradle.directory"))
 
+        scriptingDebugLog { "loading gradle script templates from $templateClasspath" }
+
         return loadDefinitionsFromTemplates(
             listOf(templateClass),
             templateClasspath,
@@ -292,7 +296,9 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
 
     private class ErrorScriptDependenciesResolver(private val message: String? = null) : DependenciesResolver {
         override fun resolve(scriptContents: ScriptContents, environment: Environment): ResolveResult {
-            val failureMessage = if (GradleScriptDefinitionsUpdater.gradleState.isSyncInProgress) {
+            val importTasks = KotlinDslSyncListener.instance.tasks
+            val importInProgress = synchronized(importTasks) { importTasks.isNotEmpty() }
+            val failureMessage = if (importInProgress) {
                 KotlinIdeaGradleBundle.message("error.text.highlighting.is.impossible.during.gradle.import")
             } else {
                 message ?: KotlinIdeaGradleBundle.message(
