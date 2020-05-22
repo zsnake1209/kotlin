@@ -28,6 +28,10 @@ class KotlinTargetDataService : AbstractProjectDataService<KotlinTargetData, Voi
         for (nodeToImport in toImport) {
             val targetData = nodeToImport.data
             val artifactFile = targetData.artifactFile ?: continue
+            if (!artifactFile.extension.equals("jar", ignoreCase = true)) {
+                // only JAR artifacts are supported
+                continue
+            }
 
             //TODO(auskov) should be replaced with direct invocation of the method after migration to new API in IDEA 192
             val artifactModel = try {

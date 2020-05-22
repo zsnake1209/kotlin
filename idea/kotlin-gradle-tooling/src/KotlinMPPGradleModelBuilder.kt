@@ -376,12 +376,16 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
                 compilation.addDependsOnSourceSetsToCompilation(sourceSetMap, isHMPPEnabled)
             }
         }
-        val artifact = buildJarArtifact(gradleTarget, project)
+
+        val artifact =
+            if (platform == KotlinPlatform.NATIVE) buildKlibArtifact(compilations)
+            else buildJarArtifact(gradleTarget, project)
         val testRunTasks = buildTestRunTasks(project, gradleTarget)
         val nativeMainRunTasks =
             if (platform == KotlinPlatform.NATIVE) buildNativeMainRunTasks(gradleTarget)
             else emptyList()
         val nativeBinaries = buildNativeBinaries(gradleTarget)
+
         val target = KotlinTargetImpl(
             name = gradleTarget.name,
             presetName = targetPresetName,
@@ -512,10 +516,18 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         }.map { KotlinTestRunTaskImpl(it, KotlinCompilation.TEST_COMPILATION_NAME) }
     }
 
+    // for JS, JVM & common (legacy) platforms
     private fun buildJarArtifact(gradleTarget: Named, project: Project): KotlinArtifact? {
         val artifactsTaskName = gradleTarget["getArtifactsTaskName"] as? String ?: return null
         val jarTask = project.tasks.findByName(artifactsTaskName) ?: return null
         val artifactFile = jarTask["getArchivePath"] as? File? ?: return null
+        return KotlinArtifactImpl(artifactFile)
+    }
+
+    // for KLIB artifacts
+    private fun buildKlibArtifact(compilations: List<KotlinCompilation>): KotlinArtifact? {
+        val mainCompilation = compilations.firstOrNull { it.name == KotlinCompilation.MAIN_COMPILATION_NAME } ?: return null
+        val artifactFile = mainCompilation.output.classesDirs.firstOrNull { it.extension == "klib" } ?: return null
         return KotlinArtifactImpl(artifactFile)
     }
 

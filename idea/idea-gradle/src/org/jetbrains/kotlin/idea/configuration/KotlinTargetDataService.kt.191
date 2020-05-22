@@ -27,7 +27,13 @@ class KotlinTargetDataService : AbstractProjectDataService<KotlinTargetData, Voi
         for (nodeToImport in toImport) {
             val targetData = nodeToImport.data
             val artifactFile = targetData.artifactFile ?: continue
+            if (!artifactFile.extension.equals("jar", ignoreCase = true)) {
+                // only JAR artifacts are supported
+                continue
+            }
+
             val artifactModel = modelsProvider.modifiableArtifactModel
+
             val artifactName = FileUtil.getNameWithoutExtension(artifactFile)
             artifactModel.findArtifact(artifactName)?.let { artifactModel.removeArtifact(it) }
             artifactModel.addArtifact(artifactName, JarArtifactType.getInstance()).also {
