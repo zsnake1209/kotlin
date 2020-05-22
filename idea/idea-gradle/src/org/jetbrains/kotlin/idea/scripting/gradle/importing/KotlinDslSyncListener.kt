@@ -28,10 +28,12 @@ class KotlinDslSyncListener : ExternalSystemTaskNotificationListenerAdapter() {
         if (!isGradleProjectResolve(id)) return
 
         if (workingDir == null) return
-        synchronized(tasks) { tasks[id] = KotlinDslGradleBuildSync(workingDir, id) }
+        val task = KotlinDslGradleBuildSync(workingDir, id)
+        synchronized(tasks) { tasks[id] = task }
 
         // project may be null in case of new project
         val project = id.findProject() ?: return
+        task.project = project
         GradleBuildRootsManager.getInstance(project).markImportingInProgress(workingDir)
     }
 

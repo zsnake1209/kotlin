@@ -128,7 +128,7 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
                 return default.distinct().asSequence()
             }
 
-            return sequenceOf(ErrorGradleScriptDefinition())
+            return sequenceOf(ErrorGradleScriptDefinition(project))
         }
 
     private fun tryToLoadOldBuildScriptDefinition(): List<ScriptDefinition> {
@@ -163,11 +163,7 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
             Logger.getInstance(GradleScriptDefinitionsContributor::class.java)
                 .info("[kts] error loading gradle script templates: ${t.message}")
         }
-        listOf(
-            ErrorGradleScriptDefinition(
-                t.message
-            )
-        )
+        listOf(ErrorGradleScriptDefinition(project, t.message))
     }
 
 
@@ -262,15 +258,13 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
     }
 
     // TODO: refactor - minimize
-    private class ErrorGradleScriptDefinition(message: String? = null) :
+    private class ErrorGradleScriptDefinition(project: Project, message: String? = null) :
         ScriptDefinition.FromLegacy(
             ScriptingHostConfiguration(defaultJvmScriptingHostConfiguration),
-            LegacyDefinition(
-                message
-            )
+            LegacyDefinition(project, message)
         ) {
 
-        private class LegacyDefinition(message: String?) : KotlinScriptDefinitionAdapterFromNewAPIBase() {
+        private class LegacyDefinition(project: Project, message: String?) : KotlinScriptDefinitionAdapterFromNewAPIBase() {
             companion object {
                 private const val KOTLIN_DSL_SCRIPT_EXTENSION = "gradle.kts"
             }
@@ -283,9 +277,7 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
             override val baseClass: KClass<*> = ScriptTemplateWithArgs::class
 
             override val dependencyResolver: DependenciesResolver =
-                ErrorScriptDependenciesResolver(
-                    message
-                )
+                ErrorScriptDependenciesResolver(project, message)
 
             override fun toString(): String = "ErrorGradleScriptDefinition"
         }
@@ -294,10 +286,13 @@ class GradleScriptDefinitionsContributor(private val project: Project) : ScriptD
         override fun hashCode(): Int = name.hashCode()
     }
 
-    private class ErrorScriptDependenciesResolver(private val message: String? = null) : DependenciesResolver {
+    private class ErrorScriptDependenciesResolver(
+        private val project: Project,
+        private val message: String? = null
+    ) : DependenciesResolver {
         override fun resolve(scriptContents: ScriptContents, environment: Environment): ResolveResult {
             val importTasks = KotlinDslSyncListener.instance.tasks
-            val importInProgress = synchronized(importTasks) { importTasks.isNotEmpty() }
+            val importInProgress = synchronized(importTasks) { importTasks.values.any { it.project == project } }
             val failureMessage = if (importInProgress) {
                 KotlinIdeaGradleBundle.message("error.text.highlighting.is.impossible.during.gradle.import")
             } else {
