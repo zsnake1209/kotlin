@@ -54,6 +54,5 @@ fun compareAndMergeFirFileAndOldFrontendFile(
 fun loadTestDataWithoutDiagnostics(file: File): String {
     val textWithoutDiagnostics = KotlinTestUtils.doLoadFile(file)
         .replace(DIAGNOSTIC_IN_TESTDATA_PATTERN, "")
-        .replace(SPEC_LINKS_IN_TESTDATA_PATTERN, "")
     return StringUtil.convertLineSeparators(textWithoutDiagnostics.trim()).trimTrailingWhitespacesAndAddNewlineAtEOF()
 }
