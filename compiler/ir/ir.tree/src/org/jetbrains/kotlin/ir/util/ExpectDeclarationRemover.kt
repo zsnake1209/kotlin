@@ -60,7 +60,7 @@ class ExpectDeclarationRemover(
 
     private fun shouldRemoveTopLevelDeclaration(declaration: IrDeclaration): Boolean {
         // TODO: rewrite findCompatibleActualForExpected using IR structures instead of descriptors
-        val descriptor = declaration.safeAs<IrSymbolOwner>()?.symbol?.initialDescriptor ?: return false
+        val descriptor = declaration.initialDescriptor ?: return false
         return doRemove && descriptor is MemberDescriptor && descriptor.isExpect &&
                 !(keepOptionalAnnotations && descriptor is ClassDescriptor && ExpectedActualDeclarationChecker.shouldGenerateExpectClass(descriptor))
     }
@@ -80,7 +80,7 @@ class ExpectDeclarationRemover(
             return
         }
 
-        if (!function.symbol.initialDescriptor.isActual) return
+        if (!function.initialDescriptor.isActual) return
 
         val index = declaration.index
 

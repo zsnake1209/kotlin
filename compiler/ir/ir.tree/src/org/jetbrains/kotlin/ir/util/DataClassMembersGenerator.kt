@@ -37,7 +37,7 @@ abstract class DataClassMembersGenerator(
 
     inline fun <T : IrDeclaration> T.buildWithScope(builder: (T) -> Unit): T =
         also { irDeclaration ->
-            symbolTable.withScope(irDeclaration.safeAs<IrSymbolOwner>()!!.symbol.initialDescriptor) {
+            symbolTable.withScope(irDeclaration.initialDescriptor) {
                 builder(irDeclaration)
             }
         }
@@ -178,7 +178,7 @@ abstract class DataClassMembersGenerator(
 
         fun generateToStringMethodBody(properties: List<PropertyDescriptor>) {
             val irConcat = irConcat()
-            irConcat.addArgument(irString(irClass.symbol.initialDescriptor.name.asString() + "("))
+            irConcat.addArgument(irString(irClass.initialDescriptor.name.asString() + "("))
             var first = true
             for (property in properties) {
                 if (!first) irConcat.addArgument(irString(", "))
@@ -207,7 +207,7 @@ abstract class DataClassMembersGenerator(
     }
 
     fun getBackingField(property: PropertyDescriptor): IrField =
-        irClass.properties.single { it.symbol.initialDescriptor == property }.backingField!!
+        irClass.properties.single { it.initialDescriptor == property }.backingField!!
 
     abstract fun declareSimpleFunction(startOffset: Int, endOffset: Int, functionDescriptor: FunctionDescriptor): IrFunction
 

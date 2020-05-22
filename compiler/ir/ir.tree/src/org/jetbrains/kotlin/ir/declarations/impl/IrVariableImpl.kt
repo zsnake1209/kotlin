@@ -91,6 +91,7 @@ class IrVariableImpl(
     }
 
     override val descriptor: VariableDescriptor get() = symbol.descriptor
+    override val initialDescriptor: VariableDescriptor get() = symbol.initialDescriptor
 
     override var initializer: IrExpression? = null
 
