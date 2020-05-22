@@ -516,14 +516,10 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
     }
 
     private fun buildJarArtifact(gradleTarget: Named, project: Project): KotlinArtifact? {
-        val targetClass = gradleTarget.javaClass
-        val getArtifactsTaskName = targetClass.getMethodOrNull("getArtifactsTaskName") ?: return null
-        val artifactsTaskName = getArtifactsTaskName(gradleTarget) as? String ?: return null
+        val artifactsTaskName = gradleTarget["getArtifactsTaskName"] as? String ?: return null
         val jarTask = project.tasks.findByName(artifactsTaskName) ?: return null
-        val jarTaskClass = jarTask.javaClass
-        val getArchivePath = jarTaskClass.getMethodOrNull("getArchivePath")
-        val archiveFile = getArchivePath?.invoke(jarTask) as? File? ?: return null
-        return KotlinArtifactImpl(archiveFile)
+        val artifactFile = jarTask["getArchivePath"] as? File? ?: return null
+        return KotlinArtifactImpl(artifactFile)
     }
 
     private fun buildCompilation(
