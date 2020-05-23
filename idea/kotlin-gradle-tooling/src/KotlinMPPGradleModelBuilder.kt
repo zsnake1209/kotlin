@@ -328,17 +328,14 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
     }
 
     private fun buildNativeBinaries(target: Named): List<KonanArtifactModel> {
-        val result = ArrayList<KonanArtifactModel>()
+        val binaries = target["getBinaries"] as? Collection<*> ?: return emptyList()
 
-        val binaries = target["getBinaries"] as? Collection<*> ?: return result
-        binaries.forEach { binary ->
+        return binaries.mapNotNull { binary ->
+            val linkTask = binary["getLinkTask"] as? Task ?: return@mapNotNull null
             val executableName = binary["getBaseName"] as? String ?: ""
-            val linkTask = binary["getLinkTask"] as? Task ?: return@forEach
             val runConfiguration = KonanRunConfigurationModelImpl(binary["getRunTask"] as? Exec)
-            buildNativeBinary(executableName, linkTask, runConfiguration)?.let { result.add(it) }
+            buildNativeBinary(executableName, linkTask, runConfiguration)
         }
-
-        return result
     }
 
     private fun buildTarget(
