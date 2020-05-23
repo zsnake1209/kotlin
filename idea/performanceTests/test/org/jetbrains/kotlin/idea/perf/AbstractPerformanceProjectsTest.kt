@@ -721,7 +721,14 @@ abstract class AbstractPerformanceProjectsTest : UsefulTestCase() {
                     tearDown {
                         highlightInfos = it.value ?: emptyList()
                         commitAllDocuments()
-                        FileEditorManager.getInstance(project).closeFile(it.setUpValue!!.psiFile.virtualFile)
+                        it.setUpValue?.let { editorFile ->
+                            val editorFactory = EditorFactory.getInstance()
+                            editorFactory.getEditors(editorFile.document).forEach { editor ->
+                                editorFactory.releaseEditor(editor)
+                            }
+                            val fileEditorManager = FileEditorManager.getInstance(project)
+                            fileEditorManager.closeFile(editorFile.psiFile.virtualFile)
+                        }
                         PsiManager.getInstance(project).dropPsiCaches()
                     }
                     profilerEnabled(!isWarmUp)
