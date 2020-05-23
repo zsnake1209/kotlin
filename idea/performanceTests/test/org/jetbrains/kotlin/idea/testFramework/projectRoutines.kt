@@ -76,6 +76,7 @@ fun loadProjectWithName(path: String, name: String): Project? =
 
 fun TestApplicationManager.closeProject(project: Project) {
     val name = project.name
+    setDataProvider(null)
     DaemonCodeAnalyzerSettings.getInstance().isImportHintEnabled = true // return default value to avoid unnecessary save
     (StartupManager.getInstance(project) as StartupManagerImpl).checkCleared()
     (DaemonCodeAnalyzer.getInstance(project) as DaemonCodeAnalyzerImpl).cleanupAfterTest()
@@ -85,7 +86,6 @@ fun TestApplicationManager.closeProject(project: Project) {
     val projectManagerEx = ProjectManagerEx.getInstanceEx()
     projectManagerEx.forceCloseProjectEx(project, true)
 
-    setDataProvider(null)
     logMessage { "project '$name' successfully closed" }
 }
 
