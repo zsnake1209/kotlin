@@ -63,7 +63,7 @@ class JvmPropertiesLowering(private val context: JvmBackendContext) : IrElementT
             null
 
     private fun createSyntheticMethodForAnnotations(declaration: IrProperty): IrFunctionImpl {
-        val descriptor = WrappedSimpleFunctionDescriptor(declaration.descriptor.annotations)
+        val descriptor = WrappedSimpleFunctionDescriptor(declaration.wrappedDescriptor.annotations)
         val symbol = IrSimpleFunctionSymbolImpl(descriptor)
         val name = computeSyntheticMethodName(declaration)
         return IrFunctionImpl(

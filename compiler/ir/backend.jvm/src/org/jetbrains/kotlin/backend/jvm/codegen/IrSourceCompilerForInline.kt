@@ -70,7 +70,7 @@ class IrSourceCompilerForInline(
         get() = codegen.context.psiSourceManager.getKtFile(codegen.irFunction.fileParent)
 
     override val contextKind: OwnerKind
-        get() = OwnerKind.getMemberOwnerKind(callElement.symbol.descriptor.containingDeclaration)
+        get() = OwnerKind.getMemberOwnerKind(callElement.symbol.wrappedDescriptor.containingDeclaration)
 
     override val inlineCallSiteInfo: InlineCallSiteInfo
         get() {
@@ -79,7 +79,7 @@ class IrSourceCompilerForInline(
                 root.classCodegen.type.internalName,
                 root.signature.asmMethod.name,
                 root.signature.asmMethod.descriptor,
-                root.irFunction.descriptor.isInlineOrInsideInline(),
+                root.irFunction.wrappedDescriptor.isInlineOrInsideInline(),
                 root.irFunction.isSuspend,
                 findElement()?.let { CodegenUtil.getLineNumberForElement(it, false) } ?: 0
             )
@@ -97,7 +97,7 @@ class IrSourceCompilerForInline(
         callDefault: Boolean,
         asmMethod: Method
     ): SMAPAndMethodNode {
-        assert(callableDescriptor == callee.symbol.descriptor.original) { "Expected $callableDescriptor got ${callee.descriptor.original}" }
+        assert(callableDescriptor == callee.symbol.wrappedDescriptor.original) { "Expected $callableDescriptor got ${callee.wrappedDescriptor.original}" }
         return ClassCodegen.getOrCreate(callee.parentAsClass, codegen.context).generateMethodNode(callee)
     }
 
@@ -118,7 +118,7 @@ class IrSourceCompilerForInline(
 
     override fun isCallInsideSameModuleAsDeclared(functionDescriptor: FunctionDescriptor): Boolean {
         // TODO port to IR structures
-        return DescriptorUtils.areInSameModule(DescriptorUtils.getDirectMember(functionDescriptor), codegen.irFunction.descriptor)
+        return DescriptorUtils.areInSameModule(DescriptorUtils.getDirectMember(functionDescriptor), codegen.irFunction.wrappedDescriptor)
     }
 
     override fun isFinallyMarkerRequired(): Boolean {
@@ -129,7 +129,7 @@ class IrSourceCompilerForInline(
         get() = compilationContextFunctionDescriptor
 
     override val compilationContextFunctionDescriptor: FunctionDescriptor
-        get() = generateSequence(codegen) { it.inlinedInto }.last().irFunction.descriptor
+        get() = generateSequence(codegen) { it.inlinedInto }.last().irFunction.wrappedDescriptor
 
     override fun getContextLabels(): Set<String> {
         val name = codegen.irFunction.name.asString()
@@ -143,5 +143,5 @@ class IrSourceCompilerForInline(
             .report(SUSPENSION_POINT_INSIDE_MONITOR, stackTraceElement)
     }
 
-    private fun findElement() = (callElement.symbol.descriptor.original as? DeclarationDescriptorWithSource)?.source?.getPsi() as? KtElement
+    private fun findElement() = (callElement.symbol.wrappedDescriptor.original as? DeclarationDescriptorWithSource)?.source?.getPsi() as? KtElement
 }

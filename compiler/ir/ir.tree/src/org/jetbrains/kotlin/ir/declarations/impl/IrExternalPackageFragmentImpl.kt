@@ -32,13 +32,13 @@ class IrExternalPackageFragmentImpl(
 ) : IrElementBase(UNDEFINED_OFFSET, UNDEFINED_OFFSET),
     IrExternalPackageFragment {
 
-    constructor(symbol: IrExternalPackageFragmentSymbol) : this(symbol, symbol.descriptor.fqName)
+    constructor(symbol: IrExternalPackageFragmentSymbol) : this(symbol, symbol.wrappedDescriptor.fqName)
 
     init {
         symbol.bind(this)
     }
 
-    override val packageFragmentDescriptor: PackageFragmentDescriptor get() = symbol.descriptor
+    override val packageFragmentDescriptor: PackageFragmentDescriptor get() = symbol.wrappedDescriptor
 
     override val declarations: MutableList<IrDeclaration> = ArrayList()
 

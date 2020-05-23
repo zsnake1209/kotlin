@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.multiplatform.ExpectedActualResolver
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 // `doRemove` means should expect-declaration be removed from IR
 class ExpectDeclarationRemover(
@@ -75,7 +74,7 @@ class ExpectDeclarationRemover(
         val function = declaration.parent as? IrFunction ?: return
 
         if (function is IrConstructor &&
-            ExpectedActualDeclarationChecker.isOptionalAnnotationClass(function.descriptor.constructedClass)
+            ExpectedActualDeclarationChecker.isOptionalAnnotationClass(function.wrappedDescriptor.constructedClass)
         ) {
             return
         }

@@ -284,16 +284,16 @@ class IrBuiltIns(
 
     val checkNotNullSymbol = defineCheckNotNullOperator()
 
-    val checkNotNull = checkNotNullSymbol.descriptor
+    val checkNotNull = checkNotNullSymbol.wrappedDescriptor
 
     private fun TypeConstructor.makeNonNullType() = KotlinTypeFactory.simpleType(Annotations.EMPTY, this, listOf(), false)
     private fun TypeConstructor.makeNullableType() = KotlinTypeFactory.simpleType(Annotations.EMPTY, this, listOf(), true)
 
     val dataClassArrayMemberHashCodeSymbol = defineOperator("dataClassArrayMemberHashCode", intType, listOf(anyType))
-    val dataClassArrayMemberHashCode = dataClassArrayMemberHashCodeSymbol.descriptor
+    val dataClassArrayMemberHashCode = dataClassArrayMemberHashCodeSymbol.wrappedDescriptor
 
     val dataClassArrayMemberToStringSymbol = defineOperator("dataClassArrayMemberToString", stringType, listOf(anyNType))
-    val dataClassArrayMemberToString = dataClassArrayMemberToStringSymbol.descriptor
+    val dataClassArrayMemberToString = dataClassArrayMemberToStringSymbol.wrappedDescriptor
 
     companion object {
         val KOTLIN_INTERNAL_IR_FQN = FqName("kotlin.internal.ir")

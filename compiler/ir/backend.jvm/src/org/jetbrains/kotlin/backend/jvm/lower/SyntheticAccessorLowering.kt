@@ -527,11 +527,11 @@ internal class SyntheticAccessorLowering(val context: JvmBackendContext) : IrEle
             parentAsClass.isJvmInterface -> if (!Visibilities.isPrivate(visibility)) "\$jd" else ""
 
             // Accessor for _s_uper-qualified call
-            superQualifier != null -> "\$s" + superQualifier.descriptor.syntheticAccessorToSuperSuffix()
+            superQualifier != null -> "\$s" + superQualifier.wrappedDescriptor.syntheticAccessorToSuperSuffix()
 
             // Access to static members that need an accessor must be because they are inherited,
             // hence accessed on a _s_upertype.
-            isStatic -> "\$s" + parentAsClass.descriptor.syntheticAccessorToSuperSuffix()
+            isStatic -> "\$s" + parentAsClass.wrappedDescriptor.syntheticAccessorToSuperSuffix()
 
             else -> ""
         }
@@ -556,7 +556,7 @@ internal class SyntheticAccessorLowering(val context: JvmBackendContext) : IrEle
 
         // Static accesses that need an accessor must be due to being inherited, hence accessed on a
         // _s_upertype
-        return "p" + if (isStatic) "\$s" + parentAsClass.descriptor.syntheticAccessorToSuperSuffix() else ""
+        return "p" + if (isStatic) "\$s" + parentAsClass.wrappedDescriptor.syntheticAccessorToSuperSuffix() else ""
     }
 
     private val Visibility.isPrivate

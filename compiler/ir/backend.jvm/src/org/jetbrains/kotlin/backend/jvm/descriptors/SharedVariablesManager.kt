@@ -99,7 +99,7 @@ class JvmSharedVariablesManager(
                 isConst = false, // const vals could not possibly require ref wrappers
                 isLateinit = false
             ).apply {
-                (descriptor as WrappedVariableDescriptor).bind(this)
+                (wrappedDescriptor as WrappedVariableDescriptor).bind(this)
                 initializer = refConstructorCall
             }
         }

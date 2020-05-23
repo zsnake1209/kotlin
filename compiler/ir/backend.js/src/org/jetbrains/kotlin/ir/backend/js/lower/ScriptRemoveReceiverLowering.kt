@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.ir.backend.js.lower
 
 import org.jetbrains.kotlin.backend.common.CommonBackendContext
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
-import org.jetbrains.kotlin.backend.common.phaser.makeIrModulePhase
 import org.jetbrains.kotlin.descriptors.ScriptDescriptor
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
@@ -57,7 +56,7 @@ class ScriptRemoveReceiverLowering(val context: CommonBackendContext) : FileLowe
 
                     val result = with(super.visitFunctionReference(expression) as IrFunctionReference) {
                         val arguments = (type as IrSimpleType).arguments.filter {
-                            !(it is IrTypeProjection && it.type is IrSimpleType && (it.type as IrSimpleType).classifier.descriptor is ScriptDescriptor)
+                            !(it is IrTypeProjection && it.type is IrSimpleType && (it.type as IrSimpleType).classifier.wrappedDescriptor is ScriptDescriptor)
                         }
                         IrFunctionReferenceImpl(
                             startOffset,
@@ -93,7 +92,7 @@ class ScriptRemoveReceiverLowering(val context: CommonBackendContext) : FileLowe
 
                     val result = with(super.visitPropertyReference(expression) as IrPropertyReference) {
                         val arguments = (type as IrSimpleType).arguments.filter {
-                            !(it is IrTypeProjection && it.type is IrSimpleType && (it.type as IrSimpleType).classifier.descriptor is ScriptDescriptor)
+                            !(it is IrTypeProjection && it.type is IrSimpleType && (it.type as IrSimpleType).classifier.wrappedDescriptor is ScriptDescriptor)
                         }
                         IrPropertyReferenceImpl(
                             startOffset,

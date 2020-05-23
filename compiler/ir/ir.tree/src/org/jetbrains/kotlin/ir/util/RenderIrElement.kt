@@ -701,8 +701,8 @@ class RenderIrElementVisitor(private val normalizeNames: Boolean = false) : IrEl
         "DYN_MEMBER memberName='${expression.memberName}' type=${expression.type.render()}"
 
     override fun visitErrorDeclaration(declaration: IrErrorDeclaration, data: Nothing?): String =
-        "ERROR_DECL ${declaration.descriptor::class.java.simpleName} " +
-                descriptorRendererForErrorDeclarations.renderDescriptor(declaration.descriptor.original)
+        "ERROR_DECL ${declaration.wrappedDescriptor::class.java.simpleName} " +
+                descriptorRendererForErrorDeclarations.renderDescriptor(declaration.wrappedDescriptor.original)
 
     override fun visitErrorExpression(expression: IrErrorExpression, data: Nothing?): String =
         "ERROR_EXPR '${expression.description}' type=${expression.type.render()}"
@@ -714,7 +714,7 @@ class RenderIrElementVisitor(private val normalizeNames: Boolean = false) : IrEl
 }
 
 internal fun IrDeclaration.name(): String =
-    descriptor.name.toString()
+    wrappedDescriptor.name.toString()
 
 internal fun DescriptorRenderer.renderDescriptor(descriptor: DeclarationDescriptor): String =
     if (descriptor is ReceiverParameterDescriptor)
@@ -739,7 +739,7 @@ internal fun IrTypeAliasSymbol.renderTypeAliasFqn(): String =
     if (isBound)
         StringBuilder().also { owner.renderDeclarationFqn(it) }.toString()
     else
-        "<unbound $this: ${this.descriptor}>"
+        "<unbound $this: ${this.wrappedDescriptor}>"
 
 internal fun IrClass.renderClassFqn(): String =
     StringBuilder().also { renderDeclarationFqn(it) }.toString()

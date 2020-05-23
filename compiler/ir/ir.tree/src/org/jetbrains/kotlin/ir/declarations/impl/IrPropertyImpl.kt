@@ -133,7 +133,7 @@ class IrPropertyImpl(
         symbol.bind(this)
     }
 
-    override val descriptor: PropertyDescriptor get() = symbol.descriptor
+    override val wrappedDescriptor: PropertyDescriptor get() = symbol.wrappedDescriptor
     override val initialDescriptor: PropertyDescriptor get() = symbol.initialDescriptor
 
     override var backingFieldField: IrField? = null

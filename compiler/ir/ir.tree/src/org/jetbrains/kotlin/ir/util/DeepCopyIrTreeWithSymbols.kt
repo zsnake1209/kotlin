@@ -113,7 +113,7 @@ open class DeepCopyIrTreeWithSymbols(
     override fun visitScript(declaration: IrScript): IrStatement {
         return IrScriptImpl(
             //TODO: something may go wrong, because expected using symbolRemapper
-            IrScriptSymbolImpl(declaration.descriptor as ScriptDescriptor),
+            IrScriptSymbolImpl(declaration.wrappedDescriptor as ScriptDescriptor),
             declaration.name
         ).also {
             it.thisReceiver = declaration.thisReceiver.transform()
@@ -281,7 +281,7 @@ open class DeepCopyIrTreeWithSymbols(
         IrAnonymousInitializerImpl(
             declaration.startOffset, declaration.endOffset,
             mapDeclarationOrigin(declaration.origin),
-            IrAnonymousInitializerSymbolImpl(declaration.descriptor)
+            IrAnonymousInitializerSymbolImpl(declaration.wrappedDescriptor)
         ).apply {
             body = declaration.body.transform()
         }
@@ -767,7 +767,7 @@ open class DeepCopyIrTreeWithSymbols(
         ).copyAttributes(expression)
 
     override fun visitErrorDeclaration(declaration: IrErrorDeclaration): IrErrorDeclaration =
-        IrErrorDeclarationImpl(declaration.startOffset, declaration.endOffset, declaration.descriptor)
+        IrErrorDeclarationImpl(declaration.startOffset, declaration.endOffset, declaration.wrappedDescriptor)
 
     override fun visitErrorExpression(expression: IrErrorExpression): IrErrorExpression =
         IrErrorExpressionImpl(

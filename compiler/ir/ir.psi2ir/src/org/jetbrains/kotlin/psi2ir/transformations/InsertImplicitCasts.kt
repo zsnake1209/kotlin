@@ -198,7 +198,7 @@ internal class InsertImplicitCasts(
 
     override fun visitSetVariable(expression: IrSetVariable): IrExpression =
         expression.transformPostfix {
-            value = value.cast(expression.symbol.descriptor.type)
+            value = value.cast(expression.symbol.wrappedDescriptor.type)
         }
 
     override fun visitGetField(expression: IrGetField): IrExpression =
@@ -215,7 +215,7 @@ internal class InsertImplicitCasts(
 
     override fun visitVariable(declaration: IrVariable): IrVariable =
         declaration.transformPostfix {
-            initializer = initializer?.cast(declaration.descriptor.type)
+            initializer = initializer?.cast(declaration.wrappedDescriptor.type)
         }
 
     override fun visitField(declaration: IrField): IrStatement {
@@ -232,7 +232,7 @@ internal class InsertImplicitCasts(
         typeTranslator.buildWithScope(declaration) {
             declaration.transformPostfix {
                 valueParameters.forEach {
-                    it.defaultValue?.coerceInnerExpression(it.descriptor.type)
+                    it.defaultValue?.coerceInnerExpression(it.wrappedDescriptor.type)
                 }
             }
         }
@@ -375,7 +375,7 @@ internal class InsertImplicitCasts(
         val returnTypeFromOriginalExpected = originalExpectedType.getFunctionReturnTypeOrNull()
 
         if (returnTypeFromOriginalExpected?.isTypeParameter() != true) {
-            expectedFunctionExpressionReturnType[function.descriptor] = returnTypeFromExpected.toIrType()
+            expectedFunctionExpressionReturnType[function.wrappedDescriptor] = returnTypeFromExpected.toIrType()
         }
     }
 

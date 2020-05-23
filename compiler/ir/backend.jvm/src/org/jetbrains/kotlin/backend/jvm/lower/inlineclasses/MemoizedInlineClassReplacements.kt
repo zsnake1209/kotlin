@@ -177,7 +177,7 @@ class MemoizedInlineClassReplacements {
         noFakeOverride: Boolean = false,
         body: IrFunctionImpl.() -> Unit
     ) =
-        buildFunWithDescriptorForInlining(function.descriptor) {
+        buildFunWithDescriptorForInlining(function.wrappedDescriptor) {
             updateFrom(function)
             origin = if (function.origin == IrDeclarationOrigin.GENERATED_INLINE_CLASS_MEMBER) {
                 JvmLoweredDeclarationOrigin.INLINE_CLASS_GENERATED_IMPL_METHOD

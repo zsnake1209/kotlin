@@ -35,7 +35,7 @@ class JsGenerationContext(
         get() = if (isCoroutineDoResume()) {
             JsThisRef()
         } else {
-            if (currentFunction!!.descriptor.isSuspend) {
+            if (currentFunction!!.wrappedDescriptor.isSuspend) {
                 JsNameRef(Namer.CONTINUATION)
             } else {
                 getNameForValueDeclaration(currentFunction.valueParameters.last()).makeRef()

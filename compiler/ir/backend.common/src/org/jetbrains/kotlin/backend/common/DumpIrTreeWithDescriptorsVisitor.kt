@@ -22,7 +22,7 @@ class RenderIrElementWithDescriptorsVisitor : IrElementVisitor<String, Nothing?>
         "? ${element.javaClass.simpleName}"
 
     override fun visitDeclaration(declaration: IrDeclaration, data: Nothing?): String =
-        "? ${declaration.javaClass.simpleName} ${declaration.descriptor.ref()}"
+        "? ${declaration.javaClass.simpleName} ${declaration.wrappedDescriptor.ref()}"
 
     override fun visitModuleFragment(declaration: IrModuleFragment, data: Nothing?): String =
         "MODULE_FRAGMENT ${declaration.descriptor}"
@@ -31,31 +31,31 @@ class RenderIrElementWithDescriptorsVisitor : IrElementVisitor<String, Nothing?>
         "FILE ${declaration.path}"
 
     override fun visitFunction(declaration: IrFunction, data: Nothing?): String =
-        "FUN ${declaration.descriptor}"
+        "FUN ${declaration.wrappedDescriptor}"
 
     override fun visitConstructor(declaration: IrConstructor, data: Nothing?): String =
-        "CONSTRUCTOR ${declaration.descriptor}"
+        "CONSTRUCTOR ${declaration.wrappedDescriptor}"
 
     override fun visitProperty(declaration: IrProperty, data: Nothing?): String =
-        "PROPERTY ${declaration.descriptor}"
+        "PROPERTY ${declaration.wrappedDescriptor}"
 
     override fun visitField(declaration: IrField, data: Nothing?): String =
-        "FIELD ${declaration.descriptor}"
+        "FIELD ${declaration.wrappedDescriptor}"
 
     override fun visitClass(declaration: IrClass, data: Nothing?): String =
-        "CLASS ${declaration.descriptor}"
+        "CLASS ${declaration.wrappedDescriptor}"
 
     override fun visitVariable(declaration: IrVariable, data: Nothing?): String =
-        "VAR ${declaration.descriptor}"
+        "VAR ${declaration.wrappedDescriptor}"
 
     override fun visitEnumEntry(declaration: IrEnumEntry, data: Nothing?): String =
-        "ENUM_ENTRY ${declaration.descriptor}"
+        "ENUM_ENTRY ${declaration.wrappedDescriptor}"
 
     override fun visitAnonymousInitializer(declaration: IrAnonymousInitializer, data: Nothing?): String =
-        "ANONYMOUS_INITIALIZER ${declaration.descriptor}"
+        "ANONYMOUS_INITIALIZER ${declaration.wrappedDescriptor}"
 
     override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty, data: Nothing?): String =
-        "LOCAL_DELEGATED_PROPERTY ${declaration.descriptor}"
+        "LOCAL_DELEGATED_PROPERTY ${declaration.wrappedDescriptor}"
 
     override fun visitExpressionBody(body: IrExpressionBody, data: Nothing?): String =
         "EXPRESSION_BODY"
@@ -88,38 +88,38 @@ class RenderIrElementWithDescriptorsVisitor : IrElementVisitor<String, Nothing?>
         "RETURN type=${expression.type.render()} from='${expression.returnTarget}'"
 
     override fun visitCall(expression: IrCall, data: Nothing?): String =
-        "CALL '${expression.symbol.descriptor}' ${expression.renderSuperQualifier()}" +
+        "CALL '${expression.symbol.wrappedDescriptor}' ${expression.renderSuperQualifier()}" +
                 "type=${expression.type.render()} origin=${expression.origin}"
 
     private fun IrCall.renderSuperQualifier(): String =
         superQualifierSymbol?.let { "superQualifier=${it.owner.name} " } ?: ""
 
     override fun visitDelegatingConstructorCall(expression: IrDelegatingConstructorCall, data: Nothing?): String =
-        "DELEGATING_CONSTRUCTOR_CALL '${expression.symbol.descriptor}'"
+        "DELEGATING_CONSTRUCTOR_CALL '${expression.symbol.wrappedDescriptor}'"
 
     override fun visitEnumConstructorCall(expression: IrEnumConstructorCall, data: Nothing?): String =
-        "ENUM_CONSTRUCTOR_CALL '${expression.symbol.descriptor}'"
+        "ENUM_CONSTRUCTOR_CALL '${expression.symbol.wrappedDescriptor}'"
 
     override fun visitInstanceInitializerCall(expression: IrInstanceInitializerCall, data: Nothing?): String =
         "INSTANCE_INITIALIZER_CALL classDescriptor='${expression.classDescriptor}'"
 
     override fun visitGetValue(expression: IrGetValue, data: Nothing?): String =
-        "GET_VAR '${expression.symbol.descriptor}' type=${expression.type.render()} origin=${expression.origin}"
+        "GET_VAR '${expression.symbol.wrappedDescriptor}' type=${expression.type.render()} origin=${expression.origin}"
 
     override fun visitSetVariable(expression: IrSetVariable, data: Nothing?): String =
-        "SET_VAR '${expression.symbol.descriptor}' type=${expression.type.render()} origin=${expression.origin}"
+        "SET_VAR '${expression.symbol.wrappedDescriptor}' type=${expression.type.render()} origin=${expression.origin}"
 
     override fun visitGetField(expression: IrGetField, data: Nothing?): String =
-        "GET_FIELD '${expression.symbol.descriptor}' type=${expression.type.render()} origin=${expression.origin}"
+        "GET_FIELD '${expression.symbol.wrappedDescriptor}' type=${expression.type.render()} origin=${expression.origin}"
 
     override fun visitSetField(expression: IrSetField, data: Nothing?): String =
-        "SET_FIELD '${expression.symbol.descriptor}' type=${expression.type.render()} origin=${expression.origin}"
+        "SET_FIELD '${expression.symbol.wrappedDescriptor}' type=${expression.type.render()} origin=${expression.origin}"
 
     override fun visitGetObjectValue(expression: IrGetObjectValue, data: Nothing?): String =
-        "GET_OBJECT '${expression.symbol.descriptor}' type=${expression.type.render()}"
+        "GET_OBJECT '${expression.symbol.wrappedDescriptor}' type=${expression.type.render()}"
 
     override fun visitGetEnumValue(expression: IrGetEnumValue, data: Nothing?): String =
-        "GET_ENUM '${expression.symbol.descriptor}' type=${expression.type.render()}"
+        "GET_ENUM '${expression.symbol.wrappedDescriptor}' type=${expression.type.render()}"
 
     override fun visitStringConcatenation(expression: IrStringConcatenation, data: Nothing?): String =
         "STRING_CONCATENATION type=${expression.type.render()}"
@@ -149,10 +149,10 @@ class RenderIrElementWithDescriptorsVisitor : IrElementVisitor<String, Nothing?>
         "THROW type=${expression.type.render()}"
 
     override fun visitCallableReference(expression: IrCallableReference, data: Nothing?): String =
-        "CALLABLE_REFERENCE '${expression.symbol.descriptor}' type=${expression.type.render()} origin=${expression.origin}"
+        "CALLABLE_REFERENCE '${expression.symbol.wrappedDescriptor}' type=${expression.type.render()} origin=${expression.origin}"
 
     override fun visitClassReference(expression: IrClassReference, data: Nothing?): String =
-        "CLASS_REFERENCE '${expression.symbol.descriptor}' type=${expression.type.render()}"
+        "CLASS_REFERENCE '${expression.symbol.wrappedDescriptor}' type=${expression.type.render()}"
 
     override fun visitGetClass(expression: IrGetClass, data: Nothing?): String =
         "GET_CLASS type=${expression.type.render()}"
@@ -164,7 +164,7 @@ class RenderIrElementWithDescriptorsVisitor : IrElementVisitor<String, Nothing?>
         "CATCH parameter=${aCatch.parameter.ref()}"
 
     override fun visitErrorDeclaration(declaration: IrErrorDeclaration, data: Nothing?): String =
-        "ERROR_DECL ${declaration.descriptor.javaClass.simpleName} ${declaration.descriptor.ref()}"
+        "ERROR_DECL ${declaration.wrappedDescriptor.javaClass.simpleName} ${declaration.wrappedDescriptor.ref()}"
 
     override fun visitErrorExpression(expression: IrErrorExpression, data: Nothing?): String =
         "ERROR_EXPR '${expression.description}' type=${expression.type.render()}"
@@ -185,7 +185,7 @@ class RenderIrElementWithDescriptorsVisitor : IrElementVisitor<String, Nothing?>
         val REFERENCE_RENDERER = DescriptorRenderer.ONLY_NAMES_WITH_SHORT_TYPES
 
         internal fun IrDeclaration.name(): String =
-            descriptor.let { it.name.toString() }
+            wrappedDescriptor.let { it.name.toString() }
 
         internal fun DeclarationDescriptor.ref(): String =
             if (this is ReceiverParameterDescriptor)
@@ -230,7 +230,7 @@ class DumpIrTreeWithDescriptorsVisitor(out: Appendable) : IrElementVisitor<Unit,
 
     override fun visitBlock(expression: IrBlock, data: String) {
         if (expression is IrReturnableBlock) {
-            printer.println("RETURNABLE BLOCK " + expression.descriptor)
+            printer.println("RETURNABLE BLOCK " + expression.wrappedDescriptor)
             indented { super.visitBlock(expression, data) }
             return
         }
@@ -254,7 +254,7 @@ class DumpIrTreeWithDescriptorsVisitor(out: Appendable) : IrElementVisitor<Unit,
 
     private fun visitFunctionWithParameters(declaration: IrFunction, data: String) {
         declaration.dumpLabeledElementWith(data) {
-            declaration.descriptor.valueParameters.forEach { valueParameter ->
+            declaration.wrappedDescriptor.valueParameters.forEach { valueParameter ->
                 declaration.getDefault(valueParameter)?.accept(this, valueParameter.name.asString())
             }
             declaration.body?.accept(this, "")
@@ -272,7 +272,7 @@ class DumpIrTreeWithDescriptorsVisitor(out: Appendable) : IrElementVisitor<Unit,
         expression.dumpLabeledElementWith(data) {
             dumpTypeArguments(expression)
 
-            val descriptor = expression.symbol.descriptor as CallableDescriptor
+            val descriptor = expression.symbol.wrappedDescriptor as CallableDescriptor
             expression.dispatchReceiver?.accept(this, "\$this")
             expression.extensionReceiver?.accept(this, "\$receiver")
             for (valueParameter in descriptor.valueParameters) {
@@ -282,7 +282,7 @@ class DumpIrTreeWithDescriptorsVisitor(out: Appendable) : IrElementVisitor<Unit,
     }
 
     private fun dumpTypeArguments(expression: IrMemberAccessExpression) {
-        val descriptor = expression.symbol.descriptor as CallableDescriptor
+        val descriptor = expression.symbol.wrappedDescriptor as CallableDescriptor
         for (typeParameter in descriptor.original.typeParameters) {
             val typeArgument = expression.getTypeArgument(typeParameter) ?: continue
             val renderedParameter = DescriptorRenderer.ONLY_NAMES_WITH_SHORT_TYPES.render(typeParameter)

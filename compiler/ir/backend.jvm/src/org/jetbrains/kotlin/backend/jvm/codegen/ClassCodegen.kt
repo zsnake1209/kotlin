@@ -79,7 +79,7 @@ abstract class ClassCodegen protected constructor(
             throw IllegalStateException("Generating class with invalid name '${type.className}': ${irClass.dump()}")
         }
         defineClass(
-            irClass.descriptor.psiElement,
+            irClass.wrappedDescriptor.psiElement,
             state.classFileVersion,
             irClass.flags,
             signature.name,
@@ -371,7 +371,7 @@ private val Visibility.flags: Int
     get() = AsmUtil.getVisibilityAccessFlag(this) ?: throw AssertionError("Unsupported visibility $this")
 
 internal val IrDeclaration.OtherOrigin: JvmDeclarationOrigin
-    get() = OtherOrigin(descriptor)
+    get() = OtherOrigin(wrappedDescriptor)
 
 private fun IrClass.getSuperClassInfo(typeMapper: IrTypeMapper): IrSuperClassInfo {
     if (isInterface) {

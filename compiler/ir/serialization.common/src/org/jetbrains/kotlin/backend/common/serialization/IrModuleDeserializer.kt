@@ -217,7 +217,7 @@ open class CurrentModuleDeserializer(
         return when (descriptor) {
             is ClassDescriptor -> symbolTable.referenceClass(descriptor)
             is PropertyDescriptor -> symbolTable.referenceProperty(descriptor)
-            is PackageFragmentDescriptor -> moduleFragment.files.single { it.symbol.descriptor === descriptor }.symbol
+            is PackageFragmentDescriptor -> moduleFragment.files.single { it.symbol.wrappedDescriptor === descriptor }.symbol
             else -> error("Unexpected declaration parent $descriptor")
         }
     }

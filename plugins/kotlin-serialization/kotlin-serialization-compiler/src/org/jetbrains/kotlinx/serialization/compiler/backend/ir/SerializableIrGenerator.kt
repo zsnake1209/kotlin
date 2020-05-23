@@ -1,6 +1,5 @@
 package org.jetbrains.kotlinx.serialization.compiler.backend.ir
 
-import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.deepCopyWithVariables
 import org.jetbrains.kotlin.backend.common.lower.irThrow
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -18,13 +17,10 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrTypeProjection
 import org.jetbrains.kotlin.ir.types.classOrNull
-import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.SerializableCodegen
 import org.jetbrains.kotlinx.serialization.compiler.diagnostic.serializableAnnotationIsUseless
@@ -36,7 +32,7 @@ class SerializableIrGenerator(
     val irClass: IrClass,
     override val compilerContext: SerializationPluginContext,
     bindingContext: BindingContext
-) : SerializableCodegen(irClass.descriptor, bindingContext), IrBuilderExtension {
+) : SerializableCodegen(irClass.wrappedDescriptor, bindingContext), IrBuilderExtension {
 
     override fun generateInternalConstructor(constructorDescriptor: ClassConstructorDescriptor) =
         irClass.contributeConstructor(constructorDescriptor, overwriteValueParameters = true) { ctor ->
@@ -54,7 +50,7 @@ class SerializableIrGenerator(
             val seenVars = (0 until seenVarsOffset).map { ctor.valueParameters[it] }
 
             val thiz = irClass.thisReceiver!!
-            val superClass = irClass.descriptor.getSuperClassOrAny()
+            val superClass = irClass.wrappedDescriptor.getSuperClassOrAny()
             var startPropOffset: Int = 0
             when {
                 KotlinBuiltIns.isAny(superClass) -> generateAnySuperConstructorCall(toBuilder = this@contributeConstructor)
@@ -95,7 +91,7 @@ class SerializableIrGenerator(
             val serialDescs = serializableProperties.map { it.descriptor }.toSet()
             irClass.declarations.asSequence()
                 .filterIsInstance<IrProperty>()
-                .filter { it.descriptor !in serialDescs }
+                .filter { it.wrappedDescriptor !in serialDescs }
                 .filter { it.backingField != null }
                 .mapNotNull { prop -> transformFieldInitializer(prop.backingField!!)?.let { prop to it } }
                 .forEach { (prop, expr) -> +irSetField(irGet(thiz), prop.backingField!!, expr) }
@@ -123,7 +119,7 @@ class SerializableIrGenerator(
     }
 
     private fun IrDelegatingConstructorCallImpl.insertTypeArgumentsForSuperClass(superClass: ClassDescriptor) {
-        val superTypeCallArguments = (irClass.superTypes.find { it.classOrNull?.descriptor == superClass } as? IrSimpleType)?.arguments
+        val superTypeCallArguments = (irClass.superTypes.find { it.classOrNull?.wrappedDescriptor == superClass } as? IrSimpleType)?.arguments
         superTypeCallArguments?.forEachIndexed { index, irTypeArgument ->
             val argType =
                 irTypeArgument as? IrTypeProjection ?: throw IllegalStateException("Star projection in immediate argument for supertype")
@@ -166,7 +162,7 @@ class SerializableIrGenerator(
             context: SerializationPluginContext,
             bindingContext: BindingContext
         ) {
-            val serializableClass = irClass.descriptor
+            val serializableClass = irClass.wrappedDescriptor
 
             if (serializableClass.isInternalSerializable) {
                 SerializableIrGenerator(irClass, context, bindingContext).generate()

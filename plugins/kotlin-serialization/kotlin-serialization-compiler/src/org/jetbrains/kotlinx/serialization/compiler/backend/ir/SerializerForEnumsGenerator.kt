@@ -84,7 +84,7 @@ class SerializerForEnumsGenerator(
             null, ctor,
             irString(serialName),
             irInt(serializableDescriptor.enumEntries().size),
-            typeHint = ctor.descriptor.returnType.toIrType()
+            typeHint = ctor.wrappedDescriptor.returnType.toIrType()
         )
     }
 

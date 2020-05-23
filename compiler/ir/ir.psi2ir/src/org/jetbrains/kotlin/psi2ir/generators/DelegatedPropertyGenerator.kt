@@ -179,7 +179,7 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
             BackingFieldLValue(
                 context,
                 ktDelegate.startOffsetSkippingComments, ktDelegate.endOffset,
-                irDelegateField.descriptor.type.toIrType(),
+                irDelegateField.wrappedDescriptor.type.toIrType(),
                 irDelegateField,
                 thisValue,
                 null
@@ -348,7 +348,7 @@ class DelegatedPropertyGenerator(declarationGenerator: DeclarationGenerator) : D
             context,
             ktDelegate.startOffsetSkippingComments, ktDelegate.endOffset,
             irDelegate,
-            irDelegate.descriptor.type.toIrType()
+            irDelegate.wrappedDescriptor.type.toIrType()
         )
 
     private inline fun createLocalPropertyAccessor(

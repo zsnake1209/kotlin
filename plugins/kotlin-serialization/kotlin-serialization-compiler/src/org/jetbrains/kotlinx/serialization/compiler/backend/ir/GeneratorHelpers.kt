@@ -141,7 +141,7 @@ interface IrBuilderExtension {
         vararg args: IrExpression,
         typeHint: IrType? = null
     ): IrMemberAccessExpression {
-        val returnType = typeHint ?: callee.run { if (isBound) owner.returnType else descriptor.returnType!!.toIrType() }
+        val returnType = typeHint ?: callee.run { if (isBound) owner.returnType else wrappedDescriptor.returnType!!.toIrType() }
         val call = irCall(callee, type = returnType)
         call.dispatchReceiver = dispatchReceiver
         args.forEachIndexed(call::putValueArgument)
@@ -203,7 +203,7 @@ interface IrBuilderExtension {
 
     fun <T : IrDeclaration> T.buildWithScope(builder: (T) -> Unit): T =
         also { irDeclaration ->
-            compilerContext.symbolTable.withScope(irDeclaration.descriptor) {
+            compilerContext.symbolTable.withScope(irDeclaration.wrappedDescriptor) {
                 builder(irDeclaration)
             }
         }
@@ -314,7 +314,7 @@ interface IrBuilderExtension {
 
         return declaration.buildWithScope { irAccessor ->
             irAccessor.createParameterDeclarations(receiver = null)
-            irAccessor.returnType = irAccessor.descriptor.returnType!!.toIrType()
+            irAccessor.returnType = irAccessor.wrappedDescriptor.returnType!!.toIrType()
             irAccessor.body = when (descriptor) {
                 is PropertyGetterDescriptor -> generateDefaultGetterBody(descriptor, irAccessor)
                 is PropertySetterDescriptor -> generateDefaultSetterBody(descriptor, irAccessor)
@@ -405,20 +405,20 @@ interface IrBuilderExtension {
             it.parent = this@createParameterDeclarations
         }
 
-        dispatchReceiverParameter = descriptor.dispatchReceiverParameter?.irValueParameter()
-        extensionReceiverParameter = descriptor.extensionReceiverParameter?.irValueParameter()
+        dispatchReceiverParameter = wrappedDescriptor.dispatchReceiverParameter?.irValueParameter()
+        extensionReceiverParameter = wrappedDescriptor.extensionReceiverParameter?.irValueParameter()
 
         if (!overwriteValueParameters)
             assert(valueParameters.isEmpty())
 
-        valueParameters = descriptor.valueParameters.map { it.irValueParameter() }
+        valueParameters = wrappedDescriptor.valueParameters.map { it.irValueParameter() }
 
         assert(typeParameters.isEmpty())
         if (copyTypeParameters) copyTypeParamsFromDescriptor()
     }
 
     fun IrFunction.copyTypeParamsFromDescriptor() {
-        typeParameters += descriptor.typeParameters.map {
+        typeParameters += wrappedDescriptor.typeParameters.map {
             IrTypeParameterImpl(
                 startOffset, endOffset,
                 SERIALIZABLE_PLUGIN_ORIGIN,
@@ -455,13 +455,13 @@ interface IrBuilderExtension {
             ?: throw IllegalStateException("Serializable class must have single primary constructor")
         // default arguments of original constructor
         val defaultsMap: Map<ParameterDescriptor, IrExpression?> =
-            original.valueParameters.associate { it.descriptor to it.defaultValue?.expression }
+            original.valueParameters.associate { it.wrappedDescriptor to it.defaultValue?.expression }
         return fun(f: IrField): IrExpression? {
             val i = f.initializer?.expression ?: return null
             val irExpression =
                 if (i is IrGetValueImpl && i.origin == IrStatementOrigin.INITIALIZE_PROPERTY_FROM_PARAMETER) {
                     // this is a primary constructor property, use corresponding default of value parameter
-                    defaultsMap.getValue(i.symbol.descriptor as ParameterDescriptor)
+                    defaultsMap.getValue(i.symbol.wrappedDescriptor as ParameterDescriptor)
                 } else {
                     i
                 }
@@ -518,14 +518,14 @@ interface IrBuilderExtension {
     ): IrExpression {
         return if (type.isMarkedNullable) {
             val nullableConstructor =
-                compilerContext.symbolTable.referenceConstructor(nullableSerializerClass.descriptor.constructors.toList().first())
+                compilerContext.symbolTable.referenceConstructor(nullableSerializerClass.wrappedDescriptor.constructors.toList().first())
             val resultType = type.makeNotNullable()
             irInvoke(
                 null, nullableConstructor,
                 typeArguments = listOf(resultType.toIrType()),
                 valueArguments = listOf(expression),
                 // Return type should be correctly substituted
-                returnTypeHint = nullableConstructor.descriptor.returnType.replace(listOf(resultType.asTypeProjection())).toIrType()
+                returnTypeHint = nullableConstructor.wrappedDescriptor.returnType.replace(listOf(resultType.asTypeProjection())).toIrType()
             )
         } else {
             expression
@@ -688,7 +688,7 @@ interface IrBuilderExtension {
                 val ctorDecl = ctor.owner
                 val typeParameters = ctorDecl.parentAsClass.typeParameters
                 ctor.owner.returnType.substitute(typeParameters, typeArgs)
-            } else ctor.descriptor.returnType.replace(typeArgs.map { it.toKotlinType().asTypeProjection() }).toIrType()
+            } else ctor.wrappedDescriptor.returnType.replace(typeArgs.map { it.toKotlinType().asTypeProjection() }).toIrType()
             return irInvoke(null, ctor, typeArguments = typeArgs, valueArguments = args, returnTypeHint = substitutedReturnType)
         }
     }

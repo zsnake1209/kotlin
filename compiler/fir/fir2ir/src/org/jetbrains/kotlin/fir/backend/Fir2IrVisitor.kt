@@ -87,7 +87,7 @@ class Fir2IrVisitor(
                 it.accept(this@Fir2IrVisitor, data) as? IrConstructorCall
             }
 
-            (this as IrFileImpl).metadata = FirMetadataSource.File(file, components.session, declarations.map { it.descriptor })
+            (this as IrFileImpl).metadata = FirMetadataSource.File(file, components.session, declarations.map { it.wrappedDescriptor })
         }
     }
 
@@ -101,7 +101,7 @@ class Fir2IrVisitor(
     override fun visitEnumEntry(enumEntry: FirEnumEntry, data: Any?): IrElement {
         val irEnumEntry = classifierStorage.getCachedIrEnumEntry(enumEntry)!!
         val correspondingClass = irEnumEntry.correspondingClass ?: return irEnumEntry
-        declarationStorage.enterScope(irEnumEntry.descriptor)
+        declarationStorage.enterScope(irEnumEntry.wrappedDescriptor)
         classifierStorage.putEnumEntryClassInScope(enumEntry, correspondingClass)
         converter.processAnonymousObjectMembers(enumEntry.initializer as FirAnonymousObject, correspondingClass)
         conversionScope.withParent(correspondingClass) {
@@ -113,7 +113,7 @@ class Fir2IrVisitor(
                 )
             )
         }
-        declarationStorage.leaveScope(irEnumEntry.descriptor)
+        declarationStorage.leaveScope(irEnumEntry.wrappedDescriptor)
         return irEnumEntry
     }
 
@@ -175,9 +175,9 @@ class Fir2IrVisitor(
 
     override fun visitAnonymousInitializer(anonymousInitializer: FirAnonymousInitializer, data: Any?): IrElement {
         val irAnonymousInitializer = declarationStorage.getCachedIrAnonymousInitializer(anonymousInitializer)!!
-        declarationStorage.enterScope(irAnonymousInitializer.descriptor)
+        declarationStorage.enterScope(irAnonymousInitializer.wrappedDescriptor)
         irAnonymousInitializer.body = convertToIrBlockBody(anonymousInitializer.body!!)
-        declarationStorage.leaveScope(irAnonymousInitializer.descriptor)
+        declarationStorage.leaveScope(irAnonymousInitializer.wrappedDescriptor)
         return irAnonymousInitializer
     }
 
@@ -235,7 +235,7 @@ class Fir2IrVisitor(
         val irTarget = conversionScope.returnTarget(returnExpression)
         return returnExpression.convertWithOffsets { startOffset, endOffset ->
             val result = returnExpression.result
-            val descriptor = irTarget.descriptor
+            val descriptor = irTarget.wrappedDescriptor
             IrReturnImpl(
                 startOffset, endOffset, irBuiltIns.nothingType,
                 when (descriptor) {

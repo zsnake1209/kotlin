@@ -97,7 +97,7 @@ class JvmDeclarationFactory(
     }
 
     private fun createInnerClassConstructorWithOuterThisParameter(oldConstructor: IrConstructor): IrConstructor {
-        val newDescriptor = WrappedClassConstructorDescriptor(oldConstructor.descriptor.annotations)
+        val newDescriptor = WrappedClassConstructorDescriptor(oldConstructor.wrappedDescriptor.annotations)
         return IrConstructorImpl(
             oldConstructor.startOffset,
             oldConstructor.endOffset,
@@ -139,7 +139,7 @@ class JvmDeclarationFactory(
 
     override fun getFieldForObjectInstance(singleton: IrClass): IrField =
         singletonFieldDeclarations.getOrPut(singleton) {
-            val isNotMappedCompanion = singleton.isCompanion && !isMappedIntrinsicCompanionObject(singleton.descriptor)
+            val isNotMappedCompanion = singleton.isCompanion && !isMappedIntrinsicCompanionObject(singleton.wrappedDescriptor)
             val useProperVisibilityForCompanion =
                 languageVersionSettings.supportsFeature(LanguageFeature.ProperVisibilityForCompanionObjectInstanceField)
                         && singleton.isCompanion
@@ -273,7 +273,7 @@ class JvmDeclarationFactory(
         defaultImplsRedirections.getOrPut(fakeOverride) {
             assert(fakeOverride.isFakeOverride)
             val irClass = fakeOverride.parentAsClass
-            val descriptor = DescriptorsToIrRemapper.remapDeclaredSimpleFunction(fakeOverride.descriptor)
+            val descriptor = DescriptorsToIrRemapper.remapDeclaredSimpleFunction(fakeOverride.wrappedDescriptor)
             with(fakeOverride) {
                 IrFunctionImpl(
                     UNDEFINED_OFFSET, UNDEFINED_OFFSET, JvmLoweredDeclarationOrigin.DEFAULT_IMPLS_BRIDGE,
@@ -295,7 +295,7 @@ class JvmDeclarationFactory(
                     fakeOverride.correspondingPropertySymbol?.owner?.let { fakeOverrideProperty ->
                         // NB: property is only generated for the sake of the type mapper.
                         // If both setter and getter are present, original property will be duplicated.
-                        val newPropertyDescriptor = DescriptorsToIrRemapper.remapDeclaredProperty(fakeOverrideProperty.descriptor)
+                        val newPropertyDescriptor = DescriptorsToIrRemapper.remapDeclaredProperty(fakeOverrideProperty.wrappedDescriptor)
                         correspondingPropertySymbol = with(fakeOverrideProperty) {
                             IrPropertyImpl(
                                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,

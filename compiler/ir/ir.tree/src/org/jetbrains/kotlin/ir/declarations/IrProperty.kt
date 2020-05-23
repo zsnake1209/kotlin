@@ -25,7 +25,7 @@ interface IrProperty :
     IrDeclarationWithVisibility,
     IrSymbolOwner {
 
-    override val descriptor: PropertyDescriptor
+    override val wrappedDescriptor: PropertyDescriptor
     override val initialDescriptor: PropertyDescriptor
     override val symbol: IrPropertySymbol
 

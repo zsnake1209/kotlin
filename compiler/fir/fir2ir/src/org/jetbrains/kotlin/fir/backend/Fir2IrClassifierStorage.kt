@@ -65,7 +65,7 @@ class Fir2IrClassifierStorage(
     }
 
     private fun IrClass.setThisReceiver(typeParameters: List<FirTypeParameterRef>) {
-        symbolTable.enterScope(descriptor)
+        symbolTable.enterScope(wrappedDescriptor)
         val typeArguments = typeParameters.map {
             IrSimpleTypeImpl(getCachedIrTypeParameter(it.symbol.fir)!!.symbol, false, emptyList(), emptyList())
         }
@@ -74,7 +74,7 @@ class Fir2IrClassifierStorage(
             thisType = IrSimpleTypeImpl(symbol, false, typeArguments, emptyList()),
             thisOrigin = IrDeclarationOrigin.INSTANCE_RECEIVER
         )
-        symbolTable.leaveScope(descriptor)
+        symbolTable.leaveScope(wrappedDescriptor)
     }
 
     internal fun preCacheTypeParameters(owner: FirTypeParameterRefsOwner) {
@@ -354,11 +354,11 @@ class Fir2IrClassifierStorage(
 
     fun getIrClassSymbol(firClassSymbol: FirClassSymbol<*>): IrClassSymbol {
         val firClass = firClassSymbol.fir
-        getCachedIrClass(firClass)?.let { return symbolTable.referenceClass(it.descriptor) }
+        getCachedIrClass(firClass)?.let { return symbolTable.referenceClass(it.wrappedDescriptor) }
         // TODO: remove all this code and change to unbound symbol creation
         val irClass = createIrClass(firClass)
         if (firClass is FirAnonymousObject || firClass is FirRegularClass && firClass.visibility == Visibilities.LOCAL) {
-            return symbolTable.referenceClass(irClass.descriptor)
+            return symbolTable.referenceClass(irClass.wrappedDescriptor)
         }
         val classId = firClassSymbol.classId
         val parentId = classId.outerClassId
@@ -370,7 +370,7 @@ class Fir2IrClassifierStorage(
             declarationStorage.addDeclarationsToExternalClass(firClass as FirRegularClass, irClass)
         }
 
-        return symbolTable.referenceClass(irClass.descriptor)
+        return symbolTable.referenceClass(irClass.wrappedDescriptor)
     }
 
     fun getIrTypeParameterSymbol(
@@ -379,6 +379,6 @@ class Fir2IrClassifierStorage(
     ): IrTypeParameterSymbol {
         val irTypeParameter = getCachedIrTypeParameter(firTypeParameterSymbol.fir, typeContext = typeContext)
             ?: throw AssertionError("Cannot find cached type parameter by FIR symbol: ${firTypeParameterSymbol.name}")
-        return symbolTable.referenceTypeParameter(irTypeParameter.descriptor)
+        return symbolTable.referenceTypeParameter(irTypeParameter.wrappedDescriptor)
     }
 }

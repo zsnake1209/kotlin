@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.types.model.TypeParameterMarker
 
 interface IrSymbol {
     val owner: IrSymbolOwner
-    val descriptor: DeclarationDescriptor
+    val wrappedDescriptor: DeclarationDescriptor
     val initialDescriptor: DeclarationDescriptor
     val isBound: Boolean
 
@@ -40,14 +40,14 @@ interface IrSymbol {
 
 interface IrBindableSymbol<out D : DeclarationDescriptor, B : IrSymbolOwner> : IrSymbol {
     override val owner: B
-    override val descriptor: D
+    override val wrappedDescriptor: D
     override val initialDescriptor: D
 
     fun bind(owner: B)
 }
 
 interface IrPackageFragmentSymbol : IrSymbol {
-    override val descriptor: PackageFragmentDescriptor
+    override val wrappedDescriptor: PackageFragmentDescriptor
 
     override fun <D, R> accept(visitor: IrSymbolVisitor<R, D>, data: D): R =
         visitor.visitPackageFragmentSymbol(this, data)
@@ -91,7 +91,7 @@ interface IrFieldSymbol :
 interface IrClassifierSymbol :
     IrSymbol, TypeConstructorMarker {
 
-    override val descriptor: ClassifierDescriptor
+    override val wrappedDescriptor: ClassifierDescriptor
     override val initialDescriptor: ClassifierDescriptor
 
     override fun <D, R> accept(visitor: IrSymbolVisitor<R, D>, data: D): R =
@@ -122,7 +122,7 @@ interface IrTypeParameterSymbol :
 interface IrValueSymbol :
     IrSymbol {
 
-    override val descriptor: ValueDescriptor
+    override val wrappedDescriptor: ValueDescriptor
     override val owner: IrValueDeclaration
 
     override fun <D, R> accept(visitor: IrSymbolVisitor<R, D>, data: D): R =
@@ -146,7 +146,7 @@ interface IrVariableSymbol :
 interface IrReturnTargetSymbol :
     IrSymbol {
 
-    override val descriptor: FunctionDescriptor
+    override val wrappedDescriptor: FunctionDescriptor
     override val initialDescriptor: FunctionDescriptor
     override val owner: IrReturnTarget
 

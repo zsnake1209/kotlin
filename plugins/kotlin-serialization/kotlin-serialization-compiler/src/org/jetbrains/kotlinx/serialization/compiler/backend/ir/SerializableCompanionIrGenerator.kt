@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
-import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.ClassId
@@ -24,7 +23,6 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.components.isVararg
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
-import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.SerializableCompanionCodegen
 import org.jetbrains.kotlinx.serialization.compiler.backend.common.findTypeSerializer
 import org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationPluginContext
@@ -34,7 +32,7 @@ class SerializableCompanionIrGenerator(
     val irClass: IrClass,
     override val compilerContext: SerializationPluginContext,
     bindingContext: BindingContext
-) : SerializableCompanionCodegen(irClass.descriptor, bindingContext), IrBuilderExtension {
+) : SerializableCompanionCodegen(irClass.wrappedDescriptor, bindingContext), IrBuilderExtension {
 
     companion object {
         fun generate(
@@ -42,7 +40,7 @@ class SerializableCompanionIrGenerator(
             context: SerializationPluginContext,
             bindingContext: BindingContext
         ) {
-            val companionDescriptor = irClass.descriptor
+            val companionDescriptor = irClass.wrappedDescriptor
             val serializableClass = getSerializableClassDescriptorByCompanion(companionDescriptor) ?: return
             if (serializableClass.shouldHaveGeneratedMethodsInCompanion) {
                 SerializableCompanionIrGenerator(irClass, context, bindingContext).generate()
@@ -65,7 +63,7 @@ class SerializableCompanionIrGenerator(
 
         val irSerializableClass = compilerContext.symbolTable.referenceClass(serializableDescriptor).takeIf { it.isBound }?.owner ?: return
         val serializableWithAlreadyPresent = irSerializableClass.annotations.any {
-            it.symbol.descriptor.constructedClass.fqNameSafe == annotationMarkerClass.fqNameSafe
+            it.symbol.wrappedDescriptor.constructedClass.fqNameSafe == annotationMarkerClass.fqNameSafe
         }
         if (serializableWithAlreadyPresent) return
 

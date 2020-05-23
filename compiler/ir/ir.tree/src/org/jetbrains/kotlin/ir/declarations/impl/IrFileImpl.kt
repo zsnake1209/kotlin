@@ -38,7 +38,7 @@ class IrFileImpl(
     constructor(
         fileEntry: SourceManager.FileEntry,
         symbol: IrFileSymbol
-    ) : this(fileEntry, symbol, symbol.descriptor.fqName)
+    ) : this(fileEntry, symbol, symbol.wrappedDescriptor.fqName)
 
     constructor(
         fileEntry: SourceManager.FileEntry,
@@ -49,7 +49,7 @@ class IrFileImpl(
         symbol.bind(this)
     }
 
-    override val packageFragmentDescriptor: PackageFragmentDescriptor get() = symbol.descriptor
+    override val packageFragmentDescriptor: PackageFragmentDescriptor get() = symbol.wrappedDescriptor
 
     override val declarations: MutableList<IrDeclaration> = ArrayList()
 
