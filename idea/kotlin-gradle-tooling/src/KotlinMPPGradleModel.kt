@@ -138,6 +138,7 @@ interface KotlinPlatformContainer : Serializable {
 // an artifact that Kotlin modules may depend on
 interface KotlinArtifact : Serializable {
     val file: File
+    val compilationName: String? // non-null if this artifact is associated with a concrete compilation in target
 }
 
 interface KotlinTarget : Serializable {
@@ -148,7 +149,7 @@ interface KotlinTarget : Serializable {
     val compilations: Collection<KotlinCompilation>
     val testRunTasks: Collection<KotlinTestRunTask>
     val nativeMainRunTasks: Collection<KotlinNativeMainRunTask>
-    val artifact: KotlinArtifact?
+    val artifacts: List<KotlinArtifact>
     val nativeBinaries: List<KonanArtifactModel>
 
     companion object {

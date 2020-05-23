@@ -27,11 +27,12 @@ class KotlinTargetDataService : AbstractProjectDataService<KotlinTargetData, Voi
     ) {
         for (nodeToImport in toImport) {
             val targetData = nodeToImport.data
-            val artifactFile = targetData.artifactFile ?: continue
-            if (!artifactFile.extension.equals("jar", ignoreCase = true)) {
+            val artifactFiles = targetData.artifacts.mapNotNull { artifact ->
                 // only JAR artifacts are supported
-                continue
+                artifact.file.takeIf { it.extension.equals("jar", ignoreCase = true) }
             }
+
+            if (artifactFiles.isEmpty()) continue
 
             //TODO(auskov) should be replaced with direct invocation of the method after migration to new API in IDEA 192
             val artifactModel = try {
@@ -48,17 +49,19 @@ class KotlinTargetDataService : AbstractProjectDataService<KotlinTargetData, Voi
                     .invoke(packagingModifiableModel) as ModifiableArtifactModel
             }
 
-            val artifactName = FileUtil.getNameWithoutExtension(artifactFile)
-            artifactModel.findArtifact(artifactName)?.let { artifactModel.removeArtifact(it) }
-            artifactModel.addArtifact(artifactName, JarArtifactType.getInstance()).also {
-                it.outputPath = artifactFile.parent
-                for (moduleId in targetData.moduleIds) {
-                    val compilationModuleDataNode = nodeToImport.parent?.findChildModuleById(moduleId) ?: continue
-                    val compilationData = compilationModuleDataNode.data
-                    val kotlinSourceSet = compilationModuleDataNode.kotlinSourceSet ?: continue
-                    if (kotlinSourceSet.isTestModule) continue
-                    val moduleToPackage = modelsProvider.findIdeModule(compilationData) ?: continue
-                    it.rootElement.addOrFindChild(ProductionModuleOutputPackagingElement(project, moduleToPackage.createPointer()))
+            for (artifactFile in artifactFiles) {
+                val artifactName = FileUtil.getNameWithoutExtension(artifactFile)
+                artifactModel.findArtifact(artifactName)?.let { artifactModel.removeArtifact(it) }
+                artifactModel.addArtifact(artifactName, JarArtifactType.getInstance()).also {
+                    it.outputPath = artifactFile.parent
+                    for (moduleId in targetData.moduleIds) {
+                        val compilationModuleDataNode = nodeToImport.parent?.findChildModuleById(moduleId) ?: continue
+                        val compilationData = compilationModuleDataNode.data
+                        val kotlinSourceSet = compilationModuleDataNode.kotlinSourceSet ?: continue
+                        if (kotlinSourceSet.isTestModule) continue
+                        val moduleToPackage = modelsProvider.findIdeModule(compilationData) ?: continue
+                        it.rootElement.addOrFindChild(ProductionModuleOutputPackagingElement(project, moduleToPackage.createPointer()))
+                    }
                 }
             }
         }

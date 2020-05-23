@@ -153,7 +153,8 @@ data class KotlinCompilationImpl(
 }
 
 data class KotlinArtifactImpl(
-    override val file: File
+    override val file: File,
+    override val compilationName: String?
 ) : KotlinArtifact
 
 data class KotlinTargetImpl(
@@ -164,7 +165,7 @@ data class KotlinTargetImpl(
     override val compilations: Collection<KotlinCompilation>,
     override val testRunTasks: Collection<KotlinTestRunTask>,
     override val nativeMainRunTasks: Collection<KotlinNativeMainRunTask>,
-    override val artifact: KotlinArtifact?,
+    override val artifacts: List<KotlinArtifact>,
     override val nativeBinaries: List<KonanArtifactModel>
 ) : KotlinTarget {
     override fun toString() = name
@@ -199,7 +200,7 @@ data class KotlinTargetImpl(
                     cloningCache[initialTestTask] = it
                 }
         },
-        target.artifact?.let { KotlinArtifactImpl(it.file) },
+        target.artifacts.map { KotlinArtifactImpl(it.file, it.compilationName) },
         target.nativeBinaries.map { KonanArtifactModelImpl(it) }
     )
 }

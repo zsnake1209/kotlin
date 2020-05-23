@@ -58,7 +58,7 @@ class KotlinAndroidSourceSetData(
 
 class KotlinTargetData(name: String) : AbstractNamedData(GradleConstants.SYSTEM_ID, name) {
     var moduleIds: Set<String> = emptySet()
-    var artifactFile: File? = null
+    var artifacts: Collection<KotlinArtifact> = emptyList()
     var konanArtifacts: Collection<KonanArtifactModel>? = null
 
     companion object {

@@ -94,6 +94,10 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         return (project.findProperty("kotlin.mpp.enableGranularSourceSetsMetadata") as? String)?.toBoolean() ?: false
     }
 
+    private fun isCompatibilityMetadataVariantEnabled(project: Project): Boolean {
+        return (project.findProperty("kotlin.mpp.enableCompatibilityMetadataVariant") as? String)?.toBoolean() ?: false
+    }
+
     private fun isNativeDependencyPropagationEnabled(project: Project): Boolean {
         return (project.findProperty("kotlin.native.enableDependencyPropagation") as? String)?.toBoolean() ?: true
     }
@@ -291,7 +295,18 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         dependencyMapper: KotlinDependencyMapper
     ): Collection<KotlinTarget>? {
         val isHMPPEnabled = isHMPPEnabled(project)
-        return projectTargets.mapNotNull { buildTarget(it, sourceSetMap, dependencyResolver, project, dependencyMapper, isHMPPEnabled) }
+        val isCompatibilityMetadataVariantEnabled = !isHMPPEnabled || isCompatibilityMetadataVariantEnabled(project)
+        return projectTargets.mapNotNull { gradleTarget ->
+            buildTarget(
+                gradleTarget = gradleTarget,
+                sourceSetMap = sourceSetMap,
+                dependencyResolver = dependencyResolver,
+                project = project,
+                dependencyMapper = dependencyMapper,
+                isHMPPEnabled = isHMPPEnabled,
+                isCompatibilityMetadataVariantEnabled = isCompatibilityMetadataVariantEnabled
+            )
+        }
     }
 
     private operator fun Any?.get(methodName: String, vararg params: Any): Any? {
@@ -344,7 +359,8 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         dependencyResolver: DependencyResolver,
         project: Project,
         dependencyMapper: KotlinDependencyMapper,
-        isHMPPEnabled: Boolean
+        isHMPPEnabled: Boolean,
+        isCompatibilityMetadataVariantEnabled: Boolean
     ): KotlinTarget? {
         val targetClass = gradleTarget.javaClass
         val getPlatformType = targetClass.getMethodOrNull("getPlatformType") ?: return null
@@ -377,9 +393,15 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
             }
         }
 
-        val artifact =
-            if (platform == KotlinPlatform.NATIVE) buildKlibArtifact(compilations)
-            else buildJarArtifact(gradleTarget, project)
+        val artifacts = buildArtifacts(
+            gradleTarget = gradleTarget,
+            project = project,
+            platform = platform,
+            compilations = compilations,
+            isHMPPEnabled = isHMPPEnabled,
+            isCompatibilityMetadataVariantEnabled = isCompatibilityMetadataVariantEnabled
+        )
+
         val testRunTasks = buildTestRunTasks(project, gradleTarget)
         val nativeMainRunTasks =
             if (platform == KotlinPlatform.NATIVE) buildNativeMainRunTasks(gradleTarget)
@@ -394,7 +416,7 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
             compilations = compilations,
             testRunTasks = testRunTasks,
             nativeMainRunTasks = nativeMainRunTasks,
-            artifact = artifact,
+            artifacts = artifacts,
             nativeBinaries = nativeBinaries
         )
         compilations.forEach {
@@ -516,19 +538,76 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         }.map { KotlinTestRunTaskImpl(it, KotlinCompilation.TEST_COMPILATION_NAME) }
     }
 
+    private fun buildArtifacts(
+        gradleTarget: Named,
+        project: Project,
+        platform: KotlinPlatform,
+        compilations: List<KotlinCompilation>,
+        isHMPPEnabled: Boolean,
+        isCompatibilityMetadataVariantEnabled: Boolean
+    ): List<KotlinArtifact> = when (platform) {
+        KotlinPlatform.NATIVE -> {
+            val klib = compilations
+                .firstOrNull { it.name == KotlinCompilation.MAIN_COMPILATION_NAME }
+                ?.let { mainCompilation ->
+                    buildKlibArtifact(
+                        compilation = mainCompilation,
+                        allowUnzipped = false
+                    )
+                }
+            listOfNotNull(klib)
+        }
+        KotlinPlatform.COMMON -> {
+            compilations.mapNotNull { compilation ->
+                if (compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME) {
+                    if (isCompatibilityMetadataVariantEnabled) {
+                        // legacy metadata compilation
+                        buildJarArtifact(
+                            gradleTarget = gradleTarget,
+                            project = project,
+                            compilationName = if (isHMPPEnabled) compilation.name else null
+                        )
+                    } else null
+                } else if (isHMPPEnabled) {
+                    // KLIB-based metadata compilation
+                    buildKlibArtifact(
+                        compilation = compilation,
+                        allowUnzipped = true
+                    )
+                } else null
+            }
+        }
+        else -> listOfNotNull(
+            buildJarArtifact(
+                gradleTarget = gradleTarget,
+                project = project,
+                compilationName = null
+            )
+        )
+    }
+
     // for JS, JVM & common (legacy) platforms
-    private fun buildJarArtifact(gradleTarget: Named, project: Project): KotlinArtifact? {
+    private fun buildJarArtifact(
+        gradleTarget: Named,
+        project: Project,
+        compilationName: String?
+    ): KotlinArtifact? {
         val artifactsTaskName = gradleTarget["getArtifactsTaskName"] as? String ?: return null
         val jarTask = project.tasks.findByName(artifactsTaskName) ?: return null
         val artifactFile = jarTask["getArchivePath"] as? File? ?: return null
-        return KotlinArtifactImpl(artifactFile)
+        return KotlinArtifactImpl(artifactFile, compilationName)
     }
 
-    // for KLIB artifacts
-    private fun buildKlibArtifact(compilations: List<KotlinCompilation>): KotlinArtifact? {
-        val mainCompilation = compilations.firstOrNull { it.name == KotlinCompilation.MAIN_COMPILATION_NAME } ?: return null
-        val artifactFile = mainCompilation.output.classesDirs.firstOrNull { it.extension == "klib" } ?: return null
-        return KotlinArtifactImpl(artifactFile)
+    // for KLIB artifacts, zipped (in form of *.klib file) and unzipped (in form of a directory)
+    private fun buildKlibArtifact(
+        compilation: KotlinCompilation,
+        allowUnzipped: Boolean
+    ): KotlinArtifact? {
+        val artifactFile = compilation.output.classesDirs.firstOrNull {
+            val extension = it.extension
+            extension == "klib" || (allowUnzipped && extension.isEmpty())
+        } ?: return null
+        return KotlinArtifactImpl(artifactFile, compilation.name)
     }
 
     private fun buildCompilation(
