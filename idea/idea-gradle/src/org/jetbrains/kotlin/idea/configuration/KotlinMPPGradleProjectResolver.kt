@@ -311,7 +311,7 @@ open class KotlinMPPGradleProjectResolver : AbstractProjectResolverExtensionComp
                 if (target.name == KotlinTarget.METADATA_TARGET_NAME) continue
                 val targetData = KotlinTargetData(target.name).also {
                     it.artifactFile = target.artifact?.file
-                    it.konanArtifacts = target.konanArtifacts
+                    it.konanArtifacts = target.nativeBinaries
                 }
                 mainModuleNode.createChild(KotlinTargetData.KEY, targetData)
 

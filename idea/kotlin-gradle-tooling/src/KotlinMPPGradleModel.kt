@@ -149,7 +149,7 @@ interface KotlinTarget : Serializable {
     val testRunTasks: Collection<KotlinTestRunTask>
     val nativeMainRunTasks: Collection<KotlinNativeMainRunTask>
     val artifact: KotlinArtifact?
-    val konanArtifacts: List<KonanArtifactModel>
+    val nativeBinaries: List<KonanArtifactModel>
 
     companion object {
         const val METADATA_TARGET_NAME = "metadata"
@@ -186,6 +186,7 @@ interface KotlinMPPGradleModel : Serializable {
     }
 }
 
+// TODO: rename to KotlinNativeBinary
 interface KonanArtifactModel : Serializable {
     val targetName: String // represents org.jetbrains.kotlin.gradle.plugin.KotlinTarget.name, ex: "iosX64", "iosArm64"
     val executableName: String // a base name for the output binary file
@@ -197,6 +198,7 @@ interface KonanArtifactModel : Serializable {
     val isTests: Boolean
 }
 
+// TODO: rename to KotlinNativeBinaryRunConfiguration
 interface KonanRunConfigurationModel : Serializable {
     val workingDirectory: String
     val programParameters: List<String>

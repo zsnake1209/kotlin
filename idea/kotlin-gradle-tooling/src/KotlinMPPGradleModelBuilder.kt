@@ -303,7 +303,7 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         return this::class.java.getMethodOrNull(methodName, *paramTypes.toTypedArray())?.invoke(this, *params.toTypedArray())
     }
 
-    private fun buildArtifact(
+    private fun buildNativeBinary(
         executableName: String,
         linkTask: Task,
         runConfiguration: KonanRunConfigurationModel
@@ -316,18 +316,18 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         val isTests = linkTask["getProcessTests"] as? Boolean ?: return null
 
         return KonanArtifactModelImpl(
-            compilationTargetName,
-            executableName,
-            outputKind,
-            konanTargetName,
-            outputFile,
-            linkTask.path,
-            runConfiguration,
-            isTests
+            targetName = compilationTargetName,
+            executableName = executableName,
+            type = outputKind,
+            targetPlatform = konanTargetName,
+            file = outputFile,
+            buildTaskPath = linkTask.path,
+            runConfiguration = runConfiguration,
+            isTests = isTests
         )
     }
 
-    private fun konanArtifacts(target: Named): List<KonanArtifactModel> {
+    private fun buildNativeBinaries(target: Named): List<KonanArtifactModel> {
         val result = ArrayList<KonanArtifactModel>()
 
         val binaries = target["getBinaries"] as? Collection<*> ?: return result
@@ -335,7 +335,7 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
             val executableName = binary["getBaseName"] as? String ?: ""
             val linkTask = binary["getLinkTask"] as? Task ?: return@forEach
             val runConfiguration = KonanRunConfigurationModelImpl(binary["getRunTask"] as? Exec)
-            buildArtifact(executableName, linkTask, runConfiguration)?.let { result.add(it) }
+            buildNativeBinary(executableName, linkTask, runConfiguration)?.let { result.add(it) }
         }
 
         return result
@@ -384,7 +384,7 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
         val nativeMainRunTasks =
             if (platform == KotlinPlatform.NATIVE) buildNativeMainRunTasks(gradleTarget)
             else emptyList()
-        val artifacts = konanArtifacts(gradleTarget)
+        val nativeBinaries = buildNativeBinaries(gradleTarget)
         val target = KotlinTargetImpl(
             name = gradleTarget.name,
             presetName = targetPresetName,
@@ -394,7 +394,7 @@ class KotlinMPPGradleModelBuilder : ModelBuilderService {
             testRunTasks = testRunTasks,
             nativeMainRunTasks = nativeMainRunTasks,
             artifact = artifact,
-            konanArtifacts = artifacts
+            nativeBinaries = nativeBinaries
         )
         compilations.forEach {
             it.disambiguationClassifier = target.disambiguationClassifier
