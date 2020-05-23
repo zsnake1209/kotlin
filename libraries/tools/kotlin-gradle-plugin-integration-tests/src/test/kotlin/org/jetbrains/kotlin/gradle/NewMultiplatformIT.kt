@@ -654,10 +654,10 @@ class NewMultiplatformIT : BaseGradleIT() {
         }
 
     @Test
-    fun testLibWithTests() = doTestLibWithTests(Project("new-mpp-lib-with-tests"))
+    fun testLibWithTests() = doTestLibWithTests(Project("new-mpp-lib-with-tests", gradleVersion))
 
     @Test
-    fun testLibWithTestsKotlinDsl() = with(Project("new-mpp-lib-with-tests")) {
+    fun testLibWithTestsKotlinDsl() = with(Project("new-mpp-lib-with-tests", gradleVersion)) {
         setupWorkingDir()
         gradleBuildScript().delete()
         projectDir.resolve("build.gradle.kts.alternative").renameTo(projectDir.resolve("build.gradle.kts"))
