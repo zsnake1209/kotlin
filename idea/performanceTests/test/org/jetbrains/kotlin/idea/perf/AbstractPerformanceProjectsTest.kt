@@ -722,10 +722,6 @@ abstract class AbstractPerformanceProjectsTest : UsefulTestCase() {
                         highlightInfos = it.value ?: emptyList()
                         commitAllDocuments()
                         it.setUpValue?.let { editorFile ->
-                            val editorFactory = EditorFactory.getInstance()
-                            editorFactory.getEditors(editorFile.document).forEach { editor ->
-                                editorFactory.releaseEditor(editor)
-                            }
                             val fileEditorManager = FileEditorManager.getInstance(project)
                             fileEditorManager.closeFile(editorFile.psiFile.virtualFile)
                         }
