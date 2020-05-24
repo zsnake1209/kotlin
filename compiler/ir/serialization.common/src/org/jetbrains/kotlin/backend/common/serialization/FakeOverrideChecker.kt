@@ -51,14 +51,14 @@ class FakeOverrideChecker(val irMangler: KotlinMangler.IrMangler, val descriptor
             checkOverriddenSymbols(it)
         }
 
-        val irSignarures = irFakeOverrides
+        val irSignatures = irFakeOverrides
             .map { with(irMangler) { it.signatureString }}
             .sorted()
 
-        assert(descriptorSignatures == irSignarures) {
+        assert(descriptorSignatures == irSignatures) {
             "[IR VALIDATION] Fake override mismatch for ${clazz.fqNameWhenAvailable!!}\n" +
             "\tDescriptor based: $descriptorSignatures\n" +
-            "\tIR based        : $irSignarures"
+            "\tIR based        : $irSignatures"
         }
     }
 
