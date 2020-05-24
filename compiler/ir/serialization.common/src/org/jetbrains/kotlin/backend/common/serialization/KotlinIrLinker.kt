@@ -573,6 +573,14 @@ abstract class KotlinIrLinker(
         val unbound = symbolTable.noUnboundLeft("unbound after fake overrides:")
     }
 
+    fun validate() {
+        deserializersForModules.values.forEach {
+            it.postProcess {
+                fakeOverrideChecker.check(it)
+            }
+        }
+    }
+
     // The issue here is that an expect can not trigger its actual deserialization by reachability
     // because the expect can not see the actual higher in the module dependency dag.
     // So we force deserialization of actuals for all deserialized expect symbols here.

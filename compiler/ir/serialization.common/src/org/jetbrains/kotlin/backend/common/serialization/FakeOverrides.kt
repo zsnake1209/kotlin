@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.ir.descriptors.*
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
@@ -62,7 +63,7 @@ class FakeOverrideBuilder(
     private val irOverridingUtil = IrOverridingUtil(irBuiltIns, this)
 
     override fun fakeOverrideMember(superType: IrType, member: IrOverridableMember, clazz: IrClass, newModality: Modality?, newVisibility: Visibility?): IrOverridableMember {
-        if (superType !is IrSimpleType) error("superType is $superType, expected IrSimpleType")
+        require(superType is IrSimpleType) { "superType is $superType, expected IrSimpleType" }
         val classifier = superType.classifier
         if (classifier !is IrClassSymbol) error("superType classifier is not IrClassSymbol: ${classifier}")
 
@@ -91,7 +92,7 @@ class FakeOverrideBuilder(
         val superTypes = clazz.superTypes
 
         val superClasses = superTypes.map {
-            it.classifierOrNull?.owner as IrClass?
+            it.classOrNull?.owner
         }.filterNotNull()
 
         superClasses.forEach {
@@ -108,7 +109,6 @@ class FakeOverrideBuilder(
         when (fake) {
             is IrSimpleFunction -> {
                 redelegateFunction(fake)
-                checkOverriddenSymbols(fake)
             }
             is IrProperty -> redelegateProperty(fake)
         }
@@ -151,15 +151,13 @@ class FakeOverrideBuilder(
             if (!it.isBound()) it.bind(declaration)
         }
 
-        declaration.getter?.let { redelegateFunction(it) }
-        declaration.setter?.let { redelegateFunction(it) }
-    }
-
-    fun checkOverriddenSymbols(fake: IrSimpleFunction) {
-        fake.overriddenSymbols.forEach { symbol ->
-            if(!(symbol.owner.parent as IrClass).declarations.contains(symbol.owner)) {
-                debug("CHECK overridden symbols: ${fake.render()} refers to ${symbol.owner.render()} which is not a member of ${symbol.owner.parent.render()}")
-            }
+        declaration.getter?.let {
+            redelegateFunction(it)
+            it.correspondingPropertySymbol = declaration.symbol
+        }
+        declaration.setter?.let {
+            redelegateFunction(it)
+            it.correspondingPropertySymbol = declaration.symbol
         }
     }
 
@@ -175,7 +173,6 @@ class FakeOverrideBuilder(
             }
             override fun visitFunction(declaration: IrFunction) {
                 // Don't go for function local classes
-                return
             }
         })
 

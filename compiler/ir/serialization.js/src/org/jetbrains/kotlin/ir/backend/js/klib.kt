@@ -161,6 +161,7 @@ fun generateKLib(
     val moduleFragment = psi2IrContext.generateModuleFragmentWithPlugins(project, files, irLinker, expectDescriptorToSymbol)
 
     irLinker.postProcess()
+    irLinker.validate()
 
     moduleFragment.acceptVoid(ManglerChecker(JsManglerIr, Ir2DescriptorManglerAdapter(JsManglerDesc)))
 
@@ -267,6 +268,7 @@ fun loadIr(
             irLinker.init(null)
             ExternalDependenciesGenerator(symbolTable, listOf(irLinker), configuration.languageVersionSettings).generateUnboundSymbolsAsDependencies()
             irLinker.postProcess()
+            irLinker.validate()
 
             return IrModuleInfo(moduleFragment, deserializedModuleFragments, irBuiltIns, symbolTable, irLinker)
         }
